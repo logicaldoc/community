@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.common.client.widgets.preview;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -28,7 +31,7 @@ public class PreviewPopup extends Window {
 	/**
 	 * Gallery of documents to navigate
 	 */
-	private GUIDocument[] docs;
+	private List<GUIDocument> docs = new ArrayList<>();
 
 	private PreviewPopup() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
@@ -69,7 +72,7 @@ public class PreviewPopup extends Window {
 	 * @param docs the documents of the gallery
 	 * @param index the index of the file to preview
 	 */
-	public PreviewPopup(GUIDocument[] docs, int index) {
+	public PreviewPopup(List<GUIDocument> docs, int index) {
 		this();
 		this.currentIndex = index;
 		this.docs = docs;
@@ -83,10 +86,10 @@ public class PreviewPopup extends Window {
 		prev.setIcon("[SKIN]/headerIcons/arrow_left.png");
 		prev.addClickHandler(event -> {
 			if (currentIndex <= 0)
-				currentIndex = PreviewPopup.this.docs.length - 1;
+				currentIndex = PreviewPopup.this.docs.size() - 1;
 			else
 				currentIndex--;
-			reloadPreview(PreviewPopup.this.docs[currentIndex]);
+			reloadPreview(PreviewPopup.this.docs.get(currentIndex));
 		});
 
 		IButton next = new IButton("");
@@ -97,16 +100,16 @@ public class PreviewPopup extends Window {
 		next.setShowDown(true);
 		next.setIcon("[SKIN]/headerIcons/arrow_right.png");
 		next.addClickHandler(event -> {
-				if (currentIndex >= PreviewPopup.this.docs.length)
-					currentIndex = 0;
-				else
-					currentIndex++;
-				reloadPreview(PreviewPopup.this.docs[currentIndex]);
+			if (currentIndex >= PreviewPopup.this.docs.size())
+				currentIndex = 0;
+			else
+				currentIndex++;
+			reloadPreview(PreviewPopup.this.docs.get(currentIndex));
 		});
 
 		layout.setMembers(prev, previewSlot, next);
 
-		reloadPreview(docs[currentIndex]);
+		reloadPreview(docs.get(currentIndex));
 	}
 
 	/**

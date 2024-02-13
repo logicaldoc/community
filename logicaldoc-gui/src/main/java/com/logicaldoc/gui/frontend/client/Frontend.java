@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client;
 
+import java.util.Arrays;
+
 import org.realityforge.gwt.websockets.client.WebSocket;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -111,7 +113,7 @@ public class Frontend implements EntryPoint {
 								if (session == null || !session.isLoggedIn()) {
 									SC.warn(I18N.message("accessdenied"));
 								} else {
-									session.getInfo().setUserNo(info.getUserNo());
+									session.setInfo(info);
 									init(session.getInfo());
 									Session.get().init(session);
 
@@ -159,7 +161,7 @@ public class Frontend implements EntryPoint {
 
 		Session.get().setInfo(info);
 
-		ReadingRequestController.get().addUnconfirmedReadings(info.getUnconfirmedReagings());
+		ReadingRequestController.get().addUnconfirmedReadings(Arrays.asList(info.getUnconfirmedReagings()));
 
 		Util.setupDensity(info);
 	}

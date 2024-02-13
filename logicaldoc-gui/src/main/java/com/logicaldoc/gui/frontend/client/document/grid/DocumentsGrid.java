@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document.grid;
 
+import java.util.List;
+
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
@@ -31,16 +33,16 @@ public interface DocumentsGrid {
 	/**
 	 * Forces the records in the grid
 	 * 
-	 * @param documents array of documents to render
+	 * @param documents collectiomn of documents to render
 	 */
-	public void setDocuments(GUIDocument[] documents);
+	public void setDocuments(List<GUIDocument> documents);
 
 	/**
 	 * Retrieves all the documents dispalyed in the grid
 	 * 
-	 * @return the array of documents
+	 * @return the list of documents
 	 */
-	public GUIDocument[] getDocuments();
+	public List<GUIDocument> getDocuments();
 
 	/**
 	 * Gets a bean representation of the currently selected item (not all
@@ -63,21 +65,21 @@ public interface DocumentsGrid {
 	 * 
 	 * @return the documents selected in the grid
 	 */
-	public GUIDocument[] getSelectedDocuments();
+	public List<GUIDocument> getSelectedDocuments();
 
 	/**
 	 * Retrieves the list of all selected document IDs
 	 * 
 	 * @return identifiers of the selected documents
 	 */
-	public Long[] getSelectedIds();
-	
+	public List<Long> getSelectedIds();
+
 	/**
 	 * Retrieves the list of all the ids
 	 * 
 	 * @return list of identifiers
 	 */
-	public Long[] getIds();
+	public List<Long> getIds();
 
 	/**
 	 * Clear the actual selection

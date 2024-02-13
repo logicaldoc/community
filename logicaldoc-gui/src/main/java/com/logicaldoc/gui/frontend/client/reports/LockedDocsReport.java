@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.LockedDocsDS;
@@ -159,10 +162,9 @@ public class LockedDocsReport extends ReportPanel {
 		unlock.addClickHandler((MenuItemClickEvent event) -> {
 			if (selection == null || selection.length == 0)
 				return;
-			final Long[] ids = new Long[selection.length];
-			for (int i = 0; i < selection.length; i++) {
-				ids[i] = Long.parseLong(selection[i].getAttribute("id"));
-			}
+			List<Long> ids = new ArrayList<>();
+			for (int i = 0; i < selection.length; i++)
+				ids.add(selection[i].getAttributeAsLong("id"));
 
 			DocumentService.Instance.get().unlock(ids, new AsyncCallback<Void>() {
 				@Override

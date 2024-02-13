@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -1103,7 +1102,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		}
 	}
 
-	private boolean saveRules(Session session, Menu menu, GUIAccessControlEntry[] rights)
+	private boolean saveACL(Session session, Menu menu, List<GUIAccessControlEntry> aces)
 			throws PermissionException, PersistenceException {
 		MenuDAO mdao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		if (!mdao.isReadEnable(Menu.SECURITY, session.getUserId()))
@@ -1125,7 +1124,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		menu.getAccessControlList().clear();
 
 		sqlerrors = false;
-		for (GUIAccessControlEntry right : rights) {
+		for (GUIAccessControlEntry right : aces) {
 			Group group = gdao.findById(right.getEntityId());
 			if (group == null || group.getTenantId() != session.getTenantId())
 				continue;
@@ -1151,7 +1150,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
 		MenuDAO mdao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		try {
-			saveRules(session, mdao.findById(menu.getId()), menu.getRights());
+			saveACL(session, mdao.findById(menu.getId()), menu.getAccessControlList());
 		} catch (PermissionException | PersistenceException e) {
 			throwServerException(session, log, e);
 		}
@@ -1209,10 +1208,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			menu.setType(guiMenu.getType());
 
 			menu.getAccessControlList().clear();
-			if (guiMenu.getRights() != null && guiMenu.getRights().length > 0) {
-				for (GUIAccessControlEntry right : guiMenu.getRights())
-					menu.getAccessControlList().add(new AccessControlEntry(right.getEntityId()));
-			}
+			for (GUIAccessControlEntry right : guiMenu.getAccessControlList())
+				menu.getAccessControlList().add(new AccessControlEntry(right.getEntityId()));
 
 			dao.store(menu);
 			return getMenu(menu.getId(), locale);
@@ -1259,21 +1256,17 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				return null;
 
 			GUIMenu f = toGUIMenu(menu, locale);
-
-			int i = 0;
-			GUIAccessControlEntry[] rights = new GUIAccessControlEntry[menu.getAccessControlList().size()];
+			List<GUIAccessControlEntry> acl = new ArrayList<>();
 			for (AccessControlEntry fg : menu.getAccessControlList()) {
 				Group group = gdao.findById(fg.getGroupId());
 				if (group == null || group.getTenantId() != session.getTenantId())
 					continue;
 
-				GUIAccessControlEntry right = new GUIAccessControlEntry();
-				right.setEntityId(fg.getGroupId());
-				rights[i] = right;
-				i++;
+				GUIAccessControlEntry ace = new GUIAccessControlEntry();
+				ace.setEntityId(fg.getGroupId());
+				acl.add(ace);
 			}
-			f.setRights(rights);
-
+			f.setAccessControlList(acl);
 			return f;
 		} catch (PersistenceException e) {
 			return (GUIMenu) throwServerException(session, log, e);
@@ -1296,35 +1289,35 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		dao.initialize(menu);
 
-		List<GUIAccessControlEntry> rights = new ArrayList<>();
+		List<GUIAccessControlEntry> acl = new ArrayList<>();
 
 		if (menu.getAccessControlList() != null && !menu.getAccessControlList().isEmpty()) {
 			GroupDAO gdao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 			UserDAO udao = (UserDAO) Context.get().getBean(UserDAO.class);
 			for (AccessControlEntry mg : menu.getAccessControlList()) {
-				GUIAccessControlEntry right = new GUIAccessControlEntry();
-				right.setEntityId(mg.getGroupId());
-				right.setWrite(mg.getWrite() == 1);
+				GUIAccessControlEntry ace = new GUIAccessControlEntry();
+				ace.setEntityId(mg.getGroupId());
+				ace.setWrite(mg.getWrite() == 1);
 
 				Group group = gdao.findById(mg.getGroupId());
 				if (group == null)
 					continue;
 
 				if (group.getType() == Group.TYPE_DEFAULT) {
-					right.setLabel(group.getName());
-					right.setName(I18N.message("group", LocaleUtil.toLocale(locale)) + ": " + group.getName());
+					ace.setLabel(group.getName());
+					ace.setName(I18N.message("group", LocaleUtil.toLocale(locale)) + ": " + group.getName());
 				} else {
 					User user = udao.findByGroup(group.getId()).iterator().next();
-					right.setLabel(user.getUsername());
-					right.setName(I18N.message("user", LocaleUtil.toLocale(locale)) + ": " + user.getFullName() + " ("
+					ace.setLabel(user.getUsername());
+					ace.setName(I18N.message("user", LocaleUtil.toLocale(locale)) + ": " + user.getFullName() + " ("
 							+ user.getUsername() + ")");
 				}
 
-				rights.add(right);
+				acl.add(ace);
 			}
 		}
 
-		f.setRights(rights.toArray(new GUIAccessControlEntry[0]));
+		f.setAccessControlList(acl);
 
 		return f;
 	}
@@ -1588,14 +1581,14 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	}
 
 	@Override
-	public void cloneWorkTimes(long srcUserId, List<Long> userIds, long[] groupIds) throws ServerException {
+	public void cloneWorkTimes(long srcUserId, List<Long> userIds, List<Long> groupIds) throws ServerException {
 		Session session = validateSession();
 
 		Set<Long> uniqueUserIds = userIds.stream().distinct().collect(Collectors.toSet());
 
 		if (groupIds != null) {
 			UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
-			Arrays.stream(groupIds).forEach(gId -> {
+			groupIds.stream().forEach(gId -> {
 				Set<User> usrs = gDao.findByGroup(gId);
 				for (User user : usrs)
 					uniqueUserIds.add(user.getId());

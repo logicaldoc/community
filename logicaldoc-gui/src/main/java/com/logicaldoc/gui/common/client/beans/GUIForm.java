@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Representation of a form
@@ -107,7 +108,7 @@ public class GUIForm extends GUIExtensibleObject implements Serializable {
 
 	private int statChartWidth = 250;
 
-	private GUIUser[] recipients;
+	private List<GUIUser> recipients;
 
 	public String getName() {
 		return name;
@@ -309,11 +310,11 @@ public class GUIForm extends GUIExtensibleObject implements Serializable {
 		this.notifyResponses = notifyResponses;
 	}
 
-	public GUIUser[] getRecipients() {
+	public List<GUIUser> getRecipients() {
 		return recipients;
 	}
 
-	public void setRecipients(GUIUser[] recipients) {
+	public void setRecipients(List<GUIUser> recipients) {
 		this.recipients = recipients;
 	}
 }

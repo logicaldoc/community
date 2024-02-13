@@ -337,7 +337,7 @@ public class Session implements DocumentObserver {
 	}
 
 	@Override
-	public void onDocumentsDeleted(GUIDocument[] documents) {
+	public void onDocumentsDeleted(List<GUIDocument> documents) {
 		// Nothing to do
 	}
 

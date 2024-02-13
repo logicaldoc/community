@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.folder;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -23,7 +25,7 @@ public class RestoreDialog extends Dialog {
 
 	protected ClickHandler handler;
 
-	public RestoreDialog(final Long[] docIds, final Long[] folderIds, ClickHandler handler) {
+	public RestoreDialog(final List<Long> docIds, final Long[] folderIds, ClickHandler handler) {
 		super();
 		this.handler = handler;
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
@@ -54,43 +56,43 @@ public class RestoreDialog extends Dialog {
 		restore.setAutoFit(true);
 		restore.setMargin(1);
 		restore.addClickHandler(event -> {
-				if (docIds != null)
-					DocumentService.Instance.get().restore(docIds,
-							Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
-							new AsyncCallback<Void>() {
+			if (docIds != null)
+				DocumentService.Instance.get().restore(docIds,
+						Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
+						new AsyncCallback<Void>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void arg0) {
-									if (RestoreDialog.this.handler != null)
-										RestoreDialog.this.handler.onClick(event);
-									close();
-								}
-							});
+							@Override
+							public void onSuccess(Void arg0) {
+								if (RestoreDialog.this.handler != null)
+									RestoreDialog.this.handler.onClick(event);
+								close();
+							}
+						});
 
-				if (folderIds != null)
-					FolderService.Instance.get().restore(folderIds,
-							Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
-							new AsyncCallback<Void>() {
+			if (folderIds != null)
+				FolderService.Instance.get().restore(folderIds,
+						Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
+						new AsyncCallback<Void>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-								@Override
-								public void onSuccess(Void arg0) {
-									if (RestoreDialog.this.handler != null)
-										RestoreDialog.this.handler.onClick(event);
-									close();
-								}
-							});
+							@Override
+							public void onSuccess(Void arg0) {
+								if (RestoreDialog.this.handler != null)
+									RestoreDialog.this.handler.onClick(event);
+								close();
+							}
+						});
 
-				close();
+			close();
 		});
 
 		buttons.setMembers(restore);

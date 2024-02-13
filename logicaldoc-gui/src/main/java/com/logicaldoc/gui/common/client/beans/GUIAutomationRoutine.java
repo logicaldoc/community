@@ -1,8 +1,8 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
-
-import com.logicaldoc.gui.common.client.Constants;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GUIAutomationRoutine extends GUIExtensibleObject implements Serializable {
 
@@ -14,9 +14,9 @@ public class GUIAutomationRoutine extends GUIExtensibleObject implements Seriali
 
 	private String automation;
 
-	private GUIAccessControlEntry[] rights = new GUIAccessControlEntry[] {};
+	private List<GUIAccessControlEntry> accessControlList = new ArrayList<>();
 
-	private String[] permissions = new String[] {};
+	private List<String> permissions = new ArrayList<>();
 
 	public GUIAutomationRoutine(long id) {
 		super(id);
@@ -50,24 +50,24 @@ public class GUIAutomationRoutine extends GUIExtensibleObject implements Seriali
 		this.automation = automation;
 	}
 
-	public GUIAccessControlEntry[] getRights() {
-		return rights;
+	public List<GUIAccessControlEntry> getAccessControlList() {
+		return accessControlList;
 	}
 
-	public void setRights(GUIAccessControlEntry[] rights) {
-		this.rights = rights;
+	public void setAccessControlList(List<GUIAccessControlEntry> accessControlList) {
+		this.accessControlList = accessControlList;
 	}
 
-	public String[] getPermissions() {
+	public List<String> getPermissions() {
 		return permissions;
 	}
 
-	public void setPermissions(String[] permissions) {
+	public void setPermissions(List<String> permissions) {
 		this.permissions = permissions;
 	}
 
 	public boolean isWrite() {
-		return hasPermission(Constants.PERMISSION_WRITE);
+		return hasPermission(GUIAccessControlEntry.PERMISSION_WRITE);
 	}
 
 	public boolean hasPermission(String permission) {

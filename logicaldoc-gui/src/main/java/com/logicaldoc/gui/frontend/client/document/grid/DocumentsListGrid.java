@@ -395,7 +395,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 		addKeyPressHandler((KeyPressEvent keyPress) -> {
 			if (keyPress.isCtrlKeyDown()) {
-				GUIDocument[] selection = getSelectedDocuments();
+				List<GUIDocument> selection = getSelectedDocuments();
 				if ("C".equalsIgnoreCase(keyPress.getKeyName())) {
 					// we could take the action to copy (CTRL + C) into the
 					// clipboard
@@ -409,7 +409,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		});
 	}
 
-	private void addSelectionToClipboard(GUIDocument[] selection) {
+	private void addSelectionToClipboard(List<GUIDocument> selection) {
 		for (GUIDocument document : selection)
 			Clipboard.getInstance().add(document);
 	}
@@ -624,12 +624,12 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	}
 
 	@Override
-	public GUIDocument[] getSelectedDocuments() {
+	public List<GUIDocument> getSelectedDocuments() {
 		return DocumentGridUtil.toDocuments(getSelectedRecords());
 	}
 
 	@Override
-	public GUIDocument[] getDocuments() {
+	public List<GUIDocument> getDocuments() {
 		return DocumentGridUtil.toDocuments(getRecords());
 	}
 
@@ -722,19 +722,19 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	}
 
 	@Override
-	public Long[] getSelectedIds() {
+	public List<Long> getSelectedIds() {
 		return DocumentGridUtil.getIds(getSelectedRecords());
 	}
 
 	@Override
-	public Long[] getIds() {
+	public List<Long> getIds() {
 		ListGridRecord[] records = getRecords();
 		if (records == null || records.length == 0)
-			return new Long[0];
+			return new ArrayList<>();
 
-		Long[] ids = new Long[records.length];
-		for (int j = 0; j < ids.length; j++)
-			ids[j] = Long.parseLong(records[j].getAttributeAsString("id"));
+		List<Long> ids = new ArrayList<>();
+		for (int i = 0; i < records.length; i++)
+			ids.add(Long.parseLong(records[i].getAttributeAsString("id")));
 
 		return ids;
 	}
@@ -763,19 +763,13 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	}
 
 	@Override
-	public void setDocuments(GUIDocument[] documents) {
-		ListGridRecord[] records = new ListGridRecord[0];
+	public void setDocuments(List<GUIDocument> documents) {
+		List<ListGridRecord> records = new ArrayList<>();
 
-		if (documents != null && documents.length > 0) {
-			records = new ListGridRecord[documents.length];
-			for (int i = 0; i < documents.length; i++) {
-				GUIDocument doc = documents[i];
-				ListGridRecord rec = DocumentGridUtil.fromDocument(doc);
-				records[i] = rec;
-			}
-		}
+		for (GUIDocument document : documents)
+			records.add(DocumentGridUtil.fromDocument(document));
 
-		setRecords(records);
+		setRecords(records.toArray(new ListGridRecord[0]));
 	}
 
 	@Override
@@ -856,20 +850,18 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	}
 
 	@Override
-	public void onDocumentsDeleted(GUIDocument[] documents) {
-		if (documents != null) {
-			for (GUIDocument doc : documents) {
-				try {
-					Record rec = findRecord(doc.getId());
-					if (rec != null)
-						removeData(rec);
-				} catch (Exception t) {
-					// Nothing to do
-				}
+	public void onDocumentsDeleted(List<GUIDocument> documents) {
+		for (GUIDocument doc : documents) {
+			try {
+				Record rec = findRecord(doc.getId());
+				if (rec != null)
+					removeData(rec);
+			} catch (Exception t) {
+				// Nothing to do
 			}
-			RecordList recordList = getDataAsRecordList();
-			cursor.setMessage(I18N.message(SHOWNDOCUMENTS, "" + recordList.getLength()));
 		}
+		RecordList recordList = getDataAsRecordList();
+		cursor.setMessage(I18N.message(SHOWNDOCUMENTS, "" + recordList.getLength()));
 	}
 
 	@Override
@@ -880,7 +872,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		if (document.getFolder().getId() == folder.getId())
 			onDocumentStored(document);
 		else
-			onDocumentsDeleted(new GUIDocument[] { document });
+			onDocumentsDeleted(Arrays.asList(document));
 	}
 
 	@Override

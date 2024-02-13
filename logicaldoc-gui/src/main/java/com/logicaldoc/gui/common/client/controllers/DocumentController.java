@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.common.client.controllers;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -63,7 +65,7 @@ public class DocumentController {
 		}
 	}
 
-	public void deleted(GUIDocument[] documents) {
+	public void deleted(List<GUIDocument> documents) {
 		synchronized (observers) {
 			for (DocumentObserver observer : observers)
 				try {
@@ -155,7 +157,7 @@ public class DocumentController {
 		currentDocument = document;
 		editing = true;
 		if (document.getStatus() == GUIDocument.DOC_UNLOCKED && Session.get().getConfigAsBoolean("gui.onedit.lock")) {
-			DocumentService.Instance.get().lock(new Long[] { document.getId() }, null, new AsyncCallback<Void>() {
+			DocumentService.Instance.get().lock(Arrays.asList(document.getId()), null, new AsyncCallback<Void>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.error(I18N.message("cannotlockdoc"), null, null);
@@ -187,7 +189,7 @@ public class DocumentController {
 
 	public synchronized void cancelEditing(GUIDocument document) {
 		if (document != null && isEditing(document) && Session.get().getConfigAsBoolean("gui.onedit.lock")) {
-			DocumentService.Instance.get().unlock(new Long[] { document.getId() }, new AsyncCallback<Void>() {
+			DocumentService.Instance.get().unlock(Arrays.asList(document.getId()), new AsyncCallback<Void>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

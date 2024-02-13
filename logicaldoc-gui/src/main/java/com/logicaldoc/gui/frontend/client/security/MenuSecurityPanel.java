@@ -1,8 +1,11 @@
 package com.logicaldoc.gui.frontend.client.security;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.beans.GUIMenu;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
+import com.logicaldoc.gui.common.client.beans.GUIMenu;
 import com.logicaldoc.gui.common.client.data.AccessControlListDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -181,20 +184,17 @@ public class MenuSecurityPanel extends VLayout {
 	 * 
 	 * @return array of rights
 	 */
-	public GUIAccessControlEntry[] getACL() {
+	public List<GUIAccessControlEntry> getACL() {
 		ListGridRecord[] records = aclGrid.getRecords();
-		GUIAccessControlEntry[] tmp = new GUIAccessControlEntry[records.length];
-
-		int i = 0;
+		List<GUIAccessControlEntry> acl = new ArrayList<>();
 		for (ListGridRecord rec : records) {
-			GUIAccessControlEntry right = new GUIAccessControlEntry();
-			right.setName(rec.getAttributeAsString(ENTITY));
-			right.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
-			right.setRead(rec.getAttributeAsBoolean(READ));
-			tmp[i++] = right;
+			GUIAccessControlEntry ace = new GUIAccessControlEntry();
+			ace.setName(rec.getAttributeAsString(ENTITY));
+			ace.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
+			ace.setRead(rec.getAttributeAsBoolean(READ));
+			acl.add(ace);
 		}
-
-		return tmp;
+		return acl;
 	}
 
 	/**
@@ -226,8 +226,8 @@ public class MenuSecurityPanel extends VLayout {
 	}
 
 	public void onSave() {
-		// Apply all rights
-		menu.setRights(getACL());
+		// Apply the ACL
+		menu.setAccessControlList(getACL());
 
 		SecurityService.Instance.get().saveACL(menu, new AsyncCallback<Void>() {
 

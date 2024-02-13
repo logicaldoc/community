@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.dashboard.dashlet;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -171,7 +172,7 @@ public class DocumentDashlet extends Dashlet {
 		if (document.getStatus() == Constants.DOC_LOCKED || document.getStatus() == Constants.DOC_CHECKED_OUT) {
 			MenuItem unlock = new MenuItem();
 			unlock.setTitle(I18N.message("unlock"));
-			unlock.addClickHandler(event -> DocumentService.Instance.get().unlock(new Long[] { document.getId() },
+			unlock.addClickHandler(event -> DocumentService.Instance.get().unlock(Arrays.asList(document.getId()),
 					new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {

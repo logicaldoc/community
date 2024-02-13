@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -71,7 +73,7 @@ public interface GDriveService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public String[] exportDocuments(Long[] ids) throws ServerException;
+	public String[] exportDocuments(List<Long> ids) throws ServerException;
 
 	/**
 	 * Save the settings used by the Google Drive module
@@ -121,7 +123,7 @@ public interface GDriveService extends RemoteService {
 
 		private Instance() {
 		}
-		
+
 		public static GDriveServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(GDriveService.class);

@@ -40,8 +40,8 @@ public class DocumentSelector extends StaticTextItem {
 		PickerIcon search = new PickerIcon(PickerIcon.SEARCH, evnt -> new DocumentSelectorDialog() {
 
 			@Override
-			protected void onSelection(GUIDocument[] selection) {
-				setDocument(selection[0]);
+			protected void onSelection(List<GUIDocument> selection) {
+				setDocument(selection.get(0));
 				close();
 			}
 		}.show());

@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.zoho;
 
+import java.util.Arrays;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -63,7 +65,7 @@ public class ZohoMenuItem extends MenuItem {
 
 			if (document.getStatus() == 0) {
 				// Need to checkout first
-				DocumentService.Instance.get().checkout(new Long[] { document.getId() }, new AsyncCallback<Void>() {
+				DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

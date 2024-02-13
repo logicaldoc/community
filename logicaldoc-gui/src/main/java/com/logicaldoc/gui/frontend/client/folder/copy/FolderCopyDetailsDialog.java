@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.folder.copy;
 
+import java.util.Arrays;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -66,7 +68,7 @@ public class FolderCopyDetailsDialog extends StickyWindow {
 				return;
 
 			LD.contactingServer();
-			FolderService.Instance.get().copyFolders(new long[] { metadata.getId() }, targetFolderId, foldersOnly,
+			FolderService.Instance.get().copyFolders(Arrays.asList(metadata.getId()), targetFolderId, foldersOnly,
 					securityPolicy, metadata, new AsyncCallback<Void>() {
 
 						@Override

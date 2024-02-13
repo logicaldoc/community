@@ -1,10 +1,12 @@
 package com.logicaldoc.gui.frontend.client.document.update;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.ServerValidationException;
 import com.logicaldoc.gui.common.client.Session;
-import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
+import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -59,9 +61,9 @@ public class UpdateDialog extends StickyWindow {
 
 	private boolean majorVersion = false;
 
-	private final Long[] ids;
+	private final List<Long> ids;
 
-	public UpdateDialog(Long[] ids, GUIDocument metadata, String context, boolean majorVersion, String charset) {
+	public UpdateDialog(List<Long> ids, GUIDocument metadata, String context, boolean majorVersion, String charset) {
 		super(context);
 		this.context = context;
 		this.metadata = metadata;
@@ -70,7 +72,7 @@ public class UpdateDialog extends StickyWindow {
 		this.charset = charset != null ? charset : Session.get().getConfig("charset");
 	}
 
-	public UpdateDialog(Long[] ids, GUIDocument metadata, String context, boolean majorVersion) {
+	public UpdateDialog(List<Long> ids, GUIDocument metadata, String context, boolean majorVersion) {
 		this(ids, metadata, context, majorVersion, null);
 	}
 
@@ -176,7 +178,7 @@ public class UpdateDialog extends StickyWindow {
 				public void onSuccess(Void arg0) {
 					if (CHECKIN.equals(context)) {
 						doCheckin();
-					} else if (ids != null && ids.length > 0)
+					} else if (!ids.isEmpty())
 						doBulkUpdate(saveForm);
 					else {
 						doAddDocuments(saveForm);

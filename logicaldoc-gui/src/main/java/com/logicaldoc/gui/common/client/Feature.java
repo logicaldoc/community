@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.common.client;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -209,24 +209,24 @@ public class Feature {
 	public static final int ZONAL_BARCODE = 98;
 
 	public static final int WEB_FORM = 99;
-	
+
 	public static final int DIGITAL_SIGNATURE_CLIENT = 100;
-	
+
 	public static final int VIEW_TICKET = 101;
-	
+
 	public static final int READING_CONFIRMATION = 102;
-	
+
 	public static final int TECHNICAL_SUPPORT = 103;
 
 	private static Set<String> features = new HashSet<>();
 
 	private Feature() {
-		
+
 	}
-	
+
 	public static void init(GUIInfo info) {
 		features.clear();
-		Collections.addAll(features, info.getFeatures());
+		features.addAll(Arrays.asList(info.getFeatures()));
 	}
 
 	public static boolean enabled(int feature) {

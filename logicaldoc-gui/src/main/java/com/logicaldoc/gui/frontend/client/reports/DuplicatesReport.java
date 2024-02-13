@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -286,12 +288,11 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		delete.addClickHandler(event -> {
 			if (selection == null || selection.length == 0)
 				return;
-			final Long[] ids = new Long[selection.length];
-			for (int i = 0; i < selection.length; i++) {
-				ids[i] = Long.parseLong(selection[i].getAttribute("id"));
-			}
+			List<Long> ids = new ArrayList<>();
+			for (int i = 0; i < selection.length; i++)
+				ids.add(selection[i].getAttributeAsLong("id"));
 
-			if (ids.length > 0)
+			if (!ids.isEmpty())
 				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), yes -> {
 					if (Boolean.TRUE.equals(yes)) {
 						DocumentService.Instance.get().delete(ids, new AsyncCallback<Void>() {

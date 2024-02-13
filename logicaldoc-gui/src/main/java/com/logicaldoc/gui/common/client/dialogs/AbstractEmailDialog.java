@@ -165,17 +165,17 @@ public abstract class AbstractEmailDialog extends Window {
 		List<GUIContact> tos = new ArrayList<>();
 		for (String email : to)
 			tos.add(new GUIContact(email));
-		mail.setTos(tos.toArray(new GUIContact[0]));
+		mail.setTos(tos);
 
 		List<GUIContact> ccs = new ArrayList<>();
 		for (String email : cc)
 			ccs.add(new GUIContact(email));
-		mail.setCcs(ccs.toArray(new GUIContact[0]));
+		mail.setCcs(ccs);
 
 		List<GUIContact> bccs = new ArrayList<>();
 		for (String email : bcc)
 			bccs.add(new GUIContact(email));
-		mail.setBccs(bccs.toArray(new GUIContact[0]));
+		mail.setBccs(bccs);
 	}
 
 	protected abstract void onSubmit(GUIEmail mail);

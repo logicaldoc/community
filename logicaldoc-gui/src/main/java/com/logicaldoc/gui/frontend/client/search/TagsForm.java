@@ -2,10 +2,10 @@ package com.logicaldoc.gui.frontend.client.search;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
-import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.data.TagsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -229,17 +229,11 @@ public class TagsForm extends VLayout {
 		options.setExpression(word);
 		options.setMaxHits(Search.get().getMaxHits());
 
-		if (searchInHits) {
-			GUIDocument[] records = Search.get().getLastResult();
-			Long[] ids = new Long[records.length];
-			int i = 0;
-			for (GUIDocument rec : records) {
-				ids[i] = rec.getId();
-				i++;
-			}
-			options.setFilterIds(ids);
-		} else
-			options.setFilterIds(null);
+		if (searchInHits)
+			options.setFilterIds(
+					Search.get().getLastResult().stream().map(doc -> doc.getId()).collect(Collectors.toList()));
+		else
+			options.setFilterIds(new ArrayList<>());
 
 		Search.get().setOptions(options);
 		Search.get().search();

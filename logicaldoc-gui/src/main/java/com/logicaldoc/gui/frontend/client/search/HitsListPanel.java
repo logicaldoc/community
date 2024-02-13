@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.search;
 
+import java.util.List;
+
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.CookiesManager;
@@ -181,9 +183,8 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		GUISearchOptions options = Search.get().getOptions();
 		if (options.getType() == GUISearchOptions.TYPE_FULLTEXT)
 			grid.setCanExpandRows();
-		GUIDocument[] result = Search.get().getLastResult();
-		if (result != null)
-			grid.setDocuments(result);
+
+		grid.setDocuments(Search.get().getLastResult());
 
 		if (Search.get().isHasMore())
 			GuiLog.warn(I18N.message("possiblemorehits"), I18N.message("possiblemorehitsdetail"));
@@ -304,7 +305,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 	}
 
 	@Override
-	public void onDocumentsDeleted(GUIDocument[] documents) {
+	public void onDocumentsDeleted(List<GUIDocument> documents) {
 		// Nothing to do
 	}
 

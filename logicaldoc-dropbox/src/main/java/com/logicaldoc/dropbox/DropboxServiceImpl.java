@@ -2,8 +2,6 @@ package com.logicaldoc.dropbox;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -146,7 +144,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 	}
 
 	@Override
-	public boolean exportDocuments(String targetPath, long[] folderIds, Long[] docIds) throws ServerException {
+	public boolean exportDocuments(String targetPath, List<Long> folderIds, List<Long> docIds) throws ServerException {
 		Session session = DropboxServiceImpl.validateSession(getThreadLocalRequest());
 
 		try {
@@ -171,10 +169,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			Map<Long, String> documents = new HashMap<>();
 
 			// First of all put all single selected documents
-			List<Long> dIds = new ArrayList<>();
-			Collections.addAll(dIds, docIds);
-
-			for (Document document : docDao.findByIds(dIds.toArray(new Long[0]), null))
+			for (Document document : docDao.findByIds(docIds.toArray(new Long[0]), null))
 				documents.put(document.getId(), document.getFileName());
 
 			/*

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -12,7 +13,6 @@ import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUICriterion;
-import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -379,16 +379,10 @@ public class ParametricForm extends VLayout {
 
 	private void addSearchInHitsCondition(GUISearchOptions options) {
 		if (Boolean.parseBoolean(vm.getValueAsString(SEARCHINHITS))) {
-			GUIDocument[] records = Search.get().getLastResult();
-			Long[] ids = new Long[records.length];
-			int i = 0;
-			for (GUIDocument rec : records) {
-				ids[i] = rec.getId();
-				i++;
-			}
-			options.setFilterIds(ids);
+			options.setFilterIds(
+					Search.get().getLastResult().stream().map(rec -> rec.getId()).collect(Collectors.toList()));
 		} else
-			options.setFilterIds(null);
+			options.setFilterIds(new ArrayList<>());
 	}
 
 	private void setFolderCondition(GUISearchOptions options) {

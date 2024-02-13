@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document;
 
+import java.util.Arrays;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -121,7 +123,7 @@ public class DocumentCheckin extends Window {
 		}
 
 		document.setComment(vm.getValueAsString("comment"));
-		UpdateDialog bulk = new UpdateDialog(new Long[] { document.getId() }, document, UpdateDialog.CHECKIN,
+		UpdateDialog bulk = new UpdateDialog(Arrays.asList(document.getId()), document, UpdateDialog.CHECKIN,
 				"true".equals(vm.getValueAsString(MAJORVERSION)));
 		bulk.show();
 		destroy();

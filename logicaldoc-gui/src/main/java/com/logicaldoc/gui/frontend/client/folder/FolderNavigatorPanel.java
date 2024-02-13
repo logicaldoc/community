@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.folder;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.controllers.FolderObserver;
@@ -37,7 +38,8 @@ public class FolderNavigatorPanel extends VLayout implements FolderObserver {
 
 	private FolderNavigatorPanel() {
 		newFolder = new ToolStripButton(I18N.message("newfolder"));
-		newFolder.addClickHandler(event -> FolderNavigator.get().onCreate(FolderNavigator.get().getSelectedIds()[0]));
+		newFolder.addClickHandler(
+				event -> FolderNavigator.get().onCreate(FolderNavigator.get().getSelectedIds().get(0)));
 		newFolder.setDisabled(true);
 
 		newWorkspace = new ToolStripButton(I18N.message("newworkspace"));
@@ -64,7 +66,7 @@ public class FolderNavigatorPanel extends VLayout implements FolderObserver {
 
 	@Override
 	public void onFolderSelected(GUIFolder folder) {
-		newFolder.setDisabled(!folder.hasPermission(Constants.PERMISSION_ADD));
+		newFolder.setDisabled(!folder.hasPermission(GUIAccessControlEntry.PERMISSION_ADD));
 		addDocuments.setDisabled(!folder.isWrite());
 		boolean newWorkspaceDisabled = !Feature.enabled(Feature.MULTI_WORKSPACE)
 				|| !Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN);

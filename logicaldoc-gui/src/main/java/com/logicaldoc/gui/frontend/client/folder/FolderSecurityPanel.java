@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -503,7 +502,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 	}
 
 	private void addCellContextClickHandler(GUIFolder folder) {
-		if (folder != null && folder.hasPermission(Constants.PERMISSION_SECURITY)) {
+		if (folder != null && folder.hasPermission(GUIAccessControlEntry.PERMISSION_SECURITY)) {
 			list.addCellContextClickHandler((CellContextClickEvent contextClick) -> {
 				if (contextClick.getColNum() == 0) {
 					Menu contextMenu = setupContextMenu();

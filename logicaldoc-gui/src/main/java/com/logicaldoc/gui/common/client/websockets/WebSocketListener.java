@@ -3,6 +3,7 @@ package com.logicaldoc.gui.common.client.websockets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -18,7 +19,6 @@ import com.google.gwt.user.client.rpc.SerializationStreamReader;
 import com.google.gwt.user.client.rpc.SerializationStreamWriter;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
-import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIReadingRequest;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -133,7 +133,7 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 		} else if ("event.moved".equals(event.getEvent())) {
 			handleMovedEvent(event);
 		} else if ("event.deleted".equals(event.getEvent())) {
-			DocumentController.get().deleted(new GUIDocument[] { event.getDocument() });
+			DocumentController.get().deleted(Arrays.asList(event.getDocument()));
 		} else if (isFolderEvent(event)) {
 			handleFolderEvent(event);
 		} else if ("event.user.messagereceived".equals(event.getEvent()) && Menu.enabled(Menu.MESSAGES)) {
@@ -149,18 +149,19 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 		} else if ("event.reading.requested".equals(event.getEvent())) {
 			String recipient = event.getComment().substring(event.getComment().indexOf(':') + 1).trim();
 			if (Session.get().getUser().getUsername().equals(recipient)) {
-				ReadingRequestService.Instance.get().getUnconfimedReadings(new AsyncCallback<GUIReadingRequest[]>() {
+				ReadingRequestService.Instance.get()
+						.getUnconfimedReadings(new AsyncCallback<List<GUIReadingRequest>>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-					@Override
-					public void onSuccess(GUIReadingRequest[] readings) {
-						ReadingRequestController.get().addUnconfirmedReadings(readings);
-					}
-				});
+							@Override
+							public void onSuccess(List<GUIReadingRequest> readings) {
+								ReadingRequestController.get().addUnconfirmedReadings(readings);
+							}
+						});
 			}
 		} else if (isCommandEvent(event)) {
 			processCommand(event);

@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -87,13 +89,14 @@ public interface AutomationService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void execute(GUIAutomationRoutine routine, Long[] docIds, Long folderId) throws ServerException;
+	public void execute(GUIAutomationRoutine routine, List<Long> docIds, Long folderId) throws ServerException;
 
 	public static class Instance {
 		private static AutomationServiceAsync inst;
 
-		private Instance() {}
-		
+		private Instance() {
+		}
+
 		public static AutomationServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(AutomationService.class);

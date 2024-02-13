@@ -1,6 +1,5 @@
 package com.logicaldoc.gui.common.client.beans;
 
-import java.beans.Transient;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Set;

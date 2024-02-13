@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -373,7 +372,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 	}
 
 	private void addCellContextClickHandler(GUIDocument document) {
-		if (document != null && document.hasPermission(Constants.PERMISSION_SECURITY)) {
+		if (document != null && document.hasPermission(GUIAccessControlEntry.PERMISSION_SECURITY)) {
 			list.addCellContextClickHandler((CellContextClickEvent contextClick) -> {
 				if (contextClick.getColNum() == 0) {
 					Menu contextMenu = setupContextMenu();

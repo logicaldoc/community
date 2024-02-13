@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -148,7 +150,7 @@ public interface FolderService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void delete(long[] folderIds) throws ServerException;
+	public void delete(List<Long> folderIds) throws ServerException;
 
 	/**
 	 * Deletes a selection of folders from trash
@@ -177,7 +179,7 @@ public interface FolderService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void move(long[] folderIds, long targetId) throws ServerException;
+	public void move(List<Long> folderIds, long targetId) throws ServerException;
 
 	/**
 	 * Merges some folders to a target folder
@@ -187,7 +189,7 @@ public interface FolderService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void merge(long[] folderIds, long targetId) throws ServerException;
+	public void merge(List<Long> folderIds, long targetId) throws ServerException;
 
 	/**
 	 * Copies a folder under a target folder
@@ -201,7 +203,7 @@ public interface FolderService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void copyFolders(long[] folderIds, long targetId, boolean foldersOnly, String securityOption,
+	public void copyFolders(List<Long> folderIds, long targetId, boolean foldersOnly, String securityOption,
 			GUIFolder model) throws ServerException;
 
 	/**
@@ -217,9 +219,10 @@ public interface FolderService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void paste(long[] docIds, long folderId, String action, boolean links, boolean notes, boolean security) throws ServerException;
+	public void paste(List<Long> docIds, long folderId, String action, boolean links, boolean notes, boolean security)
+			throws ServerException;
 
-	public void pasteAsAlias(long[] docIds, long folderId, String type) throws ServerException;
+	public void pasteAsAlias(List<Long> docIds, long folderId, String type) throws ServerException;
 
 	/**
 	 * Loads the folders templates
@@ -256,11 +259,12 @@ public interface FolderService extends RemoteService {
 	 * 
 	 * @param folderId identifier of the folder
 	 * 
-	 * @return the statistics (total number of documents, total number of subfolders, total size
+	 * @return the statistics (total number of documents, total number of
+	 *         subfolders, total size
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public long[] computeStats(long folderId) throws ServerException;
+	public List<Long> computeStats(long folderId) throws ServerException;
 
 	/**
 	 * Sets the pagination informations for the visualization of the folders
@@ -284,22 +288,21 @@ public interface FolderService extends RemoteService {
 	 */
 	public void applyGridLayout(long folderId) throws ServerException;
 
-	
 	/**
-	 * Read the uploaded image and converts it into Base64 
+	 * Read the uploaded image and converts it into Base64
 	 * 
 	 * @return the string conversion of the uploaded image
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
 	public String readImage() throws ServerException;
-	
+
 	public static class Instance {
 		private static FolderServiceAsync inst;
 
 		private Instance() {
 		}
-		
+
 		public static FolderServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(FolderService.class);

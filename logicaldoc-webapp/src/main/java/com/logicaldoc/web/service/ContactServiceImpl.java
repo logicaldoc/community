@@ -3,7 +3,7 @@ package com.logicaldoc.web.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -170,19 +170,16 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 	}
 
 	@Override
-	public void shareContacts(long[] contactIds, List<Long> userIds, long[] groupIds) throws ServerException {
+	public void shareContacts(List<Long> contactIds, List<Long> userIds, List<Long> groupIds) throws ServerException {
 		validateSession();
-		HashSet<Long> users = new HashSet<>();
-		for (Long uId : userIds)
-			users.add(uId);
 
-		appendUserIdsFromGroups(groupIds, users);
+		appendUserIdsFromGroups(groupIds, userIds);
 
 		try {
 			ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
 			for (Long cId : contactIds) {
 				Contact originalContact = dao.findById(cId);
-				for (Long userId : users) {
+				for (Long userId : userIds) {
 					List<Contact> userContacts = dao.findByUser(userId, originalContact.getEmail());
 					if (userContacts.isEmpty()) {
 						Contact cloned = new Contact(originalContact);
@@ -206,15 +203,13 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 		}
 	}
 
-	private void appendUserIdsFromGroups(long[] groupIds, HashSet<Long> users) {
-		if (groupIds != null) {
-			UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
-			for (Long gId : groupIds) {
-				Set<User> usrs = gDao.findByGroup(gId);
-				for (User user : usrs) {
-					if (!users.contains(user.getId()))
-						users.add(user.getId());
-				}
+	private void appendUserIdsFromGroups(Collection<Long> groupIds, Collection<Long> users) {
+		UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		for (Long gId : groupIds) {
+			Set<User> usrs = gDao.findByGroup(gId);
+			for (User user : usrs) {
+				if (!users.contains(user.getId()))
+					users.add(user.getId());
 			}
 		}
 	}

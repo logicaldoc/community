@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 
@@ -20,7 +22,7 @@ public interface WorkflowServiceAsync {
 	void saveTrigger(String folderId, String workflowId, String templateId, String events,
 			AsyncCallback<Void> callback);
 
-	void startWorkflow(String workflowName, String workflowDescription, String tag, String color, Long[] docIds,
+	void startWorkflow(String workflowName, String workflowDescription, String tag, String color, List<Long> docIds,
 			AsyncCallback<Void> callback);
 
 	void getWorkflowDetailsByTask(String taskId, AsyncCallback<GUIWorkflow> callback);
@@ -33,7 +35,7 @@ public interface WorkflowServiceAsync {
 
 	void countAssignedTasks(String username, AsyncCallback<Integer> callback);
 
-	void appendDocuments(String taskId, Long[] docIds, AsyncCallback<Void> callback);
+	void appendDocuments(String taskId, List<Long> docIds, AsyncCallback<Void> callback);
 
 	void importSchema(AsyncCallback<GUIWorkflow> callback);
 

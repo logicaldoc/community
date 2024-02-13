@@ -1,7 +1,9 @@
 package com.logicaldoc.gui.common.client.widgets.preview;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -130,81 +132,60 @@ public class MailPreviewPanel extends VLayout {
 		attachmentsPanel.setWidth100();
 		attachmentsPanel.setHeight(75);
 
-		GUIDocument[] docs = prepareAttachments(mail, document, attachmentsPanel);
-
 		VLayout header = new VLayout();
 		header.setWidth100();
 		header.setBackgroundColor("#efefef;");
-		if (docs != null && docs.length > 0)
-			header.setMembers(form, attachmentsPanel);
-		else
+
+		List<GUIDocument> attachments = prepareAttachments(mail, document, attachmentsPanel);
+		if (attachments.isEmpty())
 			header.setMembers(form);
+		else
+			header.setMembers(form, attachmentsPanel);
 		return header;
 	}
 
-	private GUIDocument[] prepareAttachments(final GUIEmail mail, final GUIDocument document,
+	private List<GUIDocument> prepareAttachments(final GUIEmail mail, final GUIDocument document,
 			FlowLayout attachmentsPanel) {
-		GUIDocument[] docs = mail.getAttachments();
-		if (docs != null)
-			for (final GUIDocument doc : docs) {
-				IButton button = new IButton(
-						doc.getFileName() + " (" + Util.formatSizeCompact(doc.getFileSize()) + ")");
-				button.setAutoFit(true);
-				button.setIcon("[SKIN]/" + doc.getIcon());
-				if (doc.getFolder().isDownload())
-					button.addClickHandler(event -> {
-						String filename = doc.getFileName();
-						filename = filename.replace("&", "%26");
-						filename = filename.replace(" ", "%20");
-						filename = filename.replace("#", "%23");
-						filename = filename.replace("/", "%2F");
-						filename = filename.replace("=", "%3D");
-						filename = filename.replace("?", "%3F");
-						filename = filename.replace(":", "%3A");
+		List<GUIDocument> attachments = mail.getAttachments();
+		for (final GUIDocument doc : attachments) {
+			IButton button = new IButton(doc.getFileName() + " (" + Util.formatSizeCompact(doc.getFileSize()) + ")");
+			button.setAutoFit(true);
+			button.setIcon("[SKIN]/" + doc.getIcon());
+			if (doc.getFolder().isDownload())
+				button.addClickHandler(event -> {
+					String filename = doc.getFileName();
+					filename = filename.replace("&", "%26");
+					filename = filename.replace(" ", "%20");
+					filename = filename.replace("#", "%23");
+					filename = filename.replace("/", "%2F");
+					filename = filename.replace("=", "%3D");
+					filename = filename.replace("?", "%3F");
+					filename = filename.replace(":", "%3A");
 
-						Util.download(
-								Util.downloadAttachmentURL(document.getId(), document.getFileVersion(), filename));
-					});
-				button.setContextMenu(prepareButtonMenu(document, doc));
-				attachmentsPanel.addTile(button);
-			}
-		return docs;
+					Util.download(Util.downloadAttachmentURL(document.getId(), document.getFileVersion(), filename));
+				});
+			button.setContextMenu(prepareButtonMenu(document, doc));
+			attachmentsPanel.addTile(button);
+		}
+		return attachments;
 	}
 
 	private StaticTextItem prepareBccItem(final GUIEmail mail) {
-		StringBuilder bccString = new StringBuilder();
-		if (mail.getBccs() != null && mail.getBccs().length > 0)
-			for (GUIContact contact : mail.getBccs()) {
-				if (!bccString.toString().isEmpty())
-					bccString.append(", ");
-				bccString.append(contact.displayLink());
-			}
+		String bccString = mail.getBccs().stream().map(c -> c.displayString()).collect(Collectors.joining(", "));
 		StaticTextItem bcc = ItemFactory.newStaticTextItem("bcc", bccString.toString());
-		bcc.setVisible(!bccString.toString().isEmpty());
+		bcc.setVisible(!bccString.isEmpty());
 		return bcc;
 	}
 
 	private StaticTextItem prepareCcItem(final GUIEmail mail) {
-		StringBuilder ccString = new StringBuilder();
-		if (mail.getCcs() != null && mail.getCcs().length > 0)
-			for (GUIContact contact : mail.getCcs()) {
-				if (!ccString.toString().isEmpty())
-					ccString.append(", ");
-				ccString.append(contact.displayLink());
-			}
+		String ccString = mail.getCcs().stream().map(c -> c.displayString()).collect(Collectors.joining(", "));
 		StaticTextItem cc = ItemFactory.newStaticTextItem("cc", ccString.toString());
 		cc.setVisible(!ccString.toString().isEmpty());
 		return cc;
 	}
 
 	private StaticTextItem prepareToItem(final GUIEmail mail) {
-		StringBuilder toString = new StringBuilder();
-		if (mail.getTos() != null && mail.getTos().length > 0)
-			for (GUIContact contact : mail.getTos()) {
-				if (!toString.toString().isEmpty())
-					toString.append(", ");
-				toString.append(contact.displayLink());
-			}
+		String toString = mail.getTos().stream().map(c -> c.displayString()).collect(Collectors.joining(", "));
 		StaticTextItem to = ItemFactory.newStaticTextItem("to", toString.toString());
 		to.setVisible(!toString.toString().isEmpty());
 		return to;
@@ -229,15 +210,10 @@ public class MailPreviewPanel extends VLayout {
 	}
 
 	private StaticTextItem prepareReplyToItem(final GUIEmail mail) {
-		StringBuilder replyToString = new StringBuilder();
-		if (mail.getReplyTo() != null && mail.getReplyTo().length > 0)
-			for (GUIContact contact : mail.getReplyTo()) {
-				if (!replyToString.toString().isEmpty())
-					replyToString.append(", ");
-				replyToString.append(contact.displayLink());
-			}
+		String replyToString = mail.getReplyTo().stream().map(c -> c.displayString()).collect(Collectors.joining(", "));
 		StaticTextItem replyto = ItemFactory.newStaticTextItem("replyto", replyToString.toString());
-		replyto.setVisible(!replyToString.toString().isEmpty() && !replyToString.toString().equals(mail.getFrom().getEmail()));
+		replyto.setVisible(
+				!replyToString.toString().isEmpty() && !replyToString.toString().equals(mail.getFrom().getEmail()));
 		return replyto;
 	}
 
@@ -262,10 +238,8 @@ public class MailPreviewPanel extends VLayout {
 
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
-		download.addClickHandler(event -> {
-			String url = Util.downloadAttachmentURL(doc.getId(), doc.getFileVersion(), attachment.getFileName());
-			Util.download(url);
-		});
+		download.addClickHandler(event -> Util
+				.download(Util.downloadAttachmentURL(doc.getId(), doc.getFileVersion(), attachment.getFileName())));
 		download.setEnabled(doc.getFolder().isDownload());
 
 		Menu contextMenu = new Menu();

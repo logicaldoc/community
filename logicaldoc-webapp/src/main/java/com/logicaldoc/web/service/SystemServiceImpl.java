@@ -636,7 +636,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			appendEventsCondition("C", events, query);
 		}
 
-		if (Arrays.asList(SystemInfo.get().getFeatures()).contains("Feature_19")) {
+		if (SystemInfo.get().getFeatures().contains("Feature_19")) {
 
 			// Search in the workflow history
 			query.append(
@@ -649,7 +649,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			appendEventsCondition("D", events, query);
 		}
 
-		if (Arrays.asList(SystemInfo.get().getFeatures()).contains("Feature_1")) {
+		if (SystemInfo.get().getFeatures().contains("Feature_1")) {
 			// Search in the workflow history
 			query.append(
 					" union select E.ld_username, E.ld_event, E.ld_date, E.ld_filename, E.ld_folderid, E.ld_path, null, E.ld_docid, E.ld_userid, null as ip, E.ld_userlogin, E.ld_comment, null, null, null  from ld_importfolder_history E where E.ld_tenantid = "
@@ -662,7 +662,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			appendEventsCondition("E", events, query);
 		}
 
-		if (Arrays.asList(SystemInfo.get().getFeatures()).contains("Feature_3")) {
+		if (SystemInfo.get().getFeatures().contains("Feature_3")) {
 			// Search in the OCR history
 			query.append(
 					" union select F.ld_username, F.ld_event, F.ld_date, F.ld_filename, F.ld_folderid, F.ld_path, null, F.ld_docid, F.ld_userid, null as ip, F.ld_userlogin, F.ld_comment, null, null, null  from ld_ocr_history F where F.ld_tenantid = "

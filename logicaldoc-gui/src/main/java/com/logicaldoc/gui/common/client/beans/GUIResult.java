@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Collects the results of a search and store some search statistics
@@ -18,7 +20,7 @@ public class GUIResult implements Serializable {
 
 	private boolean hasMore = false;
 
-	private GUIDocument[] hits = new GUIDocument[0];
+	private List<GUIDocument> hits = new ArrayList<>();
 
 	public long getTime() {
 		return time;
@@ -36,11 +38,11 @@ public class GUIResult implements Serializable {
 		this.hasMore = hasMore;
 	}
 
-	public GUIDocument[] getHits() {
+	public List<GUIDocument> getHits() {
 		return hits;
 	}
 
-	public void setHits(GUIDocument[] hits) {
+	public void setHits(List<GUIDocument> hits) {
 		this.hits = hits;
 	}
 

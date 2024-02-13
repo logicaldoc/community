@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.document.stamp;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -37,9 +37,9 @@ public class StampDialog extends StickyWindow {
 
 	private SelectItem stampSelector;
 
-	protected GUIDocument[] documents;
+	protected List<GUIDocument> documents;
 
-	public StampDialog(GUIDocument[] documents) {
+	public StampDialog(List<GUIDocument> documents) {
 		super("applystamp");
 		this.documents = documents;
 
@@ -93,8 +93,7 @@ public class StampDialog extends StickyWindow {
 				Boolean visualPositioningFlag = visualPositioning.getValueAsBoolean();
 				if (stamp.getTemplateId() != null) {
 					// Display the form for filling the form parameters
-					FillStamp fillStamp = new FillStamp(documents, stamp, visualPositioningFlag);
-					fillStamp.show();
+					new FillStamp(documents, stamp, visualPositioningFlag).show();
 					destroy();
 				} else {
 					applyStamp(stamp, visualPositioningFlag, StampDialog.this, documents);
@@ -103,7 +102,7 @@ public class StampDialog extends StickyWindow {
 		});
 	}
 
-	static void applyStamp(GUIStamp stamp, Boolean visualPositioningFlag, Window popup, GUIDocument[] documents) {
+	static void applyStamp(GUIStamp stamp, Boolean visualPositioningFlag, Window popup, List<GUIDocument> documents) {
 		if (Boolean.TRUE.equals(visualPositioningFlag)) {
 			VisualPositioningStampDialog dialog = new VisualPositioningStampDialog(documents, stamp);
 			dialog.show();
@@ -111,8 +110,9 @@ public class StampDialog extends StickyWindow {
 		} else {
 			LD.contactingServer();
 
-			StampService.Instance.get().applyStamp(Arrays.asList(documents).stream().map(d -> d.getId())
-					.collect(Collectors.toList()).toArray(new Long[0]), stamp, new AsyncCallback<Void>() {
+			StampService.Instance.get().applyStamp(
+					documents.stream().map(d -> d.getId()).collect(Collectors.toList()).toArray(new Long[0]), stamp,
+					new AsyncCallback<Void>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

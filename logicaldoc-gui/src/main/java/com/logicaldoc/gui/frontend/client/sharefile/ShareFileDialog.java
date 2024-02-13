@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.sharefile;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -77,18 +80,18 @@ public class ShareFileDialog extends Dialog {
 		if (selection == null)
 			return;
 
-		final Long[] docIds = MainPanel.get().isOnDocumentsTab()
+		final List<Long> docIds = MainPanel.get().isOnDocumentsTab()
 				? DocumentsPanel.get().getDocumentsGrid().getSelectedIds()
 				: SearchPanel.get().getDocumentsGrid().getSelectedIds();
 
-		SC.ask(docIds.length == 0
+		SC.ask(docIds.size() == 0
 				? I18N.message("exportdirtosfile", FolderController.get().getCurrentFolder().getName())
 				: I18N.message("exportdocstosfile"), choice -> {
 					if (choice.booleanValue()) {
 						String targetId = selection.getAttributeAsString("iid");
-						Long[] folderIds = new Long[0];
-						if (docIds.length == 0 && FolderController.get().getCurrentFolder() != null)
-							folderIds[0] = FolderController.get().getCurrentFolder().getId();
+						List<Long> folderIds = new ArrayList<>();
+						if (docIds.size() == 0 && FolderController.get().getCurrentFolder() != null)
+							folderIds.add(FolderController.get().getCurrentFolder().getId());
 
 						LD.contactingServer();
 						ShareFileService.Instance.get().exportDocuments(targetId, folderIds, docIds,

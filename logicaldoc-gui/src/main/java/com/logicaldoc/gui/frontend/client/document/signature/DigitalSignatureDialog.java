@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document.signature;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -34,9 +36,9 @@ public class DigitalSignatureDialog extends Window {
 
 	private DynamicForm form = new DynamicForm();
 
-	private Long[] docIds;
+	private List<Long> docIds;
 
-	public DigitalSignatureDialog(Long[] docIds) {
+	public DigitalSignatureDialog(List<Long> docIds) {
 		super();
 
 		this.docIds = docIds;
@@ -104,8 +106,7 @@ public class DigitalSignatureDialog extends Window {
 			return;
 
 		if (Boolean.TRUE.equals(visualPositioning.getValueAsBoolean())) {
-			new VisualPositioningDigitalSignatureDialog(docIds,
-					vm.getValueAsString(REASON)).show();
+			new VisualPositioningDigitalSignatureDialog(docIds, vm.getValueAsString(REASON)).show();
 			destroy();
 		} else {
 			destroy();

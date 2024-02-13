@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document.grid;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.Constants;
@@ -177,17 +178,11 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	}
 
 	@Override
-	public void setDocuments(GUIDocument[] documents) {
-		Record[] records = new Record[0];
-		if (documents != null && documents.length > 0) {
-			records = new Record[documents.length];
-			for (int i = 0; i < documents.length; i++) {
-				GUIDocument doc = documents[i];
-				Record rec = DocumentGridUtil.fromDocument(doc);
-				records[i] = rec;
-			}
-		}
-		setData(records);
+	public void setDocuments(List<GUIDocument> documents) {
+		List<Record> records = new ArrayList<>();
+		for (GUIDocument document : documents)
+			records.add(DocumentGridUtil.fromDocument(document));
+		setData(records.toArray(new Record[0]));
 	}
 
 	@Override
@@ -196,12 +191,12 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	}
 
 	@Override
-	public GUIDocument[] getSelectedDocuments() {
+	public List<GUIDocument> getSelectedDocuments() {
 		return DocumentGridUtil.toDocuments(getSelection());
 	}
 
 	@Override
-	public GUIDocument[] getDocuments() {
+	public List<GUIDocument> getDocuments() {
 		return DocumentGridUtil.toDocuments(getRecordList().toArray());
 	}
 
@@ -211,12 +206,12 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	}
 
 	@Override
-	public Long[] getSelectedIds() {
+	public List<Long> getSelectedIds() {
 		return DocumentGridUtil.getIds(getSelection());
 	}
 
 	@Override
-	public Long[] getIds() {
+	public List<Long> getIds() {
 		return DocumentGridUtil.getIds(getRecordList().toArray());
 	}
 
@@ -340,7 +335,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	}
 
 	@Override
-	public void onDocumentsDeleted(GUIDocument[] documents) {
+	public void onDocumentsDeleted(List<GUIDocument> documents) {
 		for (GUIDocument doc : documents) {
 			Record rec = findRecord(doc.getId());
 			if (rec != null) {
@@ -378,7 +373,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	@Override
 	public void onDocumentMoved(GUIDocument document) {
 		if (folder != null && document.getFolder().getId() != folder.getId())
-			onDocumentsDeleted(new GUIDocument[] { document });
+			onDocumentsDeleted(Arrays.asList(document));
 	}
 
 	@Override

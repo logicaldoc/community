@@ -44,8 +44,8 @@ public class ReadingRequestController {
 		}
 	}
 
-	public void addUnconfirmedReadings(GUIReadingRequest[] readings) {
-		if (readings == null || readings.length == 0)
+	public void addUnconfirmedReadings(List<GUIReadingRequest> readings) {
+		if (readings.isEmpty())
 			return;
 
 		for (GUIReadingRequest guiReading : readings) {
@@ -77,12 +77,10 @@ public class ReadingRequestController {
 		return unconfirmedReadings.get(docId);
 	}
 
-	public long[] getUnconfirmedReadingIds(long docId) {
-		long[] readingIds = new long[0];
+	public List<Long> getUnconfirmedReadingIds(long docId) {
+		List<Long> readingIds = new ArrayList<>();
 		if (isReadingConfirmRequired(docId)) {
-			List<Long> values = unconfirmedReadings.get(docId).stream().map(r -> r.getId())
-					.collect(Collectors.toList());
-			readingIds = values.stream().mapToLong(l -> l).toArray();
+			readingIds = unconfirmedReadings.get(docId).stream().map(r -> r.getId()).collect(Collectors.toList());
 		}
 		return readingIds;
 	}

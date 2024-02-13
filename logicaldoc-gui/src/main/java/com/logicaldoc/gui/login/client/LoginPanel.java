@@ -440,13 +440,11 @@ public class LoginPanel extends VLayout {
 	 */
 	protected void prepareAlerts() {
 		List<MessageLabel> messages = new ArrayList<>();
-		if (info.getAlerts() != null && info.getAlerts().length > 0) {
-			for (GUIMessage alert : info.getAlerts()) {
-				MessageLabel label = new MessageLabel(alert, info.getTenant().getId() == 1L);
-				label.setStyleName("loginMemesage");
-				if (alert.isShowInLogin()) {
-					messages.add(label);
-				}
+		for (GUIMessage alert : info.getAlerts()) {
+			MessageLabel label = new MessageLabel(alert, info.getTenant().getId() == 1L);
+			label.setStyleName("loginMemesage");
+			if (alert.isShowInLogin()) {
+				messages.add(label);
 			}
 		}
 

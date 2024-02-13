@@ -3,6 +3,7 @@ package com.logicaldoc.web.service;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -369,7 +370,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		att.setBooleanValue(templateExtAttr.getBooleanValue());
 		att.setDoubleValue(templateExtAttr.getDoubleValue());
 		att.setDateValue(templateExtAttr.getDateValue());
-		att.setOptions(List.of(templateExtAttr.getStringValue()));
+		att.setOptions(Arrays.asList(templateExtAttr.getStringValue()));
 
 		if (extensibleObject != null) {
 			Attribute attribute = extensibleObject.getAttribute(attrName);

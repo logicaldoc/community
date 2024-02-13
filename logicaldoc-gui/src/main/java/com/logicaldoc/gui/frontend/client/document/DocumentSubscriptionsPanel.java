@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document;
 
+import java.util.Arrays;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -100,7 +102,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 			if (selectedRecord == null)
 				return;
 			long groupId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
-			AuditService.Instance.get().subscribeDocuments(new Long[] { document.getId() },
+			AuditService.Instance.get().subscribeDocuments(Arrays.asList(document.getId()),
 					Constants.getAuditDefaultEvents(), null, groupId, new AsyncCallback<Void>() {
 
 						@Override
@@ -124,7 +126,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 			if (selectedRecord == null)
 				return;
 			long userId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
-			AuditService.Instance.get().subscribeDocuments(new Long[] { document.getId() },
+			AuditService.Instance.get().subscribeDocuments(Arrays.asList(document.getId()),
 					Constants.getAuditDefaultEvents(), userId, null, new AsyncCallback<Void>() {
 
 						@Override
@@ -155,23 +157,22 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> 
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
-				if (Boolean.TRUE.equals(answer)) {
-					AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+			if (Boolean.TRUE.equals(answer)) {
+				AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							list.removeSelectedData();
-							list.deselectAllRecords();
-						}
-					});
-				}
-			}));
+					@Override
+					public void onSuccess(Void result) {
+						list.removeSelectedData();
+						list.deselectAllRecords();
+					}
+				});
+			}
+		}));
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));

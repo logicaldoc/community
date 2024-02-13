@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.frontend.client.personal.contacts;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -230,9 +232,9 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 	protected void onShare() {
 		ListGridRecord[] selection = list.getSelectedRecords();
 
-		long[] ids = new long[selection.length];
-		for (int i = 0; i < ids.length; i++)
-			ids[i] = selection[i].getAttributeAsLong("id");
+		List<Long> ids = new ArrayList<>();
+		for (int i = 0; i < selection.length; i++)
+			ids.add(selection[i].getAttributeAsLong("id"));
 
 		final UserSelectorCombo usersSelector = new UserSelectorCombo("users", "users", null, true, true);
 

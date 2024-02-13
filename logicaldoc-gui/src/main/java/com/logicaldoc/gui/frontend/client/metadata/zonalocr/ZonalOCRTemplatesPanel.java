@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.frontend.client.metadata.zonalocr;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
@@ -157,7 +158,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		deleteZones.addClickHandler(
 				event -> LD.ask(I18N.message("deletezones"), I18N.message("deletezonesquestion"), (Boolean answer) -> {
 					if (Boolean.TRUE.equals(answer)) {
-						selectedOcrTemplate.setZones(new GUIZone[0]);
+						selectedOcrTemplate.setZones(new ArrayList<>());
 						setSelectedOcrTemplate(selectedOcrTemplate);
 					}
 				}));

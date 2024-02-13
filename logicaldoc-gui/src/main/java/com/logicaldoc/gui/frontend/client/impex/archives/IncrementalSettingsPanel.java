@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.impex.archives;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.logicaldoc.gui.common.client.beans.GUIIncrementalArchive;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
@@ -35,11 +36,11 @@ public class IncrementalSettingsPanel extends VLayout {
 	protected DynamicForm form = new DynamicForm();
 
 	protected FolderSelector folderSelector = new FolderSelector("folder", null);
-	
+
 	protected TextItem prefix = null;
-	
+
 	protected IntegerItem frequency = null;
-	
+
 	protected SelectItem templates = null;
 
 	public IncrementalSettingsPanel(GUIIncrementalArchive incremental, ChangedHandler changedHandler,
@@ -67,7 +68,8 @@ public class IncrementalSettingsPanel extends VLayout {
 
 		templates = ItemFactory.newTemplateSelector(false, null);
 		templates.addChangedHandler(changedHandler);
-		templates.setValues(incremental.getTemplateIds());
+		templates.setValues(incremental.getTemplateIds().stream().map(id -> Long.toString(id))
+				.collect(Collectors.toList()).toArray(new String[0]));
 
 		form.setFields(prefix, frequency, folderSelector, templates);
 
@@ -83,8 +85,8 @@ public class IncrementalSettingsPanel extends VLayout {
 			incremental.setFolder(folderSelector.getFolder());
 
 			if (vm.getValues().get("template") != null) {
-				String templateIdString = vm.getValues().get("template").toString().trim().replace("[", "")
-						.replace("]", "");
+				String templateIdString = vm.getValues().get("template").toString().trim().replace("[", "").replace("]",
+						"");
 				if (!templateIdString.isEmpty()) {
 					String[] selection = templateIdString.split(",");
 					List<GUITemplate> guiTemplates = new ArrayList<>();
@@ -93,7 +95,7 @@ public class IncrementalSettingsPanel extends VLayout {
 						currentTemplate.setId(Long.parseLong(selectionId.trim()));
 						guiTemplates.add(currentTemplate);
 					}
-					incremental.setTemplates(guiTemplates.toArray(new GUITemplate[0]));
+					incremental.setTemplates(guiTemplates);
 				}
 			}
 

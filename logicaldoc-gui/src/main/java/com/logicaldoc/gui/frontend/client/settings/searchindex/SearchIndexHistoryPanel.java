@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.settings.searchindex;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
@@ -214,10 +217,7 @@ public class SearchIndexHistoryPanel extends VLayout {
 		index.setTitle(I18N.message("index"));
 		index.addClickHandler(event -> {
 			LD.contactingServer();
-
-			Long[] docIds = getSelectedDocIds(list);
-
-			DocumentService.Instance.get().indexDocuments(docIds, new AsyncCallback<Void>() {
+			DocumentService.Instance.get().indexDocuments(getSelectedDocIds(list), new AsyncCallback<Void>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					LD.clearPrompt();
@@ -235,10 +235,7 @@ public class SearchIndexHistoryPanel extends VLayout {
 		MenuItem markIndexMetadataOnly = new MenuItem();
 		markIndexMetadataOnly.setTitle(I18N.message("markindexablemetadataonly"));
 		markIndexMetadataOnly.addClickHandler(event -> {
-
-			Long[] docIds = getSelectedDocIds(list);
-
-			DocumentService.Instance.get().markIndexable(docIds, Constants.INDEX_TO_INDEX_METADATA,
+			DocumentService.Instance.get().markIndexable(getSelectedDocIds(list), Constants.INDEX_TO_INDEX_METADATA,
 					new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
@@ -255,10 +252,7 @@ public class SearchIndexHistoryPanel extends VLayout {
 		MenuItem markUnindexable = new MenuItem();
 		markUnindexable.setTitle(I18N.message("markunindexable"));
 		markUnindexable.addClickHandler(event -> {
-
-			Long[] docIds = getSelectedDocIds(list);
-
-			DocumentService.Instance.get().markUnindexable(docIds, new AsyncCallback<Void>() {
+			DocumentService.Instance.get().markUnindexable(getSelectedDocIds(list), new AsyncCallback<Void>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
@@ -274,20 +268,18 @@ public class SearchIndexHistoryPanel extends VLayout {
 		MenuItem markIndexable = new MenuItem();
 		markIndexable.setTitle(I18N.message("markindexable"));
 		markIndexable.addClickHandler(event -> {
+			DocumentService.Instance.get().markIndexable(getSelectedDocIds(list), Constants.INDEX_TO_INDEX,
+					new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-			Long[] docIds = getSelectedDocIds(list);
-
-			DocumentService.Instance.get().markIndexable(docIds, Constants.INDEX_TO_INDEX, new AsyncCallback<Void>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
-				@Override
-				public void onSuccess(Void result) {
-					refresh(list);
-				}
-			});
+						@Override
+						public void onSuccess(Void result) {
+							refresh(list);
+						}
+					});
 		});
 
 		contextMenu.setItems(preview, downloadIndexed, openInFolder, index, markIndexable, markIndexMetadataOnly,
@@ -295,11 +287,11 @@ public class SearchIndexHistoryPanel extends VLayout {
 		contextMenu.showContextMenu();
 	}
 
-	private Long[] getSelectedDocIds(RefreshableListGrid list) {
+	private List<Long> getSelectedDocIds(RefreshableListGrid list) {
 		ListGridRecord[] selection = list.getSelectedRecords();
-		Long[] docIds = new Long[selection.length];
+		List<Long> docIds = new ArrayList<>();
 		for (int i = 0; i < selection.length; i++)
-			docIds[i] = selection[i].getAttributeAsLong(DOC_ID);
+			docIds.add(selection[i].getAttributeAsLong(DOC_ID));
 		return docIds;
 	}
 }

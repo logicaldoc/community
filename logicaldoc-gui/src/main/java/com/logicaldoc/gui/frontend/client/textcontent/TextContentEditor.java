@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.textcontent;
 
+import java.util.Arrays;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -108,7 +110,7 @@ public class TextContentEditor extends Window {
 
 	private void unlockAndClose() {
 		if (document.getId() != 0)
-			DocumentService.Instance.get().unlock(new Long[] { TextContentEditor.this.document.getId() },
+			DocumentService.Instance.get().unlock(Arrays.asList(TextContentEditor.this.document.getId()),
 					new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {

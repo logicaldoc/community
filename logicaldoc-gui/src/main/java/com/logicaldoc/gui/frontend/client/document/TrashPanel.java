@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -95,7 +96,7 @@ public class TrashPanel extends VLayout {
 	}
 
 	private void restoreDocument(final long id) {
-		DocumentService.Instance.get().restore(new Long[] { id }, FolderController.get().getCurrentFolder().getId(),
+		DocumentService.Instance.get().restore(Arrays.asList(id), FolderController.get().getCurrentFolder().getId(),
 				new AsyncCallback<Void>() {
 
 					@Override
@@ -203,19 +204,18 @@ public class TrashPanel extends VLayout {
 		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean response) -> {
 			if (Boolean.TRUE.equals(response)) {
 				if (!docIds.isEmpty())
-					DocumentService.Instance.get().deleteFromTrash(docIds.toArray(new Long[0]),
-							new AsyncCallback<Void>() {
+					DocumentService.Instance.get().deleteFromTrash(docIds, new AsyncCallback<Void>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-								@Override
-								public void onSuccess(Void arg) {
-									refresh();
-								}
-							});
+						@Override
+						public void onSuccess(Void arg) {
+							refresh();
+						}
+					});
 				if (!folderIds.isEmpty())
 					FolderService.Instance.get().deleteFromTrash(folderIds.toArray(new Long[0]),
 							new AsyncCallback<Void>() {

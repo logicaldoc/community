@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document.selector;
 
+import java.util.List;
+
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.widgets.StickyWindow;
@@ -23,7 +25,7 @@ public abstract class DocumentSelectorDialog extends StickyWindow {
 		return new WindowStatus(950, 600);
 	}
 
-	protected abstract void onSelection(GUIDocument[] selection);
+	protected abstract void onSelection(List<GUIDocument> selection);
 
 	@Override
 	protected void onDraw() {

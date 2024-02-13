@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -161,7 +163,7 @@ public interface WorkflowService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server applications
 	 */
-	public void startWorkflow(String workflowName, String workflowDescription, String tag, String color, Long[] docIds)
+	public void startWorkflow(String workflowName, String workflowDescription, String tag, String color, List<Long> docIds)
 			throws ServerException;
 
 	/**
@@ -239,7 +241,7 @@ public interface WorkflowService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server applications
 	 */
-	public void appendDocuments(String taskId, Long[] docIds) throws ServerException;
+	public void appendDocuments(String taskId, List<Long> docIds) throws ServerException;
 
 	/**
 	 * Detaches a document from a workflow

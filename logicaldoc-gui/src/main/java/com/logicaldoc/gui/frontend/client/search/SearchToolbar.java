@@ -5,9 +5,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
-import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -136,7 +136,7 @@ public class SearchToolbar extends ToolStrip {
 		addButton(download);
 		download.addClickHandler((ClickEvent event) -> {
 			if (Search.get().getOptions().getType() == GUISearchOptions.TYPE_FOLDERS
-					|| Search.get().getLastResult() == null || Search.get().getLastResult().length < 1)
+					|| Search.get().getLastResult().isEmpty())
 				return;
 
 			StringBuilder url = new StringBuilder(GWT.getHostPageBaseURL() + "zip-export?1=1");
@@ -160,17 +160,18 @@ public class SearchToolbar extends ToolStrip {
 
 			bulkUpdate.addClickHandler(event -> {
 				if (Search.get().getOptions().getType() == GUISearchOptions.TYPE_FOLDERS
-						|| Search.get().getLastResult() == null || Search.get().getLastResult().length < 1)
+						|| Search.get().getLastResult().isEmpty())
 					return;
 
-				if (hitsPanel.getGrid().getSelectedIds().length > 1) {
+				if (!hitsPanel.getGrid().getSelectedIds().isEmpty()) {
 					GUIDocument metadata = new GUIDocument();
 					metadata.setBulkUpdate(true);
 					metadata.setStartPublishing(null);
 					metadata.setPublished(-1);
 					metadata.setLockUserId(Session.get().getUser().getId());
 					GUIFolder fld = new GUIFolder();
-					fld.setAllowedPermissions(new GUIAccessControlEntry(GUIAccessControlEntry.PERMISSION_READ, GUIAccessControlEntry.PERMISSION_WRITE));
+					fld.setAllowedPermissions(new GUIAccessControlEntry(GUIAccessControlEntry.PERMISSION_READ,
+							GUIAccessControlEntry.PERMISSION_WRITE));
 					metadata.setFolder(fld);
 
 					UpdateDialog dialog = new UpdateDialog(hitsPanel.getGrid().getSelectedIds(), metadata,

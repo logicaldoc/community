@@ -10,11 +10,11 @@ import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIReminder;
-import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.controllers.FolderObserver;
@@ -289,9 +289,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			addCalendarEvent.addClickHandler(
 					event -> checkPermissionsAndRun(new String[] { GUIAccessControlEntry.PERMISSION_CALENDAR }, () -> {
 						DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-
-						GUIDocument[] docs = grid.getSelectedDocuments();
-
 						GUICalendarEvent calEvent = new GUICalendarEvent();
 						calEvent.setCreator(Session.get().getUser().getFullName());
 						calEvent.setCreatorId(Session.get().getUser().getId());
@@ -302,10 +299,11 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 						user.setName(Session.get().getUser().getName());
 						calEvent.addParticipant(user);
 
-						if (docs != null && docs.length > 0) {
+						List<GUIDocument> docs = grid.getSelectedDocuments();
+						if (!docs.isEmpty()) {
 							calEvent.setDocuments(docs);
-							calEvent.setTitle(Util.getBaseName(docs[0].getFileName()));
-							calEvent.setType(docs[0].getTemplate());
+							calEvent.setTitle(Util.getBaseName(docs.get(0).getFileName()));
+							calEvent.setType(docs.get(0).getTemplate());
 						}
 
 						calEvent.addReminder(new GUIReminder(0, GUIReminder.TIME_UNIT_MINUTE));
@@ -322,7 +320,8 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.WORKFLOW))
 				setFeatureDisabled(startWorkflow);
 
-			startWorkflow.addClickHandler(event -> checkPermissionsAndRun(new String[] { GUIAccessControlEntry.PERMISSION_WORKFLOW },
+			startWorkflow.addClickHandler(event -> checkPermissionsAndRun(
+					new String[] { GUIAccessControlEntry.PERMISSION_WORKFLOW },
 					() -> new StartWorkflowDialog(DocumentsPanel.get().getDocumentsGrid().getSelectedIds()).show()));
 		}
 	}
@@ -360,7 +359,8 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.STAMP))
 				setFeatureDisabled(stamp);
 
-			stamp.addClickHandler(event -> checkPermissionsAndRun(new String[] { GUIAccessControlEntry.PERMISSION_WRITE },
+			stamp.addClickHandler(event -> checkPermissionsAndRun(
+					new String[] { GUIAccessControlEntry.PERMISSION_WRITE },
 					() -> new StampDialog(DocumentsPanel.get().getDocumentsGrid().getSelectedDocuments()).show()));
 		}
 	}
@@ -372,8 +372,9 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				setFeatureDisabled(bulkCheckout);
 
 			bulkCheckout.addClickHandler(event -> checkPermissionsAndRun(
-					new String[] { GUIAccessControlEntry.PERMISSION_DOWNLOAD, GUIAccessControlEntry.PERMISSION_WRITE }, () -> {
-						GUIDocument[] docs = DocumentsPanel.get().getDocumentsGrid().getSelectedDocuments();
+					new String[] { GUIAccessControlEntry.PERMISSION_DOWNLOAD, GUIAccessControlEntry.PERMISSION_WRITE },
+					() -> {
+						List<GUIDocument> docs = DocumentsPanel.get().getDocumentsGrid().getSelectedDocuments();
 						List<Long> unlockedIds = new ArrayList<>();
 						for (GUIDocument doc : docs)
 							if (doc.getStatus() == 0 && doc.getImmutable() == 0)
@@ -389,7 +390,8 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.BULK_UPDATE))
 				setFeatureDisabled(bulkUpdate);
 
-			bulkUpdate.addClickHandler(event -> checkPermissionsAndRun(new String[] { GUIAccessControlEntry.PERMISSION_WRITE },
+			bulkUpdate.addClickHandler(event -> checkPermissionsAndRun(
+					new String[] { GUIAccessControlEntry.PERMISSION_WRITE },
 					() -> new UpdateDialog(DocumentsPanel.get().getDocumentsGrid().getSelectedIds(),
 							FolderController.get().getCurrentFolder().newDocument(), UpdateDialog.BULKUPDATE, false)
 									.show()));
@@ -403,7 +405,8 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.IMPEX))
 				setFeatureDisabled(archive);
 
-			archive.addClickHandler(event -> checkPermissionsAndRun(new String[] { GUIAccessControlEntry.PERMISSION_ARCHIVE },
+			archive.addClickHandler(event -> checkPermissionsAndRun(
+					new String[] { GUIAccessControlEntry.PERMISSION_ARCHIVE },
 					() -> new SendToArchiveDialog(DocumentsPanel.get().getDocumentsGrid().getSelectedIds(), true)
 							.show()));
 		}
@@ -416,9 +419,10 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.AUDIT))
 				setFeatureDisabled(subscribe);
 
-			subscribe.addClickHandler(event -> checkPermissionsAndRun(new String[] { GUIAccessControlEntry.PERMISSION_SUBSCRIPTION },
-					() -> new SubscriptionDialog(null, DocumentsPanel.get().getDocumentsGrid().getSelectedIds())
-							.show()));
+			subscribe.addClickHandler(
+					event -> checkPermissionsAndRun(new String[] { GUIAccessControlEntry.PERMISSION_SUBSCRIPTION },
+							() -> new SubscriptionDialog(null, DocumentsPanel.get().getDocumentsGrid().getSelectedIds())
+									.show()));
 		}
 	}
 
@@ -468,7 +472,8 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.OFFICE))
 				setFeatureDisabled(office);
 
-			office.addClickHandler(event -> checkPermissionsAndRun(new String[] { GUIAccessControlEntry.PERMISSION_DOWNLOAD,  GUIAccessControlEntry.PERMISSION_WRITE},
+			office.addClickHandler(event -> checkPermissionsAndRun(
+					new String[] { GUIAccessControlEntry.PERMISSION_DOWNLOAD, GUIAccessControlEntry.PERMISSION_WRITE },
 					() -> Util.openEditWithOffice(document.getId())));
 		}
 	}
@@ -494,44 +499,46 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.PDF))
 				setFeatureDisabled(pdf);
 
-			pdf.addClickHandler(event -> checkPermissionsAndRun(new String[] { GUIAccessControlEntry.PERMISSION_DOWNLOAD }, () -> {
-				Long[] selection = DocumentsPanel.get().getDocumentsGrid().getSelectedIds();
-				if (selection.length == 1) {
-					DocUtil.downloadPdfConversion(document.getId(), document.getVersion());
-				} else {
-					StringBuilder url = new StringBuilder(Util.contextPath() + "convertpdf?open=true&docId=");
-					for (long id : selection) {
-						url.append(Long.toString(id));
-						url.append(",");
-					}
-					Util.download(url.toString());
-				}
-			}));
+			pdf.addClickHandler(
+					event -> checkPermissionsAndRun(new String[] { GUIAccessControlEntry.PERMISSION_DOWNLOAD }, () -> {
+						List<Long> selection = DocumentsPanel.get().getDocumentsGrid().getSelectedIds();
+						if (selection.size() == 1) {
+							DocUtil.downloadPdfConversion(document.getId(), document.getVersion());
+						} else {
+							StringBuilder url = new StringBuilder(Util.contextPath() + "convertpdf?open=true&docId=");
+							for (long id : selection) {
+								url.append(Long.toString(id));
+								url.append(",");
+							}
+							Util.download(url.toString());
+						}
+					}));
 		}
 	}
 
 	private void addDownload() {
 		addButton(download);
-		download.addClickHandler(event -> checkPermissionsAndRun(new String[] { GUIAccessControlEntry.PERMISSION_DOWNLOAD }, () -> {
-			GUIDocument[] selection = DocumentsPanel.get().getDocumentsGrid().getSelectedDocuments();
-			if (selection.length == 1) {
-				long id = selection[0].getId();
-				DocUtil.download(id, null);
-			} else {
-				StringBuilder url = new StringBuilder(GWT.getHostPageBaseURL());
-				url.append("zip-export?folderId=");
-				url.append(FolderController.get().getCurrentFolder().getId());
-				for (GUIDocument rec : selection) {
-					if (rec.isPasswordProtected()) {
-						SC.warn(I18N.message("somedocsprotected"));
-						break;
+		download.addClickHandler(
+				event -> checkPermissionsAndRun(new String[] { GUIAccessControlEntry.PERMISSION_DOWNLOAD }, () -> {
+					List<GUIDocument> selection = DocumentsPanel.get().getDocumentsGrid().getSelectedDocuments();
+					if (selection.size() == 1) {
+						long id = selection.get(0).getId();
+						DocUtil.download(id, null);
+					} else {
+						StringBuilder url = new StringBuilder(GWT.getHostPageBaseURL());
+						url.append("zip-export?folderId=");
+						url.append(FolderController.get().getCurrentFolder().getId());
+						for (GUIDocument rec : selection) {
+							if (rec.isPasswordProtected()) {
+								SC.warn(I18N.message("somedocsprotected"));
+								break;
+							}
+							url.append("&docId=");
+							url.append(rec.getId());
+						}
+						Util.download(url.toString());
 					}
-					url.append("&docId=");
-					url.append(rec.getId());
-				}
-				Util.download(url.toString());
-			}
-		}));
+				}));
 	}
 
 	/**
@@ -547,23 +554,24 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		if (grid.getSelectedCount() == 0)
 			return;
 
-		DocumentService.Instance.get().getEnabledPermissions(grid.getSelectedIds(), new AsyncCallback<GUIAccessControlEntry>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
-			@Override
-			public void onSuccess(GUIAccessControlEntry grantedPermissions) {
-				for (String permission : requiredPermissions) {
-					if (!grantedPermissions.isPermissionAllowed(permission.toLowerCase())) {
-						GuiLog.warn(I18N.message("somedocsdonothaveperm", permission.toUpperCase()), null);
-						return;
+		DocumentService.Instance.get().getEnabledPermissions(grid.getSelectedIds(),
+				new AsyncCallback<GUIAccessControlEntry>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
 					}
-				}
-				task.run();
-			}
-		});
+
+					@Override
+					public void onSuccess(GUIAccessControlEntry grantedPermissions) {
+						for (String permission : requiredPermissions) {
+							if (!grantedPermissions.isPermissionAllowed(permission.toLowerCase())) {
+								GuiLog.warn(I18N.message("somedocsdonothaveperm", permission.toUpperCase()), null);
+								return;
+							}
+						}
+						task.run();
+					}
+				});
 	}
 
 	private void addRefresh() {
@@ -616,18 +624,21 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 	private void updateUsingFolder(GUIFolder folder) {
 		if (folder != null) {
 			refresh.setDisabled(false);
-			add.setDisabled(!folder.hasPermission(Constants.PERMISSION_WRITE));
-			dropSpot.setDisabled(!folder.hasPermission(Constants.PERMISSION_WRITE)
-					|| !folder.hasPermission(Constants.PERMISSION_IMPORT) || !Feature.enabled(Feature.DROP_SPOT));
-			addForm.setDisabled(!folder.hasPermission(Constants.PERMISSION_WRITE) || !Feature.enabled(Feature.FORM));
-			scan.setDisabled(!folder.hasPermission(Constants.PERMISSION_WRITE) || !Feature.enabled(Feature.SCAN));
+			add.setDisabled(!folder.hasPermission(GUIAccessControlEntry.PERMISSION_WRITE));
+			dropSpot.setDisabled(!folder.hasPermission(GUIAccessControlEntry.PERMISSION_WRITE)
+					|| !folder.hasPermission(GUIAccessControlEntry.PERMISSION_IMPORT)
+					|| !Feature.enabled(Feature.DROP_SPOT));
+			addForm.setDisabled(
+					!folder.hasPermission(GUIAccessControlEntry.PERMISSION_WRITE) || !Feature.enabled(Feature.FORM));
+			scan.setDisabled(
+					!folder.hasPermission(GUIAccessControlEntry.PERMISSION_WRITE) || !Feature.enabled(Feature.SCAN));
 			bulkUpdate.setDisabled(!Feature.enabled(Feature.BULK_UPDATE) || !folder.isWrite());
 			bulkCheckout
 					.setDisabled(!Feature.enabled(Feature.BULK_CHECKOUT) || !folder.isDownload() || !folder.isWrite());
-			addCalendarEvent.setDisabled(
-					!folder.hasPermission(GUIAccessControlEntry.PERMISSION_CALENDAR) || !Feature.enabled(Feature.CALENDAR));
-			startWorkflow.setDisabled(
-					!folder.hasPermission(GUIAccessControlEntry.PERMISSION_WORKFLOW) || !Feature.enabled(Feature.WORKFLOW));
+			addCalendarEvent.setDisabled(!folder.hasPermission(GUIAccessControlEntry.PERMISSION_CALENDAR)
+					|| !Feature.enabled(Feature.CALENDAR));
+			startWorkflow.setDisabled(!folder.hasPermission(GUIAccessControlEntry.PERMISSION_WORKFLOW)
+					|| !Feature.enabled(Feature.WORKFLOW));
 
 			list.setDisabled(false);
 			gallery.setDisabled(false);
@@ -666,13 +677,14 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		sign.setDisabled(!Feature.enabled(Feature.DIGITAL_SIGNATURE) || !document.isWrite()
 				|| !document.hasPermission(GUIAccessControlEntry.PERMISSION_SIGN));
 
-		archive.setDisabled(!document.hasPermission(GUIAccessControlEntry.PERMISSION_ARCHIVE) || !Feature.enabled(Feature.IMPEX));
-		startWorkflow.setDisabled(
-				!document.hasPermission(GUIAccessControlEntry.PERMISSION_WORKFLOW) || !Feature.enabled(Feature.WORKFLOW));
+		archive.setDisabled(
+				!document.hasPermission(GUIAccessControlEntry.PERMISSION_ARCHIVE) || !Feature.enabled(Feature.IMPEX));
+		startWorkflow.setDisabled(!document.hasPermission(GUIAccessControlEntry.PERMISSION_WORKFLOW)
+				|| !Feature.enabled(Feature.WORKFLOW));
 		readingRequest.setDisabled(!document.hasPermission(GUIAccessControlEntry.PERMISSION_READINGREQ)
 				|| !Feature.enabled(Feature.READING_CONFIRMATION));
-		addCalendarEvent.setDisabled(
-				!document.hasPermission(GUIAccessControlEntry.PERMISSION_CALENDAR) || !Feature.enabled(Feature.CALENDAR));
+		addCalendarEvent.setDisabled(!document.hasPermission(GUIAccessControlEntry.PERMISSION_CALENDAR)
+				|| !Feature.enabled(Feature.CALENDAR));
 
 		boolean isOfficeFile = false;
 		if (document.getFileName() != null)

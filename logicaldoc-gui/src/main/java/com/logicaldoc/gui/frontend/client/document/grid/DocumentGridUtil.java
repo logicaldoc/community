@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document.grid;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
@@ -72,19 +73,19 @@ public class DocumentGridUtil {
 	private DocumentGridUtil() {
 	}
 
-	public static Long[] getIds(Record[] records) {
-		Long[] ids = new Long[records.length];
+	public static List<Long> getIds(Record[] records) {
+		List<Long> ids = new ArrayList<>();
 		for (int i = 0; i < records.length; i++)
-			ids[i] = Long.parseLong(records[i].getAttributeAsString("id"));
+			ids.add(Long.parseLong(records[i].getAttributeAsString("id")));
 		return ids;
 	}
 
-	public static GUIDocument[] toDocuments(Record[] records) {
-		ArrayList<GUIDocument> docs = new ArrayList<>();
+	public static List<GUIDocument> toDocuments(Record[] records) {
+		List<GUIDocument> docs = new ArrayList<>();
 		if (records != null)
 			for (Record rec : records)
 				docs.add(DocumentGridUtil.toDocument(rec));
-		return docs.toArray(new GUIDocument[0]);
+		return docs;
 	}
 
 	public static GUIDocument toDocument(Record rec) {

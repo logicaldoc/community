@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.calendar;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -28,7 +29,6 @@ import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.selector.DocumentSelectorDialog;
 import com.logicaldoc.gui.frontend.client.services.CalendarService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
-import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -291,16 +291,16 @@ public class CalendarEventDialog extends Window {
 	}
 
 	private void fillRemindersGrid() {
-		ListGridRecord[] records = new ListGridRecord[calendarEvent.getReminders().length];
-		for (int i = 0; i < calendarEvent.getReminders().length; i++) {
-			records[i] = new ListGridRecord();
-			records[i].setAttribute(VALUE, calendarEvent.getReminders()[i].getValue());
-			records[i].setAttribute("unit", calendarEvent.getReminders()[i].getUnit());
-			records[i].setAttribute("when", BEFORE);
-			records[i].setAttribute("date", calendarEvent.getReminders()[i].getDate());
-			records[i].setAttribute(REMINDED, calendarEvent.getReminders()[i].getReminded());
+		List<ListGridRecord> records = new ArrayList<>();
+		for (GUIReminder reminder : calendarEvent.getReminders()) {
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute(VALUE, reminder.getValue());
+			rec.setAttribute("unit", reminder.getUnit());
+			rec.setAttribute("when", BEFORE);
+			rec.setAttribute("date", reminder.getDate());
+			rec.setAttribute(REMINDED, reminder.getReminded());
 		}
-		remindersGrid.setRecords(records);
+		remindersGrid.setRecords(records.toArray(new ListGridRecord[0]));
 	}
 
 	private Tab prepareParticipants() {
@@ -394,15 +394,15 @@ public class CalendarEventDialog extends Window {
 	}
 
 	private void fillParticipantsGrid(final ListGrid participantsGrid) {
-		ListGridRecord[] records = new ListGridRecord[calendarEvent.getParticipants().length];
-		for (int i = 0; i < calendarEvent.getParticipants().length; i++) {
-			records[i] = new ListGridRecord();
-			records[i].setAttribute("id", calendarEvent.getParticipants()[i].getId());
-			records[i].setAttribute("avatar", calendarEvent.getParticipants()[i].getId());
-			records[i].setAttribute("name", calendarEvent.getParticipants()[i].getFullName());
-			records[i].setAttribute(USERNAME, calendarEvent.getParticipants()[i].getUsername());
+		List<ListGridRecord> records = new ArrayList<>();
+		for (GUIUser participant : calendarEvent.getParticipants()) {
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute("id", participant.getId());
+			rec.setAttribute("avatar", participant.getId());
+			rec.setAttribute("name", participant.getFullName());
+			rec.setAttribute(USERNAME, participant.getUsername());
 		}
-		participantsGrid.setRecords(records);
+		participantsGrid.setRecords(records.toArray(new ListGridRecord[0]));
 	}
 
 	private Tab prepareDocumentsTab() {
@@ -476,7 +476,7 @@ public class CalendarEventDialog extends Window {
 
 		documentsGrid.addCellDoubleClickHandler((CellDoubleClickEvent event) -> {
 			destroy();
-			Record rec = event.getRecord();
+			ListGridRecord rec = event.getRecord();
 			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong(FOLDER_ID), rec.getAttributeAsLong("id"));
 		});
 
@@ -485,10 +485,9 @@ public class CalendarEventDialog extends Window {
 		addDocuments.addClickHandler(evnt -> new DocumentSelectorDialog() {
 
 			@Override
-			protected void onSelection(GUIDocument[] selection) {
-				for (GUIDocument doc : selection) {
+			protected void onSelection(List<GUIDocument> selection) {
+				for (GUIDocument doc : selection)
 					calendarEvent.addDocument(doc);
-				}
 				refreshDocumentsGrid(documentsGrid);
 				close();
 			}
@@ -497,21 +496,26 @@ public class CalendarEventDialog extends Window {
 		Button addDocumentsFromClipboard = new Button(I18N.message("adddocumentsfromclipboard"));
 		addDocumentsFromClipboard.setAutoFit(true);
 		addDocumentsFromClipboard.addClickHandler(eevnt -> {
+
 			Clipboard clipboard = Clipboard.getInstance();
 			if (clipboard.isEmpty()) {
 				SC.warn(I18N.message("nodocsinclipboard"));
 				return;
 			}
 
-			for (GUIDocument doc : clipboard) {
+			for (
+
+			GUIDocument doc : clipboard) {
 				calendarEvent.addDocument(doc);
 			}
 			clipboard.clear();
+
 			refreshDocumentsGrid(documentsGrid);
 		});
 
 		Tab documentsTab = new Tab();
 		documentsTab.setTitle(I18N.message("documents"));
+
 		VLayout layout = new VLayout();
 		layout.setWidth100();
 		layout.setHeight100();
@@ -533,20 +537,20 @@ public class CalendarEventDialog extends Window {
 	}
 
 	private void refreshDocumentsGrid(final ListGrid list) {
-		ListGridRecord[] records = new ListGridRecord[calendarEvent.getDocuments().length];
-		for (int i = 0; i < calendarEvent.getDocuments().length; i++) {
-			records[i] = new ListGridRecord();
-			records[i].setAttribute("id", calendarEvent.getDocuments()[i].getId());
-			records[i].setAttribute(FOLDER_ID, calendarEvent.getDocuments()[i].getFolder().getId());
-			records[i].setAttribute("icon", calendarEvent.getDocuments()[i].getIcon());
-			records[i].setAttribute("version", calendarEvent.getDocuments()[i].getVersion());
-			records[i].setAttribute("fileVersion", calendarEvent.getDocuments()[i].getFileVersion());
-			records[i].setAttribute("filename", calendarEvent.getDocuments()[i].getFileName());
-			records[i].setAttribute("lastModified", calendarEvent.getDocuments()[i].getLastModified());
-			records[i].setAttribute("docRef", calendarEvent.getDocuments()[i].getDocRef());
-			records[i].setAttribute("color", calendarEvent.getDocuments()[i].getColor());
+		List<ListGridRecord> records = new ArrayList<>();
+		for (GUIDocument document : calendarEvent.getDocuments()) {
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute("id", document.getId());
+			rec.setAttribute(FOLDER_ID, document.getFolder().getId());
+			rec.setAttribute("icon", document.getIcon());
+			rec.setAttribute("version", document.getVersion());
+			rec.setAttribute("fileVersion", document.getFileVersion());
+			rec.setAttribute("filename", document.getFileName());
+			rec.setAttribute("lastModified", document.getLastModified());
+			rec.setAttribute("docRef", document.getDocRef());
+			rec.setAttribute("color", document.getColor());
 		}
-		list.setRecords(records);
+		list.setRecords(records.toArray(new ListGridRecord[0]));
 	}
 
 	private Tab prepareDetails() {
@@ -776,7 +780,7 @@ public class CalendarEventDialog extends Window {
 	}
 
 	private void saveReminders(GUICalendarEvent calendarEvent) {
-		ArrayList<GUIReminder> reminders = new ArrayList<>();
+		List<GUIReminder> reminders = new ArrayList<>();
 		ListGridRecord[] records = remindersGrid.getRecords();
 		if (records != null)
 			for (ListGridRecord rec : records) {
@@ -785,7 +789,7 @@ public class CalendarEventDialog extends Window {
 				reminder.setReminded(rec.getAttributeAsInt(REMINDED));
 				reminders.add(reminder);
 			}
-		calendarEvent.setReminders(reminders.toArray(new GUIReminder[0]));
+		calendarEvent.setReminders(reminders);
 	}
 
 	/**
@@ -818,6 +822,7 @@ public class CalendarEventDialog extends Window {
 				});
 			} else
 				CalendarService.Instance.get().deleteEvent(calendarEvent.getId(), new AsyncCallback<Void>() {
+
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -829,6 +834,7 @@ public class CalendarEventDialog extends Window {
 						if (onChangedCallback != null)
 							onChangedCallback.onSuccess(arg);
 					}
+
 				});
 		});
 	}

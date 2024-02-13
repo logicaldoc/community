@@ -1,11 +1,14 @@
 package com.logicaldoc.gui.frontend.client.document;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.ServerValidationException;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.controllers.DocumentObserver;
@@ -391,7 +394,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 					subscriptionsTabPanel.removeMember(subscriptionsPanel);
 			}
 
-			if (document.hasPermission(Constants.PERMISSION_SUBSCRIPTION)) {
+			if (document.hasPermission(GUIAccessControlEntry.PERMISSION_SUBSCRIPTION)) {
 				tabSet.showTab(subscriptionsTab);
 				try {
 					subscriptionsPanel = new DocumentSubscriptionsPanel(document);
@@ -533,7 +536,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 				securityTabPanel.removeMember(securityPanel);
 		}
 
-		if (document.hasPermission(Constants.PERMISSION_SECURITY)) {
+		if (document.hasPermission(GUIAccessControlEntry.PERMISSION_SECURITY)) {
 			tabSet.showTab(securityTab);
 			try {
 				securityPanel = new DocumentSecurityPanel(document);
@@ -746,14 +749,13 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	}
 
 	@Override
-	public void onDocumentsDeleted(GUIDocument[] documents) {
-		if (document != null && documents != null)
-			for (GUIDocument deletedDoc : documents) {
-				if (deletedDoc.getId() == document.getId()) {
-					removeMembers(getMembers());
-					return;
-				}
+	public void onDocumentsDeleted(List<GUIDocument> documents) {
+		for (GUIDocument deletedDoc : documents) {
+			if (deletedDoc.getId() == document.getId()) {
+				removeMembers(getMembers());
+				return;
 			}
+		}
 	}
 
 	@Override

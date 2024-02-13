@@ -1,9 +1,11 @@
 package com.logicaldoc.gui.frontend.client.folder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.gwt.http.client.RequestTimeoutException;
 import com.google.gwt.user.client.Window;
@@ -11,6 +13,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -174,10 +177,9 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 				 * In this case we are moving documents
 				 */
 				DocumentsGrid grid = (DocumentsGrid) EventHandler.getDragTarget();
-				final GUIDocument[] selection = grid.getSelectedDocuments();
-				if (selection == null || selection.length == 0)
+				final List<GUIDocument> selection = grid.getSelectedDocuments();
+				if (selection.isEmpty())
 					return;
-				final long[] ids = getSelectedDocIDs(selection);
 
 				final TreeNode selectedNode = getDropFolder();
 				final long folderId = Long.parseLong(selectedNode.getAttribute(FOLDER_ID));
@@ -185,16 +187,9 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 				if (FolderController.get().getCurrentFolder().getId() == folderId)
 					return;
 
-				doMoveDocumentOnDrop(selection, ids, selectedNode, folderId);
+				doMoveDocumentOnDrop(selection, selectedNode, folderId);
 			}
 		});
-	}
-
-	private long[] getSelectedDocIDs(final GUIDocument[] selection) {
-		final long[] ids = new long[selection.length];
-		for (int i = 0; i < selection.length; i++)
-			ids[i] = selection[i].getId();
-		return ids;
 	}
 
 	/**
@@ -226,27 +221,28 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		});
 	}
 
-	private void doMoveDocumentOnDrop(final GUIDocument[] selection, final long[] ids, final TreeNode selectedNode,
+	private void doMoveDocumentOnDrop(final List<GUIDocument> selection, final TreeNode selectedNode,
 			final long folderId) {
-		final String sourceName = selection.length == 1 ? selection[0].getFileName()
-				: (selection.length + " " + I18N.message("documents").toLowerCase());
+		final String sourceName = selection.size() == 1 ? selection.get(0).getFileName()
+				: (selection.size() + " " + I18N.message("documents").toLowerCase());
 		final String targetName = selectedNode.getAttributeAsString("name");
 
 		LD.ask(I18N.message("move"), I18N.message("moveask", new String[] { sourceName, targetName }), yes -> {
 			if (Boolean.TRUE.equals(yes)) {
-				FolderService.Instance.get().paste(ids, folderId, "cut", false, false, false, new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-						GuiLog.warn(I18N.message(OPERATIONNOTALLOWED), null);
-					}
+				FolderService.Instance.get().paste(selection.stream().map(d -> d.getId()).collect(Collectors.toList()),
+						folderId, "cut", false, false, false, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+								GuiLog.warn(I18N.message(OPERATIONNOTALLOWED), null);
+							}
 
-					@Override
-					public void onSuccess(Void result) {
-						DocumentsPanel.get().onFolderSelected(FolderController.get().getCurrentFolder());
-						GuiLog.debug("Drag&Drop operation completed.");
-					}
-				});
+							@Override
+							public void onSuccess(Void result) {
+								DocumentsPanel.get().onFolderSelected(FolderController.get().getCurrentFolder());
+								GuiLog.debug("Drag&Drop operation completed.");
+							}
+						});
 			}
 
 			TreeNode node = getTree().find(FOLDER_ID, (Object) Long.valueOf(folderId));
@@ -256,7 +252,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	}
 
 	private void doMoveFolderOnDrop() {
-		final long[] source = getSelectedIds();
+		final List<Long> source = getSelectedIds();
 		final long target = Long.parseLong(getDropFolder().getAttributeAsString(FOLDER_ID));
 
 		final String sourceName = getDragData()[0].getAttributeAsString("name");
@@ -390,12 +386,13 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		addBookmark.setTitle(I18N.message("addbookmark"));
 		addBookmark.addClickHandler(click -> onAddBookmark());
 
-		if (!selectedFolder.hasPermission(Constants.PERMISSION_WRITE) || Clipboard.getInstance().isEmpty()) {
+		if (!selectedFolder.hasPermission(GUIAccessControlEntry.PERMISSION_WRITE)
+				|| Clipboard.getInstance().isEmpty()) {
 			paste.setEnabled(false);
 			pasteAsAlias.setEnabled(false);
 		}
 
-		if (!selectedFolder.hasPermission(Constants.PERMISSION_ADD)) {
+		if (!selectedFolder.hasPermission(GUIAccessControlEntry.PERMISSION_ADD)) {
 			createAlias.setEnabled(false);
 		}
 
@@ -449,7 +446,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 
 			contextMenu.addItem(automation);
 			if (!Feature.enabled(Feature.AUTOMATION)
-					|| !selectedFolder.hasPermission(Constants.PERMISSION_AUTOMATION)) {
+					|| !selectedFolder.hasPermission(GUIAccessControlEntry.PERMISSION_AUTOMATION)) {
 				automation.setEnabled(false);
 			}
 		}
@@ -462,13 +459,13 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			sendToExpArchive.addClickHandler(
 					event -> LD.ask(I18N.message("question"), I18N.message("confirmputinexparchive"), yes -> {
 						if (Boolean.TRUE.equals(yes)) {
-							SendToArchiveDialog archiveDialog = new SendToArchiveDialog(new Long[] { folder.getId() },
+							SendToArchiveDialog archiveDialog = new SendToArchiveDialog(Arrays.asList(folder.getId()),
 									false);
 							archiveDialog.show();
 						}
 					}));
 			contextMenu.addItem(sendToExpArchive);
-			if (!Feature.enabled(Feature.IMPEX) || !folder.hasPermission(Constants.PERMISSION_EXPORT))
+			if (!Feature.enabled(Feature.IMPEX) || !folder.hasPermission(GUIAccessControlEntry.PERMISSION_EXPORT))
 				sendToExpArchive.setEnabled(false);
 		}
 	}
@@ -479,7 +476,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			archive.setTitle(I18N.message("archive"));
 			archive.addClickHandler(archiveClick -> onArchive(folder.getId()));
 			contextMenu.addItem(archive);
-			if (!Feature.enabled(Feature.ARCHIVING) || !folder.hasPermission(Constants.PERMISSION_ARCHIVE))
+			if (!Feature.enabled(Feature.ARCHIVING) || !folder.hasPermission(GUIAccessControlEntry.PERMISSION_ARCHIVE))
 				archive.setEnabled(false);
 		}
 	}
@@ -490,7 +487,8 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			applyTemplate.setTitle(I18N.message("applytemplate"));
 			applyTemplate.addClickHandler(applyTemplateClick -> onApplyTemplate());
 			contextMenu.addItem(applyTemplate);
-			if (!Feature.enabled(Feature.FOLDER_TEMPLATE) || !folder.hasPermission(Constants.PERMISSION_ADD))
+			if (!Feature.enabled(Feature.FOLDER_TEMPLATE)
+					|| !folder.hasPermission(GUIAccessControlEntry.PERMISSION_ADD))
 				applyTemplate.setEnabled(false);
 		}
 	}
@@ -525,8 +523,8 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		exportZip.setTitle(I18N.message("exportzip"));
 		exportZip.addClickHandler(
 				event -> Window.open(Util.contextPath() + "zip-export?folderId=" + folder.getId(), "_blank", ""));
-		exportZip.setEnabled(folder.hasPermission(Constants.PERMISSION_EXPORT)
-				&& folder.hasPermission(Constants.PERMISSION_DOWNLOAD));
+		exportZip.setEnabled(folder.hasPermission(GUIAccessControlEntry.PERMISSION_EXPORT)
+				&& folder.hasPermission(GUIAccessControlEntry.PERMISSION_DOWNLOAD));
 		return exportZip;
 	}
 
@@ -534,7 +532,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		MenuItem move = new MenuItem();
 		move.setTitle(I18N.message("move"));
 		move.addClickHandler(event -> new MoveDialog().show());
-		move.setEnabled(folder.hasPermission(Constants.PERMISSION_MOVE) && !folder.isDefaultWorkspace()
+		move.setEnabled(folder.hasPermission(GUIAccessControlEntry.PERMISSION_MOVE) && !folder.isDefaultWorkspace()
 				&& GUIFolder.TYPE_ALIAS != getSelectedRecord().getAttributeAsInt("type"));
 		return move;
 	}
@@ -543,7 +541,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		MenuItem merge = new MenuItem();
 		merge.setTitle(I18N.message("merge"));
 		merge.addClickHandler(event -> new MergeDialog().show());
-		merge.setEnabled(folder.hasPermission(Constants.PERMISSION_DELETE) && !folder.isDefaultWorkspace()
+		merge.setEnabled(folder.hasPermission(GUIAccessControlEntry.PERMISSION_DELETE) && !folder.isDefaultWorkspace()
 				&& GUIFolder.TYPE_ALIAS != getSelectedRecord().getAttributeAsInt("type"));
 		return merge;
 	}
@@ -552,7 +550,8 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> onDelete());
-		delete.setEnabled(folder.hasPermission(Constants.PERMISSION_DELETE) && !folder.isDefaultWorkspace());
+		delete.setEnabled(
+				folder.hasPermission(GUIAccessControlEntry.PERMISSION_DELETE) && !folder.isDefaultWorkspace());
 		return delete;
 	}
 
@@ -573,7 +572,8 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		MenuItem rename = new MenuItem();
 		rename.setTitle(I18N.message("rename"));
 		rename.addClickHandler(event -> onRename());
-		rename.setEnabled(folder.hasPermission(Constants.PERMISSION_RENAME) && !folder.isDefaultWorkspace());
+		rename.setEnabled(
+				folder.hasPermission(GUIAccessControlEntry.PERMISSION_RENAME) && !folder.isDefaultWorkspace());
 		return rename;
 	}
 
@@ -581,12 +581,12 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		MenuItem create = new MenuItem();
 		create.setTitle(I18N.message("newfolder"));
 		create.addClickHandler(event -> onCreate(folder.getId()));
-		create.setEnabled(folder.hasPermission(Constants.PERMISSION_ADD));
+		create.setEnabled(folder.hasPermission(GUIAccessControlEntry.PERMISSION_ADD));
 		return create;
 	}
 
 	private void onDelete() {
-		final long[] selectedIds = getSelectedIds();
+		final List<Long> selectedIds = getSelectedIds();
 		LD.contactingServer();
 		DocumentService.Instance.get().countDocuments(selectedIds, Constants.DOC_ARCHIVED, new AsyncCallback<Long>() {
 
@@ -599,8 +599,8 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			@Override
 			public void onSuccess(Long count) {
 				LD.clearPrompt();
-				final String folderMessage = selectedIds.length == 1 ? "confirmdeletefolder" : "confirmdeletefolders";
-				final String documentMessage = selectedIds.length == 1 ? "confirmdeletefolderarchdocs"
+				final String folderMessage = selectedIds.size() == 1 ? "confirmdeletefolder" : "confirmdeletefolders";
+				final String documentMessage = selectedIds.size() == 1 ? "confirmdeletefolderarchdocs"
 						: "confirmdeletefoldersarchdocs";
 				LD.ask(I18N.message("question"),
 						count.longValue() == 0L ? (I18N.message(folderMessage)) : (I18N.message(documentMessage)),
@@ -614,7 +614,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		});
 	}
 
-	private void doDelete(final long[] selectedIds) {
+	private void doDelete(final List<Long> selectedIds) {
 		TreeNode parentNode = getTree().getParent(getSelectedRecord());
 		TreeNode firstNode = getTree().getChildren(parentNode)[0];
 
@@ -668,7 +668,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		final TreeNode selectedNode = getSelectedRecord();
 		final long folderId = Long.parseLong(selectedNode.getAttributeAsString(FOLDER_ID));
 
-		DocumentService.Instance.get().addBookmarks(new Long[] { folderId }, 1, new AsyncCallback<Void>() {
+		DocumentService.Instance.get().addBookmarks(Arrays.asList(folderId), 1, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -816,12 +816,12 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 						node.setAttribute(FOLD_REF, folderRef != null ? Long.toString(folderRef) : null);
 						if (folder.getColor() != null)
 							node.setAttribute(COLOR, folder.getColor());
-						node.setAttribute(Constants.PERMISSION_ADD,
-								Boolean.toString(folder.hasPermission(Constants.PERMISSION_ADD)));
-						node.setAttribute(Constants.PERMISSION_DELETE,
-								Boolean.toString(folder.hasPermission(Constants.PERMISSION_DELETE)));
-						node.setAttribute(Constants.PERMISSION_RENAME,
-								Boolean.toString(folder.hasPermission(Constants.PERMISSION_RENAME)));
+						node.setAttribute(GUIAccessControlEntry.PERMISSION_ADD,
+								Boolean.toString(folder.hasPermission(GUIAccessControlEntry.PERMISSION_ADD)));
+						node.setAttribute(GUIAccessControlEntry.PERMISSION_DELETE,
+								Boolean.toString(folder.hasPermission(GUIAccessControlEntry.PERMISSION_DELETE)));
+						node.setAttribute(GUIAccessControlEntry.PERMISSION_RENAME,
+								Boolean.toString(folder.hasPermission(GUIAccessControlEntry.PERMISSION_RENAME)));
 						getTree().add(node, parent);
 						parent = node;
 
@@ -860,9 +860,12 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			node.setAttribute(FOLD_REF, fldRef != null ? Long.toString(fldRef) : null);
 			if (fld.getColor() != null)
 				node.setAttribute(COLOR, fld.getColor());
-			node.setAttribute(Constants.PERMISSION_ADD, fld.hasPermission(Constants.PERMISSION_ADD));
-			node.setAttribute(Constants.PERMISSION_DELETE, fld.hasPermission(Constants.PERMISSION_DELETE));
-			node.setAttribute(Constants.PERMISSION_RENAME, fld.hasPermission(Constants.PERMISSION_RENAME));
+			node.setAttribute(GUIAccessControlEntry.PERMISSION_ADD,
+					fld.hasPermission(GUIAccessControlEntry.PERMISSION_ADD));
+			node.setAttribute(GUIAccessControlEntry.PERMISSION_DELETE,
+					fld.hasPermission(GUIAccessControlEntry.PERMISSION_DELETE));
+			node.setAttribute(GUIAccessControlEntry.PERMISSION_RENAME,
+					fld.hasPermission(GUIAccessControlEntry.PERMISSION_RENAME));
 
 			getTree().add(node, parent);
 			parent = node;
@@ -915,11 +918,6 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	private void onPaste() {
 		TreeNode selectedNode = getSelectedRecord();
 		final long folderId = Long.parseLong(selectedNode.getAttribute(FOLDER_ID));
-		final long[] docIds = new long[Clipboard.getInstance().size()];
-		int i = 0;
-		for (GUIDocument doc : Clipboard.getInstance()) {
-			docIds[i++] = doc.getId();
-		}
 
 		List<FormItem> items = new ArrayList<>();
 		CheckboxItem copyDocuments = ItemFactory.newCheckbox("copydocuments");
@@ -943,9 +941,11 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 
 			@Override
 			public void execute(Map<String, Object> values) {
-				FolderService.Instance.get().paste(docIds, folderId, Clipboard.getInstance().getLastAction(),
-						Boolean.TRUE.equals(values.get("copylinks")), Boolean.TRUE.equals(values.get("copynotes")),
-						Boolean.TRUE.equals(values.get("copysecurity")), new AsyncCallback<Void>() {
+				FolderService.Instance.get().paste(
+						Clipboard.getInstance().stream().map(doc -> doc.getId()).collect(Collectors.toList()), folderId,
+						Clipboard.getInstance().getLastAction(), Boolean.TRUE.equals(values.get("copylinks")),
+						Boolean.TRUE.equals(values.get("copynotes")), Boolean.TRUE.equals(values.get("copysecurity")),
+						new AsyncCallback<Void>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -970,10 +970,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	private void onPasteAsAlias() {
 		TreeNode selectedNode = getSelectedRecord();
 		final long folderId = Long.parseLong(selectedNode.getAttribute(FOLDER_ID));
-		final long[] docIds = new long[Clipboard.getInstance().size()];
-		int i = 0;
-		for (GUIDocument doc : Clipboard.getInstance())
-			docIds[i++] = doc.getId();
+		final List<Long> docIds = Clipboard.getInstance().stream().map(d -> d.getId()).collect(Collectors.toList());
 
 		if (Feature.enabled(Feature.PDF))
 			LD.askForValue(I18N.message("pasteasalias"), "type", "", ItemFactory.newAliasTypeSelector(),
@@ -982,7 +979,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			pasteAsAlias(folderId, docIds, null);
 	}
 
-	private void pasteAsAlias(final long folderId, final long[] docIds, String type) {
+	private void pasteAsAlias(final long folderId, final List<Long> docIds, String type) {
 		FolderService.Instance.get().pasteAsAlias(docIds, folderId, type, new AsyncCallback<Void>() {
 
 			@Override
@@ -1010,16 +1007,12 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	 * 
 	 * @return identifiers of folders
 	 */
-	public long[] getSelectedIds() {
+	public List<Long> getSelectedIds() {
 		ListGridRecord[] selection = getSelectedRecords();
 		List<Long> ids = new ArrayList<>();
 		for (ListGridRecord rec : selection)
-			ids.add(Long.parseLong(rec.getAttributeAsString(FOLDER_ID)));
-		long[] idsArray = new long[ids.size()];
-		for (int i = 0; i < idsArray.length; i++) {
-			idsArray[i] = ids.get(i);
-		}
-		return idsArray;
+			ids.add(rec.getAttributeAsLong(FOLDER_ID));
+		return ids;
 	}
 
 	/**
@@ -1028,7 +1021,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	 * @param targetFolderId The parent folder
 	 */
 	public void moveTo(final long targetFolderId) {
-		long[] ids = getSelectedIds();
+		List<Long> ids = getSelectedIds();
 		for (long id : ids) {
 			TreeNode node = getTree().find(FOLDER_ID, (Object) id);
 			getTree().remove(node);
@@ -1060,7 +1053,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	 * @param targetFolderId The target folder
 	 */
 	public void mergeTo(final long targetFolderId) {
-		long[] ids = getSelectedIds();
+		List<Long> ids = getSelectedIds();
 		for (long id : ids) {
 			TreeNode node = getTree().find(FOLDER_ID, (Object) id);
 			getTree().remove(node);
@@ -1372,7 +1365,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		}));
 	}
 
-	private void executeRoutine(long folderId, Long[] docIds, GUIAutomationRoutine routine) {
+	private void executeRoutine(long folderId, List<Long> docIds, GUIAutomationRoutine routine) {
 		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<Void>() {
 
 			@Override

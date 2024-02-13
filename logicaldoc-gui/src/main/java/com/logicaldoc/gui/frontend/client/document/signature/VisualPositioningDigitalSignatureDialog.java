@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document.signature;
 
 import java.util.Date;
+import java.util.List;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -41,11 +42,11 @@ public class VisualPositioningDigitalSignatureDialog extends Window {
 
 	private ImageCropper cropper;
 
-	private Long[] docIds;
+	private List<Long> docIds;
 
 	private String reason;
 
-	public VisualPositioningDigitalSignatureDialog(Long[] docIds, String reason) {
+	public VisualPositioningDigitalSignatureDialog(List<Long> docIds, String reason) {
 		this.docIds = docIds;
 		this.reason = reason;
 
@@ -71,7 +72,7 @@ public class VisualPositioningDigitalSignatureDialog extends Window {
 				}
 
 				public void onResponseReceived(Request request, Response response) {
-					DocumentService.Instance.get().getById(docIds[0], new AsyncCallback<GUIDocument>() {
+					DocumentService.Instance.get().getById(docIds.get(0), new AsyncCallback<GUIDocument>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -151,7 +152,7 @@ public class VisualPositioningDigitalSignatureDialog extends Window {
 	}
 
 	private String getPageUrl(int page) {
-		return Util.contextPath() + "convertjpg?docId=" + docIds[0] + "&page=" + page + "&random="
+		return Util.contextPath() + "convertjpg?docId=" + docIds.get(0) + "&page=" + page + "&random="
 				+ new Date().getTime();
 	}
 

@@ -1,6 +1,9 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * An incremental export archive configuration
@@ -22,8 +25,8 @@ public class GUIIncrementalArchive implements Serializable {
 
 	private int type = GUIArchive.TYPE_DEFAULT;
 
-	private GUITemplate[] templates;
-	
+	private List<GUITemplate> templates = new ArrayList<>();
+
 	private Long aosManagerId;
 
 	public GUIIncrementalArchive() {
@@ -64,11 +67,11 @@ public class GUIIncrementalArchive implements Serializable {
 		this.type = type;
 	}
 
-	public GUITemplate[] getTemplates() {
+	public List<GUITemplate> getTemplates() {
 		return templates;
 	}
 
-	public void setTemplates(GUITemplate[] templates) {
+	public void setTemplates(List<GUITemplate> templates) {
 		this.templates = templates;
 	}
 
@@ -80,14 +83,8 @@ public class GUIIncrementalArchive implements Serializable {
 		this.id = id;
 	}
 
-	public String[] getTemplateIds() {
-		if (templates == null)
-			return new String[0];
-		String[] ids = new String[templates.length];
-		for (int i = 0; i < templates.length; i++) {
-			ids[i] = Long.toString(templates[i].getId());
-		}
-		return ids;
+	public List<Long> getTemplateIds() {
+		return templates.stream().map(t -> t.getId()).collect(Collectors.toList());
 	}
 
 	public Long getAosManagerId() {

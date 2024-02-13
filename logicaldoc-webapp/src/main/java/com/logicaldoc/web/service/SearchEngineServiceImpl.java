@@ -3,7 +3,6 @@ package com.logicaldoc.web.service;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -281,23 +280,22 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 	}
 
 	@Override
-	public void remove(Long[] entryIds) throws ServerException {
+	public void remove(List<Long> entryIds) throws ServerException {
 		Session session = validateSession();
 
 		try {
 			Runnable runnable = () -> {
 				SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);
 
-				List<Long> hitsIds = Arrays.asList(entryIds);
-				indexer.deleteHits(hitsIds);
-				log.info("Removed {} entries from the index", hitsIds.size());
+				indexer.deleteHits(entryIds);
+				log.info("Removed {} entries from the index", entryIds.size());
 
 				DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 				StringBuilder updateQuery = new StringBuilder();
 				updateQuery = new StringBuilder("update ld_document set ld_indexed=0 where ld_indexed = 1 ");
 
 				StringBuilder hitsIdsCondition = new StringBuilder();
-				if (!hitsIds.isEmpty()) {
+				if (!entryIds.isEmpty()) {
 					hitsIdsCondition.append(" and (");
 
 					if (dao.isOracle()) {
@@ -309,10 +307,10 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 						 */
 						hitsIdsCondition.append(" (ld_id,0) in ( ");
 						hitsIdsCondition.append(
-								hitsIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
+								entryIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
 						hitsIdsCondition.append(" )");
 					} else {
-						hitsIdsCondition.append(" ld_id in " + hitsIds.toString().replace('[', '(').replace(']', ')'));
+						hitsIdsCondition.append(" ld_id in " + entryIds.toString().replace('[', '(').replace(']', ')'));
 					}
 
 					hitsIdsCondition.append(")");
@@ -357,10 +355,9 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			// Now sort the hits by score desc
 			List<Hit> sortedHitsList = new ArrayList<>(hitsMap.values());
 			sortedHitsList.sort((h1, h2) -> Long.compare(h1.getId(), h2.getId()));
-			for (Hit hit : sortedHitsList) {
+			for (Hit hit : sortedHitsList)
 				guiResults.add(toDocument(hit));
-			}
-			result.setHits(guiResults.toArray(new GUIDocument[0]));
+			result.setHits(guiResults);
 
 			return result;
 		} catch (Exception t) {

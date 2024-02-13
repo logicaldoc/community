@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -172,9 +175,9 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		MenuItem restore = new MenuItem();
 		restore.setTitle(I18N.message("restore"));
 		restore.addClickHandler(event -> {
-			long[] docIds = new long[selection.length];
+			List<Long> docIds = new ArrayList<>();
 			for (int i = 0; i < selection.length; i++)
-				docIds[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
+				docIds.add(selection[i].getAttributeAsLong("id"));
 			DocumentService.Instance.get().unarchiveDocuments(docIds, new AsyncCallback<Void>() {
 				@Override
 				public void onFailure(Throwable caught) {
@@ -192,9 +195,9 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> {
-			final Long[] docIds = new Long[selection.length];
+			List<Long> docIds = new ArrayList<>();
 			for (int i = 0; i < selection.length; i++)
-				docIds[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
+				docIds.add(selection[i].getAttributeAsLong("id"));
 
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 				if (Boolean.TRUE.equals(value)) {
@@ -216,11 +219,10 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		MenuItem sendToExpArchive = new MenuItem();
 		sendToExpArchive.setTitle(I18N.message("sendtoexparchive"));
 		sendToExpArchive.addClickHandler(event -> {
-			Long[] selectionIds = new Long[selection.length];
+			List<Long> selectionIds = new ArrayList<>();
 			for (int i = 0; i < selection.length; i++)
-				selectionIds[i] = Long.parseLong(selection[i].getAttributeAsString("id"));
-			SendToArchiveDialog archiveDialog = new SendToArchiveDialog(selectionIds, true);
-			archiveDialog.show();
+				selectionIds.add(Long.parseLong(selection[i].getAttributeAsString("id")));
+			new SendToArchiveDialog(selectionIds, true).show();
 		});
 
 		download.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1);

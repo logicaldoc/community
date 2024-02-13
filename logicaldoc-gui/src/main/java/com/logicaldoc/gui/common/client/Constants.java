@@ -48,48 +48,6 @@ public final class Constants {
 
 	public static final String TIME_BUSINESS_WEEK = "businessweek";
 
-	public static final String PERMISSION_DELETE = "delete";
-
-	public static final String PERMISSION_IMMUTABLE = "immutable";
-
-	public static final String PERMISSION_SECURITY = "security";
-
-	public static final String PERMISSION_WRITE = "write";
-	
-	public static final String PERMISSION_READ = "read";
-
-	public static final String PERMISSION_ADD = "add";
-
-	public static final String PERMISSION_RENAME = "rename";
-
-	public static final String PERMISSION_IMPORT = "import";
-
-	public static final String PERMISSION_EXPORT = "export";
-
-	public static final String PERMISSION_SIGN = "sign";
-
-	public static final String PERMISSION_ARCHIVE = "archive";
-
-	public static final String PERMISSION_WORKFLOW = "workflow";
-
-	public static final String PERMISSION_DOWNLOAD = "download";
-
-	public static final String PERMISSION_CALENDAR = "calendar";
-
-	public static final String PERMISSION_SUBSCRIPTION = "subscription";
-
-	public static final String PERMISSION_PASSWORD = "password";
-
-	public static final String PERMISSION_MOVE = "move";
-
-	public static final String PERMISSION_EMAIL = "email";
-
-	public static final String PERMISSION_AUTOMATION = "automation";
-
-	public static final String PERMISSION_STORAGE = "storage";
-	
-	public static final String PERMISSION_READINGREQ = "readingreq";
-
 	public static final int DOC_UNLOCKED = 0;
 
 	public static final int DOC_CHECKED_OUT = 1;

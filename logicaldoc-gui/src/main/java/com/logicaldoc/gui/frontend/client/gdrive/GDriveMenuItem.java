@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.gdrive;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
@@ -68,7 +71,7 @@ public class GDriveMenuItem extends MenuItem {
 		final MenuItem exportDocs = new MenuItem(I18N.message("exporttogdrive"));
 		exportDocs.addClickHandler((MenuItemClickEvent exportDocsClick) -> {
 			DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-			final Long[] ids = grid.getSelectedIds();
+			List<Long> ids = grid.getSelectedIds();
 
 			LD.contactingServer();
 			GDriveService.Instance.get().exportDocuments(ids, new AsyncCallback<String[]>() {
@@ -124,7 +127,7 @@ public class GDriveMenuItem extends MenuItem {
 
 	private void checkoutAndUploadToGDrive(final GUIDocument document) {
 		// Need to checkout first
-		DocumentService.Instance.get().checkout(new Long[] { document.getId() }, new AsyncCallback<Void>() {
+		DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

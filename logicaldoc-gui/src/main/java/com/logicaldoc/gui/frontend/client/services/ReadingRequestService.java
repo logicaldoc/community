@@ -32,8 +32,8 @@ public interface ReadingRequestService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void askReadingConfirmation(Long[] docIds, List<Long> userIds, long[] groupIds, boolean alertConfirmation,
-			String comment) throws ServerException;
+	public void askReadingConfirmation(List<Long> docIds, List<Long> userIds, List<Long> groupIds,
+			boolean alertConfirmation, String comment) throws ServerException;
 
 	/**
 	 * Confirms the read completion of a given file version
@@ -44,7 +44,7 @@ public interface ReadingRequestService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void confirmReadings(long[] readingIds, String version) throws ServerException;
+	public void confirmReadings(List<Long> readingIds, String version) throws ServerException;
 
 	/**
 	 * Deletes a reading request.
@@ -67,9 +67,11 @@ public interface ReadingRequestService extends RemoteService {
 	/**
 	 * Retrieves all the unconfirmed readings by the current user
 	 * 
+	 * @return those readings not already confirmed
+	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIReadingRequest[] getUnconfimedReadings() throws ServerException;
+	public List<GUIReadingRequest> getUnconfimedReadings() throws ServerException;
 
 	public static class Instance {
 		private static ReadingRequestServiceAsync inst;

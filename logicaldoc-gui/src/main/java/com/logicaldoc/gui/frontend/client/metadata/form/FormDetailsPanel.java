@@ -1,5 +1,9 @@
 package com.logicaldoc.gui.frontend.client.metadata.form;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
@@ -198,11 +202,8 @@ public class FormDetailsPanel extends VLayout {
 		notifyResponses.addChangedHandler(changedHandler);
 		notifyResponses.setEndRow(true);
 
-		Long[] ids = new Long[form.getRecipients().length];
-		for (int i = 0; i < ids.length; i++)
-			ids[i] = form.getRecipients()[i].getId();
-
-		recipients = ItemFactory.newMultiComboBoxItem("recipients", "recipients", new UsersDS(null, false, false), ids);
+		recipients = ItemFactory.newMultiComboBoxItem("recipients", "recipients", new UsersDS(null, false, false),
+				form.getRecipients().stream().map(r -> r.getId()).collect(Collectors.toList()).toArray());
 		recipients.setValueField("id");
 		recipients.setDisplayField("username");
 		recipients.addChangedHandler(changedHandler);
@@ -394,13 +395,12 @@ public class FormDetailsPanel extends VLayout {
 			form.setNotifyResponses("true".equals(vm.getValueAsString("notifyResponses")));
 
 			String[] ids = recipients.getValues();
-			GUIUser[] formReceipients = new GUIUser[ids != null ? ids.length : 0];
-
+			List<GUIUser> formReceipients = new ArrayList<>();
 			if (ids != null && ids.length > 0)
 				for (int i = 0; i < ids.length; i++) {
 					GUIUser user = new GUIUser();
 					user.setId(Long.parseLong(ids[i]));
-					formReceipients[i] = user;
+					formReceipients.add(user);
 				}
 			form.setRecipients(formReceipients);
 		}

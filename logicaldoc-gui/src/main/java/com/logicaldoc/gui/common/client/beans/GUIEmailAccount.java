@@ -1,7 +1,9 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Model of an email account.
@@ -66,10 +68,10 @@ public class GUIEmailAccount implements Serializable {
 
 	private String type = "default";
 
-	private GUIEmailRule[] rules;
+	private List<GUIEmailRule> rules = new ArrayList<>();
 
 	private String automation;
-	
+
 	private String automationAfter;
 
 	public GUIEmailAccount() {
@@ -205,11 +207,11 @@ public class GUIEmailAccount implements Serializable {
 		this.ssl = ssl;
 	}
 
-	public GUIEmailRule[] getRules() {
+	public List<GUIEmailRule> getRules() {
 		return rules;
 	}
 
-	public void setRules(GUIEmailRule[] rules) {
+	public void setRules(List<GUIEmailRule> rules) {
 		this.rules = rules;
 	}
 

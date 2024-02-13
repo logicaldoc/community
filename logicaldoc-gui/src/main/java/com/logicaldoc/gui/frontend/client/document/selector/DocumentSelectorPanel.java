@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document.selector;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -34,7 +36,7 @@ public class DocumentSelectorPanel extends HLayout {
 		documents.setAlign(Alignment.CENTER);
 		documents.setWidth100();
 		documents.setShowResizeBar(true);
-		
+
 		prepareFolderBrowser();
 		setMembers(folders, documents);
 	}
@@ -59,7 +61,7 @@ public class DocumentSelectorPanel extends HLayout {
 				}));
 	}
 
-	public GUIDocument[] getSelection() {
+	public List<GUIDocument> getSelection() {
 		return ((DocumentsListPanel) documents).getGrid().getSelectedDocuments();
 	}
 }

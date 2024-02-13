@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.dropbox;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -78,17 +81,17 @@ public class DropboxDialog extends Dialog {
 		if (selection == null)
 			return;
 
-		final Long[] docIds = MainPanel.get().isOnDocumentsTab()
+		final List<Long> docIds = MainPanel.get().isOnDocumentsTab()
 				? DocumentsPanel.get().getDocumentsGrid().getSelectedIds()
 				: SearchPanel.get().getDocumentsGrid().getSelectedIds();
 
-		SC.ask(docIds.length == 0 ? I18N.message("exportdirtodbox", FolderController.get().getCurrentFolder().getName())
+		SC.ask(docIds.size() == 0 ? I18N.message("exportdirtodbox", FolderController.get().getCurrentFolder().getName())
 				: I18N.message("exportdocstodbox"), choice -> {
 					if (choice.booleanValue()) {
 						String targetPath = selection.getAttributeAsString("path");
-						long[] folderIds = new long[0];
-						if (docIds.length == 0 && FolderController.get().getCurrentFolder() != null)
-							folderIds[0] = FolderController.get().getCurrentFolder().getId();
+						List<Long> folderIds = new ArrayList<>();
+						if (docIds.size() == 0 && FolderController.get().getCurrentFolder() != null)
+							folderIds.add(FolderController.get().getCurrentFolder().getId());
 
 						LD.contactingServer();
 						DropboxService.Instance.get().exportDocuments(targetPath, folderIds, docIds,

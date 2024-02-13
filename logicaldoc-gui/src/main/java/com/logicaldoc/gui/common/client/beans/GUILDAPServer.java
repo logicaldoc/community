@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * LDAP Settings bean as used in the GUI
@@ -64,7 +66,7 @@ public class GUILDAPServer implements Serializable {
 
 	private String validation;
 
-	private GUIGroup[] defaultGroups = new GUIGroup[0];
+	private List<GUIGroup> defaultGroups = new ArrayList<>();
 
 	public int getPosition() {
 		return position;
@@ -201,7 +203,7 @@ public class GUILDAPServer implements Serializable {
 	public void setId(long id) {
 		this.id = id;
 	}
-	
+
 	public String getUserNodes() {
 		return userNodes;
 	}
@@ -274,11 +276,11 @@ public class GUILDAPServer implements Serializable {
 		this.timeout = timeout;
 	}
 
-	public GUIGroup[] getDefaultGroups() {
+	public List<GUIGroup> getDefaultGroups() {
 		return defaultGroups;
 	}
 
-	public void setDefaultGroups(GUIGroup[] defaultGroups) {
+	public void setDefaultGroups(List<GUIGroup> defaultGroups) {
 		this.defaultGroups = defaultGroups;
 	}
 }

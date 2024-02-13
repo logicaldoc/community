@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -42,7 +44,7 @@ public interface ImpexService extends RemoteService {
 	/**
 	 * Change the status of the given Archive
 	 * 
-	 * @param archiveId identifier of the archive 
+	 * @param archiveId identifier of the archive
 	 * @param status the status of the archive
 	 * 
 	 * @throws ServerException an error happened in the server application
@@ -63,7 +65,7 @@ public interface ImpexService extends RemoteService {
 	/**
 	 * Loads a given archive
 	 * 
-	 * @param archiveId identifier of the archive 
+	 * @param archiveId identifier of the archive
 	 * 
 	 * @return the archive retrieved by the server application
 	 * 
@@ -74,12 +76,12 @@ public interface ImpexService extends RemoteService {
 	/**
 	 * Adds a set of documents(their current versions) to the given archive
 	 * 
-	 * @param archiveId identifier of the archive 
+	 * @param archiveId identifier of the archive
 	 * @param documentIds identifiers of the documents
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void addDocuments(long archiveId, Long[] documentIds) throws ServerException;
+	public void addDocuments(long archiveId, List<Long> documentIds) throws ServerException;
 
 	/**
 	 * Adds a a folder(the current version of the contained documents at any
@@ -104,7 +106,7 @@ public interface ImpexService extends RemoteService {
 	/**
 	 * Loads an incremental configuration
 	 * 
-	 * @param id identifier of the incremental configuration 
+	 * @param id identifier of the incremental configuration
 	 * 
 	 * @return the configuration retrieved by the server application
 	 * 
@@ -146,7 +148,7 @@ public interface ImpexService extends RemoteService {
 
 		private Instance() {
 		}
-		
+
 		public static ImpexServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(ImpexService.class);

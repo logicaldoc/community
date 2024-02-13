@@ -1,12 +1,16 @@
 package com.logicaldoc.gui.frontend.client.workflow;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUITransition;
@@ -725,7 +729,7 @@ public class TaskDetailsDialog extends Window {
 		addDocuments.addClickHandler(evnt -> new DocumentSelectorDialog() {
 
 			@Override
-			protected void onSelection(GUIDocument[] selection) {
+			protected void onSelection(List<GUIDocument> selection) {
 				appendDocuments(selection);
 				close();
 			}
@@ -741,7 +745,7 @@ public class TaskDetailsDialog extends Window {
 				return;
 			}
 
-			appendDocuments(clipboard.toArray(new GUIDocument[0]));
+			appendDocuments(Clipboard.getInstance());
 			Clipboard.getInstance().clear();
 		});
 
@@ -754,14 +758,9 @@ public class TaskDetailsDialog extends Window {
 		}
 	}
 
-	private void appendDocuments(GUIDocument[] documents) {
-		Long[] ids = new Long[documents.length];
-		int i = 0;
-		for (GUIDocument doc : documents)
-			ids[i++] = doc.getId();
-
-		WorkflowService.Instance.get().appendDocuments(workflow.getSelectedTask().getId(), ids,
-				new AsyncCallback<Void>() {
+	private void appendDocuments(Collection<GUIDocument> documents) {
+		WorkflowService.Instance.get().appendDocuments(workflow.getSelectedTask().getId(),
+				documents.stream().map(d -> d.getId()).collect(Collectors.toList()), new AsyncCallback<Void>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -866,8 +865,8 @@ public class TaskDetailsDialog extends Window {
 													&& Session.get().getUser().getId() == selectedDocument
 															.getLockUserId());
 											office.setEnabled(Feature.enabled(Feature.OFFICE)
-													&& folder.hasPermission(Constants.PERMISSION_WRITE)
-													&& folder.hasPermission(Constants.PERMISSION_DOWNLOAD)
+													&& folder.hasPermission(GUIAccessControlEntry.PERMISSION_WRITE)
+													&& folder.hasPermission(GUIAccessControlEntry.PERMISSION_DOWNLOAD)
 													&& Util.isOfficeFile(selectedDocument.getFileName()));
 										}
 
@@ -902,7 +901,7 @@ public class TaskDetailsDialog extends Window {
 	private MenuItem prepareUnlockContextMenuItem(final GUIDocument selectedDocument) {
 		final MenuItem unlock = new MenuItem();
 		unlock.setTitle(I18N.message("unlock"));
-		unlock.addClickHandler(event -> DocumentService.Instance.get().unlock(new Long[] { selectedDocument.getId() },
+		unlock.addClickHandler(event -> DocumentService.Instance.get().unlock(Arrays.asList(selectedDocument.getId()),
 				new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
@@ -922,7 +921,7 @@ public class TaskDetailsDialog extends Window {
 		final MenuItem checkout = new MenuItem();
 		checkout.setTitle(I18N.message("checkout"));
 		checkout.addClickHandler(event -> DocumentService.Instance.get()
-				.checkout(new Long[] { selectedDocument.getId() }, new AsyncCallback<Void>() {
+				.checkout(Arrays.asList(selectedDocument.getId()), new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

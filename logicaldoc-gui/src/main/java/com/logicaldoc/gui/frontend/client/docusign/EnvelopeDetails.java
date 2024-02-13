@@ -41,7 +41,7 @@ public class EnvelopeDetails extends Window {
 
 	private DynamicForm form;
 
-	private GUIDocument[] documents = new GUIDocument[0];
+	private List<GUIDocument> documents = new ArrayList<>();
 
 	public EnvelopeDetails() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);

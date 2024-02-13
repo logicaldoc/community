@@ -3,8 +3,8 @@ package com.logicaldoc.gui.frontend.client.settings.automation;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
+import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.data.AutomationRoutineAclDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.GridUtil;
@@ -207,13 +207,13 @@ public class AutomationRoutineSecurity extends AutomationRoutineDetailsTab {
 	}
 
 	/**
-	 * Creates an array of all the ACL
+	 * Creates a list of all the ACL
 	 * 
 	 * @return the array of rights
 	 */
-	public GUIAccessControlEntry[] getACL() {
+	public List<GUIAccessControlEntry> getACL() {
 		int totalRecords = list.getRecordList().getLength();
-		List<GUIAccessControlEntry> tmp = new ArrayList<>();
+		List<GUIAccessControlEntry> acl = new ArrayList<>();
 
 		for (int i = 0; i < totalRecords; i++) {
 			Record rec = list.getRecordList().get(i);
@@ -222,10 +222,10 @@ public class AutomationRoutineSecurity extends AutomationRoutineDetailsTab {
 			ace.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
 			ace.setWrite("true".equals(rec.getAttributeAsString(WRITE)));
 			ace.setRead("true".equals(rec.getAttributeAsString(READ)));
-			tmp.add(ace);
+			acl.add(ace);
 		}
 
-		return tmp.toArray(new GUIAccessControlEntry[0]);
+		return acl;
 	}
 
 	/**
@@ -261,7 +261,7 @@ public class AutomationRoutineSecurity extends AutomationRoutineDetailsTab {
 		// the grid could not be initialized already so scroll it
 		if (list != null) {
 			try {
-				routine.setRights(this.getACL());
+				routine.setAccessControlList(this.getACL());
 			} catch (Exception e) {
 				// Nothing to do
 			}

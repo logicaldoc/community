@@ -70,7 +70,7 @@ public interface ContactService extends RemoteService {
 	 * 
 	 * @throws ServerException share the search to
 	 */
-	void shareContacts(long[] contactIds, List<Long> userIds, long[] groupIds) throws ServerException;
+	void shareContacts(List<Long> contactIds, List<Long> userIds, List<Long> groupIds) throws ServerException;
 
 	public static class Instance {
 		private static ContactServiceAsync inst;

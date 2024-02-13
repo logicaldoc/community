@@ -1,9 +1,12 @@
 package com.logicaldoc.gui.frontend.client.document;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
@@ -110,9 +113,9 @@ public class LinksPanel extends DocumentDetailTab {
 			final ListGridRecord[] selection = treeGrid.getSelectedRecords();
 			if (selection.length == 0)
 				return;
-			final long[] ids = new long[selection.length];
+			List<Long> ids = new ArrayList<>();
 			for (int i = 0; i < selection.length; i++)
-				ids[i] = Long.parseLong(selection[i].getAttribute("linkId"));
+				ids.add(selection[i].getAttributeAsLong("linkId"));
 
 			final MenuItem delete = prepareDeleteMenuItem(ids);
 
@@ -168,7 +171,7 @@ public class LinksPanel extends DocumentDetailTab {
 		});
 	}
 
-	private MenuItem prepareDeleteMenuItem(final long[] selectedIds) {
+	private MenuItem prepareDeleteMenuItem(List<Long> selectedIds) {
 		final MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(evnt ->
@@ -186,7 +189,7 @@ public class LinksPanel extends DocumentDetailTab {
 						TreeNode parent = treeGrid.getTree().getParent(treeGrid.getSelectedRecord());
 						treeGrid.selectRecord(parent);
 						treeGrid.getTree().reloadChildren(parent);
-						document.setLinks(document.getLinks() - selectedIds.length);
+						document.setLinks(document.getLinks() - selectedIds.size());
 						DocumentController.get().modified(document);
 					}
 				});
@@ -216,7 +219,7 @@ public class LinksPanel extends DocumentDetailTab {
 		treeGrid.setFields(fileName, direction, type, attribute);
 		addMember(treeGrid);
 
-		if (folder != null && folder.hasPermission(Constants.PERMISSION_WRITE)) {
+		if (folder != null && folder.hasPermission(GUIAccessControlEntry.PERMISSION_WRITE)) {
 			treeGrid.setCanEdit(true);
 			treeGrid.setEditEvent(ListGridEditEvent.CLICK);
 			treeGrid.setEditByCell(true);

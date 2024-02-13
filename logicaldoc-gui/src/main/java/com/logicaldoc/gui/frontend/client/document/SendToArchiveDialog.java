@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIArchive;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -29,7 +31,7 @@ public class SendToArchiveDialog extends Window {
 	 * @param document True if the ids refers to documents, False in case of
 	 *        folders
 	 */
-	public SendToArchiveDialog(Long[] ids, boolean document) {
+	public SendToArchiveDialog(List<Long> ids, boolean document) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 
 		setTitle(I18N.message("sendtoexparchive"));
@@ -55,7 +57,7 @@ public class SendToArchiveDialog extends Window {
 		addItem(form);
 	}
 
-	public void onSubmit(Long[] ids, boolean document) {
+	public void onSubmit(List<Long> ids, boolean document) {
 		if (!form.validate())
 			return;
 
@@ -75,7 +77,7 @@ public class SendToArchiveDialog extends Window {
 						}
 					});
 		else
-			ImpexService.Instance.get().addFolder(Long.parseLong(form.getValueAsString("archive")), ids[0],
+			ImpexService.Instance.get().addFolder(Long.parseLong(form.getValueAsString("archive")), ids.get(0),
 					new AsyncCallback<Void>() {
 
 						@Override

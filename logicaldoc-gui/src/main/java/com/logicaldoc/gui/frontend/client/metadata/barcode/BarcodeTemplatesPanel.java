@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.frontend.client.metadata.barcode;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIBarcodeTemplate;
@@ -83,7 +85,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 	private void onSave() {
 		if (!((GUIBarcodeTemplate) selectedOcrTemplate).isZonal()) {
 			Record[] records = positionalGrid.getRecords();
-			GUIBarcodeZone[] patterns = new GUIBarcodeZone[records.length];
+			List<GUIZone> patterns = new ArrayList<>();
 			int i = 0;
 			for (Record rec : records) {
 				GUIBarcodeZone patt = new GUIBarcodeZone();
@@ -91,8 +93,8 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 				patt.setInclude(rec.getAttributeAsString("include"));
 				patt.setExclude(rec.getAttributeAsString("exclude"));
 				patt.setFormats(rec.getAttributeAsString("formats"));
-				patterns[i++] = patt;
-				patt.setIndex(i);
+				patt.setIndex(i++);
+				patterns.add(patt);
 			}
 			selectedOcrTemplate.setZones(patterns);
 		}
@@ -304,7 +306,8 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 	}
 
 	private void addBarcodeTemplateSelector(Long documentTemplateId, Long barcodeTemplateId) {
-		SelectItem barcodeTemplateSelector = ItemFactory.newBarcodeTemplateSelector(false, documentTemplateId, barcodeTemplateId);
+		SelectItem barcodeTemplateSelector = ItemFactory.newBarcodeTemplateSelector(false, documentTemplateId,
+				barcodeTemplateId);
 		barcodeTemplateSelector.setWrapTitle(false);
 		barcodeTemplateSelector.setMultiple(false);
 		barcodeTemplateSelector.setEndRow(false);

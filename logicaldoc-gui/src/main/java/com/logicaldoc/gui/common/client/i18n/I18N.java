@@ -1,8 +1,11 @@
 package com.logicaldoc.gui.common.client.i18n;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -26,9 +29,9 @@ public class I18N {
 
 	private static String locale = "en";
 
-	private static GUIValue[] languages;
+	private static List<GUIValue> languages = new ArrayList<>();
 
-	private static GUIValue[] guiLanguages;
+	private static List<GUIValue> guiLanguages = new ArrayList<>();
 
 	private static HashMap<String, String> bundle = new HashMap<>();
 
@@ -99,7 +102,7 @@ public class I18N {
 				return l.getCode();
 		}
 
-		return languages[0].getCode();
+		return languages.get(0).getCode();
 	}
 
 	public static char groupingSepator() {
@@ -136,19 +139,18 @@ public class I18N {
 		return map;
 	}
 
-	public GUIValue[] getLanguages() {
+	public List<GUIValue> getLanguages() {
 		return languages;
 	}
 
-	public static void setLanguages(GUIValue[] languages) {
+	public static void setLanguages(List<GUIValue> languages) {
 		I18N.languages = languages;
 	}
 
-	private static void initBundle(GUIValue[] messages) {
+	private static void initBundle(List<GUIValue> messages) {
 		bundle.clear();
-		for (GUIValue val : messages) {
+		for (GUIValue val : messages)
 			bundle.put(val.getCode(), val.getValue());
-		}
 
 		String[] dayNames = new String[7];
 		for (int i = 0; i < 7; i++)
@@ -158,9 +160,9 @@ public class I18N {
 	}
 
 	public static void init(GUIInfo info) {
-		setLanguages(info.getSupportedLanguages());
-		setGuiLanguages(info.getSupportedGUILanguages());
-		initBundle(info.getBundle());
+		setLanguages(Arrays.asList(info.getSupportedLanguages()));
+		setGuiLanguages(Arrays.asList(info.getSupportedGUILanguages()));
+		initBundle(Arrays.asList(info.getBundle()));
 
 		/*
 		 * Prepare the date formatters
@@ -192,11 +194,11 @@ public class I18N {
 			dateFormatLong = DateTimeFormat.getFormat(message(FORMAT_DATELONG));
 	}
 
-	public static GUIValue[] getGuiLanguages() {
+	public static List<GUIValue> getGuiLanguages() {
 		return guiLanguages;
 	}
 
-	public static void setGuiLanguages(GUIValue[] guiLanguages) {
+	public static void setGuiLanguages(List<GUIValue> guiLanguages) {
 		I18N.guiLanguages = guiLanguages;
 	}
 

@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -147,14 +149,14 @@ public interface SearchEngineService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void remove(Long[] entryIds) throws ServerException;
+	public void remove(List<Long> entryIds) throws ServerException;
 
 	public static class Instance {
 		private static SearchEngineServiceAsync inst;
 
 		private Instance() {
 		}
-		
+
 		public static SearchEngineServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(SearchEngineService.class);

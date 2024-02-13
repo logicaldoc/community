@@ -1,8 +1,8 @@
 package com.logicaldoc.gui.frontend.client.document.stamp;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.gwt.http.client.Request;
@@ -56,9 +56,9 @@ public class VisualPositioningStampDialog extends Window {
 
 	private ImageCropper cropper;
 
-	private GUIDocument[] documents;
+	private List<GUIDocument> documents;
 
-	public VisualPositioningStampDialog(GUIDocument[] documents, GUIStamp stamp) {
+	public VisualPositioningStampDialog(List<GUIDocument> documents, GUIStamp stamp) {
 		this.documents = documents;
 		this.stamp = stamp;
 
@@ -84,7 +84,7 @@ public class VisualPositioningStampDialog extends Window {
 				}
 
 				public void onResponseReceived(Request request, Response response) {
-					firstSelectedDoc = documents[0];
+					firstSelectedDoc = documents.get(0);
 
 					DocumentService.Instance.get().getById(firstSelectedDoc.getId(), new AsyncCallback<GUIDocument>() {
 
@@ -118,7 +118,7 @@ public class VisualPositioningStampDialog extends Window {
 	}
 
 	private String getPageUrl(int page) {
-		return Util.contextPath() + "convertjpg?docId=" + documents[0].getId() + "&page=" + page + "&random="
+		return Util.contextPath() + "convertjpg?docId=" + documents.get(0).getId() + "&page=" + page + "&random="
 				+ new Date().getTime();
 	}
 
@@ -143,8 +143,8 @@ public class VisualPositioningStampDialog extends Window {
 		LD.contactingServer();
 
 		StampService.Instance.get().applyStamp(
-				Arrays.asList(documents).stream().map(d -> d.getId()).collect(Collectors.toList()).toArray(new Long[0]),
-				stamp, new AsyncCallback<Void>() {
+				documents.stream().map(d -> d.getId()).collect(Collectors.toList()).toArray(new Long[0]), stamp,
+				new AsyncCallback<Void>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

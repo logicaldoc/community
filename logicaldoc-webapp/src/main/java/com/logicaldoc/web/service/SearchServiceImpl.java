@@ -2,7 +2,7 @@ package com.logicaldoc.web.service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -88,7 +88,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 
 				guiResults.add(guiHit);
 			}
-			result.setHits(guiResults.toArray(new GUIDocument[0]));
+			result.setHits(guiResults);
 
 			return result;
 		} catch (Exception t) {
@@ -308,15 +308,13 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			op.setCriteria(criteria.toArray(new GUICriterion[0]));
 		}
 
-		if (!searchOptions.getFilterIds().isEmpty()) {
-			op.setFilterIds(searchOptions.getFilterIds().toArray(new Long[0]));
-		}
+		op.setFilterIds(new ArrayList<>(searchOptions.getFilterIds()));
 
 		return op;
 	}
 
 	@Override
-	public void shareSearch(String name, List<Long> userIds, long[] groupIds) throws ServerException {
+	public void shareSearch(String name, List<Long> userIds, List<Long> groupIds) throws ServerException {
 		Session session = validateSession();
 
 		try {
@@ -324,10 +322,9 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			if (search == null)
 				return;
 
-			HashSet<Long> users = new HashSet<Long>(userIds);
-			addUsersFromGroups(groupIds, users);
+			addUsersFromGroups(groupIds, userIds);
 
-			for (Long userId : users)
+			for (Long userId : userIds)
 				store(search, userId);
 		} catch (Exception t) {
 			throwServerException(session, log, t);
@@ -346,15 +343,13 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		}
 	}
 
-	private void addUsersFromGroups(long[] groupIds, Set<Long> users) {
-		if (groupIds != null) {
-			UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
-			for (Long gId : groupIds) {
-				Set<User> usrs = gDao.findByGroup(gId);
-				for (User user : usrs) {
-					if (!users.contains(user.getId()))
-						users.add(user.getId());
-				}
+	private void addUsersFromGroups(Collection<Long> groupIds, Collection<Long> users) {
+		UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		for (Long gId : groupIds) {
+			Set<User> usrs = gDao.findByGroup(gId);
+			for (User user : usrs) {
+				if (!users.contains(user.getId()))
+					users.add(user.getId());
 			}
 		}
 	}
@@ -429,16 +424,8 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			((FolderSearchOptions) searchOptions).setCriteria(criteria);
 		}
 
-		putFilterIdOptions(options, searchOptions);
+		searchOptions.setFilterIds(new HashSet<>(options.getFilterIds()));
 
 		return searchOptions;
-	}
-
-	private void putFilterIdOptions(GUISearchOptions options, SearchOptions searchOptions) {
-		if (options.getFilterIds() != null && options.getFilterIds().length > 0) {
-			Set<Long> ids = new HashSet<>();
-			Collections.addAll(ids, options.getFilterIds());
-			searchOptions.setFilterIds(ids);
-		}
 	}
 }

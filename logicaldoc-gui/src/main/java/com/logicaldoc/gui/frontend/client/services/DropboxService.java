@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -58,18 +60,16 @@ public interface DropboxService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public boolean exportDocuments(String targetPath, long[] folderIds, Long[] docIds)
-			throws ServerException;
-	
-	public int importDocuments(long targetFolder, String[] paths)
-			throws ServerException;
-	
+	public boolean exportDocuments(String targetPath, List<Long> folderIds, List<Long> docIds) throws ServerException;
+
+	public int importDocuments(long targetFolder, String[] paths) throws ServerException;
+
 	public static class Instance {
 		private static DropboxServiceAsync inst;
 
 		private Instance() {
 		}
-		
+
 		public static DropboxServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(DropboxService.class);

@@ -1,5 +1,9 @@
 package com.logicaldoc.gui.common.client.widgets;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.logicaldoc.gui.common.client.data.GroupsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
@@ -28,10 +32,7 @@ public class GroupSelectorCombo extends MultiComboBoxItem {
 		setValueFormatter((value, rec, form, item) -> AwesomeFactory.getIconHtml("user-friends") + "&nbsp;" + value);
 	}
 
-	public long[] getGroupIds() {
-		long[] ids = new long[getValues().length];
-		for (int i = 0; i < ids.length; i++)
-			ids[i] = Long.parseLong(getValues()[i]);
-		return ids;
+	public List<Long> getGroupIds() {
+		return Arrays.asList(getValues()).stream().map(id -> Long.parseLong(id)).collect(Collectors.toList());
 	}
 }

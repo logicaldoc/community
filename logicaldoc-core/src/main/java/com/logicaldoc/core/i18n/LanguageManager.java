@@ -53,7 +53,7 @@ public class LanguageManager {
 			log.error(e.getMessage());
 		}
 
-		for (Extension ext : extensions) {			
+		for (Extension ext : extensions) {
 			String language = ext.getParameter("locale").valueAsString();
 			String analyzer = ext.getParameter("analyzer").valueAsString();
 			log.debug("analyzer = {}", analyzer);
@@ -81,19 +81,19 @@ public class LanguageManager {
 		return languageManager;
 	}
 
-	public Collection<Language> getLanguages() {
+	public List<Language> getLanguages() {
 		List<Language> langs = new ArrayList<>();
 		langs.addAll(languages.values());
 		Collections.sort(langs);
 		return langs;
 	}
 
-	public Collection<Language> getActiveLanguages(String tenantName) {
+	public List<Language> getActiveLanguages(String tenantName) {
 		ContextProperties config = Context.get().getProperties();
 		if (config == null)
 			return getLanguages();
 
-		Collection<Language> actives = new ArrayList<>();
+		List<Language> actives = new ArrayList<>();
 		for (Language l : getLanguages()) {
 			if ("enabled".equals(config.getProperty(tenantName + ".lang." + l)))
 				actives.add(l);

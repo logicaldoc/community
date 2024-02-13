@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DeletedDocsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -37,7 +40,7 @@ public class DeletedDocsReport extends ReportPanel implements FolderChangeListen
 	private FolderSelector folderSelector;
 
 	private SpinnerItem max;
-	
+
 	public DeletedDocsReport() {
 		super("deleteddocs", "showndocuments");
 	}
@@ -102,7 +105,7 @@ public class DeletedDocsReport extends ReportPanel implements FolderChangeListen
 		toolStrip.addButton(display);
 		toolStrip.addFormItem(max);
 		toolStrip.addSeparator();
-		
+
 		userSelector = ItemFactory.newUserSelector("user", "deletedby", null, false, false);
 		userSelector.setWrapTitle(false);
 		userSelector.setWidth(150);
@@ -115,7 +118,7 @@ public class DeletedDocsReport extends ReportPanel implements FolderChangeListen
 		folderSelector.addFolderChangeListener(this);
 		toolStrip.addFormItem(folderSelector);
 	}
-	
+
 	@Override
 	protected void refresh() {
 		Long folderId = folderSelector.getFolderId();
@@ -135,10 +138,9 @@ public class DeletedDocsReport extends ReportPanel implements FolderChangeListen
 		restore.addClickHandler(event -> {
 			if (selection == null || selection.length == 0)
 				return;
-			final Long[] ids = new Long[selection.length];
+			List<Long> ids = new ArrayList<>();
 			for (int i = 0; i < selection.length; i++)
-				ids[i] = Long.parseLong(selection[i].getAttribute("id"));
-
+				ids.add(selection[i].getAttributeAsLong("id"));
 			new RestoreDialog(ids, null, evt -> refresh()).show();
 		});
 

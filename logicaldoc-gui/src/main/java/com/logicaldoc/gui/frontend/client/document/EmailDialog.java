@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.frontend.client.document;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class EmailDialog extends AbstractEmailDialog {
 
 	private static final String SIGNATURE_SEPARATOR = "--";
 
-	private Long[] docIds;
+	private List<Long> docIds = new ArrayList<>();
 
 	private String docTitle;
 
@@ -44,7 +45,7 @@ public class EmailDialog extends AbstractEmailDialog {
 
 	private SelectItem messageTemplate;
 
-	public EmailDialog(Long[] docIds, final String docTitle) {
+	public EmailDialog(List<Long> docIds, final String docTitle) {
 		super();
 		this.docIds = docIds;
 		this.docTitle = docTitle;
@@ -110,7 +111,7 @@ public class EmailDialog extends AbstractEmailDialog {
 
 		fields.add(1, messageTemplate);
 		fields.add(2, subject);
-		if (docIds.length == 1)
+		if (docIds.size() == 1)
 			fields.add(3, ticket);
 		else
 			fields.add(3, zip);

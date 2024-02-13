@@ -160,7 +160,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 				attributes.add(rec.getAttributeAsString("name"));
 			}
 
-			AttributeSetPropertiesPanel.this.attributeSet.reorderAttributes(attributes);
+			AttributeSetPropertiesPanel.this.attributeSet.repositionAttributes(attributes);
 			changedHandler.onChanged(null);
 		});
 

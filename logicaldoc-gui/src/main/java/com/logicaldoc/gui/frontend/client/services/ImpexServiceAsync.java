@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIArchive;
 import com.logicaldoc.gui.common.client.beans.GUIIncrementalArchive;
@@ -20,7 +22,7 @@ public interface ImpexServiceAsync {
 
 	void saveIncremental(GUIIncrementalArchive incremental, AsyncCallback<GUIIncrementalArchive> callback);
 
-	void addDocuments(long archiveId, Long[] documentIds, AsyncCallback<Void> callback);
+	void addDocuments(long archiveId, List<Long> documentIds, AsyncCallback<Void> callback);
 
 	void addFolder(long archiveId, long rootId, AsyncCallback<Void> callback);
 

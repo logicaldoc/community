@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document;
 
+import java.util.Arrays;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIBookmark;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -125,14 +127,14 @@ public class BookmarksPanel extends VLayout {
 			final ListGridRecord[] selection = list.getSelectedRecords();
 			if (selection == null || selection.length == 0)
 				return;
-			final long[] ids = new long[selection.length];
+			final Long[] ids = new Long[selection.length];
 			for (int i = 0; i < selection.length; i++) {
 				ids[i] = Long.parseLong(selection[i].getAttribute("id"));
 			}
 
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 				if (Boolean.TRUE.equals(value)) {
-					DocumentService.Instance.get().deleteBookmarks(ids, new AsyncCallback<Void>() {
+					DocumentService.Instance.get().deleteBookmarks(Arrays.asList(ids), new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);

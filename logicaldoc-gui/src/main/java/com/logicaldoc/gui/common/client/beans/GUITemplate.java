@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.Constants;
-
 /**
  * This user interface bean to model a document template
  * 
@@ -153,7 +151,7 @@ public class GUITemplate implements Serializable {
 	}
 
 	public boolean isWrite() {
-		return hasPermission(Constants.PERMISSION_WRITE);
+		return hasPermission(GUIAccessControlEntry.PERMISSION_WRITE);
 	}
 
 	public boolean hasPermission(String permission) {

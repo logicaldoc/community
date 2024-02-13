@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.search;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -237,7 +239,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 	}
 
 	@Override
-	public void onDocumentsDeleted(GUIDocument[] documents) {
+	public void onDocumentsDeleted(List<GUIDocument> documents) {
 		previewPanel.reset();
 	}
 

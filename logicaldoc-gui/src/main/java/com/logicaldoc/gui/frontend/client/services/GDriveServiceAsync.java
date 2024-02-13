@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 
@@ -12,11 +14,10 @@ public interface GDriveServiceAsync {
 	void delete(String resourceId, AsyncCallback<Void> callback);
 
 	void saveSettings(String clientId, String clientSecret, AsyncCallback<String> callback);
-	
-	void importDocuments(String[] resourceIds, long targetFolderId, String type,
-			AsyncCallback<Void> callback);
 
-	void exportDocuments(Long[] ids, AsyncCallback<String[]> callback);
+	void importDocuments(String[] resourceIds, long targetFolderId, String type, AsyncCallback<Void> callback);
+
+	void exportDocuments(List<Long> ids, AsyncCallback<String[]> callback);
 
 	void search(String expression, AsyncCallback<GUIDocument[]> callback);
 

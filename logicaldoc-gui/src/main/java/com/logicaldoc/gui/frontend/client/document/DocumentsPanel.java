@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.document;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.CookiesManager;
@@ -387,7 +390,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	}
 
 	@Override
-	public void onDocumentsDeleted(GUIDocument[] documents) {
+	public void onDocumentsDeleted(List<GUIDocument> documents) {
 		for (GUIDocument doc : documents)
 			if (DocumentsPanel.get().getSelectedDocument() != null
 					&& doc.getId() == DocumentsPanel.get().getSelectedDocument().getId()) {
@@ -402,7 +405,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	@Override
 	public void onDocumentMoved(GUIDocument document) {
 		if (folder != null && document.getFolder().getId() != folder.getId())
-			onDocumentsDeleted(new GUIDocument[] { document });
+			onDocumentsDeleted(Arrays.asList(document));
 	}
 
 	@Override

@@ -172,7 +172,7 @@ public class ResponsesGrid extends RefreshableListGrid {
 				}
 				iv = new PreviewPopup(doc);
 			} else {
-				GUIDocument[] docs = DocumentGridUtil.toDocuments(selection);
+				List<GUIDocument> docs = DocumentGridUtil.toDocuments(selection);
 				for (GUIDocument doc : docs) {
 					/*
 					 * in case of alias the data servlet inverts the docId and

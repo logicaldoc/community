@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.common.client.controllers;
 
+import java.util.List;
+
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 
 /**
@@ -23,21 +25,20 @@ public interface DocumentObserver {
 	 * @param document the document that has been modified
 	 */
 	public void onDocumentModified(GUIDocument document);
-	
+
 	/**
 	 * Invoked after the document's properties are being edited
 	 * 
 	 * @param document the document that is being edited
 	 */
-	public void onDocumentBeginEditing(GUIDocument document);	
-	
+	public void onDocumentBeginEditing(GUIDocument document);
+
 	/**
 	 * Invoked after the document's properties are being edited
 	 * 
 	 * @param document the document that is being edited
 	 */
 	public void onDocumentCancelEditing(GUIDocument document);
-	
 
 	/**
 	 * Invoked after the document has been stored
@@ -86,5 +87,5 @@ public interface DocumentObserver {
 	 * 
 	 * @param documents the documents that have been deleted
 	 */
-	public void onDocumentsDeleted(GUIDocument[] documents);
+	public void onDocumentsDeleted(List<GUIDocument> documents);
 }

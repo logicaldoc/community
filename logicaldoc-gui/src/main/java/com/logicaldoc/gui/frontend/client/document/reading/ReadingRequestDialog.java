@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document.reading;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -25,13 +27,13 @@ public class ReadingRequestDialog extends StickyWindow {
 
 	private DynamicForm form = new DynamicForm();
 
-	private Long[] docIds;
+	private List<Long> docIds;
 
 	private UserSelectorCombo usersItem;
 
 	private GroupSelectorCombo groupsItem;
 
-	public ReadingRequestDialog(Long[] docIds) {
+	public ReadingRequestDialog(List<Long> docIds) {
 		super(I18N.message("requesttoconfirmreading"));
 		setCanDragResize(true);
 		setIsModal(true);

@@ -36,7 +36,7 @@ public class CustomActionEditor extends Window {
 
 	private TabSet tabs = new TabSet();
 
-	private MenuSecurityPanel rightsPanel = null;
+	private MenuSecurityPanel securityPanel = null;
 
 	public CustomActionEditor(GUIMenu action, CustomActionsPanel panel) {
 		this.action = action;
@@ -110,8 +110,8 @@ public class CustomActionEditor extends Window {
 		details.setPane(form);
 
 		Tab security = new Tab(I18N.message("security"));
-		rightsPanel = new MenuSecurityPanel(action, false);
-		security.setPane(rightsPanel);
+		securityPanel = new MenuSecurityPanel(action, false);
+		security.setPane(securityPanel);
 
 		tabs.setTabs(details, security);
 		addItem(tabs);
@@ -131,8 +131,8 @@ public class CustomActionEditor extends Window {
 			action.setRoutineId(routineId);
 
 			try {
-				if (rightsPanel != null)
-					action.setRights(rightsPanel.getACL());
+				if (securityPanel != null)
+					action.setAccessControlList(securityPanel.getACL());
 			} catch (Exception t) {
 				// Nothing to do
 			}

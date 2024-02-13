@@ -6,11 +6,11 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
-import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -191,7 +191,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 
 		List<String> fields = new ArrayList<>();
 		Collections.addAll(fields, searchinItem.getValues());
-		
+
 		if (fields.contains(Constants.FULLTEXT_FIELD_FILENAME) && !fields.contains(Constants.FULLTEXT_FIELD_TITLE))
 			fields.add(Constants.FULLTEXT_FIELD_TITLE);
 		if (fields.contains(Constants.FULLTEXT_FIELD_TITLE) && !fields.contains(Constants.FULLTEXT_FIELD_FILENAME))
@@ -213,17 +213,11 @@ public class FulltextForm extends VLayout implements SearchObserver {
 
 	private void setSubfolderCondition(GUISearchOptions options) {
 		options.setSearchInSubPath(Boolean.parseBoolean(vm.getValueAsString("subfolders")));
-		if (Boolean.parseBoolean(vm.getValueAsString(SEARCHINHITS))) {
-			GUIDocument[] docs = Search.get().getLastResult();
-			Long[] ids = new Long[docs.length];
-			int i = 0;
-			for (GUIDocument doc : docs) {
-				ids[i] = doc.getId();
-				i++;
-			}
-			options.setFilterIds(ids);
-		} else
-			options.setFilterIds(null);
+		if (Boolean.parseBoolean(vm.getValueAsString(SEARCHINHITS)))
+			options.setFilterIds(
+					Search.get().getLastResult().stream().map(doc -> doc.getId()).collect(Collectors.toList()));
+		else
+			options.setFilterIds(new ArrayList<>());
 	}
 
 	private void setTemplateCondition(Map<String, Object> values, GUISearchOptions options) {

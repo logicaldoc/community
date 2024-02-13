@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.security.ldap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
@@ -237,16 +238,10 @@ public class LDAPServerDetailsPanel extends VLayout {
 		password.setWidth(300);
 
 		// Default groups
-		List<String> defaultGroupsIds = new ArrayList<>();
-		GUIGroup[] defaultGroups = server.getDefaultGroups();
-		if (defaultGroups != null && defaultGroups.length > 0) {
-			for (int i = 0; i < defaultGroups.length; i++)
-				if (defaultGroups[i].getType() == 0)
-					defaultGroupsIds.add(Long.toString(defaultGroups[i].getId()));
-		}
 
 		defaultGroupsItem = ItemFactory.newMultiComboBoxItem("defaultGroups", "defaultassignedgroups", new GroupsDS(),
-				defaultGroupsIds.toArray(new String[0]));
+				server.getDefaultGroups().stream().map(g -> g.getId()).collect(Collectors.toList())
+						.toArray(new Long[0]));
 		defaultGroupsItem.setValueField("id");
 		defaultGroupsItem.setDisplayField("name");
 
@@ -320,11 +315,11 @@ public class LDAPServerDetailsPanel extends VLayout {
 			LDAPServerDetailsPanel.this.server.setPassword((String) values.get(PASSWORD_HIDDEN));
 
 			String[] ids = defaultGroupsItem.getValues();
-			GUIGroup[] groups = new GUIGroup[ids.length];
+			List<GUIGroup> groups = new ArrayList<>();
 			for (int i = 0; i < ids.length; i++) {
 				GUIGroup group = new GUIGroup();
 				group.setId(Long.parseLong(ids[i]));
-				groups[i] = group;
+				groups.add(group);
 			}
 			LDAPServerDetailsPanel.this.server.setDefaultGroups(groups);
 

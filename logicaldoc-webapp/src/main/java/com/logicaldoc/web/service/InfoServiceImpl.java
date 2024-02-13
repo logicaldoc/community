@@ -1,7 +1,6 @@
 package com.logicaldoc.web.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -69,14 +68,14 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
 		try {
 			info = getInfo(tenantName);
-			info.setBundle(getBundle(locale, tenantName));
+			info.setBundle(getBundle(locale, tenantName).toArray(new GUIValue[0]));
 
 			Locale withLocale = LocaleUtil.toLocale(locale);
 
-			ArrayList<GUIValue> supportedLanguages = setSupportedLocales(tenantName, info, withLocale);
+			List<GUIValue> supportedLanguages = setSupportedLocales(tenantName, info, withLocale);
 
 			LanguageManager manager = LanguageManager.getInstance();
-			Collection<Language> languages = manager.getActiveLanguages(tenantName);
+			List<Language> languages = manager.getActiveLanguages(tenantName);
 			supportedLanguages.clear();
 			for (Language language : languages) {
 				Locale lc = language.getLocale();
@@ -225,45 +224,46 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		/*
 		 * Populate the infos from the SystemInfo
 		 */
-		GUIInfo info = new GUIInfo();
-		info.setTenant(tenant);
-		info.setSessionHeartbeat(config.getInt(tname + ".session.heartbeat", 60));
+		GUIInfo guiInfo = new GUIInfo();
+		guiInfo.setTenant(tenant);
+		guiInfo.setSessionHeartbeat(config.getInt(tname + ".session.heartbeat", 60));
 
-		SystemInfo inf = SystemInfo.get(tenant.getId());
-		info.setLicensee(inf.getLicensee());
-		info.setRelease(inf.getRelease());
-		info.setRunLevel(inf.getRunLevel());
-		info.setYear(inf.getYear());
-		info.setHostName(inf.getHostName());
-		info.setDate(inf.getDate());
-		info.setInstallationId(inf.getInstallationId());
-		info.setFeatures(inf.getFeatures());
+		SystemInfo info = SystemInfo.get(tenant.getId());
+		guiInfo.setLicensee(info.getLicensee());
+		guiInfo.setRelease(info.getRelease());
+		guiInfo.setRunLevel(info.getRunLevel());
+		guiInfo.setYear(info.getYear());
+		guiInfo.setHostName(info.getHostName());
+		guiInfo.setDate(info.getDate());
+		guiInfo.setInstallationId(info.getInstallationId());
+		guiInfo.setFeatures(info.getFeatures().toArray(new String[0]));
 
-		info.getBranding().setBugs(inf.getBugs());
-		info.getBranding().setForum(inf.getForum());
-		info.getBranding().setHelp(inf.getHelp());
-		info.getBranding().setProduct(inf.getProduct());
-		info.getBranding().setProductName(inf.getProductName());
-		info.getBranding().setSupport(inf.getSupport());
-		info.getBranding().setUrl(inf.getUrl());
-		info.getBranding().setVendor(inf.getVendor());
-		info.getBranding().setVendorAddress(inf.getVendorAddress());
-		info.getBranding().setVendorCap(inf.getVendorCap());
-		info.getBranding().setVendorCity(inf.getVendorCity());
-		info.getBranding().setVendorCountry(inf.getVendorCountry());
+		guiInfo.getBranding().setBugs(info.getBugs());
+		guiInfo.getBranding().setForum(info.getForum());
+		guiInfo.getBranding().setHelp(info.getHelp());
+		guiInfo.getBranding().setProduct(info.getProduct());
+		guiInfo.getBranding().setProductName(info.getProductName());
+		guiInfo.getBranding().setSupport(info.getSupport());
+		guiInfo.getBranding().setUrl(info.getUrl());
+		guiInfo.getBranding().setVendor(info.getVendor());
+		guiInfo.getBranding().setVendorAddress(info.getVendorAddress());
+		guiInfo.getBranding().setVendorCap(info.getVendorCap());
+		guiInfo.getBranding().setVendorCity(info.getVendorCity());
+		guiInfo.getBranding().setVendorCountry(info.getVendorCountry());
 
 		try {
-			ArrayList<GUIValue> values = new ArrayList<>();
+			List<GUIValue> values = new ArrayList<>();
 			for (Object key : config.keySet()) {
 				GUIValue pair = new GUIValue();
-				pair.setCode((String) key);
-				pair.setValue(config.getProperty((String) key));
+				String keyString = (String) key;
+				pair.setCode(keyString);
+				pair.setValue(config.getProperty(keyString));
 				values.add(pair);
 			}
 
 			loadGUISettingsFromDB(tenant, values);
 
-			info.setConfig(values.toArray(new GUIValue[0]));
+			guiInfo.setConfig(values.toArray(new GUIValue[0]));
 		} catch (Exception t) {
 			log.warn("cannot load GUI settings", t);
 		}
@@ -273,15 +273,15 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		 */
 		try {
 			GUIAttributeSet defaultSet = new AttributeSetServiceImpl().getAttributeSet("default");
-			info.setDefaultAttributeSet(defaultSet);
+			guiInfo.setDefaultAttributeSet(defaultSet);
 		} catch (Exception t) {
-			// Nothing to dox
+			// Nothing to do
 		}
 
-		return info;
+		return guiInfo;
 	}
 
-	private static void loadGUISettingsFromDB(GUITenant tenant, ArrayList<GUIValue> values) {
+	private static void loadGUISettingsFromDB(GUITenant tenant, List<GUIValue> values) {
 		try {
 			GenericDAO dao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 			List<Generic> dbSettings = dao.findByTypeAndSubtype("guisetting", null, 0L, tenant.getId());
@@ -292,18 +292,16 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		}
 	}
 
-	protected static GUIValue[] getBundle(String locale, String tenantName) {
-
+	protected static List<GUIValue> getBundle(String locale, String tenantName) {
 		Locale l = getLocaleForBundle(tenantName, LocaleUtil.toLocale(locale));
 
 		ResourceBundle rb = ResourceBundle.getBundle("i18n.messages", l);
-		GUIValue[] buf = new GUIValue[rb.keySet().size()];
-		int i = 0;
+		List<GUIValue> buf = new ArrayList<>();
 		for (String key : rb.keySet()) {
 			GUIValue entry = new GUIValue();
 			entry.setCode(key);
 			entry.setValue(rb.getString(key));
-			buf[i++] = entry;
+			buf.add(entry);
 		}
 		return buf;
 	}

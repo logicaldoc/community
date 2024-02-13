@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a Menu from the GUI view
@@ -34,7 +36,7 @@ public class GUIMenu implements Serializable {
 
 	private int position = 0;
 
-	private GUIAccessControlEntry[] rights = new GUIAccessControlEntry[] {};
+	private List<GUIAccessControlEntry> accessControlList = new ArrayList<>();
 
 	private int type = 0;
 
@@ -54,12 +56,12 @@ public class GUIMenu implements Serializable {
 		this.name = name;
 	}
 
-	public GUIAccessControlEntry[] getRights() {
-		return rights;
+	public List<GUIAccessControlEntry> getAccessControlList() {
+		return accessControlList;
 	}
 
-	public void setRights(GUIAccessControlEntry[] rights) {
-		this.rights = rights;
+	public void setAccessControlList(List<GUIAccessControlEntry> accessControlList) {
+		this.accessControlList = accessControlList;
 	}
 
 	public boolean isEnabled() {

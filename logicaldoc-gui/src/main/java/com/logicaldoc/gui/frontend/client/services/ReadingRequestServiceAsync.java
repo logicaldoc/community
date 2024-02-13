@@ -7,12 +7,12 @@ import com.logicaldoc.gui.common.client.beans.GUIReadingRequest;
 
 public interface ReadingRequestServiceAsync {
 
-	void askReadingConfirmation(Long[] docIds, List<Long> userIds, long[] groupIds, boolean alertConfirmation,
+	void askReadingConfirmation(List<Long> docIds, List<Long> userIds, List<Long> groupIds, boolean alertConfirmation,
 			String comment, AsyncCallback<Void> callback);
 
-	void confirmReadings(long[] readingIds, String version, AsyncCallback<Void> callback);
+	void confirmReadings(List<Long> readingIds, String version, AsyncCallback<Void> callback);
 
-	void getUnconfimedReadings(AsyncCallback<GUIReadingRequest[]> callback);
+	void getUnconfimedReadings(AsyncCallback<List<GUIReadingRequest>> callback);
 
 	void delete(long readingId, AsyncCallback<Void> callback);
 

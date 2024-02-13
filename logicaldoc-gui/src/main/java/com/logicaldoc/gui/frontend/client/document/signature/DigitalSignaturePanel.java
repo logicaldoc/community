@@ -1,8 +1,10 @@
 package com.logicaldoc.gui.frontend.client.document.signature;
 
+import java.util.Arrays;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.DocumentHistoryDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -103,11 +105,11 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 
 			if (Boolean.TRUE.equals(visualPositioning.getValueAsBoolean())) {
 				VisualPositioningDigitalSignatureDialog dialog = new VisualPositioningDigitalSignatureDialog(
-						new Long[] { document.getId() }, form.getValueAsString(REASON));
+						Arrays.asList(document.getId()), form.getValueAsString(REASON));
 				dialog.show();
 			} else {
 				LD.contactingServer();
-				SignService.Instance.get().signDocuments(new Long[] { document.getId() }, form.getValueAsString(REASON),
+				SignService.Instance.get().signDocuments(Arrays.asList(document.getId()), form.getValueAsString(REASON),
 						1, null, null, null, new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -124,7 +126,7 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 			}
 		});
 
-		if (document.getFolder().hasPermission(Constants.PERMISSION_SIGN))
+		if (document.getFolder().hasPermission(GUIAccessControlEntry.PERMISSION_SIGN))
 			form.setItems(sign, reason, visualPositioning, rootCert);
 		else {
 			form.setItems(rootCert);

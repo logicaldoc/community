@@ -480,8 +480,8 @@ public class SearchIndexPanel extends AdminPanel {
 
 		TextItem customSorting = ItemFactory.newTextItem("customsorting", this.searchEngine.getCustomSorting());
 		customSorting.setWidth(300);
-		customSorting.addChangeHandler(changeEvent -> 
-			sorting.setDisabled(changeEvent.getValue() != null && !changeEvent.getValue().toString().isEmpty()));
+		customSorting.addChangeHandler(changeEvent -> sorting
+				.setDisabled(changeEvent.getValue() != null && !changeEvent.getValue().toString().isEmpty()));
 
 		// The optional batch
 		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", this.searchEngine.getBatch());
@@ -572,24 +572,23 @@ public class SearchIndexPanel extends AdminPanel {
 	private IButton preparePurgeButton() {
 		IButton purge = new IButton(I18N.message("purge"));
 		purge.setAutoFit(true);
-		purge.addClickHandler(purgeClick -> 
-			SC.ask(I18N.message("purgeconfirmation"), answer -> {
-				if (Boolean.TRUE.equals(answer)) {
-					LD.contactingServer();
-					SearchEngineService.Instance.get().purge(new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							LD.clearPrompt();
-							GuiLog.serverError(caught);
-						}
+		purge.addClickHandler(purgeClick -> SC.ask(I18N.message("purgeconfirmation"), answer -> {
+			if (Boolean.TRUE.equals(answer)) {
+				LD.contactingServer();
+				SearchEngineService.Instance.get().purge(new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						LD.clearPrompt();
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void ret) {
-							LD.clearPrompt();
-						}
-					});
-				}
-			}));
+					@Override
+					public void onSuccess(Void ret) {
+						LD.clearPrompt();
+					}
+				});
+			}
+		}));
 		return purge;
 	}
 
@@ -865,7 +864,6 @@ public class SearchIndexPanel extends AdminPanel {
 		final ListGridRecord[] selection = docsList.getSelectedRecords();
 
 		Menu contextMenu = new Menu();
-
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
 		openInFolder.addClickHandler(event -> {
@@ -881,10 +879,9 @@ public class SearchIndexPanel extends AdminPanel {
 		markUnindexable.addClickHandler(event -> {
 			if (selection == null)
 				return;
-			Long[] ids = new Long[selection.length];
-			for (int j = 0; j < selection.length; j++) {
-				ids[j] = Long.parseLong(selection[j].getAttribute("id"));
-			}
+			List<Long> ids = new ArrayList<>();
+			for (int j = 0; j < selection.length; j++)
+				ids.add(selection[j].getAttributeAsLong("id"));
 
 			DocumentService.Instance.get().markUnindexable(ids, new AsyncCallback<Void>() {
 				@Override

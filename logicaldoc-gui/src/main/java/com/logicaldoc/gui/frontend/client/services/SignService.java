@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -54,7 +56,7 @@ public interface SignService extends RemoteService {
 	 * @throws ServerException an error happened manipulating the keystore
 	 */
 	public void importCertificate(String certificate, String privateKey) throws ServerException;
-	
+
 	/**
 	 * Read the uploaded file and returns it's content
 	 * 
@@ -86,7 +88,7 @@ public interface SignService extends RemoteService {
 
 	public boolean isVisualSignatureEnabled() throws ServerException;
 
-	public void signDocuments(Long[] docIds, String reason, int page, String signX, String signY, String signWidth)
+	public void signDocuments(List<Long> docIds, String reason, int page, String signX, String signY, String signWidth)
 			throws ServerException;
 
 	public static class Instance {

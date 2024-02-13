@@ -134,11 +134,11 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	@Override
-	public void delete(final long[] folderIds) throws ServerException {
+	public void delete(List<Long> folderIds) throws ServerException {
 		Session session = validateSession();
-		for (int i = 0; i < folderIds.length; i++)
+		for (long folderId : folderIds)
 			try {
-				delete(session, folderIds[i]);
+				delete(session, folderId);
 			} catch (PersistenceException | PermissionException e) {
 				throwServerException(session, log, e);
 			}
@@ -211,14 +211,15 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		return guiFolder;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public long[] computeStats(long folderId) throws ServerException {
+	public List<Long> computeStats(long folderId) throws ServerException {
 		Session session = validateSession();
 		try {
 			long[] docs = countDocsInTree(folderId);
-			return new long[] { docs[0], countSubfoldersInTree(folderId), docs[1] };
+			return Arrays.asList(docs[0], countSubfoldersInTree(folderId), docs[1]);
 		} catch (PersistenceException e) {
-			return (long[]) throwServerException(session, log, e);
+			return (List<Long>) throwServerException(session, log, e);
 		}
 	}
 
@@ -434,14 +435,13 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	@Override
-	public void copyFolders(long[] folderIds, long targetId, boolean foldersOnly, String securityOption,
+	public void copyFolders(List<Long> folderIds, long targetId, boolean foldersOnly, String securityOption,
 			GUIFolder model) throws ServerException {
 		Session session = validateSession();
 
 		try {
-			for (int i = 0; i < folderIds.length; i++) {
-				copyFolder(session, folderIds[i], targetId, foldersOnly, securityOption, model);
-			}
+			for (long folderId : folderIds)
+				copyFolder(session, folderId, targetId, foldersOnly, securityOption, model);
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
 		}
@@ -492,13 +492,12 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	@Override
-	public void move(long[] folderIds, long targetId) throws ServerException {
+	public void move(List<Long> folderIds, long targetId) throws ServerException {
 		Session session = validateSession();
 
 		try {
-			for (long folderId : folderIds) {
+			for (long folderId : folderIds)
 				move(session, folderId, targetId);
-			}
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
 		}
@@ -782,7 +781,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	@Override
-	public void paste(long[] docIds, long folderId, String action, boolean links, boolean notes, boolean security)
+	public void paste(List<Long> docIds, long folderId, String action, boolean links, boolean notes, boolean security)
 			throws ServerException {
 		Session session = validateSession();
 
@@ -805,7 +804,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		}
 	}
 
-	private void cut(Session session, long[] docIds, long folderId) throws ServerException {
+	private void cut(Session session, List<Long> docIds, long folderId) throws ServerException {
 		DocumentManager docManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -860,7 +859,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		}
 	}
 
-	private void copy(Session session, long[] docIds, long folderId, boolean links, boolean notes, boolean security)
+	private void copy(Session session, List<Long> docIds, long folderId, boolean links, boolean notes, boolean security)
 			throws ServerException {
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		DocumentManager docManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -892,7 +891,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	@Override
-	public void pasteAsAlias(long[] docIds, long folderId, String type) throws ServerException {
+	public void pasteAsAlias(List<Long> docIds, long folderId, String type) throws ServerException {
 		Session session = validateSession();
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -1162,7 +1161,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	@Override
-	public void merge(long[] folderIds, long targetId) throws ServerException {
+	public void merge(List<Long> folderIds, long targetId) throws ServerException {
 		Session session = validateSession();
 
 		checkPermission(Permission.ADD, session.getUser(), targetId);

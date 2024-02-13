@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.gdrive;
 
+import java.util.Arrays;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -125,7 +127,7 @@ public class GDriveEditor extends Window {
 		toolStrip.addButton(cancel);
 		toolStrip.addSeparator();
 		cancel.addClickHandler(event -> DocumentService.Instance.get()
-				.unlock(new Long[] { GDriveEditor.this.document.getId() }, new AsyncCallback<Void>() {
+				.unlock(Arrays.asList(GDriveEditor.this.document.getId()), new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

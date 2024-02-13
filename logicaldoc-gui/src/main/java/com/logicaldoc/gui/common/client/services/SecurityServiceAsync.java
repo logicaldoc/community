@@ -80,7 +80,7 @@ public interface SecurityServiceAsync {
 
 	void resetAvatar(long userId, AsyncCallback<Void> callback);
 
-	void cloneWorkTimes(long srcUserId, List<Long> userIds, long[] groupIds, AsyncCallback<Void> callback);
+	void cloneWorkTimes(long srcUserId, List<Long> userIds, List<Long> groupIds, AsyncCallback<Void> callback);
 
 	void changeStatus(long userId, boolean enabled, AsyncCallback<Void> callback);
 

@@ -1,8 +1,8 @@
 package com.logicaldoc.gui.frontend.client.document;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -135,7 +135,7 @@ public class DocumentsUploader extends Window {
 		immediateIndexing.setValue(false);
 		immediateIndexing.setTitleAlign(Alignment.LEFT);
 
-		if (!FolderController.get().getCurrentFolder().hasPermission(Constants.PERMISSION_IMPORT)) {
+		if (!FolderController.get().getCurrentFolder().hasPermission(GUIAccessControlEntry.PERMISSION_IMPORT)) {
 			zipItem.setDisabled(true);
 			zipItem.setValue(false);
 		}

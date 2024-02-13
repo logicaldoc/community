@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.zoho;
 
+import java.util.Arrays;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
@@ -110,7 +112,7 @@ public class ZohoEditor extends Window {
 	}
 
 	private void onCancel() {
-		DocumentService.Instance.get().unlock(new Long[] { ZohoEditor.this.document.getId() },
+		DocumentService.Instance.get().unlock(Arrays.asList(ZohoEditor.this.document.getId()),
 				new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {

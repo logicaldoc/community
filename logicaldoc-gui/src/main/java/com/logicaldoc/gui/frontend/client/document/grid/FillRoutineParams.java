@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document.grid;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -26,9 +28,9 @@ public class FillRoutineParams extends Window {
 
 	private long folderId;
 
-	private Long[] docIds;
+	private List<Long> docIds;
 
-	public FillRoutineParams(String title, GUIAutomationRoutine routine, long folderId, Long[] docIds) {
+	public FillRoutineParams(String title, GUIAutomationRoutine routine, long folderId, List<Long> docIds) {
 		this.routine = routine;
 		this.folderId = folderId;
 		this.docIds = docIds;

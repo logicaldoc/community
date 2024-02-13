@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.folder;
 
+import java.util.List;
+
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.folder.browser.FolderBrowser;
@@ -36,9 +38,9 @@ public class MoveDialog extends Dialog {
 		move.setMargin(1);
 		move.addClickHandler(event -> {
 			String shownName = FolderNavigator.get().getSelectedRecord().getAttributeAsString("name");
-			long[] selection = FolderNavigator.get().getSelectedIds();
-			if (selection.length > 1)
-				shownName = selection.length + " " + I18N.message("folders").toLowerCase();
+			List<Long> selection = FolderNavigator.get().getSelectedIds();
+			if (!selection.isEmpty())
+				shownName = selection.size() + " " + I18N.message("folders").toLowerCase();
 
 			LD.ask(I18N.message("move"),
 					I18N.message("moveask",

@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.folder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIResult;
@@ -29,7 +32,7 @@ public class FolderSearchDialog extends Window {
 
 	private FolderSearchForm form;
 
-	private ListGridRecord[] lastResult = new ListGridRecord[0];
+	private List<ListGridRecord> lastResult = new ArrayList<>();
 
 	private ListGrid grid = new ListGrid();
 
@@ -69,7 +72,7 @@ public class FolderSearchDialog extends Window {
 		grid.setShowRecordComponentsByCell(true);
 		grid.setAutoFetchData(true);
 		grid.setWrapCells(false);
-		grid.setData(lastResult);
+		grid.setData(lastResult.toArray(new ListGridRecord[0]));
 
 		grid.addDoubleClickHandler((DoubleClickEvent event) -> {
 			ListGridRecord selection = grid.getSelectedRecord();
@@ -101,25 +104,24 @@ public class FolderSearchDialog extends Window {
 
 			@Override
 			public void onSuccess(GUIResult result) {
-				lastResult = new ListGridRecord[result.getHits().length];
-				for (int i = 0; i < result.getHits().length; i++) {
-					GUIDocument hit = result.getHits()[i];
+				lastResult = new ArrayList<>();
+				for (GUIDocument hit : result.getHits()) {
 					ListGridRecord rec = new ListGridRecord();
-					lastResult[i] = rec;
 					rec.setAttribute("id", hit.getId());
 					rec.setAttribute("name", hit.getFileName());
 					rec.setAttribute(DESCRIPTION, hit.getSummary());
+					lastResult.add(rec);
 				}
 
-				if (lastResult.length == 1) {
-					onSelect(lastResult[0].getAttributeAsLong("id"), lastResult[0].getAttribute("name"));
+				if (lastResult.size() == 1) {
+					onSelect(lastResult.get(0).getAttributeAsLong("id"), lastResult.get(0).getAttribute("name"));
 				} else
-					grid.setData(lastResult);
+					grid.setData(lastResult.toArray(new ListGridRecord[0]));
 			}
 		});
 	}
 
-	public ListGridRecord[] getLastResult() {
+	public List<ListGridRecord> getLastResult() {
 		return lastResult;
 	}
 

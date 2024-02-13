@@ -1,7 +1,9 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * GUI representation of an e-mail to be sent
@@ -29,19 +31,19 @@ public class GUIEmail implements Serializable {
 
 	private GUIUser user;
 
-	private Long[] docIds;
+	private List<Long> docIds = new ArrayList<>();
 
 	private GUIContact from;
 
-	private GUIContact[] replyTo;
+	private List<GUIContact> replyTo = new ArrayList<>();
 
-	private GUIContact[] tos;
+	private List<GUIContact> tos = new ArrayList<>();
 
-	private GUIContact[] ccs;
+	private List<GUIContact> ccs = new ArrayList<>();
 
-	private GUIContact[] bccs;
+	private List<GUIContact> bccs = new ArrayList<>();
 
-	private GUIDocument[] attachments;
+	private List<GUIDocument> attachments = new ArrayList<>();
 
 	private boolean signed = false;
 
@@ -85,11 +87,11 @@ public class GUIEmail implements Serializable {
 		this.user = user;
 	}
 
-	public Long[] getDocIds() {
+	public List<Long> getDocIds() {
 		return docIds;
 	}
 
-	public void setDocIds(Long[] docIds) {
+	public void setDocIds(List<Long> docIds) {
 		this.docIds = docIds;
 	}
 
@@ -109,27 +111,27 @@ public class GUIEmail implements Serializable {
 		this.pdfConversion = pdfConversion;
 	}
 
-	public GUIContact[] getTos() {
+	public List<GUIContact> getTos() {
 		return tos;
 	}
 
-	public void setTos(GUIContact[] tos) {
+	public void setTos(List<GUIContact> tos) {
 		this.tos = tos;
 	}
 
-	public GUIContact[] getCcs() {
+	public List<GUIContact> getCcs() {
 		return ccs;
 	}
 
-	public void setCcs(GUIContact[] ccs) {
+	public void setCcs(List<GUIContact> ccs) {
 		this.ccs = ccs;
 	}
 
-	public GUIContact[] getBccs() {
+	public List<GUIContact> getBccs() {
 		return bccs;
 	}
 
-	public void setBccs(GUIContact[] bccs) {
+	public void setBccs(List<GUIContact> bccs) {
 		this.bccs = bccs;
 	}
 
@@ -157,19 +159,19 @@ public class GUIEmail implements Serializable {
 		this.from = from;
 	}
 
-	public GUIDocument[] getAttachments() {
+	public List<GUIDocument> getAttachments() {
 		return attachments;
 	}
 
-	public void setAttachments(GUIDocument[] attachments) {
+	public void setAttachments(List<GUIDocument> attachments) {
 		this.attachments = attachments;
 	}
 
-	public GUIContact[] getReplyTo() {
+	public List<GUIContact> getReplyTo() {
 		return replyTo;
 	}
 
-	public void setReplyTo(GUIContact[] replyTo) {
+	public void setReplyTo(List<GUIContact> replyTo) {
 		this.replyTo = replyTo;
 	}
 }

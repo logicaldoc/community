@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.folder;
 
+import java.util.List;
+
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.folder.browser.FolderBrowser;
@@ -37,10 +39,10 @@ public class MergeDialog extends Dialog {
 		merge.setAutoFit(true);
 		merge.setMargin(1);
 		merge.addClickHandler(event -> {
-			long[] selectedIds = FolderNavigator.get().getSelectedIds();
+			List<Long> selectedIds = FolderNavigator.get().getSelectedIds();
 			String label = FolderNavigator.get().getSelectedRecord().getAttributeAsString("name");
-			if (selectedIds.length > 1)
-				label = selectedIds.length + " " + I18N.message("folders").toLowerCase();
+			if (!selectedIds.isEmpty())
+				label = selectedIds.size() + " " + I18N.message("folders").toLowerCase();
 
 			LD.ask(I18N.message(MERGE),
 					I18N.message("mergeask",

@@ -2,7 +2,6 @@ package com.logicaldoc.web.service;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -154,12 +153,10 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 
 	private void saveAttributes(GUIAttributeSet attributeSet, AttributeSet attSet) {
 		Map<String, Attribute> attrs = new HashMap<>();
-		if (attributeSet.getAttributes() != null && attributeSet.getAttributes().length > 0) {
-			attSet.getAttributes().clear();
-			for (GUIAttribute attribute : attributeSet.getAttributes()) {
-				if (attribute != null) {
-					saveAttribute(attribute, attributeSet, attrs);
-				}
+		attSet.getAttributes().clear();
+		for (GUIAttribute attribute : attributeSet.getAttributes()) {
+			if (attribute != null) {
+				saveAttribute(attribute, attributeSet, attrs);
 			}
 		}
 		if (attrs.size() > 0)
@@ -226,12 +223,9 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			attSet.setReadonly(attributeSet.getReadonly() == 1);
 			attSet.setType(attributeSet.getType());
 
-			GUIAttribute[] attributes = readAttributes(attributeSet);
-
-			if (attributes.length > 0) {
-				Arrays.sort(attributes);
-				attSet.setAttributes(attributes);
-			}
+			List<GUIAttribute> attributes = readAttributes(attributeSet);
+			attributes.sort(null);
+			attSet.setAttributes(attributes);
 
 			return attSet;
 		} catch (Exception t) {
@@ -241,13 +235,10 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		return null;
 	}
 
-	private GUIAttribute[] readAttributes(AttributeSet attributeSet) {
-		GUIAttribute[] attributes = new GUIAttribute[attributeSet.getAttributeNames().size()];
-		int i = 0;
-		for (String attrName : attributeSet.getAttributeNames()) {
-			attributes[i] = readAttribute(attrName, attributeSet);
-			i++;
-		}
+	private List<GUIAttribute> readAttributes(AttributeSet attributeSet) {
+		List<GUIAttribute> attributes = new ArrayList<>();
+		for (String attrName : attributeSet.getAttributeNames())
+			attributes.add(readAttribute(attrName, attributeSet));
 		return attributes;
 	}
 

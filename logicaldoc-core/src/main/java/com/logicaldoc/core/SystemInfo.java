@@ -108,21 +108,20 @@ public class SystemInfo {
 		/*
 		 * Collect installed features
 		 */
-		if (info.getFeatures() == null || info.getFeatures().length == 0)
-			try {
-				List<String> features = new ArrayList<>();
-				PluginRegistry registry = PluginRegistry.getInstance();
-				Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "Feature");
-				for (Extension extension : exts) {
-					// Retrieve the task name
-					String name = extension.getParameter("name").valueAsString();
-					if (!features.contains(name))
-						features.add(name);
-				}
-				info.setFeatures(features.toArray(new String[0]));
-			} catch (Exception e) {
-				log.error(e.getMessage());
+		try {
+			List<String> features = new ArrayList<>();
+			PluginRegistry registry = PluginRegistry.getInstance();
+			Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "Feature");
+			for (Extension extension : exts) {
+				// Retrieve the task name
+				String name = extension.getParameter("name").valueAsString();
+				if (!features.contains(name))
+					features.add(name);
 			}
+			info.setFeatures(features);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		}
 
 		/*
 		 * Read some informations from the context
@@ -189,7 +188,7 @@ public class SystemInfo {
 	 */
 	protected String hostName;
 
-	protected String[] features;
+	protected List<String> features = new ArrayList<>();
 
 	public String getProductName() {
 		return productName;
@@ -343,11 +342,11 @@ public class SystemInfo {
 		this.hostName = hostName;
 	}
 
-	public String[] getFeatures() {
+	public List<String> getFeatures() {
 		return features;
 	}
 
-	public void setFeatures(String[] features) {
+	public void setFeatures(List<String> features) {
 		this.features = features;
 	}
 }

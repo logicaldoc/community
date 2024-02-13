@@ -6,9 +6,9 @@ import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.TagsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -35,7 +35,6 @@ import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.form.validator.DoesntContainValidator;
 import com.smartgwt.client.widgets.layout.HLayout;
 
@@ -87,10 +86,10 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		FormItemIcon enforceStorage = prepareEnforceStorage();
 
 		SelectItem storage = ItemFactory.newStorageSelector("storage", folder.getStorage());
-		storage.setDisabled(!folder.hasPermission(Constants.PERMISSION_STORAGE));
+		storage.setDisabled(!folder.hasPermission(GUIAccessControlEntry.PERMISSION_STORAGE));
 		boolean storageVisible = folder.getFoldRef() == null && Feature.enabled(Feature.MULTI_STORAGE);
 		storage.setVisible(storageVisible);
-		if (folder.hasPermission(Constants.PERMISSION_STORAGE) && storageVisible) {
+		if (folder.hasPermission(GUIAccessControlEntry.PERMISSION_STORAGE) && storageVisible) {
 			storage.addChangedHandler(changedHandler);
 			storage.setIcons(applyStorageToSubfolders, enforceStorage);
 		}
@@ -99,7 +98,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 		TextItem description = ItemFactory.newTextItem("description", folder.getDescription());
 		description.setWidth(250);
-		if (folder.hasPermission(Constants.PERMISSION_RENAME))
+		if (folder.hasPermission(GUIAccessControlEntry.PERMISSION_RENAME))
 			description.addChangedHandler(changedHandler);
 		else
 			description.setDisabled(true);
@@ -189,27 +188,26 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	}
 
 	private void addComputeStatsIcons(StaticTextItem documents, StaticTextItem subfolders, StaticTextItem size) {
-		PickerIcon computeStats = new PickerIcon(PickerIconName.REFRESH,
-				(final FormItemIconClickEvent computeStatsClick) -> {
-					computeStatsClick.getItem().setValue(I18N.message("computing") + "...");
-					FolderService.Instance.get().computeStats(folder.getId(), new AsyncCallback<long[]>() {
+		PickerIcon computeStats = new PickerIcon(PickerIconName.REFRESH, computeStatsClick -> {
+			computeStatsClick.getItem().setValue(I18N.message("computing") + "...");
+			FolderService.Instance.get().computeStats(folder.getId(), new AsyncCallback<List<Long>>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-						@Override
-						public void onSuccess(long[] stats) {
-							folder.setDocumentCount(stats[0]);
-							documents.setValue(Util.formatLong(stats[0]));
-							folder.setSubfolderCount(stats[1]);
-							subfolders.setValue(Util.formatLong(stats[1]));
-							folder.setSize(stats[2]);
-							size.setValue(Util.formatSize(stats[2]));
-						}
-					});
-				});
+				@Override
+				public void onSuccess(List<Long> stats) {
+					folder.setDocumentCount(stats.get(0));
+					documents.setValue(Util.formatLong(stats.get(0)));
+					folder.setSubfolderCount(stats.get(1));
+					subfolders.setValue(Util.formatLong(stats.get(1)));
+					folder.setSize(stats.get(2));
+					size.setValue(Util.formatSize(stats.get(2)));
+				}
+			});
+		});
 		computeStats.setPrompt(I18N.message("calculatestats"));
 
 		documents.setIcons(computeStats);
@@ -292,7 +290,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		validator.setSubstring("/");
 		validator.setErrorMessage(I18N.message("invalidchar"));
 		name.setValidators(validator);
-		if (folder.hasPermission(Constants.PERMISSION_RENAME) && folder.isWrite())
+		if (folder.hasPermission(GUIAccessControlEntry.PERMISSION_RENAME) && folder.isWrite())
 			name.addChangedHandler(changedHandler);
 		else
 			name.setDisabled(true);
@@ -461,7 +459,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		if (vm.getValueAsString("name") != null)
 			folder.setName(vm.getValueAsString("name").replace("/", ""));
 
-		if (folder.hasPermission(Constants.PERMISSION_STORAGE))
+		if (folder.hasPermission(GUIAccessControlEntry.PERMISSION_STORAGE))
 			try {
 				folder.setStorage(Integer.parseInt(vm.getValueAsString("storage")));
 			} catch (Exception t) {

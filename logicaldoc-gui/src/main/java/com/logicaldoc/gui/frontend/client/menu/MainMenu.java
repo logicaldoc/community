@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.frontend.client.menu;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
@@ -265,7 +267,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 			if (document.getStatus() == 0) {
 				// Need to checkout first
-				DocumentService.Instance.get().checkout(new Long[] { document.getId() }, new AsyncCallback<Void>() {
+				DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -311,7 +313,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 			if (document.getStatus() == 0) {
 				// Need to checkout first
-				DocumentService.Instance.get().checkout(new Long[] { document.getId() }, new AsyncCallback<Void>() {
+				DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -784,7 +786,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	}
 
 	@Override
-	public void onDocumentsDeleted(GUIDocument[] documents) {
+	public void onDocumentsDeleted(List<GUIDocument> documents) {
 		// Nothing to do
 	}
 

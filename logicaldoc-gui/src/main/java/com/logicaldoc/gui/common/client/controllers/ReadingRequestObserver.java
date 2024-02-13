@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.common.client.controllers;
 
+import java.util.List;
+
 import com.logicaldoc.gui.common.client.beans.GUIReadingRequest;
 
 /**
@@ -22,6 +24,6 @@ public interface ReadingRequestObserver {
 	 * 
 	 * @param readings The new readings
 	 */
-	public void onNewReadingRequests(GUIReadingRequest[] readings);
+	public void onNewReadingRequests(List<GUIReadingRequest> readings);
 
 }

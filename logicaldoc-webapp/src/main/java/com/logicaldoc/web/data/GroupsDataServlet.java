@@ -34,7 +34,7 @@ public class GroupsDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		StringBuilder query = new StringBuilder("select A.id, A.name, A.description, A.source "
-				+ "from com.logicaldoc.core.security.Group A where A.deleted = 0 and A.type = " + Group.TYPE_DEFAULT
+				+ "from com.logicaldoc.core.security.user.Group A where A.deleted = 0 and A.type = " + Group.TYPE_DEFAULT
 				+ " and A.tenantId=" + session.getTenantId());
 
 		GroupDAO dao = (GroupDAO) Context.get().getBean(GroupDAO.class);

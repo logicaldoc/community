@@ -51,7 +51,7 @@ public interface SearchService extends RemoteService {
 	 * 
 	 * @throws ServerException share the search to
 	 */
-	void shareSearch(String name, List<Long> userIds, long[] groupIds) throws ServerException;
+	void shareSearch(String name, List<Long> userIds, List<Long> groupIds) throws ServerException;
 
 	/**
 	 * Deletes a previously saved search

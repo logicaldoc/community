@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.services;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -138,7 +139,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void deleteLinks(long[] ids) throws ServerException;
+	public void deleteLinks(List<Long> ids) throws ServerException;
 
 	/**
 	 * Deletes a selection of versions
@@ -149,7 +150,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIDocument deleteVersions(long[] ids) throws ServerException;
+	public GUIDocument deleteVersions(List<Long> ids) throws ServerException;
 
 	/**
 	 * Links a set of documents
@@ -159,7 +160,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void linkDocuments(Long[] inDocIds, Long[] outDocIds) throws ServerException;
+	public void linkDocuments(List<Long> inDocIds, List<Long> outDocIds) throws ServerException;
 
 	/**
 	 * Deletes a selection of documents
@@ -168,7 +169,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void delete(Long[] ids) throws ServerException;
+	public void delete(List<Long> ids) throws ServerException;
 
 	/**
 	 * Deletes a selection of documents from trash
@@ -177,7 +178,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void deleteFromTrash(Long[] ids) throws ServerException;
+	public void deleteFromTrash(List<Long> ids) throws ServerException;
 
 	/**
 	 * Clear the user's trash
@@ -194,7 +195,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void makeImmutable(Long[] docIds, String comment) throws ServerException;
+	public void makeImmutable(List<Long> docIds, String comment) throws ServerException;
 
 	/**
 	 * Archives a set of documents
@@ -204,7 +205,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void archiveDocuments(Long[] docIds, String comment) throws ServerException;
+	public void archiveDocuments(List<Long> docIds, String comment) throws ServerException;
 
 	/**
 	 * Archives the documents in a folder
@@ -242,7 +243,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public long countDocuments(long[] folderIds, int status) throws ServerException;
+	public long countDocuments(List<Long> folderIds, int status) throws ServerException;
 
 	/**
 	 * Unlocks a set of documents
@@ -251,7 +252,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void unlock(Long[] docIds) throws ServerException;
+	public void unlock(List<Long> docIds) throws ServerException;
 
 	/**
 	 * Locks a set of documents
@@ -261,7 +262,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void lock(Long[] docIds, String comment) throws ServerException;
+	public void lock(List<Long> docIds, String comment) throws ServerException;
 
 	/**
 	 * Checks out the document
@@ -270,7 +271,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void checkout(Long[] docIds) throws ServerException;
+	public void checkout(List<Long> docIds) throws ServerException;
 
 	/**
 	 * Adds new documents previously uploaded
@@ -325,7 +326,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void indexDocuments(Long[] docIds) throws ServerException;
+	public void indexDocuments(List<Long> docIds) throws ServerException;
 
 	/**
 	 * Checks-in a new document version
@@ -407,7 +408,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void restore(Long[] docIds, long folderId) throws ServerException;
+	public void restore(List<Long> docIds, long folderId) throws ServerException;
 
 	/**
 	 * Restores a given set of archived documents
@@ -416,7 +417,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void unarchiveDocuments(long[] docIds) throws ServerException;
+	public void unarchiveDocuments(List<Long> docIds) throws ServerException;
 
 	/**
 	 * Adds new bookmarks
@@ -426,7 +427,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void addBookmarks(Long[] targetIds, int type) throws ServerException;
+	public void addBookmarks(List<Long> targetIds, int type) throws ServerException;
 
 	/**
 	 * Deletes a set of bookmarks
@@ -435,7 +436,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void deleteBookmarks(long[] bookmarkIds) throws ServerException;
+	public void deleteBookmarks(List<Long> bookmarkIds) throws ServerException;
 
 	/**
 	 * Updates a single bookmark's data
@@ -463,7 +464,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void markUnindexable(Long[] docIds) throws ServerException;
+	public void markUnindexable(List<Long> docIds) throws ServerException;
 
 	/**
 	 * Marks a set of documents as indexable
@@ -476,7 +477,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void markIndexable(Long[] docIds, int policy) throws ServerException;
+	public void markIndexable(List<Long> docIds, int policy) throws ServerException;
 
 	/**
 	 * Cleans the uploaded files folder
@@ -561,7 +562,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void deleteNotes(long[] ids) throws ServerException;
+	public void deleteNotes(List<Long> ids) throws ServerException;
 
 	/**
 	 * Applies to a selection of documents all the given data
@@ -574,7 +575,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIDocument[] bulkUpdate(Long[] ids, GUIDocument vo, boolean ignoreEmptyFields) throws ServerException;
+	public GUIDocument[] bulkUpdate(List<Long> ids, GUIDocument vo, boolean ignoreEmptyFields) throws ServerException;
 
 	/**
 	 * Creates a new empty document
@@ -689,7 +690,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIDocument merge(Long[] docIds, long targetFolderId, String fileName) throws ServerException;
+	public GUIDocument merge(List<Long> docIds, long targetFolderId, String fileName) throws ServerException;
 
 	/**
 	 * Counts the pages of a document and updates the DB.
@@ -705,8 +706,10 @@ public interface DocumentService extends RemoteService {
 	/**
 	 * Gets the shared permissions on a set of documents in regards of the
 	 * current user
+	 * 
+	 * @param docIds collection of the documents
 	 */
-	public GUIAccessControlEntry getEnabledPermissions(Long[] docIds) throws ServerException;
+	public GUIAccessControlEntry getEnabledPermissions(List<Long> docIds) throws ServerException;
 
 	/**
 	 * Applies all security settings to document

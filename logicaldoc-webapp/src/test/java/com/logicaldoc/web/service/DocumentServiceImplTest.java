@@ -187,12 +187,12 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testDeleteFromTrash() throws ServerException, PersistenceException {
-		service.delete(new Long[] { 7L });
+		service.delete(List.of(7L));
 		List<Long> docIds = (List<Long>) docDao.queryForList("select ld_id from ld_document where ld_deleted=1",
 				Long.class);
 		assertEquals(1, docIds.size());
 
-		service.deleteFromTrash(docIds.toArray(new Long[] {}));
+		service.deleteFromTrash(docIds);
 		docIds = (List<Long>) docDao.queryForList("select ld_id from ld_document where ld_deleted=1", Long.class);
 		assertEquals(0, docIds.size());
 		docIds = (List<Long>) docDao.queryForList("select ld_id from ld_document where ld_deleted=2", Long.class);
@@ -202,7 +202,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testEmptyTrash() throws ServerException, PersistenceException {
-		service.delete(new Long[] { 7L });
+		service.delete(List.of(7L));
 		List<Long> docIds = (List<Long>) docDao.queryForList("select ld_id from ld_document where ld_deleted=1",
 				Long.class);
 		assertEquals(1, docIds.size());
@@ -217,12 +217,12 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	@Test
 	public void testArchiveAndUnarchiveDocuments() throws ServerException, PersistenceException {
 		GUIDocument doc = service.getById(7);
-		service.archiveDocuments(new Long[] { doc.getId() }, "archive comment");
+		service.archiveDocuments(List.of(doc.getId()), "archive comment");
 
 		Document document = docDao.findById(7);
 		assertEquals(Document.DOC_ARCHIVED, document.getStatus());
 
-		service.unarchiveDocuments(new long[] { doc.getId() });
+		service.unarchiveDocuments(List.of(doc.getId()));
 		document = docDao.findById(7);
 		assertEquals(Document.DOC_UNLOCKED, document.getStatus());
 	}
@@ -332,7 +332,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		doc = service.getById(doc.getId());
 		assertNotNull(doc);
 		assertEquals("text content", storer.getString(doc.getId(), storer.getResourceName(doc.getId(), null, null)));
-		service.checkout(new Long[] { doc.getId() });
+		service.checkout(List.of(doc.getId()));
 
 		doc.setId(0);
 		doc.setFileName("testcontent2.txt");
@@ -344,15 +344,16 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		doc = service.getById(doc.getId());
 		assertNotNull(doc);
 		assertEquals(" ", storer.getString(doc.getId(), storer.getResourceName(doc.getId(), null, null)));
-		service.checkout(new Long[] { doc.getId() });
+		service.checkout(List.of(doc.getId()));
 	}
 
 	@Test
 	public void testCheckinContext() throws ServerException {
 		testCreateWithContent();
-		service.checkout(new Long[] { 7L });
+		service.checkout(List.of(7L));
 
 		service.checkinContent(7, "checkedin contents");
+
 		assertEquals("checkedin contents", service.getContentAsString(7));
 	}
 
@@ -444,7 +445,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		GUIDocument doc = service.getById(7);
 		assertEquals(0, doc.getImmutable());
 
-		service.makeImmutable(new Long[] { 7L }, "immutable comment");
+		service.makeImmutable(List.of(7L), "immutable comment");
 
 		doc = service.getById(7);
 		assertEquals(1, doc.getImmutable());
@@ -476,7 +477,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertTrue(exceptionHappened);
 
 		// Document locked
-		service.lock(new Long[] { 7L }, "lock comment");
+		service.lock(List.of(7L), "lock comment");
 		exceptionHappened = false;
 		try {
 			service.promoteVersion(doc.getId(), "1.0");
@@ -492,7 +493,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		GUIDocument doc = service.getById(7);
 		assertEquals(Document.DOC_UNLOCKED, doc.getStatus());
 
-		service.checkout(new Long[] { 7L });
+		service.checkout(List.of(7L));
 		doc = service.getById(7);
 		assertEquals(Document.DOC_CHECKED_OUT, doc.getStatus());
 	}
@@ -625,7 +626,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 			GUIDocument[] createdDocs = service.addDocuments(false, UTF_8, false, doc);
 			assertEquals(2, createdDocs.length);
 
-			GUIDocument mergedDoc = service.merge(new Long[] { createdDocs[0].getId(), createdDocs[1].getId() }, 1200,
+			GUIDocument mergedDoc = service.merge(List.of(createdDocs[0].getId(), createdDocs[1].getId()), 1200,
 					"merged.pdf");
 			mergedDoc = service.getById(mergedDoc.getId());
 			assertNotNull(mergedDoc);
@@ -728,11 +729,11 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		FileUtil.copyResource("/New error indexing documents.eml",
 				new File(repositoryDir.getPath() + "/docs/" + doc.getId() + "/doc/" + doc.getFileVersion()));
 
-		service.indexDocuments(new Long[] { doc.getId() });
+		service.indexDocuments(List.of(doc.getId()));
 		doc = service.getById(doc.getId());
 		assertEquals(1, doc.getIndexed());
 
-		service.indexDocuments(null);
+		service.indexDocuments(new ArrayList<>());
 	}
 
 	@Test
@@ -775,7 +776,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testDeleteVersions() throws ServerException {
-		long[] ids = new long[] { 21, 22, 23 };
+		List<Long> ids = List.of(21L, 22L, 23L);
 		GUIDocument gdoc;
 		boolean exceptionHappened = false;
 		try {
@@ -785,7 +786,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		}
 		assertTrue(exceptionHappened);
 
-		ids = new long[] { 1, 2 };
+		ids = List.of(1L, 2L);
 		gdoc = service.deleteVersions(ids);
 		assertNotNull(gdoc);
 		assertEquals(1, gdoc.getId());
@@ -846,7 +847,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertNotNull(link);
 		assertEquals("xyz", link.getType());
 
-		service.deleteLinks(new long[] { 1, 2 });
+		service.deleteLinks(List.of(1L, 2L));
 
 		link = linkDao.findById(1);
 		assertNull(link);
@@ -869,7 +870,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		doc = docDao.findById(1);
 		assertNotNull(doc);
-		service.delete(new Long[] { 2L, 3L });
+		service.delete(List.of(2L, 3L));
 
 		doc = docDao.findById(1);
 		assertNotNull(doc);
@@ -886,7 +887,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertEquals(2, notes.size());
 		assertEquals("message for note 1", notes.get(0).getMessage());
 
-		service.deleteNotes(new long[] { 1 });
+		service.deleteNotes(List.of(1L));
 
 		notes = noteDao.findByDocId(1, "1.0");
 		assertNotNull(notes);
@@ -928,7 +929,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertNotNull(doc);
 		assertEquals(3L, doc.getLockUserId().longValue());
 
-		service.unlock(new Long[] { 1L, 2L });
+		service.unlock(List.of(1L, 2L));
 
 		doc = docDao.findDocument(1);
 		assertNotNull(doc);
@@ -937,7 +938,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertNotNull(doc);
 		assertNull(doc.getLockUserId());
 
-		service.lock(new Long[] { 1L, 2L }, "comment");
+		service.lock(List.of(1L, 2L), "comment");
 
 		doc = docDao.findDocument(1);
 		assertEquals(1L, doc.getLockUserId().longValue());
@@ -947,7 +948,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testLinkDocuments() throws ServerException {
-		service.linkDocuments(new Long[] { 1L, 2L }, new Long[] { 3L, 4L });
+		service.linkDocuments(List.of(1L, 2L), List.of(3L, 4L));
 
 		DocumentLink link = linkDao.findByDocIdsAndType(1, 3, "default");
 		assertNotNull(link);
@@ -965,7 +966,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	public void testRestore() throws ServerException, PersistenceException {
 		docDao.delete(4);
 		assertNull(docDao.findById(4));
-		service.restore(new Long[] { 4L }, 5);
+		service.restore(List.of(4L), 5);
 		assertNotNull(docDao.findById(4));
 		assertNotNull(docDao.findById(4));
 		assertEquals(5L, docDao.findById(4).getFolder().getId());
@@ -973,9 +974,10 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testBookmarks() throws ServerException, PersistenceException {
-		service.addBookmarks(new Long[] { 1L, 2L }, 0);
+		service.addBookmarks(List.of(1L, 2L), 0);
 
 		Bookmark book = bookDao.findByUserIdAndDocId(1, 1);
+
 		assertNotNull(book);
 		book = bookDao.findByUserIdAndDocId(1, 2);
 		assertNotNull(book);
@@ -991,7 +993,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertEquals("bookmarkTest", book.getTitle());
 		assertEquals("bookDescr", book.getDescription());
 
-		service.deleteBookmarks(new long[] { bookmark.getId() });
+		service.deleteBookmarks(List.of(bookmark.getId()));
 
 		book = bookDao.findById(1);
 		assertNull(book);
@@ -999,15 +1001,15 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertNull(book);
 
 		// delete an already deleted bookmark
-		service.deleteBookmarks(new long[] { bookmark.getId() });
+		service.deleteBookmarks(List.of(bookmark.getId()));
 
 		// Add bookmarks on folders
-		service.addBookmarks(new Long[] { 6L, 7L }, Bookmark.TYPE_FOLDER);
+		service.addBookmarks(List.of(6L, 7L), Bookmark.TYPE_FOLDER);
 
 		// Add bookmarks on non existent documents
 		boolean exceptionHappened = false;
 		try {
-			service.addBookmarks(new Long[] { 21L, 22L }, Bookmark.TYPE_DOCUMENT);
+			service.addBookmarks(List.of(21L, 22L), Bookmark.TYPE_DOCUMENT);
 		} catch (ServerException e) {
 			exceptionHappened = true;
 		}
@@ -1040,7 +1042,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		Document doc3 = docDao.findById(3);
 		assertNotNull(doc3);
 		assertEquals(AbstractDocument.INDEX_INDEXED, doc3.getIndexed());
-		service.markUnindexable(new Long[] { 1L, 2L, 3L });
+		service.markUnindexable(List.of(1L, 2L, 3L));
 
 		doc1 = docDao.findById(1);
 		assertNotNull(doc1);
@@ -1052,7 +1054,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertNotNull(doc3);
 		assertEquals(AbstractDocument.INDEX_SKIP, doc3.getIndexed());
 
-		service.markIndexable(new Long[] { 1L, 3L }, AbstractDocument.INDEX_TO_INDEX);
+		service.markIndexable(List.of(1L, 3L), AbstractDocument.INDEX_TO_INDEX);
 
 		doc1 = docDao.findById(1);
 		assertNotNull(doc1);
@@ -1064,8 +1066,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testCountDocuments() throws ServerException {
-		assertEquals(7, service.countDocuments(new long[] { 5 }, 0));
-		assertEquals(0, service.countDocuments(new long[] { 5 }, 3));
+		assertEquals(7, service.countDocuments(List.of(5L), 0));
+		assertEquals(0, service.countDocuments(List.of(5L), 3));
 	}
 
 	@Test
@@ -1135,24 +1137,23 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		// Send the email as download ticket
 		GUIEmail gmail = service.extractEmail(5, "1.0");
 		log.info(gmail.getFrom().getEmail());
-		gmail.setDocIds(new Long[] { 5L });
+		gmail.setDocIds(List.of(5L));
 
 		List<GUIContact> tos = new ArrayList<>();
 		GUIContact gc = new GUIContact("Kenneth", "Botterill", "ken-botterill@acme.com");
 		tos.add(gc);
 
-		GUIContact[] carr = new GUIContact[] {};
-		gmail.setTos(tos.toArray(carr));
+		gmail.setTos(tos);
 
 		tos = new ArrayList<>();
 		gc = new GUIContact("Riley", "Arnold", "riley-arnold@acme.com");
 		tos.add(gc);
-		gmail.setBccs(tos.toArray(carr));
+		gmail.setBccs(tos);
 
 		tos = new ArrayList<>();
 		gc = new GUIContact("Scout", "Marsh", "s.marsh@acme.com");
 		tos.add(gc);
-		gmail.setCcs(tos.toArray(carr));
+		gmail.setCcs(tos);
 		gmail.setSendAsTicket(true);
 
 		String retvalue = service.sendAsEmail(gmail, "en-US");
@@ -1162,16 +1163,15 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		// Send the email with attached .zip
 		gmail = service.extractEmail(5, "1.0");
 		log.info(gmail.getFrom().getEmail());
-		gmail.setDocIds(new Long[] { 5L });
+		gmail.setDocIds(List.of(5L));
 
 		tos = new ArrayList<>();
 		gc = new GUIContact("Kenneth", "Botterill", "ken-botterill@acme.com");
 		tos.add(gc);
 
-		carr = new GUIContact[] {};
-		gmail.setTos(tos.toArray(carr));
-		gmail.setBccs(null);
-		gmail.setCcs(null);
+		gmail.setTos(tos);
+		gmail.getBccs().clear();
+		gmail.getCcs().clear();
 
 		gmail.setSendAsTicket(false);
 		gmail.setZipCompression(true);
@@ -1260,7 +1260,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		GUIDocument doc4 = service.getById(4L);
 		assertNull(doc4.getAttribute("attr1"));
 
-		Long[] ids = new Long[] { 4L };
+		List<Long> ids = List.of(4L);
 		GUIDocument vo = new GUIDocument();
 		vo.setPublished(1);
 
@@ -1304,7 +1304,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		doc.setStatus(AbstractDocument.DOC_CHECKED_OUT);
 		docDao.store(doc);
 
-		ids = new Long[] { 5L, 6L };
+		ids = List.of(5L, 6L);
 		vo = new GUIDocument();
 		vo.setPublished(0);
 
@@ -1368,17 +1368,17 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testGetEnabledPermissions() throws ParseException, PersistenceException, ServerException {
-		GUIAccessControlEntry permissions = service.getEnabledPermissions(new Long[] { 2L, 3L, 4L });
+		GUIAccessControlEntry permissions = service.getEnabledPermissions(List.of(2L, 3L, 4L));
 		for (Permission permission : Permission.all())
 			assertTrue("Does not allow " + permission.name(),
 					permissions.isPermissionAllowed(permission.name().toLowerCase()));
 
 		prepareSession("boss", "admin");
-		permissions = service.getEnabledPermissions(new Long[] { 2L, 3L, 4L });
+		permissions = service.getEnabledPermissions(List.of(2L, 3L, 4L));
 		assertFalse(permissions.isRead());
 
 		prepareSession("author", "admin");
-		permissions = service.getEnabledPermissions(new Long[] { 2L, 3L, 4L });
+		permissions = service.getEnabledPermissions(List.of(2L, 3L, 4L));
 		assertTrue(permissions.isRead());
 		assertTrue(permissions.isReadingreq());
 		assertTrue(permissions.isPrint());

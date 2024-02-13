@@ -81,17 +81,17 @@ public class ZohoDialog extends Dialog {
 		if (selection == null)
 			return;
 
-		final Long[] docIds = MainPanel.get().isOnDocumentsTab()
+		final List<Long> docIds = MainPanel.get().isOnDocumentsTab()
 				? DocumentsPanel.get().getDocumentsGrid().getSelectedIds()
 				: SearchPanel.get().getDocumentsGrid().getSelectedIds();
 
-		SC.ask(docIds.length == 0 ? I18N.message("exportdirtozoho", FolderController.get().getCurrentFolder().getName())
+		SC.ask(docIds.size() == 0 ? I18N.message("exportdirtozoho", FolderController.get().getCurrentFolder().getName())
 				: I18N.message("exportdocstozoho"), choice -> {
 					if (choice.booleanValue()) {
 						String targetId = selection.getAttributeAsString("id");
-						long[] folderIds = new long[0];
-						if (docIds.length == 0 && FolderController.get().getCurrentFolder() != null)
-							folderIds[0] = FolderController.get().getCurrentFolder().getId();
+						List<Long> folderIds = new ArrayList<>();
+						if (docIds.isEmpty() && FolderController.get().getCurrentFolder() != null)
+							folderIds.add(FolderController.get().getCurrentFolder().getId());
 
 						LD.contactingServer();
 						ZohoService.Instance.get().exportDocuments(targetId, folderIds, docIds,

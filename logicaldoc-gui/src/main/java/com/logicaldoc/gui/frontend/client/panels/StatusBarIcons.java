@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.panels;
 
+import java.util.List;
+
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
@@ -164,7 +166,7 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 	}
 
 	@Override
-	public void onNewReadingRequests(GUIReadingRequest[] readings) {
+	public void onNewReadingRequests(List<GUIReadingRequest> readings) {
 		onConfirmReading(0L);
 	}
 }

@@ -16,5 +16,5 @@ public interface ContactServiceAsync {
 
 	void parseContacts(boolean preview, GUIParseContactsParameters parameters, AsyncCallback<GUIContact[]> callback);
 
-	void shareContacts(long[] contactIds, List<Long> userIds, long[] groupIds, AsyncCallback<Void> callback);
+	void shareContacts(List<Long> contactIds, List<Long> userIds, List<Long> groupIds, AsyncCallback<Void> callback);
 }

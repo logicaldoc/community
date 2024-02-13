@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document.stamp;
 
+import java.util.List;
+
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIStamp;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -24,9 +26,9 @@ public class FillStamp extends StickyWindow {
 
 	private GUIStamp stamp;
 
-	protected GUIDocument[] documents;
+	protected List<GUIDocument> documents;
 
-	public FillStamp(GUIDocument[] documents, GUIStamp stamp, boolean visualPositioning) {
+	public FillStamp(List<GUIDocument> documents, GUIStamp stamp, boolean visualPositioning) {
 		super("applystamp");
 		this.documents = documents;
 		this.visualPositioning = visualPositioning;

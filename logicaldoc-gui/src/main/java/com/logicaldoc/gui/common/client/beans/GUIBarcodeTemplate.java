@@ -44,24 +44,19 @@ public class GUIBarcodeTemplate extends GUIOCRTemplate {
 	}
 
 	public void removeBarcodeZone(int index) {
-		if (getZones() == null || getZones().length < 1 || index > getZones().length - 1)
+		if (zones.isEmpty() || index > zones.size() - 1)
 			return;
 
-		List<GUIBarcodeZone> newSpecs = new ArrayList<>();
-		for (int i = 0; i < getZones().length; i++) {
+		List<GUIZone> newSpecs = new ArrayList<>();
+		for (int i = 0; i < zones.size(); i++) {
 			if (i != index)
-				newSpecs.add((GUIBarcodeZone) getZones()[i]);
+				newSpecs.add(zones.get(i));
 		}
 
-		setZones(newSpecs.toArray(new GUIBarcodeZone[0]));
+		zones = newSpecs;
 	}
 
 	public void appendBarcodeZone(GUIBarcodeZone a) {
-		List<GUIBarcodeZone> newSpecs = new ArrayList<>();
-		if (getZones() != null)
-			for (GUIZone barcodeZone : getZones())
-				newSpecs.add((GUIBarcodeZone) barcodeZone);
-		newSpecs.add(a);
-		setZones(newSpecs.toArray(new GUIBarcodeZone[0]));
+		zones.add(a);
 	}
 }

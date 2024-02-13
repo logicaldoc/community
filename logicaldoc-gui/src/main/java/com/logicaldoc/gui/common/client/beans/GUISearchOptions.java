@@ -2,6 +2,7 @@ package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
@@ -72,7 +73,7 @@ public class GUISearchOptions implements Serializable {
 
 	private String topOperator;
 
-	private Long[] filterIds;
+	private List<Long> filterIds;
 
 	private int caseSensitive = 1;
 
@@ -82,7 +83,7 @@ public class GUISearchOptions implements Serializable {
 	public GUISearchOptions() {
 		if (Session.get() != null && Session.get().getSession() != null) {
 			Integer pageSize = null;
-			if(Session.get().getUser()!=null)
+			if (Session.get().getUser() != null)
 				pageSize = DocumentGridUtil.getPageSizeFromSpec(Session.get().getUser().getHitsGrid());
 			if (pageSize == null)
 				pageSize = Session.get().getConfigAsInt("search.hits");
@@ -276,11 +277,11 @@ public class GUISearchOptions implements Serializable {
 		this.topOperator = topOperator;
 	}
 
-	public Long[] getFilterIds() {
+	public List<Long> getFilterIds() {
 		return filterIds;
 	}
 
-	public void setFilterIds(Long[] filterIds) {
+	public void setFilterIds(List<Long> filterIds) {
 		this.filterIds = filterIds;
 	}
 

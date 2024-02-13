@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.settings.gui;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIMenu;
@@ -247,7 +248,8 @@ public class CustomActionsPanel extends VLayout {
 			rec.setAttribute("name", menu.getName());
 			rec.setAttribute(DESCRIPTION, menu.getDescription());
 			rec.setAttribute(EENABLED, menu.isEnabled() ? "0" : "2");
-			rec.setAttribute(ALLOWED, Util.toString(menu.getRights()));
+			rec.setAttribute(ALLOWED,
+					menu.getAccessControlList().stream().map(ace -> ace.getName()).collect(Collectors.joining(",")));
 			records[i++] = rec;
 		}
 		grid.setData(records);
@@ -259,7 +261,8 @@ public class CustomActionsPanel extends VLayout {
 			rec.setAttribute("name", action.getName());
 			rec.setAttribute(DESCRIPTION, action.getDescription());
 			rec.setAttribute(EENABLED, action.isEnabled() ? "0" : "2");
-			rec.setAttribute(ALLOWED, Util.toString(action.getRights()));
+			rec.setAttribute(ALLOWED,
+					action.getAccessControlList().stream().map(ace -> ace.getName()).collect(Collectors.joining(",")));
 
 			grid.invalidateRecordComponents();
 			grid.refreshRecordComponent(grid.getRecordIndex(rec));

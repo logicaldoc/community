@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 
-import com.logicaldoc.gui.common.client.Constants;
-
 /**
  * Workflow bean as used in the GUI
  * 
@@ -19,9 +17,9 @@ public class GUIWorkflow implements Serializable {
 	private String id = null;
 
 	private String name = "";
-	
+
 	private String label = "";
-	
+
 	private String color = null;
 
 	private String description = "";
@@ -239,7 +237,7 @@ public class GUIWorkflow implements Serializable {
 	}
 
 	public boolean isWrite() {
-		return hasPermission(Constants.PERMISSION_WRITE);
+		return hasPermission(GUIAccessControlEntry.PERMISSION_WRITE);
 	}
 
 	public boolean hasPermission(String permission) {

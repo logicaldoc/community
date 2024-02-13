@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.frontend.client.subscription;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
@@ -113,17 +115,16 @@ public class SubscriptionDialog extends Window {
 		return selectedEvents;
 	}
 
-	private Long[] getSelectedIds(ListGrid grid) {
+	private List<Long> getSelectedIds(ListGrid grid) {
 		ListGridRecord[] selectedRecords = grid.getSelectedRecords();
-		Long[] selectedIds = new Long[selectedRecords.length];
-		for (int i = 0; i < selectedRecords.length; i++) {
-			selectedIds[i] = Long.parseLong(selectedRecords[i].getAttributeAsString("id"));
-		}
+		List<Long> selectedIds = new ArrayList<>();
+		for (int i = 0; i < selectedRecords.length; i++)
+			selectedIds.add(selectedRecords[i].getAttributeAsLong("id"));
 		return selectedIds;
 	}
 
 	private ButtonItem prepareSaveButton(ListGrid grid, DynamicForm form) {
-		Long[] selectedIds = getSelectedIds(grid);
+		List<Long> selectedIds = getSelectedIds(grid);
 
 		ButtonItem save = new ButtonItem();
 		save.setTitle(I18N.message("save"));
@@ -147,7 +148,7 @@ public class SubscriptionDialog extends Window {
 		return save;
 	}
 
-	private void doUpdateSubscriptions(ListGrid grid, Long[] selectedIds, String[] events, final String eventsStr,
+	private void doUpdateSubscriptions(ListGrid grid, List<Long> selectedIds, String[] events, final String eventsStr,
 			final String folderOption) {
 		AuditService.Instance.get().update(selectedIds, CURRENT.equals(folderOption), events,
 				new AsyncCallback<Void>() {
@@ -175,7 +176,7 @@ public class SubscriptionDialog extends Window {
 	 * @param folderId identifier of the folder
 	 * @param docIds identifier of the documents
 	 */
-	public SubscriptionDialog(final Long folderId, final Long[] docIds) {
+	public SubscriptionDialog(final Long folderId, List<Long> docIds) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 
 		if (folderId != null)
@@ -229,7 +230,7 @@ public class SubscriptionDialog extends Window {
 		addItem(form);
 	}
 
-	private ButtonItem prepareSubscribeButton(final Long folderId, final Long[] docIds, final DynamicForm form) {
+	private ButtonItem prepareSubscribeButton(final Long folderId, List<Long> docIds, final DynamicForm form) {
 		ButtonItem subscribe = new ButtonItem();
 		subscribe.setTitle(I18N.message("subscribe"));
 		subscribe.setAutoFit(true);

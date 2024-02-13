@@ -150,13 +150,13 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	private static EMailSender emailSender;
 
 	@Override
-	public void addBookmarks(Long[] ids, int type) throws ServerException {
+	public void addBookmarks(List<Long> ids, int type) throws ServerException {
 		Session session = validateSession();
 
 		BookmarkDAO bookmarkDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		for (long id : ids) {
+		for (Long id : ids) {
 			try {
 				Bookmark bookmark = null;
 				if (bookmarkDao.findByUserIdAndDocId(session.getUserId(), id) != null) {
@@ -205,12 +205,11 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void indexDocuments(Long[] docIds) throws ServerException {
+	public void indexDocuments(List<Long> docIds) throws ServerException {
 		Session session = validateSession();
-
 		executeLongRunningOperation("Index Documents", () -> {
 			try {
-				index(docIds, session);
+				index(docIds.toArray(new Long[0]), session);
 			} catch (ParseException | PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
@@ -586,7 +585,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void checkout(Long[] docIds) throws ServerException {
+	public void checkout(List<Long> docIds) throws ServerException {
 		Session session = validateSession();
 
 		// Checkout the document; throws an exception if something
@@ -610,7 +609,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void lock(Long[] docIds, String comment) throws ServerException {
+	public void lock(List<Long> docIds, String comment) throws ServerException {
 		Session session = validateSession();
 
 		// Unlock the document; throws an exception if something
@@ -636,16 +635,14 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void delete(Long[] ids) throws ServerException {
+	public void delete(List<Long> ids) throws ServerException {
 		Session session = validateSession();
 
-		if (ids.length > 0) {
-			for (long docId : ids) {
-				try {
-					deleteDocument(docId, session);
-				} catch (PersistenceException e) {
-					throwServerException(session, log, e);
-				}
+		for (long docId : ids) {
+			try {
+				deleteDocument(docId, session);
+			} catch (PersistenceException e) {
+				throwServerException(session, log, e);
 			}
 		}
 	}
@@ -693,7 +690,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void deleteBookmarks(long[] bookmarkIds) throws ServerException {
+	public void deleteBookmarks(List<Long> bookmarkIds) throws ServerException {
 		validateSession();
 		BookmarkDAO dao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 		for (long id : bookmarkIds) {
@@ -706,7 +703,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void deleteLinks(long[] ids) throws ServerException {
+	public void deleteLinks(List<Long> ids) throws ServerException {
 		validateSession();
 
 		DocumentLinkDAO dao = (DocumentLinkDAO) Context.get().getBean(DocumentLinkDAO.class);
@@ -1022,37 +1019,33 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void linkDocuments(Long[] inDocIds, Long[] outDocIds) throws ServerException {
+	public void linkDocuments(List<Long> inDocIds, List<Long> outDocIds) throws ServerException {
 		Session session = validateSession();
 
 		DocumentLinkDAO linkDao = (DocumentLinkDAO) Context.get().getBean(DocumentLinkDAO.class);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		if (outDocIds.length > 0) {
-
-			for (int i = 0; i < inDocIds.length; i++) {
-				for (int j = 0; j < outDocIds.length; j++) {
-					DocumentLink link = linkDao.findByDocIdsAndType(inDocIds[i], outDocIds[j], "default");
-					if (link == null) {
-						// The link doesn't exist and must be created
-						link = new DocumentLink();
-						link.setTenantId(session.getTenantId());
-						try {
-							link.setDocument1(docDao.findById(inDocIds[i]));
-							link.setDocument2(docDao.findById(outDocIds[j]));
-							link.setType("default");
-							linkDao.store(link);
-						} catch (PersistenceException e) {
-							throwServerException(session, log, e);
-						}
+		for (Long inDocId : inDocIds) {
+			for (Long outDocId : outDocIds) {
+				DocumentLink link = linkDao.findByDocIdsAndType(inDocId, outDocId, "default");
+				if (link == null) {
+					// The link doesn't exist and must be created
+					link = new DocumentLink();
+					link.setTenantId(session.getTenantId());
+					try {
+						link.setDocument1(docDao.findById(inDocId));
+						link.setDocument2(docDao.findById(outDocId));
+						link.setType("default");
+						linkDao.store(link);
+					} catch (PersistenceException e) {
+						throwServerException(session, log, e);
 					}
 				}
 			}
-
 		}
 	}
 
 	@Override
-	public void makeImmutable(Long[] docIds, String comment) throws ServerException {
+	public void makeImmutable(List<Long> docIds, String comment) throws ServerException {
 		Session session = validateSession();
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -1089,7 +1082,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void markIndexable(Long[] docIds, int policy) throws ServerException {
+	public void markIndexable(List<Long> docIds, int policy) throws ServerException {
 		Session session = validateSession();
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -1104,7 +1097,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void markUnindexable(Long[] docIds) throws ServerException {
+	public void markUnindexable(List<Long> docIds) throws ServerException {
 		Session session = validateSession();
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -1118,7 +1111,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void restore(Long[] docIds, long folderId) throws ServerException {
+	public void restore(List<Long> docIds, long folderId) throws ServerException {
 		Session session = validateSession();
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -1435,13 +1428,11 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 		setAuthorAddress(mail, guiMail, session);
 
-		setRecipients(mail, guiMail);
+		mail.parseRecipientsBCC(guiMail.getBccs().stream().map(c -> c.getEmail()).collect(Collectors.joining(",")));
+		mail.parseRecipientsCC(guiMail.getCcs().stream().map(c -> c.getEmail()).collect(Collectors.joining(",")));
+		mail.parseRecipients(guiMail.getTos().stream().map(c -> c.getEmail()).collect(Collectors.joining(",")));
 
-		setReceipientsCC(mail, guiMail);
-
-		setRecipientsBCC(mail, guiMail);
-
-		List<Document> attachedDocs = documentDao.findByIds(guiMail.getDocIds(), null);
+		List<Document> attachedDocs = documentDao.findByIds(guiMail.getDocIds().toArray(new Long[0]), null);
 		for (Document document : attachedDocs)
 			documentDao.initialize(document);
 
@@ -1465,7 +1456,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				if (!guiMail.getMessage().contains(DOWNLOAD_TICKET))
 					message += "<br/><br/>" + dictionary.get(DOWNLOAD_TICKET);
 
-				Document doc = documentDao.findDocument(guiMail.getDocIds()[0]);
+				Document doc = documentDao.findDocument(guiMail.getDocIds().get(0));
 
 				if (doc.getDocRef() != null)
 					doc = documentDao.findById(doc.getDocRef());
@@ -1489,42 +1480,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		}
 	}
 
-	private void setRecipientsBCC(EMail mail, GUIEmail guiMail) {
-		if (guiMail.getBccs() != null && guiMail.getBccs().length > 0) {
-			StringBuilder sb = new StringBuilder();
-			for (GUIContact contact : guiMail.getBccs()) {
-				if (sb.length() > 0)
-					sb.append(",");
-				sb.append(contact.getEmail());
-			}
-			mail.parseRecipientsBCC(sb.toString());
-		}
-	}
-
-	private void setReceipientsCC(EMail mail, GUIEmail guiMail) {
-		if (guiMail.getCcs() != null && guiMail.getCcs().length > 0) {
-			StringBuilder sb = new StringBuilder();
-			for (GUIContact contact : guiMail.getCcs()) {
-				if (sb.length() > 0)
-					sb.append(",");
-				sb.append(contact.getEmail());
-			}
-			mail.parseRecipientsCC(sb.toString());
-		}
-	}
-
-	private void setRecipients(EMail mail, GUIEmail guiMail) {
-		if (guiMail.getTos() != null && guiMail.getTos().length > 0) {
-			StringBuilder sb = new StringBuilder();
-			for (GUIContact contact : guiMail.getTos()) {
-				if (sb.length() > 0)
-					sb.append(",");
-				sb.append(contact.getEmail());
-			}
-			mail.parseRecipients(sb.toString());
-		}
-	}
-
 	private void setAuthorAddress(EMail mail, GUIEmail guiMail, Session session) {
 		mail.setAuthor(session.getUser().getUsername());
 		if (Context.get().getProperties().getBoolean(session.getTenantName() + SMTP_USERASFROM, true)) {
@@ -1535,7 +1490,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		}
 	}
 
-	private void prepareZipAttachment(EMail mail, Long[] docIds, boolean pdfConversion, Session session)
+	private void prepareZipAttachment(EMail mail, List<Long> docIds, boolean pdfConversion, Session session)
 			throws IOException {
 		/*
 		 * Create a temporary archive for sending it as unique attachment
@@ -1548,7 +1503,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			transaction.setEvent(DocumentEvent.DOWNLOADED.toString());
 
 			ZipExport export = new ZipExport();
-			export.process(docIds, out, pdfConversion, transaction);
+			export.process(docIds.toArray(new Long[0]), out, pdfConversion, transaction);
 			createAttachment(mail, zipFile);
 		} catch (IOException | PersistenceException t) {
 			log.error(t.getMessage(), t);
@@ -1582,12 +1537,12 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSession(session);
 
-			Document doc = documentDao.findDocument(email.getDocIds()[0]);
+			Document doc = documentDao.findDocument(email.getDocIds().get(0));
 
 			Ticket ticket = new Ticket();
 			ticket.setTenantId(session.getTenantId());
 			ticket.setType(Ticket.DOWNLOAD);
-			ticket.setDocId(email.getDocIds()[0]);
+			ticket.setDocId(email.getDocIds().get(0));
 
 			ticket = manager.createTicket(ticket, transaction);
 			String ticketDiv = "<div style='margin-top:10px; border-top:1px solid black; background-color:#CCCCCC;'><b>&nbsp;"
@@ -1724,7 +1679,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void unlock(Long[] docIds) throws ServerException {
+	public void unlock(List<Long> docIds) throws ServerException {
 		Session session = validateSession();
 
 		// Create the document history event
@@ -2060,7 +2015,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void deleteNotes(long[] ids) throws ServerException {
+	public void deleteNotes(List<Long> ids) throws ServerException {
 		validateSession();
 
 		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
@@ -2073,7 +2028,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public GUIDocument[] bulkUpdate(Long[] ids, GUIDocument vo, boolean ignoreEmptyFields) throws ServerException {
+	public GUIDocument[] bulkUpdate(List<Long> ids, GUIDocument vo, boolean ignoreEmptyFields) throws ServerException {
 		Session session = validateSession();
 
 		List<GUIDocument> updatedDocs = new ArrayList<>();
@@ -2205,7 +2160,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public GUIDocument deleteVersions(long[] ids) throws ServerException {
+	public GUIDocument deleteVersions(List<Long> ids) throws ServerException {
 		Session session = validateSession();
 
 		long docId = 0;
@@ -2264,9 +2219,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void deleteFromTrash(Long[] ids) throws ServerException {
+	public void deleteFromTrash(List<Long> ids) throws ServerException {
 		Session session = validateSession();
-		if (ids == null || ids.length < 1)
+		if (ids.isEmpty())
 			return;
 
 		String idsStr = Arrays.asList(ids).toString().replace('[', '(').replace(']', ')');
@@ -2298,14 +2253,14 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void archiveDocuments(Long[] docIds, String comment) throws ServerException {
+	public void archiveDocuments(List<Long> docIds, String comment) throws ServerException {
 		Session session = validateSession();
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSession(session);
 		try {
-			manager.archiveDocuments(ArrayUtils.toPrimitive(docIds), transaction);
+			manager.archiveDocuments(ArrayUtils.toPrimitive(docIds.toArray(new Long[0])), transaction);
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
 		}
@@ -2327,7 +2282,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void unarchiveDocuments(long[] docIds) throws ServerException {
+	public void unarchiveDocuments(List<Long> docIds) throws ServerException {
 		Session session = validateSession();
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -2346,12 +2301,11 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public long countDocuments(long[] folderIds, int status) throws ServerException {
+	public long countDocuments(List<Long> folderIds, int status) throws ServerException {
 		validateSession();
 		long count = 0;
-		for (int i = 0; i < folderIds.length; i++) {
-			count += countDocuments(folderIds[i], status);
-		}
+		for (long folderId : folderIds)
+			count += countDocuments(folderId, status);
 		return count;
 	}
 
@@ -2730,7 +2684,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			d.setFolder(emailDocument.getFolder());
 			attachments.add(d);
 		}
-		guiMail.setAttachments(attachments.toArray(new GUIDocument[0]));
+		guiMail.setAttachments(attachments);
 	}
 
 	private void setEmailRecipients(EMail email, GUIEmail guiMail) {
@@ -2738,25 +2692,25 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		List<GUIContact> contacts = new ArrayList<>();
 		for (Recipient rec : recipients)
 			contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
-		guiMail.setTos(contacts.toArray(new GUIContact[0]));
+		guiMail.setTos(contacts);
 
 		recipients = email.getRecipientsCC();
 		contacts = new ArrayList<>();
 		for (Recipient rec : recipients)
 			contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
-		guiMail.setCcs(contacts.toArray(new GUIContact[0]));
+		guiMail.setCcs(contacts);
 
 		recipients = email.getRecipientsBCC();
 		contacts = new ArrayList<>();
 		for (Recipient rec : recipients)
 			contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
-		guiMail.setBccs(contacts.toArray(new GUIContact[0]));
+		guiMail.setBccs(contacts);
 
 		recipients = email.getReplyTo();
 		contacts = new ArrayList<>();
 		for (Recipient rec : recipients)
 			contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
-		guiMail.setReplyTo(contacts.toArray(new GUIContact[0]));
+		guiMail.setReplyTo(contacts);
 	}
 
 	@Override
@@ -3087,7 +3041,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public GUIDocument merge(Long[] docIds, long targetFolderId, String fileName) throws ServerException {
+	public GUIDocument merge(List<Long> docIds, long targetFolderId, String fileName) throws ServerException {
 		final Session session = validateSession();
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -3247,7 +3201,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public GUIAccessControlEntry getEnabledPermissions(Long[] docIds) throws ServerException {
+	public GUIAccessControlEntry getEnabledPermissions(List<Long> docIds) throws ServerException {
 		Session session = validateSession();
 
 		try {

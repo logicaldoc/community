@@ -139,13 +139,7 @@ public class AddTemplateAttributeDialog extends Window {
 					for (ListGridRecord rec : records)
 						setAttributesList.removeData(rec);
 
-				GUIAttribute[] attributes = set.getAttributes();
-
-				if (attributes == null)
-					return;
-
-				for (int i = 0; i < attributes.length; i++) {
-					GUIAttribute att = attributes[i];
+				for (GUIAttribute att : set.getAttributes()) {
 					ListGridRecord rec = new ListGridRecord();
 					rec.setAttribute("name", att.getName());
 					rec.setAttribute(LABEL, att.getLabel());

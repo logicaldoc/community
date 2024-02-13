@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.folder;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -41,7 +43,7 @@ public class AutomationDialog extends Window {
 
 	private TabSet tabSet = new TabSet();
 
-	public AutomationDialog(Long folderId, Long[] docIds) {
+	public AutomationDialog(Long folderId, List<Long> docIds) {
 		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, (ClickEvent event) -> destroy());
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, closeIcon);
@@ -133,7 +135,7 @@ public class AutomationDialog extends Window {
 		return new Tab(I18N.message("parameters"));
 	}
 
-	private void onExecute(Long folderId, Long[] docIds) {
+	private void onExecute(Long folderId, List<Long> docIds) {
 		if (routine.getId() == 0L && !scriptForm.validate())
 			return;
 

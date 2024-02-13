@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.dashboard.reading;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -155,7 +156,7 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 					requests.add(req);
 				}
 			}
-			ReadingRequestController.get().addUnconfirmedReadings(requests.toArray(new GUIReadingRequest[0]));
+			ReadingRequestController.get().addUnconfirmedReadings(requests);
 		});
 
 		content.setWidth100();
@@ -189,7 +190,7 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 
 					@Override
 					public void onSuccess(GUIDocument document) {
-						new PreviewPopup(new GUIDocument[] { document }, 0).show();
+						new PreviewPopup(Arrays.asList(document), 0).show();
 					}
 				}));
 
@@ -255,7 +256,7 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 	}
 
 	@Override
-	public void onNewReadingRequests(GUIReadingRequest[] requests) {
+	public void onNewReadingRequests(List<GUIReadingRequest> requests) {
 		refresh();
 	}
 }
