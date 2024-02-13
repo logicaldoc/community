@@ -1102,16 +1102,13 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		}
 	}
 
-	private boolean saveACL(Session session, Menu menu, List<GUIAccessControlEntry> aces)
+	private void saveACL(Session session, Menu menu, List<GUIAccessControlEntry> aces)
 			throws PermissionException, PersistenceException {
 		MenuDAO mdao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		if (!mdao.isReadEnable(Menu.SECURITY, session.getUserId()))
 			throw new PermissionException(session.getUsername(), "Menu " + menu.getName(), Permission.READ);
 
 		GroupDAO gdao = (GroupDAO) Context.get().getBean(GroupDAO.class);
-
-		boolean sqlerrors = false;
-
 		mdao.initialize(menu);
 
 		// Remove all current tenant rights
@@ -1123,7 +1120,6 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		}
 		menu.getAccessControlList().clear();
 
-		sqlerrors = false;
 		for (GUIAccessControlEntry right : aces) {
 			Group group = gdao.findById(right.getEntityId());
 			if (group == null || group.getTenantId() != session.getTenantId())
@@ -1132,17 +1128,12 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			AccessControlEntry ace = new AccessControlEntry();
 			ace.setGroupId(right.getEntityId());
 			ace.setRead(right.isRead() ? 1 : 0);
+			ace.setWrite(right.isWrite() ? 1 : 0);
 			grps.add(ace);
 		}
 
 		menu.setAccessControlList(grps);
-		try {
-			mdao.store(menu);
-		} catch (PersistenceException e) {
-			sqlerrors = true;
-		}
-
-		return !sqlerrors;
+		mdao.store(menu);
 	}
 
 	@Override
@@ -1291,32 +1282,29 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 		List<GUIAccessControlEntry> acl = new ArrayList<>();
 
-		if (menu.getAccessControlList() != null && !menu.getAccessControlList().isEmpty()) {
-			GroupDAO gdao = (GroupDAO) Context.get().getBean(GroupDAO.class);
-			UserDAO udao = (UserDAO) Context.get().getBean(UserDAO.class);
-			for (AccessControlEntry mg : menu.getAccessControlList()) {
-				GUIAccessControlEntry ace = new GUIAccessControlEntry();
-				ace.setEntityId(mg.getGroupId());
-				ace.setWrite(mg.getWrite() == 1);
+		GroupDAO gdao = (GroupDAO) Context.get().getBean(GroupDAO.class);
+		UserDAO udao = (UserDAO) Context.get().getBean(UserDAO.class);
+		for (AccessControlEntry mg : menu.getAccessControlList()) {
+			GUIAccessControlEntry ace = new GUIAccessControlEntry();
+			ace.setEntityId(mg.getGroupId());
+			ace.setWrite(mg.getWrite() == 1);
 
-				Group group = gdao.findById(mg.getGroupId());
-				if (group == null)
-					continue;
+			Group group = gdao.findById(mg.getGroupId());
+			if (group == null)
+				continue;
 
-				if (group.getType() == Group.TYPE_DEFAULT) {
-					ace.setLabel(group.getName());
-					ace.setName(I18N.message("group", LocaleUtil.toLocale(locale)) + ": " + group.getName());
-				} else {
-					User user = udao.findByGroup(group.getId()).iterator().next();
-					ace.setLabel(user.getUsername());
-					ace.setName(I18N.message("user", LocaleUtil.toLocale(locale)) + ": " + user.getFullName() + " ("
-							+ user.getUsername() + ")");
-				}
-
-				acl.add(ace);
+			if (group.getType() == Group.TYPE_DEFAULT) {
+				ace.setLabel(group.getName());
+				ace.setName(I18N.message("group", LocaleUtil.toLocale(locale)) + ": " + group.getName());
+			} else {
+				User user = udao.findByGroup(group.getId()).iterator().next();
+				ace.setLabel(user.getUsername());
+				ace.setName(I18N.message("user", LocaleUtil.toLocale(locale)) + ": " + user.getFullName() + " ("
+						+ user.getUsername() + ")");
 			}
-		}
 
+			acl.add(ace);
+		}
 		f.setAccessControlList(acl);
 
 		return f;

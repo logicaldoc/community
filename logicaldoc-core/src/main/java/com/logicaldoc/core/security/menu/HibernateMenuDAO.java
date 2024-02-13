@@ -99,16 +99,16 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				return coll;
 
 			// The administrators can see all menus
-			if (user.isMemberOf(Group.GROUP_ADMIN))
+			if (user.isAdmin())
 				return findAll();
 
-			Set<Group> precoll = user.getGroups();
-			if (!precoll.isEmpty()) {
+			Set<Group> groups = user.getGroups();
+			if (!groups.isEmpty()) {
 				// First of all collect all menus that define it's own policies
 				StringBuilder query = new StringBuilder("select distinct(_menu) from Menu _menu  ");
 				query.append(" left join _menu.accessControlList as _group ");
 				query.append(" where _menu.enabled=1 and _group.groupId in (");
-				query.append(precoll.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
+				query.append(groups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 				query.append(")");
 
 				coll = findByQuery(query.toString(), (Map<String, Object>) null, null);

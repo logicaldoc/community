@@ -34,9 +34,9 @@ public class StampDetailsPanel extends VLayout {
 
 	private StampParameters parametersPanel;
 
-	private Layout usersTabPanel;
+	private Layout securityTabPanel;
 
-	private StampUsersPanel usersPanel;
+	private StampSecurity securityPanel;
 
 	public StampDetailsPanel(StampsPanel stampsPanel) {
 		super();
@@ -80,12 +80,12 @@ public class StampDetailsPanel extends VLayout {
 		parametersTab.setPane(parametersTabPanel);
 		tabSet.addTab(parametersTab);
 
-		Tab usersTab = new Tab(I18N.message("users"));
-		usersTabPanel = new HLayout();
-		usersTabPanel.setWidth100();
-		usersTabPanel.setHeight100();
-		usersTab.setPane(usersTabPanel);
-		tabSet.addTab(usersTab);
+		Tab securityTab = new Tab(I18N.message("security"));
+		securityTabPanel = new HLayout();
+		securityTabPanel.setWidth100();
+		securityTabPanel.setHeight100();
+		securityTab.setPane(securityTabPanel);
+		tabSet.addTab(securityTab);
 
 		addMember(tabSet);
 	}
@@ -105,10 +105,10 @@ public class StampDetailsPanel extends VLayout {
 				parametersTabPanel.removeMember(parametersPanel);
 		}
 
-		if (usersPanel != null) {
-			usersPanel.destroy();
-			if (Boolean.TRUE.equals(usersTabPanel.contains(usersPanel)))
-				usersTabPanel.removeMember(usersPanel);
+		if (securityPanel != null) {
+			securityPanel.destroy();
+			if (Boolean.TRUE.equals(securityTabPanel.contains(securityPanel)))
+				securityTabPanel.removeMember(securityPanel);
 		}
 
 		ChangedHandler changeHandler = (ChangedEvent event) -> onModified();
@@ -119,8 +119,8 @@ public class StampDetailsPanel extends VLayout {
 		parametersPanel = new StampParameters(stamp, changeHandler);
 		parametersTabPanel.addMember(parametersPanel);
 
-		usersPanel = new StampUsersPanel(stamp.getId());
-		usersTabPanel.addMember(usersPanel);
+		securityPanel = new StampSecurity(stamp, changeHandler);
+		securityTabPanel.addMember(securityPanel);
 	}
 
 	public GUIStamp getStamp() {
@@ -143,7 +143,10 @@ public class StampDetailsPanel extends VLayout {
 		boolean paramsValid = parametersPanel.validate();
 		if (!propsValid)
 			tabSet.selectTab(1);
-		return propsValid && paramsValid;
+		boolean securityValid = securityPanel.validate();
+		if (!securityValid)
+			tabSet.selectTab(2);
+		return propsValid && paramsValid && securityValid;
 	}
 
 	public void onSave() {

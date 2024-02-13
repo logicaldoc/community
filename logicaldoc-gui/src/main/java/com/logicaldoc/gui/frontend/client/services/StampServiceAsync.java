@@ -19,9 +19,5 @@ public interface StampServiceAsync {
 
 	void applyStamp(Long[] docIds, GUIStamp stamp, AsyncCallback<Void> callback);
 
-	void removeUsers(long[] userIds, long stampId, AsyncCallback<Void> callback);
-
-	void addUsers(long[] userIds, long stampId, AsyncCallback<Void> callback);
-
 	void getSignature(AsyncCallback<GUIStamp> callback);
 }

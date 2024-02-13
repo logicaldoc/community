@@ -1,11 +1,11 @@
-package com.logicaldoc.gui.frontend.client.metadata.template;
+package com.logicaldoc.gui.frontend.client.metadata.stamp;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
-import com.logicaldoc.gui.common.client.beans.GUITemplate;
-import com.logicaldoc.gui.common.client.data.AccessControlListDS;
+import com.logicaldoc.gui.common.client.beans.GUIStamp;
+import com.logicaldoc.gui.common.client.data.StampAclDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -27,12 +27,12 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 
 /**
- * This panel shows the security policies of a template
+ * Shows stamp's security settings
  * 
- * @author Matteo Caruso - LogicalDOC
- * @since 8.7.2
+ * @author Marco Meschieri - LogicalDOC
+ * @since 8.9.1
  */
-public class TemplateSecurityPanel extends VLayout {
+public class StampSecurity extends StampDetailsTab {
 	private static final String READ = "read";
 
 	private static final String WRITE = "write";
@@ -43,33 +43,24 @@ public class TemplateSecurityPanel extends VLayout {
 
 	private static final String ENTITY_ID = "entityId";
 
-	protected GUITemplate template;
-
-	protected ChangedHandler changedHandler;
-
 	private ListGrid list;
 
 	private boolean aclInitialized = false;
 
-	public TemplateSecurityPanel(GUITemplate template, ChangedHandler changedHandler) {
-		if (template == null) {
-			setMembers(TemplatesPanel.SELECT_TEMPLATE);
-			return;
-		}
-
-		this.template = template;
-		this.changedHandler = changedHandler;
+	public StampSecurity(GUIStamp stamp, ChangedHandler changedHandler) {
+		super(stamp, changedHandler);
 		setWidth100();
 		setHeight100();
 		setMembersMargin(3);
+
 	}
 
 	@Override
 	protected void onDraw() {
-		refresh(template);
+		refresh();
 	}
 
-	void refresh(GUITemplate template) {
+	void refresh() {
 		removeMembers(getMembers());
 
 		ListGridField entityId = new ListGridField(ENTITY_ID, ENTITY_ID);
@@ -91,13 +82,11 @@ public class TemplateSecurityPanel extends VLayout {
 		write.setCanEdit(true);
 		write.setAutoFitWidth(true);
 
-		prepareList(template);
+		prepareList();
 
 		list.setFields(entityId, entity, read, write);
 
-		addMember(list);
-
-		if (template.isWrite()) {
+		if (stamp.isWrite()) {
 			list.addCellContextClickHandler(event -> {
 				if (event.getColNum() == 0)
 					setupContextMenu().showContextMenu();
@@ -106,21 +95,24 @@ public class TemplateSecurityPanel extends VLayout {
 			list.addEditCompleteHandler(event -> changedHandler.onChanged(null));
 		}
 
-		addButons(template);
+		VLayout container = new VLayout();
+		container.setMembersMargin(3);
+		container.addMember(list);
+		container.addMember(prepareButons());
+		addMember(container);
 	}
 
-	private void addButons(GUITemplate template) {
+	private HLayout prepareButons() {
 		HLayout buttons = new HLayout();
 		buttons.setMembersMargin(4);
 		buttons.setWidth100();
 		buttons.setHeight(20);
-		addMember(buttons);
 
 		// Prepare the combo and button for adding a new Group
 		final DynamicForm groupForm = new DynamicForm();
 		final SelectItem group = ItemFactory.newGroupSelector("group", "addgroup");
 		groupForm.setItems(group);
-		if (template.isWrite())
+		if (stamp.isWrite())
 			buttons.addMember(groupForm);
 
 		group.addChangedHandler(event -> {
@@ -179,7 +171,7 @@ public class TemplateSecurityPanel extends VLayout {
 			changedHandler.onChanged(null);
 			user.clearValue();
 		});
-		if (template.isWrite())
+		if (stamp.isWrite())
 			buttons.addMember(userForm);
 
 		Button exportButton = new Button(I18N.message("export"));
@@ -191,9 +183,11 @@ public class TemplateSecurityPanel extends VLayout {
 		printButton.setAutoFit(true);
 		buttons.addMember(printButton);
 		printButton.addClickHandler(event -> GridUtil.print(list));
+
+		return buttons;
 	}
 
-	private void prepareList(GUITemplate template) {
+	private void prepareList() {
 		list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
@@ -203,7 +197,7 @@ public class TemplateSecurityPanel extends VLayout {
 		list.setHeight100();
 		list.setMinHeight(200);
 		list.setMinWidth(300);
-		list.setDataSource(new AccessControlListDS(template.getId(), "template"));
+		list.setDataSource(new StampAclDS(stamp.getId()));
 		list.addDataArrivedHandler(event -> aclInitialized = true);
 	}
 
@@ -212,7 +206,7 @@ public class TemplateSecurityPanel extends VLayout {
 	 * 
 	 * @return the array of rights
 	 */
-	private GUIAccessControlEntry[] getACL() {
+	private List<GUIAccessControlEntry> getACL() {
 		int totalRecords = list.getRecordList().getLength();
 		List<GUIAccessControlEntry> acl = new ArrayList<>();
 
@@ -226,7 +220,7 @@ public class TemplateSecurityPanel extends VLayout {
 			acl.add(ace);
 		}
 
-		return acl.toArray(new GUIAccessControlEntry[0]);
+		return acl;
 	}
 
 	/**
@@ -261,15 +255,11 @@ public class TemplateSecurityPanel extends VLayout {
 	protected boolean validate() {
 		if (aclInitialized)
 			try {
-				if (template.isWrite())
-					template.setRights(getACL());
+				if (stamp.isWrite())
+					stamp.setAccessControlList(getACL());
 			} catch (Exception t) {
 				// Nothing to do
 			}
 		return true;
-	}
-
-	public GUITemplate getTemplate() {
-		return template;
 	}
 }

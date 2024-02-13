@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation of a Stamp
@@ -69,7 +71,11 @@ public class GUIStamp extends GUIExtensibleObject implements Serializable {
 
 	private int imageHeight = 150;
 
-	private GUIUser[] users;
+	private List<GUIAccessControlEntry> accessControlList = new ArrayList<>();
+
+	private boolean read = true;
+
+	private boolean write = true;
 
 	public GUIStamp() {
 		super();
@@ -84,7 +90,7 @@ public class GUIStamp extends GUIExtensibleObject implements Serializable {
 	public long getId() {
 		return id;
 	}
-	
+
 	@Override
 	public void setId(long id) {
 		this.id = id;
@@ -170,12 +176,12 @@ public class GUIStamp extends GUIExtensibleObject implements Serializable {
 		this.color = color;
 	}
 
-	public GUIUser[] getUsers() {
-		return users;
+	public List<GUIAccessControlEntry> getAccessControlList() {
+		return accessControlList;
 	}
 
-	public void setUsers(GUIUser[] users) {
-		this.users = users;
+	public void setAccessControlList(List<GUIAccessControlEntry> accessControlList) {
+		this.accessControlList = accessControlList;
 	}
 
 	public int getSize() {
@@ -263,5 +269,21 @@ public class GUIStamp extends GUIExtensibleObject implements Serializable {
 
 	public void setFont(String font) {
 		this.font = font;
+	}
+
+	public boolean isRead() {
+		return read;
+	}
+
+	public void setRead(boolean read) {
+		this.read = read;
+	}
+
+	public boolean isWrite() {
+		return write;
+	}
+
+	public void setWrite(boolean write) {
+		this.write = write;
 	}
 }
