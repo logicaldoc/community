@@ -226,7 +226,7 @@ public class Feature {
 
 	public static void init(GUIInfo info) {
 		features.clear();
-		features.addAll(Arrays.asList(info.getFeatures()));
+		features.addAll(info.getFeatures());
 	}
 
 	public static boolean enabled(int feature) {

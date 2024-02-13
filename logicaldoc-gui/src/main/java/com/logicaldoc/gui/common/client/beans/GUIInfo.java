@@ -47,14 +47,14 @@ public class GUIInfo implements Serializable {
 
 	private List<GUIValue> bundle = new ArrayList<>();
 
-	private GUIValue[] config = new GUIValue[0];
+	private List<GUIValue> config = new ArrayList<>();
 
 	private List<GUIReadingRequest> unconfirmedReagings = new ArrayList<>();
 
 	// The definitions of attributes
-	private GUIAttribute[] attributeDefinitions = new GUIAttribute[0];
+	private List<GUIAttribute> attributeDefinitions = new ArrayList<>();
 
-	private String[] features = new String[0];
+	private List<String> features = new ArrayList<>();
 
 	private boolean databaseConnected = true;
 
@@ -102,23 +102,19 @@ public class GUIInfo implements Serializable {
 		this.bundle = bundle;
 	}
 
-	public String[] getFeatures() {
+	public List<String> getFeatures() {
 		return features;
 	}
 
 	public boolean isEnabled(String feature) {
-		if (features == null || features.length == 0)
-			return false;
-		else {
-			for (String f : features) {
-				if (f.equals(feature))
-					return true;
-			}
+		for (String f : features) {
+			if (f.equals(feature))
+				return true;
 		}
 		return false;
 	}
 
-	public void setFeatures(String[] features) {
+	public void setFeatures(List<String> features) {
 		this.features = features;
 	}
 
@@ -154,8 +150,12 @@ public class GUIInfo implements Serializable {
 		this.sessionHeartbeat = sessionHeartbeat;
 	}
 
-	public GUIValue[] getConfig() {
+	public List<GUIValue> getConfig() {
 		return config;
+	}
+
+	public void setConfig(List<GUIValue> config) {
+		this.config = config;
 	}
 
 	/**
@@ -215,10 +215,6 @@ public class GUIInfo implements Serializable {
 				return;
 			}
 		}
-	}
-
-	public void setConfig(GUIValue[] config) {
-		this.config = config;
 	}
 
 	public String getRunLevel() {
@@ -307,11 +303,11 @@ public class GUIInfo implements Serializable {
 		this.branding = branding;
 	}
 
-	public GUIAttribute[] getAttributeDefinitions() {
+	public List<GUIAttribute> getAttributeDefinitions() {
 		return attributeDefinitions;
 	}
 
-	public void setAttributeDefinitions(GUIAttribute[] attributeDefinitions) {
+	public void setAttributeDefinitions(List<GUIAttribute> attributeDefinitions) {
 		this.attributeDefinitions = attributeDefinitions;
 	}
 

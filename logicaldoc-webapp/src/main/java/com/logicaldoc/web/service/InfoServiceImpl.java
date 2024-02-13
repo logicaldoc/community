@@ -145,7 +145,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 				guiAtt.setType(att.getType());
 				guiAttributes.add(guiAtt);
 			}
-			info.setAttributeDefinitions(guiAttributes.toArray(new GUIAttribute[0]));
+			info.setAttributeDefinitions(guiAttributes);
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}
@@ -236,7 +236,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		guiInfo.setHostName(info.getHostName());
 		guiInfo.setDate(info.getDate());
 		guiInfo.setInstallationId(info.getInstallationId());
-		guiInfo.setFeatures(info.getFeatures().toArray(new String[0]));
+		guiInfo.setFeatures(info.getFeatures());
 
 		guiInfo.getBranding().setBugs(info.getBugs());
 		guiInfo.getBranding().setForum(info.getForum());
@@ -263,7 +263,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
 			loadGUISettingsFromDB(tenant, values);
 
-			guiInfo.setConfig(values.toArray(new GUIValue[0]));
+			guiInfo.setConfig(values);
 		} catch (Exception t) {
 			log.warn("cannot load GUI settings", t);
 		}
