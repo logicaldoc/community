@@ -49,7 +49,7 @@ public class GUIInfo implements Serializable {
 
 	private GUIValue[] config = new GUIValue[0];
 
-	private GUIReadingRequest[] unconfirmedReagings = new GUIReadingRequest[0];
+	private List<GUIReadingRequest> unconfirmedReagings = new ArrayList<>();
 
 	// The definitions of attributes
 	private GUIAttribute[] attributeDefinitions = new GUIAttribute[0];
@@ -315,11 +315,11 @@ public class GUIInfo implements Serializable {
 		this.attributeDefinitions = attributeDefinitions;
 	}
 
-	public GUIReadingRequest[] getUnconfirmedReagings() {
+	public List<GUIReadingRequest> getUnconfirmedReagings() {
 		return unconfirmedReagings;
 	}
 
-	public void setUnconfirmedReagings(GUIReadingRequest[] unconfirmedReagings) {
+	public void setUnconfirmedReagings(List<GUIReadingRequest> unconfirmedReagings) {
 		this.unconfirmedReagings = unconfirmedReagings;
 	}
 }

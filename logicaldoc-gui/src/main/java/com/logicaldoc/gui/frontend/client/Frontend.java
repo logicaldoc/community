@@ -1,7 +1,5 @@
 package com.logicaldoc.gui.frontend.client;
 
-import java.util.Arrays;
-
 import org.realityforge.gwt.websockets.client.WebSocket;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -161,7 +159,7 @@ public class Frontend implements EntryPoint {
 
 		Session.get().setInfo(info);
 
-		ReadingRequestController.get().addUnconfirmedReadings(Arrays.asList(info.getUnconfirmedReagings()));
+		ReadingRequestController.get().addUnconfirmedReadings(info.getUnconfirmedReagings());
 
 		Util.setupDensity(info);
 	}
