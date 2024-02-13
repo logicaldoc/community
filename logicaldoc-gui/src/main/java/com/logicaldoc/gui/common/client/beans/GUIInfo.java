@@ -41,9 +41,9 @@ public class GUIInfo implements Serializable {
 	// Optional list of messages to be shown to the user
 	private List<GUIMessage> alerts = new ArrayList<>();
 
-	private GUIValue[] supportedLanguages = new GUIValue[0];
+	private List<GUIValue> supportedLanguages = new ArrayList<>();
 
-	private GUIValue[] supportedGUILanguages = new GUIValue[0];
+	private List<GUIValue> supportedGUILanguages = new ArrayList<>();
 
 	private GUIValue[] bundle = new GUIValue[0];
 
@@ -86,11 +86,11 @@ public class GUIInfo implements Serializable {
 		this.alerts = alerts;
 	}
 
-	public GUIValue[] getSupportedLanguages() {
+	public List<GUIValue> getSupportedLanguages() {
 		return supportedLanguages;
 	}
 
-	public void setSupportedLanguages(GUIValue[] supportedLanguages) {
+	public void setSupportedLanguages(List<GUIValue> supportedLanguages) {
 		this.supportedLanguages = supportedLanguages;
 	}
 
@@ -130,11 +130,11 @@ public class GUIInfo implements Serializable {
 		this.installationId = installationId;
 	}
 
-	public GUIValue[] getSupportedGUILanguages() {
+	public List<GUIValue> getSupportedGUILanguages() {
 		return supportedGUILanguages;
 	}
 
-	public void setSupportedGUILanguages(GUIValue[] supportedGUILanguages) {
+	public void setSupportedGUILanguages(List<GUIValue> supportedGUILanguages) {
 		this.supportedGUILanguages = supportedGUILanguages;
 	}
 

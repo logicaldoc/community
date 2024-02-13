@@ -160,8 +160,8 @@ public class I18N {
 	}
 
 	public static void init(GUIInfo info) {
-		setLanguages(Arrays.asList(info.getSupportedLanguages()));
-		setGuiLanguages(Arrays.asList(info.getSupportedGUILanguages()));
+		setLanguages(info.getSupportedLanguages());
+		setGuiLanguages(info.getSupportedGUILanguages());
 		initBundle(Arrays.asList(info.getBundle()));
 
 		/*

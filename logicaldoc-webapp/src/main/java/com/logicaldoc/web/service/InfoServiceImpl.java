@@ -84,7 +84,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 				l.setValue(lc.getDisplayName(withLocale));
 				supportedLanguages.add(l);
 			}
-			info.setSupportedLanguages(supportedLanguages.toArray(new GUIValue[0]));
+			info.setSupportedLanguages(supportedLanguages);
 
 			List<GUIMessage> alerts = new ArrayList<>();
 
@@ -187,7 +187,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 			}
 		}
 
-		info.setSupportedGUILanguages(supportedLanguages.toArray(new GUIValue[0]));
+		info.setSupportedGUILanguages(supportedLanguages);
 		return supportedLanguages;
 	}
 
