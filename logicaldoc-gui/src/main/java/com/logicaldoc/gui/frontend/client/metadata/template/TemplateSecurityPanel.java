@@ -208,14 +208,13 @@ public class TemplateSecurityPanel extends VLayout {
 	}
 
 	/**
-	 * Creates an array of all the right
+	 * Creates an array of all the ACL
 	 * 
-	 * @return the array of rights
+	 * @return the complete ACL
 	 */
-	private GUIAccessControlEntry[] getACL() {
+	private List<GUIAccessControlEntry> getACL() {
 		int totalRecords = list.getRecordList().getLength();
 		List<GUIAccessControlEntry> acl = new ArrayList<>();
-
 		for (int i = 0; i < totalRecords; i++) {
 			Record rec = list.getRecordList().get(i);
 			GUIAccessControlEntry ace = new GUIAccessControlEntry();
@@ -225,8 +224,7 @@ public class TemplateSecurityPanel extends VLayout {
 			ace.setRead(rec.getAttributeAsBoolean(READ));
 			acl.add(ace);
 		}
-
-		return acl.toArray(new GUIAccessControlEntry[0]);
+		return acl;
 	}
 
 	/**
@@ -262,7 +260,7 @@ public class TemplateSecurityPanel extends VLayout {
 		if (aclInitialized)
 			try {
 				if (template.isWrite())
-					template.setRights(getACL());
+					template.setAccessControlList(getACL());
 			} catch (Exception t) {
 				// Nothing to do
 			}

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +33,6 @@ import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Tenant;
-import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
@@ -156,16 +153,9 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		template.setReadonly(guiTemplate.isReadonly() ? 1 : 0);
 		template.setType(guiTemplate.getType());
 
-		Map<String, Attribute> attrs = new HashMap<>();
-		if (guiTemplate.getAttributes() != null && guiTemplate.getAttributes().length > 0) {
-			template.getAttributes().clear();
-			for (GUIAttribute attribute : guiTemplate.getAttributes()) {
-				Attribute att = prepareAttribute(attribute);
-				attrs.put(attribute.getName(), att);
-			}
-		}
-		if (attrs.size() > 0)
-			template.setAttributes(attrs);
+		template.getAttributes().clear();
+		for (GUIAttribute attribute : guiTemplate.getAttributes())
+			template.getAttributes().put(attribute.getName(), prepareAttribute(attribute));
 	}
 
 	private Attribute prepareAttribute(GUIAttribute attribute) {
@@ -207,7 +197,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		if (guiTemplate.getId() != 0) {
 			template = dao.findById(guiTemplate.getId());
 			dao.initialize(template);
-			if (!sessionUser.isMemberOf(Group.GROUP_ADMIN)
+			if (!sessionUser.isAdmin()
 					&& (template.getReadonly() == 1 || !dao.isWriteEnable(template.getId(), session.getUserId())))
 				throw new ServerException("You do not have the permission");
 		} else {
@@ -220,8 +210,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			throws PersistenceException {
 		Template template;
 		template = new Template();
-		if (!sessionUser.isMemberOf(Group.GROUP_ADMIN)
-				&& (guiTemplate.getRights() == null || guiTemplate.getRights().length == 0)) {
+		if (!sessionUser.isAdmin() && (guiTemplate.getAccessControlList().isEmpty())) {
 			// At least the current user must have write permission to
 			// this
 			// template
@@ -232,7 +221,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			GUIAccessControlEntry r = new GUIAccessControlEntry();
 			r.setEntityId(ace.getGroupId());
 			r.setWrite(true);
-			guiTemplate.setRights(new GUIAccessControlEntry[] { r });
+			guiTemplate.getAccessControlList().add(r);
 		}
 		return template;
 	}
@@ -240,19 +229,17 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 	private void saveACL(Template template, GUITemplate guiTemplate, Session session, User sessionUser) {
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		if ((template.getReadonly() == 1 || !dao.isWriteEnable(template.getId(), session.getUserId()))
-				&& !sessionUser.isMemberOf(Group.GROUP_ADMIN))
+				&& !sessionUser.isAdmin())
 			return;
 
-		Set<AccessControlEntry> acl = new HashSet<>();
-		for (GUIAccessControlEntry guiAce : guiTemplate.getRights()) {
+		template.getAccessControlList().clear();
+		for (GUIAccessControlEntry guiAce : guiTemplate.getAccessControlList()) {
 			AccessControlEntry ace = new AccessControlEntry();
 			ace.setGroupId(guiAce.getEntityId());
 			ace.setRead(guiAce.isRead() ? 1 : 0);
 			ace.setWrite(guiAce.isWrite() ? 1 : 0);
-			acl.add(ace);
+			template.getAccessControlList().add(ace);
 		}
-		template.getAccessControlList().clear();
-		template.getAccessControlList().addAll(acl);
 	}
 
 	@Override
@@ -289,44 +276,34 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		List<String> permissionsList = new ArrayList<>();
 		for (Permission permission : permissions)
 			permissionsList.add(permission.toString());
-		guiTemplate.setPermissions(permissionsList.toArray(new String[permissionsList.size()]));
+		guiTemplate.setPermissions(permissionsList);
 
 		AttributeSetDAO setDao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 		Map<Long, AttributeSet> sets = setDao.load(template.getTenantId());
 
 		toGuiAttributes(template, guiTemplate, sets);
-
-		if (template.getAccessControlList() != null && !template.getAccessControlList().isEmpty()) {
-			List<GUIAccessControlEntry> rights = new ArrayList<>();
-			for (AccessControlEntry tg : template.getAccessControlList()) {
-				GUIAccessControlEntry right = new GUIAccessControlEntry();
-				right.setEntityId(tg.getGroupId());
-				right.setRead(tg.getRead() == 1);
-				right.setWrite(tg.getWrite() == 1);
-				rights.add(right);
-			}
-			guiTemplate.setRights(rights.toArray(new GUIAccessControlEntry[0]));
+		guiTemplate.getAccessControlList().clear();
+		for (AccessControlEntry tg : template.getAccessControlList()) {
+			GUIAccessControlEntry guiAce = new GUIAccessControlEntry();
+			guiAce.setEntityId(tg.getGroupId());
+			guiAce.setRead(tg.getRead() == 1);
+			guiAce.setWrite(tg.getWrite() == 1);
+			guiTemplate.getAccessControlList().add(guiAce);
 		}
+
 		return guiTemplate;
 	}
 
 	private void toGuiAttributes(Template template, GUITemplate guiTemplate, Map<Long, AttributeSet> sets) {
-		GUIAttribute[] attributes = new GUIAttribute[template.getAttributeNames().size()];
-		int i = 0;
+		guiTemplate.getAttributes().clear();
 		for (String attrName : template.getAttributeNames()) {
 			Attribute templateExtAttr = template.getAttributes().get(attrName);
 			AttributeSet aSet = sets.get(templateExtAttr.getSetId());
 			Attribute setExtAttr = aSet != null ? aSet.getAttribute(attrName) : null;
 
-			GUIAttribute guiAttribute = toGuiAttribute(attrName, templateExtAttr, setExtAttr, aSet);
-
-			attributes[i] = guiAttribute;
-			i++;
+			guiTemplate.getAttributes().add(toGuiAttribute(attrName, templateExtAttr, setExtAttr, aSet));
 		}
-		if (attributes.length > 0) {
-			Arrays.sort(attributes);
-			guiTemplate.setAttributes(attributes);
-		}
+		guiTemplate.getAttributes().sort(null);
 	}
 
 	private GUIAttribute toGuiAttribute(String attrName, Attribute templateExtAttr, Attribute setExtAttr,

@@ -54,9 +54,9 @@ public class TemplateServiceImplTest extends AbstractWebappTestCase {
 		Assert.assertNotNull(template);
 		Assert.assertEquals("pippo", template.getName());
 		Assert.assertEquals("paperino", template.getDescription());
-		Assert.assertEquals(1, template.getAttributes().length);
-		Assert.assertEquals("attr1", template.getAttributes()[0].getName());
-		Assert.assertEquals("val1", template.getAttributes()[0].getStringValue());
+		Assert.assertEquals(1, template.getAttributes().size());
+		Assert.assertEquals("attr1", template.getAttributes().get(0).getName());
+		Assert.assertEquals("val1", template.getAttributes().get(0).getStringValue());
 	}
 
 	@Test

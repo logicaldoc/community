@@ -1,6 +1,9 @@
 package com.logicaldoc.gui.frontend.client.metadata.template;
 
+import java.util.Arrays;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.data.TemplatesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -260,7 +263,8 @@ public class TemplatesPanel extends VLayout {
 	protected void onAddingTemplate() {
 		list.deselectAllRecords();
 		GUITemplate newTemplate = new GUITemplate();
-		newTemplate.setPermissions(new String[] { "read", "write" });
+		newTemplate.setPermissions(
+				Arrays.asList(GUIAccessControlEntry.PERMISSION_READ, GUIAccessControlEntry.PERMISSION_WRITE));
 		showTemplateDetails(newTemplate);
 	}
 }

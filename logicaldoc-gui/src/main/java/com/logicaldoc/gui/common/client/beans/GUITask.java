@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Representation of a task
@@ -36,27 +38,19 @@ public class GUITask implements Serializable {
 
 	private boolean sendActivityReport = false;
 
-	private GUIUser[] reportRecipients = new GUIUser[0];
+	private List<GUIUser> reportRecipients = new ArrayList<>();
 
-	public GUIUser[] getReportRecipients() {
+	public List<GUIUser> getReportRecipients() {
 		return reportRecipients;
 	}
 
-	public void setReportRecipients(GUIUser[] reportRecipients) {
+	public void setReportRecipients(List<GUIUser> reportRecipients) {
 		this.reportRecipients = reportRecipients;
 	}
 
 	public void addReportRecipient(GUIUser user) {
-		GUIUser[] tmp = new GUIUser[reportRecipients.length + 1];
-		int i = 0;
-		for (GUIUser u : reportRecipients) {
-			// Skip if the user already exists
-			if (u.getUsername().equals(user.getUsername()))
-				return;
-			tmp[i++] = u;
-		}
-		tmp[i] = user;
-		reportRecipients = tmp;
+		if (reportRecipients.stream().noneMatch(u -> u.getName().equals(user.getName())))
+			reportRecipients.add(user);
 	}
 
 	public int getStatus() {

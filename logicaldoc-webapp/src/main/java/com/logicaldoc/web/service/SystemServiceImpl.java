@@ -385,7 +385,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	private void addReportRecipients(GUITask guiTask, Task task) {
 		UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
-		if (task.getReportRecipients() != null) {
+		if (StringUtils.isNotEmpty(task.getReportRecipients())) {
 			StringTokenizer st = new StringTokenizer(task.getReportRecipients(), ",", false);
 			while (st.hasMoreTokens()) {
 				try {
@@ -486,13 +486,8 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			tsk.getScheduling().setMaxLength(task.getScheduling().getMaxLength());
 
 			tsk.setSendActivityReport(task.isSendActivityReport());
-			StringBuilder sb = new StringBuilder();
-			for (GUIUser user : task.getReportRecipients()) {
-				if (sb.length() > 0)
-					sb.append(",");
-				sb.append(user.getId());
-			}
-			tsk.setReportRecipients(sb.toString());
+			tsk.setReportRecipients(task.getReportRecipients().stream().map(u -> Long.toString(u.getId()))
+					.collect(Collectors.joining(",")));
 
 			saveTask(tsk);
 		}
