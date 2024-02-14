@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.common.client.util;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.google.gwt.user.client.Timer;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -10,6 +12,7 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 public class GridUtil {
 
@@ -60,7 +63,7 @@ public class GridUtil {
 			timer.schedule(100);
 		}
 	}
-	
+
 	/**
 	 * Scrolls the grid all down
 	 * 
@@ -230,6 +233,20 @@ public class GridUtil {
 																// ";"
 		stringBuilder.append("\n");
 		return fields;
+	}
+
+	/**
+	 * Collects all the IDs in an array of recods, the field 'id' is used.
+	 * 
+	 * @param records the records to list
+	 * 
+	 * @return the collection of extracted ids
+	 */
+	public static List<Long> getIds(ListGridRecord[] records) {
+		List<Long> ids = new ArrayList<>();
+		for (int i = 0; i < records.length; i++)
+			ids.add(records[i].getAttributeAsLong("id"));
+		return ids;
 	}
 
 	/**

@@ -90,8 +90,7 @@ public class TenantQuotaPanel extends HLayout {
 		if (!readonly)
 			usersQuota.addChangedHandler(changedHandler);
 
-		SpinnerItem guestsQuota = ItemFactory.newSpinnerItem(GUESTSQUOTA, "readonlyusersquota",
-				tenant.getMaxGuests());
+		SpinnerItem guestsQuota = ItemFactory.newSpinnerItem(GUESTSQUOTA, "readonlyusersquota", tenant.getMaxGuests());
 		guestsQuota.setDisabled(readonly);
 		guestsQuota.setRequired(false);
 		guestsQuota.setMin((double) tenant.getGuests());
@@ -138,7 +137,7 @@ public class TenantQuotaPanel extends HLayout {
 			quotaThreshold.addChangedHandler(changedHandler);
 
 		recipients = ItemFactory.newMultiComboBoxItem("recipients", "alertrecipients", new UsersDS(null, false, false),
-				tenant.getQuotaAlertRecipients());
+				tenant.getQuotaAlertRecipients().toArray(new String[0]));
 		recipients.setDisabled(readonly);
 		recipients.setValueField("username");
 		recipients.setDisplayField("username");
@@ -161,7 +160,7 @@ public class TenantQuotaPanel extends HLayout {
 
 	@SuppressWarnings("unchecked")
 	public boolean validate() {
-		Map<String, Object> values =  vm.getValues();
+		Map<String, Object> values = vm.getValues();
 		if (Boolean.FALSE.equals(vm.validate()))
 			return false;
 
@@ -201,7 +200,8 @@ public class TenantQuotaPanel extends HLayout {
 	}
 
 	private void setQuotaAlertRecipients() {
-		tenant.clearQuotaAlertRecipients();
+		tenant.getQuotaAlertRecipients().clear();
+		;
 		String[] usernames = recipients.getValues();
 		if (usernames != null && usernames.length > 0)
 			for (int i = 0; i < usernames.length; i++)

@@ -1,11 +1,15 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.SubscriptionsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -146,17 +150,13 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 		final ListGridRecord[] selection = list.getSelectedRecords();
 		if (selection == null || selection.length == 0)
 			return;
-		final long[] ids = new long[selection.length];
-		for (int i = 0; i < selection.length; i++) {
-			ids[i] = Long.parseLong(selection[i].getAttribute("id"));
-		}
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(
-				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
-						AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<Void>() {
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+					if (Boolean.TRUE.equals(answer)) {
+						AuditService.Instance.get().deleteSubscriptions(GridUtil.getIds(selection), new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);

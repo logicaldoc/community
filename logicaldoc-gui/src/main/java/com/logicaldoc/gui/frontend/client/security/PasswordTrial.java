@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.security;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -60,7 +63,7 @@ public class PasswordTrial extends PasswordGenerator {
 		
 		submit.setDisabled(true);
 		SecurityService.Instance.get().validatePassword(form.getValueAsString(PASSWORD_CONSTANT), pwdSize, pwdUpperCase,
-				pwdLowerCase, pwdDigit, pwdSpecial, pwdSequence, pwdOccurrence, new AsyncCallback<String[]>() {
+				pwdLowerCase, pwdDigit, pwdSpecial, pwdSequence, pwdOccurrence, new AsyncCallback<List<String>>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -68,15 +71,11 @@ public class PasswordTrial extends PasswordGenerator {
 					}
 
 					@Override
-					public void onSuccess(String[] failures) {
-						if (failures == null || failures.length == 0) {
+					public void onSuccess(List<String> failures) {
+						if (failures.isEmpty()) {
 							result.setValue("<p style='color:green'>" + I18N.message("thispasswdisvalid") + "</p>");
 						} else {
-							StringBuilder sb = new StringBuilder("<ol>");
-							for (String failure : failures)
-								sb.append("<li>" + failure + "</li>");
-							sb.append("</ol>");
-							result.setValue(sb.toString());
+							result.setValue("<ol>"+failures.stream().map(failure->"<li>"+failure+"</li>").collect(Collectors.joining())+"</ol>");
 						}
 
 						submit.setDisabled(false);

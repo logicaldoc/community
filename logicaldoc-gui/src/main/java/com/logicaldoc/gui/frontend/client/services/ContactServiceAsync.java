@@ -8,7 +8,7 @@ import com.logicaldoc.gui.common.client.beans.GUIParseContactsParameters;
 
 public interface ContactServiceAsync {
 
-	void delete(long[] ids, AsyncCallback<Void> callback);
+	void delete(List<Long> ids, AsyncCallback<Void> callback);
 
 	void load(long id, AsyncCallback<GUIContact> callback);
 

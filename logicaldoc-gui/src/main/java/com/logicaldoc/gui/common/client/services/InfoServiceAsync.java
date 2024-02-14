@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.common.client.services;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
@@ -8,7 +10,7 @@ public interface InfoServiceAsync {
 
 	void getInfo(String locale, String tenant, boolean login, AsyncCallback<GUIInfo> callback);
 
-	void getSessionInfo(AsyncCallback<GUIParameter[]> callback);
+	void getSessionInfo(AsyncCallback<List<GUIParameter>> callback);
 
 	void ping(AsyncCallback<Boolean> callback);
 

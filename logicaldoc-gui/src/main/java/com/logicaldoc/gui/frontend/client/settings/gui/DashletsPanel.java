@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.settings.gui;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -177,7 +176,7 @@ public class DashletsPanel extends VLayout {
 	 * Sends the dashlets
 	 */
 	private void saveDashlets() {
-		DashletService.Instance.get().saveDashlets(dashlets.toArray(new GUIDashlet[0]), new AsyncCallback<Void>() {
+		DashletService.Instance.get().saveDashlets(dashlets, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
@@ -237,15 +236,15 @@ public class DashletsPanel extends VLayout {
 	}
 
 	private void reload() {
-		DashletService.Instance.get().loadDashlets(new AsyncCallback<GUIDashlet[]>() {
+		DashletService.Instance.get().loadDashlets(new AsyncCallback<List<GUIDashlet>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
 			}
 
 			@Override
-			public void onSuccess(GUIDashlet[] dashlts) {
-				Collections.addAll(dashlets, dashlts);
+			public void onSuccess(List<GUIDashlet> dashlts) {
+				dashlets.addAll(dashlts);
 				refreshGrid();
 			}
 		});

@@ -1,7 +1,10 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.logicaldoc.gui.common.client.Constants;
 
@@ -75,7 +78,7 @@ public class GUITenant implements Serializable {
 
 	private Integer quotaThreshold = null;
 
-	private String[] quotaAlertRecipients = new String[0];
+	private List<String> quotaAlertRecipients = new ArrayList<>();
 
 	public String getName() {
 		return name;
@@ -292,59 +295,22 @@ public class GUITenant implements Serializable {
 		this.quotaThreshold = quotaThreshold;
 	}
 
-	public String[] getQuotaAlertRecipients() {
+	public List<String> getQuotaAlertRecipients() {
 		return quotaAlertRecipients;
 	}
 
-	public String getQuotaAlertRecipientsAsString() {
-		if (quotaAlertRecipients == null || quotaAlertRecipients.length == 0)
-			return null;
-		StringBuilder str = new StringBuilder();
-		for (String rec : quotaAlertRecipients) {
-			if (!str.toString().isEmpty())
-				str.append(",");
-			str.append(rec.trim());
-		}
-		return str.toString();
-	}
-
-	public void setQuotaAlertRecipients(String[] quotaAlertRecipients) {
+	public void setQuotaAlertRecipients(List<String> quotaAlertRecipients) {
 		this.quotaAlertRecipients = quotaAlertRecipients;
 	}
 
-	public void clearQuotaAlertRecipients() {
-		this.quotaAlertRecipients = new String[] {};
-	}
-
 	public void addQuotaAlertRecipient(String recipient) {
-		String[] tmp = null;
-		if (quotaAlertRecipients != null) {
-			tmp = new String[quotaAlertRecipients.length + 1];
-
-			int i = 0;
-			for (String tg : quotaAlertRecipients) {
-				// Skip if the tag already exists
-				if (tg.equals(recipient))
-					return;
-				tmp[i++] = tg;
-			}
-			tmp[i] = recipient;
-			quotaAlertRecipients = tmp;
-		} else
-			quotaAlertRecipients = new String[] { recipient };
+		if (!quotaAlertRecipients.contains(recipient))
+			quotaAlertRecipients.add(recipient);
 	}
 
 	public void removeQuotaAlertRecipient(String recipient) {
-		if (quotaAlertRecipients == null || quotaAlertRecipients.length == 0)
-			return;
-
-		String[] tmp = new String[quotaAlertRecipients.length - 1];
-		int i = 0;
-		for (String tg : quotaAlertRecipients) {
-			if (!tg.equals(recipient) && tmp.length > 0)
-				tmp[i++] = tg;
-		}
-		quotaAlertRecipients = tmp;
+		quotaAlertRecipients = quotaAlertRecipients.stream().filter(r -> !r.equals(recipient))
+				.collect(Collectors.toList());
 	}
 
 	public Integer getMaxGuests() {

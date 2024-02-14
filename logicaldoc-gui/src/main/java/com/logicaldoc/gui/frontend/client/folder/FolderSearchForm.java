@@ -248,7 +248,7 @@ public abstract class FolderSearchForm extends VLayout {
 
 		addFolderCriterion(options, criteria);
 
-		options.setCriteria(criteria.toArray(new GUICriterion[0]));
+		options.setCriteria(criteria);
 
 		return options;
 	}

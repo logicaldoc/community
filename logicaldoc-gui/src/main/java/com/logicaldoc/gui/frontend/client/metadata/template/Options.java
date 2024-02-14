@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.metadata.template;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
@@ -179,10 +182,9 @@ public class Options extends com.smartgwt.client.widgets.Window {
 	 */
 	private void onSave() {
 		Record[] records = list.getRecords();
-		GUIValue[] values = new GUIValue[records.length];
-		int i = 0;
+		List<GUIValue> values = new ArrayList<>();
 		for (Record rec : records)
-			values[i++] = new GUIValue(rec.getAttributeAsString(CATEGORY), rec.getAttributeAsString(VALUE));
+			values.add(new GUIValue(rec.getAttributeAsString(CATEGORY), rec.getAttributeAsString(VALUE)));
 
 		LD.contactingServer();
 		AttributeSetService.Instance.get().saveOptions(setId, attribute, values, new AsyncCallback<Void>() {
@@ -207,9 +209,9 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		final ListGridRecord[] selection = list.getSelectedRecords();
 		if (selection == null || selection.length == 0)
 			return;
-		final String[] values = new String[selection.length];
+		List<String> values = new ArrayList<>();
 		for (int i = 0; i < selection.length; i++)
-			values[i] = selection[i].getAttributeAsString(VALUE);
+			values.add(selection[i].getAttributeAsString(VALUE));
 
 		AttributeSetService.Instance.get().deleteOptions(setId, attribute, values, new AsyncCallback<Void>() {
 			@Override

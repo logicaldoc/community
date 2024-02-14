@@ -1,8 +1,9 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Workflow bean as used in the GUI
@@ -28,21 +29,13 @@ public class GUIWorkflow implements Serializable {
 
 	private String startStateId = null;
 
-	private GUIUser[] supervisors = null;
-
-	private GUIWFState[] states = new GUIWFState[0];
-
 	private GUIWFState selectedTask = null;
 
 	private Date startDate;
 
 	private Date endDate;
 
-	private GUIDocument[] appendedDocs;
-
 	private String appendedDocIds;
-
-	private GUIWFState[] wflHistory;
 
 	// The persistence template
 	private Long templateId;
@@ -53,27 +46,31 @@ public class GUIWorkflow implements Serializable {
 
 	private boolean latestVersion = true;
 
-	private GUIAccessControlEntry[] rights = new GUIAccessControlEntry[] {};
+	private List<GUIAccessControlEntry> accessControlList = new ArrayList<>();
 
-	private String[] permissions = new String[] {};
+	private List<String> permissions = new ArrayList<>();
+
+	private List<GUIUser> supervisors = new ArrayList<>();
+
+	private List<GUIWFState> states = new ArrayList<>();
+
+	private List<GUIDocument> appendedDocs = new ArrayList<>();
+
+	private List<GUIWFState> wflHistory = new ArrayList<>();
 
 	public GUIWFState getStateById(String id) {
-		if (states != null && states.length > 0) {
-			for (GUIWFState state : states) {
-				if (state.getId().trim().equals(id.trim())) {
-					return state;
-				}
+		for (GUIWFState state : states) {
+			if (state.getId().trim().equals(id.trim())) {
+				return state;
 			}
 		}
 		return null;
 	}
 
 	public GUIWFState getStateByName(String name) {
-		if (states != null && states.length > 0) {
-			for (GUIWFState state : states) {
-				if (state.getName().trim().equals(name.trim())) {
-					return state;
-				}
+		for (GUIWFState state : states) {
+			if (state.getName().trim().equals(name.trim())) {
+				return state;
 			}
 		}
 		return null;
@@ -111,14 +108,6 @@ public class GUIWorkflow implements Serializable {
 		this.startStateId = startStateId;
 	}
 
-	public GUIWFState[] getStates() {
-		return states;
-	}
-
-	public void setStates(GUIWFState[] states) {
-		this.states = states;
-	}
-
 	public GUIWFState getSelectedTask() {
 		return selectedTask;
 	}
@@ -143,33 +132,12 @@ public class GUIWorkflow implements Serializable {
 		this.endDate = endDate;
 	}
 
-	public GUIDocument[] getAppendedDocs() {
-		return appendedDocs;
-	}
-
-	public void setAppendedDocs(GUIDocument[] appendedDocs) {
-		this.appendedDocs = appendedDocs;
-	}
-
-	public GUIWFState[] getWflHistory() {
-		return wflHistory;
-	}
-
-	public void setWflHistory(GUIWFState[] wflHistory) {
-		this.wflHistory = wflHistory;
-	}
-
 	public String getAppendedDocIds() {
 		return appendedDocIds;
 	}
 
 	public void setAppendedDocIds(String appendedDocIds) {
 		this.appendedDocIds = appendedDocIds;
-	}
-
-	public void addState(GUIWFState status) {
-		GUIWFState[] newStates = Arrays.copyOf(getStates(), getStates().length + 1);
-		newStates[newStates.length - 1] = status;
 	}
 
 	public Long getTemplateId() {
@@ -186,14 +154,6 @@ public class GUIWorkflow implements Serializable {
 
 	public void setTag(String tag) {
 		this.tag = tag;
-	}
-
-	public GUIUser[] getSupervisors() {
-		return supervisors;
-	}
-
-	public void setSupervisors(GUIUser[] supervisors) {
-		this.supervisors = supervisors;
 	}
 
 	public int getVersion() {
@@ -218,22 +178,6 @@ public class GUIWorkflow implements Serializable {
 
 	public void setLatestVersion(boolean latestVersion) {
 		this.latestVersion = latestVersion;
-	}
-
-	public GUIAccessControlEntry[] getRights() {
-		return rights;
-	}
-
-	public void setRights(GUIAccessControlEntry[] rights) {
-		this.rights = rights;
-	}
-
-	public String[] getPermissions() {
-		return permissions;
-	}
-
-	public void setPermissions(String[] permissions) {
-		this.permissions = permissions;
 	}
 
 	public boolean isWrite() {
@@ -263,5 +207,53 @@ public class GUIWorkflow implements Serializable {
 
 	public void setColor(String color) {
 		this.color = color;
+	}
+
+	public List<GUIAccessControlEntry> getAccessControlList() {
+		return accessControlList;
+	}
+
+	public void setAccessControlList(List<GUIAccessControlEntry> accessControlList) {
+		this.accessControlList = accessControlList;
+	}
+
+	public List<String> getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(List<String> permissions) {
+		this.permissions = permissions;
+	}
+
+	public List<GUIUser> getSupervisors() {
+		return supervisors;
+	}
+
+	public void setSupervisors(List<GUIUser> supervisors) {
+		this.supervisors = supervisors;
+	}
+
+	public List<GUIWFState> getStates() {
+		return states;
+	}
+
+	public void setStates(List<GUIWFState> states) {
+		this.states = states;
+	}
+
+	public List<GUIDocument> getAppendedDocs() {
+		return appendedDocs;
+	}
+
+	public void setAppendedDocs(List<GUIDocument> appendedDocs) {
+		this.appendedDocs = appendedDocs;
+	}
+
+	public List<GUIWFState> getWflHistory() {
+		return wflHistory;
+	}
+
+	public void setWflHistory(List<GUIWFState> wflHistory) {
+		this.wflHistory = wflHistory;
 	}
 }

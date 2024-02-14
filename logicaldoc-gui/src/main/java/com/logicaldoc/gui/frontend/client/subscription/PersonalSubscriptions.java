@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.subscription;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -146,10 +149,9 @@ public class PersonalSubscriptions extends com.smartgwt.client.widgets.Window {
 		final ListGridRecord[] selection = list.getSelectedRecords();
 		if (selection == null || selection.length == 0)
 			return;
-		final long[] ids = new long[selection.length];
-		for (int i = 0; i < selection.length; i++) {
-			ids[i] = Long.parseLong(selection[i].getAttribute("id"));
-		}
+		List<Long> ids = new ArrayList<>();
+		for (int i = 0; i < selection.length; i++)
+			ids.add(selection[i].getAttributeAsLong("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));

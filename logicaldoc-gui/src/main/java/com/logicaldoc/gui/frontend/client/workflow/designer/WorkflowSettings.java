@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.workflow.designer;
 
+import java.util.stream.Collectors;
+
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.data.UsersDS;
@@ -80,9 +82,9 @@ public class WorkflowSettings extends Window {
 		color.setWrapTitle(false);
 		color.setEndRow(true);
 
-		Long[] supervisorIds = getSupervisorsIds(workflow);
 		MultiComboBoxItem supervisors = ItemFactory.newMultiComboBoxItem("supervisors", "supervisors",
-				new UsersDS(null, false, false), supervisorIds);
+				new UsersDS(null, false, false), workflow.getSupervisors().stream().map(u -> u.getId())
+						.collect(Collectors.toList()).toArray(new Long[0]));
 		supervisors.setWidth("*");
 		supervisors.setValueField("id");
 		supervisors.setDisplayField("username");
@@ -113,25 +115,14 @@ public class WorkflowSettings extends Window {
 		WorkflowSettings.this.workflow.setColor(vm.getValueAsString(COLOR));
 
 		String[] supervisorIds = supervisors.getValues();
-		GUIUser[] users = new GUIUser[supervisorIds != null ? supervisorIds.length : 0];
+		workflow.getSupervisors().clear();
 		if (supervisorIds != null && supervisorIds.length > 0)
 			for (int i = 0; i < supervisorIds.length; i++) {
 				GUIUser user = new GUIUser();
 				user.setId(Long.parseLong(supervisorIds[i]));
-				users[i] = user;
+				workflow.getSupervisors().add(user);
 			}
-		workflow.setSupervisors(users);
 
 		destroy();
-	}
-
-	private Long[] getSupervisorsIds(GUIWorkflow workflow) {
-		Long[] ids = null;
-		if (workflow.getSupervisors() != null && workflow.getSupervisors().length > 0) {
-			ids = new Long[workflow.getSupervisors().length];
-			for (int i = 0; i < ids.length; i++)
-				ids[i] = workflow.getSupervisors()[i].getId();
-		}
-		return ids;
 	}
 }

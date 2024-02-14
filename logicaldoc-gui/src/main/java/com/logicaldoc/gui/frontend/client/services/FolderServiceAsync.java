@@ -34,7 +34,7 @@ public interface FolderServiceAsync {
 
 	void create(GUIFolder folder, boolean inheritSecurity, AsyncCallback<GUIFolder> callback);
 
-	void restore(Long[] folderIds, long parentId, AsyncCallback<Void> callback);
+	void restore(List<Long> folderIds, long parentId, AsyncCallback<Void> callback);
 
 	void copyFolders(List<Long> folderIds, long targetId, boolean foldersOnly, String securityOption, GUIFolder model,
 			AsyncCallback<Void> callback);
@@ -43,7 +43,7 @@ public interface FolderServiceAsync {
 
 	void inheritACL(long folderId, long rightsFolderId, AsyncCallback<GUIFolder> callback);
 
-	void deleteFromTrash(Long[] ids, AsyncCallback<Void> callback);
+	void deleteFromTrash(List<Long> ids, AsyncCallback<Void> callback);
 
 	void createAlias(long parentId, long foldRef, AsyncCallback<GUIFolder> callback);
 

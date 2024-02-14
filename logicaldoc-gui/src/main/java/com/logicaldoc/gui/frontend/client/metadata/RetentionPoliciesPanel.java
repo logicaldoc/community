@@ -1,10 +1,14 @@
 package com.logicaldoc.gui.frontend.client.metadata;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIRetentionPolicy;
 import com.logicaldoc.gui.common.client.data.RetentionPoliciesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
@@ -175,11 +179,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 				.setMessage(I18N.message("showretpolicies", Integer.toString(list.getTotalRows()))));
 
 		list.addDropCompleteHandler(listDropCompleted -> {
-			ListGridRecord[] records = list.getRecords();
-			long[] ids = new long[records.length];
-			for (int i = 0; i < ids.length; i++)
-				ids[i] = Long.parseLong(records[i].getAttributeAsString("id"));
-			RetentionPoliciesService.Instance.get().reorder(ids, new AsyncCallback<Void>() {
+			RetentionPoliciesService.Instance.get().reorder(GridUtil.getIds(list.getRecords()), new AsyncCallback<Void>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

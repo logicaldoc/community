@@ -194,16 +194,12 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 		final ListGridRecord[] selection = list.getSelectedRecords();
 		if (selection == null || selection.length == 0)
 			return;
-		final long[] ids = new long[selection.length];
-		for (int i = 0; i < selection.length; i++) {
-			ids[i] = Long.parseLong(selection[i].getAttribute("id"));
-		}
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm))
-				ContactService.Instance.get().delete(ids, new AsyncCallback<Void>() {
+				ContactService.Instance.get().delete(GridUtil.getIds(selection), new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -230,12 +226,6 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 	}
 
 	protected void onShare() {
-		ListGridRecord[] selection = list.getSelectedRecords();
-
-		List<Long> ids = new ArrayList<>();
-		for (int i = 0; i < selection.length; i++)
-			ids.add(selection[i].getAttributeAsLong("id"));
-
 		final UserSelectorCombo usersSelector = new UserSelectorCombo("users", "users", null, true, true);
 
 		final GroupSelectorCombo groupsSelector = new GroupSelectorCombo("groups", "groups");
@@ -249,7 +239,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 			@Override
 			public void execute(Map<String, Object> values) {
 				LD.contactingServer();
-				ContactService.Instance.get().shareContacts(ids, usersSelector.getUserIds(),
+				ContactService.Instance.get().shareContacts(GridUtil.getIds(list.getSelectedRecords()), usersSelector.getUserIds(),
 						groupsSelector.getGroupIds(), new AsyncCallback<Void>() {
 
 							@Override

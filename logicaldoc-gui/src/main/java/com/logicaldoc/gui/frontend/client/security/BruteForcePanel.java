@@ -161,7 +161,7 @@ public class BruteForcePanel extends AdminPanel {
 
 		body.addMember(form);
 
-		SecurityService.Instance.get().loadBlockedEntities(new AsyncCallback<GUISequence[]>() {
+		SecurityService.Instance.get().loadBlockedEntities(new AsyncCallback<List<GUISequence>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -169,13 +169,13 @@ public class BruteForcePanel extends AdminPanel {
 			}
 
 			@Override
-			public void onSuccess(GUISequence[] seqs) {
+			public void onSuccess(List<GUISequence> seqs) {
 				prepareBlockedEntriesGrid(seqs);
 			}
 		});
 	}
 
-	private void prepareBlockedEntriesGrid(GUISequence[] data) {
+	private void prepareBlockedEntriesGrid(List<GUISequence> data) {
 		ListGridField id = new ListGridField("id", I18N.message("id"));
 		id.setWidth(60);
 		id.setHidden(true);
@@ -199,15 +199,14 @@ public class BruteForcePanel extends AdminPanel {
 		blockedEntities.setSelectionType(SelectionStyle.MULTIPLE);
 
 		List<ListGridRecord> records = new ArrayList<>();
-		if (data != null)
-			for (GUISequence cid : data) {
-				ListGridRecord rec = new ListGridRecord();
-				rec.setAttribute("id", cid.getId());
-				rec.setAttribute("entity", cid.getName());
-				rec.setAttribute(ATTEMPTS, cid.getValue());
-				rec.setAttribute("lastmodified", cid.getLastModified());
-				records.add(rec);
-			}
+		for (GUISequence cid : data) {
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute("id", cid.getId());
+			rec.setAttribute("entity", cid.getName());
+			rec.setAttribute(ATTEMPTS, cid.getValue());
+			rec.setAttribute("lastmodified", cid.getLastModified());
+			records.add(rec);
+		}
 		blockedEntities.setData(records.toArray(new ListGridRecord[0]));
 
 		blockedEntities.setFields(id, entity, attempts, lastAttempt);
@@ -224,9 +223,9 @@ public class BruteForcePanel extends AdminPanel {
 		Menu contextMenu = new Menu();
 
 		final ListGridRecord[] records = blockedEntities.getSelectedRecords();
-		final long[] ids = new long[records.length];
+		final List<Long> ids = new ArrayList<>();
 		for (int i = 0; i < records.length; i++)
-			ids[i] = records[i].getAttributeAsLong("id");
+			ids.add(records[i].getAttributeAsLong("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));

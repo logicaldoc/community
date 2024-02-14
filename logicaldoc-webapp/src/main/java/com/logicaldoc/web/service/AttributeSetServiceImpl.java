@@ -54,17 +54,16 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	}
 
 	@Override
-	public void saveOptions(long setId, String attribute, GUIValue[] values) throws ServerException {
+	public void saveOptions(long setId, String attribute, List<GUIValue> values) throws ServerException {
 		Session session = validateSession();
 
 		try {
 			AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
 			dao.deleteBySetIdAndAttribute(setId, attribute);
-			for (int i = 0; i < values.length; i++) {
-				GUIValue value = values[i];
+			int i=0;
+			for (GUIValue value : values) {
 				AttributeOption option = new AttributeOption(setId, attribute, value.getValue(), value.getCode());
-				option.setPosition(i);
-
+				option.setPosition(i++);
 				store(setId, option);
 			}
 		} catch (Exception t) {
@@ -82,7 +81,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	}
 
 	@Override
-	public void deleteOptions(long setId, String attribute, String[] values) throws ServerException {
+	public void deleteOptions(long setId, String attribute, List<String> values) throws ServerException {
 		Session session = validateSession();
 		try {
 			AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
@@ -303,8 +302,9 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		return val == 1;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public GUIAttributeSet[] getAttributeSets() throws ServerException {
+	public List<GUIAttributeSet> getAttributeSets() throws ServerException {
 		Session session = validateSession();
 		try {
 			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
@@ -312,14 +312,14 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			List<Long> setIds = dao.findAllIds(session.getTenantId());
 			for (Long setId : setIds)
 				guiSets.add(getAttributeSet(setId));
-			return guiSets.toArray(new GUIAttributeSet[0]);
+			return guiSets;
 		} catch (Exception t) {
-			return (GUIAttributeSet[]) throwServerException(session, log, t);
+			return (List<GUIAttributeSet>) throwServerException(session, log, t);
 		}
 	}
 
 	@Override
-	public GUIValue[] parseOptions(long setId, String attribute) throws ServerException {
+	public List<GUIValue> parseOptions(long setId, String attribute) throws ServerException {
 		Session session = validateSession();
 
 		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
@@ -344,9 +344,8 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			UploadServlet.cleanReceivedFiles(session.getSid());
 		}
 
-		GUIValue[] optionsArray = options.toArray(new GUIValue[0]);
-		saveOptions(setId, attribute, optionsArray);
-		return optionsArray;
+		saveOptions(setId, attribute, options);
+		return options;
 	}
 
 	@Override

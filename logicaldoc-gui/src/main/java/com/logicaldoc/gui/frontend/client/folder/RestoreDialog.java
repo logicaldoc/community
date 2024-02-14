@@ -25,7 +25,7 @@ public class RestoreDialog extends Dialog {
 
 	protected ClickHandler handler;
 
-	public RestoreDialog(final List<Long> docIds, final Long[] folderIds, ClickHandler handler) {
+	public RestoreDialog(final List<Long> docIds, final List<Long> folderIds, ClickHandler handler) {
 		super();
 		this.handler = handler;
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);

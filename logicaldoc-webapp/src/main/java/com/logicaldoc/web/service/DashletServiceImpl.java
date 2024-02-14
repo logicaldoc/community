@@ -57,16 +57,14 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 	}
 
 	@Override
-	public void saveDashlets(GUIDashlet[] dashlets) throws ServerException {
-		if (dashlets == null || dashlets.length < 1)
-			return;
-		for (GUIDashlet guiDashlet : dashlets) {
+	public void saveDashlets(List<GUIDashlet> dashlets) throws ServerException {
+		for (GUIDashlet guiDashlet : dashlets)
 			save(guiDashlet);
-		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public GUIDashlet[] loadDashlets() throws ServerException {
+	public List<GUIDashlet> loadDashlets() throws ServerException {
 		Session session = validateSession();
 		try {
 			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
@@ -74,9 +72,9 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 			ArrayList<GUIDashlet> guiDashlets = new ArrayList<>();
 			for (Dashlet dashlet : dashlets)
 				guiDashlets.add(fromDashlet(dashlet));
-			return guiDashlets.toArray(new GUIDashlet[0]);
+			return guiDashlets;
 		} catch (Exception e) {
-			return (GUIDashlet[]) throwServerException(session, log, e);
+			return (List<GUIDashlet>) throwServerException(session, log, e);
 		}
 	}
 
@@ -117,7 +115,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 	}
 
 	@Override
-	public void saveUserDashlets(GUIDashlet[] dashlets) throws ServerException {
+	public void saveUserDashlets(List<GUIDashlet> dashlets) throws ServerException {
 		Session session = validateSession();
 		GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);

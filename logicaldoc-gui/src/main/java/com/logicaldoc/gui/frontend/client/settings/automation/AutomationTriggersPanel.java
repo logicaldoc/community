@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.settings.automation;
 
+import java.util.Arrays;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationTrigger;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -175,13 +177,13 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 		Menu contextMenu = new Menu();
 
 		final ListGridRecord rec = list.getSelectedRecord();
-		final long id = Long.parseLong(rec.getAttributeAsString("id"));
+		final long id = rec.getAttributeAsLong("id");
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(evnt -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
 			if (Boolean.TRUE.equals(value)) {
-				AutomationService.Instance.get().deleteTriggers(new long[] { id }, new AsyncCallback<Void>() {
+				AutomationService.Instance.get().deleteTriggers(Arrays.asList(id), new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

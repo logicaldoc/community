@@ -336,7 +336,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		ListGridRecord[] selection = attributesList.getSelectedRecords();
 
 		LD.contactingServer();
-		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<GUIAttributeSet[]>() {
+		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<List<GUIAttributeSet>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -345,7 +345,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			}
 
 			@Override
-			public void onSuccess(GUIAttributeSet[] sets) {
+			public void onSuccess(List<GUIAttributeSet> sets) {
 				LD.clearPrompt();
 				Map<Long, GUIAttributeSet> setsMap = new HashMap<>();
 				for (GUIAttributeSet set : sets)
@@ -386,7 +386,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		ListGridRecord[] selection = attributesList.getSelectedRecords();
 
 		LD.contactingServer();
-		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<GUIAttributeSet[]>() {
+		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<List<GUIAttributeSet>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -395,7 +395,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			}
 
 			@Override
-			public void onSuccess(GUIAttributeSet[] sets) {
+			public void onSuccess(List<GUIAttributeSet> sets) {
 				LD.clearPrompt();
 				Map<Long, GUIAttributeSet> setsMap = new HashMap<>();
 				for (GUIAttributeSet set : sets)
@@ -784,7 +784,7 @@ public class TemplatePropertiesPanel extends HLayout {
 	private void resetValidation() {
 		ListGridRecord[] selection = attributesList.getSelectedRecords();
 		LD.contactingServer();
-		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<GUIAttributeSet[]>() {
+		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<List<GUIAttributeSet>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -793,7 +793,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			}
 
 			@Override
-			public void onSuccess(GUIAttributeSet[] sets) {
+			public void onSuccess(List<GUIAttributeSet> sets) {
 				LD.clearPrompt();
 				Map<Long, GUIAttributeSet> setsMap = new HashMap<>();
 				for (GUIAttributeSet set : sets)

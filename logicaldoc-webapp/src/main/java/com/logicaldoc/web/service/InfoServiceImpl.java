@@ -351,7 +351,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 	}
 
 	@Override
-	public GUIParameter[] getSessionInfo() throws InvalidSessionServerException {
+	public List<GUIParameter> getSessionInfo() throws InvalidSessionServerException {
 		Session session = validateSession();
 		log.debug("Requested info for session {}", session.getSid());
 
@@ -364,7 +364,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 			parameters.add(messages);
 			parameters.add(new GUIParameter("valid", "" + SessionManager.get().isOpen(session.getSid())));
 
-			return parameters.toArray(new GUIParameter[0]);
+			return parameters;
 		} catch (Exception t) {
 			throw new InvalidSessionServerException(t.getMessage());
 		}

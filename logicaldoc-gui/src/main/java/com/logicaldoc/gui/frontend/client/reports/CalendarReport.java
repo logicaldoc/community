@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -324,7 +326,7 @@ public class CalendarReport extends AdminPanel {
 	}
 
 	private void doSearch(GUICalendarEventSearchCriteria criteria) {
-		CalendarService.Instance.get().find(criteria, new AsyncCallback<GUICalendarEvent[]>() {
+		CalendarService.Instance.get().find(criteria, new AsyncCallback<List<GUICalendarEvent>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -332,25 +334,24 @@ public class CalendarReport extends AdminPanel {
 			}
 
 			@Override
-			public void onSuccess(GUICalendarEvent[] result) {
-				if (result != null && result.length > 0) {
-					ListGridRecord[] records = new ListGridRecord[result.length];
-					for (int i = 0; i < result.length; i++) {
-						ListGridRecord rec = new ListGridRecord();
-						rec.setAttribute("date", result[i].getStartDate());
-						rec.setAttribute(TITLE, result[i].getTitle());
-						rec.setAttribute("type", result[i].getType());
-						rec.setAttribute(SUBTYPE, result[i].getSubType());
-						rec.setAttribute(FREQUENCY, result[i].getFrequency());
-						rec.setAttribute(STATUS, result[i].getStatus());
-						rec.setAttribute(DESCRIPTION, result[i].getDescription());
-						rec.setAttribute("endDate", result[i].getDeadline());
-						rec.setAttribute(PARTICIPANTS, result[i].getParticipants().stream().map(u -> u.toString())
-								.collect(Collectors.joining(", ")));
-						records[i] = rec;
-					}
-					list.setData(records);
+			public void onSuccess(List<GUICalendarEvent> result) {
+				List<ListGridRecord> records = new ArrayList<>();
+				for (GUICalendarEvent event : result) {
+					ListGridRecord rec = new ListGridRecord();
+					rec.setAttribute("date", event.getStartDate());
+					rec.setAttribute(TITLE, event.getTitle());
+					rec.setAttribute("type", event.getType());
+					rec.setAttribute(SUBTYPE, event.getSubType());
+					rec.setAttribute(FREQUENCY, event.getFrequency());
+					rec.setAttribute(STATUS, event.getStatus());
+					rec.setAttribute(DESCRIPTION, event.getDescription());
+					rec.setAttribute("endDate", event.getDeadline());
+					rec.setAttribute(PARTICIPANTS,
+							event.getParticipants().stream().map(u -> u.toString()).collect(Collectors.joining(", ")));
+					records.add(rec);
 				}
+				list.setData(records.toArray(new ListGridRecord[0]));
+
 				layout.removeMember(infoPanel);
 				infoPanel = new InfoPanel("");
 				infoPanel.setMessage(I18N.message("showelements", Integer.toString(list.getTotalRows())));

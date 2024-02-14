@@ -43,8 +43,7 @@ public class MoveDialog extends Dialog {
 				shownName = selection.size() + " " + I18N.message("folders").toLowerCase();
 
 			LD.ask(I18N.message("move"),
-					I18N.message("moveask",
-							new String[] { shownName, folders.getSelectedRecord().getAttributeAsString("name") }),
+					I18N.message("moveask", shownName, folders.getSelectedRecord().getAttributeAsString("name")),
 					(Boolean value) -> {
 						if (Boolean.TRUE.equals(value)) {
 							FolderNavigator.get().moveTo(

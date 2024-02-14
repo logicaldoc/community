@@ -1044,7 +1044,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	@Override
-	public void restore(Long[] folderIds, long parentId) throws ServerException {
+	public void restore(List<Long> folderIds, long parentId) throws ServerException {
 		Session session = validateSession();
 
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -1064,9 +1064,9 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	@Override
-	public void deleteFromTrash(Long[] ids) throws ServerException {
+	public void deleteFromTrash(List<Long> ids) throws ServerException {
 		Session session = validateSession();
-		if (ids == null || ids.length < 1)
+		if (ids.isEmpty())
 			return;
 
 		String idsStr = Arrays.asList(ids).toString().replace('[', '(').replace(']', ')');

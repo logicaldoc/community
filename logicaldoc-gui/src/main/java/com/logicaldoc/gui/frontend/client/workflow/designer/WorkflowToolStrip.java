@@ -1,7 +1,10 @@
 package com.logicaldoc.gui.frontend.client.workflow.designer;
 
+import java.util.Arrays;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUITransition;
 import com.logicaldoc.gui.common.client.beans.GUIWFState;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
@@ -285,29 +288,12 @@ public class WorkflowToolStrip extends ToolStrip {
 	}
 
 	private boolean checkTaskWithoutParticipants() {
-		boolean stateWithoutAssigneeFound = false;
-		if (currentWorkflow.getStates() != null && currentWorkflow.getStates().length > 0) {
-			for (GUIWFState state : currentWorkflow.getStates()) {
-				if (state.getType() == GUIWFState.TYPE_TASK
-						&& (state.getParticipants() == null || state.getParticipants().length == 0)) {
-					stateWithoutAssigneeFound = true;
-					break;
-				}
-			}
-		}
-		return stateWithoutAssigneeFound;
+		return currentWorkflow.getStates().stream()
+				.anyMatch(state -> state.getType() == GUIWFState.TYPE_TASK && state.getParticipants().isEmpty());
 	}
 
 	private boolean checkTaskPresence() {
-		boolean taskFound = false;
-		if (currentWorkflow.getStates() != null && currentWorkflow.getStates().length > 0)
-			for (GUIWFState state : currentWorkflow.getStates()) {
-				if (state.getType() == GUIWFState.TYPE_TASK) {
-					taskFound = true;
-					break;
-				}
-			}
-		return taskFound;
+		return currentWorkflow.getStates().stream().anyMatch(state -> state.getType() == GUIWFState.TYPE_TASK);
 	}
 
 	private void addSave() {
@@ -339,7 +325,7 @@ public class WorkflowToolStrip extends ToolStrip {
 				if (value != null && !value.trim().isEmpty()) {
 					GUIWorkflow newWF = new GUIWorkflow();
 					newWF.setName(value);
-					newWF.setPermissions(new String[] { "write" });
+					newWF.setPermissions(Arrays.asList(GUIAccessControlEntry.PERMISSION_WRITE));
 					newWF.setLatestVersion(true);
 
 					AdminScreen.get().setContent(new WorkflowDesigner(newWF));

@@ -97,7 +97,7 @@ public class Session implements DocumentObserver {
 	}
 
 	public void init(final GUISession session) {
-		InfoService.Instance.get().getSessionInfo(new AsyncCallback<GUIParameter[]>() {
+		InfoService.Instance.get().getSessionInfo(new AsyncCallback<List<GUIParameter>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -105,7 +105,7 @@ public class Session implements DocumentObserver {
 			}
 
 			@Override
-			public void onSuccess(GUIParameter[] parameters) {
+			public void onSuccess(List<GUIParameter> parameters) {
 				Session.get().guiSession = session;
 				Session.get().info = session.getInfo();
 
@@ -131,7 +131,7 @@ public class Session implements DocumentObserver {
 				setupPingTimer(session);
 			}
 
-			private boolean updateStatusIconCountsAndSessionValid(GUIParameter[] parameters, GUIUser user) {
+			private boolean updateStatusIconCountsAndSessionValid(List<GUIParameter> parameters, GUIUser user) {
 				boolean validSession = false;
 				for (GUIParameter parameter : parameters) {
 					if (parameter.getName().equals("messages"))

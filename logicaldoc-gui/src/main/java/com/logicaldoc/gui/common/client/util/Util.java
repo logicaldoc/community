@@ -4,9 +4,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
@@ -61,24 +63,25 @@ public abstract class Util {
 
 	private static final String AND_FILEVERSION_EQUAL = "&fileVersion=";
 
-	private static final String[] officeExts = new String[] { ".doc", ".xls", ".xlsm", ".ppt", ".docx", ".docxm",
-			".dotm", ".xlsx", ".pptx", ".rtf", ".odt", ".ods", ".odp", ".vsd", ".vsdx", ".mpp" };
+	private static final Set<String> officeExts = new HashSet<>(Arrays.asList(".doc", ".xls", ".xlsm", ".ppt", ".docx",
+			".docxm", ".dotm", ".xlsx", ".pptx", ".rtf", ".odt", ".ods", ".odp", ".vsd", ".vsdx", ".mpp"));
 
-	private static final String[] spreadsheetExts = new String[] { ".xls", ".xlsm", ".xlsx", ".ods" };
+	private static final Set<String> spreadsheetExts = new HashSet<>(Arrays.asList(".xls", ".xlsm", ".xlsx", ".ods"));
 
-	private static final String[] imageExts = new String[] { ".gif", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".png",
-			".jfif", ".webp" };
+	private static final Set<String> imageExts = new HashSet<>(
+			Arrays.asList(".gif", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".png", ".jfif", ".webp"));;
 
-	private static final String[] videoExts = new String[] { ".mp4", ".avi", ".mpg", ".wmv", ".wma", ".asf", ".mov",
-			".rm", ".flv", ".aac", ".vlc", ".ogg", ".webm", ".swf", ".mpeg", ".swf", ".m2v", ".m2ts", ".mkv", ".m4v" };
+	private static final Set<String> videoExts = new HashSet<>(
+			Arrays.asList(".mp4", ".avi", ".mpg", ".wmv", ".wma", ".asf", ".mov", ".rm", ".flv", ".aac", ".vlc", ".ogg",
+					".webm", ".swf", ".mpeg", ".swf", ".m2v", ".m2ts", ".mkv", ".m4v"));
 
-	private static final String[] audioExts = new String[] { ".mp3", ".m4p", ".m4a", ".wav" };
+	private static final Set<String> audioExts = new HashSet<>(Arrays.asList(".mp3", ".m4p", ".m4a", ".wav"));
 
-	private static final String[] webcontentExts = new String[] { ".html", ".htm", ".xhtml" };
+	private static final Set<String> webcontentExts = new HashSet<>(Arrays.asList(".html", ".htm", ".xhtml"));
 
-	private static final String[] emailExts = new String[] { ".eml", ".msg" };
+	private static final Set<String> emailExts = new HashSet<>(Arrays.asList(".eml", ".msg"));
 
-	private static final String[] dicomExts = new String[] { ".dcm", ".dicom" };
+	private static final Set<String> dicomExts = new HashSet<>(Arrays.asList(".dcm", ".dicom"));
 
 	private Util() {
 		// Empty constructor
@@ -403,31 +406,20 @@ public abstract class Util {
 		return !Feature.enabled(Feature.ADDITIONAL_FORMATS);
 	}
 
+	public static boolean isOfficeFileType(String type) {
+		return officeExts.stream().anyMatch(ext -> type.equalsIgnoreCase(ext));
+	}
+	
 	public static boolean isOfficeFile(String fileName) {
-		String tmp = fileName.toLowerCase();
-		for (String ext : officeExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		return false;
+		return officeExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext));
 	}
 
 	public static boolean isSpreadsheetFile(String fileName) {
-		String tmp = fileName.toLowerCase();
-		for (String ext : spreadsheetExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		return false;
+		return spreadsheetExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext));
 	}
 
 	public static boolean isDICOMFile(String fileName) {
-		String tmp = fileName.toLowerCase();
-		for (String ext : dicomExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		return false;
+		return dicomExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext));
 	}
 
 	public static boolean isTextFile(String fileName) {
@@ -451,60 +443,24 @@ public abstract class Util {
 	}
 
 	public static boolean isImageFile(String fileName) {
-		String tmp = fileName.toLowerCase();
-		for (String ext : imageExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		return false;
+		return imageExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext));
 	}
 
 	public static boolean isWebContentFile(String fileName) {
-		String tmp = fileName.toLowerCase();
-		for (String ext : webcontentExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		return false;
+		return webcontentExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext));
 	}
 
 	public static boolean isMediaFile(String fileName) {
-		String tmp = fileName.toLowerCase();
-		for (String ext : videoExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		for (String ext : audioExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		return false;
+		return videoExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext))
+				|| isAudioFile(fileName);
 	}
 
 	public static boolean isAudioFile(String fileName) {
-		String tmp = fileName.toLowerCase();
-		for (String ext : audioExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		return false;
-	}
-
-	public static boolean isOfficeFileType(String type) {
-		for (String ext : officeExts) {
-			if (type.equalsIgnoreCase(ext))
-				return true;
-		}
-		return false;
+		return audioExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext));
 	}
 
 	public static boolean isEmailFile(String fileName) {
-		String tmp = fileName.toLowerCase();
-		for (String ext : emailExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		return false;
+		return emailExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext));
 	}
 
 	/**

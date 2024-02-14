@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -53,29 +55,29 @@ public interface AttributeSetService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIAttributeSet[] getAttributeSets() throws ServerException;
+	public List<GUIAttributeSet> getAttributeSets() throws ServerException;
 
 	/**
 	 * Saves the list of all possible options
 	 * 
 	 * @param setId identifier of the set
 	 * @param attribute name of the attribute
-	 * @param options array of possible options
+	 * @param options possible options
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void saveOptions(long setId, String attribute, GUIValue[] options) throws ServerException;
+	public void saveOptions(long setId, String attribute, List<GUIValue> options) throws ServerException;
 
 	/**
 	 * Delete a selection of options
 	 * 
 	 * @param setId identifier of the set
 	 * @param attribute name of the attribute
-	 * @param values array of options to delete
+	 * @param values collectiojn of options to delete
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void deleteOptions(long setId, String attribute, String[] values) throws ServerException;
+	public void deleteOptions(long setId, String attribute, List<String> values) throws ServerException;
 
 	/**
 	 * Reads the contacts that are about to be imported from CSV
@@ -87,10 +89,11 @@ public interface AttributeSetService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIValue[] parseOptions(long setId, String attribute) throws ServerException;
+	public List<GUIValue> parseOptions(long setId, String attribute) throws ServerException;
 
 	/**
-	 * Forces all the settings of an attribute to all those templates that use it
+	 * Forces all the settings of an attribute to all those templates that use
+	 * it
 	 * 
 	 * @param setId identifier of the set
 	 * @param attribute name of the attribute
@@ -98,7 +101,7 @@ public interface AttributeSetService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	void applyAllToTemplates(long setId, String attribute) throws ServerException;
-	
+
 	/**
 	 * Forces the validation of an attribute to all those templates that use it
 	 * 
@@ -134,5 +137,4 @@ public interface AttributeSetService extends RemoteService {
 			return inst;
 		}
 	}
-
 }

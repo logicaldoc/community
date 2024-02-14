@@ -110,9 +110,8 @@ public class StampDialog extends StickyWindow {
 		} else {
 			LD.contactingServer();
 
-			StampService.Instance.get().applyStamp(
-					documents.stream().map(d -> d.getId()).collect(Collectors.toList()).toArray(new Long[0]), stamp,
-					new AsyncCallback<Void>() {
+			StampService.Instance.get().applyStamp(documents.stream().map(d -> d.getId()).collect(Collectors.toList()),
+					stamp, new AsyncCallback<Void>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

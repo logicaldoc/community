@@ -41,9 +41,9 @@ public interface AutomationService extends RemoteService {
 	 */
 	public GUIAutomationRoutine getRoutine(long id) throws ServerException;
 
-	public void deleteRoutines(long[] ids) throws ServerException;
+	public void deleteRoutines(List<Long> ids) throws ServerException;
 
-	public void deleteTriggers(long[] ids) throws ServerException;
+	public void deleteTriggers(List<Long> ids) throws ServerException;
 
 	/**
 	 * Creates or updates a trigger

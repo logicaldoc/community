@@ -226,11 +226,11 @@ public class TaskEditor extends Window {
 		return automationPanel;
 	}
 
-	// Checks if the tast requires human interaction
+	// Checks if the task requires human interaction
 	private boolean isHumanInteraction() {
 		try {
-			GUIValue[] parts = this.state.getParticipants();
-			return !(parts != null && parts.length == 1 && parts[0].getCode().equals("_workflow"));
+			return !(state.getParticipants().size() == 1
+					&& state.getParticipants().get(0).getCode().equals("_workflow"));
 		} catch (Exception t) {
 			return true;
 		}
@@ -549,7 +549,8 @@ public class TaskEditor extends Window {
 		if (Boolean.FALSE.equals(vm.validate()) && humanInteraction)
 			return;
 
-		// Remove the ' because of the WF engine would go in error saving into the DB
+		// Remove the ' because of the WF engine would go in error saving into
+		// the DB
 		TaskEditor.this.state.setName(values.get("taskName").toString().trim().replace("'", ""));
 		TaskEditor.this.state.setDisplay((String) values.get("taskColor"));
 		TaskEditor.this.state.setDescription((String) values.get("taskDescr"));
@@ -580,12 +581,10 @@ public class TaskEditor extends Window {
 		ArrayList<GUIValue> participants = new ArrayList<>();
 		for (ListGridRecord rec : participantsGrid.getRecords())
 			participants.add(new GUIValue(rec.getAttributeAsString("name"), rec.getAttributeAsString(LABEL)));
-		TaskEditor.this.state.setParticipants(participants.toArray(new GUIValue[0]));
+		TaskEditor.this.state.setParticipants(participants);
 
 		if (humanInteraction && state.getType() == GUIWFState.TYPE_TASK
-				&& (TaskEditor.this.state.getParticipants() == null
-						|| TaskEditor.this.state.getParticipants().length == 0)) {
+				&& TaskEditor.this.state.getParticipants().isEmpty())
 			SC.warn(I18N.message("workflowtaskparticipantatleast"));
-		}
 	}
 }

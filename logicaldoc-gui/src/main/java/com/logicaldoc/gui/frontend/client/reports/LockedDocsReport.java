@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocUtil;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
@@ -162,11 +163,8 @@ public class LockedDocsReport extends ReportPanel {
 		unlock.addClickHandler((MenuItemClickEvent event) -> {
 			if (selection == null || selection.length == 0)
 				return;
-			List<Long> ids = new ArrayList<>();
-			for (int i = 0; i < selection.length; i++)
-				ids.add(selection[i].getAttributeAsLong("id"));
 
-			DocumentService.Instance.get().unlock(ids, new AsyncCallback<Void>() {
+			DocumentService.Instance.get().unlock(GridUtil.getIds(selection), new AsyncCallback<Void>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

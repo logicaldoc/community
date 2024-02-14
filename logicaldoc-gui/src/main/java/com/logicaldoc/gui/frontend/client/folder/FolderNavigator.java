@@ -227,7 +227,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 				: (selection.size() + " " + I18N.message("documents").toLowerCase());
 		final String targetName = selectedNode.getAttributeAsString("name");
 
-		LD.ask(I18N.message("move"), I18N.message("moveask", new String[] { sourceName, targetName }), yes -> {
+		LD.ask(I18N.message("move"), I18N.message("moveask", sourceName, targetName), yes -> {
 			if (Boolean.TRUE.equals(yes)) {
 				FolderService.Instance.get().paste(selection.stream().map(d -> d.getId()).collect(Collectors.toList()),
 						folderId, "cut", false, false, false, new AsyncCallback<Void>() {
@@ -258,7 +258,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		final String sourceName = getDragData()[0].getAttributeAsString("name");
 		final String targetName = getDropFolder().getAttributeAsString("name");
 
-		LD.ask(I18N.message("move"), I18N.message("moveask", new String[] { sourceName, targetName }), yes -> {
+		LD.ask(I18N.message("move"), I18N.message("moveask", sourceName, targetName), yes -> {
 			if (Boolean.TRUE.equals(yes)) {
 				for (long id : source) {
 					TreeNode node = getTree().find(FOLDER_ID, (Object) id);
@@ -431,8 +431,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	private void addCustomActionsMenuItem(final GUIFolder selectedFolder, Menu contextMenu) {
 		if (Feature.enabled(Feature.CUSTOM_ACTIONS)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.CUSTOM_ACTIONS)
-				&& Session.get().getUser().getCustomActions() != null
-				&& Session.get().getUser().getCustomActions().length > 0) {
+				&& !Session.get().getUser().getCustomActions().isEmpty()) {
 			MenuItem customActionsItem = prepareCustomActionsMenu(selectedFolder.getId());
 			contextMenu.addItem(customActionsItem);
 		}
@@ -1292,12 +1291,8 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 
 	private MenuItem prepareCustomActionsMenu(final long folderId) {
 		Menu customActionsMenu = new Menu();
-		if (Session.get().getUser().getCustomActions() != null
-				&& Session.get().getUser().getCustomActions().length > 0) {
-			for (GUIMenu menuAction : Session.get().getUser().getCustomActions()) {
-				prepareCustomActionMenuItem(folderId, menuAction, customActionsMenu);
-			}
-		}
+		for (GUIMenu menuAction : Session.get().getUser().getCustomActions())
+			prepareCustomActionMenuItem(folderId, menuAction, customActionsMenu);
 
 		MenuItem customActionsItem = new MenuItem(I18N.message("customactions"));
 		customActionsItem.setSubmenu(customActionsMenu);

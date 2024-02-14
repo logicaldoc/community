@@ -45,8 +45,7 @@ public class MergeDialog extends Dialog {
 				label = selectedIds.size() + " " + I18N.message("folders").toLowerCase();
 
 			LD.ask(I18N.message(MERGE),
-					I18N.message("mergeask",
-							new String[] { label, folders.getSelectedRecord().getAttributeAsString("name") }),
+					I18N.message("mergeask", label, folders.getSelectedRecord().getAttributeAsString("name")),
 					(Boolean value) -> {
 						if (Boolean.TRUE.equals(value)) {
 							FolderNavigator.get().mergeTo(

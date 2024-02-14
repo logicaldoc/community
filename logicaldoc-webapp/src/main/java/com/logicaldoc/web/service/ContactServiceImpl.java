@@ -39,12 +39,12 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 	private static Logger log = LoggerFactory.getLogger(ContactServiceImpl.class);
 
 	@Override
-	public void delete(long[] ids) throws ServerException {
+	public void delete(List<Long> ids) throws ServerException {
 		validateSession();
 
 		try {
 			ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
-			for (long id : ids) {
+			for (Long id : ids) {
 				dao.delete(id);
 			}
 		} catch (PersistenceException e) {

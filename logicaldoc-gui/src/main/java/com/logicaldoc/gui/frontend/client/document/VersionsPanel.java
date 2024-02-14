@@ -1,8 +1,5 @@
 package com.logicaldoc.gui.frontend.client.document;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
@@ -254,27 +251,24 @@ public class VersionsPanel extends DocumentDetailTab {
 		delete.addClickHandler((MenuItemClickEvent event) -> LD.ask(I18N.message("question"),
 				I18N.message("delversionwarn") + ".\n " + I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
-						List<Long> ids = new ArrayList<>();
-						for (ListGridRecord rec : selection)
-							ids.add(rec.getAttributeAsLong("id"));
+						DocumentService.Instance.get().deleteVersions(GridUtil.getIds(selection),
+								new AsyncCallback<GUIDocument>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+									}
 
-						DocumentService.Instance.get().deleteVersions(ids, new AsyncCallback<GUIDocument>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUIDocument result) {
-								if (result != null) {
-									document.setVersion(result.getVersion());
-									document.setFileVersion(result.getFileVersion());
-									DocumentController.get().modified(result);
-									DocumentController.get().selected(result);
-									list.removeSelectedData();
-								}
-							}
-						});
+									@Override
+									public void onSuccess(GUIDocument result) {
+										if (result != null) {
+											document.setVersion(result.getVersion());
+											document.setFileVersion(result.getFileVersion());
+											DocumentController.get().modified(result);
+											DocumentController.get().selected(result);
+											list.removeSelectedData();
+										}
+									}
+								});
 					}
 				}));
 		return delete;

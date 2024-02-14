@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -93,7 +95,7 @@ public interface StampService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void applyStamp(Long[] docIds, GUIStamp stamp) throws ServerException;
+	public void applyStamp(List<Long> docIds, GUIStamp stamp) throws ServerException;
 
 	public static class Instance {
 		private static StampServiceAsync inst;

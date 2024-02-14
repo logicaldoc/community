@@ -10,7 +10,7 @@ public interface ImpexServiceAsync {
 
 	void delete(long archiveId, AsyncCallback<Void> callback);
 
-	void deleteVersions(long archiveId, Long[] versionIds, AsyncCallback<GUIArchive> callback);
+	void deleteVersions(long archiveId, List<Long> versionIds, AsyncCallback<GUIArchive> callback);
 
 	void save(GUIArchive archive, AsyncCallback<GUIArchive> callback);
 

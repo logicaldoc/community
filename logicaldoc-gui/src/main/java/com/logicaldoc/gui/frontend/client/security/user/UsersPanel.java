@@ -2,11 +2,11 @@ package com.logicaldoc.gui.frontend.client.security.user;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
-import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.UsersDS;
 import com.logicaldoc.gui.common.client.formatters.UserCellFormatter;
@@ -170,7 +170,7 @@ public class UsersPanel extends AdminPanel {
 		lastLogin.setAutoFitWidth(true);
 		lastLogin.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 		lastLogin.setCellFormatter(new UserDateCellFormatter(false));
-		
+
 		DateListGridField creation = new DateListGridField("creation", "createdon",
 				DateListGridField.DateCellFormatter.FORMAT_DEFAULT);
 		creation.setAutoFitWidth(true);
@@ -221,8 +221,8 @@ public class UsersPanel extends AdminPanel {
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
 		list.setDataSource(new UsersDS(null, true, false));
-		list.setFields(id, enabledIcon, avatar, username, firstName, name, email, creation, lastLogin, expire, phone, cell, groups, enabled,
-				guest, timeZone, source);
+		list.setFields(id, enabledIcon, avatar, username, firstName, name, email, creation, lastLogin, expire, phone,
+				cell, groups, enabled, guest, timeZone, source);
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -287,23 +287,10 @@ public class UsersPanel extends AdminPanel {
 		rec.setAttribute(PHONE, user.getPhone());
 		rec.setAttribute("expire", user.getExpire());
 		rec.setAttribute(EENABLED, user.isEnabled());
-		if (user.isEnabled())
-			rec.setAttribute(ENABLED_ICON, "0");
-		else
-			rec.setAttribute(ENABLED_ICON, "2");
+		rec.setAttribute(ENABLED_ICON, user.isEnabled() ? "0" : "2");
 		rec.setAttribute(GUEST, user.isReadOnly());
 		rec.setAttribute(SOURCE, user.getSource());
-
-		GUIGroup[] groups = user.getGroups();
-		StringBuilder gnames = new StringBuilder();
-		for (GUIGroup group : groups) {
-			if (!group.getName().startsWith("_user_")) {
-				if (!gnames.toString().isEmpty())
-					gnames.append(", ");
-				gnames.append(group.getName());
-			}
-		}
-		rec.setAttribute(GROUPS, gnames);
+		rec.setAttribute(GROUPS, user.getGroups().stream().map(g -> g.getName()).collect(Collectors.joining(",")));
 
 		list.refreshRow(list.getRecordIndex(rec));
 		list.redraw();

@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.common.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -35,12 +37,12 @@ public interface InfoService extends RemoteService {
 	/**
 	 * Retrieves all the settings for the current session
 	 * 
-	 * @return array with all the settings
+	 * @return all the settings
 	 * 
 	 * @throws InvalidSessionServerException the session does not exist or is
 	 *         expired
 	 */
-	public GUIParameter[] getSessionInfo() throws InvalidSessionServerException;
+	public List<GUIParameter> getSessionInfo() throws InvalidSessionServerException;
 
 	/**
 	 * Retrieves the natural language description of a given cron expression

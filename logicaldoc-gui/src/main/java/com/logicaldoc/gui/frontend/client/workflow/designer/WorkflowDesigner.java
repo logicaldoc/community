@@ -2,7 +2,6 @@ package com.logicaldoc.gui.frontend.client.workflow.designer;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.beans.GUITransition;
@@ -83,8 +82,7 @@ public class WorkflowDesigner extends AdminPanel {
 
 	public void onAddState(int type) {
 		GUIWFState state = new GUIWFState("" + new Date().getTime(), I18N.message("statename"), type);
-
-		getWorkflow().addState(state);
+		getWorkflow().getStates().add(state);
 
 		/*
 		 * Check if this must be the initial state
@@ -128,11 +126,9 @@ public class WorkflowDesigner extends AdminPanel {
 	 */
 	public boolean saveModel() {
 		// Collect all the states as drawn in the designer.
-		List<GUIWFState> states = new ArrayList<>();
-		Iterator<FunctionShape> iter = getDrawingPanel().getDiagramController().getShapes().iterator();
 		int i = 0;
-		while (iter.hasNext()) {
-			FunctionShape shape = iter.next();
+		workflow.getStates().clear();
+		for (FunctionShape shape : getDrawingPanel().getDiagramController().getShapes()) {
 			StateWidget widget = (StateWidget) shape.getWidget();
 
 			String id = Integer.toString(i++);
@@ -146,14 +142,11 @@ public class WorkflowDesigner extends AdminPanel {
 			wfState.setId(id);
 			wfState.setTop(shape.getTop());
 			wfState.setLeft(shape.getLeft());
-			states.add(wfState);
+			workflow.getStates().add(wfState);
 		}
-		workflow.setStates(states.toArray(new GUIWFState[0]));
 
 		// Collect all the transitions as drawn in the designer
-		iter = getDrawingPanel().getDiagramController().getShapes().iterator();
-		while (iter.hasNext()) {
-			FunctionShape shape = iter.next();
+		for (FunctionShape shape : getDrawingPanel().getDiagramController().getShapes()) {
 			StateWidget srcWidget = (StateWidget) shape.getWidget();
 
 			DrawableSet<Connection> connections = shape.getConnections();
@@ -177,7 +170,7 @@ public class WorkflowDesigner extends AdminPanel {
 				transition.setPoints(sb.toString());
 			}
 
-			srcWidget.getWfState().setTransitions(transitions.toArray(new GUITransition[0]));
+			srcWidget.getWfState().setTransitions(transitions);
 		}
 
 		return true;

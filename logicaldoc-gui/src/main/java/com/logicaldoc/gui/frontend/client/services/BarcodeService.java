@@ -1,13 +1,15 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
-import com.logicaldoc.gui.common.client.beans.GUIBarcodeZone;
 import com.logicaldoc.gui.common.client.beans.GUIBarcodeTemplate;
+import com.logicaldoc.gui.common.client.beans.GUIBarcodeZone;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 
 /**
@@ -33,7 +35,7 @@ public interface BarcodeService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void markUnprocessable(long[] ids) throws ServerException;
+	public void markUnprocessable(List<Long> ids) throws ServerException;
 
 	/**
 	 * Deletes a given template
@@ -91,8 +93,9 @@ public interface BarcodeService extends RemoteService {
 	public static class Instance {
 		private static BarcodeServiceAsync inst;
 
-		private Instance() {}
-		
+		private Instance() {
+		}
+
 		public static BarcodeServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(BarcodeService.class);

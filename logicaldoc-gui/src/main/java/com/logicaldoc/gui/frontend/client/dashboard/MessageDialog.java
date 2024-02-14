@@ -1,5 +1,9 @@
 package com.logicaldoc.gui.frontend.client.dashboard;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
@@ -7,6 +11,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.EventPanel;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.services.MessageService;
@@ -117,16 +122,13 @@ public class MessageDialog extends Window {
 					msg.setValidity(Integer.parseInt(form.getValueAsString(VALIDITY)));
 				msg.setPriority(Integer.parseInt(form.getValue(PRIORITY).toString()));
 
-				if (recipientsGrid.getRecords() == null || recipientsGrid.getRecords().length < 1) {
+				final ListGridRecord[] records = recipientsGrid.getRecords();
+				if (records == null || records.length < 1) {
 					SC.warn(I18N.message("noselectedrecipients"));
 					return;
 				}
 
-				long[] ids = new long[recipientsGrid.getRecords().length];
-				for (int i = 0; i < ids.length; i++)
-					ids[i] = recipientsGrid.getRecords()[i].getAttributeAsLong("id");
-
-				MessageService.Instance.get().save(msg, ids, new AsyncCallback<Void>() {
+				MessageService.Instance.get().save(msg, GridUtil.getIds(records), new AsyncCallback<Void>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -189,8 +191,7 @@ public class MessageDialog extends Window {
 		recipientsGrid.addCellContextClickHandler(event -> {
 			MenuItem delete = new MenuItem();
 			delete.setTitle(I18N.message("ddelete"));
-			delete.addClickHandler(evt ->
-					recipientsGrid.removeSelectedData());
+			delete.addClickHandler(evt -> recipientsGrid.removeSelectedData());
 
 			Menu contextMenu = new Menu();
 			contextMenu.setItems(delete);
@@ -203,7 +204,7 @@ public class MessageDialog extends Window {
 		userSelector.setWidth(150);
 		userSelector.setMultiple(true);
 		userSelector.addChangedHandler(event -> {
-			addRecipients(userSelector.getSelectedRecords());
+			addRecipients(Arrays.asList(userSelector.getSelectedRecords()));
 			userSelector.clearValue();
 		});
 
@@ -212,23 +213,23 @@ public class MessageDialog extends Window {
 		groupSelector.setMultiple(false);
 		groupSelector.addChangedHandler(event -> {
 			String groupId = groupSelector.getSelectedRecord().getAttributeAsString("id");
-			SecurityService.Instance.get().searchUsers(null, groupId, new AsyncCallback<GUIUser[]>() {
+			SecurityService.Instance.get().searchUsers(null, groupId, new AsyncCallback<List<GUIUser>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
 				}
 
 				@Override
-				public void onSuccess(GUIUser[] users) {
-					if (users == null || users.length < 1)
+				public void onSuccess(List<GUIUser> users) {
+					if (users.isEmpty())
 						return;
 
-					ListGridRecord[] records = new ListGridRecord[users.length];
-					for (int i = 0; i < users.length; i++) {
-						records[i] = new ListGridRecord();
-						records[i].setAttribute("id", users[i].getId());
-						records[i].setAttribute(AVATAR, users[i].getId());
-						records[i].setAttribute(LABEL, users[i].getFullName());
+					List<ListGridRecord> records = new ArrayList<>();
+					for (GUIUser user : users) {
+						ListGridRecord rec = new ListGridRecord();
+						rec.setAttribute("id", user.getId());
+						rec.setAttribute(AVATAR, user.getId());
+						rec.setAttribute(LABEL, user.getFullName());
 					}
 
 					addRecipients(records);
@@ -250,15 +251,15 @@ public class MessageDialog extends Window {
 	/**
 	 * Add new users in the recipients grid
 	 */
-	private void addRecipients(ListGridRecord[] newSelection) {
-		if (newSelection == null || newSelection.length < 1)
+	private void addRecipients(List<ListGridRecord> newSelection) {
+		if (newSelection.isEmpty())
 			return;
 
-		for (int i = 0; i < newSelection.length; i++) {
+		for (ListGridRecord rcd : newSelection) {
 			ListGridRecord newRec = new ListGridRecord();
-			newRec.setAttribute("id", newSelection[i].getAttributeAsString("id"));
-			newRec.setAttribute(AVATAR, newSelection[i].getAttributeAsString(AVATAR));
-			newRec.setAttribute(LABEL, newSelection[i].getAttributeAsString(LABEL));
+			newRec.setAttribute("id", rcd.getAttributeAsString("id"));
+			newRec.setAttribute(AVATAR, rcd.getAttributeAsString(AVATAR));
+			newRec.setAttribute(LABEL, rcd.getAttributeAsString(LABEL));
 
 			// Iterate over the current recipients avoiding duplicates
 			boolean duplicate = false;

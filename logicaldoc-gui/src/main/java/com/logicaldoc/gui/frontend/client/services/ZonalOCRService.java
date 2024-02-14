@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -69,7 +71,7 @@ public interface ZonalOCRService extends RemoteService {
 	 * @throws ServerException an error happened during the Zonal OCR processing
 	 */
 	public GUIDocument process(long docId) throws ServerException;
-	
+
 	/**
 	 * Reschedule all documents for processing
 	 * 
@@ -84,14 +86,14 @@ public interface ZonalOCRService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void markUnprocessable(long[] ids) throws ServerException;
+	public void markUnprocessable(List<Long> ids) throws ServerException;
 
 	public static class Instance {
 		private static ZonalOCRServiceAsync inst;
 
 		private Instance() {
 		}
-		
+
 		public static ZonalOCRServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(ZonalOCRService.class);

@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.reports;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DeletedFoldersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
@@ -108,11 +109,7 @@ public class DeletedFoldersReport extends ReportPanel implements FolderChangeLis
 		restore.addClickHandler(event -> {
 			if (selection == null || selection.length == 0)
 				return;
-			final Long[] ids = new Long[selection.length];
-			for (int i = 0; i < selection.length; i++)
-				ids[i] = Long.parseLong(selection[i].getAttribute("id"));
-
-			new RestoreDialog(null, ids, evn -> refresh()).show();
+			new RestoreDialog(null, GridUtil.getIds(selection), evn -> refresh()).show();
 		});
 
 		contextMenu.setItems(restore);

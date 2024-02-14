@@ -1,9 +1,11 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.logicaldoc.gui.common.client.Constants;
 
@@ -38,8 +40,6 @@ public class GUIUser implements Serializable {
 	private String username = "";
 
 	private long id = 0;
-
-	private GUIGroup[] groups = new GUIGroup[0];
 
 	private String firstName = "";
 
@@ -95,8 +95,6 @@ public class GUIUser implements Serializable {
 
 	private GUITenant tenant = null;
 
-	private Long[] menus = new Long[0];
-
 	private long quota = -1;
 
 	private long quotaCount = 0;
@@ -106,10 +104,6 @@ public class GUIUser implements Serializable {
 	private String ipWhitelist;
 
 	private String ipBlacklist;
-
-	private GUIDashlet[] dashlets = new GUIDashlet[0];
-
-	private GUIMenu[] customActions = new GUIMenu[0];
 
 	private Long defaultWorkspace;
 
@@ -149,8 +143,6 @@ public class GUIUser implements Serializable {
 	 */
 	private boolean enforceWorkingTime = false;
 
-	private GUIWorkingTime[] workingTimes = new GUIWorkingTime[0];
-
 	private Integer maxInactivity;
 
 	private String timeZone;
@@ -161,10 +153,20 @@ public class GUIUser implements Serializable {
 	private String lastLoginFailureReason;
 
 	private int source = 0;
-	
+
 	private Date creation;
-	
+
 	private Date lastLogin;
+
+	private List<GUIGroup> groups = new ArrayList<>();
+
+	private List<GUIDashlet> dashlets = new ArrayList<>();
+
+	private List<GUIMenu> customActions = new ArrayList<>();
+
+	private List<GUIWorkingTime> workingTimes = new ArrayList<>();
+
+	private List<Long> menus = new ArrayList<>();
 
 	public GUIUser() {
 		tenant = new GUITenant();
@@ -203,14 +205,6 @@ public class GUIUser implements Serializable {
 
 	public void setId(long id) {
 		this.id = id;
-	}
-
-	public GUIGroup[] getGroups() {
-		return groups;
-	}
-
-	public void setGroups(GUIGroup[] groups) {
-		this.groups = groups;
 	}
 
 	public boolean isMemberOf(String group) {
@@ -344,49 +338,6 @@ public class GUIUser implements Serializable {
 		this.enabled = enabled;
 	}
 
-	public void addGroup(GUIGroup group) {
-		if (!isMemberOf(group.getName())) {
-			GUIGroup[] newGroups = Arrays.copyOf(groups, groups.length + 1);
-			newGroups[groups.length] = group;
-			groups = newGroups;
-		}
-	}
-
-	public void addDashlet(GUIDashlet dashlet) {
-		GUIDashlet[] newDashlets = Arrays.copyOf(dashlets, dashlets.length + 1);
-		newDashlets[groups.length] = dashlet;
-		dashlets = newDashlets;
-	}
-
-	public void removeGroup(String groupName) {
-		if (groups.length == 0)
-			return;
-
-		if (isMemberOf(groupName)) {
-			GUIGroup[] tmp = new GUIGroup[groups.length - 1];
-			int i = 0;
-			for (GUIGroup g : groups) {
-				if (!g.getName().equals(groupName))
-					tmp[i++] = g;
-			}
-			groups = tmp;
-		}
-	}
-
-	public void removeDashlet(int id) {
-		if (dashlets.length == 0)
-			return;
-
-		GUIDashlet[] tmp = new GUIDashlet[dashlets.length - 1];
-		int i = 0;
-		for (GUIDashlet g : dashlets) {
-			if (g.getId() != id)
-				tmp[i++] = g;
-		}
-		dashlets = tmp;
-
-	}
-
 	public int getCheckedOutDocs() {
 		return checkedOutDocs;
 	}
@@ -433,14 +384,6 @@ public class GUIUser implements Serializable {
 
 	public void setAssignedTasks(int tasks) {
 		this.tasks = tasks;
-	}
-
-	public Long[] getMenus() {
-		return menus;
-	}
-
-	public void setMenus(Long[] menus) {
-		this.menus = menus;
 	}
 
 	public int getSubscriptions() {
@@ -491,14 +434,6 @@ public class GUIUser implements Serializable {
 
 	public void setIpBlacklist(String ipBlacklist) {
 		this.ipBlacklist = ipBlacklist;
-	}
-
-	public GUIDashlet[] getDashlets() {
-		return dashlets;
-	}
-
-	public void setDashlets(GUIDashlet[] dashlets) {
-		this.dashlets = dashlets;
 	}
 
 	public boolean isNotifyCredentials() {
@@ -623,22 +558,6 @@ public class GUIUser implements Serializable {
 		this.hitsGrid = hitsGrid;
 	}
 
-	public GUIMenu[] getCustomActions() {
-		return customActions;
-	}
-
-	public void setCustomActions(GUIMenu[] customActions) {
-		this.customActions = customActions;
-	}
-
-	public void updateCustomAction(GUIMenu action) {
-		if (customActions != null)
-			for (int i = 0; i < customActions.length; i++) {
-				if (customActions[i].getId() == action.getId())
-					customActions[i] = action;
-			}
-	}
-
 	public String getDateFormat() {
 		return dateFormat;
 	}
@@ -696,14 +615,6 @@ public class GUIUser implements Serializable {
 		this.enforceWorkingTime = enforceWorkingTime;
 	}
 
-	public GUIWorkingTime[] getWorkingTimes() {
-		return workingTimes;
-	}
-
-	public void setWorkingTimes(GUIWorkingTime[] workingTimes) {
-		this.workingTimes = workingTimes;
-	}
-
 	public Integer getMaxInactivity() {
 		return maxInactivity;
 	}
@@ -750,5 +661,74 @@ public class GUIUser implements Serializable {
 
 	public void setLastLogin(Date lastLogin) {
 		this.lastLogin = lastLogin;
+	}
+
+	public int getTasks() {
+		return tasks;
+	}
+
+	public void setTasks(int tasks) {
+		this.tasks = tasks;
+	}
+
+	public List<GUIGroup> getGroups() {
+		return groups;
+	}
+
+	public void setGroups(List<GUIGroup> groups) {
+		this.groups = groups;
+	}
+
+	public List<GUIDashlet> getDashlets() {
+		return dashlets;
+	}
+
+	public void setDashlets(List<GUIDashlet> dashlets) {
+		this.dashlets = dashlets;
+	}
+
+	public List<GUIWorkingTime> getWorkingTimes() {
+		return workingTimes;
+	}
+
+	public void setWorkingTimes(List<GUIWorkingTime> workingTimes) {
+		this.workingTimes = workingTimes;
+	}
+
+	public List<Long> getMenus() {
+		return menus;
+	}
+
+	public void setMenus(List<Long> menus) {
+		this.menus = menus;
+	}
+
+	public void addGroup(GUIGroup group) {
+		if (!isMemberOf(group.getName()))
+			groups.add(group);
+	}
+
+	public void removeGroup(String groupName) {
+		groups = groups.stream().filter(g -> !g.getName().equals(groupName)).collect(Collectors.toList());
+	}
+
+	public void addDashlet(GUIDashlet dashlet) {
+		dashlets.add(dashlet);
+	}
+
+	public void removeDashlet(long id) {
+		dashlets = dashlets.stream().filter(d -> d.getId() != id).collect(Collectors.toList());
+	}
+	
+	public void updateCustomAction(GUIMenu action) {
+		customActions.set(customActions.indexOf(action), action);
+	}
+
+	public List<GUIMenu> getCustomActions() {
+		return customActions;
+	}
+
+	public void setCustomActions(List<GUIMenu> customActions) {
+		this.customActions = customActions;
 	}
 }

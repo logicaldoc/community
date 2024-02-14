@@ -159,7 +159,7 @@ public interface FolderService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void deleteFromTrash(Long[] ids) throws ServerException;
+	public void deleteFromTrash(List<Long> ids) throws ServerException;
 
 	/**
 	 * Restores a given folder
@@ -169,7 +169,7 @@ public interface FolderService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void restore(Long[] folderIds, long targetId) throws ServerException;
+	public void restore(List<Long> folderIds, long targetId) throws ServerException;
 
 	/**
 	 * Moves some folders under a target folder

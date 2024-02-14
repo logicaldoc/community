@@ -1,7 +1,5 @@
 package com.logicaldoc.gui.frontend.client.document;
 
-import java.util.Arrays;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIBookmark;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -9,6 +7,7 @@ import com.logicaldoc.gui.common.client.data.BookmarksDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
@@ -127,24 +126,21 @@ public class BookmarksPanel extends VLayout {
 			final ListGridRecord[] selection = list.getSelectedRecords();
 			if (selection == null || selection.length == 0)
 				return;
-			final Long[] ids = new Long[selection.length];
-			for (int i = 0; i < selection.length; i++) {
-				ids[i] = Long.parseLong(selection[i].getAttribute("id"));
-			}
 
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-				if (Boolean.TRUE.equals(value)) {
-					DocumentService.Instance.get().deleteBookmarks(Arrays.asList(ids), new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+				if (Boolean.TRUE.equals(answer)) {
+					DocumentService.Instance.get().deleteBookmarks(GridUtil.getIds(selection),
+							new AsyncCallback<Void>() {
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
 
-						@Override
-						public void onSuccess(Void result) {
-							list.removeSelectedData();
-						}
-					});
+								@Override
+								public void onSuccess(Void result) {
+									list.removeSelectedData();
+								}
+							});
 				}
 			});
 		});

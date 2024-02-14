@@ -174,8 +174,8 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		 */
 		NumberFormat format = NumberFormat.getFormat("#.###");
 
-		String stats = I18N.message("aboutresults", new String[] { "" + Search.get().getEstimatedHits(),
-				format.format((double) Search.get().getTime() / (double) 1000) });
+		String stats = I18N.message("aboutresults", Long.toString(Search.get().getEstimatedHits()),
+				format.format((double) Search.get().getTime() / (double) 1000));
 		stats += " (<b>" + format.format((double) Search.get().getTime() / (double) 1000) + "</b> "
 				+ I18N.message("seconds").toLowerCase() + ")";
 		searchCursor.setMessage(stats);

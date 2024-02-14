@@ -3,6 +3,7 @@ package com.logicaldoc.web.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -105,9 +106,7 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testRemoveFromGroup() throws ServerException, PersistenceException {
-		long[] users = new long[2];
-		users[0] = 5;
-		users[1] = 1;
+		List<Long> users = List.of(5L, 1L);
 		Group group = groupDAO.findByName("author", Tenant.DEFAULT_ID);
 		service.removeFromGroup(group.getId(), users);
 		User user = userDAO.findByUsername("test");

@@ -53,9 +53,8 @@ public class InheritRightsDialog extends Dialog {
 		inheritRights.setAutoFit(true);
 		inheritRights.setMargin(1);
 		inheritRights.addClickHandler(event -> LD.ask(I18N.message(INHERITRIGHTS),
-				I18N.message("inheritrightsask",
-						new String[] { FolderNavigator.get().getSelectedRecord().getAttributeAsString("name"),
-								folders.getSelectedRecord().getAttributeAsString("name") }),
+				I18N.message("inheritrightsask", FolderNavigator.get().getSelectedRecord().getAttributeAsString("name"),
+						folders.getSelectedRecord().getAttributeAsString("name")),
 				confirm -> {
 					if (Boolean.TRUE.equals(confirm)) {
 						FolderService.Instance.get().inheritACL(panel.getFolder().getId(),

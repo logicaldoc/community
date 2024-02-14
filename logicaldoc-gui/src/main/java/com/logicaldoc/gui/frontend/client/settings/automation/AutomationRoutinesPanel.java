@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.settings.automation;
 
+import java.util.Arrays;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.data.AutomationRoutinesDS;
@@ -153,13 +155,13 @@ public class AutomationRoutinesPanel extends VLayout {
 		Menu contextMenu = new Menu();
 
 		final ListGridRecord rec = list.getSelectedRecord();
-		final long id = Long.parseLong(rec.getAttributeAsString("id"));
+		final long id = rec.getAttributeAsLong("id");
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				AutomationService.Instance.get().deleteRoutines(new long[] { id }, new AsyncCallback<Void>() {
+				AutomationService.Instance.get().deleteRoutines(Arrays.asList(id), new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

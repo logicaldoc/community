@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -45,7 +47,7 @@ public interface DashletService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void saveDashlets(GUIDashlet[] dashlets) throws ServerException;
+	public void saveDashlets(List<GUIDashlet> dashlets) throws ServerException;
 
 	/**
 	 * Loads all the dashlet definitions
@@ -54,7 +56,7 @@ public interface DashletService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIDashlet[] loadDashlets() throws ServerException;
+	public List<GUIDashlet> loadDashlets() throws ServerException;
 
 	/**
 	 * Saves the user's dashlet configuration
@@ -63,7 +65,7 @@ public interface DashletService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void saveUserDashlets(GUIDashlet[] dashlets) throws ServerException;
+	public void saveUserDashlets(List<GUIDashlet> dashlets) throws ServerException;
 
 	/**
 	 * Gets a dashlet

@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.security.group;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.data.UsersDS;
 import com.logicaldoc.gui.common.client.formatters.UserCellFormatter;
@@ -92,7 +95,7 @@ public class GroupUsersPanel extends VLayout {
 		enabledIcon.setImageURLPrefix(Util.imagePrefix());
 		enabledIcon.setImageURLSuffix(".gif");
 		enabledIcon.setCanFilter(false);
-		
+
 		ListGridField enabled = new ListGridField(EENABLED, I18N.message("enabled"), 55);
 		enabled.setCanFilter(true);
 		enabled.setHidden(true);
@@ -183,9 +186,9 @@ public class GroupUsersPanel extends VLayout {
 		remove.addClickHandler(event -> {
 			if (selection == null || selection.length == 0)
 				return;
-			final long[] ids = new long[selection.length];
+			final List<Long> ids = new ArrayList<>();
 			for (int i = 0; i < selection.length; i++) {
-				ids[i] = Long.parseLong(selection[i].getAttribute("id"));
+				ids.add(Long.parseLong(selection[i].getAttribute("id")));
 			}
 
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {

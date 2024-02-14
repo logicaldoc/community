@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.common.client.widgets;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -89,7 +92,7 @@ public class UserSearchDialog extends Window {
 	}
 
 	protected void search(String username, String groupId) {
-		SecurityService.Instance.get().searchUsers(username, groupId, new AsyncCallback<GUIUser[]>() {
+		SecurityService.Instance.get().searchUsers(username, groupId, new AsyncCallback<List<GUIUser>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				LD.clearPrompt();
@@ -97,23 +100,22 @@ public class UserSearchDialog extends Window {
 			}
 
 			@Override
-			public void onSuccess(GUIUser[] result) {
-				lastResult = new ListGridRecord[result.length];
-				for (int i = 0; i < result.length; i++) {
-					GUIUser hit = result[i];
+			public void onSuccess(List<GUIUser> result) {
+				List<ListGridRecord> lastResult = new ArrayList<>();
+				for (GUIUser hit : result) {
 					ListGridRecord rec = new ListGridRecord();
-					lastResult[i] = rec;
 					rec.setAttribute("avatar", hit.getId());
 					rec.setAttribute("id", hit.getId());
 					rec.setAttribute(USERNAME, hit.getUsername());
 					rec.setAttribute(FIRSTNAME, hit.getFirstName());
 					rec.setAttribute(LASTNAME, hit.getName());
+					lastResult.add(rec);
 				}
 
-				if (lastResult.length == 1) {
-					onSelect(lastResult[0].getAttributeAsLong("id"));
+				if (lastResult.size() == 1) {
+					onSelect(lastResult.get(0).getAttributeAsLong("id"));
 				} else
-					grid.setData(lastResult);
+					grid.setData(lastResult.toArray(new ListGridRecord[0]));
 			}
 		});
 	}

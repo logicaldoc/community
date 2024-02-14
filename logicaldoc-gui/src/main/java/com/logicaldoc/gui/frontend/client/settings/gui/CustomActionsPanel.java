@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.settings.gui;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -187,18 +186,16 @@ public class CustomActionsPanel extends VLayout {
 
 	private void reload() {
 		SecurityService.Instance.get().getMenus(com.logicaldoc.gui.common.client.Menu.CUSTOM_ACTIONS, I18N.getLocale(),
-				false, new AsyncCallback<GUIMenu[]>() {
+				false, new AsyncCallback<List<GUIMenu>>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
 					}
 
 					@Override
-					public void onSuccess(GUIMenu[] mns) {
+					public void onSuccess(List<GUIMenu> menus) {
 						actions.clear();
-
-						if (mns != null)
-							Collections.addAll(actions, mns);
+						actions.addAll(menus);
 						fillGrid();
 					}
 				});
@@ -221,18 +218,17 @@ public class CustomActionsPanel extends VLayout {
 					action.setPosition(i++);
 			}
 
-		SecurityService.Instance.get().saveMenus(actions.toArray(new GUIMenu[0]), I18N.getLocale(),
-				new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+		SecurityService.Instance.get().saveMenus(actions, I18N.getLocale(), new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(Void arg0) {
-						GuiLog.info(I18N.message("settingssaved"), null);
-					}
-				});
+			@Override
+			public void onSuccess(Void arg0) {
+				GuiLog.info(I18N.message("settingssaved"), null);
+			}
+		});
 	}
 
 	private void onEdit() {

@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.metadata.template;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -71,7 +73,7 @@ public class OptionsUploader extends Window {
 
 		LD.contactingServer();
 		AttributeSetService.Instance.get().parseOptions(options.getSetId(), options.getAttribute(),
-				new AsyncCallback<GUIValue[]>() {
+				new AsyncCallback<List<GUIValue>>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -81,7 +83,7 @@ public class OptionsUploader extends Window {
 					}
 
 					@Override
-					public void onSuccess(GUIValue[] ret) {
+					public void onSuccess(List<GUIValue> ret) {
 						options.refresh();
 						LD.clearPrompt();
 						destroy();

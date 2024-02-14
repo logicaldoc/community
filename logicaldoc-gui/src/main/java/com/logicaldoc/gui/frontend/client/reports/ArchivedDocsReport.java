@@ -1,8 +1,5 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -10,6 +7,7 @@ import com.logicaldoc.gui.common.client.data.ArchivedDocsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
@@ -175,10 +173,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		MenuItem restore = new MenuItem();
 		restore.setTitle(I18N.message("restore"));
 		restore.addClickHandler(event -> {
-			List<Long> docIds = new ArrayList<>();
-			for (int i = 0; i < selection.length; i++)
-				docIds.add(selection[i].getAttributeAsLong("id"));
-			DocumentService.Instance.get().unarchiveDocuments(docIds, new AsyncCallback<Void>() {
+			DocumentService.Instance.get().unarchiveDocuments(GridUtil.getIds(selection), new AsyncCallback<Void>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
@@ -195,13 +190,9 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> {
-			List<Long> docIds = new ArrayList<>();
-			for (int i = 0; i < selection.length; i++)
-				docIds.add(selection[i].getAttributeAsLong("id"));
-
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-				if (Boolean.TRUE.equals(value)) {
-					DocumentService.Instance.get().delete(docIds, new AsyncCallback<Void>() {
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+				if (Boolean.TRUE.equals(answer)) {
+					DocumentService.Instance.get().delete(GridUtil.getIds(selection), new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
@@ -218,12 +209,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 
 		MenuItem sendToExpArchive = new MenuItem();
 		sendToExpArchive.setTitle(I18N.message("sendtoexparchive"));
-		sendToExpArchive.addClickHandler(event -> {
-			List<Long> selectionIds = new ArrayList<>();
-			for (int i = 0; i < selection.length; i++)
-				selectionIds.add(Long.parseLong(selection[i].getAttributeAsString("id")));
-			new SendToArchiveDialog(selectionIds, true).show();
-		});
+		sendToExpArchive.addClickHandler(event -> new SendToArchiveDialog(GridUtil.getIds(selection), true).show());
 
 		download.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1);
 		preview.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length == 1);

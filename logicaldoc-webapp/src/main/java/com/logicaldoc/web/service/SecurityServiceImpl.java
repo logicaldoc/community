@@ -150,29 +150,29 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	public static GUITenant fromTenant(Tenant tenant) {
 		if (tenant == null)
 			return null;
-		GUITenant ten = new GUITenant();
-		ten.setId(tenant.getId());
-		ten.setTenantId(tenant.getTenantId());
-		ten.setCity(tenant.getCity());
-		ten.setCountry(tenant.getCountry());
-		ten.setDisplayName(tenant.getDisplayName());
-		ten.setEmail(tenant.getEmail());
-		ten.setName(tenant.getName());
-		ten.setPostalCode(tenant.getPostalCode());
-		ten.setState(tenant.getState());
-		ten.setStreet(tenant.getStreet());
-		ten.setTelephone(tenant.getTelephone());
-		ten.setMaxRepoDocs(tenant.getMaxRepoDocs());
-		ten.setMaxRepoSize(tenant.getMaxRepoSize());
-		ten.setMaxSessions(tenant.getMaxSessions());
-		ten.setQuotaThreshold(tenant.getQuotaThreshold());
-		ten.setQuotaAlertRecipients(tenant.getQuotaAlertRecipientsAsList().toArray(new String[0]));
-		ten.setMaxUsers(tenant.getMaxUsers());
-		ten.setMaxGuests(tenant.getMaxGuests());
-		ten.setEnabled(tenant.getEnabled() == 1);
-		ten.setExpire(tenant.getExpire());
+		GUITenant guiTenant = new GUITenant();
+		guiTenant.setId(tenant.getId());
+		guiTenant.setTenantId(tenant.getTenantId());
+		guiTenant.setCity(tenant.getCity());
+		guiTenant.setCountry(tenant.getCountry());
+		guiTenant.setDisplayName(tenant.getDisplayName());
+		guiTenant.setEmail(tenant.getEmail());
+		guiTenant.setName(tenant.getName());
+		guiTenant.setPostalCode(tenant.getPostalCode());
+		guiTenant.setState(tenant.getState());
+		guiTenant.setStreet(tenant.getStreet());
+		guiTenant.setTelephone(tenant.getTelephone());
+		guiTenant.setMaxRepoDocs(tenant.getMaxRepoDocs());
+		guiTenant.setMaxRepoSize(tenant.getMaxRepoSize());
+		guiTenant.setMaxSessions(tenant.getMaxSessions());
+		guiTenant.setQuotaThreshold(tenant.getQuotaThreshold());
+		guiTenant.setQuotaAlertRecipients(tenant.getQuotaAlertRecipientsAsList());
+		guiTenant.setMaxUsers(tenant.getMaxUsers());
+		guiTenant.setMaxGuests(tenant.getMaxGuests());
+		guiTenant.setEnabled(tenant.getEnabled() == 1);
+		guiTenant.setExpire(tenant.getExpire());
 
-		return ten;
+		return guiTenant;
 	}
 
 	public static GUITenant getTenant(String tenantName) {
@@ -231,7 +231,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 		MenuDAO mdao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		List<Long> menus = mdao.findMenuIdByUserId(sess.getUserId(), true);
-		guiUser.setMenus(menus.toArray(new Long[0]));
+		guiUser.setMenus(menus);
 
 		loadDashlets(guiUser);
 
@@ -501,16 +501,15 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				guiUser.setCreation(user.getCreation());
 				guiUser.setLastLogin(user.getLastLogin());
 
-				GUIGroup[] grps = new GUIGroup[user.getGroups().size()];
-				int i = 0;
+				List<GUIGroup> grps = new ArrayList<>();
 				for (Group group : user.getGroups()) {
-					grps[i] = new GUIGroup();
-					grps[i].setId(group.getId());
-					grps[i].setName(group.getName());
-					grps[i].setDescription(group.getDescription());
-					grps[i].setType(group.getType());
-					grps[i].setSource(group.getSource());
-					i++;
+					GUIGroup guiGroup = new GUIGroup();
+					guiGroup.setId(group.getId());
+					guiGroup.setName(group.getName());
+					guiGroup.setDescription(group.getDescription());
+					guiGroup.setType(group.getType());
+					guiGroup.setSource(group.getSource());
+					grps.add(guiGroup);
 				}
 				guiUser.setGroups(grps);
 
@@ -563,11 +562,11 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				// Nothing to do
 			}
 		}
-		usr.setDashlets(dashlets.toArray(new GUIDashlet[0]));
+		usr.setDashlets(dashlets);
 	}
 
 	@Override
-	public void removeFromGroup(long groupId, long[] userIds) throws ServerException {
+	public void removeFromGroup(long groupId, List<Long> userIds) throws ServerException {
 		Session session = checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
 
 		checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
@@ -735,11 +734,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 		user.removeGroupMemberships(null);
-		long[] ids = new long[guiUser.getGroups().length];
-		for (int i = 0; i < guiUser.getGroups().length; i++) {
-			ids[i] = guiUser.getGroups()[i].getId();
-			user.addGroup(groupDao.findById(ids[i]));
-		}
+		for (Long groupId : guiUser.getGroups().stream().map(g -> g.getId()).toList())
+			user.addGroup(groupDao.findById(groupId));
 
 		Group adminGroup = groupDao.findByName(ADMIN, user.getTenantId());
 		groupDao.initialize(adminGroup);
@@ -776,12 +772,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		return usr;
 	}
 
-	private void saveWorkingTimes(User user, GUIWorkingTime[] guiWts) {
-		if (user.getWorkingTimes() != null)
-			user.getWorkingTimes().clear();
-		if (guiWts == null || guiWts.length < 1)
-			return;
-
+	private void saveWorkingTimes(User user, List<GUIWorkingTime> guiWts) {
+		user.getWorkingTimes().clear();
 		Calendar cal = Calendar.getInstance();
 		for (GUIWorkingTime guiWorkingTime : guiWts) {
 			cal.setTime(guiWorkingTime.getStart());
@@ -838,7 +830,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				guiWts.add(guiWt);
 			}
 
-		guiUser.setWorkingTimes(guiWts.toArray(new GUIWorkingTime[0]));
+		guiUser.setWorkingTimes(guiWts);
 	}
 
 	/**
@@ -1166,11 +1158,9 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	}
 
 	@Override
-	public void saveMenus(GUIMenu[] menus, String locale) throws ServerException {
+	public void saveMenus(List<GUIMenu> menus, String locale) throws ServerException {
 		validateSession();
 
-		if (menus == null || menus.length < 1)
-			return;
 		for (GUIMenu guiMenu : menus)
 			saveMenu(guiMenu, locale);
 	}
@@ -1211,7 +1201,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	}
 
 	@Override
-	public GUIMenu[] getMenus(long parentId, String locale, boolean enabledOnly) throws ServerException {
+	public List<GUIMenu> getMenus(long parentId, String locale, boolean enabledOnly) throws ServerException {
 		Session session = validateSession();
 
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
@@ -1231,7 +1221,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			return m1.getPosition() < m2.getPosition() ? -1 : 1;
 		});
 
-		return guiMenus.toArray(new GUIMenu[0]);
+		return guiMenus;
 
 	}
 
@@ -1310,8 +1300,9 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		return f;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public GUIUser[] searchUsers(String username, String groupId) throws ServerException {
+	public List<GUIUser> searchUsers(String username, String groupId) throws ServerException {
 		Session session = validateSession();
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
@@ -1327,7 +1318,6 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			query.append(" and A.ld_id=B.ld_userid and B.ld_groupid=" + Long.parseLong(groupId));
 
 		try {
-			@SuppressWarnings("unchecked")
 			List<GUIUser> users = userDao.query(query.toString(), new RowMapper<>() {
 
 				@Override
@@ -1341,18 +1331,19 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				}
 			}, null);
 
-			return users.toArray(new GUIUser[0]);
+			return users;
 		} catch (PersistenceException e) {
-			return (GUIUser[]) throwServerException(session, log, e);
+			return (List<GUIUser>) throwServerException(session, log, e);
 		}
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public GUISequence[] loadBlockedEntities() throws ServerException {
+	public List<GUISequence> loadBlockedEntities() throws ServerException {
 		Session session = validateSession();
 		if (session.getTenantId() != Tenant.DEFAULT_ID)
-			return new GUISequence[0];
+			return new ArrayList<>();
 
 		ContextProperties config = Context.get().getProperties();
 		SequenceDAO dao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
@@ -1382,24 +1373,24 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 								+ "%' and _entity.value >= :max and _entity.lastModified >= :oldestDate",
 						params, null, null));
 
-			GUISequence[] ret = new GUISequence[seqs.size()];
-			for (int i = 0; i < ret.length; i++) {
-				ret[i] = new GUISequence();
-				ret[i].setId(seqs.get(i).getId());
-				ret[i].setValue(seqs.get(i).getValue());
-				ret[i].setLastModified(seqs.get(i).getLastModified());
-				ret[i].setName(seqs.get(i).getName());
+			ArrayList<GUISequence> ret = new ArrayList<>();
+			for (Sequence seq : seqs) {
+				GUISequence guiSeq = new GUISequence();
+				guiSeq.setId(seq.getId());
+				guiSeq.setValue(seq.getValue());
+				guiSeq.setLastModified(seq.getLastModified());
+				guiSeq.setName(seq.getName());
+				ret.add(guiSeq);
 			}
-
 			return ret;
 		} catch (PersistenceException e) {
-			return (GUISequence[]) throwServerException(session, log, e);
+			return (List<GUISequence>) throwServerException(session, log, e);
 		}
 
 	}
 
 	@Override
-	public void removeBlockedEntities(long[] ids) throws ServerException {
+	public void removeBlockedEntities(List<Long> ids) throws ServerException {
 		Session session = validateSession();
 		if (session.getTenantId() != Tenant.DEFAULT_ID)
 			return;
@@ -1415,7 +1406,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	}
 
 	@Override
-	public void replicateUsersSettings(long masterUserId, Long[] userIds, boolean gui, boolean groups)
+	public void replicateUsersSettings(long masterUserId, List<Long> userIds, boolean gui, boolean groups)
 			throws ServerException {
 		Session session = validateSession();
 
@@ -1506,11 +1497,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	}
 
 	@Override
-	public void deleteTrustedDevices(String[] ids) throws ServerException {
+	public void deleteTrustedDevices(List<String> ids) throws ServerException {
 		Session session = validateSession();
-		if (ids == null || ids.length < 1)
-			return;
-
 		DeviceDAO dDao = (DeviceDAO) Context.get().getBean(DeviceDAO.class);
 		for (String id : ids)
 			try {
@@ -1651,14 +1639,14 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	}
 
 	@Override
-	public String[] validatePassword(String password, int minLength, int uppercaseChars, int lowercaseChars, int digits,
-			int specialChars, int maxSequenceSize, int maxOccurrences) {
+	public List<String> validatePassword(String password, int minLength, int uppercaseChars, int lowercaseChars,
+			int digits, int specialChars, int maxSequenceSize, int maxOccurrences) {
 		PasswordCriteria criteria = new PasswordCriteria(minLength, uppercaseChars, lowercaseChars, digits,
 				specialChars);
 		criteria.setMaxSequenceSize(maxSequenceSize);
 		criteria.setMaxOccurrences(maxOccurrences);
 
 		PasswordValidator validator = new PasswordValidator(criteria, null);
-		return validator.validate(password).toArray(new String[0]);
+		return validator.validate(password);
 	}
 }

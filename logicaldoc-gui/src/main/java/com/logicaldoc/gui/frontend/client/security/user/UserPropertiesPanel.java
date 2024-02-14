@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.security.user;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
@@ -320,14 +321,8 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private void prepareGroupsForm(boolean readOnly) {
-		List<String> groupIds = new ArrayList<>();
-		GUIGroup[] groups = user.getGroups();
-		if (groups != null && groups.length > 0) {
-			for (int i = 0; i < groups.length; i++)
-				if (groups[i].getType() == 0)
-					groupIds.add(Long.toString(groups[i].getId()));
-		}
-
+		List<String> groupIds = user.getGroups().stream().filter(g -> g.getType() == 0)
+				.map(g -> Long.toString(g.getId())).collect(Collectors.toList());
 		groupsItem = ItemFactory.newMultiComboBoxItem("groups", "groups", new GroupsDS(),
 				groupIds.toArray(new String[0]));
 		groupsItem.setDisabled(readOnly || ADMIN.equals(user.getUsername())
@@ -367,24 +362,24 @@ public class UserPropertiesPanel extends HLayout {
 				user.setNotifyCredentials(Boolean.parseBoolean(values.get("notifyCredentials").toString()));
 		}
 
-		String[] ids = groupsItem.getValues();
-		if (ids == null || ids.length == 0) {
+		String[] groupIds = groupsItem.getValues();
+		if (groupIds == null || groupIds.length == 0) {
 			SC.warn(I18N.message(USERMUSTBELONGTOGROUP));
 			GuiLog.warn(I18N.message(USERMUSTBELONGTOGROUP), I18N.message(USERMUSTBELONGTOGROUP));
 			return false;
 		}
 
-		GUIGroup[] groups = new GUIGroup[ids.length];
-		for (int i = 0; i < ids.length; i++) {
+		List<GUIGroup> groups = new ArrayList<>();
+		for (int i = 0; i < groupIds.length; i++) {
 			GUIGroup group = new GUIGroup();
-			group.setId(Long.parseLong(ids[i]));
-			groups[i] = group;
+			group.setId(Long.parseLong(groupIds[i]));
+			groups.add(group);
 		}
 		user.setGroups(groups);
 
 		if (Boolean.parseBoolean(values.get(READONLY).toString())) {
 			user.setType(GUIUser.TYPE_READONLY);
-			user.setGroups(new GUIGroup[0]);
+			user.setGroups(new ArrayList<>());
 		} else
 			user.setType(GUIUser.TYPE_DEFAULT);
 

@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.frontend.client.folder.copy;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -108,8 +109,7 @@ public class FolderCopyDialog extends Dialog {
 		String label = selectedSourceIds.size() + " " + I18N.message("folders").toLowerCase();
 
 		LD.ask(I18N.message("copy"),
-				I18N.message("copyask",
-						new String[] { label, folders.getSelectedRecord().getAttributeAsString("name") }),
+				I18N.message("copyask", Arrays.asList(label, folders.getSelectedRecord().getAttributeAsString("name"))),
 				(Boolean yes) -> {
 					if (Boolean.TRUE.equals(yes)) {
 						FolderNavigator.get().copyTo(tagetFolderId, "true".equals(form.getValueAsString(FOLDERS_ONLY)),

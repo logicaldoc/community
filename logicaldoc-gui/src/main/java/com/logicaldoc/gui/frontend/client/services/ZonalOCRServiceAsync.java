@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIOCRTemplate;
@@ -19,5 +21,5 @@ public interface ZonalOCRServiceAsync {
 
 	void rescheduleAll(AsyncCallback<Void> callback);
 
-	void markUnprocessable(long[] ids, AsyncCallback<Void> callback);
+	void markUnprocessable(List<Long> ids, AsyncCallback<Void> callback);
 }

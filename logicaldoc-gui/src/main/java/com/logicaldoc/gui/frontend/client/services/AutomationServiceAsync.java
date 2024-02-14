@@ -8,9 +8,9 @@ import com.logicaldoc.gui.common.client.beans.GUIAutomationTrigger;
 
 public interface AutomationServiceAsync {
 
-	void deleteRoutines(long[] ids, AsyncCallback<Void> callback);
+	void deleteRoutines(List<Long> ids, AsyncCallback<Void> callback);
 
-	void deleteTriggers(long[] ids, AsyncCallback<Void> callback);
+	void deleteTriggers(List<Long> ids, AsyncCallback<Void> callback);
 
 	void saveTrigger(GUIAutomationTrigger trigger, AsyncCallback<GUIAutomationTrigger> callback);
 

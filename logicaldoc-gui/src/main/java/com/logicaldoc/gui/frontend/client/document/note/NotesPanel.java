@@ -1,7 +1,5 @@
 package com.logicaldoc.gui.frontend.client.document.note;
 
-import java.util.Arrays;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
@@ -171,13 +169,10 @@ public class NotesPanel extends DocumentDetailTab {
 		ListGridRecord[] selection = notesGrid.getSelectedRecords();
 		if (selection == null || selection.length == 0)
 			return;
-		final Long[] ids = new Long[selection.length];
-		for (int i = 0; i < selection.length; i++)
-			ids[i] = selection[i].getAttributeAsLong("id");
 
 		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				DocumentService.Instance.get().deleteNotes(Arrays.asList(ids), new AsyncCallback<Void>() {
+				DocumentService.Instance.get().deleteNotes(GridUtil.getIds(selection), new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

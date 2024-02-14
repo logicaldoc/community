@@ -50,8 +50,8 @@ public class DropboxAuthorizationWizard extends Window {
 		setShowModalMask(true);
 		setTop(0);
 
-		HTMLFlow message = new HTMLFlow(I18N.message("authorizelogicaldochint", new String[] {
-				Session.get().getInfo().getBranding().getProduct(), authorizationUrl, authorizationUrl }));
+		HTMLFlow message = new HTMLFlow(I18N.message("authorizelogicaldochint",
+				Session.get().getInfo().getBranding().getProduct(), authorizationUrl, authorizationUrl));
 		message.setWidth100();
 
 		DynamicForm form = new DynamicForm();
@@ -96,7 +96,7 @@ public class DropboxAuthorizationWizard extends Window {
 						if (account != null) {
 							destroy();
 							SC.say(I18N.message("correctlyauthorized",
-									new String[] { Session.get().getInfo().getBranding().getProductName(), account }));
+									Session.get().getInfo().getBranding().getProductName(), account));
 						} else
 							SC.warn(I18N.message("unabletoauthorize"));
 					}

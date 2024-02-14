@@ -1,8 +1,5 @@
 package com.logicaldoc.gui.frontend.client.security.ldap;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
@@ -10,6 +7,7 @@ import com.logicaldoc.gui.common.client.beans.GUILDAPServer;
 import com.logicaldoc.gui.common.client.data.LDAPServersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
@@ -157,11 +155,8 @@ public class LDAPServersPanel extends AdminPanel {
 				event -> infoPanel.setMessage(I18N.message("showservers", Integer.toString(list.getTotalRows()))));
 
 		list.addDropCompleteHandler(event -> {
-			List<Long> ids = new ArrayList<>();
 			if (list.getRecords() != null && list.getRecords().length > 0) {
-				for (ListGridRecord rec : list.getRecords())
-					ids.add(rec.getAttributeAsLong("id"));
-				LDAPService.Instance.get().reorder(ids.toArray(new Long[0]), new AsyncCallback<Void>() {
+				LDAPService.Instance.get().reorder(GridUtil.getIds(list.getRecords()), new AsyncCallback<Void>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

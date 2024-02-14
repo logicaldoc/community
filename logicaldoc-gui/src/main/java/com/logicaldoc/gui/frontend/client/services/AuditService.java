@@ -70,7 +70,7 @@ public interface AuditService extends RemoteService {
 	 * 
 	 * @throws ServerException error in the server application
 	 */
-	public void deleteSubscriptions(long[] ids) throws ServerException;
+	public void deleteSubscriptions(List<Long> ids) throws ServerException;
 
 	public static class Instance {
 		private static AuditServiceAsync inst;

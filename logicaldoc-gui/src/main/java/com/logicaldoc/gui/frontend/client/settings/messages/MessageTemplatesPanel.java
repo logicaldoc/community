@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.settings.messages;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIMessageTemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -220,11 +223,11 @@ public class MessageTemplatesPanel extends VLayout {
 		copyFromDefault.setTitle(I18N.message("copyfromdefault"));
 		copyFromDefault.addClickHandler((MenuItemClickEvent event) -> {
 			ListGridRecord[] records = list.getSelectedRecords();
-			long[] ids = new long[records.length];
+			List<Long> ids = new ArrayList<>();
 			for (int i = 0; i < records.length; i++) {
 				// Avoid deletion of default templates
 				if (!"en".equals(records[i].getAttributeAsString(LANGUAGE)))
-					ids[i] = Long.parseLong(records[i].getAttributeAsString("id"));
+					ids.add(records[i].getAttributeAsLong("id"));
 			}
 
 			MessageService.Instance.get().deleteTemplates(ids, new AsyncCallback<Void>() {

@@ -27,7 +27,7 @@ public interface ContactService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void delete(long[] ids) throws ServerException;
+	public void delete(List<Long> ids) throws ServerException;
 
 	/**
 	 * Saves a contact in the database

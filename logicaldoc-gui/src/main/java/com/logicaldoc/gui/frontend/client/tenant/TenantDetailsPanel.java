@@ -220,8 +220,8 @@ public class TenantDetailsPanel extends VLayout {
 					tabSet.hideSave();
 					if (tenant != null) {
 						if (newTenant) {
-							SC.say(I18N.message("newtenantresume",
-									new String[] { tenant.getName(), tenant.getAdminUsername(), "admin" }));
+							SC.say(I18N.message("newtenantresume", tenant.getName(), tenant.getAdminUsername(),
+									"admin"));
 						}
 
 						TenantDetailsPanel.this.tenant = tenant;

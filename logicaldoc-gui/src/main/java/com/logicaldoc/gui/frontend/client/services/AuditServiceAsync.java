@@ -11,7 +11,7 @@ public interface AuditServiceAsync {
 
 	void subscribeDocuments(List<Long> docIds, List<String> events, Long user, Long group, AsyncCallback<Void> callback);
 
-	void deleteSubscriptions(long[] ids, AsyncCallback<Void> callback);
+	void deleteSubscriptions(List<Long> ids, AsyncCallback<Void> callback);
 
 	void update(List<Long> ids, boolean currentOnly, List<String> events, AsyncCallback<Void> callback);
 }

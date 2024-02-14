@@ -387,7 +387,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 					@Override
 					public void onSuccess(GUIFolder parent) {
 						LD.ask(I18N.message("inheritrights"),
-								I18N.message("inheritrightsask", new String[] { folder.getName(), parent.getName() }),
+								I18N.message("inheritrightsask", folder.getName(), parent.getName()),
 								(Boolean interitConfirmed) -> {
 									if (Boolean.TRUE.equals(interitConfirmed)) {
 										FolderService.Instance.get().inheritACL(folder.getId(), folder.getParentId(),

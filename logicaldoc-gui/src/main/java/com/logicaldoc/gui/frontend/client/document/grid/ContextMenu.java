@@ -464,8 +464,7 @@ public class ContextMenu extends Menu {
 	private void addCustomActionsItem(MenuItem customActionsItem) {
 		if (Feature.enabled(Feature.CUSTOM_ACTIONS)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.CUSTOM_ACTIONS)
-				&& Session.get().getUser().getCustomActions() != null
-				&& Session.get().getUser().getCustomActions().length > 0)
+				&& !Session.get().getUser().getCustomActions().isEmpty())
 			addItem(customActionsItem);
 	}
 
@@ -1149,7 +1148,7 @@ public class ContextMenu extends Menu {
 		Menu menu = new Menu();
 		item.setSubmenu(menu);
 
-		if (Session.get().getUser().getCustomActions() == null || Session.get().getUser().getCustomActions().length < 1)
+		if (Session.get().getUser().getCustomActions().isEmpty())
 			return item;
 
 		for (GUIMenu menuAction : Session.get().getUser().getCustomActions()) {

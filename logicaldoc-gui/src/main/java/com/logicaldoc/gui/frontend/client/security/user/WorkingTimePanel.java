@@ -1,6 +1,5 @@
 package com.logicaldoc.gui.frontend.client.security.user;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
@@ -57,8 +56,8 @@ public class WorkingTimePanel extends VLayout {
 
 	@Override
 	protected void onDraw() {
-		if (user.getWorkingTimes() != null && user.getWorkingTimes().length > 0) {
-			calendar.setChosenDate(user.getWorkingTimes()[0].getStart());
+		if (!user.getWorkingTimes().isEmpty()) {
+			calendar.setChosenDate(user.getWorkingTimes().get(0).getStart());
 			for (GUIWorkingTime wt : user.getWorkingTimes()) {
 				try {
 					calendar.addEvent(wt.getStart(), wt.getEnd(), wt.getLabel(), wt.getDescription());
@@ -164,21 +163,15 @@ public class WorkingTimePanel extends VLayout {
 
 	boolean validate() {
 		if (calendar != null) {
+			user.getWorkingTimes().clear();
 			CalendarEvent[] events = calendar.getData();
-			if (events != null && events.length > 0) {
-				ArrayList<GUIWorkingTime> wts = new ArrayList<>();
+			if (events != null && events.length > 0)
 				for (CalendarEvent calendarEvent : events) {
 					GUIWorkingTime wt = new GUIWorkingTime(calendarEvent.getName(), calendarEvent.getStartDate(),
 							calendarEvent.getEndDate());
 					wt.setDescription(calendarEvent.getDescription());
-					wts.add(wt);
+					user.getWorkingTimes().add(wt);
 				}
-				if (wts.isEmpty())
-					user.setWorkingTimes(new GUIWorkingTime[0]);
-				else
-					user.setWorkingTimes(wts.toArray(new GUIWorkingTime[0]));
-			} else
-				user.setWorkingTimes(new GUIWorkingTime[0]);
 		}
 
 		return true;

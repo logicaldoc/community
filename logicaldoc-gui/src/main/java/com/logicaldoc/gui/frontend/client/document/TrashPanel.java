@@ -117,7 +117,7 @@ public class TrashPanel extends VLayout {
 	}
 
 	private void restoreFolder(final long id) {
-		FolderService.Instance.get().restore(new Long[] { id }, FolderController.get().getCurrentFolder().getId(),
+		FolderService.Instance.get().restore(Arrays.asList(id), FolderController.get().getCurrentFolder().getId(),
 				new AsyncCallback<Void>() {
 
 					@Override
@@ -217,19 +217,18 @@ public class TrashPanel extends VLayout {
 						}
 					});
 				if (!folderIds.isEmpty())
-					FolderService.Instance.get().deleteFromTrash(folderIds.toArray(new Long[0]),
-							new AsyncCallback<Void>() {
+					FolderService.Instance.get().deleteFromTrash(folderIds, new AsyncCallback<Void>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-								@Override
-								public void onSuccess(Void arg) {
-									refresh();
-								}
-							});
+						@Override
+						public void onSuccess(Void arg) {
+							refresh();
+						}
+					});
 			}
 		});
 	}

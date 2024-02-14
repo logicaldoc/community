@@ -5,6 +5,7 @@ import com.logicaldoc.gui.common.client.data.DocumentsDS;
 import com.logicaldoc.gui.common.client.data.DocumentsDSParameters;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -215,14 +216,9 @@ public class ZonalOCRQueuePanel extends VLayout {
 		MenuItem markUnprocessable = new MenuItem();
 		markUnprocessable.setTitle(I18N.message("markunprocessable"));
 		markUnprocessable.addClickHandler(event -> {
-			if (selection == null)
+			if (selection == null || selection.length < 1)
 				return;
-			final long[] ids = new long[selection.length];
-			for (int j = 0; j < selection.length; j++) {
-				ids[j] = Long.parseLong(selection[j].getAttribute("id"));
-			}
-
-			ZonalOCRService.Instance.get().markUnprocessable(ids, new AsyncCallback<Void>() {
+			ZonalOCRService.Instance.get().markUnprocessable(GridUtil.getIds(selection), new AsyncCallback<Void>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

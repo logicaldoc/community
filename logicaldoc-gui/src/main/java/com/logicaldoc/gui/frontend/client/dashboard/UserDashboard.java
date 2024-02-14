@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.dashboard;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
@@ -107,7 +110,7 @@ public class UserDashboard extends VLayout {
 	public void save() {
 		Portlet[][][] portlets = portal.getPortletArray();
 
-		GUIDashlet[] dashlets = new GUIDashlet[portal.getPortlets().length];
+		List<GUIDashlet> dashlets = new ArrayList<>();
 
 		int q = 0;
 		for (int column = 0; column < portlets.length; column++)
@@ -118,7 +121,7 @@ public class UserDashboard extends VLayout {
 					guiDashlet.setColumn(column);
 					guiDashlet.setRow(row);
 					guiDashlet.setIndex(i);
-					dashlets[q++] = guiDashlet;
+					dashlets.add(guiDashlet);
 				}
 
 		Session.get().getUser().setDashlets(dashlets);

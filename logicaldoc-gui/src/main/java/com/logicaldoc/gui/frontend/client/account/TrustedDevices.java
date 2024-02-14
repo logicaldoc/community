@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.account;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.data.DevicesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -116,15 +119,15 @@ public class TrustedDevices extends com.smartgwt.client.widgets.Window {
 		final ListGridRecord[] selection = list.getSelectedRecords();
 		if (selection == null || selection.length == 0)
 			return;
-		final String[] ids = new String[selection.length];
+		final List<String> ids = new ArrayList<>();
 		for (int i = 0; i < selection.length; i++)
-			ids[i] = selection[i].getAttributeAsString("id");
+			ids.add(selection[i].getAttributeAsString("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(
-				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+					if (Boolean.TRUE.equals(answer)) {
 						SecurityService.Instance.get().deleteTrustedDevices(ids, new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {

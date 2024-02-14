@@ -6,6 +6,7 @@ import com.logicaldoc.gui.common.client.data.VersionsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
@@ -129,33 +130,30 @@ public class VersionsPanel extends VLayout {
 		delete.addClickHandler(event -> {
 			if (selection == null || selection.length == 0)
 				return;
-			final Long[] ids = new Long[selection.length];
-			for (int i = 0; i < selection.length; i++) {
-				ids[i] = Long.parseLong(selection[i].getAttribute("id"));
-			}
 
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-				if (Boolean.TRUE.equals(value)) {
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+				if (Boolean.TRUE.equals(answer)) {
 					listGrid.removeSelectedData();
 					listGrid.deselectAllRecords();
 
-					ImpexService.Instance.get().deleteVersions(archiveId, ids, new AsyncCallback<GUIArchive>() {
+					ImpexService.Instance.get().deleteVersions(archiveId, GridUtil.getIds(selection),
+							new AsyncCallback<GUIArchive>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
 
-						@Override
-						public void onSuccess(GUIArchive archive) {
-							ListGridRecord selectedRecord = archivesList.getList().getSelectedRecord();
-							if (selectedRecord != null) {
-								selectedRecord.setAttribute("size", archive.getSize());
-								archivesList.getList()
-										.refreshRow(archivesList.getList().getRecordIndex(selectedRecord));
-							}
-						}
-					});
+								@Override
+								public void onSuccess(GUIArchive archive) {
+									ListGridRecord selectedRecord = archivesList.getList().getSelectedRecord();
+									if (selectedRecord != null) {
+										selectedRecord.setAttribute("size", archive.getSize());
+										archivesList.getList()
+												.refreshRow(archivesList.getList().getRecordIndex(selectedRecord));
+									}
+								}
+							});
 				}
 			});
 		});

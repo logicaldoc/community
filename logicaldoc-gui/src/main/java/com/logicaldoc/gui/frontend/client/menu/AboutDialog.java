@@ -63,10 +63,8 @@ public class AboutDialog extends Window {
 		copyright.setHeight(20);
 		copyright.setAlign(Alignment.CENTER);
 
-		Label trademark = new Label(I18N.message("copyrights",
-				new String[] { Session.get().getInfo().getBranding().getProduct(),
-						Session.get().getInfo().getBranding().getProduct(),
-						Session.get().getInfo().getBranding().getVendor() }));
+		Label trademark = new Label(I18N.message("copyrights", Session.get().getInfo().getBranding().getProduct(),
+				Session.get().getInfo().getBranding().getProduct(), Session.get().getInfo().getBranding().getVendor()));
 		trademark.setWidth("80%");
 		trademark.setHeight(40);
 		trademark.setAlign(Alignment.CENTER);

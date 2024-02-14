@@ -145,7 +145,7 @@ public class LDAPBrowser extends VLayout {
 	private void onSearch() {
 		users.setData();
 
-		final Map<String, Object> values =  vm.getValues();
+		final Map<String, Object> values = vm.getValues();
 
 		if (Boolean.TRUE.equals(vm.validate())) {
 			String username = (String) values.get(USERNAME);
@@ -214,8 +214,8 @@ public class LDAPBrowser extends VLayout {
 				@Override
 				public void onSuccess(GUIValue[] report) {
 					LD.clearPrompt();
-					String message = I18N.message("importreport",
-							new String[] { report[0].getValue(), report[1].getValue(), report[2].getValue() });
+					String message = I18N.message("importreport", report[0].getValue(), report[1].getValue(),
+							report[2].getValue());
 					if ("0".equals(report[2].getValue()))
 						GuiLog.info(I18N.message("importcompleted"), message);
 					else

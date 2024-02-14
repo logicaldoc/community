@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.common.client.i18n;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -63,14 +65,14 @@ public class I18N {
 	}
 
 	public static String message(String key, String val1, String val2, String val3) {
-		return message(key, new String[] { val1, val2, val3 });
+		return message(key, Arrays.asList(val1, val2, val3));
 	}
 
-	public static String message(String key, String[] vals) {
+	public static String message(String key, List<String> vals) {
 		String tmp = message(key);
 		try {
-			for (int i = 0; i < vals.length; i++) {
-				tmp = tmp.replace("{" + i + "}", vals[i]);
+			for (int i = 0; i < vals.size(); i++) {
+				tmp = tmp.replace("{" + i + "}", vals.get(i));
 			}
 		} catch (Exception t) {
 			// Nothing to do

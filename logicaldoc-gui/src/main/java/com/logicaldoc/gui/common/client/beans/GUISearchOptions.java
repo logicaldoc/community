@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -49,8 +50,6 @@ public class GUISearchOptions implements Serializable {
 
 	private Long folder = null;
 
-	private List<String> fields = Constants.getFulltextDefaultFields();
-
 	private String language = null;
 
 	private Date dateFrom = null;
@@ -69,15 +68,17 @@ public class GUISearchOptions implements Serializable {
 
 	private String folderName;
 
-	private GUICriterion[] criteria;
-
 	private String topOperator;
-
-	private List<Long> filterIds;
 
 	private int caseSensitive = 1;
 
 	private int retrieveAliases = 0;
+
+	private List<Long> filterIds;
+
+	private List<GUICriterion> criteria = new ArrayList<>();
+
+	private List<String> fields = Constants.getFulltextDefaultFields();
 
 	/** Creates a new instance of SearchOptions */
 	public GUISearchOptions() {
@@ -261,11 +262,11 @@ public class GUISearchOptions implements Serializable {
 		this.folderName = folderName;
 	}
 
-	public GUICriterion[] getCriteria() {
+	public List<GUICriterion> getCriteria() {
 		return criteria;
 	}
 
-	public void setCriteria(GUICriterion[] criteria) {
+	public void setCriteria(List<GUICriterion> criteria) {
 		this.criteria = criteria;
 	}
 

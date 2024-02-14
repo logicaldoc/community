@@ -56,7 +56,7 @@ public class ReplicateUserSettings extends Window {
 			if (Boolean.FALSE.equals(vm.hasErrors())) {
 				long masterUserId = Long.parseLong(vm.getValueAsString("user"));
 				LD.contactingServer();
-				SecurityService.Instance.get().replicateUsersSettings(masterUserId, userIds.toArray(new Long[0]),
+				SecurityService.Instance.get().replicateUsersSettings(masterUserId, userIds,
 						userInterface.getValueAsBoolean(), groups.getValueAsBoolean(), new AsyncCallback<Void>() {
 
 							@Override

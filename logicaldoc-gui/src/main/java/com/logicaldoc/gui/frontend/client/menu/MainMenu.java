@@ -208,7 +208,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			} else
 				criterion.setStringValue(value);
 			options.setCaseSensitive(0);
-			options.setCriteria(new GUICriterion[] { criterion });
+			options.setCriteria(Arrays.asList(criterion));
 		}
 
 		Search.get().setOptions(options);

@@ -305,7 +305,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 				criterion.setOperator(crit.getOperator().toLowerCase());
 				criteria.add(criterion);
 			}
-			op.setCriteria(criteria.toArray(new GUICriterion[0]));
+			op.setCriteria(criteria);
 		}
 
 		op.setFilterIds(new ArrayList<>(searchOptions.getFilterIds()));

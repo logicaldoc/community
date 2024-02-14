@@ -228,11 +228,11 @@ public class WorkflowSecurity extends Window {
 	/**
 	 * Creates an array of all the ACL
 	 * 
-	 * @return the array of rights
+	 * @return the list of ACEs
 	 */
-	public GUIAccessControlEntry[] getACL() {
+	public List<GUIAccessControlEntry> getACL() {
 		int totalRecords = list.getRecordList().getLength();
-		List<GUIAccessControlEntry> tmp = new ArrayList<>();
+		List<GUIAccessControlEntry> acl = new ArrayList<>();
 
 		for (int i = 0; i < totalRecords; i++) {
 			Record rec = list.getRecordList().get(i);
@@ -245,10 +245,10 @@ public class WorkflowSecurity extends Window {
 			right.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
 			right.setWrite("true".equals(rec.getAttributeAsString(WRITE)));
 
-			tmp.add(right);
+			acl.add(right);
 		}
 
-		return tmp.toArray(new GUIAccessControlEntry[0]);
+		return acl;
 	}
 
 	@Override
@@ -287,8 +287,7 @@ public class WorkflowSecurity extends Window {
 	}
 
 	public void onSave() {
-		// Apply all rights
-		workflow.setRights(this.getACL());
+		workflow.setAccessControlList(getACL());
 		destroy();
 	}
 }

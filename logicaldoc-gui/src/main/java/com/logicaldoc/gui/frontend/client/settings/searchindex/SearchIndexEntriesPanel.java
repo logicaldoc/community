@@ -127,8 +127,8 @@ public class SearchIndexEntriesPanel extends VLayout {
 				 * with search time and the list of hits
 				 */
 				NumberFormat format = NumberFormat.getFormat("#.###");
-				total.setValue(I18N.message("nresultsinseconds", new String[] { "" + result.getEstimatedHits(),
-						format.format((double) Search.get().getTime() / (double) 1000) }));
+				total.setValue(I18N.message("nresultsinseconds", Long.toString(result.getEstimatedHits()),
+						format.format((double) Search.get().getTime() / (double) 1000)));
 
 				entriesGrid.setDocuments(result.getHits());
 				LD.clearPrompt();

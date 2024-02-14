@@ -89,8 +89,8 @@ public interface SecurityService extends RemoteService {
 	 * 
 	 * @return the reasons for the failure or empty
 	 */
-	public String[] validatePassword(String password, int length, int uppercaseChars, int lowercaseChars, int digits,
-			int specialChars, int maxSequenceSize, int maxOccurrences);
+	public List<String> validatePassword(String password, int length, int uppercaseChars, int lowercaseChars,
+			int digits, int specialChars, int maxSequenceSize, int maxOccurrences);
 
 	/**
 	 * Changes the status of a user
@@ -140,7 +140,7 @@ public interface SecurityService extends RemoteService {
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */
-	public void replicateUsersSettings(long masterUserId, Long[] userIds, boolean gui, boolean groups)
+	public void replicateUsersSettings(long masterUserId, List<Long> userIds, boolean gui, boolean groups)
 			throws ServerException;
 
 	/**
@@ -211,11 +211,11 @@ public interface SecurityService extends RemoteService {
 	 * Removes users from a group
 	 * 
 	 * @param groupId identifier of the group
-	 * @param userIds array of user identifiers
+	 * @param userIds user identifiers
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */
-	public void removeFromGroup(long groupId, long[] userIds) throws ServerException;
+	public void removeFromGroup(long groupId, List<Long> userIds) throws ServerException;
 
 	/**
 	 * Adds a user to a group
@@ -288,7 +288,7 @@ public interface SecurityService extends RemoteService {
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */
-	public GUIMenu[] getMenus(long parentId, String locale, boolean enabledOnly) throws ServerException;
+	public List<GUIMenu> getMenus(long parentId, String locale, boolean enabledOnly) throws ServerException;
 
 	/**
 	 * Saves a set of menus
@@ -298,7 +298,7 @@ public interface SecurityService extends RemoteService {
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */
-	public void saveMenus(GUIMenu[] menus, String locale) throws ServerException;
+	public void saveMenus(List<GUIMenu> menus, String locale) throws ServerException;
 
 	/**
 	 * Saves a menu
@@ -331,7 +331,7 @@ public interface SecurityService extends RemoteService {
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */
-	public GUIUser[] searchUsers(String username, String groupId) throws ServerException;
+	public List<GUIUser> searchUsers(String username, String groupId) throws ServerException;
 
 	/**
 	 * Retrieves the list of actually blocked usernames and IPs detected as
@@ -341,7 +341,7 @@ public interface SecurityService extends RemoteService {
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */
-	public GUISequence[] loadBlockedEntities() throws ServerException;
+	public List<GUISequence> loadBlockedEntities() throws ServerException;
 
 	/**
 	 * Removes blocked entries detected as Brute Force Attack
@@ -350,7 +350,7 @@ public interface SecurityService extends RemoteService {
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */
-	public void removeBlockedEntities(long[] id) throws ServerException;
+	public void removeBlockedEntities(List<Long> id) throws ServerException;
 
 	/**
 	 * Permanently trusts the current device for the current user
@@ -392,7 +392,7 @@ public interface SecurityService extends RemoteService {
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */
-	public void deleteTrustedDevices(String[] deviceIds) throws ServerException;
+	public void deleteTrustedDevices(List<String> deviceIds) throws ServerException;
 
 	/**
 	 * Downloads the most recent version of the Geolocation database

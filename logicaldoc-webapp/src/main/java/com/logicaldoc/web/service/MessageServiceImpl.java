@@ -43,7 +43,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public void delete(long[] ids) throws ServerException {
+	public void delete(List<Long> ids) throws ServerException {
 		validateSession();
 		Context context = Context.get();
 		SystemMessageDAO dao = (SystemMessageDAO) context.getBean(SystemMessageDAO.class);
@@ -113,11 +113,11 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 	}
 
 	@Override
-	public void save(GUIMessage message, long[] recipientIds) throws ServerException {
+	public void save(GUIMessage message, List<Long> recipientIds) throws ServerException {
 		Session session = validateSession();
 
 		try {
-			for (long id : recipientIds)
+			for (Long id : recipientIds)
 				saveMessage(message, session, id);
 		} catch (Exception t) {
 			throwServerException(session, log, t);
@@ -238,12 +238,12 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 	}
 
 	@Override
-	public void deleteTemplates(long[] ids) throws ServerException {
+	public void deleteTemplates(List<Long> ids) throws ServerException {
 		Session session = validateSession();
 
 		try {
 			MessageTemplateDAO dao = (MessageTemplateDAO) Context.get().getBean(MessageTemplateDAO.class);
-			for (long id : ids) {
+			for (Long id : ids) {
 				MessageTemplate template = dao.findById(id);
 				if (template != null && !"en".equals(template.getLanguage()))
 					delete(id);

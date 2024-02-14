@@ -9,6 +9,7 @@ import com.logicaldoc.gui.common.client.controllers.UserObserver;
 import com.logicaldoc.gui.common.client.data.MessagesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
@@ -178,16 +179,12 @@ public class MessagesPanel extends VLayout implements UserObserver {
 		ListGridRecord[] selection = grid.getSelectedRecords();
 		if (selection == null || selection.length == 0)
 			return;
-		final long[] ids = new long[selection.length];
-		for (int i = 0; i < selection.length; i++) {
-			ids[i] = Long.parseLong(selection[i].getAttribute("id"));
-		}
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				MessageService.Instance.get().delete(ids, new AsyncCallback<Void>() {
+				MessageService.Instance.get().delete(GridUtil.getIds(selection), new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
