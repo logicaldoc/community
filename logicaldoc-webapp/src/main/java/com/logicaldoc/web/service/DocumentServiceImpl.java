@@ -223,7 +223,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public GUIDocument[] addDocuments(boolean importZip, String charset, boolean immediateIndexing,
+	public List<GUIDocument> addDocuments(boolean importZip, String charset, boolean immediateIndexing,
 			final GUIDocument metadata) throws ServerException {
 		final Session session = validateSession();
 
@@ -243,9 +243,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				log.error(e.getMessage(), e);
 			}
 		}, session)) {
-			return createdDocs.toArray(new GUIDocument[0]);
+			return createdDocs;
 		} else {
-			return new GUIDocument[0];
+			return new ArrayList<>();
 		}
 	}
 
@@ -535,8 +535,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public GUIDocument[] addDocuments(String language, long folderId, boolean importZip, String charset,
+	public List<GUIDocument> addDocuments(String language, long folderId, boolean importZip, String charset,
 			boolean immediateIndexing, final Long templateId) throws ServerException {
 		Session session = validateSession();
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -550,7 +551,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			metadata.setTemplateId(templateId);
 			return addDocuments(importZip, charset, immediateIndexing, metadata);
 		} catch (PermissionException | PersistenceException | ServerException e) {
-			return (GUIDocument[]) throwServerException(session, log, e);
+			return (List<GUIDocument>) throwServerException(session, log, e);
 		}
 	}
 
@@ -872,8 +873,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public GUIVersion[] getVersionsById(long id1, long id2) throws ServerException {
+	public List<GUIVersion> getVersionsById(long id1, long id2) throws ServerException {
 		Session session = validateSession();
 
 		VersionDAO versDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
@@ -881,7 +883,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		try {
 			docVersion = versDao.findById(id1);
 		} catch (PersistenceException e) {
-			return (GUIVersion[]) throwServerException(session, null, e);
+			return (List<GUIVersion>) throwServerException(session, null, e);
 		}
 		if (docVersion != null)
 			versDao.initialize(docVersion);
@@ -929,7 +931,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		try {
 			docVersion = versDao.findById(id2);
 		} catch (PersistenceException e) {
-			return (GUIVersion[]) throwServerException(session, null, e);
+			return (List<GUIVersion>) throwServerException(session, null, e);
 		}
 		if (docVersion != null)
 			versDao.initialize(docVersion);
@@ -973,19 +975,15 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			version2.setFolder(folder2);
 		}
 
-		GUIVersion[] versions = null;
+		List<GUIVersion> versions = new ArrayList<>();
 		if (version1 != null && version2 != null) {
-			versions = new GUIVersion[2];
-			versions[0] = version1;
-			versions[1] = version2;
+			versions.add(version1);
+			versions.add(version2);
 		} else if (version1 != null) {
-			versions = new GUIVersion[1];
-			versions[0] = version1;
+			versions.add(version1);
 		} else if (version2 != null) {
-			versions = new GUIVersion[1];
-			versions[0] = version2;
-		} else
-			return new GUIVersion[0];
+			versions.add(version2);
+		}
 
 		return versions;
 	}
@@ -1835,15 +1833,16 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public GUIDocumentNote[] getNotes(long docId, String fileVersion, Collection<String> types) throws ServerException {
+	public List<GUIDocumentNote> getNotes(long docId, String fileVersion, Collection<String> types) throws ServerException {
 		Session session = validateSession();
 
 		Document document;
 		try {
 			document = retrieveDocument(docId);
 		} catch (PersistenceException e) {
-			return (GUIDocumentNote[]) throwServerException(session, log, e);
+			return (List<GUIDocumentNote>) throwServerException(session, log, e);
 		}
 
 		if (document == null)
@@ -1882,23 +1881,20 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			guiNotes.add(guiNote);
 		}
 
-		return guiNotes.toArray(new GUIDocumentNote[0]);
+		return guiNotes;
 	}
 
 	@Override
-	public void saveNotes(long docId, GUIDocumentNote[] notes, Collection<String> types) throws ServerException {
+	public void saveNotes(long docId, List<GUIDocumentNote> notes, Collection<String> types) throws ServerException {
 		Session session = validateSession();
 
 		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
-		List<GUIDocumentNote> notesList = new ArrayList<>();
 		Document document = null;
 		try {
 			document = retrieveDocument(docId);
 			if (document == null)
 				throw new ServerException(UNEXISTING_DOCUMENT + " " + docId);
 
-			if (notes != null && notes.length > 0)
-				notesList = Arrays.asList(notes);
 
 			/*
 			 * Check for deletions
@@ -1906,7 +1902,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			List<DocumentNote> documentNotes = dao.findByDocIdAndTypes(document.getId(), document.getFileVersion(),
 					types);
 			List<Long> actualNoteIds = documentNotes.stream().map(PersistentObject::getId).toList();
-			List<Long> noteIds = notesList.stream().map(GUIDocumentNote::getId).toList();
+			List<Long> noteIds = notes.stream().map(GUIDocumentNote::getId).toList();
 			for (Long actualNoteId : actualNoteIds)
 				if (!noteIds.contains(actualNoteId))
 					dao.delete(actualNoteId);
@@ -1920,7 +1916,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		/*
 		 * Do the updates / inserts
 		 */
-		for (GUIDocumentNote guiNote : notesList) {
+		for (GUIDocumentNote guiNote : notes) {
 			saveNote(session, document, guiNote);
 		}
 
@@ -2028,7 +2024,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public GUIDocument[] bulkUpdate(List<Long> ids, GUIDocument vo, boolean ignoreEmptyFields) throws ServerException {
+	public List<GUIDocument> bulkUpdate(List<Long> ids, GUIDocument vo, boolean ignoreEmptyFields)
+			throws ServerException {
 		Session session = validateSession();
 
 		List<GUIDocument> updatedDocs = new ArrayList<>();
@@ -2045,7 +2042,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				log.error(e.getMessage(), e);
 			}
 		}
-		return updatedDocs.toArray(new GUIDocument[0]);
+		return updatedDocs;
 	}
 
 	private GUIDocument bulkUpdateDocument(long docId, GUIDocument model, boolean ignoreEmptyFields, Session session)
@@ -2329,8 +2326,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public String[] createDownloadTicket(long docId, int type, String suffix, Integer expireHours, Date expireDate,
+	public List<String> createDownloadTicket(long docId, int type, String suffix, Integer expireHours, Date expireDate,
 			Integer maxDownloads, Integer maxViews) throws ServerException {
 		Session session = validateSession();
 
@@ -2356,15 +2354,15 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 			ticket = manager.createTicket(ticket, transaction);
 
-			String[] result = new String[3];
-			result[0] = ticket.getTicketId();
-			result[1] = ticket.getUrl();
-			result[2] = new URI(
-					ticket.getUrl().replace(urlPrefix, Context.get().getProperties().getProperty("server.url")))
-							.normalize().toString();
+			List<String> result = new ArrayList<>();
+			result.add(ticket.getTicketId());
+			result.add(ticket.getUrl());
+			result.add(
+					new URI(ticket.getUrl().replace(urlPrefix, Context.get().getProperties().getProperty("server.url")))
+							.normalize().toString());
 			return result;
 		} catch (PermissionException | PersistenceException | URISyntaxException e) {
-			return (String[]) throwServerException(session, log, e);
+			return (List<String>) throwServerException(session, log, e);
 		}
 	}
 

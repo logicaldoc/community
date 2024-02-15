@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.personal.contacts;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -192,7 +193,7 @@ public class ContactsImportSettings extends Window {
 		if (form.validate()) {
 			LD.contactingServer();
 			try {
-				ContactService.Instance.get().parseContacts(true, getParseContactsParameters(), new AsyncCallback<GUIContact[]>() {
+				ContactService.Instance.get().parseContacts(true, getParseContactsParameters(), new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -201,7 +202,7 @@ public class ContactsImportSettings extends Window {
 							}
 
 							@Override
-							public void onSuccess(GUIContact[] contacts) {
+							public void onSuccess(List<GUIContact> contacts) {
 								LD.clearPrompt();
 								ContactsImportPreview preview = new ContactsImportPreview(ContactsImportSettings.this);
 								preview.show();

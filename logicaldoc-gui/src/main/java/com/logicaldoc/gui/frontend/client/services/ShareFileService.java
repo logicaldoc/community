@@ -31,7 +31,7 @@ public interface ShareFileService extends RemoteService {
 	 */
 	public boolean exportDocuments(String targetFolder, List<Long> folderIds, List<Long> docIds) throws ServerException;
 
-	public int importDocuments(long targetFolder, String[] itemIds) throws ServerException;
+	public int importDocuments(long targetFolder, List<String> itemIds) throws ServerException;
 
 	/**
 	 * Retrieve the settings saved for connecting to FileShare
@@ -40,7 +40,7 @@ public interface ShareFileService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public String[] loadSettings() throws ServerException;
+	public List<String> loadSettings() throws ServerException;
 
 	/**
 	 * Saves the settings into the database and returns the authorization URL

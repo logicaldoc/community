@@ -123,20 +123,19 @@ public class JobsPanel extends VLayout {
 							selectedJobs.add(
 									new GUIValue(rec.getAttributeAsString(TRIGGER), rec.getAttributeAsString("group")));
 
-						SystemService.Instance.get().unscheduleJobs(selectedJobs.toArray(new GUIValue[0]),
-								new AsyncCallback<Void>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										LD.clearPrompt();
-										GuiLog.serverError(caught);
-									}
+						SystemService.Instance.get().unscheduleJobs(selectedJobs, new AsyncCallback<>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								LD.clearPrompt();
+								GuiLog.serverError(caught);
+							}
 
-									@Override
-									public void onSuccess(Void result) {
-										LD.clearPrompt();
-										refresh();
-									}
-								});
+							@Override
+							public void onSuccess(Void result) {
+								LD.clearPrompt();
+								refresh();
+							}
+						});
 					}
 				}));
 

@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.settings;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
@@ -262,7 +263,7 @@ public class StoragesPanel extends VLayout {
 	}
 
 	private void doRemoveStorage(int selectedStorageId) {
-		SettingService.Instance.get().removeStorage(selectedStorageId, new AsyncCallback<String[]>() {
+		SettingService.Instance.get().removeStorage(selectedStorageId, new AsyncCallback<List<String>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -270,18 +271,11 @@ public class StoragesPanel extends VLayout {
 			}
 
 			@Override
-			public void onSuccess(String[] paths) {
-				if (paths != null && paths.length > 0) {
-					StringBuilder report = new StringBuilder("<ul>");
-					for (String path : paths) {
-						report.append("<li>");
-						report.append(path);
-						report.append("</li>");
-					}
-					report.append("</ul>");
-
-					SC.warn(I18N.message("foldersusingstorage", "" + selectedStorageId)
-							+ Util.padLeft(report.toString(), 1000));
+			public void onSuccess(List<String> paths) {
+				if (!paths.isEmpty()) {
+					SC.warn(I18N.message("foldersusingstorage", "" + selectedStorageId) + Util.padLeft("<ul>"
+							+ paths.stream().map(p -> "<li>" + p + "</li>").collect(Collectors.joining()) + "</ul>",
+							1000));
 				} else {
 					refresh();
 				}

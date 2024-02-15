@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.document.note;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -101,20 +100,19 @@ public abstract class AbstractAnnotationsWindow extends Window {
 		setShowModalMask(true);
 		centerInPage();
 
-		DocumentService.Instance.get().getNotes(document.getId(), fileVersion, types,
-				new AsyncCallback<GUIDocumentNote[]>() {
+		DocumentService.Instance.get().getNotes(document.getId(), fileVersion, types, new AsyncCallback<>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(GUIDocumentNote[] nts) {
-						notes.addAll(Arrays.asList(nts));
-						initGUI();
-					}
-				});
+			@Override
+			public void onSuccess(List<GUIDocumentNote> nts) {
+				notes.addAll(nts);
+				initGUI();
+			}
+		});
 	}
 
 	protected void showAnnotations(int page) {
@@ -186,18 +184,17 @@ public abstract class AbstractAnnotationsWindow extends Window {
 	 */
 	protected void onSave() {
 		captureNotesPosition();
-		DocumentService.Instance.get().saveNotes(document.getId(), notes.toArray(new GUIDocumentNote[0]), types,
-				new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+		DocumentService.Instance.get().saveNotes(document.getId(), notes, types, new AsyncCallback<>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(Void arg0) {
-						onNotesSaved();
-					}
-				});
+			@Override
+			public void onSuccess(Void arg) {
+				onNotesSaved();
+			}
+		});
 	}
 
 	protected void initGUI() {
@@ -257,7 +254,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 	protected abstract void prepareAdditionalActions(ToolStrip toolStrip);
 
 	/**
-	 * Retrieves the internal panel containing the image 
+	 * Retrieves the internal panel containing the image
 	 * 
 	 * @return panel containing the image
 	 */

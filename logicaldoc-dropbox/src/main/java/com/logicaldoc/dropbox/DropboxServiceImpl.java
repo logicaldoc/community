@@ -251,7 +251,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 	}
 
 	@Override
-	public int importDocuments(long targetFolder, String[] paths) throws ServerException {
+	public int importDocuments(long targetFolder, List<String> paths) throws ServerException {
 		Session session = DropboxServiceImpl.validateSession(getThreadLocalRequest());
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 

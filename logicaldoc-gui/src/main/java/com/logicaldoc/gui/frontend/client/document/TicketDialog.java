@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.document;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
@@ -158,7 +159,7 @@ public class TicketDialog extends Window {
 
 		DocumentService.Instance.get().createDownloadTicket(document.getId(),
 				Integer.parseInt(form.getValueAsString(ACTION)), suffix, expireHours, date, maxDownloads, maxViews,
-				new AsyncCallback<String[]>() {
+				new AsyncCallback<List<String>>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -167,9 +168,9 @@ public class TicketDialog extends Window {
 					}
 
 					@Override
-					public void onSuccess(String[] ret) {
+					public void onSuccess(List<String> ret) {
 						destroy();
-						new TicketDisplay(ret[0], ret[1], ret[2]).show();
+						new TicketDisplay(ret.get(0), ret.get(1), ret.get(2)).show();
 					}
 				});
 	}

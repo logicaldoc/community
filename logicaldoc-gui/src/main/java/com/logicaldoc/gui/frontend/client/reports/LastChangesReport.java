@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -186,7 +187,8 @@ public class LastChangesReport extends AdminPanel {
 		eventForm.setColWidths(1, "*");
 
 		// Event
-		SelectItem event = ItemFactory.newEventsSelector(EVENT, I18N.message(EVENT), null, true, true, true, true, true);
+		SelectItem event = ItemFactory.newEventsSelector(EVENT, I18N.message(EVENT), null, true, true, true, true,
+				true);
 		event.setColSpan(2);
 		event.setEndRow(true);
 
@@ -303,12 +305,12 @@ public class LastChangesReport extends AdminPanel {
 	private void onSearch() {
 		histories.setData();
 
-		final Map<String, Object> values =  vm.getValues();
+		final Map<String, Object> values = vm.getValues();
 
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
-		String[] eventValues = getEvents(values);
+		List<String> eventValues = getEvents(values);
 
 		Long userId = getUserId(values);
 
@@ -328,7 +330,7 @@ public class LastChangesReport extends AdminPanel {
 		doSearch(eventValues, userId, fromValue, tillValue, sid, displayMaxValue);
 	}
 
-	private String[] getEvents(final Map<String, Object> values) {
+	private List<String> getEvents(final Map<String, Object> values) {
 		String[] eventValues = new String[0];
 		if (values.get(EVENT) != null) {
 			String buf = values.get(EVENT).toString().trim().toLowerCase();
@@ -337,7 +339,7 @@ public class LastChangesReport extends AdminPanel {
 			buf = buf.replace(" ", "");
 			eventValues = buf.split(",");
 		}
-		return eventValues;
+		return Arrays.asList(eventValues);
 	}
 
 	private Long getUserId(final Map<String, Object> values) {
@@ -362,11 +364,11 @@ public class LastChangesReport extends AdminPanel {
 		return displayMaxValue;
 	}
 
-	private void doSearch(String[] eventValues, Long userId, Date fromValue, Date tillValue, String sid,
+	private void doSearch(List<String> eventValues, Long userId, Date fromValue, Date tillValue, String sid,
 			int displayMaxValue) {
 		LD.contactingServer();
 		SystemService.Instance.get().search(userId, fromValue, tillValue, displayMaxValue, sid, eventValues,
-				folder.getFolderId(), new AsyncCallback<GUIHistory[]>() {
+				folder.getFolderId(), new AsyncCallback<List<GUIHistory>>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -375,33 +377,31 @@ public class LastChangesReport extends AdminPanel {
 					}
 
 					@Override
-					public void onSuccess(GUIHistory[] result) {
+					public void onSuccess(List<GUIHistory> result) {
 						LD.clearPrompt();
 
-						if (result != null && result.length > 0) {
-							ListGridRecord[] records = new ListGridRecord[result.length];
-							for (int i = 0; i < result.length; i++) {
-								ListGridRecord rec = new ListGridRecord();
-								rec.setAttribute(EVENT, I18N.message(result[i].getEvent()));
-								rec.setAttribute("date", result[i].getDate());
-								rec.setAttribute("user", result[i].getUsername());
-								rec.setAttribute(NAME, result[i].getFileName());
-								rec.setAttribute(FOLDER_STR, result[i].getPath());
-								rec.setAttribute("sid", result[i].getSessionId());
-								rec.setAttribute(DOC_ID, result[i].getDocId());
-								rec.setAttribute(FOLDER_ID, result[i].getFolderId());
-								rec.setAttribute(USER_ID, result[i].getUserId());
-								rec.setAttribute("ip", result[i].getIp());
-								rec.setAttribute(DEVICE, result[i].getDevice());
-								rec.setAttribute(GEOLOCATION, result[i].getGeolocation());
-								rec.setAttribute(USERNAME, result[i].getUserLogin());
-								rec.setAttribute(COMMENT, result[i].getComment());
-								rec.setAttribute(REASON, result[i].getReason());
-								rec.setAttribute("icon", result[i].getIcon());
-								records[i] = rec;
-							}
-							histories.setData(records);
+						List<ListGridRecord> records = new ArrayList<>();
+						for (GUIHistory hist : result) {
+							ListGridRecord rec = new ListGridRecord();
+							rec.setAttribute(EVENT, I18N.message(hist.getEvent()));
+							rec.setAttribute("date", hist.getDate());
+							rec.setAttribute("user", hist.getUsername());
+							rec.setAttribute(NAME, hist.getFileName());
+							rec.setAttribute(FOLDER_STR, hist.getPath());
+							rec.setAttribute("sid", hist.getSessionId());
+							rec.setAttribute(DOC_ID, hist.getDocId());
+							rec.setAttribute(FOLDER_ID, hist.getFolderId());
+							rec.setAttribute(USER_ID, hist.getUserId());
+							rec.setAttribute("ip", hist.getIp());
+							rec.setAttribute(DEVICE, hist.getDevice());
+							rec.setAttribute(GEOLOCATION, hist.getGeolocation());
+							rec.setAttribute(USERNAME, hist.getUserLogin());
+							rec.setAttribute(COMMENT, hist.getComment());
+							rec.setAttribute(REASON, hist.getReason());
+							rec.setAttribute("icon", hist.getIcon());
 						}
+						histories.setData(records.toArray(new ListGridRecord[0]));
+
 						lastchanges.removeMember(infoPanel);
 						infoPanel = new InfoPanel("");
 						infoPanel.setMessage(I18N.message("showelements", Integer.toString(histories.getTotalRows())));

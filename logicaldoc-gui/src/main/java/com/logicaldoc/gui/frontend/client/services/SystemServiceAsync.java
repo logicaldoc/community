@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
 import java.util.Date;
+import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIHistory;
@@ -28,24 +29,24 @@ public interface SystemServiceAsync {
 
 	void setGUILanguageStatus(String language, boolean active, AsyncCallback<Void> callback);
 
-	void getPlugins(AsyncCallback<GUIValue[]> callback);
+	void getPlugins(AsyncCallback<List<GUIValue>> callback);
 
 	void confirmUpdate(AsyncCallback<Void> callback);
 
 	void restart(AsyncCallback<Void> callback);
 
-	void search(Long userId, Date from, Date till, int maxResult, String historySid, String[] event, Long rootFolderId,
-			AsyncCallback<GUIHistory[]> callback);
-	
+	void search(Long userId, Date from, Date till, int maxResult, String historySid, List<String> event,
+			Long rootFolderId, AsyncCallback<List<GUIHistory>> callback);
+
 	void searchApiCalls(Long userId, Date from, Date till, String callSid, String protocol, String uri, int maxResult,
 			AsyncCallback<GUIHistory[]> callback);
 
-	void unscheduleJobs(GUIValue[] jobs, AsyncCallback<Void> callback);
+	void unscheduleJobs(List<GUIValue> jobs, AsyncCallback<Void> callback);
 
 	void initializePlugin(String plugin, AsyncCallback<Void> callback);
 
 	void installPlugin(AsyncCallback<Void> callback);
 
 	void uninstallPlugin(String plugin, AsyncCallback<Void> callback);
-	
+
 }

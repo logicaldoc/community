@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.gdrive;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -111,7 +114,7 @@ public class GDriveImport extends Window {
 			@Override
 			protected void onSearch() {
 				LD.contactingServer();
-				GDriveService.Instance.get().search(this.getValueAsString(), new AsyncCallback<GUIDocument[]>() {
+				GDriveService.Instance.get().search(this.getValueAsString(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						LD.clearPrompt();
@@ -119,10 +122,9 @@ public class GDriveImport extends Window {
 					}
 
 					@Override
-					public void onSuccess(GUIDocument[] hits) {
+					public void onSuccess(List<GUIDocument> hits) {
 						LD.clearPrompt();
-						ListGridRecord[] records = new ListGridRecord[hits.length];
-						int i = 0;
+						List<ListGridRecord> records = new ArrayList<>();
 						for (GUIDocument hit : hits) {
 							ListGridRecord rec = new ListGridRecord();
 							rec.setAttribute(RESOURCE_ID, hit.getExtResId());
@@ -132,9 +134,9 @@ public class GDriveImport extends Window {
 							rec.setAttribute("size", hit.getFileSize());
 							rec.setAttribute("editor", hit.getPublisher());
 							rec.setAttribute("lastModified", hit.getLastModified());
-							records[i++] = rec;
+							records.add(rec);
 						}
-						grid.setData(records);
+						grid.setData(records.toArray(new ListGridRecord[0]));
 					}
 				});
 			}
@@ -149,9 +151,9 @@ public class GDriveImport extends Window {
 			if (selection == null || selection.length == 0)
 				return;
 
-			String[] resIds = new String[selection.length];
-			for (int i = 0; i < resIds.length; i++)
-				resIds[i] = selection[i].getAttributeAsString(RESOURCE_ID);
+			List<String> resIds = new ArrayList<>();
+			for (int i = 0; i < selection.length; i++)
+				resIds.add(selection[i].getAttributeAsString(RESOURCE_ID));
 
 			LD.contactingServer();
 			GDriveService.Instance.get().importDocuments(resIds, FolderController.get().getCurrentFolder().getId(),

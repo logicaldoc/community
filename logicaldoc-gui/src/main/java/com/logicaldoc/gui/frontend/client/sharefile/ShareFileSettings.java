@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.sharefile;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -31,7 +33,7 @@ public class ShareFileSettings extends Window {
 		setPadding(2);
 		setAutoSize(true);
 
-		ShareFileService.Instance.get().loadSettings(new AsyncCallback<String[]>() {
+		ShareFileService.Instance.get().loadSettings(new AsyncCallback<List<String>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -39,28 +41,28 @@ public class ShareFileSettings extends Window {
 			}
 
 			@Override
-			public void onSuccess(String[] settings) {
+			public void onSuccess(List<String> settings) {
 				initGUI(settings);
 			}
 
 		});
 	}
 
-	private void initGUI(String[] settings) {
-		TextItem clientId = ItemFactory.newTextItem("clientid", settings[0]);
+	private void initGUI(List<String> settings) {
+		TextItem clientId = ItemFactory.newTextItem("clientid", settings.get(0));
 		clientId.setRequired(true);
 		clientId.setWidth(300);
 
-		TextItem clientSecret = ItemFactory.newTextItem("clientsecret", settings[1]);
+		TextItem clientSecret = ItemFactory.newTextItem("clientsecret", settings.get(1));
 		clientSecret.setRequired(true);
 		clientSecret.setWidth(300);
 
-		TextItem authBaseUrl = ItemFactory.newTextItem("authbaseurl", settings[2]);
+		TextItem authBaseUrl = ItemFactory.newTextItem("authbaseurl", settings.get(2));
 		authBaseUrl.setRequired(true);
 		authBaseUrl.setDisabled(true);
 		authBaseUrl.setWidth(300);
 
-		TextItem callbackUrl = ItemFactory.newTextItem("callbackurl", settings[3]);
+		TextItem callbackUrl = ItemFactory.newTextItem("callbackurl", settings.get(3));
 		callbackUrl.setRequired(false);
 		callbackUrl.setDisabled(true);
 		callbackUrl.setWidth(300);

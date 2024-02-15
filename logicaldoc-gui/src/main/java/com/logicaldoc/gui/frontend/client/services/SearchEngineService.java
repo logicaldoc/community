@@ -100,7 +100,7 @@ public interface SearchEngineService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void reorderTokenFilters(String[] filters) throws ServerException;
+	public void reorderTokenFilters(List<String> filters) throws ServerException;
 
 	/**
 	 * Saves the settings of the specified token filter

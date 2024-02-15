@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -24,7 +26,7 @@ public interface ClusterService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void makeGlobal(String[] parameters) throws ServerException;
+	public void makeGlobal(List<String> parameters) throws ServerException;
 
 	/**
 	 * Unshares a list of configuration parameters
@@ -33,7 +35,7 @@ public interface ClusterService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void makeLocal(String[] parameters) throws ServerException;
+	public void makeLocal(List<String> parameters) throws ServerException;
 
 	public static class Instance {
 		private static ClusterServiceAsync inst;

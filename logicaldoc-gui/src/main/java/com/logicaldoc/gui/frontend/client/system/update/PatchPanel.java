@@ -67,7 +67,7 @@ public class PatchPanel extends VLayout {
 	private static final String INSTALLED = "installed";
 
 	private static final long MAX_WAIT_TIME = 2L * 60L * 1000L; // 2 minutes
-	
+
 	// Shows the install notes panel
 	VLayout notesPanel = new VLayout();
 
@@ -396,7 +396,7 @@ public class PatchPanel extends VLayout {
 	}
 
 	private void displayNotes(String fileName) {
-		UpdateService.Instance.get().getPatchNotes(fileName, new AsyncCallback<String[]>() {
+		UpdateService.Instance.get().getPatchNotes(fileName, new AsyncCallback<List<String>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -404,17 +404,17 @@ public class PatchPanel extends VLayout {
 			}
 
 			@Override
-			public void onSuccess(String[] infos) {
+			public void onSuccess(List<String> infos) {
 				DynamicForm form = new DynamicForm();
 				form.setTitleOrientation(TitleOrientation.TOP);
 				form.setColWidths("*");
 				form.setNumCols(1);
 
-				TextAreaItem changelog = ItemFactory.newTextAreaItem("changelog", infos[0]);
+				TextAreaItem changelog = ItemFactory.newTextAreaItem("changelog", infos.get(0));
 				changelog.setWidth("100%");
 				changelog.setHeight(220);
 
-				TextAreaItem patchNotes = ItemFactory.newTextAreaItem("patchnotes", infos[1]);
+				TextAreaItem patchNotes = ItemFactory.newTextAreaItem("patchnotes", infos.get(1));
 				patchNotes.setWidth("100%");
 				patchNotes.setHeight(220);
 
@@ -500,7 +500,7 @@ public class PatchPanel extends VLayout {
 							LD.clearPrompt();
 							ok.setDisabled(patch.isRestart());
 							GuiLog.info(I18N.message("patchinstalled"));
-							if(patch.isRestart())
+							if (patch.isRestart())
 								Util.waitForUpAndRunning(Session.get().getTenantName(), I18N.getLocale());
 						} else if (!"running".equals(statusLabel) && elapsedTime > MAX_WAIT_TIME) {
 							LD.clearPrompt();

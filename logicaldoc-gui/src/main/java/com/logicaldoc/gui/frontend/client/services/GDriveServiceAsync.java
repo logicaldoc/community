@@ -15,14 +15,14 @@ public interface GDriveServiceAsync {
 
 	void saveSettings(String clientId, String clientSecret, AsyncCallback<String> callback);
 
-	void importDocuments(String[] resourceIds, long targetFolderId, String type, AsyncCallback<Void> callback);
+	void importDocuments(List<String> resourceIds, long targetFolderId, String type, AsyncCallback<Void> callback);
 
-	void exportDocuments(List<Long> ids, AsyncCallback<String[]> callback);
+	void exportDocuments(List<Long> ids, AsyncCallback<List<String>> callback);
 
-	void search(String expression, AsyncCallback<GUIDocument[]> callback);
+	void search(String expression, AsyncCallback<List<GUIDocument>> callback);
 
 	void create(String fileName, AsyncCallback<String> callback);
 
-	void loadSettings(AsyncCallback<String[]> callback);
+	void loadSettings(AsyncCallback<List<String>> callback);
 
 }

@@ -67,7 +67,7 @@ public interface WorkflowService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void deleteInstances(String[] ids) throws ServerException;
+	public void deleteInstances(List<String> ids) throws ServerException;
 
 	/**
 	 * Imports a new workflow schema already uploaded

@@ -295,8 +295,9 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		storer.init();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public String[] removeStorage(int storageId) throws ServerException {
+	public List<String> removeStorage(int storageId) throws ServerException {
 		Session session = checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
 
 		try {
@@ -310,7 +311,6 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 			/*
 			 * Search for those folders that refer this storage
 			 */
-			@SuppressWarnings("unchecked")
 			List<Long> folderIds = dao.queryForList(
 					"select ld_folderid from ld_folder_storage where ld_storageid = " + storageId + " and ld_nodeid = '"
 							+ SqlUtil.doubleQuotesAndBackslashes(config.getProperty("id")) + "'",
@@ -325,39 +325,39 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 					}
 				}).collect(Collectors.toList());
 				paths.sort(null);
-				return paths.toArray(new String[0]);
+				return paths;
 			} else {
 				Map<String, String> settings = config.getProperties("store." + storageId + ".");
 				for (String setting : settings.keySet())
 					config.remove("store." + storageId + "." + setting);
 				config.write();
-				return new String[0];
+				return new ArrayList<>();
 			}
 		} catch (Exception e) {
-			return (String[]) throwServerException(session, log, e);
+			return (List<String>) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
-	public GUIParameter[] loadSettingsByNames(String[] names) throws ServerException {
+	public List<GUIParameter> loadSettingsByNames(List<String> names) throws ServerException {
 		Session session = validateSession();
 
 		List<GUIParameter> values = new ArrayList<>();
 		try {
 			ContextProperties conf = Context.get().getProperties();
 
-			for (int i = 0; i < names.length; i++) {
-				if (names[i].endsWith("*")) {
-					Map<String, String> map = conf.getProperties(names[i].substring(0, names[i].length() - 1));
+			for (String name : names) {
+				if (name.endsWith("*")) {
+					Map<String, String> map = conf.getProperties(name.substring(0, name.length() - 1));
 					for (Map.Entry<String, String> entry : map.entrySet())
 						values.add(new GUIParameter(entry.getKey(), entry.getValue()));
 				} else
-					values.add(new GUIParameter(names[i], conf.getProperty(names[i])));
+					values.add(new GUIParameter(name, conf.getProperty(name)));
 			}
 		} catch (Exception e) {
 			throwServerException(session, log, e);
 		}
-		return values.toArray(new GUIParameter[0]);
+		return values;
 	}
 
 	@Override

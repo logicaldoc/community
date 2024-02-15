@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.security;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,16 +75,16 @@ public class BruteForcePanel extends AdminPanel {
 		addMember(save);
 
 		SettingService.Instance.get()
-				.loadSettingsByNames(new String[] { THROTTLE_ENABLED, THROTTLE_USERNAME_MAX, THROTTLE_USERNAME_WAIT,
+				.loadSettingsByNames(Arrays.asList(THROTTLE_ENABLED, THROTTLE_USERNAME_MAX, THROTTLE_USERNAME_WAIT,
 						THROTTLE_USERNAME_DISABLEUSER, THROTTLE_USERNAME_WAIT, THROTTLE_IP_MAX, THROTTLE_IP_WAIT,
-						THROTTLE_ALERT_RECIPIENTS }, new AsyncCallback<GUIParameter[]>() {
+						THROTTLE_ALERT_RECIPIENTS), new AsyncCallback<List<GUIParameter>>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
 							}
 
 							@Override
-							public void onSuccess(GUIParameter[] params) {
+							public void onSuccess(List<GUIParameter> params) {
 								Map<String, String> p = new HashMap<>();
 								for (GUIParameter par : params)
 									p.put(par.getName(), par.getValue());

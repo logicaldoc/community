@@ -204,7 +204,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	}
 
 	@Override
-	public void delete(String[] names) throws ServerException {
+	public void delete(List<String> names) throws ServerException {
 		Session session = validateSession();
 		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 

@@ -307,22 +307,21 @@ public class SearchIndexPanel extends AdminPanel {
 		filtersGrid.addDropCompleteHandler(event -> {
 			List<String> filters = new ArrayList<>();
 			ListGridRecord[] records = filtersGrid.getRecords();
-			for (ListGridRecord rec : records) {
+			for (ListGridRecord rec : records)
 				filters.add(rec.getAttributeAsString("name"));
-			}
-			SearchEngineService.Instance.get().reorderTokenFilters(filters.toArray(new String[0]),
-					new AsyncCallback<Void>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+			SearchEngineService.Instance.get().reorderTokenFilters(filters, new AsyncCallback<Void>() {
 
-						@Override
-						public void onSuccess(Void arg) {
-							// Nothing to do
-						}
-					});
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(Void arg) {
+					// Nothing to do
+				}
+			});
 		});
 
 		filtersGrid.addCellContextClickHandler(event -> {

@@ -38,7 +38,7 @@ public interface ZohoService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public String[] loadSettings() throws ServerException;
+	public List<String> loadSettings() throws ServerException;
 
 	/**
 	 * Exports documents and folders into Zoho
@@ -68,7 +68,7 @@ public interface ZohoService extends RemoteService {
 	 * 
 	 * @throws ServerException error in the server application
 	 */
-	public int importDocuments(long targetFolder, String[] folderCompositeIds, String[] documentIds)
+	public int importDocuments(long targetFolder, List<String> folderCompositeIds, List<String> documentIds)
 			throws ServerException;
 
 	/**

@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.security;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
@@ -89,8 +92,7 @@ public class FirewallPanel extends VLayout {
 		IButton save = new IButton();
 		save.setAutoFit(true);
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(event -> 
-				onSave());
+		save.addClickHandler(event -> onSave());
 
 		setMembers(tabs, save);
 	}
@@ -99,22 +101,21 @@ public class FirewallPanel extends VLayout {
 		prepareForm();
 
 		RadioGroupItem enabled = prepareEnabledSwitch();
-			
 
 		final TextAreaItem whitelist = prepareWhiteListItem();
-		
+
 		final TextAreaItem blacklist = prepareBlackListItem();
-			
+
 		RadioGroupItem allowSemicolon = prepareAllowSemicolonSwitch();
-			
+
 		RadioGroupItem allowBackSlash = prepareAllowBackSlashSwitch();
-			
+
 		RadioGroupItem allowUrlEncodedPercent = prepareAllowUrlEncodedPercentSwitch();
 
 		RadioGroupItem allowUrlEncodedSlash = prepareAllowUrlEncodedSlashSwitch();
-			
+
 		RadioGroupItem allowUrlEncodedPeriod = prepareAllowUrlEncodedPeriodSwitch();
-		
+
 		if (user == null) {
 			/*
 			 * We are operating on application-wide filters
@@ -137,25 +138,26 @@ public class FirewallPanel extends VLayout {
 		form.setItems(enabled, whitelist, blacklist, allowSemicolon, allowBackSlash, allowUrlEncodedPercent,
 				allowUrlEncodedSlash, allowUrlEncodedPeriod);
 		SettingService.Instance.get()
-				.loadSettingsByNames(new String[] { FIREWALL_ENABLED, FIREWALL_WHITELIST, FIREWALL_BLACKLIST,
-						FIREWALL_ALLOW_SEMICOLON, FIREWALL_ALLOW_BACK_SLASH, FIREWALL_ALLOW_URL_ENCODED_PERCENT,
-						FIREWALL_ALLOW_URL_ENCODED_SLASH, FIREWALL_ALLOW_URL_ENCODED_PERIOD },
-						new AsyncCallback<GUIParameter[]>() {
+				.loadSettingsByNames(
+						Arrays.asList(FIREWALL_ENABLED, FIREWALL_WHITELIST, FIREWALL_BLACKLIST,
+								FIREWALL_ALLOW_SEMICOLON, FIREWALL_ALLOW_BACK_SLASH, FIREWALL_ALLOW_URL_ENCODED_PERCENT,
+								FIREWALL_ALLOW_URL_ENCODED_SLASH, FIREWALL_ALLOW_URL_ENCODED_PERIOD),
+						new AsyncCallback<List<GUIParameter>>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
 							}
 
 							@Override
-							public void onSuccess(GUIParameter[] params) {
-								enabled.setValue("true".equals(params[0].getValue()) ? "yes" : "no");
-								whitelist.setValue(params[1].getValue().replace(',', '\n'));
-								blacklist.setValue(params[2].getValue().replace(',', '\n'));
-								allowSemicolon.setValue("true".equals(params[3].getValue()) ? "yes" : "no");
-								allowBackSlash.setValue("true".equals(params[4].getValue()) ? "yes" : "no");
-								allowUrlEncodedPercent.setValue("true".equals(params[5].getValue()) ? "yes" : "no");
-								allowUrlEncodedSlash.setValue("true".equals(params[6].getValue()) ? "yes" : "no");
-								allowUrlEncodedPeriod.setValue("true".equals(params[7].getValue()) ? "yes" : "no");
+							public void onSuccess(List<GUIParameter> params) {
+								enabled.setValue("true".equals(params.get(0).getValue()) ? "yes" : "no");
+								whitelist.setValue(params.get(1).getValue().replace(',', '\n'));
+								blacklist.setValue(params.get(2).getValue().replace(',', '\n'));
+								allowSemicolon.setValue("true".equals(params.get(3).getValue()) ? "yes" : "no");
+								allowBackSlash.setValue("true".equals(params.get(4).getValue()) ? "yes" : "no");
+								allowUrlEncodedPercent.setValue("true".equals(params.get(5).getValue()) ? "yes" : "no");
+								allowUrlEncodedSlash.setValue("true".equals(params.get(6).getValue()) ? "yes" : "no");
+								allowUrlEncodedPeriod.setValue("true".equals(params.get(7).getValue()) ? "yes" : "no");
 							}
 						});
 	}

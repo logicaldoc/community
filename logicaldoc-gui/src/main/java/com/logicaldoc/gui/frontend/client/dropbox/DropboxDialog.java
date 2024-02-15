@@ -121,9 +121,9 @@ public class DropboxDialog extends Dialog {
 		if (selection == null)
 			return;
 
-		final String[] paths = new String[selection.length];
+		List<String> paths = new ArrayList<>();
 		for (int i = 0; i < selection.length; i++)
-			paths[i] = selection[i].getAttributeAsString("path");
+			paths.add(selection[i].getAttributeAsString("path"));
 
 		SC.ask(I18N.message("importfromdbox", FolderController.get().getCurrentFolder().getName()), choice -> {
 			if (choice.booleanValue()) {

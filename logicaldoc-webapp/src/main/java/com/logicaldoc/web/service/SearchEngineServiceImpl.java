@@ -224,7 +224,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 	}
 
 	@Override
-	public void reorderTokenFilters(String[] filters) throws ServerException {
+	public void reorderTokenFilters(List<String> filters) throws ServerException {
 		Session session = validateSession();
 		try {
 			ContextProperties conf = Context.get().getProperties();

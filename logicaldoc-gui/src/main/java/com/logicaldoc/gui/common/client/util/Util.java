@@ -409,7 +409,7 @@ public abstract class Util {
 	public static boolean isOfficeFileType(String type) {
 		return officeExts.stream().anyMatch(ext -> type.equalsIgnoreCase(ext));
 	}
-	
+
 	public static boolean isOfficeFile(String fileName) {
 		return officeExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext));
 	}
@@ -451,8 +451,7 @@ public abstract class Util {
 	}
 
 	public static boolean isMediaFile(String fileName) {
-		return videoExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext))
-				|| isAudioFile(fileName);
+		return videoExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext)) || isAudioFile(fileName);
 	}
 
 	public static boolean isAudioFile(String fileName) {
@@ -1064,11 +1063,10 @@ public abstract class Util {
 		}
 	}
 
-	public static Map<String, String> convertToMap(GUIParameter[] parameters) {
+	public static Map<String, String> convertToMap(List<GUIParameter> parameters) {
 		Map<String, String> map = new HashMap<>();
-		if (parameters != null)
-			for (GUIParameter param : parameters)
-				map.put(param.getName(), param.getValue());
+		for (GUIParameter param : parameters)
+			map.put(param.getName(), param.getValue());
 		return map;
 	}
 

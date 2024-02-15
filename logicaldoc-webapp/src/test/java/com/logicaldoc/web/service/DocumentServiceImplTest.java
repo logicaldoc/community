@@ -245,39 +245,39 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testCreateDownloadTicket() throws ServerException, PersistenceException {
-		String[] ticket = service.createDownloadTicket(5L, 0, null, null, null, null, null);
+		List<String> ticket = service.createDownloadTicket(5L, 0, null, null, null, null, null);
 		// We do not have a HTTP request so expect that the first string is the
 		// exact ticket ID
-		assertEquals("http://server:port/download-ticket?ticketId=" + ticket[0], ticket[1]);
+		assertEquals("http://server:port/download-ticket?ticketId=" + ticket.get(0), ticket.get(1));
 
 		TicketDAO tDao = (TicketDAO) context.getBean("TicketDAO");
-		Ticket t = tDao.findByTicketId(ticket[0]);
+		Ticket t = tDao.findByTicketId(ticket.get(0));
 		assertNotNull(t);
 		assertEquals(5L, t.getDocId());
 	}
 
 	@Test
 	public void testDeleteEnableDisableTicket() throws ServerException, PersistenceException {
-		String[] ticket = service.createDownloadTicket(5, 0, null, null, null, null, null);
+		List<String> ticket = service.createDownloadTicket(5, 0, null, null, null, null, null);
 
 		// We do not have a HTTP request so expect that the first string is the
 		// exact ticket ID
 		TicketDAO tDao = (TicketDAO) context.getBean("TicketDAO");
-		Ticket t = tDao.findByTicketId(ticket[0]);
+		Ticket t = tDao.findByTicketId(ticket.get(0));
 		assertNotNull(t);
 		assertEquals(5L, t.getDocId());
 		assertEquals(1, t.getEnabled());
 
 		service.disableTicket(t.getId());
-		t = tDao.findByTicketId(ticket[0]);
+		t = tDao.findByTicketId(ticket.get(0));
 		assertEquals(0, t.getEnabled());
 
 		service.enableTicket(t.getId());
-		t = tDao.findByTicketId(ticket[0]);
+		t = tDao.findByTicketId(ticket.get(0));
 		assertEquals(1, t.getEnabled());
 
 		service.deleteTicket(t.getId());
-		t = tDao.findByTicketId(ticket[0]);
+		t = tDao.findByTicketId(ticket.get(0));
 		assertNull(t);
 	}
 
@@ -529,8 +529,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		doc.setIndexed(0);
 		doc.setNotifyUsers(List.of(2L, 3L));
 
-		GUIDocument[] createdDocs = service.addDocuments(false, UTF_8, false, doc);
-		assertEquals(4, createdDocs.length);
+		List<GUIDocument> createdDocs = service.addDocuments(false, UTF_8, false, doc);
+		assertEquals(4, createdDocs.size());
 
 		waiting();
 
@@ -543,7 +543,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		// Request immediate indexing
 		createdDocs = service.addDocuments(false, UTF_8, true, doc);
-		assertEquals(4, createdDocs.length);
+		assertEquals(4, createdDocs.size());
 
 		prepareUploadedFiles();
 		doc = service.getById(7);
@@ -554,7 +554,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		// Request zip import so just the other 3 documents are imported
 		// immediately
 		createdDocs = service.addDocuments(true, UTF_8, false, doc);
-		assertEquals(3, createdDocs.length);
+		assertEquals(3, createdDocs.size());
 
 		// Remove the uploaded files
 		@SuppressWarnings("unchecked")
@@ -585,12 +585,12 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		prepareUploadedFiles();
 
 		createdDocs = service.addDocuments(true, UTF_8, false, doc);
-		assertEquals(0, createdDocs.length);
+		assertEquals(0, createdDocs.size());
 
 		prepareSession("admin", "admin");
 		prepareUploadedFiles();
 		createdDocs = service.addDocuments("en", 1201, false, UTF_8, false, null);
-		assertEquals(4, createdDocs.length);
+		assertEquals(4, createdDocs.size());
 
 		// Cannot add documents into the root
 		exceptionHappened = false;
@@ -623,10 +623,10 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 			session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
 
-			GUIDocument[] createdDocs = service.addDocuments(false, UTF_8, false, doc);
-			assertEquals(2, createdDocs.length);
+			List<GUIDocument> createdDocs = service.addDocuments(false, UTF_8, false, doc);
+			assertEquals(2, createdDocs.size());
 
-			GUIDocument mergedDoc = service.merge(List.of(createdDocs[0].getId(), createdDocs[1].getId()), 1200,
+			GUIDocument mergedDoc = service.merge(createdDocs.stream().map(d -> d.getId()).toList(), 1200,
 					"merged.pdf");
 			mergedDoc = service.getById(mergedDoc.getId());
 			assertNotNull(mergedDoc);
@@ -653,11 +653,11 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 			session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
 
-			GUIDocument[] createdDocs = service.addDocuments(false, UTF_8, false, doc);
-			assertEquals(1, createdDocs.length);
-			assertEquals(2, createdDocs[0].getPages());
+			List<GUIDocument> createdDocs = service.addDocuments(false, UTF_8, false, doc);
+			assertEquals(1, createdDocs.size());
+			assertEquals(2, createdDocs.get(0).getPages());
 
-			assertEquals(2, service.updatePages(createdDocs[0].getId()));
+			assertEquals(2, service.updatePages(createdDocs.get(0).getId()));
 		} finally {
 			FileUtil.strongDelete(pdf2);
 		}
@@ -754,24 +754,24 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testGetVersionsById() throws ServerException {
-		GUIVersion[] versions = service.getVersionsById(1, 2);
+		List<GUIVersion> versions = service.getVersionsById(1, 2);
 		assertNotNull(versions);
-		assertEquals(2, versions.length);
+		assertEquals(2, versions.size());
 
 		// only the first version of the two
 		versions = service.getVersionsById(1, 23);
 		assertNotNull(versions);
-		assertEquals(1, versions.length);
+		assertEquals(1, versions.size());
 
 		// only the 2nd version of the two
 		versions = service.getVersionsById(21, 2);
 		assertNotNull(versions);
-		assertEquals(1, versions.length);
+		assertEquals(1, versions.size());
 
 		// no versions
 		versions = service.getVersionsById(21, 22);
 		assertNotNull(versions);
-		assertEquals(0, versions.length);
+		assertEquals(0, versions.size());
 	}
 
 	@Test
@@ -1205,29 +1205,29 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		}
 
 		// test on a doc without notes
-		GUIDocumentNote[] notes = service.getNotes(6, "1.0", null);
-		assertEquals(0, notes.length);
+		List<GUIDocumentNote> notes = service.getNotes(6, "1.0", null);
+		assertEquals(0, notes.size());
 
 		// get a document with a single note
 		notes = service.getNotes(4, "1.0", null);
-		assertEquals(1, notes.length);
+		assertEquals(1, notes.size());
 
 		notes = service.getNotes(4, null, null);
-		assertEquals(1, notes.length);
+		assertEquals(1, notes.size());
 
 	}
 
 	@Test
 	public void testUpdateNote() throws ServerException {
-		GUIDocumentNote[] notes = service.getNotes(4, null, null);
-		assertEquals(1, notes.length);
-		assertEquals("message for note 3", notes[0].getMessage());
+		List<GUIDocumentNote> notes = service.getNotes(4, null, null);
+		assertEquals(1, notes.size());
+		assertEquals("message for note 3", notes.get(0).getMessage());
 
-		service.updateNote(4, notes[0].getId(), "updated message");
-		GUIDocumentNote[] notes2 = service.getNotes(4, null, null);
-		assertEquals(1, notes2.length);
-		assertEquals(notes[0].getId(), notes2[0].getId());
-		assertEquals("updated message", notes2[0].getMessage());
+		service.updateNote(4, notes.get(0).getId(), "updated message");
+		List<GUIDocumentNote> notes2 = service.getNotes(4, null, null);
+		assertEquals(1, notes2.size());
+		assertEquals(notes.get(0).getId(), notes2.get(0).getId());
+		assertEquals("updated message", notes2.get(0).getMessage());
 	}
 
 	@Test
@@ -1235,7 +1235,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		boolean exceptionHappened = false;
 		try {
 			List<GUIDocumentNote> notes = new ArrayList<>();
-			service.saveNotes(888, notes.toArray(new GUIDocumentNote[] {}), null);
+			service.saveNotes(888, notes, null);
 		} catch (ServerException e) {
 			exceptionHappened = true;
 		}
@@ -1252,7 +1252,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		gdn02.setRecipientEmail("ken-botterill@acme.com");
 		notes.add(gdn01);
 		notes.add(gdn02);
-		service.saveNotes(5, notes.toArray(new GUIDocumentNote[] {}), null);
+		service.saveNotes(5, notes, null);
 	}
 
 	@Test
@@ -1285,13 +1285,13 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		vo.setAttributes(attributes);
 
 		try {
-			GUIDocument[] gdocs = service.bulkUpdate(ids, vo, true);
+			List<GUIDocument> gdocs = service.bulkUpdate(ids, vo, true);
 			assertNotNull(gdocs);
-			assertTrue(gdocs.length > 0);
-			assertNotNull(gdocs[0].getTags());
-			assertEquals(3, gdocs[0].getTags().size());
+			assertTrue(gdocs.size() > 0);
+			assertNotNull(gdocs.get(0).getTags());
+			assertEquals(3, gdocs.get(0).getTags().size());
 
-			GUIAttribute gatX = gdocs[0].getAttribute("attr1");
+			GUIAttribute gatX = gdocs.get(0).getAttribute("attr1");
 			assertNotNull(gatX);
 		} catch (ServerException e) {
 			fail("Unexpected exception was thrown");
@@ -1309,12 +1309,12 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		vo.setPublished(0);
 
 		try {
-			GUIDocument[] gdocs = service.bulkUpdate(ids, vo, true);
+			List<GUIDocument> gdocs = service.bulkUpdate(ids, vo, true);
 			assertNotNull(gdocs);
-			assertTrue(gdocs.length > 0);
+			assertFalse(gdocs.isEmpty());
 
 			// only one document updated because 1 was locked (checked-out)
-			assertEquals(1, gdocs.length);
+			assertEquals(1, gdocs.size());
 		} catch (ServerException e) {
 			fail("Unexpected exception was thrown");
 		}

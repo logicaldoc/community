@@ -60,7 +60,7 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 			LD.contactingServer();
 			try {
 				ContactService.Instance.get().parseContacts(false, settings.getParseContactsParameters(),
-						new AsyncCallback<GUIContact[]>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -69,7 +69,7 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 							}
 
 							@Override
-							public void onSuccess(GUIContact[] contacts) {
+							public void onSuccess(List<GUIContact> contacts) {
 								LD.clearPrompt();
 								settings.destroy();
 								destroy();
@@ -142,7 +142,7 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 		addItem(list);
 	}
 
-	public void setContacts(GUIContact[] contacts) {
+	public void setContacts(List<GUIContact> contacts) {
 		List<ListGridRecord> records = new ArrayList<>();
 		for (GUIContact contact : contacts) {
 			ListGridRecord rec = new ListGridRecord();

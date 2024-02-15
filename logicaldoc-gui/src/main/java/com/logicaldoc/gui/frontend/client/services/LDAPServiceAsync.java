@@ -13,9 +13,9 @@ public interface LDAPServiceAsync {
 
 	void testConnection(GUILDAPServer ldapSettings, AsyncCallback<Boolean> callback);
 
-	void listUsers(String login, long serverId, AsyncCallback<GUIUser[]> callback);
+	void listUsers(String login, long serverId, AsyncCallback<List<GUIUser>> callback);
 
-	void importUsers(String[] usernames, long tenantId, AsyncCallback<GUIValue[]> callback);
+	void importUsers(List<String> usernames, long tenantId, AsyncCallback<List<GUIValue>> callback);
 
 	void get(long serverId, AsyncCallback<GUILDAPServer> callback);
 

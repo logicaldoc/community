@@ -74,7 +74,7 @@ public class GDriveMenuItem extends MenuItem {
 			List<Long> ids = grid.getSelectedIds();
 
 			LD.contactingServer();
-			GDriveService.Instance.get().exportDocuments(ids, new AsyncCallback<String[]>() {
+			GDriveService.Instance.get().exportDocuments(ids, new AsyncCallback<List<String>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
@@ -82,7 +82,7 @@ public class GDriveMenuItem extends MenuItem {
 				}
 
 				@Override
-				public void onSuccess(String[] settings) {
+				public void onSuccess(List<String> settings) {
 					LD.clearPrompt();
 					GuiLog.info(I18N.message("gdriveexportok"), null);
 				}

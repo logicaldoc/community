@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.security;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
@@ -27,11 +30,17 @@ import com.smartgwt.client.widgets.tab.TabSet;
 public class AntivirusPanel extends VLayout {
 
 	private static final String ENABLED = "enabled";
+
 	private static final String ANTIVIRUS_EXCLUDES = ".antivirus.excludes";
+
 	private static final String ANTIVIRUS_INCLUDES = ".antivirus.includes";
+
 	private static final String ANTIVIRUS_TIMEOUT = ".antivirus.timeout";
+
 	private static final String ANTIVIRUS_ENABLED = ".antivirus.enabled";
+
 	private static final String ANTIVIRUS_COMMAND = "antivirus.command";
+
 	private DynamicForm form = new DynamicForm();
 
 	public AntivirusPanel() {
@@ -43,24 +52,24 @@ public class AntivirusPanel extends VLayout {
 	@Override
 	protected void onDraw() {
 		String tenant = Session.get().getTenantName();
-		SettingService.Instance.get()
-				.loadSettingsByNames(new String[] { ANTIVIRUS_COMMAND, tenant + ANTIVIRUS_ENABLED,
-						tenant + ANTIVIRUS_INCLUDES, tenant + ANTIVIRUS_EXCLUDES, tenant + ANTIVIRUS_TIMEOUT },
-						new AsyncCallback<GUIParameter[]>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		SettingService.Instance.get().loadSettingsByNames(
+				Arrays.asList(ANTIVIRUS_COMMAND, tenant + ANTIVIRUS_ENABLED, tenant + ANTIVIRUS_INCLUDES,
+						tenant + ANTIVIRUS_EXCLUDES, tenant + ANTIVIRUS_TIMEOUT),
+				new AsyncCallback<List<GUIParameter>>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-							@Override
-							public void onSuccess(GUIParameter[] parameters) {
-								initGUI(parameters);
-							}
-						});
+					@Override
+					public void onSuccess(List<GUIParameter> parameters) {
+						initGUI(parameters);
+					}
+				});
 
 	}
 
-	private void initGUI(GUIParameter[] settings) {
+	private void initGUI(List<GUIParameter> settings) {
 		prepareForm(settings);
 
 		IButton save = new IButton();
@@ -107,7 +116,7 @@ public class AntivirusPanel extends VLayout {
 		setMembers(tabs, save);
 	}
 
-	private void prepareForm(GUIParameter[] settings) {
+	private void prepareForm(List<GUIParameter> settings) {
 		form.setTitleOrientation(TitleOrientation.LEFT);
 		form.setAlign(Alignment.LEFT);
 

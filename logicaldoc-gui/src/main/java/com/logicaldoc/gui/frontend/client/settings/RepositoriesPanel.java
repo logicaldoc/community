@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.settings;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -47,9 +48,9 @@ public class RepositoriesPanel extends AdminPanel {
 
 		tabs.addTab(foldersTab);
 
-		SettingService.Instance.get().loadSettingsByNames(new String[] { "conf.dbdir", "conf.exportdir",
-				"conf.importdir", "conf.logdir", "conf.plugindir", "conf.userdir" },
-				new AsyncCallback<GUIParameter[]>() {
+		SettingService.Instance.get().loadSettingsByNames(Arrays.asList("conf.dbdir", "conf.exportdir",
+				"conf.importdir", "conf.logdir", "conf.plugindir", "conf.userdir"),
+				new AsyncCallback<List<GUIParameter>>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -57,7 +58,7 @@ public class RepositoriesPanel extends AdminPanel {
 					}
 
 					@Override
-					public void onSuccess(GUIParameter[] folderParameters) {
+					public void onSuccess(List<GUIParameter> folderParameters) {
 						List<FormItem> items = new ArrayList<>();
 
 						for (GUIParameter f : folderParameters) {
@@ -84,8 +85,8 @@ public class RepositoriesPanel extends AdminPanel {
 		final List<GUIParameter> settings = new ArrayList<>();
 		@SuppressWarnings("unchecked")
 		Map<String, Object> values = foldersForm.getValues();
-		for (Map.Entry<String, Object> entry : values.entrySet()){
-			String name=entry.getKey();
+		for (Map.Entry<String, Object> entry : values.entrySet()) {
+			String name = entry.getKey();
 			if (!"save".equals(name))
 				settings.add(new GUIParameter(ItemFactory.originalItemName(name), entry.getValue().toString().trim()));
 		}

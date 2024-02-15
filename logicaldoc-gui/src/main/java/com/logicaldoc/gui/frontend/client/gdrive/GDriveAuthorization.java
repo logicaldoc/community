@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.gdrive;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -65,7 +67,7 @@ public class GDriveAuthorization extends Window {
 
 		addItem(form);
 
-		GDriveService.Instance.get().loadSettings(new AsyncCallback<String[]>() {
+		GDriveService.Instance.get().loadSettings(new AsyncCallback<List<String>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -73,9 +75,9 @@ public class GDriveAuthorization extends Window {
 			}
 
 			@Override
-			public void onSuccess(String[] settings) {
-				clientId.setValue(settings[0]);
-				clientSecret.setValue(settings[1]);
+			public void onSuccess(List<String> settings) {
+				clientId.setValue(settings.get(0));
+				clientSecret.setValue(settings.get(1));
 			}
 		});
 	}

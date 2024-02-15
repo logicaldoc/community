@@ -121,9 +121,9 @@ public class ShareFileDialog extends Dialog {
 		if (selection == null)
 			return;
 
-		final String[] ids = new String[selection.length];
+		List<String> ids = new ArrayList<>();
 		for (int i = 0; i < selection.length; i++)
-			ids[i] = selection[i].getAttributeAsString("iid");
+			ids.add(selection[i].getAttributeAsString("iid"));
 
 		SC.ask(I18N.message("importfromsfile", FolderController.get().getCurrentFolder().getName()), choice -> {
 			if (choice.booleanValue()) {

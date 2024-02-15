@@ -194,7 +194,7 @@ public class UpdateDialog extends StickyWindow {
 		LD.contactingServer();
 		hide();
 		DocumentService.Instance.get().addDocuments(zip, charset, immediteIndexing, bulkPanel.getDocument(),
-				new AsyncCallback<GUIDocument[]>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable error) {
 						LD.clearPrompt();
@@ -208,7 +208,7 @@ public class UpdateDialog extends StickyWindow {
 					}
 
 					@Override
-					public void onSuccess(GUIDocument[] doc) {
+					public void onSuccess(List<GUIDocument> docs) {
 						DocumentsPanel.get().refresh();
 						LD.clearPrompt();
 					}
@@ -221,8 +221,7 @@ public class UpdateDialog extends StickyWindow {
 				bulkPanel.getDocument().setComment(saveForm.getValueAsString(VERSIONCOMMENT));
 				LD.contactingServer();
 				DocumentService.Instance.get().bulkUpdate(ids, bulkPanel.getDocument(),
-						"true".equals(saveForm.getValueAsString(IGNOREEMPTYFIELDS)),
-						new AsyncCallback<GUIDocument[]>() {
+						"true".equals(saveForm.getValueAsString(IGNOREEMPTYFIELDS)), new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable error) {
 								LD.clearPrompt();
@@ -230,12 +229,11 @@ public class UpdateDialog extends StickyWindow {
 							}
 
 							@Override
-							public void onSuccess(GUIDocument[] updatedDocs) {
+							public void onSuccess(List<GUIDocument> updatedDocs) {
 								LD.clearPrompt();
 								GuiLog.info(I18N.message("bulkapplied"), null);
-								if (updatedDocs != null && updatedDocs.length > 0)
-									for (GUIDocument updatedDoc : updatedDocs)
-										DocumentController.get().modified(updatedDoc);
+								for (GUIDocument updatedDoc : updatedDocs)
+									DocumentController.get().modified(updatedDoc);
 								destroy();
 							}
 						});

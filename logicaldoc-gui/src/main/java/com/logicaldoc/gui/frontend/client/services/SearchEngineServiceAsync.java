@@ -25,7 +25,7 @@ public interface SearchEngineServiceAsync {
 
 	void countEntries(AsyncCallback<Long> callback);
 
-	void reorderTokenFilters(String[] filters, AsyncCallback<Void> callback);
+	void reorderTokenFilters(List<String> filters, AsyncCallback<Void> callback);
 
 	void saveTokenFilterSettings(String filter, GUIParameter[] settings, AsyncCallback<Void> callback);
 

@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.menu;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
@@ -623,8 +624,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
 			MenuItem registration = new MenuItem(I18N.message("registration"));
 			registration.addClickHandler(registrationClick -> SettingService.Instance.get().loadSettingsByNames(
-					new String[] { "reg.name", "reg.email", "reg.organization", "reg.website" },
-					new AsyncCallback<GUIParameter[]>() {
+					Arrays.asList("reg.name", "reg.email", "reg.organization", "reg.website"),
+					new AsyncCallback<List<GUIParameter>>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -632,13 +633,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 						}
 
 						@Override
-						public void onSuccess(GUIParameter[] reg) {
-							String[] values = new String[reg.length];
-							for (int j = 0; j < reg.length; j++) {
-								values[j] = reg[j].getValue();
-							}
-							Registration r = new Registration(values);
-							r.show();
+						public void onSuccess(List<GUIParameter> reg) {
+							new Registration(reg.stream().map(r -> r.getValue()).collect(Collectors.toList())).show();
 						}
 					}));
 			menu.addItem(registration);

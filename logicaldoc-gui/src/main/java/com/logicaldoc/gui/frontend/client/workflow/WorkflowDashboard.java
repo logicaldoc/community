@@ -108,7 +108,7 @@ public class WorkflowDashboard extends VLayout {
 	 */
 	public void killWorkflows(List<String> instanceIds) {
 		LD.contactingServer();
-		WorkflowService.Instance.get().deleteInstances(instanceIds.toArray(new String[0]), new AsyncCallback<Void>() {
+		WorkflowService.Instance.get().deleteInstances(instanceIds, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

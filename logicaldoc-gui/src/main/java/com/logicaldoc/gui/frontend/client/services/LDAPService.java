@@ -72,7 +72,7 @@ public interface LDAPService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIUser[] listUsers(String login, long serverId) throws ServerException;
+	public List<GUIUser> listUsers(String login, long serverId) throws ServerException;
 
 	/**
 	 * Imports a selection of users
@@ -84,7 +84,7 @@ public interface LDAPService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIValue[] importUsers(String[] usernames, long serverId) throws ServerException;
+	public List<GUIValue> importUsers(List<String> usernames, long serverId) throws ServerException;
 
 	public static class Instance {
 		private static LDAPServiceAsync inst;

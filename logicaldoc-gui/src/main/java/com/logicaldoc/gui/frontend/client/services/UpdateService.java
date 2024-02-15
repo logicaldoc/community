@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -68,7 +70,7 @@ public interface UpdateService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public String[] getUpdateNotes(String updateFileName) throws ServerException;
+	public List<String> getUpdateNotes(String updateFileName) throws ServerException;
 
 	/**
 	 * Retrieves more informations from the patch
@@ -79,7 +81,7 @@ public interface UpdateService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public String[] getPatchNotes(String patchFileName) throws ServerException;
+	public List<String> getPatchNotes(String patchFileName) throws ServerException;
 
 	/**
 	 * Checks the status of the current download process

@@ -8,7 +8,6 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.frontend.client.document.DocumentCapturePanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentExtendedPropertiesPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentSecurityPanel;

@@ -81,7 +81,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIVersion[] getVersionsById(long id1, long id2) throws ServerException;
+	public List<GUIVersion> getVersionsById(long id1, long id2) throws ServerException;
 
 	/**
 	 * Sends a document as email(attachment or download ticket)
@@ -288,10 +288,10 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIDocument[] addDocuments(String language, long folderId, boolean importZip, String charset,
+	public List<GUIDocument> addDocuments(String language, long folderId, boolean importZip, String charset,
 			boolean immediateIndexing, Long templateId) throws ServerException;
 
-	public GUIDocument[] addDocuments(boolean importZip, String charset, boolean immediateIndexing,
+	public List<GUIDocument> addDocuments(boolean importZip, String charset, boolean immediateIndexing,
 			GUIDocument metadata) throws ServerException;
 
 	/**
@@ -310,7 +310,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public String[] createDownloadTicket(long docId, int type, String suffix, Integer expireHours, Date expireDate,
+	public List<String> createDownloadTicket(long docId, int type, String suffix, Integer expireHours, Date expireDate,
 			Integer maxDownloads, Integer maxViews) throws ServerException;
 
 	public void deleteTicket(long ticketId) throws ServerException;
@@ -542,7 +542,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIDocumentNote[] getNotes(long docId, String fileVersion, Collection<String> types) throws ServerException;
+	public List<GUIDocumentNote> getNotes(long docId, String fileVersion, Collection<String> types) throws ServerException;
 
 	/**
 	 * Saves a set of notes
@@ -553,7 +553,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void saveNotes(long docId, GUIDocumentNote[] notes, Collection<String> types) throws ServerException;
+	public void saveNotes(long docId, List<GUIDocumentNote> notes, Collection<String> types) throws ServerException;
 
 	/**
 	 * Deletes a selection of document notes
@@ -575,7 +575,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIDocument[] bulkUpdate(List<Long> ids, GUIDocument vo, boolean ignoreEmptyFields) throws ServerException;
+	public List<GUIDocument> bulkUpdate(List<Long> ids, GUIDocument vo, boolean ignoreEmptyFields) throws ServerException;
 
 	/**
 	 * Creates a new empty document

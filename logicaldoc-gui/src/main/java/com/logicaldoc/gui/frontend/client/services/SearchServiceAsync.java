@@ -14,7 +14,7 @@ public interface SearchServiceAsync {
 
 	void load(String name, AsyncCallback<GUISearchOptions> callback);
 
-	void delete(String[] names, AsyncCallback<Void> callback);
+	void delete(List<String> names, AsyncCallback<Void> callback);
 
 	void shareSearch(String name, List<Long> userIds, List<Long> groupIds, AsyncCallback<Void> callback);
 }

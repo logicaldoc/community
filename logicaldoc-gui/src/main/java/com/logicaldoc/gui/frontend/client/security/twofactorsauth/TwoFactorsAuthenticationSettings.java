@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.security.twofactorsauth;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -45,8 +46,8 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 	public TwoFactorsAuthenticationSettings() {
 		super("twofactorsauth");
 
-		SettingService.Instance.get().loadSettingsByNames(new String[] { Session.get().getTenantName() + TWOFA_STAR },
-				new AsyncCallback<GUIParameter[]>() {
+		SettingService.Instance.get().loadSettingsByNames(Arrays.asList(Session.get().getTenantName() + TWOFA_STAR),
+				new AsyncCallback<List<GUIParameter>>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -54,13 +55,13 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 					}
 
 					@Override
-					public void onSuccess(GUIParameter[] params) {
+					public void onSuccess(List<GUIParameter> params) {
 						init(params);
 					}
 				});
 	}
 
-	private void init(GUIParameter[] parameters) {
+	private void init(List<GUIParameter> parameters) {
 		DynamicForm form = new DynamicForm();
 		form.setWidth(1);
 		form.setValuesManager(vm);

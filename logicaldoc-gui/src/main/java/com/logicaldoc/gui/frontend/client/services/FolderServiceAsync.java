@@ -24,9 +24,9 @@ public interface FolderServiceAsync {
 
 	void pasteAsAlias(List<Long> docIds, long folderId, String type, AsyncCallback<Void> callback);
 
-	void loadTemplates(AsyncCallback<GUIValue[]> callback);
+	void loadTemplates(AsyncCallback<List<GUIValue>> callback);
 
-	void saveTemplates(GUIValue[] templates, AsyncCallback<Void> callback);
+	void saveTemplates(List<GUIValue> templates, AsyncCallback<Void> callback);
 
 	void applyTemplate(long folderId, long templateId, boolean inheritSecurity, AsyncCallback<Void> callback);
 

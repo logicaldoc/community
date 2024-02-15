@@ -134,8 +134,7 @@ public class ZohoDialog extends Dialog {
 				ZohoDialog.this.destroy();
 				LD.contactingServer();
 				ZohoService.Instance.get().importDocuments(FolderController.get().getCurrentFolder().getId(),
-						folderCompositeIds.toArray(new String[0]), docIds.toArray(new String[0]),
-						new AsyncCallback<Integer>() {
+						folderCompositeIds, docIds, new AsyncCallback<Integer>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								LD.clearPrompt();

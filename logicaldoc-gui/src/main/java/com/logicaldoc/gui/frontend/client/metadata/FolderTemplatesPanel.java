@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.metadata;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -59,14 +62,14 @@ public class FolderTemplatesPanel extends AdminPanel {
 
 		body.setMembers(hint, toolStrip);
 
-		FolderService.Instance.get().loadTemplates(new AsyncCallback<GUIValue[]>() {
+		FolderService.Instance.get().loadTemplates(new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
 			}
 
 			@Override
-			public void onSuccess(GUIValue[] p) {
+			public void onSuccess(List<GUIValue> p) {
 				reloadTemplates(p);
 			}
 		});
@@ -92,29 +95,29 @@ public class FolderTemplatesPanel extends AdminPanel {
 	private void saveTemplates() {
 		Record[] records = grid.getRecords();
 
-		GUIValue[] templates = new GUIValue[records != null ? records.length : 0];
-		int i = 0;
+		List<GUIValue> templates = new ArrayList<>();
 		if (records != null)
 			for (Record rec : records) {
-				templates[i] = new GUIValue();
-				templates[i].setCode(rec.getAttributeAsString("name"));
-				templates[i++].setValue(rec.getAttributeAsString(FOLDERS));
+				GUIValue val = new GUIValue();
+				val.setCode(rec.getAttributeAsString("name"));
+				val.setValue(rec.getAttributeAsString(FOLDERS));
+				templates.add(val);
 			}
 
-		FolderService.Instance.get().saveTemplates(templates, new AsyncCallback<Void>() {
+		FolderService.Instance.get().saveTemplates(templates, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
 			}
 
 			@Override
-			public void onSuccess(Void arg0) {
+			public void onSuccess(Void arg) {
 				GuiLog.info(I18N.message("settingssaved"), null);
 			}
 		});
 	}
 
-	protected void reloadTemplates(GUIValue[] templates) {
+	protected void reloadTemplates(List<GUIValue> templates) {
 		if (grid != null)
 			body.removeMember(grid);
 
@@ -143,15 +146,14 @@ public class FolderTemplatesPanel extends AdminPanel {
 		});
 
 		body.removeMember(grid);
-		ListGridRecord[] records = new ListGridRecord[templates.length];
-		int i = 0;
+		List<ListGridRecord> records = new ArrayList<>();
 		for (GUIValue template : templates) {
 			ListGridRecord rec = new ListGridRecord();
 			rec.setAttribute("name", template.getCode());
 			rec.setAttribute(FOLDERS, template.getValue());
-			records[i++] = rec;
+			records.add(rec);
 		}
-		grid.setData(records);
+		grid.setData(records.toArray(new ListGridRecord[0]));
 
 		body.addMember(grid);
 	}

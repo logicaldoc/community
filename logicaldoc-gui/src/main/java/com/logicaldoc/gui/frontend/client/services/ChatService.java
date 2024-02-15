@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -33,13 +35,14 @@ public interface ChatService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void invite(String[] users, String invitation) throws ServerException;
-	
+	public void invite(List<String> users, String invitation) throws ServerException;
+
 	public static class Instance {
 		private static ChatServiceAsync inst;
 
-		private Instance() {}
-		
+		private Instance() {
+		}
+
 		public static ChatServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(ChatService.class);

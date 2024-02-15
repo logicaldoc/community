@@ -60,7 +60,7 @@ public interface SearchService extends RemoteService {
 	 * 
 	 * @throws ServerException error in the server application
 	 */
-	public void delete(String[] names) throws ServerException;
+	public void delete(List<String> names) throws ServerException;
 
 	/**
 	 * Loads a saved search

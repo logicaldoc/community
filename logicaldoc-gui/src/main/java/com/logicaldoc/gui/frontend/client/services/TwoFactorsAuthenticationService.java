@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -25,7 +27,7 @@ public interface TwoFactorsAuthenticationService extends RemoteService {
 	 * 
 	 * @throws ServerException error in the server application
 	 */
-	public String[] generateGoogleAuthorizationCredentials(String account) throws ServerException;
+	public List<String> generateGoogleAuthorizationCredentials(String account) throws ServerException;
 
 	/**
 	 * Saves the YubiKey credentials in the given user.

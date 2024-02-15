@@ -62,7 +62,7 @@ public interface GDriveService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void importDocuments(String[] resourceIds, long targetFolderId, String format) throws ServerException;
+	public void importDocuments(List<String> resourceIds, long targetFolderId, String format) throws ServerException;
 
 	/**
 	 * Exports a selection of documents from LogicalDOC into GoogleDocs
@@ -73,7 +73,7 @@ public interface GDriveService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public String[] exportDocuments(List<Long> ids) throws ServerException;
+	public List<String> exportDocuments(List<Long> ids) throws ServerException;
 
 	/**
 	 * Save the settings used by the Google Drive module
@@ -94,7 +94,7 @@ public interface GDriveService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public String[] loadSettings() throws ServerException;
+	public List<String> loadSettings() throws ServerException;
 
 	/**
 	 * Creates a new Google Document
@@ -116,7 +116,7 @@ public interface GDriveService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIDocument[] search(String expression) throws ServerException;
+	public List<GUIDocument> search(String expression) throws ServerException;
 
 	public static class Instance {
 		private static GDriveServiceAsync inst;

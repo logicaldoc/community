@@ -15,7 +15,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -25,6 +24,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.java.plugin.registry.PluginDescriptor;
@@ -595,9 +595,10 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public GUIHistory[] search(Long userId, Date from, Date till, int maxResult, String historySid, String[] events,
-			Long rootFolderId) throws ServerException {
+	public List<GUIHistory> search(Long userId, Date from, Date till, int maxResult, String historySid,
+			List<String> events, Long rootFolderId) throws ServerException {
 		Session session = validateSession();
 
 		// Search in the document/folder history
@@ -673,19 +674,17 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		query.append(" order by 3 desc ");
 
 		try {
-			List<GUIHistory> histories = executeQuery(query.toString(), maxResult, session);
-			return histories.toArray(new GUIHistory[histories.size()]);
+			return executeQuery(query.toString(), maxResult, session);
 		} catch (PersistenceException e) {
-			return (GUIHistory[]) throwServerException(session, log, e);
+			return (List<GUIHistory>) throwServerException(session, log, e);
 		}
 	}
 
-	private void appendEventsCondition(String tableAlias, String[] events, StringBuilder query) {
-		if (events.length > 0) {
+	private void appendEventsCondition(String tableAlias, List<String> events, StringBuilder query) {
+		if (CollectionUtils.isNotEmpty(events)) {
 			query.append(" and (");
-			query.append(
-					Arrays.stream(events).map(e -> " " + tableAlias + ".ld_event = '" + SqlUtil.doubleQuotes(e) + "'")
-							.collect(Collectors.joining(" or ")));
+			query.append(events.stream().map(e -> " " + tableAlias + ".ld_event = '" + SqlUtil.doubleQuotes(e) + "'")
+					.collect(Collectors.joining(" or ")));
 			query.append(" ) ");
 		}
 	}
@@ -778,8 +777,8 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public GUIHistory[] searchApiCalls(Long userId, Date from, Date till, String callSid, String protocol, String uri,
-			int maxResult) throws ServerException {
+	public List<GUIHistory> searchApiCalls(Long userId, Date from, Date till, String callSid, String protocol,
+			String uri, int maxResult) throws ServerException {
 		Session session = validateSession();
 
 		TenantDAO dao = (TenantDAO) Context.get().getBean(TenantDAO.class);
@@ -809,7 +808,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		query.append(" order by ld_date desc ");
 
 		try {
-			List<GUIHistory> calls = dao.query(query.toString(), new RowMapper<GUIHistory>() {
+			return dao.query(query.toString(), new RowMapper<GUIHistory>() {
 
 				@Override
 				public GUIHistory mapRow(ResultSet rs, int arg1) throws SQLException {
@@ -836,15 +835,13 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 				}
 
 			}, maxResult);
-
-			return calls.toArray(new GUIHistory[calls.size()]);
 		} catch (PersistenceException e) {
-			return (GUIHistory[]) throwServerException(session, log, e);
+			return (List<GUIHistory>) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
-	public void unscheduleJobs(GUIValue[] jobs) throws ServerException {
+	public void unscheduleJobs(List<GUIValue> jobs) throws ServerException {
 		Session session = validateSession();
 		JobManager jobManager = (JobManager) Context.get().getBean(JobManager.class);
 		for (GUIValue trigger : jobs)
@@ -1046,7 +1043,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	}
 
 	@Override
-	public GUIValue[] getPlugins() throws ServerException {
+	public List<GUIValue> getPlugins() throws ServerException {
 		validateSession();
 
 		Collection<PluginDescriptor> descriptors = PluginRegistry.getInstance().getPlugins();
@@ -1070,6 +1067,6 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			});
 		}
 
-		return plugins.toArray(new GUIValue[0]);
+		return plugins;
 	}
 }

@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.zoho;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -53,7 +55,7 @@ public class ZohoAuthorization extends Window {
 
 		addItem(form);
 
-		ZohoService.Instance.get().loadSettings(new AsyncCallback<String[]>() {
+		ZohoService.Instance.get().loadSettings(new AsyncCallback<List<String>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -61,9 +63,9 @@ public class ZohoAuthorization extends Window {
 			}
 
 			@Override
-			public void onSuccess(String[] settings) {
-				clientId.setValue(settings[0]);
-				clientSecret.setValue(settings[1]);
+			public void onSuccess(List<String> settings) {
+				clientId.setValue(settings.get(0));
+				clientSecret.setValue(settings.get(1));
 			}
 		});
 	}

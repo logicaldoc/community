@@ -169,26 +169,25 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 		Menu contextMenu = new Menu();
 		MenuItem inviteToChat = new MenuItem();
 		inviteToChat.setTitle(I18N.message("invitetochat"));
-		inviteToChat.addClickHandler(event -> 
-			LD.askForValue(I18N.message("invitetochat"), I18N.message("message"), null, answer -> {
-				final String[] users = new String[selection.length];
-				for (int i = 0; i < selection.length; i++)
-					users[i] = selection[i].getAttributeAsString(USERNAME);
+		inviteToChat.addClickHandler(
+				event -> LD.askForValue(I18N.message("invitetochat"), I18N.message("message"), null, answer -> {
+					List<String> users = new ArrayList<>();
+					for (int i = 0; i < selection.length; i++)
+						users.add(selection[i].getAttributeAsString(USERNAME));
 
-				ChatService.Instance.get().invite(users, answer, new AsyncCallback<Void>() {
+					ChatService.Instance.get().invite(users, answer, new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-					@Override
-					public void onSuccess(Void arg) {
-						GuiLog.info(I18N.message("invitationsent"));
-					}
-				});
-			})
-		);
+						@Override
+						public void onSuccess(Void arg) {
+							GuiLog.info(I18N.message("invitationsent"));
+						}
+					});
+				}));
 
 		contextMenu.setItems(inviteToChat);
 		return contextMenu;

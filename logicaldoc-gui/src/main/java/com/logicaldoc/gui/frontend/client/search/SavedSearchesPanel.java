@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.frontend.client.search;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -149,9 +151,9 @@ public class SavedSearchesPanel extends VLayout {
 			ListGridRecord[] selection = list.getSelectedRecords();
 			if (selection == null || selection.length == 0)
 				return;
-			final String[] names = new String[selection.length];
+			List<String> names = new ArrayList<>();
 			for (int i = 0; i < selection.length; i++) {
-				names[i] = selection[i].getAttributeAsString("name");
+				names.add(selection[i].getAttributeAsString("name"));
 			}
 
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {

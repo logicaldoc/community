@@ -231,7 +231,7 @@ public interface FolderService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIValue[] loadTemplates() throws ServerException;
+	public List<GUIValue> loadTemplates() throws ServerException;
 
 	/**
 	 * Saves the passed folder templates
@@ -240,7 +240,7 @@ public interface FolderService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void saveTemplates(GUIValue[] templates) throws ServerException;
+	public void saveTemplates(List<GUIValue> templates) throws ServerException;
 
 	/**
 	 * Applies a template to a folder

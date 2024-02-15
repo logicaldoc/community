@@ -14,6 +14,6 @@ public interface DropboxServiceAsync {
 
 	void exportDocuments(String targetPath, List<Long> folderIds, List<Long> docIds, AsyncCallback<Boolean> callback);
 
-	void importDocuments(long targetFolder, String[] paths, AsyncCallback<Integer> callback);
+	void importDocuments(long targetFolder, List<String> paths, AsyncCallback<Integer> callback);
 
 }

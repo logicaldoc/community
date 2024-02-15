@@ -62,7 +62,7 @@ public interface DropboxService extends RemoteService {
 	 */
 	public boolean exportDocuments(String targetPath, List<Long> folderIds, List<Long> docIds) throws ServerException;
 
-	public int importDocuments(long targetFolder, String[] paths) throws ServerException;
+	public int importDocuments(long targetFolder, List<String> paths) throws ServerException;
 
 	public static class Instance {
 		private static DropboxServiceAsync inst;

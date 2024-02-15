@@ -1,8 +1,6 @@
 package com.logicaldoc.gui.frontend.client.personal.contacts;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -239,8 +237,8 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 			@Override
 			public void execute(Map<String, Object> values) {
 				LD.contactingServer();
-				ContactService.Instance.get().shareContacts(GridUtil.getIds(list.getSelectedRecords()), usersSelector.getUserIds(),
-						groupsSelector.getGroupIds(), new AsyncCallback<Void>() {
+				ContactService.Instance.get().shareContacts(GridUtil.getIds(list.getSelectedRecords()),
+						usersSelector.getUserIds(), groupsSelector.getGroupIds(), new AsyncCallback<Void>() {
 
 							@Override
 							public void onFailure(Throwable caught) {

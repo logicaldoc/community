@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
 import java.util.Date;
+import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -123,7 +124,7 @@ public interface SystemService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void unscheduleJobs(GUIValue[] jobs) throws ServerException;
+	public void unscheduleJobs(List<GUIValue> jobs) throws ServerException;
 
 	/**
 	 * Changes the activation status of a language
@@ -142,7 +143,7 @@ public interface SystemService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIValue[] getPlugins() throws ServerException;
+	public List<GUIValue> getPlugins() throws ServerException;
 
 	/**
 	 * Launches the initialization of a plugin
@@ -183,18 +184,18 @@ public interface SystemService extends RemoteService {
 	 */
 	public void restart() throws ServerException;
 
-	public GUIHistory[] search(Long userId, Date from, Date till, int maxResult, String historySid, String[] event,
-			Long rootFolderId) throws ServerException;
+	public List<GUIHistory> search(Long userId, Date from, Date till, int maxResult, String historySid,
+			List<String> event, Long rootFolderId) throws ServerException;
 
-	public GUIHistory[] searchApiCalls(Long userId, Date from, Date till, String callSid, String protocol, String uri,
-			int maxResult) throws ServerException;
+	public List<GUIHistory> searchApiCalls(Long userId, Date from, Date till, String callSid, String protocol,
+			String uri, int maxResult) throws ServerException;
 
 	public static class Instance {
 		private static SystemServiceAsync inst;
 
 		private Instance() {
 		}
-		
+
 		public static SystemServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(SystemService.class);

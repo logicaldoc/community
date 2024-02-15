@@ -106,7 +106,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 	}
 
 	@Override
-	public GUIContact[] parseContacts(boolean preview, GUIParseContactsParameters parameters) throws ServerException {
+	public List<GUIContact> parseContacts(boolean preview, GUIParseContactsParameters parameters) throws ServerException {
 		final Session session = validateSession();
 
 		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
@@ -166,7 +166,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 			UploadServlet.cleanReceivedFiles(session.getSid());
 		}
 
-		return contacts.toArray(new GUIContact[0]);
+		return contacts;
 	}
 
 	@Override

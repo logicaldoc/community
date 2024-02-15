@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.system.plugin;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
@@ -83,21 +86,21 @@ public class PluginsPanel extends VLayout {
 	}
 
 	void refresh() {
-		SystemService.Instance.get().getPlugins(new AsyncCallback<GUIValue[]>() {
+		SystemService.Instance.get().getPlugins(new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
 			}
 
 			@Override
-			public void onSuccess(GUIValue[] plugins) {
-				ListGridRecord[] records = new ListGridRecord[plugins.length];
-				for (int i = 0; i < plugins.length; i++) {
-					records[i] = new ListGridRecord();
-					records[i].setAttribute("name", plugins[i].getCode());
-					records[i].setAttribute("version", plugins[i].getValue());
+			public void onSuccess(List<GUIValue> plugins) {
+				List<ListGridRecord> records = new ArrayList<>();
+				for (GUIValue val : plugins) {
+					ListGridRecord rec = new ListGridRecord();
+					rec.setAttribute("name", val.getCode());
+					rec.setAttribute("version", val.getValue());
 				}
-				list.setRecords(records);
+				list.setRecords(records.toArray(new ListGridRecord[0]));
 			}
 		});
 	}

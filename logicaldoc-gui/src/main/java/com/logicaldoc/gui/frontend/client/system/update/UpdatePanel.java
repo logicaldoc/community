@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.system.update;
 
 import java.util.Date;
+import java.util.List;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -269,7 +270,7 @@ public class UpdatePanel extends VLayout {
 	}
 
 	private void displayNotes(String fileName) {
-		UpdateService.Instance.get().getUpdateNotes(fileName, new AsyncCallback<String[]>() {
+		UpdateService.Instance.get().getUpdateNotes(fileName, new AsyncCallback<List<String>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -277,17 +278,17 @@ public class UpdatePanel extends VLayout {
 			}
 
 			@Override
-			public void onSuccess(String[] infos) {
+			public void onSuccess(List<String> infos) {
 				DynamicForm form = new DynamicForm();
 				form.setTitleOrientation(TitleOrientation.TOP);
 				form.setColWidths("*");
 				form.setNumCols(1);
 
-				TextAreaItem changelog = ItemFactory.newTextAreaItem("changelog", infos[0]);
+				TextAreaItem changelog = ItemFactory.newTextAreaItem("changelog", infos.get(0));
 				changelog.setWidth("100%");
 				changelog.setHeight(220);
 
-				TextAreaItem updatenotes = ItemFactory.newTextAreaItem("updatenotes", infos[1]);
+				TextAreaItem updatenotes = ItemFactory.newTextAreaItem("updatenotes", infos.get(1));
 				updatenotes.setWidth("100%");
 				updatenotes.setHeight(220);
 

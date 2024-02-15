@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
@@ -305,40 +307,39 @@ public class VersionsPanel extends DocumentDetailTab {
 	private MenuItem compareContentMenuItem(final ListGridRecord[] selection) {
 		MenuItem compareContent = new MenuItem();
 		compareContent.setTitle(I18N.message("comparecontent"));
-		compareContent.addClickHandler((MenuItemClickEvent compareContentEvent) -> DocumentService.Instance.get()
-				.getVersionsById(Long.parseLong(selection[0].getAttribute("id")),
-						Long.parseLong(selection[1].getAttribute("id")), new AsyncCallback<GUIVersion[]>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		compareContent.addClickHandler(compareContentEvent -> DocumentService.Instance.get().getVersionsById(
+				Long.parseLong(selection[0].getAttribute("id")), Long.parseLong(selection[1].getAttribute("id")),
+				new AsyncCallback<>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-							@Override
-							public void onSuccess(GUIVersion[] versions) {
-								ComparisonWindow diffWinfow = new ComparisonWindow(versions[0], versions[1]);
-								diffWinfow.show();
-							}
-						}));
+					@Override
+					public void onSuccess(List<GUIVersion> versions) {
+						new ComparisonWindow(versions.get(0), versions.get(1)).show();
+					}
+				}));
 		return compareContent;
 	}
 
 	private MenuItem prepareCompareMetadataItem(final ListGridRecord[] selection) {
 		MenuItem compareMetadata = new MenuItem();
 		compareMetadata.setTitle(I18N.message("comparemetadata"));
-		compareMetadata.addClickHandler((MenuItemClickEvent compareMetadataEvent) -> DocumentService.Instance.get()
-				.getVersionsById(Long.parseLong(selection[0].getAttribute("id")),
-						Long.parseLong(selection[1].getAttribute("id")), new AsyncCallback<GUIVersion[]>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+		compareMetadata.addClickHandler(compareMetadataEvent -> DocumentService.Instance.get().getVersionsById(
+				Long.parseLong(selection[0].getAttribute("id")), Long.parseLong(selection[1].getAttribute("id")),
+				new AsyncCallback<>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-							@Override
-							public void onSuccess(GUIVersion[] result) {
-								MetadataDiff diffWinfow = new MetadataDiff(result[0], result[1]);
-								diffWinfow.show();
-							}
-						}));
+					@Override
+					public void onSuccess(List<GUIVersion> result) {
+						MetadataDiff diffWinfow = new MetadataDiff(result.get(0), result.get(1));
+						diffWinfow.show();
+					}
+				}));
 		return compareMetadata;
 	}
 }

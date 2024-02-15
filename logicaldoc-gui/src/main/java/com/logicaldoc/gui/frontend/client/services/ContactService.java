@@ -59,7 +59,7 @@ public interface ContactService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIContact[] parseContacts(boolean preview, GUIParseContactsParameters parameters) throws ServerException;
+	public List<GUIContact> parseContacts(boolean preview, GUIParseContactsParameters parameters) throws ServerException;
 
 	/**
 	 * Shares contacts among a set of users and groups

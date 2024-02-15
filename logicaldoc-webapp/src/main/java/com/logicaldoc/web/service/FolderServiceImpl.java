@@ -919,12 +919,12 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	@Override
-	public GUIValue[] loadTemplates() throws ServerException {
-		return new GUIValue[0];
+	public List<GUIValue> loadTemplates() throws ServerException {
+		return new ArrayList<>();
 	}
 
 	@Override
-	public void saveTemplates(GUIValue[] templates) throws ServerException {
+	public void saveTemplates(List<GUIValue> templates) throws ServerException {
 		// Nothing to do
 	}
 

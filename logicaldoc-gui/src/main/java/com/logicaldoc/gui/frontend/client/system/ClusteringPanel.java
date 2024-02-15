@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.system;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -31,6 +33,7 @@ import com.smartgwt.client.widgets.tab.Tab;
 public class ClusteringPanel extends AdminPanel {
 
 	private static final String BASEPORT = "baseport";
+
 	private ValuesManager vm = new ValuesManager();
 
 	public ClusteringPanel() {
@@ -39,25 +42,24 @@ public class ClusteringPanel extends AdminPanel {
 
 	@Override
 	protected void onDraw() {
-		SettingService.Instance.get()
-				.loadSettingsByNames(
-						new String[] { "cluster.enabled", "cluster.name", "cluster.port", "cluster.multicastip",
-								"cluster.cache.resources", "cluster.chunk.size", "id" },
-						new AsyncCallback<GUIParameter[]>() {
+		SettingService.Instance.get().loadSettingsByNames(
+				Arrays.asList("cluster.enabled", "cluster.name", "cluster.port", "cluster.multicastip",
+						"cluster.cache.resources", "cluster.chunk.size", "id"),
+				new AsyncCallback<List<GUIParameter>>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-							@Override
-							public void onSuccess(GUIParameter[] parameters) {
-								init(parameters);
-							}
-						});
+					@Override
+					public void onSuccess(List<GUIParameter> parameters) {
+						init(parameters);
+					}
+				});
 	}
 
-	private void init(GUIParameter[] parameters) {
+	private void init(List<GUIParameter> parameters) {
 		DynamicForm clusterForm = new DynamicForm();
 		clusterForm.setWidth(300);
 		clusterForm.setColWidths(1, "*");
@@ -65,29 +67,29 @@ public class ClusteringPanel extends AdminPanel {
 		clusterForm.setTitleOrientation(TitleOrientation.LEFT);
 
 		RadioGroupItem enabled = ItemFactory.newBooleanSelector("eenabled", "enabled");
-		enabled.setValue("true".equals(parameters[0].getValue()) ? "yes" : "no");
+		enabled.setValue("true".equals(parameters.get(0).getValue()) ? "yes" : "no");
 
-		TextItem name = ItemFactory.newTextItem("name", parameters[1].getValue());
+		TextItem name = ItemFactory.newTextItem("name", parameters.get(1).getValue());
 		name.setRequired(true);
 
 		IntegerItem baseport = ItemFactory.newIntegerItem(BASEPORT, I18N.message(BASEPORT),
-				Integer.parseInt(parameters[2].getValue()));
+				Integer.parseInt(parameters.get(2).getValue()));
 		baseport.setRequired(true);
 
-		TextItem multicastip = ItemFactory.newTextItem("multicastip", parameters[3].getValue());
+		TextItem multicastip = ItemFactory.newTextItem("multicastip", parameters.get(3).getValue());
 
 		RadioGroupItem cacheResources = ItemFactory.newBooleanSelector("cacheResources", "cache");
 		cacheResources.setHint(I18N.message("cachesresources"));
-		cacheResources.setValue("true".equals(parameters[4].getValue()) ? "yes" : "no");
+		cacheResources.setValue("true".equals(parameters.get(4).getValue()) ? "yes" : "no");
 
-		SpinnerItem chunkSize = ItemFactory.newSpinnerItem("chunksize", Integer.valueOf(parameters[5].getValue()));
+		SpinnerItem chunkSize = ItemFactory.newSpinnerItem("chunksize", Integer.valueOf(parameters.get(5).getValue()));
 		chunkSize.setHint("MB");
 		chunkSize.setRequired(true);
 		chunkSize.setWrapTitle(false);
 		chunkSize.setMin(1);
 		chunkSize.setStep(10);
 
-		StaticTextItem id = ItemFactory.newStaticTextItem("id", I18N.message("nodeid"), parameters[6].getValue());
+		StaticTextItem id = ItemFactory.newStaticTextItem("id", I18N.message("nodeid"), parameters.get(6).getValue());
 		id.setWrap(false);
 		id.setWrapTitle(false);
 
@@ -98,7 +100,7 @@ public class ClusteringPanel extends AdminPanel {
 			public void onClick(ClickEvent event) {
 				final Map<String, Object> values = vm.getValues();
 
-				if (Boolean.TRUE.equals(vm.validate()))  {
+				if (Boolean.TRUE.equals(vm.validate())) {
 					final GUIParameter[] settings = new GUIParameter[6];
 					settings[0] = new GUIParameter("cluster.enabled",
 							values.get("eenabled").equals("yes") ? "true" : "false");

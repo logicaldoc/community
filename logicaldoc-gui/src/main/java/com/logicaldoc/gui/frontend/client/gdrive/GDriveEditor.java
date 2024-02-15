@@ -165,7 +165,7 @@ public class GDriveEditor extends Window {
 				new GDriveCheckin(document, GDriveEditor.this).show();
 			} else {
 				LD.contactingServer();
-				GDriveService.Instance.get().importDocuments(new String[] { document.getExtResId() },
+				GDriveService.Instance.get().importDocuments(Arrays.asList(document.getExtResId()),
 						FolderController.get().getCurrentFolder().getId(), document.getType(),
 						new AsyncCallback<Void>() {
 							@Override

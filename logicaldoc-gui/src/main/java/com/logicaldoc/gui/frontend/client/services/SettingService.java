@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -46,7 +48,7 @@ public interface SettingService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIParameter[] loadSettingsByNames(String[] names) throws ServerException;
+	public List<GUIParameter> loadSettingsByNames(List<String> names) throws ServerException;
 
 	/**
 	 * Saves the registration settings
@@ -128,7 +130,7 @@ public interface SettingService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public String[] removeStorage(int storageId) throws ServerException;
+	public List<String> removeStorage(int storageId) throws ServerException;
 
 	/**
 	 * Saves email settings (SMTP connection)

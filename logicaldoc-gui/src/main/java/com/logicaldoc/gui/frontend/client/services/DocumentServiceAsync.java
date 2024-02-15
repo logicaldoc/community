@@ -15,7 +15,7 @@ import com.logicaldoc.gui.common.client.beans.GUIVersion;
 
 public interface DocumentServiceAsync {
 
-	void getVersionsById(long id1, long id2, AsyncCallback<GUIVersion[]> callback);
+	void getVersionsById(long id1, long id2, AsyncCallback<List<GUIVersion>> callback);
 
 	void getById(long docId, AsyncCallback<GUIDocument> callback);
 
@@ -36,7 +36,7 @@ public interface DocumentServiceAsync {
 	void unlock(List<Long> ids, AsyncCallback<Void> callback);
 
 	void addDocuments(String language, long folderId, boolean importZip, String charset, boolean immediateIndexing,
-			Long templateId, AsyncCallback<GUIDocument[]> callback);
+			Long templateId, AsyncCallback<List<GUIDocument>> callback);
 
 	void checkout(List<Long> docIds, AsyncCallback<Void> callback);
 
@@ -68,10 +68,10 @@ public interface DocumentServiceAsync {
 
 	void addNote(long docId, String message, AsyncCallback<Long> callback);
 
-	void bulkUpdate(List<Long> ids, GUIDocument vo, boolean ignoreEmptyFields, AsyncCallback<GUIDocument[]> callback);
+	void bulkUpdate(List<Long> ids, GUIDocument vo, boolean ignoreEmptyFields, AsyncCallback<List<GUIDocument>> callback);
 
 	void addDocuments(boolean importZip, String charset, boolean immediateIndexing, GUIDocument metadata,
-			AsyncCallback<GUIDocument[]> callback);
+			AsyncCallback<List<GUIDocument>> callback);
 
 	void updateNote(long docId, long noteId, String message, AsyncCallback<Void> callback);
 
@@ -94,7 +94,7 @@ public interface DocumentServiceAsync {
 	void unarchiveDocuments(List<Long> docIds, AsyncCallback<Void> callback);
 
 	void createDownloadTicket(long docId, int type, String suffix, Integer expireHours, Date expireDate,
-			Integer maxDownloads, Integer maxViews, AsyncCallback<String[]> callback);
+			Integer maxDownloads, Integer maxViews, AsyncCallback<List<String>> callback);
 
 	void setPassword(long docId, String password, AsyncCallback<Void> callback);
 
@@ -127,9 +127,9 @@ public interface DocumentServiceAsync {
 
 	void promoteVersion(long docId, String version, AsyncCallback<GUIDocument> callback);
 
-	void getNotes(long docId, String fileVersion, Collection<String> types, AsyncCallback<GUIDocumentNote[]> callback);
+	void getNotes(long docId, String fileVersion, Collection<String> types, AsyncCallback<List<GUIDocumentNote>> callback);
 
-	void saveNotes(long docId, GUIDocumentNote[] notes, Collection<String> types, AsyncCallback<Void> callback);
+	void saveNotes(long docId, List<GUIDocumentNote> notes, Collection<String> types, AsyncCallback<Void> callback);
 
 	void deleteTicket(long ticketId, AsyncCallback<Void> callback);
 
