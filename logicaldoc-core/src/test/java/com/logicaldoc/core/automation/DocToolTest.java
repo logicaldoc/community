@@ -115,7 +115,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 		doc.setTemplate(template);
 		doc.setFileName("pippo.pdf");
 
-		doc.setValues("multi", new String[] { "value1", "value2", "value3" });
+		doc.setValues("multi", List.of("value1", "value2", "value3"));
 		testSubject.store(doc);
 		assertNotSame(0L, doc.getId());
 
@@ -270,7 +270,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 		Document result = testSubject.convert(doc, "pdf", "admin");
 		assertNotNull(result);
 	}
-	
+
 	@Test
 	public void testMerge() throws Exception {
 		Document doc1 = testSubject.findById(1);
@@ -293,15 +293,13 @@ public class DocToolTest extends AbstractCoreTestCase {
 		Assert.assertEquals(56, testSubject.countPages(mergedDoc));
 	}
 
-
 	@Test
 	public void testFindByPath() throws Exception {
 		Document doc = testSubject.findById(1L);
-		String path=testSubject.getPath(doc);
+		String path = testSubject.getPath(doc);
 		Document pathDoc = testSubject.findByPath(path);
-		assertEquals(doc, pathDoc);		
+		assertEquals(doc, pathDoc);
 	}
-
 
 	@Test
 	public void testGetPath() throws Exception {
@@ -311,13 +309,13 @@ public class DocToolTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testGetIds() throws Exception {
-		Document doc1=new Document();
+		Document doc1 = new Document();
 		doc1.setId(101L);
-		Document doc2=new Document();
+		Document doc2 = new Document();
 		doc2.setId(102L);
-		Document doc3=new Document();
+		Document doc3 = new Document();
 		doc3.setId(103L);
-		List<Long> ids =testSubject.getIds(Arrays.asList(doc1, doc2, doc3));
+		List<Long> ids = testSubject.getIds(Arrays.asList(doc1, doc2, doc3));
 		Assert.assertEquals(3, ids.size());
 		Assert.assertEquals(Long.valueOf(102L), ids.get(1));
 	}
@@ -328,10 +326,10 @@ public class DocToolTest extends AbstractCoreTestCase {
 		Folder result = testSubject.createPath(doc, "/Default/xxx", "admin");
 		FolderTool ft = new FolderTool();
 		assertEquals(result, ft.findByPath("/Default/xxx", doc.getTenantId()));
-		
+
 		result = testSubject.createPath(doc, "yyy", "admin");
 		assertEquals(result, ft.findByPath("/Workspace X/folder6/yyy", doc.getTenantId()));
-		
+
 		result = testSubject.createPath(doc, "/zzz", "admin");
 		assertEquals(result, ft.findByPath("/Default/zzz", doc.getTenantId()));
 	}

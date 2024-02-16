@@ -186,7 +186,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			long id = Long.parseLong(getSelectedRecord().getAttribute("id"));
 			String ratingImageName = getSelectedRecord().getAttribute(RATING);
 			final int docRating = Integer.parseInt(ratingImageName.replace(RATING, ""));
-			DocumentService.Instance.get().getRating(id, new AsyncCallback<GUIRating>() {
+			DocumentService.Instance.get().getRating(id, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

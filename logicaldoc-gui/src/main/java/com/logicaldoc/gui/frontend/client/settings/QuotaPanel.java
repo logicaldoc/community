@@ -22,7 +22,7 @@ public class QuotaPanel extends AdminPanel {
 	public QuotaPanel(long tenantId) {
 		super("quota");
 
-		TenantService.Instance.get().load(tenantId, new AsyncCallback<GUITenant>() {
+		TenantService.Instance.get().load(tenantId, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
@@ -45,7 +45,7 @@ public class QuotaPanel extends AdminPanel {
 		save.setMinWidth(80);
 		save.addClickHandler(event -> {
 			if (tenantQuota.validate())
-				TenantService.Instance.get().save(tenant, new AsyncCallback<GUITenant>() {
+				TenantService.Instance.get().save(tenant, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

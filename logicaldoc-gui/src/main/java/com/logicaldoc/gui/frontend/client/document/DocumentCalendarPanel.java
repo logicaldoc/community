@@ -34,7 +34,7 @@ public class DocumentCalendarPanel extends DocumentDetailTab {
 		if (document.getDocRef() != null)
 			docId = document.getDocRef();
 
-		calendar = new EventsCalendar(docId, null, new AsyncCallback<Void>() {
+		calendar = new EventsCalendar(docId, null, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

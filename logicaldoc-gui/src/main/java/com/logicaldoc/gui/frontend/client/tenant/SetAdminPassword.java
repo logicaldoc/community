@@ -70,7 +70,7 @@ public class SetAdminPassword extends Window {
 			if (Boolean.FALSE.equals(vm.hasErrors())) {
 				apply.setDisabled(true);
 				TenantService.Instance.get().changeAdminPassword(vm.getValueAsString(NEWPASSWORD).trim(), tenantName,
-						new AsyncCallback<Void>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {

@@ -39,7 +39,7 @@ public class AutomationTriggerDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (trigger.getId() != 0) {
-				AutomationService.Instance.get().getTrigger(trigger.getId(), new AsyncCallback<GUIAutomationTrigger>() {
+				AutomationService.Instance.get().getTrigger(trigger.getId(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -105,7 +105,7 @@ public class AutomationTriggerDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (validate()) {
-			AutomationService.Instance.get().saveTrigger(trigger, new AsyncCallback<GUIAutomationTrigger>() {
+			AutomationService.Instance.get().saveTrigger(trigger, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					if (caught.getMessage().toLowerCase().contains("cron")) {

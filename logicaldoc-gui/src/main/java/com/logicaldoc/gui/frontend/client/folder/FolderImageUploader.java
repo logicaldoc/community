@@ -66,7 +66,7 @@ public class FolderImageUploader extends Window {
 	}
 
 	private void cleanUploads() {
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -93,7 +93,7 @@ public class FolderImageUploader extends Window {
 			return;
 		}
 
-		FolderService.Instance.get().readImage(new AsyncCallback<String>() {
+		FolderService.Instance.get().readImage(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

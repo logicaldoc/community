@@ -80,7 +80,7 @@ public class OCRSettingsPanel extends AdminPanel {
 	public OCRSettingsPanel() {
 		super("ocr");
 
-		OCRService.Instance.get().loadSettings(new AsyncCallback<GUIParameter[]>() {
+		OCRService.Instance.get().loadSettings(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -88,13 +88,13 @@ public class OCRSettingsPanel extends AdminPanel {
 			}
 
 			@Override
-			public void onSuccess(GUIParameter[] params) {
+			public void onSuccess(List<GUIParameter> params) {
 				initGUI(params);
 			}
 		});
 	}
 
-	private void initGUI(final GUIParameter[] params) {
+	private void initGUI(final List<GUIParameter> params) {
 		DynamicForm form = new DynamicForm();
 		form.setValuesManager(vm);
 		form.setTitleOrientation(TitleOrientation.LEFT);
@@ -118,7 +118,7 @@ public class OCRSettingsPanel extends AdminPanel {
 				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.excludes"));
 		excludes.setWidth(300);
 		excludes.setColSpan(4);
-		
+
 		SpinnerItem timeout = prepareTimeoutSpinner(params);
 
 		SpinnerItem batchTimeout = prepareBatchTimeoutSpinner(params);
@@ -218,7 +218,7 @@ public class OCRSettingsPanel extends AdminPanel {
 		tabs.addTab(history);
 	}
 
-	private RadioGroupItem prepareCropImageSwitch(GUIParameter[] params) {
+	private RadioGroupItem prepareCropImageSwitch(List<GUIParameter> params) {
 		RadioGroupItem cropImage = ItemFactory.newBooleanSelector("ocr_cropimage",
 				I18N.message("cropvisiblepartofimage"));
 		cropImage.setWrapTitle(false);
@@ -231,7 +231,7 @@ public class OCRSettingsPanel extends AdminPanel {
 		return cropImage;
 	}
 
-	private SpinnerItem prepareOcrRendResSpinner(GUIParameter[] params) {
+	private SpinnerItem prepareOcrRendResSpinner(List<GUIParameter> params) {
 		SpinnerItem ocrrendres = ItemFactory.newSpinnerItem(OCR_RENDRES, I18N.message("ocrrendres"), Integer
 				.parseInt(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, OCR_DOT_TIMEOUT)));
 		ocrrendres.setRequired(true);
@@ -243,7 +243,7 @@ public class OCRSettingsPanel extends AdminPanel {
 		return ocrrendres;
 	}
 
-	private RadioGroupItem prepareEngineOptions(final GUIParameter[] params) {
+	private RadioGroupItem prepareEngineOptions(final List<GUIParameter> params) {
 		// Deduct the list of available OCR engines
 		Map<String, String> engines = new HashMap<>();
 		for (GUIParameter param : params)
@@ -260,7 +260,7 @@ public class OCRSettingsPanel extends AdminPanel {
 		return engine;
 	}
 
-	private SpinnerItem prepareBatchTimeoutSpinner(GUIParameter[] params) {
+	private SpinnerItem prepareBatchTimeoutSpinner(List<GUIParameter> params) {
 		SpinnerItem batchTimeout = ItemFactory.newSpinnerItem(OCR_TIMEOUT_BATCH, I18N.message("batchtimeout"),
 				Integer.parseInt(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params,
 						OCR_TIMEOUT_BATCH.replace('_', '.'))));
@@ -273,7 +273,7 @@ public class OCRSettingsPanel extends AdminPanel {
 		return batchTimeout;
 	}
 
-	private SpinnerItem prepareTimeoutSpinner(GUIParameter[] params) {
+	private SpinnerItem prepareTimeoutSpinner(List<GUIParameter> params) {
 		SpinnerItem timeout = ItemFactory.newSpinnerItem(OCR_TIMEOUT, I18N.message("timeout"), Integer
 				.parseInt(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, OCR_DOT_TIMEOUT)));
 		timeout.setEndRow(true);
@@ -285,7 +285,7 @@ public class OCRSettingsPanel extends AdminPanel {
 		return timeout;
 	}
 
-	private FloatItem prepareTextThresholdSpinner(GUIParameter[] params) {
+	private FloatItem prepareTextThresholdSpinner(List<GUIParameter> params) {
 		FloatItem textThreshold = ItemFactory.newFloatItem(OCR_TEXT_THRESHOLD, I18N.message("textthreshold"),
 				Float.parseFloat(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params,
 						OCR_TEXT_THRESHOLD.replace('_', '.'))));
@@ -303,7 +303,7 @@ public class OCRSettingsPanel extends AdminPanel {
 		return textThreshold;
 	}
 
-	private SpinnerItem prepareResolutionThresholdSpinner(GUIParameter[] params) {
+	private SpinnerItem prepareResolutionThresholdSpinner(List<GUIParameter> params) {
 		SpinnerItem resolutionThreshold = ItemFactory.newSpinnerItem(OCR_RESOLUTION_THRESHOLD,
 				I18N.message("resolutionthreshold"), Integer.parseInt(com.logicaldoc.gui.common.client.util.Util
 						.getParameterValue(params, OCR_RESOLUTION_THRESHOLD.replace('_', '.'))));
@@ -316,7 +316,7 @@ public class OCRSettingsPanel extends AdminPanel {
 		return resolutionThreshold;
 	}
 
-	private RadioGroupItem prepareEnabledSwitch(GUIParameter[] params) {
+	private RadioGroupItem prepareEnabledSwitch(List<GUIParameter> params) {
 		RadioGroupItem enabled = ItemFactory.newBooleanSelector("ocr_enabled", "enabled");
 		enabled.setRequired(true);
 		enabled.setEndRow(true);
@@ -327,7 +327,7 @@ public class OCRSettingsPanel extends AdminPanel {
 		return enabled;
 	}
 
-	private void initEngineForm(String engine, GUIParameter[] params) {
+	private void initEngineForm(String engine, List<GUIParameter> params) {
 		if (engineForm != null)
 			body.removeMember(engineForm);
 
@@ -455,7 +455,7 @@ public class OCRSettingsPanel extends AdminPanel {
 	}
 
 	private void doSaveSettings(List<GUIParameter> params) {
-		SettingService.Instance.get().saveSettings(params.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
+		SettingService.Instance.get().saveSettings(params, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

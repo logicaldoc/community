@@ -189,7 +189,7 @@ public class ExportArchivesList extends VLayout {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				ImpexService.Instance.get().delete(id, new AsyncCallback<Void>() {
+				ImpexService.Instance.get().delete(id, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -244,7 +244,7 @@ public class ExportArchivesList extends VLayout {
 
 	protected void closeArchive(final ListGridRecord rec) {
 		ImpexService.Instance.get().setStatus(Long.parseLong(rec.getAttributeAsString("id")), GUIArchive.STATUS_CLOSED,
-				new AsyncCallback<Void>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -282,7 +282,7 @@ public class ExportArchivesList extends VLayout {
 
 	protected void openArchive(final ListGridRecord rec) {
 		ImpexService.Instance.get().setStatus(Long.parseLong(rec.getAttributeAsString("id")), GUIArchive.STATUS_OPENED,
-				new AsyncCallback<Void>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

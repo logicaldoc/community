@@ -90,7 +90,7 @@ public class NoteUpdateDialog extends Window {
 			return;
 
 		DocumentService.Instance.get().updateNote(docId, noteId, message.getValue().toString(),
-				new AsyncCallback<Void>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

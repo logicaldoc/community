@@ -70,7 +70,7 @@ public class ImageUploader extends Window {
 		layout.addMember(uploadButton);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -86,7 +86,7 @@ public class ImageUploader extends Window {
 		addItem(layout);
 
 		// Just to clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -106,7 +106,7 @@ public class ImageUploader extends Window {
 			return;
 		}
 
-		TenantService.Instance.get().encodeBrandingImage(new AsyncCallback<String>() {
+		TenantService.Instance.get().encodeBrandingImage(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -116,7 +116,7 @@ public class ImageUploader extends Window {
 			@Override
 			public void onSuccess(String imageContent) {
 				panel.updateImage(imageName, imageContent);
-				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

@@ -48,7 +48,7 @@ public class AutomationRoutineDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (routine.getId() != 0) {
-				AutomationService.Instance.get().getRoutine(routine.getId(), new AsyncCallback<GUIAutomationRoutine>() {
+				AutomationService.Instance.get().getRoutine(routine.getId(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -151,7 +151,7 @@ public class AutomationRoutineDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (validate()) {
-			AutomationService.Instance.get().saveRoutine(routine, new AsyncCallback<GUIAutomationRoutine>() {
+			AutomationService.Instance.get().saveRoutine(routine, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

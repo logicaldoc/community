@@ -73,7 +73,7 @@ public class OptionsUploader extends Window {
 
 		LD.contactingServer();
 		AttributeSetService.Instance.get().parseOptions(options.getSetId(), options.getAttribute(),
-				new AsyncCallback<List<GUIValue>>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

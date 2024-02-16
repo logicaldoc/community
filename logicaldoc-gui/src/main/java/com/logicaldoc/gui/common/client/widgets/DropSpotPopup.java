@@ -56,7 +56,7 @@ public class DropSpotPopup extends Window {
 
 	public static void openDropSpot() {
 		// Just to clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

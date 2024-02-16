@@ -114,7 +114,7 @@ public class PluginsPanel extends VLayout {
 					if (Boolean.TRUE.equals(value)) {
 						LD.contactingServer();
 						SystemService.Instance.get().initializePlugin(
-								list.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<Void>() {
+								list.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<>() {
 									@Override
 									public void onFailure(Throwable caught) {
 										LD.clearPrompt();
@@ -137,7 +137,7 @@ public class PluginsPanel extends VLayout {
 					if (Boolean.TRUE.equals(value)) {
 						LD.contactingServer();
 						SystemService.Instance.get().uninstallPlugin(
-								list.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<Void>() {
+								list.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<>() {
 									@Override
 									public void onFailure(Throwable caught) {
 										LD.clearPrompt();

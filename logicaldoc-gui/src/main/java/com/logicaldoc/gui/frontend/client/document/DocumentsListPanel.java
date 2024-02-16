@@ -116,7 +116,7 @@ public class DocumentsListPanel extends VLayout {
 			if (documentsGrid.getSelectedCount() != 1)
 				return;
 			GUIDocument selectedDocument = documentsGrid.getSelectedDocument();
-			DocumentService.Instance.get().getById(selectedDocument.getId(), new AsyncCallback<GUIDocument>() {
+			DocumentService.Instance.get().getById(selectedDocument.getId(), new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

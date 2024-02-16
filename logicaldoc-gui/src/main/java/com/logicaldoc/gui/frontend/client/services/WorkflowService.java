@@ -116,7 +116,7 @@ public interface WorkflowService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server applications
 	 */
-	public GUIWorkflow[] list() throws ServerException;
+	public List<GUIWorkflow> list() throws ServerException;
 
 	/**
 	 * Deletes a workflow trigger

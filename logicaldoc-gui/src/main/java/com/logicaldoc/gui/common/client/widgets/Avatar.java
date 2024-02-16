@@ -68,7 +68,7 @@ public class Avatar extends HLayout {
 	private Menu prepareContextMenu() {
 		MenuItem reset = new MenuItem();
 		reset.setTitle(I18N.message("reset"));
-		reset.addClickHandler(event -> SecurityService.Instance.get().resetAvatar(userId, new AsyncCallback<Void>() {
+		reset.addClickHandler(event -> SecurityService.Instance.get().resetAvatar(userId, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
@@ -134,7 +134,7 @@ public class Avatar extends HLayout {
 			layout.addMember(saveButton);
 
 			addCloseClickHandler(
-					event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+					event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -156,7 +156,7 @@ public class Avatar extends HLayout {
 				return;
 			}
 
-			SecurityService.Instance.get().saveAvatar(userId, new AsyncCallback<Void>() {
+			SecurityService.Instance.get().saveAvatar(userId, new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -167,7 +167,7 @@ public class Avatar extends HLayout {
 				@Override
 				public void onSuccess(Void arg) {
 					Avatar.this.initGUI();
-					DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+					DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

@@ -62,7 +62,7 @@ public class GDriveEditor extends Window {
 				// doc in Google Drive
 				LD.contactingServer();
 				GDriveService.Instance.get().delete(GDriveEditor.this.document.getExtResId(),
-						new AsyncCallback<Void>() {
+						new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								LD.clearPrompt();
@@ -127,7 +127,7 @@ public class GDriveEditor extends Window {
 		toolStrip.addButton(cancel);
 		toolStrip.addSeparator();
 		cancel.addClickHandler(event -> DocumentService.Instance.get()
-				.unlock(Arrays.asList(GDriveEditor.this.document.getId()), new AsyncCallback<Void>() {
+				.unlock(Arrays.asList(GDriveEditor.this.document.getId()), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -140,7 +140,7 @@ public class GDriveEditor extends Window {
 						DocumentController.get().setCurrentDocument(document);
 						LD.contactingServer();
 						GDriveService.Instance.get().delete(GDriveEditor.this.document.getExtResId(),
-								new AsyncCallback<Void>() {
+								new AsyncCallback<>() {
 									@Override
 									public void onFailure(Throwable caught) {
 										LD.clearPrompt();
@@ -167,7 +167,7 @@ public class GDriveEditor extends Window {
 				LD.contactingServer();
 				GDriveService.Instance.get().importDocuments(Arrays.asList(document.getExtResId()),
 						FolderController.get().getCurrentFolder().getId(), document.getType(),
-						new AsyncCallback<Void>() {
+						new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								LD.clearPrompt();
@@ -180,7 +180,7 @@ public class GDriveEditor extends Window {
 								DocumentsPanel.get().refresh();
 
 								// Delete the temporary resource in GDrive
-								GDriveService.Instance.get().delete(document.getExtResId(), new AsyncCallback<Void>() {
+								GDriveService.Instance.get().delete(document.getExtResId(), new AsyncCallback<>() {
 
 									@Override
 									public void onFailure(Throwable caught) {

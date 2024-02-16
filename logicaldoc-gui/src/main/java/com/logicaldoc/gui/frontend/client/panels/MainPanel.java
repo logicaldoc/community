@@ -115,7 +115,7 @@ public class MainPanel extends VLayout implements SessionObserver {
 
 	private void retrieveAlerts() {
 		InfoService.Instance.get().getInfo(I18N.getLocale(), Session.get().getTenantName(), false,
-				new AsyncCallback<GUIInfo>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						// Nothing to do

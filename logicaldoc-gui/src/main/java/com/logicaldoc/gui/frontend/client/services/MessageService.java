@@ -53,7 +53,7 @@ public interface MessageService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIMessageTemplate[] loadTemplates(String language, String type) throws ServerException;
+	public List<GUIMessageTemplate> loadTemplates(String language, String type) throws ServerException;
 
 	/**
 	 * Gets the template
@@ -73,7 +73,7 @@ public interface MessageService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void saveTemplates(GUIMessageTemplate[] templates) throws ServerException;
+	public void saveTemplates(List<GUIMessageTemplate> templates) throws ServerException;
 
 	/**
 	 * Deletes a selection of templates

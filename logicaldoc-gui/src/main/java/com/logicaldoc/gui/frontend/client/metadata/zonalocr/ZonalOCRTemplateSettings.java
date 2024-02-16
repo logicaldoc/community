@@ -68,7 +68,7 @@ public class ZonalOCRTemplateSettings extends Window {
 		layout.addMember(save);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -84,7 +84,7 @@ public class ZonalOCRTemplateSettings extends Window {
 		addItem(layout);
 
 		// Just to clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -153,7 +153,7 @@ public class ZonalOCRTemplateSettings extends Window {
 			ocrPanel.getSelectedOcrTemplate().setBatch(batch);
 		}
 
-		ZonalOCRService.Instance.get().save(ocrPanel.getSelectedOcrTemplate(), new AsyncCallback<GUIOCRTemplate>() {
+		ZonalOCRService.Instance.get().save(ocrPanel.getSelectedOcrTemplate(), new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

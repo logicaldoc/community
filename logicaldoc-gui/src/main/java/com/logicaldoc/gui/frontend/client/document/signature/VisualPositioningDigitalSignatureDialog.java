@@ -72,7 +72,7 @@ public class VisualPositioningDigitalSignatureDialog extends Window {
 				}
 
 				public void onResponseReceived(Request request, Response response) {
-					DocumentService.Instance.get().getById(docIds.get(0), new AsyncCallback<GUIDocument>() {
+					DocumentService.Instance.get().getById(docIds.get(0), new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -166,7 +166,7 @@ public class VisualPositioningDigitalSignatureDialog extends Window {
 
 		LD.contactingServer();
 
-		SignService.Instance.get().signDocuments(docIds, reason, page, exprX, exprY, exprW, new AsyncCallback<Void>() {
+		SignService.Instance.get().signDocuments(docIds, reason, page, exprX, exprY, exprW, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

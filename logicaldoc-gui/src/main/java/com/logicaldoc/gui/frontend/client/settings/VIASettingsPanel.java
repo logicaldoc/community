@@ -62,7 +62,7 @@ public class VIASettingsPanel extends AdminPanel {
 		setHeight100();
 		setMembersMargin(20);
 
-		VIAService.Instance.get().get(new AsyncCallback<GUIVIASettings>() {
+		VIAService.Instance.get().get(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -203,7 +203,7 @@ public class VIASettingsPanel extends AdminPanel {
 		resetCache.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmresetcache"), yes -> {
 			if (Boolean.TRUE.equals(yes)) {
 				EmailAccountService.Instance.get().resetCache(settings.getEmailAccount().getId(),
-						new AsyncCallback<Void>() {
+						new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -223,7 +223,7 @@ public class VIASettingsPanel extends AdminPanel {
 		ButtonItem testEmail = new ButtonItem("testconnection", I18N.message("testconnection"));
 		testEmail.addClickHandler(event -> {
 			if (validate()) {
-				VIAService.Instance.get().save(settings, new AsyncCallback<GUIVIASettings>() {
+				VIAService.Instance.get().save(settings, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -257,7 +257,7 @@ public class VIASettingsPanel extends AdminPanel {
 
 	private void onSave() {
 		if (validate()) {
-			VIAService.Instance.get().save(settings, new AsyncCallback<GUIVIASettings>() {
+			VIAService.Instance.get().save(settings, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

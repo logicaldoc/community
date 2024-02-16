@@ -121,7 +121,7 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 						if (value != null) {
 							LD.contactingServer();
 							DocumentService.Instance.get().deDuplicate(folderSelector.getFolderId(),
-									NEWEST.equals(value), new AsyncCallback<Void>() {
+									NEWEST.equals(value), new AsyncCallback<>() {
 
 										@Override
 										public void onFailure(Throwable caught) {
@@ -264,7 +264,7 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 		preview.addClickHandler(event -> {
 			long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
-			DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
+			DocumentService.Instance.get().getById(id, new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -290,7 +290,7 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), yes -> {
 				if (Boolean.TRUE.equals(yes)) {
-					DocumentService.Instance.get().delete(GridUtil.getIds(selection), new AsyncCallback<Void>() {
+					DocumentService.Instance.get().delete(GridUtil.getIds(selection), new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);

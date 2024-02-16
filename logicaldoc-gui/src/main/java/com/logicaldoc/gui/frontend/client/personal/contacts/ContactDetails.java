@@ -73,7 +73,7 @@ public class ContactDetails extends Window {
 				c.setMobile(vm.getValueAsString("cell"));
 				c.setCompany(vm.getValueAsString("company"));
 
-				ContactService.Instance.get().save(c, new AsyncCallback<Void>() {
+				ContactService.Instance.get().save(c, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						SC.warn(caught.getMessage());

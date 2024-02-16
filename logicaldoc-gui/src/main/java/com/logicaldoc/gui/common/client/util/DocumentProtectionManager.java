@@ -38,7 +38,7 @@ public class DocumentProtectionManager {
 	 *        gets unlocked
 	 */
 	public static void askForPassword(final Long docId, final DocumentProtectionHandler handler) {
-		DocumentService.Instance.get().getById(docId, new AsyncCallback<GUIDocument>() {
+		DocumentService.Instance.get().getById(docId, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
@@ -75,7 +75,7 @@ public class DocumentProtectionManager {
 
 	private static void unsetPassword(final Long docId, final DocumentProtectionHandler handler,
 			final GUIDocument result, final String password) {
-		DocumentService.Instance.get().unsetPassword(result.getId(), password, new AsyncCallback<Void>() {
+		DocumentService.Instance.get().unsetPassword(result.getId(), password, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -91,7 +91,7 @@ public class DocumentProtectionManager {
 
 	private static void unprotect(final Long docId, final DocumentProtectionHandler handler, final GUIDocument result,
 			final String password) {
-		DocumentService.Instance.get().unprotect(result.getId(), password, new AsyncCallback<Boolean>() {
+		DocumentService.Instance.get().unprotect(result.getId(), password, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

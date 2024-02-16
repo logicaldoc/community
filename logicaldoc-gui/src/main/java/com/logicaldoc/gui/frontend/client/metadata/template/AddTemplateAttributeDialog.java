@@ -125,7 +125,7 @@ public class AddTemplateAttributeDialog extends Window {
 	}
 
 	protected void fillSetAttributesList(Long setId) {
-		AttributeSetService.Instance.get().getAttributeSet(setId, new AsyncCallback<GUIAttributeSet>() {
+		AttributeSetService.Instance.get().getAttributeSet(setId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

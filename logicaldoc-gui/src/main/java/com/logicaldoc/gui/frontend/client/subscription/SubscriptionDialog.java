@@ -151,7 +151,7 @@ public class SubscriptionDialog extends Window {
 	private void doUpdateSubscriptions(ListGrid grid, List<Long> selectedIds, List<String> events,
 			final String eventsStr, final String folderOption) {
 		AuditService.Instance.get().update(selectedIds, CURRENT.equals(folderOption), events,
-				new AsyncCallback<Void>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -248,7 +248,7 @@ public class SubscriptionDialog extends Window {
 
 			if (folderId != null)
 				AuditService.Instance.get().subscribeFolder(folderId, form.getValueAsString(OPTION).equals(CURRENT),
-						events, null, null, new AsyncCallback<Void>() {
+						events, null, null, new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -262,7 +262,7 @@ public class SubscriptionDialog extends Window {
 							}
 						});
 			else
-				AuditService.Instance.get().subscribeDocuments(docIds, events, null, null, new AsyncCallback<Void>() {
+				AuditService.Instance.get().subscribeDocuments(docIds, events, null, null, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

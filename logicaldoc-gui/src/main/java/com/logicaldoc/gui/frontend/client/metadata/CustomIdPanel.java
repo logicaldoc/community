@@ -51,9 +51,9 @@ public class CustomIdPanel extends AdminPanel {
 
 	private ListGrid sequences;
 
-	private GUIScheme[] schemesData;
+	private List<GUIScheme> schemesData;
 
-	public CustomIdPanel(GUIScheme[] schemesData) {
+	public CustomIdPanel(List<GUIScheme> schemesData) {
 		super("customid");
 		this.schemesData = schemesData;
 	}
@@ -88,7 +88,7 @@ public class CustomIdPanel extends AdminPanel {
 		tabs.addTab(sequencesTab);
 	}
 
-	private VLayout setupSchemesPanel(GUIScheme[] data, String type) {
+	private VLayout setupSchemesPanel(List<GUIScheme> data, String type) {
 		ListGridField template = new ListGridField("templateName", I18N.message(TEMPLATE));
 		template.setWidth(120);
 		template.setCanEdit(false);
@@ -153,7 +153,7 @@ public class CustomIdPanel extends AdminPanel {
 			cid.setScheme(rec.getAttributeAsString(SCHEME));
 			cid.setType(rec.getAttributeAsString("type"));
 
-			SchemeService.Instance.get().save(cid, new AsyncCallback<Void>() {
+			SchemeService.Instance.get().save(cid, new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -190,7 +190,7 @@ public class CustomIdPanel extends AdminPanel {
 		id.setWidth(60);
 		id.setCanEdit(false);
 		id.setHidden(true);
-		
+
 		ListGridField name = new ListGridField("name", I18N.message("name"));
 		name.setWidth(150);
 		name.setCanEdit(false);
@@ -225,7 +225,7 @@ public class CustomIdPanel extends AdminPanel {
 		sequences.addEditCompleteHandler(event -> {
 			ListGridRecord rec = sequences.getRecord(event.getRowNum());
 			SchemeService.Instance.get().resetSequence(Long.parseLong(rec.getAttribute("id")),
-					rec.getAttributeAsInt(VALUE), new AsyncCallback<Void>() {
+					rec.getAttributeAsInt(VALUE), new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
@@ -251,14 +251,14 @@ public class CustomIdPanel extends AdminPanel {
 	}
 
 	private void refreshSequences() {
-		SchemeService.Instance.get().loadSequences(new AsyncCallback<GUISequence[]>() {
+		SchemeService.Instance.get().loadSequences(new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
 			}
 
 			@Override
-			public void onSuccess(GUISequence[] data) {
+			public void onSuccess(List<GUISequence> data) {
 				List<ListGridRecord> records = new ArrayList<>();
 				if (data != null)
 					for (GUISequence cid : data) {
@@ -288,7 +288,7 @@ public class CustomIdPanel extends AdminPanel {
 					if (Boolean.TRUE.equals(confirm)) {
 						final ListGridRecord rec = schemes.getSelectedRecord();
 						SchemeService.Instance.get().delete(Long.parseLong(rec.getAttributeAsString(TEMPLATE_ID)),
-								rec.getAttributeAsString("type"), new AsyncCallback<Void>() {
+								rec.getAttributeAsString("type"), new AsyncCallback<>() {
 
 									@Override
 									public void onFailure(Throwable caught) {
@@ -321,7 +321,7 @@ public class CustomIdPanel extends AdminPanel {
 		delete.addClickHandler(
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean confirm) -> {
 					if (Boolean.TRUE.equals(confirm)) {
-						SchemeService.Instance.get().deleteSequence(id, new AsyncCallback<Void>() {
+						SchemeService.Instance.get().deleteSequence(id, new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);

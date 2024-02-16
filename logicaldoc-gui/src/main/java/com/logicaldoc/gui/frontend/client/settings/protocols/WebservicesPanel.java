@@ -54,7 +54,7 @@ public class WebservicesPanel extends VLayout {
 
 	private StaticTextItem apicallsCurrent;
 
-	public WebservicesPanel(GUIParameter[] settings, ValuesManager vm) {
+	public WebservicesPanel(List<GUIParameter> settings, ValuesManager vm) {
 		webServiceForm = new DynamicForm();
 		webServiceForm.setValuesManager(vm);
 		webServiceForm.setTitleOrientation(TitleOrientation.LEFT);
@@ -160,15 +160,15 @@ public class WebservicesPanel extends VLayout {
 	}
 
 	private void refreshStats(Long tenantId) {
-		SettingService.Instance.get().loadWebserviceStats(tenantId, new AsyncCallback<GUIParameter[]>() {
+		SettingService.Instance.get().loadWebserviceStats(tenantId, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
 			}
 
 			@Override
-			public void onSuccess(GUIParameter[] parameters) {
-				if (parameters != null && parameters.length > 0) {
+			public void onSuccess(List<GUIParameter> parameters) {
+				if (!parameters.isEmpty()) {
 					for (GUIParameter parameter : parameters) {
 						if (parameter.getName().equals("webservice.apicalls"))
 							apicalls.setValue(Util.formatLong(Long.parseLong(parameter.getValue())));

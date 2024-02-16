@@ -91,7 +91,7 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), canceEvent -> {
 			if (user.getId() != 0) {
-				SecurityService.Instance.get().getUser(user.getId(), new AsyncCallback<GUIUser>() {
+				SecurityService.Instance.get().getUser(user.getId(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -366,7 +366,7 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 			final boolean notifyCredentials = user.isNotifyCredentials();
 
 			LD.contactingServer();
-			SecurityService.Instance.get().saveUser(user, Session.get().getInfo(), new AsyncCallback<GUIUser>() {
+			SecurityService.Instance.get().saveUser(user, Session.get().getInfo(), new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					LD.clearPrompt();

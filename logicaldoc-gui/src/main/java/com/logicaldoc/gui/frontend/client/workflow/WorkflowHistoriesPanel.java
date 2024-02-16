@@ -158,7 +158,7 @@ public class WorkflowHistoriesPanel extends VLayout {
 			return;
 
 		DocumentService.Instance.get().getById(Long.parseLong(selection.getAttributeAsString(DOCUMENT_ID)),
-				new AsyncCallback<GUIDocument>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

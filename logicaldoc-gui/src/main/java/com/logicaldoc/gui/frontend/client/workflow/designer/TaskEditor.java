@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.workflow.designer;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -149,38 +150,37 @@ public class TaskEditor extends Window {
 
 		messagesPanel.addMember(messagesForm);
 
-		MessageService.Instance.get().loadTemplates(I18N.getLocale(), "user",
-				new AsyncCallback<GUIMessageTemplate[]>() {
+		MessageService.Instance.get().loadTemplates(I18N.getLocale(), "user", new AsyncCallback<>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(GUIMessageTemplate[] templates) {
-						LinkedHashMap<String, String> map = new LinkedHashMap<>();
-						map.put("", "");
-						for (GUIMessageTemplate t : templates)
-							map.put("" + t.getName(), t.getName());
+			@Override
+			public void onSuccess(List<GUIMessageTemplate> templates) {
+				LinkedHashMap<String, String> map = new LinkedHashMap<>();
+				map.put("", "");
+				for (GUIMessageTemplate t : templates)
+					map.put("" + t.getName(), t.getName());
 
-						creationMessageTemplate.setValueMap(map);
-						creationMessageTemplate.setValue("");
-						creationMessageTemplate.setValue(state.getCreationMessageTemplate());
+				creationMessageTemplate.setValueMap(map);
+				creationMessageTemplate.setValue("");
+				creationMessageTemplate.setValue(state.getCreationMessageTemplate());
 
-						completionMessageTemplate.setValueMap(map);
-						completionMessageTemplate.setValue("");
-						completionMessageTemplate.setValue(state.getCompletionMessageTemplate());
+				completionMessageTemplate.setValueMap(map);
+				completionMessageTemplate.setValue("");
+				completionMessageTemplate.setValue(state.getCompletionMessageTemplate());
 
-						assignmentMessageTemplate.setValueMap(map);
-						assignmentMessageTemplate.setValue("");
-						assignmentMessageTemplate.setValue(state.getAssignmentMessageTemplate());
+				assignmentMessageTemplate.setValueMap(map);
+				assignmentMessageTemplate.setValue("");
+				assignmentMessageTemplate.setValue(state.getAssignmentMessageTemplate());
 
-						reminderMessageTemplate.setValueMap(map);
-						reminderMessageTemplate.setValue("");
-						reminderMessageTemplate.setValue(state.getReminderMessageTemplate());
-					}
-				});
+				reminderMessageTemplate.setValueMap(map);
+				reminderMessageTemplate.setValue("");
+				reminderMessageTemplate.setValue(state.getReminderMessageTemplate());
+			}
+		});
 
 		return messagesPanel;
 	}

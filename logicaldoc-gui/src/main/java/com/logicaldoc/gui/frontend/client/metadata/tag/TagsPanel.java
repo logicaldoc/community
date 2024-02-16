@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.metadata.tag;
 
+import java.util.List;
+
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -15,9 +17,9 @@ import com.smartgwt.client.widgets.tab.Tab;
  */
 public class TagsPanel extends AdminPanel {
 
-	private GUIParameter[] parameters;
+	private List<GUIParameter> parameters;
 
-	public TagsPanel(GUIParameter[] parameters) {
+	public TagsPanel(List<GUIParameter> parameters) {
 		super("tags");
 		this.parameters = parameters;
 	}

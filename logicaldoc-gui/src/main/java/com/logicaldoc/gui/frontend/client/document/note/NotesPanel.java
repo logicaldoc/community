@@ -172,7 +172,7 @@ public class NotesPanel extends DocumentDetailTab {
 
 		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				DocumentService.Instance.get().deleteNotes(GridUtil.getIds(selection), new AsyncCallback<Void>() {
+				DocumentService.Instance.get().deleteNotes(GridUtil.getIds(selection), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

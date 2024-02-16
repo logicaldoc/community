@@ -64,7 +64,7 @@ public class ZoneEditor extends Window {
 		addItem(layout);
 
 		// Just to clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

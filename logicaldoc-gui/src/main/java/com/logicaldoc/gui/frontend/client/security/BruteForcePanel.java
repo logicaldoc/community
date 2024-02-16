@@ -77,7 +77,7 @@ public class BruteForcePanel extends AdminPanel {
 		SettingService.Instance.get()
 				.loadSettingsByNames(Arrays.asList(THROTTLE_ENABLED, THROTTLE_USERNAME_MAX, THROTTLE_USERNAME_WAIT,
 						THROTTLE_USERNAME_DISABLEUSER, THROTTLE_USERNAME_WAIT, THROTTLE_IP_MAX, THROTTLE_IP_WAIT,
-						THROTTLE_ALERT_RECIPIENTS), new AsyncCallback<List<GUIParameter>>() {
+						THROTTLE_ALERT_RECIPIENTS), new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -162,7 +162,7 @@ public class BruteForcePanel extends AdminPanel {
 
 		body.addMember(form);
 
-		SecurityService.Instance.get().loadBlockedEntities(new AsyncCallback<List<GUISequence>>() {
+		SecurityService.Instance.get().loadBlockedEntities(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -232,7 +232,7 @@ public class BruteForcePanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				SecurityService.Instance.get().removeBlockedEntities(ids, new AsyncCallback<Void>() {
+				SecurityService.Instance.get().removeBlockedEntities(ids, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -256,26 +256,26 @@ public class BruteForcePanel extends AdminPanel {
 
 		@SuppressWarnings("unchecked")
 		Map<String, Object> values = vm.getValues();
-		GUIParameter[] params = new GUIParameter[7];
-		params[0] = new GUIParameter(THROTTLE_ENABLED,
-				"yes".equals(values.get("eenabled").toString()) ? "true" : "false");
-		params[1] = new GUIParameter(THROTTLE_USERNAME_MAX, values.get("usernamemax").toString());
-		params[2] = new GUIParameter(THROTTLE_USERNAME_WAIT, values.get("usernamewait").toString());
-		params[3] = new GUIParameter(THROTTLE_IP_MAX, values.get("ipmax").toString());
-		params[4] = new GUIParameter(THROTTLE_IP_WAIT, values.get("ipwait").toString());
-		params[5] = new GUIParameter(THROTTLE_USERNAME_DISABLEUSER,
-				"yes".equals(values.get("usernamedisableuser").toString()) ? "true" : "false");
+		List<GUIParameter> params = new ArrayList<>();
+		params.add(
+				new GUIParameter(THROTTLE_ENABLED, "yes".equals(values.get("eenabled").toString()) ? "true" : "false"));
+		params.add(new GUIParameter(THROTTLE_USERNAME_MAX, values.get("usernamemax").toString()));
+		params.add(new GUIParameter(THROTTLE_USERNAME_WAIT, values.get("usernamewait").toString()));
+		params.add(new GUIParameter(THROTTLE_IP_MAX, values.get("ipmax").toString()));
+		params.add(new GUIParameter(THROTTLE_IP_WAIT, values.get("ipwait").toString()));
+		params.add(new GUIParameter(THROTTLE_USERNAME_DISABLEUSER,
+				"yes".equals(values.get("usernamedisableuser").toString()) ? "true" : "false"));
 
 		if (values.get(RECIPIENTS) != null) {
 			@SuppressWarnings("unchecked")
 			ArrayList<String> usernames = (ArrayList<String>) values.get(RECIPIENTS);
-			params[6] = new GUIParameter(THROTTLE_ALERT_RECIPIENTS,
-					usernames.stream().collect(Collectors.joining(",")));
+			params.add(
+					new GUIParameter(THROTTLE_ALERT_RECIPIENTS, usernames.stream().collect(Collectors.joining(","))));
 		} else {
-			params[6] = new GUIParameter(THROTTLE_ALERT_RECIPIENTS, "");
+			params.add(new GUIParameter(THROTTLE_ALERT_RECIPIENTS, ""));
 		}
 
-		SettingService.Instance.get().saveSettings(params, new AsyncCallback<Void>() {
+		SettingService.Instance.get().saveSettings(params, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

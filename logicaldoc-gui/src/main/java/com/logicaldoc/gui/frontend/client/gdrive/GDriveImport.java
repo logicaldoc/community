@@ -157,7 +157,7 @@ public class GDriveImport extends Window {
 
 			LD.contactingServer();
 			GDriveService.Instance.get().importDocuments(resIds, FolderController.get().getCurrentFolder().getId(),
-					null, new AsyncCallback<Void>() {
+					null, new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							LD.clearPrompt();

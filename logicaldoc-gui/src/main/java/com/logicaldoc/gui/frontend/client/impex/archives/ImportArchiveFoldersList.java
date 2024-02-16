@@ -100,7 +100,7 @@ public class ImportArchiveFoldersList extends VLayout {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				ImpexService.Instance.get().deleteFolder(name, new AsyncCallback<Void>() {
+				ImpexService.Instance.get().deleteFolder(name, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -120,7 +120,7 @@ public class ImportArchiveFoldersList extends VLayout {
 		importBundle.addClickHandler(
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmimportbundle"),  confirm -> {
 					if (Boolean.TRUE.equals(confirm)) {
-						ImpexService.Instance.get().startImport(name, new AsyncCallback<Void>() {
+						ImpexService.Instance.get().startImport(name, new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.warn(I18N.message("archiveimportingerror"), null);

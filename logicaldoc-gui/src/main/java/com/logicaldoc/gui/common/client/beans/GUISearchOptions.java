@@ -74,7 +74,7 @@ public class GUISearchOptions implements Serializable {
 
 	private int retrieveAliases = 0;
 
-	private List<Long> filterIds;
+	private List<Long> filterIds = new ArrayList<>();
 
 	private List<GUICriterion> criteria = new ArrayList<>();
 

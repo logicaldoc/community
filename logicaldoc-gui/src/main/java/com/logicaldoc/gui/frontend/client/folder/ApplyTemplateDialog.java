@@ -71,7 +71,7 @@ public class ApplyTemplateDialog extends Dialog {
 			LD.contactingServer();
 			
 			FolderService.Instance.get().applyTemplate(folderId, templateId,
-					"true".equals(form.getValueAsString("inheritSecurity")), new AsyncCallback<Void>() {
+					"true".equals(form.getValueAsString("inheritSecurity")), new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

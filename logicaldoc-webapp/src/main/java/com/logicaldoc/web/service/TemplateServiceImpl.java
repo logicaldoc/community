@@ -1,7 +1,6 @@
 package com.logicaldoc.web.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -344,8 +343,10 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		return guiAttribute;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public GUIAttribute[] getAttributes(long templateId, GUIExtensibleObject extensibleObject) throws ServerException {
+	public List<GUIAttribute> getAttributes(long templateId, GUIExtensibleObject extensibleObject)
+			throws ServerException {
 		User sessionUser = null;
 		Session session = null;
 		try {
@@ -360,7 +361,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			Template template = templateDao.findById(templateId);
 			templateDao.initialize(template);
 
-			GUIAttribute[] attributes;
+			List<GUIAttribute> attributes = new ArrayList<>();
 
 			if (extensibleObject == null) {
 				attributes = prepareGUIAttributes(template, null, sessionUser);
@@ -385,26 +386,26 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 					attributes = prepareGUIAttributes(template, null, sessionUser);
 			}
 
-			Arrays.sort(attributes, (o1, o2) -> Integer.compare(o1.getPosition(), o2.getPosition()));
+			attributes.sort((o1, o2) -> Integer.compare(o1.getPosition(), o2.getPosition()));
 
 			return attributes;
 		} catch (Exception t) {
-			return (GUIAttribute[]) throwServerException(session, log, t);
+			return (List<GUIAttribute>) throwServerException(session, log, t);
 		}
 	}
 
-	public GUIAttribute[] prepareGUIAttributes(Template template, ExtensibleObject extensibleObject, User sessionUser) {
+	public List<GUIAttribute> prepareGUIAttributes(Template template, ExtensibleObject extensibleObject,
+			User sessionUser) {
+		List<GUIAttribute> attributes = new ArrayList<>();
 		if (template == null)
-			return new GUIAttribute[0];
+			return attributes;
 
 		template = initializeTemplateAttributes(template);
 
 		AttributeSetDAO setDao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 		Map<String, Attribute> attrs = template.getAttributes();
-
-		List<GUIAttribute> attributes = new ArrayList<>();
 		if (template == null || attrs == null || attrs.isEmpty())
-			return new GUIAttribute[0];
+			return attributes;
 
 		try {
 			Template currentTemplate = loadExtensibleObjectTemplate(template, extensibleObject);
@@ -422,10 +423,10 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			}
 
 			Collections.sort(attributes);
-			return attributes.toArray(new GUIAttribute[0]);
+			return attributes;
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
-			return new GUIAttribute[0];
+			return new ArrayList<>();
 		}
 	}
 

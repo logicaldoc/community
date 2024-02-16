@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import com.logicaldoc.core.PersistentObject;
 
 /**
@@ -167,10 +169,6 @@ public abstract class ExtensibleObject extends PersistentObject {
 	}
 
 	public List<Attribute> setValues(String name, List<Object> values) {
-		return setValues(name, values != null ? values.toArray() : null);
-	}
-
-	public List<Attribute> setValues(String name, Object[] values) {
 		// clean the attributes that store the actual multiple values
 		Set<String> valNames = getValueAttributesName(name);
 		for (String n : valNames) {
@@ -179,18 +177,18 @@ public abstract class ExtensibleObject extends PersistentObject {
 			removeAttribute(n);
 		}
 
-		if (!(values != null && values.length > 0))
+		if (CollectionUtils.isEmpty(values))
 			throw new IllegalArgumentException("no values have been specified");
 
 		List<Attribute> attrs = new ArrayList<>();
-		Attribute master = setValue(name, values[0]);
+		Attribute master = setValue(name, values.get(0));
 		attrs.add(master);
 
-		if (values.length > 1) {
+		if (values.size() > 1) {
 			master.setMultiple(1);
 			NumberFormat nf = new DecimalFormat("0000");
-			for (int i = 1; i < values.length; i++) {
-				Attribute attribute = setValue(name + "-" + nf.format(i), values[i]);
+			for (int i = 1; i < values.size(); i++) {
+				Attribute attribute = setValue(name + "-" + nf.format(i), values.get(i));
 				attribute.setParent(name);
 				attrs.add(attribute);
 			}

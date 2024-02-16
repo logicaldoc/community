@@ -225,7 +225,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 
 	private void prepareTabSet() {
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> FolderService.Instance.get()
-				.getFolder(getFolder().getId(), false, false, false, new AsyncCallback<GUIFolder>() {
+				.getFolder(getFolder().getId(), false, false, false, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -488,7 +488,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 	public void onSave() {
 		if (validate()) {
 			folder.setName(folder.getName().trim());
-			FolderService.Instance.get().save(folder, new AsyncCallback<GUIFolder>() {
+			FolderService.Instance.get().save(folder, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					if (caught instanceof ServerValidationException) {

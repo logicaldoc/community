@@ -338,7 +338,7 @@ public class Profile extends Window {
 			searches.add(rec.getAttributeAsString("search"));
 		u.setSearchPref(searches.toString().replace("[", "").replace("]", "").replace(" ", ""));
 
-		SecurityService.Instance.get().saveProfile(u, new AsyncCallback<GUIUser>() {
+		SecurityService.Instance.get().saveProfile(u, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

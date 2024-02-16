@@ -85,7 +85,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 		importCsv.setTitle(I18N.message("iimport"));
 		importCsv.setTooltip(I18N.message("importfromcsv"));
 		importCsv.addClickHandler(
-				event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+				event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -197,7 +197,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm))
-				ContactService.Instance.get().delete(GridUtil.getIds(selection), new AsyncCallback<Void>() {
+				ContactService.Instance.get().delete(GridUtil.getIds(selection), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -238,7 +238,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 			public void execute(Map<String, Object> values) {
 				LD.contactingServer();
 				ContactService.Instance.get().shareContacts(GridUtil.getIds(list.getSelectedRecords()),
-						usersSelector.getUserIds(), groupsSelector.getGroupIds(), new AsyncCallback<Void>() {
+						usersSelector.getUserIds(), groupsSelector.getGroupIds(), new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -258,7 +258,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 	private void onEdit() {
 		final ListGridRecord[] selection = list.getSelectedRecords();
 		ContactService.Instance.get().load(Long.parseLong(selection[0].getAttribute("id")),
-				new AsyncCallback<GUIContact>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

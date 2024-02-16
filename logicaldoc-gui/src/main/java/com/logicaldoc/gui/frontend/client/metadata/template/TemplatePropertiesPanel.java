@@ -336,7 +336,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		ListGridRecord[] selection = attributesList.getSelectedRecords();
 
 		LD.contactingServer();
-		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<List<GUIAttributeSet>>() {
+		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -386,7 +386,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		ListGridRecord[] selection = attributesList.getSelectedRecords();
 
 		LD.contactingServer();
-		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<List<GUIAttributeSet>>() {
+		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -784,7 +784,7 @@ public class TemplatePropertiesPanel extends HLayout {
 	private void resetValidation() {
 		ListGridRecord[] selection = attributesList.getSelectedRecords();
 		LD.contactingServer();
-		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<List<GUIAttributeSet>>() {
+		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

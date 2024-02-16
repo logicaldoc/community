@@ -72,7 +72,7 @@ public class ReadingRequestDialog extends StickyWindow {
 				ReadingRequestService.Instance.get().askReadingConfirmation(docIds, usersItem.getUserIds(),
 						groupsItem.getGroupIds(),
 						Boolean.parseBoolean(form.getValueAsString("notifyreadingconfirmation")),
-						form.getValueAsString("message"), new AsyncCallback<Void>() {
+						form.getValueAsString("message"), new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {

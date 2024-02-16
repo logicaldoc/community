@@ -42,7 +42,7 @@ public class AttributeSetDetailsPanel extends VLayout {
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (attributeSet.getId() != 0) {
 				AttributeSetService.Instance.get().getAttributeSet(attributeSet.getId(),
-						new AsyncCallback<GUIAttributeSet>() {
+						new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -120,7 +120,7 @@ public class AttributeSetDetailsPanel extends VLayout {
 
 	protected void onSave() {
 		if (validate()) {
-			AttributeSetService.Instance.get().save(attributeSet, new AsyncCallback<GUIAttributeSet>() {
+			AttributeSetService.Instance.get().save(attributeSet, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

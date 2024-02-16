@@ -71,7 +71,7 @@ public class DocumentsUploader extends Window {
 		layout.addMember(submitButton);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -87,7 +87,7 @@ public class DocumentsUploader extends Window {
 		addItem(layout);
 
 		// Just to clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

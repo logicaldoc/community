@@ -175,7 +175,7 @@ public class WorkflowToolStrip extends ToolStrip {
 		delete = new ToolStripButton(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				WorkflowService.Instance.get().delete(currentWorkflow.getName(), new AsyncCallback<Void>() {
+				WorkflowService.Instance.get().delete(currentWorkflow.getName(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -203,7 +203,7 @@ public class WorkflowToolStrip extends ToolStrip {
 
 			LD.ask(I18N.message("undeploy"), I18N.message("undeploywarn"), (Boolean yes) -> {
 				if (Boolean.TRUE.equals(yes))
-					WorkflowService.Instance.get().undeploy(currentWorkflow.getName(), new AsyncCallback<Void>() {
+					WorkflowService.Instance.get().undeploy(currentWorkflow.getName(), new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
@@ -246,7 +246,7 @@ public class WorkflowToolStrip extends ToolStrip {
 			SC.warn(I18N.message("workflowtransitiontarget"));
 		else {
 			LD.contactingServer();
-			WorkflowService.Instance.get().deploy(currentWorkflow, new AsyncCallback<GUIWorkflow>() {
+			WorkflowService.Instance.get().deploy(currentWorkflow, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					LD.clearPrompt();
@@ -361,7 +361,7 @@ public class WorkflowToolStrip extends ToolStrip {
 		versionSelector.addChangedHandler(event ->
 
 		WorkflowService.Instance.get().get(currentWorkflow.getName(), (Integer) event.getValue(),
-				new AsyncCallback<GUIWorkflow>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -384,7 +384,7 @@ public class WorkflowToolStrip extends ToolStrip {
 		workflowSelector.addChangedHandler(event -> {
 			if (event.getValue() != null && !"".equals(event.getValue())) {
 				WorkflowService.Instance.get().get(workflowSelector.getSelectedRecord().getAttributeAsString("name"),
-						null, new AsyncCallback<GUIWorkflow>() {
+						null, new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -454,7 +454,7 @@ public class WorkflowToolStrip extends ToolStrip {
 		currentWorkflow = designer.getWorkflow();
 
 		LD.contactingServer();
-		WorkflowService.Instance.get().save(currentWorkflow, new AsyncCallback<GUIWorkflow>() {
+		WorkflowService.Instance.get().save(currentWorkflow, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				LD.clearPrompt();
@@ -489,7 +489,7 @@ public class WorkflowToolStrip extends ToolStrip {
 	}
 
 	protected void reload(String workflowName) {
-		WorkflowService.Instance.get().get(workflowName, null, new AsyncCallback<GUIWorkflow>() {
+		WorkflowService.Instance.get().get(workflowName, null, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

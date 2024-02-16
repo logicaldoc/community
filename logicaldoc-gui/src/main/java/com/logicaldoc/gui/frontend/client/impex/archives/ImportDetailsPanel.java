@@ -42,7 +42,7 @@ public class ImportDetailsPanel extends VLayout {
 				onSave()
 				,
 				cancelEvent ->
-				ImpexService.Instance.get().load(getArchive().getId(), new AsyncCallback<GUIArchive>() {
+				ImpexService.Instance.get().load(getArchive().getId(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -86,7 +86,7 @@ public class ImportDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (settingsPanel.validate()) {
-			ImpexService.Instance.get().save(archive, new AsyncCallback<GUIArchive>() {
+			ImpexService.Instance.get().save(archive, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

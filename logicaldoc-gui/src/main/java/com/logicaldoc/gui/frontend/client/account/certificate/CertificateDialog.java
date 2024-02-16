@@ -78,7 +78,7 @@ public class CertificateDialog extends Window implements UserObserver {
 		createNew.setAutoFit(true);
 		createNew.addClickHandler(event -> {
 			LD.contactingServer();
-			SignService.Instance.get().generateNewCertificate(new AsyncCallback<Void>() {
+			SignService.Instance.get().generateNewCertificate(new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					LD.clearPrompt();
@@ -89,7 +89,7 @@ public class CertificateDialog extends Window implements UserObserver {
 				public void onSuccess(Void arg) {
 					LD.clearPrompt();
 					SecurityService.Instance.get().getUser(Session.get().getUser().getId(),
-							new AsyncCallback<GUIUser>() {
+							new AsyncCallback<>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
@@ -114,7 +114,7 @@ public class CertificateDialog extends Window implements UserObserver {
 		delete.setAutoFit(true);
 		delete.addClickHandler(event -> SC.ask(I18N.message("deletecertwarn"), (Boolean value) -> {
 			LD.contactingServer();
-			SignService.Instance.get().deleteCertificate(new AsyncCallback<Void>() {
+			SignService.Instance.get().deleteCertificate(new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					LD.clearPrompt();

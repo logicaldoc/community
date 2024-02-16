@@ -84,7 +84,7 @@ public class BarcodeQueuePanel extends VLayout {
 		reschedule.addClickHandler(event -> LD.ask(I18N.message("rescheduleallprocessing"),
 				I18N.message("rescheduleallprocessingask"), answer -> {
 					if (Boolean.TRUE.equals(answer))
-						BarcodeService.Instance.get().rescheduleAll(new AsyncCallback<Void>() {
+						BarcodeService.Instance.get().rescheduleAll(new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -228,7 +228,7 @@ public class BarcodeQueuePanel extends VLayout {
 			if (selection == null || selection.length < 1)
 				return;
 
-			BarcodeService.Instance.get().markUnprocessable(GridUtil.getIds(selection), new AsyncCallback<Void>() {
+			BarcodeService.Instance.get().markUnprocessable(GridUtil.getIds(selection), new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

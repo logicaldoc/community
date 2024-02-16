@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.frontend.client.security;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -142,7 +143,7 @@ public class FirewallPanel extends VLayout {
 						Arrays.asList(FIREWALL_ENABLED, FIREWALL_WHITELIST, FIREWALL_BLACKLIST,
 								FIREWALL_ALLOW_SEMICOLON, FIREWALL_ALLOW_BACK_SLASH, FIREWALL_ALLOW_URL_ENCODED_PERCENT,
 								FIREWALL_ALLOW_URL_ENCODED_SLASH, FIREWALL_ALLOW_URL_ENCODED_PERIOD),
-						new AsyncCallback<List<GUIParameter>>() {
+						new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -269,35 +270,35 @@ public class FirewallPanel extends VLayout {
 		String whitelist = vm.getValueAsString(WHITELIST);
 		String blacklist = vm.getValueAsString(BLACKLIST);
 
-		GUIParameter[] params = new GUIParameter[8];
+		List<GUIParameter> params = new ArrayList<>();
 
-		params[0] = new GUIParameter(FIREWALL_ENABLED, enabled);
-		params[1] = new GUIParameter(FIREWALL_WHITELIST,
-				whitelist != null ? whitelist.replace('\n', ',').replace(" ", "") : null);
-		params[2] = new GUIParameter(FIREWALL_BLACKLIST,
-				blacklist != null ? blacklist.replace('\n', ',').replace(" ", "") : null);
-		params[3] = new GUIParameter(FIREWALL_ALLOW_SEMICOLON,
-				"yes".equals(vm.getValueAsString("allowSemicolon")) ? "true" : FALSE);
-		params[4] = new GUIParameter(FIREWALL_ALLOW_BACK_SLASH,
-				"yes".equals(vm.getValueAsString("allowBackSlash")) ? "true" : FALSE);
-		params[5] = new GUIParameter(FIREWALL_ALLOW_URL_ENCODED_PERCENT,
-				"yes".equals(vm.getValueAsString("allowUrlEncodedPercent")) ? "true" : FALSE);
-		params[6] = new GUIParameter(FIREWALL_ALLOW_URL_ENCODED_SLASH,
-				"yes".equals(vm.getValueAsString("allowUrlEncodedSlash")) ? "true" : FALSE);
-		params[7] = new GUIParameter(FIREWALL_ALLOW_URL_ENCODED_PERIOD,
-				"yes".equals(vm.getValueAsString("allowUrlEncodedPeriod")) ? "true" : FALSE);
+		params.add(new GUIParameter(FIREWALL_ENABLED, enabled));
+		params.add(new GUIParameter(FIREWALL_WHITELIST,
+				whitelist != null ? whitelist.replace('\n', ',').replace(" ", "") : null));
+		params.add(new GUIParameter(FIREWALL_BLACKLIST,
+				blacklist != null ? blacklist.replace('\n', ',').replace(" ", "") : null));
+		params.add(new GUIParameter(FIREWALL_ALLOW_SEMICOLON,
+				"yes".equals(vm.getValueAsString("allowSemicolon")) ? "true" : FALSE));
+		params.add(new GUIParameter(FIREWALL_ALLOW_BACK_SLASH,
+				"yes".equals(vm.getValueAsString("allowBackSlash")) ? "true" : FALSE));
+		params.add(new GUIParameter(FIREWALL_ALLOW_URL_ENCODED_PERCENT,
+				"yes".equals(vm.getValueAsString("allowUrlEncodedPercent")) ? "true" : FALSE));
+		params.add(new GUIParameter(FIREWALL_ALLOW_URL_ENCODED_SLASH,
+				"yes".equals(vm.getValueAsString("allowUrlEncodedSlash")) ? "true" : FALSE));
+		params.add(new GUIParameter(FIREWALL_ALLOW_URL_ENCODED_PERIOD,
+				"yes".equals(vm.getValueAsString("allowUrlEncodedPeriod")) ? "true" : FALSE));
 
 		for (GUIParameter guiParameter : params)
 			Session.get().setConfig(guiParameter.getName(), guiParameter.getValue());
 
-		SettingService.Instance.get().saveFirewallSettings(params, new AsyncCallback<Void>() {
+		SettingService.Instance.get().saveFirewallSettings(params, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
 			}
 
 			@Override
-			public void onSuccess(Void params) {
+			public void onSuccess(Void arg) {
 				if (user == null)
 					GuiLog.info(I18N.message("settingssaved"), null);
 			}

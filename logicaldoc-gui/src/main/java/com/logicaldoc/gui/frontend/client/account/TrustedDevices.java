@@ -58,7 +58,7 @@ public class TrustedDevices extends com.smartgwt.client.widgets.Window {
 		label.setCanEdit(true);
 		label.addCellSavedHandler(
 				event -> SecurityService.Instance.get().updateDeviceLabel(event.getRecord().getAttributeAsLong("id"),
-						event.getNewValue() != null ? event.getNewValue().toString() : null, new AsyncCallback<Void>() {
+						event.getNewValue() != null ? event.getNewValue().toString() : null, new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -128,7 +128,7 @@ public class TrustedDevices extends com.smartgwt.client.widgets.Window {
 		delete.addClickHandler(
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 					if (Boolean.TRUE.equals(answer)) {
-						SecurityService.Instance.get().deleteTrustedDevices(ids, new AsyncCallback<Void>() {
+						SecurityService.Instance.get().deleteTrustedDevices(ids, new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);

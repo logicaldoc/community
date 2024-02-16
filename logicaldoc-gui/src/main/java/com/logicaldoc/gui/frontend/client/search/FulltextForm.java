@@ -304,19 +304,18 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		if (templateId == null)
 			return;
 
-		TemplateService.Instance.get().getAttributes(templateId, null, new AsyncCallback<GUIAttribute[]>() {
+		TemplateService.Instance.get().getAttributes(templateId, null, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
 			}
 
 			@Override
-			public void onSuccess(GUIAttribute[] result) {
-				for (GUIAttribute att : result) {
-					if (att.getType() == GUIAttribute.TYPE_STRING && !att.isHidden()) {
-						fieldsMap.put("ext_" + att.getName(), att.getDisplayName());
-					}
-				}
+			public void onSuccess(List<GUIAttribute> result) {
+				for (GUIAttribute att : result.stream()
+						.filter(att -> att.getType() == GUIAttribute.TYPE_STRING && !att.isHidden())
+						.collect(Collectors.toList()))
+					fieldsMap.put("ext_" + att.getName(), att.getDisplayName());
 				searchinItem.setValueMap(fieldsMap);
 			}
 		});

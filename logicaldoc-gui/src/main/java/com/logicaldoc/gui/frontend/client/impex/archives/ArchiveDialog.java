@@ -72,7 +72,7 @@ public class ArchiveDialog extends Window {
 				archive.setCreatorName(Session.get().getUser().getFullName());
 				archive.setMode(GUIArchive.MODE_EXPORT);
 
-				ImpexService.Instance.get().save(archive, new AsyncCallback<GUIArchive>() {
+				ImpexService.Instance.get().save(archive, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

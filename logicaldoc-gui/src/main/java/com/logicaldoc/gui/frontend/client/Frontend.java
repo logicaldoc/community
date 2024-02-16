@@ -86,7 +86,7 @@ public class Frontend implements EntryPoint {
 		declareCheckPermission(this);
 		declareDownload();
 
-		InfoService.Instance.get().getInfo(locale, tenant, false, new AsyncCallback<GUIInfo>() {
+		InfoService.Instance.get().getInfo(locale, tenant, false, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable error) {
 				SC.warn(error.getMessage());
@@ -99,7 +99,7 @@ public class Frontend implements EntryPoint {
 				init(info);
 
 				SecurityService.Instance.get().getSession(Util.getLocaleInRequest(), null,
-						new AsyncCallback<GUISession>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {

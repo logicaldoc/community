@@ -66,7 +66,7 @@ public class BookmarkDashlet extends Dashlet {
 			event.cancel();
 			Record rec = event.getRecord();
 			DocumentService.Instance.get().getById(Long.parseLong(rec.getAttributeAsString(docIdAttribute)),
-					new AsyncCallback<GUIDocument>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

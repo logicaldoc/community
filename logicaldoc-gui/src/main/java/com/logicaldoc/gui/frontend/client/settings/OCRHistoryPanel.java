@@ -134,7 +134,7 @@ public class OCRHistoryPanel extends VLayout {
 			MenuItem downloadIndexed = new MenuItem();
 			downloadIndexed.setTitle(I18N.message("downloadindexedtext"));
 			downloadIndexed.addClickHandler(evnt -> FolderService.Instance.get().getFolder(
-					selectedRecord.getAttributeAsLong("folderId"), false, false, false, new AsyncCallback<GUIFolder>() {
+					selectedRecord.getAttributeAsLong("folderId"), false, false, false, new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

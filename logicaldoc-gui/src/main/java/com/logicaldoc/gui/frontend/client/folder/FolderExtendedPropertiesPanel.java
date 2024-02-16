@@ -45,7 +45,7 @@ public class FolderExtendedPropertiesPanel extends FolderDetailTab {
 		applyMetadata.setColSpan(1);
 		applyMetadata.addClickHandler(event -> {
 			LD.contactingServer();
-			FolderService.Instance.get().applyMetadata(folder.getId(), new AsyncCallback<Void>() {
+			FolderService.Instance.get().applyMetadata(folder.getId(), new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

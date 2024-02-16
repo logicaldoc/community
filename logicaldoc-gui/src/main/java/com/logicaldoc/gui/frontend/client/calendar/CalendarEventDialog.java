@@ -432,7 +432,7 @@ public class CalendarEventDialog extends Window {
 
 			long id = Long.parseLong(selection.getAttribute("id"));
 
-			DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
+			DocumentService.Instance.get().getById(id, new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -733,7 +733,7 @@ public class CalendarEventDialog extends Window {
 
 			saveReminders(calendarEvent);
 
-			CalendarService.Instance.get().saveEvent(calendarEvent, new AsyncCallback<Void>() {
+			CalendarService.Instance.get().saveEvent(calendarEvent, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
@@ -808,7 +808,7 @@ public class CalendarEventDialog extends Window {
 			if (calendarEvent.getParentId() != null) {
 				LD.ask(I18N.message("delevent"), I18N.message("douwantdeletealloccurrences"), (Boolean answer) -> {
 					Long id = Boolean.TRUE.equals(answer) ? calendarEvent.getParentId() : calendarEvent.getId();
-					CalendarService.Instance.get().deleteEvent(id, new AsyncCallback<Void>() {
+					CalendarService.Instance.get().deleteEvent(id, new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
@@ -821,7 +821,7 @@ public class CalendarEventDialog extends Window {
 					});
 				});
 			} else
-				CalendarService.Instance.get().deleteEvent(calendarEvent.getId(), new AsyncCallback<Void>() {
+				CalendarService.Instance.get().deleteEvent(calendarEvent.getId(), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

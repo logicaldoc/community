@@ -48,7 +48,7 @@ public class StampDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (stamp.getId() != 0) {
-				StampService.Instance.get().getStamp(stamp.getId(), new AsyncCallback<GUIStamp>() {
+				StampService.Instance.get().getStamp(stamp.getId(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -151,7 +151,7 @@ public class StampDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (validate()) {
-			StampService.Instance.get().save(stamp, new AsyncCallback<GUIStamp>() {
+			StampService.Instance.get().save(stamp, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

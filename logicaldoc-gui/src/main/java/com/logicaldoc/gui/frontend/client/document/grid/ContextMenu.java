@@ -484,7 +484,7 @@ public class ContextMenu extends Menu {
 				event -> LD.askForStringMandatory(I18N.message("merge"), I18N.message(FILENAME), null, value -> {
 					LD.contactingServer();
 					DocumentService.Instance.get().merge(selectionIds, folder.getId(), value,
-							new AsyncCallback<GUIDocument>() {
+							new AsyncCallback<>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
@@ -508,7 +508,7 @@ public class ContextMenu extends Menu {
 				event -> LD.ask(I18N.message("replacealias"), I18N.message("replacealiasquestion"), value -> {
 					if (Boolean.TRUE.equals(value)) {
 						GUIDocument alias = grid.getSelectedDocument();
-						DocumentService.Instance.get().replaceAlias(alias.getId(), new AsyncCallback<GUIDocument>() {
+						DocumentService.Instance.get().replaceAlias(alias.getId(), new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -588,7 +588,7 @@ public class ContextMenu extends Menu {
 		item.addClickHandler(event -> {
 			LD.contactingServer();
 
-			DocumentService.Instance.get().indexDocuments(getSelectionIds(selection), new AsyncCallback<Void>() {
+			DocumentService.Instance.get().indexDocuments(getSelectionIds(selection), new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					LD.clearPrompt();
@@ -626,7 +626,7 @@ public class ContextMenu extends Menu {
 				return;
 
 			DocumentService.Instance.get().markIndexable(getSelectionIds(selection), Constants.INDEX_TO_INDEX_METADATA,
-					new AsyncCallback<Void>() {
+					new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
@@ -659,7 +659,7 @@ public class ContextMenu extends Menu {
 				return;
 
 			DocumentService.Instance.get().markIndexable(getSelectionIds(selection), Constants.INDEX_TO_INDEX,
-					new AsyncCallback<Void>() {
+					new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
@@ -690,7 +690,7 @@ public class ContextMenu extends Menu {
 			if (selection.isEmpty())
 				return;
 
-			DocumentService.Instance.get().markUnindexable(getSelectionIds(selection), new AsyncCallback<Void>() {
+			DocumentService.Instance.get().markUnindexable(getSelectionIds(selection), new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
@@ -720,7 +720,7 @@ public class ContextMenu extends Menu {
 		item.addClickHandler(event -> {
 			if (selection.isEmpty())
 				return;
-			DocumentService.Instance.get().addBookmarks(getSelectionIds(selection), 0, new AsyncCallback<Void>() {
+			DocumentService.Instance.get().addBookmarks(getSelectionIds(selection), 0, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
@@ -758,7 +758,7 @@ public class ContextMenu extends Menu {
 						SC.warn(I18N.message("commentrequired"));
 					else
 						DocumentService.Instance.get().archiveDocuments(getSelectionIds(selection), value,
-								new AsyncCallback<Void>() {
+								new AsyncCallback<>() {
 									@Override
 									public void onFailure(Throwable caught) {
 										GuiLog.serverError(caught);
@@ -785,7 +785,7 @@ public class ContextMenu extends Menu {
 			final String filename = selection.get(0).getFileName();
 
 			// Just to clean the upload folder
-			DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+			DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -794,7 +794,7 @@ public class ContextMenu extends Menu {
 
 				@Override
 				public void onSuccess(Void result) {
-					DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
+					DocumentService.Instance.get().getById(id, new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -816,7 +816,7 @@ public class ContextMenu extends Menu {
 		MenuItem item = new MenuItem();
 		item.setTitle(I18N.message("checkout"));
 		item.addClickHandler(
-				event -> DocumentService.Instance.get().checkout(getSelectionIds(selection), new AsyncCallback<Void>() {
+				event -> DocumentService.Instance.get().checkout(getSelectionIds(selection), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -848,7 +848,7 @@ public class ContextMenu extends Menu {
 			if (selection == null)
 				return;
 
-			DocumentService.Instance.get().unlock(getSelectionIds(selection), new AsyncCallback<Void>() {
+			DocumentService.Instance.get().unlock(getSelectionIds(selection), new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
@@ -871,7 +871,7 @@ public class ContextMenu extends Menu {
 		item.setTitle(I18N.message("lock"));
 		item.addClickHandler(event -> LD.askForValue(I18N.message("info"), I18N.message("lockadvice"), "", value -> {
 			if (value != null)
-				DocumentService.Instance.get().lock(getSelectionIds(selection), value, new AsyncCallback<Void>() {
+				DocumentService.Instance.get().lock(getSelectionIds(selection), value, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -893,7 +893,7 @@ public class ContextMenu extends Menu {
 		item.setTitle(I18N.message("unsetpassword"));
 		item.addClickHandler(event -> {
 			if (Session.get().isAdmin()) {
-				DocumentService.Instance.get().unsetPassword(selection.get(0).getId(), "", new AsyncCallback<Void>() {
+				DocumentService.Instance.get().unsetPassword(selection.get(0).getId(), "", new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -914,7 +914,7 @@ public class ContextMenu extends Menu {
 						SC.warn(I18N.message("passwordrequired"));
 					else
 						DocumentService.Instance.get().unsetPassword(selection.get(0).getId(), value,
-								new AsyncCallback<Void>() {
+								new AsyncCallback<>() {
 									@Override
 									public void onFailure(Throwable caught) {
 										GuiLog.serverError(caught);
@@ -946,7 +946,7 @@ public class ContextMenu extends Menu {
 							SC.warn(I18N.message("passwordrequired"));
 						else
 							DocumentService.Instance.get().setPassword(selection.get(0).getId(), value,
-									new AsyncCallback<Void>() {
+									new AsyncCallback<>() {
 										@Override
 										public void onFailure(Throwable caught) {
 											GuiLog.serverError(caught);
@@ -976,7 +976,7 @@ public class ContextMenu extends Menu {
 						SC.warn(I18N.message("commentrequired"));
 					else
 						DocumentService.Instance.get().makeImmutable(getSelectionIds(selection), value,
-								new AsyncCallback<Void>() {
+								new AsyncCallback<>() {
 									@Override
 									public void onFailure(Throwable caught) {
 										GuiLog.serverError(caught);
@@ -1005,7 +1005,7 @@ public class ContextMenu extends Menu {
 
 			DocumentService.Instance.get().linkDocuments(
 					Clipboard.getInstance().stream().map(d -> d.getId()).collect(Collectors.toList()),
-					getSelectionIds(selection), new AsyncCallback<Void>() {
+					getSelectionIds(selection), new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -1032,7 +1032,7 @@ public class ContextMenu extends Menu {
 							 * further inputs will be lost.
 							 */
 							DocumentService.Instance.get().getById(grid.getSelectedDocument().getId(),
-									new AsyncCallback<GUIDocument>() {
+									new AsyncCallback<>() {
 										@Override
 										public void onFailure(Throwable caught) {
 											GuiLog.serverError(caught);
@@ -1055,7 +1055,7 @@ public class ContextMenu extends Menu {
 		item.addClickHandler(event -> {
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
 				if (Boolean.TRUE.equals(value)) {
-					DocumentService.Instance.get().delete(getSelectionIds(selection), new AsyncCallback<Void>() {
+					DocumentService.Instance.get().delete(getSelectionIds(selection), new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
@@ -1165,7 +1165,7 @@ public class ContextMenu extends Menu {
 	}
 
 	private void onClickCustomAction(long folderId, List<Long> selectedDocIds, GUIMenu menuAction) {
-		SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(), new AsyncCallback<GUIMenu>() {
+		SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(), new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -1187,7 +1187,7 @@ public class ContextMenu extends Menu {
 					executeRoutine(folderId, selectedDocIds, routine);
 				} else if (action.getRoutineId() != null && action.getRoutineId().longValue() != 0L) {
 					AutomationService.Instance.get().getRoutine(action.getRoutineId(),
-							new AsyncCallback<GUIAutomationRoutine>() {
+							new AsyncCallback<>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
@@ -1263,7 +1263,7 @@ public class ContextMenu extends Menu {
 	}
 
 	private void executeRoutine(long folderId, List<Long> docIds, GUIAutomationRoutine routine) {
-		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<Void>() {
+		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -1278,7 +1278,7 @@ public class ContextMenu extends Menu {
 	}
 
 	private void onRename(long docId, String newFilename) {
-		DocumentService.Instance.get().rename(docId, newFilename, new AsyncCallback<GUIDocument>() {
+		DocumentService.Instance.get().rename(docId, newFilename, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

@@ -128,7 +128,7 @@ public class MessageDialog extends Window {
 					return;
 				}
 
-				MessageService.Instance.get().save(msg, GridUtil.getIds(records), new AsyncCallback<Void>() {
+				MessageService.Instance.get().save(msg, GridUtil.getIds(records), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -213,7 +213,7 @@ public class MessageDialog extends Window {
 		groupSelector.setMultiple(false);
 		groupSelector.addChangedHandler(event -> {
 			String groupId = groupSelector.getSelectedRecord().getAttributeAsString("id");
-			SecurityService.Instance.get().searchUsers(null, groupId, new AsyncCallback<List<GUIUser>>() {
+			SecurityService.Instance.get().searchUsers(null, groupId, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

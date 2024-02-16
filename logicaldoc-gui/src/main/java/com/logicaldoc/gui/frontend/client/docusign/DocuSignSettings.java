@@ -37,7 +37,7 @@ public class DocuSignSettings extends Window {
 		setPadding(2);
 		setAutoSize(true);
 
-		DocuSignService.Instance.get().loadSettings(new AsyncCallback<GUIDocuSignSettings>() {
+		DocuSignService.Instance.get().loadSettings(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -102,7 +102,7 @@ public class DocuSignSettings extends Window {
 		settings.setIntegrationKey(form.getValueAsString("integrationkey"));
 		settings.setSecretKey(form.getValueAsString("secretkey"));
 
-		DocuSignService.Instance.get().authorize(settings, new AsyncCallback<String>() {
+		DocuSignService.Instance.get().authorize(settings, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

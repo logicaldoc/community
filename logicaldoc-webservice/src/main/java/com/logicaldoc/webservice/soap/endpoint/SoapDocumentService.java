@@ -641,7 +641,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		Collection<Long> folderIds = fdao.findFolderIdByUserId(user.getId(), null, true);
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		List<Document> docs = docDao.findByIds(docIds, null);
+		List<Document> docs = docDao.findByIds(Set.of(docIds), null);
 		List<WSDocument> wsDocs = new ArrayList<>();
 		for (int i = 0; i < docs.size(); i++) {
 			try {

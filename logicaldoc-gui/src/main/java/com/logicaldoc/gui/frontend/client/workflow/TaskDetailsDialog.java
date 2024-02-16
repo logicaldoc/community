@@ -372,7 +372,7 @@ public class TaskDetailsDialog extends Window {
 		completionDiagram.setAutoFit(true);
 		completionDiagram.setMargin(2);
 		completionDiagram.addClickHandler(event -> WorkflowService.Instance.get().getCompletionDiagram(wfl.getName(),
-				wfl.getVersion(), wfl.getId(), new AsyncCallback<GUIWorkflow>() {
+				wfl.getVersion(), wfl.getId(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -396,7 +396,7 @@ public class TaskDetailsDialog extends Window {
 				&& !(workflow.getSelectedTask().getOwner() == null
 						|| workflow.getSelectedTask().getOwner().trim().isEmpty()));
 		turnBackButton.addClickHandler(event -> WorkflowService.Instance.get()
-				.turnBackTaskToPool(workflow.getSelectedTask().getId(), new AsyncCallback<Void>() {
+				.turnBackTaskToPool(workflow.getSelectedTask().getId(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -405,7 +405,7 @@ public class TaskDetailsDialog extends Window {
 					@Override
 					public void onSuccess(Void result) {
 						WorkflowService.Instance.get().getWorkflowDetailsByTask(workflow.getSelectedTask().getId(),
-								new AsyncCallback<GUIWorkflow>() {
+								new AsyncCallback<>() {
 
 									@Override
 									public void onFailure(Throwable caught) {
@@ -432,7 +432,7 @@ public class TaskDetailsDialog extends Window {
 				&& (workflow.getSelectedTask().getOwner() == null
 						|| workflow.getSelectedTask().getOwner().trim().isEmpty()));
 		takeButton.addClickHandler(event -> WorkflowService.Instance.get().claimTask(workflow.getSelectedTask().getId(),
-				Long.toString(Session.get().getUser().getId()), new AsyncCallback<GUIWorkflow>() {
+				Long.toString(Session.get().getUser().getId()), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -479,7 +479,7 @@ public class TaskDetailsDialog extends Window {
 				setUser(user.getSelectedRecord().getAttribute("id"));
 
 				WorkflowService.Instance.get().reassignTask(workflow.getSelectedTask().getId(),
-						user.getSelectedRecord().getAttribute("id"), new AsyncCallback<GUIWorkflow>() {
+						user.getSelectedRecord().getAttribute("id"), new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -627,7 +627,7 @@ public class TaskDetailsDialog extends Window {
 			MenuItem delete = new MenuItem();
 			delete.setTitle(I18N.message("ddelete"));
 			delete.addClickHandler(evnt -> WorkflowService.Instance.get()
-					.deleteNote(notesGrid.getSelectedRecord().getAttributeAsLong("id"), new AsyncCallback<Void>() {
+					.deleteNote(notesGrid.getSelectedRecord().getAttributeAsLong("id"), new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -703,7 +703,7 @@ public class TaskDetailsDialog extends Window {
 		appendedDocs.registerDoubleClickHandler((DoubleClickEvent eevent) -> {
 			final ListGridRecord selection = appendedDocs.getSelectedRecord();
 			FolderService.Instance.get().getFolder(selection.getAttributeAsLong("folderId"), false, false, false,
-					new AsyncCallback<GUIFolder>() {
+					new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
@@ -760,7 +760,7 @@ public class TaskDetailsDialog extends Window {
 
 	private void appendDocuments(Collection<GUIDocument> documents) {
 		WorkflowService.Instance.get().appendDocuments(workflow.getSelectedTask().getId(),
-				documents.stream().map(d -> d.getId()).collect(Collectors.toList()), new AsyncCallback<Void>() {
+				documents.stream().map(d -> d.getId()).collect(Collectors.toList()), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -770,7 +770,7 @@ public class TaskDetailsDialog extends Window {
 					@Override
 					public void onSuccess(Void ret) {
 						WorkflowService.Instance.get().getWorkflowDetailsByTask(workflow.getSelectedTask().getId(),
-								new AsyncCallback<GUIWorkflow>() {
+								new AsyncCallback<>() {
 
 									@Override
 									public void onFailure(Throwable caught) {
@@ -807,7 +807,7 @@ public class TaskDetailsDialog extends Window {
 		final GUIDocument selectedDocument = appendedDocs.getSelectedDocument();
 
 		FolderService.Instance.get().getFolder(selectedDocument.getFolder().getId(), false, false, false,
-				new AsyncCallback<GUIFolder>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -842,7 +842,7 @@ public class TaskDetailsDialog extends Window {
 							contextMenu.setItems(preview, download, checkout, checkin, unlock, open, remove);
 
 						FolderService.Instance.get().getFolder(selectedDocument.getFolder().getId(), false, false,
-								false, new AsyncCallback<GUIFolder>() {
+								false, new AsyncCallback<>() {
 									@Override
 									public void onFailure(Throwable caught) {
 										GuiLog.serverError(caught);
@@ -882,7 +882,7 @@ public class TaskDetailsDialog extends Window {
 		final MenuItem checkin = new MenuItem();
 		checkin.setTitle(I18N.message("checkin"));
 		checkin.addClickHandler(event -> DocumentService.Instance.get().getById(selectedDocument.getId(),
-				new AsyncCallback<GUIDocument>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -902,7 +902,7 @@ public class TaskDetailsDialog extends Window {
 		final MenuItem unlock = new MenuItem();
 		unlock.setTitle(I18N.message("unlock"));
 		unlock.addClickHandler(event -> DocumentService.Instance.get().unlock(Arrays.asList(selectedDocument.getId()),
-				new AsyncCallback<Void>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -921,7 +921,7 @@ public class TaskDetailsDialog extends Window {
 		final MenuItem checkout = new MenuItem();
 		checkout.setTitle(I18N.message("checkout"));
 		checkout.addClickHandler(event -> DocumentService.Instance.get()
-				.checkout(Arrays.asList(selectedDocument.getId()), new AsyncCallback<Void>() {
+				.checkout(Arrays.asList(selectedDocument.getId()), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -949,7 +949,7 @@ public class TaskDetailsDialog extends Window {
 		final MenuItem remove = new MenuItem();
 		remove.setTitle(I18N.message("remove"));
 		remove.addClickHandler(event -> WorkflowService.Instance.get().removeDocument(
-				workflow.getSelectedTask().getId(), selectedDocument.getId(), new AsyncCallback<Void>() {
+				workflow.getSelectedTask().getId(), selectedDocument.getId(), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -990,7 +990,7 @@ public class TaskDetailsDialog extends Window {
 		preview.setTitle(I18N.message("preview"));
 		preview.setEnabled(false);
 		preview.addClickHandler(event -> DocumentService.Instance.get().getById(selectedDocument.getId(),
-				new AsyncCallback<GUIDocument>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -1069,7 +1069,7 @@ public class TaskDetailsDialog extends Window {
 	 * @param transition name of the transition to take
 	 */
 	private void onEndTask(GUIWFState task, String transition) {
-		WorkflowService.Instance.get().endTask(task.getId(), transition, new AsyncCallback<Void>() {
+		WorkflowService.Instance.get().endTask(task.getId(), transition, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

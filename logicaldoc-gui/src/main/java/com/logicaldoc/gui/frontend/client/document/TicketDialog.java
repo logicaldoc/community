@@ -159,7 +159,7 @@ public class TicketDialog extends Window {
 
 		DocumentService.Instance.get().createDownloadTicket(document.getId(),
 				Integer.parseInt(form.getValueAsString(ACTION)), suffix, expireHours, date, maxDownloads, maxViews,
-				new AsyncCallback<List<String>>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

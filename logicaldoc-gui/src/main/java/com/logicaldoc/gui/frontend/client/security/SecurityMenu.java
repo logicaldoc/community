@@ -56,7 +56,7 @@ public class SecurityMenu extends VLayout {
 		security.setWidth100();
 		security.setHeight(25);
 		security.addClickHandler(
-				event -> SecurityService.Instance.get().loadSettings(new AsyncCallback<GUISecuritySettings>() {
+				event -> SecurityService.Instance.get().loadSettings(new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

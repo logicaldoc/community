@@ -56,7 +56,7 @@ public class DocuSignTabsEditor extends AbstractAnnotationsWindow {
 	protected void prepareAdditionalActions(ToolStrip toolStrip) {
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("addtab"));
-		add.addClickHandler(event -> new DocuSignNewTabDialog(new AsyncCallback<GUIDocumentNote>() {
+		add.addClickHandler(event -> new DocuSignNewTabDialog(new AsyncCallback<>() {
 
 			@Override
 			public void onSuccess(GUIDocumentNote newNote) {

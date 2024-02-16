@@ -57,7 +57,7 @@ public class WorkflowUploader extends Window {
 			return;
 		}
 
-		WorkflowService.Instance.get().importSchema(new AsyncCallback<GUIWorkflow>() {
+		WorkflowService.Instance.get().importSchema(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -74,7 +74,7 @@ public class WorkflowUploader extends Window {
 					designer.saveModel();
 
 					// Cleanup the upload folder
-					DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+					DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

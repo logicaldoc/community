@@ -144,7 +144,7 @@ public class SessionsPanel extends VLayout {
 		killSession.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmkill"), yes -> {
 			if (Boolean.TRUE.equals(yes)) {
 				ListGridRecord rec = sessionsGrid.getSelectedRecord();
-				SecurityService.Instance.get().kill(rec.getAttributeAsString("sid"), new AsyncCallback<Void>() {
+				SecurityService.Instance.get().kill(rec.getAttributeAsString("sid"), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

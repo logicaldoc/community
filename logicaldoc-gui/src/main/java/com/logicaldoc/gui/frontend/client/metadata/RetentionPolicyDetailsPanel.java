@@ -64,7 +64,7 @@ public class RetentionPolicyDetailsPanel extends VLayout implements FolderChange
 		tabSet = new EditingTabSet((ClickEvent event) -> onSave(), (ClickEvent event) -> {
 			if (policy.getId() != 0) {
 				RetentionPoliciesService.Instance.get().getPolicy(policy.getId(),
-						new AsyncCallback<GUIRetentionPolicy>() {
+						new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -154,7 +154,7 @@ public class RetentionPolicyDetailsPanel extends VLayout implements FolderChange
 			else
 				policy.setFolderId(folder.getFolderId());
 
-			RetentionPoliciesService.Instance.get().save(policy, new AsyncCallback<GUIRetentionPolicy>() {
+			RetentionPoliciesService.Instance.get().save(policy, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

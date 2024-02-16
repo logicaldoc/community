@@ -90,7 +90,7 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		importCsv.setTitle(I18N.message("iimport"));
 		importCsv.setTooltip(I18N.message("importfromcsv"));
 		importCsv.addClickHandler(
-				event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+				event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -187,7 +187,7 @@ public class Options extends com.smartgwt.client.widgets.Window {
 			values.add(new GUIValue(rec.getAttributeAsString(CATEGORY), rec.getAttributeAsString(VALUE)));
 
 		LD.contactingServer();
-		AttributeSetService.Instance.get().saveOptions(setId, attribute, values, new AsyncCallback<Void>() {
+		AttributeSetService.Instance.get().saveOptions(setId, attribute, values, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				LD.clearPrompt();
@@ -213,7 +213,7 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		for (int i = 0; i < selection.length; i++)
 			values.add(selection[i].getAttributeAsString(VALUE));
 
-		AttributeSetService.Instance.get().deleteOptions(setId, attribute, values, new AsyncCallback<Void>() {
+		AttributeSetService.Instance.get().deleteOptions(setId, attribute, values, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

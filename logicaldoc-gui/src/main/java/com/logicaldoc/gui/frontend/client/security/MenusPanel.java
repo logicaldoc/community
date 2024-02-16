@@ -81,7 +81,7 @@ public class MenusPanel extends VLayout {
 			Record rec = menus.getSelectedRecord();
 			if (rec != null)
 				SecurityService.Instance.get().getMenu(Long.parseLong(rec.getAttributeAsString("id")), I18N.getLocale(),
-						new AsyncCallback<GUIMenu>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {

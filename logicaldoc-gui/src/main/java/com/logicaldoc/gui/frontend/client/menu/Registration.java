@@ -68,7 +68,7 @@ public class Registration extends Window {
 			if (Boolean.FALSE.equals(vm.hasErrors())) {
 				SettingService.Instance.get().saveRegistration(form.getValueAsString("reg_name"),
 						form.getValueAsString("reg_email"), form.getValueAsString("reg_organization"),
-						form.getValueAsString("reg_website"), new AsyncCallback<Void>() {
+						form.getValueAsString("reg_website"), new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								SC.warn(caught.getMessage());

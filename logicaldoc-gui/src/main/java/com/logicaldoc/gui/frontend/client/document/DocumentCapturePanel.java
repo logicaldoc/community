@@ -68,7 +68,7 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		processOcr.setColSpan(1);
 		processOcr.addClickHandler(event -> {
 			LD.contactingServer();
-			ZonalOCRService.Instance.get().process(document.getId(), new AsyncCallback<GUIDocument>() {
+			ZonalOCRService.Instance.get().process(document.getId(), new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -98,7 +98,7 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		processBarcode.setColSpan(1);
 		processBarcode.addClickHandler(event -> {
 			LD.contactingServer();
-			BarcodeService.Instance.get().process(document.getId(), new AsyncCallback<GUIDocument>() {
+			BarcodeService.Instance.get().process(document.getId(), new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					LD.clearPrompt();

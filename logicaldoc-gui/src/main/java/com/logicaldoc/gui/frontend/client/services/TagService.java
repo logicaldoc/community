@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -25,7 +27,7 @@ public interface TagService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUITag[] getTagCloud() throws ServerException;
+	public List<GUITag> getTagCloud() throws ServerException;
 
 	/**
 	 * Deletes an existing tag
@@ -71,14 +73,14 @@ public interface TagService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIParameter[] getSettings() throws ServerException;
+	public List<GUIParameter> getSettings() throws ServerException;
 
 	public static class Instance {
 		private static TagServiceAsync inst;
 
 		private Instance() {
 		}
-		
+
 		public static TagServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(TagService.class);

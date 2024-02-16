@@ -53,7 +53,7 @@ public class BrandingPackageUploader extends Window {
 		layout.addMember(uploadButton);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -69,7 +69,7 @@ public class BrandingPackageUploader extends Window {
 		addItem(layout);
 
 		// Just to clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -89,7 +89,7 @@ public class BrandingPackageUploader extends Window {
 			return;
 		}
 
-		TenantService.Instance.get().importBrandingPackage(new AsyncCallback<GUIBranding>() {
+		TenantService.Instance.get().importBrandingPackage(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -99,7 +99,7 @@ public class BrandingPackageUploader extends Window {
 			@Override
 			public void onSuccess(GUIBranding branding) {
 				panel.update(branding);
-				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

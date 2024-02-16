@@ -105,7 +105,7 @@ public class PatchPanel extends VLayout {
 		showList();
 	}
 
-	private void switchListView(GUIPatch[] patches) {
+	private void switchListView(List<GUIPatch> patches) {
 		Util.removeChildren(this);
 
 		ListGridField id = new ListGridField("id", I18N.message("id"), 100);
@@ -168,23 +168,21 @@ public class PatchPanel extends VLayout {
 		});
 
 		List<ListGridRecord> records = new ArrayList<>();
-		if (patches != null && patches.length > 0) {
-			for (GUIPatch patch : patches) {
-				ListGridRecord rec = new ListGridRecord();
-				rec.setAttribute("id", patch.getId());
-				rec.setAttribute("name", patch.getName());
-				rec.setAttribute(RATING, patch.getRating());
-				rec.setAttribute("file", patch.getFile());
-				rec.setAttribute("date", patch.getDate());
-				rec.setAttribute("size", patch.getSize());
-				rec.setAttribute(DESCRIPTION, patch.getDescription());
-				rec.setAttribute(INSTALLED, patch.isInstalled());
-				rec.setAttribute(RESTART, patch.isRestart());
-				rec.setAttribute(LOCAL, patch.isLocal());
-				records.add(rec);
-			}
-			list.setRecords(records.toArray(new ListGridRecord[0]));
+		for (GUIPatch patch : patches) {
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute("id", patch.getId());
+			rec.setAttribute("name", patch.getName());
+			rec.setAttribute(RATING, patch.getRating());
+			rec.setAttribute("file", patch.getFile());
+			rec.setAttribute("date", patch.getDate());
+			rec.setAttribute("size", patch.getSize());
+			rec.setAttribute(DESCRIPTION, patch.getDescription());
+			rec.setAttribute(INSTALLED, patch.isInstalled());
+			rec.setAttribute(RESTART, patch.isRestart());
+			rec.setAttribute(LOCAL, patch.isLocal());
+			records.add(rec);
 		}
+		list.setRecords(records.toArray(new ListGridRecord[0]));
 
 		listPanel = new VLayout();
 		listPanel.setMembersMargin(3);
@@ -294,7 +292,7 @@ public class PatchPanel extends VLayout {
 	public void showList() {
 		LD.contactingServer();
 
-		UpdateService.Instance.get().checkPatch(new AsyncCallback<GUIPatch[]>() {
+		UpdateService.Instance.get().checkPatch(new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				LD.clearPrompt();
@@ -302,7 +300,7 @@ public class PatchPanel extends VLayout {
 			}
 
 			@Override
-			public void onSuccess(GUIPatch[] patches) {
+			public void onSuccess(List<GUIPatch> patches) {
 				LD.clearPrompt();
 				switchListView(patches);
 			}
@@ -344,7 +342,7 @@ public class PatchPanel extends VLayout {
 			download.setDisabled(true);
 
 			UpdateService.Instance.get().downloadPatch(patch.getId(), fileName, patch.getSize(),
-					new AsyncCallback<Void>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -358,7 +356,7 @@ public class PatchPanel extends VLayout {
 
 							new Timer() {
 								public void run() {
-									UpdateService.Instance.get().checkDownloadStatus(new AsyncCallback<int[]>() {
+									UpdateService.Instance.get().checkDownloadStatus(new AsyncCallback<>() {
 
 										@Override
 										public void onFailure(Throwable caught) {
@@ -366,10 +364,10 @@ public class PatchPanel extends VLayout {
 										}
 
 										@Override
-										public void onSuccess(int[] status) {
-											bar.setPercentDone(status[1]);
+										public void onSuccess(List<Integer> status) {
+											bar.setPercentDone(status.get(1));
 
-											if (status[1] == 100) {
+											if (status.get(1) == 100) {
 												download.setDisabled(false);
 												confirmPatch.setVisible(true);
 												displayNotes(fileName);
@@ -396,7 +394,7 @@ public class PatchPanel extends VLayout {
 	}
 
 	private void displayNotes(String fileName) {
-		UpdateService.Instance.get().getPatchNotes(fileName, new AsyncCallback<List<String>>() {
+		UpdateService.Instance.get().getPatchNotes(fileName, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -453,7 +451,7 @@ public class PatchPanel extends VLayout {
 			if (Boolean.TRUE.equals(choice)) {
 				confirmPatch.setVisible(false);
 				download.setVisible(false);
-				UpdateService.Instance.get().confirmPatch(patch.getFile(), new AsyncCallback<String>() {
+				UpdateService.Instance.get().confirmPatch(patch.getFile(), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

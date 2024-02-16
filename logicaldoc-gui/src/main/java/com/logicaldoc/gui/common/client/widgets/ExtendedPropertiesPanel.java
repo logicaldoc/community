@@ -228,14 +228,14 @@ public class ExtendedPropertiesPanel extends HLayout {
 			return;
 		}
 
-		TemplateService.Instance.get().getAttributes(templateId, object, new AsyncCallback<GUIAttribute[]>() {
+		TemplateService.Instance.get().getAttributes(templateId, object, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
 			}
 
 			@Override
-			public void onSuccess(GUIAttribute[] templateAttributes) {
+			public void onSuccess(List<GUIAttribute> templateAttributes) {
 				// Update the object's attributes
 				if (templateAttributes != null)
 					updateAttributesFromTemplateDefinition(templateAttributes);
@@ -247,7 +247,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		});
 	}
 
-	private void updateAttributesFromTemplateDefinition(GUIAttribute[] templateAttributes) {
+	private void updateAttributesFromTemplateDefinition(List<GUIAttribute> templateAttributes) {
 		for (GUIAttribute templAttr : templateAttributes) {
 			GUIAttribute objAttr = object.getAttribute(templAttr.getName());
 			if (objAttr != null) {

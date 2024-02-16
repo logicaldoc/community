@@ -84,7 +84,7 @@ public class WebcontentCreate extends Window {
 
 		LD.contactingServer();
 		DocumentService.Instance.get().createWithContent(vo, "<html><body></body></html>", true,
-				new AsyncCallback<GUIDocument>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						LD.clearPrompt();

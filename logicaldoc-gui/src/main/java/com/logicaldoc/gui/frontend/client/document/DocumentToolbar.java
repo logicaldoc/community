@@ -555,7 +555,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			return;
 
 		DocumentService.Instance.get().getEnabledPermissions(grid.getSelectedIds(),
-				new AsyncCallback<GUIAccessControlEntry>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -737,7 +737,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 
 	private void saveGridState() {
 		Session.get().getUser().setDocsGrid(DocumentsPanel.get().getDocsGridViewState());
-		SecurityService.Instance.get().saveInterfaceSettings(Session.get().getUser(), new AsyncCallback<GUIUser>() {
+		SecurityService.Instance.get().saveInterfaceSettings(Session.get().getUser(), new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable e) {

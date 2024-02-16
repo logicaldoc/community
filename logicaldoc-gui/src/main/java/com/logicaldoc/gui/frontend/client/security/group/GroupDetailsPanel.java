@@ -42,7 +42,7 @@ public class GroupDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (group.getId() != 0) {
-				SecurityService.Instance.get().getGroup(group.getId(), new AsyncCallback<GUIGroup>() {
+				SecurityService.Instance.get().getGroup(group.getId(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -127,7 +127,7 @@ public class GroupDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (validate()) {
-			SecurityService.Instance.get().saveGroup(group, new AsyncCallback<GUIGroup>() {
+			SecurityService.Instance.get().saveGroup(group, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

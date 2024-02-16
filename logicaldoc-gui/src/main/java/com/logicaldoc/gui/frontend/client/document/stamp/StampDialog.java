@@ -78,7 +78,7 @@ public class StampDialog extends StickyWindow {
 		long stampId = selection.getAttributeAsLong("id");
 
 		LD.contactingServer();
-		StampService.Instance.get().getStamp(stampId, new AsyncCallback<GUIStamp>() {
+		StampService.Instance.get().getStamp(stampId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -111,7 +111,7 @@ public class StampDialog extends StickyWindow {
 			LD.contactingServer();
 
 			StampService.Instance.get().applyStamp(documents.stream().map(d -> d.getId()).collect(Collectors.toList()),
-					stamp, new AsyncCallback<Void>() {
+					stamp, new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -124,7 +124,7 @@ public class StampDialog extends StickyWindow {
 							LD.clearPrompt();
 							GuiLog.info(I18N.message("event.stamped"), null);
 							for (GUIDocument doc : documents) {
-								DocumentService.Instance.get().getById(doc.getId(), new AsyncCallback<GUIDocument>() {
+								DocumentService.Instance.get().getById(doc.getId(), new AsyncCallback<>() {
 
 									@Override
 									public void onFailure(Throwable caught) {

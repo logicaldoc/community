@@ -137,7 +137,7 @@ public class FormsPanel extends AdminPanel {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				FormService.Instance.get().getById(Long.parseLong(rec.getAttributeAsString("id")),
-						new AsyncCallback<GUIForm>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -171,7 +171,7 @@ public class FormsPanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
 			if (Boolean.TRUE.equals(value)) {
-				FormService.Instance.get().delete(id, new AsyncCallback<Void>() {
+				FormService.Instance.get().delete(id, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

@@ -56,7 +56,7 @@ public class PluginUploader extends Window {
 	}
 
 	private void cleanUploads() {
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -76,7 +76,7 @@ public class PluginUploader extends Window {
 			return;
 		}
 
-		SystemService.Instance.get().installPlugin(new AsyncCallback<Void>() {
+		SystemService.Instance.get().installPlugin(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

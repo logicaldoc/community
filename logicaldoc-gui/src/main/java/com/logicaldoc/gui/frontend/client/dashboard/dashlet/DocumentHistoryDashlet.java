@@ -43,7 +43,7 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 
 		HeaderControl markAsRead = new HeaderControl(HeaderControl.TRASH, e -> {
 			LD.contactingServer();
-			DocumentService.Instance.get().markHistoryAsRead(event, new AsyncCallback<Void>() {
+			DocumentService.Instance.get().markHistoryAsRead(event, new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

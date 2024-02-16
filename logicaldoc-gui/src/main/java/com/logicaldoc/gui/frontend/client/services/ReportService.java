@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -74,7 +76,7 @@ public interface ReportService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIReport[] getReports() throws ServerException;
+	public List<GUIReport> getReports() throws ServerException;
 
 	/**
 	 * Loads the attributes defined in the given report
@@ -85,7 +87,7 @@ public interface ReportService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIAttribute[] getReportParameters(long id) throws ServerException;
+	public List<GUIAttribute> getReportParameters(long id) throws ServerException;
 
 	/**
 	 * Changes a report enabled/disabled status
@@ -105,14 +107,14 @@ public interface ReportService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void execute(long id, GUIAttribute[] parameters) throws ServerException;
+	public void execute(long id, List<GUIAttribute> parameters) throws ServerException;
 
 	public static class Instance {
 		private static ReportServiceAsync inst;
 
 		private Instance() {
 		}
-		
+
 		public static ReportServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(ReportService.class);

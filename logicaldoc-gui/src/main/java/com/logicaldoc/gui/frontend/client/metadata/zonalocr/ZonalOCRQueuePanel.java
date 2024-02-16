@@ -84,7 +84,7 @@ public class ZonalOCRQueuePanel extends VLayout {
 		reschedule.addClickHandler(event -> LD.ask(I18N.message("rescheduleallprocessing"),
 				I18N.message("rescheduleallprocessingask"), confirm -> {
 					if (Boolean.TRUE.equals(confirm))
-						ZonalOCRService.Instance.get().rescheduleAll(new AsyncCallback<Void>() {
+						ZonalOCRService.Instance.get().rescheduleAll(new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -218,7 +218,7 @@ public class ZonalOCRQueuePanel extends VLayout {
 		markUnprocessable.addClickHandler(event -> {
 			if (selection == null || selection.length < 1)
 				return;
-			ZonalOCRService.Instance.get().markUnprocessable(GridUtil.getIds(selection), new AsyncCallback<Void>() {
+			ZonalOCRService.Instance.get().markUnprocessable(GridUtil.getIds(selection), new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

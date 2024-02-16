@@ -45,7 +45,7 @@ public class WorkflowTriggersPanel extends VLayout {
 		applyTriggersToSubfolders.setAutoFit(true);
 		applyTriggersToSubfolders.addClickHandler(event -> {
 			LD.contactingServer();
-			WorkflowService.Instance.get().applyTriggersToTree(folder.getId(), new AsyncCallback<Void>() {
+			WorkflowService.Instance.get().applyTriggersToTree(folder.getId(), new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -118,7 +118,7 @@ public class WorkflowTriggersPanel extends VLayout {
 					if (Boolean.TRUE.equals(value)) {
 						ListGridRecord rec = list.getSelectedRecord();
 						WorkflowService.Instance.get().deleteTrigger(Long.parseLong(rec.getAttributeAsString("id")),
-								new AsyncCallback<Void>() {
+								new AsyncCallback<>() {
 									@Override
 									public void onFailure(Throwable caught) {
 										GuiLog.serverError(caught);

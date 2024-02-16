@@ -368,7 +368,7 @@ public class LastChangesReport extends AdminPanel {
 			int displayMaxValue) {
 		LD.contactingServer();
 		SystemService.Instance.get().search(userId, fromValue, tillValue, displayMaxValue, sid, eventValues,
-				folder.getFolderId(), new AsyncCallback<List<GUIHistory>>() {
+				folder.getFolderId(), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -451,7 +451,7 @@ public class LastChangesReport extends AdminPanel {
 		preview.setTitle(I18N.message("preview"));
 		if (docId != null)
 			preview.addClickHandler(
-					event -> DocumentService.Instance.get().getById(docId, new AsyncCallback<GUIDocument>() {
+					event -> DocumentService.Instance.get().getById(docId, new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

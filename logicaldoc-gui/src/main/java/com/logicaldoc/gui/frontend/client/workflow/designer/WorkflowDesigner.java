@@ -72,8 +72,8 @@ public class WorkflowDesigner extends AdminPanel {
 	}
 
 	public void refresh() {
-		for (GUIWFState status : workflow.getStates()) {
-			StateWidget widget = getDrawingPanel().getWidget(status.getId());
+		for (GUIWFState state : workflow.getStates()) {
+			StateWidget widget = getDrawingPanel().getWidget(state.getId());
 			if (widget != null && widget.isTask())
 				widget.update();
 		}

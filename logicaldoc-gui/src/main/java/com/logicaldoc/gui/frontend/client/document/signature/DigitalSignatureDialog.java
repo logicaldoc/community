@@ -87,7 +87,7 @@ public class DigitalSignatureDialog extends Window {
 
 		addItem(layout);
 
-		SignService.Instance.get().isVisualSignatureEnabled(new AsyncCallback<Boolean>() {
+		SignService.Instance.get().isVisualSignatureEnabled(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -112,7 +112,7 @@ public class DigitalSignatureDialog extends Window {
 			destroy();
 			LD.contactingServer();
 			SignService.Instance.get().signDocuments(docIds, vm.getValueAsString(REASON), 1, null, null, null,
-					new AsyncCallback<Void>() {
+					new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							LD.clearPrompt();

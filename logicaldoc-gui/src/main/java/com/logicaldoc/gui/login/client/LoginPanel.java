@@ -509,7 +509,7 @@ public class LoginPanel extends VLayout {
 						@Override
 						public void onSuccess(Boolean required) {
 							if (Boolean.TRUE.equals(required)) {
-								LoginService.Instance.get().getUser(login, new AsyncCallback<GUIUser>() {
+								LoginService.Instance.get().getUser(login, new AsyncCallback<>() {
 
 									@Override
 									public void onFailure(Throwable caught) {
@@ -520,7 +520,7 @@ public class LoginPanel extends VLayout {
 									@Override
 									public void onSuccess(GUIUser user) {
 										TfaService.Instance.get().generateKey(user.getUsername(),
-												new AsyncCallback<String>() {
+												new AsyncCallback<>() {
 
 													@Override
 													public void onFailure(Throwable caught) {
@@ -611,7 +611,7 @@ public class LoginPanel extends VLayout {
 				public void onResponseReceived(Request request, Response response) {
 					if (response != null && response.getStatusCode() < 400) {
 						SecurityService.Instance.get().getSession(language != null ? language.getValueAsString() : "en",
-								response.getHeader("SID"), new AsyncCallback<GUISession>() {
+								response.getHeader("SID"), new AsyncCallback<>() {
 
 									@Override
 									public void onFailure(Throwable caught) {
@@ -684,7 +684,7 @@ public class LoginPanel extends VLayout {
 									} else {
 										LD.askForString(I18N.message("trustdevice"), I18N.message("optlabeldevice"),
 												null, value -> SecurityService.Instance.get().trustDevice(value,
-														new AsyncCallback<String>() {
+														new AsyncCallback<>() {
 
 															@Override
 															public void onFailure(Throwable caught) {
@@ -710,7 +710,7 @@ public class LoginPanel extends VLayout {
 	protected void onAuthenticationFailure() {
 		SC.clearPrompt();
 		lockInput();
-		LoginService.Instance.get().getUser((String) username.getValue(), new AsyncCallback<GUIUser>() {
+		LoginService.Instance.get().getUser((String) username.getValue(), new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

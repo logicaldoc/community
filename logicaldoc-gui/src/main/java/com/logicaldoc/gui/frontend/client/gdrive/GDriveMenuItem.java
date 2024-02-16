@@ -74,7 +74,7 @@ public class GDriveMenuItem extends MenuItem {
 			List<Long> ids = grid.getSelectedIds();
 
 			LD.contactingServer();
-			GDriveService.Instance.get().exportDocuments(ids, new AsyncCallback<List<String>>() {
+			GDriveService.Instance.get().exportDocuments(ids, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
@@ -127,7 +127,7 @@ public class GDriveMenuItem extends MenuItem {
 
 	private void checkoutAndUploadToGDrive(final GUIDocument document) {
 		// Need to checkout first
-		DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new AsyncCallback<Void>() {
+		DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
@@ -144,7 +144,7 @@ public class GDriveMenuItem extends MenuItem {
 				GuiLog.info(I18N.message("documentcheckedout"), null);
 
 				LD.contactingServer();
-				GDriveService.Instance.get().upload(document.getId(), new AsyncCallback<String>() {
+				GDriveService.Instance.get().upload(document.getId(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						LD.clearPrompt();

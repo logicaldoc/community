@@ -1012,12 +1012,9 @@ public abstract class Util {
 		return url;
 	}
 
-	public static String getValue(String name, GUIParameter[] parameters) {
-		if (parameters != null)
-			for (GUIParameter param : parameters)
-				if (name.equals(param.getName()))
-					return param.getValue();
-		return null;
+	public static String getValue(String name, List<GUIParameter> parameters) {
+		return parameters.stream().filter(param -> name.equals(param.getName())).map(param -> param.getValue())
+				.findFirst().orElse(null);
 	}
 
 	public static long[] toPrimitives(Long[] objects) {
@@ -1177,12 +1174,9 @@ public abstract class Util {
 		}
 	}
 
-	public static String getParameterValue(GUIParameter[] params, String name) {
-		for (GUIParameter param : params) {
-			if (param.getName().equals(Session.get().getTenantName() + "." + name) || param.getName().equals(name))
-				return param.getValue();
-		}
-		return null;
+	public static String getParameterValue(List<GUIParameter> params, String name) {
+		return params.stream().filter(param -> param.getName().equals(Session.get().getTenantName() + "." + name)
+				|| param.getName().equals(name)).map(p -> p.getValue()).findFirst().orElse(null);
 	}
 
 	public static void removeChildren(Layout container) {

@@ -55,7 +55,7 @@ public class WebFormPrefilledLink extends StickyWindow {
 
 		addItem(responderForm);
 
-		FormService.Instance.get().getById(formId, new AsyncCallback<GUIForm>() {
+		FormService.Instance.get().getById(formId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -94,7 +94,7 @@ public class WebFormPrefilledLink extends StickyWindow {
 			return;
 
 		FormService.Instance.get().getPreFilledLink((GUIForm) extPanel.getObject(), vm.getValueAsString(RESPONDEREMAIL),
-				new AsyncCallback<String>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

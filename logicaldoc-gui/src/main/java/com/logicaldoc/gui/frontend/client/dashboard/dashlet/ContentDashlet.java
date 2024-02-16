@@ -38,7 +38,7 @@ public class ContentDashlet extends Dashlet {
 	
 	@Override
 	protected void refresh() {
-		DashletService.Instance.get().get(guiDashlet.getId(), new AsyncCallback<GUIDashlet>() {
+		DashletService.Instance.get().get(guiDashlet.getId(), new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

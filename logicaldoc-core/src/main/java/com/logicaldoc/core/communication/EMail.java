@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -27,7 +26,7 @@ public class EMail extends Message {
 	private static final long serialVersionUID = 1L;
 
 	private static Logger log = LoggerFactory.getLogger(EMail.class);
-	
+
 	private String authorAddress = "";
 
 	private String username = "";
@@ -145,34 +144,27 @@ public class EMail extends Message {
 		attachments.put(max.intValue() + 1, attachment);
 	}
 
-	public InternetAddress[] getAddresses() {
+	public Set<InternetAddress> getAddresses() {
 		return getAddresses(getRecipients());
 	}
 
-	public InternetAddress[] getAddressesCC() {
+	public Set<InternetAddress> getAddressesCC() {
 		return getAddresses(recipientsCC);
 	}
 
-	public InternetAddress[] getAddressesBCC() {
+	public Set<InternetAddress> getAddressesBCC() {
 		return getAddresses(recipientsBCC);
 	}
 
-	private InternetAddress[] getAddresses(Collection<Recipient> recipients) {
-		InternetAddress[] recs = new InternetAddress[recipients.size()];
-		Iterator<Recipient> iter = recipients.iterator();
-		int i = 0;
-
-		while (iter.hasNext()) {
+	private Set<InternetAddress> getAddresses(Collection<Recipient> recipients) {
+		Set<InternetAddress> addresses = new HashSet<>();
+		for (Recipient recipient : recipients)
 			try {
-				Recipient rec = iter.next();
-				recs[i] = new InternetAddress(rec.getAddress());
-				i++;
+				addresses.add(new InternetAddress(recipient.getAddress()));
 			} catch (AddressException e) {
 				log.warn(e.getMessage());
 			}
-		}
-
-		return recs;
+		return addresses;
 	}
 
 	public int getAttachmentsCount() {

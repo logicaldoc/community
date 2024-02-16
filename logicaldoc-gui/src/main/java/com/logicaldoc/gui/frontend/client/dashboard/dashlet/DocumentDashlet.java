@@ -91,7 +91,7 @@ public class DocumentDashlet extends Dashlet {
 			event.cancel();
 			Record rec = event.getRecord();
 			DocumentService.Instance.get().getById(Long.parseLong(rec.getAttributeAsString(docIdAttribute)),
-					new AsyncCallback<GUIDocument>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -173,7 +173,7 @@ public class DocumentDashlet extends Dashlet {
 			MenuItem unlock = new MenuItem();
 			unlock.setTitle(I18N.message("unlock"));
 			unlock.addClickHandler(event -> DocumentService.Instance.get().unlock(Arrays.asList(document.getId()),
-					new AsyncCallback<Void>() {
+					new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);

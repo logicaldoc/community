@@ -52,7 +52,7 @@ public class EmailAccountDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (account.getId() != 0) {
-				EmailAccountService.Instance.get().get(account.getId(), new AsyncCallback<GUIEmailAccount>() {
+				EmailAccountService.Instance.get().get(account.getId(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -200,7 +200,7 @@ public class EmailAccountDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (validate()) {
-			EmailAccountService.Instance.get().save(account, new AsyncCallback<GUIEmailAccount>() {
+			EmailAccountService.Instance.get().save(account, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

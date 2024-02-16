@@ -112,7 +112,7 @@ public class ScopedPropertiesPanel extends VLayout {
 		makelocal.setTitle(I18N.message("makelocal"));
 		makelocal.addClickHandler(nevent -> LD.ask(I18N.message("question"), I18N.message("confirmmakelocal"), yes -> {
 			if (Boolean.TRUE.equals(yes)) {
-				ClusterService.Instance.get().makeLocal(selectedSettings, new AsyncCallback<Void>() {
+				ClusterService.Instance.get().makeLocal(selectedSettings, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -138,7 +138,7 @@ public class ScopedPropertiesPanel extends VLayout {
 		makeglobal.addClickHandler((MenuItemClickEvent event) -> LD.ask(I18N.message("question"),
 				I18N.message("confirmmakeglobal"), yes -> {
 					if (Boolean.TRUE.equals(yes)) {
-						ClusterService.Instance.get().makeGlobal(selectedSettings, new AsyncCallback<Void>() {
+						ClusterService.Instance.get().makeGlobal(selectedSettings, new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);

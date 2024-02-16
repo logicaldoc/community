@@ -536,7 +536,7 @@ public class CronExpressionComposer extends Window {
 		}
 
 		InfoService.Instance.get().getCronDescription("" + vm.getItem(EXPRESSION).getValue(), I18N.getLocale(),
-				new AsyncCallback<String>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

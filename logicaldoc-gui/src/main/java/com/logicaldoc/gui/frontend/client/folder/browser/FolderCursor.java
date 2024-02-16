@@ -180,7 +180,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 		if (currentPagination.getTotalPages() < 2
 				&& currentPagination.getPageSize() == Session.get().getConfigAsInt(GUI_FOLDER_MAXCHILDREN))
 			FolderService.Instance.get().setFolderPagination(currentPagination.getFolderId(), null, null,
-					new AsyncCallback<Void>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -194,7 +194,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 					});
 		else
 			FolderService.Instance.get().setFolderPagination(currentPagination.getFolderId(),
-					currentPagination.getStartRow(), currentPagination.getPageSize(), new AsyncCallback<Void>() {
+					currentPagination.getStartRow(), currentPagination.getPageSize(), new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.dashboard;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUITag;
@@ -78,21 +81,21 @@ public class MostUsedTagsPortlet extends Portlet {
 	}
 
 	private void refresh() {
-		TagService.Instance.get().getTagCloud(new AsyncCallback<GUITag[]>() {
+		TagService.Instance.get().getTagCloud(new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
 			}
 
 			@Override
-			public void onSuccess(GUITag[] cloud) {
-				ListGridRecord[] records = new ListGridRecord[cloud.length];
-				for (int i = 0; i < cloud.length; i++) {
-					records[i] = new ListGridRecord();
-					records[i].setAttribute("word", cloud[i].getTag());
-					records[i].setAttribute(COUNT, cloud[i].getCount());
+			public void onSuccess(List<GUITag> cloud) {
+				List<ListGridRecord> records = new ArrayList<>();
+				for (GUITag tag : cloud) {
+					ListGridRecord rec = new ListGridRecord();
+					rec.setAttribute("word", tag.getTag());
+					rec.setAttribute(COUNT, tag.getCount());
 				}
-				list.setRecords(records);
+				list.setRecords(records.toArray(new ListGridRecord[0]));
 			}
 		});
 	}

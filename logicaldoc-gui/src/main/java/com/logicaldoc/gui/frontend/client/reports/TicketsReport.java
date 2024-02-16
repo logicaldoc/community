@@ -159,7 +159,7 @@ public class TicketsReport extends ReportPanel {
 		preview.setTitle(I18N.message("preview"));
 		preview.addClickHandler((MenuItemClickEvent event) -> {
 			long id = Long.parseLong(rec.getAttribute(DOC_ID));
-			DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
+			DocumentService.Instance.get().getById(id, new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -202,7 +202,7 @@ public class TicketsReport extends ReportPanel {
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(event -> DocumentService.Instance.get().enableTicket(rec.getAttributeAsLong("id"),
-				new AsyncCallback<Void>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -220,7 +220,7 @@ public class TicketsReport extends ReportPanel {
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(event -> DocumentService.Instance.get().disableTicket(rec.getAttributeAsLong("id"),
-				new AsyncCallback<Void>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -239,7 +239,7 @@ public class TicketsReport extends ReportPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer))
-				DocumentService.Instance.get().deleteTicket(rec.getAttributeAsLong("id"), new AsyncCallback<Void>() {
+				DocumentService.Instance.get().deleteTicket(rec.getAttributeAsLong("id"), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

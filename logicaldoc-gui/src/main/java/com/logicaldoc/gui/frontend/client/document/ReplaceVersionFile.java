@@ -80,7 +80,7 @@ public class ReplaceVersionFile extends Window {
 		}
 
 		DocumentService.Instance.get().replaceFile(document.getId(), fileVersion, vm.getValueAsString("comment"),
-				new AsyncCallback<Void>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

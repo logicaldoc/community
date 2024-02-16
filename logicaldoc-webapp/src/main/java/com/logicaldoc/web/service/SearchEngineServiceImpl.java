@@ -238,7 +238,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 	}
 
 	@Override
-	public void saveTokenFilterSettings(String filter, GUIParameter[] settings) throws ServerException {
+	public void saveTokenFilterSettings(String filter, List<GUIParameter> settings) throws ServerException {
 		Session session = validateSession();
 		try {
 			String prefix = INDEX_TOKENFILTER + filter + ".";

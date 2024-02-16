@@ -141,7 +141,7 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				AutomationService.Instance.get().getTrigger(rec.getAttributeAsLong("id"),
-						new AsyncCallback<GUIAutomationTrigger>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -183,7 +183,7 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(evnt -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
 			if (Boolean.TRUE.equals(value)) {
-				AutomationService.Instance.get().deleteTriggers(Arrays.asList(id), new AsyncCallback<Void>() {
+				AutomationService.Instance.get().deleteTriggers(Arrays.asList(id), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

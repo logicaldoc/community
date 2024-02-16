@@ -85,7 +85,7 @@ public class DropboxAuthorizationWizard extends Window {
 			return;
 
 		DropboxService.Instance.get().finishAuthorization(vm.getValueAsString("code").trim(),
-				new AsyncCallback<String>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

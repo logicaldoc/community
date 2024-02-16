@@ -55,7 +55,7 @@ public class TenantDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (tenant.getId() != 0) {
-				TenantService.Instance.get().load(tenant.getId(), new AsyncCallback<GUITenant>() {
+				TenantService.Instance.get().load(tenant.getId(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -209,7 +209,7 @@ public class TenantDetailsPanel extends VLayout {
 		if (validate()) {
 			final boolean newTenant = TenantDetailsPanel.this.tenant.getId() == 0L;
 
-			TenantService.Instance.get().save(tenant, new AsyncCallback<GUITenant>() {
+			TenantService.Instance.get().save(tenant, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

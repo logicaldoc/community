@@ -197,7 +197,7 @@ public class SearchIndexHistoryPanel extends VLayout {
 		downloadIndexed.addClickHandler(evnt -> {
 			Record rec = list.getSelectedRecord();
 			FolderService.Instance.get().getFolder(rec.getAttributeAsLong("folderId"), false, false, false,
-					new AsyncCallback<GUIFolder>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -217,7 +217,7 @@ public class SearchIndexHistoryPanel extends VLayout {
 		index.setTitle(I18N.message("index"));
 		index.addClickHandler(event -> {
 			LD.contactingServer();
-			DocumentService.Instance.get().indexDocuments(getSelectedDocIds(list), new AsyncCallback<Void>() {
+			DocumentService.Instance.get().indexDocuments(getSelectedDocIds(list), new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					LD.clearPrompt();
@@ -236,7 +236,7 @@ public class SearchIndexHistoryPanel extends VLayout {
 		markIndexMetadataOnly.setTitle(I18N.message("markindexablemetadataonly"));
 		markIndexMetadataOnly.addClickHandler(event -> {
 			DocumentService.Instance.get().markIndexable(getSelectedDocIds(list), Constants.INDEX_TO_INDEX_METADATA,
-					new AsyncCallback<Void>() {
+					new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
@@ -252,7 +252,7 @@ public class SearchIndexHistoryPanel extends VLayout {
 		MenuItem markUnindexable = new MenuItem();
 		markUnindexable.setTitle(I18N.message("markunindexable"));
 		markUnindexable.addClickHandler(event -> {
-			DocumentService.Instance.get().markUnindexable(getSelectedDocIds(list), new AsyncCallback<Void>() {
+			DocumentService.Instance.get().markUnindexable(getSelectedDocIds(list), new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
@@ -269,7 +269,7 @@ public class SearchIndexHistoryPanel extends VLayout {
 		markIndexable.setTitle(I18N.message("markindexable"));
 		markIndexable.addClickHandler(event -> {
 			DocumentService.Instance.get().markIndexable(getSelectedDocIds(list), Constants.INDEX_TO_INDEX,
-					new AsyncCallback<Void>() {
+					new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);

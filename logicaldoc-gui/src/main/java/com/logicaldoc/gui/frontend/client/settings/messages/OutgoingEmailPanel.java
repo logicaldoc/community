@@ -212,7 +212,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 			OutgoingEmailPanel.this.emailSettings.setTargetFolder(targetSelector.getFolder());
 
 			SettingService.Instance.get().saveEmailSettings(OutgoingEmailPanel.this.emailSettings,
-					new AsyncCallback<Void>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

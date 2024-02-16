@@ -176,7 +176,7 @@ public class DashletsPanel extends VLayout {
 	 * Sends the dashlets
 	 */
 	private void saveDashlets() {
-		DashletService.Instance.get().saveDashlets(dashlets, new AsyncCallback<Void>() {
+		DashletService.Instance.get().saveDashlets(dashlets, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
@@ -217,7 +217,7 @@ public class DashletsPanel extends VLayout {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> DashletService.Instance.get()
-				.delete(grid.getSelectedRecord().getAttributeAsLong("id"), new AsyncCallback<Void>() {
+				.delete(grid.getSelectedRecord().getAttributeAsLong("id"), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -236,7 +236,7 @@ public class DashletsPanel extends VLayout {
 	}
 
 	private void reload() {
-		DashletService.Instance.get().loadDashlets(new AsyncCallback<List<GUIDashlet>>() {
+		DashletService.Instance.get().loadDashlets(new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

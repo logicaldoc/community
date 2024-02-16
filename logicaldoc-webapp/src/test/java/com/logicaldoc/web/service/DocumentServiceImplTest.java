@@ -236,8 +236,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		doc.setFolder(folderDao.findById(1201));
 		docDao.store(doc);
 
-		long count = service.archiveFolder(1200, "archive comment");
-		assertEquals(1, count);
+		assertEquals(1, service.archiveFolder(1200L, "archive comment"));
 
 		Document document = docDao.findById(5);
 		assertEquals(Document.DOC_ARCHIVED, document.getStatus());

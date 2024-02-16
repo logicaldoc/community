@@ -63,7 +63,7 @@ public class OwnCertificateDialog extends Window {
 		layout.addMember(submitButton);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -83,7 +83,7 @@ public class OwnCertificateDialog extends Window {
 
 	private void cleanUploadFolder() {
 		// Just to clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -128,7 +128,7 @@ public class OwnCertificateDialog extends Window {
 
 		LD.contactingServer();
 		SignService.Instance.get().importCertificate(form.getValueAsString(CERTIFICATE),
-				form.getValueAsString(PRIVATEKEY), new AsyncCallback<Void>() {
+				form.getValueAsString(PRIVATEKEY), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						LD.clearPrompt();
@@ -140,7 +140,7 @@ public class OwnCertificateDialog extends Window {
 						LD.clearPrompt();
 						cleanUploadFolder();
 						SecurityService.Instance.get().getUser(Session.get().getUser().getId(),
-								new AsyncCallback<GUIUser>() {
+								new AsyncCallback<>() {
 
 									@Override
 									public void onFailure(Throwable caught) {

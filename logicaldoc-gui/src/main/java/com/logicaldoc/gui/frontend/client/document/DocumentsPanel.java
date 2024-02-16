@@ -147,7 +147,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	}
 
 	public void openInFolder(long docId) {
-		DocumentService.Instance.get().getById(docId, new AsyncCallback<GUIDocument>() {
+		DocumentService.Instance.get().getById(docId, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				/*
@@ -177,7 +177,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	 *        list
 	 */
 	public void selectDocument(long docId, final boolean clearSelection) {
-		DocumentService.Instance.get().getById(docId, new AsyncCallback<GUIDocument>() {
+		DocumentService.Instance.get().getById(docId, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				/*

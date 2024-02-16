@@ -244,7 +244,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		// This 'if condition' is necessary to know if the close image
 		// has been selected into the Documents list panel or into the
 		// Search list panel.
-		DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<GUIDocument>() {
+		DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -678,7 +678,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	}
 
 	private void save() {
-		DocumentService.Instance.get().save(document, new AsyncCallback<GUIDocument>() {
+		DocumentService.Instance.get().save(document, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof ServerValidationException) {

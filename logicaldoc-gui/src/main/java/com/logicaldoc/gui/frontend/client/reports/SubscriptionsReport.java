@@ -1,8 +1,5 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -153,23 +150,22 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(
-				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
-					if (Boolean.TRUE.equals(answer)) {
-						AuditService.Instance.get().deleteSubscriptions(GridUtil.getIds(selection), new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void result) {
-								list.removeSelectedData();
-								list.deselectAllRecords();
-							}
-						});
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+			if (Boolean.TRUE.equals(answer)) {
+				AuditService.Instance.get().deleteSubscriptions(GridUtil.getIds(selection), new AsyncCallback<>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
 					}
-				}));
+
+					@Override
+					public void onSuccess(Void result) {
+						list.removeSelectedData();
+						list.deselectAllRecords();
+					}
+				});
+			}
+		}));
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
@@ -184,7 +180,7 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 			if ("folder".equals(type))
 				DocumentsPanel.get().openInFolder(Long.parseLong(id), null);
 			else {
-				DocumentService.Instance.get().getById(Long.parseLong(id), new AsyncCallback<GUIDocument>() {
+				DocumentService.Instance.get().getById(Long.parseLong(id), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

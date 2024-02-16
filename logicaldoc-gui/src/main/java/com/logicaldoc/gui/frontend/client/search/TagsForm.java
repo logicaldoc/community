@@ -166,7 +166,7 @@ public class TagsForm extends VLayout {
 
 						ListGridRecord selection = tags.getSelectedRecord();
 						TagService.Instance.get().rename(selection.getAttribute("word"), value,
-								new AsyncCallback<Void>() {
+								new AsyncCallback<>() {
 									@Override
 									public void onFailure(Throwable caught) {
 										GuiLog.serverError(caught);
@@ -188,7 +188,7 @@ public class TagsForm extends VLayout {
 			delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 				if (Boolean.TRUE.equals(confirm)) {
 					ListGridRecord selection = tags.getSelectedRecord();
-					TagService.Instance.get().delete(selection.getAttribute("word"), new AsyncCallback<Void>() {
+					TagService.Instance.get().delete(selection.getAttribute("word"), new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);

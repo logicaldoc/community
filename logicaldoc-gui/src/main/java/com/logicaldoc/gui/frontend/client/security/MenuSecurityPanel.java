@@ -229,7 +229,7 @@ public class MenuSecurityPanel extends VLayout {
 		// Apply the ACL
 		menu.setAccessControlList(getACL());
 
-		SecurityService.Instance.get().saveACL(menu, new AsyncCallback<Void>() {
+		SecurityService.Instance.get().saveACL(menu, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

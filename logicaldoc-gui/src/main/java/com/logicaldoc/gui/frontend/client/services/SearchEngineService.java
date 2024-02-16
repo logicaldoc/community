@@ -110,7 +110,7 @@ public interface SearchEngineService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void saveTokenFilterSettings(String filter, GUIParameter[] settings) throws ServerException;
+	public void saveTokenFilterSettings(String filter, List<GUIParameter> settings) throws ServerException;
 
 	/**
 	 * Changes the activation status of a token filter

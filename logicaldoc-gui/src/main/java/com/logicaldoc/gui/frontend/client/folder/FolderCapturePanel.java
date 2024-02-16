@@ -63,7 +63,7 @@ public class FolderCapturePanel extends FolderDetailTab {
 		applySubFolders.setColSpan(1);
 		applySubFolders.addClickHandler((ClickEvent event) -> {
 			LD.contactingServer();
-			FolderService.Instance.get().applyOCR(folder.getId(), new AsyncCallback<Void>() {
+			FolderService.Instance.get().applyOCR(folder.getId(), new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

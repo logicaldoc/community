@@ -103,7 +103,7 @@ public class Setup implements EntryPoint {
 		Window.setMargin("0px");
 
 		InfoService.Instance.get().getInfo(I18N.getLocale(), Constants.TENANT_DEFAULTNAME, true,
-				new AsyncCallback<GUIInfo>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable error) {
 						SC.warn(error.getMessage());
@@ -111,7 +111,7 @@ public class Setup implements EntryPoint {
 
 					@Override
 					public void onSuccess(final GUIInfo info) {
-						setupService.securityCheck(new AsyncCallback<Void>() {
+						setupService.securityCheck(new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable error) {
@@ -391,7 +391,7 @@ public class Setup implements EntryPoint {
 				}
 
 				LD.contactingServer();
-				setupService.setup(data, new AsyncCallback<Void>() {
+				setupService.setup(data, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						LD.clearPrompt();

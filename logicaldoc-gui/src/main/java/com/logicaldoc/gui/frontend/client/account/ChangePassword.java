@@ -103,7 +103,7 @@ public class ChangePassword extends Window {
 
 	private void doChangePassword(GUIUser user, final ValuesManager vm, PasswordItem newPass, final ButtonItem apply) {
 		SecurityService.Instance.get().changePassword(user.getId(), user.getId(), vm.getValueAsString(PASSWORD),
-				vm.getValueAsString(NEWPASSWORD), false, new AsyncCallback<GUIValue>() {
+				vm.getValueAsString(NEWPASSWORD), false, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

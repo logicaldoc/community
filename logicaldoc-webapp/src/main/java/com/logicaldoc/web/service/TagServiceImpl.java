@@ -29,8 +29,9 @@ public class TagServiceImpl extends AbstractRemoteService implements TagService 
 
 	protected static Logger log = LoggerFactory.getLogger(TagServiceImpl.class);
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public GUITag[] getTagCloud() throws ServerException {
+	public List<GUITag>getTagCloud() throws ServerException {
 		Session session = validateSession();
 		try {
 			ArrayList<GUITag> ret = new ArrayList<>();
@@ -45,9 +46,9 @@ public class TagServiceImpl extends AbstractRemoteService implements TagService 
 				ret.add(c);
 			}
 
-			return ret.toArray(new GUITag[0]);
+			return ret;
 		} catch (Exception t) {
-			return (GUITag[]) throwServerException(session, log, t);
+			return (List<GUITag>) throwServerException(session, log, t);
 		}
 	}
 
@@ -78,7 +79,7 @@ public class TagServiceImpl extends AbstractRemoteService implements TagService 
 	}
 
 	@Override
-	public GUIParameter[] getSettings() throws ServerException {
+	public List<GUIParameter> getSettings() throws ServerException {
 		Session session = validateSession();
 
 		ContextProperties conf = Context.get().getProperties();
@@ -93,6 +94,6 @@ public class TagServiceImpl extends AbstractRemoteService implements TagService 
 			}
 		}
 
-		return params.toArray(new GUIParameter[0]);
+		return params;
 	}
 }

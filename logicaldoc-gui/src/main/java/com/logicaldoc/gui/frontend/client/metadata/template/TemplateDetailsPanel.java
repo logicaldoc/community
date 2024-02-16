@@ -64,7 +64,7 @@ public class TemplateDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (template.getId() != 0) {
-				TemplateService.Instance.get().getTemplate(template.getId(), new AsyncCallback<GUITemplate>() {
+				TemplateService.Instance.get().getTemplate(template.getId(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -183,7 +183,7 @@ public class TemplateDetailsPanel extends VLayout {
 
 	private void onSave() {
 		if (validate()) {
-			TemplateService.Instance.get().save(template, new AsyncCallback<GUITemplate>() {
+			TemplateService.Instance.get().save(template, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

@@ -54,7 +54,7 @@ public class CertificateUploader extends Window {
 		layout.addMember(submit);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -70,7 +70,7 @@ public class CertificateUploader extends Window {
 		addItem(layout);
 
 		// Just to clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -85,7 +85,7 @@ public class CertificateUploader extends Window {
 	}
 
 	public void onSubmit() {
-		SignService.Instance.get().getUploadedContent(new AsyncCallback<String>() {
+		SignService.Instance.get().getUploadedContent(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

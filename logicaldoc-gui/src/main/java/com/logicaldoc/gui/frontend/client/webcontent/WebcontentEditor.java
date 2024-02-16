@@ -84,7 +84,7 @@ public class WebcontentEditor extends Window {
 	private void unlockAndClose() {
 		if (document.getId() != 0)
 			DocumentService.Instance.get().unlock(Arrays.asList(WebcontentEditor.this.document.getId()),
-					new AsyncCallback<Void>() {
+					new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);

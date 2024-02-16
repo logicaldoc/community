@@ -236,7 +236,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private void displayInheritingPanel(GUIFolder folder) {
 		FolderService.Instance.get().getFolder(folder.getSecurityRef().getId(), true, false, false,
-				new AsyncCallback<GUIFolder>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -377,7 +377,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		inheritFromParent.setAutoFit(true);
 		buttons.addMember(inheritFromParent);
 		inheritFromParent.addClickHandler((ClickEvent event) -> FolderService.Instance.get()
-				.getFolder(folder.getParentId(), false, false, false, new AsyncCallback<GUIFolder>() {
+				.getFolder(folder.getParentId(), false, false, false, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -391,7 +391,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 								(Boolean interitConfirmed) -> {
 									if (Boolean.TRUE.equals(interitConfirmed)) {
 										FolderService.Instance.get().inheritACL(folder.getId(), folder.getParentId(),
-												new AsyncCallback<GUIFolder>() {
+												new AsyncCallback<>() {
 
 													@Override
 													public void onFailure(Throwable caught) {
@@ -593,7 +593,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		// Apply all rights
 		folder.setAccessControlList(this.getACL());
 
-		FolderService.Instance.get().saveACL(folder, recursive, new AsyncCallback<Void>() {
+		FolderService.Instance.get().saveACL(folder, recursive, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

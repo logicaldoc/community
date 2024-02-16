@@ -59,7 +59,7 @@ public class InheritRightsDialog extends Dialog {
 					if (Boolean.TRUE.equals(confirm)) {
 						FolderService.Instance.get().inheritACL(panel.getFolder().getId(),
 								Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
-								new AsyncCallback<GUIFolder>() {
+								new AsyncCallback<>() {
 
 									@Override
 									public void onFailure(Throwable caught) {

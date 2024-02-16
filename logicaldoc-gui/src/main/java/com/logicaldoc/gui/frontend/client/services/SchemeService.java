@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -54,7 +56,7 @@ public interface SchemeService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIScheme[] load() throws ServerException;
+	public List<GUIScheme> load() throws ServerException;
 
 	/**
 	 * Reset the numbering of a given sequence
@@ -73,7 +75,7 @@ public interface SchemeService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUISequence[] loadSequences() throws ServerException;
+	public List<GUISequence> loadSequences() throws ServerException;
 
 	/**
 	 * Deletes the given sequence
@@ -89,7 +91,7 @@ public interface SchemeService extends RemoteService {
 
 		private Instance() {
 		}
-		
+
 		public static SchemeServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(SchemeService.class);

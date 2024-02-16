@@ -63,7 +63,7 @@ public class SendToArchiveDialog extends Window {
 
 		if (document)
 			ImpexService.Instance.get().addDocuments(Long.parseLong(form.getValueAsString("archive")), ids,
-					new AsyncCallback<Void>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -78,7 +78,7 @@ public class SendToArchiveDialog extends Window {
 					});
 		else
 			ImpexService.Instance.get().addFolder(Long.parseLong(form.getValueAsString("archive")), ids.get(0),
-					new AsyncCallback<Void>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

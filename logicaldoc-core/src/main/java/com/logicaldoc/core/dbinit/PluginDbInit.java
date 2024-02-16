@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
@@ -30,10 +32,10 @@ public class PluginDbInit extends DBInit {
 	 * @throws SQLException Error in the database
 	 */
 	public void init() throws SQLException {
-		init(null);
+		init(new HashSet<>());
 	}
 
-	public void init(String[] ids) throws SQLException {
+	public void init(Set<String> ids) throws SQLException {
 		log.info("Start database initialization");
 		log.info("Database engine is {}", getDbms());
 
@@ -60,14 +62,10 @@ public class PluginDbInit extends DBInit {
 
 			getSqlList().clear();
 
-			List<String> idSet = new ArrayList<>();
-			if (ids != null)
-				idSet = Arrays.asList(ids);
-
 			// Acquire the ordered list of sql files
 			for (Extension ext : sortedExts) {
 				String id = ext.getDeclaringPluginDescriptor().getId();
-				if (!idSet.isEmpty() && !idSet.contains(id))
+				if (!ids.isEmpty() && !ids.contains(id))
 					continue;
 
 				String sqlFile = ext.getParameter("sqlFile").valueAsString();

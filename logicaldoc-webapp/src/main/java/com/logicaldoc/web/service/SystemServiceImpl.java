@@ -15,6 +15,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -140,12 +141,12 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	}
 
 	@Override
-	public GUIParameter[][] getStatistics(String locale) throws ServerException {
+	public List<List<GUIParameter>> getStatistics(String locale) throws ServerException {
 		Session session = validateSession();
 
 		GenericDAO genDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 
-		GUIParameter[][] parameters = new GUIParameter[5][9];
+		List<List<GUIParameter>> parameters = new ArrayList<>();
 
 		/*
 		 * Repository statistics
@@ -154,7 +155,6 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		GUIParameter trashSize = new GUIParameter();
 		trashSize.setName(TRASH);
 		setLongValue(gen, trashSize);
-		parameters[0][1] = trashSize;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "docdir", null, session.getTenantId());
 		GUIParameter docDirSize = new GUIParameter();
@@ -162,49 +162,44 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		setLongValue(gen, docDirSize);
 		docDirSize
 				.setValue(Long.toString(Long.parseLong(docDirSize.getValue()) - Long.parseLong(trashSize.getValue())));
-		parameters[0][0] = docDirSize;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "userdir", null, Tenant.SYSTEM_ID);
 		GUIParameter userDirSize = new GUIParameter();
 		userDirSize.setName("users");
 		setLongValue(gen, userDirSize);
-		parameters[0][2] = userDirSize;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "indexdir", null, Tenant.SYSTEM_ID);
 		GUIParameter indexDirSize = new GUIParameter();
 		indexDirSize.setName("fulltextindex");
 		setLongValue(gen, indexDirSize);
-		parameters[0][3] = indexDirSize;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "importdir", null, Tenant.SYSTEM_ID);
 		GUIParameter importDirSize = new GUIParameter();
 		importDirSize.setName("iimport");
 		setLongValue(gen, importDirSize);
-		parameters[0][4] = importDirSize;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "exportdir", null, Tenant.SYSTEM_ID);
 		GUIParameter exportDirSize = new GUIParameter();
 		exportDirSize.setName("eexport");
 		setLongValue(gen, exportDirSize);
-		parameters[0][5] = exportDirSize;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "plugindir", null, Tenant.SYSTEM_ID);
 		GUIParameter pluginsDirSize = new GUIParameter();
 		pluginsDirSize.setName("plugins");
 		setLongValue(gen, pluginsDirSize);
-		parameters[0][6] = pluginsDirSize;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "dbdir", null, Tenant.SYSTEM_ID);
 		GUIParameter dbDirSize = new GUIParameter();
 		dbDirSize.setName("database");
 		setLongValue(gen, dbDirSize);
-		parameters[0][7] = dbDirSize;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "logdir", null, Tenant.SYSTEM_ID);
 		GUIParameter logsDirSize = new GUIParameter();
 		logsDirSize.setName("logs");
 		setLongValue(gen, logsDirSize);
-		parameters[0][8] = logsDirSize;
+
+		parameters.add(Arrays.asList(docDirSize, trashSize, userDirSize, indexDirSize, importDirSize, exportDirSize,
+				pluginsDirSize, dbDirSize, logsDirSize));
 
 		/*
 		 * Documents statistics
@@ -213,34 +208,31 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		GUIParameter notIndexed = new GUIParameter();
 		notIndexed.setName("notindexed");
 		setLongValue(gen, notIndexed);
-		parameters[1][0] = notIndexed;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexabledocs", null, session.getTenantId());
 		GUIParameter notIndexableDocs = new GUIParameter();
 		notIndexableDocs.setName("notindexabledocs");
 		notIndexableDocs.setLabel("notindexable");
 		setLongValue(gen, notIndexableDocs);
-		parameters[1][1] = notIndexableDocs;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "indexeddocs", null, session.getTenantId());
 		GUIParameter indexed = new GUIParameter();
 		indexed.setName("indexed");
 		setLongValue(gen, indexed);
-		parameters[1][2] = indexed;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "deleteddocs", null, session.getTenantId());
 		GUIParameter deletedDocs = new GUIParameter();
 		deletedDocs.setName("docstrash");
 		deletedDocs.setLabel(TRASH);
 		setLongValue(gen, deletedDocs);
-		parameters[1][3] = deletedDocs;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "archiveddocs", null, session.getTenantId());
 		GUIParameter archivedDocs = new GUIParameter();
 		archivedDocs.setName("archiveddocs");
 		archivedDocs.setLabel("archiveds");
 		setLongValue(gen, archivedDocs);
-		parameters[1][4] = archivedDocs;
+
+		parameters.add(Arrays.asList(notIndexed, notIndexableDocs, indexed, deletedDocs, archivedDocs));
 
 		/*
 		 * Pages statistics
@@ -249,34 +241,31 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		GUIParameter notIndexedPages = new GUIParameter();
 		notIndexedPages.setName("notindexed");
 		setLongValue(gen, notIndexedPages);
-		parameters[2][0] = notIndexedPages;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexablepages", null, session.getTenantId());
 		GUIParameter notIndexablePages = new GUIParameter();
 		notIndexablePages.setName("notindexablepages");
 		notIndexablePages.setLabel("notindexable");
 		setLongValue(gen, notIndexablePages);
-		parameters[2][1] = notIndexableDocs;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "indexedpages", null, session.getTenantId());
 		GUIParameter indexedPages = new GUIParameter();
 		indexedPages.setName("indexed");
 		setLongValue(gen, indexedPages);
-		parameters[2][2] = indexedPages;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "deletedpages", null, session.getTenantId());
 		GUIParameter deletedPages = new GUIParameter();
 		deletedPages.setName("pagestrash");
 		deletedPages.setLabel(TRASH);
 		setLongValue(gen, deletedPages);
-		parameters[2][3] = deletedPages;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "archivedpages", null, session.getTenantId());
 		GUIParameter archivedPages = new GUIParameter();
 		archivedPages.setName("archivedpages");
 		archivedPages.setLabel("archiveds");
 		setLongValue(gen, archivedPages);
-		parameters[2][4] = archivedPages;
+
+		parameters.add(Arrays.asList(notIndexedPages, notIndexableDocs, indexedPages, deletedPages, archivedPages));
 
 		/*
 		 * Folders statistics
@@ -285,20 +274,19 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		GUIParameter notEmptyFolders = new GUIParameter();
 		notEmptyFolders.setName("withdocs");
 		setLongValue(gen, notEmptyFolders);
-		parameters[3][0] = notEmptyFolders;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "empty", null, session.getTenantId());
 		GUIParameter emptyFolders = new GUIParameter();
 		emptyFolders.setName("empty");
 		setLongValue(gen, emptyFolders);
-		parameters[3][1] = emptyFolders;
 
 		gen = genDao.findByAlternateKey(StatsCollector.STAT, "deletedfolders", null, session.getTenantId());
 		GUIParameter deletedFolders = new GUIParameter();
 		deletedFolders.setName("folderstrash");
 		deletedFolders.setLabel(TRASH);
 		setLongValue(gen, deletedFolders);
-		parameters[3][2] = deletedFolders;
+
+		parameters.add(Arrays.asList(notEmptyFolders, emptyFolders, deletedFolders));
 
 		/*
 		 * Last run
@@ -313,7 +301,8 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		} else {
 			lastrun.setValue("");
 		}
-		parameters[4][0] = lastrun;
+
+		parameters.add(Arrays.asList(lastrun));
 
 		return parameters;
 	}
@@ -406,13 +395,12 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	}
 
 	@Override
-	public GUITask[] loadTasks(String locale) throws ServerException {
+	public List<GUITask> loadTasks(String locale) throws ServerException {
 		validateSession();
 
 		TaskManager manager = (TaskManager) Context.get().getBean(TaskManager.class);
-		GUITask[] tasks = new GUITask[manager.getTasks().size()];
+		List<GUITask> tasks = new ArrayList<>();
 
-		int i = 0;
 		for (Task t : manager.getTasks()) {
 			GUITask task = new GUITask();
 			task.setName(t.getName());
@@ -445,7 +433,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 			task.setSendActivityReport(t.isSendActivityReport());
 
-			tasks[i++] = task;
+			tasks.add(task);
 		}
 
 		return tasks;
@@ -934,7 +922,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 			if (init.testConnection()) {
 				// connection success
-				init.init(new String[] { pluginId });
+				init.init(Set.of(pluginId));
 			} else {
 				// connection failure
 				log.debug("connection failure");

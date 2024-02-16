@@ -67,7 +67,7 @@ public class EmailDialog extends AbstractEmailDialog {
 		messageTemplate.addChangedHandler(event -> {
 			if (messageTemplate.getValueAsString() != null && !"".equals(messageTemplate.getValueAsString())) {
 				MessageService.Instance.get().getTemplate(Long.parseLong(messageTemplate.getValueAsString()),
-						new AsyncCallback<GUIMessageTemplate>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -137,31 +137,30 @@ public class EmailDialog extends AbstractEmailDialog {
 
 		updateSignature();
 
-		MessageService.Instance.get().loadTemplates(I18N.getLocale(), "user",
-				new AsyncCallback<GUIMessageTemplate[]>() {
+		MessageService.Instance.get().loadTemplates(I18N.getLocale(), "user", new AsyncCallback<>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(GUIMessageTemplate[] templates) {
-						LinkedHashMap<String, String> map = new LinkedHashMap<>();
-						map.put("", "");
-						for (GUIMessageTemplate t : templates)
-							map.put("" + t.getId(), t.getName());
-						messageTemplate.setValueMap(map);
-						messageTemplate.setValue("");
-					}
-				});
+			@Override
+			public void onSuccess(List<GUIMessageTemplate> templates) {
+				LinkedHashMap<String, String> map = new LinkedHashMap<>();
+				map.put("", "");
+				for (GUIMessageTemplate t : templates)
+					map.put("" + t.getId(), t.getName());
+				messageTemplate.setValueMap(map);
+				messageTemplate.setValue("");
+			}
+		});
 	}
 
 	@Override
 	protected void onSubmit(GUIEmail mail) {
 		LD.contactingServer();
 		DocumentService.Instance.get().sendAsEmail(mail, Session.get().getUser().getLanguage(),
-				new AsyncCallback<String>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						LD.clearPrompt();

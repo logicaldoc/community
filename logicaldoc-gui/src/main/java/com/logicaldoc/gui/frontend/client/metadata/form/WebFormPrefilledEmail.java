@@ -52,7 +52,7 @@ public class WebFormPrefilledEmail extends StickyWindow {
 
 		addItem(hintForm);
 		
-		FormService.Instance.get().getById(formId, new AsyncCallback<GUIForm>() {
+		FormService.Instance.get().getById(formId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -86,7 +86,7 @@ public class WebFormPrefilledEmail extends StickyWindow {
 
 		LD.contactingServer();
 		FormService.Instance.get().invite((GUIForm) extPanel.getObject(), mail, I18N.getLocale(),
-				new AsyncCallback<Void>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

@@ -40,7 +40,7 @@ public class PasswordGenerator extends Window {
 
 	private void generatePassword() {
 		generate.setDisabled(true);
-		LoginService.Instance.get().generatePassword(username, new AsyncCallback<String>() {
+		LoginService.Instance.get().generatePassword(username, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

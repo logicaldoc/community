@@ -68,7 +68,7 @@ public class SystemMenu extends VLayout {
 		restart.setHeight(25);
 		restart.addClickHandler(event -> SC.ask(I18N.message("restartalert"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				SystemService.Instance.get().restart(new AsyncCallback<Void>() {
+				SystemService.Instance.get().restart(new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -119,7 +119,7 @@ public class SystemMenu extends VLayout {
 				"<span style='color:red;'><b>" + I18N.message("confirmupdate") + "</b></span>");
 		confirmUpdate.setWidth100();
 		confirmUpdate.setHeight(25);
-		confirmUpdate.addClickHandler(event -> SystemService.Instance.get().confirmUpdate(new AsyncCallback<Void>() {
+		confirmUpdate.addClickHandler(event -> SystemService.Instance.get().confirmUpdate(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

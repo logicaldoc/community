@@ -221,7 +221,7 @@ public class MailPreviewPanel extends VLayout {
 		MenuItem copy = new MenuItem();
 		copy.setTitle(I18N.message("copy"));
 		copy.addClickHandler(event -> DocumentService.Instance.get().saveEmailAttachment(doc.getId(),
-				doc.getFileVersion(), attachment.getFileName(), new AsyncCallback<GUIDocument>() {
+				doc.getFileVersion(), attachment.getFileName(), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

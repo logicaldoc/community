@@ -59,7 +59,7 @@ public class StampUploader extends Window {
 		layout.addMember(uploader);
 		layout.addMember(submit);
 
-		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -81,7 +81,7 @@ public class StampUploader extends Window {
 			return;
 		}
 
-		StampService.Instance.get().saveImage(stampId, new AsyncCallback<Void>() {
+		StampService.Instance.get().saveImage(stampId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

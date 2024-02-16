@@ -74,7 +74,7 @@ public class ProtocolsPanel extends AdminPanel {
 
 	@Override
 	protected void onDraw() {
-		SettingService.Instance.get().loadProtocolSettings(new AsyncCallback<GUIParameter[]>() {
+		SettingService.Instance.get().loadProtocolSettings(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -82,13 +82,13 @@ public class ProtocolsPanel extends AdminPanel {
 			}
 
 			@Override
-			public void onSuccess(GUIParameter[] settings) {
+			public void onSuccess(List<GUIParameter> settings) {
 				init(settings);
 			}
 		});
 	}
 
-	private void init(GUIParameter[] settings) {
+	private void init(List<GUIParameter> settings) {
 		collectParameters(settings);
 
 		webservicesPanel = new WebservicesPanel(settings, vm);
@@ -269,7 +269,7 @@ public class ProtocolsPanel extends AdminPanel {
 		}
 
 		@SuppressWarnings("unchecked")
-		Map<String, Object> values =  vm.getValues();
+		Map<String, Object> values = vm.getValues();
 		if (Session.get().isDefaultTenant()) {
 			webservicesPanel.save();
 
@@ -307,7 +307,7 @@ public class ProtocolsPanel extends AdminPanel {
 		params.add(ProtocolsPanel.this.ftpKeystoreAlias);
 		params.add(ProtocolsPanel.this.ftpKeystoreAliasPassword);
 
-		SettingService.Instance.get().saveSettings(params.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
+		SettingService.Instance.get().saveSettings(params, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
@@ -345,7 +345,7 @@ public class ProtocolsPanel extends AdminPanel {
 		}
 	}
 
-	private void collectParameters(GUIParameter[] settings) {
+	private void collectParameters(List<GUIParameter> settings) {
 		for (GUIParameter parameter : settings) {
 			if (parameter.getName().equals("cmis.enabled"))
 				cmisEnabled = parameter;

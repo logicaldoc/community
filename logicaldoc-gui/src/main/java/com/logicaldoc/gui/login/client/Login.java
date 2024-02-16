@@ -49,7 +49,7 @@ public class Login implements EntryPoint {
 		Window.enableScrolling(false);
 		Window.setMargin("0px");
 
-		InfoService.Instance.get().getInfo(I18N.getLocale(), tenant, true, new AsyncCallback<GUIInfo>() {
+		InfoService.Instance.get().getInfo(I18N.getLocale(), tenant, true, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable error) {
 				SC.warn(error.getMessage());

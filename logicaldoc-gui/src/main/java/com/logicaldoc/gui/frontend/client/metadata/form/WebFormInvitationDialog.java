@@ -43,7 +43,7 @@ public class WebFormInvitationDialog extends AbstractEmailDialog {
 			LD.contactingServer();
 			GUIForm gform = new GUIForm();
 			gform.setId(formId);
-			FormService.Instance.get().invite(gform, mail, I18N.getLocale(), new AsyncCallback<Void>() {
+			FormService.Instance.get().invite(gform, mail, I18N.getLocale(), new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

@@ -142,7 +142,7 @@ public class TemplatesPanel extends VLayout {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				TemplateService.Instance.get().getTemplate(Long.parseLong(rec.getAttributeAsString("id")),
-						new AsyncCallback<GUITemplate>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -185,7 +185,7 @@ public class TemplatesPanel extends VLayout {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				TemplateService.Instance.get().delete(selectedTemplateId, new AsyncCallback<Void>() {
+				TemplateService.Instance.get().delete(selectedTemplateId, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -204,7 +204,7 @@ public class TemplatesPanel extends VLayout {
 		MenuItem clone = new MenuItem();
 		clone.setTitle(I18N.message("clone"));
 		clone.addClickHandler(event -> TemplateService.Instance.get().clone(selectedTemplateId,
-				selectedRecord.getAttribute("name") + "-Clone", new AsyncCallback<GUITemplate>() {
+				selectedRecord.getAttribute("name") + "-Clone", new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

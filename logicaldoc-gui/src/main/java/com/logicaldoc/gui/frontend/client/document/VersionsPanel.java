@@ -254,7 +254,7 @@ public class VersionsPanel extends DocumentDetailTab {
 				I18N.message("delversionwarn") + ".\n " + I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
 						DocumentService.Instance.get().deleteVersions(GridUtil.getIds(selection),
-								new AsyncCallback<GUIDocument>() {
+								new AsyncCallback<>() {
 									@Override
 									public void onFailure(Throwable caught) {
 										GuiLog.serverError(caught);
@@ -284,7 +284,7 @@ public class VersionsPanel extends DocumentDetailTab {
 					if (Boolean.TRUE.equals(yes)) {
 						LD.contactingServer();
 						DocumentService.Instance.get().promoteVersion(document.getId(),
-								selection[0].getAttributeAsString(VERSION), new AsyncCallback<GUIDocument>() {
+								selection[0].getAttributeAsString(VERSION), new AsyncCallback<>() {
 
 									@Override
 									public void onFailure(Throwable caught) {

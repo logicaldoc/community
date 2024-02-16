@@ -297,7 +297,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			setIndexed(doc, tenant);
 
 			setTags(doc);
-			
+
 			AccessControlUtil.removeForbiddenPermissionsForGuests(doc);
 
 			setType(doc);
@@ -1051,19 +1051,14 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public List<Document> findByIds(Long[] ids, Integer max) {
+	public List<Document> findByIds(Set<Long> ids, Integer max) {
 		List<Document> docs = new ArrayList<>();
-		if (ids.length < 1)
+		if (CollectionUtils.isEmpty(ids))
 			return docs;
 
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < ids.length; i++) {
-			if (i > 0)
-				sb.append(",");
-			sb.append(ids[i]);
-		}
 		try {
-			docs = findByWhere(ENTITY + ".id in(" + sb.toString() + ")", null, max);
+			docs = findByWhere(ENTITY + ".id in("
+					+ ids.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")) + ")", null, max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}

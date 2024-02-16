@@ -56,7 +56,7 @@ public class EventsCalendar extends Calendar {
 
 		addEventClickHandler(event -> {
 			CalendarService.Instance.get().getEvent(Long.parseLong(event.getEvent().getAttribute("eventId")),
-					new AsyncCallback<GUICalendarEvent>() {
+					new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
@@ -78,7 +78,7 @@ public class EventsCalendar extends Calendar {
 											} else {
 												CalendarService.Instance.get().getEvent(
 														Long.parseLong(event.getEvent().getAttribute("parentId")),
-														new AsyncCallback<GUICalendarEvent>() {
+														new AsyncCallback<>() {
 															public void onFailure(Throwable caught) {
 																GuiLog.serverError(caught);
 															}

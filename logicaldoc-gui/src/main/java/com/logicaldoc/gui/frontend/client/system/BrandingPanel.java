@@ -21,7 +21,7 @@ public class BrandingPanel extends AdminPanel {
 
 	public BrandingPanel(long tenantId) {
 		super("branding");
-		TenantService.Instance.get().load(tenantId, new AsyncCallback<GUITenant>() {
+		TenantService.Instance.get().load(tenantId, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
@@ -52,7 +52,7 @@ public class BrandingPanel extends AdminPanel {
 	}
 
 	private void onSave() {
-		TenantService.Instance.get().save(tenant, new AsyncCallback<GUITenant>() {
+		TenantService.Instance.get().save(tenant, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

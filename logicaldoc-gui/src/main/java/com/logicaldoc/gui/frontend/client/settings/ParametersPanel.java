@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.settings;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
@@ -38,7 +39,7 @@ public class ParametersPanel extends AdminPanel {
 
 	@Override
 	protected void onDraw() {
-		SettingService.Instance.get().loadSettings(new AsyncCallback<GUIParameter[]>() {
+		SettingService.Instance.get().loadSettings(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -46,14 +47,14 @@ public class ParametersPanel extends AdminPanel {
 			}
 
 			@Override
-			public void onSuccess(GUIParameter[] settings) {
+			public void onSuccess(List<GUIParameter> settings) {
 				initGUI(settings);
 			}
 
 		});
 	}
 
-	private void initGUI(GUIParameter[] settings) {
+	private void initGUI(List<GUIParameter> settings) {
 		ListGridField parameter = new ListGridField(PARAMETER, I18N.message(PARAMETER));
 		parameter.setAutoFitWidth(true);
 		parameter.setCanEdit(false);
@@ -79,15 +80,13 @@ public class ParametersPanel extends AdminPanel {
 		parametersGrid.setShowRecordComponentsByCell(true);
 		parametersGrid.setFields(parameter, value);
 
-		ListGridRecord[] records = new ListGridRecord[settings.length];
-		int i = 0;
+		List<ListGridRecord> records = new ArrayList<>();
 		for (GUIParameter guiParameter : settings) {
-			records[i] = new ListGridRecord();
-			records[i].setAttribute(VALUE, guiParameter.getValue());
-			records[i].setAttribute(PARAMETER, guiParameter.getName());
-			i++;
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute(VALUE, guiParameter.getValue());
+			rec.setAttribute(PARAMETER, guiParameter.getName());
 		}
-		parametersGrid.setRecords(records);
+		parametersGrid.setRecords(records.toArray(new ListGridRecord[0]));
 
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
@@ -100,7 +99,7 @@ public class ParametersPanel extends AdminPanel {
 				params.add(param);
 			}
 
-			SettingService.Instance.get().saveSettings(params.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
+			SettingService.Instance.get().saveSettings(params, new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

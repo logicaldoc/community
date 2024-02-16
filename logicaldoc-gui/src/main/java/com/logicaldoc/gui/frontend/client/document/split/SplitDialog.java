@@ -93,7 +93,7 @@ public class SplitDialog extends Window {
 				SplitService.Instance.get().split(document.getId(),
 						Integer.parseInt((String) values.get("splittingpolicy")),
 						Integer.parseInt((String) values.get("separatorhandling")), (String) values.get("expression"),
-						new AsyncCallback<Void>() {
+						new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								LD.clearPrompt();

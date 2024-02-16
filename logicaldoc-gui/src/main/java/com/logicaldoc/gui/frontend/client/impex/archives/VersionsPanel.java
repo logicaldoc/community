@@ -137,7 +137,7 @@ public class VersionsPanel extends VLayout {
 					listGrid.deselectAllRecords();
 
 					ImpexService.Instance.get().deleteVersions(archiveId, GridUtil.getIds(selection),
-							new AsyncCallback<GUIArchive>() {
+							new AsyncCallback<>() {
 
 								@Override
 								public void onFailure(Throwable caught) {

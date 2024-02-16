@@ -63,7 +63,7 @@ public class SavedSearchesPanel extends VLayout {
 
 		list.addCellDoubleClickHandler(event -> {
 			ListGridRecord rec = event.getRecord();
-			SearchService.Instance.get().load(rec.getAttributeAsString("name"), new AsyncCallback<GUISearchOptions>() {
+			SearchService.Instance.get().load(rec.getAttributeAsString("name"), new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -92,7 +92,7 @@ public class SavedSearchesPanel extends VLayout {
 		execute.addClickHandler(event -> {
 			ListGridRecord selection = list.getSelectedRecord();
 			SearchService.Instance.get().load(selection.getAttributeAsString("name"),
-					new AsyncCallback<GUISearchOptions>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -128,7 +128,7 @@ public class SavedSearchesPanel extends VLayout {
 							LD.contactingServer();
 							SearchService.Instance.get().shareSearch(selection.getAttributeAsString("name"),
 									usersSelector.getUserIds(), groupsSelector.getGroupIds(),
-									new AsyncCallback<Void>() {
+									new AsyncCallback<>() {
 
 										@Override
 										public void onFailure(Throwable caught) {
@@ -158,7 +158,7 @@ public class SavedSearchesPanel extends VLayout {
 
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
 				if (Boolean.TRUE.equals(value)) {
-					SearchService.Instance.get().delete(names, new AsyncCallback<Void>() {
+					SearchService.Instance.get().delete(names, new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);

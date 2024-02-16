@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -23,14 +25,14 @@ public interface OCRService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIParameter[] loadSettings() throws ServerException;
+	public List<GUIParameter> loadSettings() throws ServerException;
 
 	public static class Instance {
 		private static OCRServiceAsync inst;
 
 		private Instance() {
 		}
-		
+
 		public static OCRServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(OCRService.class);

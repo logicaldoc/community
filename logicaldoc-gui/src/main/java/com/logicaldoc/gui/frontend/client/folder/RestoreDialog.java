@@ -59,7 +59,7 @@ public class RestoreDialog extends Dialog {
 			if (docIds != null)
 				DocumentService.Instance.get().restore(docIds,
 						Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
-						new AsyncCallback<Void>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -77,7 +77,7 @@ public class RestoreDialog extends Dialog {
 			if (folderIds != null)
 				FolderService.Instance.get().restore(folderIds,
 						Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
-						new AsyncCallback<Void>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {

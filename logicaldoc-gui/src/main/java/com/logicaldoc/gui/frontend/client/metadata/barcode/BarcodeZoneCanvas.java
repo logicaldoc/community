@@ -30,7 +30,7 @@ public class BarcodeZoneCanvas extends ZoneCanvas {
 	protected void onEdit() {
 		if (zone.getSample() == null || zone.getSampleText() == null) {
 			LD.contactingServer();
-			BarcodeService.Instance.get().updateZone((GUIBarcodeZone) zone, new AsyncCallback<GUIBarcodeZone>() {
+			BarcodeService.Instance.get().updateZone((GUIBarcodeZone) zone, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

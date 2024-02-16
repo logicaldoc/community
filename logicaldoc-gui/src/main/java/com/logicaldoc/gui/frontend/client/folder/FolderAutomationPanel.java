@@ -113,7 +113,7 @@ public class FolderAutomationPanel extends FolderDetailTab {
 
 		applyToSubfolders.addClickHandler(event -> {
 			LD.contactingServer();
-			AutomationService.Instance.get().applyTriggersToTree(folder.getId(), new AsyncCallback<Void>() {
+			AutomationService.Instance.get().applyTriggersToTree(folder.getId(), new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -143,7 +143,7 @@ public class FolderAutomationPanel extends FolderDetailTab {
 		delete.addClickHandler(
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirmation -> {
 					if (Boolean.TRUE.equals(confirmation)) {
-						AutomationService.Instance.get().deleteTriggers(GridUtil.getIds(selection), new AsyncCallback<Void>() {
+						AutomationService.Instance.get().deleteTriggers(GridUtil.getIds(selection), new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -198,7 +198,7 @@ public class FolderAutomationPanel extends FolderDetailTab {
 	private void onEdit() {
 		ListGridRecord selection = list.getSelectedRecord();
 		AutomationService.Instance.get().getTrigger(selection.getAttributeAsLong("id"),
-				new AsyncCallback<GUIAutomationTrigger>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

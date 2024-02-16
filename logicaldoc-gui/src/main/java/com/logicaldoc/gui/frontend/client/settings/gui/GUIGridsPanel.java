@@ -273,7 +273,7 @@ public class GUIGridsPanel extends VLayout {
 		Session.get().setConfig(param.getName(), param.getValue());
 
 		// Save all
-		SettingService.Instance.get().saveSettings(parameters.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
+		SettingService.Instance.get().saveSettings(parameters, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

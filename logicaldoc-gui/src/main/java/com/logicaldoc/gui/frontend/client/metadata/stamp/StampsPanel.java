@@ -85,7 +85,7 @@ public class StampsPanel extends AdminPanel {
 				return "";
 		});
 
-		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
+		ListGridField enabled = new ListGridField(EENABLED, " ", 30);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -140,7 +140,7 @@ public class StampsPanel extends AdminPanel {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				StampService.Instance.get().getStamp(Long.parseLong(rec.getAttributeAsString("id")),
-						new AsyncCallback<GUIStamp>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -181,7 +181,7 @@ public class StampsPanel extends AdminPanel {
 		delete.addClickHandler(
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean confirm) -> {
 					if (Boolean.TRUE.equals(confirm)) {
-						StampService.Instance.get().delete(id, new AsyncCallback<Void>() {
+						StampService.Instance.get().delete(id, new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -200,7 +200,7 @@ public class StampsPanel extends AdminPanel {
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(event -> StampService.Instance.get()
-				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new AsyncCallback<Void>() {
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -217,7 +217,7 @@ public class StampsPanel extends AdminPanel {
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(event -> StampService.Instance.get()
-				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new AsyncCallback<Void>() {
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

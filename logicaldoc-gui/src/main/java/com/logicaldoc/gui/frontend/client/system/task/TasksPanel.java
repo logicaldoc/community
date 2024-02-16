@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.system.task;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.Timer;
@@ -77,7 +78,7 @@ public class TasksPanel extends AdminPanel {
 		taskExecution.setTitle(I18N.message("execute"));
 		taskExecution.addClickHandler(event -> SystemService.Instance.get().getTaskByName(
 				tasksGrid.getSelectedRecord().getAttributeAsString("name"), I18N.getLocale(),
-				new AsyncCallback<GUITask>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -270,7 +271,7 @@ public class TasksPanel extends AdminPanel {
 			ListGridRecord rec = tasksGrid.getSelectedRecord();
 			if (rec != null)
 				SystemService.Instance.get().getTaskByName(rec.getAttribute("name"), I18N.getLocale(),
-						new AsyncCallback<GUITask>() {
+						new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -293,7 +294,7 @@ public class TasksPanel extends AdminPanel {
 			final ListGridRecord rec = tasksGrid.getSelectedRecord();
 			if (rec != null)
 				SystemService.Instance.get().getTaskByName(rec.getAttribute("name"), I18N.getLocale(),
-						new AsyncCallback<GUITask>() {
+						new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -381,14 +382,14 @@ public class TasksPanel extends AdminPanel {
 	}
 
 	private void loadTasks() {
-		SystemService.Instance.get().loadTasks(I18N.getLocale(), new AsyncCallback<GUITask[]>() {
+		SystemService.Instance.get().loadTasks(I18N.getLocale(), new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
 			}
 
 			@Override
-			public void onSuccess(GUITask[] tasks) {
+			public void onSuccess(List<GUITask> tasks) {
 				for (GUITask guiTask : tasks) {
 					Progressbar p = progresses.get(guiTask.getName());
 					if (p == null)

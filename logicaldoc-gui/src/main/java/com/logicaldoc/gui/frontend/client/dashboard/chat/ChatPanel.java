@@ -72,7 +72,7 @@ public class ChatPanel extends VLayout {
 	protected void onPost(String message) {
 		if (message == null || message.trim().isEmpty())
 			return;
-		ChatService.Instance.get().post(message, new AsyncCallback<Void>() {
+		ChatService.Instance.get().post(message, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

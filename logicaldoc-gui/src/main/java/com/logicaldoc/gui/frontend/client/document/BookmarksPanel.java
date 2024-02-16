@@ -79,7 +79,7 @@ public class BookmarksPanel extends VLayout {
 		list.addCellContextClickHandler(event -> {
 			final ListGridRecord rec = list.getSelectedRecord();
 			FolderService.Instance.get().getFolder(Long.parseLong(rec.getAttributeAsString("folderId")), false, false,
-					false, new AsyncCallback<GUIFolder>() {
+					false, new AsyncCallback<>() {
 
 						@Override
 						public void onSuccess(GUIFolder folder) {
@@ -130,7 +130,7 @@ public class BookmarksPanel extends VLayout {
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 				if (Boolean.TRUE.equals(answer)) {
 					DocumentService.Instance.get().deleteBookmarks(GridUtil.getIds(selection),
-							new AsyncCallback<Void>() {
+							new AsyncCallback<>() {
 								@Override
 								public void onFailure(Throwable caught) {
 									GuiLog.serverError(caught);

@@ -60,7 +60,7 @@ public class DashletSelector extends Window {
 				for (int row = 0; row < portlets[column].length; row++)
 					size[column] += portlets[column][row].length;
 
-			DashletService.Instance.get().get(form.getValueAsString("dashlet"), new AsyncCallback<GUIDashlet>() {
+			DashletService.Instance.get().get(form.getValueAsString("dashlet"), new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

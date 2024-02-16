@@ -3,6 +3,8 @@ package com.logicaldoc.web.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,11 +52,9 @@ public class SettingServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testSaveSettings() throws ServerException {
-		GUIParameter[] params = new GUIParameter[50];
-		for (int i = 0; i < params.length; i++) {
-			GUIParameter p = new GUIParameter("param" + i + "_name", "Value " + i);
-			params[i] = p;
-		}
+		List<GUIParameter> params = new ArrayList<>();
+		for (int i = 0; i < 50; i++)
+			params.add(new GUIParameter("param" + i + "_name", "Value " + i));
 
 		String notThrownTest = null;
 		try {
@@ -68,8 +68,6 @@ public class SettingServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testSaveWSSettings() throws ServerException {
-		GUIParameter[] settings = new GUIParameter[2];
-
 		GUIParameter wsSettings = new GUIParameter();
 		wsSettings.setName("webservice.enabled");
 		wsSettings.setValue("true");
@@ -78,12 +76,9 @@ public class SettingServiceImplTest extends AbstractWebappTestCase {
 		wsSettings.setName("webdav.enabled");
 		wsSettings.setValue("true");
 
-		settings[0] = wsSettings;
-		settings[1] = wdSettings;
-
 		String notThrownTest = null;
 		try {
-			service.saveSettings(settings);
+			service.saveSettings(List.of(wsSettings, wdSettings));
 			notThrownTest = "ok";
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);

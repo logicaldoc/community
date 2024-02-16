@@ -212,7 +212,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		pages.setWidth("1%");
 		PickerIcon countPages = new PickerIcon(PickerIconName.REFRESH, (final FormItemIconClickEvent event) -> {
 			event.getItem().setValue(I18N.message("computing") + "...");
-			DocumentService.Instance.get().updatePages(document.getId(), new AsyncCallback<Integer>() {
+			DocumentService.Instance.get().updatePages(document.getId(), new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -374,7 +374,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		rating.setEndRow(true);
 		if (updateEnabled)
 			rating.addClickHandler(
-					event -> DocumentService.Instance.get().getRating(document.getId(), new AsyncCallback<GUIRating>() {
+					event -> DocumentService.Instance.get().getRating(document.getId(), new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);

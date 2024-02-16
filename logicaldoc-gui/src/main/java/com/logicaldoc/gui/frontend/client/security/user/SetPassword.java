@@ -95,7 +95,7 @@ public class SetPassword extends Window {
 
 			apply.setDisabled(true);
 			SecurityService.Instance.get().changePassword(Session.get().getUser().getId(), userId, null,
-					vm.getValueAsString(NEWPASSWORD), notify.getValueAsBoolean(), new AsyncCallback<GUIValue>() {
+					vm.getValueAsString(NEWPASSWORD), notify.getValueAsBoolean(), new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

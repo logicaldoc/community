@@ -74,7 +74,7 @@ public class IncrementalDetailsPanel extends VLayout implements FolderChangeList
 		closeImage.addClickHandler((ClickEvent event) -> {
 			if (getIncremental().getId() != 0) {
 				ImpexService.Instance.get().loadIncremental(getIncremental().getId(),
-						new AsyncCallback<GUIIncrementalArchive>() {
+						new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -153,7 +153,7 @@ public class IncrementalDetailsPanel extends VLayout implements FolderChangeList
 
 	public void onSave() {
 		if (settingsPanel.validate()) {
-			ImpexService.Instance.get().saveIncremental(incremental, new AsyncCallback<GUIIncrementalArchive>() {
+			ImpexService.Instance.get().saveIncremental(incremental, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

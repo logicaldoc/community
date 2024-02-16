@@ -113,7 +113,7 @@ public class ZohoEditor extends Window {
 
 	private void onCancel() {
 		DocumentService.Instance.get().unlock(Arrays.asList(ZohoEditor.this.document.getId()),
-				new AsyncCallback<Void>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -126,7 +126,7 @@ public class ZohoEditor extends Window {
 						DocumentController.get().setCurrentDocument(document);
 						LD.contactingServer();
 						ZohoService.Instance.get().delete(ZohoEditor.this.document.getExtResId(),
-								new AsyncCallback<Void>() {
+								new AsyncCallback<>() {
 									@Override
 									public void onFailure(Throwable caught) {
 										LD.clearPrompt();

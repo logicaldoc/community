@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -1414,32 +1415,30 @@ public class DocumentManagerImpl implements DocumentManager {
 		this.documentNoteDAO = documentNoteDAO;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public long archiveFolder(long folderId, DocumentHistory transaction) throws PersistenceException {
-		List<Long> docIds = new ArrayList<>();
 		Folder root = folderDAO.findFolder(folderId);
+
+		Set<Long> archivedDocIds = new HashSet<>();
 
 		Collection<Long> folderIds = folderDAO.findFolderIdByUserIdAndPermission(transaction.getUserId(),
 				Permission.ARCHIVE, root.getId(), true);
 		for (Long fid : folderIds) {
 			String where = " where ld_deleted=0 and not ld_status=" + AbstractDocument.DOC_ARCHIVED
 					+ " and ld_folderid=" + fid;
-			@SuppressWarnings("unchecked")
-			List<Long> ids = documentDAO.queryForList("select ld_id from ld_document " + where, Long.class);
-			if (ids.isEmpty())
+			archivedDocIds.addAll((Set<Long>) documentDAO.queryForList("select ld_id from ld_document " + where, Long.class)
+					.stream().collect(Collectors.toSet()));
+			if (archivedDocIds.isEmpty())
 				continue;
-			docIds.addAll(ids);
-			long[] idsArray = new long[ids.size()];
-			for (int i = 0; i < idsArray.length; i++)
-				idsArray[i] = ids.get(i).longValue();
-			archiveDocuments(idsArray, transaction);
+			archiveDocuments(archivedDocIds, transaction);
 		}
 
-		return docIds.size();
+		return archivedDocIds.size();
 	}
 
 	@Override
-	public void archiveDocuments(long[] docIds, DocumentHistory transaction) throws PersistenceException {
+	public void archiveDocuments(Set<Long> docIds, DocumentHistory transaction) throws PersistenceException {
 		if (transaction.getUser() == null)
 			throw new IllegalArgumentException("transaction user cannot be null");
 
@@ -1687,7 +1686,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			Arrays.sort(pdfs, (o1, o2) -> o1.getName().compareTo(o2.getName()));
 
 			// Merge all the PDFs
-			bigPdf = mergePdf(pdfs);
+			bigPdf = mergePdf(List.of(pdfs));
 
 			// Add an history entry to track the export of the document
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -1755,12 +1754,12 @@ public class DocumentManagerImpl implements DocumentManager {
 	/**
 	 * Merges different PDFs into a single PDF-
 	 * 
-	 * @param pdfs ordered array of pdf files to be merged
+	 * @param pdfs ordered list of pdf files to be merged
 	 * @return The merged Pdf file
 	 * 
 	 * @throws IOException
 	 */
-	private File mergePdf(File[] pdfs) throws IOException {
+	private File mergePdf(List<File> pdfs) throws IOException {
 		File tempDir = null;
 		try {
 			Path tempPath = Files.createTempDirectory(MERGE);
@@ -1769,9 +1768,8 @@ public class DocumentManagerImpl implements DocumentManager {
 			File dst = FileUtil.createTempFile(MERGE, ".pdf");
 
 			PDFMergerUtility merger = new PDFMergerUtility();
-			for (File file : pdfs) {
+			for (File file : pdfs)
 				merger.addSource(file);
-			}
 
 			merger.setDestinationFileName(dst.getAbsolutePath());
 			MemoryUsageSetting memoryUsage = MemoryUsageSetting.setupTempFileOnly();
@@ -1780,8 +1778,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			return dst;
 		} finally {
-			if (tempDir != null && tempDir.exists())
-				FileUtil.strongDelete(tempDir);
+			FileUtil.strongDelete(tempDir);
 		}
 	}
 

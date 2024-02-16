@@ -147,7 +147,7 @@ public abstract class FolderSearchForm extends VLayout {
 			template.addChangedHandler(event -> {
 				if (event.getValue() != null && !"".equals(event.getValue())) {
 					TemplateService.Instance.get().getTemplate(Long.parseLong((String) event.getValue()),
-							new AsyncCallback<GUITemplate>() {
+							new AsyncCallback<>() {
 								@Override
 								public void onFailure(Throwable caught) {
 									GuiLog.serverError(caught);
@@ -241,10 +241,8 @@ public abstract class FolderSearchForm extends VLayout {
 
 		List<GUICriterion> criteria = new ArrayList<>();
 		if (conditionsLayout.getMembers() != null)
-			for (Canvas canvas : conditionsLayout.getMembers()) {
-				ParameterConditionRow condition = (ParameterConditionRow) canvas;
-				addCriterion(condition, criteria);
-			}
+			for (Canvas canvas : conditionsLayout.getMembers())
+				addCriterion((ParameterConditionRow) canvas, criteria);
 
 		addFolderCriterion(options, criteria);
 

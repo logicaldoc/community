@@ -97,7 +97,7 @@ public class Session implements DocumentObserver {
 	}
 
 	public void init(final GUISession session) {
-		InfoService.Instance.get().getSessionInfo(new AsyncCallback<List<GUIParameter>>() {
+		InfoService.Instance.get().getSessionInfo(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -159,7 +159,7 @@ public class Session implements DocumentObserver {
 		 */
 		timer = new Timer() {
 			public void run() {
-				InfoService.Instance.get().ping(new AsyncCallback<Boolean>() {
+				InfoService.Instance.get().ping(new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						missedPingCount++;
@@ -290,7 +290,7 @@ public class Session implements DocumentObserver {
 	}
 
 	public void logout() {
-		SecurityService.Instance.get().logout(new AsyncCallback<Void>() {
+		SecurityService.Instance.get().logout(new AsyncCallback<>() {
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
 				SC.warn(caught.getMessage());

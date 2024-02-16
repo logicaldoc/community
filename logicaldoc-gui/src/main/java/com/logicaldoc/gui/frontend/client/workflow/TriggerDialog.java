@@ -101,7 +101,7 @@ public class TriggerDialog extends Window {
 					templateSelectedId = template.getValueAsString();
 
 				WorkflowService.Instance.get().saveTrigger(Long.toString(panel.getFolder().getId()), workflowSelectedId,
-						templateSelectedId, eventsSelector.getValueAsString(), new AsyncCallback<Void>() {
+						templateSelectedId, eventsSelector.getValueAsString(), new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);

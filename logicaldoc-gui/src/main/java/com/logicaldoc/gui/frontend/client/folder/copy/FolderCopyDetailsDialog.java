@@ -69,7 +69,7 @@ public class FolderCopyDetailsDialog extends StickyWindow {
 
 			LD.contactingServer();
 			FolderService.Instance.get().copyFolders(Arrays.asList(metadata.getId()), targetFolderId, foldersOnly,
-					securityPolicy, metadata, new AsyncCallback<Void>() {
+					securityPolicy, metadata, new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

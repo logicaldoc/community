@@ -132,7 +132,7 @@ public class SettingsMenu extends VLayout {
 		smtp.setWidth100();
 		smtp.setHeight(25);
 		smtp.addClickHandler(
-				event -> SettingService.Instance.get().loadEmailSettings(new AsyncCallback<GUIEmailSettings>() {
+				event -> SettingService.Instance.get().loadEmailSettings(new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

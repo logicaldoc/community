@@ -640,7 +640,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 				if (Boolean.TRUE.equals(yes)) {
 					LD.contactingServer();
 					AttributeSetService.Instance.get().applyAllToTemplates(attributeSet.getId(),
-							selection.getAttributeAsString("name"), new AsyncCallback<Void>() {
+							selection.getAttributeAsString("name"), new AsyncCallback<>() {
 								@Override
 								public void onFailure(Throwable caught) {
 									GuiLog.serverError(caught);
@@ -670,7 +670,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 						if (Boolean.TRUE.equals(yes)) {
 							LD.contactingServer();
 							AttributeSetService.Instance.get().applyInitializationToTemplates(attributeSet.getId(),
-									selection.getAttributeAsString("name"), new AsyncCallback<Void>() {
+									selection.getAttributeAsString("name"), new AsyncCallback<>() {
 										@Override
 										public void onFailure(Throwable caught) {
 											GuiLog.serverError(caught);
@@ -700,7 +700,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 						if (Boolean.TRUE.equals(confirm)) {
 							LD.contactingServer();
 							AttributeSetService.Instance.get().applyValidationToTemplates(attributeSet.getId(),
-									selection.getAttributeAsString("name"), new AsyncCallback<Void>() {
+									selection.getAttributeAsString("name"), new AsyncCallback<>() {
 										@Override
 										public void onFailure(Throwable caught) {
 											GuiLog.serverError(caught);

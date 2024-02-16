@@ -91,7 +91,7 @@ public class UpdatePanel extends VLayout {
 
 		LD.contactingServer();
 
-		UpdateService.Instance.get().checkUpdate(new AsyncCallback<GUIParameter[]>() {
+		UpdateService.Instance.get().checkUpdate(new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				LD.clearPrompt();
@@ -100,13 +100,13 @@ public class UpdatePanel extends VLayout {
 			}
 
 			@Override
-			public void onSuccess(GUIParameter[] parameters) {
+			public void onSuccess(List<GUIParameter>parameters) {
 				LD.clearPrompt();
 
-				if (parameters == null || parameters.length == 0) {
+				if (parameters.isEmpty()) {
 					onUpdateUnavailable();
-				} else if (parameters.length == 1 && parameters[0].getName().equals("error")) {
-					onUpdateTemporarilyUnavailable(parameters[0].getValue());
+				} else if (parameters.size() == 1 && parameters.get(0).getName().equals("error")) {
+					onUpdateTemporarilyUnavailable(parameters.get(0).getValue());
 				} else {
 					updateFileName = Util.getValue("file", parameters);
 
@@ -184,7 +184,7 @@ public class UpdatePanel extends VLayout {
 		addMember(upload);
 	}
 
-	private VLayout prepareActionsBar(final GUIParameter[] parameters) {
+	private VLayout prepareActionsBar(final List<GUIParameter> parameters) {
 		final Label barLabel = new Label(I18N.message("downloadprogress"));
 		barLabel.setHeight(16);
 		barLabel.setWrap(false);
@@ -203,7 +203,7 @@ public class UpdatePanel extends VLayout {
 			bar.setPercentDone(0);
 			download.setDisabled(true);
 			UpdateService.Instance.get().downloadUpdate(Util.getValue("id", parameters), updateFileName,
-					Long.parseLong(Util.getValue("size", parameters)), new AsyncCallback<Void>() {
+					Long.parseLong(Util.getValue("size", parameters)), new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -217,7 +217,7 @@ public class UpdatePanel extends VLayout {
 
 							new Timer() {
 								public void run() {
-									UpdateService.Instance.get().checkDownloadStatus(new AsyncCallback<int[]>() {
+									UpdateService.Instance.get().checkDownloadStatus(new AsyncCallback<>() {
 
 										@Override
 										public void onFailure(Throwable caught) {
@@ -225,10 +225,10 @@ public class UpdatePanel extends VLayout {
 										}
 
 										@Override
-										public void onSuccess(int[] status) {
-											bar.setPercentDone(status[1]);
+										public void onSuccess(List<Integer> status) {
+											bar.setPercentDone(status.get(1));
 
-											if (status[1] == 100)
+											if (status.get(1) == 100)
 												onUpdatePackageLocallyAvailable(updateFileName);
 											else
 												schedule(50);
@@ -270,7 +270,7 @@ public class UpdatePanel extends VLayout {
 	}
 
 	private void displayNotes(String fileName) {
-		UpdateService.Instance.get().getUpdateNotes(fileName, new AsyncCallback<List<String>>() {
+		UpdateService.Instance.get().getUpdateNotes(fileName, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -380,7 +380,7 @@ public class UpdatePanel extends VLayout {
 			if (Boolean.TRUE.equals(choice)) {
 				confirmUpdate.setVisible(false);
 				download.setVisible(false);
-				UpdateService.Instance.get().confirmUpdate(updateFileName, new AsyncCallback<String>() {
+				UpdateService.Instance.get().confirmUpdate(updateFileName, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

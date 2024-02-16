@@ -13,7 +13,7 @@ public interface WorkflowServiceAsync {
 
 	void deploy(GUIWorkflow workflow, AsyncCallback<GUIWorkflow> callback);
 
-	void list(AsyncCallback<GUIWorkflow[]> callback);
+	void list(AsyncCallback<List<GUIWorkflow>> callback);
 
 	void save(GUIWorkflow workflow, AsyncCallback<GUIWorkflow> callback);
 

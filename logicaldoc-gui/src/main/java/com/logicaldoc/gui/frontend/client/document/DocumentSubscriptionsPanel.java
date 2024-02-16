@@ -1,8 +1,6 @@
 package com.logicaldoc.gui.frontend.client.document;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
@@ -106,7 +104,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 				return;
 			long groupId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
 			AuditService.Instance.get().subscribeDocuments(Arrays.asList(document.getId()),
-					Constants.getAuditDefaultEvents(), null, groupId, new AsyncCallback<Void>() {
+					Constants.getAuditDefaultEvents(), null, groupId, new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -130,7 +128,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 				return;
 			long userId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
 			AuditService.Instance.get().subscribeDocuments(Arrays.asList(document.getId()),
-					Constants.getAuditDefaultEvents(), userId, null, new AsyncCallback<Void>() {
+					Constants.getAuditDefaultEvents(), userId, null, new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -158,7 +156,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				AuditService.Instance.get().deleteSubscriptions(GridUtil.getIds(selection), new AsyncCallback<Void>() {
+				AuditService.Instance.get().deleteSubscriptions(GridUtil.getIds(selection), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

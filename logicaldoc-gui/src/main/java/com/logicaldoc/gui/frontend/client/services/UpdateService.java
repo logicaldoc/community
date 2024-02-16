@@ -26,14 +26,14 @@ public interface UpdateService extends RemoteService {
 	 * 
 	 * @return List of informations about the available update package or null
 	 */
-	public GUIParameter[] checkUpdate();
+	public List<GUIParameter> checkUpdate();
 
 	/**
 	 * Check if the current installation has patches available
 	 * 
 	 * @return List of available patches
 	 */
-	public GUIPatch[] checkPatch();
+	public List<GUIPatch> checkPatch();
 
 	void downloadUpdate(String id, String fileName, long fileSize);
 
@@ -88,7 +88,7 @@ public interface UpdateService extends RemoteService {
 	 * 
 	 * @return download status code and download progress
 	 */
-	public int[] checkDownloadStatus();
+	public List<Integer> checkDownloadStatus();
 
 	/**
 	 * Loads a new update package

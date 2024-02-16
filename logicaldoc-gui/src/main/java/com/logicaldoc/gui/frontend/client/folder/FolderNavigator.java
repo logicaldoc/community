@@ -202,7 +202,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 				contextMenu.showContextMenu();
 			} else {
 				FolderService.Instance.get().getFolder(getSelectedRecord().getAttributeAsLong(FOLDER_ID), false, true,
-						false, new AsyncCallback<GUIFolder>() {
+						false, new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -230,7 +230,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		LD.ask(I18N.message("move"), I18N.message("moveask", sourceName, targetName), yes -> {
 			if (Boolean.TRUE.equals(yes)) {
 				FolderService.Instance.get().paste(selection.stream().map(d -> d.getId()).collect(Collectors.toList()),
-						folderId, "cut", false, false, false, new AsyncCallback<Void>() {
+						folderId, "cut", false, false, false, new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -265,7 +265,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 					getTree().remove(node);
 				}
 
-				FolderService.Instance.get().move(source, target, new AsyncCallback<Void>() {
+				FolderService.Instance.get().move(source, target, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -291,7 +291,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	@Override
 	public void selectFolder(final long folderId) {
 		FolderService.Instance.get().getFolder(folderId, false, true, Session.get().isFolderPagination(),
-				new AsyncCallback<GUIFolder>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -617,7 +617,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		TreeNode parentNode = getTree().getParent(getSelectedRecord());
 		TreeNode firstNode = getTree().getChildren(parentNode)[0];
 
-		FolderService.Instance.get().delete(selectedIds, new AsyncCallback<Void>() {
+		FolderService.Instance.get().delete(selectedIds, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				LD.clearPrompt();
@@ -667,7 +667,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		final TreeNode selectedNode = getSelectedRecord();
 		final long folderId = Long.parseLong(selectedNode.getAttributeAsString(FOLDER_ID));
 
-		DocumentService.Instance.get().addBookmarks(Arrays.asList(folderId), 1, new AsyncCallback<Void>() {
+		DocumentService.Instance.get().addBookmarks(Arrays.asList(folderId), 1, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -744,7 +744,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			selectRecord(nodeToOpen);
 
 			FolderService.Instance.get().getFolder(folderId, true, true, Session.get().isFolderPagination(),
-					new AsyncCallback<GUIFolder>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -790,7 +790,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		getTree().closeAll();
 
 		FolderService.Instance.get().getFolder(folderId, true, true, isPaginationEnabled(),
-				new AsyncCallback<GUIFolder>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -891,7 +891,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 						return;
 					final String val = value.trim().replace("/", "").replace("\\\\", "");
 					final long folderId = Long.parseLong(selectedNode.getAttributeAsString(FOLDER_ID));
-					FolderService.Instance.get().rename(folderId, val, new AsyncCallback<Void>() {
+					FolderService.Instance.get().rename(folderId, val, new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -944,7 +944,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 						Clipboard.getInstance().stream().map(doc -> doc.getId()).collect(Collectors.toList()), folderId,
 						Clipboard.getInstance().getLastAction(), Boolean.TRUE.equals(values.get("copylinks")),
 						Boolean.TRUE.equals(values.get("copynotes")), Boolean.TRUE.equals(values.get("copysecurity")),
-						new AsyncCallback<Void>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -979,7 +979,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	}
 
 	private void pasteAsAlias(final long folderId, final List<Long> docIds, String type) {
-		FolderService.Instance.get().pasteAsAlias(docIds, folderId, type, new AsyncCallback<Void>() {
+		FolderService.Instance.get().pasteAsAlias(docIds, folderId, type, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -1027,7 +1027,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		}
 
 		LD.contactingServer();
-		FolderService.Instance.get().move(ids, targetFolderId, new AsyncCallback<Void>() {
+		FolderService.Instance.get().move(ids, targetFolderId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -1059,7 +1059,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		}
 
 		LD.contactingServer();
-		FolderService.Instance.get().merge(ids, targetFolderId, new AsyncCallback<Void>() {
+		FolderService.Instance.get().merge(ids, targetFolderId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -1090,7 +1090,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 
 		LD.contactingServer();
 		FolderService.Instance.get().copyFolders(getSelectedIds(), targetFolderId, foldersOnly, securityOption, null,
-				new AsyncCallback<Void>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -1116,7 +1116,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		final TreeNode parent = getSelectedRecord();
 
 		FolderService.Instance.get().createAlias(parent.getAttributeAsLong(FOLDER_ID), referencedFolderId,
-				new AsyncCallback<GUIFolder>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -1307,7 +1307,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		/**
 		 * Check on the server if the action has been modified
 		 */
-		SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(), new AsyncCallback<GUIMenu>() {
+		SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(), new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -1329,7 +1329,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 					executeRoutine(folderId, null, routine);
 				} else if (action.getRoutineId() != null && action.getRoutineId().longValue() != 0L) {
 					AutomationService.Instance.get().getRoutine(action.getRoutineId(),
-							new AsyncCallback<GUIAutomationRoutine>() {
+							new AsyncCallback<>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
@@ -1361,7 +1361,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	}
 
 	private void executeRoutine(long folderId, List<Long> docIds, GUIAutomationRoutine routine) {
-		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<Void>() {
+		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -1412,7 +1412,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 
 				FolderService.Instance.get().setFolderPagination(cursor.getCurrentPagination().getFolderId(),
 						cursor.getCurrentPagination().getStartRow(), cursor.getCurrentPagination().getPageSize(),
-						new AsyncCallback<Void>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -1443,7 +1443,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			scrollToCell(getRowNum(node), 0);
 
 			FolderService.Instance.get().getFolder(fld.getId(), true, true, Session.get().isFolderPagination(),
-					new AsyncCallback<GUIFolder>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

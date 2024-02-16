@@ -83,7 +83,7 @@ public class GDriveCreate extends Window {
 			filename = filename + "." + type;
 		final String fn = filename;
 
-		GDriveService.Instance.get().create(filename, new AsyncCallback<String>() {
+		GDriveService.Instance.get().create(filename, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				LD.clearPrompt();

@@ -156,7 +156,7 @@ public class DocUtil {
 		String html = "";
 
 		if (type == GUIFolder.TYPE_WORKSPACE)
-			html = AwesomeFactory.getColoredIconHtml("cube", name, color);
+			html = AwesomeFactory.getColoredIconHtmlWithoutI18N("cube", name, color);
 		else if (type == GUIFolder.TYPE_ALIAS) {
 			html = "<div><span class='fa-layers fa-fw'>";
 			html += "<i class='" + AwesomeFactory.getCssClassPrefix() + " fa-lg fa-fw fa-"
@@ -167,9 +167,9 @@ public class DocUtil {
 			html += name + "</div>";
 		} else {
 			if (open)
-				html = AwesomeFactory.getColoredIconHtml("folder-open", name, color);
+				html = AwesomeFactory.getColoredIconHtmlWithoutI18N("folder-open", name, color);
 			else
-				html = AwesomeFactory.getColoredIconHtml("folder", name, color);
+				html = AwesomeFactory.getColoredIconHtmlWithoutI18N("folder", name, color);
 		}
 
 		return html;

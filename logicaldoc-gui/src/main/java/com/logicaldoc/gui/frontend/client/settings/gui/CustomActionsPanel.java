@@ -79,7 +79,7 @@ public class CustomActionsPanel extends VLayout {
 				action.setEnabled(true);
 				action.setParentId(com.logicaldoc.gui.common.client.Menu.CUSTOM_ACTIONS);
 
-				SecurityService.Instance.get().saveMenu(action, I18N.getLocale(), new AsyncCallback<GUIMenu>() {
+				SecurityService.Instance.get().saveMenu(action, I18N.getLocale(), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -186,7 +186,7 @@ public class CustomActionsPanel extends VLayout {
 
 	private void reload() {
 		SecurityService.Instance.get().getMenus(com.logicaldoc.gui.common.client.Menu.CUSTOM_ACTIONS, I18N.getLocale(),
-				false, new AsyncCallback<List<GUIMenu>>() {
+				false, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -218,7 +218,7 @@ public class CustomActionsPanel extends VLayout {
 					action.setPosition(i++);
 			}
 
-		SecurityService.Instance.get().saveMenus(actions, I18N.getLocale(), new AsyncCallback<Void>() {
+		SecurityService.Instance.get().saveMenus(actions, I18N.getLocale(), new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
@@ -281,7 +281,7 @@ public class CustomActionsPanel extends VLayout {
 					actions.remove(index);
 				} else {
 					SecurityService.Instance.get().deleteMenu(selectedRecord.getAttributeAsLong("id"),
-							new AsyncCallback<Void>() {
+							new AsyncCallback<>() {
 								@Override
 								public void onFailure(Throwable caught) {
 									GuiLog.serverError(caught);

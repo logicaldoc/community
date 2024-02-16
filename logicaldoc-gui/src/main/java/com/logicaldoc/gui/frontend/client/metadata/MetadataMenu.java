@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.metadata;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
@@ -149,7 +151,7 @@ public class MetadataMenu extends VLayout {
 		customidAndAutonaming.setWidth100();
 		customidAndAutonaming.setHeight(25);
 		customidAndAutonaming.addClickHandler(
-				customidAndAutonamingClick -> SchemeService.Instance.get().load(new AsyncCallback<GUIScheme[]>() {
+				customidAndAutonamingClick -> SchemeService.Instance.get().load(new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -157,7 +159,7 @@ public class MetadataMenu extends VLayout {
 					}
 
 					@Override
-					public void onSuccess(final GUIScheme[] schemas) {
+					public void onSuccess(List<GUIScheme> schemas) {
 						AdminScreen.get().setContent(new CustomIdPanel(schemas));
 					}
 				}));
@@ -191,7 +193,7 @@ public class MetadataMenu extends VLayout {
 			if (!Feature.enabled(Feature.TAGS_ADMIN))
 				setFeatureDisabled(tags);
 		}
-		tags.addClickHandler(tagsClick -> TagService.Instance.get().getSettings(new AsyncCallback<GUIParameter[]>() {
+		tags.addClickHandler(tagsClick -> TagService.Instance.get().getSettings(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -199,7 +201,7 @@ public class MetadataMenu extends VLayout {
 			}
 
 			@Override
-			public void onSuccess(GUIParameter[] parameters) {
+			public void onSuccess(List<GUIParameter> parameters) {
 				AdminScreen.get().setContent(new TagsPanel(parameters));
 			}
 		}));

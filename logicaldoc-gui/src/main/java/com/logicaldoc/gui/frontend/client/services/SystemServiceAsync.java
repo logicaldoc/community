@@ -11,9 +11,9 @@ import com.logicaldoc.gui.common.client.beans.GUIValue;
 
 public interface SystemServiceAsync {
 
-	void getStatistics(String locale, AsyncCallback<GUIParameter[][]> callback);
+	void getStatistics(String locale, AsyncCallback<List<List<GUIParameter>>> callback);
 
-	void loadTasks(String locale, AsyncCallback<GUITask[]> callback);
+	void loadTasks(String locale, AsyncCallback<List<GUITask>> callback);
 
 	void startTask(String taskName, AsyncCallback<Boolean> callback);
 
@@ -39,7 +39,7 @@ public interface SystemServiceAsync {
 			Long rootFolderId, AsyncCallback<List<GUIHistory>> callback);
 
 	void searchApiCalls(Long userId, Date from, Date till, String callSid, String protocol, String uri, int maxResult,
-			AsyncCallback<GUIHistory[]> callback);
+			AsyncCallback<List<GUIHistory>> callback);
 
 	void unscheduleJobs(List<GUIValue> jobs, AsyncCallback<Void> callback);
 

@@ -28,10 +28,10 @@ public interface SystemService extends RemoteService {
 	 * Retrieves all the statistics parameters.
 	 * 
 	 * <ol>
-	 * <li>The first array is the Repository statistics.</li>
-	 * <li>The second array is the Documents statistics.</li>
-	 * <li>The third array is the Folders statistics.</li>
-	 * <li>The fourth array contains the last run date.</li>
+	 * <li>The first list is the Repository statistics.</li>
+	 * <li>The second list is the Documents statistics.</li>
+	 * <li>The third list is the Folders statistics.</li>
+	 * <li>The fourth list contains the last run date.</li>
 	 * </ol>
 	 * 
 	 * @param locale The current user locale
@@ -40,7 +40,7 @@ public interface SystemService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIParameter[][] getStatistics(String locale) throws ServerException;
+	public List<List<GUIParameter>> getStatistics(String locale) throws ServerException;
 
 	/**
 	 * Retrieves all tasks.
@@ -51,7 +51,7 @@ public interface SystemService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUITask[] loadTasks(String locale) throws ServerException;
+	public List<GUITask> loadTasks(String locale) throws ServerException;
 
 	/**
 	 * Starts the task execution.

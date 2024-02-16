@@ -60,7 +60,7 @@ public class TenantKeystorePanel extends VLayout {
 			setHeight100();
 			setMembersMargin(20);
 
-			SignService.Instance.get().loadKeystore(tenantId, new AsyncCallback<GUIKeystore>() {
+			SignService.Instance.get().loadKeystore(tenantId, new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -305,7 +305,7 @@ public class TenantKeystorePanel extends VLayout {
 		delete.setAutoFit(true);
 		delete.addClickHandler(event -> SC.ask(I18N.message("deletekeystorewarn"), answer -> {
 			if (Boolean.TRUE.equals(answer))
-				SignService.Instance.get().deleteKeystore(tenantId, new AsyncCallback<Void>() {
+				SignService.Instance.get().deleteKeystore(tenantId, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -335,7 +335,7 @@ public class TenantKeystorePanel extends VLayout {
 				return;
 
 			LD.contactingServer();
-			SignService.Instance.get().saveKeystore(keystore, new AsyncCallback<Void>() {
+			SignService.Instance.get().saveKeystore(keystore, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					LD.clearPrompt();
@@ -358,7 +358,7 @@ public class TenantKeystorePanel extends VLayout {
 			if (!validate())
 				return;
 			LD.contactingServer();
-			SignService.Instance.get().generateNewKeystore(keystore, new AsyncCallback<Void>() {
+			SignService.Instance.get().generateNewKeystore(keystore, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					LD.clearPrompt();

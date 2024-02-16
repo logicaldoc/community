@@ -121,7 +121,7 @@ public class FolderCopyDialog extends Dialog {
 	}
 
 	private void copySingleFolder(long selectedSourceId, final DynamicForm form, long tagetFolderId) {
-		FolderService.Instance.get().getFolder(selectedSourceId, false, false, false, new AsyncCallback<GUIFolder>() {
+		FolderService.Instance.get().getFolder(selectedSourceId, false, false, false, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

@@ -87,7 +87,7 @@ public class LinksPanel extends DocumentDetailTab {
 			final ListGridRecord rec = evnt.getRecord();
 
 			FolderService.Instance.get().getFolder(rec.getAttributeAsLong("folderId"), false, false, false,
-					new AsyncCallback<GUIFolder>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -146,7 +146,7 @@ public class LinksPanel extends DocumentDetailTab {
 			if (document.getFolder().getId() == folderId)
 				folderId = selection[0].getAttributeAsLong("folderId2");
 
-			FolderService.Instance.get().getFolder(folderId, false, false, false, new AsyncCallback<GUIFolder>() {
+			FolderService.Instance.get().getFolder(folderId, false, false, false, new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -178,7 +178,7 @@ public class LinksPanel extends DocumentDetailTab {
 
 		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				DocumentService.Instance.get().deleteLinks(selectedIds, new AsyncCallback<Void>() {
+				DocumentService.Instance.get().deleteLinks(selectedIds, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -198,6 +198,7 @@ public class LinksPanel extends DocumentDetailTab {
 		return delete;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void addGrid(ListGridField type, ListGridField direction, ListGridField fileName, ListGridField attribute,
 			GUIFolder folder) {
 		treeGrid = new TreeGrid() {
@@ -231,7 +232,7 @@ public class LinksPanel extends DocumentDetailTab {
 				} else {
 					long id = Long.parseLong(event.getOldValues().getAttribute("linkId"));
 					final String typ = (String) event.getNewValues().get("type");
-					DocumentService.Instance.get().updateLink(id, typ, new AsyncCallback<Void>() {
+					DocumentService.Instance.get().updateLink(id, typ, new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -252,7 +253,7 @@ public class LinksPanel extends DocumentDetailTab {
 	protected void onOpenInFolder(ListGridRecord rec) {
 		String documentId = rec.getAttributeAsString(DOCUMENT_ID);
 		long docId = Long.parseLong(documentId.substring(documentId.lastIndexOf('-') + 1));
-		DocumentService.Instance.get().getById(docId, new AsyncCallback<GUIDocument>() {
+		DocumentService.Instance.get().getById(docId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -301,7 +302,7 @@ public class LinksPanel extends DocumentDetailTab {
 	protected void onPreview(ListGridRecord rec) {
 		String documentId = rec.getAttributeAsString(DOCUMENT_ID);
 		long docId = Long.parseLong(documentId.substring(documentId.lastIndexOf('-') + 1));
-		DocumentService.Instance.get().getById(docId, new AsyncCallback<GUIDocument>() {
+		DocumentService.Instance.get().getById(docId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

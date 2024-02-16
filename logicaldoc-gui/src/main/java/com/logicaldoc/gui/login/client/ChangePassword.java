@@ -137,7 +137,7 @@ public class ChangePassword extends Window {
 
 	private void doChangePassword(LoginPanel loginPanel, long userId, PasswordItem newPass, ValuesManager vm) {
 		loginService.changePassword(userId, vm.getValueAsString(PASSWORD), vm.getValueAsString(NEWPASSWORD),
-				new AsyncCallback<GUIValue>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

@@ -64,7 +64,7 @@ public class ConversionDialog extends Window {
 		convert.addClickHandler(event -> onConvert());
 
 		FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
-				new AsyncCallback<GUIFolder>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -98,7 +98,7 @@ public class ConversionDialog extends Window {
 		LD.contactingServer();
 		if ("save".equals(form.getValueAsString(ACTION))) {
 			DocumentService.Instance.get().convert(document.getId(), document.getFileVersion(), format,
-					new AsyncCallback<GUIDocument>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

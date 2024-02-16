@@ -175,7 +175,7 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 					for (int i = 0; i < selection.length; i++)
 						users.add(selection[i].getAttributeAsString(USERNAME));
 
-					ChatService.Instance.get().invite(users, answer, new AsyncCallback<Void>() {
+					ChatService.Instance.get().invite(users, answer, new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

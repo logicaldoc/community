@@ -82,7 +82,7 @@ public class CreateDialog extends Dialog {
 			folder.setName(form.getValueAsString("name").trim());
 			FolderService.Instance.get().create(folder,
 					folder.getType() == 0 && "true".equals(form.getValueAsString("inheritSecurity")),
-					new AsyncCallback<GUIFolder>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

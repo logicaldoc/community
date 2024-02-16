@@ -126,7 +126,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			tenantItem.addChangedHandler(event -> {
 				long tenantId = Long.parseLong(event.getValue().toString());
 				if (tenantId != Session.get().getInfo().getTenant().getId())
-					TenantService.Instance.get().changeSessionTenant(tenantId, new AsyncCallback<GUITenant>() {
+					TenantService.Instance.get().changeSessionTenant(tenantId, new AsyncCallback<>() {
 
 						@Override
 						public void onSuccess(GUITenant tenant) {
@@ -268,7 +268,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 			if (document.getStatus() == 0) {
 				// Need to checkout first
-				DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new AsyncCallback<Void>() {
+				DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -314,7 +314,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 			if (document.getStatus() == 0) {
 				// Need to checkout first
-				DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new AsyncCallback<Void>() {
+				DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -359,7 +359,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			@Override
 			public void onSuccess(Boolean connected) {
 				if (Boolean.FALSE.equals(connected))
-					DropboxService.Instance.get().startAuthorization(new AsyncCallback<String>() {
+					DropboxService.Instance.get().startAuthorization(new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -390,7 +390,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			@Override
 			public void onSuccess(Boolean connected) {
 				if (Boolean.FALSE.equals(connected))
-					DropboxService.Instance.get().startAuthorization(new AsyncCallback<String>() {
+					DropboxService.Instance.get().startAuthorization(new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -625,7 +625,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			MenuItem registration = new MenuItem(I18N.message("registration"));
 			registration.addClickHandler(registrationClick -> SettingService.Instance.get().loadSettingsByNames(
 					Arrays.asList("reg.name", "reg.email", "reg.organization", "reg.website"),
-					new AsyncCallback<List<GUIParameter>>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

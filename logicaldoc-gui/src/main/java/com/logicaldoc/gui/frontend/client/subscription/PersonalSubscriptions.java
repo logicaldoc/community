@@ -158,7 +158,7 @@ public class PersonalSubscriptions extends com.smartgwt.client.widgets.Window {
 		delete.addClickHandler(
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
-						AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<Void>() {
+						AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -186,7 +186,7 @@ public class PersonalSubscriptions extends com.smartgwt.client.widgets.Window {
 			if ("folder".equals(type))
 				DocumentsPanel.get().openInFolder(Long.parseLong(id), null);
 			else {
-				DocumentService.Instance.get().getById(Long.parseLong(id), new AsyncCallback<GUIDocument>() {
+				DocumentService.Instance.get().getById(Long.parseLong(id), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

@@ -190,7 +190,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	private void addComputeStatsIcons(StaticTextItem documents, StaticTextItem subfolders, StaticTextItem size) {
 		PickerIcon computeStats = new PickerIcon(PickerIconName.REFRESH, computeStatsClick -> {
 			computeStatsClick.getItem().setValue(I18N.message("computing") + "...");
-			FolderService.Instance.get().computeStats(folder.getId(), new AsyncCallback<List<Long>>() {
+			FolderService.Instance.get().computeStats(folder.getId(), new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -236,7 +236,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 					I18N.message("enforcefilesintofolderstorage") + ".\n" + I18N.message("doyouwanttoproceed"), yes -> {
 						if (Boolean.TRUE.equals(yes)) {
 							DocumentService.Instance.get().enforceFilesIntoFolderStorage(folder.getId(),
-									new AsyncCallback<Void>() {
+									new AsyncCallback<>() {
 
 										@Override
 										public void onFailure(Throwable caught) {
@@ -264,7 +264,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		applyStorageToSubfolders.setHeight(16);
 		applyStorageToSubfolders.addFormItemClickHandler(applyStorageToSubfoldersClick -> {
 			LD.contactingServer();
-			FolderService.Instance.get().applyStorage(folder.getId(), new AsyncCallback<Void>() {
+			FolderService.Instance.get().applyStorage(folder.getId(), new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -431,7 +431,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		applyTags.setDisabled(!folder.isWrite());
 		applyTags.addClickHandler(event -> {
 			LD.contactingServer();
-			FolderService.Instance.get().applyTags(folder.getId(), new AsyncCallback<Void>() {
+			FolderService.Instance.get().applyTags(folder.getId(), new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

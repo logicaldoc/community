@@ -105,7 +105,7 @@ public class SearchIndexEntriesPanel extends VLayout {
 		String q = query.getValueAsString();
 		LD.contactingServer();
 
-		SearchEngineService.Instance.get().query(q, pageNumber, size, new AsyncCallback<GUIResult>() {
+		SearchEngineService.Instance.get().query(q, pageNumber, size, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -162,7 +162,7 @@ public class SearchIndexEntriesPanel extends VLayout {
 		deleteEntry.addClickHandler(event -> SC.ask(I18N.message("deleteindexentriesconfirm"), confirm -> {
 			if (confirm.booleanValue()) {
 				LD.contactingServer();
-				SearchEngineService.Instance.get().remove(entriesGrid.getSelectedIds(), new AsyncCallback<Void>() {
+				SearchEngineService.Instance.get().remove(entriesGrid.getSelectedIds(), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

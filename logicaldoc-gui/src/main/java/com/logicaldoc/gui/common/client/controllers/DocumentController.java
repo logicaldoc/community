@@ -157,7 +157,7 @@ public class DocumentController {
 		currentDocument = document;
 		editing = true;
 		if (document.getStatus() == GUIDocument.DOC_UNLOCKED && Session.get().getConfigAsBoolean("gui.onedit.lock")) {
-			DocumentService.Instance.get().lock(Arrays.asList(document.getId()), null, new AsyncCallback<Void>() {
+			DocumentService.Instance.get().lock(Arrays.asList(document.getId()), null, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.error(I18N.message("cannotlockdoc"), null, null);
@@ -189,7 +189,7 @@ public class DocumentController {
 
 	public synchronized void cancelEditing(GUIDocument document) {
 		if (document != null && isEditing(document) && Session.get().getConfigAsBoolean("gui.onedit.lock")) {
-			DocumentService.Instance.get().unlock(Arrays.asList(document.getId()), new AsyncCallback<Void>() {
+			DocumentService.Instance.get().unlock(Arrays.asList(document.getId()), new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

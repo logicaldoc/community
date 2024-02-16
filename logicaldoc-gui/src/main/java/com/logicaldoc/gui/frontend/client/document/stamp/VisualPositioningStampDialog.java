@@ -86,7 +86,7 @@ public class VisualPositioningStampDialog extends Window {
 				public void onResponseReceived(Request request, Response response) {
 					firstSelectedDoc = documents.get(0);
 
-					DocumentService.Instance.get().getById(firstSelectedDoc.getId(), new AsyncCallback<GUIDocument>() {
+					DocumentService.Instance.get().getById(firstSelectedDoc.getId(), new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -143,7 +143,7 @@ public class VisualPositioningStampDialog extends Window {
 		LD.contactingServer();
 
 		StampService.Instance.get().applyStamp(documents.stream().map(d -> d.getId()).collect(Collectors.toList()),
-				stamp, new AsyncCallback<Void>() {
+				stamp, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -156,7 +156,7 @@ public class VisualPositioningStampDialog extends Window {
 						LD.clearPrompt();
 						GuiLog.info(I18N.message("event.stamped"), null);
 						for (GUIDocument doc : documents) {
-							DocumentService.Instance.get().getById(doc.getId(), new AsyncCallback<GUIDocument>() {
+							DocumentService.Instance.get().getById(doc.getId(), new AsyncCallback<>() {
 
 								@Override
 								public void onFailure(Throwable caught) {

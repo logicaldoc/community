@@ -2,7 +2,6 @@ package com.logicaldoc.gui.common.client.i18n;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;

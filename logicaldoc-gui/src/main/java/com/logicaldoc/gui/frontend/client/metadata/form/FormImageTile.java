@@ -114,7 +114,7 @@ public class FormImageTile extends HLayout {
 			layout.addMember(saveButton);
 
 			addCloseClickHandler(
-					event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+					event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -136,7 +136,7 @@ public class FormImageTile extends HLayout {
 				return;
 			}
 
-			FormService.Instance.get().processImage(new AsyncCallback<String>() {
+			FormService.Instance.get().processImage(new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -148,7 +148,7 @@ public class FormImageTile extends HLayout {
 				public void onSuccess(String imageSrc) {
 					form.setHeaderImage(imageSrc);
 					FormImageTile.this.initGUI();
-					DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+					DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

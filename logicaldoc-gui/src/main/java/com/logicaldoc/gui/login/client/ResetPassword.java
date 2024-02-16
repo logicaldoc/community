@@ -77,7 +77,7 @@ public class ResetPassword extends Window {
 					final String userName = (String) values.get("username");
 					final String emailAddress = (String) values.get(EMAIL);
 					buttonForm.setDisabled(true);
-					loginService.resetPassword(userName, emailAddress, productName, new AsyncCallback<Void>() {
+					loginService.resetPassword(userName, emailAddress, productName, new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

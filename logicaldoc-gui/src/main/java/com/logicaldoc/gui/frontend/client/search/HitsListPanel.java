@@ -89,7 +89,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 				final GUIDocument doc = grid.getSelectedDocument();
 
 				FolderService.Instance.get().getFolder(doc.getFolder().getId(), false, false, false,
-						new AsyncCallback<GUIFolder>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -130,7 +130,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 					/*
 					 * We need to retrieve the folder from the server
 					 */
-					FolderService.Instance.get().getFolder(id, false, false, false, new AsyncCallback<GUIFolder>() {
+					FolderService.Instance.get().getFolder(id, false, false, false, new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

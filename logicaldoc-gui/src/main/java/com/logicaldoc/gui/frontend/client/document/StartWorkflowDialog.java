@@ -76,7 +76,7 @@ public class StartWorkflowDialog extends Window {
 
 		WorkflowService.Instance.get().startWorkflow(selection.getAttributeAsString("name"),
 				selection.getAttributeAsString("description"), tag.getValueAsString(), color.getValueAsString(), ids,
-				new AsyncCallback<Void>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

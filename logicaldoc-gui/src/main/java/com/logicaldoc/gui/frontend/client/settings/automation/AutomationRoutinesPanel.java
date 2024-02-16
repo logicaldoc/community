@@ -121,7 +121,7 @@ public class AutomationRoutinesPanel extends VLayout {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				AutomationService.Instance.get().getRoutine(rec.getAttributeAsLong("id"),
-						new AsyncCallback<GUIAutomationRoutine>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -161,7 +161,7 @@ public class AutomationRoutinesPanel extends VLayout {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				AutomationService.Instance.get().deleteRoutines(Arrays.asList(id), new AsyncCallback<Void>() {
+				AutomationService.Instance.get().deleteRoutines(Arrays.asList(id), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

@@ -1,8 +1,5 @@
 package com.logicaldoc.gui.frontend.client.metadata;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIRetentionPolicy;
 import com.logicaldoc.gui.common.client.data.RetentionPoliciesDS;
@@ -161,7 +158,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				RetentionPoliciesService.Instance.get().getPolicy(Long.parseLong(rec.getAttributeAsString("id")),
-						new AsyncCallback<GUIRetentionPolicy>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -179,18 +176,19 @@ public class RetentionPoliciesPanel extends AdminPanel {
 				.setMessage(I18N.message("showretpolicies", Integer.toString(list.getTotalRows()))));
 
 		list.addDropCompleteHandler(listDropCompleted -> {
-			RetentionPoliciesService.Instance.get().reorder(GridUtil.getIds(list.getRecords()), new AsyncCallback<Void>() {
+			RetentionPoliciesService.Instance.get().reorder(GridUtil.getIds(list.getRecords()),
+					new AsyncCallback<>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-				@Override
-				public void onSuccess(Void arg) {
-					// Nothing to do
-				}
-			});
+						@Override
+						public void onSuccess(Void arg) {
+							// Nothing to do
+						}
+					});
 		});
 	}
 
@@ -236,7 +234,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm))
-				RetentionPoliciesService.Instance.get().delete(id, new AsyncCallback<Void>() {
+				RetentionPoliciesService.Instance.get().delete(id, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -254,7 +252,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(event -> RetentionPoliciesService.Instance.get()
-				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new AsyncCallback<Void>() {
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -271,7 +269,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(event -> RetentionPoliciesService.Instance.get()
-				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new AsyncCallback<Void>() {
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

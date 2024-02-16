@@ -110,7 +110,7 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 			} else {
 				LD.contactingServer();
 				SignService.Instance.get().signDocuments(Arrays.asList(document.getId()), form.getValueAsString(REASON),
-						1, null, null, null, new AsyncCallback<Void>() {
+						1, null, null, null, new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								LD.clearPrompt();
@@ -135,7 +135,7 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 		container.addMember(list);
 		container.addMember(form);
 
-		SignService.Instance.get().isVisualSignatureEnabled(new AsyncCallback<Boolean>() {
+		SignService.Instance.get().isVisualSignatureEnabled(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

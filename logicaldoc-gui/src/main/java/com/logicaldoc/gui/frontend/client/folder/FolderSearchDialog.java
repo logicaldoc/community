@@ -95,7 +95,7 @@ public class FolderSearchDialog extends Window {
 	}
 
 	protected void search(GUISearchOptions options) {
-		SearchService.Instance.get().search(options, new AsyncCallback<GUIResult>() {
+		SearchService.Instance.get().search(options, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				LD.clearPrompt();

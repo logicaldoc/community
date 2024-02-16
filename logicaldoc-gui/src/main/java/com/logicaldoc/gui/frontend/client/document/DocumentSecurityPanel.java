@@ -464,7 +464,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 	public void onSave() {
 		validate();
 
-		DocumentService.Instance.get().saveACL(document, new AsyncCallback<Void>() {
+		DocumentService.Instance.get().saveACL(document, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -481,7 +481,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 
 	public void onCopyParentFolderSecurity() {
 		FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
-				new AsyncCallback<GUIFolder>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

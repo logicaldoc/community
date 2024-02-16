@@ -396,7 +396,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		syncGeoDB.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
 			LD.contactingServer();
 			SecurityService.Instance.get().syncGeolocationDB(licenseKey.getValueAsString(),
-					new AsyncCallback<String>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

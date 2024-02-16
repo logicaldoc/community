@@ -71,7 +71,7 @@ public class SamlPanel extends VLayout {
 
 	@Override
 	protected void onDraw() {
-		SamlService.Instance.get().loadSettings(new AsyncCallback<GUISamlSettings>() {
+		SamlService.Instance.get().loadSettings(new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
@@ -252,7 +252,7 @@ public class SamlPanel extends VLayout {
 			settings.setPrivateKey(form.getValueAsString(SP_PRIVATEKEY));
 			settings.setIdpMetadata(form.getValueAsString(IDP_METADATA));
 
-			SamlService.Instance.get().saveSettings(settings, new AsyncCallback<Void>() {
+			SamlService.Instance.get().saveSettings(settings, new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

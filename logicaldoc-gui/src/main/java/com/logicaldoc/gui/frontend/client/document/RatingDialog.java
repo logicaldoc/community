@@ -123,7 +123,7 @@ public class RatingDialog extends Window {
 				RatingDialog.this.rating.setUserId(Session.get().getUser().getId());
 				RatingDialog.this.rating.setVote(Integer.parseInt(vm.getValueAsString("stars")));
 
-				DocumentService.Instance.get().saveRating(RatingDialog.this.rating, new AsyncCallback<Integer>() {
+				DocumentService.Instance.get().saveRating(RatingDialog.this.rating, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -144,7 +144,7 @@ public class RatingDialog extends Window {
 		ratingForm.setItems(actualRating, totalVotes, yourVote, vote);
 		layout.addMember(ratingForm);
 
-		DocumentService.Instance.get().getUserRating(rat.getDocId(), new AsyncCallback<GUIRating>() {
+		DocumentService.Instance.get().getUserRating(rat.getDocId(), new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -173,7 +173,7 @@ public class RatingDialog extends Window {
 
 					ButtonItem delete = new ButtonItem("delete", I18N.message("deleteyourvote"));
 					delete.addClickHandler(event -> DocumentService.Instance.get().deleteRating(vote.getId(),
-							new AsyncCallback<Integer>() {
+							new AsyncCallback<>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
@@ -200,7 +200,7 @@ public class RatingDialog extends Window {
 		// the rating is changed. We need to know if
 		// this operation into the Documents list
 		// panel or into the Search list panel.
-		DocumentService.Instance.get().getById(rating.getDocId(), new AsyncCallback<GUIDocument>() {
+		DocumentService.Instance.get().getById(rating.getDocId(), new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

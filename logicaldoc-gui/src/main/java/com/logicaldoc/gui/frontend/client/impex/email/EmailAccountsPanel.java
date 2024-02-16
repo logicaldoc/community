@@ -78,7 +78,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		ListGridField email = new ListGridField(EMAIL, I18N.message(EMAIL), 300);
 		email.setCanFilter(true);
 
-		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
+		ListGridField enabled = new ListGridField(EENABLED, " ", 30);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -140,7 +140,7 @@ public class EmailAccountsPanel extends AdminPanel {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				EmailAccountService.Instance.get().get(Long.parseLong(rec.getAttributeAsString("id")),
-						new AsyncCallback<GUIEmailAccount>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -174,7 +174,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		delete.addClickHandler((MenuItemClickEvent event) -> LD.ask(I18N.message(QUESTION),
 				I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
-						EmailAccountService.Instance.get().delete(id, new AsyncCallback<Void>() {
+						EmailAccountService.Instance.get().delete(id, new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -211,7 +211,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler((MenuItemClickEvent event) -> EmailAccountService.Instance.get()
-				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new AsyncCallback<Void>() {
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -228,7 +228,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler((MenuItemClickEvent event) -> EmailAccountService.Instance.get()
-				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new AsyncCallback<Void>() {
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -247,7 +247,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		resetCache.addClickHandler((MenuItemClickEvent event) -> LD.ask(I18N.message(QUESTION),
 				I18N.message("confirmresetcache"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
-						EmailAccountService.Instance.get().resetCache(id, new AsyncCallback<Void>() {
+						EmailAccountService.Instance.get().resetCache(id, new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -266,7 +266,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		resetCounter.addClickHandler((MenuItemClickEvent event) -> LD.ask(I18N.message(QUESTION),
 				I18N.message("confirmresetcounter"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
-						EmailAccountService.Instance.get().resetCounter(id, new AsyncCallback<Void>() {
+						EmailAccountService.Instance.get().resetCounter(id, new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);

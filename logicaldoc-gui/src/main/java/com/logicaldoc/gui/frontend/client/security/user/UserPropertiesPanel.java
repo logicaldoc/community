@@ -154,7 +154,7 @@ public class UserPropertiesPanel extends HLayout {
 
 	private void addAvatar() {
 		if (user.getId() != 0L) {
-			Avatar avatar = new Avatar(user.getId(), new AsyncCallback<Void>() {
+			Avatar avatar = new Avatar(user.getId(), new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

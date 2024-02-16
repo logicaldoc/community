@@ -57,7 +57,7 @@ public class ReplicateUserSettings extends Window {
 				long masterUserId = Long.parseLong(vm.getValueAsString("user"));
 				LD.contactingServer();
 				SecurityService.Instance.get().replicateUsersSettings(masterUserId, userIds,
-						userInterface.getValueAsBoolean(), groups.getValueAsBoolean(), new AsyncCallback<Void>() {
+						userInterface.getValueAsBoolean(), groups.getValueAsBoolean(), new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {

@@ -93,7 +93,7 @@ public class TenantsPanel extends AdminPanel {
 		ListGridField address = new ListGridField(ADDRESS, I18N.message(ADDRESS), 150);
 		address.setCanFilter(true);
 
-		ListGridField enabled = new ListGridField(ENABLED_ICON, " ", 24);
+		ListGridField enabled = new ListGridField(ENABLED_ICON, " ", 30);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -155,7 +155,7 @@ public class TenantsPanel extends AdminPanel {
 	}
 
 	public void loadTenant(long tenantId) {
-		TenantService.Instance.get().load(tenantId, new AsyncCallback<GUITenant>() {
+		TenantService.Instance.get().load(tenantId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -226,7 +226,7 @@ public class TenantsPanel extends AdminPanel {
 		delete.addClickHandler(event -> 
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 				if (Boolean.TRUE.equals(answer)) {
-					TenantService.Instance.get().delete(id, new AsyncCallback<Void>() {
+					TenantService.Instance.get().delete(id, new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);

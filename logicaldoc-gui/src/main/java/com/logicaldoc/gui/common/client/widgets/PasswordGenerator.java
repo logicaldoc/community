@@ -64,7 +64,7 @@ public class PasswordGenerator extends Window {
 	protected void onSubmit() {
 		submit.setDisabled(true);
 		if (pwdSize == null)
-			SecurityService.Instance.get().generatePassword(new AsyncCallback<String>() {
+			SecurityService.Instance.get().generatePassword(new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
@@ -79,7 +79,7 @@ public class PasswordGenerator extends Window {
 			});
 		else
 			SecurityService.Instance.get().generatePassword2(pwdSize, pwdUpperCase, pwdLowerCase, pwdDigit, pwdSpecial,
-					pwdSequence, pwdOccurrence, new AsyncCallback<String>() {
+					pwdSequence, pwdOccurrence, new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);

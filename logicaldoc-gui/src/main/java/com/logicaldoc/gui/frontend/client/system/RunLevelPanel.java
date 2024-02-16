@@ -102,7 +102,7 @@ public class RunLevelPanel extends VLayout {
 					rec.getAttributeAsString("demo")));
 		}
 
-		SettingService.Instance.get().saveSettings(settings.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
+		SettingService.Instance.get().saveSettings(settings, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

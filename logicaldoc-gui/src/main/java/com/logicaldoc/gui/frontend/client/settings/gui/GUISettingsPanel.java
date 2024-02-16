@@ -51,20 +51,20 @@ public class GUISettingsPanel extends AdminPanel {
 
 	@Override
 	protected void onDraw() {
-		SettingService.Instance.get().loadGUISettings(new AsyncCallback<GUIParameter[]>() {
+		SettingService.Instance.get().loadGUISettings(new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
 			}
 
 			@Override
-			public void onSuccess(GUIParameter[] settings) {
+			public void onSuccess(List<GUIParameter> settings) {
 				initGUI(settings);
 			}
 		});
 	}
 
-	private void initGUI(GUIParameter[] settings) {
+	private void initGUI(List<GUIParameter> settings) {
 		DynamicForm parametersForm = new DynamicForm();
 		parametersForm.setValuesManager(vm);
 		parametersForm.setTitleOrientation(TitleOrientation.LEFT);
@@ -464,7 +464,7 @@ public class GUISettingsPanel extends AdminPanel {
 		for (GUIParameter p : params)
 			Session.get().getInfo().setConfig(p.getName(), p.getValue());
 
-		SettingService.Instance.get().saveSettings(params.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
+		SettingService.Instance.get().saveSettings(params, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -600,7 +600,7 @@ public class GUISettingsPanel extends AdminPanel {
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.saveinputs", trueFalse("saveinputs")));
 	}
 
-	private String yesNo(GUIParameter[] settings, String name) {
+	private String yesNo(List<GUIParameter> settings, String name) {
 		String parameterValue = Util.getParameterValue(settings, name);
 		return parameterValue != null && parameterValue.equals("true") ? "yes" : "no";
 	}

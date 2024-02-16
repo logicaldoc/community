@@ -73,7 +73,6 @@ public class MockServletSession implements HttpSession {
 		return null;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public HttpSessionContext getSessionContext() {
 		return null;

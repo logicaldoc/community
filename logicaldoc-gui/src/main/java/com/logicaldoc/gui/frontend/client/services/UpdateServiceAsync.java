@@ -8,17 +8,17 @@ import com.logicaldoc.gui.common.client.beans.GUIPatch;
 
 public interface UpdateServiceAsync {
 
-	void checkUpdate(AsyncCallback<GUIParameter[]> callback);
+	void checkUpdate(AsyncCallback<List<GUIParameter>> callback);
 
 	void downloadUpdate(String id, String fileName, long fileSize, AsyncCallback<Void> callback);
 
-	void checkDownloadStatus(AsyncCallback<int[]> callback);
+	void checkDownloadStatus(AsyncCallback<List<Integer>> callback);
 
 	void getUpdateNotes(String updateFileName, AsyncCallback<List<String>> callback);
 
 	void confirmUpdate(String updateFileName, AsyncCallback<String> callback);
 
-	void checkPatch(AsyncCallback<GUIPatch[]> callback);
+	void checkPatch(AsyncCallback<List<GUIPatch>> callback);
 
 	void confirmPatch(String updateFileName, AsyncCallback<String> callback);
 

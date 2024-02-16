@@ -323,7 +323,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 			}
 			LDAPServerDetailsPanel.this.server.setDefaultGroups(groups);
 
-			LDAPService.Instance.get().save(LDAPServerDetailsPanel.this.server, new AsyncCallback<GUILDAPServer>() {
+			LDAPService.Instance.get().save(LDAPServerDetailsPanel.this.server, new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

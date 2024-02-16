@@ -59,7 +59,7 @@ public class UserCalendarPanel extends VLayout {
 	}
 
 	private void initCalendar() {
-		calendar = new EventsCalendar(null, choosenDate, new AsyncCallback<Void>() {
+		calendar = new EventsCalendar(null, choosenDate, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

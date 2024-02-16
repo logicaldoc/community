@@ -77,7 +77,7 @@ public class AutomationDialog extends Window {
 				routine = new GUIAutomationRoutine();
 			} else {
 				AutomationService.Instance.get().getRoutine(Long.parseLong(event.getValue().toString()),
-						new AsyncCallback<GUIAutomationRoutine>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -145,7 +145,7 @@ public class AutomationDialog extends Window {
 		if (routine.getId() == 0L)
 			routine.setAutomation(scriptForm.getValueAsString("automation"));
 
-		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<Void>() {
+		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

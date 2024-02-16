@@ -326,7 +326,7 @@ public class CalendarReport extends AdminPanel {
 	}
 
 	private void doSearch(GUICalendarEventSearchCriteria criteria) {
-		CalendarService.Instance.get().find(criteria, new AsyncCallback<List<GUICalendarEvent>>() {
+		CalendarService.Instance.get().find(criteria, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

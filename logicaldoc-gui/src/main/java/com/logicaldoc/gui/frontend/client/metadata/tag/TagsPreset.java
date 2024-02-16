@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.metadata.tag;
 
+import java.util.Arrays;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
@@ -40,23 +42,22 @@ public class TagsPreset extends VLayout {
 
 		final SelectItem mode = ItemFactory.newTagInputMode("mode", "inputmode");
 		mode.setValue(tagMode);
-		mode.addChangedHandler(event -> SettingService.Instance.get()
-				.saveSettings(new GUIParameter[] {
-						new GUIParameter(Session.get().getTenantName() + ".tag.mode", mode.getValueAsString()) },
-						new AsyncCallback<Void>() {
+		mode.addChangedHandler(event -> SettingService.Instance.get().saveSettings(
+				Arrays.asList(new GUIParameter(Session.get().getTenantName() + ".tag.mode", mode.getValueAsString())),
+				new AsyncCallback<>() {
 
-							@Override
-							public void onFailure(Throwable t) {
-								GuiLog.serverError(t);
-							}
+					@Override
+					public void onFailure(Throwable t) {
+						GuiLog.serverError(t);
+					}
 
-							@Override
-							public void onSuccess(Void arg) {
-								Session.get().getInfo().setConfig(Session.get().getTenantName() + ".tag.mode",
-										mode.getValueAsString());
-								GuiLog.info(I18N.message("settingssaved"), null);
-							}
-						}));
+					@Override
+					public void onSuccess(Void arg) {
+						Session.get().getInfo().setConfig(Session.get().getTenantName() + ".tag.mode",
+								mode.getValueAsString());
+						GuiLog.info(I18N.message("settingssaved"), null);
+					}
+				}));
 
 		addTag = new ButtonItem();
 		addTag.setTitle(I18N.message("addtag"));
@@ -64,7 +65,7 @@ public class TagsPreset extends VLayout {
 		addTag.setRequired(true);
 		addTag.addClickHandler(event -> LD.askForValue(I18N.message("addtag"), I18N.message("tag"), "", value -> {
 			if (value != null && !"".equals(value))
-				TagService.Instance.get().addTag(value, new AsyncCallback<Void>() {
+				TagService.Instance.get().addTag(value, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -115,7 +116,7 @@ public class TagsPreset extends VLayout {
 		delete.setTitle(I18N.message("delete"));
 		delete.addClickHandler(event -> {
 			ListGridRecord selection = tags.getSelectedRecord();
-			TagService.Instance.get().removeTag(selection.getAttributeAsString("word"), new AsyncCallback<Void>() {
+			TagService.Instance.get().removeTag(selection.getAttributeAsString("word"), new AsyncCallback<>() {
 
 				@Override
 				public void onSuccess(Void arg0) {

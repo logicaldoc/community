@@ -70,7 +70,7 @@ public class ZohoCheckin extends Window {
 			return;
 		LD.contactingServer();
 		ZohoService.Instance.get().checkin(document.getId(), vm.getValueAsString("comment"),
-				"true".equals(vm.getValueAsString(MAJORVERSION)), new AsyncCallback<GUIDocument>() {
+				"true".equals(vm.getValueAsString(MAJORVERSION)), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						LD.clearPrompt();

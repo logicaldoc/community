@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -169,7 +170,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			Map<Long, String> documents = new HashMap<>();
 
 			// First of all put all single selected documents
-			for (Document document : docDao.findByIds(docIds.toArray(new Long[0]), null))
+			for (Document document : docDao.findByIds(docIds.stream().collect(Collectors.toSet()), null))
 				documents.put(document.getId(), document.getFileName());
 
 			/*

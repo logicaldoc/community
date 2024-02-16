@@ -178,7 +178,7 @@ public class UsersPanel extends AdminPanel {
 		creation.setCellFormatter(new UserDateCellFormatter(false));
 		creation.setHidden(true);
 
-		ListGridField enabledIcon = new ListGridField(ENABLED_ICON, " ", 24);
+		ListGridField enabledIcon = new ListGridField(ENABLED_ICON, " ", 30);
 		enabledIcon.setType(ListGridFieldType.IMAGE);
 		enabledIcon.setCanSort(false);
 		enabledIcon.setAlign(Alignment.CENTER);
@@ -249,7 +249,7 @@ public class UsersPanel extends AdminPanel {
 	}
 
 	private void onSelectUser(long userId) {
-		SecurityService.Instance.get().getUser(userId, new AsyncCallback<GUIUser>() {
+		SecurityService.Instance.get().getUser(userId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -369,7 +369,7 @@ public class UsersPanel extends AdminPanel {
 		MenuItem disableUser = new MenuItem();
 		disableUser.setTitle(I18N.message("disable"));
 		disableUser.addClickHandler(event -> SecurityService.Instance.get()
-				.changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), false, new AsyncCallback<Void>() {
+				.changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), false, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -390,7 +390,7 @@ public class UsersPanel extends AdminPanel {
 		MenuItem enableUser = new MenuItem();
 		enableUser.setTitle(I18N.message("enable"));
 		enableUser.addClickHandler(event -> SecurityService.Instance.get()
-				.changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), true, new AsyncCallback<Void>() {
+				.changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), true, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -411,7 +411,7 @@ public class UsersPanel extends AdminPanel {
 		MenuItem twoTactorsAuth = new MenuItem();
 		twoTactorsAuth.setTitle(I18N.message("twofactorsauth"));
 		twoTactorsAuth.addClickHandler(event -> SecurityService.Instance.get()
-				.getUser(selectedUsers[0].getAttributeAsLong("id"), new AsyncCallback<GUIUser>() {
+				.getUser(selectedUsers[0].getAttributeAsLong("id"), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -453,7 +453,7 @@ public class UsersPanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), yes -> {
 			if (Boolean.TRUE.equals(yes)) {
-				SecurityService.Instance.get().deleteUser(selectedUserId, new AsyncCallback<Void>() {
+				SecurityService.Instance.get().deleteUser(selectedUserId, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

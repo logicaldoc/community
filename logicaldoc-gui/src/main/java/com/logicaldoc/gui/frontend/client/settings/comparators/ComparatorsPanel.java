@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.settings.comparators;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -146,7 +147,7 @@ public class ComparatorsPanel extends AdminPanel {
 	protected void prepareAssociationsGrid() {
 		buildAssociationsGrid();
 
-		ListGridField in = new ListGridField("in", I18N.message("ext"), 40);
+		ListGridField in = new ListGridField("in", I18N.message("ext"), 60);
 		ListGridField comparator = new ListGridField(gridAttributeName, listGridAttributeLabel);
 		comparator.setWidth("*");
 		comparator.setCanEdit(!Session.get().isDemo());
@@ -216,7 +217,7 @@ public class ComparatorsPanel extends AdminPanel {
 		settingsGrid.setCanEdit(false);
 		settingsGrid.setDataSource(getSettingsDataSource());
 
-		ListGridField enabled = new ListGridField(EENABLED, " ", 20);
+		ListGridField enabled = new ListGridField(EENABLED, " ", 30);
 		enabled.setCanSort(false);
 		enabled.setCanFilter(false);
 		enabled.setCellFormatter((value, rec, rowNum, colNum) -> {
@@ -306,7 +307,7 @@ public class ComparatorsPanel extends AdminPanel {
 	private void onSave() {
 		List<GUIParameter> settings = collectSettings();
 
-		SettingService.Instance.get().saveSettings(settings.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
+		SettingService.Instance.get().saveSettings(settings, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -391,9 +392,9 @@ public class ComparatorsPanel extends AdminPanel {
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(event -> SettingService.Instance.get()
-				.saveSettings(new GUIParameter[] { new GUIParameter(
-						settingsPrefix + settingsGrid.getSelectedRecord().getAttribute(LABEL) + ".enabled", "false") },
-						new AsyncCallback<Void>() {
+				.saveSettings(Arrays.asList(new GUIParameter(
+						settingsPrefix + settingsGrid.getSelectedRecord().getAttribute(LABEL) + ".enabled", "false")),
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -429,9 +430,9 @@ public class ComparatorsPanel extends AdminPanel {
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(event -> SettingService.Instance.get()
-				.saveSettings(new GUIParameter[] { new GUIParameter(
-						settingsPrefix + settingsGrid.getSelectedRecord().getAttribute(LABEL) + ".enabled", "true") },
-						new AsyncCallback<Void>() {
+				.saveSettings(Arrays.asList(new GUIParameter(
+						settingsPrefix + settingsGrid.getSelectedRecord().getAttribute(LABEL) + ".enabled", "true")),
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {

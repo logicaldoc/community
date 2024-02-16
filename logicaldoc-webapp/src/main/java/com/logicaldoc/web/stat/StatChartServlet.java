@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -58,7 +59,7 @@ public class StatChartServlet extends HttpServlet {
 			String chart = request.getParameter("chart");
 			SystemServiceImpl service = new SystemServiceImpl();
 
-			GUIParameter[][] parameters = service.getStatistics(user.getLanguage());
+			List<List<GUIParameter>> parameters = service.getStatistics(user.getLanguage());
 
 			DefaultPieDataset dataset = prepareDataSet(parameters, chart, user);
 
@@ -126,25 +127,22 @@ public class StatChartServlet extends HttpServlet {
 		return font;
 	}
 
-	private DefaultPieDataset prepareDataSet(GUIParameter[][] parameters, String chart, User user) {
+	private DefaultPieDataset prepareDataSet(List<List<GUIParameter>> parameters, String chart, User user) {
 		int index = getIndex(chart);
 
 		DefaultPieDataset dataset = new DefaultPieDataset();
 		long total = 0;
-		for (GUIParameter param : parameters[index]) {
+		for (GUIParameter param : parameters.get(index)) {
 			if (param == null)
 				continue;
 			total += parseLong(param);
 		}
-		for (int i = 0; i < parameters[index].length; i++) {
-			GUIParameter param = parameters[index][i];
-			if (param != null) {
-				double val = parseLong(param);
-				if (total > 0) {
-					val = val * 100 / total;
-					if (val >= 1)
-						dataset.setValue(I18N.message(param.getName(), user.getLocale()), val);
-				}
+		for (GUIParameter param : parameters.get(index)) {
+			double val = parseLong(param);
+			if (total > 0) {
+				val = val * 100 / total;
+				if (val >= 1)
+					dataset.setValue(I18N.message(param.getName(), user.getLocale()), val);
 			}
 		}
 		return dataset;

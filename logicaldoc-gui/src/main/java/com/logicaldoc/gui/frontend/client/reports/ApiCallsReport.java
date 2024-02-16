@@ -318,7 +318,7 @@ public class ApiCallsReport extends AdminPanel {
 			int displayMaxValue) {
 		LD.contactingServer();
 		SystemService.Instance.get().searchApiCalls(userId, fromValue, tillValue, sid, protocol, uri, displayMaxValue,
-				new AsyncCallback<GUIHistory[]>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -327,28 +327,28 @@ public class ApiCallsReport extends AdminPanel {
 					}
 
 					@Override
-					public void onSuccess(GUIHistory[] result) {
+					public void onSuccess(List<GUIHistory> histories) {
 						LD.clearPrompt();
 
-						if (result != null && result.length > 0) {
-							ListGridRecord[] records = new ListGridRecord[result.length];
-							for (int i = 0; i < result.length; i++) {
+						if (!histories.isEmpty()) {
+							List<ListGridRecord> records = new ArrayList<>();
+							for (GUIHistory history : histories) {
 								ListGridRecord rec = new ListGridRecord();
-								rec.setAttribute("date", result[i].getDate());
-								rec.setAttribute("user", result[i].getUsername());
-								rec.setAttribute("sid", result[i].getSessionId());
-								rec.setAttribute(USER_ID, result[i].getUserId());
-								rec.setAttribute("ip", result[i].getIp());
-								rec.setAttribute(DEVICE, result[i].getDevice());
-								rec.setAttribute(GEOLOCATION, result[i].getGeolocation());
-								rec.setAttribute(USERNAME, result[i].getUserLogin());
-								rec.setAttribute(PAYLOAD, result[i].getComment());
-								rec.setAttribute("uri", result[i].getPath());
-								rec.setAttribute(PROTOCOL, result[i].getProtocol());
-								rec.setAttribute(TENANT, result[i].getTenant());
-								records[i] = rec;
+								rec.setAttribute("date", history.getDate());
+								rec.setAttribute("user", history.getUsername());
+								rec.setAttribute("sid", history.getSessionId());
+								rec.setAttribute(USER_ID, history.getUserId());
+								rec.setAttribute("ip", history.getIp());
+								rec.setAttribute(DEVICE, history.getDevice());
+								rec.setAttribute(GEOLOCATION, history.getGeolocation());
+								rec.setAttribute(USERNAME, history.getUserLogin());
+								rec.setAttribute(PAYLOAD, history.getComment());
+								rec.setAttribute("uri", history.getPath());
+								rec.setAttribute(PROTOCOL, history.getProtocol());
+								rec.setAttribute(TENANT, history.getTenant());
+								records.add(rec);
 							}
-							calls.setData(records);
+							calls.setData(records.toArray(new ListGridRecord[0]));
 						}
 						callsLayout.removeMember(infoPanel);
 						infoPanel = new InfoPanel("");

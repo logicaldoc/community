@@ -52,7 +52,7 @@ public class PatchUploader extends Window {
 	}
 
 	private void cleanUploads() {
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -72,7 +72,7 @@ public class PatchUploader extends Window {
 			return;
 		}
 
-		UpdateService.Instance.get().loadPatch(new AsyncCallback<String>() {
+		UpdateService.Instance.get().loadPatch(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

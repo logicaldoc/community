@@ -166,7 +166,7 @@ public class WorkflowDashlet extends Portlet {
 		list.addCellDoubleClickHandler(event -> {
 			Record rec = event.getRecord();
 			WorkflowService.Instance.get().getWorkflowDetailsByTask(rec.getAttributeAsString("id"),
-					new AsyncCallback<GUIWorkflow>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

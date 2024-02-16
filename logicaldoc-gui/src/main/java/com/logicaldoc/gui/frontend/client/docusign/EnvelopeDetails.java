@@ -120,7 +120,7 @@ public class EnvelopeDetails extends Window {
 			docIds.add(document.getId());
 
 		LD.contactingServer();
-		DocuSignService.Instance.get().validateEnvelope(docIds, new AsyncCallback<Collection<GUIDocument>>() {
+		DocuSignService.Instance.get().validateEnvelope(docIds, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -148,7 +148,7 @@ public class EnvelopeDetails extends Window {
 					settings.setSubject(form.getValueAsString("subject"));
 
 					LD.contactingServer();
-					DocuSignService.Instance.get().sendEnvelope(settings, new AsyncCallback<String>() {
+					DocuSignService.Instance.get().sendEnvelope(settings, new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

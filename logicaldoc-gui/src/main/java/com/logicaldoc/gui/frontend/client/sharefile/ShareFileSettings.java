@@ -33,7 +33,7 @@ public class ShareFileSettings extends Window {
 		setPadding(2);
 		setAutoSize(true);
 
-		ShareFileService.Instance.get().loadSettings(new AsyncCallback<List<String>>() {
+		ShareFileService.Instance.get().loadSettings(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -83,7 +83,7 @@ public class ShareFileSettings extends Window {
 			return;
 
 		ShareFileService.Instance.get().authorize(form.getValueAsString("clientid"),
-				form.getValueAsString("clientsecret"), new AsyncCallback<String>() {
+				form.getValueAsString("clientsecret"), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

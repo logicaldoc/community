@@ -48,7 +48,7 @@ public class ResponsesStatsPanel extends VLayout {
 		save.addClickHandler(event -> {
 			if (Boolean.TRUE.equals(tileWidth.validate())) {
 				form.setStatChartWidth((Integer) tileWidth.getValue());
-				FormService.Instance.get().save(form, new AsyncCallback<GUIForm>() {
+				FormService.Instance.get().save(form, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

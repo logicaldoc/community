@@ -24,13 +24,6 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.AbstractDocument;
-import com.logicaldoc.core.document.Document;
-import com.logicaldoc.core.document.DocumentDAO;
-import com.logicaldoc.core.document.DocumentEvent;
-import com.logicaldoc.core.document.DocumentHistory;
-import com.logicaldoc.core.document.TagCloud;
-import com.logicaldoc.core.document.TagsProcessor;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.lock.LockManager;
@@ -386,7 +379,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		doc.setTemplate(template);
 		doc.setFileName("pippo.pdf");
 
-		doc.setValues("multi", new String[] { "value1", "value2", "value3" });
+		doc.setValues("multi", List.of("value1", "value2", "value3"));
 		dao.store(doc);
 
 		doc = dao.findById(doc.getId());
@@ -399,7 +392,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 		Assert.assertEquals(3, doc.getValueAttributes("multi").size());
 
-		doc.setValues("multi", new String[] { "A", "B" });
+		doc.setValues("multi", List.of("A", "B"));
 		dao.store(doc);
 
 		doc = dao.findById(doc.getId());
@@ -701,11 +694,11 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testFindByIds() {
-		List<Document> docs = dao.findByIds(new Long[0], 5);
+		List<Document> docs = dao.findByIds(new HashSet<>(), 5);
 		Assert.assertNotNull(docs);
 		Assert.assertTrue(docs.isEmpty());
 
-		docs = dao.findByIds(new Long[] { 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L }, null);
+		docs = dao.findByIds(Set.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L), null);
 		Assert.assertNotNull(docs);
 		Assert.assertEquals(4, docs.size());
 	}

@@ -27,7 +27,7 @@ public interface SearchEngineServiceAsync {
 
 	void reorderTokenFilters(List<String> filters, AsyncCallback<Void> callback);
 
-	void saveTokenFilterSettings(String filter, GUIParameter[] settings, AsyncCallback<Void> callback);
+	void saveTokenFilterSettings(String filter, List<GUIParameter> settings, AsyncCallback<Void> callback);
 
 	void setTokenFilterStatus(String language, boolean active, AsyncCallback<Void> callback);
 

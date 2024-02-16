@@ -121,7 +121,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 
 	public void onSelectedDocumentHit(long id) {
 		if (id > 0) {
-			DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
+			DocumentService.Instance.get().getById(id, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
@@ -138,7 +138,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 
 	public void onSelectedFolderHit(long id) {
 		if (id > 0) {
-			FolderService.Instance.get().getFolder(id, true, false, false, new AsyncCallback<GUIFolder>() {
+			FolderService.Instance.get().getFolder(id, true, false, false, new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

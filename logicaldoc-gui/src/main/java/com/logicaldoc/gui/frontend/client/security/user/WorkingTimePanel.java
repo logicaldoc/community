@@ -86,7 +86,7 @@ public class WorkingTimePanel extends VLayout {
 						public void execute(Map<String, Object> values) {
 							LD.contactingServer();
 							SecurityService.Instance.get().cloneWorkTimes(user.getId(), usersSelector.getUserIds(),
-									groupsSelector.getGroupIds(), new AsyncCallback<Void>() {
+									groupsSelector.getGroupIds(), new AsyncCallback<>() {
 
 										@Override
 										public void onFailure(Throwable caught) {

@@ -100,7 +100,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		}
 
 		BarcodeService.Instance.get().save((GUIBarcodeTemplate) selectedOcrTemplate,
-				new AsyncCallback<GUIBarcodeTemplate>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -236,7 +236,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		delete.addClickHandler(deleteClick -> LD.ask(I18N.message("question"),
 				I18N.message("confirmdeletebarcodetemplate"), (Boolean yes) -> {
 					if (Boolean.TRUE.equals(yes))
-						BarcodeService.Instance.get().delete(selectedOcrTemplate.getId(), new AsyncCallback<Void>() {
+						BarcodeService.Instance.get().delete(selectedOcrTemplate.getId(), new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -314,7 +314,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		barcodeTemplateSelector.addChangedHandler((ChangedEvent barcodeTemplateSelectorChanged) -> {
 			ListGridRecord rec = barcodeTemplateSelector.getSelectedRecord();
 			BarcodeService.Instance.get().getTemplate(rec.getAttributeAsLong("id"),
-					new AsyncCallback<GUIBarcodeTemplate>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

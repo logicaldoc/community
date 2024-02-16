@@ -29,7 +29,7 @@ public class ZonalOCRZoneCanvas extends ZoneCanvas {
 	public void onEdit() {
 		if (zone.getSample() == null || zone.getSampleText() == null) {
 			LD.contactingServer();
-			ZonalOCRService.Instance.get().updateZone(zone, new AsyncCallback<GUIZone>() {
+			ZonalOCRService.Instance.get().updateZone(zone, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

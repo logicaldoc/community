@@ -74,7 +74,7 @@ public class SyndicationsPanel extends AdminPanel {
 		ListGridField targetPath = new ListGridField("targetPath", I18N.message("targetpath"), 300);
 		targetPath.setCanFilter(true);
 
-		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
+		ListGridField enabled = new ListGridField(EENABLED, " ", 30);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -129,7 +129,7 @@ public class SyndicationsPanel extends AdminPanel {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				SyndicationService.Instance.get().getSyndication(Long.parseLong(rec.getAttributeAsString("id")),
-						new AsyncCallback<GUISyndication>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -169,7 +169,7 @@ public class SyndicationsPanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				SyndicationService.Instance.get().delete(id, new AsyncCallback<Void>() {
+				SyndicationService.Instance.get().delete(id, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -206,7 +206,7 @@ public class SyndicationsPanel extends AdminPanel {
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(event -> SyndicationService.Instance.get()
-				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new AsyncCallback<Void>() {
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -223,7 +223,7 @@ public class SyndicationsPanel extends AdminPanel {
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(event -> SyndicationService.Instance.get()
-				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new AsyncCallback<Void>() {
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -242,7 +242,7 @@ public class SyndicationsPanel extends AdminPanel {
 		resetCache.addClickHandler(
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmresetcache"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
-						SyndicationService.Instance.get().resetCache(id, new AsyncCallback<Void>() {
+						SyndicationService.Instance.get().resetCache(id, new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);

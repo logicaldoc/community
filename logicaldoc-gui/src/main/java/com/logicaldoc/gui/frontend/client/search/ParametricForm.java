@@ -163,7 +163,7 @@ public class ParametricForm extends VLayout {
 			template.addChangedHandler(event -> {
 				if (event.getValue() != null && !"".equals(event.getValue())) {
 					TemplateService.Instance.get().getTemplate(Long.parseLong((String) event.getValue()),
-							new AsyncCallback<GUITemplate>() {
+							new AsyncCallback<>() {
 								@Override
 								public void onFailure(Throwable caught) {
 									GuiLog.serverError(caught);

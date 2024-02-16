@@ -40,7 +40,7 @@ public class TwoFactorsAuthenticationDialog extends Window {
 				save.setDisabled(true);
 				TwoFactorsAuthenticationService.Instance.get().changeTwoFactorsAuthentication(user.getId(),
 						panel.getFactor(), panel.getKey(), panel.getAccount(), panel.isNotify(),
-						new AsyncCallback<Void>() {
+						new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								LD.clearPrompt();

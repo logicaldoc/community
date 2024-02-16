@@ -120,7 +120,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 			final Record rec = grid.getSelectedRecord();
 			if (rec != null)
 				MessageService.Instance.get().getMessage(Long.parseLong(rec.getAttributeAsString("id")), true,
-						new AsyncCallback<GUIMessage>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -184,7 +184,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				MessageService.Instance.get().delete(GridUtil.getIds(selection), new AsyncCallback<Void>() {
+				MessageService.Instance.get().delete(GridUtil.getIds(selection), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

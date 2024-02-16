@@ -39,7 +39,7 @@ public class SyndicationDetailsPanel extends VLayout {
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (syndication.getId() != 0) {
 				SyndicationService.Instance.get().getSyndication(syndication.getId(),
-						new AsyncCallback<GUISyndication>() {
+						new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -106,7 +106,7 @@ public class SyndicationDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (validate()) {
-			SyndicationService.Instance.get().save(syndication, new AsyncCallback<GUISyndication>() {
+			SyndicationService.Instance.get().save(syndication, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

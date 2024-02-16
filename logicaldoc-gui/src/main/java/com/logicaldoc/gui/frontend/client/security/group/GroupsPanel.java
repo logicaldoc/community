@@ -140,7 +140,7 @@ public class GroupsPanel extends AdminPanel {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				SecurityService.Instance.get().getGroup(Long.parseLong(rec.getAttributeAsString("id")),
-						new AsyncCallback<GUIGroup>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -203,7 +203,7 @@ public class GroupsPanel extends AdminPanel {
 		delete.addClickHandler(
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
-						SecurityService.Instance.get().deleteGroup(id, new AsyncCallback<Void>() {
+						SecurityService.Instance.get().deleteGroup(id, new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);

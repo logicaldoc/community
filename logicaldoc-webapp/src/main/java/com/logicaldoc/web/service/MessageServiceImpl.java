@@ -160,8 +160,9 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public GUIMessageTemplate[] loadTemplates(String language, String type) throws ServerException {
+	public List<GUIMessageTemplate> loadTemplates(String language, String type) throws ServerException {
 		Session session = validateSession();
 		Context context = Context.get();
 
@@ -195,14 +196,14 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 
 			buf.sort((s1, s2) -> s1.getType().compareTo(s2.getType()));
 
-			return buf.toArray(new GUIMessageTemplate[0]);
+			return buf;
 		} catch (Exception t) {
-			return (GUIMessageTemplate[]) throwServerException(session, log, t);
+			return (List<GUIMessageTemplate>) throwServerException(session, log, t);
 		}
 	}
 
 	@Override
-	public void saveTemplates(GUIMessageTemplate[] templates) throws ServerException {
+	public void saveTemplates(List<GUIMessageTemplate> templates) throws ServerException {
 		Session session = validateSession();
 
 		try {

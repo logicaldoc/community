@@ -65,7 +65,7 @@ public class ZohoMenuItem extends MenuItem {
 
 			if (document.getStatus() == 0) {
 				// Need to checkout first
-				DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new AsyncCallback<Void>() {
+				DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -76,7 +76,7 @@ public class ZohoMenuItem extends MenuItem {
 						DocUtil.markCheckedOut(document);
 
 						LD.contactingServer();
-						ZohoService.Instance.get().upload(document.getId(), new AsyncCallback<String>() {
+						ZohoService.Instance.get().upload(document.getId(), new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								LD.clearPrompt();

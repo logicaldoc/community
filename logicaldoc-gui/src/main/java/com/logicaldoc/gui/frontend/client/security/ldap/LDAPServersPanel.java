@@ -67,7 +67,7 @@ public class LDAPServersPanel extends AdminPanel {
 		url.setCanFilter(true);
 		url.setWidth("*");
 
-		ListGridField enabled = new ListGridField("eenabled", " ", 24);
+		ListGridField enabled = new ListGridField("eenabled", " ", 30);
 		enabled.setType(ListGridFieldType.IMAGE);
 		enabled.setCanSort(false);
 		enabled.setAlign(Alignment.CENTER);
@@ -137,7 +137,7 @@ public class LDAPServersPanel extends AdminPanel {
 		list.addSelectionChangedHandler(event -> {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
-				LDAPService.Instance.get().get(rec.getAttributeAsLong("id"), new AsyncCallback<GUILDAPServer>() {
+				LDAPService.Instance.get().get(rec.getAttributeAsLong("id"), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -156,7 +156,7 @@ public class LDAPServersPanel extends AdminPanel {
 
 		list.addDropCompleteHandler(event -> {
 			if (list.getRecords() != null && list.getRecords().length > 0) {
-				LDAPService.Instance.get().reorder(GridUtil.getIds(list.getRecords()), new AsyncCallback<Void>() {
+				LDAPService.Instance.get().reorder(GridUtil.getIds(list.getRecords()), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -190,7 +190,7 @@ public class LDAPServersPanel extends AdminPanel {
 		delete.addClickHandler(
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
-						LDAPService.Instance.get().delete(id, new AsyncCallback<Void>() {
+						LDAPService.Instance.get().delete(id, new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);

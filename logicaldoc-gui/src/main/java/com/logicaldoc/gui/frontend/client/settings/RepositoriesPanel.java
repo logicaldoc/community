@@ -50,7 +50,7 @@ public class RepositoriesPanel extends AdminPanel {
 
 		SettingService.Instance.get().loadSettingsByNames(Arrays.asList("conf.dbdir", "conf.exportdir",
 				"conf.importdir", "conf.logdir", "conf.plugindir", "conf.userdir"),
-				new AsyncCallback<List<GUIParameter>>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -91,7 +91,7 @@ public class RepositoriesPanel extends AdminPanel {
 				settings.add(new GUIParameter(ItemFactory.originalItemName(name), entry.getValue().toString().trim()));
 		}
 
-		SettingService.Instance.get().saveSettings(settings.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
+		SettingService.Instance.get().saveSettings(settings, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -103,9 +103,8 @@ public class RepositoriesPanel extends AdminPanel {
 				GuiLog.info(I18N.message("settingssaved"), null);
 
 				// Replicate the settings in the current session
-				for (GUIParameter setting : settings) {
+				for (GUIParameter setting : settings)
 					Session.get().setConfig(setting.getName(), setting.getValue());
-				}
 			}
 		});
 	}

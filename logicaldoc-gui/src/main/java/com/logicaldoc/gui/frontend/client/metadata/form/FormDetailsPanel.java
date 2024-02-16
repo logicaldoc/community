@@ -96,7 +96,7 @@ public class FormDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (form.getId() != 0) {
-				FormService.Instance.get().getById(form.getId(), new AsyncCallback<GUIForm>() {
+				FormService.Instance.get().getById(form.getId(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -409,7 +409,7 @@ public class FormDetailsPanel extends VLayout {
 	}
 
 	private void saveForm() {
-		FormService.Instance.get().save(form, new AsyncCallback<GUIForm>() {
+		FormService.Instance.get().save(form, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

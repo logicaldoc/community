@@ -61,7 +61,7 @@ public class TextContentEditor extends Window {
 			prepareBody(content);
 		} else {
 			DocumentService.Instance.get().getContentAsString(TextContentEditor.this.document.getId(),
-					new AsyncCallback<String>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -111,7 +111,7 @@ public class TextContentEditor extends Window {
 	private void unlockAndClose() {
 		if (document.getId() != 0)
 			DocumentService.Instance.get().unlock(Arrays.asList(TextContentEditor.this.document.getId()),
-					new AsyncCallback<Void>() {
+					new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
@@ -133,7 +133,7 @@ public class TextContentEditor extends Window {
 		if (document.getId() != 0L) {
 			// We are editing an existing file
 			DocumentService.Instance.get().checkinContent(document.getId(), form.getValueAsString(CONTENT),
-					new AsyncCallback<GUIDocument>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -152,7 +152,7 @@ public class TextContentEditor extends Window {
 		} else {
 			// We are creating a new file
 			DocumentService.Instance.get().createDocument(document, form.getValueAsString(CONTENT),
-					new AsyncCallback<GUIDocument>() {
+					new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							LD.clearPrompt();

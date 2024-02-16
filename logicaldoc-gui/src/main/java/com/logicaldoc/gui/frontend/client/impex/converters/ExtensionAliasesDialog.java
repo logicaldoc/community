@@ -65,7 +65,7 @@ public class ExtensionAliasesDialog extends Window {
 			String als = (String) event.getNewValues().get(ALIASES);
 			als = als.trim().toLowerCase().replace(" ", "");
 
-			SettingService.Instance.get().saveExtensionAliases(extn, als, new AsyncCallback<Void>() {
+			SettingService.Instance.get().saveExtensionAliases(extn, als, new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

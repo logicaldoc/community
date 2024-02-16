@@ -39,7 +39,7 @@ public class AccountMenu extends Menu {
 
 		MenuItem profile = new MenuItem(I18N.message("profile"));
 		profile.addClickHandler(event -> SecurityService.Instance.get().getUser(Session.get().getUser().getId(),
-				new AsyncCallback<GUIUser>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -62,7 +62,7 @@ public class AccountMenu extends Menu {
 			Session.get().getUser().setHitsGrid(null);
 
 			Session.get().getUser().setDocsGrid(null);
-			SecurityService.Instance.get().saveInterfaceSettings(Session.get().getUser(), new AsyncCallback<GUIUser>() {
+			SecurityService.Instance.get().saveInterfaceSettings(Session.get().getUser(), new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable e) {
 					GuiLog.serverError(e);

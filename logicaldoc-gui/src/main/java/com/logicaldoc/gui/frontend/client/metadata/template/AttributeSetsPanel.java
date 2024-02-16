@@ -137,7 +137,7 @@ public class AttributeSetsPanel extends VLayout {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				AttributeSetService.Instance.get().getAttributeSet(rec.getAttributeAsLong("id"),
-						new AsyncCallback<GUIAttributeSet>() {
+						new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -170,7 +170,7 @@ public class AttributeSetsPanel extends VLayout {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				AttributeSetService.Instance.get().delete(id, new AsyncCallback<Void>() {
+				AttributeSetService.Instance.get().delete(id, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

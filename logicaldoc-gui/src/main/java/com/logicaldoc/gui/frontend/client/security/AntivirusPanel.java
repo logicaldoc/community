@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.frontend.client.security;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,7 +14,6 @@ import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -55,7 +55,7 @@ public class AntivirusPanel extends VLayout {
 		SettingService.Instance.get().loadSettingsByNames(
 				Arrays.asList(ANTIVIRUS_COMMAND, tenant + ANTIVIRUS_ENABLED, tenant + ANTIVIRUS_INCLUDES,
 						tenant + ANTIVIRUS_EXCLUDES, tenant + ANTIVIRUS_TIMEOUT),
-				new AsyncCallback<List<GUIParameter>>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -74,22 +74,22 @@ public class AntivirusPanel extends VLayout {
 
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler((ClickEvent event) -> {
+		save.addClickHandler(click -> {
 			if (form.validate()) {
-				GUIParameter[] params = new GUIParameter[Session.get().isDefaultTenant() ? 4 : 3];
-				params[0] = new GUIParameter(Session.get().getTenantName() + ANTIVIRUS_ENABLED,
-						"" + ("yes".equals(form.getValueAsString(ENABLED))));
-				params[1] = new GUIParameter(Session.get().getTenantName() + ANTIVIRUS_EXCLUDES,
-						form.getValueAsString("excludes").trim());
-				params[2] = new GUIParameter(Session.get().getTenantName() + ANTIVIRUS_INCLUDES,
-						form.getValueAsString("includes").trim());
-				params[3] = new GUIParameter(Session.get().getTenantName() + ANTIVIRUS_TIMEOUT,
-						form.getValueAsString("timeout").trim());
+				List<GUIParameter> params = new ArrayList<>();
+				params.add(new GUIParameter(Session.get().getTenantName() + ANTIVIRUS_ENABLED,
+						"" + ("yes".equals(form.getValueAsString(ENABLED)))));
+				params.add(new GUIParameter(Session.get().getTenantName() + ANTIVIRUS_EXCLUDES,
+						form.getValueAsString("excludes").trim()));
+				params.add(new GUIParameter(Session.get().getTenantName() + ANTIVIRUS_INCLUDES,
+						form.getValueAsString("includes").trim()));
+				params.add(new GUIParameter(Session.get().getTenantName() + ANTIVIRUS_TIMEOUT,
+						form.getValueAsString("timeout").trim()));
 
 				if (Session.get().isDefaultTenant())
-					params[4] = new GUIParameter(ANTIVIRUS_COMMAND, form.getValueAsString("command").trim());
+					params.add(new GUIParameter(ANTIVIRUS_COMMAND, form.getValueAsString("command").trim()));
 
-				SettingService.Instance.get().saveSettings(params, new AsyncCallback<Void>() {
+				SettingService.Instance.get().saveSettings(params, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

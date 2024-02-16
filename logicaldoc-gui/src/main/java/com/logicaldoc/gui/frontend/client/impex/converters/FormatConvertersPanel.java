@@ -55,7 +55,7 @@ public class FormatConvertersPanel extends ComparatorsPanel {
 	protected void prepareAssociationsGrid() {
 		buildAssociationsGrid();
 
-		ListGridField in = new ListGridField("in", I18N.message("in"), 50);
+		ListGridField in = new ListGridField("in", I18N.message("in"), 60);
 		ListGridField converter = new ListGridField(gridAttributeName, listGridAttributeLabel);
 		converter.setWidth("*");
 		converter.setCanEdit(!Session.get().isDemo());
@@ -69,7 +69,7 @@ public class FormatConvertersPanel extends ComparatorsPanel {
 		});
 		converter.setFilterEditorProperties(ItemFactory.newFormatConverterSelector());
 
-		ListGridField out = new ListGridField("out", I18N.message("out"), 50);
+		ListGridField out = new ListGridField("out", I18N.message("out"), 60);
 		associationsGrid.setFields(in, out, converter);
 
 		associationsGrid.setEditorCustomizer(context -> {

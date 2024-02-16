@@ -191,7 +191,7 @@ public class ResponsesGrid extends RefreshableListGrid {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler((MenuItemClickEvent event) -> DocumentService.Instance.get()
-				.delete(DocumentGridUtil.getIds(selection), new AsyncCallback<Void>() {
+				.delete(DocumentGridUtil.getIds(selection), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

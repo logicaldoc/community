@@ -95,7 +95,7 @@ public class DropboxDialog extends Dialog {
 
 						LD.contactingServer();
 						DropboxService.Instance.get().exportDocuments(targetPath, folderIds, docIds,
-								new AsyncCallback<Boolean>() {
+								new AsyncCallback<>() {
 									@Override
 									public void onFailure(Throwable caught) {
 										LD.clearPrompt();
@@ -130,7 +130,7 @@ public class DropboxDialog extends Dialog {
 				DropboxDialog.this.destroy();
 				LD.contactingServer();
 				DropboxService.Instance.get().importDocuments(FolderController.get().getCurrentFolder().getId(), paths,
-						new AsyncCallback<Integer>() {
+						new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								LD.clearPrompt();

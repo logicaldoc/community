@@ -137,7 +137,7 @@ public class GroupUsersPanel extends VLayout {
 			}
 
 			SecurityService.Instance.get().addUserToGroup(groupId, Long.parseLong(selectedRecord.getAttribute("id")),
-					new AsyncCallback<Void>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -193,7 +193,7 @@ public class GroupUsersPanel extends VLayout {
 
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 				if (Boolean.TRUE.equals(confirm)) {
-					SecurityService.Instance.get().removeFromGroup(groupId, ids, new AsyncCallback<Void>() {
+					SecurityService.Instance.get().removeFromGroup(groupId, ids, new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);

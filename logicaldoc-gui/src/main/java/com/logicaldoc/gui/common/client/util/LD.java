@@ -262,6 +262,7 @@ public class LD {
 	 * @param callback call back used when the user confirms the input
 	 * @param cancelCallback call back used when the user cancels the input
 	 */
+	@SuppressWarnings("unchecked")
 	public static void askForValues(String title, String message, List<FormItem> items, Integer width,
 			final ValueCallback callback, final ClickHandler cancelCallback) {
 		final Window dialog = prepareDialogForAskValues(title, width);

@@ -95,7 +95,7 @@ public class FolderTree extends TreeGrid {
 			addCellClickHandler(event ->
 
 			FolderService.Instance.get().getFolder(getSelectedFolderId(), false, false, true,
-					new AsyncCallback<GUIFolder>() {
+					new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
@@ -235,7 +235,7 @@ public class FolderTree extends TreeGrid {
 	 */
 	public void selectFolder(final long folderId) {
 		FolderService.Instance.get().getFolder(folderId, false, false, Session.get().isFolderPagination(),
-				new AsyncCallback<GUIFolder>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

@@ -112,7 +112,6 @@ public class UserDashboard extends VLayout {
 
 		List<GUIDashlet> dashlets = new ArrayList<>();
 
-		int q = 0;
 		for (int column = 0; column < portlets.length; column++)
 			for (int row = 0; row < portlets[column].length; row++)
 				for (int i = 0; i < portlets[column][row].length; i++) {
@@ -125,7 +124,7 @@ public class UserDashboard extends VLayout {
 				}
 
 		Session.get().getUser().setDashlets(dashlets);
-		DashletService.Instance.get().saveUserDashlets(dashlets, new AsyncCallback<Void>() {
+		DashletService.Instance.get().saveUserDashlets(dashlets, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

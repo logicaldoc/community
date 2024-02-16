@@ -100,7 +100,7 @@ public class PreviewPanel extends VLayout {
 
 		ReadingRequestService.Instance.get().confirmReadings(
 				ReadingRequestController.get().getUnconfirmedReadingIds(document.getId()), document.getVersion(),
-				new AsyncCallback<Void>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -124,7 +124,7 @@ public class PreviewPanel extends VLayout {
 		} else if (Util.isEmailFile(document.getFileName().toLowerCase())) {
 			reloadMail();
 		} else if (Util.isDICOMFile(document.getFileName().toLowerCase())) {
-			DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<GUIDocument>() {
+			DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -209,7 +209,7 @@ public class PreviewPanel extends VLayout {
 	 * Reloads a mail preview
 	 */
 	protected void reloadMail() {
-		DocumentService.Instance.get().extractEmail(docId, document.getFileVersion(), new AsyncCallback<GUIEmail>() {
+		DocumentService.Instance.get().extractEmail(docId, document.getFileVersion(), new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

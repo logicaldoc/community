@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.reports.custom;
 
+import java.util.List;
+
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
@@ -176,14 +178,14 @@ public class CustomReportsPanel extends AdminPanel {
 	}
 
 	public void update() {
-		ReportService.Instance.get().getReports(new AsyncCallback<GUIReport[]>() {
+		ReportService.Instance.get().getReports(new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
 			}
 
 			@Override
-			public void onSuccess(GUIReport[] reports) {
+			public void onSuccess(List<GUIReport> reports) {
 				for (GUIReport report : reports)
 					updateReportRecord(report);
 			}
@@ -244,7 +246,7 @@ public class CustomReportsPanel extends AdminPanel {
 		MenuItem execute = new MenuItem();
 		execute.setTitle(I18N.message("execute"));
 		execute.addClickHandler(
-				event -> ReportService.Instance.get().getReport(selectedId, false, new AsyncCallback<GUIReport>() {
+				event -> ReportService.Instance.get().getReport(selectedId, false, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -275,7 +277,7 @@ public class CustomReportsPanel extends AdminPanel {
 		delete.addClickHandler(
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value))
-						ReportService.Instance.get().delete(selectedId, new AsyncCallback<Void>() {
+						ReportService.Instance.get().delete(selectedId, new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -293,7 +295,7 @@ public class CustomReportsPanel extends AdminPanel {
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(event -> ReportService.Instance.get()
-				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new AsyncCallback<Void>() {
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -312,7 +314,7 @@ public class CustomReportsPanel extends AdminPanel {
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(event -> ReportService.Instance.get()
-				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new AsyncCallback<Void>() {
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -339,7 +341,7 @@ public class CustomReportsPanel extends AdminPanel {
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
 		preview.addClickHandler(
-				event -> DocumentService.Instance.get().getById(outputDocId, new AsyncCallback<GUIDocument>() {
+				event -> DocumentService.Instance.get().getById(outputDocId, new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -408,7 +410,7 @@ public class CustomReportsPanel extends AdminPanel {
 		Record rec = list.getSelectedRecord();
 		if (rec != null)
 			ReportService.Instance.get().getReport(Long.parseLong(rec.getAttributeAsString("id")), true,
-					new AsyncCallback<GUIReport>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

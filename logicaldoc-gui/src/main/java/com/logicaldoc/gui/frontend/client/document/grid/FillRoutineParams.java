@@ -68,7 +68,7 @@ public class FillRoutineParams extends Window {
 		if (!propertiesPanel.validate())
 			return;
 
-		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<Void>() {
+		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

@@ -46,7 +46,7 @@ public class DocumentSelectorPanel extends HLayout {
 		folders.setWidth(250);
 		folders.setShowResizeBar(true);
 		folders.addCellClickHandler(event -> FolderService.Instance.get().getFolder(folders.getSelectedFolderId(),
-				false, false, Session.get().isFolderPagination(), new AsyncCallback<GUIFolder>() {
+				false, false, Session.get().isFolderPagination(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

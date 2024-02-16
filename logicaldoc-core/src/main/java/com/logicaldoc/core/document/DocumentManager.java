@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Set;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
@@ -344,7 +345,7 @@ public interface DocumentManager {
 	 * @throws PersistenceException raised if at least a document cannot be
 	 *         archived
 	 */
-	public void archiveDocuments(long[] docIds, DocumentHistory transaction) throws PersistenceException;
+	public void archiveDocuments(Set<Long> docIds, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Creates a new ticket.

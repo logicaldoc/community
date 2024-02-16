@@ -1,8 +1,5 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.LockedDocsDS;
@@ -164,7 +161,7 @@ public class LockedDocsReport extends ReportPanel {
 			if (selection == null || selection.length == 0)
 				return;
 
-			DocumentService.Instance.get().unlock(GridUtil.getIds(selection), new AsyncCallback<Void>() {
+			DocumentService.Instance.get().unlock(GridUtil.getIds(selection), new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
@@ -183,7 +180,7 @@ public class LockedDocsReport extends ReportPanel {
 				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 		preview.addClickHandler((MenuItemClickEvent event) -> {
 			long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
-			DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
+			DocumentService.Instance.get().getById(id, new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

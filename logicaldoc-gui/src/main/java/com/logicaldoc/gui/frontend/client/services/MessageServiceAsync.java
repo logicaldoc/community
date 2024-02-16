@@ -14,9 +14,9 @@ public interface MessageServiceAsync {
 
 	void save(GUIMessage message, List<Long> recipientIds, AsyncCallback<Void> callback);
 
-	void loadTemplates(String language, String type, AsyncCallback<GUIMessageTemplate[]> callback);
+	void loadTemplates(String language, String type, AsyncCallback<List<GUIMessageTemplate>> callback);
 
-	void saveTemplates(GUIMessageTemplate[] templates, AsyncCallback<Void> callback);
+	void saveTemplates(List<GUIMessageTemplate> templates, AsyncCallback<Void> callback);
 
 	void deleteTemplates(String name, AsyncCallback<Void> callback);
 

@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.dashboard;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUITag;
 import com.logicaldoc.gui.frontend.client.services.TagService;
@@ -24,20 +26,20 @@ public class TagCloud extends VLayout {
 	}
 
 	public void refresh() {
-		TagService.Instance.get().getTagCloud(new AsyncCallback<GUITag[]>() {
+		TagService.Instance.get().getTagCloud(new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable arg0) {
 				// Nothing to do
 			}
 
 			@Override
-			public void onSuccess(GUITag[] tags) {
+			public void onSuccess(List<GUITag> tags) {
 				refresh(tags);
 			}
 		});
 	}
 
-	private void refresh(GUITag[] tags) {
+	private void refresh(List<GUITag> tags) {
 		if (layout != null) {
 			removeMember(layout);
 			layout = null;

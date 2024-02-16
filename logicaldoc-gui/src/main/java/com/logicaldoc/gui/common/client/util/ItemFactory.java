@@ -1307,7 +1307,7 @@ public class ItemFactory {
 		validate.setWidth(16);
 		validate.setHeight(16);
 		validate.addFormItemClickHandler((FormItemIconClickEvent event) -> InfoService.Instance.get()
-				.getCronDescription(cron.getValueAsString(), I18N.getLocale(), new AsyncCallback<String>() {
+				.getCronDescription(cron.getValueAsString(), I18N.getLocale(), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

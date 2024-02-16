@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.system.stats;
 
 import java.util.Date;
+import java.util.List;
 
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.Image;
@@ -36,27 +37,18 @@ public class StatsPie extends HLayout {
 
 	private static final int STATS_FOLDERS = 3;
 
-	public StatsPie(GUIParameter[][] parameters) {
+	public StatsPie(List<List<GUIParameter>> parameters) {
 		super();
 		setWidth100();
 		setHeight100();
-
 		setAlign(VerticalAlignment.TOP);
 
-		VLayout repository = new VLayout();
-		try {
-			// Convert all in MBytes
-			GUIParameter[] params = new GUIParameter[parameters[0].length];
-			for (int i = 0; i < params.length; i++) {
-				params[i] = new GUIParameter();
-				params[i].setName(parameters[0][i].getName());
-				long val = Long.parseLong(parameters[0][i].getValue()) / 1024 / 1024;
-				params[i].setValue(Long.toString(val));
-			}
-		} catch (Exception t) {
-			// Nothing to do
-		}
+		// Convert all sizes in MBytes
+		for (List<GUIParameter> list : parameters)
+			for (GUIParameter param : list)
+				param.setValue(Long.toString(Long.parseLong(param.getValue()) / 1024 / 1024));
 
+		VLayout repository = new VLayout();
 		Image pieImage = new Image(Util.contextPath() + "stat?chart=repository&random=" + new Date().getTime());
 		pieImage.setWidth(PX250);
 		pieImage.setHeight(PX250);
@@ -67,7 +59,7 @@ public class StatsPie extends HLayout {
 		repository.addMember(spacer);
 
 		try {
-			repository.addMember(prepareLegend(parameters[STATS_REPOSITORY], STATS_REPOSITORY));
+			repository.addMember(prepareLegend(parameters.get(STATS_REPOSITORY), STATS_REPOSITORY));
 			addMember(repository);
 		} catch (Exception t) {
 			// Nothing to do
@@ -84,7 +76,7 @@ public class StatsPie extends HLayout {
 		documents.addMember(spacer);
 
 		try {
-			documents.addMember(prepareLegend(parameters[STATS_DOCUMENTS], STATS_DOCUMENTS));
+			documents.addMember(prepareLegend(parameters.get(STATS_DOCUMENTS), STATS_DOCUMENTS));
 			addMember(documents);
 		} catch (Exception t) {
 			// Nothing to do
@@ -101,7 +93,7 @@ public class StatsPie extends HLayout {
 		pages.addMember(spacer);
 
 		try {
-			pages.addMember(prepareLegend(parameters[STATS_PAGES], STATS_PAGES));
+			pages.addMember(prepareLegend(parameters.get(STATS_PAGES), STATS_PAGES));
 			addMember(pages);
 		} catch (Exception t) {
 			// Nothing to do
@@ -119,14 +111,14 @@ public class StatsPie extends HLayout {
 		folders.addMember(spacer);
 
 		try {
-			folders.addMember(prepareLegend(parameters[STATS_FOLDERS], STATS_FOLDERS));
+			folders.addMember(prepareLegend(parameters.get(STATS_FOLDERS), STATS_FOLDERS));
 			addMember(folders);
 		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
 
-	private DynamicForm prepareLegend(GUIParameter[] parameters, int type) {
+	private DynamicForm prepareLegend(List<GUIParameter> parameters, int type) {
 		// Calculate the total value
 		long count = sumTotal(parameters);
 
@@ -207,7 +199,7 @@ public class StatsPie extends HLayout {
 		return item;
 	}
 
-	private long sumTotal(GUIParameter[] parameters) {
+	private long sumTotal(List<GUIParameter> parameters) {
 		long count = 0;
 		NumberFormat fmt1 = NumberFormat.getFormat("#############");
 		for (GUIParameter parameter : parameters) {

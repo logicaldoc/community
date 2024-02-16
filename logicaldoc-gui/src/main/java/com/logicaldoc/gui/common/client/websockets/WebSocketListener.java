@@ -150,7 +150,7 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 			String recipient = event.getComment().substring(event.getComment().indexOf(':') + 1).trim();
 			if (Session.get().getUser().getUsername().equals(recipient)) {
 				ReadingRequestService.Instance.get()
-						.getUnconfimedReadings(new AsyncCallback<List<GUIReadingRequest>>() {
+						.getUnconfimedReadings(new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {

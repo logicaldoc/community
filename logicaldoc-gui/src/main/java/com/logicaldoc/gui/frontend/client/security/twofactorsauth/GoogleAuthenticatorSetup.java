@@ -92,7 +92,7 @@ public class GoogleAuthenticatorSetup extends TwoFactorsAuthenticationSetup {
 		account = user.getUsername() + "@" + WindowUtils.getRequestInfo().getHostName();
 
 		TwoFactorsAuthenticationService.Instance.get().generateGoogleAuthorizationCredentials(account,
-				new AsyncCallback<List<String>>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

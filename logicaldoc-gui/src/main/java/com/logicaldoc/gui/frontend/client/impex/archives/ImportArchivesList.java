@@ -156,7 +156,7 @@ public class ImportArchivesList extends VLayout {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				ImpexService.Instance.get().delete(id, new AsyncCallback<Void>() {
+				ImpexService.Instance.get().delete(id, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -185,7 +185,7 @@ public class ImportArchivesList extends VLayout {
 			return;
 		}
 
-		ImpexService.Instance.get().load(archiveId, new AsyncCallback<GUIArchive>() {
+		ImpexService.Instance.get().load(archiveId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

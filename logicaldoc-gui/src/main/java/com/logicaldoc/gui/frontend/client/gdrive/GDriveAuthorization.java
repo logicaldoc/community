@@ -67,7 +67,7 @@ public class GDriveAuthorization extends Window {
 
 		addItem(form);
 
-		GDriveService.Instance.get().loadSettings(new AsyncCallback<List<String>>() {
+		GDriveService.Instance.get().loadSettings(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -84,7 +84,7 @@ public class GDriveAuthorization extends Window {
 
 	public void onAuthenticate() {
 		GDriveService.Instance.get().saveSettings(form.getValueAsString("clientid"),
-				form.getValueAsString("clientsecret"), new AsyncCallback<String>() {
+				form.getValueAsString("clientsecret"), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

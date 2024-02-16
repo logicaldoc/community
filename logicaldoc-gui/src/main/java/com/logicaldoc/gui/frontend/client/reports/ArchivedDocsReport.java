@@ -141,7 +141,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		preview.addClickHandler(event -> {
 			long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
 
-			DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
+			DocumentService.Instance.get().getById(id, new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -173,7 +173,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		MenuItem restore = new MenuItem();
 		restore.setTitle(I18N.message("restore"));
 		restore.addClickHandler(event -> {
-			DocumentService.Instance.get().unarchiveDocuments(GridUtil.getIds(selection), new AsyncCallback<Void>() {
+			DocumentService.Instance.get().unarchiveDocuments(GridUtil.getIds(selection), new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
@@ -192,7 +192,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		delete.addClickHandler(event -> {
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 				if (Boolean.TRUE.equals(answer)) {
-					DocumentService.Instance.get().delete(GridUtil.getIds(selection), new AsyncCallback<Void>() {
+					DocumentService.Instance.get().delete(GridUtil.getIds(selection), new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);

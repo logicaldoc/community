@@ -149,7 +149,7 @@ public class AutomationTriggerDialog extends Window {
 
 			trigger.setEvents(eventsStr);
 
-			AutomationService.Instance.get().saveTrigger(trigger, new AsyncCallback<GUIAutomationTrigger>() {
+			AutomationService.Instance.get().saveTrigger(trigger, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

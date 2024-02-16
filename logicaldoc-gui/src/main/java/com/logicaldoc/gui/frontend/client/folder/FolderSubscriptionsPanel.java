@@ -110,7 +110,7 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 				return;
 			long groupId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
 			AuditService.Instance.get().subscribeFolder(folder.getId(), false, Constants.getAuditDefaultEvents(), null,
-					groupId, new AsyncCallback<Void>() {
+					groupId, new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -134,7 +134,7 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 				return;
 			long userId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
 			AuditService.Instance.get().subscribeFolder(folder.getId(), false, Constants.getAuditDefaultEvents(),
-					userId, null, new AsyncCallback<Void>() {
+					userId, null, new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -162,7 +162,7 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				AuditService.Instance.get().deleteSubscriptions(GridUtil.getIds(selection), new AsyncCallback<Void>() {
+				AuditService.Instance.get().deleteSubscriptions(GridUtil.getIds(selection), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

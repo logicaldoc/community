@@ -55,7 +55,7 @@ public class ZohoAuthorization extends Window {
 
 		addItem(form);
 
-		ZohoService.Instance.get().loadSettings(new AsyncCallback<List<String>>() {
+		ZohoService.Instance.get().loadSettings(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -72,7 +72,7 @@ public class ZohoAuthorization extends Window {
 
 	public void onAuthenticate() {
 		ZohoService.Instance.get().saveSettings(form.getValueAsString("clientid"),
-				form.getValueAsString("clientsecret"), new AsyncCallback<String>() {
+				form.getValueAsString("clientsecret"), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

@@ -65,7 +65,7 @@ public class KeystoreUploader extends Window {
 		addItem(layout);
 
 		// Cleanup the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -118,7 +118,7 @@ public class KeystoreUploader extends Window {
 		keystore.setPassword(vm.getValueAsString("password"));
 		keystore.setTenantId(keystorePanel.getTenantId());
 
-		SignService.Instance.get().imporKeystore(keystore, new AsyncCallback<Void>() {
+		SignService.Instance.get().imporKeystore(keystore, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -130,7 +130,7 @@ public class KeystoreUploader extends Window {
 				keystorePanel.initGUI();
 
 				// Cleanup the upload folder
-				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

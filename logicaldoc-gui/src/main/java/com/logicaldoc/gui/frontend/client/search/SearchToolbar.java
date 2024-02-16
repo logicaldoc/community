@@ -263,7 +263,7 @@ public class SearchToolbar extends ToolStrip {
 
 	private void saveGridState() {
 		Session.get().getUser().setHitsGrid(SearchPanel.get().getDocsGridLayout());
-		SecurityService.Instance.get().saveInterfaceSettings(Session.get().getUser(), new AsyncCallback<GUIUser>() {
+		SecurityService.Instance.get().saveInterfaceSettings(Session.get().getUser(), new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable e) {

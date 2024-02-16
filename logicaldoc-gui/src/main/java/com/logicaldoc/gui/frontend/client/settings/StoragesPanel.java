@@ -263,7 +263,7 @@ public class StoragesPanel extends VLayout {
 	}
 
 	private void doRemoveStorage(int selectedStorageId) {
-		SettingService.Instance.get().removeStorage(selectedStorageId, new AsyncCallback<List<String>>() {
+		SettingService.Instance.get().removeStorage(selectedStorageId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -328,8 +328,8 @@ public class StoragesPanel extends VLayout {
 	private void onSave(boolean alertInclusion) {
 		List<GUIParameter> settings = collectSettings();
 
-		SettingService.Instance.get().saveStorageSettings(settings.toArray(new GUIParameter[0]),
-				new AsyncCallback<Void>() {
+		SettingService.Instance.get().saveStorageSettings(settings,
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

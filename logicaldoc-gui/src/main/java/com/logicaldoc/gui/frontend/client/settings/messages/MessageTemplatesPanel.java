@@ -189,21 +189,19 @@ public class MessageTemplatesPanel extends VLayout {
 			return;
 
 		Record[] records = list.getRecords();
-		GUIMessageTemplate[] templates = new GUIMessageTemplate[records.length];
-		int i = 0;
+		List<GUIMessageTemplate> templates = new ArrayList<>();
 		for (Record rec : records) {
-			GUIMessageTemplate t = new GUIMessageTemplate();
-			t.setId(Long.parseLong(rec.getAttributeAsString("id")));
-			t.setLanguage(lang);
-			t.setName(rec.getAttributeAsString("name"));
-			t.setSubject(rec.getAttributeAsString(SUBJECT));
-			t.setBody(rec.getAttributeAsString("body"));
-			t.setType(rec.getAttributeAsString("type"));
-
-			templates[i++] = t;
+			GUIMessageTemplate template = new GUIMessageTemplate();
+			template.setId(Long.parseLong(rec.getAttributeAsString("id")));
+			template.setLanguage(lang);
+			template.setName(rec.getAttributeAsString("name"));
+			template.setSubject(rec.getAttributeAsString(SUBJECT));
+			template.setBody(rec.getAttributeAsString("body"));
+			template.setType(rec.getAttributeAsString("type"));
+			templates.add(template);
 		}
 
-		MessageService.Instance.get().saveTemplates(templates, new AsyncCallback<Void>() {
+		MessageService.Instance.get().saveTemplates(templates, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
@@ -230,7 +228,7 @@ public class MessageTemplatesPanel extends VLayout {
 					ids.add(records[i].getAttributeAsLong("id"));
 			}
 
-			MessageService.Instance.get().deleteTemplates(ids, new AsyncCallback<Void>() {
+			MessageService.Instance.get().deleteTemplates(ids, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
@@ -246,7 +244,7 @@ public class MessageTemplatesPanel extends VLayout {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> MessageService.Instance.get()
-				.deleteTemplates(list.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<Void>() {
+				.deleteTemplates(list.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -268,16 +266,15 @@ public class MessageTemplatesPanel extends VLayout {
 	private void reload() {
 		String lang = langSelector.getValueAsString();
 
-		MessageService.Instance.get().loadTemplates(lang, null, new AsyncCallback<GUIMessageTemplate[]>() {
+		MessageService.Instance.get().loadTemplates(lang, null, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
 			}
 
 			@Override
-			public void onSuccess(GUIMessageTemplate[] templates) {
-				ListGridRecord[] records = new ListGridRecord[templates.length];
-				int i = 0;
+			public void onSuccess(List<GUIMessageTemplate> templates) {
+				List<ListGridRecord> records = new ArrayList<>();
 				for (GUIMessageTemplate pat : templates) {
 					ListGridRecord rec = new ListGridRecord();
 					rec.setAttribute("id", pat.getId());
@@ -286,9 +283,9 @@ public class MessageTemplatesPanel extends VLayout {
 					rec.setAttribute(SUBJECT, pat.getSubject());
 					rec.setAttribute("body", pat.getBody());
 					rec.setAttribute("type", pat.getType());
-					records[i++] = rec;
+					records.add(rec);
 				}
-				list.setData(records);
+				list.setData(records.toArray(new ListGridRecord[0]));
 			}
 		});
 	}

@@ -3,6 +3,7 @@ package com.logicaldoc.web.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -82,7 +83,7 @@ public class TemplateServiceImplTest extends AbstractWebappTestCase {
 		Assert.assertNotNull(guiTemplate);
 		Assert.assertEquals("v1", guiTemplate.getAttribute("attr1").getValue());
 
-		GUIAttribute[] extAttr = service.getAttributes(template.getId(), null);
+		List<GUIAttribute> extAttr = service.getAttributes(template.getId(), null);
 		for (GUIAttribute at : extAttr) {
 			if ("attr1".equals(at.getName())) {
 				Assert.assertEquals(GUIAttribute.TYPE_STRING, at.getType());

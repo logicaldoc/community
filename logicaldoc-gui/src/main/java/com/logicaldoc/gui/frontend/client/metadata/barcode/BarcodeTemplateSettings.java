@@ -82,7 +82,7 @@ public class BarcodeTemplateSettings extends Window {
 		addItem(layout);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -96,7 +96,7 @@ public class BarcodeTemplateSettings extends Window {
 		}));
 
 		// Just to clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -202,7 +202,7 @@ public class BarcodeTemplateSettings extends Window {
 			template.setRendRes(Integer.parseInt(vm.getValueAsString("rendres")));
 		}
 
-		BarcodeService.Instance.get().save(template, new AsyncCallback<GUIBarcodeTemplate>() {
+		BarcodeService.Instance.get().save(template, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

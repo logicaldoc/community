@@ -55,7 +55,7 @@ public class TaskDetailPanel extends VLayout {
 	@Override
 	public void onDraw() {
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> SystemService.Instance.get()
-				.getTaskByName(task.getName(), I18N.getLocale(), new AsyncCallback<GUITask>() {
+				.getTaskByName(task.getName(), I18N.getLocale(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -155,7 +155,7 @@ public class TaskDetailPanel extends VLayout {
 
 	public void onSave() {
 		if (schedulingPanel.validate() && notificationPanel.validate()) {
-			SystemService.Instance.get().saveTask(task, I18N.getLocale(), new AsyncCallback<GUITask>() {
+			SystemService.Instance.get().saveTask(task, I18N.getLocale(), new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

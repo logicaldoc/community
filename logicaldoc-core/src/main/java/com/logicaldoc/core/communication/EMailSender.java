@@ -8,12 +8,12 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
@@ -36,6 +36,7 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 import javax.mail.util.ByteArrayDataSource;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -275,15 +276,15 @@ public class EMailSender {
 			} catch (AddressException t) {
 				// Nothing to do
 			}
-		InternetAddress[] to = email.getAddresses();
-		InternetAddress[] cc = email.getAddressesCC();
-		InternetAddress[] bcc = email.getAddressesBCC();
+		Set<InternetAddress> to = email.getAddresses();
+		Set<InternetAddress> cc = email.getAddressesCC();
+		Set<InternetAddress> bcc = email.getAddressesBCC();
 		message.setFrom(from);
-		message.setRecipients(javax.mail.Message.RecipientType.TO, to);
-		if (cc.length > 0)
-			message.setRecipients(javax.mail.Message.RecipientType.CC, cc);
-		if (bcc.length > 0)
-			message.setRecipients(javax.mail.Message.RecipientType.BCC, bcc);
+		message.setRecipients(javax.mail.Message.RecipientType.TO, to.toArray(new InternetAddress[0]));
+		if (CollectionUtils.isNotEmpty(cc))
+			message.setRecipients(javax.mail.Message.RecipientType.CC, cc.toArray(new InternetAddress[0]));
+		if (CollectionUtils.isNotEmpty(cc))
+			message.setRecipients(javax.mail.Message.RecipientType.BCC, bcc.toArray(new InternetAddress[0]));
 		message.setSubject(email.getSubject(), UTF_8);
 
 		MimeBodyPart body = buildBodyPart(email);
@@ -344,7 +345,8 @@ public class EMailSender {
 			log.info("Sent email with subject '{}' to recipients {}", email.getSubject(),
 					email.getAllRecipientsEmails());
 		} else {
-			log.info("Email with subject '{}' not sent because of the config parameter smtp.nosend", email.getSubject());
+			log.info("Email with subject '{}' not sent because of the config parameter smtp.nosend",
+					email.getSubject());
 		}
 
 		/*
@@ -531,13 +533,15 @@ public class EMailSender {
 				attributes.put("from", ext);
 
 				ext = new Attribute();
-				ext.setStringValue(StringUtils.substring(Arrays.asList(email.getAddresses()).stream()
-						.map(a -> a.getAddress()).collect(Collectors.joining(", ")), 0, 3999));
+				ext.setStringValue(StringUtils.substring(
+						email.getAddresses().stream().map(a -> a.getAddress()).collect(Collectors.joining(", ")), 0,
+						3999));
 				attributes.put("to", ext);
 
 				ext = new Attribute();
-				ext.setStringValue(StringUtils.substring(Arrays.asList(email.getAddressesCC()).stream()
-						.map(a -> a.getAddress()).collect(Collectors.joining(", ")), 0, 3999));
+				ext.setStringValue(StringUtils.substring(
+						email.getAddressesCC().stream().map(a -> a.getAddress()).collect(Collectors.joining(", ")), 0,
+						3999));
 				attributes.put("cc", ext);
 
 				ext = new Attribute();

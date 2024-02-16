@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.frontend.client.document.update;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -21,7 +22,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -61,14 +61,15 @@ public class UpdateDialog extends StickyWindow {
 
 	private boolean majorVersion = false;
 
-	private final List<Long> ids;
+	private List<Long> ids = new ArrayList<>();
 
 	public UpdateDialog(List<Long> ids, GUIDocument metadata, String context, boolean majorVersion, String charset) {
 		super(context);
 		this.context = context;
 		this.metadata = metadata;
 		this.majorVersion = majorVersion;
-		this.ids = ids;
+		if (ids != null)
+			this.ids = ids;
 		this.charset = charset != null ? charset : Session.get().getConfig("charset");
 	}
 
@@ -85,7 +86,7 @@ public class UpdateDialog extends StickyWindow {
 	protected void onDraw() {
 		super.onDraw();
 
-		DocumentService.Instance.get().getEnabledPermissions(ids, new AsyncCallback<GUIAccessControlEntry>() {
+		DocumentService.Instance.get().getEnabledPermissions(ids, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
@@ -160,11 +161,11 @@ public class UpdateDialog extends StickyWindow {
 	private Button prepareSaveButton(final DynamicForm saveForm) {
 		Button saveButton = new Button(CHECKIN.equals(context) ? I18N.message(CHECKIN) : I18N.message("save"));
 		saveButton.setLayoutAlign(VerticalAlignment.CENTER);
-		saveButton.addClickHandler((ClickEvent event) -> {
+		saveButton.addClickHandler(click -> {
 			if (!bulkPanel.validate())
 				return;
 
-			DocumentService.Instance.get().validate(metadata, new AsyncCallback<Void>() {
+			DocumentService.Instance.get().validate(metadata, new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -175,12 +176,12 @@ public class UpdateDialog extends StickyWindow {
 				}
 
 				@Override
-				public void onSuccess(Void arg0) {
+				public void onSuccess(Void arg) {
 					if (CHECKIN.equals(context)) {
 						doCheckin();
-					} else if (!ids.isEmpty())
+					} else if (!ids.isEmpty()) {
 						doBulkUpdate(saveForm);
-					else {
+					} else {
 						doAddDocuments(saveForm);
 					}
 				}
@@ -243,7 +244,7 @@ public class UpdateDialog extends StickyWindow {
 
 	private void doCheckin() {
 		LD.contactingServer();
-		DocumentService.Instance.get().checkin(metadata, majorVersion, new AsyncCallback<GUIDocument>() {
+		DocumentService.Instance.get().checkin(metadata, majorVersion, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable error) {

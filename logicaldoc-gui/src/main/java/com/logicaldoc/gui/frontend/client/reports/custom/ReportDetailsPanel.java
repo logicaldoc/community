@@ -44,7 +44,7 @@ public class ReportDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (report.getId() != 0) {
-				ReportService.Instance.get().getReport(report.getId(), true, new AsyncCallback<GUIReport>() {
+				ReportService.Instance.get().getReport(report.getId(), true, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -129,7 +129,7 @@ public class ReportDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (validate()) {
-			ReportService.Instance.get().save(report, new AsyncCallback<GUIReport>() {
+			ReportService.Instance.get().save(report, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);

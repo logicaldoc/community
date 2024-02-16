@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.system.stats;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -24,7 +26,7 @@ public class StatsPanel extends VLayout {
 
 	@Override
 	public void onDraw() {
-		SystemService.Instance.get().getStatistics(I18N.getLocale(), new AsyncCallback<GUIParameter[][]>() {
+		SystemService.Instance.get().getStatistics(I18N.getLocale(), new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -32,9 +34,9 @@ public class StatsPanel extends VLayout {
 			}
 
 			@Override
-			public void onSuccess(GUIParameter[][] parameters) {
+			public void onSuccess(List<List<GUIParameter>> parameters) {
 				Label lastUpdateLabel = new Label("<b>" + I18N.message("lastupdate") + ": "
-						+ parameters[4][0].getValue() + "</b>");
+						+ parameters.get(4).get(0).getValue() + "</b>");
 				lastUpdateLabel.setHeight(30);
 				lastUpdateLabel.setAlign(Alignment.RIGHT);
 

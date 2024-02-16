@@ -200,7 +200,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
 		save.addClickHandler(
-				event -> ZonalOCRService.Instance.get().save(selectedOcrTemplate, new AsyncCallback<GUIOCRTemplate>() {
+				event -> ZonalOCRService.Instance.get().save(selectedOcrTemplate, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -223,7 +223,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 			if (selectedOcrTemplate != null && selectedOcrTemplate.getId() != 0L)
 				LD.ask(I18N.message("question"), I18N.message("confirmdeleteocrtemplate"), (Boolean yes) -> {
 					if (Boolean.TRUE.equals(yes)) {
-						ZonalOCRService.Instance.get().delete(selectedOcrTemplate.getId(), new AsyncCallback<Void>() {
+						ZonalOCRService.Instance.get().delete(selectedOcrTemplate.getId(), new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -276,7 +276,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		ocrTemplateSelector.addChangedHandler(event -> {
 			ListGridRecord rec = ocrTemplateSelector.getSelectedRecord();
 			ZonalOCRService.Instance.get().getTemplate(rec.getAttributeAsLong("id"),
-					new AsyncCallback<GUIOCRTemplate>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

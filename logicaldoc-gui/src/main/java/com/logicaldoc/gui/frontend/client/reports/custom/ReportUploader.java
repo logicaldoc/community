@@ -70,7 +70,7 @@ public class ReportUploader extends Window {
 		layout.addMember(uploader);
 		layout.addMember(save);
 
-		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -86,7 +86,7 @@ public class ReportUploader extends Window {
 		addItem(layout);
 
 		// Clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
+		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -123,7 +123,7 @@ public class ReportUploader extends Window {
 		}
 
 		if (report != null) {
-			ReportService.Instance.get().storeUploadedDesign(report.getId(), new AsyncCallback<Void>() {
+			ReportService.Instance.get().storeUploadedDesign(report.getId(), new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -144,7 +144,7 @@ public class ReportUploader extends Window {
 			report.setName(vm.getValueAsString("name"));
 			report.setOutputFolder(outputFolderSelector.getFolder());
 
-			ReportService.Instance.get().create(report, new AsyncCallback<GUIReport>() {
+			ReportService.Instance.get().create(report, new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

@@ -123,7 +123,7 @@ public class IncrementalArchivesList extends VLayout {
 			if (rec == null)
 				return;
 			ImpexService.Instance.get().loadIncremental(Long.parseLong(rec.getAttributeAsString("id")),
-					new AsyncCallback<GUIIncrementalArchive>() {
+					new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
@@ -167,7 +167,7 @@ public class IncrementalArchivesList extends VLayout {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				ImpexService.Instance.get().deleteIncremental(id, new AsyncCallback<Void>() {
+				ImpexService.Instance.get().deleteIncremental(id, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

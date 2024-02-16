@@ -1,8 +1,5 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DeletedDocsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;

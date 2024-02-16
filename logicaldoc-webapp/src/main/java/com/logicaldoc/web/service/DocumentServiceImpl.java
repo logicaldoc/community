@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.cms.CMSException;
 import org.slf4j.Logger;
@@ -846,9 +845,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 		setBookmarked(guiDocument, isFolder, sessionUser);
 
-		GUIAttribute[] attributes = new TemplateServiceImpl().prepareGUIAttributes(realDoc.getTemplate(), realDoc,
+		List<GUIAttribute> attributes = new TemplateServiceImpl().prepareGUIAttributes(realDoc.getTemplate(), realDoc,
 				sessionUser);
-		guiDocument.setAttributes(Arrays.asList(attributes));
+		guiDocument.setAttributes(attributes);
 
 		if (folder != null) {
 			guiDocument.setFolder(folder);
@@ -1430,7 +1429,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		mail.parseRecipientsCC(guiMail.getCcs().stream().map(c -> c.getEmail()).collect(Collectors.joining(",")));
 		mail.parseRecipients(guiMail.getTos().stream().map(c -> c.getEmail()).collect(Collectors.joining(",")));
 
-		List<Document> attachedDocs = documentDao.findByIds(guiMail.getDocIds().toArray(new Long[0]), null);
+		List<Document> attachedDocs = documentDao.findByIds(guiMail.getDocIds().stream().collect(Collectors.toSet()),
+				null);
 		for (Document document : attachedDocs)
 			documentDao.initialize(document);
 
@@ -1835,7 +1835,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<GUIDocumentNote> getNotes(long docId, String fileVersion, Collection<String> types) throws ServerException {
+	public List<GUIDocumentNote> getNotes(long docId, String fileVersion, Collection<String> types)
+			throws ServerException {
 		Session session = validateSession();
 
 		Document document;
@@ -1894,7 +1895,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			document = retrieveDocument(docId);
 			if (document == null)
 				throw new ServerException(UNEXISTING_DOCUMENT + " " + docId);
-
 
 			/*
 			 * Check for deletions
@@ -2257,7 +2257,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSession(session);
 		try {
-			manager.archiveDocuments(ArrayUtils.toPrimitive(docIds.toArray(new Long[0])), transaction);
+			manager.archiveDocuments(docIds.stream().collect(Collectors.toSet()), transaction);
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
 		}

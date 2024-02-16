@@ -63,7 +63,7 @@ public class PasswordTrial extends PasswordGenerator {
 		
 		submit.setDisabled(true);
 		SecurityService.Instance.get().validatePassword(form.getValueAsString(PASSWORD_CONSTANT), pwdSize, pwdUpperCase,
-				pwdLowerCase, pwdDigit, pwdSpecial, pwdSequence, pwdOccurrence, new AsyncCallback<List<String>>() {
+				pwdLowerCase, pwdDigit, pwdSpecial, pwdSequence, pwdOccurrence, new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

@@ -72,7 +72,7 @@ public class Search {
 	public void search() {
 		LD.contactingServer();
 
-		SearchService.Instance.get().search(options, new AsyncCallback<GUIResult>() {
+		SearchService.Instance.get().search(options, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

@@ -98,7 +98,7 @@ public class FolderInterfacePanel extends FolderDetailTab {
 		applyToSubFolders.setHeight(12);
 		applyToSubFolders.addFormItemClickHandler(event -> {
 			LD.contactingServer();
-			FolderService.Instance.get().applyGridLayout(folder.getId(), new AsyncCallback<Void>() {
+			FolderService.Instance.get().applyGridLayout(folder.getId(), new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					LD.clearPrompt();

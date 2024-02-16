@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -35,7 +37,7 @@ public interface TemplateService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public GUITemplate save(GUITemplate template) throws ServerException;
-	
+
 	/**
 	 * Makes a clone of an existing template
 	 * 
@@ -81,14 +83,15 @@ public interface TemplateService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIAttribute[] getAttributes(long templateId, GUIExtensibleObject extensibleObject) throws ServerException;
+	public List<GUIAttribute> getAttributes(long templateId, GUIExtensibleObject extensibleObject)
+			throws ServerException;
 
 	public static class Instance {
 		private static TemplateServiceAsync inst;
-		
+
 		private Instance() {
 		}
-		
+
 		public static TemplateServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(TemplateService.class);

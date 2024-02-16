@@ -74,7 +74,7 @@ public class FormCreate extends Window {
 		else
 			vo.setTemplateId(Long.parseLong(vm.getValueAsString(TEMPLATE)));
 
-		FormService.Instance.get().save(vo, new AsyncCallback<GUIForm>() {
+		FormService.Instance.get().save(vo, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

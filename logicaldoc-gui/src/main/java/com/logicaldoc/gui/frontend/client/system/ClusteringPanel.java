@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.frontend.client.system;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +21,6 @@ import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.tab.Tab;
 
 /**
@@ -45,7 +44,7 @@ public class ClusteringPanel extends AdminPanel {
 		SettingService.Instance.get().loadSettingsByNames(
 				Arrays.asList("cluster.enabled", "cluster.name", "cluster.port", "cluster.multicastip",
 						"cluster.cache.resources", "cluster.chunk.size", "id"),
-				new AsyncCallback<List<GUIParameter>>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -59,6 +58,7 @@ public class ClusteringPanel extends AdminPanel {
 				});
 	}
 
+	@SuppressWarnings("unchecked")
 	private void init(List<GUIParameter> parameters) {
 		DynamicForm clusterForm = new DynamicForm();
 		clusterForm.setWidth(300);
@@ -95,34 +95,31 @@ public class ClusteringPanel extends AdminPanel {
 
 		ButtonItem save = new ButtonItem();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(new ClickHandler() {
-			@SuppressWarnings("unchecked")
-			public void onClick(ClickEvent event) {
-				final Map<String, Object> values = vm.getValues();
+		save.addClickHandler(click -> {
+			final Map<String, Object> values = vm.getValues();
 
-				if (Boolean.TRUE.equals(vm.validate())) {
-					final GUIParameter[] settings = new GUIParameter[6];
-					settings[0] = new GUIParameter("cluster.enabled",
-							values.get("eenabled").equals("yes") ? "true" : "false");
-					settings[1] = new GUIParameter("cluster.name", vm.getValueAsString("name"));
-					settings[2] = new GUIParameter("cluster.port", vm.getValueAsString(BASEPORT));
-					settings[3] = new GUIParameter("cluster.multicastip", vm.getValueAsString("multicastip"));
-					settings[4] = new GUIParameter("cluster.cache.resources",
-							values.get("cacheResources").equals("yes") ? "true" : "false");
-					settings[5] = new GUIParameter("cluster.chunk.size", vm.getValueAsString("chunksize"));
+			if (Boolean.TRUE.equals(vm.validate())) {
+				List<GUIParameter> settings = new ArrayList<>();
+				settings.add(
+						new GUIParameter("cluster.enabled", values.get("eenabled").equals("yes") ? "true" : "false"));
+				settings.add(new GUIParameter("cluster.name", vm.getValueAsString("name")));
+				settings.add(new GUIParameter("cluster.port", vm.getValueAsString(BASEPORT)));
+				settings.add(new GUIParameter("cluster.multicastip", vm.getValueAsString("multicastip")));
+				settings.add(new GUIParameter("cluster.cache.resources",
+						values.get("cacheResources").equals("yes") ? "true" : "false"));
+				settings.add(new GUIParameter("cluster.chunk.size", vm.getValueAsString("chunksize")));
 
-					SettingService.Instance.get().saveSettings(settings, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+				SettingService.Instance.get().saveSettings(settings, new AsyncCallback<>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							GuiLog.info(I18N.message("settingssaved") + " " + I18N.message("needrestart"), null);
-						}
-					});
-				}
+					@Override
+					public void onSuccess(Void result) {
+						GuiLog.info(I18N.message("settingssaved") + " " + I18N.message("needrestart"), null);
+					}
+				});
 			}
 		});
 

@@ -97,7 +97,7 @@ public class TrashPanel extends VLayout {
 
 	private void restoreDocument(final long id) {
 		DocumentService.Instance.get().restore(Arrays.asList(id), FolderController.get().getCurrentFolder().getId(),
-				new AsyncCallback<Void>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -118,7 +118,7 @@ public class TrashPanel extends VLayout {
 
 	private void restoreFolder(final long id) {
 		FolderService.Instance.get().restore(Arrays.asList(id), FolderController.get().getCurrentFolder().getId(),
-				new AsyncCallback<Void>() {
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -167,7 +167,7 @@ public class TrashPanel extends VLayout {
 		emptyTrash.addClickHandler(
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmemptytrash"), (Boolean response) -> {
 					if (Boolean.TRUE.equals(response)) {
-						DocumentService.Instance.get().emptyTrash(new AsyncCallback<Void>() {
+						DocumentService.Instance.get().emptyTrash(new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -204,7 +204,7 @@ public class TrashPanel extends VLayout {
 		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean response) -> {
 			if (Boolean.TRUE.equals(response)) {
 				if (!docIds.isEmpty())
-					DocumentService.Instance.get().deleteFromTrash(docIds, new AsyncCallback<Void>() {
+					DocumentService.Instance.get().deleteFromTrash(docIds, new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -217,7 +217,7 @@ public class TrashPanel extends VLayout {
 						}
 					});
 				if (!folderIds.isEmpty())
-					FolderService.Instance.get().deleteFromTrash(folderIds, new AsyncCallback<Void>() {
+					FolderService.Instance.get().deleteFromTrash(folderIds, new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

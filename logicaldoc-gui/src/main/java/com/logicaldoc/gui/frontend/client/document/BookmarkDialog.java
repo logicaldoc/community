@@ -70,7 +70,7 @@ public class BookmarkDialog extends Window {
 						bookmark.setDescription((String) values.get(DESCRIPTION));
 					}
 
-					DocumentService.Instance.get().updateBookmark(bookmark, new AsyncCallback<Void>() {
+					DocumentService.Instance.get().updateBookmark(bookmark, new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);

@@ -86,7 +86,7 @@ public class WorkflowHistoryDialog extends Window {
 				return;
 
 			WorkflowService.Instance.get().get(selectedRecord.getAttributeAsString("name"), null,
-					new AsyncCallback<GUIWorkflow>() {
+					new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
@@ -225,7 +225,7 @@ public class WorkflowHistoryDialog extends Window {
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
 			if (Boolean.TRUE.equals(value)) {
 				WorkflowService.Instance.get().deleteInstance(selection.getAttributeAsString("id"),
-						new AsyncCallback<Void>() {
+						new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -246,7 +246,7 @@ public class WorkflowHistoryDialog extends Window {
 		completionDiagram.setTitle(I18N.message("completiondiagram"));
 		completionDiagram.addClickHandler(event -> WorkflowService.Instance.get().getCompletionDiagram(
 				selectedWorkflow.getName(), selectedWorkflow.getVersion(), selection.getAttributeAsString("id"),
-				new AsyncCallback<GUIWorkflow>() {
+				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
