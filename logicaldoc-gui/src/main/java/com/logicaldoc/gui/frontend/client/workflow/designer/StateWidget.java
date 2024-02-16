@@ -89,8 +89,8 @@ public class StateWidget extends Label {
 			contextMenu.setItems(edit, makeStart, delete);
 		else if (isConnection()) {
 			StateWidget start = (StateWidget) ((FunctionShape) connection.getStartShape()).getWidget();
-			if (start.isFork())
-				// No edit in case the transition starts from a fork
+			if (start.isFork() || start.isJoin())
+				// No edit in case the transition starts from a fork or join
 				// node
 				contextMenu.setItems(straight, delete);
 			else
@@ -165,7 +165,7 @@ public class StateWidget extends Label {
 		if (isTask() || isEnd()) {
 			new TaskEditor(StateWidget.this).show();
 		} else if (isJoin() || isFork()) {
-			new StatusDialog(StateWidget.this).show();
+			new ForkEditor(StateWidget.this).show();
 		} else {
 			new TransitionEditor(StateWidget.this).show();
 		}
@@ -192,7 +192,7 @@ public class StateWidget extends Label {
 		for (GUIWFState s : workflowDesigner.getWorkflow().getStates()) {
 			s.setInitial(false);
 		}
-		getWfState().setInitial(true);
+		getWFState().setInitial(true);
 		workflowDesigner.saveModel();
 		workflowDesigner.refresh();
 	}
@@ -224,7 +224,7 @@ public class StateWidget extends Label {
 		return connection != null;
 	}
 
-	public GUIWFState getWfState() {
+	public GUIWFState getWFState() {
 		return wfState;
 	}
 

@@ -50,7 +50,7 @@ public class FunctionShape extends AbstractShape {
 		if (widget instanceof StateWidget) {
 			if (((StateWidget) widget).isReadonly())
 				return false;
-			if (((StateWidget) widget).getWfState().getType() == GUIWFState.TYPE_JOIN) {
+			if (((StateWidget) widget).getWFState().getType() == GUIWFState.TYPE_JOIN) {
 				// just one outcoming connection for a join node
 				for (Connection con : getConnections()) {
 					if (con.getStartShape().equals(this))

@@ -20,7 +20,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
-public class StatusDialog extends Window {
+public class ForkEditor extends Window {
 
 	private ValuesManager vm = new ValuesManager();
 
@@ -28,7 +28,7 @@ public class StatusDialog extends Window {
 
 	private StateWidget widget;
 
-	public StatusDialog(StateWidget widget) {
+	public ForkEditor(StateWidget widget) {
 		this.widget = widget;
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
@@ -57,9 +57,9 @@ public class StatusDialog extends Window {
 				Map<String, Object> values =  vm.getValues();
 
 				if (Boolean.TRUE.equals(vm.validate())) {
-					StatusDialog.this.widget.getWfState().setName((String) values.get("name"));
-					StatusDialog.this.widget.setContents("<b>" + (String) values.get("name") + "</b>");
-					StatusDialog.this.widget.getDrawingPanel().getDiagramController().update();
+					ForkEditor.this.widget.getWFState().setName((String) values.get("name"));
+					ForkEditor.this.widget.setContents("<b>" + (String) values.get("name") + "</b>");
+					ForkEditor.this.widget.getDrawingPanel().getDiagramController().update();
 					destroy();
 				}
 			}

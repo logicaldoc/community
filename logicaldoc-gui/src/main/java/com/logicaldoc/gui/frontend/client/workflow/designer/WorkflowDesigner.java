@@ -133,7 +133,7 @@ public class WorkflowDesigner extends AdminPanel {
 
 			String id = Integer.toString(i++);
 
-			GUIWFState wfState = widget.getWfState();
+			GUIWFState wfState = widget.getWFState();
 			if (wfState.getId().equals(workflow.getStartStateId())) {
 				workflow.setStartStateId(id);
 				wfState.setInitial(true);
@@ -158,7 +158,7 @@ public class WorkflowDesigner extends AdminPanel {
 
 				StateWidget end = (StateWidget) ((FunctionShape) connection.getEndShape()).getWidget();
 				GUITransition transition = ((StateWidget) connection.getDecoration().getWidget()).getTransition();
-				transition.setTargetState(end.getWfState());
+				transition.setTargetState(end.getWFState());
 				transitions.add(transition);
 				StringBuilder sb = new StringBuilder("");
 				for (Point point : connection.getMovablePoints()) {
@@ -170,7 +170,7 @@ public class WorkflowDesigner extends AdminPanel {
 				transition.setPoints(sb.toString());
 			}
 
-			srcWidget.getWfState().setTransitions(transitions);
+			srcWidget.getWFState().setTransitions(transitions);
 		}
 
 		return true;

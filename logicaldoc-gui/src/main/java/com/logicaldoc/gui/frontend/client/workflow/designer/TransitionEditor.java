@@ -60,7 +60,7 @@ public class TransitionEditor extends Window {
 
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(event -> {
+		save.addClickHandler(click -> {
 			if (Boolean.TRUE.equals(name.validate())) {
 				String transitionName = name.getValue().toString().trim().replace("'", "");
 
@@ -75,7 +75,7 @@ public class TransitionEditor extends Window {
 
 		ToolStripButton close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
-		close.addClickHandler(event -> destroy());
+		close.addClickHandler(click -> destroy());
 
 		toolStrip.addFormItem(name);
 		toolStrip.addButton(save);

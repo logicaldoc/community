@@ -71,7 +71,7 @@ public class TaskEditor extends Window {
 	private StateWidget widget;
 
 	public TaskEditor(StateWidget widget) {
-		this.state = widget.getWfState();
+		this.state = widget.getWFState();
 		this.widget = widget;
 
 		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, event -> destroy());
