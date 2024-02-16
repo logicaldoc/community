@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
@@ -157,11 +158,11 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
 		Assert.assertEquals(2, hits.getEstimatedCount());
 
 		hits = engine.search("content:document",
-				new String[] { "templateId:0", "folderId:4", "date:[2012-01-01T00:00:00Z TO *]" }, "en", 50);
+				Set.of("templateId:0", "folderId:4", "date:[2012-01-01T00:00:00Z TO *]"), "en", 50);
 		Assert.assertEquals(1, hits.getCount());
 		Assert.assertEquals(111L, hits.next().getId());
 
-		hits = engine.search("content:document", new String[] { "templateId:1" }, "en", 50);
+		hits = engine.search("content:document", Set.of("templateId:1"), "en", 50);
 		Assert.assertEquals(0, hits.getCount());
 
 		hits = engine.search("content:house", null, "en", 50);

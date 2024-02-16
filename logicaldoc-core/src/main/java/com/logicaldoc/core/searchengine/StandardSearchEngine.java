@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -373,7 +374,7 @@ public class StandardSearchEngine implements SearchEngine {
 	}
 
 	@Override
-	public Hits search(String expression, String[] filters, String expressionLanguage, Integer rows) {
+	public Hits search(String expression, Set<String> filters, String expressionLanguage, Integer rows) {
 		try {
 			// This configures the analyzer to use to to parse the expression of
 			// the content field
@@ -397,12 +398,12 @@ public class StandardSearchEngine implements SearchEngine {
 	/**
 	 * Prepares the query for a search.
 	 */
-	protected SolrQuery prepareSearchQuery(String expression, String[] filters, String expressionLanguage,
+	protected SolrQuery prepareSearchQuery(String expression, Set<String> filters, String expressionLanguage,
 			Integer rows) {
 		SolrQuery query = new SolrQuery().setQuery(expression);
 		if (rows != null)
 			query = query.setRows(rows);
-		if (filters != null)
+		if (CollectionUtils.isNotEmpty(filters))
 			query = query.addFilterQuery(Joiner.on(" +").join(filters));
 		query = query.setSort(SortClause.desc("score"));
 		query.set("exprLang", expressionLanguage);
@@ -559,7 +560,7 @@ public class StandardSearchEngine implements SearchEngine {
 			log.warn(e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	@PostConstruct
 	public void init() {

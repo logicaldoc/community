@@ -2,6 +2,7 @@ package com.logicaldoc.core.searchengine;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -82,7 +83,7 @@ public interface SearchEngine {
 	 * 
 	 * @return the hits ordered by descending score
 	 */
-	public Hits search(String expression, String[] filters, String expressionLanguage, Integer rows);
+	public Hits search(String expression, Set<String> filters, String expressionLanguage, Integer rows);
 
 	/**
 	 * Executes a low-level query in the fulltext index<br>

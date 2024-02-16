@@ -138,15 +138,14 @@ public class FulltextSearch extends Search {
 		/*
 		 * Prepare the filters
 		 */
-		List<String> filters = new ArrayList<>();
+		Set<String> filters = new HashSet<>();
 		setQueryFilters(opt, filters, tenantId, accessibleFolderIds);
 
 		/*
 		 * Launch the search
 		 */
 		log.debug("Full-text seach: {}", query);
-		Hits results = engine.search(query.toString(), filters.toArray(new String[0]), opt.getExpressionLanguage(),
-				null);
+		Hits results = engine.search(query.toString(), filters, opt.getExpressionLanguage(), null);
 		log.debug("End of Full-text search");
 		log.debug("Fulltext hits count: {}", (results != null ? results.getCount() : 0));
 
@@ -295,7 +294,7 @@ public class FulltextSearch extends Search {
 		}
 	}
 
-	private void setQueryFilters(FulltextSearchOptions opt, List<String> filters, long tenantId,
+	private void setQueryFilters(FulltextSearchOptions opt, Set<String> filters, long tenantId,
 			Collection<Long> accessibleFolderIds) throws SearchException {
 		TenantDAO tdao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		if (searchUser != null && tdao.count() > 1)
@@ -329,7 +328,7 @@ public class FulltextSearch extends Search {
 		appendFolderQueryFilter(opt, filters, accessibleFolderIds);
 	}
 
-	private void appendFolderQueryFilter(FulltextSearchOptions opt, List<String> filters,
+	private void appendFolderQueryFilter(FulltextSearchOptions opt, Set<String> filters,
 			Collection<Long> accessibleFolderIds) throws SearchException {
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		try {

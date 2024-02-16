@@ -1,7 +1,6 @@
 package com.logicaldoc.core.automation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -72,8 +71,7 @@ public class SearchTool {
 	 * @since 8.7.4
 	 */
 	public List<Hit> search(long tenantId, String expression, String expressionLanguage) {
-		return search(tenantId, expression, Arrays.asList(HitField.TENANT_ID.getName() + ":" + tenantId),
-				expressionLanguage);
+		return search(tenantId, expression, Set.of(HitField.TENANT_ID.getName() + ":" + tenantId), expressionLanguage);
 	}
 
 	/**
@@ -89,11 +87,11 @@ public class SearchTool {
 	 * 
 	 * @since 8.7.4
 	 */
-	public List<Hit> search(long tenantId, String expression, List<String> filters, String expressionLanguage) {
+	public List<Hit> search(long tenantId, String expression, Set<String> filters, String expressionLanguage) {
 		filters.add(HitField.TENANT_ID.getName() + ":" + tenantId);
 
 		SearchEngine engine = (SearchEngine) Context.get().getBean(SearchEngine.class);
-		Hits result = engine.search(expression, filters.toArray(new String[0]), expressionLanguage, null);
+		Hits result = engine.search(expression, filters, expressionLanguage, null);
 
 		Map<Long, Hit> hitsMap = new HashMap<>();
 		while (result.hasNext()) {
