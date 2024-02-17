@@ -99,6 +99,7 @@ public class PluginsPanel extends VLayout {
 					ListGridRecord rec = new ListGridRecord();
 					rec.setAttribute("name", val.getCode());
 					rec.setAttribute("version", val.getValue());
+					records.add(rec);
 				}
 				list.setRecords(records.toArray(new ListGridRecord[0]));
 			}
