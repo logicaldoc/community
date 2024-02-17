@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.dashboard;
+package com.logicaldoc.gui.frontend.client.dashboard.tag;
 
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.frontend.client.dashboard.dashlet.TagCloudDashlet;

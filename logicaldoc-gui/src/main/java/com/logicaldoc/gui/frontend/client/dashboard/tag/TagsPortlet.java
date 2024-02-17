@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.dashboard;
+package com.logicaldoc.gui.frontend.client.dashboard.tag;
 
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.i18n.I18N;

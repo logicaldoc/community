@@ -5,7 +5,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
-import com.logicaldoc.gui.frontend.client.dashboard.TagCloud;
+import com.logicaldoc.gui.frontend.client.dashboard.tag.TagCloud;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DragAppearance;
 import com.smartgwt.client.types.HeaderControls;

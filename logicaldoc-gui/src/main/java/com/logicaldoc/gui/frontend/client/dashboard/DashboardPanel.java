@@ -7,6 +7,7 @@ import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.calendar.UserCalendarPanel;
 import com.logicaldoc.gui.frontend.client.dashboard.chat.ChatPanel;
 import com.logicaldoc.gui.frontend.client.dashboard.reading.ReadingRequestsPanel;
+import com.logicaldoc.gui.frontend.client.dashboard.tag.TagsDashboard;
 import com.logicaldoc.gui.frontend.client.workflow.WorkflowDashboard;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.layout.VLayout;

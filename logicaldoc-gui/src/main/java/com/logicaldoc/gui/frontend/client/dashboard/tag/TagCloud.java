@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.dashboard;
+package com.logicaldoc.gui.frontend.client.dashboard.tag;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.dashboard;
+package com.logicaldoc.gui.frontend.client.dashboard.tag;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,6 +94,7 @@ public class MostUsedTagsPortlet extends Portlet {
 					ListGridRecord rec = new ListGridRecord();
 					rec.setAttribute("word", tag.getTag());
 					rec.setAttribute(COUNT, tag.getCount());
+					records.add(rec);
 				}
 				list.setRecords(records.toArray(new ListGridRecord[0]));
 			}

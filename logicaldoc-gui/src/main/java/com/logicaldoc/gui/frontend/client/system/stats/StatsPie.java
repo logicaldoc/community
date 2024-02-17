@@ -44,9 +44,8 @@ public class StatsPie extends HLayout {
 		setAlign(VerticalAlignment.TOP);
 
 		// Convert all sizes in MBytes
-		for (List<GUIParameter> list : parameters)
-			for (GUIParameter param : list)
-				param.setValue(Long.toString(Long.parseLong(param.getValue()) / 1024 / 1024));
+		for (GUIParameter param : parameters.get(STATS_REPOSITORY))
+			param.setValue(Long.toString(Long.parseLong(param.getValue()) / 1024 / 1024));
 
 		VLayout repository = new VLayout();
 		Image pieImage = new Image(Util.contextPath() + "stat?chart=repository&random=" + new Date().getTime());
