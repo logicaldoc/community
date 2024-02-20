@@ -955,12 +955,12 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		// Kill the LogicalDOC session
 		SessionManager.get().kill(sid);
 
-		SessionManager.get().removeSid(getThreadLocalRequest());
-
 		// Also kill the servlet container session, if any
 		HttpSession httpSession = SessionManager.get().getServletSession(sid);
 		if (httpSession != null)
 			httpSession.invalidate();
+		
+		SessionManager.get().removeSid(getThreadLocalRequest());
 	}
 
 	@Override

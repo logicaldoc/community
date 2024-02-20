@@ -1,5 +1,6 @@
 package com.logicaldoc.core.document;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -882,8 +883,10 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 	 * Sets the password and encode it
 	 * 
 	 * @param pwd The password in readable format
+	 * 
+	 * @throws NoSuchAlgorithmException Cripting error 
 	 */
-	public void setDecodedPassword(String pwd) {
+	public void setDecodedPassword(String pwd) throws NoSuchAlgorithmException {
 		if (org.apache.commons.lang.StringUtils.isNotEmpty(pwd)) {
 			decodedPassword = pwd;
 			password = CryptUtil.cryptString(pwd);

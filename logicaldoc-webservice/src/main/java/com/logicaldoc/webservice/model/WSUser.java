@@ -1,5 +1,6 @@
 package com.logicaldoc.webservice.model;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -251,8 +252,10 @@ public class WSUser {
 	 * Sets the password and encode it
 	 * 
 	 * @param passwd The password in readable format
+	 * 
+	 * @throws NoSuchAlgorithmException Cripting error 
 	 */
-	public void setPassword(String passwd) {
+	public void setPassword(String passwd) throws NoSuchAlgorithmException {
 		decodedPassword = passwd;
 		password = null;
 		if (org.apache.commons.lang.StringUtils.isNotEmpty(passwd))

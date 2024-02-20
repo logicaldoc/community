@@ -2,6 +2,7 @@ package com.logicaldoc.core.security.user;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Collection;
@@ -115,7 +116,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByUserName() throws PersistenceException {
+	public void testFindByUserName() throws PersistenceException, NoSuchAlgorithmException {
 		User user = dao.findByUsername("admin");
 		Assert.assertNotNull(user);
 		Assert.assertEquals("admin", user.getUsername());
@@ -168,7 +169,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindById() throws PersistenceException {
+	public void testFindById() throws PersistenceException, NoSuchAlgorithmException {
 		User user = dao.findById(1, true);
 		Assert.assertNotNull(user);
 		Assert.assertEquals("admin", user.getUsername());
@@ -200,7 +201,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testStore() throws PersistenceException {
+	public void testStore() throws PersistenceException, NoSuchAlgorithmException {
 		User user = new User();
 		user.setUsername("xxx");
 		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
@@ -250,7 +251,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testStorePasswordChanged() throws PersistenceException {
+	public void testStorePasswordChanged() throws PersistenceException, NoSuchAlgorithmException {
 
 		User user = dao.findById(1L);
 		dao.initialize(user);

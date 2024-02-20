@@ -1,6 +1,7 @@
 package com.logicaldoc.core.security.user;
 
 import java.io.Serializable;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -388,8 +389,9 @@ public class User extends PersistentObject implements Serializable {
 	 * Sets the password and encode it
 	 * 
 	 * @param pwd The password in readable format
+	 * @throws NoSuchAlgorithmException Cripting error
 	 */
-	public void setDecodedPassword(String pwd) {
+	public void setDecodedPassword(String pwd) throws NoSuchAlgorithmException {
 		if (org.apache.commons.lang.StringUtils.isNotEmpty(pwd)) {
 			decodedPassword = pwd;
 			password = CryptUtil.cryptString(pwd);

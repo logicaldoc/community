@@ -312,6 +312,8 @@ public class LoginPanel extends VLayout {
 			username.setValue(credentials[0]);
 			password.setValue(credentials[1]);
 		}
+		
+		CookiesManager.removeSid();
 	}
 
 	private void prepareSecretKey() {

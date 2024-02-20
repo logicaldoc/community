@@ -118,8 +118,7 @@ public class TagsDataServlet extends AbstractDataServlet {
 
 		if (("preset".equals(firstLetter) || "preset".equals(mode)) && "true".equals(editing)) {
 			// We have to return the preset only, because the user is
-			// editing
-			// a document
+			// editing a document
 			GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 			List<Generic> buf = gDao.findByTypeAndSubtype("tag", null, null, session.getTenantId());
 			for (Generic generic : buf)

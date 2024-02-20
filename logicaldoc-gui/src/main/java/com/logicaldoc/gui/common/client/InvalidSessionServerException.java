@@ -14,6 +14,14 @@ public class InvalidSessionServerException extends ServerException {
 		super();
 	}
 
+	public InvalidSessionServerException(Throwable cause) {
+		super(cause);
+	}
+	
+	public InvalidSessionServerException(String message, Throwable cause) {
+		super(message, cause);
+	}
+	
 	public InvalidSessionServerException(String message) {
 		super(message);
 	}

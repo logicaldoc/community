@@ -740,7 +740,7 @@ public abstract class Util {
 
 	public static native void redirect(String url)
 	/*-{
-		$wnd.location.replace(url);
+	    $wnd.location.href = url;
 	}-*/;
 
 	public static String padLeft(String s, int n) {
@@ -991,7 +991,7 @@ public abstract class Util {
 				url += "?locale=" + locale;
 			}
 		}
-		Util.redirect(url);
+		WindowUtils.openUrl(url);
 	}
 
 	/**

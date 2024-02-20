@@ -31,31 +31,34 @@ public class LDAuthenticationSuccessHandler extends SavedRequestAwareAuthenticat
 	private static final String PARAM_SUCCESSURL = "j_successurl";
 
 	private static RequestCache myCache = new HttpSessionRequestCache();
-	
+
 	public LDAuthenticationSuccessHandler() {
 		setRequestCache(myCache);
 	}
-	
-	
+
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException, ServletException {
-		
+
 		/*
 		 * Deduct the destination URL
 		 */
 		String requestedUrl = request.getParameter(PARAM_SUCCESSURL);
-		if(requestedUrl==null && request.getSession(false)!=null)
+		if (requestedUrl == null && request.getSession(false) != null)
 			request.getSession(false).removeAttribute(LDAccessDecisionManager.REQUESTED_URL);
-			
+
 		LDAuthenticationToken token = (LDAuthenticationToken) authentication;
-		
+
 		Cookie sidCookie = new Cookie(LDAuthenticationToken.COOKIE_SID, token.getSid());
 		sidCookie.setHttpOnly(true);
-		sidCookie.setSecure(Context.get().getProperties().getBoolean("cookies.secure", false));	
+		sidCookie.setSecure(Context.get().getProperties().getBoolean("cookies.secure", false));
+		sidCookie.setPath("/");
 		response.addCookie(sidCookie);
 		response.setHeader("SID", token.getSid());
 		
+        log.debug("authentication success {} with sid {}", requestedUrl, token.getSid());		
+		SessionManager.get().saveSid(request, response, token.getSid());
+
 		if (requestedUrl != null) {
 			StringBuilder successUrl = new StringBuilder(requestedUrl);
 			if (requestedUrl.indexOf('?') != -1)

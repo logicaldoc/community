@@ -12,7 +12,7 @@ public class UtilWorkbench {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		System.out.println(CryptUtil.cryptString("admin"));
+		System.out.println(CryptUtil.cryptString("12345678"));
 		
 		System.out.println(DateUtil.truncateToDay(new Date()));
 		

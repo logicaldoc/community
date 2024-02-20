@@ -2,6 +2,7 @@ package com.logicaldoc.core.document;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -1305,7 +1306,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				throw new PersistenceException("The document already has a password, unset it first");
 
 			initialize(doc);
-			doc.setDecodedPassword(password);
+			try {
+				doc.setDecodedPassword(password);
+			} catch (NoSuchAlgorithmException e) {
+				throw new PersistenceException("Cannot cript the password", e);
+			}
 			store(doc, transaction);
 
 			List<Version> versions = versionDAO.findByDocId(docId);

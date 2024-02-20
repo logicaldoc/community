@@ -196,11 +196,11 @@ public class LDAPServerDetailsPanel extends VLayout {
 		timeout.setStep(5);
 		timeout.setHint(I18N.message("seconds").toLowerCase());
 
-		// Synch TTL
+		// Sync TTL
 		SpinnerItem syncTtl = ItemFactory.newSpinnerItem("syncttl", "synchronizeifolderthan", this.server.getSyncTtl());
 		syncTtl.setRequired(true);
 		syncTtl.setHint(I18N.message("hours").toLowerCase());
-		syncTtl.setMin(0);
+		syncTtl.setMin(-1);
 		syncTtl.setStep(1);
 
 		// Language
@@ -245,8 +245,8 @@ public class LDAPServerDetailsPanel extends VLayout {
 		defaultGroupsItem.setValueField("id");
 		defaultGroupsItem.setDisplayField("name");
 
-		ldapForm.setItems(enabled, url, fakeUsername, hiddenPassword, username, password, anon, syncTtl, pageSize,
-				timeout, language, userType, keepMembership, defaultGroupsItem, userIdentifierAttr, grpIdentifierAttr,
+		ldapForm.setItems(enabled, url, fakeUsername, hiddenPassword, username, password, anon, pageSize, timeout,
+				language, userType, defaultGroupsItem, syncTtl, keepMembership, userIdentifierAttr, grpIdentifierAttr,
 				userClass, groupClass, usersBaseNode, groupsBaseNode, userInclude, groupInclude, userExclude,
 				groupExclude, logonAttr, realm, validation);
 

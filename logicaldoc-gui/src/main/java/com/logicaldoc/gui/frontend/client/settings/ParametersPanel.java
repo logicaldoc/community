@@ -85,6 +85,7 @@ public class ParametersPanel extends AdminPanel {
 			ListGridRecord rec = new ListGridRecord();
 			rec.setAttribute(VALUE, guiParameter.getValue());
 			rec.setAttribute(PARAMETER, guiParameter.getName());
+			records.add(rec);
 		}
 		parametersGrid.setRecords(records.toArray(new ListGridRecord[0]));
 

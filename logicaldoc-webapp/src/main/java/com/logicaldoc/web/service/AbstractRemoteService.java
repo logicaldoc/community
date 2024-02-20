@@ -85,7 +85,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		try {
 			return ServletUtil.validateSession(request);
 		} catch (InvalidSessionException e) {
-			throw new InvalidSessionServerException(e.getMessage());
+			throw new InvalidSessionServerException(e.getMessage(), e);
 		}
 	}
 

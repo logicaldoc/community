@@ -23,7 +23,6 @@ import org.springframework.web.filter.GenericFilterBean;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
-import com.logicaldoc.util.Context;
 
 /**
  * This filter looks for a sid parameter in the request and auto-authenticate
@@ -44,33 +43,47 @@ public class SessionIdFilter extends GenericFilterBean {
 		HttpServletRequest request = (HttpServletRequest) rec;
 		HttpServletResponse response = (HttpServletResponse) res;
 
-		if (request.getAttribute(FILTER_APPLIED) != null
-				|| !Context.get().getProperties().getBoolean("security.acceptsid", false)) {
+		// Do not execute the filter twice
+		if (request.getAttribute(FILTER_APPLIED) != null) {
 			chain.doFilter(request, response);
 			return;
 		}
 
 		request.setAttribute(FILTER_APPLIED, Boolean.TRUE);
 
-		String sid = request.getParameter(LDAuthenticationToken.PARAM_SID);
+		// Do not execute the filter if there is an existing authentication
+		// already
+		if (SecurityContextHolder.getContext().getAuthentication() != null && request.getSession(false) != null
+				&& request.getSession(false).getAttribute("sid") != null) {
+			chain.doFilter(request, response);
+			return;
+		}
+
+		String sid = request.getParameter(SessionManager.PARAM_SID);
+		if (StringUtils.isEmpty(sid)) {
+			Cookie[] cookies = request.getCookies();
+			if (cookies != null)
+				for (Cookie cookie : cookies) {
+					if (SessionManager.COOKIE_SID.equals(cookie.getName())) {
+						sid = cookie.getValue();
+						break;
+					}
+				}
+		}
 
 		if (StringUtils.isNotEmpty(sid)) {
 			log.debug("The request specifies the sid {}", sid);
 
 			try {
 				Session session = SessionManager.get().get(sid);
-				if (session == null || !session.isOpen())
-					throw new AuthenticationException(String.format("Invalid session %s", sid));
-
+				if (session == null || !session.isOpen()) {
+					log.debug("The sid {} is unexisting or expired", sid);
+					chain.doFilter(request, response);
+					return;
+				}
 				log.debug("Connecting current request to session {}", sid);
 
 				SessionManager.get().saveSid(request, response, sid);
-
-				// Put the cookie
-				Cookie sidCookie = new Cookie(LDAuthenticationToken.COOKIE_SID, session.getSid());
-				sidCookie.setHttpOnly(true);
-				sidCookie.setSecure(Context.get().getProperties().getBoolean("cookies.secure", false));
-				response.addCookie(sidCookie);
 
 				// Preferably clear the password in the user object before
 				// storing in authentication object

@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -407,11 +408,14 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		if (request == null)
 			return sid;
 
-		if (request.getSession(false) != null && request.getSession(false).getAttribute(PARAM_SID) != null)
-			sid = (String) request.getSession(false).getAttribute(PARAM_SID);
-		else if (request.getAttribute(PARAM_SID) != null)
+		if (request.getSession(true).getAttribute(PARAM_SID) != null
+				&& StringUtils.isNotEmpty((String) request.getSession(true).getAttribute(PARAM_SID)))
+			sid = (String) request.getSession(true).getAttribute(PARAM_SID);
+		else if (request.getAttribute(PARAM_SID) != null
+				&& StringUtils.isNotEmpty((String) request.getAttribute(PARAM_SID)))
 			sid = (String) request.getAttribute(PARAM_SID);
-		else if (request.getParameter(PARAM_SID) != null)
+		else if (StringUtils.isNotEmpty(request.getParameter(PARAM_SID))
+				&& Context.get().getProperties().getBoolean("security.acceptsid", false))
 			sid = request.getParameter(PARAM_SID);
 		else {
 			Cookie[] cookies = request.getCookies();
@@ -423,7 +427,6 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 					}
 				}
 		}
-
 		return sid;
 	}
 
@@ -437,13 +440,9 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 */
 	public void saveSid(HttpServletRequest request, HttpServletResponse response, String sid) {
 		request.setAttribute(PARAM_SID, sid);
-		if (request.getSession(false) != null)
-			request.getSession(false).setAttribute(PARAM_SID, sid);
+		request.getSession(true).setAttribute(PARAM_SID, sid);
 
-		Cookie sidCookie = new Cookie(COOKIE_SID, sid);
-		sidCookie.setHttpOnly(true);
-		sidCookie.setSecure(true);
-		response.addCookie(sidCookie);
+		log.debug("Saved sid {} in session {}", sid, request.getSession(true).getId());
 	}
 
 	/**
@@ -454,8 +453,11 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	public void removeSid(HttpServletRequest request) {
 		if (request != null) {
 			request.removeAttribute(PARAM_SID);
-			if (request.getSession(false) != null)
+			if (request.getSession(false) != null) {
+				log.debug("remove sid {} from session {}", request.getSession(false).getAttribute(PARAM_SID),
+						request.getSession(true).getId());
 				request.getSession(false).removeAttribute(PARAM_SID);
+			}
 		}
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

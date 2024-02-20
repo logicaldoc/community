@@ -1,7 +1,10 @@
 package com.logicaldoc.core.security.authentication;
 
+import java.security.NoSuchAlgorithmException;
+
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -50,14 +53,22 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 		validateUser(user);
 
 		// Check the password match with one of the current or legacy algorithm
-		String test = CryptUtil.cryptString(password);
-		String testLegacy = CryptUtil.cryptStringLegacy(password);
+		String test=null;
+		String testLegacy=null;
+		try {
+			test = CryptUtil.cryptString(password);
+			testLegacy = CryptUtil.cryptStringLegacy(password);
+		} catch (NoSuchAlgorithmException e) {
+			log.error(e.getMessage(), e);
+		}
+		
+		
 		if (user.getPassword() == null || (!user.getPassword().equals(test) && !user.getPassword().equals(testLegacy)))
 			throw new WrongPasswordException(this);
 
 		try {
 			// Make sure the password in the DB follows the current scheme
-			if (user.getPassword().equals(testLegacy))
+			if (StringUtils.isNotEmpty(test) && user.getPassword().equals(testLegacy))
 				userDAO.jdbcUpdate("update ld_user set ld_password='" + test + "' where ld_id = " + user.getId());
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage());

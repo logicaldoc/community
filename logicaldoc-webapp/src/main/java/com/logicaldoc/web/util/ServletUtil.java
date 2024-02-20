@@ -89,9 +89,9 @@ public class ServletUtil {
 	public static Session validateSession(String sid) throws InvalidSessionException {
 		Session session = SessionManager.get().get(sid);
 		if (session == null)
-			throw new InvalidSessionException("Invalid Session");
+			throw new InvalidSessionException("Invalid Session " + sid);
 		if (!SessionManager.get().isOpen(sid))
-			throw new InvalidSessionException("Invalid or Expired Session");
+			throw new InvalidSessionException("Invalid or expired Session " + sid);
 		SessionManager.get().renew(sid);
 		return session;
 	}
@@ -265,7 +265,6 @@ public class ServletUtil {
 		response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
 		response.setHeader("Expires", "0");
 		response.setHeader("Pragma", "no-cache");
-		
 
 		// Send requested file (part(s)) to client
 		// ------------------------------------------------

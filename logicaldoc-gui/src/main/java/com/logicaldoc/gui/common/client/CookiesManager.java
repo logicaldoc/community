@@ -48,9 +48,15 @@ public class CookiesManager {
 	 */
 	public static void removeSid() {
 		try {
+			Cookies.removeCookie(COOKIE_SID, "/");
+			Cookies.removeCookie(COOKIE_JSESSIONID, "/");
+		} catch (Exception t) {
+			// Nothing to do
+		}
+
+		try {
 			Offline.remove(COOKIE_SID);
-			Cookies.removeCookie(COOKIE_SID);
-			Cookies.removeCookie(COOKIE_JSESSIONID);
+			Offline.remove(COOKIE_JSESSIONID);
 		} catch (Exception t) {
 			// Nothing to do
 		}

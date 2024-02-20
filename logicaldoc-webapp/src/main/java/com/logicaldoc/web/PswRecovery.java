@@ -2,6 +2,7 @@ package com.logicaldoc.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -114,7 +115,7 @@ public class PswRecovery extends HttpServlet {
 	}
 
 	private void sendEmail(HttpServletRequest request, HttpServletResponse response, String tenant, Ticket ticket,
-			User user) throws IOException, PersistenceException, MessagingException {
+			User user) throws IOException, PersistenceException, MessagingException, NoSuchAlgorithmException {
 
 		EMail email = new EMail();
 		email.setHtml(1);

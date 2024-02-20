@@ -178,10 +178,5 @@ body {
 </script>
 
 <script src="./fontawesome/js/all.min.js"></script>
-<script src="./frontend/ace/ace.js"></script>
-<script src="./frontend/ace/ext-language_tools.js"></script>
-<script src="./frontend/ace/snippets/velocity.js" type="text/javascript" charset="utf-8"></script>
-<script src="./frontend/ace/mode-velocity.js" type="text/javascript" charset="utf-8"></script>
-<script src="./frontend/ace/theme-eclipse.js" type="text/javascript" charset="utf-8"></script>
 
 </head>

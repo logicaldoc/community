@@ -155,19 +155,17 @@ public class CryptUtil {
 	 * @param original String to encode
 	 * 
 	 * @return Encoded string
+	 * 
+	 * @throws NoSuchAlgorithmException Cripting exception
 	 */
-	public static String cryptStringLegacy(String original) {
+	public static String cryptStringLegacy(String original) throws NoSuchAlgorithmException {
 		StringBuilder copy = new StringBuilder();
 
-		try {
-			MessageDigest md = MessageDigest.getInstance("SHA");
-			byte[] digest = md.digest(original.getBytes(StandardCharsets.UTF_8));
+		MessageDigest md = MessageDigest.getInstance("SHA");
+		byte[] digest = md.digest(original.getBytes(StandardCharsets.UTF_8));
 
-			for (int i = 0; i < digest.length; i++) {
-				copy.append(Integer.toHexString(digest[i] & 0xFF));
-			}
-		} catch (NoSuchAlgorithmException nsae) {
-			log.error(nsae.getMessage());
+		for (int i = 0; i < digest.length; i++) {
+			copy.append(Integer.toHexString(digest[i] & 0xFF));
 		}
 
 		return copy.toString();
@@ -179,19 +177,17 @@ public class CryptUtil {
 	 * @param original String to encode
 	 * 
 	 * @return Encoded string
+	 * 
+	 * @throws NoSuchAlgorithmException Cripting exception
 	 */
-	public static String cryptString(String original) {
+	public static String cryptString(String original) throws NoSuchAlgorithmException {
 		StringBuilder copy = new StringBuilder();
 
-		try {
-			MessageDigest md = MessageDigest.getInstance("SHA-256");
-			byte[] digest = md.digest(original.getBytes(StandardCharsets.UTF_8));
+		MessageDigest md = MessageDigest.getInstance("SHA-256");
+		byte[] digest = md.digest(original.getBytes(StandardCharsets.UTF_8));
 
-			for (int i = 0; i < digest.length; i++) {
-				copy.append(String.format("%02X", digest[i]));
-			}
-		} catch (NoSuchAlgorithmException nsae) {
-			log.error(nsae.getMessage());
+		for (int i = 0; i < digest.length; i++) {
+			copy.append(String.format("%02X", digest[i]));
 		}
 
 		return copy.toString();
