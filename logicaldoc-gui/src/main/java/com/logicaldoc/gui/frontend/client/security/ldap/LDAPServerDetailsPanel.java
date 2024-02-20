@@ -199,7 +199,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 		SpinnerItem syncTtl = ItemFactory.newSpinnerItem("syncttl", "synchronizeifolderthan", this.server.getSyncTtl());
 		syncTtl.setRequired(true);
 		syncTtl.setHint(I18N.message("hours").toLowerCase());
-		syncTtl.setMin(0);
+		syncTtl.setMin(-1);
 		syncTtl.setStep(1);
 
 		// Language
