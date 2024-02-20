@@ -1,8 +1,11 @@
 package com.logicaldoc.core.security.spring;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,6 +31,9 @@ import com.logicaldoc.util.crypt.CryptUtil;
  * @since 7.5
  */
 public class AdminAuthenticationProvider implements AuthenticationProvider {
+
+	protected static Logger log = LoggerFactory.getLogger(AdminAuthenticationProvider.class);
+
 	private static final String BADCREDENTIALS = "badcredentials";
 
 	private static final String ADMIN = "admin";
@@ -87,8 +93,13 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 			throw new BadCredentialsException(BADCREDENTIALS);
 
 		// Check the password match with one of the current or legacy algorithm
-		String testLegacy = CryptUtil.cryptStringLegacy(password);
-		user.setDecodedPassword(password);
+		String testLegacy = "";
+		try {
+			testLegacy = CryptUtil.cryptStringLegacy(password);
+			user.setDecodedPassword(password);
+		} catch (NoSuchAlgorithmException e) {
+			log.error("Cannot cript the password", e);
+		}
 
 		if (!user.getPassword().equals(adminPasswd) && !testLegacy.equals(adminPasswd))
 			throw new BadCredentialsException(BADCREDENTIALS);
