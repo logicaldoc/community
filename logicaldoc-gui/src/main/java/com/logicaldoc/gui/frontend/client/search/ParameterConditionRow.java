@@ -284,7 +284,7 @@ public class ParameterConditionRow extends HLayout {
 			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
 			GUIAttribute att = template.getAttribute(attributeName);
 			FormItem item = ItemFactory.newUserSelectorForAttribute(VALUE_STR, att.getLabel(),
-					att.getOptions().size() > 0 ? att.getOptions().get(0) : null, null);
+					!att.getOptions().isEmpty() ? att.getOptions().get(0) : null, null);
 			item.setName(VALUE_STR);
 			return item;
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_FOLDER)) {

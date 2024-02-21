@@ -175,21 +175,19 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		list.addDataArrivedHandler(listArrived -> infoPanel
 				.setMessage(I18N.message("showretpolicies", Integer.toString(list.getTotalRows()))));
 
-		list.addDropCompleteHandler(listDropCompleted -> {
-			RetentionPoliciesService.Instance.get().reorder(GridUtil.getIds(list.getRecords()),
-					new AsyncCallback<>() {
+		list.addDropCompleteHandler(listDropCompleted -> RetentionPoliciesService.Instance.get()
+				.reorder(GridUtil.getIds(list.getRecords()), new AsyncCallback<>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void arg) {
-							// Nothing to do
-						}
-					});
-		});
+					@Override
+					public void onSuccess(Void arg) {
+						// Nothing to do
+					}
+				}));
 	}
 
 	private ListGridField prepareActionField() {

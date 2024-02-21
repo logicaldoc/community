@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This user interface bean to model a barcode template
@@ -47,7 +46,7 @@ public class GUIBarcodeTemplate extends GUIOCRTemplate {
 		if (zones.isEmpty() || index > zones.size() - 1)
 			return;
 
-		List<GUIZone> newSpecs = new ArrayList<>();
+		ArrayList<GUIZone> newSpecs = new ArrayList<>();
 		for (int i = 0; i < zones.size(); i++) {
 			if (i != index)
 				newSpecs.add(zones.get(i));

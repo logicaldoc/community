@@ -262,4 +262,17 @@ public class StampSecurity extends StampDetailsTab {
 			}
 		return true;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof StampSecurity)
+			return super.equals(obj);
+		else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

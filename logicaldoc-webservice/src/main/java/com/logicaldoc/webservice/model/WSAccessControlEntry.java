@@ -85,9 +85,6 @@ public class WSAccessControlEntry {
 	@WSDoc(description = "permission to send reading requests")
 	private int readingreq = 0;
 
-	public WSAccessControlEntry() {
-	}
-
 	public long getGroupId() {
 		return groupId;
 	}

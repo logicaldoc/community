@@ -84,13 +84,12 @@ public class ShareFileDialog extends Dialog {
 				? DocumentsPanel.get().getDocumentsGrid().getSelectedIds()
 				: SearchPanel.get().getDocumentsGrid().getSelectedIds();
 
-		SC.ask(docIds.size() == 0
-				? I18N.message("exportdirtosfile", FolderController.get().getCurrentFolder().getName())
+		SC.ask(docIds.isEmpty() ? I18N.message("exportdirtosfile", FolderController.get().getCurrentFolder().getName())
 				: I18N.message("exportdocstosfile"), choice -> {
 					if (choice.booleanValue()) {
 						String targetId = selection.getAttributeAsString("iid");
 						List<Long> folderIds = new ArrayList<>();
-						if (docIds.size() == 0 && FolderController.get().getCurrentFolder() != null)
+						if (docIds.isEmpty() && FolderController.get().getCurrentFolder() != null)
 							folderIds.add(FolderController.get().getCurrentFolder().getId());
 
 						LD.contactingServer();

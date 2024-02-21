@@ -407,24 +407,6 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	}
 
 	@Override
-	public boolean isReadable(String sid, long docId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		User user = validateSession(sid);
-
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		Document doc = docDao.findById(docId);
-		if (doc == null)
-			return false;
-
-		try {
-			checkDocumentPermission(Permission.READ, user, doc.getId());
-		} catch (PermissionException e) {
-			return false;
-		}
-		return true;
-	}
-
-	@Override
 	public void lock(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);

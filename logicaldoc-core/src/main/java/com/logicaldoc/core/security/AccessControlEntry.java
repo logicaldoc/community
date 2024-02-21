@@ -272,38 +272,24 @@ public class AccessControlEntry implements Serializable {
 
 	public Set<Permission> grantedPermissions() {
 		HashSet<Permission> granted = new HashSet<>();
-		if (add == 1)
-			granted.add(Permission.ADD);
+		grantedBasicPermissions(granted);
+
 		if (archive == 1)
 			granted.add(Permission.ARCHIVE);
 		if (automation == 1)
 			granted.add(Permission.AUTOMATION);
 		if (calendar == 1)
 			granted.add(Permission.CALENDAR);
-		if (delete == 1)
-			granted.add(Permission.DELETE);
-		if (download == 1)
-			granted.add(Permission.DOWNLOAD);
-		if (email == 1)
-			granted.add(Permission.EMAIL);
 		if (export == 1)
 			granted.add(Permission.EXPORT);
 		if (iimport == 1)
-			granted.add(Permission.IMMUTABLE);
+			granted.add(Permission.IMPORT);
 		if (immutable == 1)
 			granted.add(Permission.IMMUTABLE);
-		if (move == 1)
-			granted.add(Permission.MOVE);
 		if (password == 1)
 			granted.add(Permission.PASSWORD);
-		if (print == 1)
-			granted.add(Permission.PRINT);
-		if (read == 1)
-			granted.add(Permission.READ);
 		if (readingreq == 1)
 			granted.add(Permission.READINGREQ);
-		if (rename == 1)
-			granted.add(Permission.RENAME);
 		if (security == 1)
 			granted.add(Permission.SECURITY);
 		if (sign == 1)
@@ -314,9 +300,29 @@ public class AccessControlEntry implements Serializable {
 			granted.add(Permission.SUBSCRIPTION);
 		if (workflow == 1)
 			granted.add(Permission.WORKFLOW);
+
+		return granted;
+	}
+
+	private void grantedBasicPermissions(HashSet<Permission> granted) {
+		if (add == 1)
+			granted.add(Permission.ADD);
+		if (read == 1)
+			granted.add(Permission.READ);
 		if (write == 1)
 			granted.add(Permission.WRITE);
-		return granted;
+		if (rename == 1)
+			granted.add(Permission.RENAME);
+		if (delete == 1)
+			granted.add(Permission.DELETE);
+		if (download == 1)
+			granted.add(Permission.DOWNLOAD);
+		if (move == 1)
+			granted.add(Permission.MOVE);
+		if (print == 1)
+			granted.add(Permission.PRINT);
+		if (email == 1)
+			granted.add(Permission.EMAIL);
 	}
 
 	public void grantPermissions(Set<Permission> permissions) {

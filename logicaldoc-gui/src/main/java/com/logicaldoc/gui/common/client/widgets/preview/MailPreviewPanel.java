@@ -172,22 +172,22 @@ public class MailPreviewPanel extends VLayout {
 
 	private StaticTextItem prepareBccItem(final GUIEmail mail) {
 		String bccString = mail.getBccs().stream().map(c -> c.displayString()).collect(Collectors.joining(", "));
-		StaticTextItem bcc = ItemFactory.newStaticTextItem("bcc", bccString.toString());
+		StaticTextItem bcc = ItemFactory.newStaticTextItem("bcc", bccString);
 		bcc.setVisible(!bccString.isEmpty());
 		return bcc;
 	}
 
 	private StaticTextItem prepareCcItem(final GUIEmail mail) {
 		String ccString = mail.getCcs().stream().map(c -> c.displayString()).collect(Collectors.joining(", "));
-		StaticTextItem cc = ItemFactory.newStaticTextItem("cc", ccString.toString());
-		cc.setVisible(!ccString.toString().isEmpty());
+		StaticTextItem cc = ItemFactory.newStaticTextItem("cc", ccString);
+		cc.setVisible(!ccString.isEmpty());
 		return cc;
 	}
 
 	private StaticTextItem prepareToItem(final GUIEmail mail) {
 		String toString = mail.getTos().stream().map(c -> c.displayString()).collect(Collectors.joining(", "));
-		StaticTextItem to = ItemFactory.newStaticTextItem("to", toString.toString());
-		to.setVisible(!toString.toString().isEmpty());
+		StaticTextItem to = ItemFactory.newStaticTextItem("to", toString);
+		to.setVisible(!toString.isEmpty());
 		return to;
 	}
 
@@ -211,9 +211,8 @@ public class MailPreviewPanel extends VLayout {
 
 	private StaticTextItem prepareReplyToItem(final GUIEmail mail) {
 		String replyToString = mail.getReplyTo().stream().map(c -> c.displayString()).collect(Collectors.joining(", "));
-		StaticTextItem replyto = ItemFactory.newStaticTextItem("replyto", replyToString.toString());
-		replyto.setVisible(
-				!replyToString.toString().isEmpty() && !replyToString.toString().equals(mail.getFrom().getEmail()));
+		StaticTextItem replyto = ItemFactory.newStaticTextItem("replyto", replyToString);
+		replyto.setVisible(!replyToString.isEmpty() && !replyToString.equals(mail.getFrom().getEmail()));
 		return replyto;
 	}
 

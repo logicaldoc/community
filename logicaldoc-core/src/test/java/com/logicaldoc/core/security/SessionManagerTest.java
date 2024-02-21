@@ -67,6 +67,7 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 
 		when(client.getId()).thenReturn("testid");
 		when(request.getHeader("Authorization")).thenReturn("Basic YWRtaW46YWRtaW4=");
+		when(request.getSession(true)).thenReturn(httpSession);
 	}
 
 	@After
@@ -209,6 +210,7 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 		testSubject.clear();
 		Session session = testSubject.newSession("admin", "admin", null);
 		when(request.getParameter(SessionManager.PARAM_SID)).thenReturn(session.getSid());
+		when(httpSession.getAttribute(SessionManager.PARAM_SID)).thenReturn(session.getSid());
 		assertEquals(session, testSubject.getSession(request));
 
 		when(request.getSession(false)).thenReturn(httpSession);
@@ -230,7 +232,6 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 	@Test
 	public void saveSid() {
 		Session session = testSubject.newSession("admin", "admin", null);
-		when(request.getSession(false)).thenReturn(httpSession);
 		when(request.getAttribute(SessionManager.PARAM_SID)).thenReturn(session.getSid());
 
 		when(request.getAttribute(SessionManager.PARAM_SID)).thenReturn(session.getSid());
@@ -241,7 +242,6 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 	@Test
 	public void removeSid() {
 		Session session = testSubject.newSession("admin", "admin", null);
-		when(request.getSession(false)).thenReturn(httpSession);
 		when(request.getAttribute(SessionManager.PARAM_SID)).thenReturn(session.getSid());
 
 		testSubject.saveSid(request, response, session.getSid());

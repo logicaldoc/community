@@ -33,6 +33,6 @@ public class GroupSelectorCombo extends MultiComboBoxItem {
 	}
 
 	public List<Long> getGroupIds() {
-		return Arrays.asList(getValues()).stream().map(id -> Long.parseLong(id)).collect(Collectors.toList());
+		return Arrays.asList(getValues()).stream().map(Long::parseLong).collect(Collectors.toList());
 	}
 }

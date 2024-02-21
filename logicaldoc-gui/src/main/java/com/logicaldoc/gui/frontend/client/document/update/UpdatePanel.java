@@ -170,9 +170,6 @@ public class UpdatePanel extends VLayout {
 		propertiesPanel = new UpdateStandardPropertiesPanel(document);
 		propertiesTabPanel.addMember(propertiesPanel);
 
-		ChangedHandler nothingToDo = event -> {
-			// Nothing to do
-		};
 
 		ChangedHandler templateChangedHandler = event -> {
 			document.setOcrTemplateId(null);
@@ -180,6 +177,10 @@ public class UpdatePanel extends VLayout {
 			capturePanel.refresh(document.getTemplateId());
 		};
 
+		ChangedHandler nothingToDo = event -> {
+			// Nothing to do
+		};
+		
 		/*
 		 * Prepare the extended properties tab
 		 */
@@ -216,6 +217,15 @@ public class UpdatePanel extends VLayout {
 		/*
 		 * Prepare the notifications tab
 		 */
+		refreshNotificationsTab();
+
+		/*
+		 * Prepare the security tab
+		 */
+		refreshSecurityTab();
+	}
+
+	private void refreshNotificationsTab() {
 		if (notificationPanel != null) {
 			notificationPanel.destroy();
 			if (Boolean.TRUE.equals(notificationTabPanel.contains(notificationPanel)))
@@ -223,10 +233,9 @@ public class UpdatePanel extends VLayout {
 		}
 		notificationPanel = new UpdateNotificationPanel(document);
 		notificationTabPanel.addMember(notificationPanel);
+	}
 
-		/*
-		 * Prepare the security tab
-		 */
+	private void refreshSecurityTab() {
 		if (securityPanel != null) {
 			securityPanel.destroy();
 			if (Boolean.TRUE.equals(securityTabPanel.contains(securityPanel)))

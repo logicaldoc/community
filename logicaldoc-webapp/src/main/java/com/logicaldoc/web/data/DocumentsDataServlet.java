@@ -371,25 +371,19 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			throws PersistenceException {
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		StringBuilder query = new StringBuilder(
-				"""
-								select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.publisher,
-								       A.creation, A.creator, A.fileSize, A.immutable, A.indexed, A.lockUserId, A.fileName, A.status,
-								       A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus,
-								       A.startPublishing, A.stopPublishing, A.published, A.extResId,
-								       B.name, A.docRefType, A.stamped, A.lockUser, A.password, A.pages,
-								       A.workflowStatusDisplay, A.language, A.links+A.docAttrs, A.tgs, A.creatorId,
-								       A.publisherId, A.color, A.folder.id, A.tenantId
-								  from Document as A
-								  left outer join A.template as B
-						         where A.deleted = 0
-						           and not A.status=
-						""");
+		StringBuilder query = new StringBuilder("""
+select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.publisher, A.creation, A.creator, A.fileSize, A.immutable, A.indexed, A.lockUserId, A.fileName, A.status,
+       A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus, A.startPublishing, A.stopPublishing, A.published, A.extResId, B.name, A.docRefType, A.stamped, A.lockUser,
+       A.password, A.pages, A.workflowStatusDisplay, A.language, A.links+A.docAttrs, A.tgs, A.creatorId, A.publisherId, A.color, A.folder.id, A.tenantId
+  from Document as A
+  left outer join A.template as B
+ where A.deleted = 0
+   and not A.status=""");
 		query.append(AbstractDocument.DOC_ARCHIVED);
-		
+
 		if (folderId != null) {
 			query.append(" and A.folder.id=" + folderId);
-			
+
 			List<Long> forbiddenDocIds = getForbiddenDocumentIds(user, folderId);
 			if (!forbiddenDocIds.isEmpty()) {
 				query.append(" and A.id not in(");
@@ -436,19 +430,18 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 				.collect(Collectors.joining(","));
 
 		StringBuilder forbiddenDocsQuery = new StringBuilder("""
-							select ld_docid
-						      from ld_document_acl, ld_document
-				             where ld_docid=ld_id
-				               and ld_deleted = 0
-				               and ld_read = 0
-				               and ld_groupId in(
-				""");
+select ld_docid
+  from ld_document_acl, ld_document
+ where ld_docid=ld_id
+   and ld_deleted = 0
+   and ld_read = 0
+   and ld_groupId in(""");
 		forbiddenDocsQuery.append(groupIdsString);
 		forbiddenDocsQuery.append(") and ld_folderid = ");
 		forbiddenDocsQuery.append(Long.toString(folderId));
 
 		@SuppressWarnings("unchecked")
-		List<Long> forbiddenDocIds = (List<Long>) docDao.queryForList(forbiddenDocsQuery.toString(), Long.class);
+		List<Long> forbiddenDocIds = docDao.queryForList(forbiddenDocsQuery.toString(), Long.class);
 		return forbiddenDocIds;
 	}
 

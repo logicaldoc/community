@@ -347,7 +347,7 @@ public class CalendarReport extends AdminPanel {
 					rec.setAttribute(DESCRIPTION, event.getDescription());
 					rec.setAttribute("endDate", event.getDeadline());
 					rec.setAttribute(PARTICIPANTS,
-							event.getParticipants().stream().map(u -> u.toString()).collect(Collectors.joining(", ")));
+							event.getParticipants().stream().map(Object::toString).collect(Collectors.joining(", ")));
 					records.add(rec);
 				}
 				list.setData(records.toArray(new ListGridRecord[0]));

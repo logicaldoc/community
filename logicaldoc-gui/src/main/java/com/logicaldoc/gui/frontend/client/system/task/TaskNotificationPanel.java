@@ -64,7 +64,7 @@ public class TaskNotificationPanel extends VLayout {
 		items.add(sendReport);
 
 		recipients = ItemFactory.newMultiComboBoxItem("recipients", "recipients", new UsersDS(null, false, false), task
-				.getReportRecipients().stream().map(u -> u.getId()).collect(Collectors.toList()).toArray(new Long[0]));
+				.getReportRecipients().stream().map(GUIUser::getId).collect(Collectors.toList()).toArray(new Long[0]));
 		recipients.setValueField("id");
 		recipients.setDisplayField("username");
 		recipients.addChangedHandler(changedHandler);

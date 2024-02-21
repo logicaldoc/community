@@ -631,26 +631,6 @@ public interface DocumentService {
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException, IOException;
 
 	/**
-	 * Tests if a document is readable
-	 * 
-	 * @param sid identifier of the session
-	 * @param docId The document id
-	 * 
-	 * @return True if the identifier denotes a document, otherwise false
-	 * 
-	 * @throws PersistenceException Error in the database
-	 * @throws WebserviceException Error in the webservice
-	 * @throws AuthenticationException Invalid session
-	 */
-	@WebMethod(action = "isReadable")
-	@WSDoc(description = "tests if a document is readable")
-	public boolean isReadable(@WSDoc(description = "identifier of the session", required = true)
-	@WebParam(name = "sid")
-	String sid, @WSDoc(description = "the document id")
-	@WebParam(name = "docId")
-	long docId) throws AuthenticationException, WebserviceException, PersistenceException;
-
-	/**
 	 * Restores a deleted document
 	 * 
 	 * @param sid identifier of the session
@@ -1345,7 +1325,7 @@ public interface DocumentService {
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "docId")
 	long docId) throws AuthenticationException, WebserviceException, PersistenceException;
-
+	
 	/**
 	 * Tests if a document is writable
 	 * 

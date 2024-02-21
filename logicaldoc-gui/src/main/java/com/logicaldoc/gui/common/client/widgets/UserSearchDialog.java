@@ -101,7 +101,7 @@ public class UserSearchDialog extends Window {
 
 			@Override
 			public void onSuccess(List<GUIUser> result) {
-				List<ListGridRecord> lastResult = new ArrayList<>();
+				List<ListGridRecord> recs = new ArrayList<>();
 				for (GUIUser hit : result) {
 					ListGridRecord rec = new ListGridRecord();
 					rec.setAttribute("avatar", hit.getId());
@@ -109,13 +109,13 @@ public class UserSearchDialog extends Window {
 					rec.setAttribute(USERNAME, hit.getUsername());
 					rec.setAttribute(FIRSTNAME, hit.getFirstName());
 					rec.setAttribute(LASTNAME, hit.getName());
-					lastResult.add(rec);
+					recs.add(rec);
 				}
 
-				if (lastResult.size() == 1) {
-					onSelect(lastResult.get(0).getAttributeAsLong("id"));
+				if (recs.size() == 1) {
+					onSelect(recs.get(0).getAttributeAsLong("id"));
 				} else
-					grid.setData(lastResult.toArray(new ListGridRecord[0]));
+					grid.setData(recs.toArray(new ListGridRecord[0]));
 			}
 		});
 	}

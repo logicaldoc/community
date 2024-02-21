@@ -78,12 +78,6 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
-	public boolean isReadable(String sid, long docId)
-			throws AuthenticationException, WebserviceException, PersistenceException {
-		return client.isReadable(sid, docId);
-	}
-
-	@Override
 	public void lock(String sid, long docId)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		client.lock(sid, docId);

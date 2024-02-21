@@ -203,7 +203,7 @@ public class FormDetailsPanel extends VLayout {
 		notifyResponses.setEndRow(true);
 
 		recipients = ItemFactory.newMultiComboBoxItem("recipients", "recipients", new UsersDS(null, false, false),
-				form.getRecipients().stream().map(r -> r.getId()).collect(Collectors.toList()).toArray());
+				form.getRecipients().stream().map(GUIUser::getId).collect(Collectors.toList()).toArray());
 		recipients.setValueField("id");
 		recipients.setDisplayField("username");
 		recipients.addChangedHandler(changedHandler);

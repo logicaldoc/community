@@ -85,7 +85,7 @@ public class ZohoDialog extends Dialog {
 				? DocumentsPanel.get().getDocumentsGrid().getSelectedIds()
 				: SearchPanel.get().getDocumentsGrid().getSelectedIds();
 
-		SC.ask(docIds.size() == 0 ? I18N.message("exportdirtozoho", FolderController.get().getCurrentFolder().getName())
+		SC.ask(docIds.isEmpty() ? I18N.message("exportdirtozoho", FolderController.get().getCurrentFolder().getName())
 				: I18N.message("exportdocstozoho"), choice -> {
 					if (choice.booleanValue()) {
 						String targetId = selection.getAttributeAsString("id");

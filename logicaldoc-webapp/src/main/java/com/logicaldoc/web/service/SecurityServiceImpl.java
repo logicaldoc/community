@@ -1318,7 +1318,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			query.append(" and A.ld_id=B.ld_userid and B.ld_groupid=" + Long.parseLong(groupId));
 
 		try {
-			List<GUIUser> users = userDao.query(query.toString(), new RowMapper<>() {
+			return userDao.query(query.toString(), new RowMapper<>() {
 
 				@Override
 				public GUIUser mapRow(ResultSet rs, int row) throws SQLException {
@@ -1330,8 +1330,6 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 					return user;
 				}
 			}, null);
-
-			return users;
 		} catch (PersistenceException e) {
 			return (List<GUIUser>) throwServerException(session, log, e);
 		}

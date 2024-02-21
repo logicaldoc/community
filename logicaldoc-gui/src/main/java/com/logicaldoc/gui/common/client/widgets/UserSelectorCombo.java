@@ -41,7 +41,7 @@ public class UserSelectorCombo extends MultiComboBoxItem {
 	}
 
 	public List<Long> getUserIds() {
-		return Arrays.asList(getValues()).stream().map(id -> Long.parseLong(id)).collect(Collectors.toList());
+		return Arrays.asList(getValues()).stream().map(Long::parseLong).collect(Collectors.toList());
 	}
 
 	public GUIUser getUser() {

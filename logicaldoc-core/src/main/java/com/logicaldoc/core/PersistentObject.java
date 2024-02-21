@@ -30,7 +30,7 @@ public abstract class PersistentObject implements Serializable {
 	private int deleted = 0;
 
 	private Date lastModified = new Date();
-	
+
 	private Date creation = new Date();
 
 	private long recordVersion = 0L;
@@ -106,13 +106,13 @@ public abstract class PersistentObject implements Serializable {
 	public void setCreation(Date creation) {
 		this.creation = creation;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof PersistentObject))
+		if (obj instanceof PersistentObject other)
+			return other.getId() == this.getId();
+		else
 			return false;
-		PersistentObject other = (PersistentObject) obj;
-		return other.getId() == this.getId();
 	}
 
 	@Override

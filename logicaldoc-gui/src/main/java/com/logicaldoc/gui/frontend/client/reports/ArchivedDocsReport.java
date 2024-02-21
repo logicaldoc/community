@@ -172,40 +172,37 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 
 		MenuItem restore = new MenuItem();
 		restore.setTitle(I18N.message("restore"));
-		restore.addClickHandler(event -> {
-			DocumentService.Instance.get().unarchiveDocuments(GridUtil.getIds(selection), new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+		restore.addClickHandler(event -> DocumentService.Instance.get().unarchiveDocuments(GridUtil.getIds(selection),
+				new AsyncCallback<>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-				@Override
-				public void onSuccess(Void arg0) {
-					list.removeSelectedData();
-					GuiLog.info(I18N.message("docsrestored"), null);
-				}
-			});
-		});
+					@Override
+					public void onSuccess(Void arg0) {
+						list.removeSelectedData();
+						GuiLog.info(I18N.message("docsrestored"), null);
+					}
+				}));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> {
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
-				if (Boolean.TRUE.equals(answer)) {
-					DocumentService.Instance.get().delete(GridUtil.getIds(selection), new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+			if (Boolean.TRUE.equals(answer)) {
+				DocumentService.Instance.get().delete(GridUtil.getIds(selection), new AsyncCallback<>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							list.removeSelectedData();
-						}
-					});
-				}
-			});
-		});
+					@Override
+					public void onSuccess(Void result) {
+						list.removeSelectedData();
+					}
+				});
+			}
+		}));
 
 		MenuItem sendToExpArchive = new MenuItem();
 		sendToExpArchive.setTitle(I18N.message("sendtoexparchive"));

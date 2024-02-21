@@ -241,6 +241,18 @@ public class MenuSecurityPanel extends VLayout {
 				GuiLog.info(I18N.message("appliedrightsmenu"), null);
 			}
 		});
+	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof MenuSecurityPanel)
+			return super.equals(obj);
+		else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

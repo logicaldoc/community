@@ -215,7 +215,7 @@ public class WorkflowDashlet extends Portlet {
 
 			// If the returned entries are a different total,
 			// recalculate the total assigned tasks
-			if (total != Session.get().getUser().getAssignedTasks()) {
+			if (total != Session.get().getUser().getTasks()) {
 				WorkflowService.Instance.get().countAssignedTasks(Session.get().getUser().getUsername(),
 						new AsyncCallback<Integer>() {
 
@@ -226,7 +226,7 @@ public class WorkflowDashlet extends Portlet {
 
 							@Override
 							public void onSuccess(Integer total) {
-								Session.get().getUser().setAssignedTasks(total != null ? total.intValue() : 0);
+								Session.get().getUser().setTasks(total != null ? total.intValue() : 0);
 								UserController.get().changed(Session.get().getUser());
 							}
 						});

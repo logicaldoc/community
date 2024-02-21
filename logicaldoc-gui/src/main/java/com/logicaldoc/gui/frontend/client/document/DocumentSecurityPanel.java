@@ -494,4 +494,17 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 					}
 				});
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof DocumentSecurityPanel)
+			return super.equals(obj);
+		else
+			return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

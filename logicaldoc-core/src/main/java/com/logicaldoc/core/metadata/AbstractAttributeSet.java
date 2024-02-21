@@ -10,6 +10,7 @@ import com.logicaldoc.core.security.SecurableExtensibleObject;
  * @since 8.8.3
  */
 public class AbstractAttributeSet extends SecurableExtensibleObject {
+
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -65,5 +66,18 @@ public class AbstractAttributeSet extends SecurableExtensibleObject {
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof AbstractAttributeSet other)
+			return other.getId() == this.getId();
+		else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

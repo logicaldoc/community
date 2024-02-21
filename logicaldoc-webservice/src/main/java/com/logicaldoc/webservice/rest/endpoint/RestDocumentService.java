@@ -694,17 +694,6 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	}
 
 	@Override
-	@GET
-	@Path("/isReadable")
-	@Operation(summary = "Tests if a document is readable", description = "Tests if a document is readable; returns True if the identifier denotes a document, otherwise false")
-	public boolean isReadable(@QueryParam("docId")
-	@Parameter(description = "Document ID", required = true)
-	long docId) throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
-		return super.isReadable(sid, docId);
-	}
-
-	@Override
 	@POST
 	@Path("/link")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
@@ -918,7 +907,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	public boolean isRead(@QueryParam("docId")
 	long docId) throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSession();
-		return super.isReadable(sid, docId);
+		return super.isRead(sid, docId);
 	}
 
 	@Override

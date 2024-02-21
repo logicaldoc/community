@@ -337,7 +337,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 
 		List<GUIAttribute> attributes = new ArrayList<>();
 		if (template == null || template.getAttributes() == null || template.getAttributes().isEmpty())
-			return new ArrayList<GUIAttribute>();
+			return new ArrayList<>();
 		try {
 			for (String attrName : template.getAttributeNames())
 				attributes.add(prepareGUIAttribute(attrName, template, attributes, extensibleObject));
@@ -346,7 +346,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 			return attributes;
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
-			return new ArrayList<GUIAttribute>();
+			return new ArrayList<>();
 		}
 	}
 

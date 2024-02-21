@@ -404,10 +404,10 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	}
 
 	private String getSessionIdFromRequest(HttpServletRequest request) {
-		String sid = null;
 		if (request == null)
-			return sid;
+			return null;
 
+		String sid = null;
 		if (request.getSession(true).getAttribute(PARAM_SID) != null
 				&& StringUtils.isNotEmpty((String) request.getSession(true).getAttribute(PARAM_SID)))
 			sid = (String) request.getSession(true).getAttribute(PARAM_SID);
@@ -418,16 +418,20 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 				&& Context.get().getProperties().getBoolean("security.acceptsid", false))
 			sid = request.getParameter(PARAM_SID);
 		else {
-			Cookie[] cookies = request.getCookies();
-			if (cookies != null)
-				for (Cookie cookie : cookies) {
-					if (COOKIE_SID.equals(cookie.getName())) {
-						sid = cookie.getValue();
-						break;
-					}
-				}
+			sid = getSessionIdFromCookie(request);
 		}
 		return sid;
+	}
+
+	private String getSessionIdFromCookie(HttpServletRequest request) {
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null)
+			for (Cookie cookie : cookies) {
+				if (COOKIE_SID.equals(cookie.getName())) {
+					return cookie.getValue();
+				}
+			}
+		return null;
 	}
 
 	/**

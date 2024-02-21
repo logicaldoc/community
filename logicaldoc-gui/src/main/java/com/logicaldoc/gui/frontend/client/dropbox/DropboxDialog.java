@@ -85,12 +85,12 @@ public class DropboxDialog extends Dialog {
 				? DocumentsPanel.get().getDocumentsGrid().getSelectedIds()
 				: SearchPanel.get().getDocumentsGrid().getSelectedIds();
 
-		SC.ask(docIds.size() == 0 ? I18N.message("exportdirtodbox", FolderController.get().getCurrentFolder().getName())
+		SC.ask(docIds.isEmpty() ? I18N.message("exportdirtodbox", FolderController.get().getCurrentFolder().getName())
 				: I18N.message("exportdocstodbox"), choice -> {
 					if (choice.booleanValue()) {
 						String targetPath = selection.getAttributeAsString("path");
 						List<Long> folderIds = new ArrayList<>();
-						if (docIds.size() == 0 && FolderController.get().getCurrentFolder() != null)
+						if (docIds.isEmpty() && FolderController.get().getCurrentFolder() != null)
 							folderIds.add(FolderController.get().getCurrentFolder().getId());
 
 						LD.contactingServer();

@@ -378,14 +378,6 @@ public class GUIUser implements Serializable {
 		}
 	}
 
-	public int getAssignedTasks() {
-		return tasks;
-	}
-
-	public void setAssignedTasks(int tasks) {
-		this.tasks = tasks;
-	}
-
 	public int getSubscriptions() {
 		return subscriptions;
 	}
@@ -719,7 +711,7 @@ public class GUIUser implements Serializable {
 	public void removeDashlet(long id) {
 		dashlets = dashlets.stream().filter(d -> d.getId() != id).collect(Collectors.toList());
 	}
-	
+
 	public void updateCustomAction(GUIMenu action) {
 		customActions.set(customActions.indexOf(action), action);
 	}

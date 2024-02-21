@@ -25,7 +25,6 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.security.TenantDAO;
-import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.Context;
@@ -248,8 +247,8 @@ public abstract class Search {
 	 */
 	@SuppressWarnings("unchecked")
 	protected Set<Long> getDeniedDocIds(List<Hit> hits, Collection<Long> accessibleFolderIds) throws SearchException {
-		HashSet<Long> denied = new HashSet<Long>();
-		if (searchUser.isMemberOf(Group.GROUP_ADMIN) || hits.isEmpty())
+		HashSet<Long> denied = new HashSet<>();
+		if (searchUser.isAdmin() || hits.isEmpty())
 			return denied;
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -261,7 +260,7 @@ public abstract class Search {
 
 		// Detect those hits with specific read prohibition for the search user.
 		try {
-			StringBuffer query = new StringBuffer(
+			StringBuilder query = new StringBuilder(
 					"select ld_docid from ld_document_acl where ld_read=0 and ld_docid in (");
 			query.append(hits.stream().map(h -> Long.toString(h.getId())).collect(Collectors.joining(",")));
 			query.append(") and ld_groupid in (");
@@ -271,10 +270,10 @@ public abstract class Search {
 			if (!denied.isEmpty()) {
 				// skip those docs already marked as denied
 				query.append(" and not ld_docid in (");
-				query.append(denied.stream().map(id -> id.toString()).collect(Collectors.joining(",")));
+				query.append(denied.stream().map(Object::toString).collect(Collectors.joining(",")));
 				query.append(")");
 			}
-			denied.addAll((List<Long>) dao.queryForList(query.toString(), Long.class));
+			denied.addAll(dao.queryForList(query.toString(), Long.class));
 		} catch (PersistenceException e) {
 			throw new SearchException(e.getMessage(), e);
 		}

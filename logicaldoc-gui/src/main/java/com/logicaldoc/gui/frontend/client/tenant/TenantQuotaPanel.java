@@ -201,7 +201,6 @@ public class TenantQuotaPanel extends HLayout {
 
 	private void setQuotaAlertRecipients() {
 		tenant.getQuotaAlertRecipients().clear();
-		;
 		String[] usernames = recipients.getValues();
 		if (usernames != null && usernames.length > 0)
 			for (int i = 0; i < usernames.length; i++)

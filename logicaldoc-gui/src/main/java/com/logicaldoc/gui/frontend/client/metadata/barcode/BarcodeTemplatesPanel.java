@@ -2,7 +2,6 @@ package com.logicaldoc.gui.frontend.client.metadata.barcode;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIBarcodeTemplate;
@@ -85,7 +84,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 	private void onSave() {
 		if (!((GUIBarcodeTemplate) selectedOcrTemplate).isZonal()) {
 			Record[] records = positionalGrid.getRecords();
-			List<GUIZone> patterns = new ArrayList<>();
+			ArrayList<GUIZone> patterns = new ArrayList<>();
 			int i = 0;
 			for (Record rec : records) {
 				GUIBarcodeZone patt = new GUIBarcodeZone();
@@ -99,18 +98,17 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 			selectedOcrTemplate.setZones(patterns);
 		}
 
-		BarcodeService.Instance.get().save((GUIBarcodeTemplate) selectedOcrTemplate,
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+		BarcodeService.Instance.get().save((GUIBarcodeTemplate) selectedOcrTemplate, new AsyncCallback<>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(GUIBarcodeTemplate template) {
-						GuiLog.info(I18N.message("settingssaved"), null);
-					}
-				});
+			@Override
+			public void onSuccess(GUIBarcodeTemplate template) {
+				GuiLog.info(I18N.message("settingssaved"), null);
+			}
+		});
 	}
 
 	private void refresh(Long documentTemplateId, Long barcodeTemplateId) {
@@ -313,19 +311,18 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		barcodeTemplateSelector.setEndRow(false);
 		barcodeTemplateSelector.addChangedHandler((ChangedEvent barcodeTemplateSelectorChanged) -> {
 			ListGridRecord rec = barcodeTemplateSelector.getSelectedRecord();
-			BarcodeService.Instance.get().getTemplate(rec.getAttributeAsLong("id"),
-					new AsyncCallback<>() {
+			BarcodeService.Instance.get().getTemplate(rec.getAttributeAsLong("id"), new AsyncCallback<>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-						@Override
-						public void onSuccess(GUIBarcodeTemplate tmpl) {
-							setSelectedOcrTemplate(tmpl);
-						}
-					});
+				@Override
+				public void onSuccess(GUIBarcodeTemplate tmpl) {
+					setSelectedOcrTemplate(tmpl);
+				}
+			});
 		});
 		toolStrip.addFormItem(barcodeTemplateSelector);
 	}

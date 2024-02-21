@@ -137,7 +137,7 @@ public class Session implements DocumentObserver {
 					if (parameter.getName().equals("messages"))
 						user.setMessages(Integer.parseInt(parameter.getValue()));
 					else if (parameter.getName().equals("workflows"))
-						user.setAssignedTasks(Integer.parseInt(parameter.getValue()));
+						user.setTasks(Integer.parseInt(parameter.getValue()));
 					else if (parameter.getName().equals("events"))
 						user.setUpcomingEvents(Integer.parseInt(parameter.getValue()));
 					else if (parameter.getName().equals("valid"))

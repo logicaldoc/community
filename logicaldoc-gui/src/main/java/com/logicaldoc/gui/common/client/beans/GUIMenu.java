@@ -119,7 +119,7 @@ public class GUIMenu implements Serializable {
 	public void setType(int type) {
 		this.type = type;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -137,8 +137,6 @@ public class GUIMenu implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		GUIMenu other = (GUIMenu) obj;
-		if (id != other.id)
-			return false;
-		return true;
+		return id == other.id;
 	}
 }

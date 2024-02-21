@@ -158,7 +158,7 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 		Document doc = docDao.findByFileNameAndParentFolderId(wsDoc.getFolderId(), wsDoc.getFileName(), null, 1L, null)
 				.get(0);
 		System.out.println(doc.getFileName());
-		
+
 		Assert.assertNotNull(doc);
 		docDao.initialize(doc);
 
@@ -253,8 +253,8 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testIsReadable() throws Exception {
-		Assert.assertTrue(docService.isReadable("", 1));
-		Assert.assertFalse(docService.isReadable("", 99));
+		Assert.assertTrue(docService.isRead("", 1));
+		Assert.assertFalse(docService.isRead("", 99));
 	}
 
 	@Test

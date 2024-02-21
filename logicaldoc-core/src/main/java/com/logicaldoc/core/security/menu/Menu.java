@@ -69,8 +69,6 @@ public class Menu extends SecurablePersistentObject implements Comparable<Menu> 
 
 	public static final int TYPE_CUSTOM_ACTION = 2;
 
-	private long id = 0;
-
 	private String name = "";
 
 	private long parentId = 0;
@@ -99,11 +97,6 @@ public class Menu extends SecurablePersistentObject implements Comparable<Menu> 
 		super();
 	}
 
-	@Override
-	public long getId() {
-		return id;
-	}
-
 	public long getParentId() {
 		return parentId;
 	}
@@ -114,11 +107,6 @@ public class Menu extends SecurablePersistentObject implements Comparable<Menu> 
 
 	public int getType() {
 		return type;
-	}
-
-	@Override
-	public void setId(long id) {
-		this.id = id;
 	}
 
 	public void setParentId(long parentId) {
@@ -139,22 +127,6 @@ public class Menu extends SecurablePersistentObject implements Comparable<Menu> 
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	@Override
-	public int compareTo(Menu o) {
-		int comparison = Integer.compare(this.position, o.position);
-		if (comparison != 0)
-			return comparison;
-		return this.name.compareTo(o.name);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof Menu))
-			return false;
-		Menu other = (Menu) obj;
-		return other.getId() == this.getId();
 	}
 
 	public int getPosition() {
@@ -195,5 +167,26 @@ public class Menu extends SecurablePersistentObject implements Comparable<Menu> 
 
 	public void setAutomation(String automation) {
 		this.automation = automation;
+	}
+
+	@Override
+	public int compareTo(Menu o) {
+		int comparison = Integer.compare(this.position, o.position);
+		if (comparison != 0)
+			return comparison;
+		return this.name.compareTo(o.name);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Menu other)
+			return other.getId() == this.getId();
+		else
+			return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

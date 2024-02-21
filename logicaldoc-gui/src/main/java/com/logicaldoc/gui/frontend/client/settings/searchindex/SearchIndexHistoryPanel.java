@@ -234,53 +234,48 @@ public class SearchIndexHistoryPanel extends VLayout {
 
 		MenuItem markIndexMetadataOnly = new MenuItem();
 		markIndexMetadataOnly.setTitle(I18N.message("markindexablemetadataonly"));
-		markIndexMetadataOnly.addClickHandler(event -> {
-			DocumentService.Instance.get().markIndexable(getSelectedDocIds(list), Constants.INDEX_TO_INDEX_METADATA,
-					new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		markIndexMetadataOnly.addClickHandler(event -> DocumentService.Instance.get()
+				.markIndexable(getSelectedDocIds(list), Constants.INDEX_TO_INDEX_METADATA, new AsyncCallback<>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							refresh(list);
-						}
-					});
-		});
+					@Override
+					public void onSuccess(Void result) {
+						refresh(list);
+					}
+				}));
 
 		MenuItem markUnindexable = new MenuItem();
 		markUnindexable.setTitle(I18N.message("markunindexable"));
-		markUnindexable.addClickHandler(event -> {
-			DocumentService.Instance.get().markUnindexable(getSelectedDocIds(list), new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+		markUnindexable.addClickHandler(
+				event -> DocumentService.Instance.get().markUnindexable(getSelectedDocIds(list), new AsyncCallback<>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-				@Override
-				public void onSuccess(Void result) {
-					refresh(list);
-				}
-			});
-		});
+					@Override
+					public void onSuccess(Void result) {
+						refresh(list);
+					}
+				}));
 
 		MenuItem markIndexable = new MenuItem();
 		markIndexable.setTitle(I18N.message("markindexable"));
-		markIndexable.addClickHandler(event -> {
-			DocumentService.Instance.get().markIndexable(getSelectedDocIds(list), Constants.INDEX_TO_INDEX,
-					new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		markIndexable.addClickHandler(event -> DocumentService.Instance.get().markIndexable(getSelectedDocIds(list),
+				Constants.INDEX_TO_INDEX, new AsyncCallback<>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							refresh(list);
-						}
-					});
-		});
+					@Override
+					public void onSuccess(Void result) {
+						refresh(list);
+					}
+				}));
 
 		contextMenu.setItems(preview, downloadIndexed, openInFolder, index, markIndexable, markIndexMetadataOnly,
 				markUnindexable);

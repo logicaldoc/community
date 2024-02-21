@@ -260,7 +260,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 
 		LD.ask(I18N.message("move"), I18N.message("moveask", sourceName, targetName), yes -> {
 			if (Boolean.TRUE.equals(yes)) {
-				for (long id : source) {
+				for (Long id : source) {
 					TreeNode node = getTree().find(FOLDER_ID, (Object) id);
 					getTree().remove(node);
 				}
@@ -1021,7 +1021,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	 */
 	public void moveTo(final long targetFolderId) {
 		List<Long> ids = getSelectedIds();
-		for (long id : ids) {
+		for (Long id : ids) {
 			TreeNode node = getTree().find(FOLDER_ID, (Object) id);
 			getTree().remove(node);
 		}
@@ -1053,7 +1053,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	 */
 	public void mergeTo(final long targetFolderId) {
 		List<Long> ids = getSelectedIds();
-		for (long id : ids) {
+		for (Long id : ids) {
 			TreeNode node = getTree().find(FOLDER_ID, (Object) id);
 			getTree().remove(node);
 		}

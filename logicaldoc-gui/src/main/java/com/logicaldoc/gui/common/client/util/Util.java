@@ -69,7 +69,7 @@ public abstract class Util {
 	private static final Set<String> spreadsheetExts = new HashSet<>(Arrays.asList(".xls", ".xlsm", ".xlsx", ".ods"));
 
 	private static final Set<String> imageExts = new HashSet<>(
-			Arrays.asList(".gif", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".png", ".jfif", ".webp"));;
+			Arrays.asList(".gif", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".png", ".jfif", ".webp"));
 
 	private static final Set<String> videoExts = new HashSet<>(
 			Arrays.asList(".mp4", ".avi", ".mpg", ".wmv", ".wma", ".asf", ".mov", ".rm", ".flv", ".aac", ".vlc", ".ogg",
@@ -407,7 +407,7 @@ public abstract class Util {
 	}
 
 	public static boolean isOfficeFileType(String type) {
-		return officeExts.stream().anyMatch(ext -> type.equalsIgnoreCase(ext));
+		return officeExts.stream().anyMatch(type::equalsIgnoreCase);
 	}
 
 	public static boolean isOfficeFile(String fileName) {
@@ -1013,8 +1013,8 @@ public abstract class Util {
 	}
 
 	public static String getValue(String name, List<GUIParameter> parameters) {
-		return parameters.stream().filter(param -> name.equals(param.getName())).map(param -> param.getValue())
-				.findFirst().orElse(null);
+		return parameters.stream().filter(param -> name.equals(param.getName())).map(GUIParameter::getValue).findFirst()
+				.orElse(null);
 	}
 
 	public static long[] toPrimitives(Long[] objects) {

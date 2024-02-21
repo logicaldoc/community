@@ -83,7 +83,7 @@ public class WorkflowSettings extends Window {
 		color.setEndRow(true);
 
 		MultiComboBoxItem supervisors = ItemFactory.newMultiComboBoxItem("supervisors", "supervisors",
-				new UsersDS(null, false, false), workflow.getSupervisors().stream().map(u -> u.getId())
+				new UsersDS(null, false, false), workflow.getSupervisors().stream().map(GUIUser::getId)
 						.collect(Collectors.toList()).toArray(new Long[0]));
 		supervisors.setWidth("*");
 		supervisors.setValueField("id");

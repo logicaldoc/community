@@ -39,4 +39,17 @@ public abstract class SecurablePersistentObject extends PersistentObject impleme
 			acl.add(ace);
 		}
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof SecurablePersistentObject other)
+			return other.getId() == this.getId();
+		else
+			return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

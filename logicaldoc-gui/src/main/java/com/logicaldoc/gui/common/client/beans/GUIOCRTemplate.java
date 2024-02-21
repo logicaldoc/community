@@ -38,7 +38,7 @@ public class GUIOCRTemplate implements Serializable {
 	/**
 	 * The zones
 	 */
-	protected List<GUIZone> zones = new ArrayList<>();
+	protected ArrayList<GUIZone> zones = new ArrayList<>();
 
 	private int batch = 200;
 
@@ -68,8 +68,8 @@ public class GUIOCRTemplate implements Serializable {
 		if (getZone(name) == null)
 			return;
 
-		List<GUIZone> newAttrs = new ArrayList<>();
-		for (GUIZone att : getZones())
+		ArrayList<GUIZone> newAttrs = new ArrayList<>();
+		for (GUIZone att : zones)
 			if (!att.getName().equals(name))
 				newAttrs.add(att);
 
@@ -81,7 +81,8 @@ public class GUIOCRTemplate implements Serializable {
 	}
 
 	public void setZones(List<GUIZone> zones) {
-		this.zones = zones;
+		this.zones.clear();
+		this.zones.addAll(zones);
 	}
 
 	public String getName() {

@@ -33,9 +33,37 @@ import com.logicaldoc.util.Context;
  */
 public class AclDataServlet extends AbstractDataServlet {
 
+	private static final String AVATAR_GROUP_AVATAR = "<avatar>group</avatar>";
+
+	private static final String TYPE_CLOSED = "</type>";
+
+	private static final String TYPE = "<type>";
+
+	private static final String READ_CLOSED = "</read>";
+
+	private static final String READ = "<read>";
+
+	private static final String AVATAR_CLOSED = "</avatar>";
+
+	private static final String AVATAR = "<avatar>";
+
+	private static final String LIST_CLOSED = "</list>";
+
+	private static final String ACE_CLOSED = "</ace>";
+
+	private static final String ENTITYID_CLOSED = "</entityId>";
+
+	private static final String ENTITYID = "<entityId>";
+
+	private static final String ACE = "<ace>";
+
+	private static final String AND_B_LD_TENANTID = " and B.ld_tenantid = ";
+
+	private static final String LIST = "<list>";
+
 	private static final String ENTITY = "<entity><![CDATA[";
 
-	private static final String CLOSE_ENTITY = "]]></entity>";
+	private static final String ENTITY_CLOSED = "]]></entity>";
 
 	private static final long serialVersionUID = 1L;
 
@@ -86,13 +114,13 @@ public class AclDataServlet extends AbstractDataServlet {
 		Map<Long, String> users = getUsers(template.getTenantId());
 
 		PrintWriter writer = response.getWriter();
-		writer.write("<list>");
+		writer.write(LIST);
 
 		// Prepare the query on the folder group in join with groups
 		StringBuilder query = new StringBuilder(
 				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write, A.ld_read from ld_template_acl as A, ld_group B where A.ld_templateid = ");
 		query.append("" + template.getId());
-		query.append(" and B.ld_tenantid = " + template.getTenantId());
+		query.append(AND_B_LD_TENANTID + template.getTenantId());
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id order by B.ld_name asc");
 
 		SqlRowSet set = tDao.queryForRowSet(query.toString(), null);
@@ -108,24 +136,24 @@ public class AclDataServlet extends AbstractDataServlet {
 			if (groupType == Group.TYPE_USER && groupName != null)
 				userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
 
-			writer.print("<ace>");
-			writer.print("<entityId>" + groupId + "</entityId>");
+			writer.print(ACE);
+			writer.print(ENTITYID + groupId + ENTITYID_CLOSED);
 
 			if (groupType == Group.TYPE_DEFAULT) {
-				writer.print("<entity><![CDATA[" + groupName + "]]></entity>");
-				writer.print("<avatar>group</avatar>");
+				writer.print(ENTITY + groupName + ENTITY_CLOSED);
+				writer.print(AVATAR_GROUP_AVATAR);
 			} else {
-				writer.print("<entity><![CDATA[" + users.get(userId) + "]]></entity>");
-				writer.print("<avatar>" + userId + "</avatar>");
+				writer.print(ENTITY + users.get(userId) + ENTITY_CLOSED);
+				writer.print(AVATAR + userId + AVATAR_CLOSED);
 			}
 			writer.print("<write>" + (set.getInt(4) == 1) + "</write>");
-			writer.print("<read>" + (set.getInt(5) == 1) + "</read>");
-			writer.print("<type>" + groupType + "</type>");
-			writer.print("</ace>");
+			writer.print(READ + (set.getInt(5) == 1) + READ_CLOSED);
+			writer.print(TYPE + groupType + TYPE_CLOSED);
+			writer.print(ACE_CLOSED);
 
 		}
 
-		writer.write("</list>");
+		writer.write(LIST_CLOSED);
 	}
 
 	private void documentACL(HttpServletResponse response, long documentId)
@@ -138,7 +166,7 @@ public class AclDataServlet extends AbstractDataServlet {
 		Map<Long, String> users = getUsers(document.getTenantId());
 
 		PrintWriter writer = response.getWriter();
-		writer.write("<list>");
+		writer.write(LIST);
 
 		// Prepare the query on the ACL in join with groups
 		StringBuilder query = new StringBuilder(
@@ -151,7 +179,7 @@ public class AclDataServlet extends AbstractDataServlet {
 						 where A.ld_docid =
 						""");
 		query.append(Long.toString(documentId));
-		query.append(" and B.ld_tenantid = " + document.getTenantId());
+		query.append(AND_B_LD_TENANTID + document.getTenantId());
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id order by B.ld_type asc, B.ld_name asc");
 
 		SqlRowSet set = docDao.queryForRowSet(query.toString(), null);
@@ -162,7 +190,7 @@ public class AclDataServlet extends AbstractDataServlet {
 		while (set.next())
 			printACE(writer, set, users);
 
-		writer.write("</list>");
+		writer.write(LIST_CLOSED);
 	}
 
 	private void folderACL(HttpServletResponse response, long folderId) throws IOException, PersistenceException {
@@ -180,7 +208,7 @@ public class AclDataServlet extends AbstractDataServlet {
 		Map<Long, String> users = getUsers(ref.getTenantId());
 
 		PrintWriter writer = response.getWriter();
-		writer.write("<list>");
+		writer.write(LIST);
 
 		// Prepare the query on the ACL in join with groups
 		StringBuilder query = new StringBuilder(
@@ -193,7 +221,7 @@ public class AclDataServlet extends AbstractDataServlet {
 						 where A.ld_folderid =
 						""");
 		query.append(Long.toString(ref.getId()));
-		query.append(" and B.ld_tenantid = " + ref.getTenantId());
+		query.append(AND_B_LD_TENANTID + ref.getTenantId());
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id order by B.ld_type asc, B.ld_name asc");
 
 		SqlRowSet set = folderDao.queryForRowSet(query.toString(), null);
@@ -204,7 +232,7 @@ public class AclDataServlet extends AbstractDataServlet {
 		while (set.next())
 			printACE(writer, set, users);
 
-		writer.write("</list>");
+		writer.write(LIST_CLOSED);
 	}
 
 	private void menuAcl(HttpServletResponse response, long menuId, long tenantId)
@@ -217,7 +245,7 @@ public class AclDataServlet extends AbstractDataServlet {
 		Map<Long, String> users = getUsers(tenantId);
 
 		PrintWriter writer = response.getWriter();
-		writer.write("<list>");
+		writer.write(LIST);
 
 		// Prepare the query on the menu ACL in join with groups
 		StringBuilder query = new StringBuilder(
@@ -239,23 +267,23 @@ public class AclDataServlet extends AbstractDataServlet {
 			if (groupType == Group.TYPE_USER && groupName != null)
 				userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
 
-			writer.print("<ace>");
-			writer.print("<entityId>" + groupId + "</entityId>");
+			writer.print(ACE);
+			writer.print(ENTITYID + groupId + ENTITYID_CLOSED);
 
 			if (groupType == Group.TYPE_DEFAULT) {
-				writer.print(ENTITY + groupName + CLOSE_ENTITY);
-				writer.print("<avatar>group</avatar>");
+				writer.print(ENTITY + groupName + ENTITY_CLOSED);
+				writer.print(AVATAR_GROUP_AVATAR);
 			} else {
-				writer.print(ENTITY + users.get(userId) + CLOSE_ENTITY);
-				writer.print("<avatar>" + userId + "</avatar>");
+				writer.print(ENTITY + users.get(userId) + ENTITY_CLOSED);
+				writer.print(AVATAR + userId + AVATAR_CLOSED);
 			}
 
-			writer.print("<read>" + intToBoolean(set.getInt(4)) + "</read>");
-			writer.print("<type>" + groupType + "</type>");
-			writer.print("</ace>");
+			writer.print(READ + intToBoolean(set.getInt(4)) + READ_CLOSED);
+			writer.print(TYPE + groupType + TYPE_CLOSED);
+			writer.print(ACE_CLOSED);
 		}
 
-		writer.write("</list>");
+		writer.write(LIST_CLOSED);
 	}
 
 	private void printACE(PrintWriter writer, SqlRowSet set, Map<Long, String> users) {
@@ -266,15 +294,15 @@ public class AclDataServlet extends AbstractDataServlet {
 		if (groupType == Group.TYPE_USER && groupName != null)
 			userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
 
-		writer.print("<ace>");
-		writer.print("<entityId>" + groupId + "</entityId>");
+		writer.print(ACE);
+		writer.print(ENTITYID + groupId + ENTITYID_CLOSED);
 
 		if (groupType == Group.TYPE_DEFAULT) {
-			writer.print(ENTITY + groupName + CLOSE_ENTITY);
-			writer.print("<avatar>group</avatar>");
+			writer.print(ENTITY + groupName + ENTITY_CLOSED);
+			writer.print(AVATAR_GROUP_AVATAR);
 		} else {
-			writer.print(ENTITY + users.get(userId) + CLOSE_ENTITY);
-			writer.print("<avatar>" + userId + "</avatar>");
+			writer.print(ENTITY + users.get(userId) + ENTITY_CLOSED);
+			writer.print(AVATAR + userId + AVATAR_CLOSED);
 		}
 
 		writer.print("<write>" + intToBoolean(set.getInt(4)) + "</write>");
@@ -298,9 +326,9 @@ public class AclDataServlet extends AbstractDataServlet {
 		writer.print("<automation>" + intToBoolean(set.getInt(22)) + "</automation>");
 		writer.print("<storage>" + intToBoolean(set.getInt(23)) + "</storage>");
 		writer.print("<readingreq>" + intToBoolean(set.getInt(24)) + "</readingreq>");
-		writer.print("<read>" + intToBoolean(set.getInt(25)) + "</read>");
-		writer.print("<type>" + groupType + "</type>");
-		writer.print("</ace>");
+		writer.print(READ + intToBoolean(set.getInt(25)) + READ_CLOSED);
+		writer.print(TYPE + groupType + TYPE_CLOSED);
+		writer.print(ACE_CLOSED);
 	}
 
 	private boolean intToBoolean(int val) {

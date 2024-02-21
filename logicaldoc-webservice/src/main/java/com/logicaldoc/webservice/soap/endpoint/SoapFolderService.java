@@ -410,7 +410,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		// Check if the session user has the Security Permission of this
 		// folder
 		if (!folderDao.isPermissionEnabled(Permission.SECURITY, folderId, sessionUser.getId()))
-			throw new PermissionException(sessionUser.getUsername(), "Folder " + folderId, Permission.SECURITY);
+			throw new PermissionException(sessionUser.getUsername(), FOLDER + folderId, Permission.SECURITY);
 
 		Folder folder = folderDao.findById(folderId);
 		folderDao.initialize(folder);

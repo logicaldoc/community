@@ -280,8 +280,8 @@ public class ContextMenu extends Menu {
 				/**
 				 * Now implement the security policies
 				 */
-				boolean someSelection = selection != null && selection.size() > 0;
-				boolean moreSelected = selection != null && selection.size() > 1;
+				boolean someSelection = !selection.isEmpty();
+				boolean moreSelected = selection.size() > 1;
 				boolean justOneSelected = someSelection && selection.size() == 1;
 				boolean immutablesInSelection = someSelection && checkImmutablesInSelection(selection);
 
@@ -483,21 +483,20 @@ public class ContextMenu extends Menu {
 		item.addClickHandler(
 				event -> LD.askForStringMandatory(I18N.message("merge"), I18N.message(FILENAME), null, value -> {
 					LD.contactingServer();
-					DocumentService.Instance.get().merge(selectionIds, folder.getId(), value,
-							new AsyncCallback<>() {
+					DocumentService.Instance.get().merge(selectionIds, folder.getId(), value, new AsyncCallback<>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-									LD.clearPrompt();
-								}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+							LD.clearPrompt();
+						}
 
-								@Override
-								public void onSuccess(GUIDocument mergedDoc) {
-									LD.clearPrompt();
-									DocumentController.get().stored(mergedDoc);
-								}
-							});
+						@Override
+						public void onSuccess(GUIDocument mergedDoc) {
+							LD.clearPrompt();
+							DocumentController.get().stored(mergedDoc);
+						}
+					});
 				}));
 		return item;
 	}
@@ -1052,29 +1051,27 @@ public class ContextMenu extends Menu {
 	private MenuItem prepareDeleteItem(final List<GUIDocument> selection) {
 		MenuItem item = new MenuItem();
 		item.setTitle(I18N.message("ddelete"));
-		item.addClickHandler(event -> {
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
-				if (Boolean.TRUE.equals(value)) {
-					DocumentService.Instance.get().delete(getSelectionIds(selection), new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+		item.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
+			if (Boolean.TRUE.equals(value)) {
+				DocumentService.Instance.get().delete(getSelectionIds(selection), new AsyncCallback<>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-						@Override
-						public void onSuccess(Void result) {
-							// If the data grid is big the records
-							// deletion doesn't work, so refresh the
-							// screen.
-							if (grid.getFolder() != null
-									&& grid.getFolder().getId() == FolderController.get().getCurrentFolder().getId())
-								DocumentsPanel.get().refresh();
-							DocumentController.get().deleted(grid.getSelectedDocuments());
-						}
-					});
-				}
-			});
-		});
+					@Override
+					public void onSuccess(Void result) {
+						// If the data grid is big the records
+						// deletion doesn't work, so refresh the
+						// screen.
+						if (grid.getFolder() != null
+								&& grid.getFolder().getId() == FolderController.get().getCurrentFolder().getId())
+							DocumentsPanel.get().refresh();
+						DocumentController.get().deleted(grid.getSelectedDocuments());
+					}
+				});
+			}
+		}));
 		return item;
 	}
 
@@ -1186,33 +1183,32 @@ public class ContextMenu extends Menu {
 					routine.setAutomation(action.getAutomation());
 					executeRoutine(folderId, selectedDocIds, routine);
 				} else if (action.getRoutineId() != null && action.getRoutineId().longValue() != 0L) {
-					AutomationService.Instance.get().getRoutine(action.getRoutineId(),
-							new AsyncCallback<>() {
+					AutomationService.Instance.get().getRoutine(action.getRoutineId(), new AsyncCallback<>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-								@Override
-								public void onSuccess(GUIAutomationRoutine routine) {
-									if (routine.getTemplateId() != null && routine.getTemplateId().longValue() != 0L) {
-										/*
-										 * A routine with parameters is
-										 * referenced, so open the input popup
-										 */
-										FillRoutineParams dialog = new FillRoutineParams(action.getName(), routine,
-												folderId, selectedDocIds);
-										dialog.show();
-									} else {
-										/*
-										 * A routine without parameters is
-										 * referenced, so launch directly
-										 */
-										executeRoutine(folderId, selectedDocIds, routine);
-									}
-								}
-							});
+						@Override
+						public void onSuccess(GUIAutomationRoutine routine) {
+							if (routine.getTemplateId() != null && routine.getTemplateId().longValue() != 0L) {
+								/*
+								 * A routine with parameters is referenced, so
+								 * open the input popup
+								 */
+								FillRoutineParams dialog = new FillRoutineParams(action.getName(), routine, folderId,
+										selectedDocIds);
+								dialog.show();
+							} else {
+								/*
+								 * A routine without parameters is referenced,
+								 * so launch directly
+								 */
+								executeRoutine(folderId, selectedDocIds, routine);
+							}
+						}
+					});
 				}
 			}
 		});

@@ -128,7 +128,7 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 		lockedCounter.setTitle(AwesomeFactory.getIconHtml("lock-alt", Integer.toString(user.getLockedDocs())));
 		checkoutCounter.setTitle(AwesomeFactory.getIconHtml("edit", Integer.toString(user.getCheckedOutDocs())));
 		messagesCounter.setTitle(AwesomeFactory.getIconHtml("envelope", Integer.toString(user.getUnreadMessages())));
-		workflowsCounter.setTitle(AwesomeFactory.getIconHtml("tasks", Integer.toString(user.getAssignedTasks())));
+		workflowsCounter.setTitle(AwesomeFactory.getIconHtml("tasks", Integer.toString(user.getTasks())));
 		eventsCounter.setTitle(AwesomeFactory.getIconHtml("calendar", Integer.toString(user.getUpcomingEvents())));
 	}
 

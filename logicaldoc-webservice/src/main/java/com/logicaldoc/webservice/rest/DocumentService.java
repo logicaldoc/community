@@ -802,19 +802,6 @@ public interface DocumentService {
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException;
 
 	/**
-	 * Tests if a document is readable
-	 * 
-	 * @param docId The document id
-	 * 
-	 * @return True if the identifier denotes a document, otherwise false
-	 * 
-	 * @throws PersistenceException Error in the database
-	 * @throws WebserviceException A generic error in the WebService
-	 * @throws AuthenticationException Invalid credentials
-	 */
-	public boolean isReadable(long docId) throws AuthenticationException, WebserviceException, PersistenceException;
-
-	/**
 	 * Creates a new link between two documents.
 	 * 
 	 * @param doc1 ID of document 1

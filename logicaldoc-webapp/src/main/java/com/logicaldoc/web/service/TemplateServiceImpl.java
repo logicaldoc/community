@@ -361,7 +361,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			Template template = templateDao.findById(templateId);
 			templateDao.initialize(template);
 
-			List<GUIAttribute> attributes = new ArrayList<>();
+			List<GUIAttribute> attributes;
 
 			if (extensibleObject == null) {
 				attributes = prepareGUIAttributes(template, null, sessionUser);

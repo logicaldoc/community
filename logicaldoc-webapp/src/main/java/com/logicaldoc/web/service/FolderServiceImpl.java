@@ -206,7 +206,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			guiFolder.setAttributes(prepareGUIAttributes(folder.getTemplate(), folder));
 		}
 
-		guiFolder.setTags(new ArrayList<String>(folder.getTagsAsWords()));
+		guiFolder.setTags(new ArrayList<>(folder.getTagsAsWords()));
 		guiFolder.setColor(folder.getColor());
 		return guiFolder;
 	}

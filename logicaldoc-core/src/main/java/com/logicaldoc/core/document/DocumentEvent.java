@@ -72,6 +72,6 @@ public enum DocumentEvent {
 	}
 
 	public static Set<String> valuesAsString() {
-		return Arrays.asList(DocumentEvent.values()).stream().map(e -> e.toString()).collect(Collectors.toSet());
+		return Arrays.asList(DocumentEvent.values()).stream().map(Object::toString).collect(Collectors.toSet());
 	}
 }

@@ -787,7 +787,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		}
 
 		guiDocument.setCustomId(realDoc.getCustomId());
-		guiDocument.setTags(new ArrayList<String>(realDoc.getTagsAsWords()));
+		guiDocument.setTags(new ArrayList<>(realDoc.getTagsAsWords()));
 		guiDocument.setType(doc.getType());
 		guiDocument.setFileName(doc.getFileName());
 		guiDocument.setColor(doc.getColor());

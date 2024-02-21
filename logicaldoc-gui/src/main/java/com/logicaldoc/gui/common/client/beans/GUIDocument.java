@@ -612,7 +612,7 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	}
 
 	public int getDocAttrs() {
-		if (docAttrs == 0 && getAttributes().size() > 0)
+		if (docAttrs == 0 && getAttributes().isEmpty())
 			for (GUIAttribute att : getAttributes())
 				if (att.getType() == GUIAttribute.TYPE_DOCUMENT && att.getIntValue() != null)
 					docAttrs++;

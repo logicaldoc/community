@@ -47,6 +47,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class StandardPropertiesPanel extends DocumentDetailTab {
+	private static final String FOLDER = "folder";
+
 	private static final String COLOR = "color";
 
 	private static final int DEFAULT_ITEM_WIDTH = 250;
@@ -196,9 +198,9 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 
 	private LinkItem prepareFolderItem() {
 		String path = document.getPathExtended();
-		LinkItem folder = ItemFactory.newLinkItem("folder", "folder", Util.padLeft(path, 40),
+		LinkItem folder = ItemFactory.newLinkItem(FOLDER, FOLDER, Util.padLeft(path, 40),
 				Util.displayURL(null, document.getFolder().getId()), path);
-		folder.setTitle(I18N.message("folder"));
+		folder.setTitle(I18N.message(FOLDER));
 		folder.setTooltip(path);
 		folder.setWrap(false);
 		return folder;

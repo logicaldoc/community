@@ -59,17 +59,7 @@ public class SessionIdFilter extends GenericFilterBean {
 			return;
 		}
 
-		String sid = request.getParameter(SessionManager.PARAM_SID);
-		if (StringUtils.isEmpty(sid)) {
-			Cookie[] cookies = request.getCookies();
-			if (cookies != null)
-				for (Cookie cookie : cookies) {
-					if (SessionManager.COOKIE_SID.equals(cookie.getName())) {
-						sid = cookie.getValue();
-						break;
-					}
-				}
-		}
+		String sid = getSidFromRequest(request);
 
 		if (StringUtils.isNotEmpty(sid)) {
 			log.debug("The request specifies the sid {}", sid);
@@ -107,5 +97,20 @@ public class SessionIdFilter extends GenericFilterBean {
 		}
 
 		chain.doFilter(request, response);
+	}
+
+	private String getSidFromRequest(HttpServletRequest request) {
+		String sid = request.getParameter(SessionManager.PARAM_SID);
+		if (StringUtils.isEmpty(sid)) {
+			Cookie[] cookies = request.getCookies();
+			if (cookies != null)
+				for (Cookie cookie : cookies) {
+					if (SessionManager.COOKIE_SID.equals(cookie.getName())) {
+						sid = cookie.getValue();
+						break;
+					}
+				}
+		}
+		return sid;
 	}
 }
