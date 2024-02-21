@@ -31,6 +31,7 @@ import com.logicaldoc.webservice.doc.WSDoc;
  */
 @XmlType(name = "WSUser")
 public class WSUser {
+	@WSDoc(documented = false)
 	protected static Logger log = LoggerFactory.getLogger(WSUser.class);
 
 	@WSDoc(documented = false)
@@ -59,10 +60,13 @@ public class WSUser {
 
 	private String username = "";
 
+	@WSDoc(required = false)
 	private String password = "";
 
+	@WSDoc(required = false)
 	private String decodedPassword = "";
 
+	@WSDoc(required = false)
 	private String passwordmd4 = "";
 
 	@WSDoc(required = false)
@@ -86,16 +90,16 @@ public class WSUser {
 	@WSDoc(required = false)
 	private String state = "";
 
-	@WSDoc(description = "default language; <a href='/wiki/LanguageSpecification'>See specification</a>")
+	@WSDoc(description = "default language; <a href='/wiki/LanguageSpecification'>See specification</a>", required = false)
 	private String language = "";
 
-	@WSDoc(required = true, description = "address used for notifications, must be a valid e-mail")
+	@WSDoc(description = "address used for notifications, must be a valid e-mail", required = true)
 	private String email = "";
 
 	@WSDoc(description = "a simple text to be used as a signature in the footer of the outgoing emails", required = false)
 	private String emailSignature;
 
-	@WSDoc(required = false, description = "secondary email address, must be a valid e-mail")
+	@WSDoc(description = "secondary email address, must be a valid e-mail", required = false)
 	private String email2 = "";
 
 	@WSDoc(description = "a simple text to be used as a signature in the footer of the outgoing emails", required = false)
@@ -137,40 +141,40 @@ public class WSUser {
 	@WSDoc(required = false)
 	private String lastModified;
 
-	@WSDoc(required = false, description = "last time the user has logged in")
+	@WSDoc(description = "last time the user has logged in", required = false)
 	private String lastLogin;
 
-	@WSDoc(required = false, description = "when the user has been created")
+	@WSDoc(description = "when the user has been created", required = false)
 	private String creation;
 
-	@WSDoc(description = "date format to use when display dates")
+	@WSDoc(description = "date format to use when display dates", required = false)
 	private String dateFormat;
 
-	@WSDoc(description = "date format to use when display dates in short format")
+	@WSDoc(description = "date format to use when display dates in short format", required = false)
 	private String dateFormatShort;
 
-	@WSDoc(description = "date format to use when display dates and times")
+	@WSDoc(description = "date format to use when display dates and times", required = false)
 	private String dateFormatLong;
 
-	@WSDoc(description = "comma separated list of searches that defines the order they are displayed in the user interface")
+	@WSDoc(description = "comma separated list of searches that defines the order they are displayed in the user interface", required = false)
 	private String searchPref;
 
-	@WSDoc(required = false, description = "when this account expires")
+	@WSDoc(description = "when this account expires", required = false)
 	private String expire;
 
-	@WSDoc(required = false, description = "the working time specification")
+	@WSDoc(description = "the working time specification", required = false)
 	private WSWorkingTime[] workingTimes = null;
 
-	@WSDoc(required = false, description = "maximum number of inactivity days after which the account gets disabled")
+	@WSDoc(description = "maximum number of inactivity days after which the account gets disabled", required = false)
 	private Integer maxInactivity;
 
-	@WSDoc(required = false, description = "the time zone of the suer")
+	@WSDoc(description = "the time zone of the suer", required = false)
 	private String timeZone;
 
-	@WSDoc(required = false, description = "the second factor authenticator to use")
+	@WSDoc(description = "the second factor authenticator to use", required = false)
 	private String secondFactor;
 
-	@WSDoc(required = false, description = "key used by the second factor authenticator")
+	@WSDoc(description = "key used by the second factor authenticator", required = false)
 	private String key;
 
 	public long getId() {
@@ -253,7 +257,7 @@ public class WSUser {
 	 * 
 	 * @param passwd The password in readable format
 	 * 
-	 * @throws NoSuchAlgorithmException Cripting error 
+	 * @throws NoSuchAlgorithmException Cripting error
 	 */
 	public void setPassword(String passwd) throws NoSuchAlgorithmException {
 		decodedPassword = passwd;
