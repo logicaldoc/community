@@ -70,7 +70,7 @@ public class TemplateRightsDataServlet extends AbstractDataServlet {
 
 		// Prepare the query on the folder group in join with groups
 		StringBuilder query = new StringBuilder(
-				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write from ld_templategroup as A, ld_group B where A.ld_templateid = ");
+				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write from ld_templategroup A, ld_group B where A.ld_templateid = ");
 		query.append("" + template.getId());
 		query.append(" and B.ld_tenantid = " + template.getTenantId());
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id order by B.ld_name asc");
