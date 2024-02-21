@@ -802,8 +802,12 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 				public GUIHistory mapRow(ResultSet rs, int arg1) throws SQLException {
 					GUIHistory history = new GUIHistory();
 					history.setUsername(rs.getString(1));
+					
+					System.out.println(rs.getObject(2).getClass());
 					if (rs.getObject(2) instanceof Timestamp)
 						history.setDate(rs.getTimestamp(2));
+					else if (rs.getObject(2) instanceof LocalDateTime localDateTime)
+						history.setDate(java.sql.Timestamp.valueOf(localDateTime));
 					else
 						history.setDate(rs.getDate(2));
 

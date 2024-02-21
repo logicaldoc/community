@@ -118,7 +118,7 @@ public class AclDataServlet extends AbstractDataServlet {
 
 		// Prepare the query on the folder group in join with groups
 		StringBuilder query = new StringBuilder(
-				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write, A.ld_read from ld_template_acl as A, ld_group B where A.ld_templateid = ");
+				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write, A.ld_read from ld_template_acl A, ld_group B where A.ld_templateid = ");
 		query.append("" + template.getId());
 		query.append(AND_B_LD_TENANTID + template.getTenantId());
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id order by B.ld_name asc");

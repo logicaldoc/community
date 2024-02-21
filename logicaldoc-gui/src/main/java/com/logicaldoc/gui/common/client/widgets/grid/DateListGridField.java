@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
@@ -22,12 +23,15 @@ public class DateListGridField extends ColoredListGridField {
 		setCellFormatter(new DateCellFormatter(format));
 		setCanFilter(false);
 		setCanSort(true);
+		setAutoFitWidth(true);
+		setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
+		
 		if (format == DateCellFormatter.FORMAT_LONG)
-			setWidth(125);
+			setMinWidth(130);
 		else if (format == DateCellFormatter.FORMAT_SHORT)
-			setWidth(80);
+			setMinWidth(90);
 		else
-			setWidth(110);
+			setMinWidth(120);
 	}
 
 	public DateListGridField(String name, String title) {

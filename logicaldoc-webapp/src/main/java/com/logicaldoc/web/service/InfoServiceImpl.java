@@ -236,7 +236,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		guiInfo.setHostName(info.getHostName());
 		guiInfo.setDate(info.getDate());
 		guiInfo.setInstallationId(info.getInstallationId());
-		guiInfo.setFeatures(info.getFeatures());
+		guiInfo.getFeatures().addAll(info.getFeatures());
 
 		guiInfo.getBranding().setBugs(info.getBugs());
 		guiInfo.getBranding().setForum(info.getForum());

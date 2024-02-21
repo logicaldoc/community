@@ -205,14 +205,16 @@ public class SoapSystemService extends AbstractService implements SystemService 
 	@Override
 	public WSSystemInfo getInfo() throws WebserviceException {
 		try {
-			SystemInfo inf = SystemInfo.get();
-			WSSystemInfo info = new WSSystemInfo();
-			BeanUtils.copyProperties(info, inf);
+			SystemInfo info = SystemInfo.get();
+			
+			WSSystemInfo wsInfo = new WSSystemInfo();
+			BeanUtils.copyProperties(wsInfo, info);
+			wsInfo.setFeatures(info.getFeatures().toArray(new String[0]));
 
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-			info.setDate(df.format(inf.getDate()));
+			wsInfo.setDate(df.format(info.getDate()));
 
-			return info;
+			return wsInfo;
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new WebserviceException(e.getMessage(), e);
 		}

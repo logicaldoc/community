@@ -110,70 +110,70 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	}
 
 	@Override
-	public long storeUser(String sid, WSUser user) throws WebserviceException, PersistenceException {
+	public long storeUser(String sid, WSUser wsUser) throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 		User sessionUser = validateSession(sid);
 
 		try {
 			GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 			UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
-			User usr = user.toUser();
+			User usr = wsUser.toUser();
 			usr.setTenantId(sessionUser.getTenantId());
 
-			if (user.getId() != 0) {
-				usr = dao.findById(user.getId());
+			if (wsUser.getId() != 0) {
+				usr = dao.findById(wsUser.getId());
 				if (usr.getType() == User.TYPE_SYSTEM)
 					throw new PermissionException(
 							"You cannot edit user with id " + usr.getId() + " because it is a system user");
 				dao.initialize(usr);
 
-				usr.setCity(user.getCity());
-				usr.setCountry(user.getCountry());
-				usr.setEmail(user.getEmail());
-				usr.setEmailSignature(user.getEmailSignature());
-				usr.setEmail2(user.getEmail2());
-				usr.setEmailSignature2(user.getEmailSignature2());
-				usr.setFirstName(user.getFirstName());
-				usr.setName(user.getName());
-				usr.setLanguage(user.getLanguage());
-				usr.setPostalcode(user.getPostalcode());
-				usr.setState(user.getState());
-				usr.setStreet(user.getStreet());
-				usr.setTelephone(user.getTelephone());
-				usr.setTelephone2(user.getTelephone2());
-				usr.setUsername(user.getUsername());
-				usr.setEnabled(user.getEnabled());
-				usr.setPasswordExpires(user.getPasswordExpires());
-				usr.setQuota(user.getQuota());
-				usr.setType(user.getType());
-				usr.setSource(user.getSource());
-				usr.setDateFormat(user.getDateFormat());
-				usr.setDateFormatShort(user.getDateFormatShort());
-				usr.setDateFormatLong(user.getDateFormatLong());
-				usr.setKey(user.getKey());
-				usr.setSecondFactor(user.getSecondFactor());
-				usr.setTimeZone(user.getTimeZone());
-				usr.setExpire(WSUtil.convertStringToDate(user.getExpire()));
-				usr.setEnforceWorkingTime(user.getEnforceWorkingTime());
-				usr.setMaxInactivity(user.getMaxInactivity());
+				usr.setCity(wsUser.getCity());
+				usr.setCountry(wsUser.getCountry());
+				usr.setEmail(wsUser.getEmail());
+				usr.setEmailSignature(wsUser.getEmailSignature());
+				usr.setEmail2(wsUser.getEmail2());
+				usr.setEmailSignature2(wsUser.getEmailSignature2());
+				usr.setFirstName(wsUser.getFirstName());
+				usr.setName(wsUser.getName());
+				usr.setLanguage(wsUser.getLanguage());
+				usr.setPostalcode(wsUser.getPostalcode());
+				usr.setState(wsUser.getState());
+				usr.setStreet(wsUser.getStreet());
+				usr.setTelephone(wsUser.getTelephone());
+				usr.setTelephone2(wsUser.getTelephone2());
+				usr.setUsername(wsUser.getUsername());
+				usr.setEnabled(wsUser.getEnabled());
+				usr.setPasswordExpires(wsUser.getPasswordExpires());
+				usr.setQuota(wsUser.getQuota());
+				usr.setType(wsUser.getType());
+				usr.setSource(wsUser.getSource());
+				usr.setDateFormat(wsUser.getDateFormat());
+				usr.setDateFormatShort(wsUser.getDateFormatShort());
+				usr.setDateFormatLong(wsUser.getDateFormatLong());
+				usr.setKey(wsUser.getKey());
+				usr.setSecondFactor(wsUser.getSecondFactor());
+				usr.setTimeZone(wsUser.getTimeZone());
+				usr.setExpire(WSUtil.convertStringToDate(wsUser.getExpire()));
+				usr.setEnforceWorkingTime(wsUser.getEnforceWorkingTime());
+				usr.setMaxInactivity(wsUser.getMaxInactivity());
 
-				if (user.getWorkingTimes() != null && user.getWorkingTimes().length > 0)
-					for (WSWorkingTime wswt : user.getWorkingTimes()) {
+				if (wsUser.getWorkingTimes() != null && wsUser.getWorkingTimes().length > 0)
+					for (WSWorkingTime wswt : wsUser.getWorkingTimes()) {
 						WorkingTime wt = new WorkingTime();
 						BeanUtils.copyProperties(wt, wswt);
 						usr.getWorkingTimes().add(wt);
 					}
 			} else {
-				usr.setDecodedPassword(user.getDecodedPassword());
+				usr.setDecodedPassword(wsUser.getDecodedPassword());
 			}
 
 			validateMandatoryFields(usr);
 
 			dao.store(usr);
 
-			if (user.getGroupIds() != null && user.getGroupIds().length > 0) {
+			if (wsUser.getGroupIds() != null && wsUser.getGroupIds().length > 0) {
 				usr.removeGroupMemberships(null);
-				for (long groupId : user.getGroupIds())
+				for (long groupId : wsUser.getGroupIds())
 					usr.addGroup(gDao.findById(groupId));
 				dao.store(usr);
 			}

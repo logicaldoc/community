@@ -399,6 +399,7 @@ public class LastChangesReport extends AdminPanel {
 							rec.setAttribute(COMMENT, hist.getComment());
 							rec.setAttribute(REASON, hist.getReason());
 							rec.setAttribute("icon", hist.getIcon());
+							records.add(rec);
 						}
 						histories.setData(records.toArray(new ListGridRecord[0]));
 

@@ -2,10 +2,10 @@ package com.logicaldoc.core;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
@@ -109,16 +109,13 @@ public class SystemInfo {
 		 * Collect installed features
 		 */
 		try {
-			List<String> features = new ArrayList<>();
 			PluginRegistry registry = PluginRegistry.getInstance();
 			Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "Feature");
 			for (Extension extension : exts) {
 				// Retrieve the task name
 				String name = extension.getParameter("name").valueAsString();
-				if (!features.contains(name))
-					features.add(name);
+				info.getFeatures().add(name);
 			}
-			info.setFeatures(features);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
@@ -188,7 +185,7 @@ public class SystemInfo {
 	 */
 	protected String hostName;
 
-	protected List<String> features = new ArrayList<>();
+	protected Set<String> features = new HashSet<>();
 
 	public String getProductName() {
 		return productName;
@@ -342,11 +339,11 @@ public class SystemInfo {
 		this.hostName = hostName;
 	}
 
-	public List<String> getFeatures() {
+	public Set<String> getFeatures() {
 		return features;
 	}
 
-	public void setFeatures(List<String> features) {
+	public void setFeatures(Set<String> features) {
 		this.features = features;
 	}
 }
