@@ -209,6 +209,7 @@ public class SoapSystemService extends AbstractService implements SystemService 
 			
 			WSSystemInfo wsInfo = new WSSystemInfo();
 			BeanUtils.copyProperties(wsInfo, info);
+			
 			wsInfo.setFeatures(info.getFeatures().toArray(new String[0]));
 
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");

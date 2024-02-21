@@ -3,6 +3,7 @@ package com.logicaldoc.core.generic;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -28,7 +29,7 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 
 	@Override
 	public void delete(long genericId, int code) throws PersistenceException {
-		if(code==0)
+		if (code == 0)
 			throw new IllegalArgumentException("code cannot be 0");
 
 		if (!checkStoringAspect())
@@ -47,8 +48,8 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 	@Override
 	public Generic findByAlternateKey(String type, String subtype, Long qualifier, long tenantId) {
 		Generic generic = null;
-		StringBuilder sb = new StringBuilder(" " + ENTITY + ".type = '" + SqlUtil.doubleQuotes(type) + "' and "
-				+ ENTITY + ".subtype='" + SqlUtil.doubleQuotes(subtype) + "' ");
+		StringBuilder sb = new StringBuilder(" " + ENTITY + ".type = '" + SqlUtil.doubleQuotes(type) + "' and " + ENTITY
+				+ ".subtype='" + SqlUtil.doubleQuotes(subtype) + "' ");
 		sb.append(AND + ENTITY + ".tenantId=" + tenantId);
 		if (qualifier != null)
 			sb.append(AND + ENTITY + ".qualifier=" + qualifier);
@@ -68,16 +69,16 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 	public List<Generic> findByTypeAndSubtype(String type, String subtype, Long qualifier, Long tenantId) {
 		String query = " 1=1 ";
 		if (StringUtils.isNotEmpty(type))
-			query += AND + ENTITY + ".type like '" + SqlUtil.doubleQuotes(type) + "' ";
+			query += AND + ENTITY + ".type like :type ";
 		if (StringUtils.isNotEmpty(subtype))
-			query += AND + ENTITY + ".subtype like '" + SqlUtil.doubleQuotes(subtype) + "' ";
+			query += AND + ENTITY + ".subtype like :subtype ";
 		if (qualifier != null)
 			query += AND + ENTITY + ".qualifier = " + qualifier;
 		if (tenantId != null)
 			query += AND + ENTITY + ".tenantId = " + tenantId;
 
 		try {
-			return findByWhere(query, null, null);
+			return findByWhere(query, Map.of("type", type, "subtype", subtype), null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();

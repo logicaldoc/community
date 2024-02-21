@@ -38,8 +38,15 @@ public class HTMLSanitizer {
 
 		OutputSettings outputSettings = new OutputSettings().indentAmount(0).prettyPrint(false);
 		Safelist whiteList = Safelist.simpleText().preserveRelativeLinks(false);
-		String sanitized = Jsoup.clean(unsafeHtmlContent, "", whiteList, outputSettings);
-		sanitized = StringEscapeUtils.unescapeHtml(sanitized);
+		String previousSanitized = "";
+		String sanitized = StringEscapeUtils
+				.unescapeHtml(Jsoup.clean(unsafeHtmlContent, "", whiteList, outputSettings));
+
+		// Iterate until when no HTML is present
+		while (!previousSanitized.equals(sanitized)) {
+			previousSanitized = sanitized;
+			sanitized = StringEscapeUtils.unescapeHtml(Jsoup.clean(previousSanitized, "", whiteList, outputSettings));
+		}
 		return sanitized;
 	}
 
