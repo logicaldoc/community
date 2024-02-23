@@ -214,52 +214,57 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		GUIInfo info = new InfoServiceImpl().getInfo(locale, sess.getTenantName(), true);
 		session.setInfo(info);
 
-		guiUser.setPasswordExpired(false);
-		guiUser.setLockedDocs(documentDao.findByLockUserAndStatus(user.getId(), AbstractDocument.DOC_LOCKED).size());
-		guiUser.setCheckedOutDocs(
-				documentDao.findByLockUserAndStatus(user.getId(), AbstractDocument.DOC_CHECKED_OUT).size());
-		guiUser.setUnreadMessages(messageDao.getUnreadCount(user.getUsername(), Message.TYPE_SYSTEM));
-		guiUser.setQuota(user.getQuota());
-		guiUser.setQuotaCount(seqDao.getCurrentValue("userquota", user.getId(), user.getTenantId()));
-		guiUser.setCertDN(user.getCertDN());
-		guiUser.setCertExpire(user.getCertExpire());
-		guiUser.setSecondFactor(user.getSecondFactor());
+		try {
+			guiUser.setPasswordExpired(false);
+			guiUser.setLockedDocs(
+					documentDao.findByLockUserAndStatus(user.getId(), AbstractDocument.DOC_LOCKED).size());
+			guiUser.setCheckedOutDocs(
+					documentDao.findByLockUserAndStatus(user.getId(), AbstractDocument.DOC_CHECKED_OUT).size());
+			guiUser.setUnreadMessages(messageDao.getUnreadCount(user.getUsername(), Message.TYPE_SYSTEM));
+			guiUser.setQuota(user.getQuota());
+			guiUser.setQuotaCount(seqDao.getCurrentValue("userquota", user.getId(), user.getTenantId()));
+			guiUser.setCertDN(user.getCertDN());
+			guiUser.setCertExpire(user.getCertExpire());
+			guiUser.setSecondFactor(user.getSecondFactor());
 
-		session.setSid(sess.getSid());
-		session.setUser(guiUser);
-		session.setLoggedIn(true);
+			session.setSid(sess.getSid());
+			session.setUser(guiUser);
+			session.setLoggedIn(true);
 
-		MenuDAO mdao = (MenuDAO) Context.get().getBean(MenuDAO.class);
-		List<Long> menus = mdao.findMenuIdByUserId(sess.getUserId(), true);
-		guiUser.setMenus(menus);
+			MenuDAO mdao = (MenuDAO) Context.get().getBean(MenuDAO.class);
+			List<Long> menus = mdao.findMenuIdByUserId(sess.getUserId(), true);
+			guiUser.setMenus(menus);
 
-		loadDashlets(guiUser);
+			loadDashlets(guiUser);
 
-		/*
-		 * Prepare an incoming message, if any
-		 */
-		GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
-		Generic welcome = gDao.findByAlternateKey("guisetting", "gui.welcome", 0L, sess.getTenantId());
-		if (welcome != null && StringUtils.isNotEmpty(welcome.getString1())) {
-			Map<String, Object> dictionary = new HashMap<>();
-			dictionary.put(Automation.LOCALE, user.getLocale());
-			dictionary.put(Automation.TENANT_ID, sess.getTenantId());
-			dictionary.put("session", sess);
-			dictionary.put("user", session.getUser());
+			/*
+			 * Prepare an incoming message, if any
+			 */
+			GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
+			Generic welcome = gDao.findByAlternateKey("guisetting", "gui.welcome", 0L, sess.getTenantId());
+			if (welcome != null && StringUtils.isNotEmpty(welcome.getString1())) {
+				Map<String, Object> dictionary = new HashMap<>();
+				dictionary.put(Automation.LOCALE, user.getLocale());
+				dictionary.put(Automation.TENANT_ID, sess.getTenantId());
+				dictionary.put("session", sess);
+				dictionary.put("user", session.getUser());
 
-			Automation automation = new Automation("incomingmessage");
-			String welcomeMessage = automation.evaluate(welcome.getString1(), dictionary);
-			session.setWelcomeMessage(welcomeMessage != null ? welcomeMessage.trim() : null);
+				Automation automation = new Automation("incomingmessage");
+				String welcomeMessage = automation.evaluate(welcome.getString1(), dictionary);
+				session.setWelcomeMessage(welcomeMessage != null ? welcomeMessage.trim() : null);
+			}
+
+			// Define the current locale
+			sess.getDictionary().put(LOCALE, user.getLocale());
+			sess.getDictionary().put(USER, user);
+
+			ContextProperties config = Context.get().getProperties();
+			guiUser.setPasswordMinLenght(config.getInt(sess.getTenantName() + PASSWORD_SIZE, 12));
+
+			return session;
+		} catch (PersistenceException e) {
+			return (GUISession) throwServerException(sess, log, e);
 		}
-
-		// Define the current locale
-		sess.getDictionary().put(LOCALE, user.getLocale());
-		sess.getDictionary().put(USER, user);
-
-		ContextProperties config = Context.get().getProperties();
-		guiUser.setPasswordMinLenght(config.getInt(sess.getTenantName() + PASSWORD_SIZE, 12));
-
-		return session;
 	}
 
 	@Override
@@ -545,8 +550,10 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	 * Retrieves the dashlets configuration
 	 * 
 	 * @param usr current user
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	protected static void loadDashlets(GUIUser usr) {
+	protected static void loadDashlets(GUIUser usr) throws PersistenceException {
 		DashletServiceImpl dashletService = new DashletServiceImpl();
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		List<GUIDashlet> dashlets = new ArrayList<>();
@@ -1576,9 +1583,13 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		if (groupIds != null) {
 			UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
 			groupIds.stream().forEach(gId -> {
-				Set<User> usrs = gDao.findByGroup(gId);
-				for (User user : usrs)
-					uniqueUserIds.add(user.getId());
+				try {
+					Set<User> usrs = gDao.findByGroup(gId);
+					for (User user : usrs)
+						uniqueUserIds.add(user.getId());
+				} catch (PersistenceException e) {
+					log.error(e.getMessage(), e);
+				}
 			});
 		}
 

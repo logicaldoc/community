@@ -76,7 +76,7 @@ public class JobsDataServlet extends AbstractDataServlet {
 	}
 
 	private void writeJobs(PrintWriter writer, Session session, int maxRecords, String group)
-			throws SchedulerException {
+			throws SchedulerException, PersistenceException {
 		DateFormat df = getDateFormat();
 
 		TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);

@@ -344,25 +344,21 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 	}
 
 	@Override
-	public List<Menu> findByGroupId(long groupId) {
+	public List<Menu> findByGroupId(long groupId) throws PersistenceException {
 		List<Menu> coll = new ArrayList<>();
 
 		// The administrators can see all menus
 		if (groupId == Group.GROUPID_ADMIN)
 			return findAll();
 
-		try {
-			/*
-			 * Search for menus that define its own security policies
-			 */
-			StringBuilder query = new StringBuilder(SELECT_DISTINCT + ENTITY + CLOSE_BRACKET_FROM_MENU + ENTITY + "  ");
-			query.append(LEFT_JOIN + ENTITY + ACL_AS_GROUP);
-			query.append(WHERE + ENTITY + ".deleted=0 and _group.read=1 and _group.groupId =" + groupId);
+		/*
+		 * Search for menus that define its own security policies
+		 */
+		StringBuilder query = new StringBuilder(SELECT_DISTINCT + ENTITY + CLOSE_BRACKET_FROM_MENU + ENTITY + "  ");
+		query.append(LEFT_JOIN + ENTITY + ACL_AS_GROUP);
+		query.append(WHERE + ENTITY + ".deleted=0 and _group.read=1 and _group.groupId =" + groupId);
 
-			coll = findByQuery(query.toString(), (Map<String, Object>) null, null);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
+		coll = findByQuery(query.toString(), (Map<String, Object>) null, null);
 
 		return coll;
 	}

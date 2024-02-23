@@ -172,10 +172,8 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 	@Override
 	public void shareContacts(List<Long> contactIds, List<Long> userIds, List<Long> groupIds) throws ServerException {
 		validateSession();
-
-		appendUserIdsFromGroups(groupIds, userIds);
-
 		try {
+			appendUserIdsFromGroups(groupIds, userIds);
 			ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
 			for (Long cId : contactIds) {
 				Contact originalContact = dao.findById(cId);
@@ -203,7 +201,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 		}
 	}
 
-	private void appendUserIdsFromGroups(Collection<Long> groupIds, Collection<Long> users) {
+	private void appendUserIdsFromGroups(Collection<Long> groupIds, Collection<Long> users) throws PersistenceException {
 		UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		for (Long gId : groupIds) {
 			Set<User> usrs = gDao.findByGroup(gId);

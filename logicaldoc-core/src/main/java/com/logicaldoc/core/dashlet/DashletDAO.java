@@ -1,5 +1,6 @@
 package com.logicaldoc.core.dashlet;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 
 /**
@@ -17,6 +18,8 @@ public interface DashletDAO extends PersistentObjectDAO<Dashlet> {
 	 * @param tenantId identifier of the tenant
 	 * 
 	 * @return the found dashlet
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public Dashlet findByName(String name, long tenantId);
+	public Dashlet findByName(String name, long tenantId) throws PersistenceException;
 }

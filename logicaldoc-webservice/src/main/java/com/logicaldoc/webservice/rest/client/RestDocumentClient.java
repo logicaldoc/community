@@ -23,6 +23,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSNote;
@@ -125,8 +126,8 @@ public class RestDocumentClient extends AbstractRestClient {
 		proxy.checkout(docId);
 	}
 
-	public void update(WSDocument document)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public void update(WSDocument document) throws AuthenticationException, PermissionException, WebserviceException,
+			PersistenceException, UnexistingResourceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		proxy.update(document);
@@ -142,8 +143,8 @@ public class RestDocumentClient extends AbstractRestClient {
 		proxy.checkin(Long.toString(docId), comment, release.toString(), packageFile.getName(), fileAttachment);
 	}
 
-	public WSNote addNote(long docId, String note)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSNote addNote(long docId, String note) throws AuthenticationException, PermissionException,
+			WebserviceException, PersistenceException, UnexistingResourceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_FORM_URLENCODED);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.addNote(docId, note);
@@ -191,9 +192,10 @@ public class RestDocumentClient extends AbstractRestClient {
 	 * @throws WebserviceException Error in the Webservice layer
 	 * @throws AuthenticationException Authentication issue
 	 * @throws PermissionException Not enough permissions
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
-	public WSNote[] getNotes(long docId)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSNote[] getNotes(long docId) throws AuthenticationException, PermissionException, WebserviceException,
+			PersistenceException, UnexistingResourceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.getNotes(docId);
@@ -211,9 +213,10 @@ public class RestDocumentClient extends AbstractRestClient {
 	 * @throws WebserviceException Error in the Webservice layer
 	 * @throws AuthenticationException Authentication issue
 	 * @throws PermissionException Not enough permissions
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
-	public WSRating rateDocument(long docId, int vote)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSRating rateDocument(long docId, int vote) throws AuthenticationException, PermissionException,
+			WebserviceException, PersistenceException, UnexistingResourceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.rateDocument(docId, vote);
@@ -230,9 +233,10 @@ public class RestDocumentClient extends AbstractRestClient {
 	 * @throws WebserviceException Error in the Webservice layer
 	 * @throws AuthenticationException Authentication issue
 	 * @throws PermissionException Not enough permissions
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
-	public WSRating[] getRatings(long docId)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSRating[] getRatings(long docId) throws AuthenticationException, PermissionException, WebserviceException,
+			PersistenceException, UnexistingResourceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.getRatings(docId);

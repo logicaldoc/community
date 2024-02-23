@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
+import com.logicaldoc.core.PersistenceException;
 
 public class DocumentComparatorTest extends AbstractCoreTestCase {
 
@@ -30,7 +31,7 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testGetComparatorString() {
+	public void testGetComparatorString() throws PersistenceException {
 
 		Comparator<AbstractDocument> fdatec = DocumentComparator.getComparator("fileName desc, date asc");
 		assertNotNull(fdatec);

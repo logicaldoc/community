@@ -95,11 +95,15 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 	@Override
 	public GUIDashlet get(String name) throws ServerException {
 		Session session = validateSession();
-		DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
-		Dashlet dashlet = dao.findByName(name, session.getTenantId());
-		if (dashlet == null)
-			throw new ServerException("Unexisting dashlet " + name);
-		return fromDashlet(dashlet);
+		try {
+			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
+			Dashlet dashlet = dao.findByName(name, session.getTenantId());
+			if (dashlet == null)
+				throw new ServerException("Unexisting dashlet " + name);
+			return fromDashlet(dashlet);
+		} catch (Exception e) {
+			return (GUIDashlet) throwServerException(session, log, e);
+		}
 	}
 
 	@Override

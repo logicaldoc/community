@@ -39,6 +39,7 @@ import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
@@ -165,7 +166,11 @@ public class TypeManager {
 		documentType.setContentStreamAllowed(ContentStreamAllowed.ALLOWED);
 
 		addBasePropertyDefinitions(documentType);
-		addDocumentPropertyDefinitions(documentType);
+		try {
+			addDocumentPropertyDefinitions(documentType);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 
 		addTypeInteral(documentType);
 
@@ -259,7 +264,7 @@ public class TypeManager {
 				Updatability.READONLY, false, false));
 	}
 
-	private static void addDocumentPropertyDefinitions(DocumentTypeDefinitionImpl type) {
+	private static void addDocumentPropertyDefinitions(DocumentTypeDefinitionImpl type) throws PersistenceException {
 		type.addPropertyDefinition(createPropDef(PropertyIds.IS_IMMUTABLE, "Is Immutable", "Is Immutable",
 				PropertyType.BOOLEAN, Cardinality.SINGLE, Updatability.READONLY, false, false));
 

@@ -41,7 +41,7 @@ public class HibernateGenericDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByAlternateKey() {
+	public void testFindByAlternateKey() throws PersistenceException {
 		Generic generic = dao.findByAlternateKey("a", "a1", null, Tenant.DEFAULT_ID);
 		Assert.assertNotNull(generic);
 		Assert.assertEquals(Long.valueOf(0L), generic.getInteger1());
@@ -57,7 +57,7 @@ public class HibernateGenericDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByTypeAndSubtype() {
+	public void testFindByTypeAndSubtype() throws PersistenceException {
 		List<Generic> generics = dao.findByTypeAndSubtype("a", "a%", null, null);
 		Assert.assertEquals(2, generics.size());
 		generics = dao.findByTypeAndSubtype("a", "a%", null, Tenant.DEFAULT_ID);

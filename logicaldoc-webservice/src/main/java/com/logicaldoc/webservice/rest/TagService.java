@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
@@ -39,12 +40,13 @@ public interface TagService {
 	 * @throws AuthenticationException Invalid session
 	 * @throws PermissionException The user does not have the required
 	 *         permission
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
 	@POST
 	@Path("/setDocumentTags")
 	public void setDocumentTags(@FormParam("docId")
 	long docId, @FormParam("tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, UnexistingResourceException;
 
 	/**
 	 * Adds tags to a document
@@ -76,11 +78,12 @@ public interface TagService {
 	 * @throws AuthenticationException Invalid session
 	 * @throws PermissionException The user does not have the required
 	 *         permission
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
 	@GET
 	@Path("/getDocumentTags")
 	public String[] getDocumentTags(@QueryParam("docId")
-	long docId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException;
+	long docId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException, UnexistingResourceException;
 
 	/**
 	 * Sets the tags of a folder

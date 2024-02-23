@@ -128,7 +128,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByUserNameString() {
+	public void testFindByUserNameString() throws PersistenceException {
 		List<Menu> menus = dao.findByUserId(1);
 		Assert.assertNotNull(menus);
 		Assert.assertEquals(dao.findAllIds().size(), menus.size());
@@ -293,7 +293,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindMenuIdByUserIdAndPermission() {
+	public void testFindMenuIdByUserIdAndPermission() throws PersistenceException {
 		List<Long> ids = dao.findMenuIdByUserIdAndPermission(4, Permission.WRITE, true);
 		Assert.assertNotNull(ids);
 		Assert.assertEquals(3, ids.size());

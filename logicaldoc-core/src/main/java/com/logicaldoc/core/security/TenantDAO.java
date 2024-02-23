@@ -2,6 +2,7 @@ package com.logicaldoc.core.security;
 
 import java.util.Set;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 
 public interface TenantDAO extends PersistentObjectDAO<Tenant> {
@@ -28,8 +29,10 @@ public interface TenantDAO extends PersistentObjectDAO<Tenant> {
 	 * Retrieves all the tenant names
 	 * 
 	 * @return the collection of all the tenant names
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public Set<String> findAllNames();
+	public Set<String> findAllNames() throws PersistenceException;
 
 	/**
 	 * Counts the total number of tenants

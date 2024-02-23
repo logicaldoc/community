@@ -199,13 +199,14 @@ public class IndexerTask extends Task {
 
 			indexer.unlock();
 
-			// To be safer always release the lock
-			lockManager.release(getName(), transactionId);
-
-			// Remove the transaction reference
-			Map<String, Object> params = new HashMap<>();
-			params.put("transactionId", transactionId);
 			try {
+				// To be safer always release the lock
+				lockManager.release(getName(), transactionId);
+
+				// Remove the transaction reference
+				Map<String, Object> params = new HashMap<>();
+				params.put("transactionId", transactionId);
+
 				documentDao.bulkUpdate("set ld_transactionid = null where ld_transactionId = :transactionId", params);
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);

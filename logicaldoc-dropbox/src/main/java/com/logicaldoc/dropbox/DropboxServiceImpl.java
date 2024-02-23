@@ -115,8 +115,10 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 	/**
 	 * Loads the access token saved for the given user.
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	static String loadAccessToken(User user) {
+	static String loadAccessToken(User user) throws PersistenceException {
 		GenericDAO dao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 		Generic generic = dao.findByAlternateKey(DROPBOX, TOKEN, user.getId(), user.getTenantId());
 		if (generic == null)
@@ -128,8 +130,10 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 	/**
 	 * Saves the access token saved for the given user. The token is saved in a
 	 * Generic(type: dropbox, subtype: token)
+	 * 
+	 * @throws PersistenceException Error in the database 
 	 */
-	protected void saveAccessToken(User user, String token, String account) {
+	protected void saveAccessToken(User user, String token, String account) throws PersistenceException {
 		GenericDAO dao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 		Generic generic = dao.findByAlternateKey(DROPBOX, TOKEN, user.getId(), user.getTenantId());
 		if (generic == null)

@@ -2028,25 +2028,30 @@ public class LDRepository {
 		addPropertyInteger(result, typeId, filter, TypeManager.PROP_TYPE, folder.getType());
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<ObjectData> getAllVersions(String objectId) {
 		validatePermission(objectId, null, null);
 
 		List<ObjectData> versions = new ArrayList<>();
+		try {
+			AbstractDocument doc = getDocument(objectId);
 
-		AbstractDocument doc = getDocument(objectId);
+			List<Version> buf = versionDao.findByDocId(doc.getId());
 
-		List<Version> buf = versionDao.findByDocId(doc.getId());
-
-		if (doc instanceof Document) {
-			for (Version version : buf) {
-				ObjectData data = compileObjectType(null, version, null, true, false, null);
-				versions.add(data);
+			if (doc instanceof Document) {
+				for (Version version : buf) {
+					ObjectData data = compileObjectType(null, version, null, true, false, null);
+					versions.add(data);
+				}
+			} else {
+				versions.add(compileObjectType(null, doc, null, true, false, null));
 			}
-		} else {
-			versions.add(compileObjectType(null, doc, null, true, false, null));
-		}
 
-		return versions;
+			return versions;
+		} catch (Exception t) {
+			log.warn("Not able to retrieve object {}", objectId);
+			return (List<ObjectData>) catchError(t);
+		}
 	}
 
 	/**

@@ -195,21 +195,21 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 	}
 
-	private void removeLinks(long docId, int delCode) {
+	private void removeLinks(long docId, int delCode) throws PersistenceException {
 		for (DocumentLink link : linkDAO.findByDocId(docId)) {
 			link.setDeleted(delCode);
 			saveOrUpdate(link);
 		}
 	}
 
-	private void removeNotes(long docId, int delCode) {
+	private void removeNotes(long docId, int delCode) throws PersistenceException {
 		for (DocumentNote note : noteDAO.findByDocId(docId, null)) {
 			note.setDeleted(delCode);
 			saveOrUpdate(note);
 		}
 	}
 
-	private void removeVersions(long docId, int delCode) {
+	private void removeVersions(long docId, int delCode) throws PersistenceException {
 		for (Version version : versionDAO.findByDocId(docId)) {
 			version.setDeleted(delCode);
 			saveOrUpdate(version);

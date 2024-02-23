@@ -10,8 +10,6 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.security.user.PasswordHistory;
-import com.logicaldoc.core.security.user.PasswordHistoryDAO;
 
 import junit.framework.Assert;
 
@@ -45,7 +43,7 @@ public class HibernatePasswordHistoryDAOTest extends AbstractCoreTestCase {
 		histories = dao.findByUserId(1L, null);
 		Assert.assertEquals(2, histories.size());
 	}
-	
+
 	@Test
 	public void testFindByUserId() throws PersistenceException {
 		List<PasswordHistory> histories = dao.findByUserId(1L, null);
@@ -53,7 +51,7 @@ public class HibernatePasswordHistoryDAOTest extends AbstractCoreTestCase {
 
 		histories = dao.findByUserId(1L, 100);
 		Assert.assertEquals(3, histories.size());
-		
+
 		histories = dao.findByUserId(1L, 2);
 		Assert.assertEquals(2, histories.size());
 		Assert.assertEquals("psw1", histories.get(0).getPassword());

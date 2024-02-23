@@ -343,7 +343,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		}
 	}
 
-	private void addUsersFromGroups(Collection<Long> groupIds, Collection<Long> users) {
+	private void addUsersFromGroups(Collection<Long> groupIds, Collection<Long> users) throws PersistenceException {
 		UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		for (Long gId : groupIds) {
 			Set<User> usrs = gDao.findByGroup(gId);

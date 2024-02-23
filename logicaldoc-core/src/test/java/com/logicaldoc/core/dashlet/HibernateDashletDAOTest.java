@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
+import com.logicaldoc.core.PersistenceException;
 
 import junit.framework.Assert;
 
@@ -31,7 +32,7 @@ public class HibernateDashletDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByName() {
+	public void testFindByName() throws PersistenceException {
 		Dashlet dashlet = dao.findByName("checkout", 1L);
 		Assert.assertNotNull(dashlet);
 		Assert.assertEquals(1L, dashlet.getId());

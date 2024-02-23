@@ -11,8 +11,6 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.Bookmark;
-import com.logicaldoc.core.document.BookmarkDAO;
 
 import junit.framework.Assert;
 
@@ -52,7 +50,7 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	@SuppressWarnings("rawtypes")
-	public void testFindByUserId() {
+	public void testFindByUserId() throws PersistenceException {
 		Collection bookmarks = dao.findByUserId(1);
 		Assert.assertNotNull(bookmarks);
 		Assert.assertEquals(2, bookmarks.size());
@@ -69,7 +67,7 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	@SuppressWarnings("rawtypes")
-	public void testFindBookmarkedDocs() {
+	public void testFindBookmarkedDocs() throws PersistenceException {
 		Collection bookmarks = dao.findByUserId(1);
 		Assert.assertNotNull(bookmarks);
 		Assert.assertEquals(2, bookmarks.size());
@@ -82,7 +80,7 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testIsDocBookmarkedByUser() {
+	public void testIsDocBookmarkedByUser() throws PersistenceException {
 		Assert.assertTrue(dao.isDocBookmarkedByUser(1L, 1L));
 		Assert.assertFalse(dao.isDocBookmarkedByUser(55L, 1L));
 	}
@@ -104,22 +102,22 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 		bookmark = dao.findByUserIdAndDocId(1, 2);
 		Assert.assertNotNull(bookmark);
 	}
-	
+
 	@Test
 	public void testDelete() throws PersistenceException {
-		
+
 		Bookmark bmark = new Bookmark();
 		bmark.setType(Bookmark.TYPE_DOCUMENT);
 		bmark.setTitle("Photo-2022-07-13-21-18-28_1495.jpg");
 		bmark.setFileType("jpg");
 		bmark.setUserId(1);
 		bmark.setTargetId(244);
-			
+
 		dao.store(bmark);
 		long bkmID = bmark.getId();
-		
+
 		dao.delete(bkmID);
 		bmark = dao.findByUserIdAndDocId(1, bkmID);
 		Assert.assertNull(bmark);
-	}	
+	}
 }

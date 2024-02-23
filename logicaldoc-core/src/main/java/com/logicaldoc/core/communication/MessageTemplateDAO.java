@@ -2,6 +2,7 @@ package com.logicaldoc.core.communication;
 
 import java.util.List;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 
 /**
@@ -19,8 +20,10 @@ public interface MessageTemplateDAO extends PersistentObjectDAO<MessageTemplate>
 	 * @param tenantId identifier of the tenant
 	 * 
 	 * @return collection of templates 
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<MessageTemplate> findByLanguage(String language, long tenantId);
+	public List<MessageTemplate> findByLanguage(String language, long tenantId) throws PersistenceException;
 
 	/**
 	 * Finds the templates by given name, you may have the same name but for different languages.
@@ -29,8 +32,10 @@ public interface MessageTemplateDAO extends PersistentObjectDAO<MessageTemplate>
 	 * @param tenantId identifier of the tenant
 	 * 
 	 * @return collection of templates
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<MessageTemplate> findByName(String name, long tenantId);
+	public List<MessageTemplate> findByName(String name, long tenantId) throws PersistenceException;
 
 	/**
 	 * Finds the template by the alternate key. If the template is not found for
@@ -41,8 +46,10 @@ public interface MessageTemplateDAO extends PersistentObjectDAO<MessageTemplate>
 	 * @param tenantId the tenant
 	 * 
 	 * @return The found template or the 'en' if none was found
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public MessageTemplate findByNameAndLanguage(String name, String language, long tenantId);
+	public MessageTemplate findByNameAndLanguage(String name, String language, long tenantId) throws PersistenceException;
 
 	/**
 	 * Finds the templates by the type.
@@ -52,6 +59,8 @@ public interface MessageTemplateDAO extends PersistentObjectDAO<MessageTemplate>
 	 * @param tenantId the tenant
 	 * 
 	 * @return the found templates
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<MessageTemplate> findByTypeAndLanguage(String type, String language, long tenantId);
+	public List<MessageTemplate> findByTypeAndLanguage(String type, String language, long tenantId) throws PersistenceException;
 }

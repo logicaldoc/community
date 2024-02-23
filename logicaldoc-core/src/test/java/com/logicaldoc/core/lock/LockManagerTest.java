@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Tenant;
@@ -38,7 +39,7 @@ public class LockManagerTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testGet() {
+	public void testGet() throws PersistenceException {
 		Assert.assertTrue(manager.get("test", "t1"));
 		Assert.assertTrue(manager.get("test", "t1"));
 		Assert.assertFalse(manager.get("test", "t2"));

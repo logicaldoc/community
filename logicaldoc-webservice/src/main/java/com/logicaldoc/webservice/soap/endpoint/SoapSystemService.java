@@ -136,7 +136,7 @@ public class SoapSystemService extends AbstractService implements SystemService 
 		return parameters;
 	}
 
-	private WSParameter getStat(String statSubtype, String paramName) {
+	private WSParameter getStat(String statSubtype, String paramName) throws PersistenceException {
 		GenericDAO genDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 		Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, statSubtype, null, Tenant.DEFAULT_ID);
 		WSParameter logsDirSize = new WSParameter();
@@ -148,35 +148,35 @@ public class SoapSystemService extends AbstractService implements SystemService 
 		return logsDirSize;
 	}
 
-	private WSParameter getLogsDirSize() {
+	private WSParameter getLogsDirSize() throws PersistenceException {
 		return getStat("logdir", "repo_logs");
 	}
 
-	private WSParameter getDbDirSize() {
+	private WSParameter getDbDirSize() throws PersistenceException {
 		return getStat("dbdir", "repo_database");
 	}
 
-	private WSParameter getPluginsDirSize() {
+	private WSParameter getPluginsDirSize() throws PersistenceException {
 		return getStat("plugindir", "repo_plugins");
 	}
 
-	private WSParameter getExportDirSize() {
+	private WSParameter getExportDirSize() throws PersistenceException {
 		return getStat("exportdir", "repo_export");
 	}
 
-	private WSParameter getImportDirSize() {
+	private WSParameter getImportDirSize() throws PersistenceException {
 		return getStat("importdir", "repo_import");
 	}
 
-	private WSParameter getIndexDirSize() {
+	private WSParameter getIndexDirSize() throws PersistenceException {
 		return getStat("indexdir", "repo_fulltextindex");
 	}
 
-	private WSParameter getUserDirSize() {
+	private WSParameter getUserDirSize() throws PersistenceException {
 		return getStat("userdir", "repo_users");
 	}
 
-	private WSParameter getDocDirSize() {
+	private WSParameter getDocDirSize() throws PersistenceException {
 		return getStat("docdir", "repo_docs");
 	}
 

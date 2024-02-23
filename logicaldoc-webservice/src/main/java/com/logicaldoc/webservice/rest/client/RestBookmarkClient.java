@@ -19,6 +19,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSBookmark;
 import com.logicaldoc.webservice.rest.BookmarkService;
@@ -53,13 +54,13 @@ public class RestBookmarkClient extends AbstractRestClient {
 		}
 	}
 
-	public WSBookmark saveBookmark(WSBookmark bookmark) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSBookmark saveBookmark(WSBookmark bookmark) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, UnexistingResourceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.saveBookmark(bookmark);
 	}
 
-	public WSBookmark bookmarkDocument(@QueryParam("docId") long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSBookmark bookmarkDocument(@QueryParam("docId") long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, UnexistingResourceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.bookmarkDocument(docId);

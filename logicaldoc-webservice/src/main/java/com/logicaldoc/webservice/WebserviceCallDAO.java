@@ -1,5 +1,6 @@
 package com.logicaldoc.webservice;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 
 /**
@@ -16,6 +17,8 @@ public interface WebserviceCallDAO extends PersistentObjectDAO<WebserviceCall> {
 	 * 
 	 * @param ttl The maximum number of days over which the item is considered
 	 *        old
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public void cleanOldCalls(int ttl);
+	public void cleanOldCalls(int ttl) throws PersistenceException;
 }

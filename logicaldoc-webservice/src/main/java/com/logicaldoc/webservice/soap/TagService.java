@@ -8,6 +8,7 @@ import javax.jws.WebService;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.doc.WSDoc;
 import com.logicaldoc.webservice.model.WSDocument;
@@ -37,6 +38,7 @@ public interface TagService {
 	 * @throws AuthenticationException Invalid session
 	 * @throws PermissionException The user does not have the required
 	 *         permission
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
 	@WebMethod(action = "setDocumentTags")
 	@WSDoc(description = "sets the tags of a document")
@@ -45,7 +47,8 @@ public interface TagService {
 	String sid, @WSDoc(description = "identifier of the document", required = true)
 	@WebParam(name = "docId")
 	long docId, @WebParam(name = "tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			UnexistingResourceException;
 
 	/**
 	 * Adds tags to a document
@@ -59,6 +62,7 @@ public interface TagService {
 	 * @throws AuthenticationException Invalid session
 	 * @throws PermissionException The user does not have the required
 	 *         permission
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
 	@WebMethod(action = "addDocumentTags")
 	@WSDoc(description = "adds tags to a document")
@@ -67,7 +71,8 @@ public interface TagService {
 	String sid, @WSDoc(description = "identifier of the document", required = true)
 	@WebParam(name = "docId")
 	long docId, @WebParam(name = "tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			UnexistingResourceException;
 
 	/**
 	 * Retrieves all the tags of a document.
@@ -82,6 +87,7 @@ public interface TagService {
 	 * @throws AuthenticationException Invalid session
 	 * @throws PermissionException The user does not have the required
 	 *         permission
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
 	@WebMethod(action = "getDocumentTags")
 	@WebResult(name = "tag")
@@ -90,7 +96,8 @@ public interface TagService {
 	@WebParam(name = "sid")
 	String sid, @WSDoc(description = "identifier of the document", required = true)
 	@WebParam(name = "docId")
-	long docId) throws PermissionException, PersistenceException, AuthenticationException, WebserviceException;
+	long docId) throws PermissionException, PersistenceException, AuthenticationException, WebserviceException,
+			UnexistingResourceException;
 
 	/**
 	 * Sets the tags of a folder

@@ -133,207 +133,192 @@ public class StatsCollector extends Task {
 		if (interruptRequested)
 			return;
 
-		/*
-		 * Collect users data
-		 */
-		int users = userDao.count(null);
-		int guests = userDao.countGuests(null);
-		int groups = 0;
 		try {
-			groups = groupDAO.count();
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-		log.debug("Collected users data");
+			/*
+			 * Collect users statistics
+			 */
+			int users = userDao.count(null);
+			int guests = userDao.countGuests(null);
+			int groups = groupDAO.count();
+			log.debug("Collected users data");
 
-		long userdir = calculateUserDirSize();
-		saveStatistic("userdir", userdir, Tenant.SYSTEM_ID);
+			long userdir = calculateUserDirSize();
+			saveStatistic("userdir", userdir, Tenant.SYSTEM_ID);
 
-		long indexdir = calculateIndexDirSize();
-		saveStatistic("indexdir", indexdir, Tenant.SYSTEM_ID);
+			long indexdir = calculateIndexDirSize();
+			saveStatistic("indexdir", indexdir, Tenant.SYSTEM_ID);
 
-		long importdir = calculateImportDirSize();
-		saveStatistic("importdir", importdir, Tenant.SYSTEM_ID);
+			long importdir = calculateImportDirSize();
+			saveStatistic("importdir", importdir, Tenant.SYSTEM_ID);
 
-		long exportdir = calculateExportDirSize();
-		saveStatistic("exportdir", exportdir, Tenant.SYSTEM_ID);
+			long exportdir = calculateExportDirSize();
+			saveStatistic("exportdir", exportdir, Tenant.SYSTEM_ID);
 
-		long plugindir = calculatePluginDirSize();
-		saveStatistic("plugindir", plugindir, Tenant.SYSTEM_ID);
+			long plugindir = calculatePluginDirSize();
+			saveStatistic("plugindir", plugindir, Tenant.SYSTEM_ID);
 
-		next();
-		if (interruptRequested)
-			return;
+			next();
+			if (interruptRequested)
+				return;
 
-		long dbdir = calculateDatabaseSize();
-		saveStatistic("dbdir", dbdir, Tenant.SYSTEM_ID);
+			long dbdir = calculateDatabaseSize();
+			saveStatistic("dbdir", dbdir, Tenant.SYSTEM_ID);
 
-		long logdir = calculateLogDirSize();
-		saveStatistic("logdir", logdir, Tenant.SYSTEM_ID);
+			long logdir = calculateLogDirSize();
+			saveStatistic("logdir", logdir, Tenant.SYSTEM_ID);
 
-		log.info("Saved repository statistics");
-		next();
-		if (interruptRequested)
-			return;
+			log.info("Saved repository statistics");
+			next();
+			if (interruptRequested)
+				return;
 
-		/*
-		 * Collect documents statistics
-		 */
-		long totaldocs;
-		long archiveddocs;
-		long docdir;
-		long trash;
-		try {
+			/*
+			 * Collect documents statistics
+			 */
 			long[] docStats = extractDocStats(Tenant.SYSTEM_ID);
-			totaldocs = docStats[3];
-			archiveddocs = docStats[4];
-			docdir = docStats[5];
-			trash = docStats[7];
+			long totaldocs = docStats[3];
+			long archiveddocs = docStats[4];
+			long docdir = docStats[5];
+			long trash = docStats[7];
 
 			calculateAllTenantsDocsStats();
+
+			log.info("Saved documents statistics");
+			next();
+			if (interruptRequested)
+				return;
+
+			/*
+			 * Collect pages statistics
+			 */
+
+			long[] pageStats = extractPageStats(Tenant.SYSTEM_ID);
+			long totalpages = pageStats[3];
+
+			calculateAllTenantsPageStats();
+
+			log.info("Saved pages statistics");
+			next();
+			if (interruptRequested)
+				return;
+
+			/*
+			 * Collect folders statistics
+			 */
+			long[] fldStats = extractFldStats(Tenant.SYSTEM_ID);
+			long withdocs = fldStats[0];
+			long empty = fldStats[1];
+			long deletedfolders = fldStats[2];
+
+			calculateAllTenantsFolderStats();
+
+			log.info("Saved folder statistics");
+			next();
+			if (interruptRequested)
+				return;
+
+			/*
+			 * Collect sizing statistics
+			 */
+			
+			long tags = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_tag");
+			long versions = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_version");
+			long histories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_history");
+			long userHistories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_user_history");
+			long votes = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_rating");
+			long wsCalls = sequenceDAO.getCurrentValue("wscall", 0, Tenant.SYSTEM_ID);
+
+			/*
+			 * Save the last update time
+			 */
+			saveStatistic("lastrun", new Date(), Tenant.SYSTEM_ID);
+
+			log.info("Statistics collected");
+			next();
+			if (interruptRequested)
+				return;
+
+			log.debug("Package collected statistics");
+
+			// Prepare the post parameters
+			List<NameValuePair> postParams = new ArrayList<>();
+
+			// Add all statistics as parameters
+			postParams.add(new BasicNameValuePair("id", StringUtils.defaultString(id)));
+			postParams.add(new BasicNameValuePair("userno", StringUtils.defaultString(userno)));
+			postParams.add(new BasicNameValuePair("sid", StringUtils.defaultString(sid)));
+
+			postParams.add(new BasicNameValuePair("product_release", StringUtils.defaultString(release)));
+			postParams.add(new BasicNameValuePair("email", StringUtils.defaultString(email)));
+			postParams.add(new BasicNameValuePair("product", StringUtils.defaultString(StatsCollector.product)));
+			postParams
+					.add(new BasicNameValuePair("product_name", StringUtils.defaultString(StatsCollector.productName)));
+
+			postParams.add(new BasicNameValuePair("java_version", StringUtils.defaultString(javaversion)));
+			postParams.add(new BasicNameValuePair("java_vendor", StringUtils.defaultString(javavendor)));
+			postParams.add(new BasicNameValuePair("java_arch", StringUtils.defaultString(javaarch)));
+			postParams.add(new BasicNameValuePair("dbms", StringUtils.defaultString(dbms)));
+
+			postParams.add(new BasicNameValuePair("os_name", StringUtils.defaultString(osname)));
+			postParams.add(new BasicNameValuePair("os_version", StringUtils.defaultString(osversion)));
+			postParams.add(new BasicNameValuePair("file_encoding", StringUtils.defaultString(fileencoding)));
+
+			postParams.add(new BasicNameValuePair("user_language", StringUtils.defaultString(userlanguage)));
+			postParams.add(new BasicNameValuePair("user_country", StringUtils.defaultString(usercountry)));
+
+			// Sizing
+			postParams.add(new BasicNameValuePair("users", Integer.toString(users)));
+			postParams.add(new BasicNameValuePair("guests", Integer.toString(guests)));
+			postParams.add(new BasicNameValuePair("groups", Integer.toString(groups)));
+			postParams.add(new BasicNameValuePair("docs", Long.toString(totaldocs)));
+			postParams.add(new BasicNameValuePair("pages", Long.toString(totalpages)));
+
+			postParams.add(new BasicNameValuePair("archived_docs", Long.toString(archiveddocs)));
+			postParams.add(new BasicNameValuePair("folders", Long.toString(withdocs + empty + deletedfolders)));
+			postParams.add(new BasicNameValuePair("tags", Long.toString(tags)));
+			postParams.add(new BasicNameValuePair("versions", Long.toString(versions)));
+			postParams.add(new BasicNameValuePair("histories", Long.toString(histories)));
+			postParams.add(new BasicNameValuePair("user_histories", Long.toString(userHistories)));
+			postParams.add(new BasicNameValuePair("votes", Long.toString(votes)));
+			postParams.add(new BasicNameValuePair("wscalls", Long.toString(wsCalls)));
+
+			collectFeatureUsageStats(postParams);
+			next();
+			if (interruptRequested)
+				return;
+
+			/*
+			 * General usage
+			 */
+			Date lastLogin = findLastLogin();
+			postParams.add(new BasicNameValuePair("last_login", formatDate(lastLogin)));
+
+			Date lastCreation = findLastCreation();
+			postParams.add(new BasicNameValuePair("last_creation", formatDate(lastCreation)));
+
+			/*
+			 * Quotas
+			 */
+			postParams.add(new BasicNameValuePair("docdir", Long.toString(docdir)));
+			postParams.add(new BasicNameValuePair("trash", Long.toString(trash)));
+			postParams.add(new BasicNameValuePair("indexdir", Long.toString(indexdir)));
+			postParams.add(new BasicNameValuePair("quota",
+					Long.toString(docdir + indexdir + userdir + importdir + exportdir + plugindir + dbdir + logdir)));
+
+			/*
+			 * Registration
+			 */
+			postParams.add(new BasicNameValuePair("reg_name", regName != null ? regName : ""));
+			postParams.add(new BasicNameValuePair("reg_email", regEmail != null ? regEmail : ""));
+			postParams.add(new BasicNameValuePair("reg_organization", regOrganization != null ? regOrganization : ""));
+			postParams.add(new BasicNameValuePair("reg_website", regWebsite != null ? regWebsite : ""));
+
+			postStatistics(postParams);
+
+			next();
 		} catch (PersistenceException e) {
 			throw new TaskException(e.getMessage(), e);
 		}
-
-		log.info("Saved documents statistics");
-		next();
-		if (interruptRequested)
-			return;
-
-		/*
-		 * Collect pages statistics
-		 */
-		long[] pageStats = extractPageStats(Tenant.SYSTEM_ID);
-		long totalpages = pageStats[3];
-
-		calculateAllTenantsPageStats();
-
-		log.info("Saved pages statistics");
-		next();
-		if (interruptRequested)
-			return;
-
-		/*
-		 * Collect folders statistics
-		 */
-		long[] fldStats = extractFldStats(Tenant.SYSTEM_ID);
-		long withdocs = fldStats[0];
-		long empty = fldStats[1];
-		long deletedfolders = fldStats[2];
-
-		calculateAllTenantsFolderStats();
-
-		log.info("Saved folder statistics");
-		next();
-		if (interruptRequested)
-			return;
-
-		/*
-		 * Collect sizing statistics
-		 */
-		long tags;
-		long versions;
-		long histories;
-		long userHistories;
-		long votes;
-		try {
-			tags = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_tag");
-			versions = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_version");
-			histories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_history");
-			userHistories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_user_history");
-			votes = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_rating");
-		} catch (PersistenceException e) {
-			throw new TaskException(e.getMessage(), e);
-		}
-		long wsCalls = sequenceDAO.getCurrentValue("wscall", 0, Tenant.SYSTEM_ID);
-
-		/*
-		 * Save the last update time
-		 */
-		saveStatistic("lastrun", new Date(), Tenant.SYSTEM_ID);
-
-		log.info("Statistics collected");
-		next();
-		if (interruptRequested)
-			return;
-
-		log.debug("Package collected statistics");
-
-		// Prepare the post parameters
-		List<NameValuePair> postParams = new ArrayList<>();
-
-		// Add all statistics as parameters
-		postParams.add(new BasicNameValuePair("id", StringUtils.defaultString(id)));
-		postParams.add(new BasicNameValuePair("userno", StringUtils.defaultString(userno)));
-		postParams.add(new BasicNameValuePair("sid", StringUtils.defaultString(sid)));
-
-		postParams.add(new BasicNameValuePair("product_release", StringUtils.defaultString(release)));
-		postParams.add(new BasicNameValuePair("email", StringUtils.defaultString(email)));
-		postParams.add(new BasicNameValuePair("product", StringUtils.defaultString(StatsCollector.product)));
-		postParams.add(new BasicNameValuePair("product_name", StringUtils.defaultString(StatsCollector.productName)));
-
-		postParams.add(new BasicNameValuePair("java_version", StringUtils.defaultString(javaversion)));
-		postParams.add(new BasicNameValuePair("java_vendor", StringUtils.defaultString(javavendor)));
-		postParams.add(new BasicNameValuePair("java_arch", StringUtils.defaultString(javaarch)));
-		postParams.add(new BasicNameValuePair("dbms", StringUtils.defaultString(dbms)));
-
-		postParams.add(new BasicNameValuePair("os_name", StringUtils.defaultString(osname)));
-		postParams.add(new BasicNameValuePair("os_version", StringUtils.defaultString(osversion)));
-		postParams.add(new BasicNameValuePair("file_encoding", StringUtils.defaultString(fileencoding)));
-
-		postParams.add(new BasicNameValuePair("user_language", StringUtils.defaultString(userlanguage)));
-		postParams.add(new BasicNameValuePair("user_country", StringUtils.defaultString(usercountry)));
-
-		// Sizing
-		postParams.add(new BasicNameValuePair("users", Integer.toString(users)));
-		postParams.add(new BasicNameValuePair("guests", Integer.toString(guests)));
-		postParams.add(new BasicNameValuePair("groups", Integer.toString(groups)));
-		postParams.add(new BasicNameValuePair("docs", Long.toString(totaldocs)));
-		postParams.add(new BasicNameValuePair("pages", Long.toString(totalpages)));
-
-		postParams.add(new BasicNameValuePair("archived_docs", Long.toString(archiveddocs)));
-		postParams.add(new BasicNameValuePair("folders", Long.toString(withdocs + empty + deletedfolders)));
-		postParams.add(new BasicNameValuePair("tags", Long.toString(tags)));
-		postParams.add(new BasicNameValuePair("versions", Long.toString(versions)));
-		postParams.add(new BasicNameValuePair("histories", Long.toString(histories)));
-		postParams.add(new BasicNameValuePair("user_histories", Long.toString(userHistories)));
-		postParams.add(new BasicNameValuePair("votes", Long.toString(votes)));
-		postParams.add(new BasicNameValuePair("wscalls", Long.toString(wsCalls)));
-
-		collectFeatureUsageStats(postParams);
-		next();
-		if (interruptRequested)
-			return;
-
-		/*
-		 * General usage
-		 */
-		Date lastLogin = findLastLogin();
-		postParams.add(new BasicNameValuePair("last_login", formatDate(lastLogin)));
-
-		Date lastCreation = findLastCreation();
-		postParams.add(new BasicNameValuePair("last_creation", formatDate(lastCreation)));
-
-		/*
-		 * Quotas
-		 */
-		postParams.add(new BasicNameValuePair("docdir", Long.toString(docdir)));
-		postParams.add(new BasicNameValuePair("trash", Long.toString(trash)));
-		postParams.add(new BasicNameValuePair("indexdir", Long.toString(indexdir)));
-		postParams.add(new BasicNameValuePair("quota",
-				Long.toString(docdir + indexdir + userdir + importdir + exportdir + plugindir + dbdir + logdir)));
-
-		/*
-		 * Registration
-		 */
-		postParams.add(new BasicNameValuePair("reg_name", regName != null ? regName : ""));
-		postParams.add(new BasicNameValuePair("reg_email", regEmail != null ? regEmail : ""));
-		postParams.add(new BasicNameValuePair("reg_organization", regOrganization != null ? regOrganization : ""));
-		postParams.add(new BasicNameValuePair("reg_website", regWebsite != null ? regWebsite : ""));
-
-		postStatistics(postParams);
-
-		next();
 	}
 
 	private String formatDate(Date lastLogin) {
@@ -389,12 +374,12 @@ public class StatsCollector extends Task {
 		return lastCreation;
 	}
 
-	private void calculateAllTenantsFolderStats() {
+	private void calculateAllTenantsFolderStats() throws PersistenceException {
 		for (Tenant tenant : tenantDAO.findAll())
 			extractFldStats(tenant.getId());
 	}
 
-	private void calculateAllTenantsPageStats() {
+	private void calculateAllTenantsPageStats() throws PersistenceException {
 		for (Tenant tenant : tenantDAO.findAll())
 			extractPageStats(tenant.getId());
 	}
@@ -696,8 +681,10 @@ public class StatsCollector extends Task {
 	 *         <li>archivedpages</li>
 	 *         <li>notindexablepages</li>
 	 *         </ol>
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	private long[] extractPageStats(long tenantId) {
+	private long[] extractPageStats(long tenantId) throws PersistenceException {
 		long[] stats = new long[6];
 
 		stats[0] = 0;
@@ -777,8 +764,10 @@ public class StatsCollector extends Task {
 	 *         <li>empty</li>
 	 *         <li>deletedfolders</li>
 	 *         </ol>
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	private long[] extractFldStats(long tenantId) {
+	private long[] extractFldStats(long tenantId) throws PersistenceException {
 		long[] stats = new long[4];
 
 		stats[0] = 0;
@@ -816,8 +805,10 @@ public class StatsCollector extends Task {
 
 	/**
 	 * Convenience method for saving statistical data in the DB as Generics
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	protected void saveStatistic(String parameter, Object val, long tenantId) {
+	protected void saveStatistic(String parameter, Object val, long tenantId) throws PersistenceException {
 		Generic gen = genericDAO.findByAlternateKey(STAT, parameter, null, tenantId);
 		if (gen == null) {
 			gen = new Generic();

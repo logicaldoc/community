@@ -48,7 +48,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	long setId, @QueryParam("attribute")
 	String attribute, @QueryParam("options")
 	WSAttributeOption[] options) throws WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		super.setAttributeOptions(sid, setId, attribute, options);
 	}
 
@@ -57,7 +57,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@Path("/storeAttributeSet")
 	@Operation(summary = "Create/Update an attribute set", description = "Create/Update an attribute set. You can completely customize the attribute set through a value object containing the attribute set's metadata")
 	public long storeAttributeSet(WSAttributeSet attributeSet) throws WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.storeAttributeSet(sid, attributeSet);
 	}
 
@@ -67,7 +67,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@Operation(summary = "Create/Update a template", description = "Create/Update a template. You can completely customize the template through a value object")
 	public long storeTemplate(WSTemplate template)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.storeTemplate(sid, template);
 	}
 
@@ -78,7 +78,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	public WSAttributeSet getAttributeSetById(@Parameter(description = "Attribute set identifier (ID)")
 	@QueryParam("setId")
 	long setId) throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.getAttributeSetById(sid, setId);
 	}
 
@@ -89,7 +89,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	public WSAttributeSet getAttributeSet(@Parameter(description = "The attribute set's name")
 	@QueryParam("name")
 	String name) throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.getAttributeSet(sid, name);
 	}
 
@@ -100,7 +100,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	public WSTemplate getTemplate(@Parameter(description = "The template name")
 	@QueryParam("name")
 	String name) throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.getTemplate(sid, name);
 	}
 
@@ -111,7 +111,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	public WSTemplate getTemplateById(@Parameter(description = "The template identifier (ID)")
 	@QueryParam("templateId")
 	long templateId) throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.getTemplateById(sid, templateId);
 	}
 
@@ -124,7 +124,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	long setId, @Parameter(description = "The attribute's name")
 	@QueryParam("attribute")
 	String attribute) throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.getAttributeOptions(sid, setId, attribute);
 	}
 
@@ -134,7 +134,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@Operation(summary = "Lists the attribute sets", description = "Gets metadata of all existing attribute sets")
 	public WSAttributeSet[] listAttributeSets()
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.listAttributeSets(sid);
 	}
 
@@ -145,7 +145,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	public void deleteAttributeSet(@Parameter(description = "Attribute set identifier (ID)")
 	@QueryParam("setId")
 	long setId) throws WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		super.deleteAttributeSet(sid, setId);
 	}
 
@@ -156,7 +156,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	public void deleteTemplate(@Parameter(description = "A template ID")
 	@QueryParam("templateId")
 	long templateId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		super.deleteTemplate(sid, templateId);
 	}
 
@@ -165,7 +165,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@Path("/listTemplates")
 	@Operation(summary = "Lists all the templates", description = "Gets metadata of all existing templates")
 	public WSTemplate[] listTemplates() throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.listTemplates(sid);
 	}
 
@@ -179,7 +179,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	Long setId, @Multipart(value = "attribute")
 	String attribute, @Multipart(value = "options", type = "application/json")
 	WSAttributeOption[] options) throws WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		super.setAttributeOptions(sid, setId, attribute, options);
 	}
 
@@ -226,7 +226,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	long setId, @FormParam("attribute")
 	String attribute, @FormParam("option")
 	WSAttributeOption option) throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		super.addAttributeOption(sid, setId, attribute, option);
 	}
 }

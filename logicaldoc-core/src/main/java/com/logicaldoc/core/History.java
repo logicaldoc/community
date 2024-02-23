@@ -113,8 +113,6 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	private String color;
 
-	protected History() {
-	}
 
 	public String getVersion() {
 		return version;
@@ -435,6 +433,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 	protected void copyAttributesFrom(History source) {
 		setTenantId(source.getTenantId());
 		setDate(source.getDate());
+		setCreation(source.getCreation());
 		setDocId(source.getDocId());
 		setFolderId(source.getFolderId());
 		setUser(source.getUser());

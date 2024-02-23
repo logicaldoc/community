@@ -335,7 +335,8 @@ public class DocTool {
 	 * 
 	 * @return the new document created
 	 */
-	public Document copy(Document doc, String targetPath, boolean links, boolean notes, boolean security, String username) {
+	public Document copy(Document doc, String targetPath, boolean links, boolean notes, boolean security,
+			String username) {
 		User user = new SecurityTool().getUser(username);
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -378,7 +379,12 @@ public class DocTool {
 	 */
 	public DocumentLink link(Document doc1, Document doc2, String type) {
 		DocumentLinkDAO linkDao = (DocumentLinkDAO) Context.get().getBean(DocumentLinkDAO.class);
-		DocumentLink link = linkDao.findByDocIdsAndType(doc1.getId(), doc2.getId(), "default");
+		DocumentLink link = null;
+		try {
+			link = linkDao.findByDocIdsAndType(doc1.getId(), doc2.getId(), "default");
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 		if (link == null) {
 			// The link doesn't exist and must be created
 			link = new DocumentLink();
@@ -797,7 +803,13 @@ public class DocTool {
 	 */
 	public List<DocumentHistory> getHistories(long docId, String event) {
 		DocumentHistoryDAO hDao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
-		return hDao.findByDocIdAndEvent(docId, event);
+
+		try {
+			return hDao.findByDocIdAndEvent(docId, event);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<>();
+		}
 	}
 
 	/**
@@ -853,7 +865,12 @@ public class DocTool {
 				log.error(e.getMessage(), e);
 			}
 		}
-		return dao.findByDocId(docId, fVer);
+		try {
+			return dao.findByDocId(docId, fVer);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
 	}
 
 	/**

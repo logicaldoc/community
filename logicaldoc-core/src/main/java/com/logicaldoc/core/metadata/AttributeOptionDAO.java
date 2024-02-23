@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 
 /**
@@ -20,17 +21,19 @@ public interface AttributeOptionDAO extends PersistentObjectDAO<AttributeOption>
 	 * @param setId ID of the attribute set
 	 * @param attribute Name of the attribute (optional)
 	 * 
-	 * @return if all went ok
+	 * @throws PersistenceException Error in the database 
 	 */
-	public boolean deleteBySetIdAndAttribute(long setId, String attribute);
+	public void deleteBySetIdAndAttribute(long setId, String attribute) throws PersistenceException;
 	
 	/**
 	 * This method deletes the orphaned options of a given template
 	 * 
 	 * @param setId ID of the attribute set
 	 * @param currentAttributes Names of the attributes of the actual template
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public void deleteOrphaned(long setId, Collection<String> currentAttributes);
+	public void deleteOrphaned(long setId, Collection<String> currentAttributes) throws PersistenceException;
 
 	/**
 	 * This finds all the options for a given attribute. The list is ordered by
@@ -40,8 +43,10 @@ public interface AttributeOptionDAO extends PersistentObjectDAO<AttributeOption>
 	 * @param attribute The attribute name (Optional)
 	 * 
 	 * @return The ordered list of options
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<AttributeOption> findByAttribute(long setId, String attribute);
+	public List<AttributeOption> findByAttribute(long setId, String attribute) throws PersistenceException;
 
 	/**
 	 * This finds all the options for a given attribute and groups them by category. The list is ordered by
@@ -51,8 +56,10 @@ public interface AttributeOptionDAO extends PersistentObjectDAO<AttributeOption>
 	 * @param attribute The attribute name
 	 * 
 	 * @return The map of opions, key is the category
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public Map<String, List<AttributeOption>> findByAttributeAsMap(long setId, String attribute);
+	public Map<String, List<AttributeOption>> findByAttributeAsMap(long setId, String attribute) throws PersistenceException;
 	
 	/**
 	 * This finds all the options for a given attribute. The list is ordered by
@@ -63,6 +70,8 @@ public interface AttributeOptionDAO extends PersistentObjectDAO<AttributeOption>
 	 * @param category The category (Optional)
 	 * 
 	 * @return The ordered list of options
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<AttributeOption> findByAttributeAndCategory(long setId, String attribute, String category);
+	public List<AttributeOption> findByAttributeAndCategory(long setId, String attribute, String category) throws PersistenceException;
 }

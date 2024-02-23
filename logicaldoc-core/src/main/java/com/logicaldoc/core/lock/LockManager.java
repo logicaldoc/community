@@ -30,10 +30,10 @@ public class LockManager {
 
 	protected Logger log = LoggerFactory.getLogger(LockManager.class);
 
-	@Resource(name="GenericDAO")
+	@Resource(name = "GenericDAO")
 	private GenericDAO genericDao;
 
-	@Resource(name="ContextProperties")
+	@Resource(name = "ContextProperties")
 	private ContextProperties config;
 
 	/**
@@ -65,17 +65,22 @@ public class LockManager {
 		cal.add(Calendar.SECOND, config.getInt("lock.wait"));
 		Date ldDate = cal.getTime();
 		while (new Date().before(ldDate)) {
-			if (getInternal(lockName, transactionId)) {
-				log.debug("Acquired lock {}", lockName);
-				return true;
-			} else
-				synchronized (this) {
-					try {
-						wait(1000);
-					} catch (InterruptedException e) {
-						Thread.currentThread().interrupt();
+			try {
+				if (getInternal(lockName, transactionId)) {
+					log.debug("Acquired lock {}", lockName);
+					return true;
+				} else {
+					synchronized (this) {
+						try {
+							wait(1000);
+						} catch (InterruptedException e) {
+							Thread.currentThread().interrupt();
+						}
 					}
 				}
+			} catch (PersistenceException e) {
+				log.warn(e.getMessage(), e);
+			}
 		}
 
 		log.warn("Unable to get lock  {}", lockName);
@@ -91,8 +96,9 @@ public class LockManager {
 	 * 
 	 * @param lockName The lock name
 	 * @param transactionId The transaction ID
+	 * @throws PersistenceException
 	 */
-	public void release(String lockName, String transactionId) {
+	public void release(String lockName, String transactionId) throws PersistenceException {
 		if (lockName == null || transactionId == null)
 			return;
 
@@ -109,7 +115,7 @@ public class LockManager {
 		}
 	}
 
-	protected boolean getInternal(String lockName, String transactionId) {
+	protected boolean getInternal(String lockName, String transactionId) throws PersistenceException {
 		Date today = new Date();
 		Generic lock = genericDao.findByAlternateKey(LOCK, getSubType(lockName), null, Tenant.DEFAULT_ID);
 		try {

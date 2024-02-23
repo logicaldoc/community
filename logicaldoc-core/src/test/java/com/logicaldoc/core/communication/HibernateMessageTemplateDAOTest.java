@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
+import com.logicaldoc.core.PersistenceException;
 
 import junit.framework.Assert;
 
@@ -34,7 +35,7 @@ public class HibernateMessageTemplateDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByLanguage() {
+	public void testFindByLanguage() throws PersistenceException {
 		Collection<MessageTemplate> coll = dao.findByLanguage("en", 1L);
 		Assert.assertEquals(9, coll.size());
 		coll = dao.findByLanguage("it", 1L);
@@ -44,7 +45,7 @@ public class HibernateMessageTemplateDAOTest extends AbstractCoreTestCase {
 	}
 	
 	@Test
-	public void testFindByName() {
+	public void testFindByName() throws PersistenceException {
 		Collection<MessageTemplate> coll = dao.findByName("psw.rec1", 1L);
 		Assert.assertEquals(1, coll.size());
 		coll = dao.findByName("psw.rec1", 2L);
@@ -54,7 +55,7 @@ public class HibernateMessageTemplateDAOTest extends AbstractCoreTestCase {
 	}
 	
 	@Test
-	public void testFindByTypeLanguage() {
+	public void testFindByTypeLanguage() throws PersistenceException {
 		Collection<MessageTemplate> coll = dao.findByTypeAndLanguage(MessageTemplate.TYPE_SYSTEM,"en", 1L);
 		Assert.assertEquals(6, coll.size());
 		coll = dao.findByTypeAndLanguage("xxx","en", 1L);
@@ -62,7 +63,7 @@ public class HibernateMessageTemplateDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByNameAndLanguage() {
+	public void testFindByNameAndLanguage() throws PersistenceException {
 		Map<String, Object> dictionary = new HashMap<>();
 		dictionary.put("username", "pippo");
 		dictionary.put("xxx", "label");

@@ -381,11 +381,16 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		/*
 		 * Now go into the DB
 		 */
-		GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
-		List<Generic> generics = gDao.findByTypeAndSubtype(GUISETTING, null, null, session.getTenantId());
-		for (Generic gen : generics)
-			params.add(new GUIParameter(tenantName + "." + gen.getSubtype(), gen.getString1()));
-
+		
+		try {
+			GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
+			List<Generic> generics = gDao.findByTypeAndSubtype(GUISETTING, null, null, session.getTenantId());
+			for (Generic gen : generics)
+				params.add(new GUIParameter(tenantName + "." + gen.getSubtype(), gen.getString1()));
+		} catch (PersistenceException e) {
+			log.warn(e.getMessage(), e);
+		}
+		
 		return params;
 	}
 

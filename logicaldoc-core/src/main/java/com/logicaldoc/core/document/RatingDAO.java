@@ -42,8 +42,10 @@ public interface RatingDAO extends PersistentObjectDAO<Rating> {
 	 * @param docId ID of the document
 	 * 
 	 * @return the rating for the document
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public Rating findVotesByDocId(long docId);
+	public Rating findVotesByDocId(long docId) throws PersistenceException;
 
 	/**
 	 * Finds the rating for the given user id and the given document id
@@ -52,8 +54,10 @@ public interface RatingDAO extends PersistentObjectDAO<Rating> {
 	 * @param userId ID of the user
 	 * 
 	 * @return the vote of the given user on the document
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public Rating findByDocIdAndUserId(long docId, long userId);
+	public Rating findByDocIdAndUserId(long docId, long userId) throws PersistenceException;
 
 	/**
 	 * Finds the ratings stored for the given document id
@@ -61,6 +65,8 @@ public interface RatingDAO extends PersistentObjectDAO<Rating> {
 	 * @param docId ID of the document
 	 * 
 	 * @return the list of ratings
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<Rating> findByDocId(long docId);
+	public List<Rating> findByDocId(long docId) throws PersistenceException;
 }

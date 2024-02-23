@@ -2,6 +2,7 @@ package com.logicaldoc.core.communication;
 
 import java.util.List;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 
 /**
@@ -19,9 +20,12 @@ public interface SystemMessageDAO extends PersistentObjectDAO<SystemMessage> {
 	 * @param recipient The recipient name
 	 * @param type The message type
 	 * @param read Optional flag
+	 * 
 	 * @return The messages list
+	 * 
+	 * @throws PersistenceException @throws PersistenceException Error in the database
 	 */
-	public List<SystemMessage> findByRecipient(String recipient, int type, Integer read);
+	public List<SystemMessage> findByRecipient(String recipient, int type, Integer read) throws PersistenceException;
 
 	/**
 	 * This methods gets the number of unread messages for the specified
@@ -29,39 +33,50 @@ public interface SystemMessageDAO extends PersistentObjectDAO<SystemMessage> {
 	 * 
 	 * @param recipient The recipient name
 	 * @param type The message type
+	 * 
 	 * @return The number of messages
+	 * 
+     * @throws PersistenceException Error in the database
 	 */
-	public int getUnreadCount(String recipient, int type);
+	public int getUnreadCount(String recipient, int type) throws PersistenceException;
 
 	/**
 	 * Removes all system expired messages for the specified recipient
 	 * 
 	 * @param recipient The recipient
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public void deleteExpiredMessages(String recipient);
+	public void deleteExpiredMessages(String recipient) throws PersistenceException;
 
 	/**
 	 * Removes all expired messages for the specified type
 	 * 
 	 * @param type The message type
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public void deleteExpiredMessages(int type);
+	public void deleteExpiredMessages(int type) throws PersistenceException;
 
 	/**
 	 * This method selects all the messages for the specified type
 	 * 
 	 * @param type type of the message
 	 * @return The list of messages with the given type
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<SystemMessage> findByType(int type);
+	public List<SystemMessage> findByType(int type) throws PersistenceException;
 
 	/**
 	 * This method selects all the messages for the specified mode
 	 * 
 	 * @param mode The message mode
 	 * @return The list of messages of the given mode
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<SystemMessage> findByMode(String mode);
+	public List<SystemMessage> findByMode(String mode) throws PersistenceException;
 
 	/**
 	 * This method selects all the messages for the specified type that are not
@@ -72,6 +87,8 @@ public interface SystemMessageDAO extends PersistentObjectDAO<SystemMessage> {
 	 * @param maxTrials The maximum number of sending trials
 	 * 
 	 * @return The list of messages of the given type
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<SystemMessage> findMessagesToBeSent(int type, int maxTrials);
+	public List<SystemMessage> findMessagesToBeSent(int type, int maxTrials) throws PersistenceException;
 }

@@ -110,7 +110,7 @@ public class ThumbnailServlet extends HttpServlet {
 			throw new FileNotFoundException("Document not published");
 	}
 
-	private String getFileVersion(HttpServletRequest request, long docId, Document doc) {
+	private String getFileVersion(HttpServletRequest request, long docId, Document doc) throws PersistenceException {
 		String version = request.getParameter(VERSION);
 		String fileVersion = request.getParameter(FILE_VERSION);
 		if (StringUtils.isEmpty(fileVersion))
@@ -149,8 +149,8 @@ public class ThumbnailServlet extends HttpServlet {
 		if (storer.size(doc.getId(), resource) <= 0L) {
 			try {
 				/*
-				 * In this case the resource is like thumn450.png so we
-				 * extract the size from the name
+				 * In this case the resource is like thumn450.png so we extract
+				 * the size from the name
 				 */
 				String sizeStr = resource.substring(resource.indexOf('-') + 6, resource.lastIndexOf('.'));
 				ThumbnailManager thumbManager = (ThumbnailManager) Context.get().getBean(ThumbnailManager.class);

@@ -25,40 +25,48 @@ public interface DocumentNoteDAO extends PersistentObjectDAO<DocumentNote> {
 	public void store(DocumentNote note, DocumentHistory transaction) throws PersistenceException;
 
 	/**
-	 * This method finds the list of document notes regarding a document with the
-	 * given ID
+	 * This method finds the list of document notes regarding a document with
+	 * the given ID
 	 * 
 	 * @param docId ID of the document.
 	 * @param fileVersion indicates a specific file version, optional
 	 * 
 	 * @return The list of document note
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<DocumentNote> findByDocId(long docId, String fileVersion);
+	public List<DocumentNote> findByDocId(long docId, String fileVersion) throws PersistenceException;
 
 	/**
-	 * This method finds the list of document notes regarding a document with the
-	 * given ID and optionally filter on the type
+	 * This method finds the list of document notes regarding a document with
+	 * the given ID and optionally filter on the type
 	 * 
 	 * @param docId ID of the document
 	 * @param fileVersion indicates a specific file version, optional
 	 * @param type note type, optional
 	 * 
 	 * @return The list of document note
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<DocumentNote> findByDocIdAndType(long docId, String fileVersion, String type);
-	
+	public List<DocumentNote> findByDocIdAndType(long docId, String fileVersion, String type)
+			throws PersistenceException;
+
 	/**
-	 * This method finds the list of document notes regarding a document with the
-	 * given ID and optionally filter on a collection of types
+	 * This method finds the list of document notes regarding a document with
+	 * the given ID and optionally filter on a collection of types
 	 * 
 	 * @param docId ID of the document
 	 * @param fileVersion indicates a specific file version, optional
 	 * @param types collection of admitted note types, optional
 	 * 
 	 * @return The list of document note
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<DocumentNote> findByDocIdAndTypes(long docId, String fileVersion, Collection<String> types);
-	
+	public List<DocumentNote> findByDocIdAndTypes(long docId, String fileVersion, Collection<String> types)
+			throws PersistenceException;
+
 	/**
 	 * Copies all the notes not associated to a specific page from a given file
 	 * version to another
@@ -80,6 +88,8 @@ public interface DocumentNoteDAO extends PersistentObjectDAO<DocumentNote> {
 	 * @param userId ID of the user
 	 * 
 	 * @return The list of document notes ordered by descending date
+	 * 
+	 * @throws PersistenceException Errorin the database
 	 */
-	public List<DocumentNote> findByUserId(long userId);
+	public List<DocumentNote> findByUserId(long userId) throws PersistenceException;
 }

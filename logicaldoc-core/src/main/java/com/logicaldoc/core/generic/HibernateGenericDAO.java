@@ -47,8 +47,9 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 	}
 
 	@Override
-	public Generic findByAlternateKey(String type, String subtype, Long qualifier, long tenantId) {
-		Generic generic = null;
+	public Generic findByAlternateKey(String type, String subtype, Long qualifier, long tenantId)
+			throws PersistenceException {
+
 		StringBuilder sb = new StringBuilder(" " + ENTITY + ".type = '" + SqlUtil.doubleQuotes(type) + "' and " + ENTITY
 				+ ".subtype='" + SqlUtil.doubleQuotes(subtype) + "' ");
 		sb.append(AND + ENTITY + ".tenantId=" + tenantId);
@@ -56,19 +57,16 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 			sb.append(AND + ENTITY + ".qualifier=" + qualifier);
 		else
 			sb.append(AND + ENTITY + ".qualifier is null");
-		try {
-			Collection<Generic> coll = findByWhere(sb.toString(), null, null);
-			if (CollectionUtils.isNotEmpty(coll))
-				generic = coll.iterator().next();
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-		return generic;
+		List<Generic> coll = findByWhere(sb.toString(), null, null);
+		if (CollectionUtils.isNotEmpty(coll))
+			return coll.get(0);
+		else
+			return null;
 	}
 
 	@Override
-	public List<Generic> findByTypeAndSubtype(String type, String subtype, Long qualifier, Long tenantId) {
-		Map<String, Object> params=new HashMap<>();
+	public List<Generic> findByTypeAndSubtype(String type, String subtype, Long qualifier, Long tenantId) throws PersistenceException {
+		Map<String, Object> params = new HashMap<>();
 		String query = " 1=1 ";
 		if (StringUtils.isNotEmpty(type)) {
 			query += AND + ENTITY + ".type like :type ";
@@ -83,12 +81,7 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 		if (tenantId != null)
 			query += AND + ENTITY + ".tenantId = " + tenantId;
 
-		try {
 			return findByWhere(query, params, null, null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
 	}
 
 	@Override

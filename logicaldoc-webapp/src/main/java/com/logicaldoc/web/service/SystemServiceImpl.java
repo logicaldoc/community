@@ -139,171 +139,176 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<List<GUIParameter>> getStatistics(String locale) throws ServerException {
 		Session session = validateSession();
 
-		GenericDAO genDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
+		try {
+			GenericDAO genDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 
-		List<List<GUIParameter>> parameters = new ArrayList<>();
+			List<List<GUIParameter>> parameters = new ArrayList<>();
 
-		/*
-		 * Repository statistics
-		 */
-		Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, TRASH, null, session.getTenantId());
-		GUIParameter trashSize = new GUIParameter();
-		trashSize.setName(TRASH);
-		setLongValue(gen, trashSize);
+			/*
+			 * Repository statistics
+			 */
+			Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, TRASH, null, session.getTenantId());
+			GUIParameter trashSize = new GUIParameter();
+			trashSize.setName(TRASH);
+			setLongValue(gen, trashSize);
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "docdir", null, session.getTenantId());
-		GUIParameter docDirSize = new GUIParameter();
-		docDirSize.setName("documents");
-		setLongValue(gen, docDirSize);
-		docDirSize
-				.setValue(Long.toString(Long.parseLong(docDirSize.getValue()) - Long.parseLong(trashSize.getValue())));
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "docdir", null, session.getTenantId());
+			GUIParameter docDirSize = new GUIParameter();
+			docDirSize.setName("documents");
+			setLongValue(gen, docDirSize);
+			docDirSize.setValue(
+					Long.toString(Long.parseLong(docDirSize.getValue()) - Long.parseLong(trashSize.getValue())));
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "userdir", null, Tenant.SYSTEM_ID);
-		GUIParameter userDirSize = new GUIParameter();
-		userDirSize.setName("users");
-		setLongValue(gen, userDirSize);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "userdir", null, Tenant.SYSTEM_ID);
+			GUIParameter userDirSize = new GUIParameter();
+			userDirSize.setName("users");
+			setLongValue(gen, userDirSize);
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "indexdir", null, Tenant.SYSTEM_ID);
-		GUIParameter indexDirSize = new GUIParameter();
-		indexDirSize.setName("fulltextindex");
-		setLongValue(gen, indexDirSize);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "indexdir", null, Tenant.SYSTEM_ID);
+			GUIParameter indexDirSize = new GUIParameter();
+			indexDirSize.setName("fulltextindex");
+			setLongValue(gen, indexDirSize);
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "importdir", null, Tenant.SYSTEM_ID);
-		GUIParameter importDirSize = new GUIParameter();
-		importDirSize.setName("iimport");
-		setLongValue(gen, importDirSize);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "importdir", null, Tenant.SYSTEM_ID);
+			GUIParameter importDirSize = new GUIParameter();
+			importDirSize.setName("iimport");
+			setLongValue(gen, importDirSize);
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "exportdir", null, Tenant.SYSTEM_ID);
-		GUIParameter exportDirSize = new GUIParameter();
-		exportDirSize.setName("eexport");
-		setLongValue(gen, exportDirSize);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "exportdir", null, Tenant.SYSTEM_ID);
+			GUIParameter exportDirSize = new GUIParameter();
+			exportDirSize.setName("eexport");
+			setLongValue(gen, exportDirSize);
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "plugindir", null, Tenant.SYSTEM_ID);
-		GUIParameter pluginsDirSize = new GUIParameter();
-		pluginsDirSize.setName("plugins");
-		setLongValue(gen, pluginsDirSize);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "plugindir", null, Tenant.SYSTEM_ID);
+			GUIParameter pluginsDirSize = new GUIParameter();
+			pluginsDirSize.setName("plugins");
+			setLongValue(gen, pluginsDirSize);
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "dbdir", null, Tenant.SYSTEM_ID);
-		GUIParameter dbDirSize = new GUIParameter();
-		dbDirSize.setName("database");
-		setLongValue(gen, dbDirSize);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "dbdir", null, Tenant.SYSTEM_ID);
+			GUIParameter dbDirSize = new GUIParameter();
+			dbDirSize.setName("database");
+			setLongValue(gen, dbDirSize);
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "logdir", null, Tenant.SYSTEM_ID);
-		GUIParameter logsDirSize = new GUIParameter();
-		logsDirSize.setName("logs");
-		setLongValue(gen, logsDirSize);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "logdir", null, Tenant.SYSTEM_ID);
+			GUIParameter logsDirSize = new GUIParameter();
+			logsDirSize.setName("logs");
+			setLongValue(gen, logsDirSize);
 
-		parameters.add(Arrays.asList(docDirSize, trashSize, userDirSize, indexDirSize, importDirSize, exportDirSize,
-				pluginsDirSize, dbDirSize, logsDirSize));
+			parameters.add(Arrays.asList(docDirSize, trashSize, userDirSize, indexDirSize, importDirSize, exportDirSize,
+					pluginsDirSize, dbDirSize, logsDirSize));
 
-		/*
-		 * Documents statistics
-		 */
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexeddocs", null, session.getTenantId());
-		GUIParameter notIndexed = new GUIParameter();
-		notIndexed.setName("notindexed");
-		setLongValue(gen, notIndexed);
+			/*
+			 * Documents statistics
+			 */
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexeddocs", null, session.getTenantId());
+			GUIParameter notIndexed = new GUIParameter();
+			notIndexed.setName("notindexed");
+			setLongValue(gen, notIndexed);
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexabledocs", null, session.getTenantId());
-		GUIParameter notIndexableDocs = new GUIParameter();
-		notIndexableDocs.setName("notindexabledocs");
-		notIndexableDocs.setLabel("notindexable");
-		setLongValue(gen, notIndexableDocs);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexabledocs", null, session.getTenantId());
+			GUIParameter notIndexableDocs = new GUIParameter();
+			notIndexableDocs.setName("notindexabledocs");
+			notIndexableDocs.setLabel("notindexable");
+			setLongValue(gen, notIndexableDocs);
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "indexeddocs", null, session.getTenantId());
-		GUIParameter indexed = new GUIParameter();
-		indexed.setName("indexed");
-		setLongValue(gen, indexed);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "indexeddocs", null, session.getTenantId());
+			GUIParameter indexed = new GUIParameter();
+			indexed.setName("indexed");
+			setLongValue(gen, indexed);
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "deleteddocs", null, session.getTenantId());
-		GUIParameter deletedDocs = new GUIParameter();
-		deletedDocs.setName("docstrash");
-		deletedDocs.setLabel(TRASH);
-		setLongValue(gen, deletedDocs);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "deleteddocs", null, session.getTenantId());
+			GUIParameter deletedDocs = new GUIParameter();
+			deletedDocs.setName("docstrash");
+			deletedDocs.setLabel(TRASH);
+			setLongValue(gen, deletedDocs);
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "archiveddocs", null, session.getTenantId());
-		GUIParameter archivedDocs = new GUIParameter();
-		archivedDocs.setName("archiveddocs");
-		archivedDocs.setLabel("archiveds");
-		setLongValue(gen, archivedDocs);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "archiveddocs", null, session.getTenantId());
+			GUIParameter archivedDocs = new GUIParameter();
+			archivedDocs.setName("archiveddocs");
+			archivedDocs.setLabel("archiveds");
+			setLongValue(gen, archivedDocs);
 
-		parameters.add(Arrays.asList(notIndexed, notIndexableDocs, indexed, deletedDocs, archivedDocs));
+			parameters.add(Arrays.asList(notIndexed, notIndexableDocs, indexed, deletedDocs, archivedDocs));
 
-		/*
-		 * Pages statistics
-		 */
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexedpages", null, session.getTenantId());
-		GUIParameter notIndexedPages = new GUIParameter();
-		notIndexedPages.setName("notindexed");
-		setLongValue(gen, notIndexedPages);
+			/*
+			 * Pages statistics
+			 */
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexedpages", null, session.getTenantId());
+			GUIParameter notIndexedPages = new GUIParameter();
+			notIndexedPages.setName("notindexed");
+			setLongValue(gen, notIndexedPages);
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexablepages", null, session.getTenantId());
-		GUIParameter notIndexablePages = new GUIParameter();
-		notIndexablePages.setName("notindexablepages");
-		notIndexablePages.setLabel("notindexable");
-		setLongValue(gen, notIndexablePages);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexablepages", null, session.getTenantId());
+			GUIParameter notIndexablePages = new GUIParameter();
+			notIndexablePages.setName("notindexablepages");
+			notIndexablePages.setLabel("notindexable");
+			setLongValue(gen, notIndexablePages);
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "indexedpages", null, session.getTenantId());
-		GUIParameter indexedPages = new GUIParameter();
-		indexedPages.setName("indexed");
-		setLongValue(gen, indexedPages);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "indexedpages", null, session.getTenantId());
+			GUIParameter indexedPages = new GUIParameter();
+			indexedPages.setName("indexed");
+			setLongValue(gen, indexedPages);
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "deletedpages", null, session.getTenantId());
-		GUIParameter deletedPages = new GUIParameter();
-		deletedPages.setName("pagestrash");
-		deletedPages.setLabel(TRASH);
-		setLongValue(gen, deletedPages);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "deletedpages", null, session.getTenantId());
+			GUIParameter deletedPages = new GUIParameter();
+			deletedPages.setName("pagestrash");
+			deletedPages.setLabel(TRASH);
+			setLongValue(gen, deletedPages);
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "archivedpages", null, session.getTenantId());
-		GUIParameter archivedPages = new GUIParameter();
-		archivedPages.setName("archivedpages");
-		archivedPages.setLabel("archiveds");
-		setLongValue(gen, archivedPages);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "archivedpages", null, session.getTenantId());
+			GUIParameter archivedPages = new GUIParameter();
+			archivedPages.setName("archivedpages");
+			archivedPages.setLabel("archiveds");
+			setLongValue(gen, archivedPages);
 
-		parameters.add(Arrays.asList(notIndexedPages, notIndexableDocs, indexedPages, deletedPages, archivedPages));
+			parameters.add(Arrays.asList(notIndexedPages, notIndexableDocs, indexedPages, deletedPages, archivedPages));
 
-		/*
-		 * Folders statistics
-		 */
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "withdocs", null, session.getTenantId());
-		GUIParameter notEmptyFolders = new GUIParameter();
-		notEmptyFolders.setName("withdocs");
-		setLongValue(gen, notEmptyFolders);
+			/*
+			 * Folders statistics
+			 */
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "withdocs", null, session.getTenantId());
+			GUIParameter notEmptyFolders = new GUIParameter();
+			notEmptyFolders.setName("withdocs");
+			setLongValue(gen, notEmptyFolders);
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "empty", null, session.getTenantId());
-		GUIParameter emptyFolders = new GUIParameter();
-		emptyFolders.setName("empty");
-		setLongValue(gen, emptyFolders);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "empty", null, session.getTenantId());
+			GUIParameter emptyFolders = new GUIParameter();
+			emptyFolders.setName("empty");
+			setLongValue(gen, emptyFolders);
 
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "deletedfolders", null, session.getTenantId());
-		GUIParameter deletedFolders = new GUIParameter();
-		deletedFolders.setName("folderstrash");
-		deletedFolders.setLabel(TRASH);
-		setLongValue(gen, deletedFolders);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "deletedfolders", null, session.getTenantId());
+			GUIParameter deletedFolders = new GUIParameter();
+			deletedFolders.setName("folderstrash");
+			deletedFolders.setLabel(TRASH);
+			setLongValue(gen, deletedFolders);
 
-		parameters.add(Arrays.asList(notEmptyFolders, emptyFolders, deletedFolders));
+			parameters.add(Arrays.asList(notEmptyFolders, emptyFolders, deletedFolders));
 
-		/*
-		 * Last run
-		 */
-		gen = genDao.findByAlternateKey(StatsCollector.STAT, "lastrun", null, Tenant.SYSTEM_ID);
-		Date date = gen != null ? gen.getDate1() : null;
-		GUIParameter lastrun = new GUIParameter();
-		lastrun.setName("lastrun");
-		if (date != null) {
-			DateFormat df2 = new SimpleDateFormat(I18N.message("format_date", locale));
-			lastrun.setValue(df2.format(date));
-		} else {
-			lastrun.setValue("");
+			/*
+			 * Last run
+			 */
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "lastrun", null, Tenant.SYSTEM_ID);
+			Date date = gen != null ? gen.getDate1() : null;
+			GUIParameter lastrun = new GUIParameter();
+			lastrun.setName("lastrun");
+			if (date != null) {
+				DateFormat df2 = new SimpleDateFormat(I18N.message("format_date", locale));
+				lastrun.setValue(df2.format(date));
+			} else {
+				lastrun.setValue("");
+			}
+
+			parameters.add(Arrays.asList(lastrun));
+
+			return parameters;
+		} catch (PersistenceException e) {
+			return (List<List<GUIParameter>>) throwServerException(session, log, e);
 		}
-
-		parameters.add(Arrays.asList(lastrun));
-
-		return parameters;
 	}
 
 	private void setLongValue(Generic generic, GUIParameter parameter) {
@@ -762,33 +767,34 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			String uri, int maxResult) throws ServerException {
 		Session session = validateSession();
 
-		TenantDAO dao = (TenantDAO) Context.get().getBean(TenantDAO.class);
-		Map<Long, String> tenants = dao.findAll().stream().collect(Collectors.toMap(Tenant::getId, Tenant::getName));
-		tenants.put(Tenant.SYSTEM_ID, "system");
-
-		// Search in the document/folder history
-		StringBuilder query = new StringBuilder(
-				"select ld_username, ld_date, ld_path, ld_sessionid, ld_userid, ld_ip as ip, ld_userlogin, ld_comment, ld_device, ld_geolocation, ld_protocol, ld_tenantId from ld_webservicecall where 1 = 1 ");
-		if (userId != null)
-			query.append(" and ld_userid = " + userId);
-		if (callSid != null && StringUtils.isNotEmpty(callSid))
-			query.append(" and ld_sessionid='" + callSid + "' ");
-		if (from != null) {
-			query.append(" and ld_date > '" + new Timestamp(from.getTime()) + "' ");
-		}
-		if (till != null) {
-			query.append(" and ld_date < '" + new Timestamp(till.getTime()) + "' ");
-		}
-		if (protocol != null) {
-			query.append(" and ld_protocol = '" + protocol + "' ");
-		}
-
-		if (session.getTenantId() != Tenant.DEFAULT_ID)
-			query.append(" and ld_tenantid = " + session.getTenantId());
-
-		query.append(" order by ld_date desc ");
-
 		try {
+			TenantDAO dao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+			Map<Long, String> tenants = dao.findAll().stream()
+					.collect(Collectors.toMap(Tenant::getId, Tenant::getName));
+			tenants.put(Tenant.SYSTEM_ID, "system");
+
+			// Search in the document/folder history
+			StringBuilder query = new StringBuilder(
+					"select ld_username, ld_date, ld_path, ld_sessionid, ld_userid, ld_ip as ip, ld_userlogin, ld_comment, ld_device, ld_geolocation, ld_protocol, ld_tenantId from ld_webservicecall where 1 = 1 ");
+			if (userId != null)
+				query.append(" and ld_userid = " + userId);
+			if (callSid != null && StringUtils.isNotEmpty(callSid))
+				query.append(" and ld_sessionid='" + callSid + "' ");
+			if (from != null) {
+				query.append(" and ld_date > '" + new Timestamp(from.getTime()) + "' ");
+			}
+			if (till != null) {
+				query.append(" and ld_date < '" + new Timestamp(till.getTime()) + "' ");
+			}
+			if (protocol != null) {
+				query.append(" and ld_protocol = '" + protocol + "' ");
+			}
+
+			if (session.getTenantId() != Tenant.DEFAULT_ID)
+				query.append(" and ld_tenantid = " + session.getTenantId());
+
+			query.append(" order by ld_date desc ");
+
 			return dao.query(query.toString(), new RowMapper<GUIHistory>() {
 
 				@Override

@@ -39,39 +39,25 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	}
 
 	@Override
-	public List<AttributeSet> findAll() {
-		try {
-			return findByWhere(" 1=1", ORDER_BY + ENTITY + ".name", null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+	public List<AttributeSet> findAll() throws PersistenceException {
+		return findByWhere(" 1=1", ORDER_BY + ENTITY + ".name", null);
 	}
 
 	@Override
-	public List<AttributeSet> findAll(long tenantId) {
-		try {
-			return findByWhere(" " + ENTITY + TENANT_ID_EQUAL + tenantId, ORDER_BY + ENTITY + ".name", null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+	public List<AttributeSet> findAll(long tenantId) throws PersistenceException {
+		return findByWhere(" " + ENTITY + TENANT_ID_EQUAL + tenantId, ORDER_BY + ENTITY + ".name", null);
 	}
 
 	@Override
-	public AttributeSet findByName(String name, long tenantId) {
+	public AttributeSet findByName(String name, long tenantId) throws PersistenceException {
+		List<AttributeSet> coll = findByWhere(
+				ENTITY + ".name = '" + SqlUtil.doubleQuotes(name) + "' and " + ENTITY + TENANT_ID_EQUAL + tenantId,
+				null, null);
 		AttributeSet template = null;
-		try {
-			List<AttributeSet> coll = findByWhere(
-					ENTITY + ".name = '" + SqlUtil.doubleQuotes(name) + "' and " + ENTITY + TENANT_ID_EQUAL + tenantId,
-					null, null);
-			if (CollectionUtils.isNotEmpty(coll))
-				template = coll.iterator().next();
-			if (template != null && template.getDeleted() == 1)
-				template = null;
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+		if (CollectionUtils.isNotEmpty(coll))
+			template = coll.iterator().next();
+		if (template != null && template.getDeleted() == 1)
+			template = null;
 		return template;
 	}
 
@@ -96,14 +82,9 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	}
 
 	@Override
-	public List<AttributeSet> findByType(int type, long tenantId) {
-		try {
-			return findByWhere(ENTITY + ".type =" + type + " and " + ENTITY + TENANT_ID_EQUAL + tenantId,
-					ORDER_BY + ENTITY + ".name asc", null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+	public List<AttributeSet> findByType(int type, long tenantId) throws PersistenceException {
+		return findByWhere(ENTITY + ".type =" + type + " and " + ENTITY + TENANT_ID_EQUAL + tenantId,
+				ORDER_BY + ENTITY + ".name asc", null);
 	}
 
 	public void setOptionsDao(AttributeOptionDAO optionsDao) {
@@ -135,7 +116,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	}
 
 	@Override
-	public Map<Long, AttributeSet> load(long tenantId) {
+	public Map<Long, AttributeSet> load(long tenantId) throws PersistenceException {
 		Map<Long, AttributeSet> map = new HashMap<>();
 		List<AttributeSet> all = findAll(tenantId);
 		for (AttributeSet set : all)
@@ -143,18 +124,11 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 		return map;
 	}
 
-	/**
-	 * Returns a TreeMap so the key set is alphabetically ordered
-	 */
 	@Override
-	public Map<String, Attribute> findAttributes(long tenantId, Long setId) {
+	public Map<String, Attribute> findAttributes(long tenantId, Long setId) throws PersistenceException {
 		List<AttributeSet> sets = new ArrayList<>();
 		if (setId != null)
-			try {
 				sets.add(findById(setId));
-			} catch (PersistenceException e) {
-				log.error(e.getMessage(), e);
-			}
 		else
 			sets.addAll(findAll(tenantId));
 

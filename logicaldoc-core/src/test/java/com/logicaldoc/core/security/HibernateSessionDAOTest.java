@@ -9,8 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
-import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.security.SessionDAO;
 
 import junit.framework.Assert;
 

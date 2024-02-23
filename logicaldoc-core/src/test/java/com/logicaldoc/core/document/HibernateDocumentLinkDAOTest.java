@@ -10,10 +10,6 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.Document;
-import com.logicaldoc.core.document.DocumentDAO;
-import com.logicaldoc.core.document.DocumentLink;
-import com.logicaldoc.core.document.DocumentLinkDAO;
 
 import junit.framework.Assert;
 
@@ -90,7 +86,7 @@ public class HibernateDocumentLinkDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByDocId() {
+	public void testFindByDocId() throws PersistenceException {
 		Collection<DocumentLink> links = dao.findByDocId(1, null);
 		Assert.assertNotNull(links);
 		Assert.assertEquals(4, links.size());
@@ -117,7 +113,7 @@ public class HibernateDocumentLinkDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByDocIdsAndType() {
+	public void testFindByDocIdsAndType() throws PersistenceException {
 		DocumentLink link = dao.findByDocIdsAndType(1, 2, "test");
 		Assert.assertNotNull(link);
 		Assert.assertEquals(1, link.getId());

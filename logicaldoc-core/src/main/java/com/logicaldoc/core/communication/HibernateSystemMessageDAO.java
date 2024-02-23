@@ -62,7 +62,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 	}
 
 	@Override
-	public List<SystemMessage> findByRecipient(String recipient, int type, Integer read) {
+	public List<SystemMessage> findByRecipient(String recipient, int type, Integer read) throws PersistenceException {
 		String sql = SELECT + " from ld_systemmessage where ld_deleted = 0 and ld_type = " + type
 				+ " and exists (select Q.ld_messageid from ld_recipient Q where Q.ld_name = '"
 				+ SqlUtil.doubleQuotes(recipient) + "' and Q.ld_messageid=ld_id)";
@@ -72,31 +72,19 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 					+ SqlUtil.doubleQuotes(recipient) + "' and R.ld_read=1 and R.ld_messageid=ld_id)";
 		sql = sql + " order by ld_sentdate desc";
 
-		try {
-			return query(sql, new SystemMessageMapper(), null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+		return query(sql, new SystemMessageMapper(), null);
 	}
 
 	@Override
-	public int getUnreadCount(String recipient, int type) {
+	public int getUnreadCount(String recipient, int type) throws PersistenceException {
 		String sql = "select count(distinct(R.ld_messageid)) from ld_recipient R, ld_systemmessage M "
 				+ " where R.ld_name = '" + SqlUtil.doubleQuotes(recipient)
 				+ "' and R.ld_messageid=M.ld_id and M.ld_deleted=0 and M.ld_type=" + type + " and R.ld_read=0";
-		try {
-			return queryForInt(sql);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return 0;
-		}
+		return queryForInt(sql);
 	}
 
-	/**
-	 * @see com.logicaldoc.core.communication.SystemMessageDAO#deleteExpiredMessages(java.lang.String)
-	 */
-	public void deleteExpiredMessages(String recipient) {
+	@Override
+	public void deleteExpiredMessages(String recipient) throws PersistenceException {
 		collectGarbage(findByRecipient(recipient, Message.TYPE_SYSTEM, null), true);
 	}
 
@@ -106,68 +94,54 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 	 * @param coll The input messages
 	 * @param removeExpired True if expired messages must be deleted
 	 * @return The cleaned messages collection
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	protected List<SystemMessage> collectGarbage(Collection<SystemMessage> coll, boolean removeExpired) {
+	protected List<SystemMessage> collectGarbage(Collection<SystemMessage> coll, boolean removeExpired)
+			throws PersistenceException {
 		List<SystemMessage> out = new ArrayList<>();
-		try {
-			Iterator<SystemMessage> iter = coll.iterator();
-			Date date = new Date();
-			long time = date.getTime();
 
-			while (iter.hasNext()) {
-				SystemMessage sm = iter.next();
-				long sentdate = new Date().getTime();
-				long timespan = sm.getDateScope();
-				timespan = timespan * 86400000;
-				sentdate += timespan;
+		Iterator<SystemMessage> iter = coll.iterator();
+		Date date = new Date();
+		long time = date.getTime();
 
-				if (time >= sentdate) {
-					if (removeExpired)
-						delete(sm.getId());
-				} else {
-					out.add(sm);
-				}
+		while (iter.hasNext()) {
+			SystemMessage sm = iter.next();
+			long sentdate = new Date().getTime();
+			long timespan = sm.getDateScope();
+			timespan = timespan * 86400000;
+			sentdate += timespan;
+
+			if (time >= sentdate) {
+				if (removeExpired)
+					delete(sm.getId());
+			} else {
+				out.add(sm);
 			}
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
 		}
 
 		return out;
 	}
 
-	/**
-	 * @see com.logicaldoc.core.communication.SystemMessageDAO#deleteExpiredMessages(int)
-	 */
-	public void deleteExpiredMessages(int type) {
+	@Override
+	public void deleteExpiredMessages(int type) throws PersistenceException {
 		collectGarbage(findByType(type), true);
 	}
 
 	@Override
-	public List<SystemMessage> findByMode(String mode) {
+	public List<SystemMessage> findByMode(String mode) throws PersistenceException {
 		String sql = SELECT
 				+ " from ld_systemmessage where ld_deleted = 0 and ld_id IN (select ld_messageid from ld_recipient where ld_mode = '"
 				+ SqlUtil.doubleQuotes(mode) + "') order by ld_sentdate desc";
-
-		try {
-			return query(sql, new SystemMessageMapper(), null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+		return query(sql, new SystemMessageMapper(), null);
 	}
 
 	@Override
-	public List<SystemMessage> findByType(int type) {
+	public List<SystemMessage> findByType(int type) throws PersistenceException {
 		String sql = SELECT
 				+ " from ld_systemmessage where ld_deleted = 0 and ld_id IN (select ld_messageid from ld_recipient where ld_type = "
 				+ type + ") order by ld_sentdate desc";
-
-		try {
-			return query(sql, new SystemMessageMapper(), null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+		return query(sql, new SystemMessageMapper(), null);
 	}
 
 	@Override
@@ -180,19 +154,14 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 	}
 
 	@Override
-	public List<SystemMessage> findMessagesToBeSent(int type, int maxTrial) {
+	public List<SystemMessage> findMessagesToBeSent(int type, int maxTrial) throws PersistenceException {
 		String sql = SELECT + " from ld_systemmessage where ld_deleted = 0 and not ld_status = "
 				+ SystemMessage.STATUS_DELIVERED + " and ld_type = " + type;
 		if (maxTrial > 0)
 			sql = sql + " and ld_trials < " + maxTrial;
 		sql = sql + " order by ld_sentdate desc";
 
-		try {
-			return query(sql, new SystemMessageMapper(), null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+		return query(sql, new SystemMessageMapper(), null);
 	}
 
 	@Override

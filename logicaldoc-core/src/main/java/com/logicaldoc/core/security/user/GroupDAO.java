@@ -46,8 +46,10 @@ public interface GroupDAO extends PersistentObjectDAO<Group> {
 	 * @param tenantId identifier of the tenant
 	 * 
 	 * @return collection of all the group names
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public Collection<String> findAllGroupNames(long tenantId);
+	public Collection<String> findAllGroupNames(long tenantId) throws PersistenceException;
 
 	/**
 	 * This method finds a Group by name.

@@ -115,8 +115,12 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 		if (user.isExpired())
 			throw new AccountExpiredException(user.getExpire());
 
-		if (userDAO.isInactive(user.getUsername()))
-			throw new AccountInactiveException(this);
+		try {
+			if (userDAO.isInactive(user.getUsername()))
+				throw new AccountInactiveException(this);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 
 		if (user.getEnforceWorkingTime() == 1 && !user.isInWorkingTime())
 			throw new OutsideWorkingTimeException(this);

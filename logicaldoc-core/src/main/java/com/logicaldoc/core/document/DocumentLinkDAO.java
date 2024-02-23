@@ -2,6 +2,7 @@ package com.logicaldoc.core.document;
 
 import java.util.List;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 
 /**
@@ -19,8 +20,10 @@ public interface DocumentLinkDAO extends PersistentObjectDAO<DocumentLink> {
 	 * @param docId ID of the document
 	 * 
 	 * @return The list of document link
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<DocumentLink> findByDocId(long docId);
+	public List<DocumentLink> findByDocId(long docId) throws PersistenceException;
 
 	/**
 	 * This method finds the list of document link, filtered by the given link
@@ -30,8 +33,10 @@ public interface DocumentLinkDAO extends PersistentObjectDAO<DocumentLink> {
 	 * @param type Type of each document link in the return list
 	 * 
 	 * @return The list of document link
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<DocumentLink> findByDocId(long docId, String type);
+	public List<DocumentLink> findByDocId(long docId, String type) throws PersistenceException;
 
 	/**
 	 * Find a document link using its alternate keys
@@ -39,7 +44,10 @@ public interface DocumentLinkDAO extends PersistentObjectDAO<DocumentLink> {
 	 * @param docId1 identifier of the first document
 	 * @param docId2 identifier of the second
 	 * @param type the document type(<b>null</b> or <b>pdf</b>
+	 * 
 	 * @return The found instance
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public DocumentLink findByDocIdsAndType(long docId1, long docId2, String type);
+	public DocumentLink findByDocIdsAndType(long docId1, long docId2, String type) throws PersistenceException;
 }

@@ -55,7 +55,7 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByRecipient() {
+	public void testFindByRecipient() throws PersistenceException {
 		Collection<SystemMessage> coll = dao.findByRecipient("sebastian", Message.TYPE_SYSTEM, null);
 		Assert.assertEquals(1, coll.size());
 		coll = dao.findByRecipient("marco", 1, null);
@@ -76,14 +76,14 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testGetUnreadCount() {
+	public void testGetUnreadCount() throws PersistenceException {
 		Assert.assertEquals(1, dao.getUnreadCount("sebastian", Message.TYPE_SYSTEM));
 		Assert.assertEquals(2, dao.getUnreadCount("marco", 1));
 		Assert.assertEquals(0, dao.getUnreadCount("admin", Message.TYPE_SYSTEM));
 	}
 
 	@Test
-	public void testFindByType() {
+	public void testFindByType() throws PersistenceException {
 		Collection<SystemMessage> coll = dao.findByType(0);
 		Assert.assertEquals(2, coll.size());
 		coll = dao.findByType(1);
@@ -95,7 +95,7 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByMode() {
+	public void testFindByMode() throws PersistenceException {
 		Collection<SystemMessage> coll = dao.findByMode("CC");
 		Assert.assertEquals(1, coll.size());
 		coll = dao.findByMode("sms");

@@ -2,7 +2,6 @@ package com.logicaldoc.core.document;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -45,25 +44,14 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	}
 
 	@Override
-	public List<Version> findByDocId(long docId) {
-		try {
-			return findByWhere(" " + ENTITY + DOC_ID + docId, "order by " + ENTITY + ".versionDate desc", null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
-
+	public List<Version> findByDocId(long docId) throws PersistenceException {
+		return findByWhere(" " + ENTITY + DOC_ID + docId, "order by " + ENTITY + ".versionDate desc", null);
 	}
 
 	@Override
-	public Version findByVersion(long docId, String version) {
-		List<Version> versions = new ArrayList<>();
-		try {
-			versions = findByWhere(" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".version='" + version + "'",
-					null, null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+	public Version findByVersion(long docId, String version) throws PersistenceException {
+		List<Version> versions = findByWhere(
+				" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".version='" + version + "'", null, null);
 
 		if (!versions.isEmpty())
 			return versions.get(0);
@@ -72,15 +60,10 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	}
 
 	@Override
-	public Version findByFileVersion(long docId, String fileVersion) {
-		List<Version> versions = new ArrayList<>();
-		try {
-			versions = findByWhere(
-					" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".fileVersion='" + fileVersion + "'",
-					"order by " + ENTITY + ".date asc", null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+	public Version findByFileVersion(long docId, String fileVersion) throws PersistenceException {
+		List<Version> versions = findByWhere(
+				" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".fileVersion='" + fileVersion + "'",
+				"order by " + ENTITY + ".date asc", null);
 
 		if (!versions.isEmpty())
 			return versions.get(0);

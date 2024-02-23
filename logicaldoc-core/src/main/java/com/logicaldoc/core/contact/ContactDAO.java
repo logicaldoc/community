@@ -2,6 +2,7 @@ package com.logicaldoc.core.contact;
 
 import java.util.List;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 
 /**
@@ -19,6 +20,8 @@ public interface ContactDAO extends PersistentObjectDAO<Contact> {
 	 * @param email Optional email specification,
 	 * 
 	 * @return The collection of found Contacts
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<Contact> findByUser(Long userId, String email);
+	public List<Contact> findByUser(Long userId, String email) throws PersistenceException;
 }

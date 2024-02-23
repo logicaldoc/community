@@ -46,7 +46,7 @@ public class RestSearchService extends SoapSearchService implements SearchServic
 					schema = @Schema(implementation = WSSearchOptions.class))
 			WSSearchOptions opt) throws AuthenticationException, PersistenceException, WebserviceException, SearchException 
 			{
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.find(sid, opt);
 	}
 
@@ -56,7 +56,7 @@ public class RestSearchService extends SoapSearchService implements SearchServic
 	//@ApiOperation(value = "Search documents by Filename", notes = "Finds authorized documents for the current user containing the given filename (like operator is used)")
 	@Operation(summary = "Search documents by Filename", description = "Finds authorized documents for the current user containing the given filename (like operator is used)")
 	public WSDocument[] findByFilename(@Parameter(description = "Filename of the document", required = true) @QueryParam("filename") String filename) throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.findByFilename(sid, filename);
 	}
 
@@ -66,7 +66,7 @@ public class RestSearchService extends SoapSearchService implements SearchServic
 	//@ApiOperation(value = "Search folders by name", notes = "Finds authorized folders for the current user containing the given name (like operator is used)")
 	@Operation(summary = "Search folders by name", description = "Finds authorized folders for the current user containing the given name (like operator is used)")
 	public WSFolder[] findFolders(@Parameter(description = "Name of the folder", required = true) @QueryParam("name") String name) throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.findFolders(sid, name);
 	}
 }

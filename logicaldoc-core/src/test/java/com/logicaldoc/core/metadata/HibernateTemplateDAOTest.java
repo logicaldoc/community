@@ -47,7 +47,7 @@ public class HibernateTemplateDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindAll() {
+	public void testFindAll() throws PersistenceException {
 		Collection<Template> templates = dao.findAll();
 		Assert.assertNotNull(templates);
 		Assert.assertEquals(4, templates.size());

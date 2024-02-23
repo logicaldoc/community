@@ -88,7 +88,7 @@ public class HibernateGroupDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindAllGroupNames() {
+	public void testFindAllGroupNames() throws PersistenceException {
 		Collection<String> groupNames = dao.findAllGroupNames(1);
 		assertNotNull(groupNames);
 		assertFalse(groupNames.isEmpty());

@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.VersionDAO;
@@ -27,9 +28,13 @@ public class DocUtil {
 		String fileName = document.getFileName();
 		if (StringUtils.isNotEmpty(fileVersion) && !fileVersion.equals(document.getFileVersion())) {
 			VersionDAO vDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
-			Version ver = vDao.findByFileVersion(document.getId(), fileVersion);
-			if (ver != null)
-				fileName = ver.getFileName();
+			try {
+				Version ver = vDao.findByFileVersion(document.getId(), fileVersion);
+				if (ver != null)
+					fileName = ver.getFileName();
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+			}
 		}
 		return fileName;
 	}

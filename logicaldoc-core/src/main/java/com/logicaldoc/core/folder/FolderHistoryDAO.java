@@ -4,7 +4,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.core.dashlet.Dashlet;
 
 /**
  * DAO for <code>FolderHistory</code> handling.
@@ -20,8 +22,10 @@ public interface FolderHistoryDAO extends PersistentObjectDAO<FolderHistory> {
 	 * @param userId identifier of the user
 	 * 
 	 * @return list of histories ordered by date
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<FolderHistory> findByUserId(long userId);
+	public List<FolderHistory> findByUserId(long userId) throws PersistenceException;
 
 	/**
 	 * This method selects all histories of a given folder.
@@ -29,8 +33,10 @@ public interface FolderHistoryDAO extends PersistentObjectDAO<FolderHistory> {
 	 * @param folderId ID of the folder
 	 * 
 	 * @return list of histories ordered by date
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<FolderHistory> findByFolderId(long folderId);
+	public List<FolderHistory> findByFolderId(long folderId) throws PersistenceException;
 
 	/**
 	 * This method selects all histories of a given folder and event occurred
@@ -41,8 +47,10 @@ public interface FolderHistoryDAO extends PersistentObjectDAO<FolderHistory> {
 	 * @param oldestDate optional oldest date
 	 * 
 	 * @return list of histories ordered by date
+	 * 
+	 * @throws PersistenceException Error in the database 
 	 */
-	public List<FolderHistory> findByFolderIdAndEvent(long folderId, String event, Date oldestDate);
+	public List<FolderHistory> findByFolderIdAndEvent(long folderId, String event, Date oldestDate) throws PersistenceException;
 
 	/**
 	 * This method selects all histories not notified yet.
@@ -50,8 +58,10 @@ public interface FolderHistoryDAO extends PersistentObjectDAO<FolderHistory> {
 	 * @param max Optional maximum number of records
 	 * 
 	 * @return list of histories ordered by date
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<FolderHistory> findNotNotified(Integer max);
+	public List<FolderHistory> findNotNotified(Integer max) throws PersistenceException;
 
 	/**
 	 * This method selects all histories of a given user and related to the
@@ -61,8 +71,10 @@ public interface FolderHistoryDAO extends PersistentObjectDAO<FolderHistory> {
 	 * @param event The history event
 	 * 
 	 * @return list of histories ordered by date
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<FolderHistory> findByUserIdAndEvent(long userId, String event);
+	public List<FolderHistory> findByUserIdAndEvent(long userId, String event) throws PersistenceException;
 
 	/**
 	 * This method finds all histories about a path (you can use expression)
@@ -73,8 +85,9 @@ public interface FolderHistoryDAO extends PersistentObjectDAO<FolderHistory> {
 	 * @param max Optional maximum number of records
 	 * 
 	 * @return The list of histories that matched the given criteria
+	 * @throws PersistenceException List<Dashlet> dashlets =
 	 */
-	public List<FolderHistory> findByPath(String pathExpression, Date oldestDate, Collection<String> events, Integer max);
+	public List<FolderHistory> findByPath(String pathExpression, Date oldestDate, Collection<String> events, Integer max) throws PersistenceException;
 
 	/**
 	 * This method deletes all the user history entries oldest than the given
@@ -83,6 +96,8 @@ public interface FolderHistoryDAO extends PersistentObjectDAO<FolderHistory> {
 	 * 
 	 * @param ttl The maximum number of days over which the history is
 	 *        considered old
+	 *        
+	 * @throws PersistenceException Error in the database
 	 */
-	public void cleanOldHistories(int ttl);
+	public void cleanOldHistories(int ttl) throws PersistenceException;
 }

@@ -19,6 +19,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
@@ -52,7 +53,8 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public void setDocumentTags(String sid, long docId, String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException{
+	public void setDocumentTags(String sid, long docId, String[] tags) throws AuthenticationException,
+			PermissionException, WebserviceException, PersistenceException, UnexistingResourceException {
 		SoapDocumentService docService = getDocumentService();
 		WSDocument doc = docService.getDocument(sid, docId);
 		if (doc == null)
@@ -65,7 +67,8 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public void addDocumentTags(String sid, long docId, String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException{
+	public void addDocumentTags(String sid, long docId, String[] tags) throws AuthenticationException,
+			PermissionException, WebserviceException, PersistenceException, UnexistingResourceException {
 		SoapDocumentService docService = getDocumentService();
 		WSDocument doc = docService.getDocument(sid, docId);
 		if (doc == null)
@@ -78,7 +81,8 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public String[] getDocumentTags(String sid, long docId) throws PermissionException, PersistenceException, AuthenticationException, WebserviceException{
+	public String[] getDocumentTags(String sid, long docId) throws PermissionException, PersistenceException,
+			AuthenticationException, WebserviceException, UnexistingResourceException {
 		SoapDocumentService docService = getDocumentService();
 		WSDocument doc = docService.getDocument(sid, docId);
 		if (doc == null)
@@ -89,7 +93,8 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public void setFolderTags(String sid, long folderId, String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException{
+	public void setFolderTags(String sid, long folderId, String[] tags)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		SoapFolderService folderService = getFolderService();
 		WSFolder folder = folderService.getFolder(sid, folderId);
 		if (folder == null)
@@ -101,7 +106,8 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public void addFolderTags(String sid, long folderId, String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException{
+	public void addFolderTags(String sid, long folderId, String[] tags)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		SoapFolderService folderService = getFolderService();
 		WSFolder folder = folderService.getFolder(sid, folderId);
 		if (folder == null)
@@ -114,7 +120,8 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public String[] getFolderTags(String sid, long folderId) throws PermissionException, PersistenceException, AuthenticationException, WebserviceException{
+	public String[] getFolderTags(String sid, long folderId)
+			throws PermissionException, PersistenceException, AuthenticationException, WebserviceException {
 		SoapFolderService folderService = getFolderService();
 		WSFolder folder = folderService.getFolder(sid, folderId);
 		if (folder == null)
@@ -125,7 +132,7 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public String[] getTags(String sid) throws PersistenceException, AuthenticationException, WebserviceException{
+	public String[] getTags(String sid) throws PersistenceException, AuthenticationException, WebserviceException {
 		User user = validateSession(sid);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		List<String> tags = docDao.findAllTags(null, user.getTenantId());
@@ -137,14 +144,15 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public String[] getTagsPreset(String sid) throws AuthenticationException, WebserviceException, PersistenceException{
+	public String[] getTagsPreset(String sid)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		validateSession(sid);
 		Session session = SessionManager.get().get(sid);
 		List<String> tags = new ArrayList<>();
 
 		ContextProperties config = Context.get().getProperties();
 		String mode = config.getProperty(session.getTenantName() + ".tag.mode");
-		if("preset".equals(mode)){
+		if ("preset".equals(mode)) {
 			GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 			List<Generic> buf = gDao.findByTypeAndSubtype("tag", null, null, session.getTenantId());
 			for (Generic generic : buf)
@@ -155,12 +163,13 @@ public class SoapTagService extends AbstractService implements TagService {
 		for (int i = 0; i < tags.size(); i++) {
 			wsTags[i] = tags.get(i);
 		}
-		
+
 		return wsTags;
 	}
 
 	@Override
-	public WSTagCloud[] getTagCloud(String sid) throws PersistenceException, AuthenticationException, WebserviceException{
+	public WSTagCloud[] getTagCloud(String sid)
+			throws PersistenceException, AuthenticationException, WebserviceException {
 		validateSession(sid);
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -177,7 +186,8 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public WSDocument[] findDocumentsByTag(String sid, String tag) throws PersistenceException, AuthenticationException, WebserviceException{
+	public WSDocument[] findDocumentsByTag(String sid, String tag)
+			throws PersistenceException, AuthenticationException, WebserviceException {
 		User user = validateSession(sid);
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -198,7 +208,8 @@ public class SoapTagService extends AbstractService implements TagService {
 	}
 
 	@Override
-	public WSFolder[] findFoldersByTag(String sid, String tag) throws AuthenticationException, WebserviceException, PersistenceException {
+	public WSFolder[] findFoldersByTag(String sid, String tag)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);

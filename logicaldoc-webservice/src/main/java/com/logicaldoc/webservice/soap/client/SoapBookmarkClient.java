@@ -5,6 +5,7 @@ import javax.jws.WebService;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSBookmark;
 import com.logicaldoc.webservice.soap.BookmarkService;
@@ -27,14 +28,14 @@ public class SoapBookmarkClient extends SoapClient<BookmarkService> implements B
 	}
 
 	@Override
-	public WSBookmark saveBookmark(String sid, WSBookmark bookmark)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSBookmark saveBookmark(String sid, WSBookmark bookmark) throws AuthenticationException, PermissionException,
+			WebserviceException, PersistenceException, UnexistingResourceException {
 		return client.saveBookmark(sid, bookmark);
 	}
 
 	@Override
-	public WSBookmark bookmarkDocument(String sid, long docId)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public WSBookmark bookmarkDocument(String sid, long docId) throws AuthenticationException, PermissionException,
+			WebserviceException, PersistenceException, UnexistingResourceException {
 		return client.bookmarkDocument(sid, docId);
 	}
 

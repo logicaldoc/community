@@ -15,11 +15,6 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.Document;
-import com.logicaldoc.core.document.DocumentDAO;
-import com.logicaldoc.core.document.DocumentEvent;
-import com.logicaldoc.core.document.Version;
-import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.security.user.User;
 
 /**
@@ -46,7 +41,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByDocumentId() {
+	public void testFindByDocumentId() throws PersistenceException {
 		List<Version> versions = dao.findByDocId(1);
 		assertEquals(2, versions.size());
 		assertTrue(versions.contains(dao.findByVersion(1, "0.1")));
@@ -60,7 +55,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByVersion() {
+	public void testFindByVersion() throws PersistenceException {
 		Version version = dao.findByVersion(1, "0.2");
 		assertNotNull(version);
 		assertEquals("0.2", version.getVersion());
@@ -70,7 +65,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByFileVersion() {
+	public void testFindByFileVersion() throws PersistenceException {
 		Version version = dao.findByFileVersion(1, "0.1");
 		assertNotNull(version);
 		assertEquals("0.1", version.getFileVersion());
@@ -93,10 +88,10 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		dao.store(version);
 
 		assertEquals("1.0", dao.findById(version.getId()).getVersion());
-		
+
 		version = Version.create(doc, user, "", DocumentEvent.CHANGED.toString(), true);
 		dao.store(version);
-		
+
 		assertEquals("2.0", version.getVersion());
 	}
 }

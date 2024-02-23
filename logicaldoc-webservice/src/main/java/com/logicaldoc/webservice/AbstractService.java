@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.WebApplicationException;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
@@ -232,6 +233,22 @@ public class AbstractService {
 			return sid;
 		} else
 			return null;
+	}
+
+	/**
+	 * Same as validateSession but raises a WebApplicationException with
+	 * HTTP error code 401, useful for REST implementations
+	 * 
+	 * @return The session ID (if valid)
+	 * 
+	 * @throws WebApplicationException the session is not valid
+	 */
+	protected String validateSessionREST() throws WebApplicationException {
+		try {
+			return validateSession();
+		} catch (InvalidSessionException e) {
+			throw new WebApplicationException(e.getMessage(), 401);
+		}
 	}
 
 	public static String convertDateToString(Date date) {

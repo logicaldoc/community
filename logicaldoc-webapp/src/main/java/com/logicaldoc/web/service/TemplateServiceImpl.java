@@ -260,7 +260,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		return null;
 	}
 
-	private GUITemplate toGuiTemplate(long templateId, Template template, Session session) {
+	private GUITemplate toGuiTemplate(long templateId, Template template, Session session) throws PersistenceException {
 		GUITemplate guiTemplate = new GUITemplate();
 		guiTemplate.setId(templateId);
 		guiTemplate.setName(template.getName());

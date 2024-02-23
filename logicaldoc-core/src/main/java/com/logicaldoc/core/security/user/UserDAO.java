@@ -23,8 +23,10 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * @param tenantId identifier of the tenant
 	 * 
 	 * @return total number of guest users
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public int count(Long tenantId);
+	public int count(Long tenantId) throws PersistenceException;
 
 	/**
 	 * Counts the total number of guest users
@@ -32,8 +34,10 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * @param tenantId identifier of the tenant
 	 * 
 	 * @return total number of guest users
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public int countGuests(Long tenantId);
+	public int countGuests(Long tenantId) throws PersistenceException;
 
 	/**
 	 * This method finds an User by its username. The search is case sensitive.
@@ -76,8 +80,10 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * @param username The username of wanted User.
 	 * 
 	 * @return Collection of selected users.
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<User> findByLikeUsername(String username);
+	public List<User> findByLikeUsername(String username) throws PersistenceException;
 
 	/**
 	 * This method finds an User by name.
@@ -85,8 +91,10 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * @param name The name of wanted User.
 	 * 
 	 * @return Collection of selected users.
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<User> findByName(String name);
+	public List<User> findByName(String name) throws PersistenceException;
 
 	/**
 	 * This method finds an User by username and name.
@@ -95,8 +103,10 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * @param name The name of wanted user
 	 * 
 	 * @return Collection of selected users
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<User> findByUsernameAndName(String username, String name);
+	public List<User> findByUsernameAndName(String username, String name) throws PersistenceException;
 
 	/**
 	 * Is password expired.
@@ -116,8 +126,10 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * @param username identifier of the user
 	 * 
 	 * @return the last interaction time
+	 * 
+	 * @throws PersistenceException Error in the database 
 	 */
-	public boolean isInactive(String username);
+	public boolean isInactive(String username) throws PersistenceException;
 
 	/**
 	 * This method deletes the user object and insert a new user history entry.
@@ -147,8 +159,10 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * @param namePrefix Name prefix of the property (optional)
 	 * 
 	 * @return The map setting_name-generic
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public Map<String, Generic> findUserSettings(long userId, String namePrefix);
+	public Map<String, Generic> findUserSettings(long userId, String namePrefix) throws PersistenceException;
 
 	/**
 	 * Retrieve the administrator for the given tenant. The general rule is that
@@ -162,7 +176,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * 
 	 * @return the user to administrate the tenant
 	 * 
-	 * @throws PersistenceException Error in the data layer 
+	 * @throws PersistenceException Error in the database
 	 */
 	public User findAdminUser(String tenantName) throws PersistenceException;
 
@@ -172,6 +186,8 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * @param groupId Identifier of the group
 	 * 
 	 * @return the set of groups
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public Set<User> findByGroup(long groupId);
+	public Set<User> findByGroup(long groupId) throws PersistenceException;
 }

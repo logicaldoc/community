@@ -880,7 +880,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testDeleteNotes() throws ServerException {
+	public void testDeleteNotes() throws ServerException, PersistenceException {
 		List<DocumentNote> notes = noteDao.findByDocId(1, "1.0");
 		assertNotNull(notes);
 		assertEquals(2, notes.size());
@@ -946,7 +946,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testLinkDocuments() throws ServerException {
+	public void testLinkDocuments() throws ServerException, PersistenceException {
 		service.linkDocuments(List.of(1L, 2L), List.of(3L, 4L));
 
 		DocumentLink link = linkDao.findByDocIdsAndType(1, 3, "default");
@@ -1016,7 +1016,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testMarkHistoryAsRead() throws ServerException {
+	public void testMarkHistoryAsRead() throws ServerException, PersistenceException {
 		List<DocumentHistory> histories = documentHistoryDao.findByUserIdAndEvent(1, "data test 01", null);
 		assertEquals(2, histories.size());
 		assertEquals(1, histories.get(0).getIsNew());

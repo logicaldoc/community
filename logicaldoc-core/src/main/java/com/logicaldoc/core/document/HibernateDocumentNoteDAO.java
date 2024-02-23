@@ -1,6 +1,5 @@
 package com.logicaldoc.core.document;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -51,11 +50,11 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 			documentDao.store(doc);
 		}
 	}
-	
+
 	@Override
 	public void store(DocumentNote note, DocumentHistory transaction) throws PersistenceException {
 		this.store(note);
-		
+
 		try {
 			if (transaction != null) {
 				DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -73,56 +72,46 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	}
 
 	@Override
-	public List<DocumentNote> findByDocId(long docId, String fileVersion) {
+	public List<DocumentNote> findByDocId(long docId, String fileVersion) throws PersistenceException {
 		return findByDocIdAndType(docId, fileVersion, null);
 	}
 
 	@Override
-	public List<DocumentNote> findByDocIdAndType(long docId, String fileVersion, String type) {
+	public List<DocumentNote> findByDocIdAndType(long docId, String fileVersion, String type) throws PersistenceException {
 		return findByDocIdAndTypes(docId, fileVersion, StringUtils.isEmpty(type) ? null : Arrays.asList(type));
 	}
 
 	@Override
-	public List<DocumentNote> findByDocIdAndTypes(long docId, String fileVersion, Collection<String> types) {
-		try {
-			if (StringUtils.isEmpty(fileVersion)) {
-				if (types == null || types.isEmpty()) {
-					return findByWhere(ENTITY + ".docId = " + docId, null, null);
-				} else {
-					Map<String, Object> params = new HashMap<>();
-					params.put(DOC_ID, docId);
-					params.put("types", types);
-
-					return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".type in (:types)", params, null, null);
-				}
-			} else if (types == null || types.isEmpty()) {
-				Map<String, Object> params = new HashMap<>();
-				params.put(DOC_ID, docId);
-				params.put("fileVersion", fileVersion);
-				return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion", params, null,
-						null);
+	public List<DocumentNote> findByDocIdAndTypes(long docId, String fileVersion, Collection<String> types)
+			throws PersistenceException {
+		if (StringUtils.isEmpty(fileVersion)) {
+			if (types == null || types.isEmpty()) {
+				return findByWhere(ENTITY + ".docId = " + docId, null, null);
 			} else {
 				Map<String, Object> params = new HashMap<>();
 				params.put(DOC_ID, docId);
-				params.put("fileVersion", fileVersion);
 				params.put("types", types);
-				return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion and " + ENTITY
-						+ ".type in (:types)", params, null, null);
+
+				return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".type in (:types)", params, null, null);
 			}
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
+		} else if (types == null || types.isEmpty()) {
+			Map<String, Object> params = new HashMap<>();
+			params.put(DOC_ID, docId);
+			params.put("fileVersion", fileVersion);
+			return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion", params, null, null);
+		} else {
+			Map<String, Object> params = new HashMap<>();
+			params.put(DOC_ID, docId);
+			params.put("fileVersion", fileVersion);
+			params.put("types", types);
+			return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion and " + ENTITY
+					+ ".type in (:types)", params, null, null);
 		}
 	}
 
 	@Override
-	public List<DocumentNote> findByUserId(long userId) {
-		try {
-			return findByWhere(ENTITY + ".userId =" + userId, "order by " + ENTITY + ".date desc", null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+	public List<DocumentNote> findByUserId(long userId) throws PersistenceException {
+		return findByWhere(ENTITY + ".userId =" + userId, "order by " + ENTITY + ".date desc", null);
 	}
 
 	private void markToIndex(long docId) throws PersistenceException {

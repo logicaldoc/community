@@ -572,7 +572,8 @@ public class ResourceServiceImpl implements ResourceService {
 			// verify the addchild permission on destination folder
 			boolean addchildEnabled = destination.isAddChildEnabled();
 			if (!addchildEnabled)
-				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "AddChild Permission not granted to this user");
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN,
+						"AddChild Permission not granted to this user");
 
 			// verify the MOVE permission on parent folder
 			boolean moveEnabled = parentFolder.isMoveEnabled();
@@ -611,7 +612,8 @@ public class ResourceServiceImpl implements ResourceService {
 			// folders
 			boolean addchildEnabled = destination.isAddChildEnabled();
 			if (!addchildEnabled)
-				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "AddChild Permission not granted to this user");
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN,
+						"AddChild Permission not granted to this user");
 
 			assertResourceIsDeletable(source);
 
@@ -916,31 +918,30 @@ public class ResourceServiceImpl implements ResourceService {
 
 	public List<Resource> getHistory(Resource resource) {
 		List<Resource> resourceHistory = new LinkedList<>();
-
-		Document document = null;
 		try {
-			document = documentDAO.findById(Long.parseLong(resource.getID()));
+			Document document = documentDAO.findById(Long.parseLong(resource.getID()));
+
+			documentDAO.initialize(document);
+
+			Collection<Version> tmp = versionDAO.findByDocId(document.getId());
+			Version[] sortIt = tmp.toArray(new Version[0]);
+
+			// clear collection and add sorted elements
+			Arrays.sort(sortIt);
+
+			for (Version version : sortIt) {
+				Resource res = marshallDocument(document, resource.getSession());
+				res.setVersionLabel(version.getVersion());
+				res.setVersionDate(version.getDate());
+				res.setAuthor(version.getUsername());
+				res.setCheckedOut(true);
+				resourceHistory.add(res);
+			}
+
+			return resourceHistory;
 		} catch (PersistenceException e) {
 			return resourceHistory;
 		}
-		documentDAO.initialize(document);
-
-		Collection<Version> tmp = versionDAO.findByDocId(document.getId());
-		Version[] sortIt = tmp.toArray(new Version[0]);
-
-		// clear collection and add sorted elements
-		Arrays.sort(sortIt);
-
-		for (Version version : sortIt) {
-			Resource res = marshallDocument(document, resource.getSession());
-			res.setVersionLabel(version.getVersion());
-			res.setVersionDate(version.getDate());
-			res.setAuthor(version.getUsername());
-			res.setCheckedOut(true);
-			resourceHistory.add(res);
-		}
-
-		return resourceHistory;
 	}
 
 	public void uncheckout(Resource resource, WebdavSession session) throws DavException {

@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
+import com.logicaldoc.core.PersistenceException;
 
 import junit.framework.Assert;
 
@@ -32,7 +33,7 @@ public class HibernateContactDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByUser() {
+	public void testFindByUser() throws PersistenceException {
 		List<Contact> contacts = dao.findByUser(null, null);
 		Assert.assertEquals(1, contacts.size());
 		contacts = dao.findByUser(1L, null);

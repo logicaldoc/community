@@ -10,8 +10,6 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.DocumentNote;
-import com.logicaldoc.core.document.DocumentNoteDAO;
 
 import junit.framework.Assert;
 
@@ -34,7 +32,7 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByDocId() {
+	public void testFindByDocId() throws PersistenceException {
 		List<DocumentNote> notes = dao.findByDocId(1L, null);
 		Assert.assertNotNull(notes);
 		Assert.assertEquals(2, notes.size());
@@ -43,7 +41,7 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByDocIdAndType() {
+	public void testFindByDocIdAndType() throws PersistenceException {
 		List<DocumentNote> notes = dao.findByDocIdAndType(1L, null, "x");
 		Assert.assertNotNull(notes);
 		Assert.assertEquals(1, notes.size());

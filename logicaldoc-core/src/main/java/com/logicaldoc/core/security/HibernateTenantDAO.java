@@ -116,7 +116,7 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 	}
 
 	@Override
-	public Set<String> findAllNames() {
+	public Set<String> findAllNames() throws PersistenceException {
 		Set<String> names = new HashSet<>();
 		List<Tenant> tenants = findAll();
 		for (Tenant tenant : tenants) {

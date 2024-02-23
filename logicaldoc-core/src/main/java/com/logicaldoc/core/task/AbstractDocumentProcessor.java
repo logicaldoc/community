@@ -67,7 +67,11 @@ public abstract class AbstractDocumentProcessor extends Task {
 			log.info("Errors: {}", errors);
 
 			// To be safer always release the lock
-			lockManager.release(getName(), transactionId);
+			try {
+				lockManager.release(getName(), transactionId);
+			} catch (PersistenceException e) {
+				log.warn(e.getMessage(), e);
+			}
 
 			removeTransactionReference();
 		}

@@ -1,6 +1,5 @@
 package com.logicaldoc.core.dashlet;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,17 +24,13 @@ public class HibernateDashletDAO extends HibernatePersistentObjectDAO<Dashlet> i
 	}
 
 	@Override
-	public Dashlet findByName(String name, long tenantId) {
-		List<Dashlet> dashlets = new ArrayList<>();
-		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put("tenantId", tenantId);
-			params.put("name", name);
-			dashlets = findByWhere(ENTITY + ".tenantId = :tenantId and " + ENTITY + ".name = :name", params, null,
-					null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+	public Dashlet findByName(String name, long tenantId) throws PersistenceException {
+		Map<String, Object> params = new HashMap<>();
+		params.put("tenantId", tenantId);
+		params.put("name", name);
+		List<Dashlet> dashlets = findByWhere(ENTITY + ".tenantId = :tenantId and " + ENTITY + ".name = :name", params,
+				null, null);
+
 		return CollectionUtils.isNotEmpty(dashlets) ? dashlets.get(0) : null;
 
 	}

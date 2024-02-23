@@ -84,6 +84,7 @@ import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
@@ -863,7 +864,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		return guiDocument;
 	}
 
-	private void setBookmarked(GUIDocument document, boolean isFolder, User sessionUser) {
+	private void setBookmarked(GUIDocument document, boolean isFolder, User sessionUser) throws PersistenceException {
 		if (sessionUser != null && !isFolder) {
 			BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 			document.setBookmarked(bDao.isDocBookmarkedByUser(document.getId(), sessionUser.getId()));
@@ -1023,19 +1024,20 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		for (Long inDocId : inDocIds) {
 			for (Long outDocId : outDocIds) {
-				DocumentLink link = linkDao.findByDocIdsAndType(inDocId, outDocId, "default");
-				if (link == null) {
-					// The link doesn't exist and must be created
-					link = new DocumentLink();
-					link.setTenantId(session.getTenantId());
-					try {
+				try {
+					DocumentLink link = linkDao.findByDocIdsAndType(inDocId, outDocId, "default");
+					if (link == null) {
+						// The link doesn't exist and must be created
+						link = new DocumentLink();
+						link.setTenantId(session.getTenantId());
+
 						link.setDocument1(docDao.findById(inDocId));
 						link.setDocument2(docDao.findById(outDocId));
 						link.setType("default");
 						linkDao.store(link);
-					} catch (PersistenceException e) {
-						throwServerException(session, log, e);
 					}
+				} catch (PersistenceException e) {
+					throwServerException(session, log, e);
 				}
 			}
 		}
@@ -1075,7 +1077,11 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	public void markHistoryAsRead(String event) throws ServerException {
 		Session session = validateSession();
 		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
-		dao.markHistoriesAsRead(event, session.getUserId());
+		try {
+			dao.markHistoriesAsRead(event, session.getUserId());
+		} catch (PersistenceException e) {
+			throwServerException(session, log, e);
+		}
 	}
 
 	@Override
@@ -1750,27 +1756,30 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		Session session = validateSession();
 
 		RatingDAO ratingDao = (RatingDAO) Context.get().getBean(RatingDAO.class);
+		try {
+			GUIRating rating = new GUIRating();
+			Rating rat = ratingDao.findVotesByDocId(docId);
+			if (rat != null) {
+				ratingDao.initialize(rat);
 
-		GUIRating rating = new GUIRating();
-		Rating rat = ratingDao.findVotesByDocId(docId);
-		if (rat != null) {
-			ratingDao.initialize(rat);
+				rating.setId(rat.getId());
+				rating.setDocId(docId);
+				// We use the rating userId value to know in the GUI if the user
+				// has already vote this document.
+				if (ratingDao.findByDocIdAndUserId(docId, session.getUserId()) != null)
+					rating.setUserId(session.getUserId());
+				rating.setCount(rat.getCount());
+				rating.setAverage(rat.getAverage());
+			} else {
+				rating.setDocId(docId);
+				rating.setCount(0);
+				rating.setAverage(0F);
+			}
 
-			rating.setId(rat.getId());
-			rating.setDocId(docId);
-			// We use the rating userId value to know in the GUI if the user
-			// has already vote this document.
-			if (ratingDao.findByDocIdAndUserId(docId, session.getUserId()) != null)
-				rating.setUserId(session.getUserId());
-			rating.setCount(rat.getCount());
-			rating.setAverage(rat.getAverage());
-		} else {
-			rating.setDocId(docId);
-			rating.setCount(0);
-			rating.setAverage(0F);
+			return rating;
+		} catch (PersistenceException e) {
+			return (GUIRating) throwServerException(session, log, e);
 		}
-
-		return rating;
 	}
 
 	@Override
@@ -1778,19 +1787,20 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		Session session = validateSession();
 
 		RatingDAO ratingDao = (RatingDAO) Context.get().getBean(RatingDAO.class);
-		Rating rat = ratingDao.findByDocIdAndUserId(rating.getDocId(), rating.getUserId());
-		if (rat == null) {
-			rat = new Rating();
-			rat.setTenantId(session.getTenantId());
-			rat.setDocId(rating.getDocId());
-			rat.setUserId(session.getUserId());
-			rat.setUsername(session.getUser().getFullName());
-		}
-		rat.setVote(rating.getVote());
-
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSession(session);
 		try {
+			Rating rat = ratingDao.findByDocIdAndUserId(rating.getDocId(), rating.getUserId());
+			if (rat == null) {
+				rat = new Rating();
+				rat.setTenantId(session.getTenantId());
+				rat.setDocId(rating.getDocId());
+				rat.setUserId(session.getUserId());
+				rat.setUsername(session.getUser().getFullName());
+			}
+			rat.setVote(rating.getVote());
+
+			DocumentHistory transaction = new DocumentHistory();
+			transaction.setSession(session);
+
 			ratingDao.store(rat, transaction);
 
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -1839,50 +1849,49 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			throws ServerException {
 		Session session = validateSession();
 
-		Document document;
 		try {
-			document = retrieveDocument(docId);
+			Document document = retrieveDocument(docId);
+
+			if (document == null)
+				throw new ServerException(UNEXISTING_DOCUMENT + " " + docId);
+
+			List<GUIDocumentNote> guiNotes = new ArrayList<>();
+			DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
+
+			List<DocumentNote> notes = dao.findByDocIdAndTypes(document.getId(),
+					fileVersion != null ? fileVersion : document.getFileVersion(), types);
+			for (DocumentNote note : notes) {
+				GUIDocumentNote guiNote = new GUIDocumentNote();
+				guiNote.setColor(note.getColor());
+				guiNote.setDate(note.getDate());
+				guiNote.setDocId(document.getId());
+				guiNote.setFileName(note.getFileName());
+				guiNote.setHeight(note.getHeight());
+				guiNote.setId(note.getId());
+				guiNote.setLeft(note.getLeft());
+				guiNote.setMessage(note.getMessage());
+				guiNote.setOpacity(note.getOpacity());
+				guiNote.setPage(note.getPage());
+				guiNote.setTop(note.getTop());
+				guiNote.setUserId(note.getUserId());
+				guiNote.setUsername(note.getUsername());
+				guiNote.setWidth(note.getWidth());
+				guiNote.setFileVersion(note.getFileVersion());
+				guiNote.setType(note.getType());
+				guiNote.setRecipient(note.getRecipient());
+				guiNote.setRecipientEmail(note.getRecipientEmail());
+				guiNote.setLineColor(note.getLineColor());
+				guiNote.setLineWidth(note.getLineWidth());
+				guiNote.setLineOpacity(note.getLineOpacity());
+				guiNote.setShape(note.getShape());
+				guiNote.setRotation(note.getRotation());
+				guiNotes.add(guiNote);
+			}
+			return guiNotes;
 		} catch (PersistenceException e) {
 			return (List<GUIDocumentNote>) throwServerException(session, log, e);
 		}
 
-		if (document == null)
-			throw new ServerException(UNEXISTING_DOCUMENT + " " + docId);
-
-		List<GUIDocumentNote> guiNotes = new ArrayList<>();
-		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
-
-		List<DocumentNote> notes = dao.findByDocIdAndTypes(document.getId(),
-				fileVersion != null ? fileVersion : document.getFileVersion(), types);
-		for (DocumentNote note : notes) {
-			GUIDocumentNote guiNote = new GUIDocumentNote();
-			guiNote.setColor(note.getColor());
-			guiNote.setDate(note.getDate());
-			guiNote.setDocId(document.getId());
-			guiNote.setFileName(note.getFileName());
-			guiNote.setHeight(note.getHeight());
-			guiNote.setId(note.getId());
-			guiNote.setLeft(note.getLeft());
-			guiNote.setMessage(note.getMessage());
-			guiNote.setOpacity(note.getOpacity());
-			guiNote.setPage(note.getPage());
-			guiNote.setTop(note.getTop());
-			guiNote.setUserId(note.getUserId());
-			guiNote.setUsername(note.getUsername());
-			guiNote.setWidth(note.getWidth());
-			guiNote.setFileVersion(note.getFileVersion());
-			guiNote.setType(note.getType());
-			guiNote.setRecipient(note.getRecipient());
-			guiNote.setRecipientEmail(note.getRecipientEmail());
-			guiNote.setLineColor(note.getLineColor());
-			guiNote.setLineWidth(note.getLineWidth());
-			guiNote.setLineOpacity(note.getLineOpacity());
-			guiNote.setShape(note.getShape());
-			guiNote.setRotation(note.getRotation());
-			guiNotes.add(guiNote);
-		}
-
-		return guiNotes;
 	}
 
 	@Override
@@ -1894,7 +1903,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		try {
 			document = retrieveDocument(docId);
 			if (document == null)
-				throw new ServerException(UNEXISTING_DOCUMENT + " " + docId);
+				throw new UnexistingResourceException("Document " + docId);
 
 			/*
 			 * Check for deletions
@@ -1906,23 +1915,20 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			for (Long actualNoteId : actualNoteIds)
 				if (!noteIds.contains(actualNoteId))
 					dao.delete(actualNoteId);
-		} catch (PersistenceException e) {
+
+			/*
+			 * Do the updates / inserts
+			 */
+			for (GUIDocumentNote guiNote : notes)
+				saveNote(session, document, guiNote);
+		} catch (UnexistingResourceException | PersistenceException e) {
 			throwServerException(session, log, e);
-		}
-
-		if (document == null)
-			throw new ServerException(UNEXISTING_DOCUMENT + " " + docId);
-
-		/*
-		 * Do the updates / inserts
-		 */
-		for (GUIDocumentNote guiNote : notes) {
-			saveNote(session, document, guiNote);
 		}
 
 	}
 
-	private void saveNote(Session session, Document document, GUIDocumentNote guiNote) throws ServerException {
+	private void saveNote(Session session, Document document, GUIDocumentNote guiNote)
+			throws ServerException, PersistenceException {
 
 		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
 
@@ -2545,20 +2551,24 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		Session session = validateSession();
 
 		RatingDAO rDao = (RatingDAO) Context.get().getBean(RatingDAO.class);
-		GUIRating rating = null;
-		Rating rat = rDao.findByDocIdAndUserId(docId, session.getUserId());
-		if (rat != null) {
-			rDao.initialize(rat);
-			rating = new GUIRating();
-			rating.setId(rat.getId());
-			rating.setDocId(docId);
-			rating.setUserId(session.getUserId());
-			rating.setUsername(session.getUser().getFullName());
-			rating.setVote(rat.getVote());
-			rating.setAverage(rat.getAverage());
-		}
+		try {
+			GUIRating rating = null;
+			Rating rat = rDao.findByDocIdAndUserId(docId, session.getUserId());
+			if (rat != null) {
+				rDao.initialize(rat);
+				rating = new GUIRating();
+				rating.setId(rat.getId());
+				rating.setDocId(docId);
+				rating.setUserId(session.getUserId());
+				rating.setUsername(session.getUser().getFullName());
+				rating.setVote(rat.getVote());
+				rating.setAverage(rat.getAverage());
+			}
 
-		return rating;
+			return rating;
+		} catch (PersistenceException e) {
+			return (GUIRating) throwServerException(session, log, e);
+		}
 
 	}
 

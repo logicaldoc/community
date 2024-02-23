@@ -55,7 +55,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
 
 	@SuppressWarnings("rawtypes")
 	@Test
-	public void testFindByUserId() {
+	public void testFindByUserId() throws PersistenceException {
 		Collection histories = dao.findByUserId(1);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(2, histories.size());
@@ -68,7 +68,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
 
 	@SuppressWarnings("rawtypes")
 	@Test
-	public void testFindByFolderId() {
+	public void testFindByFolderId() throws PersistenceException {
 		Collection histories = dao.findByFolderId(5);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(2, histories.size());
@@ -80,7 +80,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByFolderIdAndEvent() {
+	public void testFindByFolderIdAndEvent() throws PersistenceException {
 		List<FolderHistory> histories = dao.findByFolderIdAndEvent(5, "data test 03", null);
 		Assert.assertEquals(1, histories.size());
 
@@ -194,7 +194,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
 
 	@SuppressWarnings("rawtypes")
 	@Test
-	public void testFindByUserIdAndEvent() {
+	public void testFindByUserIdAndEvent() throws PersistenceException {
 		Collection histories = dao.findByUserIdAndEvent(1, "data test 03");
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(1, histories.size());
@@ -214,7 +214,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByPath() {
+	public void testFindByPath() throws PersistenceException {
 		List<FolderHistory> histories = dao.findByPath("/Default/pippo%", null, null, null);
 		Assert.assertEquals(2, histories.size());
 

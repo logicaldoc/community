@@ -171,8 +171,10 @@ public interface MenuDAO extends PersistentObjectDAO<Menu> {
 	 * @param groupId The group id
 	 * 
 	 * @return The List of menus
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<Menu> findByGroupId(long groupId);
+	public List<Menu> findByGroupId(long groupId) throws PersistenceException;
 
 	/**
 	 * Returns a List of menus being a parent of the given menu. The list is

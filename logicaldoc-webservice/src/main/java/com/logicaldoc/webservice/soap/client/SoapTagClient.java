@@ -5,6 +5,7 @@ import javax.jws.WebService;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
@@ -29,20 +30,20 @@ public class SoapTagClient extends SoapClient<TagService> implements TagService 
 	}
 
 	@Override
-	public void setDocumentTags(String sid, long docId, String[] tags)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public void setDocumentTags(String sid, long docId, String[] tags) throws AuthenticationException,
+			PermissionException, WebserviceException, PersistenceException, UnexistingResourceException {
 		client.setDocumentTags(sid, docId, tags);
 	}
 
 	@Override
-	public void addDocumentTags(String sid, long docId, String[] tags)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public void addDocumentTags(String sid, long docId, String[] tags) throws AuthenticationException,
+			PermissionException, WebserviceException, PersistenceException, UnexistingResourceException {
 		client.addDocumentTags(sid, docId, tags);
 	}
 
 	@Override
-	public String[] getDocumentTags(String sid, long docId)
-			throws PermissionException, AuthenticationException, PersistenceException, WebserviceException {
+	public String[] getDocumentTags(String sid, long docId) throws PermissionException, AuthenticationException,
+			PersistenceException, WebserviceException, UnexistingResourceException {
 		return client.getDocumentTags(sid, docId);
 	}
 

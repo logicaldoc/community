@@ -1,6 +1,5 @@
 package com.logicaldoc.core.contact;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,7 @@ public class HibernateContactDAO extends HibernatePersistentObjectDAO<Contact> i
 	}
 
 	@Override
-	public List<Contact> findByUser(Long userId, String email) {
+	public List<Contact> findByUser(Long userId, String email) throws PersistenceException {
 		Map<String, Object> params = new HashMap<>();
 		StringBuilder sb = new StringBuilder("");
 		if (userId == null) {
@@ -39,12 +38,6 @@ public class HibernateContactDAO extends HibernatePersistentObjectDAO<Contact> i
 			params.put("email", email);
 		}
 
-		try {
-			return findByWhere(sb.toString(), params,
-					"order by " + ENTITY + ".firstName, " + ENTITY + ".lastName", null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+		return findByWhere(sb.toString(), params, "order by " + ENTITY + ".firstName, " + ENTITY + ".lastName", null);
 	}
 }

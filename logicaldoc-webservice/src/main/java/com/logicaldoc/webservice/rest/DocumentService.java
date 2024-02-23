@@ -26,6 +26,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.parser.ParseException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSAccessControlEntry;
 import com.logicaldoc.webservice.model.WSDocument;
@@ -254,11 +255,12 @@ public interface DocumentService {
 	 * @throws PermissionException The current user does not have enough
 	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
 	@PUT
 	@Path("/update")
-	void update(WSDocument document)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	void update(WSDocument document) throws AuthenticationException, PermissionException, WebserviceException,
+			PersistenceException, UnexistingResourceException;
 
 	/**
 	 * Retrieves the file content of a document.
@@ -317,13 +319,15 @@ public interface DocumentService {
 	 * @throws PermissionException The current user does not have enough
 	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
 	@POST
 	@Path("/addNote")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
 	public WSNote addNote(@FormParam("docId")
 	long docId, @FormParam("note")
-	String note) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	String note) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			UnexistingResourceException;
 
 	/**
 	 * Deletes a new note by note identifier
@@ -351,11 +355,13 @@ public interface DocumentService {
 	 * @throws PermissionException The current user does not have enough
 	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
 	@GET
 	@Path("/getNotes")
 	public WSNote[] getNotes(@QueryParam("docId")
-	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			UnexistingResourceException;
 
 	/**
 	 * Puts a new rating on the given document
@@ -370,12 +376,14 @@ public interface DocumentService {
 	 * @throws PermissionException The current user does not have enough
 	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
 	@PUT
 	@Path("/rateDocument")
 	public WSRating rateDocument(@QueryParam("docId")
 	long docId, @QueryParam("vote")
-	int vote) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	int vote) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			UnexistingResourceException;
 
 	/**
 	 * Gets all the ratings of the given document
@@ -389,11 +397,13 @@ public interface DocumentService {
 	 * @throws PermissionException The current user does not have enough
 	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
 	@GET
 	@Path("/getRatings")
 	public WSRating[] getRatings(@QueryParam("docId")
-	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			UnexistingResourceException;
 
 	/**
 	 * Deletes a version by document identifier and version ID. You can not
@@ -425,12 +435,14 @@ public interface DocumentService {
 	 * @throws PermissionException The current user does not have enough
 	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
+	 * @throws UnexistingResourceException The requested document does not exist
 	 */
 	@PUT
 	@Path("/move")
 	public void move(@QueryParam("docId")
 	long docId, @QueryParam("folderId")
-	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			UnexistingResourceException;
 
 	/**
 	 * Copies a document into another folder
@@ -545,13 +557,14 @@ public interface DocumentService {
 	 * @throws PermissionException The current user does not have enough
 	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
 	@PUT
 	@Path("/promoteVersion")
 	public void promoteVersion(@QueryParam("docId")
 	long docId, @QueryParam("version")
-	String version)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException;
+	String version) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			IOException, UnexistingResourceException;
 
 	/**
 	 * Renames the title of an existing document with the given identifier.
@@ -564,12 +577,14 @@ public interface DocumentService {
 	 * @throws PermissionException The current user does not have enough
 	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
 	@PUT
 	@Path("/rename")
 	public void rename(@QueryParam("docId")
 	long docId, @QueryParam("name")
-	String name) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	String name) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			UnexistingResourceException;
 
 	/**
 	 * Gets the version history of an existing document with the given
@@ -584,11 +599,13 @@ public interface DocumentService {
 	 * @throws PermissionException The current user does not have enough
 	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
 	@GET
 	@Path("/getVersions")
 	public WSDocument[] getVersions(@QueryParam("docId")
-	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			UnexistingResourceException;
 
 	/**
 	 * Creates a new document alias for the given document inside a specified
@@ -815,9 +832,10 @@ public interface DocumentService {
 	 * @throws PermissionException The current user does not have enough
 	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
-	public WSLink link(long doc1, long doc2, String type)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	public WSLink link(long doc1, long doc2, String type) throws AuthenticationException, PermissionException,
+			WebserviceException, PersistenceException, UnexistingResourceException;
 
 	/**
 	 * Locks an existing document with the given identifier.
@@ -829,9 +847,10 @@ public interface DocumentService {
 	 * @throws PermissionException The current user does not have enough
 	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
-	public void lock(long docId)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	public void lock(long docId) throws AuthenticationException, PermissionException, WebserviceException,
+			PersistenceException, UnexistingResourceException;
 
 	/**
 	 * Re-indexes(or indexes from scratch) a document
@@ -903,9 +922,10 @@ public interface DocumentService {
 	 * @throws PermissionException The current user does not have enough
 	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
-	public WSNote saveNote(long docId, WSNote note)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	public WSNote saveNote(long docId, WSNote note) throws AuthenticationException, PermissionException,
+			WebserviceException, PersistenceException, UnexistingResourceException;
 
 	/**
 	 * Sends a set of documents as mail attachments
@@ -936,9 +956,10 @@ public interface DocumentService {
 	 * @throws PermissionException The current user does not have enough
 	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
-	public void setPassword(long docId, String password)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	public void setPassword(long docId, String password) throws AuthenticationException, PermissionException,
+			WebserviceException, PersistenceException, UnexistingResourceException;
 
 	/**
 	 * Unlocks an existing document with the given identifier.
@@ -950,9 +971,10 @@ public interface DocumentService {
 	 * @throws PermissionException The current user does not have enough
 	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
-	public void unlock(long docId)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	public void unlock(long docId) throws AuthenticationException, PermissionException, WebserviceException,
+			PersistenceException, UnexistingResourceException;
 
 	/**
 	 * Unprotects a document that is password protected. If the given password
@@ -982,9 +1004,10 @@ public interface DocumentService {
 	 * @throws PermissionException The current user does not have enough
 	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
+	 * @throws UnexistingResourceException The specified document does not exist
 	 */
-	public void unsetPassword(long docId, String currentPassword)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	public void unsetPassword(long docId, String currentPassword) throws AuthenticationException, PermissionException,
+			WebserviceException, PersistenceException, UnexistingResourceException;
 
 	/**
 	 * Sets the Access Control List

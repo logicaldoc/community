@@ -60,7 +60,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		try {
 			AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
 			dao.deleteBySetIdAndAttribute(setId, attribute);
-			int i=0;
+			int i = 0;
 			for (GUIValue value : values) {
 				AttributeOption option = new AttributeOption(setId, attribute, value.getValue(), value.getCode());
 				option.setPosition(i++);
@@ -197,11 +197,15 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	public GUIAttributeSet getAttributeSet(String name) throws ServerException {
 		Session session = validateSession();
 		AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
-		AttributeSet set = dao.findByName(name, session.getTenantId());
-		if (set != null)
-			return getAttributeSet(set.getId());
-		else
-			return null;
+		try {
+			AttributeSet set = dao.findByName(name, session.getTenantId());
+			if (set != null)
+				return getAttributeSet(set.getId());
+			else
+				return null;
+		} catch (Exception t) {
+			return (GUIAttributeSet) throwServerException(session, log, t);
+		}
 	}
 
 	@Override

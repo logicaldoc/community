@@ -1,6 +1,5 @@
 package com.logicaldoc.core.communication;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -33,52 +32,40 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 	}
 
 	@Override
-	public List<MessageTemplate> findByLanguage(String language, long tenantId) {
-		try {
-			return findByWhere(" " + ENTITY + LANGUAGE + language + AND + ENTITY + TENANT_ID + tenantId,
-					"order by " + ENTITY + ".name", null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+	public List<MessageTemplate> findByLanguage(String language, long tenantId) throws PersistenceException {
+		return findByWhere(" " + ENTITY + LANGUAGE + language + AND + ENTITY + TENANT_ID + tenantId,
+				"order by " + ENTITY + ".name", null);
 	}
 
 	@Override
-	public List<MessageTemplate> findByTypeAndLanguage(String type, String language, long tenantId) {
+	public List<MessageTemplate> findByTypeAndLanguage(String type, String language, long tenantId)
+			throws PersistenceException {
 		StringBuilder query = new StringBuilder(ENTITY + LANGUAGE + language + "' ");
 		query.append(" and " + ENTITY + TENANT_ID + tenantId);
 		if (StringUtils.isNotEmpty(type))
 			query.append(" and " + ENTITY + ".type='" + type + "' ");
 
-		try {
-			return findByWhere(query.toString(), "order by " + ENTITY + ".name", null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+		return findByWhere(query.toString(), "order by " + ENTITY + ".name", null);
 	}
 
 	@Override
-	public MessageTemplate findByNameAndLanguage(String name, String language, long tenantId) {
+	public MessageTemplate findByNameAndLanguage(String name, String language, long tenantId)
+			throws PersistenceException {
 		String lang = language;
 		if (StringUtils.isEmpty(lang))
 			lang = "en";
 
-		try {
-			List<MessageTemplate> buf = findByWhere(
-					" " + ENTITY + LANGUAGE + lang + AND + ENTITY + NAME + name + AND + ENTITY + TENANT_ID + tenantId,
-					null, null);
-			if (buf != null && !buf.isEmpty())
-				return buf.get(0);
+		List<MessageTemplate> buf = findByWhere(
+				" " + ENTITY + LANGUAGE + lang + AND + ENTITY + NAME + name + AND + ENTITY + TENANT_ID + tenantId, null,
+				null);
+		if (buf != null && !buf.isEmpty())
+			return buf.get(0);
 
-			buf = findByWhere(
-					" " + ENTITY + ".language='en' and " + ENTITY + NAME + name + AND + ENTITY + TENANT_ID + tenantId,
-					null, null);
-			if (buf != null && !buf.isEmpty())
-				return buf.get(0);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+		buf = findByWhere(
+				" " + ENTITY + ".language='en' and " + ENTITY + NAME + name + AND + ENTITY + TENANT_ID + tenantId, null,
+				null);
+		if (buf != null && !buf.isEmpty())
+			return buf.get(0);
 
 		return null;
 	}
@@ -100,13 +87,8 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 	}
 
 	@Override
-	public List<MessageTemplate> findByName(String name, long tenantId) {
-		try {
-			return findByWhere(" " + ENTITY + NAME + SqlUtil.doubleQuotes(name) + AND + ENTITY + TENANT_ID + tenantId,
-					null, null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+	public List<MessageTemplate> findByName(String name, long tenantId) throws PersistenceException {
+		return findByWhere(" " + ENTITY + NAME + SqlUtil.doubleQuotes(name) + AND + ENTITY + TENANT_ID + tenantId, null,
+				null);
 	}
 }

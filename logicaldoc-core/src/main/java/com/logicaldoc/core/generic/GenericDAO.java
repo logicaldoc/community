@@ -2,6 +2,7 @@ package com.logicaldoc.core.generic;
 
 import java.util.List;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 
 /**
@@ -14,14 +15,17 @@ public interface GenericDAO extends PersistentObjectDAO<Generic> {
 	/**
 	 * Finds a Generic by it's alternate key
 	 * 
-     * @param type The type(you can use like jollies and can be null)
+	 * @param type The type(you can use like jollies and can be null)
 	 * @param subtype The sub-type(you can use like jollies and can be null)
 	 * @param tenantId ID of the owning tenant
 	 * @param qualifier the qualifier, can be null
 	 * 
 	 * @return Wanted generic or null
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public Generic findByAlternateKey(String type, String subtype, Long qualifier, long tenantId);
+	public Generic findByAlternateKey(String type, String subtype, Long qualifier, long tenantId)
+			throws PersistenceException;
 
 	/**
 	 * Finds a Generic by it's alternate key. The search uses the like operator
@@ -33,6 +37,8 @@ public interface GenericDAO extends PersistentObjectDAO<Generic> {
 	 * @param qualifier the qualifier, can be null
 	 * 
 	 * @return The collection of found Generics
+	 * 
+	 * @throws PersistenceException Error in the database 
 	 */
-	public List<Generic> findByTypeAndSubtype(String type, String subtype, Long qualifier, Long tenantId);
+	public List<Generic> findByTypeAndSubtype(String type, String subtype, Long qualifier, Long tenantId) throws PersistenceException;
 }

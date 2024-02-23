@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 
 /**
@@ -17,9 +18,12 @@ public interface DocumentHistoryDAO extends PersistentObjectDAO<DocumentHistory>
 	 * This method selects all histories of a given document.
 	 * 
 	 * @param docId - ID of the document.
+	 * 
 	 * @return list of histories ordered by date
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<DocumentHistory> findByDocId(long docId);
+	public List<DocumentHistory> findByDocId(long docId) throws PersistenceException;
 
 	/**
 	 * This method selects all histories of a given document.
@@ -28,8 +32,10 @@ public interface DocumentHistoryDAO extends PersistentObjectDAO<DocumentHistory>
 	 * @param event - Optional event code
 	 * 
 	 * @return list of histories ordered by date
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<DocumentHistory> findByDocIdAndEvent(long docId, String event);
+	public List<DocumentHistory> findByDocIdAndEvent(long docId, String event) throws PersistenceException;
 
 	/**
 	 * This method selects all histories of a given user.
@@ -37,8 +43,10 @@ public interface DocumentHistoryDAO extends PersistentObjectDAO<DocumentHistory>
 	 * @param userId identifier of the user
 	 * 
 	 * @return list of histories ordered by date
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<DocumentHistory> findByUserId(long userId);
+	public List<DocumentHistory> findByUserId(long userId) throws PersistenceException;
 
 	/**
 	 * This method selects all histories of a given folder.
@@ -46,8 +54,10 @@ public interface DocumentHistoryDAO extends PersistentObjectDAO<DocumentHistory>
 	 * @param folderId - ID of the document.
 	 * 
 	 * @return list of histories ordered by date
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<DocumentHistory> findByFolderId(long folderId);
+	public List<DocumentHistory> findByFolderId(long folderId) throws PersistenceException;
 
 	/**
 	 * This method finds all histories about a path (you can use expression)
@@ -59,9 +69,11 @@ public interface DocumentHistoryDAO extends PersistentObjectDAO<DocumentHistory>
 	 * @param max Optional maximum number of records
 	 * 
 	 * @return list of histories ordered by date asc
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
 	public List<DocumentHistory> findByPath(String pathExpression, Date oldestDate, Collection<String> events,
-			Integer max);
+			Integer max) throws PersistenceException;
 
 	/**
 	 * This method selects all histories not notified yet.
@@ -69,18 +81,21 @@ public interface DocumentHistoryDAO extends PersistentObjectDAO<DocumentHistory>
 	 * @param max Optional maximum number of records
 	 * 
 	 * @return list of histories ordered by date
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<DocumentHistory> findNotNotified(Integer max);
+	public List<DocumentHistory> findNotNotified(Integer max) throws PersistenceException;
 
 	/**
-	 * This method deletes all the document history entries older than the
-	 * given days from now. If <code>ttl</code> is 0 or -1, the deletion is not
-	 * made.
+	 * This method deletes all the document history entries older than the given
+	 * days from now. If <code>ttl</code> is 0 or -1, the deletion is not made.
 	 * 
 	 * @param ttl The maximum number of days over which the history is
 	 *        considered old
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public void cleanOldHistories(int ttl);
+	public void cleanOldHistories(int ttl) throws PersistenceException;
 
 	/**
 	 * Marks all the histories of a specific event as read by the specified
@@ -88,8 +103,10 @@ public interface DocumentHistoryDAO extends PersistentObjectDAO<DocumentHistory>
 	 * 
 	 * @param event the event name
 	 * @param userId identifier of the user
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public void markHistoriesAsRead(String event, long userId);
+	public void markHistoriesAsRead(String event, long userId) throws PersistenceException;
 
 	/**
 	 * This method selects all histories of a given user and related to the
@@ -100,6 +117,9 @@ public interface DocumentHistoryDAO extends PersistentObjectDAO<DocumentHistory>
 	 * @param event Code of the event (optional)
 	 * 
 	 * @return list of histories ordered by date
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<DocumentHistory> findByUserIdAndEvent(long userId, String event, String sessionId);
+	public List<DocumentHistory> findByUserIdAndEvent(long userId, String event, String sessionId)
+			throws PersistenceException;
 }

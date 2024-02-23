@@ -221,8 +221,13 @@ public class EMailSender {
 	 */
 	public void send(EMail email, String templateName, Map<String, Object> dictionary) throws MessagingException {
 		MessageTemplateDAO templateDao = (MessageTemplateDAO) Context.get().getBean(MessageTemplateDAO.class);
-		MessageTemplate template = templateDao.findByNameAndLanguage(templateName, email.getLocale().toString(),
-				email.getTenantId());
+		MessageTemplate template=null;
+		try {
+			template = templateDao.findByNameAndLanguage(templateName, email.getLocale().toString(),
+					email.getTenantId());
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 		if (template == null) {
 			log.warn("Template {} was not found", templateName);
 			return;

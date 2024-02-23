@@ -49,7 +49,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 			@Parameter(description = "The folder metadata", required = true, example = "{ \"parentId\": 4, \"name\": \"Folder created by REST ws\"}", schema = @Schema(implementation = WSFolder.class))
 			WSFolder folder)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.create(sid, folder);
 	}
 
@@ -63,7 +63,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 			@FormParam("folderPath")
 			String folderPath)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		WSFolder root = super.getRootFolder(sid);
 		return super.createPath(sid, root.getId(), folderPath);
 	}
@@ -77,7 +77,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 			@Parameter(name = "folderPath", description = "The string representing the path to be created", example = "{\"folderPath\":\"/Default/central/repo\"}")
 			String jsonstr)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 
 		ObjectMapper mapper = new ObjectMapper();
 		TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {
@@ -108,7 +108,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		log.debug("createSimple()");
 
-		String sid = validateSession();
+		String sid = validateSessionREST();
 
 		WSFolder root = super.getRootFolder(sid);
 		return super.createPath(sid, root.getId(), folderPath);
@@ -124,7 +124,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	long parentId, @Parameter(description = "The path to create", example = "How/to/POST/JSON/data/with/Curl")
 	@FormParam("path")
 	String path) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.createPath(sid, parentId, path);
 	}
 
@@ -135,7 +135,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@Operation(summary = "Gets a folder", description = "Finds the folder at the specified path")
 	public WSFolder findByPath(@QueryParam("path")
 	String path) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.findByPath(sid, path);
 	}
 
@@ -145,7 +145,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Operation(summary = "Gets the root folder", description = "Gets the root folder in the current tenant")
 	public WSFolder getRootFolder() throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.getRootFolder(sid);
 	}
 
@@ -160,7 +160,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	long parentId, @Parameter(description = "Name of the new folder")
 	@FormParam("name")
 	String name) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.createFolder(sid, parentId, name);
 	}
 
@@ -172,7 +172,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	public WSFolder getFolder(@Parameter(description = "The folder ID", required = true)
 	@QueryParam("folderId")
 	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.getFolder(sid, folderId);
 	}
 
@@ -183,7 +183,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	public void delete(@Parameter(description = "The ID of the folder to be deleted", required = true)
 	@QueryParam("folderId")
 	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		super.delete(sid, folderId);
 	}
 
@@ -195,7 +195,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	public WSFolder[] listChildren(@Parameter(description = "The ID of the parent folder", required = true)
 	@QueryParam("folderId")
 	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.listChildren(sid, folderId);
 	}
 
@@ -206,7 +206,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	public WSFolder[] getPath(@Parameter(description = "Folder identifier (ID)", required = true)
 	@QueryParam("folderId")
 	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.getPath(sid, folderId);
 	}
 
@@ -217,7 +217,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	public String getPathString(@Parameter(description = "Folder identifier (ID)", required = true)
 	@QueryParam("folderId")
 	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		WSFolder[] sss = this.getPath(sid, folderId);
 		StringBuilder pathString = new StringBuilder();
 		for (WSFolder wsFolder : sss) {
@@ -236,7 +236,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 			WSFolder folder)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		log.debug("update()");
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		super.update(sid, folder);
 	}
 
@@ -247,7 +247,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	public void rename(@QueryParam("folderId")
 	long folderId, @QueryParam("name")
 	String name) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		super.rename(sid, folderId, name);
 	}
 
@@ -258,7 +258,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	public void move(@QueryParam("folderId")
 	long folderId, @QueryParam("parentId")
 	long parentId) throws AuthenticationException, PersistenceException, WebserviceException, PermissionException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		super.move(sid, folderId, parentId);
 	}
 
@@ -272,7 +272,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	long parentId, @Parameter(description = "Folder ID of the referenced folder (source)")
 	@FormParam("foldRef")
 	long foldRef) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.createAlias(sid, parentId, foldRef);
 	}
 
@@ -282,7 +282,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@Operation(summary = "Gets the Default workspace")
 	public WSFolder getDefaultWorkspace()
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.getDefaultWorkspace(sid);
 	}
 
@@ -291,7 +291,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@Path("/listWorkspaces")
 	@Operation(summary = "Retrieves the list of all workspaces")
 	public WSFolder[] listWorkspaces() throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.listWorkspaces(sid);
 	}
 
@@ -301,7 +301,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@Operation(operationId = "isReadableFolder", summary = "Tests if a folder is readable")
 	public boolean isReadable(@QueryParam("folderId")
 	long folderId) throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.isReadable(sid, folderId);
 	}
 
@@ -311,7 +311,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@Operation(summary = "Tests if a folder is writable")
 	public boolean isWritable(@QueryParam("folderId")
 	long folderId) throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.isWritable(sid, folderId);
 	}
 
@@ -324,7 +324,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	long folderId, @Parameter(description = "the permissions' integer representation", required = true)
 	@QueryParam("permission")
 	String permission) throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.isGranted(sid, folderId, permission);
 	}
 
@@ -345,7 +345,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 			@FormParam("securityOption")
 			String securityOption)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		super.copy(sid, folderId, targetId, foldersOnly, securityOption);
 	}
 
@@ -355,7 +355,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	public void setAccessControlList(@QueryParam("folderId")
 	long folderId, WSAccessControlEntry[] acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		super.setAccessControlList(sid, folderId, acl);
 	}
 	
@@ -364,7 +364,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@Path("/getAccessControlList")
 	public WSAccessControlEntry[] getAccessControlList(@QueryParam("folderId")
 	long folderId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.getAccessControlList(sid, folderId);
 	}
 }

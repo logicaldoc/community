@@ -1054,7 +1054,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		}
 	}
 
-	private void copyNotes(Document sourceDocument, Document createdDocument) {
+	private void copyNotes(Document sourceDocument, Document createdDocument) throws PersistenceException {
 		List<DocumentNote> docNotes = documentNoteDAO.findByDocId(sourceDocument.getId(),
 				sourceDocument.getFileVersion());
 		for (DocumentNote docNote : docNotes) {
@@ -1070,7 +1070,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		}
 	}
 
-	private void copyLinks(Document sourceDocument, Document createdDocument) {
+	private void copyLinks(Document sourceDocument, Document createdDocument) throws PersistenceException {
 		List<DocumentLink> docLinks = documentLinkDAO.findByDocId(sourceDocument.getId());
 
 		for (DocumentLink docLink : docLinks) {
@@ -1085,11 +1085,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				newLink.setDocument1(docLink.getDocument1());
 			}
 
-			try {
-				documentLinkDAO.store(newLink);
-			} catch (PersistenceException e) {
-				log.warn("Error copying link {}", docLink);
-			}
+			documentLinkDAO.store(newLink);
 		}
 	}
 

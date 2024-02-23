@@ -41,7 +41,7 @@ public class RestSystemService extends SoapSystemService implements SystemServic
 	@Path("/getStatistics")
 	@Operation(summary = "Get system statistics", description = "Retrieves the system statistics")
 	public WSParameter[] getStatistics() throws AuthenticationException, WebserviceException, PersistenceException {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.getStatistics(sid);
 	}
 
@@ -50,7 +50,7 @@ public class RestSystemService extends SoapSystemService implements SystemServic
 	@Path("/getLanguages")
 	@Operation(summary = "Get enabled languages", description = "Retrieves the languages enabled in the server")
 	public String[] getLanguages() {
-		String sid = validateSession();
+		String sid = validateSessionREST();
 		return super.getLanguages(sid);
 	}
 }

@@ -16,14 +16,6 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
-import com.logicaldoc.core.security.user.Group;
-import com.logicaldoc.core.security.user.GroupDAO;
-import com.logicaldoc.core.security.user.PasswordHistoryDAO;
-import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.core.security.user.UserEvent;
-import com.logicaldoc.core.security.user.UserHistory;
-import com.logicaldoc.core.security.user.WorkingTime;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.crypt.CryptUtil;
 
@@ -82,14 +74,14 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindAll() {
+	public void testFindAll() throws PersistenceException {
 		Collection<User> users = dao.findAll();
 		Assert.assertNotNull(users);
 		Assert.assertEquals(6, users.size());
 	}
 
 	@Test
-	public void testFindByName() {
+	public void testFindByName() throws PersistenceException {
 		Collection<User> users = dao.findByName("Seba%");
 		Assert.assertNotNull(users);
 		Assert.assertEquals(1, users.size());
@@ -152,7 +144,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByLikeUserName() {
+	public void testFindByLikeUserName() throws PersistenceException {
 		Collection<User> users = dao.findByLikeUsername("admin");
 		Assert.assertNotNull(users);
 		Assert.assertEquals(1, users.size());
@@ -184,7 +176,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByUserNameAndName() {
+	public void testFindByUserNameAndName() throws PersistenceException {
 		Collection<User> users = dao.findByUsernameAndName("boss", "Meschieri");
 		Assert.assertNotNull(users);
 		Assert.assertEquals(1, users.size());
@@ -211,7 +203,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 
 		WorkingTime wt = new WorkingTime(1, 5, 30);
 		user.getWorkingTimes().add(wt);
-		
+
 		UserHistory transaction = new UserHistory();
 		transaction.setEvent(UserEvent.LOGIN.toString());
 		transaction.setUserId(user.getId());
@@ -295,7 +287,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCount() {
+	public void testCount() throws PersistenceException {
 		Assert.assertEquals(5, dao.count(null));
 	}
 

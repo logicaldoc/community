@@ -88,40 +88,20 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		delete(id, PersistentObject.DELETED_CODE_DEFAULT);
 	}
 
-	public List<T> findAll() {
-		try {
-			return findByWhere("", "", null);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+	public List<T> findAll() throws PersistenceException {
+		return findByWhere("", "", null);
 	}
 
-	public List<T> findAll(long tenantId) {
-		try {
-			return findByWhere(" " + ENTITY + ".tenantId=" + tenantId, "", null);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+	public List<T> findAll(long tenantId) throws PersistenceException {
+		return findByWhere(" " + ENTITY + ".tenantId=" + tenantId, "", null);
 	}
 
-	public List<Long> findAllIds() {
-		try {
-			return findIdsByWhere("", "", null);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+	public List<Long> findAllIds() throws PersistenceException {
+		return findIdsByWhere("", "", null);
 	}
 
-	public List<Long> findAllIds(long tenantId) {
-		try {
+	public List<Long> findAllIds(long tenantId) throws PersistenceException {
 			return findIdsByWhere(" " + ENTITY + ".tenantId=" + tenantId, "", null);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
 	}
 
 	@Override

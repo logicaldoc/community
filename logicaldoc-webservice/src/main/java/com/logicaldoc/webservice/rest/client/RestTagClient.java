@@ -15,6 +15,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
@@ -50,31 +51,36 @@ public class RestTagClient extends AbstractRestClient {
 		}
 	}
 
-	public void addDocumentTags(long docId, String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public void addDocumentTags(long docId, String[] tags)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_FORM_URLENCODED);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		proxy.addDocumentTags(docId, tags);
 	}
 
-	public void setDocumentTags(long docId, String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public void setDocumentTags(long docId, String[] tags) throws AuthenticationException, PermissionException,
+			WebserviceException, PersistenceException, UnexistingResourceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_FORM_URLENCODED);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		proxy.setDocumentTags(docId, tags);
 	}
 
-	public void addFolderTags(long folderId, String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public void addFolderTags(long folderId, String[] tags)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_FORM_URLENCODED);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		proxy.addFolderTags(folderId, tags);
 	}
 
-	public void setFolderTags(long folderId, String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public void setFolderTags(long folderId, String[] tags)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_FORM_URLENCODED);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		proxy.setFolderTags(folderId, tags);
 	}
 
-	public String[] getDocumentTags(long docId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException {
+	public String[] getDocumentTags(long docId) throws PermissionException, AuthenticationException,
+			PersistenceException, WebserviceException, UnexistingResourceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.getDocumentTags(docId);
@@ -86,13 +92,15 @@ public class RestTagClient extends AbstractRestClient {
 		return proxy.getTags();
 	}
 
-	public WSDocument[] findDocumentsByTag(String tag) throws AuthenticationException, PersistenceException, WebserviceException {
+	public WSDocument[] findDocumentsByTag(String tag)
+			throws AuthenticationException, PersistenceException, WebserviceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.findDocumentsByTag(tag);
 	}
 
-	public WSFolder[] findFoldersByTag(String tag) throws AuthenticationException, WebserviceException, PersistenceException {
+	public WSFolder[] findFoldersByTag(String tag)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.findFoldersByTag(tag);

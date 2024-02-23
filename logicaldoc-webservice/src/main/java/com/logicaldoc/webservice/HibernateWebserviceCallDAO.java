@@ -20,11 +20,7 @@ public class HibernateWebserviceCallDAO extends HibernatePersistentObjectDAO<Web
 	}
 
 	@Override
-	public void cleanOldCalls(int ttl) {
-		try {
-			log.info("cleanOldCalls rows updated: {}", cleanOldRecords(ttl, "ld_webservicecall"));
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+	public void cleanOldCalls(int ttl) throws PersistenceException {
+		log.info("cleanOldCalls rows updated: {}", cleanOldRecords(ttl, "ld_webservicecall"));
 	}
 }

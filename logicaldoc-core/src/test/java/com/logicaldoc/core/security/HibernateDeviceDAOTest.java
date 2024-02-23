@@ -12,8 +12,6 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.i18n.DateBean;
-import com.logicaldoc.core.security.Device;
-import com.logicaldoc.core.security.DeviceDAO;
 
 import junit.framework.Assert;
 

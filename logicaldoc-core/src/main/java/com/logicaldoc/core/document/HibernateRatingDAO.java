@@ -2,7 +2,6 @@ package com.logicaldoc.core.document;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -69,53 +68,41 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 	}
 
 	@Override
-	public Rating findVotesByDocId(long docId) {
-		List<Rating> coll = new ArrayList<>();
-		try {
+	public Rating findVotesByDocId(long docId) throws PersistenceException {
+		/*
+		 * Don't use AVG function to have more control on rounding policy
+		 */
+		String query = "select count(*), SUM(ld_vote) from ld_rating where ld_deleted=0 and ld_docid = " + docId;
 
-			/*
-			 * Don't use AVG function to have more control on rounding policy
-			 */
-			String query = "select count(*), SUM(ld_vote) from ld_rating where ld_deleted=0 and ld_docid = " + docId;
+		@SuppressWarnings("rawtypes")
+		RowMapper ratingMapper = new BeanPropertyRowMapper() {
+			@Override
+			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-			@SuppressWarnings("rawtypes")
-			RowMapper ratingMapper = new BeanPropertyRowMapper() {
-				@Override
-				public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Rating rating = new Rating();
+				rating.setCount(rs.getInt(1));
+				if (rs.getInt(1) > 0) {
+					float div = (float) rs.getInt(2) / (float) rs.getInt(1);
+					double avg = Math.round(div * 100.0) / 100.0;
+					rating.setAverage((float) avg);
+				} else
+					rating.setAverage(0F);
 
-					Rating rating = new Rating();
-					rating.setCount(rs.getInt(1));
-					if (rs.getInt(1) > 0) {
-						float div = (float) rs.getInt(2) / (float) rs.getInt(1);
-						double avg = Math.round(div * 100.0) / 100.0;
-						rating.setAverage((float) avg);
-					} else
-						rating.setAverage(0F);
+				return rating;
+			}
+		};
 
-					return rating;
-				}
-			};
-
-			coll = query(query, ratingMapper, null);
-			if (!coll.isEmpty() && coll.get(0).getCount() != 0)
-				return coll.get(0);
-
-		} catch (Exception e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
-		}
-		return null;
+		List<Rating> coll = query(query, ratingMapper, null);
+		if (!coll.isEmpty() && coll.get(0).getCount() != 0)
+			return coll.get(0);
+		else
+			return null;
 	}
 
 	@Override
-	public Rating findByDocIdAndUserId(long docId, long userId) {
-		List<Rating> results = new ArrayList<>();
-		try {
-			results = findByWhere(ENTITY + ".docId =" + docId + " and " + ENTITY + ".userId =" + userId,
-					null, null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+	public Rating findByDocIdAndUserId(long docId, long userId) throws PersistenceException {
+		List<Rating> results = findByWhere(ENTITY + ".docId =" + docId + " and " + ENTITY + ".userId =" + userId, null,
+				null);
 		if (results.isEmpty())
 			return null;
 		else
@@ -123,14 +110,8 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 	}
 
 	@Override
-	public List<Rating> findByDocId(long docId) {
-		try {
-			return findByWhere(ENTITY + ".docId = " + docId, " order by " + ENTITY + ".lastModified desc",
-					null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+	public List<Rating> findByDocId(long docId) throws PersistenceException {
+		return findByWhere(ENTITY + ".docId = " + docId, " order by " + ENTITY + ".lastModified desc", null);
 	}
 
 	@Override

@@ -76,16 +76,11 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	@Override
-	public List<User> findByName(String name) {
-		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put("name", name.toLowerCase());
+	public List<User> findByName(String name) throws PersistenceException {
+		Map<String, Object> params = new HashMap<>();
+		params.put("name", name.toLowerCase());
 
-			return findByWhere(LOWER + ENTITY + ".name) like :name", params, null, null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+		return findByWhere(LOWER + ENTITY + ".name) like :name", params, null, null);
 	}
 
 	@Override
@@ -114,37 +109,24 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		return user;
 	}
 
-	/**
-	 * @see com.logicaldoc.core.security.user.UserDAO#findByUsername(java.lang.String)
-	 */
-	public List<User> findByLikeUsername(String username) {
-		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put(USERNAME, username);
-
-			return findByWhere(ENTITY + ".username like :username", params, null, null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+	@Override
+	public List<User> findByLikeUsername(String username) throws PersistenceException {
+		Map<String, Object> params = new HashMap<>();
+		params.put(USERNAME, username);
+		return findByWhere(ENTITY + ".username like :username", params, null, null);
 	}
 
 	@Override
-	public List<User> findByUsernameAndName(String username, String name) {
-		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put(USERNAME, username);
-			params.put("name", name.toLowerCase());
+	public List<User> findByUsernameAndName(String username, String name) throws PersistenceException {
+		Map<String, Object> params = new HashMap<>();
+		params.put(USERNAME, username);
+		params.put("name", name.toLowerCase());
 
-			return findByWhere(LOWER + ENTITY + ".name) like :name and " + ENTITY + ".username like :username", params,
-					null, null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+		return findByWhere(LOWER + ENTITY + ".name) like :name and " + ENTITY + ".username like :username", params,
+				null, null);
 	}
 
-	private static void checkPasswordStrength(User user) {
+	private static void checkPasswordStrength(User user) throws PasswordWeakException {
 
 		// Skip the tests in case of new tenant creation
 		if (user.getId() == 0L && user.getTenantId() != Tenant.DEFAULT_ID && "Administrator".equals(user.getFirstName())
@@ -192,7 +174,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			throw new PasswordWeakException(errors);
 	}
 
-	private void checkAlreadyUsedPassword(User user) throws PersistenceException {
+	private void checkAlreadyUsedPassword(User user) throws PersistenceException, PasswordAlreadyUsedException {
 		int enforce = getPasswordEnforce(user);
 		if (enforce < 1)
 			return;
@@ -464,8 +446,11 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	 * @param transaction the current session
 	 * @param enabledStatusChanged A flag indicating if the status has been
 	 *        modified
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	private void saveEnabledOrDisabledHistory(User user, UserHistory transaction, boolean enabledStatusChanged) {
+	private void saveEnabledOrDisabledHistory(User user, UserHistory transaction, boolean enabledStatusChanged)
+			throws PersistenceException {
 		if (enabledStatusChanged
 				&& (transaction == null || (!transaction.getEvent().equals(UserEvent.DISABLED.toString())
 						&& !transaction.getEvent().equals(UserEvent.ENABLED.toString())))) {
@@ -680,40 +665,22 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	@Override
-	public boolean isInactive(String username) {
-		try {
-			User user = findByUsernameIgnoreCase(username);
-			return isInactive(user);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return true;
-		}
+	public boolean isInactive(String username) throws PersistenceException {
+		return isInactive(findByUsernameIgnoreCase(username));
 	}
 
 	@Override
-	public int count(Long tenantId) {
+	public int count(Long tenantId) throws PersistenceException {
 		String query = "select count(*) from ld_user where ld_type=" + User.TYPE_DEFAULT + " and ld_deleted=0 "
 				+ (tenantId != null ? " and ld_tenantid=" + tenantId : "");
-
-		try {
-			return queryForInt(query);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return 0;
-		}
+		return queryForInt(query);
 	}
 
 	@Override
-	public int countGuests(Long tenantId) {
+	public int countGuests(Long tenantId) throws PersistenceException {
 		String query = "select count(*) from ld_user where ld_type=" + User.TYPE_READONLY + " and ld_deleted=0 "
 				+ (tenantId != null ? " and ld_tenantid=" + tenantId : "");
-
-		try {
-			return queryForInt(query);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return 0;
-		}
+		return queryForInt(query);
 	}
 
 	@Override
@@ -744,18 +711,13 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		saveUserHistory(user, transaction);
 	}
 
-	private void saveUserHistory(User user, UserHistory transaction) {
+	private void saveUserHistory(User user, UserHistory transaction) throws PersistenceException {
 		if (transaction == null)
 			return;
 
 		transaction.setUser(user);
 		transaction.setNotified(0);
-
-		try {
-			userHistoryDAO.store(transaction);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+		userHistoryDAO.store(transaction);
 	}
 
 	private int getPasswordEnforce(User user) {
@@ -837,7 +799,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	@Override
-	public Map<String, Generic> findUserSettings(long userId, String namePrefix) {
+	public Map<String, Generic> findUserSettings(long userId, String namePrefix) throws PersistenceException {
 		List<Generic> generics = genericDAO.findByTypeAndSubtype("usersetting", namePrefix + "%", userId, null);
 		Map<String, Generic> map = new HashMap<>();
 		for (Generic generic : generics) {
@@ -860,7 +822,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Set<User> findByGroup(long groupId) {
+	public Set<User> findByGroup(long groupId) throws PersistenceException {
 		List<Long> docIds = new ArrayList<>();
 		try {
 			docIds = queryForList("select ld_userid from ld_usergroup where ld_groupid=" + groupId, Long.class);
@@ -870,15 +832,10 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		Set<User> set = new HashSet<>();
 		if (!docIds.isEmpty()) {
 			String query = ENTITY + ".id in (" + StringUtil.arrayToString(docIds.toArray(new Long[0]), ",") + ")";
-
-			try {
-				List<User> users = findByWhere(query, (Map<String, Object>) null, null, null);
-				for (User user : users) {
-					if (user.getDeleted() == 0 && !set.contains(user))
-						set.add(user);
-				}
-			} catch (PersistenceException e) {
-				log.error(e.getMessage(), e);
+			List<User> users = findByWhere(query, (Map<String, Object>) null, null, null);
+			for (User user : users) {
+				if (user.getDeleted() == 0 && !set.contains(user))
+					set.add(user);
 			}
 		}
 		return set;

@@ -57,8 +57,10 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * Finds all entities in the database
 	 * 
 	 * @return The list of all entities
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<T> findAll();
+	public List<T> findAll() throws PersistenceException;
 
 	/**
 	 * Finds all entities in a specific tenant.
@@ -66,15 +68,19 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @param tenantId Identifier of the tenant to search in
 	 * 
 	 * @return The list of all entities
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<T> findAll(long tenantId);
+	public List<T> findAll(long tenantId) throws PersistenceException;
 
 	/**
 	 * Finds all entities ids
 	 * 
 	 * @return The list of all entities ids
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<Long> findAllIds();
+	public List<Long> findAllIds() throws PersistenceException;
 
 	/**
 	 * Finds all entities ids in a specific tenant.
@@ -82,8 +88,10 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @param tenantId Identifier of the tenant to search in
 	 * 
 	 * @return The list of all entities ids
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<Long> findAllIds(long tenantId);
+	public List<Long> findAllIds(long tenantId) throws PersistenceException;
 
 	/**
 	 * Finds all entities by the given expression. Use {@value #ENTITY} alias to

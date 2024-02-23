@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSBookmark;
 
@@ -29,12 +30,12 @@ public interface BookmarkService {
 	@POST
 	@Path("/saveBookmark")
 	public WSBookmark saveBookmark(WSBookmark bookmark)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, UnexistingResourceException;
 
 	@GET
 	@Path("/bookmarkDocument")
 	public WSBookmark bookmarkDocument(@QueryParam("docId")
-	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, UnexistingResourceException;
 
 	@GET
 	@Path("/bookmarkFolder")

@@ -58,7 +58,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 	}
 
 	@Override
-	public Collection<String> findAllGroupNames(long tenantId) {
+	public Collection<String> findAllGroupNames(long tenantId) throws PersistenceException {
 		Collection<String> coll = new ArrayList<>();
 		Collection<Group> coll2 = findAll();
 		for (Group group : coll2) {
@@ -176,7 +176,11 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 			refresh(group);
 
 		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		group.setUsers(uDao.findByGroup(group.getId()));
+		try {
+			group.setUsers(uDao.findByGroup(group.getId()));
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	@Override

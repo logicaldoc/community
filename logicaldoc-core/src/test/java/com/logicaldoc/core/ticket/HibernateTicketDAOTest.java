@@ -60,7 +60,7 @@ public class HibernateTicketDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testDeleteExpired() throws ParseException {
+	public void testDeleteExpired() throws ParseException, PersistenceException {
 		List<Ticket> tickets = dao.findAll();
 		Assert.assertEquals(3, tickets.size());
 

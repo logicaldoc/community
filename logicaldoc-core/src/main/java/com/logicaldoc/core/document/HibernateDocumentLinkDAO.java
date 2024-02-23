@@ -1,6 +1,5 @@
 package com.logicaldoc.core.document;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,20 +22,13 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
 		super.log = LoggerFactory.getLogger(HibernateDocumentLinkDAO.class);
 	}
 
-	/**
-	 * @see com.logicaldoc.core.document.DocumentLinkDAO#findByDocId(long)
-	 */
 	@Override
-	public List<DocumentLink> findByDocId(long docId) {
+	public List<DocumentLink> findByDocId(long docId) throws PersistenceException {
 		return findByDocId(docId, null);
 	}
 
-	/**
-	 * @see com.logicaldoc.core.document.DocumentLinkDAO#findByDocId(long,
-	 *      java.lang.String)
-	 */
 	@Override
-	public List<DocumentLink> findByDocId(long docId, String type) {
+	public List<DocumentLink> findByDocId(long docId, String type) throws PersistenceException {
 		Map<String, Object> params = new HashMap<>();
 		params.put("docId", docId);
 
@@ -47,16 +39,11 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
 			params.put("type", type);
 		}
 
-		try {
-			return findByWhere(query.toString(), params, null, null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+		return findByWhere(query.toString(), params, null, null);
 	}
 
 	@Override
-	public DocumentLink findByDocIdsAndType(long docId1, long docId2, String type) {
+	public DocumentLink findByDocIdsAndType(long docId1, long docId2, String type) throws PersistenceException {
 		if (type == null)
 			return null;
 
@@ -65,18 +52,12 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
 				ENTITY + ".document1.id = :docId1 and " + ENTITY + ".document2.id = :docId2 ");
 		query.append(" and " + ENTITY + ".type = :type");
 
-		List<DocumentLink> links = new ArrayList<>();
+		Map<String, Object> params = new HashMap<>();
+		params.put("docId1", docId1);
+		params.put("docId2", docId2);
+		params.put("type", type);
 
-		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put("docId1", docId1);
-			params.put("docId2", docId2);
-			params.put("type", type);
-
-			links = findByWhere(query.toString(), params, null, null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+		List<DocumentLink> links = findByWhere(query.toString(), params, null, null);
 
 		if (!links.isEmpty())
 			link = links.iterator().next();
@@ -118,13 +99,8 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
 		}
 	}
 
-	private void updateLinksCount(long docId) {
-		try {
-			jdbcUpdate(
-					"update ld_document set ld_links = (select count(*) from ld_link  where ld_deleted=0 and (ld_docid1="
-							+ docId + " or ld_docid2=" + docId + ")) where ld_id=" + docId);
-		} catch (PersistenceException e) {
-			log.warn(e.getMessage(), e);
-		}
+	private void updateLinksCount(long docId) throws PersistenceException {
+		jdbcUpdate("update ld_document set ld_links = (select count(*) from ld_link  where ld_deleted=0 and (ld_docid1="
+				+ docId + " or ld_docid2=" + docId + ")) where ld_id=" + docId);
 	}
 }

@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
+import com.logicaldoc.core.PersistenceException;
 
 /**
  * Test case for <code>HibernateAttributeOptionDAO</code>
@@ -33,7 +34,7 @@ public class HibernateAttributeOptionDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testDeleteByTemplateIdAndAttribute() {
+	public void testDeleteByTemplateIdAndAttribute() throws PersistenceException {
 		List<AttributeOption> options = dao.findByAttribute(1L, null);
 		Assert.assertEquals(5, options.size());
 
@@ -47,7 +48,7 @@ public class HibernateAttributeOptionDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testDeleteOrphaned() {
+	public void testDeleteOrphaned() throws PersistenceException {
 		List<AttributeOption> options = dao.findByAttribute(1L, "att1");
 		Assert.assertEquals(4, options.size());
 
@@ -57,7 +58,7 @@ public class HibernateAttributeOptionDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByTemplateAndAttribute() {
+	public void testFindByTemplateAndAttribute() throws PersistenceException {
 		List<AttributeOption> options = dao.findByAttribute(1L, "att1");
 		Assert.assertEquals(4, options.size());
 		options = dao.findByAttribute(1L, null);
@@ -75,7 +76,7 @@ public class HibernateAttributeOptionDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindBySetIdAndAttributeCategory() {
+	public void testFindBySetIdAndAttributeCategory() throws PersistenceException {
 		List<AttributeOption> options = dao.findByAttributeAndCategory(1L, "att1", "cat1");
 		Assert.assertEquals(3, options.size());
 		Assert.assertEquals("value1", options.get(0).getValue());
@@ -91,7 +92,7 @@ public class HibernateAttributeOptionDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByTemplateAndAttributeAsMap() {
+	public void testFindByTemplateAndAttributeAsMap() throws PersistenceException {
 		Map<String, List<AttributeOption>> optionsMap = dao.findByAttributeAsMap(1L, "att1");
 		Assert.assertEquals(2, optionsMap.size());
 		Assert.assertTrue(optionsMap.containsKey("cat1"));
