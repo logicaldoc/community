@@ -77,6 +77,14 @@ public class GUIUser implements Serializable {
 
 	private String cell = "";
 
+	private String department;
+
+	private String organizationalUnit;
+
+	private String building;
+
+	private String company;
+
 	private boolean enabled = true;
 
 	private int checkedOutDocs = 0;
@@ -722,5 +730,37 @@ public class GUIUser implements Serializable {
 
 	public void setCustomActions(List<GUIMenu> customActions) {
 		this.customActions = customActions;
+	}
+
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+
+	public String getOrganizationalUnit() {
+		return organizationalUnit;
+	}
+
+	public void setOrganizationalUnit(String organizationalUnit) {
+		this.organizationalUnit = organizationalUnit;
+	}
+
+	public String getBuilding() {
+		return building;
+	}
+
+	public void setBuilding(String building) {
+		this.building = building;
+	}
+
+	public String getCompany() {
+		return company;
+	}
+
+	public void setCompany(String company) {
+		this.company = company;
 	}
 }

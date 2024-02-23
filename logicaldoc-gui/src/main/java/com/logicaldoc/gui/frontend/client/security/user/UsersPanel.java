@@ -49,6 +49,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class UsersPanel extends AdminPanel {
 
+	private static final String DEPARTMENT = "department";
+
+	private static final String BUILDING = "building";
+
+	private static final String COMPANY = "company";
+
 	private static final String ADMIN = "admin";
 
 	private static final String SOURCE = "source";
@@ -157,6 +163,32 @@ public class UsersPanel extends AdminPanel {
 		cell.setCanFilter(true);
 		cell.setCellFormatter(new UserCellFormatter());
 
+		ListGridField city = new ListGridField("city", I18N.message("city"), 90);
+		city.setCanFilter(true);
+		city.setHidden(true);
+		city.setCellFormatter(new UserCellFormatter());
+
+		ListGridField company = new ListGridField(COMPANY, I18N.message(COMPANY), 100);
+		company.setCanFilter(true);
+		company.setHidden(true);
+		company.setCellFormatter(new UserCellFormatter());
+		
+		ListGridField building = new ListGridField(BUILDING, I18N.message(BUILDING), 100);
+		building.setCanFilter(true);
+		building.setHidden(true);
+		building.setCellFormatter(new UserCellFormatter());
+
+		ListGridField department = new ListGridField(DEPARTMENT, I18N.message(DEPARTMENT), 100);
+		department.setCanFilter(true);
+		department.setHidden(true);
+		department.setCellFormatter(new UserCellFormatter());
+
+		ListGridField organizationalUnit = new ListGridField("organizationalUnit", I18N.message("organizationalunit"),
+				100);
+		organizationalUnit.setCanFilter(true);
+		organizationalUnit.setHidden(true);
+		organizationalUnit.setCellFormatter(new UserCellFormatter());
+
 		ListGridField email = new ListGridField(EMAIL, I18N.message(EMAIL), 200);
 		email.setCanFilter(true);
 		email.setCellFormatter(new UserCellFormatter());
@@ -221,8 +253,8 @@ public class UsersPanel extends AdminPanel {
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
 		list.setDataSource(new UsersDS(null, true, false));
-		list.setFields(id, enabledIcon, avatar, username, firstName, name, email, creation, lastLogin, expire, phone,
-				cell, groups, enabled, guest, timeZone, source);
+		list.setFields(id, enabledIcon, avatar, username, firstName, name, email, creation, lastLogin, expire,
+				company, department, building, organizationalUnit, city, phone, cell, groups, enabled, guest, timeZone, source);
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -290,6 +322,11 @@ public class UsersPanel extends AdminPanel {
 		rec.setAttribute(ENABLED_ICON, user.isEnabled() ? "0" : "2");
 		rec.setAttribute(GUEST, user.isReadOnly());
 		rec.setAttribute(SOURCE, user.getSource());
+		rec.setAttribute("city", user.getCity());
+		rec.setAttribute(BUILDING, user.getBuilding());
+		rec.setAttribute("organizationalUnit", user.getOrganizationalUnit());
+		rec.setAttribute(DEPARTMENT, user.getDepartment());
+		rec.setAttribute(COMPANY, user.getCompany());
 		rec.setAttribute(GROUPS, user.getGroups().stream().map(g -> g.getName()).collect(Collectors.joining(",")));
 
 		list.refreshRow(list.getRecordIndex(rec));

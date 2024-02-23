@@ -72,8 +72,8 @@ public class Profile extends Window {
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("profile"));
-		setWidth(600);
-		setHeight(400);
+		setWidth(640);
+		setHeight(430);
 		setIsModal(true);
 		setShowModalMask(true);
 		centerInPage();
@@ -102,6 +102,11 @@ public class Profile extends Window {
 		TextItem state = ItemFactory.newTextItem("state", user.getState());
 		TextItem phone = ItemFactory.newTextItem("phone", user.getPhone());
 		TextItem cell = ItemFactory.newTextItem("cell", user.getCell());
+		TextItem company = ItemFactory.newTextItem("company", user.getCompany());
+		TextItem department = ItemFactory.newTextItem("department", user.getDepartment());
+		TextItem organizationalUnit = ItemFactory.newTextItem("organizationalunit", user.getOrganizationalUnit());
+		TextItem building = ItemFactory.newTextItem("building", user.getBuilding());
+
 		ComboBoxItem timeZone = ItemFactory.newTimeZoneSelector(TIMEZONE, user.getTimeZone());
 		timeZone.setEndRow(true);
 
@@ -113,7 +118,7 @@ public class Profile extends Window {
 		quotaCount.setWrap(false);
 
 		detailsForm.setFields(firstName, lastName, language, address, postalCode, city, country, state, phone, cell,
-				timeZone, quotaCount, quota);
+				company, department, organizationalUnit, building, timeZone, quotaCount, quota);
 
 		HLayout detailsPanel = new HLayout();
 		detailsPanel.setMembers(detailsForm, new Avatar(user.getId()));
@@ -307,6 +312,11 @@ public class Profile extends Window {
 		u.setState(vm.getValueAsString("state"));
 		u.setPhone(vm.getValueAsString("phone"));
 		u.setCell(vm.getValueAsString("cell"));
+		u.setCompany(vm.getValueAsString("company"));
+		u.setDepartment(vm.getValueAsString("department"));
+		u.setBuilding(vm.getValueAsString("building"));
+		u.setOrganizationalUnit(vm.getValueAsString("organizationalunit"));
+
 		u.setWelcomeScreen(Integer.parseInt(vm.getValueAsString("welcomescreen")));
 		String str = vm.getValueAsString("workspace");
 		if (str != null && !str.isEmpty())
@@ -361,6 +371,10 @@ public class Profile extends Window {
 				user.setState(ret.getState());
 				user.setPhone(ret.getPhone());
 				user.setCell(ret.getCell());
+				user.setCompany(ret.getCompany());
+				user.setBuilding(ret.getBuilding());
+				user.setDepartment(ret.getDepartment());
+				user.setOrganizationalUnit(ret.getOrganizationalUnit());
 				user.setWelcomeScreen(ret.getWelcomeScreen());
 				user.setDefaultWorkspace(ret.getDefaultWorkspace());
 				user.setDocsGrid(ret.getDocsGrid());

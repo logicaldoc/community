@@ -23,6 +23,7 @@ import org.springframework.web.filter.GenericFilterBean;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.user.Group;
 
 /**
  * This filter looks for a sid parameter in the request and auto-authenticate
@@ -79,9 +80,8 @@ public class SessionIdFilter extends GenericFilterBean {
 				// storing in authentication object
 				session.getUser().clearPassword();
 
-				String[] groups = session.getUser().getGroupNames();
 				Collection<GrantedAuthority> authorities = new ArrayList<>();
-				for (String role : groups)
+				for (String role : session.getUser().getGroups().stream().map(Group::getName).toList())
 					authorities.add(new SimpleGrantedAuthority(role));
 
 				// Return an authenticated token, containing user data and

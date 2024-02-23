@@ -19,6 +19,7 @@ import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FolderListGridField;
@@ -69,11 +70,11 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		max.setHint(I18N.message("elements"));
 		max.setShowTitle(false);
 		max.setStep(10);
-		max.addChangedHandler((ChangedEvent event) -> refresh());
+		max.addChangedHandler(event -> refresh());
 
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
-		display.addClickHandler((ClickEvent event) -> {
+		display.addClickHandler(click -> {
 			if (Boolean.TRUE.equals(max.validate()))
 				refresh();
 		});
@@ -158,7 +159,8 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 		version.setCanFilter(true);
 		version.setCanGroupBy(false);
 
-		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
+		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified",
+				DateCellFormatter.FORMAT_LONG);
 		lastModified.setCanGroupBy(false);
 
 		ListGridField publisher = new ColoredListGridField("publisher", I18N.message("publisher"), 90);

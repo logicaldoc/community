@@ -16,6 +16,7 @@ import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.CalendarService;
 import com.smartgwt.client.types.Alignment;
@@ -157,7 +158,7 @@ public class CalendarReport extends AdminPanel {
 		subtypeCol.setWidth(100);
 		subtypeCol.setCanFilter(true);
 
-		ListGridField date = new DateListGridField("date", "date");
+		ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_LONG);
 
 		ListGridField endDate = new DateListGridField("endDate", "enddate");
 

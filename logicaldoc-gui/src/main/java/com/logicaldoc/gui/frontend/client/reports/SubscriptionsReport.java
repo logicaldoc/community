@@ -14,6 +14,7 @@ import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.grid.EventsListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -23,7 +24,6 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.subscription.SubscriptionDialog;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -79,7 +79,7 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
-		display.addClickHandler((ClickEvent event) -> {
+		display.addClickHandler(click -> {
 			if (Boolean.TRUE.equals(max.validate()))
 				refresh();
 		});
@@ -114,7 +114,7 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 		ListGridField userName = new UserListGridField("userName", USER_ID, "user");
 		userName.setCanEdit(false);
 
-		ListGridField created = new DateListGridField("created", "subscription");
+		ListGridField created = new DateListGridField("created", "subscription", DateCellFormatter.FORMAT_LONG);
 
 		ColoredListGridField option = new FolderSubscriptionOptionListGridField();
 

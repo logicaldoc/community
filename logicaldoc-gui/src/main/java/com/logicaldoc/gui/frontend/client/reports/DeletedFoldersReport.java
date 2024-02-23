@@ -9,6 +9,7 @@ import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.grid.FolderListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.folder.RestoreDialog;
@@ -49,7 +50,8 @@ public class DeletedFoldersReport extends ReportPanel implements FolderChangeLis
 		name.setWidth(200);
 		name.setCanFilter(true);
 
-		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
+		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified",
+				DateCellFormatter.FORMAT_LONG);
 		lastModified.setCanGroupBy(false);
 
 		ListGridField deleteUser = new UserListGridField("deleteUser", "deleteUserId", "deletedby");

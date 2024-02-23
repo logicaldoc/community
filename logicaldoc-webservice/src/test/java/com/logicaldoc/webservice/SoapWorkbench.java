@@ -58,7 +58,7 @@ public class SoapWorkbench {
 //				System.out.println(Arrays.asList(feature).stream().sorted().collect(Collectors.toList()));
 //			}
 
-//		    securityStuff(sid);
+		    securityStuff(sid);
 
 			//documentStuff(sid);
 
@@ -178,30 +178,39 @@ public class SoapWorkbench {
 //
 //		folderClient.grantGroup(sid, 4L, 299630592L, 65537, false);
 
-		WSFolder fld = folderClient.getFolder(sid, 93356033L);
-		fld.setColor("red");
-		folderClient.update(sid, fld);
+//		WSFolder fld = folderClient.getFolder(sid, 93356033L);
+//		fld.setColor("red");
+//		folderClient.update(sid, fld);
 	}
 
 	private static void securityStuff(String sid) throws Exception {
 		SoapSecurityClient securityClient = new SoapSecurityClient(BASE + "/Security");
 
 		WSUser wsUserTest = new WSUser();
-		wsUserTest.setName("marco2");
+		wsUserTest.setName("marcoXX");
 		wsUserTest.setEmail("marco@acme.com");
-		wsUserTest.setUsername("marco2");
+		wsUserTest.setUsername("marcoXX");
 		wsUserTest.setFirstName("alle2");
+		wsUserTest.setDepartment("Department");
+		wsUserTest.setOrganizationalUnit("OrganizationalUnit");
+		wsUserTest.setBuilding("Building");
 		long[] ids = { 2, 3 };
 		wsUserTest.setGroupIds(ids);
 
-//		Long userId = securityClient.storeUser(sid, wsUserTest);
-//		System.out.println("user id: " + userId);
+		Long userId = securityClient.storeUser(sid, wsUserTest);
+		System.out.println("user id: " + userId);
 //		securityClient.changePassword(sid, userId, null, "marco1982");
 
-		wsUserTest = securityClient.getUser(sid, 146276353L);
-		WSWorkingTime wt = new WSWorkingTime(2, 9, 0);
-		wsUserTest.setWorkingTimes(new WSWorkingTime[] { wt });
-		securityClient.storeUser(sid, wsUserTest);
+		wsUserTest = securityClient.getUser(sid, userId);
+		System.out.println("Retrieved user "+userId);
+		System.out.println("Department: "+wsUserTest.getDepartment());
+		System.out.println("Building: "+wsUserTest.getBuilding());
+		System.out.println("OrganizationalUnit: "+wsUserTest.getOrganizationalUnit());
+		
+		
+//		WSWorkingTime wt = new WSWorkingTime(2, 9, 0);
+//		wsUserTest.setWorkingTimes(new WSWorkingTime[] { wt });
+//		securityClient.storeUser(sid, wsUserTest);
 
 //		for (WSWorkingTime wt : wsUserTest.getWorkingTimes()) {
 //			System.out.println(wt.getLabel()+" > "+wt.getHourStart()+":"+wt.getMinuteStart());

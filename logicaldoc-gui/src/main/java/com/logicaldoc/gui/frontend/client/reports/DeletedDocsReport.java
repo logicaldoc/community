@@ -9,6 +9,7 @@ import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
@@ -62,7 +63,8 @@ public class DeletedDocsReport extends ReportPanel implements FolderChangeListen
 		fileVersion.setCanGroupBy(false);
 		fileVersion.setHidden(true);
 
-		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
+		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified",
+				DateCellFormatter.FORMAT_LONG);
 		lastModified.setCanGroupBy(false);
 
 		ListGridField customId = new ColoredListGridField("customId", I18N.message("customid"), 110);

@@ -36,6 +36,11 @@
 		<property name="emailSignature2" type="string" column="ld_emailsignature2" length="1000" />
 		<property name="telephone" type="string" column="ld_telephone" length="255" />
 		<property name="telephone2" type="string" column="ld_telephone2" length="255" />
+		<property name="department" type="string" column="ld_department" length="255" />
+		<property name="organizationalUnit" type="string" column="ld_organizationalunit" length="255" />
+		<property name="building" type="string" column="ld_building" length="255" />
+		<property name="company" type="string" column="ld_company" length="255" />
+				
 		<property name="type" type="int" column="ld_type" not-null="true" />
 		<property name="source" type="int" column="ld_source" not-null="true" />
 		<property name="quota" type="long" column="ld_quota" not-null="true" />

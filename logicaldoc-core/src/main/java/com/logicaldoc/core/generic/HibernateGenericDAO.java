@@ -2,6 +2,7 @@ package com.logicaldoc.core.generic;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -67,18 +68,23 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 
 	@Override
 	public List<Generic> findByTypeAndSubtype(String type, String subtype, Long qualifier, Long tenantId) {
+		Map<String, Object> params=new HashMap<>();
 		String query = " 1=1 ";
-		if (StringUtils.isNotEmpty(type))
+		if (StringUtils.isNotEmpty(type)) {
 			query += AND + ENTITY + ".type like :type ";
-		if (StringUtils.isNotEmpty(subtype))
+			params.put("type", type);
+		}
+		if (StringUtils.isNotEmpty(subtype)) {
 			query += AND + ENTITY + ".subtype like :subtype ";
+			params.put("subtype", subtype);
+		}
 		if (qualifier != null)
 			query += AND + ENTITY + ".qualifier = " + qualifier;
 		if (tenantId != null)
 			query += AND + ENTITY + ".tenantId = " + tenantId;
 
 		try {
-			return findByWhere(query, Map.of("type", type, "subtype", subtype), null, null);
+			return findByWhere(query, params, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();

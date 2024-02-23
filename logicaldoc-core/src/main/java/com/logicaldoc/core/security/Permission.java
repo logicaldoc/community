@@ -59,7 +59,7 @@ public enum Permission {
 	public static Set<Permission> match(String... names) {
 		HashSet<Permission> set = new HashSet<>();
 		for (String name : names)
-			set.add(Permission.valueOf(name));
+			set.add(Permission.valueOf(name.toUpperCase()));
 		return set;
 	}
 

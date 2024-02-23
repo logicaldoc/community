@@ -14,6 +14,7 @@ import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
@@ -93,12 +94,13 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		fileVersion.setCanGroupBy(false);
 		fileVersion.setHidden(true);
 
-		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
+		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified",
+				DateCellFormatter.FORMAT_LONG);
 		lastModified.setCanFilter(false);
 		lastModified.setCanGroupBy(false);
 		lastModified.setHidden(true);
 
-		ListGridField created = new DateListGridField("created", "createdon");
+		ListGridField created = new DateListGridField("created", "createdon", DateCellFormatter.FORMAT_LONG);
 
 		ListGridField folder = new ColoredListGridField(FOLDER, I18N.message(FOLDER), 200);
 		folder.setAlign(Alignment.CENTER);

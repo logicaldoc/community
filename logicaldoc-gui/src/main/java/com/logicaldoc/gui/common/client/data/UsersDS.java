@@ -34,6 +34,11 @@ public class UsersDS extends DataSource {
 		DataSourceTextField timeZone = new DataSourceTextField("timeZone");
 		DataSourceTextField phone = new DataSourceTextField("phone");
 		DataSourceTextField cell = new DataSourceTextField("cell");
+		DataSourceTextField city = new DataSourceTextField("city");
+		DataSourceTextField department = new DataSourceTextField("department");
+		DataSourceTextField building = new DataSourceTextField("building");
+		DataSourceTextField company = new DataSourceTextField("company");
+		DataSourceTextField organizationalUnit = new DataSourceTextField("organizationalUnit");
 		DataSourceTextField usergroup = new DataSourceTextField("usergroup");
 		DataSourceTextField groups = new DataSourceTextField("groups");
 		DataSourceImageField avatar = new DataSourceImageField("avatar", I18N.message("avatar"), 16);
@@ -42,8 +47,9 @@ public class UsersDS extends DataSource {
 		DataSourceDateField creation = new DataSourceDateField("creation");
 		DataSourceIntegerField source = new DataSourceIntegerField("source");
 
-		setFields(id, username, label, eenabled, enabled, name, firstName, email, phone, cell, groups, usergroup, guest,
-				lastlogin, expire, creation, avatar, timeZone, source);
+		setFields(id, username, label, eenabled, enabled, name, firstName, email, phone, cell, city, company,
+				department, organizationalUnit, building, groups, usergroup, guest, lastlogin, expire, creation, avatar,
+				timeZone, source);
 		setDataURL("data/users.xml?1=1" + (groupIdOrName != null ? "&groupId=" + groupIdOrName : "") + "&required="
 				+ required + "&skipdisabled=" + skipDisabled);
 		setClientOnly(true);

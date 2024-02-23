@@ -27,7 +27,7 @@ public class DateListGridField extends ColoredListGridField {
 		setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 		
 		if (format == DateCellFormatter.FORMAT_LONG)
-			setMinWidth(130);
+			setMinWidth(150);
 		else if (format == DateCellFormatter.FORMAT_SHORT)
 			setMinWidth(90);
 		else

@@ -111,6 +111,18 @@ public class WSUser {
 	@WSDoc(required = false)
 	private String telephone2 = "";
 
+	@WSDoc(required = false)
+	private String company;
+
+	@WSDoc(required = false)
+	private String department;
+
+	@WSDoc(required = false)
+	private String organizationalUnit;
+
+	@WSDoc(required = false)
+	private String building;
+
 	@WSDoc(description = "must be <b>0: normal or 2: guest</b>")
 	private int type = TYPE_DEFAULT;
 
@@ -408,6 +420,30 @@ public class WSUser {
 		this.lastModified = lastModified;
 	}
 
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+
+	public String getOrganizationalUnit() {
+		return organizationalUnit;
+	}
+
+	public void setOrganizationalUnit(String organizationalUnit) {
+		this.organizationalUnit = organizationalUnit;
+	}
+
+	public String getBuilding() {
+		return building;
+	}
+
+	public void setBuilding(String building) {
+		this.building = building;
+	}
+
 	public User toUser() {
 		User user = new User();
 
@@ -425,6 +461,10 @@ public class WSUser {
 			user.setStreet(getStreet());
 			user.setTelephone(getTelephone());
 			user.setTelephone2(getTelephone2());
+			user.setCompany(getCompany());
+			user.setDepartment(getDepartment());
+			user.setBuilding(getBuilding());
+			user.setOrganizationalUnit(getOrganizationalUnit());
 			user.setUsername(getUsername());
 			user.setEnabled(getEnabled());
 			user.setPasswordExpires(getPasswordExpires());
@@ -492,6 +532,10 @@ public class WSUser {
 			wsUser.setStreet(user.getStreet());
 			wsUser.setTelephone(user.getTelephone());
 			wsUser.setTelephone2(user.getTelephone2());
+			wsUser.setCompany(user.getCompany());
+			wsUser.setDepartment(user.getDepartment());
+			wsUser.setBuilding(user.getBuilding());
+			wsUser.setOrganizationalUnit(user.getOrganizationalUnit());
 			wsUser.setUsername(user.getUsername());
 			wsUser.setEnabled(user.getEnabled());
 			wsUser.setPasswordExpires(user.getPasswordExpires());
@@ -690,5 +734,13 @@ public class WSUser {
 
 	public void setCreation(String creation) {
 		this.creation = creation;
+	}
+
+	public String getCompany() {
+		return company;
+	}
+
+	public void setCompany(String company) {
+		this.company = company;
 	}
 }

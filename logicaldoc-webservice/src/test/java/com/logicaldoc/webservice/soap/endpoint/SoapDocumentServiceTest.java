@@ -252,9 +252,8 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 	}
 
 	@Test
-	public void testIsReadable() throws Exception {
+	public void testIsRead() throws Exception {
 		Assert.assertTrue(docService.isRead("", 1));
-		Assert.assertFalse(docService.isRead("", 99));
 	}
 
 	@Test

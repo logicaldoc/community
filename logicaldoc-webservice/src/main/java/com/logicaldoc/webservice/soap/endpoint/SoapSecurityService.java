@@ -141,6 +141,10 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				usr.setStreet(wsUser.getStreet());
 				usr.setTelephone(wsUser.getTelephone());
 				usr.setTelephone2(wsUser.getTelephone2());
+				usr.setCompany(wsUser.getCompany());
+				usr.setDepartment(wsUser.getDepartment());
+				usr.setOrganizationalUnit(wsUser.getOrganizationalUnit());
+				usr.setBuilding(wsUser.getBuilding());
 				usr.setUsername(wsUser.getUsername());
 				usr.setEnabled(wsUser.getEnabled());
 				usr.setPasswordExpires(wsUser.getPasswordExpires());

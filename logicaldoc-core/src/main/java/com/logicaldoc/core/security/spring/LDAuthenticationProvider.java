@@ -28,6 +28,7 @@ import com.logicaldoc.core.security.authentication.AccountInactiveException;
 import com.logicaldoc.core.security.authentication.AccountNotFoundException;
 import com.logicaldoc.core.security.authentication.OutsideWorkingTimeException;
 import com.logicaldoc.core.security.authentication.PasswordExpiredException;
+import com.logicaldoc.core.security.user.Group;
 
 /**
  * This Authentication provider users the <code>AuthenticationChain</code> to
@@ -69,9 +70,8 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 			// in authentication object
 			session.getUser().clearPassword();
 
-			String[] groups = session.getUser().getGroupNames();
 			Collection<GrantedAuthority> authorities = new ArrayList<>();
-			for (String role : groups) {
+			for (String role : session.getUser().getGroups().stream().map(Group::getName).toList()) {
 				authorities.add(new SimpleGrantedAuthority(role));
 			}
 

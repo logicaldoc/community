@@ -91,12 +91,6 @@ public class User extends PersistentObject implements Serializable {
 	// Not persisted
 	private Set<Group> groups = new HashSet<>();
 
-	// Not persisted
-	private long[] groupIds;
-
-	// Not persisted
-	private String[] groupNames;
-
 	private int enabled = 1;
 
 	/**
@@ -220,6 +214,22 @@ public class User extends PersistentObject implements Serializable {
 	 */
 	private Date lastLogin = new Date();
 
+	private String department;
+
+	private String organizationalUnit;
+
+	private String building;
+
+	private String company;
+
+	public String getCompany() {
+		return company;
+	}
+
+	public void setCompany(String company) {
+		this.company = company;
+	}
+
 	public int getType() {
 		return type;
 	}
@@ -302,18 +312,6 @@ public class User extends PersistentObject implements Serializable {
 		return telephone;
 	}
 
-	public long[] getGroupIds() {
-		if (groupIds == null)
-			initGroupIdsAndNames();
-		return groupIds;
-	}
-
-	public String[] getGroupNames() {
-		if (groupNames == null)
-			initGroupIdsAndNames();
-		return groupNames;
-	}
-
 	/**
 	 * Checks if the user is member of the admin group
 	 * 
@@ -324,12 +322,7 @@ public class User extends PersistentObject implements Serializable {
 	}
 
 	public boolean isMemberOf(String groupName) {
-		String[] names = getGroupNames();
-		for (int i = 0; i < names.length; i++) {
-			if (groupName.equals(names[i]))
-				return true;
-		}
-		return false;
+		return groups.stream().anyMatch(g -> groupName.equals(g.getName()));
 	}
 
 	public void addGroup(Group group) {
@@ -434,29 +427,6 @@ public class User extends PersistentObject implements Serializable {
 		telephone = phone;
 	}
 
-	private void initGroupIdsAndNames() {
-		try {
-			groupIds = new long[userGroups.size()];
-			int i = 0;
-			for (UserGroup ug : userGroups)
-				groupIds[i++] = ug.getGroupId();
-
-			groupNames = new String[groups.size()];
-
-			Iterator<Group> iter = groups.iterator();
-			i = 0;
-			while (iter.hasNext()) {
-				Group ug = iter.next();
-				if (ug.getDeleted() == 1)
-					continue;
-				groupNames[i] = ug.getName();
-				i++;
-			}
-		} catch (Exception e) {
-			// Nothing to do
-		}
-	}
-
 	public void reset() {
 		username = "";
 		password = "";
@@ -473,13 +443,15 @@ public class User extends PersistentObject implements Serializable {
 		docsGrid = null;
 		hitsGrid = null;
 		groups = new HashSet<>();
-		groupIds = null;
 		passwordExpires = 0;
 		avatar = null;
 		expire = null;
 		enforceWorkingTime = 0;
 		lastLogin = null;
 		workingTimes = new HashSet<>();
+		building = null;
+		organizationalUnit = null;
+		department = null;
 	}
 
 	@Override
@@ -870,5 +842,29 @@ public class User extends PersistentObject implements Serializable {
 
 	public void setLastLogin(Date lastLogin) {
 		this.lastLogin = lastLogin;
+	}
+
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+
+	public String getOrganizationalUnit() {
+		return organizationalUnit;
+	}
+
+	public void setOrganizationalUnit(String organizationalUnit) {
+		this.organizationalUnit = organizationalUnit;
+	}
+
+	public String getBuilding() {
+		return building;
+	}
+
+	public void setBuilding(String building) {
+		this.building = building;
 	}
 }

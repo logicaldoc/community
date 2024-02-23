@@ -1377,8 +1377,9 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		try {
-			checkDocumentPermission(Permission.valueOf(permission), user, docId);
+			checkDocumentPermission(Permission.valueOf(permission.toUpperCase()), user, docId);
 		} catch (Exception e) {
+			log.error(e.getMessage(), e);
 			return false;
 		}
 		return true;

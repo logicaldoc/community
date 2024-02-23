@@ -467,6 +467,10 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				guiUser.setCountry(user.getCountry());
 				guiUser.setEmail(user.getEmail());
 				guiUser.setEmail2(user.getEmail2());
+				guiUser.setDepartment(user.getDepartment());
+				guiUser.setBuilding(user.getBuilding());
+				guiUser.setOrganizationalUnit(user.getOrganizationalUnit());
+				guiUser.setCompany(user.getCompany());
 				guiUser.setEnabled(user.getEnabled() == 1);
 				guiUser.setFirstName(user.getFirstName());
 				guiUser.setLanguage(user.getLanguage());
@@ -653,6 +657,10 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			user.setStreet(guiUser.getAddress());
 			user.setTelephone(guiUser.getPhone());
 			user.setTelephone2(guiUser.getCell());
+			user.setBuilding(guiUser.getBuilding());
+			user.setOrganizationalUnit(guiUser.getOrganizationalUnit());
+			user.setDepartment(guiUser.getDepartment());
+			user.setCompany(guiUser.getCompany());
 			user.setUsername(guiUser.getUsername());
 			user.setEnabled(guiUser.isEnabled() ? 1 : 0);
 			user.setPasswordExpires(guiUser.isPasswordExpires() ? 1 : 0);
@@ -872,51 +880,56 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	}
 
 	@Override
-	public GUIUser saveProfile(GUIUser user) throws ServerException {
+	public GUIUser saveProfile(GUIUser guiUser) throws ServerException {
 		Session session = validateSession();
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 
 		// Disallow the editing of other users if you do not have access to
 		// the Security
-		if (user.getId() != session.getUserId())
+		if (guiUser.getId() != session.getUserId())
 			checkMenu(getThreadLocalRequest(), Menu.SECURITY);
 
 		try {
-			User usr = userDao.findById(user.getId());
-			userDao.initialize(usr);
+			User user = userDao.findById(guiUser.getId());
+			userDao.initialize(user);
 
-			usr.setFirstName(user.getFirstName());
-			usr.setName(user.getName());
-			usr.setEmail(user.getEmail());
-			usr.setEmail2(user.getEmail2());
-			usr.setLanguage(user.getLanguage());
-			usr.setStreet(user.getAddress());
-			usr.setPostalcode(user.getPostalCode());
-			usr.setCity(user.getCity());
-			usr.setCountry(user.getCountry());
-			usr.setState(user.getState());
-			usr.setTelephone(user.getPhone());
-			usr.setTelephone2(user.getCell());
-			usr.setWelcomeScreen(user.getWelcomeScreen());
-			usr.setDefaultWorkspace(user.getDefaultWorkspace());
-			usr.setEmailSignature(user.getEmailSignature());
-			usr.setEmailSignature2(user.getEmailSignature2());
-			usr.setTimeZone(user.getTimeZone());
-			usr.setDocsGrid(user.getDocsGrid());
-			usr.setHitsGrid(user.getHitsGrid());
+			user.setFirstName(guiUser.getFirstName());
+			user.setName(guiUser.getName());
+			user.setEmail(guiUser.getEmail());
+			user.setEmail2(guiUser.getEmail2());
+			user.setLanguage(guiUser.getLanguage());
+			user.setStreet(guiUser.getAddress());
+			user.setPostalcode(guiUser.getPostalCode());
+			user.setCity(guiUser.getCity());
+			user.setCountry(guiUser.getCountry());
+			user.setState(guiUser.getState());
+			user.setTelephone(guiUser.getPhone());
+			user.setTelephone2(guiUser.getCell());
+			user.setCompany(guiUser.getCompany());
+			user.setBuilding(guiUser.getBuilding());
+			user.setOrganizationalUnit(guiUser.getOrganizationalUnit());
+			user.setDepartment(guiUser.getDepartment());
 
-			usr.setDateFormat(user.getDateFormat());
-			usr.setDateFormatShort(user.getDateFormatShort());
-			usr.setDateFormatLong(user.getDateFormatLong());
-			usr.setSearchPref(user.getSearchPref());
+			user.setWelcomeScreen(guiUser.getWelcomeScreen());
+			user.setDefaultWorkspace(guiUser.getDefaultWorkspace());
+			user.setEmailSignature(guiUser.getEmailSignature());
+			user.setEmailSignature2(guiUser.getEmailSignature2());
+			user.setTimeZone(guiUser.getTimeZone());
+			user.setDocsGrid(guiUser.getDocsGrid());
+			user.setHitsGrid(guiUser.getHitsGrid());
+
+			user.setDateFormat(guiUser.getDateFormat());
+			user.setDateFormatShort(guiUser.getDateFormatShort());
+			user.setDateFormatLong(guiUser.getDateFormatLong());
+			user.setSearchPref(guiUser.getSearchPref());
 
 			UserHistory transaction = new UserHistory();
 			transaction.setSession(session);
 			transaction.setEvent(UserEvent.UPDATED.toString());
-			userDao.store(usr, transaction);
+			userDao.store(user, transaction);
 
-			return user;
+			return guiUser;
 		} catch (PersistenceException e) {
 			return (GUIUser) throwServerException(session, log, e);
 		}
@@ -959,7 +972,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		HttpSession httpSession = SessionManager.get().getServletSession(sid);
 		if (httpSession != null)
 			httpSession.invalidate();
-		
+
 		SessionManager.get().removeSid(getThreadLocalRequest());
 	}
 

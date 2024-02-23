@@ -13,7 +13,6 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -708,12 +707,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 				history.setTenantId(session.getTenantId());
 				history.setUsername(rs.getString(1));
 				history.setEvent(rs.getString(2));
-
-				if (rs.getObject(3) instanceof Timestamp || rs.getObject(3) instanceof LocalDateTime)
-					history.setDate(rs.getTimestamp(3));
-				else
-					history.setDate(rs.getDate(3));
-
+				history.setDate(SqlUtil.getColumnDateValue(rs, 3));
 				history.setFileName(rs.getString(4));
 				history.setFolderId(rs.getLong(5));
 				history.setPath(rs.getString(6));
@@ -734,7 +728,6 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 				return history;
 			}
-
 		}, maxResult);
 	}
 
@@ -802,15 +795,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 				public GUIHistory mapRow(ResultSet rs, int arg1) throws SQLException {
 					GUIHistory history = new GUIHistory();
 					history.setUsername(rs.getString(1));
-					
-					System.out.println(rs.getObject(2).getClass());
-					if (rs.getObject(2) instanceof Timestamp)
-						history.setDate(rs.getTimestamp(2));
-					else if (rs.getObject(2) instanceof LocalDateTime localDateTime)
-						history.setDate(java.sql.Timestamp.valueOf(localDateTime));
-					else
-						history.setDate(rs.getDate(2));
-
+					history.setDate(SqlUtil.getColumnDateValue(rs, 2));
 					history.setPath(rs.getString(3));
 					history.setSessionId(rs.getString(4));
 					history.setUserId(rs.getLong(5));

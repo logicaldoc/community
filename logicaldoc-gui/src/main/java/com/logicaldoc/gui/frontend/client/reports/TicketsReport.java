@@ -13,6 +13,7 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
@@ -96,10 +97,10 @@ public class TicketsReport extends ReportPanel {
 		type.setCellFormatter(
 				(value, rcrd, rowNum, colNum) -> I18N.message("0".equals(value.toString()) ? "download" : "view"));
 
-		ListGridField creation = new DateListGridField("creation", "createdon");
+		ListGridField creation = new DateListGridField("creation", "createdon", DateCellFormatter.FORMAT_LONG);
 		creation.setCanGroupBy(false);
 
-		ListGridField expired = new DateListGridField("expired", "expireson");
+		ListGridField expired = new DateListGridField("expired", "expireson", DateCellFormatter.FORMAT_LONG);
 		expired.setCanGroupBy(false);
 
 		FileNameListGridField fileName = new FileNameListGridField();

@@ -21,6 +21,7 @@
 		</Console>
 	</Appenders>
 	<Loggers>
+		<Logger name="com.logicaldoc.util.spring.DatabasePropertySource" level="fatal" additivity="false" />
 		<Logger name="com.logicaldoc" level="error" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>

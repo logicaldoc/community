@@ -137,14 +137,24 @@ public class UserPropertiesPanel extends HLayout {
 
 		TextItem email2 = prepareEmail2Item(readonly);
 
+		TextItem building = prepareBuildingItem(readonly);
+
+		TextItem organizationalUnit = prepareOrganizationalUnitItem(readonly);
+
+		TextItem department = prepareDepartmentItem(readonly);
+
+		TextItem company = prepareCompanyItem(readonly);
+
 		ComboBoxItem timeZone = prepareTimeZoneSelector(readonly);
 
 		if (user.getId() == 0L)
-			form1.setItems(notifyCredentials, guest, username, email, firstname, name, email2, language, address,
-					postalcode, city, country, state, phone, cell, timeZone);
+			form1.setItems(notifyCredentials, guest, username, email, firstname, name, email2, language, timeZone,
+					address, postalcode, city, country, state, phone, cell, company, department, building,
+					organizationalUnit);
 		else
 			form1.setItems(id, lastLogin, creation, username, notifyCredentials, guest, email, firstname, name, email2,
-					language, address, postalcode, city, country, state, phone, cell, timeZone);
+					language, timeZone, address, postalcode, city, country, state, phone, cell, company, department,
+					building, organizationalUnit);
 		addMember(layout);
 
 		prepareGroupsForm(readonly);
@@ -169,6 +179,42 @@ public class UserPropertiesPanel extends HLayout {
 			});
 			addMember(avatar);
 		}
+	}
+
+	private TextItem prepareDepartmentItem(boolean readonly) {
+		TextItem item = ItemFactory.newTextItem("department", user.getDepartment());
+		item.setRequired(false);
+		item.setDisabled(readonly);
+		if (!readonly)
+			item.addChangedHandler(changedHandler);
+		return item;
+	}
+
+	private TextItem prepareOrganizationalUnitItem(boolean readonly) {
+		TextItem item = ItemFactory.newTextItem("organizationalunit", user.getOrganizationalUnit());
+		item.setRequired(false);
+		item.setDisabled(readonly);
+		if (!readonly)
+			item.addChangedHandler(changedHandler);
+		return item;
+	}
+
+	private TextItem prepareCompanyItem(boolean readonly) {
+		TextItem item = ItemFactory.newTextItem("company", user.getCompany());
+		item.setRequired(false);
+		item.setDisabled(readonly);
+		if (!readonly)
+			item.addChangedHandler(changedHandler);
+		return item;
+	}
+
+	private TextItem prepareBuildingItem(boolean readonly) {
+		TextItem item = ItemFactory.newTextItem("building", user.getBuilding());
+		item.setRequired(false);
+		item.setDisabled(readonly);
+		if (!readonly)
+			item.addChangedHandler(changedHandler);
+		return item;
 	}
 
 	private ComboBoxItem prepareTimeZoneSelector(boolean readonly) {
@@ -357,6 +403,10 @@ public class UserPropertiesPanel extends HLayout {
 			user.setEmail((String) values.get(EMAIL));
 			user.setEmail2((String) values.get("email2"));
 			user.setTimeZone((String) values.get("timezone"));
+			user.setBuilding((String) values.get("building"));
+			user.setOrganizationalUnit((String) values.get("organizationalunit"));
+			user.setDepartment((String) values.get("department"));
+			user.setCompany((String) values.get("company"));
 
 			if (user.getId() == 0L)
 				user.setNotifyCredentials(Boolean.parseBoolean(values.get("notifyCredentials").toString()));

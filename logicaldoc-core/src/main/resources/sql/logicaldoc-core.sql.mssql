@@ -117,9 +117,10 @@ create table ld_user (ld_id bigint not null, ld_lastmodified datetime not null, 
                       ld_email2 nvarchar(255), ld_emailsignature2 nvarchar(1000), ld_avatar nvarchar(max), ld_expire datetime,
                       ld_certexpire datetime, ld_certdn nvarchar(1000), ld_enforcewrktime int not null, ld_lastlogin datetime,
                       ld_secondfactor nvarchar(255), ld_key nvarchar(255), ld_lastenabled datetime, ld_maxinactivity int,
-                      ld_docsgrid varchar(4000), ld_hitsgrid varchar(4000), 
-                      ld_dateformat varchar(255), ld_dateformatshort varchar(255), ld_dateformatlong varchar(255),
-                      ld_searchpref varchar(255), ld_timezone varchar(255), primary key (ld_id));
+                      ld_docsgrid nvarchar(4000), ld_hitsgrid nvarchar(4000), 
+                      ld_dateformat nvarchar(255), ld_dateformatshort nvarchar(255), ld_dateformatlong nvarchar(255),
+                      ld_searchpref nvarchar(255), ld_timezone nvarchar(255), ld_company nvarchar(255),
+                      ld_department nvarchar(255), ld_organizationalunit nvarchar(255), ld_building nvarchar(255), primary key (ld_id));
 create table ld_workingtime (ld_userid bigint not null, ld_dayofweek int not null, ld_hourstart int not null, ld_minutestart int not null, 
                              ld_hourend int not null, ld_minuteend int not null, ld_label varchar(255), ld_description varchar(1000),
                              primary key(ld_userid, ld_dayofweek, ld_hourstart, ld_minutestart));

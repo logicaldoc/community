@@ -21,6 +21,7 @@ import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -208,7 +209,7 @@ public class LastChangesReport extends AdminPanel {
 		ListGridField eventField = new ListGridField(EVENT, I18N.message(EVENT), 200);
 		eventField.setCanFilter(true);
 
-		ListGridField date = new DateListGridField("date", "date");
+		ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_LONG);
 
 		ListGridField userField = new UserListGridField("user", USER_ID, "user");
 		userField.setCanFilter(true);

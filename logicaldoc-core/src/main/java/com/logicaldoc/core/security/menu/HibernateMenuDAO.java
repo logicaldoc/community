@@ -43,11 +43,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 	private static final String WHERE = " where ";
 
-	private static final String SECURITY_REF_IN = ".securityRef in (";
-
 	private static final String ENABLED_1_AND = ".enabled=1 and ";
-
-	private static final String FROM_MENU = " from Menu ";
 
 	private static final String CLOSE_BRACKET_AND = ") and ";
 
@@ -58,8 +54,6 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 	private static final String CLOSE_BRACKET_FROM_MENU = ") from Menu ";
 
 	private static final String DOT_PARENT_ID = ".parentId=";
-
-	private static final String SELECT = "select ";
 
 	private static final String PARENT_ID = "parentId";
 
@@ -171,25 +165,6 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				query1.append(AND + ENTITY + ".type = " + type.toString());
 
 			coll = findByQuery(query1.toString(), params, null);
-
-			/*
-			 * Now search for all other menus that references accessible menus
-			 */
-			StringBuilder query2 = new StringBuilder(SELECT + ENTITY + FROM_MENU + ENTITY + WHERE + ENTITY
-					+ ".deleted=0 and " + ENTITY + ENABLED_1_AND + ENTITY + ".parentId = :parentId ");
-			query2.append(AND + ENTITY + SECURITY_REF_IN);
-			query2.append("    select distinct(B.id) from Menu B ");
-			query2.append(" left join B.accessControlList as _group");
-			query2.append(WHERE_GROUP_GROUP_ID_IN);
-			query2.append(
-					user.getGroups().stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
-			query2.append("))");
-
-			List<Menu> coll2 = findByQuery(query2.toString(), params, null);
-			for (Menu menu : coll2) {
-				if (!coll.contains(menu))
-					coll.add(menu);
-			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -245,36 +220,6 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			query1.append(" and not(" + ENTITY + ".id=" + parentId + ")");
 
 			coll = findByQuery(query1.toString(), (Map<String, Object>) null, null);
-
-			/*
-			 * Now search for all other menus that references accessible menus
-			 */
-			StringBuilder query2 = new StringBuilder(SELECT + ENTITY + FROM_MENU + ENTITY + WHERE + ENTITY
-					+ ".deleted=0 and " + ENTITY + ".parentId = :parentId ");
-			query2.append(AND + ENTITY + ENABLED_1_AND + ENTITY + SECURITY_REF_IN);
-			query2.append("    select distinct(B.id) from Menu B ");
-			query2.append(" left join B.accessControlList as _group");
-			query2.append(WHERE_GROUP_GROUP_ID_IN);
-
-			first = true;
-			iter = groups.iterator();
-			while (iter.hasNext()) {
-				if (!first)
-					query2.append(",");
-				Group ug = (Group) iter.next();
-				query2.append(Long.toString(ug.getId()));
-				first = false;
-			}
-			query2.append("))");
-			query2.append(" and not(" + ENTITY + ".id=" + parentId + ")");
-
-			Map<String, Object> params = new HashMap<>();
-			params.put(PARENT_ID, parentId);
-			List<Menu> coll2 = findByQuery(query2.toString(), params, null);
-			for (Menu menu : coll2) {
-				if (!coll.contains(menu))
-					coll.add(menu);
-			}
 		} catch (Exception e) {
 			if (log.isErrorEnabled())
 				log.error(e.getMessage(), e);
@@ -415,22 +360,6 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			query.append(WHERE + ENTITY + ".deleted=0 and _group.read=1 and _group.groupId =" + groupId);
 
 			coll = findByQuery(query.toString(), (Map<String, Object>) null, null);
-
-			/*
-			 * Now search for all other menus that references the previous ones
-			 */
-			if (!coll.isEmpty()) {
-				StringBuilder query2 = new StringBuilder(
-						SELECT + ENTITY + FROM_MENU + ENTITY + WHERE + ENTITY + ".deleted=0 ");
-				query2.append(AND + ENTITY + SECURITY_REF_IN);
-				query2.append(coll.stream().map(m -> Long.toString(m.getId())).collect(Collectors.joining(",")));
-				query2.append(")");
-				List<Menu> coll2 = findByQuery(query2.toString(), (Map<String, Object>) null, null);
-				for (Menu menu : coll2) {
-					if (!coll.contains(menu))
-						coll.add(menu);
-				}
-			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}

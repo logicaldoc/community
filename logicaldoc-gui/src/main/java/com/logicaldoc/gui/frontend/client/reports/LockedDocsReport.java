@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileVersionListGridField;
@@ -94,7 +95,8 @@ public class LockedDocsReport extends ReportPanel {
 		fileVersion.setCanGroupBy(false);
 		fileVersion.setHidden(true);
 
-		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
+		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified",
+				DateCellFormatter.FORMAT_LONG);
 		lastModified.setCanGroupBy(false);
 
 		ListGridField user = new UserListGridField("username", "userId", "lockedby");
