@@ -46,7 +46,11 @@
 		</Logger>
 		<Logger name="org.hsqldb" level="error" additivity="false">
 			<AppenderRef ref="file" />
+		</Logger>
+		<Logger name="org.apache.solr" level="fatal" additivity="false">
+			<AppenderRef ref="file" />
 		</Logger>		
+		
 		<Logger name="com.logicaldoc.util.spring.DatabasePropertySource" level="fataò" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>		

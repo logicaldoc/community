@@ -59,6 +59,7 @@ public class RarUtil {
 				FileHeader fh = archive.nextFileHeader();
 				while (fh != null) {
 					if (entryName.equals(fh.getFileName())) {
+						
 						try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest));) {
 							int nBytes = -1;
 							byte[] buffer = new byte[4096];

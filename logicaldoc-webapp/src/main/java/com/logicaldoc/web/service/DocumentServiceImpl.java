@@ -1903,7 +1903,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		try {
 			document = retrieveDocument(docId);
 			if (document == null)
-				throw new UnexistingResourceException("Document " + docId);
+				throw new UnexistingResourceException(DOCUMENT_STR + docId);
 
 			/*
 			 * Check for deletions
@@ -2446,7 +2446,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			// Obtain the document's file stream
 			Storer storer = (Storer) Context.get().getBean(Storer.class);
 			String resource = storer.getResourceName(doc, null, null);
-
+			
 			return storer.getString(doc.getId(), resource);
 		} catch (PersistenceException | ServerException | IOException e) {
 			return (String) throwServerException(session, log, e);

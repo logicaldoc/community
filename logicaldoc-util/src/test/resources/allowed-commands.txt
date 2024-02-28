@@ -3,3 +3,5 @@ C:\tmp\sync.bat
 C:\LogicalDOC-Devel\imagemagick\convert.exe
 target\test-classes\nothing.bat
 target\test-classes\loop.bat
+cmd
+rm

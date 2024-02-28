@@ -51,8 +51,8 @@ public class P7M {
 
 		try {
 			this.cms = new CMSSignedData(content);
-		} catch (Exception ex1) {
-			log.error("Error extracting file certificate");
+		} catch (Exception e) {
+			log.error("Error extracting file certificate", e);
 		}
 	}
 
@@ -65,20 +65,18 @@ public class P7M {
 	 * @throws IOException I/O error
 	 */
 	public void read(InputStream is) throws IOException {
-		byte[] buffer = new byte[4096];
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		while (is.read(buffer) > 0) {
-			baos.write(buffer);
+		content = IOUtil.getBytesOfStream(is);
+
+		try {
+			read(content);
+		} catch (Exception e) {
+			// if the content is Base64 encoded, we must decode it into DER
+			// format
+			content = Base64.decode(content);
+			log.debug("Decoding on Base64 completed");
+			log.debug("The signed file is in DER format");
+			read(content);
 		}
-
-		byte[] tmp = baos.toByteArray();
-
-		// if the content is on Base64, we must decode it into DER format
-		content = Base64.decode(tmp);
-		log.debug("Decoding on Base64 completed");
-		log.debug("The signed file is in DER format");
-
-		read(content);
 	}
 
 	/**

@@ -79,7 +79,7 @@ public class ZipImport {
 
 		try {
 			ZipUtil zipUtil = new ZipUtil();
-			zipUtil.unzip(zipFile.getPath(), dir.getPath());
+			zipUtil.unzip(zipFile, dir);
 			File[] files = dir.listFiles();
 			addEntries(parent, files);
 		} catch (IOException e) {

@@ -1,5 +1,6 @@
 package com.logicaldoc.util.io;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -12,12 +13,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JarUtilTest {
+public class RarUtilTest {
 	private File dir = new File("target/test");
 
-	private File file = new File("target/test.zip");
+	private File file = new File("target/test.rar");
 
-	private JarUtil testSubject = new JarUtil();
+	private RarUtil testSubject = new RarUtil();
 
 	@Before
 	public void setUp() throws FileNotFoundException, IOException, SQLException {
@@ -25,7 +26,7 @@ public class JarUtilTest {
 		dir.mkdirs();
 		dir.mkdir();
 
-		FileUtil.copyResource("/test.zip", file);
+		FileUtil.copyResource("/kofax.rar", file);
 	}
 
 	@After
@@ -34,23 +35,15 @@ public class JarUtilTest {
 	}
 
 	@Test
-	public void testUnjar() throws IOException {
-		File test = new File(dir, "index.xml");
-		try {
-			assertFalse(test.exists());
-			testSubject.unjar(file.getPath(), "target/test");
-			assertTrue(test.exists());
-		} finally {
-			FileUtil.strongDelete(test);
-		}
+	public void testlistEntries() throws IOException {
+		assertEquals(22, testSubject.listEntries(file).size());
 	}
 
 	@Test
-	public void testUnjarEntry() throws IOException {
-		final File test = new File(dir, "test.txt");
+	public void testExtractEntry() throws IOException {
+		final File test = new File(dir, "invoice.pdf");
 		assertFalse(test.exists());
-		testSubject.unjar(file.getPath(), "abc/test.txt", test.getPath());
+		testSubject.extractEntry(file, "kofax\\export\\invoice-001.PDF", test);
 		assertTrue(test.exists());
-
 	}
 }

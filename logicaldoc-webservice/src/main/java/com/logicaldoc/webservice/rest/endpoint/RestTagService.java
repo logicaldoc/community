@@ -56,15 +56,9 @@ public class RestTagService extends SoapTagService implements TagService {
 	public void addDocumentTags(@Parameter(description = "Document ID", required = true)
 	@FormParam("docId")
 	long docId, @FormParam("tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, UnexistingResourceException {
 		String sid = validateSessionREST();
-		try {
 			super.addDocumentTags(sid, docId, tags);
-		} catch (AuthenticationException | PermissionException | PersistenceException | UnexistingResourceException
-				| WebserviceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	@Override

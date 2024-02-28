@@ -71,15 +71,16 @@ public class LockManager {
 					return true;
 				} else {
 					synchronized (this) {
-						try {
-							wait(1000);
-						} catch (InterruptedException e) {
-							Thread.currentThread().interrupt();
-						}
+						wait(1000);
 					}
 				}
 			} catch (PersistenceException e) {
 				log.warn(e.getMessage(), e);
+			} catch (InterruptedException ie) {
+				log.warn("Interrupted", ie);
+				
+				// Restore interrupted state
+				Thread.currentThread().interrupt();
 			}
 		}
 

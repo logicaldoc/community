@@ -384,7 +384,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testReplaceFile() throws ServerException {
+	public void testReplaceFile() throws ServerException, IOException {
 		GUIDocument doc = service.getById(7);
 		assertFalse(service.getContentAsString(7).contains("replaced contents"));
 
@@ -395,9 +395,11 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 			FileUtil.writeFile("replaced contents", tmpFile.getAbsolutePath());
 			Map<String, File> uploadedFiles = new HashMap<>();
 			uploadedFiles.put(doc.getFileName(), tmpFile);
-
+			assertTrue(FileUtil.readFile(tmpFile).contains("replaced contents"));
+			
 			session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
 			service.replaceFile(doc.getId(), doc.getFileVersion(), "replace");
+			
 			assertTrue(service.getContentAsString(7).contains("replaced contents"));
 		} finally {
 			FileUtil.strongDelete(tmpFile);

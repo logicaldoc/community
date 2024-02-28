@@ -66,7 +66,7 @@ create table ld_menu (ld_id bigint not null, ld_lastmodified datetime not null, 
                       ld_parentid bigint not null, ld_icon varchar(255), 
                       ld_type int not null, ld_description varchar(4000), ld_position int not null, 
                       ld_enabled int not null, ld_routineid bigint, ld_automation varchar(4000), primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
-create table ld_menu_acl (ld_menuid bigint not null, ld_groupid bigint not null, ld_read int not null,, ld_write int not null, primary key (ld_menuid, ld_groupid)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+create table ld_menu_acl (ld_menuid bigint not null, ld_groupid bigint not null, ld_read int not null, ld_write int not null, primary key (ld_menuid, ld_groupid)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_recipient (ld_messageid bigint not null, ld_name varchar(255) not null, ld_address varchar(255) not null, ld_mode varchar(255) not null, ld_type int not null, ld_read int not null) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_systemmessage (ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null,
                                ld_deleted int not null, ld_tenantid bigint not null, 
@@ -274,7 +274,7 @@ alter table ld_folder add constraint FK_FOLDER_PARENT foreign key (ld_parentid) 
 alter table ld_folder add constraint FK_FOLDER_TEMPLATE foreign key (ld_templateid) references ld_template(ld_id);
 alter table ld_folder_ext add constraint FK_FOLDEREXT_FOLDER foreign key (ld_folderid) references ld_folder(ld_id);
 alter table ld_folder_acl add constraint FK_FOLDACL_FOLDER foreign key (ld_folderid) references ld_folder(ld_id) on delete cascade;
-alter table ld_folder_acl add constraint FK_FOLDACL_GROUP foreign key (ld_groupid) references ld_group(ld_id) on delete cascade
+alter table ld_folder_acl add constraint FK_FOLDACL_GROUP foreign key (ld_groupid) references ld_group(ld_id) on delete cascade;
 alter table ld_folder_storage add constraint FK_FOLDER_STORAGE foreign key (ld_folderid) references ld_folder(ld_id) on delete cascade;
 alter table ld_foldertag add constraint FK_TAG_FOLDER foreign key (ld_folderid) references ld_folder(ld_id);
 alter table ld_workingtime add constraint FK_WRKTIME_USER foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
@@ -673,7 +673,7 @@ insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld
 values (4,3,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,1,0,0,0);
 insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (4,4,1,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,0,1);
-insert into ld_folder_acl(ld_folderid, ld_groupid, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (4,-10000,1,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,0,1);
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)

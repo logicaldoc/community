@@ -46,7 +46,8 @@ public interface TagService {
 	@Path("/setDocumentTags")
 	public void setDocumentTags(@FormParam("docId")
 	long docId, @FormParam("tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, UnexistingResourceException;
+	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			UnexistingResourceException;
 
 	/**
 	 * Adds tags to a document
@@ -59,12 +60,14 @@ public interface TagService {
 	 * @throws AuthenticationException Invalid session
 	 * @throws PermissionException The user does not have the required
 	 *         permission
+	 * @throws UnexistingResourceException The indicated document does not exist
 	 */
 	@POST
 	@Path("/addDocumentTags")
 	public void addDocumentTags(@FormParam("docId")
 	long docId, @FormParam("tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			UnexistingResourceException;
 
 	/**
 	 * Retrieves all the tags of a document
@@ -83,7 +86,8 @@ public interface TagService {
 	@GET
 	@Path("/getDocumentTags")
 	public String[] getDocumentTags(@QueryParam("docId")
-	long docId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException, UnexistingResourceException;
+	long docId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException,
+			UnexistingResourceException;
 
 	/**
 	 * Sets the tags of a folder

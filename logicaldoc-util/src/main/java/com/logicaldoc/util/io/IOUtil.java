@@ -2,15 +2,16 @@ package com.logicaldoc.util.io;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
+
+import org.apache.commons.io.IOUtils;
 
 public class IOUtil {
 	private static final int DEFAULT_BUFFER_SIZE = 10240; // ..bytes = 10KB.
@@ -61,34 +62,20 @@ public class IOUtil {
 		java.nio.file.Files.copy(input, output.toPath(), StandardCopyOption.REPLACE_EXISTING);
 	}
 
-	public static String getStringFromInputStream(InputStream is) throws IOException {
-		StringBuilder sb = new StringBuilder();
-		String line;
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
-
-			while ((line = br.readLine()) != null) {
-				if (sb.length() > 0)
-					sb.append("\n");
-				sb.append(line);
-			}
-		}
-		return sb.toString();
+	public static String readStream(InputStream is) throws IOException {
+		return IOUtils.toString(is, StandardCharsets.UTF_8);
 	}
 
-	public static byte[] printIS(InputStream stream) throws IOException {
-
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		BufferedOutputStream bos = new BufferedOutputStream(baos);
-
-		BufferedInputStream bis = new BufferedInputStream(stream);
-		int aByte;
-		while ((aByte = bis.read()) != -1) {
-			bos.write(aByte);
+	public static byte[] getBytesOfStream(InputStream stream) throws IOException {
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				BufferedOutputStream bos = new BufferedOutputStream(baos);
+				BufferedInputStream bis = new BufferedInputStream(stream);) {
+			int aByte;
+			while ((aByte = bis.read()) != -1) {
+				bos.write(aByte);
+			}
+			bos.flush();
+			return baos.toByteArray();
 		}
-		bos.flush();
-		bos.close();
-		bis.close();
-
-		return baos.toByteArray();
 	}
 }

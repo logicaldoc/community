@@ -69,6 +69,14 @@ public class TarUtil {
 		return entries;
 	}
 
+	/**
+	 * Extracts the first file entry contained in the given TAR archive
+	 * 
+	 * @param tarFile the TAR archive to read
+	 * @param dest the destination file to extract the first file entry to
+	 * 
+	 * @throws IOException I/O error
+	 */
 	public void extractEntry(File tarFile, File dest) throws IOException {
 		try {
 			try (FileInputStream fis = new FileInputStream(tarFile);
@@ -78,6 +86,9 @@ public class TarUtil {
 
 				if (input instanceof TarArchiveInputStream tarInput) {
 					try (tarInput) {
+						while (tarInput.getCurrentEntry() == null || !tarInput.getCurrentEntry().isFile())
+							tarInput.getNextEntry();
+
 						int nBytes = -1;
 						byte[] buffer = new byte[4096];
 						int totalSizeEntry = 0;

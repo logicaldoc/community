@@ -51,8 +51,8 @@ public class RestTagClient extends AbstractRestClient {
 		}
 	}
 
-	public void addDocumentTags(long docId, String[] tags)
-			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public void addDocumentTags(long docId, String[] tags) throws AuthenticationException, PermissionException,
+			PersistenceException, UnexistingResourceException, WebserviceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_FORM_URLENCODED);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		proxy.addDocumentTags(docId, tags);

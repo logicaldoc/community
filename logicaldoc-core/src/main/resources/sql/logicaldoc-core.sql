@@ -679,7 +679,7 @@ insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write , ld_add, l
 values (4,3,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,1,0,0,0);
 insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (4,4,1,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,0,1);
-insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (4,-10000,1,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,0,1);
 
 

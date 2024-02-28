@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -206,48 +207,6 @@ public class FileUtil {
 			digest = null;
 		}
 		return digest;
-	}
-
-	/**
-	 * This method calculates the digest of a file using the algorithm SHA-1.
-	 * 
-	 * @param file The file for which will be computed the digest
-	 * @return digest
-	 */
-	public static byte[] computeSha1Hash(File file) {
-		try (InputStream is = new BufferedInputStream(new FileInputStream(file), BUFF_SIZE);) {
-			return computeSha1Hash(is);
-		} catch (IOException io) {
-			log.error(io.getMessage(), io);
-		}
-		return new byte[0];
-	}
-
-	/**
-	 * This method calculates the digest of a inputStram content using the
-	 * algorithm SHA-1.
-	 * 
-	 * @param is The content of which will be computed the digest
-	 * @return digest
-	 */
-	public static byte[] computeSha1Hash(InputStream is) {
-		MessageDigest sha = null;
-		try {
-			if (is != null) {
-				sha = MessageDigest.getInstance("SHA-1");
-				byte[] message = new byte[BUFF_SIZE];
-				int len = 0;
-				while ((len = is.read(message)) != -1) {
-					sha.update(message, 0, len);
-				}
-				return sha.digest();
-			}
-		} catch (IOException io) {
-			log.error("Error generating SHA-1: ", io);
-		} catch (Exception t) {
-			log.error("Error generating SHA-1: ", t);
-		}
-		return new byte[0];
 	}
 
 	/**
@@ -639,16 +598,19 @@ public class FileUtil {
 		}
 	}
 
-	private static void deleteUsingOSCommand(File file) {
+	static void deleteUsingOSCommand(File file) {
 		try {
-			log.debug("Delete file {} using OS command", file.getAbsolutePath());
+			String command = "";
 			if (SystemUtil.isWindows()) {
 				if (file.isDirectory())
-					java.lang.Runtime.getRuntime().exec("cmd /C del /F /Q \"" + file.getAbsolutePath() + "\"");
+					command = "cmd /C rmdir /S /Q \"" + file.getCanonicalPath() + "\"";
 				else
-					java.lang.Runtime.getRuntime().exec("cmd /C rmdir /S /Q \"" + file.getAbsolutePath() + "\"");
-			} else
-				java.lang.Runtime.getRuntime().exec("rm -rf \"" + file.getAbsolutePath() + "\"");
+					command = "cmd /C del /F /Q \"" + file.getCanonicalPath() + "\"";
+			} else {
+				command = "rm -rf \"" + file.getCanonicalPath() + "\"";
+			}
+			log.debug("Deleting file {} using OS command {}", file.getAbsolutePath(), command);
+			java.lang.Runtime.getRuntime().exec(command);
 		} catch (IOException e) {
 			log.warn(e.getMessage(), e);
 		}
@@ -743,20 +705,8 @@ public class FileUtil {
 	}
 
 	public static long countLines(File file) throws IOException {
-		try (InputStream is = new BufferedInputStream(new FileInputStream(file));) {
-			byte[] c = new byte[1024];
-			long count = 0;
-			int readChars = 0;
-			boolean empty = true;
-			while ((readChars = is.read(c)) != -1) {
-				empty = false;
-				for (int i = 0; i < readChars; ++i) {
-					if (c[i] == '\n') {
-						++count;
-					}
-				}
-			}
-			return (count == 0 && !empty) ? 1 : count;
+		try (Stream<String> stream = Files.lines(file.toPath(), StandardCharsets.UTF_8)) {
+			return stream.count();
 		}
 	}
 

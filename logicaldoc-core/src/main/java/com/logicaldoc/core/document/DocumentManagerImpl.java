@@ -175,13 +175,13 @@ public class DocumentManagerImpl implements DocumentManager {
 		Document document = documentDAO.findDocument(docId);
 
 		if (document.getImmutable() == 0 && document.getStatus() == AbstractDocument.DOC_UNLOCKED) {
-			// Remove the files of the same fileVersion
-			List<String> resources = storer.listResources(document.getId(), fileVersion);
-			for (String resource : resources)
+			// Remove the ancillary files of the same fileVersion
+			final String newFilerResourceName = storer.getResourceName(document, fileVersion, null);
+			for (String resource : storer.listResources(document.getId(), fileVersion).stream().filter(r -> !r.equals(newFilerResourceName)).toList() )
 				storer.delete(document.getId(), resource);
 
 			// Store the new file
-			storer.store(newFile, document.getId(), storer.getResourceName(document, fileVersion, null));
+			storer.store(newFile, document.getId(), newFilerResourceName);
 
 			long fileSize = newFile.length();
 
@@ -205,7 +205,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			document.setSigned(0);
 			document.setStamped(0);
 			documentDAO.store(document, transaction);
-
+			
 			log.debug("Replaced fileVersion {} of document {}", fileVersion, docId);
 		}
 	}

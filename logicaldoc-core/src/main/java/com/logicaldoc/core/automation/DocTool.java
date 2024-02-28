@@ -869,7 +869,7 @@ public class DocTool {
 			return dao.findByDocId(docId, fVer);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return null;
+			return new ArrayList<>();
 		}
 	}
 

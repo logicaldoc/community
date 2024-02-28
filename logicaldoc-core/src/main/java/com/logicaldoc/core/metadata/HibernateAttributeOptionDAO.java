@@ -1,6 +1,5 @@
 package com.logicaldoc.core.metadata;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +46,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 	@Override
 	public List<AttributeOption> findByAttributeAndCategory(long setId, String attribute, String category)
 			throws PersistenceException {
-		List<AttributeOption> coll = new ArrayList<>();
+		List<AttributeOption> coll;
 
 		if (StringUtils.isEmpty(attribute)) {
 			if (StringUtils.isEmpty(category)) {

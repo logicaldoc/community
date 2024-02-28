@@ -278,7 +278,7 @@ alter table ld_folder add constraint FK_FOLDER_PARENT foreign key (ld_parentid) 
 alter table ld_folder add constraint FK_FOLDER_TEMPLATE foreign key (ld_templateid) references ld_template(ld_id);
 alter table ld_folder_ext add constraint FK_FOLDEREXT_FOLDER foreign key (ld_folderid) references ld_folder(ld_id);
 alter table ld_folder_acl add constraint FK_FOLDACL_FOLDER foreign key (ld_folderid) references ld_folder(ld_id) on delete cascade;
-alter table ld_folder_acl add constraint FK_FOLDACL_GROUP foreign key (ld_groupid) references ld_group(ld_id) on delete cascade
+alter table ld_folder_acl add constraint FK_FOLDACL_GROUP foreign key (ld_groupid) references ld_group(ld_id) on delete cascade;
 alter table ld_folder_storage add constraint FK_FOLDER_STORAGE foreign key (ld_folderid) references ld_folder(ld_id) on delete cascade;
 alter table ld_foldertag add constraint FK_TAG_FOLDER foreign key (ld_folderid) references ld_folder(ld_id);
 alter table ld_workingtime add constraint FK_WRKTIME_USER foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
@@ -677,7 +677,7 @@ insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld
 values (4,3,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,1,0,0,0);
 insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (4,4,1,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,0,1);
-insert into ld_folder_acl(ld_folderid, ld_groupid, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage, ld_readingreq)
 values (4,-10000,1,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,0,1);
 
 

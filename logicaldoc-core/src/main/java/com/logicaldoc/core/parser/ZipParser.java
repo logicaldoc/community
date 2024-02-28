@@ -98,7 +98,7 @@ public class ZipParser extends AbstractParser {
 					if (entryParser == null)
 						throw new IOException(String.format("Unable to find a parser for %s", entryExtension));
 
-					zipUtil.unzipEntry(zipFile, entry, uncompressedEntryFile);
+					zipUtil.unzip(zipFile, entry, uncompressedEntryFile);
 
 					Document clone = new Document(parameters.getDocument());
 					clone.setFileName(uncompressedEntryFile.getName());
@@ -192,7 +192,7 @@ public class ZipParser extends AbstractParser {
 				if (entryParser == null)
 					throw new IOException(String.format("Unable to find a parser for %s", entryExtension));
 
-				zipUtil.unzipEntry(zipFile, entry, uncompressedEntryFile);
+				zipUtil.unzip(zipFile, entry, uncompressedEntryFile);
 				return entryParser.countPages(uncompressedEntryFile, uncompressedEntryFile.getName());
 			} finally {
 				if (uncompressedEntryFile != null)

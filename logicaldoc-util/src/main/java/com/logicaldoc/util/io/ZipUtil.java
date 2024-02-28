@@ -125,14 +125,14 @@ public class ZipUtil {
 	/**
 	 * This method extracts all entries of a zip-file.
 	 * 
-	 * @param zipFile Path of the zip-file.
-	 * @param target Path of the extracted files.
+	 * @param zipFile the zip-file
+	 * @param target the target folder
 	 * 
 	 * @return Number of extracted entries
 	 * 
 	 * @throws IOException Error unpacking the zip
 	 */
-	public int unzip(String zipFile, String target) throws IOException {
+	public int unzip(File zipFile, File target) throws IOException {
 		return unzip(new FileInputStream(zipFile), target);
 	}
 
@@ -140,15 +140,14 @@ public class ZipUtil {
 	 * This method extracts all entries of a zip-file.
 	 * 
 	 * @param zipStream the zip contents
-	 * @param target Path of the extracted files.
+	 * @param target the target folder
 	 * 
 	 * @return Number of extracted entries
 	 * 
 	 * @throws IOException Error unpacking the zip
 	 */
-	public int unzip(InputStream zipStream, String target) throws IOException {
-		File targetDir = new File(target);
-		targetDir.mkdirs();
+	public int unzip(InputStream zipStream, File target) throws IOException {
+		target.mkdirs();
 
 		int totalSizeArchive = 0;
 		int totalEntryArchive = 0;
@@ -160,7 +159,7 @@ public class ZipUtil {
 		try (net.lingala.zip4j.io.inputstream.ZipInputStream zipInputStream = new net.lingala.zip4j.io.inputstream.ZipInputStream(
 				zipStream)) {
 			while ((localFileHeader = zipInputStream.getNextEntry()) != null) {
-				File extractedFile = new File(targetDir, localFileHeader.getFileName());
+				File extractedFile = new File(target, localFileHeader.getFileName());
 				if (localFileHeader.isDirectory()) {
 					extractedFile.mkdirs();
 				} else {
@@ -245,7 +244,7 @@ public class ZipUtil {
 	 * @return number of written bytes
 	 * @throws IOException Error extracting the zip
 	 */
-	public long unzipEntry(File zipFile, String entry, File target) throws IOException {
+	public long unzip(File zipFile, String entry, File target) throws IOException {
 		if (entry.startsWith("/"))
 			entry = entry.substring(1);
 
@@ -344,7 +343,7 @@ public class ZipUtil {
 	}
 
 	public String getEntryContent(File zip, String entry) throws IOException {
-		return IOUtil.getStringFromInputStream(getEntryStream(zip, entry));
+		return IOUtil.readStream(getEntryStream(zip, entry));
 	}
 
 	private static void logError(String message) {
@@ -417,7 +416,6 @@ public class ZipUtil {
 	 * @param dest The destination archive file
 	 */
 	public void zipFile(File src, File dest) {
-
 		try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(dest));
 				FileInputStream fis = new FileInputStream(src);) {
 			// create a new zip entry

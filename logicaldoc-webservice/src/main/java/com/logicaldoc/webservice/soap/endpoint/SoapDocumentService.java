@@ -1304,7 +1304,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	}
 
 	private Document retrieveReadableDocument(long docId, User user)
-			throws PersistenceException, WebserviceException, PermissionException, UnexistingResourceException {
+			throws PersistenceException, PermissionException, UnexistingResourceException {
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		Document doc = docDao.findById(docId);
 		if (doc == null)

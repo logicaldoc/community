@@ -22,7 +22,7 @@ public class ResourceUtil {
 	}
 
 	public static byte[] readAsBytes(String resourcePath) throws IOException {
-		return ResourceUtil.class.getClassLoader().getResourceAsStream(resourcePath).readAllBytes();
+		return ResourceUtil.class.getResourceAsStream(resourcePath).readAllBytes();
 	}
 
 	public static String readAsString(String resourcePath) throws IOException {

@@ -976,7 +976,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 						"The plugin package does not include the plugin file WEB-INF/lib/" + pluginJar);
 
 			log.info("Unpacking plugin package {} into {}", pluginPackage.getName(), rootFolder.getAbsolutePath());
-			zipUtil.unzip(pluginPackage.getAbsolutePath(), rootFolder.getAbsolutePath());
+			zipUtil.unzip(pluginPackage, rootFolder);
 
 			// Delete the plugin.xml file
 			FileUtils.deleteQuietly(new File(rootFolder, "plugin.xml"));

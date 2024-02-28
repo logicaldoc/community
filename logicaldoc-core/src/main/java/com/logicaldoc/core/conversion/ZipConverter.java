@@ -76,6 +76,6 @@ public class ZipConverter extends CompressedArchiveConverter {
 	@Override
 	protected void extractEntry(File archiveFile, String entry, File uncompressedEntryFile) throws IOException {
 		ZipUtil zipUtil = new ZipUtil();
-		zipUtil.unzipEntry(archiveFile, entry, uncompressedEntryFile);
+		zipUtil.unzip(archiveFile, entry, uncompressedEntryFile);
 	}
 }
