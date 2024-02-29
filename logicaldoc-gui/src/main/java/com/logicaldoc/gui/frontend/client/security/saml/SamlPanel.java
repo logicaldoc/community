@@ -29,6 +29,12 @@ import com.smartgwt.client.widgets.tab.TabSet;
  */
 public class SamlPanel extends VLayout {
 
+	private static final String LOGOUTRESPONSE_SIGNED = "logoutresponsesigned";
+
+	private static final String LOGOUTREQUEST_SIGNED = "logoutrequestsigned";
+
+	private static final String SLO_ENABLED = "sloenabled";
+
 	private static final String SIGNATURE_ALGORITHM = "signaturealgorithm";
 
 	private static final String GROUPS = "groups";
@@ -91,6 +97,32 @@ public class SamlPanel extends VLayout {
 		enabled.setWrapTitle(false);
 		enabled.setRequired(true);
 		enabled.setValue(settings.isEnabled() ? "yes" : "no");
+
+		RadioGroupItem sloEnabled = ItemFactory.newBooleanSelector(SLO_ENABLED);
+		sloEnabled.setWrapTitle(false);
+		sloEnabled.setRequired(true);
+		sloEnabled.setRedrawOnChange(true);
+		sloEnabled.setValue(settings.isSingleLogOut() ? "yes" : "no");
+		sloEnabled.setVisible(false);
+		
+		RadioGroupItem logoutRequestSigned = ItemFactory.newBooleanSelector(LOGOUTREQUEST_SIGNED);
+		logoutRequestSigned.setWrapTitle(true);
+		logoutRequestSigned.setRequired(true);
+		logoutRequestSigned.setRedrawOnChange(true);
+		logoutRequestSigned.setTitleOrientation(TitleOrientation.TOP);
+		logoutRequestSigned.setValue(settings.isLogoutRequestSigned() ? "yes" : "no");
+		logoutRequestSigned.setVisible(settings.isSingleLogOut());
+		logoutRequestSigned.setShowIfCondition((item, value, form) -> "yes".equals(form.getValueAsString(SLO_ENABLED)));
+
+		RadioGroupItem logoutResponseSigned = ItemFactory.newBooleanSelector(LOGOUTRESPONSE_SIGNED);
+		logoutResponseSigned.setWrapTitle(true);
+		logoutResponseSigned.setRequired(true);
+		logoutResponseSigned.setRedrawOnChange(true);
+		logoutResponseSigned.setVisible(settings.isSingleLogOut());
+		logoutResponseSigned.setTitleOrientation(TitleOrientation.TOP);
+		logoutResponseSigned.setValue(settings.isLogoutResponseSigned() ? "yes" : "no");
+		logoutResponseSigned
+				.setShowIfCondition((item, value, form) -> "yes".equals(form.getValueAsString(SLO_ENABLED)));
 
 		TextItem id = ItemFactory.newTextItem(SP_ENTITYID, SP_ENTITYID, settings.getEntityId());
 		id.setWidth(220);
@@ -155,7 +187,9 @@ public class SamlPanel extends VLayout {
 		spCertificate
 				.setShowIfCondition((item, value, form) -> "yes".equals(form.getValueAsString(ASSERTIONS_ENCRYPTED))
 						|| "yes".equals(form.getValueAsString(NAMEID_ENCRYPTED))
-						|| "yes".equals(form.getValueAsString(AUTHNREQUEST_SIGNED)));
+						|| "yes".equals(form.getValueAsString(AUTHNREQUEST_SIGNED))
+						|| "yes".equals(form.getValueAsString(LOGOUTREQUEST_SIGNED))
+						|| "yes".equals(form.getValueAsString(LOGOUTRESPONSE_SIGNED)));
 
 		TextAreaItem spPrivateKey = ItemFactory.newTextAreaItem(SP_PRIVATEKEY, "spprivatekey",
 				settings.getPrivateKey());
@@ -168,7 +202,9 @@ public class SamlPanel extends VLayout {
 				new UploadFormItemIcon("uploadspprivatekey"));
 		spPrivateKey.setShowIfCondition((item, value, form) -> "yes".equals(form.getValueAsString(ASSERTIONS_ENCRYPTED))
 				|| "yes".equals(form.getValueAsString(NAMEID_ENCRYPTED))
-				|| "yes".equals(form.getValueAsString(AUTHNREQUEST_SIGNED)));
+				|| "yes".equals(form.getValueAsString(AUTHNREQUEST_SIGNED))
+				|| "yes".equals(form.getValueAsString(LOGOUTREQUEST_SIGNED))
+				|| "yes".equals(form.getValueAsString(LOGOUTRESPONSE_SIGNED)));
 
 		TextAreaItem idpMetadata = ItemFactory.newTextAreaItem(IDP_METADATA, "idpmetadata", settings.getIdpMetadata());
 		idpMetadata.setWrapTitle(false);
@@ -199,7 +235,8 @@ public class SamlPanel extends VLayout {
 		generalForm.setWidth(1);
 		generalForm.setNumCols(2);
 		generalForm.setFields(enabled, login, id, authnRequestSigned, signatureAlgorithm, assertionsEncrypted,
-				nameIdEncrypted, spMetadata, spCertificate, spPrivateKey, idpMetadata);
+				nameIdEncrypted, spMetadata, sloEnabled, logoutRequestSigned, logoutResponseSigned, spCertificate,
+				spPrivateKey, idpMetadata);
 
 		DynamicForm attributeMappingsForm = new DynamicForm();
 		attributeMappingsForm.setValuesManager(vm);
@@ -248,6 +285,9 @@ public class SamlPanel extends VLayout {
 			settings.setWantAssertionsEncrypted("yes".equals(form.getValue(ASSERTIONS_ENCRYPTED)));
 			settings.setWantNameIdEncrypted("yes".equals(form.getValue(NAMEID_ENCRYPTED)));
 			settings.setKeepLocalMemberships("yes".equals(form.getValue(KEEPMEMBERSHIP)));
+			settings.setSingleLogOut("yes".equals(form.getValue(SLO_ENABLED)));
+			settings.setLogoutRequestSigned("yes".equals(form.getValue(LOGOUTREQUEST_SIGNED)));
+			settings.setLogoutResponseSigned("yes".equals(form.getValue(LOGOUTRESPONSE_SIGNED)));
 			settings.setCertificate(form.getValueAsString(SP_CERTIFICATE));
 			settings.setPrivateKey(form.getValueAsString(SP_PRIVATEKEY));
 			settings.setIdpMetadata(form.getValueAsString(IDP_METADATA));

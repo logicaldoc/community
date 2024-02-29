@@ -291,30 +291,30 @@ public class Session implements DocumentObserver {
 	}
 
 	public void logout() {
-		SecurityService.Instance.get().logout(new AsyncCallback<>() {
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-				SC.warn(caught.getMessage());
-			}
+		if (Session.get().getSession().isSingleSignOn() && Session.get().getConfigAsBoolean("saml.slo.enabled")) {
+			Session.get().close();
+			Util.redirect(GWT.getHostPageBaseURL() + "saml/logout");
+		} else {
+			SecurityService.Instance.get().logout(new AsyncCallback<>() {
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+					SC.warn(caught.getMessage());
+				}
 
-			@Override
-			public void onSuccess(Void result) {
-				CookiesManager.removeSid();
+				@Override
+				public void onSuccess(Void result) {
+					CookiesManager.removeSid();
 
-				try {
-					String tenant = Session.get().getUser().getTenant().getName();
-					if (Session.get().getSession().isSingleSignOn()) {
-						Session.get().close();
-						Util.redirect(GWT.getHostPageBaseURL() + "saml/login");
-					} else {
+					try {
+						String tenant = Session.get().getUser().getTenant().getName();
 						Session.get().close();
 						Util.redirectToLoginUrl(tenant);
+					} catch (Exception t) {
+						// Nothing to do
 					}
-				} catch (Exception t) {
-					// Nothing to do
 				}
-			}
-		});
+			});
+		}
 	}
 
 	@Override

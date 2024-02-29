@@ -166,7 +166,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		User user;
 		try {
-			user = userDao.findByUsername(username);
+			user = userDao.getUser(username);
 		} catch (PersistenceException e) {
 			throw new ServerException(String.format("Error in the data layer for user %s", username));
 		}

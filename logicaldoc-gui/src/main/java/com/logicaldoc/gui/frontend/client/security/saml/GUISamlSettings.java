@@ -28,10 +28,6 @@ public class GUISamlSettings implements Serializable {
 
 	private boolean wantNameIdEncrypted = false;
 
-	private boolean logoutRequestSigned = false;
-	
-	private boolean logoutResponseSigned = false;
-	
 	private String signatureAlgorithm = "SHA-256";
 
 	private String username = "username";
@@ -45,6 +41,20 @@ public class GUISamlSettings implements Serializable {
 	private String group = "group";
 
 	private boolean keepLocalMemberships = true;
+
+	private boolean singleLogOut = false;
+	
+	private boolean logoutRequestSigned = false;
+
+	private boolean logoutResponseSigned = false;
+
+	public boolean isSingleLogOut() {
+		return singleLogOut;
+	}
+
+	public void setSingleLogOut(boolean singleLogOut) {
+		this.singleLogOut = singleLogOut;
+	}
 
 	public boolean isEnabled() {
 		return enabled;

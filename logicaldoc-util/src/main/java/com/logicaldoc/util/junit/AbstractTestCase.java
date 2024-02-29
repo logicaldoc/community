@@ -142,6 +142,9 @@ public abstract class AbstractTestCase {
 
 		try (Connection con = getConnection(); Statement statement = con.createStatement()) {
 			statement.execute("shutdown");
+		} finally {
+			FileUtil.strongDelete(new File("tesdtdb.properties"));
+			FileUtil.strongDelete(new File("tesdtdb.script"));
 		}
 	}
 

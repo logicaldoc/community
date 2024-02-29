@@ -979,8 +979,13 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 		// Also kill the servlet container session, if any
 		HttpSession httpSession = SessionManager.get().getServletSession(sid);
-		if (httpSession != null)
-			httpSession.invalidate();
+
+		try {
+			if (httpSession != null)
+				httpSession.invalidate();
+		} catch (Exception e) {
+			// Ignore
+		}
 
 		SessionManager.get().removeSid(getThreadLocalRequest());
 	}

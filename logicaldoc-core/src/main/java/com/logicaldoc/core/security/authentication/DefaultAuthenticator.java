@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Client;
-import com.logicaldoc.core.security.user.HibernateUserDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.crypt.CryptUtil;
@@ -28,7 +27,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 
 	protected static Logger log = LoggerFactory.getLogger(DefaultAuthenticator.class);
 
-	@Resource(name ="UserDAO")
+	@Resource(name = "UserDAO")
 	protected UserDAO userDAO;
 
 	public void setUserDAO(UserDAO userDAO) {
@@ -53,16 +52,15 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 		validateUser(user);
 
 		// Check the password match with one of the current or legacy algorithm
-		String test=null;
-		String testLegacy=null;
+		String test = null;
+		String testLegacy = null;
 		try {
 			test = CryptUtil.encryptSHA256(password);
 			testLegacy = CryptUtil.encryptSHA(password);
 		} catch (NoSuchAlgorithmException e) {
 			log.error(e.getMessage(), e);
 		}
-		
-		
+
 		if (user.getPassword() == null || (!user.getPassword().equals(test) && !user.getPassword().equals(testLegacy)))
 			throw new WrongPasswordException(this);
 
@@ -79,12 +77,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 
 	@Override
 	public User pickUser(String username) throws PersistenceException {
-		User user = null;
-		if (HibernateUserDAO.ignoreCaseLogin())
-			user = userDAO.findByUsernameIgnoreCase(username);
-		else
-			user = userDAO.findByUsername(username);
-		return user;
+		return userDAO.getUser(username);
 	}
 
 	/**
