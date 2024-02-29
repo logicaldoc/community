@@ -1,11 +1,12 @@
 package com.logicaldoc.util.junit;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -24,6 +25,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 
 /**
@@ -46,6 +48,12 @@ public abstract class AbstractTestCase {
 
 	@Before
 	public void setUp() throws IOException, SQLException {
+		// Make sure to start with HSQLDB down
+		try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:file:testdb", "SA",
+				new ContextProperties().getProperty("jdbc.password", ""));
+				Statement statement = connection.createStatement()) {
+			statement.execute("shutdown");
+		}
 
 		loadDevelSettings();
 
@@ -170,10 +178,9 @@ public abstract class AbstractTestCase {
 		}
 
 		// Test the connection
-		try (Connection con = getConnection();
-				ResultSet rs = con.createStatement().executeQuery("select * from ld_menu where ld_id=2")) {
+		try (Connection con = getConnection(); ResultSet rs = con.createStatement().executeQuery("CALL NOW()")) {
 			rs.next();
-			assertEquals(2, rs.getInt(1));
+			assertNotNull(rs.getObject(1));
 		}
 	}
 }

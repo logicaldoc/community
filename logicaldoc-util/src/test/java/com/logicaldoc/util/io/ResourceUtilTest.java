@@ -32,7 +32,7 @@ public class ResourceUtilTest {
 
 	@Test
 	public void testReadAsString() throws IOException {
-		assertTrue(ResourceUtil.readAsString("/context.xml").contains("<beans default-autowire"));
+		assertTrue(ResourceUtil.readAsString("/context.xml").contains("<beans default-lazy-init"));
 	}
 
 	@Test

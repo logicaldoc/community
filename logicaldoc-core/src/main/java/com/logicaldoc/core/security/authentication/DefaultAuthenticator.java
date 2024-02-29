@@ -56,8 +56,8 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 		String test=null;
 		String testLegacy=null;
 		try {
-			test = CryptUtil.cryptString(password);
-			testLegacy = CryptUtil.cryptStringLegacy(password);
+			test = CryptUtil.encryptSHA256(password);
+			testLegacy = CryptUtil.encryptSHA(password);
 		} catch (NoSuchAlgorithmException e) {
 			log.error(e.getMessage(), e);
 		}

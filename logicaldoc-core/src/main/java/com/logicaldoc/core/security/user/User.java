@@ -387,7 +387,7 @@ public class User extends PersistentObject implements Serializable {
 	public void setDecodedPassword(String pwd) throws NoSuchAlgorithmException {
 		if (org.apache.commons.lang.StringUtils.isNotEmpty(pwd)) {
 			decodedPassword = pwd;
-			password = CryptUtil.cryptString(pwd);
+			password = CryptUtil.encryptSHA256(pwd);
 		}
 	}
 

@@ -158,7 +158,7 @@ public class CryptUtil {
 	 * 
 	 * @throws NoSuchAlgorithmException Cripting exception
 	 */
-	public static String cryptStringLegacy(String original) throws NoSuchAlgorithmException {
+	public static String encryptSHA(String original) throws NoSuchAlgorithmException {
 		StringBuilder copy = new StringBuilder();
 
 		MessageDigest md = MessageDigest.getInstance("SHA");
@@ -180,7 +180,7 @@ public class CryptUtil {
 	 * 
 	 * @throws NoSuchAlgorithmException Cripting exception
 	 */
-	public static String cryptString(String original) throws NoSuchAlgorithmException {
+	public static String encryptSHA256(String original) throws NoSuchAlgorithmException {
 		StringBuilder copy = new StringBuilder();
 
 		MessageDigest md = MessageDigest.getInstance("SHA-256");

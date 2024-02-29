@@ -28,6 +28,10 @@ public class GUISamlSettings implements Serializable {
 
 	private boolean wantNameIdEncrypted = false;
 
+	private boolean logoutRequestSigned = false;
+	
+	private boolean logoutResponseSigned = false;
+	
 	private String signatureAlgorithm = "SHA-256";
 
 	private String username = "username";
@@ -160,5 +164,21 @@ public class GUISamlSettings implements Serializable {
 
 	public void setSignatureAlgorithm(String signatureAlgorithm) {
 		this.signatureAlgorithm = signatureAlgorithm;
+	}
+
+	public boolean isLogoutRequestSigned() {
+		return logoutRequestSigned;
+	}
+
+	public void setLogoutRequestSigned(boolean logoutRequestSigned) {
+		this.logoutRequestSigned = logoutRequestSigned;
+	}
+
+	public boolean isLogoutResponseSigned() {
+		return logoutResponseSigned;
+	}
+
+	public void setLogoutResponseSigned(boolean logoutResponseSigned) {
+		this.logoutResponseSigned = logoutResponseSigned;
 	}
 }

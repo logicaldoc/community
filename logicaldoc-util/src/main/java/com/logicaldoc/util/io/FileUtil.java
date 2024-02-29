@@ -632,7 +632,7 @@ public class FileUtil {
 		if (!created)
 			throw new IOException(CANNOT_CREATE_FILE + merged.getAbsolutePath());
 
-		File tmp = new File(merged.getParent(), "tmp");
+		File tmp = new File(merged.getParentFile(), "merge.tmp");
 
 		try {
 			created = tmp.createNewFile();
@@ -646,7 +646,6 @@ public class FileUtil {
 				if (!renamed)
 					throw new IOException("Cannot rename file to " + merged.getAbsolutePath());
 
-				tmp = new File(merged.getParent(), "tmp");
 				created = tmp.createNewFile();
 				if (!created)
 					throw new IOException(CANNOT_CREATE_FILE + tmp.getAbsolutePath());

@@ -889,7 +889,7 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 	public void setDecodedPassword(String pwd) throws NoSuchAlgorithmException {
 		if (org.apache.commons.lang.StringUtils.isNotEmpty(pwd)) {
 			decodedPassword = pwd;
-			password = CryptUtil.cryptString(pwd);
+			password = CryptUtil.encryptSHA256(pwd);
 		} else {
 			decodedPassword = null;
 			password = null;
@@ -920,13 +920,13 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 			return true;
 
 		try {
-			String test = CryptUtil.cryptString(myPassword);
+			String test = CryptUtil.encryptSHA256(myPassword);
 			if (test.equals(getPassword()))
 				return true;
 
 			// The test with current algorithm failed so we try with the legacy
 			// one
-			String testLegacy = CryptUtil.cryptStringLegacy(myPassword);
+			String testLegacy = CryptUtil.encryptSHA(myPassword);
 			if (testLegacy.equals(getPassword())) {
 				// There is match with the old scheme, so update the database
 				// with the new one

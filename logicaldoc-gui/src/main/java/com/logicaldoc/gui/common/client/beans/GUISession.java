@@ -12,12 +12,17 @@ public class GUISession implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private GUIUser user;
-
 	private boolean loggedIn = false;
+	
+	/**
+	 * If the session was initiated with a SSO
+	 */
+	private boolean singleSignOn = false;
 
 	private String sid;
 
+	private GUIUser user;
+	
 	private GUIInfo info;
 
 	private String welcomeMessage;
@@ -60,5 +65,13 @@ public class GUISession implements Serializable {
 
 	public void setWelcomeMessage(String welcomeMessage) {
 		this.welcomeMessage = welcomeMessage;
+	}
+	
+	public boolean isSingleSignOn() {
+		return singleSignOn;
+	}
+
+	public void setSingleSignOn(boolean singleSignOn) {
+		this.singleSignOn = singleSignOn;
 	}
 }

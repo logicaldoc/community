@@ -24,7 +24,7 @@ public class ContextConfiguratorTest {
 
 	@Before
 	public void setUp() throws FileNotFoundException, IOException, SQLException {
-		FileUtil.copyResource("/context.xml", contextXml);
+		FileUtil.copyResource("/contexttest.xml", contextXml);
 	}
 
 	@Test
@@ -35,7 +35,7 @@ public class ContextConfiguratorTest {
 			config.addTrigger("TestTrigger");
 			notThrownTest = "ok";
 		} catch (Exception t) {
-			// Nothing to do
+			// Ignore
 		}
 		Assert.assertNotNull(notThrownTest);
 	}

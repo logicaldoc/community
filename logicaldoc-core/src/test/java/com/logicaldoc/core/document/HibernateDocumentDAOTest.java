@@ -662,7 +662,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		dao.setPassword(3L, "test", history);
 
 		doc = dao.findById(3L);
-		Assert.assertEquals(CryptUtil.cryptString("test"), doc.getPassword());
+		Assert.assertEquals(CryptUtil.encryptSHA256("test"), doc.getPassword());
 
 		dao.unsetPassword(3L, history);
 		doc = dao.findById(3L);

@@ -95,7 +95,7 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 		// Check the password match with one of the current or legacy algorithm
 		String testLegacy = "";
 		try {
-			testLegacy = CryptUtil.cryptStringLegacy(password);
+			testLegacy = CryptUtil.encryptSHA(password);
 			user.setDecodedPassword(password);
 		} catch (NoSuchAlgorithmException e) {
 			log.error("Cannot cript the password", e);

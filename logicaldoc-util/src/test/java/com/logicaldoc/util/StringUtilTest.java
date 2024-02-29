@@ -30,6 +30,6 @@ public class StringUtilTest {
 		str="12345678";
 		assertEquals("123/456/78", StringUtil.split(str, '/', 3));
 		
-		System.out.println("Crypt J2A86bc26QnIpf1:"+CryptUtil.cryptString("J2A86bc26QnIpf1"));
+		System.out.println("Crypt J2A86bc26QnIpf1:"+CryptUtil.encryptSHA256("J2A86bc26QnIpf1"));
 	}
 }

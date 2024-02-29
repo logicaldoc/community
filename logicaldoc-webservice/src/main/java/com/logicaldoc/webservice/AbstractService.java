@@ -236,8 +236,8 @@ public class AbstractService {
 	}
 
 	/**
-	 * Same as validateSession but raises a WebApplicationException with
-	 * HTTP error code 401, useful for REST implementations
+	 * Same as validateSession but raises a WebApplicationException with HTTP
+	 * error code 401, useful for REST implementations
 	 * 
 	 * @return The session ID (if valid)
 	 * 
@@ -252,7 +252,10 @@ public class AbstractService {
 	}
 
 	public static String convertDateToString(Date date) {
-		return DateUtil.format(date);
+		if (date == null)
+			return null;
+		else
+			return DateUtil.format(date);
 	}
 
 	public static Date convertStringToDate(String date) {

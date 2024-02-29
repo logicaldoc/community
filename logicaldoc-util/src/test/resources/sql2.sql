@@ -86,7 +86,3 @@ INSERT INTO co_attachment values(18,1,'hibernate.log','log.png','application/oct
 INSERT INTO co_systemmessage values(1,'admin','sebastian','message text1','subject1','1111999999999999999',5,3,1,0);
 INSERT INTO co_systemmessage values(2,'admin','sebastian','message text2','subject2','11119999',5,3,1,1);
 INSERT INTO co_systemmessage values(3,'sebastian','admin','message text3','subject3','1111999999999999999',5,3,1,1);
-
-
---Shut down hsql
-shutdown;

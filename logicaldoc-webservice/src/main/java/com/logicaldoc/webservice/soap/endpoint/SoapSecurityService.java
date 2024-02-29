@@ -300,8 +300,8 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			if (user == null)
 				throw new WebserviceException("User " + userId + " not found");
 
-			if (oldPassword != null && !CryptUtil.cryptString(oldPassword).equals(user.getPassword())
-					&& !CryptUtil.cryptStringLegacy(oldPassword).equals(user.getPassword())) {
+			if (oldPassword != null && !CryptUtil.encryptSHA256(oldPassword).equals(user.getPassword())
+					&& !CryptUtil.encryptSHA(oldPassword).equals(user.getPassword())) {
 				return 1;
 			}
 

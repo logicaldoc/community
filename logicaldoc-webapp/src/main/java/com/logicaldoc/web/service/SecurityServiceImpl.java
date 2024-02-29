@@ -185,22 +185,24 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	 * Used internally by login procedures, instantiates a new GUISession by a
 	 * given authenticated user
 	 * 
-	 * @param sess the current session
+	 * @param session the current session
 	 * @param locale the current locale
 	 * 
 	 * @return session details
 	 * 
 	 * @throws ServerException a generic error
 	 */
-	public GUISession loadSession(Session sess, String locale) throws ServerException {
-		GUISession session = new GUISession();
-		session.setSid(sess.getSid());
+	public GUISession loadSession(Session session, String locale) throws ServerException {
+		GUISession guiSession = new GUISession();
+		guiSession.setSid(session.getSid());
+		guiSession.setSingleSignOn(
+				session.getDictionary().keySet().stream().anyMatch(k -> k.toLowerCase().contains("saml")));
 
 		DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		SystemMessageDAO messageDao = (SystemMessageDAO) Context.get().getBean(SystemMessageDAO.class);
 		SequenceDAO seqDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
 
-		User user = sess.getUser();
+		User user = session.getUser();
 
 		GUIUser guiUser = getUser(user.getId());
 
@@ -211,8 +213,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			guiUser.setLanguage(locale);
 		}
 
-		GUIInfo info = new InfoServiceImpl().getInfo(locale, sess.getTenantName(), true);
-		session.setInfo(info);
+		GUIInfo info = new InfoServiceImpl().getInfo(locale, session.getTenantName(), true);
+		guiSession.setInfo(info);
 
 		try {
 			guiUser.setPasswordExpired(false);
@@ -227,12 +229,12 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			guiUser.setCertExpire(user.getCertExpire());
 			guiUser.setSecondFactor(user.getSecondFactor());
 
-			session.setSid(sess.getSid());
-			session.setUser(guiUser);
-			session.setLoggedIn(true);
+			guiSession.setSid(session.getSid());
+			guiSession.setUser(guiUser);
+			guiSession.setLoggedIn(true);
 
 			MenuDAO mdao = (MenuDAO) Context.get().getBean(MenuDAO.class);
-			List<Long> menus = mdao.findMenuIdByUserId(sess.getUserId(), true);
+			List<Long> menus = mdao.findMenuIdByUserId(session.getUserId(), true);
 			guiUser.setMenus(menus);
 
 			loadDashlets(guiUser);
@@ -241,29 +243,29 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			 * Prepare an incoming message, if any
 			 */
 			GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
-			Generic welcome = gDao.findByAlternateKey("guisetting", "gui.welcome", 0L, sess.getTenantId());
+			Generic welcome = gDao.findByAlternateKey("guisetting", "gui.welcome", 0L, session.getTenantId());
 			if (welcome != null && StringUtils.isNotEmpty(welcome.getString1())) {
 				Map<String, Object> dictionary = new HashMap<>();
 				dictionary.put(Automation.LOCALE, user.getLocale());
-				dictionary.put(Automation.TENANT_ID, sess.getTenantId());
-				dictionary.put("session", sess);
-				dictionary.put("user", session.getUser());
+				dictionary.put(Automation.TENANT_ID, session.getTenantId());
+				dictionary.put("session", session);
+				dictionary.put("user", guiSession.getUser());
 
 				Automation automation = new Automation("incomingmessage");
 				String welcomeMessage = automation.evaluate(welcome.getString1(), dictionary);
-				session.setWelcomeMessage(welcomeMessage != null ? welcomeMessage.trim() : null);
+				guiSession.setWelcomeMessage(welcomeMessage != null ? welcomeMessage.trim() : null);
 			}
 
 			// Define the current locale
-			sess.getDictionary().put(LOCALE, user.getLocale());
-			sess.getDictionary().put(USER, user);
+			session.getDictionary().put(LOCALE, user.getLocale());
+			session.getDictionary().put(USER, user);
 
 			ContextProperties config = Context.get().getProperties();
-			guiUser.setPasswordMinLenght(config.getInt(sess.getTenantName() + PASSWORD_SIZE, 12));
+			guiUser.setPasswordMinLenght(config.getInt(session.getTenantName() + PASSWORD_SIZE, 12));
 
-			return session;
+			return guiSession;
 		} catch (PersistenceException e) {
-			return (GUISession) throwServerException(sess, log, e);
+			return (GUISession) throwServerException(session, log, e);
 		}
 	}
 
@@ -318,8 +320,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				throw new PermissionException(String.format("User %s not allowed to change the password of user %s",
 						currentUser.getUsername(), user.getUsername()));
 
-			if (oldPassword != null && !CryptUtil.cryptString(oldPassword).equals(user.getPassword())
-					&& !CryptUtil.cryptStringLegacy(oldPassword).equals(user.getPassword()))
+			if (oldPassword != null && !CryptUtil.encryptSHA256(oldPassword).equals(user.getPassword())
+					&& !CryptUtil.encryptSHA(oldPassword).equals(user.getPassword()))
 				throw new ServerException("Wrong old passord");
 
 			UserHistory history = null;

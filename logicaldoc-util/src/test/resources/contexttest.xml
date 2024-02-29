@@ -45,5 +45,14 @@
     </bean>    
     <bean id="DataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
     	<constructor-arg ref="HikariConfig" />
-  	</bean> 	
+  	</bean>
+  	
+	<!-- Scheduler -->
+    <bean id="Scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="waitForJobsToCompleteOnShutdown" value="true" />
+        <property name="triggers">
+            <list>
+            </list>
+        </property>
+    </bean>  	
 </beans>

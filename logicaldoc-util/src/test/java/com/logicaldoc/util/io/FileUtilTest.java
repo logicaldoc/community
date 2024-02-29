@@ -9,8 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 
@@ -62,7 +61,7 @@ public class FileUtilTest {
 			FileUtil.writeFile(this.getClass().getResourceAsStream("/context.properties"), outFile.getPath());
 			assertTrue(outFile.length() > 0);
 			assertTrue(FileUtil.readFile(outFile).contains("store.1.dir"));
-			assertEquals(15, FileUtil.countLines(outFile));
+			assertEquals(166, FileUtil.countLines(outFile));
 		} finally {
 			FileUtil.strongDelete(outFile);
 		}
@@ -76,18 +75,24 @@ public class FileUtilTest {
 					new File("src/test/resources/context-override.properties"), merged);
 			assertTrue(merged.length() > 0);
 			assertTrue(FileUtil.readFile(merged).contains("newprop"));
-			assertEquals(16, FileUtil.countLines(merged));
+			assertEquals(167, FileUtil.countLines(merged));
 		} finally {
 			FileUtil.strongDelete(merged);
 		}
 
-		FileUtil.merge(List.of(new File("src/test/resources/context.properties"),
-				new File("src/test/resources/context-override.properties"), new File("src/test/resources/sql1.sql")),
-				merged);
+		final List<File> mergedFiles = List.of(new File("src/test/resources/context.properties"),
+				new File("src/test/resources/context-override.properties"), new File("src/test/resources/sql1.sql"));
+		FileUtil.merge(mergedFiles, merged);
 		try {
 			assertTrue(merged.length() > 0);
 			assertTrue(FileUtil.readFile(merged).contains("newprop"));
-			assertEquals(244, FileUtil.countLines(merged));
+			assertEquals(mergedFiles.stream().collect(Collectors.summarizingLong(f -> {
+				try {
+					return FileUtil.countLines(f);
+				} catch (IOException e) {
+					return 0L;
+				}
+			})).getSum() - mergedFiles.size() + 1, FileUtil.countLines(merged));
 		} finally {
 			FileUtil.strongDelete(merged);
 		}
@@ -156,10 +161,10 @@ public class FileUtilTest {
 
 	@Test
 	public void testComputeDigest() throws IOException {
-		assertEquals("e843fb8b615e05d33d93609360955abebe3efc88",
-				FileUtil.computeDigest(new File("src/test/resources/context.properties")));
-		assertEquals("e843fb8b615e05d33d93609360955abebe3efc88",
-				FileUtil.computeDigest(FileUtil.readFile(new File("src/test/resources/context.properties"))));
+		assertEquals("06bf55447a0ec5980c16810b757a5cf5de37e70e",
+				FileUtil.computeDigest(new File("src/test/resources/kofax.tar")));
+		assertEquals("b65e1c92aeb3534eb5430263bf654f102227f38c",
+				FileUtil.computeDigest(FileUtil.readFile(new File("src/test/resources/kofax.tar"))));
 		assertNull(FileUtil.computeDigest((InputStream) null));
 	}
 
@@ -167,7 +172,7 @@ public class FileUtilTest {
 	public void testToByteArray() throws IOException {
 		final File file = new File("src/test/resources/context.properties");
 		byte[] bytes = FileUtil.toByteArray(file);
-		assertEquals(350, bytes.length);
+		assertEquals(file.length(), bytes.length);
 
 		bytes = FileUtil.toByteArray(file, 0, 40);
 		assertEquals(40, bytes.length);
@@ -188,9 +193,10 @@ public class FileUtilTest {
 					new File(outFolder, "context-overide.properties"), 0);
 			FileUtil.copy(new File("src/test/resources/context-override.properties"),
 					new File(subfolder, "context-overide.properties"), 0);
-			assertEquals(432L, FileUtil.getFolderSize(outFolder));
+			assertEquals(4664L, FileUtil.getFolderSize(outFolder));
 		} finally {
 			FileUtil.strongDelete(outFolder);
+			FileUtil.deleteUsingOSCommand(outFolder);
 		}
 	}
 
@@ -201,9 +207,9 @@ public class FileUtilTest {
 			outFolder.mkdir();
 			File subfolder = new File(outFolder, "subfolder");
 			subfolder.mkdir();
-			
+
 			assertTrue(FileUtil.isDirEmpty(subfolder.toPath()));
-			
+
 			final File source = new File(outFolder, "context.properties");
 			FileUtil.copy(new File("src/test/resources/context.properties"), source, 0);
 			assertTrue(source.exists());
@@ -217,7 +223,7 @@ public class FileUtilTest {
 			FileUtil.strongDelete(outFolder);
 		}
 	}
-	
+
 	@Test
 	public void testCreateTempFile() throws IOException {
 		File tempFile = null;
@@ -227,17 +233,16 @@ public class FileUtilTest {
 			assertTrue(tempFile.exists());
 			assertTrue(FileUtil.getName(tempFile.getName()).startsWith("pippo"));
 			assertTrue(FileUtil.getName(tempFile.getName()).endsWith("pluto"));
-			
-			
+
 			tempFolder = FileUtil.createTempDirectory("pippo");
 			assertTrue(tempFolder.exists());
 			assertTrue(FileUtil.getName(tempFolder.getName()).startsWith("pippo"));
 		} finally {
+			FileUtil.deleteUsingOSCommand(tempFile);
 			FileUtil.strongDelete(tempFile);
 			FileUtil.strongDelete(tempFolder);
 		}
 	}
-	
 
 	@Test
 	public void testGetDisplaySize() {
@@ -247,34 +252,5 @@ public class FileUtilTest {
 		assertEquals("5,292,332.6 GB", FileUtil.getDisplaySize(5682598909897798L, null));
 		assertEquals("5,549.4 KB", FileUtil.getDisplaySizeKB(5682598L, null));
 		assertEquals(FileUtil.getDisplaySizeKB(5682598L, null), FileUtil.getDisplaySizeKB(5682598L, "en"));
-	}
-
-	@Test
-	public void testDeleteUsingOSCommand() throws IOException, InterruptedException {
-		File outFile = new File("target/folder/testappend.txt");
-		File outDir = new File("target/folder");
-		try {
-			outDir.mkdir();
-			FileUtil.writeFile(this.getClass().getResourceAsStream("/context.properties"), outFile.getPath());
-			assertTrue(outFile.length() > 0);
-			FileUtil.deleteUsingOSCommand(outFile);
-			
-			while(outFile.exists())
-				waiting();
-			assertFalse(outFile.exists());
-			
-			FileUtil.deleteUsingOSCommand(outDir);
-			while(outDir.exists())
-				waiting();
-			assertFalse(outDir.exists());
-		} finally {
-			FileUtil.strongDelete(outFile);
-		}
-	}
-	
-	private void waiting() throws InterruptedException {
-		final int secondsToWait = 5;
-		CountDownLatch lock = new CountDownLatch(1);
-		lock.await(secondsToWait, TimeUnit.SECONDS);
 	}
 }

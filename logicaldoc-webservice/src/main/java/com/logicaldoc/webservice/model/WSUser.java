@@ -275,7 +275,7 @@ public class WSUser {
 		decodedPassword = passwd;
 		password = null;
 		if (org.apache.commons.lang.StringUtils.isNotEmpty(passwd))
-			password = CryptUtil.cryptString(passwd);
+			password = CryptUtil.encryptSHA256(passwd);
 	}
 
 	public void setName(String name) {

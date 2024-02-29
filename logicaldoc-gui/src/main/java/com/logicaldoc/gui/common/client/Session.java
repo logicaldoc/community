@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -302,8 +303,13 @@ public class Session implements DocumentObserver {
 
 				try {
 					String tenant = Session.get().getUser().getTenant().getName();
-					Session.get().close();
-					Util.redirectToLoginUrl(tenant);
+					if (Session.get().getSession().isSingleSignOn()) {
+						Session.get().close();
+						Util.redirect(GWT.getHostPageBaseURL() + "saml/login");
+					} else {
+						Session.get().close();
+						Util.redirectToLoginUrl(tenant);
+					}
 				} catch (Exception t) {
 					// Nothing to do
 				}

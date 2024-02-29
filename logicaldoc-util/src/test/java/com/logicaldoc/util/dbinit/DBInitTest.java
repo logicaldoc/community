@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import junit.framework.TestCase;
@@ -20,6 +21,7 @@ public class DBInitTest extends TestCase {
 	// Instance under test
 	private DBInit testSubject;
 
+	@Before
 	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		List<String> sqlList = new ArrayList<>();
 		sqlList.add("sql1.sql");
@@ -35,15 +37,19 @@ public class DBInitTest extends TestCase {
 		testSubject.setDbms("hsqldb");
 
 		assertEquals("hsqldb", testSubject.getDbms());
-
 	}
 
 	@Test
 	public void testExecute() {
-		assertTrue(testSubject.testConnection());
-		testSubject.execute();
-		assertTrue(testSubject.isConnected());
-		testSubject.executeSql("select count(*) from co_menus;");
-		testSubject.rollback();
+		try {
+			assertTrue(testSubject.testConnection());
+			testSubject.execute();
+			assertTrue(testSubject.isConnected());
+			testSubject.executeSql("select count(*) from co_menus;");
+			testSubject.rollback();
+		} finally {
+			// Make sure to leave HSQLDB down
+			testSubject.executeSql("shutdown");
+		}
 	}
 }
