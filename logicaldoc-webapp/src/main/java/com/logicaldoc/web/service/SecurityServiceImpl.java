@@ -393,6 +393,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			Group grp = groupDao.findById(groupId);
 			groupDao.initialize(grp);
 			for (User user : grp.getUsers()) {
+				userDao.initialize(user);
 				user.removeGroup(groupId);
 				userDao.store(user);
 			}
