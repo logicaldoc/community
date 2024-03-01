@@ -25,6 +25,7 @@ public class DateUtil {
 	protected static Logger log = LoggerFactory.getLogger(DateUtil.class);
 
 	private DateUtil() {
+		throw new IllegalStateException("Utility class");
 	}
 
 	/**

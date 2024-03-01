@@ -20,6 +20,7 @@ public class TagUtil {
 	public static final int MAX_FIELD_LENGTH = 4000;
 
 	private TagUtil() {
+		throw new IllegalStateException("Utility class");
 	}
 
 	/**

@@ -1179,15 +1179,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				docDao.initialize(document);
 			}
 
-			Document docVO = toDocument(guiDocument);
-			if (guiDocument.getDocRef() != null) {
-				docVO.setDocRef(null);
-				docVO.setFileName(document.getFileName());
-				docVO.setColor(document.getColor());
-				docVO.setType(FileUtil.getExtension(document.getFileName()).toLowerCase());
-			}
-			docVO.setTenantId(session.getTenantId());
-
 			// Fix the name of multiple attributes
 			for (GUIAttribute att : guiDocument.getAttributes().stream().filter(att -> att.isMultiple()).toList()) {
 				NumberFormat nf = new DecimalFormat("0000");
@@ -1200,6 +1191,15 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 					index++;
 				}
 			}
+
+			Document docVO = toDocument(guiDocument);
+			if (guiDocument.getDocRef() != null) {
+				docVO.setDocRef(null);
+				docVO.setFileName(document.getFileName());
+				docVO.setColor(document.getColor());
+				docVO.setType(FileUtil.getExtension(document.getFileName()).toLowerCase());
+			}
+			docVO.setTenantId(session.getTenantId());
 
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
@@ -2446,7 +2446,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			// Obtain the document's file stream
 			Storer storer = (Storer) Context.get().getBean(Storer.class);
 			String resource = storer.getResourceName(doc, null, null);
-			
+
 			return storer.getString(doc.getId(), resource);
 		} catch (PersistenceException | ServerException | IOException e) {
 			return (String) throwServerException(session, log, e);

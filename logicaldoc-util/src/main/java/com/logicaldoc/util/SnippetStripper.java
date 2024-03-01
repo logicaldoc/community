@@ -16,6 +16,7 @@ public class SnippetStripper {
 	private static final String LUCENE_HILIGHT_STOP = "&lt;/font&gt;";
 
 	private SnippetStripper() {
+		throw new IllegalStateException("Utility class");
 	}
 
 	/**

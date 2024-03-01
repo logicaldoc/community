@@ -17,7 +17,7 @@ public class MimeType {
 	private static Properties mimeTypes = null;
 
 	private MimeType() {
-
+		throw new IllegalStateException("Utility class");
 	}
 
 	public static String get(String extension) {
@@ -31,7 +31,7 @@ public class MimeType {
 		}
 		if (extension.startsWith("."))
 			extension = extension.substring(1);
-		
+
 		String type = mimeTypes.getProperty(extension, "application/octet-stream");
 		if (type == null)
 			type = "application/octet-stream";

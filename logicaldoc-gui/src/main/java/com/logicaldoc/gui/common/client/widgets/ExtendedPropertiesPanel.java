@@ -44,7 +44,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	private static final String TEMPLATE = "template";
 
-	protected GUIExtensibleObject object;
+	protected GUIExtensibleObject extensibleObject;
 
 	protected ChangedHandler changedHandler;
 
@@ -74,7 +74,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 			ChangedHandler templateChangedHandler, boolean updateEnabled, boolean checkMandatory,
 			boolean allowTemplateSelection) {
 		super();
-		this.object = object;
+		this.extensibleObject = object;
 		this.changedHandler = changedHandler;
 		this.templateChangedHandler = templateChangedHandler;
 		this.updateEnabled = updateEnabled;
@@ -131,14 +131,14 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 		putCustomIdField();
 
-		templateItem = ItemFactory.newTemplateSelector(true, object.getTemplateId());
+		templateItem = ItemFactory.newTemplateSelector(true, extensibleObject.getTemplateId());
 		if (changedHandler != null)
 			templateItem.addChangedHandler(changedHandler);
 		templateItem.setMultiple(false);
-		templateItem.setDisabled(!updateEnabled || (isDocument() && ((GUIDocument) object).getFolder() != null
-				&& ((GUIDocument) object).getFolder().getTemplateLocked() == 1));
-		if (object.getTemplateId() != null)
-			templateItem.setValue(object.getTemplateId().toString());
+		templateItem.setDisabled(!updateEnabled || (isDocument() && ((GUIDocument) extensibleObject).getFolder() != null
+				&& ((GUIDocument) extensibleObject).getFolder().getTemplateLocked() == 1));
+		if (extensibleObject.getTemplateId() != null)
+			templateItem.setValue(extensibleObject.getTemplateId().toString());
 
 		templateItem.addChangedHandler(this::handleTemplateChangedSelection);
 
@@ -160,12 +160,12 @@ public class ExtendedPropertiesPanel extends HLayout {
 			addMember(templateForm);
 
 		if (Feature.enabled(Feature.TEMPLATE))
-			prepareExtendedAttributes(object.getTemplateId());
+			prepareExtendedAttributes(extensibleObject.getTemplateId());
 	}
 
 	private void putCustomIdField() {
 		if (isDocument()) {
-			TextItem customId = ItemFactory.newTextItem("customid", ((GUIDocument) object).getCustomId());
+			TextItem customId = ItemFactory.newTextItem("customid", ((GUIDocument) extensibleObject).getCustomId());
 			if (changedHandler != null)
 				customId.addChangedHandler(changedHandler);
 			customId.setDisabled(!updateEnabled);
@@ -176,14 +176,14 @@ public class ExtendedPropertiesPanel extends HLayout {
 	private void handleTemplateChangedSelection(ChangedEvent event) {
 		Object templateValue = templateItem.getValue();
 		if (templateValue != null && !"".equals(templateValue.toString())) {
-			object.setAttributes(new ArrayList<>());
+			extensibleObject.setAttributes(new ArrayList<>());
 			long templateId = Long.parseLong(templateValue.toString());
 			prepareExtendedAttributes(templateId);
-			object.setTemplateId(templateId);
+			extensibleObject.setTemplateId(templateId);
 		} else {
-			object.setAttributes(new ArrayList<>());
+			extensibleObject.setAttributes(new ArrayList<>());
 			prepareExtendedAttributes(null);
-			object.setTemplateId(null);
+			extensibleObject.setTemplateId(null);
 		}
 	}
 
@@ -209,7 +209,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		attributesForm.clearValues();
 		attributesForm.clear();
 
-		if (!object.getAttributes().isEmpty() && extendedItems != null)
+		if (!extensibleObject.getAttributes().isEmpty() && extendedItems != null)
 			attributesForm.setItems(extendedItems.toArray(new FormItem[0]));
 
 		updateDependantAttributes();
@@ -228,7 +228,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 			return;
 		}
 
-		TemplateService.Instance.get().getAttributes(templateId, object, new AsyncCallback<>() {
+		TemplateService.Instance.get().getAttributes(templateId, extensibleObject, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
@@ -236,6 +236,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 			@Override
 			public void onSuccess(List<GUIAttribute> templateAttributes) {
+
 				// Update the object's attributes
 				if (templateAttributes != null)
 					updateAttributesFromTemplateDefinition(templateAttributes);
@@ -249,7 +250,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	private void updateAttributesFromTemplateDefinition(List<GUIAttribute> templateAttributes) {
 		for (GUIAttribute templAttr : templateAttributes) {
-			GUIAttribute objAttr = object.getAttribute(templAttr.getName());
+			GUIAttribute objAttr = extensibleObject.getAttribute(templAttr.getName());
 			if (objAttr != null) {
 				objAttr.setEditor(templAttr.getEditor());
 				objAttr.setHidden(templAttr.isHidden());
@@ -265,7 +266,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 				objAttr.setPosition(templAttr.getPosition());
 				objAttr.setType(templAttr.getType());
 
-				if (object.getId() == 0L) {
+				if (extensibleObject.getId() == 0L) {
 					objAttr.setStringValue(templAttr.getStringValue());
 					objAttr.setIntValue(templAttr.getIntValue());
 					objAttr.setDateValue(templAttr.getDateValue());
@@ -273,16 +274,16 @@ public class ExtendedPropertiesPanel extends HLayout {
 					objAttr.setDoubleValue(templAttr.getDoubleValue());
 				}
 			} else {
-				object.addAttribute(templAttr);
+				extensibleObject.addAttribute(templAttr);
 			}
 		}
 	}
 
 	private void adjustMultipleValueAttribues() {
-		if (object.getAttributes() != null) {
-			for (GUIAttribute docAttr : object.getAttributes()) {
+		if (extensibleObject.getAttributes() != null) {
+			for (GUIAttribute docAttr : extensibleObject.getAttributes()) {
 				if (docAttr.isMultiple()) {
-					List<GUIAttribute> attrValues = object.getValues(docAttr.getName());
+					List<GUIAttribute> attrValues = extensibleObject.getValues(docAttr.getName());
 					if (attrValues != null)
 						for (GUIAttribute val : attrValues) {
 							val.setPosition(docAttr.getPosition());
@@ -292,14 +293,13 @@ public class ExtendedPropertiesPanel extends HLayout {
 						}
 				}
 			}
-			object.sortAttributes();
+			extensibleObject.sortAttributes();
 		}
 	}
 
 	private void displayAttributeItems() {
 		extendedItems.clear();
-
-		for (GUIAttribute att : object.getAttributes()) {
+		for (GUIAttribute att : extensibleObject.getAttributes()) {
 			if (att.isHidden())
 				continue;
 
@@ -315,6 +315,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		}
 
 		refreshAttributesForm();
+
 	}
 
 	protected FormItem prepareAttributeItem(GUIAttribute att) {
@@ -322,17 +323,19 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 		FormItem item;
 		if (att.getType() == GUIAttribute.TYPE_STRING) {
-			att.setStringValue(object.getValue(att.getName()) != null ? (String) object.getValue(att.getName()) : null);
+			att.setStringValue(
+					extensibleObject.getValue(att.getName()) != null ? (String) extensibleObject.getValue(att.getName())
+							: null);
 			item = ItemFactory.newStringItemForAttribute(att);
 		} else if (att.getType() == GUIAttribute.TYPE_INT) {
 			item = ItemFactory.newIntegerItemForAttribute(att.getName(), att.getLabel(), null);
-			if (object.getValue(att.getName()) != null)
-				item.setValue(object.getValue(att.getName()));
+			if (extensibleObject.getValue(att.getName()) != null)
+				item.setValue(extensibleObject.getValue(att.getName()));
 		} else if (att.getType() == GUIAttribute.TYPE_BOOLEAN) {
 			item = prepareBooleanItem(att);
 		} else if (att.getType() == GUIAttribute.TYPE_DOUBLE) {
 			item = ItemFactory.newFloatItemForAttribute(att.getName(), att.getLabel(), null);
-			item.setValue(object.getValue(att.getName()));
+			item.setValue(extensibleObject.getValue(att.getName()));
 		} else if (att.getType() == GUIAttribute.TYPE_DATE) {
 			item = prepareDateItem(att);
 		} else if (att.getType() == GUIAttribute.TYPE_USER) {
@@ -362,11 +365,11 @@ public class ExtendedPropertiesPanel extends HLayout {
 	}
 
 	protected FormItem prepareUserItem(GUIAttribute att, List<FormItemIcon> multiValIcons) {
-		FormItem item;
-		item = ItemFactory.newUserSelectorForAttribute(att.getName(), att.getLabel(),
-				!att.getOptions().isEmpty() ? att.getOptions().get(0) : null, multiValIcons);
-		if (object.getValue(att.getName()) != null)
-			item.setValue((object.getValue(att.getName()).toString()));
+		FormItem item = ItemFactory.newUserSelectorForAttribute(att.getName(), att.getLabel(),
+				att.getOptions() != null && !att.getOptions().isEmpty() ? att.getOptions().get(0) : null,
+				multiValIcons);
+		if (extensibleObject.getValue(att.getName()) != null)
+			item.setValue((extensibleObject.getValue(att.getName()).toString()));
 		return item;
 	}
 
@@ -374,7 +377,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		FormItem item;
 		item = ItemFactory.newFolderSelectorForAttribute(att.getName(), att.getLabel(), multiValIcons);
 		FolderSelector selector = (FolderSelector) item;
-		if (object.getValue(att.getName()) != null) {
+		if (extensibleObject.getValue(att.getName()) != null) {
 			selector.setFolder(att.getIntValue(), att.getStringValue());
 			item.setValue(att.getStringValue());
 		}
@@ -389,7 +392,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		FormItem item;
 		item = ItemFactory.newDocumentSelectorForAttribute(att.getName(), att.getLabel(), multiValIcons);
 		DocumentSelector selector = (DocumentSelector) item;
-		if (object.getValue(att.getName()) != null) {
+		if (extensibleObject.getValue(att.getName()) != null) {
 			selector.setDocument(att.getIntValue(), att.getStringValue());
 			item.setValue(att.getStringValue());
 		}
@@ -403,8 +406,8 @@ public class ExtendedPropertiesPanel extends HLayout {
 	protected FormItem prepareDateItem(GUIAttribute att) {
 		FormItem item;
 		item = ItemFactory.newDateItemForAttribute(att.getName(), att.getLabel());
-		if (object.getValue(att.getName()) != null)
-			item.setValue((Date) object.getValue(att.getName()));
+		if (extensibleObject.getValue(att.getName()) != null)
+			item.setValue((Date) extensibleObject.getValue(att.getName()));
 		item.addKeyPressHandler((KeyPressEvent event) -> {
 			if ("backspace".equalsIgnoreCase(event.getKeyName()) || "delete".equalsIgnoreCase(event.getKeyName())) {
 				item.clearValue();
@@ -421,8 +424,8 @@ public class ExtendedPropertiesPanel extends HLayout {
 		FormItem item;
 		item = ItemFactory.newBooleanSelectorForAttribute(att.getName(), att.getLabel(),
 				checkMandatory && !att.isMandatory());
-		if (object.getValue(att.getName()) != null)
-			item.setValue(((Boolean) object.getValue(att.getName())).booleanValue() ? "1" : "0");
+		if (extensibleObject.getValue(att.getName()) != null)
+			item.setValue(((Boolean) extensibleObject.getValue(att.getName())).booleanValue() ? "1" : "0");
 		return item;
 	}
 
@@ -494,7 +497,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 			return false;
 
 		if (isDocument() && allowTemplateSelection)
-			((GUIDocument) object).setCustomId((String) values.get("customid"));
+			((GUIDocument) extensibleObject).setCustomId((String) values.get("customid"));
 
 		validateExtendedAttributes();
 
@@ -510,9 +513,9 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 		if (allowTemplateSelection) {
 			if (values.get(TEMPLATE) == null || values.get(TEMPLATE).toString().isEmpty())
-				object.setTemplateId(null);
+				extensibleObject.setTemplateId(null);
 			else {
-				object.setTemplateId(Long.parseLong(values.get(TEMPLATE).toString()));
+				extensibleObject.setTemplateId(Long.parseLong(values.get(TEMPLATE).toString()));
 			}
 		}
 
@@ -521,7 +524,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 			if (itemName.startsWith("_")) {
 				String attributeName = itemName.substring(1).replace(Constants.BLANK_PLACEHOLDER, " ");
 
-				GUIAttribute attribute = object.getAttribute(attributeName);
+				GUIAttribute attribute = extensibleObject.getAttribute(attributeName);
 				if (attribute == null || attribute.isHidden())
 					continue;
 
@@ -529,7 +532,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 			}
 		}
 
-		if (object.getAttributes() != null)
+		if (extensibleObject.getAttributes() != null)
 			fixNullValues();
 	}
 
@@ -542,7 +545,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		Map<String, Object> values = vm.getValues();
 
 		// Check the current doc's values
-		for (GUIAttribute att : object.getAttributes()) {
+		for (GUIAttribute att : extensibleObject.getAttributes()) {
 			if (att.isHidden())
 				continue;
 
@@ -576,22 +579,22 @@ public class ExtendedPropertiesPanel extends HLayout {
 	private void validateNullItem(String attributeName, GUIAttribute attribute) {
 		if (attribute != null) {
 			if (attribute.getType() == GUIAttribute.TYPE_INT) {
-				object.getAttribute(attributeName).setIntValue(null);
+				extensibleObject.getAttribute(attributeName).setIntValue(null);
 			} else if (attribute.getType() == GUIAttribute.TYPE_BOOLEAN) {
-				object.getAttribute(attributeName).setBooleanValue(null);
+				extensibleObject.getAttribute(attributeName).setBooleanValue(null);
 			} else if (attribute.getType() == GUIAttribute.TYPE_DOUBLE) {
-				object.getAttribute(attributeName).setDoubleValue(null);
+				extensibleObject.getAttribute(attributeName).setDoubleValue(null);
 			} else if (attribute.getType() == GUIAttribute.TYPE_DATE) {
-				object.getAttribute(attributeName).setDateValue(null);
+				extensibleObject.getAttribute(attributeName).setDateValue(null);
 				attribute.setDateValue(null);
 			} else if (attribute.getType() == GUIAttribute.TYPE_USER || attribute.getType() == GUIAttribute.TYPE_FOLDER
 					|| attribute.getType() == GUIAttribute.TYPE_DOCUMENT) {
-				GUIAttribute at = object.getAttribute(attributeName);
+				GUIAttribute at = extensibleObject.getAttribute(attributeName);
 				at.setIntValue(null);
 				at.setStringValue(null);
 				at.setType(attribute.getType());
 			} else {
-				object.setValue(attributeName, (String) null);
+				extensibleObject.setValue(attributeName, (String) null);
 			}
 		}
 	}
@@ -606,16 +609,16 @@ public class ExtendedPropertiesPanel extends HLayout {
 		} else if (attribute.getType() == GUIAttribute.TYPE_BOOLEAN) {
 			validateBoolean(value, attributeName);
 		} else {
-			object.setValue(attributeName, value);
+			extensibleObject.setValue(attributeName, value);
 			InputValues.saveInput(itemName, value);
 		}
 	}
 
 	private void validateBoolean(Object value, String attributeName) {
 		if (!(value == null || "".equals(value.toString().trim())))
-			object.setValue(attributeName, "1".equals(value.toString().trim()));
-		else if (object.getAttribute(attributeName) != null) {
-			GUIAttribute at = object.getAttribute(attributeName);
+			extensibleObject.setValue(attributeName, "1".equals(value.toString().trim()));
+		else if (extensibleObject.getAttribute(attributeName) != null) {
+			GUIAttribute at = extensibleObject.getAttribute(attributeName);
 			at.setBooleanValue(null);
 			at.setType(GUIAttribute.TYPE_BOOLEAN);
 		}
@@ -625,9 +628,9 @@ public class ExtendedPropertiesPanel extends HLayout {
 		FolderSelector folderItem = (FolderSelector) attributesForm.getItem(itemName);
 		GUIFolder selectedFolder = folderItem.getFolder();
 		if (selectedFolder != null) {
-			object.setValue(attributeName, selectedFolder);
+			extensibleObject.setValue(attributeName, selectedFolder);
 		} else {
-			GUIAttribute at = object.getAttribute(attributeName);
+			GUIAttribute at = extensibleObject.getAttribute(attributeName);
 			at.setIntValue(null);
 			at.setStringValue(null);
 			at.setType(GUIAttribute.TYPE_FOLDER);
@@ -638,9 +641,9 @@ public class ExtendedPropertiesPanel extends HLayout {
 		DocumentSelector documentItem = (DocumentSelector) attributesForm.getItem(itemName);
 		GUIDocument selectedDocument = documentItem.getDocument();
 		if (selectedDocument != null) {
-			object.setValue(attributeName, selectedDocument);
+			extensibleObject.setValue(attributeName, selectedDocument);
 		} else {
-			GUIAttribute at = object.getAttribute(attributeName);
+			GUIAttribute at = extensibleObject.getAttribute(attributeName);
 			at.setIntValue(null);
 			at.setStringValue(null);
 			at.setType(GUIAttribute.TYPE_DOCUMENT);
@@ -659,13 +662,14 @@ public class ExtendedPropertiesPanel extends HLayout {
 			dummy.setUsername(sel.getAttributeAsString("username"));
 			dummy.setFirstName(sel.getAttributeAsString("firstName"));
 			dummy.setName(sel.getAttributeAsString("name"));
-			object.setValue(attributeName, dummy);
+			extensibleObject.setValue(attributeName, dummy);
 
-			GUIAttribute at = object.getAttribute(attributeName);
+			GUIAttribute at = extensibleObject.getAttribute(attributeName);
+			at.setIntValue(dummy.getId());
 			at.setStringValue(dummy.getUsername());
 			at.setUsername(dummy.getUsername());
 		} else {
-			GUIAttribute at = object.getAttribute(attributeName);
+			GUIAttribute at = extensibleObject.getAttribute(attributeName);
 			at.setIntValue(null);
 			at.setStringValue(null);
 			at.setType(GUIAttribute.TYPE_USER);
@@ -677,7 +681,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		validateExtendedAttributes();
 
 		// Remove the attribute and re-display
-		object.removeAttribute(att.getName());
+		extensibleObject.removeAttribute(att.getName());
 		displayAttributeItems();
 		changedHandler.onChanged(null);
 	}
@@ -686,14 +690,14 @@ public class ExtendedPropertiesPanel extends HLayout {
 		copyValuesToObject();
 
 		// Add the new attribute and redisplay
-		object.addAttributeValue(att.getName());
+		extensibleObject.addAttributeValue(att.getName());
 		displayAttributeItems();
 		changedHandler.onChanged(null);
 	}
 
 	private void onValueShift(GUIAttribute att, boolean up) {
 		copyValuesToObject();
-		object.shiftValue(att.getName(), up);
+		extensibleObject.shiftValue(att.getName(), up);
 		displayAttributeItems();
 		changedHandler.onChanged(null);
 	}
@@ -712,7 +716,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 				Object val = entry.getValue();
 				FormItem item = attributesForm.getItem(name);
 
-				GUIAttribute attribute = object.getAttribute(nm);
+				GUIAttribute attribute = extensibleObject.getAttribute(nm);
 				int originalType = attribute.getType();
 
 				if (item instanceof UserSelector) {
@@ -720,9 +724,10 @@ public class ExtendedPropertiesPanel extends HLayout {
 				} else if (item instanceof FolderSelector) {
 					copyFolderValue(item, attribute);
 				} else if (attribute.getType() == GUIAttribute.TYPE_BOOLEAN) {
-					object.setValue(nm, val != null && ("1".equals(val.toString()) || "yes".equals(val.toString())));
+					extensibleObject.setValue(nm,
+							val != null && ("1".equals(val.toString()) || "yes".equals(val.toString())));
 				} else {
-					object.setValue(nm, val);
+					extensibleObject.setValue(nm, val);
 				}
 
 				attribute.setType(originalType);
@@ -755,11 +760,11 @@ public class ExtendedPropertiesPanel extends HLayout {
 	}
 
 	private boolean isDocument() {
-		return object instanceof GUIDocument;
+		return extensibleObject instanceof GUIDocument;
 	}
 
 	public GUIExtensibleObject getObject() {
-		return object;
+		return extensibleObject;
 	}
 
 	public void onErrors(ServerValidationError[] errors) {
@@ -775,7 +780,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	 * lists according on the dependencies
 	 */
 	private void updateDependantAttributes() {
-		for (GUIAttribute att : object.getAttributes()) {
+		for (GUIAttribute att : extensibleObject.getAttributes()) {
 			String dependsOn = att.getDependsOn();
 			if (dependsOn != null && !dependsOn.isEmpty()) {
 				FormItem item = vm.getItem(ItemFactory.itemNameForAttribute(att.getName()));
@@ -806,7 +811,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 		@Override
 		public void onChanged(ChangedEvent event) {
-			for (GUIAttribute att : object.getAttributes()) {
+			for (GUIAttribute att : extensibleObject.getAttributes()) {
 				String dependsOn = att.getDependsOn();
 				if (dependsOn != null && !dependsOn.isEmpty()) {
 					FormItem item = vm.getItem(ItemFactory.itemNameForAttribute(att.getName()));

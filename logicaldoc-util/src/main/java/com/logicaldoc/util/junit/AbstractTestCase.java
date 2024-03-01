@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -25,7 +24,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 
 /**
@@ -48,13 +46,6 @@ public abstract class AbstractTestCase {
 
 	@Before
 	public void setUp() throws IOException, SQLException {
-		// Make sure to start with HSQLDB down
-		try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:file:testdb", "SA",
-				new ContextProperties().getProperty("jdbc.password", ""));
-				Statement statement = connection.createStatement()) {
-			statement.execute("shutdown");
-		}
-
 		loadDevelSettings();
 
 		updateUserHome();
@@ -142,9 +133,6 @@ public abstract class AbstractTestCase {
 
 		try (Connection con = getConnection(); Statement statement = con.createStatement()) {
 			statement.execute("shutdown");
-		} finally {
-			FileUtil.strongDelete(new File("tesdtdb.properties"));
-			FileUtil.strongDelete(new File("tesdtdb.script"));
 		}
 	}
 

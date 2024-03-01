@@ -56,9 +56,14 @@ public class ExecTest {
 		boolean yyy = SystemUtil.isWindows();
 		assertEquals(yyy, xxx);
 
-		System.setProperty("os.name", "Linux");
-		xxx = new Exec().isWindows();
-		assertNotSame(yyy, xxx);
+		String originalOsName = System.getProperty("os.name");
+		try {
+			System.setProperty("os.name", "Linux");
+			xxx = new Exec().isWindows();
+			assertNotSame(yyy, xxx);
+		} finally {
+			System.setProperty("os.name", originalOsName);
+		}
 	}
 
 	@Test

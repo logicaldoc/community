@@ -82,7 +82,7 @@ public class UserSelector extends SelectItem {
 		}
 		return user;
 	}
-	
+
 	void fireUserChanged() {
 		fireEvent(new ChangedEvent(getJsObj()));
 	}

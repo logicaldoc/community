@@ -177,7 +177,8 @@ public class DocumentManagerImpl implements DocumentManager {
 		if (document.getImmutable() == 0 && document.getStatus() == AbstractDocument.DOC_UNLOCKED) {
 			// Remove the ancillary files of the same fileVersion
 			final String newFilerResourceName = storer.getResourceName(document, fileVersion, null);
-			for (String resource : storer.listResources(document.getId(), fileVersion).stream().filter(r -> !r.equals(newFilerResourceName)).toList() )
+			for (String resource : storer.listResources(document.getId(), fileVersion).stream()
+					.filter(r -> !r.equals(newFilerResourceName)).toList())
 				storer.delete(document.getId(), resource);
 
 			// Store the new file
@@ -205,7 +206,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			document.setSigned(0);
 			document.setStamped(0);
 			documentDAO.store(document, transaction);
-			
+
 			log.debug("Replaced fileVersion {} of document {}", fileVersion, docId);
 		}
 	}
@@ -723,10 +724,8 @@ public class DocumentManagerImpl implements DocumentManager {
 			document.setTemplateId(template.getId());
 			if (docVO.getAttributes() != null) {
 				document.getAttributes().clear();
-				for (String attrName : docVO.getAttributes().keySet()) {
-					Attribute docExtendedAttribute = docVO.getAttributes().get(attrName);
-					document.getAttributes().put(attrName, docExtendedAttribute);
-				}
+				for (Map.Entry<String, Attribute> entry : docVO.getAttributes().entrySet())
+					document.getAttributes().put(entry.getKey(), entry.getValue());
 			}
 		} else {
 			document.setTemplate(null);
@@ -1423,8 +1422,9 @@ public class DocumentManagerImpl implements DocumentManager {
 		for (Long fid : folderIds) {
 			String where = " where ld_deleted=0 and not ld_status=" + AbstractDocument.DOC_ARCHIVED
 					+ " and ld_folderid=" + fid;
-			archivedDocIds.addAll((Set<Long>) documentDAO.queryForList("select ld_id from ld_document " + where, Long.class)
-					.stream().collect(Collectors.toSet()));
+			archivedDocIds
+					.addAll((Set<Long>) documentDAO.queryForList("select ld_id from ld_document " + where, Long.class)
+							.stream().collect(Collectors.toSet()));
 			if (archivedDocIds.isEmpty())
 				continue;
 			archiveDocuments(archivedDocIds, transaction);

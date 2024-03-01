@@ -30,6 +30,7 @@ public class StringUtil {
 	private static final String UTF_8 = "UTF-8";
 
 	private StringUtil() {
+		throw new IllegalStateException("Utility class");
 	}
 
 	/**

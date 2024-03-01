@@ -60,6 +60,7 @@ public class FileUtil {
 	protected static Logger log = LoggerFactory.getLogger(FileUtil.class);
 
 	private FileUtil() {
+		throw new IllegalStateException("Utility class");
 	}
 
 	/**

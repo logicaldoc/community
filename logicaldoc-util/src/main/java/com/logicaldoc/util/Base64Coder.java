@@ -10,9 +10,13 @@ package com.logicaldoc.util;
  */
 public class Base64Coder {
 
+	private Base64Coder() {
+		throw new IllegalStateException("Utility class");
+	}
+	
 	// The line separator string of the operating system.
 	private static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
-
+	
 	// Mapping table from 6-bit nibbles to Base64 characters.
 	private static final char[] map1 = new char[64];
 	static {
@@ -268,9 +272,4 @@ public class Base64Coder {
 		if (i0 > 127 || i1 > 127 || i2 > 127 || i3 > 127)
 			throw new IllegalArgumentException("Illegal character in Base64 encoded data.");
 	}
-
-	// Dummy constructor.
-	private Base64Coder() {
-	}
-
-} // end class Base64Coder
+}

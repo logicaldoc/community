@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.UsersDS;
 import com.logicaldoc.gui.common.client.formatters.UserCellFormatter;
@@ -172,7 +173,7 @@ public class UsersPanel extends AdminPanel {
 		company.setCanFilter(true);
 		company.setHidden(true);
 		company.setCellFormatter(new UserCellFormatter());
-		
+
 		ListGridField building = new ListGridField(BUILDING, I18N.message(BUILDING), 100);
 		building.setCanFilter(true);
 		building.setHidden(true);
@@ -253,8 +254,8 @@ public class UsersPanel extends AdminPanel {
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
 		list.setDataSource(new UsersDS(null, true, false));
-		list.setFields(id, enabledIcon, avatar, username, firstName, name, email, creation, lastLogin, expire,
-				company, department, building, organizationalUnit, city, phone, cell, groups, enabled, guest, timeZone, source);
+		list.setFields(id, enabledIcon, avatar, username, firstName, name, email, creation, lastLogin, expire, company,
+				department, building, organizationalUnit, city, phone, cell, groups, enabled, guest, timeZone, source);
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -327,7 +328,8 @@ public class UsersPanel extends AdminPanel {
 		rec.setAttribute("organizationalUnit", user.getOrganizationalUnit());
 		rec.setAttribute(DEPARTMENT, user.getDepartment());
 		rec.setAttribute(COMPANY, user.getCompany());
-		rec.setAttribute(GROUPS, user.getGroups().stream().map(g -> g.getName()).collect(Collectors.joining(",")));
+		rec.setAttribute(GROUPS, user.getGroups().stream().filter(g -> g.getType() == GUIGroup.TYPE_DEFAULT)
+				.map(g -> g.getName()).collect(Collectors.joining(",")));
 
 		list.refreshRow(list.getRecordIndex(rec));
 		list.redraw();

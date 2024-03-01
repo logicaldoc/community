@@ -17,6 +17,7 @@ public class FileNameCleaner {
 	}
 
 	private FileNameCleaner() {
+		throw new IllegalStateException("Utility class");
 	}
 
 	public static String cleanFileName(String badFileName) {

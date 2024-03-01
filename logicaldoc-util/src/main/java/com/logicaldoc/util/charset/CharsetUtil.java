@@ -13,6 +13,7 @@ public abstract class CharsetUtil {
 	private static final String FILE_NAME_CHARSET = "fileNameCharset=";
 
 	private CharsetUtil() {
+		throw new IllegalStateException("Utility class");
 	}
 
 	public static String getCharset(String contentType) {

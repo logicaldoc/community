@@ -32,6 +32,7 @@ public class PasswordGenerator {
 	private static SecureRandom random = new SecureRandom();
 
 	private PasswordGenerator() {
+		throw new IllegalStateException("Utility class");
 	}
 
 	public static void main(String[] args) {

@@ -28,7 +28,6 @@ public class EasySSLSocketFactory extends SSLSocketFactory {
 	private SSLSocketFactory factory;
 
 	public EasySSLSocketFactory() {
-
 		try {
 			SSLContext sslcontent = SSLContext.getInstance("TLS");
 			sslcontent.init(null, // KeyManager not required

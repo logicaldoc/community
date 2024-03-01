@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 public class CollectionUtil {
 
 	private CollectionUtil() {
+		throw new IllegalStateException("Utility class");
 	}
 
 	/**

@@ -14,6 +14,10 @@ import java.util.Map;
  */
 public class SystemUtil {
 
+	private SystemUtil() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static String printEnvironment() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(printSystemEnvironment());
@@ -67,7 +71,7 @@ public class SystemUtil {
 	}
 
 	public static boolean isWindows() {
-		return (osName().contains("win"));
+		return osName().contains("windows");
 	}
 
 	private static String osName() {

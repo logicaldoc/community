@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -88,7 +89,7 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 	private Long setId;
 
 	// Optional array of possible values
-	private List<String> options;
+	private List<String> options = new ArrayList<>();
 
 	private String stringValues;
 

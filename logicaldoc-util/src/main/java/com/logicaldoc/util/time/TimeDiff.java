@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 public class TimeDiff {
 
 	private TimeDiff() {
+		throw new IllegalStateException("Utility class");
 	}
 
 	/**

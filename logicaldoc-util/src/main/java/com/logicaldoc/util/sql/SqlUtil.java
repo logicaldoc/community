@@ -15,6 +15,7 @@ import java.util.Date;
 public class SqlUtil {
 
 	private SqlUtil() {
+		throw new IllegalStateException("Utility class");
 	}
 
 	/**

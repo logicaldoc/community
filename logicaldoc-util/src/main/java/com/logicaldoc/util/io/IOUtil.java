@@ -17,6 +17,7 @@ public class IOUtil {
 	private static final int DEFAULT_BUFFER_SIZE = 10240; // ..bytes = 10KB.
 
 	private IOUtil() {
+		throw new IllegalStateException("Utility class");
 	}
 
 	/**

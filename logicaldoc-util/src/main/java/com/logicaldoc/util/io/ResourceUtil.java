@@ -19,6 +19,7 @@ import java.io.OutputStream;
 public class ResourceUtil {
 
 	private ResourceUtil() {
+		throw new IllegalStateException("Utility class");
 	}
 
 	public static byte[] readAsBytes(String resourcePath) throws IOException {

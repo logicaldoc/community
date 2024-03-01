@@ -21,7 +21,7 @@ public class SystemUtilTest {
 
 	@Test
 	public void testGetOS() throws IOException {
-		String originalOS = System.getProperty("os.name");
+		String originalOsName = System.getProperty("os.name");
 		try {
 			System.setProperty("os.name", "Unix");
 			assertEquals("uni", SystemUtil.getOS());
@@ -29,7 +29,7 @@ public class SystemUtilTest {
 			System.setProperty("os.name", "unknown");
 			assertEquals("err", SystemUtil.getOS());
 		} finally {
-			System.setProperty("os.name", originalOS);
+			System.setProperty("os.name", originalOsName);
 		}
 	}
 }

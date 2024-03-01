@@ -76,6 +76,7 @@ public class JulianCalendarUtil {
 	}
 
 	private JulianCalendarUtil() {
+		throw new IllegalStateException("Utility class");
 	}
 
 	/**
