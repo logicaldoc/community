@@ -163,14 +163,38 @@ public class AwesomeFactory {
 		return button;
 	}
 
-	public static String getIndexedIconButtonHTML(long docId, boolean download, Integer indexed, String color) {
+	public static String getIndexedIconButtonHTML(long docId, Integer indexed, String color) {
 		String button = DIV_CLASS_STATUS_ICON
 				+ (indexed != null && indexed != Constants.INDEX_SKIP ? TITLE + I18N.message("indexed") + "' " : "")
-				+ (color != null && !color.isEmpty() ? STYLE_COLOR + color + "'" : "");
-		if (download)
-			button += " onclick=\"download('" + Util.downloadURL(docId) + "&downloadText=true')\"";
+				+ (color != null && !color.isEmpty() ? STYLE_COLOR + color + "'" : "")
+				+ " onclick=\"downloadDocumentResource('" + docId + "', '" + Util.downloadURL(docId)
+				+ "&downloadText=true');\"";
 		button += " >";
 		button += getIndexedIcon(indexed);
+		button += CLOSE_DIV;
+		return button;
+	}
+
+	public static String getStampedIconButtonHTML(long docId, String fileVersion, String tooltip, String color) {
+		String button = DIV_CLASS_STATUS_ICON + (color != null && !color.isEmpty() ? STYLE_COLOR + color + "'" : "")
+				+ (tooltip != null && !tooltip.isEmpty() ? TITLE + I18N.message(tooltip) + "'" : "")
+				+ " onclick=\"downloadDocumentResource('" + docId + "', '" + Util.downloadPdfURL(docId, fileVersion)
+				+ "');\"";
+		button += " >";
+		button += getColoredIconHtml("tint", null, color);
+		button += CLOSE_DIV;
+		return button;
+	}
+
+	public static String getSignedIconButtonHTML(long docId, String fileName, String tooltip, String color) {
+		String button = DIV_CLASS_STATUS_ICON + (color != null && !color.isEmpty() ? STYLE_COLOR + color + "'" : "")
+				+ (tooltip != null && !tooltip.isEmpty() ? TITLE + I18N.message(tooltip) + "'" : "")
+				+ " onclick=\"downloadDocumentResource('" + docId + "', '"
+				+ (fileName != null && fileName.toLowerCase().endsWith(".pdf") ? Util.downloadURL(docId, null)
+						: Util.downloadPdfURL(docId, null))
+				+ "');\"";
+		button += " >";
+		button += getColoredIconHtml("badge-check", null, color);
 		button += CLOSE_DIV;
 		return button;
 	}

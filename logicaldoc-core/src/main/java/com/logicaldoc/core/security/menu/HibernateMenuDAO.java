@@ -35,8 +35,6 @@ import com.logicaldoc.util.sql.SqlUtil;
 @SuppressWarnings("unchecked")
 public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> implements MenuDAO {
 
-	private static final String AND_B_LD_SECURITYREF_IN = " and B.ld_securityref in (";
-
 	private static final String SELECT_DISTINCT_A_LD_MENUID_FROM_LD_MENUGROUP_A_LD_MENU_B = "select distinct(A.ld_menuid) from ld_menu_acl A, ld_menu B ";
 
 	private static final String ACL_AS_GROUP = ".accessControlList as _group ";
@@ -380,22 +378,6 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 					query1.append(" AND B.ld_type=" + type.toString());
 
 				ids = queryForList(query1.toString(), Long.class);
-
-				/*
-				 * Now find all menus referencing the previously found ones
-				 */
-				StringBuilder query2 = new StringBuilder(
-						"select B.ld_id from ld_menu B where B.ld_deleted=0 and B.ld_enabled=1 ");
-				query2.append(" and B.ld_parentid=" + parentId);
-				query2.append(AND_B_LD_SECURITYREF_IN);
-				query2.append(query1.toString());
-				query2.append(")");
-
-				List<Long> menuids2 = queryForList(query2.toString(), Long.class);
-				for (Long menuid : menuids2) {
-					if (!ids.contains(menuid))
-						ids.add(menuid);
-				}
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -534,19 +516,6 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				query1.append(")");
 
 				ids = queryForList(query1.toString(), Long.class);
-
-				/*
-				 * Now search for those menus that references the previously
-				 * found ones
-				 */
-				StringBuilder query2 = new StringBuilder("select B.ld_id from ld_menu B where B.ld_deleted=0 ");
-				query2.append(AND_B_LD_SECURITYREF_IN + query1.toString() + ")");
-
-				List<Long> mrefs = queryForList(query2.toString(), Long.class);
-				for (Long menuId : mrefs) {
-					if (!ids.contains(menuId))
-						ids.add(menuId);
-				}
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -601,22 +570,6 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				query1.append(")");
 
 				ids = queryForList(query1.toString(), Long.class);
-
-				/*
-				 * Now find all menus referencing the previously found ones
-				 */
-				StringBuilder query2 = new StringBuilder("select B.ld_id from ld_menu B where B.ld_deleted=0 ");
-				query2.append(" and B.ld_parentid=" + parentId);
-				query2.append(AND_B_LD_SECURITYREF_IN);
-				query2.append(query1.toString());
-				query2.append(")");
-
-				List<Long> menuids2 = queryForList(query2.toString(), Long.class);
-				for (Long menuid : menuids2) {
-					if (!ids.contains(menuid))
-						ids.add(menuid);
-				}
-
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);

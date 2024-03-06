@@ -1,10 +1,7 @@
 package com.logicaldoc.gui.common.client.widgets.grid;
 
 import com.logicaldoc.gui.common.client.Constants;
-import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
@@ -113,9 +110,7 @@ public class StatusIconsListGridField extends ColoredListGridField {
 			Integer indexed = rec.getAttributeAsInt(INDEXED);
 			if (indexed != null && indexed.intValue() != Constants.INDEX_TO_INDEX
 					&& indexed.intValue() != Constants.INDEX_TO_INDEX_METADATA) {
-				Long idValue = rec.getAttributeAsLong("id");
-				content += AwesomeFactory.getIndexedIconButtonHTML(idValue,
-						FolderController.get().getCurrentFolder().isDownload(), indexed, color);
+				content += AwesomeFactory.getIndexedIconButtonHTML(rec.getAttributeAsLong("id"), indexed, color);
 			}
 		}
 		return content;
@@ -124,15 +119,9 @@ public class StatusIconsListGridField extends ColoredListGridField {
 	private String putStampedStatusIcon(ListGridRecord rec, String color, String content) {
 		if (rec.getAttribute(STAMPED) != null) {
 			Integer stamped = rec.getAttributeAsInt(STAMPED);
-			if (stamped != null && stamped.intValue() == 1) {
-				Long docId = rec.getAttributeAsLong("id");
-				String fileVersion = rec.getAttribute(FILE_VERSION);
-				if (FolderController.get().getCurrentFolder().isDownload())
-					content += AwesomeFactory.getIconButtonHTML("tint", null, STAMPED, color,
-							(Feature.enabled(Feature.STAMP) ? Util.downloadPdfURL(docId, fileVersion) : null));
-				else
-					content += AwesomeFactory.getIconButtonHTML("tint", null, STAMPED, color, null);
-			}
+			if (stamped != null && stamped.intValue() == 1)
+				content += AwesomeFactory.getStampedIconButtonHTML(rec.getAttributeAsLong("id"),
+						rec.getAttribute(FILE_VERSION), STAMPED, color);
 		}
 		return content;
 	}
@@ -140,17 +129,9 @@ public class StatusIconsListGridField extends ColoredListGridField {
 	private String putSignedStatusIcon(ListGridRecord rec, String color, String content) {
 		if (rec.getAttribute(SIGNED) != null) {
 			Integer signed = rec.getAttributeAsInt(SIGNED);
-			if (signed != null && signed.intValue() == 1) {
-				Long docId = rec.getAttributeAsLong("id");
-				if (FolderController.get().getCurrentFolder().isDownload())
-					content += AwesomeFactory.getIconButtonHTML("badge-check", null, SIGNED, color,
-							(rec.getAttributeAsString(FILENAME) != null
-									&& rec.getAttributeAsString(FILENAME).toLowerCase().endsWith(".pdf")
-											? Util.downloadURL(docId, null)
-											: Util.downloadPdfURL(docId, null)));
-				else
-					content += AwesomeFactory.getIconButtonHTML("badge-check", null, SIGNED, color, null);
-			}
+			if (signed != null && signed.intValue() == 1)
+				content += AwesomeFactory.getSignedIconButtonHTML(rec.getAttributeAsLong("id"),
+						rec.getAttributeAsString(FILENAME), STAMPED, color);
 		}
 		return content;
 	}

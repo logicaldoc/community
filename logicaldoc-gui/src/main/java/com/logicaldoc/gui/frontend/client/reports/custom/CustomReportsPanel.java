@@ -336,7 +336,7 @@ public class CustomReportsPanel extends AdminPanel {
 
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
-		download.addClickHandler(event -> Util.downloadDoc(outputDocId));
+		download.addClickHandler(event -> Util.downloadDocument(outputDocId));
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));

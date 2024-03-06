@@ -85,6 +85,7 @@ public class Frontend implements EntryPoint {
 		declareGetCurrentFolderId(this);
 		declareCheckPermission(this);
 		declareDownload();
+		declareDownloadDocumentResource();
 
 		InfoService.Instance.get().getInfo(locale, tenant, false, new AsyncCallback<>() {
 			@Override
@@ -228,6 +229,15 @@ public class Frontend implements EntryPoint {
 	public static native void declareDownload() /*-{
 		$wnd.download = function(url) {
 			@com.logicaldoc.gui.common.client.util.Util::download(Ljava/lang/String;)(url);
+		};
+	}-*/;
+	
+	/**
+	 * Declares the javascript function used to download a document's resource
+	 */
+	public static native void declareDownloadDocumentResource() /*-{
+		$wnd.downloadDocumentResource = function(docId, url) {
+			@com.logicaldoc.gui.common.client.util.Util::downloadDocumentResource(Ljava/lang/String;Ljava/lang/String;)(docId, url);
 		};
 	}-*/;
 }

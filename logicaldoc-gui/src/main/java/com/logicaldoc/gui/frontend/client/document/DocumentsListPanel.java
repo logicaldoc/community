@@ -21,7 +21,6 @@ import com.logicaldoc.gui.frontend.client.document.grid.NavigatorDocumentsGrid;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.menu.Menu;
 
 /**
  * This panel shows a selection of documents.
@@ -39,7 +38,6 @@ public class DocumentsListPanel extends VLayout {
 
 	protected int visualizationMode = DocumentsGrid.MODE_LIST;
 
-
 	public DocumentsListPanel(GUIFolder folder) {
 		this(folder, DocumentsGrid.MODE_LIST);
 	}
@@ -50,7 +48,7 @@ public class DocumentsListPanel extends VLayout {
 		addCursor(folder);
 
 		documentsGrid = prepareDocumentsGrid(folder, visualizationMode);
-		
+
 		addMember((Canvas) documentsGrid);
 		documentsGrid.setGridCursor(cursor);
 
@@ -70,7 +68,7 @@ public class DocumentsListPanel extends VLayout {
 	public int getVisualizationMode() {
 		return visualizationMode;
 	}
-	
+
 	private void registerGridHandlers() {
 		documentsGrid.registerDoubleClickHandler(event -> {
 			GUIDocument doc = documentsGrid.getSelectedDocument();
@@ -103,8 +101,7 @@ public class DocumentsListPanel extends VLayout {
 		registerSelectionHandler();
 
 		documentsGrid.registerCellContextClickHandler(event -> {
-			Menu contextMenu = new ContextMenu(FolderController.get().getCurrentFolder(), documentsGrid);
-			contextMenu.showContextMenu();
+			new ContextMenu(FolderController.get().getCurrentFolder(), documentsGrid).showContextMenu();
 			if (event != null)
 				event.cancel();
 		});
@@ -145,12 +142,15 @@ public class DocumentsListPanel extends VLayout {
 	 * @param folder the folder being opened
 	 */
 	public void updateData(GUIFolder folder) {
-		if (documentsGrid.getFolder() == null || (documentsGrid.getFolder() != null && documentsGrid.getFolder().getId() != folder.getId()))
+		if (documentsGrid.getFolder() == null
+				|| (documentsGrid.getFolder() != null && documentsGrid.getFolder().getId() != folder.getId()))
 			documentsGrid.loadGridLayout(folder);
 
 		DocumentsDSParameters params = new DocumentsDSParameters(folder.getId(), null,
 				documentsGrid.getGridCursor().getPageSize(), documentsGrid.getGridCursor().getCurrentPage(),
-				documentsGrid instanceof DocumentsListGrid ? DocumentGridUtil.getSortSpec((DocumentsListGrid) documentsGrid) : null);
+				documentsGrid instanceof DocumentsListGrid
+						? DocumentGridUtil.getSortSpec((DocumentsListGrid) documentsGrid)
+						: null);
 		DocumentsDS dataSource = new DocumentsDS(params);
 		documentsGrid.fetchNewData(dataSource);
 		documentsGrid.setCanDrag(folder.isMove());
