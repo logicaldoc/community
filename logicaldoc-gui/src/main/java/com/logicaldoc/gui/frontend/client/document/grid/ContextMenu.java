@@ -560,9 +560,11 @@ public class ContextMenu extends Menu {
 					 * the docRef so in order to have the preview to do the
 					 * right security checks we have to restore the correct ids
 					 */
-					long aliasId = doc.getDocRef();
-					doc.setDocRef(doc.getId());
-					doc.setId(aliasId);
+					Long aliasId = doc.getDocRef();
+					if (aliasId != null) {
+						doc.setDocRef(doc.getId());
+						doc.setId(aliasId);
+					}
 				}
 				iv = new PreviewPopup(docs, 0);
 			}
