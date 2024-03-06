@@ -34,16 +34,11 @@ public abstract class DocumentDetailTab extends DetailTab {
 			updateEnabled = true;
 			deleteEnabled = true;
 		} else {
-			updateEnabled = (document.getImmutable() == 0
-					&& (document.getStatus() == Constants.DOC_UNLOCKED
-							|| document.getLockUserId() == Session.get().getUser().getId())
-					&& document.getFolder().isWrite());
-			deleteEnabled = (document.getImmutable() == 0
-					&& (document.getStatus() == Constants.DOC_UNLOCKED
-							|| document.getLockUserId() == Session.get().getUser().getId())
-					&& document.getFolder().isDelete());
+			updateEnabled = (document.getImmutable() == 0 && (document.getStatus() == Constants.DOC_UNLOCKED
+					|| document.getLockUserId() == Session.get().getUser().getId()) && document.isWrite());
+			deleteEnabled = (document.getImmutable() == 0 && (document.getStatus() == Constants.DOC_UNLOCKED
+					|| document.getLockUserId() == Session.get().getUser().getId()) && document.isDelete());
 		}
-
 	}
 
 	public GUIDocument getDocument() {

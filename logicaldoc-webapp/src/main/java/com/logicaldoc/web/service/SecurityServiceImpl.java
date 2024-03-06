@@ -561,17 +561,21 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		List<GUIDashlet> dashlets = new ArrayList<>();
 		Map<String, Generic> map = userDao.findUserSettings(usr.getId(), "dashlet");
-		for (Generic generic : map.values()) {
-			String name = generic.getSubtype().substring(generic.getSubtype().indexOf('-') + 1);
 
+		for (Generic generic : map.values()) {
+			// This could be a dashlet name or an ID
+			String dashletIdentifier = generic.getSubtype().substring(generic.getSubtype().indexOf('-') + 1);
 			try {
-				GUIDashlet dashlet = dashletService.get(name);
-				if (dashlet != null) {
-					dashlet.setColumn(generic.getInteger2() != null ? generic.getInteger2().intValue() : 0);
-					dashlet.setRow(generic.getInteger3() != null ? generic.getInteger3().intValue() : 0);
-					dashlet.setIndex(generic.getString1() != null ? Integer.parseInt(generic.getString1()) : 0);
-					dashlets.add(dashlet);
-				}
+				GUIDashlet dashlet = null;
+				if (StringUtils.isNumeric(dashletIdentifier))
+					dashlet = dashletService.get(Long.parseLong(dashletIdentifier));
+				else
+					dashlet = dashletService.get(dashletIdentifier);
+
+				dashlet.setColumn(generic.getInteger2() != null ? generic.getInteger2().intValue() : 0);
+				dashlet.setRow(generic.getInteger3() != null ? generic.getInteger3().intValue() : 0);
+				dashlet.setIndex(generic.getString1() != null ? Integer.parseInt(generic.getString1()) : 0);
+				dashlets.add(dashlet);
 			} catch (NumberFormatException | ServerException e) {
 				// Nothing to do
 			}

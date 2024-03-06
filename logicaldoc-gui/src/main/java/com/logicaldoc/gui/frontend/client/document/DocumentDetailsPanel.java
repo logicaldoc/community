@@ -261,6 +261,8 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 		tabSet.addTab(extendedPropertiesTab);
 
+		tabSet.addTab(securityTab);
+		
 		if (Menu.enabled(Menu.VERSIONS))
 			tabSet.addTab(versionsTab);
 
@@ -304,8 +306,6 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 		if (Menu.enabled(Menu.CAPTURE))
 			tabSet.addTab(captureTab);
-
-		tabSet.addTab(securityTab);
 
 		addMember(tabSet);
 	}
@@ -691,7 +691,12 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			@Override
 			public void onSuccess(GUIDocument result) {
 				hideSave();
+				
+				result.setStatus(GUIDocument.DOC_UNLOCKED);
+				result.setLockUser(null);
+				result.setLockUserId(null);
 				setDocument(result);
+				
 				DocumentController.get().modified(result);
 
 				// If the document is an alias we should alter the file name
@@ -699,7 +704,6 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 					result.setId(document.getDocRef());
 					result.setDocRef(document.getId());
 					result.setFileName(document.getFileName());
-					result.setStatus(GUIDocument.DOC_UNLOCKED);
 					DocumentController.get().modified(result);
 				}
 			}

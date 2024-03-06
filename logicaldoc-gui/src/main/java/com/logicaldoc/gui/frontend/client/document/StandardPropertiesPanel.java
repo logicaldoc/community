@@ -116,7 +116,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		fileName.addChangedHandler(changedHandler);
 		fileName.setRequired(true);
 		fileName.setWidth(DEFAULT_ITEM_WIDTH);
-		fileName.setDisabled(!updateEnabled || !document.getFolder().isRename());
+		fileName.setDisabled(!updateEnabled || !document.isRename());
 
 		StaticTextItem wfStatus = prepareWorkflowItem();
 

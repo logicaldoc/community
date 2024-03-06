@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionListener;
 import com.logicaldoc.core.security.SessionManager;
+import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
@@ -87,7 +88,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 * 
 	 * @return the upload folder
 	 */
-	public static File getUploadDir(String sid) {
+	protected static File getUploadDir(String sid) {
 		File dir = new File(System.getProperty("java.io.tmpdir") + "/upload/" + sid);
 		dir.mkdirs();
 		dir.mkdir();
@@ -101,11 +102,28 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 * 
 	 * @return the upload folder
 	 */
-	public static File getUploadDir(HttpSession httpSession) {
+	private static File getUploadDir(HttpSession httpSession) {
 		File dir = new File(System.getProperty("java.io.tmpdir") + "/upload/" + httpSession.getId());
 		dir.mkdirs();
 		dir.mkdir();
 		return dir;
+	}
+
+	/**
+	 * Retrieves the root of the upload folder
+	 * 
+	 * @param request The current request
+	 * 
+	 * @return the upload folder
+	 */
+	private static File getUploadDir(HttpServletRequest request) {
+		String sid = getSid(request);
+		if (StringUtils.isNotEmpty(sid) && SessionManager.get().get(sid) != null
+				&& SessionManager.get().get(sid).isOpen()) {
+			return getUploadDir(sid);
+		} else {
+			return getUploadDir(request.getSession(true));
+		}
 	}
 
 	/**
@@ -139,7 +157,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 * @return the files map where the key is the original file name and the
 	 *         value is the real file
 	 */
-	public static Map<String, File> getReceivedFiles(HttpSession httpSession) {
+	private static Map<String, File> getReceivedFiles(HttpSession httpSession) {
 		@SuppressWarnings("unchecked")
 		Map<String, File> uploadedFiles = (Map<String, File>) httpSession.getAttribute(RECEIVED_FILES);
 		if (uploadedFiles == null) {
@@ -147,6 +165,23 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 			httpSession.setAttribute(RECEIVED_FILES, uploadedFiles);
 		}
 		return uploadedFiles;
+	}
+
+	/**
+	 * Retrieves the map containing the files uploaded in the current reqeust
+	 * 
+	 * @param request The current request
+	 * 
+	 * @return the files map where the key is the original file name and the
+	 *         value is the real file
+	 */
+	public static Map<String, File> getReceivedFiles(HttpServletRequest request) {
+		String sid = getSid(request);
+		if (StringUtils.isNotEmpty(sid) && SessionManager.get().get(sid) != null
+				&& SessionManager.get().get(sid).isOpen())
+			return getReceivedFiles(sid);
+		else
+			return getReceivedFiles(request.getSession(true));
 	}
 
 	/**
@@ -170,7 +205,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 		getReceivedFiles(httpSession).clear();
 	}
 
-	protected String getSid(HttpServletRequest request) {
+	protected static String getSid(HttpServletRequest request) {
 		String sid = SessionManager.get().getSessionId(request);
 		HttpSession session = SessionManager.get().getServletSession(sid);
 
@@ -199,14 +234,11 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
-			String tenant = "default";
+			File uploadDir = getUploadDir(request);
 			String sid = getSid(request);
-			File uploadDir;
-			if (StringUtils.isNotEmpty(sid)) {
-				tenant = SessionManager.get().get(sid).getTenantName();
-				uploadDir = getUploadDir(sid);
-			} else
-				uploadDir = getUploadDir(request.getSession(true));
+			String tenant = StringUtils.isNotEmpty(sid) && SessionManager.get().get(sid) != null
+					? SessionManager.get().get(sid).getTenantName()
+					: Tenant.DEFAULT_NAME;
 
 			// Check that we have a file upload request
 			boolean isMultipart = ServletFileUpload.isMultipartContent(request);
@@ -239,8 +271,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 			// maximum file size to be uploaded (in bytes)
 			upload.setFileSizeMax(Context.get().getProperties().getLong(tenant + ".upload.maxsize", 10L) * 1024 * 1024);
 
-			Map<String, File> uploadedFiles = StringUtils.isNotEmpty(sid) ? getReceivedFiles(sid)
-					: getReceivedFiles(request.getSession(true));
+			Map<String, File> uploadedFiles = getReceivedFiles(request);
 
 			// Parse the request to get uploaded file items.
 			List<FileItem> fileItems = upload.parseRequest(request);
@@ -265,6 +296,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 					out.println("Uploaded Filename: " + fileName + "<br>");
 				}
 			}
+
 			out.println("</body>");
 			out.println("</html>");
 		} catch (Exception e) {

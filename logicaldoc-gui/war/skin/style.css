@@ -407,6 +407,7 @@
   font-family: Arial, sans-serif;
   font-size: 12px;
   padding-left: 5px;
+  white-space: nowrap;
 }
 
 .dropFilesLabel {

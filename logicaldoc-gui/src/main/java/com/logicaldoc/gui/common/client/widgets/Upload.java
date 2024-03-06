@@ -87,7 +87,6 @@ public class Upload extends VerticalPanel {
 					uploadedFile = null;
 					return true;
 				});
-
 		add(uploader);
 		add(progressLabel);
 		setCellHorizontalAlignment(uploader, HasHorizontalAlignment.ALIGN_LEFT);
