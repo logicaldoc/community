@@ -19,6 +19,7 @@ import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
+import com.logicaldoc.gui.frontend.client.document.DocumentUtil;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.ReportService;
@@ -336,24 +337,23 @@ public class CustomReportsPanel extends AdminPanel {
 
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
-		download.addClickHandler(event -> Util.downloadDocument(outputDocId));
+		download.addClickHandler(event -> DocumentUtil.downloadDocument(outputDocId));
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
-		preview.addClickHandler(
-				event -> DocumentService.Instance.get().getById(outputDocId, new AsyncCallback<>() {
+		preview.addClickHandler(event -> DocumentService.Instance.get().getById(outputDocId, new AsyncCallback<>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(GUIDocument doc) {
-						PreviewPopup iv = new PreviewPopup(doc);
-						iv.show();
-					}
-				}));
+			@Override
+			public void onSuccess(GUIDocument doc) {
+				PreviewPopup iv = new PreviewPopup(doc);
+				iv.show();
+			}
+		}));
 
 		MenuItem export = new MenuItem();
 		export.setTitle(I18N.message("export"));

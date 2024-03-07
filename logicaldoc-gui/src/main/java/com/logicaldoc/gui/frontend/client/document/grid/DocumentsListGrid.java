@@ -349,7 +349,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		template.setAlign(Alignment.LEFT);
 		template.setHidden(true);
 		template.setCanFilter(true);
-		template.setCanSort(false);
+		template.setCanSort(true);
 		fieldsMap.put(template.getName(), template);
 
 		/**

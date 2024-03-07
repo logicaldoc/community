@@ -1436,10 +1436,7 @@ public class ItemFactory {
 		}
 
 		item.setName(itemName);
-		if (att.getLabel() != null)
-			item.setTitle(att.getLabel());
-		else
-			item.setTitle(att.getName());
+		item.setTitle(att.getDisplayName());
 		item.setWrapTitle(false);
 
 		return item;
@@ -1459,6 +1456,8 @@ public class ItemFactory {
 		item.setFetchMissingValues(true);
 		item.setAlwaysFetchMissingValues(true);
 		item.setValue(initialValue);
+		item.setTitle(att.getDisplayName());
+		
 
 		// When the user clicks on the item, preemptively load all the
 		// options to correctly do text completion

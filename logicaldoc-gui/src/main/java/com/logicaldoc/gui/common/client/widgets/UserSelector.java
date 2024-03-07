@@ -34,7 +34,7 @@ public class UserSelector extends SelectItem {
 		setName(name);
 		setTitle(I18N.message(title));
 		setWrapTitle(false);
-
+		
 		ListGridField id = new ListGridField("id", I18N.message("id"));
 		id.setHidden(true);
 		ListGridField username = new ListGridField(USERNAME, I18N.message(USERNAME));

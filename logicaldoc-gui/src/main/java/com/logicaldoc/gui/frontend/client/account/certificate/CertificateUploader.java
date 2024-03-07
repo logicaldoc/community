@@ -30,6 +30,8 @@ public class CertificateUploader extends Window {
 	public CertificateUploader(String title, FormItem srcItem) {
 		this.srcItem = srcItem;
 
+		GuiLog.info("A");
+
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message(title));
 		setCanDragResize(true);
@@ -48,7 +50,8 @@ public class CertificateUploader extends Window {
 		layout.setWidth100();
 
 		uploader = new Upload(submit);
-		uploader.setFileTypes("*" + srcItem.getName().substring(srcItem.getName().lastIndexOf('.')));
+		if (srcItem.getName().contains("."))
+			uploader.setFileTypes("*" + srcItem.getName().substring(srcItem.getName().lastIndexOf('.')));
 
 		layout.addMember(uploader);
 		layout.addMember(submit);

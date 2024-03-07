@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.services.SignService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
@@ -88,20 +89,19 @@ public class CertificateDialog extends Window implements UserObserver {
 				@Override
 				public void onSuccess(Void arg) {
 					LD.clearPrompt();
-					SecurityService.Instance.get().getUser(Session.get().getUser().getId(),
-							new AsyncCallback<>() {
+					SecurityService.Instance.get().getUser(Session.get().getUser().getId(), new AsyncCallback<>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-								@Override
-								public void onSuccess(GUIUser user) {
-									Session.get().setUser(user);
-									refresh();
-								}
-							});
+						@Override
+						public void onSuccess(GUIUser user) {
+							Session.get().setUser(user);
+							refresh();
+						}
+					});
 				}
 			});
 		});
@@ -131,10 +131,15 @@ public class CertificateDialog extends Window implements UserObserver {
 			});
 		}));
 
+		IButton download = new IButton(I18N.message("download"));
+		download.setAutoFit(true);
+		download.addClickHandler(event -> Util.download(Util.contextPath() + "export-keystore?cert="
+				+ Session.get().getUser().getUsername() + "&tenantId=" + Session.get().getTenantId()));
+
 		if (crtAlreadyGenerated) {
 			form.setItems(details);
 			layout.addMember(form);
-			buttons.setMembers(delete);
+			buttons.setMembers(delete, download);
 		} else {
 			Label label = new Label(I18N.message("youdonthavecert"));
 			label.setHeight(50);

@@ -103,7 +103,7 @@ public class OwnCertificateDialog extends Window {
 		form.setColWidths("1px, 100%");
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextAreaItem certificateItem = ItemFactory.newTextAreaItem(CERTIFICATE, CERTIFICATE, null);
+		TextAreaItem certificateItem = ItemFactory.newTextAreaItem(CERTIFICATE + ".crt", CERTIFICATE, null);
 		certificateItem.setWrapTitle(false);
 		certificateItem.setRequired(true);
 		certificateItem.setColSpan(2);
@@ -127,7 +127,7 @@ public class OwnCertificateDialog extends Window {
 			return;
 
 		LD.contactingServer();
-		SignService.Instance.get().importCertificate(form.getValueAsString(CERTIFICATE),
+		SignService.Instance.get().importCertificate(form.getValueAsString(CERTIFICATE + ".crt"),
 				form.getValueAsString(PRIVATEKEY), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
@@ -139,21 +139,20 @@ public class OwnCertificateDialog extends Window {
 					public void onSuccess(Void arg0) {
 						LD.clearPrompt();
 						cleanUploadFolder();
-						SecurityService.Instance.get().getUser(Session.get().getUser().getId(),
-								new AsyncCallback<>() {
+						SecurityService.Instance.get().getUser(Session.get().getUser().getId(), new AsyncCallback<>() {
 
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-									@Override
-									public void onSuccess(GUIUser user) {
-										Session.get().setUser(user);
-										UserController.get().changed(user);
-										destroy();
-									}
-								});
+							@Override
+							public void onSuccess(GUIUser user) {
+								Session.get().setUser(user);
+								UserController.get().changed(user);
+								destroy();
+							}
+						});
 					}
 				});
 	}

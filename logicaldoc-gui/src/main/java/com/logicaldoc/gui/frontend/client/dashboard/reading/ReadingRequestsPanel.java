@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.dashboard.reading;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -181,18 +180,17 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
-		preview.addClickHandler(
-				event -> DocumentService.Instance.get().getById(selectedDocId, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+		preview.addClickHandler(event -> DocumentService.Instance.get().getById(selectedDocId, new AsyncCallback<>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(GUIDocument document) {
-						new PreviewPopup(Arrays.asList(document), 0).show();
-					}
-				}));
+			@Override
+			public void onSuccess(GUIDocument document) {
+				new PreviewPopup(document).show();
+			}
+		}));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));

@@ -21,12 +21,10 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
-import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -35,8 +33,6 @@ import com.logicaldoc.gui.common.client.log.EventPanel;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.ApplicationRestarting;
 import com.logicaldoc.gui.common.client.widgets.ToastNotification;
-import com.logicaldoc.gui.frontend.client.services.DocumentService;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.Layout;
 
@@ -161,41 +157,6 @@ public abstract class Util {
 		uninstallCloseWindowAlert();
 		WindowUtils.openUrl(urlToRedirectTo);
 		installCloseWindowAlert();
-	}
-
-	/**
-	 * Checks the DOWNLOAD permission and forwards the download of the specified
-	 * document-related resource.
-	 * 
-	 * @param docId Identifier of thee document the URL refers to
-	 * 
-	 * @param url The url of a resource related to the given document,may be
-	 *        null
-	 */
-	public static void downloadDocumentResource(String docId, String url) {
-		DocumentService.Instance.get().getEnabledPermissions(Arrays.asList(Long.parseLong(docId)),
-				new AsyncCallback<GUIAccessControlEntry>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUIAccessControlEntry acl) {
-						if (acl.isDownload()) {
-							if (url == null || url.trim().isEmpty())
-								Util.download(downloadURL(Long.parseLong(docId)));
-							else
-								Util.download(url);
-						} else {
-							SC.warn(I18N.message("youdonothavedownloadpermissionondoc"));
-						}
-					}
-				});
-	}
-
-	public static void downloadDocument(long docId) {
-		downloadDocumentResource(Long.toString(docId), null);
 	}
 
 	public static String downloadTicketURL(String ticketId) {

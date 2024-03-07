@@ -161,4 +161,56 @@
 			</sequential>
 		</for>
 	</target>
+	
+	<target name="find-unused-keys" depends="init-all">
+		<loadfile property="keysonly" srcfile="src/main/resources/i18n/messages.properties">
+		     <filterchain>
+		       <tokenfilter>
+		           <replaceregex pattern="(.+)=(.+)" replace="\1"/>
+		        </tokenfilter>
+		      </filterchain>
+		</loadfile>
+		
+		<echo file="target/keys">${keysonly}</echo>
+				
+		<replace file="target/keys">
+		  <replacetoken><![CDATA[
+]]></replacetoken>
+		  <replacevalue>,</replacevalue>
+		</replace>
+		<replace file="target/keys">
+		  <replacetoken> </replacetoken>
+		  <replacevalue></replacevalue>
+		</replace>
+		
+		<loadfile property="keysonly2" srcfile="target/keys" />
+
+		<fileset id="existing" dir="${logicaldoc.devroot}">
+		    <patternset id="files">
+		    	<include name="**/*.java" />
+		    	<include name="**/*.jsp" />
+		    </patternset>
+		</fileset>
+		
+		<fileset id="matches" dir="${logicaldoc.devroot}">
+		    <patternset refid="files" />
+		    <contains text="&quot;sloenabled&quot;" />
+		</fileset>
+		
+		<echo>${toString:matches}</echo>
+		
+		<fail message="Found">
+		    <condition>
+		        <resourcecount when="greater" count="0" refid="matches" />
+		    </condition>
+		</fail>
+		
+		<!-- sloenabled
+		<for list="${keysonly2}" param="key">
+			<sequential>
+				<echo>key: @{key}</echo>
+			</sequential>
+		</for>
+		-->		
+	</target>
 </project>

@@ -237,7 +237,7 @@ public class Frontend implements EntryPoint {
 	 */
 	public static native void declareDownloadDocumentResource() /*-{
 		$wnd.downloadDocumentResource = function(docId, url) {
-			@com.logicaldoc.gui.common.client.util.Util::downloadDocumentResource(Ljava/lang/String;Ljava/lang/String;)(docId, url);
+			@com.logicaldoc.gui.frontend.client.document.DocumentUtil::downloadDocumentResource(Ljava/lang/String;Ljava/lang/String;)(docId, url);
 		};
 	}-*/;
 }

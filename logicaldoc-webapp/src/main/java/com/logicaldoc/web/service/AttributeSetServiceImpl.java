@@ -150,16 +150,17 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		}
 	}
 
-	private void saveAttributes(GUIAttributeSet attributeSet, AttributeSet attSet) {
+	private void saveAttributes(GUIAttributeSet guiAttributeSet, AttributeSet attributeSet) {
 		Map<String, Attribute> attrs = new HashMap<>();
-		attSet.getAttributes().clear();
-		for (GUIAttribute attribute : attributeSet.getAttributes()) {
-			if (attribute != null) {
-				saveAttribute(attribute, attributeSet, attrs);
+		attributeSet.getAttributes().clear();
+		if (guiAttributeSet != null)
+			for (GUIAttribute attribute : guiAttributeSet.getAttributes()) {
+				if (attribute != null) {
+					saveAttribute(attribute, guiAttributeSet, attrs);
+				}
 			}
-		}
 		if (attrs.size() > 0)
-			attSet.setAttributes(attrs);
+			attributeSet.setAttributes(attrs);
 	}
 
 	private void saveAttribute(GUIAttribute attribute, GUIAttributeSet attributeSet, Map<String, Attribute> attrs) {

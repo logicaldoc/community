@@ -1,9 +1,6 @@
 package com.logicaldoc.gui.frontend.client.tenant;
 
-import com.google.gwt.dom.client.Style.BorderStyle;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Label;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.Upload;
@@ -27,8 +24,6 @@ public class ImageUploader extends Window {
 
 	private Upload uploader;
 
-	private Label customExternalDropZone;
-
 	private String imageName;
 
 	private TenantBrandingPanel panel;
@@ -46,14 +41,6 @@ public class ImageUploader extends Window {
 		this.imageName = imageName;
 		this.panel = panel;
 
-		customExternalDropZone = new Label();
-		customExternalDropZone.setText(I18N.message("dropimagehere"));
-		customExternalDropZone.setWidth((getWidth() - 5) + "px");
-		customExternalDropZone.setHeight("40px");
-		customExternalDropZone.getElement().getStyle().setBorderStyle(BorderStyle.DASHED);
-		customExternalDropZone.getElement().getStyle().setBorderWidth(1, Unit.PX);
-		customExternalDropZone.getElement().getStyle().setPadding(10, Unit.PX);
-
 		uploadButton = new IButton(I18N.message("upload"));
 		uploadButton.addClickHandler(event -> onUpload());
 
@@ -61,8 +48,6 @@ public class ImageUploader extends Window {
 		layout.setMembersMargin(5);
 		layout.setMargin(2);
 		layout.setWidth100();
-
-		layout.addMember(customExternalDropZone);
 
 		uploader = new Upload(uploadButton);
 		uploader.setFileTypes("*.png");

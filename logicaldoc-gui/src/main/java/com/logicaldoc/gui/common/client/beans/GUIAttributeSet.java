@@ -22,7 +22,7 @@ public class GUIAttributeSet implements Serializable {
 
 	private int type = TYPE_DEFAULT;
 
-	private List<GUIAttribute> attributes;
+	private List<GUIAttribute> attributes = new ArrayList<>();
 
 	public long getId() {
 		return id;

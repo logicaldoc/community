@@ -87,12 +87,12 @@ public class PreviewPanel extends VLayout {
 
 		DocumentProtectionManager.askForPassword(docId, doc -> onAccessGranted(document));
 
-		addResizedHandler(event -> doResize());
-
 		if (Feature.enabled(Feature.READING_CONFIRMATION)
 				&& ReadingRequestController.get().isReadingConfirmRequired(document.getId())) {
 			showConfirmReadingPanel();
 		}
+		
+		addResizedHandler(event -> doResize());
 	}
 
 	private void confirmReading() {
@@ -151,7 +151,7 @@ public class PreviewPanel extends VLayout {
 	}
 
 	protected void doResize() {
-		if (getWidth() < 10L) {
+		if (getWidth() < 20L) {
 			// The panel has been closed
 			clearContent();
 			width = 0;
@@ -163,7 +163,7 @@ public class PreviewPanel extends VLayout {
 			mail = null;
 			reload = null;
 		} else if (!redrawing
-				&& (!isWithinTolerance(width, getWidth(), 10) || !isWithinTolerance(height, getHeight(), 10))) {
+				&& (!isWithinTolerance(width, getWidth(), 20) || !isWithinTolerance(height, getHeight(), 20))) {
 			width = getWidth();
 			height = getHeight();
 			clearContent();

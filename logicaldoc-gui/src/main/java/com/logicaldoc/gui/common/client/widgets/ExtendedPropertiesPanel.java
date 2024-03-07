@@ -328,13 +328,13 @@ public class ExtendedPropertiesPanel extends HLayout {
 							: null);
 			item = ItemFactory.newStringItemForAttribute(att);
 		} else if (att.getType() == GUIAttribute.TYPE_INT) {
-			item = ItemFactory.newIntegerItemForAttribute(att.getName(), att.getLabel(), null);
+			item = ItemFactory.newIntegerItemForAttribute(att.getName(), att.getDisplayName(), null);
 			if (extensibleObject.getValue(att.getName()) != null)
 				item.setValue(extensibleObject.getValue(att.getName()));
 		} else if (att.getType() == GUIAttribute.TYPE_BOOLEAN) {
 			item = prepareBooleanItem(att);
 		} else if (att.getType() == GUIAttribute.TYPE_DOUBLE) {
-			item = ItemFactory.newFloatItemForAttribute(att.getName(), att.getLabel(), null);
+			item = ItemFactory.newFloatItemForAttribute(att.getName(), att.getDisplayName(), null);
 			item.setValue(extensibleObject.getValue(att.getName()));
 		} else if (att.getType() == GUIAttribute.TYPE_DATE) {
 			item = prepareDateItem(att);
@@ -365,7 +365,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	}
 
 	protected FormItem prepareUserItem(GUIAttribute att, List<FormItemIcon> multiValIcons) {
-		FormItem item = ItemFactory.newUserSelectorForAttribute(att.getName(), att.getLabel(),
+		FormItem item = ItemFactory.newUserSelectorForAttribute(att.getName(), att.getDisplayName(),
 				att.getOptions() != null && !att.getOptions().isEmpty() ? att.getOptions().get(0) : null,
 				multiValIcons);
 		if (extensibleObject.getValue(att.getName()) != null)
@@ -375,7 +375,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	protected FormItem prepareFolderItem(GUIAttribute att, List<FormItemIcon> multiValIcons) {
 		FormItem item;
-		item = ItemFactory.newFolderSelectorForAttribute(att.getName(), att.getLabel(), multiValIcons);
+		item = ItemFactory.newFolderSelectorForAttribute(att.getName(), att.getDisplayName(), multiValIcons);
 		FolderSelector selector = (FolderSelector) item;
 		if (extensibleObject.getValue(att.getName()) != null) {
 			selector.setFolder(att.getIntValue(), att.getStringValue());
@@ -390,7 +390,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	protected FormItem prepareDocumentItem(GUIAttribute att, List<FormItemIcon> multiValIcons) {
 		FormItem item;
-		item = ItemFactory.newDocumentSelectorForAttribute(att.getName(), att.getLabel(), multiValIcons);
+		item = ItemFactory.newDocumentSelectorForAttribute(att.getName(), att.getDisplayName(), multiValIcons);
 		DocumentSelector selector = (DocumentSelector) item;
 		if (extensibleObject.getValue(att.getName()) != null) {
 			selector.setDocument(att.getIntValue(), att.getStringValue());
@@ -405,7 +405,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	protected FormItem prepareDateItem(GUIAttribute att) {
 		FormItem item;
-		item = ItemFactory.newDateItemForAttribute(att.getName(), att.getLabel());
+		item = ItemFactory.newDateItemForAttribute(att.getName(), att.getDisplayName());
 		if (extensibleObject.getValue(att.getName()) != null)
 			item.setValue((Date) extensibleObject.getValue(att.getName()));
 		item.addKeyPressHandler((KeyPressEvent event) -> {
@@ -422,7 +422,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	protected FormItem prepareBooleanItem(GUIAttribute att) {
 		FormItem item;
-		item = ItemFactory.newBooleanSelectorForAttribute(att.getName(), att.getLabel(),
+		item = ItemFactory.newBooleanSelectorForAttribute(att.getName(), att.getDisplayName(),
 				checkMandatory && !att.isMandatory());
 		if (extensibleObject.getValue(att.getName()) != null)
 			item.setValue(((Boolean) extensibleObject.getValue(att.getName())).booleanValue() ? "1" : "0");
