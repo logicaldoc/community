@@ -11,5 +11,12 @@
 	<artifactId>logicaldoc-i18n</artifactId>
 	<name>logicaldoc-i18n</name>
 	<packaging>jar</packaging>
-	<dependencies />
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.ant</groupId>
+			<artifactId>ant</artifactId>
+			<type>jar</type>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 </project>

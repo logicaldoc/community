@@ -234,14 +234,14 @@ public class WorkflowToolStrip extends ToolStrip {
 
 		boolean taskFound = checkTaskPresence();
 
-		boolean taskWithoutParticipantsFound = checkTaskWithoutParticipants();
+		boolean taskWithoutCandidatesFound = checkTaskWithoutCandidates();
 
 		boolean taskWithoutTransitionsFound = checkTaskWithoutTransitions();
 
 		if (!taskFound)
 			SC.warn(I18N.message("workflowtaskatleast"));
-		else if (taskWithoutParticipantsFound)
-			SC.warn(I18N.message("workflowtaskparticipantatleast"));
+		else if (taskWithoutCandidatesFound)
+			SC.warn(I18N.message("workflowtaskcandidateatleast"));
 		else if (taskWithoutTransitionsFound)
 			SC.warn(I18N.message("workflowtransitiontarget"));
 		else {
@@ -287,9 +287,9 @@ public class WorkflowToolStrip extends ToolStrip {
 		return transitionErrorFound;
 	}
 
-	private boolean checkTaskWithoutParticipants() {
+	private boolean checkTaskWithoutCandidates() {
 		return currentWorkflow.getStates().stream()
-				.anyMatch(state -> state.getType() == GUIWFState.TYPE_TASK && state.getParticipants().isEmpty());
+				.anyMatch(state -> state.getType() == GUIWFState.TYPE_TASK && state.getCandidates().isEmpty());
 	}
 
 	private boolean checkTaskPresence() {

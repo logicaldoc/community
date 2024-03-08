@@ -91,7 +91,7 @@ public class GUIWFState implements Serializable {
 	 */
 	private Integer minNoteSize;
 
-	private List<GUIValue> participants = new ArrayList<>();
+	private List<GUIValue> candidates = new ArrayList<>();
 
 	private List<GUITransition> transitions = new ArrayList<>();
 
@@ -342,12 +342,12 @@ public class GUIWFState implements Serializable {
 		this.minNoteSize = minNoteSize;
 	}
 
-	public List<GUIValue> getParticipants() {
-		return participants;
+	public List<GUIValue> getCandidates() {
+		return candidates;
 	}
 
-	public void setParticipants(List<GUIValue> participants) {
-		this.participants = participants;
+	public void setCandidates(List<GUIValue> candidates) {
+		this.candidates = candidates;
 	}
 
 	public List<GUITransition> getTransitions() {

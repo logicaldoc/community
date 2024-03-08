@@ -161,56 +161,73 @@
 			</sequential>
 		</for>
 	</target>
-	
+
+	<target name="detect-not-used-key">
+		<echo>Checking key ${key}</echo>
+		
+		<fileset id="matches1" dir="${logicaldoc.devroot}">
+			<patternset>
+				<include name="**/*.java" />
+				<include name="**/*.jsp" />
+				<exclude name="**/target/**" />
+			</patternset>
+			<contains text="&quot;${key}&quot;" />
+		</fileset>
+
+		<fileset id="matches2" dir="${logicaldoc.devroot}">
+			<patternset>
+				<include name="**/*.sql" />
+				<exclude name="**/target/**" />
+			</patternset>
+			<contains text="&apos;${key}&apos;" />
+		</fileset>
+
+		<if>
+			<and>
+				<resourcecount when="equal" count="0" refid="matches1" />
+				<resourcecount when="equal" count="0" refid="matches2" />
+			</and>
+			<then>
+				<echo>Key ${key} is never used</echo>
+				<echo file="${outfile}" append="true">${key}${line.separator}</echo>
+			</then>
+		</if>
+	</target>
+
 	<target name="find-unused-keys" depends="init-all">
+		<delete file="target/unused-keys" failonerror="false" />
+		<delete file="target/keys" failonerror="false" />
+
 		<loadfile property="keysonly" srcfile="src/main/resources/i18n/messages.properties">
-		     <filterchain>
-		       <tokenfilter>
-		           <replaceregex pattern="(.+)=(.+)" replace="\1"/>
-		        </tokenfilter>
-		      </filterchain>
+			<filterchain>
+				<tokenfilter>
+					<replaceregex pattern="(.+)=(.+)" replace="\1" />
+				</tokenfilter>
+			</filterchain>
 		</loadfile>
-		
-		<echo file="target/keys">${keysonly}</echo>
-				
+
+		<echo file="target/keys" append="false">${keysonly}</echo>
+
 		<replace file="target/keys">
-		  <replacetoken><![CDATA[
+			<!-- Please be sure this CDATA contains just a line feed, reformatting this file may invalidate this replace -->
+			<replacetoken><![CDATA[
 ]]></replacetoken>
-		  <replacevalue>,</replacevalue>
+			<replacevalue>,</replacevalue>
 		</replace>
 		<replace file="target/keys">
-		  <replacetoken> </replacetoken>
-		  <replacevalue></replacevalue>
+			<replacetoken><![CDATA[ ]]></replacetoken>
+			<replacevalue><![CDATA[]]></replacevalue>
 		</replace>
-		
+
 		<loadfile property="keysonly2" srcfile="target/keys" />
 
-		<fileset id="existing" dir="${logicaldoc.devroot}">
-		    <patternset id="files">
-		    	<include name="**/*.java" />
-		    	<include name="**/*.jsp" />
-		    </patternset>
-		</fileset>
-		
-		<fileset id="matches" dir="${logicaldoc.devroot}">
-		    <patternset refid="files" />
-		    <contains text="&quot;sloenabled&quot;" />
-		</fileset>
-		
-		<echo>${toString:matches}</echo>
-		
-		<fail message="Found">
-		    <condition>
-		        <resourcecount when="greater" count="0" refid="matches" />
-		    </condition>
-		</fail>
-		
-		<!-- sloenabled
 		<for list="${keysonly2}" param="key">
 			<sequential>
-				<echo>key: @{key}</echo>
+				<antcall target="detect-not-used-key">
+					<param name="key" value="@{key}" />
+					<param name="outfile" value="unused-keys" />
+				</antcall>
 			</sequential>
 		</for>
-		-->		
 	</target>
 </project>

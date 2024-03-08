@@ -66,7 +66,7 @@ public class TaskEditor extends Window {
 
 	private GUIWFState state;
 
-	private ListGrid participantsGrid;
+	private ListGrid candidatesGrid;
 
 	private StateWidget widget;
 
@@ -230,8 +230,8 @@ public class TaskEditor extends Window {
 	// Checks if the task requires human interaction
 	private boolean isHumanInteraction() {
 		try {
-			return !(state.getParticipants().size() == 1
-					&& state.getParticipants().get(0).getCode().equals("_workflow"));
+			return !(state.getCandidates().size() == 1
+					&& state.getCandidates().get(0).getCode().equals("_workflow"));
 		} catch (Exception t) {
 			return true;
 		}
@@ -262,11 +262,11 @@ public class TaskEditor extends Window {
 		propertiesPanel.setHeight100();
 		propertiesPanel.addMember(taskForm);
 
-		// The vertical panel that contains the participants
-		VLayout participantsPanel = new VLayout();
-		propertiesPanel.addMember(participantsPanel);
+		// The vertical panel that contains the candidates
+		VLayout candidatesPanel = new VLayout();
+		propertiesPanel.addMember(candidatesPanel);
 
-		// Horizontal panel that contains the forms related to the participants
+		// Horizontal panel that contains the forms related to the candiadtes
 		HLayout formsPanel = new HLayout();
 		formsPanel.setMembersMargin(5);
 		formsPanel.setHeight(70);
@@ -276,9 +276,9 @@ public class TaskEditor extends Window {
 		humanInteraction.setValue(isHumanInteraction);
 		humanInteraction.addChangedHandler((ChangedEvent event) -> {
 			if ("yes".equals(event.getValue())) {
-				participantsPanel.show();
+				candidatesPanel.show();
 			} else
-				participantsPanel.hide();
+				candidatesPanel.hide();
 		});
 
 		if (state.getType() == GUIWFState.TYPE_TASK) {
@@ -286,7 +286,7 @@ public class TaskEditor extends Window {
 			taskForm.setFields(taskName, taskColor, humanInteraction, taskDescr);
 		} else
 			taskForm.setFields(taskName, taskColor, taskDescr);
-		participantsPanel.addMembers(formsPanel);
+		candidatesPanel.addMembers(formsPanel);
 
 		addTaskItems(formsPanel);
 
@@ -294,7 +294,7 @@ public class TaskEditor extends Window {
 		spacer.setHeight(2);
 		spacer.setMargin(2);
 		spacer.setOverflow(Overflow.HIDDEN);
-		participantsPanel.addMember(spacer);
+		candidatesPanel.addMember(spacer);
 
 		VLayout addUsersAndGroupsPanel = new VLayout();
 		addUsersAndGroupsPanel.setMargin(3);
@@ -308,65 +308,65 @@ public class TaskEditor extends Window {
 		name.setHidden(true);
 
 		UserListGridField avatar = new UserListGridField();
-		participantsGrid = new RefreshableListGrid();
-		participantsGrid.setEmptyMessage(I18N.message("notitemstoshow"));
-		participantsGrid.setCanFreezeFields(true);
-		participantsGrid.setAutoFetchData(true);
-		participantsGrid.setSelectionType(SelectionStyle.MULTIPLE);
-		participantsGrid.setFilterOnKeypress(true);
-		participantsGrid.setShowFilterEditor(false);
-		participantsGrid.setShowHeader(false);
-		participantsGrid.setFields(name, avatar, label);
-		participantsGrid.addCellContextClickHandler(click -> {
+		candidatesGrid = new RefreshableListGrid();
+		candidatesGrid.setEmptyMessage(I18N.message("notitemstoshow"));
+		candidatesGrid.setCanFreezeFields(true);
+		candidatesGrid.setAutoFetchData(true);
+		candidatesGrid.setSelectionType(SelectionStyle.MULTIPLE);
+		candidatesGrid.setFilterOnKeypress(true);
+		candidatesGrid.setShowFilterEditor(false);
+		candidatesGrid.setShowHeader(false);
+		candidatesGrid.setFields(name, avatar, label);
+		candidatesGrid.addCellContextClickHandler(click -> {
 			Menu contextMenu = new Menu();
 			MenuItem delete = new MenuItem();
 			delete.setTitle(I18N.message("ddelete"));
-			delete.addClickHandler(itemClick -> participantsGrid.removeSelectedData());
+			delete.addClickHandler(itemClick -> candidatesGrid.removeSelectedData());
 
 			contextMenu.setItems(delete);
 			contextMenu.showContextMenu();
 			click.cancel();
 		});
 
-		SectionStackSection participantsSection = new SectionStackSection(I18N.message("participants"));
-		participantsSection.setCanCollapse(false);
-		participantsSection.setExpanded(true);
-		participantsSection.setItems(participantsGrid);
-		SectionStack participantsStack = new SectionStack();
-		participantsStack.setWidth100();
-		participantsStack.setHeight(220);
-		participantsStack.setSections(participantsSection);
+		SectionStackSection candidatesSection = new SectionStackSection(I18N.message("candidates"));
+		candidatesSection.setCanCollapse(false);
+		candidatesSection.setExpanded(true);
+		candidatesSection.setItems(candidatesGrid);
+		SectionStack candidatesStack = new SectionStack();
+		candidatesStack.setWidth100();
+		candidatesStack.setHeight(220);
+		candidatesStack.setSections(candidatesSection);
 
-		addUsersAndGroupsPanel.addMember(participantsStack);
-		addUsersAndGroupsPanel.addMember(prepareAddParticipantsForm());
-		participantsPanel.addMember(addUsersAndGroupsPanel);
+		addUsersAndGroupsPanel.addMember(candidatesStack);
+		addUsersAndGroupsPanel.addMember(prepareAddCandidatesForm());
+		candidatesPanel.addMember(addUsersAndGroupsPanel);
 
-		initParticipantsList();
+		initCandidatesList();
 
 		if (isHumanInteraction)
-			participantsPanel.show();
+			candidatesPanel.show();
 		else
-			participantsPanel.hide();
+			candidatesPanel.hide();
 
 		return propertiesPanel;
 	}
 
-	private DynamicForm prepareAddParticipantsForm() {
+	private DynamicForm prepareAddCandidatesForm() {
 		// Prepare the combo and button for adding a new user
-		DynamicForm participantsEditForm = new DynamicForm();
-		participantsEditForm.setTitleOrientation(TitleOrientation.LEFT);
-		participantsEditForm.setNumCols(6);
-		participantsEditForm.setWidth(1);
+		DynamicForm candidatesEditForm = new DynamicForm();
+		candidatesEditForm.setTitleOrientation(TitleOrientation.LEFT);
+		candidatesEditForm.setNumCols(6);
+		candidatesEditForm.setWidth(1);
 
 		SelectItem addUser = prepareAddUserSelector();
 
 		SelectItem addGroup = prepareAddGroupSelector();
 
-		// Prepare dynamic user participant
+		// Prepare dynamic user candidate
 		final TextItem addAttribute = prepareAddAttributeItem();
 
-		participantsEditForm.setItems(addUser, addGroup, addAttribute);
-		return participantsEditForm;
+		candidatesEditForm.setItems(addUser, addGroup, addAttribute);
+		return candidatesEditForm;
 	}
 
 	private TextItem prepareAddAttributeItem() {
@@ -381,11 +381,11 @@ public class TaskEditor extends Window {
 				return;
 
 			// Check if the digited attribute user is already present in the
-			// participants list
-			if (participantsGrid.find(new AdvancedCriteria("name", OperatorId.EQUALS, "att." + val)) != null)
+			// candidates list
+			if (candidatesGrid.find(new AdvancedCriteria("name", OperatorId.EQUALS, "att." + val)) != null)
 				return;
 			else
-				addParticipant("att." + val, val);
+				addCandidates("att." + val, val);
 			addAttribute.clearValue();
 		});
 		addAttribute.setIcons(addIcon);
@@ -403,12 +403,12 @@ public class TaskEditor extends Window {
 					return;
 
 				// Check if the selected user is already present in the
-				// participants list
-				if (participantsGrid.find(new AdvancedCriteria("name", OperatorId.EQUALS,
+				// candidates list
+				if (candidatesGrid.find(new AdvancedCriteria("name", OperatorId.EQUALS,
 						"g." + selectedRecord.getAttribute("name"))) != null)
 					return;
 				else
-					addParticipant("g." + selectedRecord.getAttribute("name"), selectedRecord.getAttribute("name"));
+					addCandidates("g." + selectedRecord.getAttribute("name"), selectedRecord.getAttribute("name"));
 				addGroup.clearValue();
 			}
 		});
@@ -427,11 +427,11 @@ public class TaskEditor extends Window {
 
 				// Check if the selected user is already present in the
 				// rights table
-				if (participantsGrid.find(new AdvancedCriteria("name", OperatorId.EQUALS,
+				if (candidatesGrid.find(new AdvancedCriteria("name", OperatorId.EQUALS,
 						selectedRecord.getAttribute("username"))) != null)
 					return;
 				else
-					addParticipant(selectedRecord.getAttribute("username"), selectedRecord.getAttribute(LABEL));
+					addCandidates(selectedRecord.getAttribute("username"), selectedRecord.getAttribute(LABEL));
 				addUser.clearValue();
 			}
 		});
@@ -499,29 +499,29 @@ public class TaskEditor extends Window {
 		}
 	}
 
-	private void initParticipantsList() {
-		// Initialize the participants list
+	private void initCandidatesList() {
+		// Initialize the candidates list
 		try {
-			if (this.state.getParticipants() != null) {
+			if (this.state.getCandidates() != null) {
 				ArrayList<ListGridRecord> records = new ArrayList<>();
 
-				for (GUIValue part : this.state.getParticipants()) {
+				for (GUIValue part : this.state.getCandidates()) {
 					if (part.getCode() == null || part.getValue() == null)
 						continue;
 
-					ListGridRecord rec = createParticipantRecord(part.getCode(), part.getValue());
+					ListGridRecord rec = createCandidateRecord(part.getCode(), part.getValue());
 					records.add(rec);
 				}
 
 				if (!records.isEmpty())
-					participantsGrid.setRecords(records.toArray(new ListGridRecord[0]));
+					candidatesGrid.setRecords(records.toArray(new ListGridRecord[0]));
 			}
 		} catch (Exception t) {
 			// Nothing to do
 		}
 	}
 
-	private ListGridRecord createParticipantRecord(String name, String label) {
+	private ListGridRecord createCandidateRecord(String name, String label) {
 		ListGridRecord rec = new ListGridRecord();
 		rec.setAttribute("name", name);
 		rec.setAttribute(LABEL, label);
@@ -535,11 +535,11 @@ public class TaskEditor extends Window {
 	}
 
 	/**
-	 * Refresh the task's users participants list.
+	 * Refresh the task's users candidates list.
 	 */
-	private void addParticipant(String entityCode, String entityLabel) {
+	private void addCandidates(String entityCode, String entityLabel) {
 		if (entityCode != null && entityLabel != null)
-			participantsGrid.getDataAsRecordList().add(createParticipantRecord(entityCode, entityLabel));
+			candidatesGrid.getDataAsRecordList().add(createCandidateRecord(entityCode, entityLabel));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -574,18 +574,18 @@ public class TaskEditor extends Window {
 			TaskEditor.this.state.setCompletionMessageTemplate((String) values.get("completionMessageTemplate"));
 
 			if (!humanInteraction) {
-				participantsGrid.getRecordList().removeList(participantsGrid.getRecordList().toArray());
-				participantsGrid.getRecordList().add(createParticipantRecord("_workflow", "Workflow Engine"));
+				candidatesGrid.getRecordList().removeList(candidatesGrid.getRecordList().toArray());
+				candidatesGrid.getRecordList().add(createCandidateRecord("_workflow", "Workflow Engine"));
 			}
 		}
 
-		ArrayList<GUIValue> participants = new ArrayList<>();
-		for (ListGridRecord rec : participantsGrid.getRecords())
-			participants.add(new GUIValue(rec.getAttributeAsString("name"), rec.getAttributeAsString(LABEL)));
-		TaskEditor.this.state.setParticipants(participants);
+		ArrayList<GUIValue> candidates = new ArrayList<>();
+		for (ListGridRecord rec : candidatesGrid.getRecords())
+			candidates.add(new GUIValue(rec.getAttributeAsString("name"), rec.getAttributeAsString(LABEL)));
+		TaskEditor.this.state.setCandidates(candidates);
 
 		if (humanInteraction && state.getType() == GUIWFState.TYPE_TASK
-				&& TaskEditor.this.state.getParticipants().isEmpty())
-			SC.warn(I18N.message("workflowtaskparticipantatleast"));
+				&& TaskEditor.this.state.getCandidates().isEmpty())
+			SC.warn(I18N.message("workflowtaskcandidateatleast"));
 	}
 }
