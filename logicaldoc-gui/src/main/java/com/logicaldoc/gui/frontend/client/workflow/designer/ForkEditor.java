@@ -32,7 +32,7 @@ public class ForkEditor extends Window {
 		this.widget = widget;
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("editworkflowstate", I18N.message("task")));
+		setTitle(I18N.message("editworkflowstate", I18N.message("task")) + " - " + widget.getTransition().getText());
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
@@ -54,7 +54,7 @@ public class ForkEditor extends Window {
 		save.addClickHandler(new ClickHandler() {
 			@SuppressWarnings("unchecked")
 			public void onClick(ClickEvent event) {
-				Map<String, Object> values =  vm.getValues();
+				Map<String, Object> values = vm.getValues();
 
 				if (Boolean.TRUE.equals(vm.validate())) {
 					ForkEditor.this.widget.getWFState().setName((String) values.get("name"));

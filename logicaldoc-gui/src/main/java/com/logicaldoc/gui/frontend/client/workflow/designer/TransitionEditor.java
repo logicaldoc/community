@@ -28,7 +28,8 @@ public class TransitionEditor extends Window {
 		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, event -> destroy());
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, closeIcon);
-		setTitle(I18N.message("editworkflowstate", I18N.message("transition")));
+		setTitle(I18N.message("editworkflowstate", I18N.message("transition")) + " - "
+				+ widget.getTransition().getText());
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);

@@ -78,7 +78,8 @@ public class TaskEditor extends Window {
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, closeIcon);
 		setTitle(I18N.message("editworkflowstate",
-				state.getType() == GUIWFState.TYPE_TASK ? I18N.message("task") : I18N.message("endstate")));
+				state.getType() == GUIWFState.TYPE_TASK ? I18N.message("task") : I18N.message("endstate")) + " - "
+				+ state.getName());
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
