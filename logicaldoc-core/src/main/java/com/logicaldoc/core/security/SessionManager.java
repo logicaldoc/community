@@ -376,6 +376,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * <li>Session attribute <code>PARAM_SID</code></li>
 	 * <li>Request attribute <code>PARAM_SID</code></li>
 	 * <li>Request parameter <code>PARAM_SID</code></li>
+	 * <li>Request header <code>PARAM_SID</code></li>
 	 * <li>Cookie <code>COOKIE_SID</code></li>
 	 * <li>Spring SecurityContextHolder</li>
 	 * </ol>
@@ -417,6 +418,8 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		else if (StringUtils.isNotEmpty(request.getParameter(PARAM_SID))
 				&& Context.get().getProperties().getBoolean("security.acceptsid", false))
 			sid = request.getParameter(PARAM_SID);
+		else if (StringUtils.isNotEmpty(request.getHeader(PARAM_SID)))
+			sid = request.getHeader(PARAM_SID);
 		else {
 			sid = getSessionIdFromCookie(request);
 		}

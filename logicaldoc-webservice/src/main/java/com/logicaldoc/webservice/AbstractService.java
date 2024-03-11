@@ -191,6 +191,7 @@ public class AbstractService {
 	 * <li>Request parameter sid</li>
 	 * <li>Request attribute sid</li>
 	 * <li>Session attribute sid</li>
+	 * <li>Request header sid</li>
 	 * <li>Request cookie ldoc-sid</li>
 	 * <li>SecurityContextHolder</li>
 	 * </ol>

@@ -30,6 +30,7 @@ import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.grid.StatusIconsListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.document.RatingDialog;
 import com.logicaldoc.gui.frontend.client.folder.browser.FolderCursor;
@@ -331,11 +332,11 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		wfStatus.setHidden(true);
 		fieldsMap.put(wfStatus.getName(), wfStatus);
 
-		ListGridField startPublishing = new DateListGridField(START_PUBLISHING, "startpublishing");
+		ListGridField startPublishing = new DateListGridField(START_PUBLISHING, "startpublishing", DateCellFormatter.FORMAT_SHORT);
 		startPublishing.setHidden(true);
 		fieldsMap.put(startPublishing.getName(), startPublishing);
 
-		ListGridField stopPublishing = new DateListGridField(STOP_PUBLISHING, "stoppublishing");
+		ListGridField stopPublishing = new DateListGridField(STOP_PUBLISHING, "stoppublishing", DateCellFormatter.FORMAT_SHORT);
 		stopPublishing.setHidden(true);
 		fieldsMap.put(stopPublishing.getName(), stopPublishing);
 
@@ -427,7 +428,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 				GUIAttribute attDef = Session.get().getInfo().getAttributeDefinition(name);
 				if (attDef != null) {
 					if (attDef.getType() == GUIAttribute.TYPE_DATE) {
-						ext = new DateListGridField("ext_" + name, Session.get().getInfo().getAttributeLabel(name));
+						ext = new DateListGridField("ext_" + name, Session.get().getInfo().getAttributeLabel(name), DateCellFormatter.FORMAT_SHORT);
 						ext.setTitle(Session.get().getInfo().getAttributeLabel(name));
 					} else if (attDef.getType() == GUIAttribute.TYPE_INT) {
 						ext.setAlign(Alignment.RIGHT);
