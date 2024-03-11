@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
-import com.logicaldoc.core.dashlet.Dashlet;
 
 /**
  * DAO for <code>FolderHistory</code> handling.
@@ -48,9 +47,10 @@ public interface FolderHistoryDAO extends PersistentObjectDAO<FolderHistory> {
 	 * 
 	 * @return list of histories ordered by date
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<FolderHistory> findByFolderIdAndEvent(long folderId, String event, Date oldestDate) throws PersistenceException;
+	public List<FolderHistory> findByFolderIdAndEvent(long folderId, String event, Date oldestDate)
+			throws PersistenceException;
 
 	/**
 	 * This method selects all histories not notified yet.
@@ -85,9 +85,10 @@ public interface FolderHistoryDAO extends PersistentObjectDAO<FolderHistory> {
 	 * @param max Optional maximum number of records
 	 * 
 	 * @return The list of histories that matched the given criteria
-	 * @throws PersistenceException List<Dashlet> dashlets =
+	 * @throws PersistenceException Error in the data layer
 	 */
-	public List<FolderHistory> findByPath(String pathExpression, Date oldestDate, Collection<String> events, Integer max) throws PersistenceException;
+	public List<FolderHistory> findByPath(String pathExpression, Date oldestDate, Collection<String> events,
+			Integer max) throws PersistenceException;
 
 	/**
 	 * This method deletes all the user history entries oldest than the given
@@ -96,7 +97,7 @@ public interface FolderHistoryDAO extends PersistentObjectDAO<FolderHistory> {
 	 * 
 	 * @param ttl The maximum number of days over which the history is
 	 *        considered old
-	 *        
+	 * 
 	 * @throws PersistenceException Error in the database
 	 */
 	public void cleanOldHistories(int ttl) throws PersistenceException;

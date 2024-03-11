@@ -11,7 +11,7 @@ import com.logicaldoc.util.Context;
  * Some utility methods for the access control
  * 
  * @author Marco Meschieri - LogicalDOC
- * @since <product_release>
+ * @since 8.9.1
  *
  */
 public class AccessControlUtil {

@@ -723,7 +723,7 @@ public interface DocumentService extends RemoteService {
 	/**
 	 * Applies all security settings from the folder to the document
 	 * 
-	 * @param document The document that will contain the new security settings
+	 * @param docId The document that will contain the new security settings
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */

@@ -225,7 +225,7 @@
 			<sequential>
 				<antcall target="detect-not-used-key">
 					<param name="key" value="@{key}" />
-					<param name="outfile" value="unused-keys" />
+					<param name="outfile" value="target/unused-keys" />
 				</antcall>
 			</sequential>
 		</for>
