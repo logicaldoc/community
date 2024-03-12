@@ -3,6 +3,7 @@ package com.logicaldoc.web;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +12,7 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -22,9 +24,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.util.Context;
@@ -32,6 +37,7 @@ import com.logicaldoc.util.SystemUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.LoggingConfigurator;
 import com.logicaldoc.util.config.OrderedProperties;
+import com.logicaldoc.util.csv.CSVFileWriter;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.web.util.ServletUtil;
 
@@ -82,7 +88,7 @@ public class LogDownload extends HttpServlet {
 				return;
 
 			downloadLogFile(response, appender, file);
-		} catch (IOException e) {
+		} catch (IOException | PersistenceException e) {
 			log.warn(e.getMessage(), e);
 		}
 	}
@@ -116,8 +122,9 @@ public class LogDownload extends HttpServlet {
 	 * context.properties, the snapshot of the env variables.
 	 * 
 	 * @throws IOException error creting a temporary file
+	 * @throws PersistenceException Error in the data layer
 	 */
-	private File prepareAllSupportResources() throws IOException {
+	private File prepareAllSupportResources() throws IOException, PersistenceException {
 		File tmp = FileUtil.createTempFile("logs", ".zip");
 
 		try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(tmp));) {
@@ -172,6 +179,12 @@ public class LogDownload extends HttpServlet {
 			 */
 			writeTomcatLogs(out, webappDescriptor);
 
+			/*
+			 * Dump all the informations about updates and batches
+			 */
+			writeUpdateLogs(out);
+			writePatchLogs(out);
+
 			prop.store(new FileOutputStream(buf), "Support Request");
 		}
 
@@ -209,6 +222,95 @@ public class LogDownload extends HttpServlet {
 					|| file.getName().toLowerCase().endsWith(today + ".txt"))
 				writeEntry(out, "tomcat/" + file.getName(), file);
 		}
+	}
+
+	private void writeUpdateLogs(ZipOutputStream out) throws IOException, PersistenceException {
+		/*
+		 * Write he log files in the updates/ folder
+		 */
+		Properties buildProperties = loadBuildProperties();
+		String dir = StrSubstitutor.replace(buildProperties.getProperty("update.dir"), buildProperties);
+		File logsDir = new File(dir);
+		File[] files = logsDir.listFiles();
+		if (files != null)
+			for (File file : files) {
+				if (file.getName().toLowerCase().endsWith(".log"))
+					writeEntry(out, "updates/" + file.getName(), file);
+			}
+
+		/*
+		 * Collect the updates table
+		 */
+		dumpUpdateTable(out);
+	}
+
+	private void dumpUpdateTable(ZipOutputStream out) throws IOException, PersistenceException {
+		File buf = FileUtil.createTempFile("updates", ".csv");
+		try {
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+
+			SqlRowSet rows = dao
+					.queryForRowSet("select ld_update, ld_date, ld_version from ld_update order by ld_date desc", null);
+			try (CSVFileWriter csv = new CSVFileWriter(buf.getAbsolutePath(), ',')) {
+				while (rows.next()) {
+					csv.writeFields(List.of(df.format(rows.getDate(2)), rows.getString(3), rows.getString(1)));
+				}
+			}
+
+			writeEntry(out, "updates/updates.csv", buf);
+		} finally {
+			FileUtil.strongDelete(buf);
+		}
+	}
+
+	private void writePatchLogs(ZipOutputStream out) throws IOException, PersistenceException {
+		/*
+		 * Write he log files in the patches/ folder
+		 */
+		Properties buildProperties = loadBuildProperties();
+		String dir = StrSubstitutor.replace(buildProperties.getProperty("patch.dir"), buildProperties);
+		File logsDir = new File(dir);
+		File[] files = logsDir.listFiles();
+		if (files != null)
+			for (File file : files) {
+				if (file.getName().toLowerCase().endsWith(".log"))
+					writeEntry(out, "patches/" + file.getName(), file);
+			}
+
+		/*
+		 * Collect the updates table
+		 */
+		dumpPatchTable(out);
+	}
+
+	private void dumpPatchTable(ZipOutputStream out) throws IOException, PersistenceException {
+		File buf = FileUtil.createTempFile("patches", ".csv");
+		try {
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+
+			SqlRowSet rows = dao
+					.queryForRowSet("select ld_patch, ld_date, ld_version from ld_patch order by ld_date desc", null);
+			try (CSVFileWriter csv = new CSVFileWriter(buf.getAbsolutePath(), ',')) {
+				while (rows.next()) {
+					csv.writeFields(List.of(df.format(rows.getDate(2)), rows.getString(3), rows.getString(1)));
+				}
+			}
+
+			writeEntry(out, "patches/patches.csv", buf);
+		} finally {
+			FileUtil.strongDelete(buf);
+		}
+	}
+
+	private Properties loadBuildProperties() throws IOException, FileNotFoundException {
+		Properties buildProperties = new Properties();
+		try (InputStream is = new FileInputStream(
+				new File(Context.get().getProperties().getProperty("LDOCHOME") + "/conf/build.properties"))) {
+			buildProperties.load(is);
+		}
+		return buildProperties;
 	}
 
 	private OrderedProperties writeContextProperties(ZipOutputStream out) throws IOException {
