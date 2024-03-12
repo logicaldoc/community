@@ -305,7 +305,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 			// Count those attributes that reference other documents
 			doc.setDocAttrs((int) doc.getAttributes().values().stream()
-					.filter(a -> a.getType() == Attribute.TYPE_DOCUMENT).count());
+					.filter(a -> a.getType() == Attribute.TYPE_DOCUMENT && a.getIntValue()!=null).count());
 
 			/*
 			 * Avoid documents inside folder alias
