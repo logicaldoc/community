@@ -355,6 +355,7 @@ public class StampProperties extends StampDetailsTab {
 		type.setValue("" + stamp.getType());
 		type.setWidth(80);
 		type.addChangedHandler((ChangedEvent typeChangedhandlerChanged) -> {
+			saveSettings();
 			stamp.setType(Integer.parseInt(type.getValue().toString()));
 			refresh();
 		});
@@ -400,6 +401,12 @@ public class StampProperties extends StampDetailsTab {
 		if (Boolean.TRUE.equals(vm.hasErrors()))
 			return false;
 
+		saveSettings();
+
+		return !vm.hasErrors();
+	}
+
+	private void saveSettings() {
 		if (vm.getValueAsString("name") != null)
 			stamp.setName(vm.getValueAsString("name"));
 
@@ -440,7 +447,5 @@ public class StampProperties extends StampDetailsTab {
 
 		if (vm.getValueAsString("text") != null)
 			stamp.setText(vm.getValueAsString("text"));
-
-		return !vm.hasErrors();
 	}
 }

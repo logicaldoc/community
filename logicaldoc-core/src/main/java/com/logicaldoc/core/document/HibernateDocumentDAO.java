@@ -304,8 +304,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			setType(doc);
 
 			// Count those attributes that reference other documents
-			doc.setDocAttrs((int) doc.getAttributes().values().stream()
-					.filter(a -> a.getType() == Attribute.TYPE_DOCUMENT && a.getIntValue()!=null).count());
+			doc.setDocAttrs((int) doc.getAttributes().values().stream().filter(
+					a -> a.getType() == Attribute.TYPE_DOCUMENT && a.getIntValue() != null && a.getIntValue() != 0L)
+					.count());
 
 			/*
 			 * Avoid documents inside folder alias
@@ -1437,8 +1438,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 
 		Set<Permission> permissions = new HashSet<>();
-		StringBuilder query = new StringBuilder(
-				"""
+		StringBuilder query = new StringBuilder("""
 						select ld_read as LDREAD, ld_write as LDWRITE, ld_security as LDSECURITY, ld_immutable as LDIMMUTABLE, ld_delete as LDDELETE,
 						ld_rename as LDRENAME, ld_sign as LDSIGN, ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD,
 						ld_calendar as LDCALENDAR, ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD,

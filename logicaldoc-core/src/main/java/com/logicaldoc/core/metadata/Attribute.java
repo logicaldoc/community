@@ -203,6 +203,20 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 	}
 
 	/**
+	 * Gets the value as it should be displayed to the user
+	 * 
+	 * @return The attribute value to display
+	 */
+	public Object getDisplayValue() {
+		switch (type) {
+		case TYPE_USER, TYPE_DOCUMENT:
+			return getStringValue();
+		default:
+			return getValue();
+		}
+	}
+
+	/**
 	 * Sets the attribute value. It can be as String, Long, Double or Date.
 	 * 
 	 * @param value The attribute value.
@@ -216,7 +230,7 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 			setBooleanValue(null);
 			return;
 		}
-		
+
 		if (value instanceof String string) {
 			this.type = TYPE_STRING;
 			setStringValue(string);
