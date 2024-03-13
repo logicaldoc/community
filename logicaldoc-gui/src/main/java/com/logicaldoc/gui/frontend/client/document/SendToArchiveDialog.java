@@ -7,6 +7,7 @@ import com.logicaldoc.gui.common.client.beans.GUIArchive;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Window;
@@ -76,20 +77,24 @@ public class SendToArchiveDialog extends Window {
 							destroy();
 						}
 					});
-		else
+		else {
+			LD.contactingServer();
 			ImpexService.Instance.get().addFolder(Long.parseLong(form.getValueAsString("archive")), ids.get(0),
 					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
+							LD.clearPrompt();
 							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(Void result) {
+							LD.clearPrompt();
 							GuiLog.info(I18N.message("documentsaddedtoarchive"), null);
 							destroy();
 						}
 					});
+		}
 	}
 }

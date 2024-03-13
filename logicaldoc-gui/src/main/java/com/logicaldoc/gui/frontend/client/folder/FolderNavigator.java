@@ -458,9 +458,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			sendToExpArchive.addClickHandler(
 					event -> LD.ask(I18N.message("question"), I18N.message("confirmputinexparchive"), yes -> {
 						if (Boolean.TRUE.equals(yes)) {
-							SendToArchiveDialog archiveDialog = new SendToArchiveDialog(Arrays.asList(folder.getId()),
-									false);
-							archiveDialog.show();
+							new SendToArchiveDialog(Arrays.asList(folder.getId()), false).show();
 						}
 					}));
 			contextMenu.addItem(sendToExpArchive);
@@ -789,50 +787,49 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	public void openFolder(final long folderId) {
 		getTree().closeAll();
 
-		FolderService.Instance.get().getFolder(folderId, true, true, isPaginationEnabled(),
-				new AsyncCallback<>() {
+		FolderService.Instance.get().getFolder(folderId, true, true, isPaginationEnabled(), new AsyncCallback<>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(GUIFolder folder) {
-						long folderId = folder.getId();
-						Long folderRef = folder.getFoldRef();
-						if (folder.getFoldRef() != null) {
-							folderId = folder.getFoldRef();
-							folderRef = folder.getId();
-						}
+			@Override
+			public void onSuccess(GUIFolder folder) {
+				long folderId = folder.getId();
+				Long folderRef = folder.getFoldRef();
+				if (folder.getFoldRef() != null) {
+					folderId = folder.getFoldRef();
+					folderRef = folder.getId();
+				}
 
-						TreeNode parent = getParentNode(folder);
+				TreeNode parent = getParentNode(folder);
 
-						TreeNode node = new TreeNode(folder.getName());
-						node.setAttribute("id", parent.getAttributeAsString("id") + "-" + Long.toString(folderId));
-						node.setAttribute(FOLDER_ID, Long.toString(folderId));
-						node.setAttribute("type", Integer.toString(folder.getType()));
-						node.setAttribute(FOLD_REF, folderRef != null ? Long.toString(folderRef) : null);
-						if (folder.getColor() != null)
-							node.setAttribute(COLOR, folder.getColor());
-						node.setAttribute(GUIAccessControlEntry.PERMISSION_ADD,
-								Boolean.toString(folder.hasPermission(GUIAccessControlEntry.PERMISSION_ADD)));
-						node.setAttribute(GUIAccessControlEntry.PERMISSION_DELETE,
-								Boolean.toString(folder.hasPermission(GUIAccessControlEntry.PERMISSION_DELETE)));
-						node.setAttribute(GUIAccessControlEntry.PERMISSION_RENAME,
-								Boolean.toString(folder.hasPermission(GUIAccessControlEntry.PERMISSION_RENAME)));
-						getTree().add(node, parent);
-						parent = node;
+				TreeNode node = new TreeNode(folder.getName());
+				node.setAttribute("id", parent.getAttributeAsString("id") + "-" + Long.toString(folderId));
+				node.setAttribute(FOLDER_ID, Long.toString(folderId));
+				node.setAttribute("type", Integer.toString(folder.getType()));
+				node.setAttribute(FOLD_REF, folderRef != null ? Long.toString(folderRef) : null);
+				if (folder.getColor() != null)
+					node.setAttribute(COLOR, folder.getColor());
+				node.setAttribute(GUIAccessControlEntry.PERMISSION_ADD,
+						Boolean.toString(folder.hasPermission(GUIAccessControlEntry.PERMISSION_ADD)));
+				node.setAttribute(GUIAccessControlEntry.PERMISSION_DELETE,
+						Boolean.toString(folder.hasPermission(GUIAccessControlEntry.PERMISSION_DELETE)));
+				node.setAttribute(GUIAccessControlEntry.PERMISSION_RENAME,
+						Boolean.toString(folder.hasPermission(GUIAccessControlEntry.PERMISSION_RENAME)));
+				getTree().add(node, parent);
+				parent = node;
 
-						getTree().openFolders(getTree().getParents(parent));
-						getTree().openFolder(parent);
-						scrollToCell(getRowNum(parent), 0);
-						selectRecord(parent);
+				getTree().openFolders(getTree().getParents(parent));
+				getTree().openFolder(parent);
+				scrollToCell(getRowNum(parent), 0);
+				selectRecord(parent);
 
-						folder.setPathExtended(getPath(folderId));
-						FolderController.get().selected(folder);
-					}
-				});
+				folder.setPathExtended(getPath(folderId));
+				FolderController.get().selected(folder);
+			}
+		});
 	}
 
 	private TreeNode getParentNode(GUIFolder folder) {
@@ -1328,33 +1325,32 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 					routine.setAutomation(action.getAutomation());
 					executeRoutine(folderId, null, routine);
 				} else if (action.getRoutineId() != null && action.getRoutineId().longValue() != 0L) {
-					AutomationService.Instance.get().getRoutine(action.getRoutineId(),
-							new AsyncCallback<>() {
+					AutomationService.Instance.get().getRoutine(action.getRoutineId(), new AsyncCallback<>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-								@Override
-								public void onSuccess(GUIAutomationRoutine routine) {
-									if (routine.getTemplateId() != null && routine.getTemplateId().longValue() != 0L) {
-										/*
-										 * A routine with parameters is
-										 * referenced, so open the input popup
-										 */
-										FillRoutineParams dialog = new FillRoutineParams(action.getName(), routine,
-												folderId, null);
-										dialog.show();
-									} else {
-										/*
-										 * A routine without parameters is
-										 * referenced, so launch directly
-										 */
-										executeRoutine(folderId, null, routine);
-									}
-								}
-							});
+						@Override
+						public void onSuccess(GUIAutomationRoutine routine) {
+							if (routine.getTemplateId() != null && routine.getTemplateId().longValue() != 0L) {
+								/*
+								 * A routine with parameters is referenced, so
+								 * open the input popup
+								 */
+								FillRoutineParams dialog = new FillRoutineParams(action.getName(), routine, folderId,
+										null);
+								dialog.show();
+							} else {
+								/*
+								 * A routine without parameters is referenced,
+								 * so launch directly
+								 */
+								executeRoutine(folderId, null, routine);
+							}
+						}
+					});
 				}
 			}
 		}));
