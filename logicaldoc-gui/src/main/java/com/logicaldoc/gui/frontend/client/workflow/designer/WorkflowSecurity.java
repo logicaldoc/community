@@ -3,15 +3,17 @@ package com.logicaldoc.gui.frontend.client.workflow.designer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.data.WorkflowAclDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
-import com.smartgwt.client.data.Record;
+import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
@@ -107,6 +109,7 @@ public class WorkflowSecurity extends Window {
 		list.setHeight100();
 		list.setMinHeight(200);
 		list.setMinWidth(300);
+
 		dataSource = new WorkflowAclDS(Long.parseLong(workflow.getId()));
 		list.setDataSource(dataSource);
 
@@ -231,22 +234,17 @@ public class WorkflowSecurity extends Window {
 	 * @return the list of ACEs
 	 */
 	public List<GUIAccessControlEntry> getACL() {
-		int totalRecords = list.getRecordList().getLength();
 		List<GUIAccessControlEntry> acl = new ArrayList<>();
 
-		for (int i = 0; i < totalRecords; i++) {
-			Record rec = list.getRecordList().get(i);
-			if (Boolean.FALSE.equals(rec.getAttributeAsBoolean("read")))
-				continue;
-
-			GUIAccessControlEntry right = new GUIAccessControlEntry();
-
-			right.setName(rec.getAttributeAsString(ENTITY));
-			right.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
-			right.setWrite("true".equals(rec.getAttributeAsString(WRITE)));
-
-			acl.add(right);
-		}
+		if (list.getRecords() != null)
+			for (ListGridRecord rec : list.getRecords()) {
+				GUIAccessControlEntry right = new GUIAccessControlEntry();
+				right.setName(rec.getAttributeAsString(ENTITY));
+				right.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
+				right.setWrite("true".equals(rec.getAttributeAsString(WRITE)));
+				right.setRead("true".equals(rec.getAttributeAsString("read")));
+				acl.add(right);
+			}
 
 		return acl;
 	}
@@ -268,8 +266,7 @@ public class WorkflowSecurity extends Window {
 
 		MenuItem deleteItem = new MenuItem();
 		deleteItem.setTitle(I18N.message("ddelete"));
-		deleteItem.addClickHandler(event ->
-				onDelete());
+		deleteItem.addClickHandler(event -> onDelete());
 
 		contextMenu.setItems(deleteItem);
 		return contextMenu;
@@ -288,6 +285,16 @@ public class WorkflowSecurity extends Window {
 
 	public void onSave() {
 		workflow.setAccessControlList(getACL());
-		destroy();
+		WorkflowService.Instance.get().saveACL(workflow, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(Void arg0) {
+				destroy();
+			}
+		});
 	}
 }

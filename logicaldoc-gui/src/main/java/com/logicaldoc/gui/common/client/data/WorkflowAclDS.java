@@ -24,6 +24,7 @@ public class WorkflowAclDS extends DataSource {
 
 		setFields(entityId, entity, read, write, type);
 		setClientOnly(true);
+
 		setDataURL("data/workflowacl.xml?workflowId=" + id + "&locale=" + I18N.getLocale());
 	}
 }

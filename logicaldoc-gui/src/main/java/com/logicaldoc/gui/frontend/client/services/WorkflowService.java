@@ -90,6 +90,15 @@ public interface WorkflowService extends RemoteService {
 	public GUIWorkflow save(GUIWorkflow workflow) throws ServerException;
 
 	/**
+	 * Saves just the ACL of a workflow
+	 * 
+	 * @param workflow the workflow to save the ACL
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void saveACL(GUIWorkflow workflow) throws ServerException;
+	
+	/**
 	 * Deploys a given workflow
 	 * 
 	 * @param workflow the workflow to deploy
