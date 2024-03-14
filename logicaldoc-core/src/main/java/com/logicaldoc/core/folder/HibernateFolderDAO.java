@@ -1199,6 +1199,12 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				log.info("Removed {} aliases pointing to the deleted folder {}", count, folderId);
 			}
 		}
+
+		/**
+		 * Clear the security refs pointing to this deleted folder
+		 */
+		long updatedRows = jdbcUpdate("update ld_folder set ld_securityref=null where ld_securityref=" + folderId);
+		log.debug("Cleared {} secuerity refs pointing to the deleted folder {}", updatedRows, folderId);
 	}
 
 	private void validateTransactionAndUser(FolderHistory transaction) throws PersistenceException {
