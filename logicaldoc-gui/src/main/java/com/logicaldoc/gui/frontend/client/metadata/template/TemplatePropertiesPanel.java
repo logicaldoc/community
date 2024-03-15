@@ -15,6 +15,7 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.validators.TemplateNameTextValidator;
 import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.types.PickerIconName;
@@ -694,6 +695,7 @@ public class TemplatePropertiesPanel extends HLayout {
 
 		TextItem name = ItemFactory.newSimpleTextItem("name", template.getName());
 		name.setRequired(true);
+		name.setValidators(new TemplateNameTextValidator());
 		name.setDisabled(template.isReadonly() || !template.isWrite());
 		if (!template.isReadonly() && template.isWrite())
 			name.addChangedHandler(changedHandler);
