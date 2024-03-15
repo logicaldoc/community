@@ -189,7 +189,7 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 
 					@Override
 					public void onSuccess(GUIDocument document) {
-						new PreviewPopup(new GUIDocument[] { document }, 0).show();
+						new PreviewPopup(document).show();
 					}
 				}));
 
