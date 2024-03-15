@@ -8,7 +8,7 @@
     </parent>
     <groupId>com.logicaldoc</groupId>
     <artifactId>logicaldoc</artifactId>
-    <version>8.9.1</version>
+    <version>8.9.2</version>
     <packaging>pom</packaging>
     <name>logicaldoc</name>
     <description>LogicalDOC is an open-source enterprise class Document Management System developed by LogicalDOC Srl, based on the Java Platform</description>

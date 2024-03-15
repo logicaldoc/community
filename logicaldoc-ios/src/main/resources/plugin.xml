@@ -88,7 +88,7 @@
 <!ELEMENT value (#PCDATA)>
 ]>
 
-<plugin id="logicaldoc-ios" version="8.9.1" class="com.logicaldoc.ios.IOSPlugin">
+<plugin id="logicaldoc-ios" version="8.9.2" class="com.logicaldoc.ios.IOSPlugin">
 	<requires>
 		<import plugin-id="logicaldoc-core" />
 	</requires>
