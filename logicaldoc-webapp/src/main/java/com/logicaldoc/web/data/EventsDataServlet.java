@@ -98,7 +98,8 @@ public class EventsDataServlet extends AbstractDataServlet {
 	private void writeWorkflowEvents(PrintWriter writer, Locale locale) {
 		String[] events = new String[] { "event.workflow.start", "event.workflow.end", "event.workflow.deleted",
 				"event.workflow.task.start", "event.workflow.task.end", "event.workflow.task.assigned",
-				"event.workflow.docappended", "event.workflow.task.reassigned", "event.workflow.task.note" };
+				"event.workflow.task.reassigned", "event.workflow.task.overdue", "event.workflow.task.note",
+				"event.workflow.docappended" };
 		for (String event : events) {
 			writer.print(EVENT);
 			writer.print(CODE + event + CLOSE_CODE);
