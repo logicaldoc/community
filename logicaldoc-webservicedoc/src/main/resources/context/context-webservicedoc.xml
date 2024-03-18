@@ -23,16 +23,6 @@
             http://cxf.apache.org/schemas/jaxws.xsd
             http://cxf.apache.org/jaxrs
             http://cxf.apache.org/schemas/jaxrs.xsd">
-    
-    <!--        
-    <import resource="classpath:META-INF/cxf/cxf.xml" />
-    <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
-    
-    <bean id="GZIPInInterceptor" class="org.apache.cxf.transport.common.gzip.GZIPInInterceptor" />
-    <bean id="GZIPOutInterceptor" class="com.logicaldoc.webservice.GZIPOutInterceptor">
-        <property name="threshold" value="${webservice.gzip}" />
-    </bean>
-    -->
 
     <!-- ############################## -->
     <!-- ###### JAX-RS (RESTful) ###### -->
@@ -43,27 +33,11 @@
     <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
     <bean id="multipartProvider" class="org.apache.cxf.jaxrs.provider.MultipartProvider" />
     <bean id="originFilter" class="demo.jaxrs.openapi.server.ApiOriginFilter" />
-
-    <!-- CXF Swagger2Feature -->  
-<!--     <bean id="swagger2Feature" class="org.apache.cxf.jaxrs.swagger.Swagger2Feature">
-            <property name="basePath" value="/services/rest"/>
-            <property name="title" value="LogicalDOC REST API"/>
-            <property name="version" value="8.4.2"/>
-            <property name="contact" value="devel@logicaldoc.com"/>
-            <property name="description" value="This is the interactive documentation of the REST APIs exposed by LogicalDOC. You can find more information about LogicalDOC at https://www.logicaldoc.com or on Twitter @logicaldoc.&lt;br/&gt;   
-            Note: The access path to the API is protected with basic authentication, to be able to run the samples you must log in using the credentials of a Logicaldoc user, or passing to the request the session ID (SID) as a cookie (cookie name: `ldoc-sid`).&lt;br/&gt;&lt;br/&gt;
-            Here is an example to list the children folders: &lt;br/&gt;
-            curl -u admin:admin -H ''Accept: application/json'' http://localhost:8080/services/rest/folder/listChildren?folderId=4
-            &lt;br/&gt;&lt;br/&gt;
-            More examples are available at the following address: http://wiki.logicaldoc.com/wiki/Bindings_And_Samples
-            &lt;br/&gt;&lt;br/&gt;
-            **Find out more about LogicalDOC** https://www.logicaldoc.com"/>                        
-    </bean> -->
     
     <!-- CXF OpenApiFeature --> 
     <bean id="openApiFeature" class="org.apache.cxf.jaxrs.openapi.OpenApiFeature">
             <property name="title" value="LogicalDOC REST API"/>
-            <property name="version" value="8.6.0"/>
+            <property name="version" value="8.9.2"/>
             <property name="contactEmail" value="devel@logicaldoc.com"/>
             <property name="description" value="This is the interactive documentation of the REST APIs exposed by LogicalDOC. You can find more information about LogicalDOC at https://www.logicaldoc.com or on Twitter @logicaldoc.&lt;br/&gt;   
             Note: The access path to the API is protected with basic authentication, to be able to run the samples you must log in using the credentials of a Logicaldoc user, or passing to the request the session ID (SID) as a cookie (cookie name: `ldoc-sid`).&lt;br/&gt;&lt;br/&gt;

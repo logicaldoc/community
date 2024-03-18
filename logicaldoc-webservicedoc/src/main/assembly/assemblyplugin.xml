@@ -15,6 +15,7 @@
 				<include>org.reflections:*</include>
 				<include>com.fasterxml.jackson.dataformat:*</include>
 				<include>javax.validation:*</include>
+				<include>org.apache.cxf:cxf-rt-rs-service-description:*</include>
 				<include>org.apache.cxf:cxf-rt-rs-service-description-openapi-v3:*</include>
 				<include>org.apache.cxf:cxf-rt-rs-service-description-swagger-ui:*</include>
 				<include>org.apache.cxf:cxf-rt-rs-service-description-common-openapi:*</include>

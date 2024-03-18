@@ -13,6 +13,7 @@
 	<properties>
 		<cxf.swagger.ui.version>4.13.2</cxf.swagger.ui.version>
 		<cxf.swagger.v3.version>2.1.6</cxf.swagger.v3.version>
+		<cxf.rs-service-description.version>3.6.2</cxf.rs-service-description.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -52,23 +53,28 @@
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-transports-http</artifactId>
-			<!--version>3.1.6</version-->
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.cxf/cxf-rt-rs-service-description -->
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-rs-service-description</artifactId>
+			<version>${cxf.rs-service-description.version}</version>
+		</dependency>			
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
-			<version>3.5.3</version>
+			<version>${cxf.rs-service-description.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-rs-service-description-swagger-ui</artifactId>
-			<version>3.5.3</version>
+			<version>${cxf.rs-service-description.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-rs-service-description-common-openapi</artifactId>
-			<version>3.5.3</version>
-		</dependency>
+			<version>${cxf.rs-service-description.version}</version>
+		</dependency>	
 		<dependency>
 			<groupId>net.sf.jpf</groupId>
 			<artifactId>jpf-boot</artifactId>
