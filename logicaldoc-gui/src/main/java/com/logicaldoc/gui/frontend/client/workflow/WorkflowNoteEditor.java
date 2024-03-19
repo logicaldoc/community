@@ -12,7 +12,7 @@ import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.RichTextItem;
 
 /**
- * This is the form used to edit a note in a workflow
+ * This is the form used to add a note in a workflow
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.6
@@ -55,7 +55,7 @@ public class WorkflowNoteEditor extends Window {
 	private void onSave() {
 		if (!noteForm.validate())
 			return;
-		WorkflowService.Instance.get().addNote(parentDialog.getWorkflow().getSelectedTask().getId(),
+		WorkflowService.Instance.get().addNote(parentDialog.getWorkflow().getSelectedTask().getId(), null,
 				message.getValue().toString(), new AsyncCallback<Long>() {
 					@Override
 					public void onFailure(Throwable caught) {

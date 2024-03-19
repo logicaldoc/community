@@ -22,6 +22,18 @@ public class GUITransition implements Serializable {
 
 	private String onChosen;
 
+	/**
+	 * If true it means that the user must enter a note when the he completes
+	 * the task
+	 */
+	private boolean requiresNote = false;
+
+	/**
+	 * If the requiredNote=1 this indicates an optional minimum size of the note
+	 * text
+	 */
+	private Integer minNoteSize;
+
 	public GUITransition() {
 	}
 
@@ -77,5 +89,21 @@ public class GUITransition implements Serializable {
 
 	public void setColor(String color) {
 		this.color = color;
+	}
+
+	public boolean isRequiresNote() {
+		return requiresNote;
+	}
+
+	public Integer getMinNoteSize() {
+		return minNoteSize;
+	}
+
+	public void setRequiresNote(boolean requiresNote) {
+		this.requiresNote = requiresNote;
+	}
+
+	public void setMinNoteSize(Integer minNoteSize) {
+		this.minNoteSize = minNoteSize;
 	}
 }

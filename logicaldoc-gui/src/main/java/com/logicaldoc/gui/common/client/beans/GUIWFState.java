@@ -67,6 +67,8 @@ public class GUIWFState implements Serializable {
 
 	private String onCompletion;
 
+	private String onOverdue;
+
 	private String display;
 
 	private String color;
@@ -102,6 +104,14 @@ public class GUIWFState implements Serializable {
 		this.id = id;
 		this.name = name;
 		this.type = type;
+	}
+
+	public String getOnOverdue() {
+		return onOverdue;
+	}
+
+	public void setOnOverdue(String onOverdue) {
+		this.onOverdue = onOverdue;
 	}
 
 	public int getType() {

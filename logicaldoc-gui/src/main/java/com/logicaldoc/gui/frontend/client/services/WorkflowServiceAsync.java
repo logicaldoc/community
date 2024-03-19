@@ -49,7 +49,7 @@ public interface WorkflowServiceAsync {
 
 	void undeploy(String workflowName, AsyncCallback<Void> callback);
 
-	void addNote(String taskId, String note, AsyncCallback<Long> callback);
+	void addNote(String taskId, String transitionName, String note, AsyncCallback<Long> callback);
 
 	void deleteNote(long noteId, AsyncCallback<Void> callback);
 

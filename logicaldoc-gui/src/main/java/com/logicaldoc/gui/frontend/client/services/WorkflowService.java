@@ -266,13 +266,14 @@ public interface WorkflowService extends RemoteService {
 	 * Adds a new note on the workflow instance
 	 * 
 	 * @param taskId identifier of the task
+	 * @param transitionName name of the transitions (optional)
 	 * @param note the new note
 	 * 
 	 * @return identifier of the new note
 	 * 
 	 * @throws ServerException an error happened in the server applications
 	 */
-	public long addNote(String taskId, String note) throws ServerException;
+	public long addNote(String taskId, String transitionName, String note) throws ServerException;
 
 	/**
 	 * Deletes a note

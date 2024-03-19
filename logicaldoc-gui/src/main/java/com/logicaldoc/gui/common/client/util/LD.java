@@ -266,6 +266,8 @@ public class LD {
 	public static void askForValues(String title, String message, List<FormItem> items, Integer width,
 			final ValueCallback callback, final ClickHandler cancelCallback) {
 		final Window dialog = prepareDialogForAskValues(title, width);
+		if (cancelCallback != null)
+			dialog.addCloseClickHandler(click -> cancelCallback.onClick(null));
 
 		VStack container = new VStack();
 		container.setWidth100();

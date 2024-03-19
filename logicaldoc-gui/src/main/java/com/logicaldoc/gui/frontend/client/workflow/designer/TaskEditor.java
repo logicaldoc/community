@@ -215,8 +215,14 @@ public class TaskEditor extends Window {
 		onCompletion.setHeight(125);
 		onCompletion.setWrapTitle(false);
 
+		TextAreaItem onOverdue = ItemFactory.newTextAreaItemForAutomation("onOverdue", "execscriptontaskoverdue",
+				state.getOnOverdue(), null, false);
+		onOverdue.setWidth("*");
+		onOverdue.setHeight(125);
+		onOverdue.setWrapTitle(false);
+
 		if (state.getType() == GUIWFState.TYPE_TASK)
-			automationForm.setItems(onCreation, onAssignment, onCompletion);
+			automationForm.setItems(onCreation, onAssignment, onCompletion, onOverdue);
 		else {
 			onCreation.setHeight(400);
 			automationForm.setItems(onCreation);
@@ -230,8 +236,7 @@ public class TaskEditor extends Window {
 	// Checks if the task requires human interaction
 	private boolean isHumanInteraction() {
 		try {
-			return !(state.getCandidates().size() == 1
-					&& state.getCandidates().get(0).getCode().equals("_workflow"));
+			return !(state.getCandidates().size() == 1 && state.getCandidates().get(0).getCode().equals("_workflow"));
 		} catch (Exception t) {
 			return true;
 		}
@@ -569,6 +574,7 @@ public class TaskEditor extends Window {
 			TaskEditor.this.state.setReminderUnit((String) values.get("remindTime"));
 			TaskEditor.this.state.setOnAssignment((String) values.get("onAssignment"));
 			TaskEditor.this.state.setOnCompletion((String) values.get("onCompletion"));
+			TaskEditor.this.state.setOnOverdue((String) values.get("onOverdue"));
 			TaskEditor.this.state.setAssignmentMessageTemplate((String) values.get("assignmentMessageTemplate"));
 			TaskEditor.this.state.setReminderMessageTemplate((String) values.get("reminderMessageTemplate"));
 			TaskEditor.this.state.setCompletionMessageTemplate((String) values.get("completionMessageTemplate"));

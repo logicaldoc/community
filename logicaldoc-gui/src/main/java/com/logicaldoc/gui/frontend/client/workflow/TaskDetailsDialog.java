@@ -251,12 +251,12 @@ public class TaskDetailsDialog extends Window {
 				transitionButton.setAutoFit(true);
 				transitionButton.addClickHandler(event -> {
 					toggleTransitionButtons();
-					if (workflow.getSelectedTask().isRequiresNote()) {
+					if (workflow.getSelectedTask().isRequiresNote() || transition.isRequiresNote()) {
 						/*
 						 * This task requires a note at completion, so we
 						 * collect the input from the user
 						 */
-						collectNoteAndEndTask(getWorkflow().getSelectedTask(), transitionName);
+						collectNoteAndEndTask(getWorkflow().getSelectedTask(), transition);
 					} else {
 						onEndTask(getWorkflow().getSelectedTask(), transitionName);
 					}
@@ -881,8 +881,8 @@ public class TaskDetailsDialog extends Window {
 	private MenuItem prepareCheckinContextMenuItem(final GUIDocument selectedDocument) {
 		final MenuItem checkin = new MenuItem();
 		checkin.setTitle(I18N.message("checkin"));
-		checkin.addClickHandler(event -> DocumentService.Instance.get().getById(selectedDocument.getId(),
-				new AsyncCallback<>() {
+		checkin.addClickHandler(
+				event -> DocumentService.Instance.get().getById(selectedDocument.getId(), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -948,8 +948,8 @@ public class TaskDetailsDialog extends Window {
 	private MenuItem prepareRemoveContextMenuItem(final GUIDocument selectedDocument) {
 		final MenuItem remove = new MenuItem();
 		remove.setTitle(I18N.message("remove"));
-		remove.addClickHandler(event -> WorkflowService.Instance.get().removeDocument(
-				workflow.getSelectedTask().getId(), selectedDocument.getId(), new AsyncCallback<>() {
+		remove.addClickHandler(event -> WorkflowService.Instance.get()
+				.removeDocument(workflow.getSelectedTask().getId(), selectedDocument.getId(), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -989,8 +989,8 @@ public class TaskDetailsDialog extends Window {
 		final MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
 		preview.setEnabled(false);
-		preview.addClickHandler(event -> DocumentService.Instance.get().getById(selectedDocument.getId(),
-				new AsyncCallback<>() {
+		preview.addClickHandler(
+				event -> DocumentService.Instance.get().getById(selectedDocument.getId(), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -1011,15 +1011,13 @@ public class TaskDetailsDialog extends Window {
 	 * given transition
 	 * 
 	 * @param task the task to end
-	 * @param transition name of the transition to take
+	 * @param transition the transition to take
 	 */
-	private void collectNoteAndEndTask(GUIWFState task, String transition) {
+	private void collectNoteAndEndTask(final GUIWFState task, final GUITransition transition) {
 		RichTextItem noteInput = ItemFactory.newRichTextItemForNote("note", "note", null);
 		noteInput.setWidth("*");
 		noteInput.setHeight(200);
-
-		Integer minlength = task.getMinNoteSize();
-		int maxlength = Session.get().getConfigAsInt("default.gui.note.maxlength");
+		noteInput.setShowErrorText(true);
 		noteInput.setValidators(new CustomValidator() {
 
 			@Override
@@ -1029,15 +1027,19 @@ public class TaskDetailsDialog extends Window {
 					return false;
 				}
 
-				setErrorMessage(I18N.message("contentexceedsmax", Integer.toString(maxlength)));
+				int maxlength = Session.get().getConfigAsInt("default.gui.note.maxlength");
+				String errorMessage = I18N.message("contentexceedsmax", Integer.toString(maxlength));
+				setErrorMessage(errorMessage);
 				if (value.toString().length() > maxlength)
 					return false;
 
-				if (minlength != null && minlength > 1) {
-					setErrorMessage(I18N.message("notetoosmall", Integer.toString(minlength)));
-					if (value.toString().length() < minlength)
-						return false;
-				}
+				int minlength = task.getMinNoteSize() != null ? task.getMinNoteSize() : 0;
+				if (transition.getMinNoteSize() != null && transition.getMinNoteSize() > minlength)
+					minlength = transition.getMinNoteSize();
+				errorMessage = I18N.message("notetoosmall", Integer.toString(minlength));
+				setErrorMessage(errorMessage);
+				if (value.toString().length() < minlength)
+					return false;
 
 				return true;
 			}
@@ -1045,7 +1047,7 @@ public class TaskDetailsDialog extends Window {
 
 		LD.askForValue("providenotetocomplete", "note", null, noteInput, 500, value -> {
 			if (Boolean.TRUE.equals(noteInput.validate()))
-				WorkflowService.Instance.get().addNote(workflow.getSelectedTask().getId(), value,
+				WorkflowService.Instance.get().addNote(workflow.getSelectedTask().getId(), transition.getText(), value,
 						new AsyncCallback<Long>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -1056,7 +1058,7 @@ public class TaskDetailsDialog extends Window {
 							@Override
 							public void onSuccess(Long noteId) {
 								destroy();
-								onEndTask(getWorkflow().getSelectedTask(), transition);
+								onEndTask(getWorkflow().getSelectedTask(), transition.getText());
 							}
 						});
 		}, event -> toggleTransitionButtons());
