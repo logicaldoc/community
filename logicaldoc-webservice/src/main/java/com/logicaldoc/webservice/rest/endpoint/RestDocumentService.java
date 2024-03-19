@@ -971,7 +971,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Override
 	@PUT
 	@Path("/setAccessControlList")
-	@Operation(operationId = "setAccessControlList_Document", summary = "Assign the complete Access Control List")
+	@Operation(operationId = "setAccessControlList_Document", summary = "Assigns the complete Access Control List")
 	public void setAccessControlList(@QueryParam("docId") long docId, WSAccessControlEntry[] acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
 		String sid = validateSessionREST();

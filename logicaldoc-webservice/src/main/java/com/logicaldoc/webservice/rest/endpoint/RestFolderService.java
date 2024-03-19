@@ -351,6 +351,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 
 	@Override
 	@PUT
+	@Path("/setAccessControlList")
 	@Operation(operationId = "setAccessControlList_Folder", summary = "Assigns the complete Access Control List")
 	public void setAccessControlList(@QueryParam("folderId") long folderId, WSAccessControlEntry[] acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
