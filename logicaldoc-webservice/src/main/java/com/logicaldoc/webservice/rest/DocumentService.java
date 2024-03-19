@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.activation.DataHandler;
-import javax.jws.WebParam;
 import javax.mail.MessagingException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -1023,8 +1022,7 @@ public interface DocumentService {
 	 */
 	@PUT
 	@Path("/setAccessControlList")
-	public void setAccessControlList(@WebParam(name = "docId")
-	long docId, WSAccessControlEntry[] acl)
+	public void setAccessControlList(@QueryParam("docId") long docId, WSAccessControlEntry[] acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException;
 
 	/**
@@ -1040,8 +1038,8 @@ public interface DocumentService {
 	 */
 	@GET
 	@Path("/getAccessControlList")
-	public WSAccessControlEntry[] getAccessControlList(@WebParam(name = "docId")
-	long docId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
+	public WSAccessControlEntry[] getAccessControlList(@QueryParam("docId") long docId) 
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Tests if a document is readable.

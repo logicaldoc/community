@@ -969,17 +969,20 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	}
 
 	@Override
-	@GET
-	@Operation(operationId = "setAccessControlList", summary = "Assignsa the complete Access Control List")
-	public void setAccessControlList(@QueryParam("docId")
-	long docId, WSAccessControlEntry[] acl)
+	@PUT
+	@Path("/setAccessControlList")
+	@Operation(operationId = "setAccessControlList_Document", summary = "Assign the complete Access Control List")
+	public void setAccessControlList(@QueryParam("docId") long docId, WSAccessControlEntry[] acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
 		String sid = validateSessionREST();
 		super.setAccessControlList(sid, docId, acl);
 	}
 
 	@Override
-	public WSAccessControlEntry[] getAccessControlList(long docId)
+	@GET
+	@Path("/getAccessControlList")
+	@Operation(operationId = "getAccessControlList_Document", summary = "Retrieves the access control list")
+	public WSAccessControlEntry[] getAccessControlList(@QueryParam("docId") long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		String sid = validateSessionREST();
 		return super.getAccessControlList(sid, docId);

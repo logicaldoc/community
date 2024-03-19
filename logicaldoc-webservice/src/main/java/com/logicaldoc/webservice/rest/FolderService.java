@@ -1,6 +1,5 @@
 package com.logicaldoc.webservice.rest;
 
-import javax.jws.WebParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -322,8 +321,7 @@ public interface FolderService {
 	 */
 	@PUT
 	@Path("/setAccessControlList")
-	public void setAccessControlList(@WebParam(name = "folderId")
-	long folderId, WSAccessControlEntry[] acl)
+	public void setAccessControlList(@QueryParam("folderId") long folderId, WSAccessControlEntry[] acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException;
 	
 	/**
@@ -339,6 +337,6 @@ public interface FolderService {
 	 */
 	@GET
 	@Path("/getAccessControlList")
-	public WSAccessControlEntry[] getAccessControlList(@WebParam(name = "folderId")
-	long folderId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
+	public WSAccessControlEntry[] getAccessControlList(@QueryParam("folderId") long folderId) 
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 }

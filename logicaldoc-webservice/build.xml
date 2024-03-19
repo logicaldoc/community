@@ -60,6 +60,8 @@
 						-->
 						<include name="**/DocumentService*.class" />
 						<include name="**/RestDocumentService*.class" />
+						<include name="**/FolderService*.class" />
+						<include name="**/RestFolderService*.class" />						
 					</fileset>
 				</copy>
 			</sequential>

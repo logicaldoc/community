@@ -350,10 +350,9 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	}
 
 	@Override
-	@GET
-	@Operation(operationId = "setAccessControlList", summary = "Assignsa the complete Access Control List")
-	public void setAccessControlList(@QueryParam("folderId")
-	long folderId, WSAccessControlEntry[] acl)
+	@PUT
+	@Operation(operationId = "setAccessControlList_Folder", summary = "Assigns the complete Access Control List")
+	public void setAccessControlList(@QueryParam("folderId") long folderId, WSAccessControlEntry[] acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
 		String sid = validateSessionREST();
 		super.setAccessControlList(sid, folderId, acl);
@@ -362,8 +361,9 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@Override
 	@GET
 	@Path("/getAccessControlList")
-	public WSAccessControlEntry[] getAccessControlList(@QueryParam("folderId")
-	long folderId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+	@Operation(operationId = "getAccessControlList_Folder", summary = "Retrieves the access control list")
+	public WSAccessControlEntry[] getAccessControlList(@QueryParam("folderId") long folderId) 
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		String sid = validateSessionREST();
 		return super.getAccessControlList(sid, folderId);
 	}
