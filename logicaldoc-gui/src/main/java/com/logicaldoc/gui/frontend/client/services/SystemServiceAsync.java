@@ -49,4 +49,7 @@ public interface SystemServiceAsync {
 
 	void uninstallPlugin(String plugin, AsyncCallback<Void> callback);
 
+	void saveLogger(String name, String level, boolean additivity, AsyncCallback<Void> callback);
+
+	void removeLogger(String name, AsyncCallback<Void> callback);
 }

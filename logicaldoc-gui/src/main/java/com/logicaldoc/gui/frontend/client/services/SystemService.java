@@ -184,6 +184,26 @@ public interface SystemService extends RemoteService {
 	 */
 	public void restart() throws ServerException;
 
+	/**
+	 * Saves a logger
+	 * 
+	 * @param name The name of the logger to save
+	 * @param level The log level
+	 * @param additivity The log additivity
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void saveLogger(String name, String level, boolean additivity) throws ServerException;
+
+	/**
+	 * The logger to remove
+	 * 
+	 * @param name The name of the logger to remove
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void removeLogger(String name) throws ServerException;
+
 	public List<GUIHistory> search(Long userId, Date from, Date till, int maxResult, String historySid,
 			List<String> event, Long rootFolderId) throws ServerException;
 

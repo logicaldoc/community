@@ -37,6 +37,8 @@ import com.logicaldoc.gui.common.client.data.FormatConvertersDS;
 import com.logicaldoc.gui.common.client.data.FormsDS;
 import com.logicaldoc.gui.common.client.data.GroupsDS;
 import com.logicaldoc.gui.common.client.data.JobsDS;
+import com.logicaldoc.gui.common.client.data.LogAppendersDS;
+import com.logicaldoc.gui.common.client.data.LoggersDS;
 import com.logicaldoc.gui.common.client.data.OCRTemplatesDS;
 import com.logicaldoc.gui.common.client.data.SkinsDS;
 import com.logicaldoc.gui.common.client.data.StampsDS;
@@ -67,7 +69,9 @@ import com.smartgwt.client.data.Criteria;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.SortSpecifier;
+import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.Cursor;
+import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.MultiComboBoxLayoutStyle;
 import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.Overflow;
@@ -1457,7 +1461,6 @@ public class ItemFactory {
 		item.setAlwaysFetchMissingValues(true);
 		item.setValue(initialValue);
 		item.setTitle(att.getDisplayName());
-		
 
 		// When the user clicks on the item, preemptively load all the
 		// options to correctly do text completion
@@ -2753,6 +2756,52 @@ public class ItemFactory {
 				}
 			});
 		return item;
+	}
+
+	public static SelectItem newLogAppenderSelector() {
+		SelectItem selector = new SelectItem("logfile");
+		selector.setTitle(I18N.message("logfile"));
+		selector.setWrapTitle(false);
+		ListGridField name = new ListGridField("name", I18N.message("logfile"));
+		name.setHidden(true);
+		name.setAutoFitWidth(true);
+
+		ListGridField label = new ListGridField("label", I18N.message("name"));
+
+		selector.setValueField("name");
+		selector.setDisplayField("label");
+		selector.setWidth(150);
+		selector.setPickListFields(name, label);
+		selector.setOptionDataSource(new LogAppendersDS());
+
+		return selector;
+	}
+
+	public static ComboBoxItem newLoggerSelector() {
+		ComboBoxItem selector = newComboBoxItem("logger", "logger");
+		selector.setWrapTitle(false);
+		ListGridField name = new ListGridField("name", I18N.message("logger"));
+		name.setWidth("*");
+
+		ListGridField level = new ListGridField("level", I18N.message("level"));
+		level.setAutoFitWidth(true);
+		level.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
+
+		selector.setValueField("name");
+		selector.setDisplayField("name");
+		selector.setWidth(250);
+		selector.setPickListFields(name, level);
+		selector.setPickListWidth(400);
+		selector.setOptionDataSource(new LoggersDS());
+		return selector;
+	}
+
+	public static SelectItem newLogLevelSelector() {
+		SelectItem selector = newSelectItem("level");
+		selector.setWrapTitle(false);
+		selector.setValueMap("trace", "debug", "info", "warn", "error", "fatal");
+		selector.setWidth(80);
+		return selector;
 	}
 
 	/**
