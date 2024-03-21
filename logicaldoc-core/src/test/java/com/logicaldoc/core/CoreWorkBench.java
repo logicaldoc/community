@@ -40,12 +40,6 @@ import com.talanlabs.avatargenerator.IdenticonAvatar;
 
 public class CoreWorkBench {
 
-	public static void sendEmailWithAttachments(String host, String port, final String userName, final String password,
-			String toAddress, String subject, String message, String[] attachFiles)
-			throws AddressException, MessagingException {
-
-	}
-
 	/**
 	 * Test sending e-mail with attachments
 	 * @throws IOException 

@@ -71,6 +71,13 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
+    <RollingFile name="FTPSERVER_WEB" fileName="${root}/ftpserver_web.log.html" filePattern="${root}/ftpserver_web.log.html.%i">
+      <LDHtmlLayout datePattern="${dateformat}" />
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>    
     <RollingFile name="FTPSERVER" fileName="${root}/ftpserver.log" filePattern="${root}/ftpserver.log.%i">
       <PatternLayout>
         <Pattern>${pattern}</Pattern>
@@ -136,22 +143,6 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="RetentionProcessor" fileName="${root}/retentionprocessor.log" filePattern="${root}/retentionprocessor.log.%i">
-      <PatternLayout>
-        <Pattern>${pattern}</Pattern>
-      </PatternLayout>
-      <Policies>
-        <SizeBasedTriggeringPolicy size="5 MB" />
-      </Policies>
-      <DefaultRolloverStrategy max="5" />
-    </RollingFile>
-    <RollingFile name="CalendarProcessor_WEB" fileName="${root}/calendarprocessor_web.log.html" filePattern="${root}/calendarprocessor_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
-      <Policies>
-        <SizeBasedTriggeringPolicy size="5 MB" />
-      </Policies>
-      <DefaultRolloverStrategy max="5" />
-    </RollingFile>
-    <RollingFile name="CalendarProcessor" fileName="${root}/calendarprocessor.log" filePattern="${root}/calendarprocessor.log.%i">
       <PatternLayout>
         <Pattern>${pattern}</Pattern>
       </PatternLayout>
@@ -272,22 +263,6 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
-    <RollingFile name="NetworkBrowser_WEB" fileName="${root}/networkbrowser_web.log.html" filePattern="${root}/networkbrowser_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
-      <Policies>
-        <SizeBasedTriggeringPolicy size="5 MB" />
-      </Policies>
-      <DefaultRolloverStrategy max="5" />
-    </RollingFile>
-    <RollingFile name="NetworkBrowser" fileName="${root}/networkbrowser.log" filePattern="${root}/networkbrowser.log.%i">
-      <PatternLayout>
-        <Pattern>${pattern}</Pattern>
-      </PatternLayout>
-      <Policies>
-        <SizeBasedTriggeringPolicy size="5 MB" />
-      </Policies>
-      <DefaultRolloverStrategy max="5" />
-    </RollingFile>
     <RollingFile name="ImportFolderCrawler_WEB" fileName="${root}/importfoldercrawler_web.log.html" filePattern="${root}/importfoldercrawler_web.log.html.%i">
       <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
       <Policies>
@@ -368,6 +343,13 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
+    <RollingFile name="DB_WEB" fileName="${root}/db_web.log.html" filePattern="${root}/db_web.log.html.%i">
+      <LDHtmlLayout datePattern="${dateformat}" />
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>    
     <RollingFile name="DB" fileName="${root}/db.log" filePattern="${root}/db.log.%i">
       <PatternLayout>
         <Pattern>${pattern}</Pattern>
@@ -377,6 +359,13 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
+    <RollingFile name="CP_WEB" fileName="${root}/cp_web.log.html" filePattern="${root}/cp_web.log.html.%i">
+      <LDHtmlLayout datePattern="${dateformat}" />
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>      
     <RollingFile name="CP" fileName="${root}/cp.log" filePattern="${root}/cp.log.%i">
       <PatternLayout>
         <Pattern>${pattern}</Pattern>
@@ -386,6 +375,13 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
+    <RollingFile name="CMIS_WEB" fileName="${root}/cmis_web.log.html" filePattern="${root}/cmis_web.log.html.%i">
+      <LDHtmlLayout datePattern="${dateformat}" />
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>    
     <RollingFile name="CMIS" fileName="${root}/cmis.log" filePattern="${root}/cmis.log.%i">
       <PatternLayout>
         <Pattern>${pattern}</Pattern>
@@ -475,10 +471,24 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
+    <RollingFile name="SPRING_WEB" fileName="${root}/spring_web.log.html" filePattern="${root}/spring_web.log.html.%i">
+      <LDHtmlLayout datePattern="${dateformat}" />
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>
     <RollingFile name="SPRING" fileName="${root}/spring.log" filePattern="${root}/spring.log.%i">
       <PatternLayout>
         <Pattern>${pattern}</Pattern>
       </PatternLayout>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>
+    <RollingFile name="AUTOMATION_WEB" fileName="${root}/automation_web.log.html" filePattern="${root}/automation_web.log.html.%i">
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -493,6 +503,13 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
+    <RollingFile name="WEBSERVICE_WEB" fileName="${root}/webservice_web.log.html" filePattern="${root}/webservice_web.log.html.%i">
+      <LDHtmlLayout datePattern="${dateformat}" />
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>
     <RollingFile name="WEBSERVICE" fileName="${root}/webservice.log" filePattern="${root}/webservice.log.%i">
       <PatternLayout>
         <Pattern>${pattern}</Pattern>
@@ -502,6 +519,13 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
+    <RollingFile name="STORAGE_DELETIONS_WEB" fileName="${root}/storage_deletions_web.log.html" filePattern="${root}/storage_deletions_web.log.html.%i">
+      <LDHtmlLayout datePattern="${dateformat}" />
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>    
     <RollingFile name="STORAGE_DELETIONS" fileName="${root}/storage_deletions.log" filePattern="${root}/storage_deletions.log.%i">
       <PatternLayout>
         <Pattern>%d{dd.MM.yyyy HH:mm:ss,SSS} - %m%n</Pattern>
@@ -527,12 +551,15 @@
     </Logger>
     <Logger name="org.hibernate" level="error" additivity="true">
       <AppenderRef ref="DB" />
+      <AppenderRef ref="DB_WEB" />
     </Logger>
     <Logger name="org.hibernate.cache" level="warn" additivity="true">
       <AppenderRef ref="DB" />
+      <AppenderRef ref="DB_WEB" />
     </Logger>    
     <Logger name="STORAGE_DELETIONS" level="info" additivity="false">
       <AppenderRef ref="STORAGE_DELETIONS" />
+      <AppenderRef ref="STORAGE_DELETIONS_WEB" />
     </Logger>    
     <Logger name="com.logicaldoc.core" level="info" additivity="true" />
     <Logger name="com.logicaldoc.web" level="info" additivity="true" />
@@ -541,6 +568,7 @@
     <Logger name="com.logicaldoc.enterprise.security" level="info" additivity="true" />
     <Logger name="org.apache.cxf" level="error" additivity="true">
       <Appender-Ref ref="WEBSERVICE" />
+      <Appender-Ref ref="WEBSERVICE_WEB" />
     </Logger>
     <Logger name="org.jgroups.protocols" level="error" additivity="true" />
     <Logger name="org.apache.pdfbox" level="error" additivity="true" />
@@ -571,10 +599,6 @@
       <Appender-Ref ref="StatsCollector" />
       <Appender-Ref ref="StatsCollector_WEB" />
     </Logger>
-    <Logger name="com.logicaldoc.share.NetworkBrowser" level="info" additivity="false">
-      <Appender-Ref ref="NetworkBrowser" />
-      <Appender-Ref ref="NetworkBrowser_WEB" />
-    </Logger>
     <Logger name="com.logicaldoc.barcode.BarcodeProcessor" level="info" additivity="false">
       <Appender-Ref ref="BarcodeProcessor" />
       <Appender-Ref ref="BarcodeProcessor_WEB" />
@@ -599,19 +623,17 @@
       <Appender-Ref ref="IncrementalArchiveCreator" />
       <Appender-Ref ref="IncrementalArchiveCreator_WEB" />
     </Logger>
-    <Logger name="com.logicaldoc.calendar.CalendarProcessor" level="info" additivity="false">
-      <Appender-Ref ref="CalendarProcessor" />
-      <Appender-Ref ref="CalendarProcessor_WEB" />
-    </Logger>
     <Logger name="com.logicaldoc.core.folder.PathCalculator" level="info" additivity="false">
       <Appender-Ref ref="PathCalculator" />
       <Appender-Ref ref="PathCalculator_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.cmis" level="warn" additivity="false">
       <Appender-Ref ref="CMIS" />
+      <Appender-Ref ref="CMIS_WEB" />
     </Logger>
     <Logger name="org.apache.chemistry.opencmis" level="warn" additivity="false">
       <Appender-Ref ref="CMIS" />
+      <Appender-Ref ref="CMIS_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.retention.RetentionPoliciesProcessor" level="info" additivity="false">
       <Appender-Ref ref="RetentionProcessor" />
@@ -623,9 +645,11 @@
     </Logger>
     <Logger name="org.springframework.security.web.session.SessionManagementFilter" level="info" additivity="true">
       <Appender-Ref ref="SPRING" />
+      <Appender-Ref ref="SPRING_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.core.automation" level="debug" additivity="true">
       <Appender-Ref ref="AUTOMATION" />
+      <Appender-Ref ref="AUTOMATION_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.report.ReportsProcessor" level="info" additivity="false">
       <Appender-Ref ref="ReportsProcessor" />
@@ -641,9 +665,11 @@
     </Logger>
     <Logger name="org.apache.ftpserver" level="info" additivity="false">
       <Appender-Ref ref="FTPSERVER" />
+      <Appender-Ref ref="FTPSERVER_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.ftp" level="info" additivity="false">
       <Appender-Ref ref="FTPSERVER" />
+      <Appender-Ref ref="FTPSERVER_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.syndication.SyndicationCrawler" level="info" additivity="false">
       <Appender-Ref ref="SyndicationCrawler" />
@@ -651,9 +677,11 @@
     </Logger>
     <Logger name="com.zaxxer.hikari" level="error" additivity="false">
       <Appender-Ref ref="CP" />
+      <Appender-Ref ref="CP_WEB" />
     </Logger>
     <Logger name="org.apache.commons.dbcp2" level="error" additivity="false">
       <Appender-Ref ref="CP" />
+      <Appender-Ref ref="CP_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.enterprise.automation.AutomationExecutor" level="info" additivity="false">
       <Appender-Ref ref="AutomationExecutor" />

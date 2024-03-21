@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.List;
 import java.util.Properties;
 
 import org.java.plugin.Plugin;
@@ -13,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.config.ContextProperties;
-import com.logicaldoc.util.config.LoggingConfigurator;
+import com.logicaldoc.util.config.LogConfigurator;
 import com.logicaldoc.util.config.WebConfigurator;
 
 /**
@@ -234,11 +235,13 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	 * Utility method to add a new appender into the log configuration
 	 * 
 	 * @param logger name of the logger
+	 * @param additivity the additivity flag
+	 * @param level the log level
 	 * @param appender name of the appender
 	 */
-	protected void addLogger(String logger, String appender) {
+	protected void addLogger(String logger, boolean additivity, String level, String appender) {
 		// Add notifier log issues
-		LoggingConfigurator logging = new LoggingConfigurator();
+		LogConfigurator logging = new LogConfigurator();
 		logging.addTextAppender(appender);
 		logging.write();
 
@@ -246,7 +249,27 @@ public abstract class LogicalDOCPlugin extends Plugin {
 		logging.addHtmlAppender(appenderWeb);
 		logging.write();
 
-		logging.addLogger(logger, new String[] { appender, appenderWeb });
+		logging.setLogger(logger, additivity, level, List.of(appender, appenderWeb));
+		logging.write();
+	}
+
+	/**
+	 * Utility method to add a new appender into the log configuration
+	 * 
+	 * @param logger name of the logger
+	 * @param appender name of the appender
+	 */
+	protected void addLogger(String logger, String appender) {
+		// Add notifier log issues
+		LogConfigurator logging = new LogConfigurator();
+		logging.addTextAppender(appender);
+		logging.write();
+
+		String appenderWeb = appender + "_WEB";
+		logging.addHtmlAppender(appenderWeb);
+		logging.write();
+
+		logging.addLogger(logger, List.of(appender, appenderWeb));
 		logging.write();
 	}
 

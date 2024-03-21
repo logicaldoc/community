@@ -46,6 +46,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
+import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
@@ -67,6 +68,7 @@ import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.config.LogConfigurator;
 import com.logicaldoc.util.config.PluginDescriptorConfigurator;
 import com.logicaldoc.util.exec.Exec;
 import com.logicaldoc.util.io.FileUtil;
@@ -76,6 +78,7 @@ import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.util.sql.SqlUtil;
 import com.logicaldoc.web.UploadServlet;
+import com.logicaldoc.web.data.LogDataServlet;
 import com.logicaldoc.web.listener.ApplicationListener;
 import com.logicaldoc.web.websockets.WebsocketTool;
 
@@ -1051,5 +1054,35 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		}
 
 		return plugins;
+	}
+
+	@Override
+	public void saveLogger(String name, String level, boolean additivity) throws ServerException {
+		Session session = validateSession();
+		if (session.getTenantId() != Tenant.DEFAULT_ID)
+			throw new AccessDeniedException("Not enough permissions");
+		checkMenu(Menu.LOGS);
+
+		LogConfigurator conf = new LogConfigurator();
+		if ("root".equals(name))
+			conf.setRootLevel(level);
+		else
+			conf.setLogger(name, additivity, StringUtils.defaultIfEmpty(level, "info"), null);
+
+		conf.write();
+		conf.initializeLogging();
+	}
+
+	@Override
+	public void removeLogger(String name) throws ServerException {
+		Session session = validateSession();
+		if (session.getTenantId() != Tenant.DEFAULT_ID || LogDataServlet.isLoggerReserved(name))
+			throw new AccessDeniedException("Not enough permissions");
+		checkMenu(Menu.LOGS);
+
+		LogConfigurator conf = new LogConfigurator();
+		conf.removeLogger(name);
+		conf.write();
+		conf.initializeLogging();
 	}
 }

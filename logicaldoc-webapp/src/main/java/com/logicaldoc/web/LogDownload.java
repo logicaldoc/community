@@ -35,7 +35,7 @@ import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.SystemUtil;
 import com.logicaldoc.util.config.ContextProperties;
-import com.logicaldoc.util.config.LoggingConfigurator;
+import com.logicaldoc.util.config.LogConfigurator;
 import com.logicaldoc.util.config.OrderedProperties;
 import com.logicaldoc.util.csv.CSVFileWriter;
 import com.logicaldoc.util.io.FileUtil;
@@ -79,7 +79,7 @@ public class LogDownload extends HttpServlet {
 				file = prepareAllSupportResources();
 			} else if (appender != null) {
 				response.setContentType("text/html");
-				LoggingConfigurator conf = new LoggingConfigurator();
+				LogConfigurator conf = new LogConfigurator();
 				if (conf.getFile(appender, true) != null)
 					file = new File(conf.getFile(appender, true));
 			}
@@ -129,8 +129,8 @@ public class LogDownload extends HttpServlet {
 
 		try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(tmp));) {
 
-			LoggingConfigurator conf = new LoggingConfigurator();
-			Collection<String> appenders = conf.getLoggingFiles();
+			LogConfigurator conf = new LogConfigurator();
+			Collection<String> appenders = conf.getAppenders();
 
 			/*
 			 * Store the log files in the zip file
@@ -140,7 +140,7 @@ public class LogDownload extends HttpServlet {
 					continue;
 
 				File logFile = new File(conf.getFile(appender, true));
-				writeEntry(out, logFile.getName(), logFile);
+				writeEntry(out, "logicaldoc/logs/" + logFile.getName(), logFile);
 			}
 
 			/*
@@ -148,7 +148,12 @@ public class LogDownload extends HttpServlet {
 			 * file
 			 */
 			File buf;
-			OrderedProperties prop = writeContextProperties(out);
+			OrderedProperties prop = writeContextPropertiesDump(out);
+
+			/*
+			 * Save the most important configuration files
+			 */
+			writeConfigFiles(out);
 
 			/*
 			 * Now create a file with the environment
@@ -158,26 +163,25 @@ public class LogDownload extends HttpServlet {
 			buf = FileUtil.createTempFile("environment", ".txt");
 			FileUtil.writeFile(env, buf.getPath());
 
-			writeEntry(out, "environment.txt", buf);
+			writeEntry(out, "logicaldoc/conf/environment.txt", buf);
 			FileUtil.strongDelete(buf);
 
 			/*
 			 * Discover the tomcat's folder
 			 */
 			ServletContext context = getServletContext();
-			File webappDescriptor = new File(context.getRealPath("/WEB-INF/web.xml"));
-			webappDescriptor = webappDescriptor.getParentFile().getParentFile().getParentFile().getParentFile();
+			File webappFolder = new File(context.getRealPath("/WEB-INF/web.xml"));
+			webappFolder = webappFolder.getParentFile().getParentFile().getParentFile().getParentFile();
 
 			/*
-			 * Now put the server.xml file
+			 * Now put the server.xml file and the other config files
 			 */
-			File serverFile = new File(webappDescriptor.getPath() + "/conf/server.xml");
-			writeEntry(out, "tomcat/server.xml", serverFile);
+			writeTomcatConfigFiles(out, webappFolder);
 
 			/*
 			 * Now put the most recent tomcat's logs
 			 */
-			writeTomcatLogs(out, webappDescriptor);
+			writeTomcatLogs(out, webappFolder);
 
 			/*
 			 * Dump all the informations about updates and batches
@@ -206,10 +210,10 @@ public class LogDownload extends HttpServlet {
 		return "";
 	}
 
-	private void writeTomcatLogs(ZipOutputStream out, File webappDescriptor) throws IOException {
+	private void writeTomcatLogs(ZipOutputStream out, File webappDir) throws IOException {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		String today = df.format(new Date());
-		File logsDir = new File(webappDescriptor.getPath() + "/logs");
+		File logsDir = new File(webappDir.getPath() + "/logs");
 		File[] files = logsDir.listFiles();
 		for (File file : files) {
 			if (file.isDirectory()
@@ -220,7 +224,34 @@ public class LogDownload extends HttpServlet {
 			// store just the logs of today
 			if (file.getName().toLowerCase().endsWith(".out") || file.getName().toLowerCase().endsWith(today + ".log")
 					|| file.getName().toLowerCase().endsWith(today + ".txt"))
-				writeEntry(out, "tomcat/" + file.getName(), file);
+				writeEntry(out, "tomcat/logs/" + file.getName(), file);
+		}
+	}
+	
+	private void writeTomcatConfigFiles(ZipOutputStream out, File webappDir) throws IOException {
+		File confDir = new File(webappDir.getPath() + "/conf");
+		File[] files = confDir.listFiles();
+		for (File file : files) {
+			if (file.isDirectory())
+				continue;
+
+			// store just the logs of today
+			if (file.getName().toLowerCase().endsWith(".xml") || file.getName().toLowerCase().endsWith(".properties")
+					|| file.getName().toLowerCase().endsWith(".policy"))
+				writeEntry(out, "tomcat/conf/" + file.getName(), file);
+		}
+	}
+
+	private void writeConfigFiles(ZipOutputStream out) throws IOException {
+		File confDir = new File(Context.get().getProperties().getProperty("LDOCHOME") + "/conf");
+		File[] files = confDir.listFiles();
+		for (File file : files) {
+			if (file.isDirectory())
+				continue;
+
+			if (file.getName().toLowerCase().endsWith(".properties") || file.getName().toLowerCase().endsWith(".xml")
+					|| file.getName().toLowerCase().endsWith(".txt"))
+				writeEntry(out, "logicaldoc/conf/" + file.getName(), file);
 		}
 	}
 
@@ -235,7 +266,7 @@ public class LogDownload extends HttpServlet {
 		if (files != null)
 			for (File file : files) {
 				if (file.getName().toLowerCase().endsWith(".log"))
-					writeEntry(out, "updates/" + file.getName(), file);
+					writeEntry(out, "logicaldoc/updates/" + file.getName(), file);
 			}
 
 		/*
@@ -258,7 +289,7 @@ public class LogDownload extends HttpServlet {
 				}
 			}
 
-			writeEntry(out, "updates/updates.csv", buf);
+			writeEntry(out, "logicaldoc/updates/updates.csv", buf);
 		} finally {
 			FileUtil.strongDelete(buf);
 		}
@@ -275,7 +306,7 @@ public class LogDownload extends HttpServlet {
 		if (files != null)
 			for (File file : files) {
 				if (file.getName().toLowerCase().endsWith(".log"))
-					writeEntry(out, "patches/" + file.getName(), file);
+					writeEntry(out, "logicaldoc/patches/" + file.getName(), file);
 			}
 
 		/*
@@ -298,7 +329,7 @@ public class LogDownload extends HttpServlet {
 				}
 			}
 
-			writeEntry(out, "patches/patches.csv", buf);
+			writeEntry(out, "logicaldoc/patches/patches.csv", buf);
 		} finally {
 			FileUtil.strongDelete(buf);
 		}
@@ -313,7 +344,16 @@ public class LogDownload extends HttpServlet {
 		return buildProperties;
 	}
 
-	private OrderedProperties writeContextProperties(ZipOutputStream out) throws IOException {
+	/**
+	 * Dumps the context properties as they are in memory
+	 * 
+	 * @param out The zip stream to write to
+	 * 
+	 * @return The written properties
+	 * 
+	 * @throws IOException error in writing the stream
+	 */
+	private OrderedProperties writeContextPropertiesDump(ZipOutputStream out) throws IOException {
 		File buf = FileUtil.createTempFile("context", ".properties");
 		ContextProperties cp = Context.get().getProperties();
 		OrderedProperties prop = new OrderedProperties();
@@ -322,8 +362,7 @@ public class LogDownload extends HttpServlet {
 				prop.put(key, cp.get(key));
 		}
 		prop.store(new FileOutputStream(buf), "Support Request");
-
-		writeEntry(out, "context.properties", buf);
+		writeEntry(out, "logicaldoc/conf/context-dump.properties", buf);
 		FileUtil.strongDelete(buf);
 		return prop;
 	}

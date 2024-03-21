@@ -52,6 +52,8 @@ public class WebservicePlugin extends LogicalDOCPlugin {
 		config.addServletMapping("WebserviceChart", "/webservicechart");
 		config.writeXMLDoc();
 
+		addLogger("org.apache.cxf", true, "error", "WEBSERVICE");
+		
 		setRestartRequired();
 	}
 }

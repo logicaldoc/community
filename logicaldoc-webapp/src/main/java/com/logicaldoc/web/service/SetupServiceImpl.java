@@ -28,7 +28,7 @@ import com.logicaldoc.gui.setup.client.SetupInfo;
 import com.logicaldoc.gui.setup.client.services.SetupService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
-import com.logicaldoc.util.config.LoggingConfigurator;
+import com.logicaldoc.util.config.LogConfigurator;
 import com.logicaldoc.util.plugin.PluginRegistry;
 
 /**
@@ -90,7 +90,7 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 	private void setLogFolder() {
 		try {
 			ContextProperties pbean = new ContextProperties();
-			LoggingConfigurator lconf = new LoggingConfigurator();
+			LogConfigurator lconf = new LogConfigurator();
 			lconf.setLogsRoot(pbean.getProperty("conf.logdir"));
 			lconf.write();
 		} catch (Exception t) {

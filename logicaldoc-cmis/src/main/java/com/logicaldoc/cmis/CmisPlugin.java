@@ -53,6 +53,10 @@ public class CmisPlugin extends LogicalDOCPlugin {
 			log.error(e.getMessage(), e);
 		}
 
+		// Add some loggers
+		addLogger("com.logicaldoc.cmis", false, "warn", "CMIS");
+		addLogger("org.apache.chemistry.opencmis", false, "warn", "CMIS");
+
 		setRestartRequired();
 	}
 }

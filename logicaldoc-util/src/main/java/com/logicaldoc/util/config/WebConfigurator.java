@@ -60,7 +60,6 @@ public class WebConfigurator extends XMLBean {
 	 * 
 	 * @return the element
 	 */
-
 	private Element elementLookUp(List<Element> elements, String matchText, String name) {
 		for (Iterator<Element> iterator = elements.iterator(); iterator.hasNext();) {
 			Element elem = iterator.next();
