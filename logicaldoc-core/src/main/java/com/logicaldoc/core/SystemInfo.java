@@ -43,6 +43,8 @@ public class SystemInfo {
 	protected String url = "https://www.logicaldoc.com";
 
 	protected String forum = "https://forums.logicaldoc.com";
+	
+	protected String evaluation = "";
 
 	protected String vendor = "LogicalDOC";
 
@@ -345,5 +347,13 @@ public class SystemInfo {
 
 	public void setFeatures(Set<String> features) {
 		this.features = features;
+	}
+
+	public String getEvaluation() {
+		return evaluation;
+	}
+
+	public void setEvaluation(String evaluation) {
+		this.evaluation = evaluation;
 	}
 }

@@ -192,7 +192,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 	}
 
 	/**
-	 * Retrieves the informations but not localization issues like messages and
+	 * Retrieves the informations but not localization resources like messages and
 	 * installed languages
 	 * 
 	 * @param tenantName name of the tenant
@@ -240,6 +240,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
 		guiInfo.getBranding().setBugs(info.getBugs());
 		guiInfo.getBranding().setForum(info.getForum());
+		guiInfo.getBranding().setEvaluation(info.getEvaluation());
 		guiInfo.getBranding().setHelp(info.getHelp());
 		guiInfo.getBranding().setProduct(info.getProduct());
 		guiInfo.getBranding().setProductName(info.getProductName());
