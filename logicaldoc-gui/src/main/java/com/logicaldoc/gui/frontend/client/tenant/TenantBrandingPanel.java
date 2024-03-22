@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.data.Record;
+import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -340,8 +341,14 @@ public class TenantBrandingPanel extends HLayout {
 		forum.setWidth(360);
 		forum.addChangedHandler(changedHandler);
 
+		TextItem evaluation = ItemFactory.newTextItem("evaluation", tenant.getBranding().getEvaluation());
+		evaluation.setDisabled(readonlyOrNotFullBranding);
+		evaluation.setColSpan(2);
+		evaluation.setWidth(360);
+		evaluation.addChangedHandler(changedHandler);
+		
 		form.setItems(product, productName, vendor, address, postalCode, city, country, support, sales, webSite, help,
-				forum, bugs);
+				forum, bugs, evaluation);
 
 		imagesPanel.setMembers(prepareImagesGrid());
 
@@ -358,9 +365,11 @@ public class TenantBrandingPanel extends HLayout {
 		grid.setShowRecordComponentsByCell(true);
 		grid.setHeight100();
 
-		ListGridField nameField = new ListGridField(NAME, I18N.getAttributeLabel(IMAGE), 100);
+		ListGridField nameField = new ListGridField(NAME, I18N.getAttributeLabel(IMAGE));
 		nameField.setCanFilter(false);
 		nameField.setCanSort(false);
+		nameField.setAutoFitWidth(true);
+		nameField.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 
 		ListGridField image = prepareImageField();
 
@@ -551,6 +560,7 @@ public class TenantBrandingPanel extends HLayout {
 			tenant.getBranding().setUrl(vm.getValueAsString("website"));
 			tenant.getBranding().setBugs(vm.getValueAsString("bugs"));
 			tenant.getBranding().setForum(vm.getValueAsString("forum"));
+			tenant.getBranding().setEvaluation(vm.getValueAsString("evaluation"));
 			tenant.getBranding().setHelp(vm.getValueAsString("help"));
 			tenant.getBranding().setSupport(vm.getValueAsString(SUPPORT));
 			tenant.getBranding().setSales(vm.getValueAsString(SALES));

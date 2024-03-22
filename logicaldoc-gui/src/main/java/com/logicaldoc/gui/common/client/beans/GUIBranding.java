@@ -48,6 +48,8 @@ public class GUIBranding implements Serializable {
 
 	private String forum = "https://forums.logicaldoc.com";
 
+	private String evaluation = "";
+
 	private String vendor = "LogicalDOC";
 
 	private String vendorAddress = "via Aldo Moro interna, 3";
@@ -340,5 +342,13 @@ public class GUIBranding implements Serializable {
 
 	public void setFooter(String footer) {
 		this.footer = footer;
+	}
+
+	public String getEvaluation() {
+		return evaluation;
+	}
+
+	public void setEvaluation(String evaluation) {
+		this.evaluation = evaluation;
 	}
 }

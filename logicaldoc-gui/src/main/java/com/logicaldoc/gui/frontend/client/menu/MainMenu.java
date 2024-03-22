@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
@@ -145,6 +146,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		addSeparator();
 		addActivableFeaturesButton();
+		addProductEvaluationButton();
 		addSeparator();
 		addSupportButton();
 		addLogoutButton();
@@ -624,8 +626,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
 			MenuItem registration = new MenuItem(I18N.message("registration"));
 			registration.addClickHandler(registrationClick -> SettingService.Instance.get().loadSettingsByNames(
-					Arrays.asList("reg.name", "reg.email", "reg.organization", "reg.website"),
-					new AsyncCallback<>() {
+					Arrays.asList("reg.name", "reg.email", "reg.organization", "reg.website"), new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -663,14 +664,35 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	}
 
 	private void addActivableFeaturesButton() {
-		ToolStripButton activable = AwesomeFactory.newToolStripButton("star", I18N.message("activablefeatures"),
+		ToolStripButton activable = AwesomeFactory.newToolStripButton("lightbulb-on", I18N.message("activablefeatures"),
 				I18N.message("activablefeatures"));
-		activable.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> Features.get().show());
+		activable.addClickHandler(event -> Features.get().show());
 
 		if (!Session.get().isDemo()
 				&& Session.get().getInfo().getBranding().getUrl().equals("https://www.logicaldoc.com")
 				&& Feature.enabled(Feature.OFFICE) && com.logicaldoc.gui.common.client.Menu
 						.enabled(com.logicaldoc.gui.common.client.Menu.ACTIVABLE_FEATURES))
+			addButton(activable);
+	}
+
+	private void addProductEvaluationButton() {
+		ToolStripButton activable = AwesomeFactory.newToolStripButton("star", I18N.message("evaluatetheproduct"),
+				I18N.message("evaluatetheproduct"));
+		activable.addClickHandler(event -> {
+			String url = Session.get().getInfo().getBranding().getEvaluation();
+			url = url.replace("NAME", URL.encodeQueryString(Session.get().getUser().getFullName()));
+			url = url.replace("COMPANY",
+					Session.get().getUser().getCompany() != null && !Session.get().getUser().getCompany().isEmpty()
+							? URL.encodeQueryString(Session.get().getUser().getCompany())
+							: URL.encodeQueryString(Session.get().getInfo().getLicensee()));
+			url = url.replace("PRODUCT", URL.encodeQueryString(Session.get().getInfo().getBranding().getProductName()));
+			WindowUtils.openUrl(url, "_blank");
+		});
+
+		if (!Session.get().isDemo() && !Session.get().getInfo().getBranding().getEvaluation().isEmpty()
+				&& Session.get().getInfo().getBranding().getUrl().equals("https://www.logicaldoc.com")
+				&& Feature.enabled(Feature.OFFICE) && com.logicaldoc.gui.common.client.Menu
+						.enabled(com.logicaldoc.gui.common.client.Menu.PRODUCT_EVALUATION))
 			addButton(activable);
 	}
 

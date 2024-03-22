@@ -201,6 +201,8 @@ public class Menu {
 	
 	public static final long ACTIVABLE_FEATURES = 19;
 	
+	public static final long PRODUCT_EVALUATION = 20;
+	
 	private static Set<Long> menus = new HashSet<>();
 
 	private Menu() {}
