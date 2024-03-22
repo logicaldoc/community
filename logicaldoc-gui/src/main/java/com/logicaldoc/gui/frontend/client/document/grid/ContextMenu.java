@@ -68,6 +68,8 @@ public class ContextMenu extends Menu {
 
 	private MenuItem rename;
 
+	private MenuItem openInFolder;
+
 	private MenuItem delete;
 
 	private MenuItem sendMail;
@@ -162,6 +164,8 @@ public class ContextMenu extends Menu {
 
 				rename = prepareRenameItem(selection);
 
+				openInFolder = prepareOpenInFolderItem(selection);
+
 				delete = prepareDeleteItem(selection);
 
 				sendMail = new MenuItem();
@@ -242,8 +246,8 @@ public class ContextMenu extends Menu {
 				readingRequest.setTitle(I18N.message("requestreading"));
 				readingRequest.addClickHandler(event -> new ReadingRequestDialog(grid.getSelectedIds()).show());
 
-				setItems(download, preview, cut, copy, rename, delete, bookmark, sendMail, links, office, checkout,
-						checkin, lock, unlock);
+				setItems(download, preview, openInFolder, cut, copy, rename, delete, bookmark, sendMail, links, office,
+						checkout, checkin, lock, unlock);
 
 				more = new MenuItem(I18N.message("more"));
 				addItem(more);
@@ -341,6 +345,8 @@ public class ContextMenu extends Menu {
 		applyCompareSecurity(selection);
 
 		automation.setEnabled(Feature.enabled(Feature.AUTOMATION) && enabledPermissions.isAutomation());
+
+		openInFolder.setEnabled(justOneSelected);
 	}
 
 	private void applySplitSecurity(GUIAccessControlEntry enabledPermissions, List<GUIDocument> selection,
@@ -1099,6 +1105,16 @@ public class ContextMenu extends Menu {
 				}
 
 			});
+		});
+		return item;
+	}
+
+	private MenuItem prepareOpenInFolderItem(final List<GUIDocument> selection) {
+		MenuItem item = new MenuItem();
+		item.setTitle(I18N.message("openinfolder"));
+		item.addClickHandler(event -> {
+			GUIDocument doc = selection.get(0);
+			DocumentsPanel.get().openInFolder(doc.getFolder().getId(), doc.getId());
 		});
 		return item;
 	}

@@ -13,6 +13,7 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.Avatar;
+import com.logicaldoc.gui.frontend.client.menu.MainMenu;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
@@ -20,6 +21,7 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
@@ -106,6 +108,8 @@ public class Profile extends Window {
 		TextItem department = ItemFactory.newTextItem("department", user.getDepartment());
 		TextItem organizationalUnit = ItemFactory.newTextItem("organizationalunit", user.getOrganizationalUnit());
 		TextItem building = ItemFactory.newTextItem("building", user.getBuilding());
+		CheckboxItem evalForm = ItemFactory.newCheckbox("evalformenabled");
+		evalForm.setValue(user.isEvalFormEnabled());
 
 		ComboBoxItem timeZone = ItemFactory.newTimeZoneSelector(TIMEZONE, user.getTimeZone());
 		timeZone.setEndRow(true);
@@ -118,7 +122,7 @@ public class Profile extends Window {
 		quotaCount.setWrap(false);
 
 		detailsForm.setFields(firstName, lastName, language, address, postalCode, city, country, state, phone, cell,
-				company, department, organizationalUnit, building, timeZone, quotaCount, quota);
+				company, department, organizationalUnit, building, timeZone, quotaCount, quota, evalForm);
 
 		HLayout detailsPanel = new HLayout();
 		detailsPanel.setMembers(detailsForm, new Avatar(user.getId()));
@@ -316,6 +320,7 @@ public class Profile extends Window {
 		u.setDepartment(vm.getValueAsString("department"));
 		u.setBuilding(vm.getValueAsString("building"));
 		u.setOrganizationalUnit(vm.getValueAsString("organizationalunit"));
+		u.setEvalFormEnabled(Boolean.parseBoolean(vm.getValueAsString("evalformenabled")));
 
 		u.setWelcomeScreen(Integer.parseInt(vm.getValueAsString("welcomescreen")));
 		String str = vm.getValueAsString("workspace");
@@ -384,12 +389,15 @@ public class Profile extends Window {
 				user.setDateFormatLong(ret.getDateFormatLong());
 				user.setSearchPref(ret.getSearchPref());
 				user.setTimeZone(ret.getTimeZone());
+				user.setEvalFormEnabled(ret.isEvalFormEnabled());
 
 				Session.get().setUser(user);
 
 				Profile.this.destroy();
 
 				GuiLog.info(I18N.message("settingssaved"), null);
+
+				MainMenu.get().refreshProductEvaluationButton();
 			}
 		});
 	}

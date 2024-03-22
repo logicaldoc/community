@@ -176,6 +176,8 @@ public class GUIUser implements Serializable {
 
 	private List<Long> menus = new ArrayList<>();
 
+	private boolean evalFormEnabled = true;
+	
 	public GUIUser() {
 		tenant = new GUITenant();
 		tenant.setId(Constants.TENANT_DEFAULTID);
@@ -762,5 +764,13 @@ public class GUIUser implements Serializable {
 
 	public void setCompany(String company) {
 		this.company = company;
+	}
+
+	public boolean isEvalFormEnabled() {
+		return evalFormEnabled;
+	}
+
+	public void setEvalFormEnabled(boolean evalFormEnabled) {
+		this.evalFormEnabled = evalFormEnabled;
 	}
 }

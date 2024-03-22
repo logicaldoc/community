@@ -16,6 +16,7 @@
 		<property name="deleted" type="int" column="ld_deleted" not-null="true" />
 		<property name="tenantId" type="long" column="ld_tenantid" not-null="true" />
 		<property name="enabled" type="int" column="ld_enabled" not-null="true" />
+		<property name="evalFormEnabled" type="int" column="ld_evalform" not-null="true" />
 		<property name="username" type="string" column="ld_username" length="255" not-null="true" />
 		<property name="password" type="string" column="ld_password" length="255" />
 		<property name="passwordmd4" type="string" column="ld_passwordmd4" length="255" />

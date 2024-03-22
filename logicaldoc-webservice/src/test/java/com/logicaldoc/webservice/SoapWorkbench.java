@@ -32,7 +32,7 @@ import com.logicaldoc.webservice.soap.client.SoapTagClient;
 
 public class SoapWorkbench {
 
-	final static String BASE = "http://localhost:9080/services";
+	final static String BASE = "http://localhost:1000/services";
 
 	public static void main(String[] args) throws Exception {
 
@@ -58,9 +58,9 @@ public class SoapWorkbench {
 //				System.out.println(Arrays.asList(feature).stream().sorted().collect(Collectors.toList()));
 //			}
 
-		    securityStuff(sid);
+//		    securityStuff(sid);
 
-			//documentStuff(sid);
+			documentStuff(sid);
 
 			// This will search by filename using LIKE %filename%
 			// searchByFilename(sid, "simply");
@@ -526,9 +526,17 @@ public class SoapWorkbench {
 
 		SoapDocumentClient documentClient = new SoapDocumentClient(BASE + "/Document");
 
-		WSDocument doc = documentClient.getDocument(sid, 723734049L);
+		WSDocument doc = documentClient.getDocument(sid, 723741317L);
 		
-		documentClient.move(sid, 723734049L, 253984768L);
+		doc.setId(0);
+		doc.setCustomId(null);
+		doc.setFileName("test2.pdf");
+		documentClient.create(sid, doc, new File("C:\\Users\\marco\\Documents\\FAX AIMAG.pdf"));
+		
+		
+		System.out.println(doc);
+		
+//		documentClient.move(sid, 723734049L, 253984768L);
 		
 		
 		// WSDocument doc = documentClient.getDocument(sid, 735L);

@@ -486,6 +486,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				guiUser.setPostalCode(user.getPostalcode());
 				guiUser.setState(user.getState());
 				guiUser.setUsername(user.getUsername());
+				guiUser.setEvalFormEnabled(user.getEvalFormEnabled() == 1);
 				guiUser.setPasswordExpires(user.getPasswordExpires() == 1);
 				guiUser.setPasswordExpired(user.getPasswordExpired() == 1);
 				guiUser.setWelcomeScreen(user.getWelcomeScreen());
@@ -679,6 +680,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			user.setEnabled(guiUser.isEnabled() ? 1 : 0);
 			user.setPasswordExpires(guiUser.isPasswordExpires() ? 1 : 0);
 			user.setPasswordExpired(guiUser.isPasswordExpired() ? 1 : 0);
+			user.setEvalFormEnabled(guiUser.isEvalFormEnabled() ? 1 : 0);
 			user.setWelcomeScreen(guiUser.getWelcomeScreen());
 			user.setIpWhiteList(guiUser.getIpWhitelist());
 			user.setIpBlackList(guiUser.getIpBlacklist());
@@ -937,6 +939,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			user.setDateFormatShort(guiUser.getDateFormatShort());
 			user.setDateFormatLong(guiUser.getDateFormatLong());
 			user.setSearchPref(guiUser.getSearchPref());
+
+			user.setEvalFormEnabled(guiUser.isEvalFormEnabled() ? 1 : 0);
 
 			UserHistory transaction = new UserHistory();
 			transaction.setSession(session);

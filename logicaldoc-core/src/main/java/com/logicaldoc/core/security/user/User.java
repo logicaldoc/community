@@ -222,6 +222,19 @@ public class User extends PersistentObject implements Serializable {
 
 	private String company;
 
+	/**
+	 * If the user wants to enable the evaluation form
+	 */
+	private int evalFormEnabled = 1;
+
+	public int getEvalFormEnabled() {
+		return evalFormEnabled;
+	}
+
+	public void setEvalFormEnabled(int evalFormEnabled) {
+		this.evalFormEnabled = evalFormEnabled;
+	}
+
 	public String getCompany() {
 		return company;
 	}

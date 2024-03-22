@@ -141,6 +141,9 @@ public class WSUser {
 	@WSDoc(description = "if <b>1</b> the password is eligible for expiration, if <b>0</b> the password never expires")
 	private int passwordExpires = 0;
 
+	@WSDoc(description = "if <b>1</b> the evaluation form is available, if <b>0</b> the evaluation form is not evailable")
+	private int evalFormEnabled = 1;
+
 	@WSDoc(description = "must be <b>0</b>")
 	private int source = 0;
 
@@ -468,6 +471,7 @@ public class WSUser {
 			user.setUsername(getUsername());
 			user.setEnabled(getEnabled());
 			user.setPasswordExpires(getPasswordExpires());
+			user.setEvalFormEnabled(getEvalFormEnabled());
 			user.setQuota(getQuota());
 			user.setType(getType());
 			user.setSource(getSource());
@@ -539,6 +543,7 @@ public class WSUser {
 			wsUser.setUsername(user.getUsername());
 			wsUser.setEnabled(user.getEnabled());
 			wsUser.setPasswordExpires(user.getPasswordExpires());
+			wsUser.setEvalFormEnabled(user.getEvalFormEnabled());
 			wsUser.setQuota(user.getQuota());
 			wsUser.setType(user.getType());
 			wsUser.setSource(user.getSource());
@@ -742,5 +747,13 @@ public class WSUser {
 
 	public void setCompany(String company) {
 		this.company = company;
+	}
+
+	public int getEvalFormEnabled() {
+		return evalFormEnabled;
+	}
+
+	public void setEvalFormEnabled(int evalFormEnabled) {
+		this.evalFormEnabled = evalFormEnabled;
 	}
 }

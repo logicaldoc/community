@@ -89,6 +89,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 	private TextItem searchBox = new TextItem();
 
+	private ToolStripButton evaluation;
+
 	public static MainMenu get() {
 		if (instance == null)
 			instance = new MainMenu();
@@ -676,9 +678,9 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	}
 
 	private void addProductEvaluationButton() {
-		ToolStripButton activable = AwesomeFactory.newToolStripButton("star", I18N.message("evaluatetheproduct"),
+		evaluation = AwesomeFactory.newToolStripButton("star", I18N.message("evaluatetheproduct"),
 				I18N.message("evaluatetheproduct"));
-		activable.addClickHandler(event -> {
+		evaluation.addClickHandler(event -> {
 			String url = Session.get().getInfo().getBranding().getEvaluation();
 			url = url.replace("NAME", URL.encodeQueryString(Session.get().getUser().getFullName()));
 			url = url.replace("COMPANY",
@@ -688,19 +690,22 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			url = url.replace("PRODUCT", URL.encodeQueryString(Session.get().getInfo().getBranding().getProductName()));
 			WindowUtils.openUrl(url, "_blank");
 		});
+		addButton(evaluation);
+		refreshProductEvaluationButton();
+	}
 
-		if (!Session.get().isDemo() && !Session.get().getInfo().getBranding().getEvaluation().isEmpty()
-				&& Session.get().getInfo().getBranding().getUrl().equals("https://www.logicaldoc.com")
-				&& Feature.enabled(Feature.OFFICE) && com.logicaldoc.gui.common.client.Menu
-						.enabled(com.logicaldoc.gui.common.client.Menu.PRODUCT_EVALUATION))
-			addButton(activable);
+	public void refreshProductEvaluationButton() {
+		boolean mustShow = !Session.get().isDemo() && !Session.get().getInfo().getBranding().getEvaluation().isEmpty()
+				&& Session.get().getUser().isEvalFormEnabled() && Feature.enabled(Feature.OFFICE)
+				&& com.logicaldoc.gui.common.client.Menu
+						.enabled(com.logicaldoc.gui.common.client.Menu.PRODUCT_EVALUATION);
+		evaluation.setVisible(mustShow);
 	}
 
 	private void addSupportButton() {
 		Menu menu = buildSupportMenu();
 		ToolStripButton supportButton = AwesomeFactory.newToolStripButton("question-circle", "support");
 		supportButton.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> menu.showContextMenu());
-
 		addButton(supportButton);
 	}
 
