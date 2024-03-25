@@ -20,6 +20,10 @@ import org.jdom2.Element;
  */
 public class LogConfigurator {
 
+	private static final String LEVEL = "level";
+
+	private static final String LOGGERS = "//Loggers";
+
 	private static final String ROOT = "${root}/";
 
 	private static final String FILE_NAME = "fileName";
@@ -69,7 +73,7 @@ public class LogConfigurator {
 	 * @return collection of the logger names
 	 */
 	public Collection<Element> getLoggers() {
-		Element loggers = xml.findElement("//Loggers");
+		Element loggers = xml.findElement(LOGGERS);
 		return loggers.getChildren();
 	}
 
@@ -171,12 +175,12 @@ public class LogConfigurator {
 			logger.setAttribute("name", name);
 
 			// Place the new logger just before the root category
-			Element loggers = xml.findElement("//Loggers");
+			Element loggers = xml.findElement(LOGGERS);
 			loggers.addContent(0, logger);
 		}
 
 		logger.setAttribute("additivity", Boolean.toString(additivity));
-		logger.setAttribute("level", level);
+		logger.setAttribute(LEVEL, level);
 		if (appenders != null && !appenders.isEmpty()) {
 			logger.removeContent();
 			for (String app : appenders) {
@@ -197,17 +201,17 @@ public class LogConfigurator {
 		Element logger = xml.findElement("//Logger[@name='" + name + "']");
 		if (logger != null) {
 			// Place the new logger just before the root category
-			Element loggers = xml.findElement("//Loggers");
+			Element loggers = xml.findElement(LOGGERS);
 			loggers.removeContent(logger);
 		}
 	}
 
 	public String getRootLevel() {
-		return xml.findElement("//Root").getAttributeValue("level");
+		return xml.findElement("//Root").getAttributeValue(LEVEL);
 	}
 
 	public void setRootLevel(String level) {
-		xml.findElement("//Root").setAttribute("level", level);
+		xml.findElement("//Root").setAttribute(LEVEL, level);
 	}
 
 	/**

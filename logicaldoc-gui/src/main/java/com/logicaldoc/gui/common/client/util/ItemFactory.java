@@ -71,7 +71,6 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.SortSpecifier;
 import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.Cursor;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.MultiComboBoxLayoutStyle;
 import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.Overflow;
@@ -127,6 +126,12 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  * @since 6.0
  */
 public class ItemFactory {
+
+	private static final String LEVEL = "level";
+
+	private static final String LOGGER = "logger";
+
+	private static final String LOGFILE = "logfile";
 
 	private static final String WORKFLOWSELECT = "workflowselect";
 
@@ -2759,17 +2764,17 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newLogAppenderSelector() {
-		SelectItem selector = new SelectItem("logfile");
-		selector.setTitle(I18N.message("logfile"));
+		SelectItem selector = new SelectItem(LOGFILE);
+		selector.setTitle(I18N.message(LOGFILE));
 		selector.setWrapTitle(false);
-		ListGridField name = new ListGridField("name", I18N.message("logfile"));
+		ListGridField name = new ListGridField("name", I18N.message(LOGFILE));
 		name.setHidden(true);
 		name.setAutoFitWidth(true);
 
-		ListGridField label = new ListGridField("label", I18N.message("name"));
+		ListGridField label = new ListGridField(LABEL, I18N.message("name"));
 
 		selector.setValueField("name");
-		selector.setDisplayField("label");
+		selector.setDisplayField(LABEL);
 		selector.setWidth(150);
 		selector.setPickListFields(name, label);
 		selector.setOptionDataSource(new LogAppendersDS());
@@ -2778,12 +2783,12 @@ public class ItemFactory {
 	}
 
 	public static ComboBoxItem newLoggerSelector() {
-		ComboBoxItem selector = newComboBoxItem("logger", "logger");
+		ComboBoxItem selector = newComboBoxItem(LOGGER, LOGGER);
 		selector.setWrapTitle(false);
-		ListGridField name = new ListGridField("name", I18N.message("logger"));
+		ListGridField name = new ListGridField("name", I18N.message(LOGGER));
 		name.setWidth("*");
 
-		ListGridField level = new ListGridField("level", I18N.message("level"));
+		ListGridField level = new ListGridField(LEVEL, I18N.message(LEVEL));
 		level.setAutoFitWidth(true);
 		level.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 
@@ -2797,7 +2802,7 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newLogLevelSelector() {
-		SelectItem selector = newSelectItem("level");
+		SelectItem selector = newSelectItem(LEVEL);
 		selector.setWrapTitle(false);
 		selector.setValueMap("trace", "debug", "info", "warn", "error", "fatal");
 		selector.setWidth(80);

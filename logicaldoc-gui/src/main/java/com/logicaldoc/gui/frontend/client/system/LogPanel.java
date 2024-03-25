@@ -57,54 +57,11 @@ public class LogPanel extends VLayout {
 		ComboBoxItem loggerSelector = ItemFactory.newLoggerSelector();
 
 		ToolStripButton save = new ToolStripButton(I18N.message("save"));
-		save.addClickHandler(event -> {
-			String name = loggerSelector.getValueAsString();
-			if (name != null && !name.isEmpty()) {
-				boolean additivity = loggerSelector.getSelectedRecord() != null
-						&& name.equals(loggerSelector.getSelectedRecord().getAttributeAsString("name"))
-								? loggerSelector.getSelectedRecord().getAttributeAsBoolean("additivity")
-								: true;
-				SystemService.Instance.get().saveLogger(name, levelSelector.getValueAsString(), additivity,
-						new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void arg0) {
-								loggerSelector.setOptionDataSource(new LoggersDS());
-								loggerSelector.setValue(name);
-								loggerSelector.selectValue();
-							}
-						});
-			}
-		});
+		save.addClickHandler(event -> onSaveLogger(levelSelector, loggerSelector));
 
 		ToolStripButton delete = new ToolStripButton(I18N.message("ddelete"));
 		delete.setDisabled(true);
-		delete.addClickHandler(event -> {
-			SC.ask(I18N.message("confirmdeletelogger"), choice -> {
-				if (Boolean.TRUE.equals(choice)) {
-					if (loggerSelector.getValueAsString() != null && !loggerSelector.getValueAsString().isEmpty()) {
-						SystemService.Instance.get().removeLogger(loggerSelector.getValueAsString(),
-								new AsyncCallback<Void>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
-
-									@Override
-									public void onSuccess(Void arg0) {
-										loggerSelector.setValue("root");
-										loggerSelector.selectValue();
-									}
-								});
-					}
-
-				}
-			});
-		});
+		delete.addClickHandler(event -> onDeleteLogger(loggerSelector));
 
 		loggerSelector.addChangedHandler(event -> {
 			levelSelector.setValue(loggerSelector.getSelectedRecord().getAttribute("level"));
@@ -138,5 +95,48 @@ public class LogPanel extends VLayout {
 		toolStrip.addFill();
 		addMember(toolStrip);
 		addMember(htmlPane);
+	}
+
+	private void onDeleteLogger(ComboBoxItem loggerSelector) {
+		SC.ask(I18N.message("confirmdeletelogger"), choice -> {
+			if (Boolean.TRUE.equals(choice) && loggerSelector.getValueAsString() != null
+					&& !loggerSelector.getValueAsString().isEmpty()) {
+				SystemService.Instance.get().removeLogger(loggerSelector.getValueAsString(), new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(Void arg0) {
+						loggerSelector.setValue("root");
+						loggerSelector.selectValue();
+					}
+				});
+			}
+		});
+	}
+
+	private void onSaveLogger(SelectItem levelSelector, ComboBoxItem loggerSelector) {
+		String name = loggerSelector.getValueAsString();
+		if (name != null && !name.isEmpty()) {
+			boolean additivity = loggerSelector.getSelectedRecord() != null
+					&& name.equals(loggerSelector.getSelectedRecord().getAttributeAsString("name"))
+					&& loggerSelector.getSelectedRecord().getAttributeAsBoolean("additivity");
+			SystemService.Instance.get().saveLogger(name, levelSelector.getValueAsString(), additivity,
+					new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(Void arg0) {
+							loggerSelector.setOptionDataSource(new LoggersDS());
+							loggerSelector.setValue(name);
+							loggerSelector.selectValue();
+						}
+					});
+		}
 	}
 }

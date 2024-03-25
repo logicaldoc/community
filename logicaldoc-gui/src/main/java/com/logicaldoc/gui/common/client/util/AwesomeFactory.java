@@ -15,6 +15,9 @@ import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
  * @since 8.0
  */
 public class AwesomeFactory {
+	
+	private static final String ONCLICK_DOWNLOAD_DOCUMENT_RESOURCE = " onclick=\"downloadDocumentResource('";
+
 	private static final String STYLE_COLOR = " style='color: ";
 
 	private static final String DIV_CLASS_STATUS_ICON = "<div class='statusIcon' ";
@@ -167,7 +170,7 @@ public class AwesomeFactory {
 		String button = DIV_CLASS_STATUS_ICON
 				+ (indexed != null && indexed != Constants.INDEX_SKIP ? TITLE + I18N.message("indexed") + "' " : "")
 				+ (color != null && !color.isEmpty() ? STYLE_COLOR + color + "'" : "")
-				+ " onclick=\"downloadDocumentResource('" + docId + "', '" + Util.downloadURL(docId)
+				+ ONCLICK_DOWNLOAD_DOCUMENT_RESOURCE + docId + "', '" + Util.downloadURL(docId)
 				+ "&downloadText=true');\"";
 		button += " >";
 		button += getIndexedIcon(indexed);
@@ -178,7 +181,7 @@ public class AwesomeFactory {
 	public static String getStampedIconButtonHTML(long docId, String fileVersion, String tooltip, String color) {
 		String button = DIV_CLASS_STATUS_ICON + (color != null && !color.isEmpty() ? STYLE_COLOR + color + "'" : "")
 				+ (tooltip != null && !tooltip.isEmpty() ? TITLE + I18N.message(tooltip) + "'" : "")
-				+ " onclick=\"downloadDocumentResource('" + docId + "', '" + Util.downloadPdfURL(docId, fileVersion)
+				+ ONCLICK_DOWNLOAD_DOCUMENT_RESOURCE + docId + "', '" + Util.downloadPdfURL(docId, fileVersion)
 				+ "');\"";
 		button += " >";
 		button += getColoredIconHtml("tint", null, color);
@@ -189,7 +192,7 @@ public class AwesomeFactory {
 	public static String getSignedIconButtonHTML(long docId, String fileName, String tooltip, String color) {
 		String button = DIV_CLASS_STATUS_ICON + (color != null && !color.isEmpty() ? STYLE_COLOR + color + "'" : "")
 				+ (tooltip != null && !tooltip.isEmpty() ? TITLE + I18N.message(tooltip) + "'" : "")
-				+ " onclick=\"downloadDocumentResource('" + docId + "', '"
+				+ ONCLICK_DOWNLOAD_DOCUMENT_RESOURCE + docId + "', '"
 				+ (fileName != null && fileName.toLowerCase().endsWith(".pdf") ? Util.downloadURL(docId, null)
 						: Util.downloadPdfURL(docId, null))
 				+ "');\"";

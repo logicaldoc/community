@@ -34,6 +34,8 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 	public static final int TYPE_FOLDER = 6;
 
 	public static final int TYPE_DOCUMENT = 7;
+	
+	public static final int TYPE_SECTION = 8;
 
 	public static final int EDITOR_DEFAULT = 0;
 
@@ -208,12 +210,10 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 	 * @return The attribute value to display
 	 */
 	public Object getDisplayValue() {
-		switch (type) {
-		case TYPE_USER, TYPE_DOCUMENT:
+		if (type == TYPE_USER || type == TYPE_DOCUMENT)
 			return getStringValue();
-		default:
+		else
 			return getValue();
-		}
 	}
 
 	/**

@@ -688,7 +688,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 							? URL.encodeQueryString(Session.get().getUser().getCompany())
 							: URL.encodeQueryString(Session.get().getInfo().getLicensee()));
 			url = url.replace("PRODUCT", URL.encodeQueryString(Session.get().getInfo().getBranding().getProductName()));
-			WindowUtils.openUrl(url, "_blank");
+			WindowUtils.openUrl(url, BLANK);
 		});
 		addButton(evaluation);
 		refreshProductEvaluationButton();

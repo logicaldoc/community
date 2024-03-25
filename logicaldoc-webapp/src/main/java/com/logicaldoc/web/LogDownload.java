@@ -3,7 +3,6 @@ package com.logicaldoc.web;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,6 +47,8 @@ import com.logicaldoc.web.util.ServletUtil;
  * @since 6.0
  */
 public class LogDownload extends HttpServlet {
+
+	private static final String DOT_PROPERTIES = ".properties";
 
 	private static final long serialVersionUID = 1L;
 
@@ -227,7 +228,7 @@ public class LogDownload extends HttpServlet {
 				writeEntry(out, "tomcat/logs/" + file.getName(), file);
 		}
 	}
-	
+
 	private void writeTomcatConfigFiles(ZipOutputStream out, File webappDir) throws IOException {
 		File confDir = new File(webappDir.getPath() + "/conf");
 		File[] files = confDir.listFiles();
@@ -236,7 +237,7 @@ public class LogDownload extends HttpServlet {
 				continue;
 
 			// store just the logs of today
-			if (file.getName().toLowerCase().endsWith(".xml") || file.getName().toLowerCase().endsWith(".properties")
+			if (file.getName().toLowerCase().endsWith(".xml") || file.getName().toLowerCase().endsWith(DOT_PROPERTIES)
 					|| file.getName().toLowerCase().endsWith(".policy"))
 				writeEntry(out, "tomcat/conf/" + file.getName(), file);
 		}
@@ -249,7 +250,7 @@ public class LogDownload extends HttpServlet {
 			if (file.isDirectory())
 				continue;
 
-			if (file.getName().toLowerCase().endsWith(".properties") || file.getName().toLowerCase().endsWith(".xml")
+			if (file.getName().toLowerCase().endsWith(DOT_PROPERTIES) || file.getName().toLowerCase().endsWith(".xml")
 					|| file.getName().toLowerCase().endsWith(".txt"))
 				writeEntry(out, "logicaldoc/conf/" + file.getName(), file);
 		}
@@ -335,7 +336,7 @@ public class LogDownload extends HttpServlet {
 		}
 	}
 
-	private Properties loadBuildProperties() throws IOException, FileNotFoundException {
+	private Properties loadBuildProperties() throws IOException {
 		Properties buildProperties = new Properties();
 		try (InputStream is = new FileInputStream(
 				new File(Context.get().getProperties().getProperty("LDOCHOME") + "/conf/build.properties"))) {
@@ -354,7 +355,7 @@ public class LogDownload extends HttpServlet {
 	 * @throws IOException error in writing the stream
 	 */
 	private OrderedProperties writeContextPropertiesDump(ZipOutputStream out) throws IOException {
-		File buf = FileUtil.createTempFile("context", ".properties");
+		File buf = FileUtil.createTempFile("context", DOT_PROPERTIES);
 		ContextProperties cp = Context.get().getProperties();
 		OrderedProperties prop = new OrderedProperties();
 		for (String key : cp.getKeys()) {

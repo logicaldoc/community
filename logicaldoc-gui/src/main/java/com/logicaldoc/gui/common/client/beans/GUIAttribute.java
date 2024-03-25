@@ -40,6 +40,8 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 	public static final int TYPE_FOLDER = 6;
 
 	public static final int TYPE_DOCUMENT = 7;
+	
+	public static final int TYPE_SECTION = 8;
 
 	public static final int EDITOR_DEFAULT = 0;
 

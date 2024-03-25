@@ -10,11 +10,7 @@ import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.util.SC;
 
-public abstract class DocumentUtil {
-
-	private DocumentUtil() {
-		// Nothing
-	}
+public interface DocumentUtil {
 
 	/**
 	 * Checks the DOWNLOAD permission and forwards the download of the specified

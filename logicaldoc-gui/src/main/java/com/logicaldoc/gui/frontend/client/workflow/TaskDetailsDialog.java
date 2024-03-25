@@ -1038,10 +1038,7 @@ public class TaskDetailsDialog extends Window {
 					minlength = transition.getMinNoteSize();
 				errorMessage = I18N.message("notetoosmall", Integer.toString(minlength));
 				setErrorMessage(errorMessage);
-				if (value.toString().length() < minlength)
-					return false;
-
-				return true;
+				return value.toString().length() >= minlength;
 			}
 		});
 
