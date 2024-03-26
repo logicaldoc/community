@@ -65,6 +65,8 @@ public class ResponsesDS extends DataSource {
 			DataSourceTextField ext = new DataSourceTextField("ext_" + name, name);
 			ext.setHidden(true);
 			ext.setCanFilter(true);
+			if (form.getAttribute(name).getType() == GUIAttribute.TYPE_SECTION)
+				continue;
 
 			GUIAttribute attDef = Session.get().getInfo().getAttributeDefinition(name);
 
@@ -78,6 +80,8 @@ public class ResponsesDS extends DataSource {
 				} else if (attDef.getType() == GUIAttribute.TYPE_DOUBLE) {
 					ext.setType(FieldType.FLOAT);
 					ext.setCanFilter(false);
+				} else if (attDef.getType() == GUIAttribute.TYPE_SECTION) {
+					continue;
 				}
 			}
 

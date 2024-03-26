@@ -50,7 +50,7 @@ public class EmailDialog extends AbstractEmailDialog {
 		this.docIds = docIds;
 		this.docTitle = docTitle;
 
-		setHeight(570);
+		setHeight(590);
 		setTitle(I18N.message("sendmail"));
 	}
 

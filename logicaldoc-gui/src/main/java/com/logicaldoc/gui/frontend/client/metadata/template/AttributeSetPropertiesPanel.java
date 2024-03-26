@@ -14,7 +14,9 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
+import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
+import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
@@ -208,6 +210,10 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		mandatory.setWidth(50);
 		mandatory.setDefaultValue(false);
 		mandatory.setDisabled(attributeSet.isReadonly());
+		boolean updatingAttributeIsNotSection = attributeSet == null || updatingAttributeName == null
+				|| attributeSet.getAttribute(updatingAttributeName.trim()) == null
+				|| attributeSet.getAttribute(updatingAttributeName.trim()).getType() != GUIAttribute.TYPE_SECTION;
+		mandatory.setVisible(updatingAttributeIsNotSection);
 
 		// Hidden
 		final CheckboxItem hidden = new CheckboxItem();
@@ -217,6 +223,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		hidden.setWidth(50);
 		hidden.setDefaultValue(false);
 		hidden.setDisabled(attributeSet.isReadonly());
+		hidden.setVisible(updatingAttributeIsNotSection);
 
 		// Readonly
 		final CheckboxItem readonly = new CheckboxItem();
@@ -226,6 +233,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		readonly.setWidth(50);
 		readonly.setDefaultValue(false);
 		readonly.setDisabled(attributeSet.isReadonly());
+		readonly.setVisible(updatingAttributeIsNotSection);
 
 		// Multiple
 		final CheckboxItem multiple = new CheckboxItem();
@@ -236,6 +244,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		multiple.setDefaultValue(false);
 		multiple.setDisabled(attributeSet.isReadonly());
 		multiple.setEndRow(true);
+		multiple.setVisible(updatingAttributeIsNotSection);
 
 		// Editor
 		addEditorItem();
@@ -247,6 +256,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		group = ItemFactory.newTextItem(GROUP_STR, null);
 		group.setHint(I18N.message("groupname"));
 		group.setDisabled(attributeSet.isReadonly());
+		group.setVisible(updatingAttributeIsNotSection);
 
 		// Options (for preset editor)
 		addOptionsItem(attributeName);
@@ -267,6 +277,24 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		attributeSettingsForm1.setItems(attributeName, new SpacerItem(), mandatory, readonly, hidden, multiple);
 		attributeSettingsForm2.setItems(label, type, editor, group, options, initialization, validation);
 		attributeButtonsForm.setItems(save, clean);
+
+		/*
+		 * Make sure that all the controls are not visible when editing a
+		 * Section, but not the initialization
+		 */
+		AdvancedCriteria visibleCriteria = new AdvancedCriteria("type", OperatorId.INOT_EQUAL,
+				"" + GUIAttribute.TYPE_SECTION);
+		editor.setVisibleWhen(visibleCriteria);
+		group.setVisibleWhen(visibleCriteria);
+		options.setVisibleWhen(visibleCriteria);
+		validation.setVisibleWhen(visibleCriteria);
+
+		type.addChangedHandler(changed -> {
+			mandatory.setVisible(!changed.getValue().equals("" + GUIAttribute.TYPE_SECTION));
+			readonly.setVisible(!changed.getValue().equals("" + GUIAttribute.TYPE_SECTION));
+			hidden.setVisible(!changed.getValue().equals("" + GUIAttribute.TYPE_SECTION));
+			multiple.setVisible(!changed.getValue().equals("" + GUIAttribute.TYPE_SECTION));
+		});
 
 		attributesLayout.setMembers(attributeSettingsForm1, attributeSettingsForm2, attributeButtonsForm);
 		attributesLayout.setMembersMargin(10);
@@ -754,6 +782,14 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			attributeSettingsForm1.setValue(HIDDEN, extAttr.isHidden());
 			attributeSettingsForm1.setValue(READONLY, extAttr.isReadonly());
 			attributeSettingsForm1.setValue(MULTIPLE, extAttr.isMultiple());
+			
+			
+			final boolean notSection = extAttr.getType()!=GUIAttribute.TYPE_SECTION;
+			attributeSettingsForm1.getItem(MANDATORY).setVisible(notSection);
+			attributeSettingsForm1.getItem(HIDDEN).setVisible(notSection);
+			attributeSettingsForm1.getItem(READONLY).setVisible(notSection);
+			attributeSettingsForm1.getItem(MULTIPLE).setVisible(notSection);
+			
 			attributeSettingsForm2.setValue(LABEL, extAttr.getLabel());
 			attributeSettingsForm2.setValue("type", extAttr.getType());
 			attributeSettingsForm2.setValue(EDITOR_STR, extAttr.getEditor());

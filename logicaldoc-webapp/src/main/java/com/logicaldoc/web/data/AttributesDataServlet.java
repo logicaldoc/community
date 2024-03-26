@@ -41,6 +41,8 @@ public class AttributesDataServlet extends AbstractDataServlet {
 
 		boolean docevent = "docevent".equals(request.getParameter("context"));
 
+		boolean sections = "true".equals(request.getParameter("sections"));
+
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
@@ -100,11 +102,12 @@ public class AttributesDataServlet extends AbstractDataServlet {
 
 		for (Map.Entry<String, Attribute> entry : attributes.entrySet()) {
 			Attribute attribute = entry.getValue();
-			if (attribute.getHidden() == 1)
+			if (attribute.getHidden() == 1 || (!sections && attribute.getType() == Attribute.TYPE_SECTION))
 				continue;
 
-			printAttibute("ext_" + entry.getKey(), (StringUtils.isNotEmpty(attribute.getLabel()) ? attribute.getLabel() : ""),
-					attribute.getType(), writer);
+			printAttibute("ext_" + entry.getKey(),
+					(StringUtils.isNotEmpty(attribute.getLabel()) ? attribute.getLabel() : ""), attribute.getType(),
+					writer);
 		}
 
 		writer.write("</list>");

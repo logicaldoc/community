@@ -63,7 +63,7 @@ public class WSAttribute implements Serializable {
 	@WSDoc(required = false, description = "the date value; format must be 'yyyy-MM-dd'")
 	private String dateValue;
 
-	@WSDoc(required = true, description = "<b>0</b> = String, <b>1</b> = int, <b>2</b> = double, <b>3</b> = date, <b>4</b> = user (intValue represents the user's id), <b>5</b> = boolean (intValue must be <b>0</b> or <b>1</b>), <b>6</b> = folder (intValue represents the folders's id, <b>7</b> = document (intValue represents the document's id)")
+	@WSDoc(required = true, description = "<b>0</b> = String, <b>1</b> = int, <b>2</b> = double, <b>3</b> = date, <b>4</b> = user (intValue represents the user's id), <b>5</b> = boolean (intValue must be <b>0</b> or <b>1</b>), <b>6</b> = folder (intValue represents the folders's id, <b>7</b> = document (intValue represents the document's id), <b>8</b> = section")
 	private int type = TYPE_STRING;
 
 	@WSDoc(required = true)

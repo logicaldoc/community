@@ -2,6 +2,7 @@ package com.logicaldoc.gui.common.client.widgets;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
+import com.smartgwt.client.widgets.form.fields.SectionItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -210,7 +212,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		attributesForm.clear();
 
 		if (!extensibleObject.getAttributes().isEmpty() && extendedItems != null)
-			attributesForm.setItems(extendedItems.toArray(new FormItem[0]));
+			attributesForm.setFields(extendedItems.toArray(new FormItem[0]));
 
 		updateDependantAttributes();
 		addMember(attributesForm);
@@ -299,20 +301,34 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	private void displayAttributeItems() {
 		extendedItems.clear();
-		for (GUIAttribute att : extensibleObject.getAttributes()) {
-			if (att.isHidden())
-				continue;
 
-			FormItem item = prepareAttributeItem(att);
-			if (item != null) {
-				if (!updateEnabled)
-					item.setDisabled(true);
-				if (changedHandler != null)
-					item.addChangedHandler(changedHandler);
-				item.addChangedHandler(dependeciesHandler);
-				extendedItems.add(item);
+		Map<SectionItem, List<String>> sections = new HashMap<>();
+		SectionItem currentSection = null;
+
+		for (GUIAttribute att : extensibleObject.getAttributes()) {
+			if (att.getType() != GUIAttribute.TYPE_SECTION && !att.isHidden()) {
+				FormItem item = prepareAttributeItem(att);
+				if (item != null) {
+					if (!updateEnabled)
+						item.setDisabled(true);
+					if (changedHandler != null)
+						item.addChangedHandler(changedHandler);
+					item.addChangedHandler(dependeciesHandler);
+					extendedItems.add(item);
+					if (currentSection != null)
+						sections.get(currentSection).add(item.getName());
+				}
+			} else if (att.getType() == GUIAttribute.TYPE_SECTION) {
+				currentSection = new SectionItem();
+				currentSection.setDefaultValue(att.getLabel());
+				currentSection.setSectionExpanded(att.isMandatory());
+				extendedItems.add(currentSection);
+				sections.put(currentSection, new ArrayList<>());
 			}
 		}
+
+		for (Map.Entry<SectionItem, List<String>> entry : sections.entrySet())
+			entry.getKey().setItemIds(entry.getValue().toArray(new String[0]));
 
 		refreshAttributesForm();
 

@@ -295,7 +295,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 	private void addNewTemplateButton() {
 		ToolStripButton newTemplate = new ToolStripButton();
 		newTemplate.setTitle(I18N.message("new"));
-		newTemplate.addClickHandler((ClickEvent newTemplateClick) -> {
+		newTemplate.addClickHandler(click -> {
 			GUIBarcodeTemplate newBarcodeTemplate = new GUIBarcodeTemplate();
 			newBarcodeTemplate.setTemplate(selectedDocumentTemplate);
 			new BarcodeTemplateSettings(BarcodeTemplatesPanel.this, newBarcodeTemplate).show();
@@ -309,7 +309,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		barcodeTemplateSelector.setWrapTitle(false);
 		barcodeTemplateSelector.setMultiple(false);
 		barcodeTemplateSelector.setEndRow(false);
-		barcodeTemplateSelector.addChangedHandler((ChangedEvent barcodeTemplateSelectorChanged) -> {
+		barcodeTemplateSelector.addChangedHandler(changed -> {
 			ListGridRecord rec = barcodeTemplateSelector.getSelectedRecord();
 			BarcodeService.Instance.get().getTemplate(rec.getAttributeAsLong("id"), new AsyncCallback<>() {
 

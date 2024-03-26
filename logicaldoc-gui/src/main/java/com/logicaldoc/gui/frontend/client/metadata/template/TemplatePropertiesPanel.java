@@ -15,9 +15,12 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.util.ValuesCallback;
 import com.logicaldoc.gui.common.client.validators.TemplateNameTextValidator;
 import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
+import com.smartgwt.client.data.AdvancedCriteria;
+import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.PickerIconName;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
@@ -25,6 +28,7 @@ import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.DropCompleteEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
@@ -110,27 +114,22 @@ public class TemplatePropertiesPanel extends HLayout {
 			GUIAttribute att = new GUIAttribute();
 			att.setName(rec.getAttributeAsString("name"));
 			att.setLabel(rec.getAttributeAsString(LABEL));
-			att.setType(Integer.parseInt(rec.getAttributeAsString("type")));
+			att.setType(rec.getAttributeAsInt("type"));
 			att.setSet(rec.getAttributeAsString("set"));
 			att.setMandatory(rec.getAttributeAsBoolean(MANDATORY));
 			att.setHidden(rec.getAttributeAsBoolean(HIDDEN));
 			att.setReadonly(rec.getAttributeAsBoolean(READONLY));
 			att.setMultiple(rec.getAttributeAsBoolean(MULTIPLE));
-			att.setSetId(Long.parseLong(rec.getAttributeAsString(SET_ID)));
-			att.setEditor(Integer.parseInt(rec.getAttributeAsString(EDITOR)));
+			att.setSetId(rec.getAttributeAsLong(SET_ID));
+			att.setEditor(rec.getAttributeAsInt(EDITOR));
 			att.setValidation(rec.getAttributeAsString(VALIDATION));
 			att.setInitialization(rec.getAttributeAsString(INITIALIZATION));
 			att.setDependsOn(rec.getAttributeAsString(DEPENDSON));
 
 			template.appendAttribute(att);
-
-			ListGridRecord[] records = attributesList.getRecords();
-			if (records != null)
-				for (ListGridRecord recd : records)
-					attributesList.removeData(recd);
-
-			fillAttributesList();
 		}
+
+		fillAttributesList();
 
 		if (changedHandler != null)
 			changedHandler.onChanged(null);
@@ -239,10 +238,36 @@ public class TemplatePropertiesPanel extends HLayout {
 		Button addAttributes = new Button(I18N.message("addattributes"));
 		addAttributes.setMargin(2);
 		addAttributes.setHeight(30);
-		addAttributes.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
-			AddTemplateAttributeDialog dialog = new AddTemplateAttributeDialog(TemplatePropertiesPanel.this);
-			dialog.show();
+		addAttributes.addClickHandler(click -> new AddTemplateAttributeDialog(TemplatePropertiesPanel.this).show());
+
+		Button addSection = new Button(I18N.message("addsection"));
+		addSection.setMargin(2);
+		addSection.setHeight(30);
+		addSection.addClickHandler(click -> {
+			TextItem lbl = ItemFactory.newTextItem("label", null);
+			lbl.setRequired(true);
+
+			CheckboxItem mandat = new CheckboxItem();
+			mandat.setName(MANDATORY);
+			mandat.setTitle(I18N.message(MANDATORY));
+			mandat.setWidth(50);
+			mandat.setDefaultValue(true);
+
+			LD.askForValues("addsection", null, Arrays.asList(lbl, mandat), null, new ValuesCallback() {
+				@Override
+				public void execute(String value) {
+					// Not used
+				}
+
+				@Override
+				public void execute(Map<String, Object> values) {
+					addSection(values.get("label").toString().trim(), Boolean.TRUE.equals(values.get("mandatory")));
+				}
+			});
 		});
+
+		HLayout buttons = new HLayout();
+		buttons.setMembers(addAttributes, addSection);
 
 		SectionStack attributesStack = new SectionStack();
 		attributesStack.setHeight100();
@@ -255,13 +280,33 @@ public class TemplatePropertiesPanel extends HLayout {
 		if (template.isReadonly() || !template.isWrite())
 			section.setItems(attributesList);
 		else
-			section.setItems(attributesList, addAttributes);
+			section.setItems(attributesList, buttons);
 
 		attributesStack.setSections(section);
 		attributesStack.draw();
 
 		container.addMember(attributesStack);
 		fillAttributesList();
+	}
+
+	private void addSection(String label, boolean mandatory) {
+		ListGridRecord rec = new ListGridRecord();
+		rec.setAttribute("label", label);
+		rec.setAttribute(SET_ID, 0);
+		rec.setAttribute(EDITOR, GUIAttribute.EDITOR_DEFAULT);
+		rec.setAttribute("type", GUIAttribute.TYPE_SECTION);
+		rec.setAttribute("mandatory", mandatory);
+		rec.setAttribute("hidden", false);
+		rec.setAttribute("readonly", false);
+		rec.setAttribute("multiple", false);
+
+		String name = "section1";
+		int i = 1;
+		while (attributesList.find(new AdvancedCriteria("name", OperatorId.EQUALS, name)) != null)
+			name = "section" + (++i);
+		rec.setAttribute("name", name);
+
+		addAttributes(new ListGridRecord[] { rec });
 	}
 
 	private void showContextMenu() {
@@ -285,14 +330,27 @@ public class TemplatePropertiesPanel extends HLayout {
 
 		MenuItem initialization = prepareInitializationItem();
 
+		MenuItem label = prepareLabelItem();
+
 		MenuItem resetInitialization = prepareResetInitializationItem();
 
 		MenuItem reset = prepareResetItem();
 
 		MenuItem dependsOn = prepareDependsOnItem();
 
-		contextMenu.setItems(makeMandatory, makeOptional, makeVisible, makeReadonly, makeHidden, dependsOn,
-				initialization, resetInitialization, validation, resetValidation, reset, delete);
+		boolean selectionInSelection = false;
+		for (ListGridRecord record : attributesList.getSelectedRecords()) {
+			if (record.getAttributeAsInt("type") == GUIAttribute.TYPE_SECTION) {
+				selectionInSelection = true;
+				break;
+			}
+		}
+		if (selectionInSelection)
+			contextMenu.setItems(label, makeMandatory, makeOptional, initialization, resetInitialization, reset,
+					delete);
+		else
+			contextMenu.setItems(label, makeMandatory, makeOptional, makeVisible, makeReadonly, makeHidden, dependsOn,
+					initialization, resetInitialization, validation, resetValidation, reset, delete);
 		contextMenu.showContextMenu();
 	}
 
@@ -422,6 +480,27 @@ public class TemplatePropertiesPanel extends HLayout {
 					changedHandler.onChanged(null);
 			}
 		});
+	}
+
+	private MenuItem prepareLabelItem() {
+		MenuItem initialization = new MenuItem();
+		initialization.setTitle(I18N.message(LABEL));
+		initialization.addClickHandler(event -> {
+			ListGridRecord selection = attributesList.getSelectedRecord();
+			GUIAttribute attribute = template.getAttribute(selection.getAttributeAsString("name"));
+
+			TextItem lbl = ItemFactory.newTextItem("label", attribute.getLabel());
+			lbl.setRequired(true);
+
+			LD.askForValue(I18N.message(INITIALIZATION), I18N.message(INITIALIZATION), attribute.getLabel(), lbl, 600,
+					(String label) -> {
+						attribute.setLabel(label);
+						fillAttributesList();
+						if (changedHandler != null)
+							changedHandler.onChanged(null);
+					});
+		});
+		return initialization;
 	}
 
 	private MenuItem prepareInitializationItem() {

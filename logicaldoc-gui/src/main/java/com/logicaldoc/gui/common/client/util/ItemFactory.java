@@ -2077,13 +2077,17 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newAttributesSelector(String context) {
+		return newAttributesSelector(context, false);
+	}
+	
+	public static SelectItem newAttributesSelector(String context, boolean sections) {
 		final SelectItem selectItem = new SelectItem("attributes", I18N.message("attributes"));
 		selectItem.setMultiple(true);
 		selectItem.setMultipleAppearance(MultipleAppearance.PICKLIST);
 		selectItem.setDisplayField(LABEL);
 		selectItem.setValueField("name");
 		selectItem.setPickListWidth(150);
-		selectItem.setOptionDataSource(new AttributesDS(context));
+		selectItem.setOptionDataSource(new AttributesDS(context, sections));
 		selectItem.setWrapTitle(false);
 
 		// Make the options ordered by label
@@ -2095,6 +2099,10 @@ public class ItemFactory {
 
 	public static SelectItem newAttributesSelector() {
 		return newAttributesSelector(null);
+	}
+	
+	public static SelectItem newAttributesSelector(boolean sections) {
+		return newAttributesSelector(null, sections);
 	}
 
 	public static SelectItem newFrequencySelector() {

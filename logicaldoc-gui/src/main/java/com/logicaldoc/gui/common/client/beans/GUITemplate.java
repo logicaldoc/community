@@ -70,6 +70,8 @@ public class GUITemplate implements Serializable {
 	}
 
 	public void appendAttribute(GUIAttribute attribute) {
+		int maxPosition=attributes.stream().mapToInt(a->a.getPosition()).max().orElse(0);
+		attribute.setPosition(++maxPosition);
 		attributes.add(attribute);
 	}
 

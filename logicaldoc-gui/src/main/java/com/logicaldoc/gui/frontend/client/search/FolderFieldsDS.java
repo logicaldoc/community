@@ -59,7 +59,7 @@ public class FolderFieldsDS extends DataSource {
 		 */
 		if (template != null && template.getAttributes() != null)
 			for (GUIAttribute attribute : template.getAttributes()) {
-				if (attribute.isHidden())
+				if (attribute.isHidden() || attribute.getType() == GUIAttribute.TYPE_SECTION)
 					continue;
 				addExtendedAttributeField(attribute, template.getName());
 			}

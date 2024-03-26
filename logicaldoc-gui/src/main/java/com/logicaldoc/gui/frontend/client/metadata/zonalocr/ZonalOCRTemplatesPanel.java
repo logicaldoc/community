@@ -174,7 +174,8 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 
 			LinkedHashMap<String, String> map = new LinkedHashMap<>();
 			for (GUIAttribute att : selectedOcrTemplate.getTemplate().getAttributes()) {
-				if (att.getParent() == null && selectedOcrTemplate.getZone(att.getName()) == null)
+				if (att.getParent() == null && selectedOcrTemplate.getZone(att.getName()) == null
+						&& att.getType() != GUIAttribute.TYPE_SECTION)
 					map.put(att.getName(), att.getName() + " (" + AttributeTypeFormatter.format(att.getType()) + ")");
 			}
 			select.setValueMap(map);
@@ -199,19 +200,18 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	private void addSaveButton(ToolStrip toolStrip) {
 		ToolStripButton save = new ToolStripButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(
-				event -> ZonalOCRService.Instance.get().save(selectedOcrTemplate, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+		save.addClickHandler(event -> ZonalOCRService.Instance.get().save(selectedOcrTemplate, new AsyncCallback<>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(GUIOCRTemplate template) {
-						ZonalOCRTemplatesPanel.this.selectedOcrTemplate = template;
-						setSelectedOcrTemplate(template);
-					}
-				}));
+			@Override
+			public void onSuccess(GUIOCRTemplate template) {
+				ZonalOCRTemplatesPanel.this.selectedOcrTemplate = template;
+				setSelectedOcrTemplate(template);
+			}
+		}));
 		save.setDisabled(selectedOcrTemplate == null);
 		toolStrip.addButton(save);
 	}
@@ -275,19 +275,18 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		ocrTemplateSelector.setEndRow(false);
 		ocrTemplateSelector.addChangedHandler(event -> {
 			ListGridRecord rec = ocrTemplateSelector.getSelectedRecord();
-			ZonalOCRService.Instance.get().getTemplate(rec.getAttributeAsLong("id"),
-					new AsyncCallback<>() {
+			ZonalOCRService.Instance.get().getTemplate(rec.getAttributeAsLong("id"), new AsyncCallback<>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-						@Override
-						public void onSuccess(GUIOCRTemplate tmpl) {
-							setSelectedOcrTemplate(tmpl);
-						}
-					});
+				@Override
+				public void onSuccess(GUIOCRTemplate tmpl) {
+					setSelectedOcrTemplate(tmpl);
+				}
+			});
 		});
 		ocrTemplateSelector.setDisabled(selectedDocumentTemplate == null);
 		toolStrip.addFormItem(ocrTemplateSelector);

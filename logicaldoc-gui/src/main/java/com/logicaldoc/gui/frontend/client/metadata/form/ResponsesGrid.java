@@ -25,7 +25,6 @@ import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
@@ -54,13 +53,12 @@ public class ResponsesGrid extends RefreshableListGrid {
 
 		prepareFields();
 
-		addCellContextClickHandler((CellContextClickEvent event) -> {
-			event.cancel();
+		addCellContextClickHandler(click -> {
+			click.cancel();
 			showContextMenu();
 		});
 
-		ResponsesDS dataSource = new ResponsesDS(form, 100);
-		setDataSource(dataSource);
+		setDataSource(new ResponsesDS(form, 100));
 	}
 
 	/**
@@ -106,6 +104,9 @@ public class ResponsesGrid extends RefreshableListGrid {
 		fields.add(folder);
 
 		for (String name : form.getAttributeNames()) {
+			if(form.getAttribute(name).getType()==GUIAttribute.TYPE_SECTION)
+				continue;
+			
 			if (name != null && !"".equals(name)) {
 				ListGridField ext = new ListGridField("ext_" + name, Session.get().getInfo().getAttributeLabel(name),
 						100);
@@ -126,6 +127,8 @@ public class ResponsesGrid extends RefreshableListGrid {
 						ext = new UserListGridField("ext_" + name, "ext_" + name,
 								Session.get().getInfo().getAttributeLabel(name));
 						ext.setTitle(Session.get().getInfo().getAttributeLabel(name));
+					} else if (attDef.getType() == GUIAttribute.TYPE_SECTION) {
+						continue;
 					}
 				}
 

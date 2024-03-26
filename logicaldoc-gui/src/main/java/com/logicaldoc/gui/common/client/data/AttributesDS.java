@@ -12,20 +12,24 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * @since 7.6 n
  */
 public class AttributesDS extends DataSource {
-
-	public AttributesDS() {
-		this(null, null);
+	
+	public AttributesDS(boolean sections) {
+		this(null, null, sections);
 	}
 
 	public AttributesDS(String context) {
-		this(null, context);
+		this(null, context, false);
+	}
+	
+	public AttributesDS(String context, boolean sections) {
+		this(null, context, sections);
 	}
 
 	public AttributesDS(Long templateId) {
-		this(templateId, null);
+		this(templateId, null, false);
 	}
 
-	public AttributesDS(Long templateId, String context) {
+	public AttributesDS(Long templateId, String context, boolean sections) {
 		setTitleField("attributes");
 		setRecordXPath("/list/attribute");
 		DataSourceTextField name = new DataSourceTextField("name");
@@ -40,7 +44,7 @@ public class AttributesDS extends DataSource {
 		setTitleField("name");
 		setDataURL("data/attributes.xml?locale=" + I18N.getLocale()
 				+ (templateId != null ? "&templateId=" + templateId : "")
-				+ (context != null ? "&context=" + context : ""));
+				+ (context != null ? "&context=" + context : "") + "&sections=" + sections);
 		setClientOnly(true);
 	}
 }

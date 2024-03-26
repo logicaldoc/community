@@ -34,7 +34,9 @@ public class AttributeTypeFormatter implements CellFormatter {
 		case GUIAttribute.TYPE_FOLDER:
 			return I18N.message("folder");
 		case GUIAttribute.TYPE_DOCUMENT:
-			return I18N.message("document");			
+			return I18N.message("document");
+		case GUIAttribute.TYPE_SECTION:
+			return I18N.message("section");	
 		default:
 			return value.toString();
 		}

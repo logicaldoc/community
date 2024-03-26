@@ -120,7 +120,7 @@ public class DocumentFieldsDS extends DataSource {
 
 	private void defineExtendedAttributes(GUITemplate template) {
 		for (GUIAttribute attribute : template.getAttributes()) {
-			if (attribute.isHidden())
+			if (attribute.isHidden() || attribute.getType() == GUIAttribute.TYPE_SECTION)
 				continue;
 
 			DataSourceField field = prepareField(template, attribute);
