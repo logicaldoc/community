@@ -40,7 +40,7 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 	public static final int TYPE_FOLDER = 6;
 
 	public static final int TYPE_DOCUMENT = 7;
-	
+
 	public static final int TYPE_SECTION = 8;
 
 	public static final int EDITOR_DEFAULT = 0;
@@ -174,6 +174,10 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
 	public void setType(int type) {
 		this.type = type;
+	}
+
+	public boolean isSection() {
+		return type == TYPE_SECTION;
 	}
 
 	public boolean isReadonly() {

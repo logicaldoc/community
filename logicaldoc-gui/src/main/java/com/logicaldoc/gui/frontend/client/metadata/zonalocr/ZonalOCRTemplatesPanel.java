@@ -175,7 +175,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 			LinkedHashMap<String, String> map = new LinkedHashMap<>();
 			for (GUIAttribute att : selectedOcrTemplate.getTemplate().getAttributes()) {
 				if (att.getParent() == null && selectedOcrTemplate.getZone(att.getName()) == null
-						&& att.getType() != GUIAttribute.TYPE_SECTION)
+						&& !att.isSection())
 					map.put(att.getName(), att.getName() + " (" + AttributeTypeFormatter.format(att.getType()) + ")");
 			}
 			select.setValueMap(map);

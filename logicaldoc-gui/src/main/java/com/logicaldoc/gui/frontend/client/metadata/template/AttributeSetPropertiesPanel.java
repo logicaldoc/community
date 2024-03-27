@@ -782,14 +782,12 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			attributeSettingsForm1.setValue(HIDDEN, extAttr.isHidden());
 			attributeSettingsForm1.setValue(READONLY, extAttr.isReadonly());
 			attributeSettingsForm1.setValue(MULTIPLE, extAttr.isMultiple());
-			
-			
-			final boolean notSection = extAttr.getType()!=GUIAttribute.TYPE_SECTION;
-			attributeSettingsForm1.getItem(MANDATORY).setVisible(notSection);
-			attributeSettingsForm1.getItem(HIDDEN).setVisible(notSection);
-			attributeSettingsForm1.getItem(READONLY).setVisible(notSection);
-			attributeSettingsForm1.getItem(MULTIPLE).setVisible(notSection);
-			
+
+			attributeSettingsForm1.getItem(MANDATORY).setVisible(!extAttr.isSection());
+			attributeSettingsForm1.getItem(HIDDEN).setVisible(!extAttr.isSection());
+			attributeSettingsForm1.getItem(READONLY).setVisible(!extAttr.isSection());
+			attributeSettingsForm1.getItem(MULTIPLE).setVisible(!extAttr.isSection());
+
 			attributeSettingsForm2.setValue(LABEL, extAttr.getLabel());
 			attributeSettingsForm2.setValue("type", extAttr.getType());
 			attributeSettingsForm2.setValue(EDITOR_STR, extAttr.getEditor());

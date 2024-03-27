@@ -306,7 +306,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		SectionItem currentSection = null;
 
 		for (GUIAttribute att : extensibleObject.getAttributes()) {
-			if (att.getType() != GUIAttribute.TYPE_SECTION && !att.isHidden()) {
+			if (!att.isSection() && !att.isHidden()) {
 				FormItem item = prepareAttributeItem(att);
 				if (item != null) {
 					if (!updateEnabled)
@@ -318,7 +318,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 					if (currentSection != null)
 						sections.get(currentSection).add(item.getName());
 				}
-			} else if (att.getType() == GUIAttribute.TYPE_SECTION) {
+			} else if (att.isSection()) {
 				currentSection = new SectionItem();
 				currentSection.setDefaultValue(att.getLabel());
 				currentSection.setSectionExpanded(att.isMandatory());

@@ -162,7 +162,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			setTags(folder);
 			
 			// Remove the sections
-			folder.getAttributes().values().removeIf(att -> att.getType() == Attribute.TYPE_SECTION);
+			folder.getAttributes().values().removeIf(att -> att.isSection());
 
 			AccessControlUtil.removeForbiddenPermissionsForGuests(folder);
 

@@ -304,7 +304,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			setType(doc);
 
 			// Remove the sections
-			doc.getAttributes().values().removeIf(att -> att.getType() == Attribute.TYPE_SECTION);
+			doc.getAttributes().values().removeIf(att -> att.isSection());
 
 			// Count those attributes that reference other documents
 			doc.setDocAttrs((int) doc.getAttributes().values().stream().filter(

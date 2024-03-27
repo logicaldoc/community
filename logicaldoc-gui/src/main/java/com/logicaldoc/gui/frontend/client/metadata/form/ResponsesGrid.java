@@ -104,7 +104,7 @@ public class ResponsesGrid extends RefreshableListGrid {
 		fields.add(folder);
 
 		for (String name : form.getAttributeNames()) {
-			if(form.getAttribute(name).getType()==GUIAttribute.TYPE_SECTION)
+			if(form.getAttribute(name).isSection())
 				continue;
 			
 			if (name != null && !"".equals(name)) {
@@ -127,7 +127,7 @@ public class ResponsesGrid extends RefreshableListGrid {
 						ext = new UserListGridField("ext_" + name, "ext_" + name,
 								Session.get().getInfo().getAttributeLabel(name));
 						ext.setTitle(Session.get().getInfo().getAttributeLabel(name));
-					} else if (attDef.getType() == GUIAttribute.TYPE_SECTION) {
+					} else if (attDef.isSection()) {
 						continue;
 					}
 				}

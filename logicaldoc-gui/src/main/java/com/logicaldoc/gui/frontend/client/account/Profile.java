@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -108,8 +109,10 @@ public class Profile extends Window {
 		TextItem department = ItemFactory.newTextItem("department", user.getDepartment());
 		TextItem organizationalUnit = ItemFactory.newTextItem("organizationalunit", user.getOrganizationalUnit());
 		TextItem building = ItemFactory.newTextItem("building", user.getBuilding());
+
 		CheckboxItem evalForm = ItemFactory.newCheckbox("evalformenabled");
 		evalForm.setValue(user.isEvalFormEnabled());
+		evalForm.setVisible(Menu.enabled(Menu.PRODUCT_EVALUATION));
 
 		ComboBoxItem timeZone = ItemFactory.newTimeZoneSelector(TIMEZONE, user.getTimeZone());
 		timeZone.setEndRow(true);
