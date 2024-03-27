@@ -678,8 +678,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	}
 
 	private void addProductEvaluationButton() {
-		evaluation = AwesomeFactory.newToolStripButton("star", I18N.message("evaluatetheproduct"),
-				I18N.message("evaluatetheproduct"));
+		evaluation = AwesomeFactory.newToolStripButton("star", I18N.message("productevaluation"),
+				I18N.message("productevaluation"));
 		evaluation.addClickHandler(event -> {
 			String url = Session.get().getInfo().getBranding().getEvaluation();
 			url = url.replace("NAME", URL.encodeQueryString(Session.get().getUser().getFullName()));
