@@ -118,7 +118,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 			editTags.setSrc("[SKIN]/actions/edit.png");
 			editTags.setWidth(16);
 			editTags.setHeight(16);
-			editTags.addFormItemClickHandler((final FormItemIconClickEvent editTagsClick) -> {
+			editTags.addFormItemClickHandler(editTagsClick -> {
 				tagsString.setVisible(false);
 				tagItem.setVisible(true);
 				tagItem.setEndRow(true);
