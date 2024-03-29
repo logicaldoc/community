@@ -156,7 +156,7 @@ public class DocumentsUploader extends Window {
 
 		GUIFolder folder = FolderController.get().getCurrentFolder();
 		GUIDocument metadata = new GUIDocument();
-		metadata.setFolder(FolderController.get().getCurrentFolder());
+		metadata.setFolder(folder);
 		metadata.setLanguage(I18N.getDefaultLocaleForDoc());
 		metadata.setTemplateId(folder.getTemplateId());
 		metadata.setTemplate(folder.getTemplate());

@@ -147,7 +147,7 @@ public interface DocumentServiceAsync {
 
 	void validate(GUIDocument document, AsyncCallback<Void> callback);
 
-	void getEnabledPermissions(List<Long> docIds, AsyncCallback<GUIAccessControlEntry> callback);
+	void getAllowedPermissions(List<Long> docIds, AsyncCallback<GUIAccessControlEntry> callback);
 
 	void saveACL(GUIDocument document, AsyncCallback<Void> callback);
 

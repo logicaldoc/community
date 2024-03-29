@@ -22,7 +22,7 @@ public interface DocumentUtil {
 	 *        null
 	 */
 	public static void downloadDocumentResource(String docId, String url) {
-		DocumentService.Instance.get().getEnabledPermissions(Arrays.asList(Long.parseLong(docId)),
+		DocumentService.Instance.get().getAllowedPermissions(Arrays.asList(Long.parseLong(docId)),
 				new AsyncCallback<GUIAccessControlEntry>() {
 					@Override
 					public void onFailure(Throwable caught) {

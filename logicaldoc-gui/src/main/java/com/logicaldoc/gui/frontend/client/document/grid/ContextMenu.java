@@ -145,7 +145,7 @@ public class ContextMenu extends Menu {
 		final List<GUIDocument> selection = grid.getSelectedDocuments();
 		List<Long> selectionIds = grid.getSelectedIds();
 
-		DocumentService.Instance.get().getEnabledPermissions(selectionIds, new AsyncCallback<>() {
+		DocumentService.Instance.get().getAllowedPermissions(selectionIds, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

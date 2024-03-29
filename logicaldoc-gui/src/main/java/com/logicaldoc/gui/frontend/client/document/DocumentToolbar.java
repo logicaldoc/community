@@ -554,7 +554,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		if (grid.getSelectedCount() == 0)
 			return;
 
-		DocumentService.Instance.get().getEnabledPermissions(grid.getSelectedIds(),
+		DocumentService.Instance.get().getAllowedPermissions(grid.getSelectedIds(),
 				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {

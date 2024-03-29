@@ -1369,17 +1369,17 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testGetEnabledPermissions() throws ParseException, PersistenceException, ServerException {
-		GUIAccessControlEntry permissions = service.getEnabledPermissions(List.of(2L, 3L, 4L));
+		GUIAccessControlEntry permissions = service.getAllowedPermissions(List.of(2L, 3L, 4L));
 		for (Permission permission : Permission.all())
 			assertTrue("Does not allow " + permission.name(),
 					permissions.isPermissionAllowed(permission.name().toLowerCase()));
 
 		prepareSession("boss", "admin");
-		permissions = service.getEnabledPermissions(List.of(2L, 3L, 4L));
+		permissions = service.getAllowedPermissions(List.of(2L, 3L, 4L));
 		assertFalse(permissions.isRead());
 
 		prepareSession("author", "admin");
-		permissions = service.getEnabledPermissions(List.of(2L, 3L, 4L));
+		permissions = service.getAllowedPermissions(List.of(2L, 3L, 4L));
 		assertTrue(permissions.isRead());
 		assertTrue(permissions.isReadingreq());
 		assertTrue(permissions.isPrint());

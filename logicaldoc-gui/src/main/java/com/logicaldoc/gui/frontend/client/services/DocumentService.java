@@ -704,12 +704,12 @@ public interface DocumentService extends RemoteService {
 	public int updatePages(long docId) throws ServerException;
 
 	/**
-	 * Gets the shared permissions on a set of documents in regards of the
+	 * Gets the allowed permissions on a set of documents in regards of the
 	 * current user
 	 * 
 	 * @param docIds collection of the documents
 	 */
-	public GUIAccessControlEntry getEnabledPermissions(List<Long> docIds) throws ServerException;
+	public GUIAccessControlEntry getAllowedPermissions(List<Long> docIds) throws ServerException;
 
 	/**
 	 * Applies all security settings to document

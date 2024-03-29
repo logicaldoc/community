@@ -365,6 +365,7 @@ public class TaskEditor extends Window {
 
 		if (state.getType() == GUIWFState.TYPE_TASK) {
 			taskForm.setNumCols(3);
+			taskDescr.setColSpan(3);
 			taskForm.setFields(taskName, taskColor, humanInteraction, taskDescr);
 		} else
 			taskForm.setFields(taskName, taskColor, taskDescr);

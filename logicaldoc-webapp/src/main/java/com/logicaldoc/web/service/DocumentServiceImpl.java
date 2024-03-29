@@ -3209,7 +3209,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public GUIAccessControlEntry getEnabledPermissions(List<Long> docIds) throws ServerException {
+	public GUIAccessControlEntry getAllowedPermissions(List<Long> docIds) throws ServerException {
 		Session session = validateSession();
 
 		try {
