@@ -464,6 +464,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	@Override
 	public List queryForList(String sql, Class elementType, Integer maxRows) throws PersistenceException {
 		try {
+			logQuery(sql);
 			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 			if (maxRows != null)

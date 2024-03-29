@@ -40,13 +40,13 @@ public class TransitionEditor extends Window {
 		setShowModalMask(true);
 		setMargin(3);
 		setWidth(600);
-		setHeight(400);
+		setHeight(420);
 		centerInPage();
 
 		TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", "execscriptontranschosen",
 				transition.getOnChosen(), null, false);
 		automation.setWidth("*");
-		automation.setHeight("*");
+		automation.setHeight(200);
 		automation.setColSpan(2);
 		automation.setWrapTitle(false);
 

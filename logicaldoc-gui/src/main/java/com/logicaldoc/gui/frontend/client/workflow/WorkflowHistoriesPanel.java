@@ -83,6 +83,7 @@ public class WorkflowHistoriesPanel extends VLayout {
 
 		ListGridField historyUser = new UserListGridField("user", "userId", "user");
 		ListGridField historyComment = new ListGridField("comment", I18N.message("comment"));
+		historyComment.setMinWidth(200);
 		historyComment.setWidth("*");
 		historyComment.setHidden(!showComment);
 		FileNameListGridField historyFilename = new FileNameListGridField();

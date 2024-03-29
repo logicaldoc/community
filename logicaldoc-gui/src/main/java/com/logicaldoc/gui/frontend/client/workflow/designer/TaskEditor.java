@@ -84,7 +84,7 @@ public class TaskEditor extends Window {
 		setIsModal(true);
 		setShowModalMask(true);
 		setMargin(3);
-		setWidth(600);
+		setWidth(650);
 		setHeight(600);
 		centerInPage();
 
@@ -94,12 +94,22 @@ public class TaskEditor extends Window {
 		Tab automationTab = new Tab(I18N.message("automation"));
 		automationTab.setPane(prepareAutomationPanel());
 
+		Tab duedateTab = new Tab(I18N.message("duedate"));
+		duedateTab.setPane(prepareDueDatePanel());
+
+		Tab validationTab = new Tab(I18N.message("validation"));
+		validationTab.setPane(prepareValidationPanel());
+
 		Tab messagesTab = new Tab(I18N.message("messages"));
 		messagesTab.setPane(prepareMessagesPanel());
 
 		TabSet tabSet = new TabSet();
 		tabSet.setWidth100();
-		tabSet.setTabs(propertiesTab, automationTab, messagesTab);
+
+		if (state.getType() == GUIWFState.TYPE_TASK)
+			tabSet.setTabs(propertiesTab, duedateTab, validationTab, automationTab, messagesTab);
+		else
+			tabSet.setTabs(propertiesTab, automationTab, messagesTab);
 		addItem(tabSet);
 
 		Button save = new Button(I18N.message("save"));
@@ -200,37 +210,104 @@ public class TaskEditor extends Window {
 				state.getType() == GUIWFState.TYPE_TASK ? "execscriptontaskreached" : "execscriptonenstatusreached",
 				state.getOnCreation(), null, false);
 		onCreation.setWidth("*");
-		onCreation.setHeight(125);
+		onCreation.setHeight(130);
 		onCreation.setWrapTitle(false);
 
 		TextAreaItem onAssignment = ItemFactory.newTextAreaItemForAutomation("onAssignment",
 				"execscriptontaskassignment", state.getOnAssignment(), null, false);
 		onAssignment.setWidth("*");
-		onAssignment.setHeight(125);
+		onAssignment.setHeight(130);
 		onAssignment.setWrapTitle(false);
 
 		TextAreaItem onCompletion = ItemFactory.newTextAreaItemForAutomation("onCompletion",
 				"execscriptontaskcompletion", state.getOnCompletion(), null, false);
 		onCompletion.setWidth("*");
-		onCompletion.setHeight(125);
+		onCompletion.setHeight(130);
 		onCompletion.setWrapTitle(false);
 
-		TextAreaItem onOverdue = ItemFactory.newTextAreaItemForAutomation("onOverdue", "execscriptontaskoverdue",
-				state.getOnOverdue(), null, false);
-		onOverdue.setWidth("*");
-		onOverdue.setHeight(125);
-		onOverdue.setWrapTitle(false);
-
 		if (state.getType() == GUIWFState.TYPE_TASK)
-			automationForm.setItems(onCreation, onAssignment, onCompletion, onOverdue);
+			automationForm.setItems(onCreation, onAssignment, onCompletion);
 		else {
-			onCreation.setHeight(400);
+			onCreation.setHeight(390);
 			automationForm.setItems(onCreation);
 		}
 
 		automationPanel.addMember(automationForm);
 
 		return automationPanel;
+	}
+
+	private VLayout prepareValidationPanel() {
+		VLayout validationPanel = new VLayout();
+		validationPanel.setWidth100();
+		validationPanel.setHeight100();
+
+		DynamicForm validationForm = new DynamicForm();
+		validationForm.setTitleOrientation(TitleOrientation.TOP);
+		validationForm.setNumCols(1);
+		validationForm.setValuesManager(vm);
+
+		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation("onValidation", "wftaskvalidationscript",
+				state.getOnValidation(), null, false);
+		validation.setWidth("*");
+		validation.setHeight(400);
+		validation.setWrapTitle(true);
+
+		validationForm.setItems(validation);
+
+		validationPanel.addMember(validationForm);
+
+		return validationPanel;
+	}
+
+	private VLayout prepareDueDatePanel() {
+		VLayout escalationPanel = new VLayout();
+		escalationPanel.setWidth100();
+		escalationPanel.setHeight100();
+
+		SpinnerItem duedateTimeItem = ItemFactory.newSpinnerItem("duedateNumber", "duedate",
+				this.state.getDueDateNumber());
+		duedateTimeItem.setWrapTitle(false);
+		duedateTimeItem.setDefaultValue(0);
+
+		SelectItem duedateTime = ItemFactory.newDueTimeSelector("duedateTime", "");
+		duedateTime.setWrapTitle(false);
+		duedateTime.setValue(this.state.getDueDateUnit());
+		duedateTime.setEndRow(true);
+
+		SpinnerItem remindTimeItem = ItemFactory.newSpinnerItem("remindtimeNumber", "remindtime",
+				this.state.getReminderNumber());
+		remindTimeItem.setDefaultValue(0);
+		remindTimeItem.setWrapTitle(false);
+
+		SelectItem remindTime = ItemFactory.newDueTimeSelector("remindTime", "");
+		remindTime.setWrapTitle(false);
+		remindTime.setValue(this.state.getReminderUnit());
+		remindTime.setEndRow(true);
+		if (Session.get().isDemo()) {
+			// In demo mode disable the remind setting because of this may
+			// send massive emails
+			remindTimeItem.setDisabled(true);
+			remindTime.setDisabled(true);
+		}
+
+		TextAreaItem onOverdue = ItemFactory.newTextAreaItemForAutomation("onOverdue", "execscriptontaskoverdue",
+				state.getOnOverdue(), null, false);
+		onOverdue.setWidth("*");
+		onOverdue.setHeight(400);
+		onOverdue.setColSpan(6);
+		onOverdue.setWrapTitle(false);
+		onOverdue.setTitleOrientation(TitleOrientation.TOP);
+		onOverdue.setDisabled(Session.get().isDemo());
+
+		DynamicForm escalationForm = new DynamicForm();
+		escalationForm.setTitleOrientation(TitleOrientation.LEFT);
+		escalationForm.setNumCols(6);
+		escalationForm.setValuesManager(vm);
+		escalationForm.setFields(duedateTimeItem, duedateTime, remindTimeItem, remindTime, onOverdue);
+
+		escalationPanel.setMembers(escalationForm);
+		return escalationPanel;
 	}
 
 	// Checks if the task requires human interaction
@@ -445,39 +522,6 @@ public class TaskEditor extends Window {
 
 	private void addTaskItems(HLayout formsPanel) {
 		if (state.getType() == GUIWFState.TYPE_TASK) {
-			SpinnerItem duedateTimeItem = ItemFactory.newSpinnerItem("duedateNumber", "duedate",
-					this.state.getDueDateNumber());
-			duedateTimeItem.setWrapTitle(false);
-			duedateTimeItem.setDefaultValue(0);
-
-			SelectItem duedateTime = ItemFactory.newDueTimeSelector("duedateTime", "");
-			duedateTime.setWrapTitle(false);
-			duedateTime.setValue(this.state.getDueDateUnit());
-
-			SpinnerItem remindTimeItem = ItemFactory.newSpinnerItem("remindtimeNumber", "remindtime",
-					this.state.getReminderNumber());
-			remindTimeItem.setDefaultValue(0);
-			remindTimeItem.setWrapTitle(false);
-
-			SelectItem remindTime = ItemFactory.newDueTimeSelector("remindTime", "");
-			remindTime.setWrapTitle(false);
-			remindTime.setValue(this.state.getReminderUnit());
-			if (Session.get().isDemo()) {
-				// In demo mode disable the remind setting because of this may
-				// send massive emails
-				remindTimeItem.setDisabled(true);
-				remindTime.setDisabled(true);
-			}
-
-			DynamicForm escalationForm = new DynamicForm();
-			escalationForm.setGroupTitle(I18N.message("escalationmanagement"));
-			escalationForm.setIsGroup(true);
-			escalationForm.setTitleOrientation(TitleOrientation.LEFT);
-			escalationForm.setNumCols(4);
-			escalationForm.setColWidths("35", "35", "50", "130");
-			escalationForm.setValuesManager(vm);
-			escalationForm.setFields(duedateTimeItem, duedateTime, remindTimeItem, remindTime);
-
 			RadioGroupItem requiresNote = ItemFactory.newBooleanSelector("requiresNote", "requirenoteatcompletion");
 			requiresNote.setWrapTitle(false);
 			requiresNote.setDefaultValue(this.state.isRequiresNote() ? "yes" : "no");
@@ -500,7 +544,7 @@ public class TaskEditor extends Window {
 			mandatoryNoteForm.setValuesManager(vm);
 			mandatoryNoteForm.setFields(requiresNote, minNoteSize);
 
-			formsPanel.setMembers(escalationForm, mandatoryNoteForm);
+			formsPanel.setMembers(mandatoryNoteForm);
 		}
 	}
 
@@ -575,6 +619,7 @@ public class TaskEditor extends Window {
 			TaskEditor.this.state.setOnAssignment((String) values.get("onAssignment"));
 			TaskEditor.this.state.setOnCompletion((String) values.get("onCompletion"));
 			TaskEditor.this.state.setOnOverdue((String) values.get("onOverdue"));
+			TaskEditor.this.state.setOnValidation((String) values.get("onValidation"));
 			TaskEditor.this.state.setAssignmentMessageTemplate((String) values.get("assignmentMessageTemplate"));
 			TaskEditor.this.state.setReminderMessageTemplate((String) values.get("reminderMessageTemplate"));
 			TaskEditor.this.state.setCompletionMessageTemplate((String) values.get("completionMessageTemplate"));

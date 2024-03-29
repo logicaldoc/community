@@ -68,6 +68,8 @@ public class GUIWFState implements Serializable {
 	private String onCompletion;
 
 	private String onOverdue;
+	
+	private String onValidation;
 
 	private String display;
 
@@ -366,5 +368,13 @@ public class GUIWFState implements Serializable {
 
 	public void setTransitions(List<GUITransition> transitions) {
 		this.transitions = transitions;
+	}
+
+	public String getOnValidation() {
+		return onValidation;
+	}
+
+	public void setOnValidation(String onValidation) {
+		this.onValidation = onValidation;
 	}
 }
