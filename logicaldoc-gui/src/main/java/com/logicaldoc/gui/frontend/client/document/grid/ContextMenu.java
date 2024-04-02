@@ -295,56 +295,57 @@ public class ContextMenu extends Menu {
 		});
 	}
 
-	private void applySecurityPolicies(GUIAccessControlEntry enabledPermissions, final List<GUIDocument> selection,
+	private void applySecurityPolicies(GUIAccessControlEntry allowedPermissions, final List<GUIDocument> selection,
 			boolean someSelection, boolean moreSelected, boolean justOneSelected, boolean immutablesInSelection) {
 		preview.setEnabled(someSelection
-				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW)
+				&& allowedPermissions.isPreview());
 		cut.setEnabled(someSelection && !immutablesInSelection
-				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isMove());
+				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && allowedPermissions.isMove());
 
-		applyLockingSecurity(enabledPermissions, selection, someSelection, immutablesInSelection, justOneSelected);
+		applyLockingSecurity(allowedPermissions, selection, someSelection, immutablesInSelection, justOneSelected);
 
 		immutable.setEnabled(someSelection && !immutablesInSelection
-				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isImmutable());
-		applySignSecurity(enabledPermissions, selection, someSelection, immutablesInSelection);
+				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && allowedPermissions.isImmutable());
+		applySignSecurity(allowedPermissions, selection, someSelection, immutablesInSelection);
 
 		stamp.setEnabled(
 				someSelection && !immutablesInSelection && checkStatusInSelection(Constants.DOC_UNLOCKED, selection)
-						&& enabledPermissions.isWrite() && Feature.enabled(Feature.STAMP));
+						&& allowedPermissions.isWrite() && Feature.enabled(Feature.STAMP));
 		delete.setEnabled(someSelection && !immutablesInSelection
-				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isDelete());
-		links.setEnabled(!Clipboard.getInstance().isEmpty() && enabledPermissions.isWrite());
+				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && allowedPermissions.isDelete());
+		links.setEnabled(!Clipboard.getInstance().isEmpty() && allowedPermissions.isWrite());
 
-		applyIndexableSecurity(enabledPermissions, selection, someSelection, immutablesInSelection);
+		applyIndexableSecurity(allowedPermissions, selection, someSelection, immutablesInSelection);
 
 		applyIndexSecurity(selection, someSelection, immutablesInSelection);
 
-		applyPasswordSecurity(enabledPermissions, selection, justOneSelected, immutablesInSelection);
+		applyPasswordSecurity(allowedPermissions, selection, justOneSelected, immutablesInSelection);
 
-		sendMail.setEnabled(someSelection && enabledPermissions.isEmail());
+		sendMail.setEnabled(someSelection && allowedPermissions.isEmail());
 
 		copy.setEnabled(someSelection);
 		rename.setEnabled(justOneSelected && !immutablesInSelection
-				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && enabledPermissions.isRename());
+				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && allowedPermissions.isRename());
 
-		applyDownloadSecurity(enabledPermissions, someSelection, justOneSelected);
+		applyDownloadSecurity(allowedPermissions, someSelection, justOneSelected);
 
-		applyOfficeSecurity(enabledPermissions, justOneSelected);
+		applyOfficeSecurity(allowedPermissions, justOneSelected);
 
 		convert.setEnabled(justOneSelected && Feature.enabled(Feature.FORMAT_CONVERSION));
-		archive.setEnabled(someSelection && enabledPermissions.isArchive() && Feature.enabled(Feature.ARCHIVING));
-		sendToExpArchive.setEnabled(someSelection && enabledPermissions.isExport() && Feature.enabled(Feature.IMPEX));
-		workflow.setEnabled(someSelection && enabledPermissions.isWorkflow() && Feature.enabled(Feature.WORKFLOW));
+		archive.setEnabled(someSelection && allowedPermissions.isArchive() && Feature.enabled(Feature.ARCHIVING));
+		sendToExpArchive.setEnabled(someSelection && allowedPermissions.isExport() && Feature.enabled(Feature.IMPEX));
+		workflow.setEnabled(someSelection && allowedPermissions.isWorkflow() && Feature.enabled(Feature.WORKFLOW));
 		replaceAlias
-				.setEnabled(justOneSelected && enabledPermissions.isWrite() && selection.get(0).getDocRef() != null);
+				.setEnabled(justOneSelected && allowedPermissions.isWrite() && selection.get(0).getDocRef() != null);
 		readingRequest.setEnabled(
-				someSelection && enabledPermissions.isReadingreq() && Feature.enabled(Feature.READING_CONFIRMATION));
+				someSelection && allowedPermissions.isReadingreq() && Feature.enabled(Feature.READING_CONFIRMATION));
 
-		applySplitSecurity(enabledPermissions, selection, moreSelected, justOneSelected);
+		applySplitSecurity(allowedPermissions, selection, moreSelected, justOneSelected);
 
 		applyCompareSecurity(selection);
 
-		automation.setEnabled(Feature.enabled(Feature.AUTOMATION) && enabledPermissions.isAutomation());
+		automation.setEnabled(Feature.enabled(Feature.AUTOMATION) && allowedPermissions.isAutomation());
 
 		openInFolder.setEnabled(justOneSelected);
 	}

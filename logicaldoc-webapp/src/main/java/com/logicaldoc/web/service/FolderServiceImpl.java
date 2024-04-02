@@ -146,7 +146,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	private void delete(Session session, final long folderId) throws PermissionException, PersistenceException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		if (!dao.isPermissionEnabled(Permission.DELETE, folderId, session.getUserId()))
+		if (!dao.isPermissionAllowed(Permission.DELETE, folderId, session.getUserId()))
 			throw new PermissionException(session.getUsername(), FOLDER + folderId, Permission.DELETE);
 
 		// Add a folder history entry
@@ -472,7 +472,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			throw new SecurityException("Not Allowed");
 
 		// Check addChild permission on destParentFolder
-		boolean addchildEnabled = folderDao.isPermissionEnabled(Permission.ADD, destParentFolder.getId(),
+		boolean addchildEnabled = folderDao.isPermissionAllowed(Permission.ADD, destParentFolder.getId(),
 				session.getUserId());
 		if (!addchildEnabled)
 			throw new SecurityException("Add Child body not granted to this user in the target folder");
@@ -527,14 +527,14 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 		// Check move permission on the folder parent of folderToMove
 		Folder sourceParent = folderDao.findById(folderToMove.getParentId());
-		boolean sourceParentMoveEnabled = folderDao.isPermissionEnabled(Permission.MOVE, sourceParent.getId(),
+		boolean sourceParentMoveEnabled = folderDao.isPermissionAllowed(Permission.MOVE, sourceParent.getId(),
 				session.getUserId());
 		if (!sourceParentMoveEnabled)
 			throw new SecurityException(String.format("User %s has not the MOVE permission on folder %s",
 					session.getUsername(), sourceParent.getName()));
 
 		// Check addChild permission on destParentFolder
-		boolean addchildEnabled = folderDao.isPermissionEnabled(Permission.ADD, destParentFolder.getId(),
+		boolean addchildEnabled = folderDao.isPermissionAllowed(Permission.ADD, destParentFolder.getId(),
 				session.getUserId());
 		if (!addchildEnabled)
 			throw new SecurityException(String.format("User %s has not the ADD CHILD permission on folder %s",
@@ -747,6 +747,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			grps.add(fg);
 
 			fg.setRead(booleanToInt(ace.isRead()));
+			fg.setPreview(booleanToInt(ace.isPreview()));
 			fg.setPrint(booleanToInt(ace.isPrint()));
 			fg.setWrite(booleanToInt(ace.isWrite()));
 			fg.setAdd(booleanToInt(ace.isAdd()));
@@ -791,7 +792,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		try {
 			folder = fdao.findFolder(folderId);
 
-			if (!fdao.isWriteEnabled(folder.getId(), session.getUserId()))
+			if (!fdao.isWriteAllowed(folder.getId(), session.getUserId()))
 				throw new ServerException("Cannot write in folder " + folder.getName());
 
 			if (action.equals(Clipboard.CUT))

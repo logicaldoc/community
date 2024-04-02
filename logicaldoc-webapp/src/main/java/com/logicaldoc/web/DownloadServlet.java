@@ -205,7 +205,7 @@ public class DownloadServlet extends HttpServlet {
 
 	private void checkDownloadPermission(Session session, Document doc) throws PersistenceException, IOException {
 		DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		if (!documentDao.isDownloadEnabled(doc.getId(), session.getUserId()))
+		if (!documentDao.isDownloadAllowed(doc.getId(), session.getUserId()))
 			throw new IOException("You don't have the DOWNLOAD permission");
 	}
 

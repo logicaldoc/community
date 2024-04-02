@@ -21,6 +21,9 @@ public class WSAccessControlEntry {
 	
 	@WSDoc(description = "permission to read")
 	private int read = 1;
+	
+	@WSDoc(description = "permission to preview")
+	private int preview = 1;
 
 	@WSDoc(description = "permission to edit")
 	private int write = 0;
@@ -275,5 +278,13 @@ public class WSAccessControlEntry {
 
 	public void setUserId(long userId) {
 		this.userId = userId;
+	}
+
+	public int getPreview() {
+		return preview;
+	}
+
+	public void setPreview(int preview) {
+		this.preview = preview;
 	}
 }

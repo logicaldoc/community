@@ -105,7 +105,7 @@ public class DocumentResourceUpload extends HttpServlet {
 
 			Document doc = docDao.findById(Long.parseLong(docId));
 			Folder folder = doc.getFolder();
-			if (fdao.isPermissionEnabled(Permission.SIGN, folder.getId(), user.getId())) {
+			if (fdao.isPermissionAllowed(Permission.SIGN, folder.getId(), user.getId())) {
 				ServletUtil.uploadDocumentResource(request, docId, suffix, fileVersion, docVersion);
 				if (suffix.startsWith("sign")) {
 					docDao.initialize(doc);

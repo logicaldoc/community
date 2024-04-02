@@ -178,7 +178,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	protected void checkPermission(Permission permission, User user, long folderId) throws AccessDeniedException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		try {
-			if (!dao.isPermissionEnabled(permission, folderId, user.getId())) {
+			if (!dao.isPermissionAllowed(permission, folderId, user.getId())) {
 				String message = String.format("User %s doesn't have permission %s on folder %s", user.getUsername(),
 						permission.getName(), folderId);
 				throw new AccessDeniedException(message);

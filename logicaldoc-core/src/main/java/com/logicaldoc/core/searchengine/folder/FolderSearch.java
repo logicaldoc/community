@@ -556,7 +556,7 @@ public class FolderSearch extends Search {
 			if (criterion.getType() == FolderCriterion.TYPE_FOLDER && !criterion.isEmpty()) {
 				if (FolderCriterion.OPERATOR_INORSUBFOLDERS.equals(criterion.getOperator())) {
 					ids.addAll(folderDAO.findFolderIdByUserIdInPath(user.getId(), criterion.getLongValue()));
-				} else if (folderDAO.isReadEnabled(criterion.getLongValue(), user.getId())) {
+				} else if (folderDAO.isReadAllowed(criterion.getLongValue(), user.getId())) {
 					ids.add(criterion.getLongValue());
 				}
 			}

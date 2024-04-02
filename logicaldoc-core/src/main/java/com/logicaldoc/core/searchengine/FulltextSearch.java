@@ -333,7 +333,7 @@ public class FulltextSearch extends Search {
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		try {
 			if (opt.getFolderId() != null && !accessibleFolderIds.contains(opt.getFolderId())
-					&& fdao.isReadEnabled(opt.getFolderId().longValue(), opt.getUserId()))
+					&& fdao.isReadAllowed(opt.getFolderId().longValue(), opt.getUserId()))
 				accessibleFolderIds.add(opt.getFolderId());
 		} catch (PersistenceException e1) {
 			throw new SearchException(e1.getMessage(), e1);

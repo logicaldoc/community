@@ -139,7 +139,7 @@ public class ExportZip extends HttpServlet {
 			for (int i = 0; i < ids.length; i++) {
 				Document doc = docDao.findDocument(Long.parseLong(ids[i]));
 				Long docId = Long.parseLong(ids[i]);
-				if (doc != null && folderDao.isDownloadEnabled(doc.getFolder().getId(), userId)
+				if (doc != null && folderDao.isDownloadllowed(doc.getFolder().getId(), userId)
 						&& !docIds.contains(docId))
 					docIds.add(docId);
 			}

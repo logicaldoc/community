@@ -185,7 +185,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			Map<Long, String> folders = new HashMap<>();
 			for (long folderId : folderIds) {
 				Folder folder = folderDao.findFolder(folderId);
-				if (folder == null || !folderDao.isPermissionEnabled(Permission.DOWNLOAD, folder.getId(), user.getId()))
+				if (folder == null || !folderDao.isPermissionAllowed(Permission.DOWNLOAD, folder.getId(), user.getId()))
 					continue;
 
 				loadFoldersTree(folder.getId(), folder.getName() + "/", user.getId(), folders);
@@ -262,7 +262,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 		int count = 0;
 		try {
-			if (!fdao.isPermissionEnabled(Permission.IMPORT, targetFolder, session.getUserId()))
+			if (!fdao.isPermissionAllowed(Permission.IMPORT, targetFolder, session.getUserId()))
 				return 0;
 
 			User user = session.getUser();

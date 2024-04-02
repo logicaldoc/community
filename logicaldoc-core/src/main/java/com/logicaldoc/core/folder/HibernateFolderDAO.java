@@ -453,27 +453,32 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public boolean isPrintEnabled(long folderId, long userId) throws PersistenceException {
-		return isPermissionEnabled(Permission.PRINT, folderId, userId);
+	public boolean isPrintAllowed(long folderId, long userId) throws PersistenceException {
+		return isPermissionAllowed(Permission.PRINT, folderId, userId);
 	}
 
 	@Override
-	public boolean isWriteEnabled(long folderId, long userId) throws PersistenceException {
-		return isPermissionEnabled(Permission.WRITE, folderId, userId);
+	public boolean isWriteAllowed(long folderId, long userId) throws PersistenceException {
+		return isPermissionAllowed(Permission.WRITE, folderId, userId);
 	}
 
 	@Override
-	public boolean isDownloadEnabled(long id, long userId) throws PersistenceException {
-		return isPermissionEnabled(Permission.DOWNLOAD, id, userId);
+	public boolean isDownloadllowed(long id, long userId) throws PersistenceException {
+		return isPermissionAllowed(Permission.DOWNLOAD, id, userId);
 	}
 
 	@Override
-	public boolean isMoveEnabled(long id, long userId) throws PersistenceException {
-		return isPermissionEnabled(Permission.MOVE, id, userId);
+	public boolean isMoveAllowed(long id, long userId) throws PersistenceException {
+		return isPermissionAllowed(Permission.MOVE, id, userId);
+	}
+	
+	@Override
+	public boolean isPreviewAllowed(long id, long userId) throws PersistenceException {
+		return isPermissionAllowed(Permission.PREVIEW, id, userId);
 	}
 
 	@Override
-	public boolean isReadEnabled(long folderId, long userId) throws PersistenceException {
+	public boolean isReadAllowed(long folderId, long userId) throws PersistenceException {
 		User user = getExistingtUser(userId);
 		if (user.isMemberOf(Group.GROUP_ADMIN))
 			return true;
@@ -504,7 +509,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	@Override
 	public boolean hasWriteAccess(Folder folder, long userId) throws PersistenceException {
-		if (!isWriteEnabled(folder.getId(), userId))
+		if (!isWriteAllowed(folder.getId(), userId))
 			return false;
 
 		List<Folder> children = findByParentId(folder.getId());
@@ -831,7 +836,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public boolean isPermissionEnabled(Permission permission, long folderId, long userId) throws PersistenceException {
+	public boolean isPermissionAllowed(Permission permission, long folderId, long userId) throws PersistenceException {
 		Set<Permission> permissions = getEnabledPermissions(folderId, userId);
 		return permissions.contains(permission);
 	}
@@ -896,7 +901,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		}
 
 		StringBuilder query = new StringBuilder(
-				"select ld_read as LDREAD, ld_write as LDWRITE, ld_add as LDADD, ld_security as LDSECURITY, ld_immutable as LDIMMUTABLE, ld_delete as LDDELETE, ld_rename as LDRENAME, ld_import as LDIMPORT, ld_export as LDEXPORT, ld_sign as LDSIGN, ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD, ld_calendar as LDCALENDAR, ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD, ld_move as LDMOVE, ld_email as LDEMAIL, ld_automation LDAUTOMATION, ld_storage LDSTORAGE, ld_readingreq LDREADINGREQ");
+				"select ld_read as LDREAD, ld_write as LDWRITE, ld_add as LDADD, ld_security as LDSECURITY, ld_immutable as LDIMMUTABLE, ld_delete as LDDELETE, ld_rename as LDRENAME, ld_import as LDIMPORT, ld_export as LDEXPORT, ld_sign as LDSIGN, ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD, ld_calendar as LDCALENDAR, ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD, ld_move as LDMOVE, ld_email as LDEMAIL, ld_automation LDAUTOMATION, ld_storage LDSTORAGE, ld_readingreq LDREADINGREQ, ld_preview LDPREVIEW");
 		query.append(" from ld_folder_acl ");
 		query.append(WHERE);
 		query.append(" ld_folderid=" + id);
@@ -927,6 +932,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		permissionColumn.put("LDAUTOMATION", Permission.AUTOMATION);
 		permissionColumn.put("LDSTORAGE", Permission.STORAGE);
 		permissionColumn.put("LDREADINGREQ", Permission.READINGREQ);
+		permissionColumn.put("LDPREVIEW", Permission.PREVIEW);
 
 		/**
 		 * IMPORTANT: the connection MUST be explicitly closed, otherwise it is

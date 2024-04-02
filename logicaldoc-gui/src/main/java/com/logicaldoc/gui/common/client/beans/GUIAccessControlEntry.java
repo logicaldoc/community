@@ -35,6 +35,8 @@ public class GUIAccessControlEntry implements Serializable {
 
 	public static final String PERMISSION_READ = "read";
 
+	public static final String PERMISSION_PREVIEW = "preview";
+
 	public static final String PERMISSION_WRITE = "write";
 
 	public static final String PERMISSION_ADD = "add";
@@ -93,6 +95,10 @@ public class GUIAccessControlEntry implements Serializable {
 		return isPermissionAllowed(PERMISSION_READ);
 	}
 
+	public boolean isPreview() {
+		return isPermissionAllowed(PERMISSION_PREVIEW);
+	}
+
 	private GUIValue getPermission(String permission) {
 		for (GUIValue guiValue : permissions)
 			if (guiValue.getCode().equalsIgnoreCase(permission))
@@ -112,6 +118,10 @@ public class GUIAccessControlEntry implements Serializable {
 
 	public void setRead(boolean read) {
 		setPermissionValue(PERMISSION_READ, read);
+	}
+
+	public void setPreview(boolean preview) {
+		setPermissionValue(PERMISSION_PREVIEW, preview);
 	}
 
 	public boolean isWrite() {

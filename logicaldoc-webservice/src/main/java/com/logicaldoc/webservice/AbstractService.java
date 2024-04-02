@@ -142,7 +142,7 @@ public class AbstractService {
 	protected void checkFolderPermission(Permission permission, User user, long folderId)
 			throws PersistenceException, PermissionException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		if (!dao.isPermissionEnabled(permission, folderId, user.getId())) {
+		if (!dao.isPermissionAllowed(permission, folderId, user.getId())) {
 			String message = String.format("User %s doesn't have permission %s on folder %s", user.getUsername(),
 					permission.getName(), folderId);
 			log.error(message);
@@ -153,7 +153,7 @@ public class AbstractService {
 	protected void checkDocumentPermission(Permission permission, User user, long docId)
 			throws PersistenceException, PermissionException {
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		if (!dao.isPermissionEnabled(permission, docId, user.getId())) {
+		if (!dao.isPermissionAllowed(permission, docId, user.getId())) {
 			String message = String.format("User %s doesn't have permission %s on document %s", user.getUsername(),
 					permission.getName(), docId);
 			log.error(message);

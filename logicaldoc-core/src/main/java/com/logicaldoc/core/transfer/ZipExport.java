@@ -146,7 +146,7 @@ public class ZipExport {
 				// Check if the current user has the download permission in the
 				// document's folder
 				if (transaction != null && transaction.getUserId() != 0L
-						&& !fdao.isDownloadEnabled(doc.getFolder().getId(), transaction.getUserId()))
+						&& !fdao.isDownloadllowed(doc.getFolder().getId(), transaction.getUserId()))
 					continue;
 
 				boolean convertToPdf = pdfConversion;

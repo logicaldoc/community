@@ -631,10 +631,18 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 		this.allowedPermissions = permissions;
 	}
 
+	public boolean isRead() {
+		return allowedPermissions.isRead();
+	}
+	
 	public boolean isWrite() {
 		return allowedPermissions.isWrite();
 	}
 
+	public boolean isPreview() {
+		return allowedPermissions.isPreview();
+	}
+	
 	public boolean isDownload() {
 		return allowedPermissions.isDownload();
 	}

@@ -604,7 +604,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				break;
 			if (docid != null) {
 				Document document = findById(docid);
-				if (folderDAO.isReadEnabled(document.getFolder().getId(), userId))
+				if (folderDAO.isReadAllowed(document.getFolder().getId(), userId))
 					coll.add(document);
 			}
 		}
@@ -1392,34 +1392,39 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public boolean isPrintEnabled(long id, long userId) throws PersistenceException {
-		return isPermissionEnabled(Permission.PRINT, id, userId);
+	public boolean isPrintAllowed(long id, long userId) throws PersistenceException {
+		return isPermissionAllowed(Permission.PRINT, id, userId);
 	}
 
 	@Override
-	public boolean isWriteEnabled(long id, long userId) throws PersistenceException {
-		return isPermissionEnabled(Permission.WRITE, id, userId);
+	public boolean isWriteAllowed(long id, long userId) throws PersistenceException {
+		return isPermissionAllowed(Permission.WRITE, id, userId);
 	}
 
 	@Override
-	public boolean isDownloadEnabled(long id, long userId) throws PersistenceException {
-		return isPermissionEnabled(Permission.DOWNLOAD, id, userId);
+	public boolean isDownloadAllowed(long id, long userId) throws PersistenceException {
+		return isPermissionAllowed(Permission.DOWNLOAD, id, userId);
 	}
 
 	@Override
-	public boolean isMoveEnabled(long id, long userId) throws PersistenceException {
-		return isPermissionEnabled(Permission.MOVE, id, userId);
+	public boolean isMoveAllowed(long id, long userId) throws PersistenceException {
+		return isPermissionAllowed(Permission.MOVE, id, userId);
 	}
 
 	@Override
-	public boolean isReadEnabled(long docId, long userId) throws PersistenceException {
-		return isPermissionEnabled(Permission.READ, docId, userId);
+	public boolean isReadAllowed(long docId, long userId) throws PersistenceException {
+		return isPermissionAllowed(Permission.READ, docId, userId);
 	}
 
 	@Override
-	public boolean isPermissionEnabled(Permission permission, long documentId, long userId)
+	public boolean isPreviewAllowed(long docId, long userId) throws PersistenceException {
+		return isPermissionAllowed(Permission.PREVIEW, docId, userId);
+	}
+
+	@Override
+	public boolean isPermissionAllowed(Permission permission, long documentId, long userId)
 			throws PersistenceException {
-		Set<Permission> permissions = getEnabledPermissions(documentId, userId);
+		Set<Permission> permissions = getAllowedPermissions(documentId, userId);
 		return permissions.contains(permission);
 	}
 
@@ -1431,7 +1436,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public Set<Permission> getEnabledPermissions(long docId, long userId) throws PersistenceException {
+	public Set<Permission> getAllowedPermissions(long docId, long userId) throws PersistenceException {
 		User user = getExistingtUser(userId);
 		userDAO.initialize(user);
 
@@ -1445,7 +1450,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 						select ld_read as LDREAD, ld_write as LDWRITE, ld_security as LDSECURITY, ld_immutable as LDIMMUTABLE, ld_delete as LDDELETE,
 						ld_rename as LDRENAME, ld_sign as LDSIGN, ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD,
 						ld_calendar as LDCALENDAR, ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD,
-						ld_move as LDMOVE, ld_email as LDEMAIL, ld_automation LDAUTOMATION, ld_readingreq LDREADINGREQ
+						ld_move as LDMOVE, ld_email as LDEMAIL, ld_automation as LDAUTOMATION, ld_readingreq as LDREADINGREQ, ld_preview as LDPREVIEW
 						from ld_document_acl where
 						ld_docid=
 						""");
@@ -1473,6 +1478,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		permissionColumn.put("LDEMAIL", Permission.EMAIL);
 		permissionColumn.put("LDAUTOMATION", Permission.AUTOMATION);
 		permissionColumn.put("LDREADINGREQ", Permission.READINGREQ);
+		permissionColumn.put("LDPREVIEW", Permission.PREVIEW);
 
 		/**
 		 * IMPORTANT: the connection MUST be explicitly closed, otherwise it is
@@ -1515,7 +1521,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		log.debug("Removed {} security policies of document {}", count, docId);
 
 		StringBuilder update = new StringBuilder("""
-				 insert into ld_document_acl(ld_docId,ld_groupid,ld_read,ld_write,ld_security,
+				 insert into ld_document_acl(ld_docId,ld_groupid,ld_read,ld_preview,ld_write,ld_security,
 				                              ld_immutable,ld_delete,ld_rename,ld_sign,ld_archive,
 				                              ld_workflow,ld_download,ld_calendar,ld_subscription,
 				                              ld_print,ld_password,ld_move,ld_email,ld_automation,
@@ -1524,7 +1530,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		update.append(" select ");
 		update.append(Long.toString(docId));
 		update.append("""
-				,ld_groupid,ld_read,ld_write,ld_security,
+				,ld_groupid,ld_read,ld_preview,ld_write,ld_security,
 				                              ld_immutable,ld_delete,ld_rename,ld_sign,ld_archive,
 				                              ld_workflow,ld_download,ld_calendar,ld_subscription,
 				                              ld_print,ld_password,ld_move,ld_email,ld_automation,

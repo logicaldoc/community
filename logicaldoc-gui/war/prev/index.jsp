@@ -6,6 +6,7 @@
 <%@ page import="com.logicaldoc.core.security.*" %>
 <%@ page import="com.logicaldoc.util.*" %>
 <%@ page import="com.logicaldoc.web.util.*" %>
+<%@ page import="com.logicaldoc.i18n.*" %>
 <%
   Long docId = null;
   String ticketId = request.getParameter("ticketId");
@@ -27,11 +28,23 @@
     userId = ldSession.getUserId();
   }  
  
-  if(ticket == null && !docDao.isReadEnabled(docId, userId))
-      throw new Exception("Permission Denied");
+  String locale = "en";
+  if(request.getParameter("locale")!=null && !request.getParameter("locale").isEmpty())
+      locale = request.getParameter("locale");
+ 
+  boolean read = ticket == null && docDao.isReadAllowed(docId, userId);
+  boolean preview = ticket == null && docDao.isPreviewAllowed(docId, userId);
+ 
+  if(ticket == null && (!read || !preview)) {
+      if(!read)
+         response.getWriter().write(I18N.message("youdonothavereadpermissionondoc", locale));
+      else
+         response.getWriter().write(I18N.message("youdonothavepreviewpermissionondoc", locale));
+      return;
+  }
   
-  boolean print = ticket !=null ? !ticket.isTicketExpired() : docDao.isPrintEnabled(docId, userId);
-  boolean download = ticket !=null ? !ticket.isTicketExpired() : docDao.isDownloadEnabled(docId, userId);
+  boolean print = ticket !=null ? !ticket.isTicketExpired() : docDao.isPrintAllowed(docId, userId);
+  boolean download = ticket !=null ? !ticket.isTicketExpired() : docDao.isDownloadAllowed(docId, userId);
   
   /*
    * Prepares an hash so the servlet could check that this request comes from a real preview panel.

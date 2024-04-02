@@ -1644,7 +1644,7 @@ public class LDRepository {
 
 	private void checkReadEnable(User user, long folderId) throws PermissionException, PersistenceException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		if (!dao.isReadEnabled(folderId, user.getId())) {
+		if (!dao.isReadAllowed(folderId, user.getId())) {
 			String message = "User " + user.getUsername() + " doesn't have read permission on folder " + folderId;
 			log.error(message);
 			throw new PermissionException(message);
@@ -2773,14 +2773,14 @@ public class LDRepository {
 			}
 		}
 
-		enabled = folderDao.isReadEnabled(objectId, userId);
+		enabled = folderDao.isReadAllowed(objectId, userId);
 
 		if (enabled && permission != null) {
 			if (object instanceof Folder && objectId == Folder.ROOTID) {
 				// The root is just readable
 				enabled = permission.equals(Permission.READ);
 			} else {
-				enabled = folderDao.isPermissionEnabled(permission, objectId, userId);
+				enabled = folderDao.isPermissionAllowed(permission, objectId, userId);
 			}
 		}
 

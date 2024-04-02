@@ -86,7 +86,7 @@ public class CommentService extends AbstractService {
 	private boolean isWriteEnabled(User user, long docId) {
 		try {
 			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			if (dao.isPermissionEnabled(Permission.WRITE, docId, user.getId())) {
+			if (dao.isPermissionAllowed(Permission.WRITE, docId, user.getId())) {
 				return true;
 			}
 		} catch (Exception e) {

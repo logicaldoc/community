@@ -243,7 +243,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 		// Check delete permission on the folder parent of folderToMove
 		Folder sourceParent = folderDao.findById(folderToMove.getParentId());
-		boolean sourceParentDeleteEnabled = folderDao.isPermissionEnabled(Permission.DELETE, sourceParent.getId(),
+		boolean sourceParentDeleteEnabled = folderDao.isPermissionAllowed(Permission.DELETE, sourceParent.getId(),
 				user.getId());
 		if (!sourceParentDeleteEnabled)
 			throw new SecurityException("No rights to delete folder");
@@ -300,7 +300,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		if (!folderDao.isPermissionEnabled(Permission.RENAME, folderId, user.getId()))
+		if (!folderDao.isPermissionAllowed(Permission.RENAME, folderId, user.getId()))
 			throw new PermissionException(user.getUsername(), FOLDER + folderId, Permission.RENAME.toString());
 
 		long rootId = folderDao.findRoot(user.getTenantId()).getId();
@@ -355,7 +355,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		return folderDao.isWriteEnabled(folderId, user.getId());
+		return folderDao.isWriteAllowed(folderId, user.getId());
 	}
 
 	@Override
@@ -409,7 +409,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		// Check if the session user has the Security Permission of this
 		// folder
-		if (!folderDao.isPermissionEnabled(Permission.SECURITY, folderId, sessionUser.getId()))
+		if (!folderDao.isPermissionAllowed(Permission.SECURITY, folderId, sessionUser.getId()))
 			throw new PermissionException(sessionUser.getUsername(), FOLDER + folderId, Permission.SECURITY);
 
 		Folder folder = folderDao.findById(folderId);
@@ -453,7 +453,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		String name = wsFolder.getName();
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		if (!folderDao.isPermissionEnabled(Permission.RENAME, folderId, user.getId()))
+		if (!folderDao.isPermissionAllowed(Permission.RENAME, folderId, user.getId()))
 			throw new PermissionException(user.getUsername(), FOLDER + folderId, Permission.RENAME);
 
 		if (folderId == folderDao.findRoot(user.getTenantId()).getId())

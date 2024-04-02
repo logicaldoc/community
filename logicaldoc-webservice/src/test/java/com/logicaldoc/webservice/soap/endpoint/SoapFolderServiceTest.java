@@ -167,8 +167,8 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 	public void testSetAccessControlList() throws Exception {
 		User user = userDao.findById(4);
 
-		assertTrue(folderDao.isPermissionEnabled(Permission.ADD, 80, user.getId()));
-		assertFalse(folderDao.isPermissionEnabled(Permission.IMMUTABLE, 80, user.getId()));
+		assertTrue(folderDao.isPermissionAllowed(Permission.ADD, 80, user.getId()));
+		assertFalse(folderDao.isPermissionAllowed(Permission.IMMUTABLE, 80, user.getId()));
 
 		WSAccessControlEntry ace = new WSAccessControlEntry();
 		ace.setUserId(user.getId());

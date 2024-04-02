@@ -322,7 +322,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	private void checkWritePermission(final GUIDocument metadata, final Session session)
 			throws PersistenceException, ServerException {
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		if (!fdao.isWriteEnabled(metadata.getFolder().getId(), session.getUserId()))
+		if (!fdao.isWriteAllowed(metadata.getFolder().getId(), session.getUserId()))
 			throw new ServerException("The user doesn't have the write permission on the current folder");
 	}
 
@@ -566,7 +566,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				throw new ServerException(UNEXISTING_DOCUMENT);
 
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			if (!fDao.isWriteEnabled(doc.getFolder().getId(), session.getUserId()))
+			if (!fDao.isWriteAllowed(doc.getFolder().getId(), session.getUserId()))
 				throw new PermissionException(session.getUsername(), DOCUMENT_STR + docId, Permission.WRITE);
 
 			if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED)
@@ -1220,7 +1220,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			throws PersistenceException {
 		if (session != null) {
 			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			Set<Permission> permissions = dao.getEnabledPermissions(documentId, session.getUserId());
+			Set<Permission> permissions = dao.getAllowedPermissions(documentId, session.getUserId());
 			guiDocument.setAllowedPermissions(new GUIAccessControlEntry(
 					permissions.stream().map(p -> p.name().toLowerCase()).toList().toArray(new String[0])));
 		}
@@ -2191,7 +2191,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
-			if (!fdao.isWriteEnabled(vo.getFolder().getId(), session.getUserId()))
+			if (!fdao.isWriteAllowed(vo.getFolder().getId(), session.getUserId()))
 				throw new PermissionException(session.getUsername(), "Folder " + vo.getFolder().getId(),
 						Permission.WRITE);
 
@@ -2434,7 +2434,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				throw new ServerException(UNEXISTING_DOCUMENT);
 
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			if (!fDao.isDownloadEnabled(doc.getFolder().getId(), session.getUserId()))
+			if (!fDao.isDownloadllowed(doc.getFolder().getId(), session.getUserId()))
 				throw new IOException("You don't have the DOWNLOAD permission");
 
 			/*
@@ -2465,7 +2465,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				throw new ServerException(UNEXISTING_DOCUMENT);
 
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			if (!fDao.isWriteEnabled(doc.getFolder().getId(), session.getUserId()))
+			if (!fDao.isWriteAllowed(doc.getFolder().getId(), session.getUserId()))
 				throw new PermissionException(session.getUsername(), DOCUMENT_STR + docId, Permission.WRITE);
 
 			if (doc.getStatus() != AbstractDocument.DOC_CHECKED_OUT || doc.getLockUserId() != session.getUserId())
@@ -2502,7 +2502,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				throw new ServerException(UNEXISTING_DOCUMENT);
 
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			if (!fDao.isWriteEnabled(doc.getFolder().getId(), session.getUserId()))
+			if (!fDao.isWriteAllowed(doc.getFolder().getId(), session.getUserId()))
 				throw new IOException("You don't have the WRITE permission");
 
 			doc = docDao.findDocument(docId);
@@ -2529,7 +2529,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 		try {
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			if (!fDao.isWriteEnabled(document.getFolder().getId(), session.getUserId()))
+			if (!fDao.isWriteAllowed(document.getFolder().getId(), session.getUserId()))
 				throw new IOException("You don't have the WRITE permission");
 
 			DocumentHistory transaction = new DocumentHistory();
@@ -2606,7 +2606,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				throw new ServerException(UNEXISTING_DOCUMENT);
 
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			if (!fDao.isWriteEnabled(doc.getFolder().getId(), session.getUserId()))
+			if (!fDao.isWriteAllowed(doc.getFolder().getId(), session.getUserId()))
 				throw new PermissionException(session.getUsername(), DOCUMENT_STR + doc.getId(), Permission.WRITE);
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSession(session);
@@ -3161,6 +3161,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				AccessControlEntry ace = new AccessControlEntry();
 				ace.setGroupId(guiAce.getEntityId());
 				ace.setRead(booleanToInt(guiAce.isRead()));
+				ace.setPreview(booleanToInt(guiAce.isPreview()));
 				ace.setPrint(booleanToInt(guiAce.isPrint()));
 				ace.setWrite(booleanToInt(guiAce.isWrite()));
 				ace.setSecurity(booleanToInt(guiAce.isSecurity()));
@@ -3217,7 +3218,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			if (!session.getUser().isAdmin()) {
 				DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 				for (long docId : docIds) {
-					Set<Permission> docPermissions = docDao.getEnabledPermissions(docId, session.getUserId());
+					Set<Permission> docPermissions = docDao.getAllowedPermissions(docId, session.getUserId());
 					for (Permission permission : Permission.all()) {
 						if (!docPermissions.contains(permission))
 							commonPermissions.remove(permission);

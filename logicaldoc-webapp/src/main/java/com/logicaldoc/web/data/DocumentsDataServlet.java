@@ -302,7 +302,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			} catch (Exception t) {
 				// Nothing to do
 			}
-			if (doc == null || doc.getDeleted() == 1 || !dao.isReadEnabled(Long.parseLong(id), session.getUserId()))
+			if (doc == null || doc.getDeleted() == 1 || !dao.isReadAllowed(Long.parseLong(id), session.getUserId()))
 				continue;
 			documentsInCurrentPage.add(doc);
 		}
@@ -317,7 +317,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		int end = Math.min(begin + maxRecords - 1, docs.size() - 1);
 		for (int i = begin; i <= end; i++) {
 			Document doc = docs.get(i);
-			if (!dao.isReadEnabled(doc.getId(), session.getUserId()))
+			if (!dao.isReadAllowed(doc.getId(), session.getUserId()))
 				continue;
 			documentsInCurrentPage.add(doc);
 		}
@@ -677,7 +677,7 @@ select ld_docid
 		if (StringUtils.isNotEmpty(request.getParameter("folderId")))
 			folderId = Long.parseLong(request.getParameter("folderId"));
 
-		if (folderId != null && session != null && !fDao.isReadEnabled(folderId, session.getUserId()))
+		if (folderId != null && session != null && !fDao.isReadAllowed(folderId, session.getUserId()))
 			throw new IOException(
 					String.format("Folder %s is not accessible by user %s", folderId, session.getUsername()));
 		return folderId;

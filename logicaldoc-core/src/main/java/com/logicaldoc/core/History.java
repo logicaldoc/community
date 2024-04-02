@@ -55,14 +55,6 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	private String fileVersion = null;
 
-	public String getFileVersion() {
-		return fileVersion;
-	}
-
-	public void setFileVersion(String fileVersion) {
-		this.fileVersion = fileVersion;
-	}
-
 	private String path = null;
 
 	private String pathOld = null;
@@ -114,6 +106,14 @@ public abstract class History extends PersistentObject implements Comparable<His
 	private String color;
 
 
+	public String getFileVersion() {
+		return fileVersion;
+	}
+
+	public void setFileVersion(String fileVersion) {
+		this.fileVersion = fileVersion;
+	}
+	
 	public String getVersion() {
 		return version;
 	}

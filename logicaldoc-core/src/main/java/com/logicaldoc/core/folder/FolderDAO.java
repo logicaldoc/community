@@ -233,7 +233,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
-	public boolean isWriteEnabled(long folderId, long userId) throws PersistenceException;
+	public boolean isWriteAllowed(long folderId, long userId) throws PersistenceException;
 
 	/**
 	 * Checks that the user has write access to the folder and all its sub-items
@@ -247,16 +247,18 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 */
 	public boolean hasWriteAccess(Folder folder, long userId) throws PersistenceException;
 	
-	public boolean isReadEnabled(long folderId, long userId) throws PersistenceException;
+	public boolean isReadAllowed(long folderId, long userId) throws PersistenceException;
+	
+	public boolean isPreviewAllowed(long folderId, long userId) throws PersistenceException;
 
-	public boolean isPrintEnabled(long folderId, long userId) throws PersistenceException;
+	public boolean isPrintAllowed(long folderId, long userId) throws PersistenceException;
 
-	public boolean isDownloadEnabled(long folderId, long userId) throws PersistenceException;
+	public boolean isDownloadllowed(long folderId, long userId) throws PersistenceException;
 
-	public boolean isMoveEnabled(long folderId, long userId) throws PersistenceException;
+	public boolean isMoveAllowed(long folderId, long userId) throws PersistenceException;
 
 	/**
-	 * This method checks if the given permission is enabled for a folder and an
+	 * This method checks if the given permission is allowed for a folder and an
 	 * user.
 	 * 
 	 * @param permission the permission to check
@@ -267,7 +269,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
-	public boolean isPermissionEnabled(Permission permission, long folderId, long userId) throws PersistenceException;
+	public boolean isPermissionAllowed(Permission permission, long folderId, long userId) throws PersistenceException;
 
 	/**
 	 * Finds all permissions of a user enabled on the specified folder

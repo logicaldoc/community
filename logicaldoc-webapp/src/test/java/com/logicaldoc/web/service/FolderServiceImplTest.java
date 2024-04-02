@@ -64,22 +64,22 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 	public void testApplyRights() throws ServerException, PersistenceException {
 		Folder parentFolder = folderDao.findById(6);
 		Assert.assertNotNull(parentFolder);
-		Assert.assertTrue(folderDao.isPermissionEnabled(Permission.DELETE, 1201, 3));
-		Assert.assertTrue(folderDao.isPermissionEnabled(Permission.RENAME, 1201, 3));
+		Assert.assertTrue(folderDao.isPermissionAllowed(Permission.DELETE, 1201, 3));
+		Assert.assertTrue(folderDao.isPermissionAllowed(Permission.RENAME, 1201, 3));
 		Folder childFolder1 = folderDao.findById(1202);
 		Assert.assertNotNull(childFolder1);
 		Assert.assertEquals(1201, childFolder1.getParentId());
-		Assert.assertTrue(folderDao.isPermissionEnabled(Permission.DELETE, 1202, 3));
-		Assert.assertTrue(folderDao.isPermissionEnabled(Permission.RENAME, 1202, 3));
+		Assert.assertTrue(folderDao.isPermissionAllowed(Permission.DELETE, 1202, 3));
+		Assert.assertTrue(folderDao.isPermissionAllowed(Permission.RENAME, 1202, 3));
 
 		GUIFolder folder = service.getFolder(6, false, false, false);
 
 		service.saveACL(folder, true);
 
-		Assert.assertTrue(folderDao.isPermissionEnabled(Permission.DELETE, 1202, 1));
-		Assert.assertTrue(folderDao.isPermissionEnabled(Permission.RENAME, 1202, 1));
-		Assert.assertTrue(folderDao.isPermissionEnabled(Permission.DELETE, 1201, 1));
-		Assert.assertTrue(folderDao.isPermissionEnabled(Permission.RENAME, 1201, 1));
+		Assert.assertTrue(folderDao.isPermissionAllowed(Permission.DELETE, 1202, 1));
+		Assert.assertTrue(folderDao.isPermissionAllowed(Permission.RENAME, 1202, 1));
+		Assert.assertTrue(folderDao.isPermissionAllowed(Permission.DELETE, 1201, 1));
+		Assert.assertTrue(folderDao.isPermissionAllowed(Permission.RENAME, 1201, 1));
 	}
 
 	@Test

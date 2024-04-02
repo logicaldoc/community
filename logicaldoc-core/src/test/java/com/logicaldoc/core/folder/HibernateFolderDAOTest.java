@@ -854,15 +854,15 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testIsWriteEnabled() throws PersistenceException {
-		Assert.assertTrue(dao.isWriteEnabled(Folder.ROOTID, 1));
-		Assert.assertTrue(dao.isWriteEnabled(6, 1));
-		Assert.assertTrue(dao.isWriteEnabled(1200, 3));
-		Assert.assertTrue(dao.isWriteEnabled(Folder.ROOTID, 3));
+		Assert.assertTrue(dao.isWriteAllowed(Folder.ROOTID, 1));
+		Assert.assertTrue(dao.isWriteAllowed(6, 1));
+		Assert.assertTrue(dao.isWriteAllowed(1200, 3));
+		Assert.assertTrue(dao.isWriteAllowed(Folder.ROOTID, 3));
 
 		// Unexisting user
 		String runOk = null;
 		try {
-			Assert.assertFalse(dao.isWriteEnabled(Folder.ROOTID, 99));
+			Assert.assertFalse(dao.isWriteAllowed(Folder.ROOTID, 99));
 			runOk = "ok";
 		} catch (PersistenceException e) {
 			Assert.assertEquals("Unexisting user 99", e.getMessage());
@@ -872,20 +872,20 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testIsDownloadEnabled() throws PersistenceException {
-		Assert.assertTrue(dao.isDownloadEnabled(Folder.ROOTID, 1));
-		Assert.assertTrue(dao.isDownloadEnabled(6, 1));
-		Assert.assertTrue(dao.isDownloadEnabled(1200, 3));
-		Assert.assertTrue(dao.isDownloadEnabled(Folder.ROOTID, 3));
-		Assert.assertFalse(dao.isDownloadEnabled(1200, 4));
+		Assert.assertTrue(dao.isDownloadllowed(Folder.ROOTID, 1));
+		Assert.assertTrue(dao.isDownloadllowed(6, 1));
+		Assert.assertTrue(dao.isDownloadllowed(1200, 3));
+		Assert.assertTrue(dao.isDownloadllowed(Folder.ROOTID, 3));
+		Assert.assertFalse(dao.isDownloadllowed(1200, 4));
 	}
 
 	@Test
 	public void testIsMoveEnabled() throws PersistenceException {
-		Assert.assertTrue(dao.isMoveEnabled(Folder.ROOTID, 1));
-		Assert.assertTrue(dao.isMoveEnabled(6, 1));
-		Assert.assertTrue(dao.isMoveEnabled(1200, 3));
-		Assert.assertTrue(dao.isMoveEnabled(Folder.ROOTID, 3));
-		Assert.assertFalse(dao.isMoveEnabled(1200, 4));
+		Assert.assertTrue(dao.isMoveAllowed(Folder.ROOTID, 1));
+		Assert.assertTrue(dao.isMoveAllowed(6, 1));
+		Assert.assertTrue(dao.isMoveAllowed(1200, 3));
+		Assert.assertTrue(dao.isMoveAllowed(Folder.ROOTID, 3));
+		Assert.assertFalse(dao.isMoveAllowed(1200, 4));
 	}
 
 	@Test
@@ -896,12 +896,12 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testIsReadEnabled() throws PersistenceException {
-		Assert.assertTrue(dao.isReadEnabled(Folder.ROOTID, 1));
-		Assert.assertTrue(dao.isReadEnabled(5, 1));
+		Assert.assertTrue(dao.isReadAllowed(Folder.ROOTID, 1));
+		Assert.assertTrue(dao.isReadAllowed(5, 1));
 
 		boolean runOk = false;
 		try {
-			Assert.assertFalse(dao.isReadEnabled(Folder.ROOTID, 22));
+			Assert.assertFalse(dao.isReadAllowed(Folder.ROOTID, 22));
 			runOk = true;
 		} catch (PersistenceException e) {
 			Assert.assertEquals("Unexisting user 22", e.getMessage());
@@ -911,31 +911,31 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		runOk = false;
 		try {
 			// Unexisting user
-			Assert.assertFalse(dao.isReadEnabled(Folder.ROOTID, 99));
+			Assert.assertFalse(dao.isReadAllowed(Folder.ROOTID, 99));
 		} catch (PersistenceException e) {
 			Assert.assertEquals("Unexisting user 99", e.getMessage());
 		}
 		Assert.assertFalse(runOk);
 
-		Assert.assertTrue(dao.isReadEnabled(1200L, 3L));
-		Assert.assertFalse(dao.isReadEnabled(1200L, 4L));
-		Assert.assertTrue(dao.isReadEnabled(1201L, 4L));
+		Assert.assertTrue(dao.isReadAllowed(1200L, 3L));
+		Assert.assertFalse(dao.isReadAllowed(1200L, 4L));
+		Assert.assertTrue(dao.isReadAllowed(1201L, 4L));
 
 		Folder folder = dao.findById(6L);
 		dao.initialize(folder);
 		folder.setSecurityRef(1201L);
 		dao.store(folder);
-		Assert.assertTrue(dao.isReadEnabled(6L, 4L));
+		Assert.assertTrue(dao.isReadAllowed(6L, 4L));
 	}
 
 	@Test
 	public void testIsPrintEnable() throws PersistenceException {
-		Assert.assertTrue(dao.isPrintEnabled(Folder.ROOTID, 1L));
-		Assert.assertTrue(dao.isPrintEnabled(5, 1));
+		Assert.assertTrue(dao.isPrintAllowed(Folder.ROOTID, 1L));
+		Assert.assertTrue(dao.isPrintAllowed(5, 1));
 
 		String runOk = null;
 		try {
-			dao.isPrintEnabled(Folder.ROOTID, 22L);
+			dao.isPrintAllowed(Folder.ROOTID, 22L);
 			runOk = "ok";
 		} catch (PersistenceException e) {
 			Assert.assertEquals("Unexisting user 22", e.getMessage());
@@ -943,33 +943,33 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		Assert.assertNull(runOk);
 
 		try {
-			dao.isPrintEnabled(Folder.ROOTID, 999L);
+			dao.isPrintAllowed(Folder.ROOTID, 999L);
 			runOk = "ok";
 		} catch (PersistenceException e) {
 			Assert.assertEquals("Unexisting user 999", e.getMessage());
 		}
 		Assert.assertNull(runOk);
 
-		Assert.assertTrue(dao.isPrintEnabled(1200, 3));
+		Assert.assertTrue(dao.isPrintAllowed(1200, 3));
 	}
 
 	@Test
 	public void testIsPermissionEnabled() throws PersistenceException {
-		Assert.assertTrue(dao.isPermissionEnabled(Permission.WRITE, Folder.ROOTID, 1));
-		Assert.assertTrue(dao.isPermissionEnabled(Permission.WRITE, 6, 1));
-		Assert.assertFalse(dao.isPermissionEnabled(Permission.WRITE, Folder.ROOTID, 5));
+		Assert.assertTrue(dao.isPermissionAllowed(Permission.WRITE, Folder.ROOTID, 1));
+		Assert.assertTrue(dao.isPermissionAllowed(Permission.WRITE, 6, 1));
+		Assert.assertFalse(dao.isPermissionAllowed(Permission.WRITE, Folder.ROOTID, 5));
 
 		// Unexisting user
 		String runOk = null;
 		try {
-			Assert.assertFalse(dao.isPermissionEnabled(Permission.WRITE, Folder.ROOTID, 99));
+			Assert.assertFalse(dao.isPermissionAllowed(Permission.WRITE, Folder.ROOTID, 99));
 			runOk = "ok";
 		} catch (PersistenceException e) {
 			Assert.assertEquals("Unexisting user 99", e.getMessage());
 		}
 		Assert.assertNull(runOk);
 
-		Assert.assertTrue(dao.isPermissionEnabled(Permission.WRITE, 6, 4));
+		Assert.assertTrue(dao.isPermissionAllowed(Permission.WRITE, 6, 4));
 	}
 
 	@Test
@@ -980,7 +980,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		Assert.assertTrue(permissions.contains(Permission.SECURITY));
 		Assert.assertTrue(permissions.contains(Permission.SIGN));
 		permissions = dao.getEnabledPermissions(6, 4);
-		Assert.assertEquals(9, permissions.size());
+		Assert.assertEquals(10, permissions.size());
 		Assert.assertTrue(permissions.contains(Permission.READ));
 		Assert.assertTrue(permissions.contains(Permission.WRITE));
 		Assert.assertTrue(permissions.contains(Permission.MOVE));

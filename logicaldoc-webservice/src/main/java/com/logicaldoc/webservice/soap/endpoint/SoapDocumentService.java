@@ -699,7 +699,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (docIds != null && docIds.length > 0) {
 			for (long id : docIds) {
 				Document doc = docDao.findById(id);
-				if (doc != null && folderDao.isReadEnabled(doc.getFolder().getId(), user.getId())) {
+				if (doc != null && folderDao.isReadAllowed(doc.getFolder().getId(), user.getId())) {
 					doc = docDao.findDocument(id);
 					createAttachment(mail, doc);
 					docs.add(doc);
@@ -1322,7 +1322,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		// Check if the session user has the Security Permission of this
 		// document
-		if (!documentDao.isPermissionEnabled(Permission.SECURITY, docId, sessionUser.getId()))
+		if (!documentDao.isPermissionAllowed(Permission.SECURITY, docId, sessionUser.getId()))
 			throw new PermissionException(sessionUser.getUsername(), "Document " + docId, Permission.SECURITY);
 
 		Document document = documentDao.findById(docId);

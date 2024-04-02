@@ -183,7 +183,7 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	private boolean isFolderAccessible(Resource parentResource, final Long folderID) throws PersistenceException {
-		boolean hasAccess = folderDAO.isReadEnabled(folderID, parentResource.getRequestedPerson());
+		boolean hasAccess = folderDAO.isReadAllowed(folderID, parentResource.getRequestedPerson());
 
 		if (!hasAccess) {
 			// Check if the folder is a root and in that case we mark it as
@@ -254,7 +254,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 			document = docs.iterator().next();
 
-			hasAccess = folderDAO.isReadEnabled(document.getFolder().getId(), userId);
+			hasAccess = folderDAO.isReadAllowed(document.getFolder().getId(), userId);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			hasAccess = false;

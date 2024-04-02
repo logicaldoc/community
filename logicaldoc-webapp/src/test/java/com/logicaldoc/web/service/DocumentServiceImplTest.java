@@ -1377,13 +1377,15 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		prepareSession("boss", "admin");
 		permissions = service.getAllowedPermissions(List.of(2L, 3L, 4L));
 		assertFalse(permissions.isRead());
-
+		assertFalse(permissions.isPreview());
+		
 		prepareSession("author", "admin");
 		permissions = service.getAllowedPermissions(List.of(2L, 3L, 4L));
 		assertTrue(permissions.isRead());
+		assertTrue(permissions.isPreview());
 		assertTrue(permissions.isReadingreq());
 		assertTrue(permissions.isPrint());
-		assertEquals(3, permissions.getAllowedPermissions().size());
+		assertEquals(4, permissions.getAllowedPermissions().size());
 	}
 
 	private void waiting() throws InterruptedException {

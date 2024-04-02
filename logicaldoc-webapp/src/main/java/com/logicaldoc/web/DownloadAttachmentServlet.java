@@ -60,7 +60,7 @@ public class DownloadAttachmentServlet extends HttpServlet {
 			String filename = request.getParameter("attachmentFileName");
 
 			Document doc = docDao.findById(docId);
-			if (session.getUser() != null && !folderDao.isPermissionEnabled(Permission.DOWNLOAD,
+			if (session.getUser() != null && !folderDao.isPermissionAllowed(Permission.DOWNLOAD,
 					doc.getFolder().getId(), session.getUserId()))
 				throw new IOException("You don't have the DOWNLOAD permission");
 

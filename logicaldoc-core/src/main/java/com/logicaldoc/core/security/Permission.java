@@ -30,6 +30,7 @@ import java.util.Set;
  * <li>AUTOMATION: permission to handle the automation</li>
  * <li>STORAGE: permission to handle the storage</li>
  * <li>READINGREQ: permission to send reading requests</li>
+ * <li>PREVIEW: permission to preview a document</li>
  * </ul>
  * 
  * @author Marco Meschieri - LogicalDOC
@@ -39,8 +40,8 @@ public enum Permission {
 	READ("read"), DOWNLOAD("download"), WRITE("write"), ADD("add"), SECURITY("security"), IMMUTABLE(
 			"immutable"), DELETE("delete"), RENAME("rename"), IMPORT("import"), EXPORT("export"), SIGN("sign"), ARCHIVE(
 					"archive"), WORKFLOW("workflow"), CALENDAR("calendar"), SUBSCRIPTION("subscription"), PRINT(
-							"print"), PASSWORD("password"), MOVE("move"), EMAIL(
-									"email"), AUTOMATION("automation"), STORAGE("storage"), READINGREQ("readingreq");
+							"print"), PASSWORD("password"), MOVE("move"), EMAIL("email"), AUTOMATION(
+									"automation"), STORAGE("storage"), READINGREQ("readingreq"), PREVIEW("preview");
 
 	private final String name;
 
@@ -66,6 +67,7 @@ public enum Permission {
 	public static Set<Permission> forGuests() {
 		HashSet<Permission> set = new HashSet<>();
 		set.add(READ);
+		set.add(PREVIEW);
 		set.add(DOWNLOAD);
 		set.add(PRINT);
 		set.add(EMAIL);

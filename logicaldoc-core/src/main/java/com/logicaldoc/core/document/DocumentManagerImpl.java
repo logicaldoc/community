@@ -1194,7 +1194,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		Folder folder = alias.getFolder();
 		folderDAO.initialize(folder);
 
-		if (!folderDAO.isWriteEnabled(alias.getFolder().getId(), transaction.getUserId()))
+		if (!folderDAO.isWriteAllowed(alias.getFolder().getId(), transaction.getUserId()))
 			throw new PersistenceException(String.format("User %s without WRITE permission in folder %s",
 					transaction.getUsername(), folder.getId()));
 
@@ -1474,7 +1474,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		if (document == null)
 			throw new PersistenceException("Unexisting document " + ticket.getDocId());
 
-		if (!folderDAO.isDownloadEnabled(document.getFolder().getId(), transaction.getUserId()))
+		if (!folderDAO.isDownloadllowed(document.getFolder().getId(), transaction.getUserId()))
 			throw new PermissionException(transaction.getUsername(), "Folder " + document.getFolder().getId(),
 					Permission.DOWNLOAD);
 

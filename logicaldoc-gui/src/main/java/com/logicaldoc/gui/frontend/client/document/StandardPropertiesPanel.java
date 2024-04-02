@@ -149,7 +149,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		/*
 		 * Prepare the tile
 		 */
-		if (document.getId() != 0L) {
+		if (document.getId() != 0L && document.isPreview()) {
 			thumbnail = new PreviewTile(document.getId(), document.getFileName());
 			columns.addMember(thumbnail);
 		}

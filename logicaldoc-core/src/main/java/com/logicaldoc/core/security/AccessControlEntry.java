@@ -16,6 +16,8 @@ public class AccessControlEntry implements Serializable {
 
 	private int read = 1;
 
+	private int preview = 1;
+
 	private int write = 0;
 
 	private int download = 1;
@@ -64,9 +66,30 @@ public class AccessControlEntry implements Serializable {
 	}
 
 	public AccessControlEntry(AccessControlEntry source) {
-		this.write = source.write;
-		this.read = source.read;
+		this.add = source.add;
+		this.archive = source.archive;
+		this.automation = source.automation;
+		this.calendar = source.calendar;
+		this.delete = source.delete;
+		this.download = source.download;
+		this.email = source.email;
+		this.export = source.export;
 		this.groupId = source.groupId;
+		this.iimport = source.iimport;
+		this.immutable = source.immutable;
+		this.move = source.move;
+		this.password = source.password;
+		this.preview = source.preview;
+		this.print = source.print;
+		this.read = source.read;
+		this.readingreq = source.readingreq;
+		this.rename = source.rename;
+		this.security = source.security;
+		this.sign = source.sign;
+		this.storage = source.storage;
+		this.subscription = source.subscription;
+		this.workflow = source.workflow;
+		this.write = source.write;
 	}
 
 	public AccessControlEntry(long groupId) {
@@ -253,6 +276,14 @@ public class AccessControlEntry implements Serializable {
 		return readingreq;
 	}
 
+	public int getPreview() {
+		return preview;
+	}
+
+	public void setPreview(int preview) {
+		this.preview = preview;
+	}
+
 	public void setReadingreq(int readingreq) {
 		this.readingreq = readingreq;
 	}
@@ -309,6 +340,8 @@ public class AccessControlEntry implements Serializable {
 			granted.add(Permission.ADD);
 		if (read == 1)
 			granted.add(Permission.READ);
+		if (preview == 1)
+			granted.add(Permission.PREVIEW);		
 		if (write == 1)
 			granted.add(Permission.WRITE);
 		if (rename == 1)
@@ -341,6 +374,7 @@ public class AccessControlEntry implements Serializable {
 		print = booleanToInt(permissions.contains(Permission.PRINT));
 		readingreq = booleanToInt(permissions.contains(Permission.READINGREQ));
 		read = booleanToInt(permissions.contains(Permission.READ));
+		preview = booleanToInt(permissions.contains(Permission.PREVIEW));
 		rename = booleanToInt(permissions.contains(Permission.RENAME));
 		security = booleanToInt(permissions.contains(Permission.SECURITY));
 		sign = booleanToInt(permissions.contains(Permission.SIGN));

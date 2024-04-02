@@ -118,6 +118,10 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		ListGridField read = new ListGridField("read", prepareHeaderLabel("read"));
 		read.setType(ListGridFieldType.BOOLEAN);
 		read.setCanEdit(true);
+		
+		ListGridField preview = new ListGridField("preview", prepareHeaderLabel("preview"));
+		preview.setType(ListGridFieldType.BOOLEAN);
+		preview.setCanEdit(true);
 
 		ListGridField print = new ListGridField(PRINT, prepareHeaderLabel(PRINT));
 		print.setType(ListGridFieldType.BOOLEAN);
@@ -173,6 +177,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		fields.add(entityId);
 		fields.add(entity);
 		fields.add(read);
+		fields.add(preview);
 		fields.add(print);
 		fields.add(download);
 		fields.add(email);
@@ -320,6 +325,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 			rec.setAttribute(ENTITY,
 					selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
 			rec.setAttribute("read", true);
+			rec.setAttribute("preview", true);
 
 			list.addData(rec);
 			user.clearValue();
@@ -353,6 +359,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 			rec.setAttribute(AVATAR, "group");
 			rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
 			rec.setAttribute("read", true);
+			rec.setAttribute("preview", true);
 			list.addData(rec);
 			group.clearValue();
 		});
@@ -397,7 +404,9 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 			GUIAccessControlEntry ace = new GUIAccessControlEntry();
 			ace.setName(rec.getAttributeAsString(ENTITY));
 			ace.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
+			
 			ace.setRead(rec.getAttributeAsBoolean("read"));
+			ace.setPreview(rec.getAttributeAsBoolean("preview"));
 			ace.setPrint(rec.getAttributeAsBoolean(PRINT));
 			ace.setWrite(rec.getAttributeAsBoolean(WRITE));
 			ace.setDelete(rec.getAttributeAsBoolean(DELETE));

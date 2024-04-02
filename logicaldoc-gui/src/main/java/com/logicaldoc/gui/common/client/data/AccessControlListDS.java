@@ -26,6 +26,7 @@ public class AccessControlListDS extends DataSource {
 		DataSourceTextField entityId = new DataSourceTextField("entityId");
 		entityId.setPrimaryKey(true);
 		DataSourceBooleanField read = new DataSourceBooleanField("read");
+		DataSourceBooleanField preview = new DataSourceBooleanField("preview");
 		DataSourceBooleanField print = new DataSourceBooleanField("print");
 		DataSourceBooleanField write = new DataSourceBooleanField("write");
 		DataSourceBooleanField delete = new DataSourceBooleanField("delete");
@@ -49,7 +50,7 @@ public class AccessControlListDS extends DataSource {
 		DataSourceBooleanField readingreq = new DataSourceBooleanField("readingreq");
 		DataSourceTextField type = new DataSourceTextField("type");
 
-		setFields(entityId, entity, read, print, write, delete, move, add, workflow, sign, importField, export, rename,
+		setFields(entityId, entity, read, preview, print, write, delete, move, add, workflow, sign, importField, export, rename,
 				immutable, security, password, archive, type, download, email, calendar, subscription, automation,
 				storage, readingreq);
 		setClientOnly(true);

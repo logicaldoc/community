@@ -2,6 +2,7 @@ package com.logicaldoc.web;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,8 +19,10 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.document.thumbnail.ThumbnailManager;
+import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.authentication.InvalidSessionException;
+import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.store.Storer;
@@ -89,7 +92,13 @@ public class ThumbnailServlet extends HttpServlet {
 			User user = session.getUser();
 
 			checkPublication(doc, user);
-
+			
+			// Check read and preview
+			DocumentDAO dDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			Set<Permission> allowedPermissions = dDao.getAllowedPermissions(docId, user.getId());
+			if(!allowedPermissions.contains(Permission.READ) || !allowedPermissions.contains(Permission.PREVIEW))
+				throw new PermissionException(user.getUsername(), doc.toString(), Permission.PREVIEW);
+					
 			String resource = storer.getResourceName(docId, fileVersion, suffix);
 
 			// 2) prepare the thumbnail
@@ -99,7 +108,7 @@ public class ThumbnailServlet extends HttpServlet {
 			ServletUtil.downloadDocument(request, response, session.getSid(), docId, fileVersion,
 					storer.getResourceName(doc, fileVersion, suffix), suffix, user);
 		} catch (NumberFormatException | InvalidSessionException | PersistenceException | IOException
-				| ServletException e) {
+				| PermissionException | ServletException e) {
 			log.error(e.getMessage(), e);
 			ServletUtil.sendError(response, e.getMessage());
 		}

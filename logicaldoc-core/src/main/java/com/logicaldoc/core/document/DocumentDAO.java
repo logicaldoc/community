@@ -634,15 +634,17 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
-	public boolean isWriteEnabled(long documentId, long userId) throws PersistenceException;
+	public boolean isWriteAllowed(long documentId, long userId) throws PersistenceException;
 
-	public boolean isReadEnabled(long documentId, long userId) throws PersistenceException;
+	public boolean isReadAllowed(long documentId, long userId) throws PersistenceException;
+	
+	public boolean isPreviewAllowed(long documentId, long userId) throws PersistenceException;
 
-	public boolean isPrintEnabled(long documentId, long userId) throws PersistenceException;
+	public boolean isPrintAllowed(long documentId, long userId) throws PersistenceException;
 
-	public boolean isDownloadEnabled(long documentId, long userId) throws PersistenceException;
+	public boolean isDownloadAllowed(long documentId, long userId) throws PersistenceException;
 
-	public boolean isMoveEnabled(long documentId, long userId) throws PersistenceException;
+	public boolean isMoveAllowed(long documentId, long userId) throws PersistenceException;
 
 	/**
 	 * This method checks if the given permission is enabled for a document and
@@ -656,7 +658,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
-	public boolean isPermissionEnabled(Permission permission, long documentId, long userId) throws PersistenceException;
+	public boolean isPermissionAllowed(Permission permission, long documentId, long userId) throws PersistenceException;
 
 	/**
 	 * Finds all permissions of a user enabled on the specified document
@@ -668,5 +670,5 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
-	public Set<Permission> getEnabledPermissions(long documentId, long userId) throws PersistenceException;
+	public Set<Permission> getAllowedPermissions(long documentId, long userId) throws PersistenceException;
 }

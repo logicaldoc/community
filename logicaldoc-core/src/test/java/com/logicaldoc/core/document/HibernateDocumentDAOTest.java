@@ -756,12 +756,12 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void getEnabledPermissions() throws PersistenceException {
-		assertTrue(dao.isReadEnabled(7L, 3L));
-		assertTrue(dao.isWriteEnabled(7L, 3L));
-		assertTrue(dao.isPrintEnabled(7L, 3L));
+		assertTrue(dao.isReadAllowed(7L, 3L));
+		assertTrue(dao.isWriteAllowed(7L, 3L));
+		assertTrue(dao.isPrintAllowed(7L, 3L));
 
-		assertTrue(dao.getEnabledPermissions(7L, 3L).contains(Permission.SECURITY));
-		assertTrue(!dao.getEnabledPermissions(7L, 2L).contains(Permission.SECURITY));
+		assertTrue(dao.getAllowedPermissions(7L, 3L).contains(Permission.SECURITY));
+		assertTrue(!dao.getAllowedPermissions(7L, 2L).contains(Permission.SECURITY));
 	}
 
 	@Test
