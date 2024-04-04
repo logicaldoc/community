@@ -8,6 +8,7 @@ import com.logicaldoc.gui.common.client.ServerValidationException;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -17,6 +18,7 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.StickyWindow;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
+import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
@@ -86,76 +88,32 @@ public class UpdateDialog extends StickyWindow {
 	protected void onDraw() {
 		super.onDraw();
 
-		DocumentService.Instance.get().getEnabledPermissions(ids, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
+		if (ids==null || ids.isEmpty()) {
+			FolderService.Instance.get().getFolder(metadata.getFolder().getId(), false, false, false,
+					new AsyncCallback<GUIFolder>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-			@Override
-			public void onSuccess(GUIAccessControlEntry permissions) {
-				/*
-				 * Since the document is locked, temporarily alter the status to
-				 * have the editing enabled.
-				 */
-				int originalStatus = 0;
-				if (CHECKIN.equals(context) && metadata != null) {
-					originalStatus = metadata.getStatus();
-					metadata.setStatus(0);
+						@Override
+						public void onSuccess(GUIFolder folder) {
+							onDraw(folder.getAllowedPermissions());
+						}
+					});
+		} else {
+			DocumentService.Instance.get().getEnabledPermissions(ids, new AsyncCallback<>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
 				}
 
-				bulkPanel = new UpdatePanel(metadata, CONTEXT_UPLOAD.equals(context) || CHECKIN.equals(context),
-						permissions.isSecurity());
-				bulkPanel.setWidth100();
-				bulkPanel.setHeight("*");
-				bulkPanel.setShowResizeBar(false);
-
-				if (CHECKIN.equals(context) && metadata != null)
-					metadata.setStatus(originalStatus);
-
-				HTMLPane spacer = new HTMLPane();
-				spacer.setContents("<div>&nbsp;</div>");
-				spacer.setWidth("60%");
-				spacer.setOverflow(Overflow.HIDDEN);
-
-				TextItem versionComment = ItemFactory.newTextItem(VERSIONCOMMENT, null);
-				versionComment.setWidth(350);
-
-				CheckboxItem ignoreEmptyFields = ItemFactory.newCheckbox(IGNOREEMPTYFIELDS, IGNOREEMPTYFIELDS);
-				ignoreEmptyFields.setValue(true);
-
-				final DynamicForm saveForm = new DynamicForm();
-				saveForm.setMargin(3);
-				saveForm.setTitleOrientation(TitleOrientation.LEFT);
-				saveForm.setNumCols(4);
-				saveForm.setShowResizeBar(false);
-				if (BULKUPDATE.equals(context))
-					saveForm.setItems(versionComment, ignoreEmptyFields);
-				else
-					saveForm.setItems(versionComment);
-
-				Button saveButton = prepareSaveButton(saveForm);
-
-				HLayout savePanel = new HLayout();
-				savePanel.addMember(saveButton);
-				if (!CHECKIN.equals(context))
-					savePanel.addMember(saveForm);
-				savePanel.addMember(spacer);
-				savePanel.setWidth100();
-				savePanel.setHeight(30);
-				savePanel.setMargin(2);
-				savePanel.setMembersMargin(10);
-
-				VLayout content = new VLayout();
-				content.setTop(10);
-				content.setWidth100();
-				content.setHeight100();
-				content.setMembersMargin(3);
-				content.setMembers(bulkPanel, savePanel);
-
-				addItem(content);
-			}
-		});
+				@Override
+				public void onSuccess(GUIAccessControlEntry permissions) {
+					onDraw(permissions);
+				}
+			});
+		}
 	}
 
 	private Button prepareSaveButton(final DynamicForm saveForm) {
@@ -275,5 +233,69 @@ public class UpdateDialog extends StickyWindow {
 
 	public void setCharset(String charset) {
 		this.charset = charset;
+	}
+
+	private void onDraw(GUIAccessControlEntry permissions) {
+		/*
+		 * Since the document is locked, temporarily alter the status to have
+		 * the editing enabled.
+		 */
+		int originalStatus = 0;
+		if (CHECKIN.equals(context) && metadata != null) {
+			originalStatus = metadata.getStatus();
+			metadata.setStatus(0);
+		}
+
+		metadata.setAllowedPermissions(permissions);
+		bulkPanel = new UpdatePanel(metadata, CONTEXT_UPLOAD.equals(context) || CHECKIN.equals(context),
+				permissions.isSecurity());
+		bulkPanel.setWidth100();
+		bulkPanel.setHeight("*");
+		bulkPanel.setShowResizeBar(false);
+
+		if (CHECKIN.equals(context) && metadata != null)
+			metadata.setStatus(originalStatus);
+
+		HTMLPane spacer = new HTMLPane();
+		spacer.setContents("<div>&nbsp;</div>");
+		spacer.setWidth("60%");
+		spacer.setOverflow(Overflow.HIDDEN);
+
+		TextItem versionComment = ItemFactory.newTextItem(VERSIONCOMMENT, null);
+		versionComment.setWidth(350);
+
+		CheckboxItem ignoreEmptyFields = ItemFactory.newCheckbox(IGNOREEMPTYFIELDS, IGNOREEMPTYFIELDS);
+		ignoreEmptyFields.setValue(true);
+
+		final DynamicForm saveForm = new DynamicForm();
+		saveForm.setMargin(3);
+		saveForm.setTitleOrientation(TitleOrientation.LEFT);
+		saveForm.setNumCols(4);
+		saveForm.setShowResizeBar(false);
+		if (BULKUPDATE.equals(context))
+			saveForm.setItems(versionComment, ignoreEmptyFields);
+		else
+			saveForm.setItems(versionComment);
+
+		Button saveButton = prepareSaveButton(saveForm);
+
+		HLayout savePanel = new HLayout();
+		savePanel.addMember(saveButton);
+		if (!CHECKIN.equals(context))
+			savePanel.addMember(saveForm);
+		savePanel.addMember(spacer);
+		savePanel.setWidth100();
+		savePanel.setHeight(30);
+		savePanel.setMargin(2);
+		savePanel.setMembersMargin(10);
+
+		VLayout content = new VLayout();
+		content.setTop(10);
+		content.setWidth100();
+		content.setHeight100();
+		content.setMembersMargin(3);
+		content.setMembers(bulkPanel, savePanel);
+
+		addItem(content);
 	}
 }
