@@ -72,11 +72,11 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
 			Locale withLocale = LocaleUtil.toLocale(locale);
 
-			List<GUIValue> supportedLanguages = setSupportedLocales(tenantName, info, withLocale);
+			setSupportedGUILanguages(tenantName, info, withLocale);
 
 			LanguageManager manager = LanguageManager.getInstance();
 			List<Language> languages = manager.getActiveLanguages(tenantName);
-			supportedLanguages.clear();
+			List<GUIValue> supportedLanguages = new ArrayList<>();
 			for (Language language : languages) {
 				Locale lc = language.getLocale();
 				GUIValue l = new GUIValue();
@@ -174,7 +174,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		}
 	}
 
-	private ArrayList<GUIValue> setSupportedLocales(String tenantName, GUIInfo info, Locale withLocale) {
+	private void setSupportedGUILanguages(String tenantName, GUIInfo info, Locale withLocale) {
 		ArrayList<GUIValue> supportedLanguages = new ArrayList<>();
 		List<String> installedLocales = I18N.getLocales();
 		for (String loc : installedLocales) {
@@ -186,14 +186,12 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 				supportedLanguages.add(l);
 			}
 		}
-
 		info.setSupportedGUILanguages(supportedLanguages);
-		return supportedLanguages;
 	}
 
 	/**
-	 * Retrieves the informations but not localization resources like messages and
-	 * installed languages
+	 * Retrieves the informations but not localization resources like messages
+	 * and installed languages
 	 * 
 	 * @param tenantName name of the tenant
 	 * 
