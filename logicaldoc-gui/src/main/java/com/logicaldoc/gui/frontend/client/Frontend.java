@@ -111,13 +111,27 @@ public class Frontend implements EntryPoint {
 								if (session == null || !session.isLoggedIn()) {
 									SC.warn(I18N.message("accessdenied"));
 								} else {
-									session.getInfo().setUserNo(info.getUserNo());
-									init(session.getInfo());
-									Session.get().init(session);
+									String loc = Util.getLocaleInRequest() == null ? session.getUser().getLanguage()
+											: Util.getLocaleInRequest();
+									InfoService.Instance.get().getInfo(loc, tenant, false,
+											new AsyncCallback<GUIInfo>() {
+												@Override
+												public void onFailure(Throwable caught) {
+													GuiLog.serverError(caught);
+												}
 
-									connectWebsockets();
-									declareReloadTrigger(Frontend.this);
-									showMain();
+												@Override
+												public void onSuccess(GUIInfo info) {
+													session.setInfo(info);
+													init(info);
+
+													Session.get().init(session);
+
+													connectWebsockets();
+													declareReloadTrigger(Frontend.this);
+													showMain();
+												}
+											});
 								}
 							}
 						});

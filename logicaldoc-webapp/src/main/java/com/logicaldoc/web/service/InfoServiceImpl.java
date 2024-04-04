@@ -73,11 +73,11 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
 			Locale withLocale = LocaleUtil.toLocale(locale);
 
-			ArrayList<GUIValue> supportedLanguages = setSupportedLocales(tenantName, info, withLocale);
+			setSupportedLocales(tenantName, info, withLocale);
 
 			LanguageManager manager = LanguageManager.getInstance();
 			Collection<Language> languages = manager.getActiveLanguages(tenantName);
-			supportedLanguages.clear();
+			ArrayList<GUIValue> supportedLanguages = new ArrayList<>();
 			for (Language language : languages) {
 				Locale lc = language.getLocale();
 				GUIValue l = new GUIValue();
