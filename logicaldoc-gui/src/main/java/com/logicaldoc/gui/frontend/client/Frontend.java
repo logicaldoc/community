@@ -99,29 +99,42 @@ public class Frontend implements EntryPoint {
 
 				init(info);
 
-				SecurityService.Instance.get().getSession(Util.getLocaleInRequest(), null,
-						new AsyncCallback<>() {
+				SecurityService.Instance.get().getSession(Util.getLocaleInRequest(), null, new AsyncCallback<>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								SC.warn(I18N.message("accessdenied") + " - " + caught.getMessage());
-							}
+					@Override
+					public void onFailure(Throwable caught) {
+						SC.warn(I18N.message("accessdenied") + " - " + caught.getMessage());
+					}
 
-							@Override
-							public void onSuccess(GUISession session) {
-								if (session == null || !session.isLoggedIn()) {
-									SC.warn(I18N.message("accessdenied"));
-								} else {
-									session.setInfo(info);
-									init(session.getInfo());
-									Session.get().init(session);
+					@Override
+					public void onSuccess(GUISession session) {
+						if (session == null || !session.isLoggedIn()) {
+							SC.warn(I18N.message("accessdenied"));
+						} else {
+							String loc = Util.getLocaleInRequest() == null ? session.getUser().getLanguage()
+									: Util.getLocaleInRequest();
+							InfoService.Instance.get().getInfo(loc, tenant, false,
+									new AsyncCallback<GUIInfo>() {
+										@Override
+										public void onFailure(Throwable caught) {
+											GuiLog.serverError(caught);
+										}
 
-									connectWebsockets();
-									declareReloadTrigger(Frontend.this);
-									showMain();
-								}
-							}
-						});
+										@Override
+										public void onSuccess(GUIInfo info) {
+											session.setInfo(info);
+											init(info);
+
+											Session.get().init(session);
+
+											connectWebsockets();
+											declareReloadTrigger(Frontend.this);
+											showMain();
+										}
+									});
+						}
+					}
+				});
 			}
 		});
 	}
@@ -231,7 +244,7 @@ public class Frontend implements EntryPoint {
 			@com.logicaldoc.gui.common.client.util.Util::download(Ljava/lang/String;)(url);
 		};
 	}-*/;
-	
+
 	/**
 	 * Declares the javascript function used to download a document's resource
 	 */
