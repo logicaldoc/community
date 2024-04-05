@@ -73,7 +73,7 @@ public class Frontend implements EntryPoint {
 		I18N.setLocale(locale);
 
 		// Tries to capture tenant parameter
-		final String tenant = Util.detectTenant();
+		final String tenant = Util.getTenantInRequest();
 
 		// Get grid of scrollbars, and clear out the window's built-in margin,
 		// because we want to take advantage of the entire client area.
@@ -113,7 +113,8 @@ public class Frontend implements EntryPoint {
 						} else {
 							String loc = Util.getLocaleInRequest() == null ? session.getUser().getLanguage()
 									: Util.getLocaleInRequest();
-							InfoService.Instance.get().getInfo(loc, tenant, false,
+							InfoService.Instance.get().getInfo(loc,
+									tenant != null ? tenant : session.getUser().getTenant().getName(), false,
 									new AsyncCallback<GUIInfo>() {
 										@Override
 										public void onFailure(Throwable caught) {
