@@ -3,8 +3,7 @@
 <%@ page import="javax.servlet.http.*" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
-<%@ page import="com.logicaldoc.core.security.dao.*" %>
-<%@ page import="com.logicaldoc.core.security.*" %>
+<%@ page import="com.logicaldoc.core.security.user.*" %>
 <%@ page import="com.logicaldoc.util.*" %>
 
 <%
