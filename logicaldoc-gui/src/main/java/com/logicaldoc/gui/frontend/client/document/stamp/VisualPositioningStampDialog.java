@@ -26,6 +26,7 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -169,7 +170,7 @@ public class VisualPositioningStampDialog extends Window {
 								}
 							});
 						}
-						destroy();
+						showPage(pageCursor.getValueAsInteger());
 					}
 				});
 	}
@@ -179,6 +180,25 @@ public class VisualPositioningStampDialog extends Window {
 		toolStrip.setHeight(20);
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
+
+		SelectItem stampSelector = ItemFactory.newStampSelector();
+		stampSelector.setTitle(I18N.message("stamp"));
+		stampSelector.setWrapTitle(false);
+		stampSelector.setRequired(true);
+		stampSelector.setValue(stamp.getId());
+		stampSelector.addChangedHandler(changed -> StampService.Instance.get()
+				.getStamp(Long.parseLong(stampSelector.getValueAsString()), new AsyncCallback<>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(GUIStamp stmp) {
+						VisualPositioningStampDialog.this.stamp = stmp;
+					}
+				}));
 
 		ToolStripButton apply = new ToolStripButton();
 		apply.setTitle(I18N.message("apply"));
@@ -231,6 +251,7 @@ public class VisualPositioningStampDialog extends Window {
 		pageSelection = ItemFactory.newTextItem("pageSelection", I18N.message("selection"), stamp.getPageSelection());
 		pageSelection.setShowTitle(false);
 
+		toolStrip.addFormItem(stampSelector);
 		toolStrip.addFormItem(pageCursor);
 		toolStrip.addButton(zoomIn);
 		toolStrip.addButton(zoomOut);

@@ -176,9 +176,9 @@ public class VisualPositioningDigitalSignatureDialog extends Window {
 
 			@Override
 			public void onSuccess(Void arg0) {
-				destroy();
-				GuiLog.info(I18N.message("event.signed"), null);
 				LD.clearPrompt();
+				GuiLog.info(I18N.message("event.signed"), null);
+				showPage(pageCursor.getValueAsInteger());
 			}
 		});
 	}
