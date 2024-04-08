@@ -719,7 +719,7 @@ public interface DocumentService {
 	String version) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException, UnexistingResourceException;
 
 	/**
-	 * Gets a document in a specific folder
+	 * Gets the documents in a specific folder
 	 * 
 	 * @param sid identifier of the session
 	 * @param folderId The folder id
