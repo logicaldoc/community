@@ -725,7 +725,7 @@ public interface DocumentService {
 	 * @param folderId The folder id
 	 * @param fileName Optional file name filter
 	 * 
-	 * @return A value object containing the document's metadata
+	 * @return Collection of documents
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
