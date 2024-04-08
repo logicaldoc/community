@@ -3,6 +3,7 @@ package com.logicaldoc.webservice.soap.client;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
@@ -187,19 +188,19 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
-	public WSDocument[] getDocuments(String sid, Long[] docIds)
+	public List<WSDocument> getDocuments(String sid, List<Long> docIds)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		return client.getDocuments(sid, docIds);
 	}
 
 	@Override
-	public WSDocument[] getRecentDocuments(String sid, Integer max)
+	public List<WSDocument> getRecentDocuments(String sid, Integer max)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		return client.getRecentDocuments(sid, max);
 	}
 
 	@Override
-	public void sendEmail(String sid, Long[] docIds, String recipients, String subject, String message)
+	public void sendEmail(String sid, List<Long> docIds, String recipients, String subject, String message)
 			throws AuthenticationException, WebserviceException, PersistenceException, IOException, MessagingException {
 		client.sendEmail(sid, docIds, recipients, subject, message);
 	}
@@ -217,13 +218,13 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
-	public WSDocument[] listDocuments(String sid, long folderId, String fileName)
+	public List<WSDocument> listDocuments(String sid, long folderId, String fileName)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.listDocuments(sid, folderId, fileName);
 	}
 
 	@Override
-	public WSDocument[] getAliases(String sid, long docId)
+	public List<WSDocument> getAliases(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		return client.getAliases(sid, docId);
 	}
@@ -235,7 +236,7 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
-	public WSLink[] getLinks(String sid, long docId)
+	public List<WSLink> getLinks(String sid, long docId)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.getLinks(sid, docId);
 	}
@@ -322,7 +323,7 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
-	public WSNote[] getNotes(String sid, long docId) throws AuthenticationException, PermissionException,
+	public List<WSNote> getNotes(String sid, long docId) throws AuthenticationException, PermissionException,
 			WebserviceException, PersistenceException, UnexistingResourceException {
 		return client.getNotes(sid, docId);
 	}
@@ -334,7 +335,7 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
-	public WSRating[] getRatings(String sid, long docId) throws AuthenticationException, PermissionException,
+	public List<WSRating> getRatings(String sid, long docId) throws AuthenticationException, PermissionException,
 			WebserviceException, PersistenceException, UnexistingResourceException {
 		return client.getRatings(sid, docId);
 	}
@@ -372,7 +373,7 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
-	public WSDocument[] getVersions(String sid, long docId) throws AuthenticationException, PermissionException,
+	public List<WSDocument> getVersions(String sid, long docId) throws AuthenticationException, PermissionException,
 			WebserviceException, PersistenceException, UnexistingResourceException {
 		return client.getVersions(sid, docId);
 	}
@@ -408,13 +409,13 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
-	public WSAccessControlEntry[] getAccessControlList(String sid, long docId)
+	public List<WSAccessControlEntry> getAccessControlList(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		return client.getAccessControlList(sid, docId);
 	}
 
 	@Override
-	public void setAccessControlList(String sid, long docId, WSAccessControlEntry[] acl)
+	public void setAccessControlList(String sid, long docId, List<WSAccessControlEntry> acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
 		client.setAccessControlList(sid, docId, acl);
 	}

@@ -220,7 +220,7 @@ public interface DocumentService {
 	@GET
 	@Path("/list")
 	@Produces({ MediaType.APPLICATION_JSON })
-	WSDocument[] list(@QueryParam("folderId")
+	List<WSDocument> list(@QueryParam("folderId")
 	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
@@ -239,7 +239,7 @@ public interface DocumentService {
 	 */
 	@GET
 	@Path("/listDocuments")
-	WSDocument[] listDocuments(@QueryParam("folderId")
+	List<WSDocument> listDocuments(@QueryParam("folderId")
 	long folderId, @QueryParam("fileName")
 	String fileName) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
@@ -347,7 +347,7 @@ public interface DocumentService {
 	 * 
 	 * @param docId identifier of the document
 	 *
-	 * @return array of notes
+	 * @return List of notes
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
@@ -358,7 +358,7 @@ public interface DocumentService {
 	 */
 	@GET
 	@Path("/getNotes")
-	public WSNote[] getNotes(@QueryParam("docId")
+	public List<WSNote> getNotes(@QueryParam("docId")
 	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
 			UnexistingResourceException;
 
@@ -400,7 +400,7 @@ public interface DocumentService {
 	 */
 	@GET
 	@Path("/getRatings")
-	public WSRating[] getRatings(@QueryParam("docId")
+	public List<WSRating> getRatings(@QueryParam("docId")
 	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
 			UnexistingResourceException;
 
@@ -602,7 +602,7 @@ public interface DocumentService {
 	 */
 	@GET
 	@Path("/getVersions")
-	public WSDocument[] getVersions(@QueryParam("docId")
+	public List<WSDocument> getVersions(@QueryParam("docId")
 	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
 			UnexistingResourceException;
 
@@ -696,7 +696,7 @@ public interface DocumentService {
 	 * Gets the aliases of the given document
 	 * 
 	 * @param docId The master document ID
-	 * @return Arrays of aliases
+	 * @return List of aliases
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
@@ -704,7 +704,7 @@ public interface DocumentService {
 	 */
 	@GET
 	@Path("/getAliases")
-	public WSDocument[] getAliases(long docId)
+	public List<WSDocument> getAliases(long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
@@ -740,7 +740,7 @@ public interface DocumentService {
 	 */
 	@GET
 	@Path("/getDocuments")
-	public WSDocument[] getDocuments(Long[] docIds)
+	public List<WSDocument> getDocuments(List<Long> docIds)
 			throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
@@ -765,7 +765,7 @@ public interface DocumentService {
 	 * 
 	 * @param maxHits Maximum number of returned records
 	 * 
-	 * @return Array of documents
+	 * @return List of documents
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
@@ -773,7 +773,7 @@ public interface DocumentService {
 	 */
 	@GET
 	@Path("/getRecentDocuments")
-	public WSDocument[] getRecentDocuments(Integer maxHits)
+	public List<WSDocument> getRecentDocuments(Integer maxHits)
 			throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
@@ -791,7 +791,7 @@ public interface DocumentService {
 	 */
 	@GET
 	@Path("/getLinks")
-	public WSLink[] getLinks(long docId)
+	public List<WSLink> getLinks(long docId)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
@@ -941,7 +941,7 @@ public interface DocumentService {
 	 * @throws MessagingException Error in the communication with the mail
 	 *         server
 	 */
-	public void sendEmail(Long[] docIds, String recipients, String subject, String message)
+	public void sendEmail(List<Long> docIds, String recipients, String subject, String message)
 			throws AuthenticationException, WebserviceException, PersistenceException, IOException, MessagingException;
 
 	/**
@@ -1022,13 +1022,14 @@ public interface DocumentService {
 	 */
 	@PUT
 	@Path("/setAccessControlList")
-	public void setAccessControlList(@QueryParam("docId") long docId, WSAccessControlEntry[] acl)
+	public void setAccessControlList(@QueryParam("docId") long docId, List<WSAccessControlEntry> acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException;
 
 	/**
 	 * Retrieves the access control list
 	 * 
 	 * @param docId Document id
+	 * 
 	 * @return 'error' if error occurred, the right objects collection
 	 * 
 	 * @throws PermissionException The permission has not been granted
@@ -1038,7 +1039,7 @@ public interface DocumentService {
 	 */
 	@GET
 	@Path("/getAccessControlList")
-	public WSAccessControlEntry[] getAccessControlList(@QueryParam("docId") long docId) 
+	public List<WSAccessControlEntry> getAccessControlList(@QueryParam("docId") long docId) 
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**

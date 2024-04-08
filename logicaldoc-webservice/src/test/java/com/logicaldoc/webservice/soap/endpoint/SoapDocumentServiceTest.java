@@ -87,11 +87,11 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 		WSNote note = docService.addNote("", doc.getId(), "note1");
 		note = docService.addNote("", doc.getId(), "note2");
 
-		WSNote[] notes = docService.getNotes("", doc.getId());
-		Assert.assertEquals(4, notes.length);
+		List<WSNote> notes = docService.getNotes("", doc.getId());
+		Assert.assertEquals(4, notes.size());
 		docService.deleteNote("", note.getId());
 		notes = docService.getNotes("", doc.getId());
-		Assert.assertEquals(3, notes.length);
+		Assert.assertEquals(3, notes.size());
 	}
 
 	@Test
@@ -103,8 +103,8 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 		Assert.assertNotNull(rating);
 		Assert.assertEquals(3, rating.getVote());
 
-		WSRating[] ratings = docService.getRatings("", doc.getId());
-		Assert.assertEquals(1, ratings.length);
+		List<WSRating> ratings = docService.getRatings("", doc.getId());
+		Assert.assertEquals(1, ratings.size());
 	}
 
 	@Test
@@ -265,56 +265,54 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testGetVersions() throws Exception {
-		WSDocument[] versions = docService.getVersions("", 1);
-		Assert.assertEquals(2, versions.length);
-		List<WSDocument> versionsList = Arrays.asList(versions);
-		Assert.assertEquals("testVer02", versionsList.get(0).getVersion());
-		Assert.assertEquals("testVer01", versionsList.get(1).getVersion());
+		List<WSDocument> versions = docService.getVersions("", 1);
+		Assert.assertEquals(2, versions.size());
+		Assert.assertEquals("testVer02", versions.get(0).getVersion());
+		Assert.assertEquals("testVer01", versions.get(1).getVersion());
 
 		versions = docService.getVersions("", 2L);
-		Assert.assertEquals(2, versions.length);
+		Assert.assertEquals(2, versions.size());
 	}
 
 	@Test
 	public void testListDocuments() throws Exception {
-		WSDocument[] docs = docService.listDocuments("", 103, null);
+		List<WSDocument> docs = docService.listDocuments("", 103, null);
 		Assert.assertNotNull(docs);
-		Assert.assertEquals(2, docs.length);
-		List<WSDocument> docsList = Arrays.asList(docs);
-		Assert.assertEquals(1, docsList.get(0).getId());
-		Assert.assertEquals(2, docsList.get(1).getId());
+		Assert.assertEquals(2, docs.size());
+		Assert.assertEquals(1, docs.get(0).getId());
+		Assert.assertEquals(2, docs.get(1).getId());
 
 		docs = docService.listDocuments("", 103, "plo");
 		Assert.assertNotNull(docs);
-		Assert.assertEquals(0, docs.length);
+		Assert.assertEquals(0, docs.size());
 
 		docs = docService.listDocuments("", 103, "*ut*");
 		Assert.assertNotNull(docs);
-		Assert.assertEquals(1, docs.length);
-		Assert.assertEquals("pluto", docs[0].getFileName());
+		Assert.assertEquals(1, docs.size());
+		Assert.assertEquals("pluto", docs.get(0).getFileName());
 
 		docs = docService.listDocuments("", 103, "pippo");
 		Assert.assertNotNull(docs);
-		Assert.assertEquals(1, docs.length);
-		Assert.assertEquals("pippo", docs[0].getFileName());
+		Assert.assertEquals(1, docs.size());
+		Assert.assertEquals("pippo", docs.get(0).getFileName());
 	}
 
 	@Test
 	public void testGetDocuments() throws Exception {
-		WSDocument[] docs = docService.getDocuments("", new Long[] { 1L, 2L, 3L });
+		List<WSDocument> docs = docService.getDocuments("", List.of(1L, 2L, 3L));
 		Assert.assertNotNull(docs);
-		Assert.assertEquals(2, docs.length);
+		Assert.assertEquals(2, docs.size());
 	}
 
 	@Test
 	public void testGetAliases() throws Exception {
-		WSDocument[] docs = docService.getAliases("", 1L);
+		List<WSDocument> docs = docService.getAliases("", 1L);
 		Assert.assertNotNull(docs);
-		Assert.assertEquals(1, docs.length);
+		Assert.assertEquals(1, docs.size());
 
 		docs = docService.getAliases("", 2L);
 		Assert.assertNotNull(docs);
-		Assert.assertEquals(0, docs.length);
+		Assert.assertEquals(0, docs.size());
 	}
 
 	@Test

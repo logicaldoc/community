@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.rest;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -107,12 +109,12 @@ public interface FolderService {
 	@GET
 	@Path("/listChildren")
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	public WSFolder[] listChildren(@QueryParam("folderId")
+	public List<WSFolder> listChildren(@QueryParam("folderId")
 	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	@GET
 	@Path("/getPath")
-	public WSFolder[] getPath(@QueryParam("folderId")
+	public List<WSFolder> getPath(@QueryParam("folderId")
 	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	@GET
@@ -220,7 +222,7 @@ public interface FolderService {
 	 */
 	@GET
 	@Path("/listWorkspaces")
-	public WSFolder[] listWorkspaces() throws AuthenticationException, WebserviceException, PersistenceException;
+	public List<WSFolder> listWorkspaces() throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Tests if a folder is readable.
@@ -321,13 +323,14 @@ public interface FolderService {
 	 */
 	@PUT
 	@Path("/setAccessControlList")
-	public void setAccessControlList(@QueryParam("folderId") long folderId, WSAccessControlEntry[] acl)
+	public void setAccessControlList(@QueryParam("folderId") long folderId, List<WSAccessControlEntry> acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException;
 	
 	/**
 	 * Retrieves the access control list
 	 * 
 	 * @param folderId Folder id
+	 * 
 	 * @return 'error' if error occurred, the right objects collection
 	 * 
 	 * @throws PermissionException The permission has not been granted
@@ -337,6 +340,6 @@ public interface FolderService {
 	 */
 	@GET
 	@Path("/getAccessControlList")
-	public WSAccessControlEntry[] getAccessControlList(@QueryParam("folderId") long folderId) 
+	public List<WSAccessControlEntry> getAccessControlList(@QueryParam("folderId") long folderId) 
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 }

@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.rest;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -44,7 +46,7 @@ public interface BookmarkService {
 
 	@GET
 	@Path("/getBookmarks")
-	public WSBookmark[] getBookmarks()
+	public List<WSBookmark> getBookmarks()
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	@DELETE

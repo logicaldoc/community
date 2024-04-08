@@ -323,7 +323,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Path("/list")
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Operation(summary = "Lists documents by folder", description = "Lists Documents by folder identifier")
-	public WSDocument[] list(@QueryParam("folderId")
+	public List<WSDocument> list(@QueryParam("folderId")
 	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
 		return super.listDocuments(sid, folderId, null);
@@ -333,7 +333,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@GET
 	@Path("/listDocuments")
 	@Operation(summary = "Lists documents by folder and filename", description = "Lists Documents by folder ID filtering the results by filename")
-	public WSDocument[] listDocuments(@QueryParam("folderId")
+	public List<WSDocument> listDocuments(@QueryParam("folderId")
 	long folderId, @QueryParam("fileName")
 	String fileName) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
@@ -421,7 +421,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@GET
 	@Path("/getNotes")
 	@Operation(summary = "Gets all the notes of a document")
-	public WSNote[] getNotes(@QueryParam("docId")
+	public List<WSNote> getNotes(@QueryParam("docId")
 	@Parameter(description = "Document ID", required = true)
 	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
 			UnexistingResourceException {
@@ -447,7 +447,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@GET
 	@Path("/getRatings")
 	@Operation(summary = "Retrieves the different ratings of a focuments")
-	public WSRating[] getRatings(@QueryParam("docId")
+	public List<WSRating> getRatings(@QueryParam("docId")
 	@Parameter(description = "Document ID", required = true)
 	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
 			UnexistingResourceException {
@@ -549,7 +549,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@GET
 	@Path("/getVersions")
 	@Operation(summary = "Gets the versions", description = "Gets the version history of an existing document with the given identifier")
-	public WSDocument[] getVersions(@QueryParam("docId")
+	public List<WSDocument> getVersions(@QueryParam("docId")
 	@Parameter(description = "Document ID", required = true)
 	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
 			UnexistingResourceException {
@@ -631,7 +631,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@GET
 	@Path("/getAliases")
 	@Operation(summary = "Gets the aliases", description = "Gets the aliases of the given document; returns an array of WSDocument that are aliases")
-	public WSDocument[] getAliases(@Parameter(description = "The document ID", required = true)
+	public List<WSDocument> getAliases(@Parameter(description = "The document ID", required = true)
 	@QueryParam("docId")
 	long docId) throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
@@ -653,9 +653,9 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@GET
 	@Path("/getDocuments")
 	@Operation(summary = "Gets the metadata of a collection of document", description = "Gets document metadata of a collection of existing documents with the given identifiers; returns an array of WSDocument")
-	public WSDocument[] getDocuments(@QueryParam("docIds")
-	@Parameter(description = "Array of document IDs", required = true)
-	Long[] docIds) throws AuthenticationException, WebserviceException, PersistenceException {
+	public List<WSDocument> getDocuments(@QueryParam("docIds")
+	@Parameter(description = "List of document IDs", required = true)
+	List<Long> docIds) throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
 		return super.getDocuments(sid, docIds);
 	}
@@ -676,7 +676,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@GET
 	@Path("/getRecentDocuments")
 	@Operation(summary = "Gets the last modified documents", description = "Lists of last modified documents of the current session")
-	public WSDocument[] getRecentDocuments(@QueryParam("maxHits")
+	public List<WSDocument> getRecentDocuments(@QueryParam("maxHits")
 	@Parameter(description = "Maximum number of returned records", required = true)
 	Integer maxHits) throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
@@ -687,7 +687,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@GET
 	@Path("/getLinks")
 	@Operation(summary = "Gets the links of a document", description = "Gets all the links of a specific document; returns an array of links")
-	public WSLink[] getLinks(@QueryParam("docId")
+	public List<WSLink> getLinks(@QueryParam("docId")
 	@Parameter(description = "The document ID", required = true)
 	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
@@ -827,7 +827,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Operation(summary = "Sends documents by email", description = "Sends a set of documents as mail attachments")
 	public void sendEmail(@FormParam("docIds")
 	@Parameter(description = "Document IDs", required = true)
-	Long[] docIds, @FormParam("recipients")
+	List<Long> docIds, @FormParam("recipients")
 	@Parameter(description = "Set of recipients(comma separated)", required = true)
 	String recipients, @FormParam("subject")
 	@Parameter(description = "The email subject")
@@ -972,7 +972,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@PUT
 	@Path("/setAccessControlList")
 	@Operation(operationId = "setAccessControlList_Document", summary = "Assigns the complete Access Control List")
-	public void setAccessControlList(@QueryParam("docId") long docId, WSAccessControlEntry[] acl)
+	public void setAccessControlList(@QueryParam("docId")
+	long docId, List<WSAccessControlEntry> acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
 		String sid = validateSessionREST();
 		super.setAccessControlList(sid, docId, acl);
@@ -982,8 +983,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@GET
 	@Path("/getAccessControlList")
 	@Operation(operationId = "getAccessControlList_Document", summary = "Retrieves the access control list")
-	public WSAccessControlEntry[] getAccessControlList(@QueryParam("docId") long docId)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+	public List<WSAccessControlEntry> getAccessControlList(@QueryParam("docId")
+	long docId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		String sid = validateSessionREST();
 		return super.getAccessControlList(sid, docId);
 	}

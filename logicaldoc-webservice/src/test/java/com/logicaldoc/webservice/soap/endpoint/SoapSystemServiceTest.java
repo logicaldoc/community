@@ -3,6 +3,7 @@ package com.logicaldoc.webservice.soap.endpoint;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -42,13 +43,13 @@ public class SoapSystemServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testGetStatistics() throws Exception {
-		WSParameter[] parameters = systemServiceImpl.getStatistics("");
+		List<WSParameter> parameters = systemServiceImpl.getStatistics("");
 
-		Assert.assertEquals("5437281", parameters[0].getValue());
-		Assert.assertEquals("986753", parameters[6].getValue());
-		Assert.assertEquals("181", parameters[9].getValue());
-		Assert.assertEquals("45", parameters[11].getValue());
-		Assert.assertEquals("2011-02-15 10:46:27", parameters[14].getValue());
-		Assert.assertEquals("0", parameters[4].getValue());
+		Assert.assertEquals("5437281", parameters.get(0).getValue());
+		Assert.assertEquals("986753", parameters.get(6).getValue());
+		Assert.assertEquals("181", parameters.get(9).getValue());
+		Assert.assertEquals("45", parameters.get(11).getValue());
+		Assert.assertEquals("2011-02-15 10:46:27", parameters.get(14).getValue());
+		Assert.assertEquals("0", parameters.get(4).getValue());
 	}
 }

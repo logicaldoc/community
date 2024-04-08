@@ -2,10 +2,10 @@ package com.logicaldoc.core;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public class SystemInfo {
 	protected String url = "https://www.logicaldoc.com";
 
 	protected String forum = "https://forums.logicaldoc.com";
-	
+
 	protected String evaluation = "";
 
 	protected String vendor = "LogicalDOC";
@@ -67,6 +67,13 @@ public class SystemInfo {
 	protected long tenantId = Tenant.DEFAULT_ID;
 
 	protected Date date = new Date();
+
+	/**
+	 * Deducted server's host name
+	 */
+	protected String hostName;
+
+	protected List<String> features = new ArrayList<>();
 
 	protected SystemInfo() {
 	}
@@ -181,13 +188,6 @@ public class SystemInfo {
 		else
 			return 0;
 	}
-
-	/**
-	 * Deducted server's host name
-	 */
-	protected String hostName;
-
-	protected Set<String> features = new HashSet<>();
 
 	public String getProductName() {
 		return productName;
@@ -341,11 +341,11 @@ public class SystemInfo {
 		this.hostName = hostName;
 	}
 
-	public Set<String> getFeatures() {
+	public List<String> getFeatures() {
 		return features;
 	}
 
-	public void setFeatures(Set<String> features) {
+	public void setFeatures(List<String> features) {
 		this.features = features;
 	}
 

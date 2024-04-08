@@ -39,38 +39,38 @@ public class SoapSystemService extends AbstractService implements SystemService 
 	protected static Logger log = LoggerFactory.getLogger(SoapSystemService.class);
 
 	@Override
-	public WSParameter[] getStatistics(String sid)
+	public List<WSParameter> getStatistics(String sid)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		validateSession(sid);
 
-		WSParameter[] parameters = new WSParameter[15];
+		List<WSParameter> parameters = new ArrayList<>();
 		try {
 			/*
 			 * Repository statistics
 			 */
 			WSParameter docDirSize = getDocDirSize();
-			parameters[0] = docDirSize;
+			parameters.add(docDirSize);
 
 			WSParameter userDirSize = getUserDirSize();
-			parameters[1] = userDirSize;
+			parameters.add(userDirSize);
 
 			WSParameter indexDirSize = getIndexDirSize();
-			parameters[2] = indexDirSize;
+			parameters.add(indexDirSize);
 
 			WSParameter importDirSize = getImportDirSize();
-			parameters[3] = importDirSize;
+			parameters.add(importDirSize);
 
 			WSParameter exportDirSize = getExportDirSize();
-			parameters[4] = exportDirSize;
+			parameters.add(exportDirSize);
 
 			WSParameter pluginsDirSize = getPluginsDirSize();
-			parameters[5] = pluginsDirSize;
+			parameters.add(pluginsDirSize);
 
 			WSParameter dbDirSize = getDbDirSize();
-			parameters[6] = dbDirSize;
+			parameters.add(dbDirSize);
 
 			WSParameter logsDirSize = getLogsDirSize();
-			parameters[7] = logsDirSize;
+			parameters.add(logsDirSize);
 
 			/*
 			 * Document statistics
@@ -80,19 +80,19 @@ public class SoapSystemService extends AbstractService implements SystemService 
 			WSParameter notIndexed = new WSParameter();
 			notIndexed.setName("docs_notindexed");
 			notIndexed.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
-			parameters[8] = notIndexed;
+			parameters.add(notIndexed);
 
 			gen = genDao.findByAlternateKey(StatsCollector.STAT, "indexeddocs", null, Tenant.DEFAULT_ID);
 			WSParameter indexed = new WSParameter();
 			indexed.setName("docs_indexed");
 			indexed.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
-			parameters[9] = indexed;
+			parameters.add(indexed);
 
 			gen = genDao.findByAlternateKey(StatsCollector.STAT, "deleteddocs", null, Tenant.DEFAULT_ID);
 			WSParameter deletedDocs = new WSParameter();
 			deletedDocs.setName("docs_trash");
 			deletedDocs.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
-			parameters[10] = deletedDocs;
+			parameters.add(deletedDocs);
 
 			/*
 			 * Folders statistics
@@ -101,19 +101,19 @@ public class SoapSystemService extends AbstractService implements SystemService 
 			WSParameter notEmptyFolders = new WSParameter();
 			notEmptyFolders.setName("folder_withdocs");
 			notEmptyFolders.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
-			parameters[11] = notEmptyFolders;
+			parameters.add(notEmptyFolders);
 
 			gen = genDao.findByAlternateKey(StatsCollector.STAT, "empty", null, Tenant.DEFAULT_ID);
 			WSParameter emptyFolders = new WSParameter();
 			emptyFolders.setName("folder_empty");
 			emptyFolders.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
-			parameters[12] = emptyFolders;
+			parameters.add(emptyFolders);
 
 			gen = genDao.findByAlternateKey(StatsCollector.STAT, "deletedfolders", null, Tenant.DEFAULT_ID);
 			WSParameter deletedFolders = new WSParameter();
 			deletedFolders.setName("folder_trash");
 			deletedFolders.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
-			parameters[13] = deletedFolders;
+			parameters.add(deletedFolders);
 
 			/*
 			 * Last run
@@ -128,7 +128,7 @@ public class SoapSystemService extends AbstractService implements SystemService 
 			} else {
 				lastrun.setValue("");
 			}
-			parameters[14] = lastrun;
+			parameters.add(lastrun);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -181,7 +181,7 @@ public class SoapSystemService extends AbstractService implements SystemService 
 	}
 
 	@Override
-	public String[] getLanguages(String tenantOrSid) {
+	public List<String> getLanguages(String tenantOrSid) {
 		List<String> langs = new ArrayList<>();
 
 		String t = Tenant.DEFAULT_NAME;
@@ -199,18 +199,18 @@ public class SoapSystemService extends AbstractService implements SystemService 
 			log.error(e.getMessage(), e);
 		}
 
-		return langs.toArray(new String[0]);
+		return langs;
 	}
 
 	@Override
 	public WSSystemInfo getInfo() throws WebserviceException {
 		try {
 			SystemInfo info = SystemInfo.get();
-			
+
 			WSSystemInfo wsInfo = new WSSystemInfo();
 			BeanUtils.copyProperties(wsInfo, info);
-			
-			wsInfo.setFeatures(info.getFeatures().toArray(new String[0]));
+
+			wsInfo.setFeatures(new ArrayList<>(info.getFeatures()));
 
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 			wsInfo.setDate(df.format(info.getDate()));

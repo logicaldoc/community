@@ -1,14 +1,11 @@
 package com.logicaldoc.webservice;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.searchengine.SearchOptions;
-import com.logicaldoc.util.time.DateUtil;
 import com.logicaldoc.webservice.model.WSAttribute;
 import com.logicaldoc.webservice.model.WSBookmark;
 import com.logicaldoc.webservice.model.WSDocument;
@@ -19,7 +16,6 @@ import com.logicaldoc.webservice.model.WSSearchOptions;
 import com.logicaldoc.webservice.model.WSSearchResult;
 import com.logicaldoc.webservice.model.WSTemplate;
 import com.logicaldoc.webservice.model.WSUser;
-import com.logicaldoc.webservice.model.WSWorkingTime;
 import com.logicaldoc.webservice.soap.client.SoapAuthClient;
 import com.logicaldoc.webservice.soap.client.SoapBookmarkClient;
 import com.logicaldoc.webservice.soap.client.SoapDocumentClient;
@@ -194,20 +190,18 @@ public class SoapWorkbench {
 		wsUserTest.setDepartment("Department");
 		wsUserTest.setOrganizationalUnit("OrganizationalUnit");
 		wsUserTest.setBuilding("Building");
-		long[] ids = { 2, 3 };
-		wsUserTest.setGroupIds(ids);
+		wsUserTest.setGroupIds(Arrays.asList(2L, 3L));
 
 		Long userId = securityClient.storeUser(sid, wsUserTest);
 		System.out.println("user id: " + userId);
 //		securityClient.changePassword(sid, userId, null, "marco1982");
 
 		wsUserTest = securityClient.getUser(sid, userId);
-		System.out.println("Retrieved user "+userId);
-		System.out.println("Department: "+wsUserTest.getDepartment());
-		System.out.println("Building: "+wsUserTest.getBuilding());
-		System.out.println("OrganizationalUnit: "+wsUserTest.getOrganizationalUnit());
-		
-		
+		System.out.println("Retrieved user " + userId);
+		System.out.println("Department: " + wsUserTest.getDepartment());
+		System.out.println("Building: " + wsUserTest.getBuilding());
+		System.out.println("OrganizationalUnit: " + wsUserTest.getOrganizationalUnit());
+
 //		WSWorkingTime wt = new WSWorkingTime(2, 9, 0);
 //		wsUserTest.setWorkingTimes(new WSWorkingTime[] { wt });
 //		securityClient.storeUser(sid, wsUserTest);
@@ -329,12 +323,12 @@ public class SoapWorkbench {
 		System.out.println("Created note: " + note.getId() + " - " + note.getUsername() + " - " + note.getMessage());
 		note = docClient.addNote(sid, doc.getId(), "Test note 2");
 		System.out.println("Created note: " + note.getId() + " - " + note.getUsername() + " - " + note.getMessage());
-		WSNote[] notes = docClient.getNotes(sid, doc.getId());
-		System.out.println("Found " + notes.length + " notes");
+		List<WSNote> notes = docClient.getNotes(sid, doc.getId());
+		System.out.println("Found " + notes.size() + " notes");
 		docClient.deleteNote(sid, note.getId());
 		System.out.println("Deleted note " + note.getId());
 		notes = docClient.getNotes(sid, doc.getId());
-		System.out.println("Found " + notes.length + " notes");
+		System.out.println("Found " + notes.size() + " notes");
 	}
 
 	private static void ratingStuff(String sid) throws Exception {
@@ -348,16 +342,16 @@ public class SoapWorkbench {
 			}
 		}
 
-		WSRating[] ratings = docClient.getRatings(sid, doc.getId());
+		List<WSRating> ratings = docClient.getRatings(sid, doc.getId());
 		if (ratings != null)
-			System.out.println("Found " + ratings.length + " ratings");
+			System.out.println("Found " + ratings.size() + " ratings");
 
 		WSRating rating = docClient.rateDocument(sid, doc.getId(), 3);
 		System.out.println("Created rating: " + rating.getUsername() + " - " + rating.getVote());
 
 		ratings = docClient.getRatings(sid, doc.getId());
 		if (ratings != null)
-			System.out.println("Found " + ratings.length + " ratings");
+			System.out.println("Found " + ratings.size() + " ratings");
 	}
 
 	private static void bookmarkStuff(String sid) throws Exception {
@@ -372,45 +366,45 @@ public class SoapWorkbench {
 		}
 
 		SoapBookmarkClient bClient = new SoapBookmarkClient(BASE + "/Bookmark");
-		WSBookmark[] bookmarks = bClient.getBookmarks(sid);
+		List<WSBookmark> bookmarks = bClient.getBookmarks(sid);
 		if (bookmarks != null)
-			System.out.println("Found " + bookmarks.length + " bookmarks");
+			System.out.println("Found " + bookmarks.size() + " bookmarks");
 
 		WSBookmark bookmark = bClient.bookmarkDocument(sid, doc.getId());
 		System.out.println("Created bookmark: " + bookmark.getTitle() + " - " + bookmark.getFileType());
 
 		bookmarks = bClient.getBookmarks(sid);
 		if (bookmarks != null)
-			System.out.println("Found " + bookmarks.length + " bookmarks");
+			System.out.println("Found " + bookmarks.size() + " bookmarks");
 	}
 
 	private static void tagStuff(String sid) throws Exception {
 		SoapTagClient tagClient = new SoapTagClient(BASE + "/Tag");
-		List<String> tags = Arrays.asList(tagClient.getTags(sid));
+		List<String> tags = tagClient.getTags(sid);
 		System.out.println("Found tags " + tags);
 		for (String tag : tags) {
-			WSDocument[] docs = tagClient.findDocumentsByTag(sid, tag);
-			if (docs != null && docs.length > 0) {
-				System.out.println("Found " + docs.length + " documents tagged with '" + tag + "'");
+			List<WSDocument> docs = tagClient.findDocumentsByTag(sid, tag);
+			if (docs != null && docs.size() > 0) {
+				System.out.println("Found " + docs.size() + " documents tagged with '" + tag + "'");
 				for (WSDocument doc : docs)
-					tagClient.addDocumentTags(sid, doc.getId(), new String[] { "xyz" });
+					tagClient.addDocumentTags(sid, doc.getId(), Arrays.asList("xyz"));
 				break;
 			}
 		}
 
 		for (String tag : tags) {
-			WSFolder[] folders = tagClient.findFoldersByTag(sid, tag);
-			if (folders != null && folders.length > 0) {
-				System.out.println("Found " + folders.length + " folders tagged with '" + tag + "'");
+			List<WSFolder> folders = tagClient.findFoldersByTag(sid, tag);
+			if (folders != null && folders.size() > 0) {
+				System.out.println("Found " + folders.size() + " folders tagged with '" + tag + "'");
 				for (WSFolder folder : folders)
-					tagClient.addFolderTags(sid, folder.getId(), new String[] { "xyz" });
+					tagClient.addFolderTags(sid, folder.getId(), Arrays.asList("xyz"));
 				break;
 			}
 		}
 
-		String[] tgs = tagClient.getTagsPreset(sid);
+		List<String> tgs = tagClient.getTagsPreset(sid);
 		if (tgs != null) {
-			tags = Arrays.asList(tagClient.getTagsPreset(sid));
+			tags = tagClient.getTagsPreset(sid);
 			System.out.println("Found tags in preset: " + tags);
 		} else
 			System.out.println("No tags in preset");
@@ -481,7 +475,7 @@ public class SoapWorkbench {
 		opt.setRetrieveAliases(0);
 
 		WSSearchResult result = searchClient.find(sid, opt);
-		System.out.println("---- " + result.getHits().length);
+		System.out.println("---- " + result.getHits().size());
 		for (WSDocument hit : result.getHits()) {
 			System.out.println("hit customid: " + hit.getCustomId());
 			if (hit.getDocRef() != null)
@@ -491,10 +485,10 @@ public class SoapWorkbench {
 			System.out.println("hit fileName: " + hit.getFileName());
 			System.out.println("hit creation: " + hit.getCreation());
 			System.out.println("hit summary: " + hit.getSummary());
-			System.out.println("hit tags: " + hit.getTags().length + " "
+			System.out.println("hit tags: " + hit.getTags().size() + " "
 					+ (hit.getTags() != null ? Arrays.asList(hit.getTags()) : ""));
 			System.out.println(">> hit attributes: " + hit.getAttributes() != null
-					? Arrays.asList(hit.getAttributes()).stream().map(h -> h.getName()).collect(Collectors.toList())
+					? hit.getAttributes().stream().map(h -> h.getName()).collect(Collectors.toList())
 					: "");
 			System.out.println("************************");
 		}
@@ -504,12 +498,11 @@ public class SoapWorkbench {
 	private static void searchByFilename(String sid, String filename) throws Exception {
 		SoapSearchClient searchClient = new SoapSearchClient(BASE + "/Search");
 
-		WSDocument[] documents = searchClient.findByFilename(sid, filename);
+		List<WSDocument> documents = searchClient.findByFilename(sid, filename);
 		if (documents != null) {
-			System.out.println("---- " + documents.length);
+			System.out.println("---- " + documents.size());
 
-			List<WSDocument> docsList = Arrays.asList(documents);
-			for (WSDocument doc : docsList) {
+			for (WSDocument doc : documents) {
 				System.out.println("title: " + doc.getFileName());
 				System.out.println("custom id: " + doc.getCustomId());
 				System.out.println("version: " + doc.getVersion());
@@ -527,18 +520,16 @@ public class SoapWorkbench {
 		SoapDocumentClient documentClient = new SoapDocumentClient(BASE + "/Document");
 
 		WSDocument doc = documentClient.getDocument(sid, 723741317L);
-		
+
 		doc.setId(0);
 		doc.setCustomId(null);
 		doc.setFileName("test2.pdf");
 		documentClient.create(sid, doc, new File("C:\\Users\\marco\\Documents\\FAX AIMAG.pdf"));
-		
-		
+
 		System.out.println(doc);
-		
+
 //		documentClient.move(sid, 723734049L, 253984768L);
-		
-		
+
 		// WSDocument doc = documentClient.getDocument(sid, 735L);
 
 //		documentClient.deleteLink(sid, 102L);
@@ -765,7 +756,7 @@ public class SoapWorkbench {
 	}
 
 	private static void metadataStuff(SoapDocumentMetadataClient metadataClient, String sid) throws Exception {
-		WSTemplate[] templates = metadataClient.listTemplates(sid);
+		List<WSTemplate> templates = metadataClient.listTemplates(sid);
 
 		for (WSTemplate wsTemplate : templates) {
 			System.out.println("\nProcessing template " + wsTemplate.getName());

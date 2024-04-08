@@ -136,7 +136,7 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 	}
 
 	@Override
-	public WSBookmark[] getBookmarks(String sid)
+	public List<WSBookmark> getBookmarks(String sid)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
@@ -144,7 +144,7 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 		List<WSBookmark> wsBookmarks = new ArrayList<>();
 		for (Bookmark bookmark : list)
 			wsBookmarks.add(WSBookmark.fromBookmark(bookmark));
-		return wsBookmarks.toArray(new WSBookmark[0]);
+		return wsBookmarks;
 	}
 
 	@Override

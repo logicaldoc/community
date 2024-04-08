@@ -10,6 +10,7 @@ import static org.junit.Assert.fail;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -174,7 +175,7 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 		ace.setUserId(user.getId());
 		ace.setGroupId(user.getUserGroup().getId());
 
-		soapFolderService.setAccessControlList("", 80L, new WSAccessControlEntry[] { ace });
+		soapFolderService.setAccessControlList("", 80L, List.of(ace));
 
 		// Because of these methods use JDBC directly, they fails when the test
 		// is executed by maven. Probably the folder groups are not already
@@ -188,9 +189,8 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 	@Test
 	public void testGetAccessControlList() {
 		try {
-			WSAccessControlEntry[] acl = new WSAccessControlEntry[0];
-			acl = soapFolderService.getAccessControlList("", 80);
-			assertEquals(4, acl.length);
+			List<WSAccessControlEntry> acl = soapFolderService.getAccessControlList("", 80);
+			assertEquals(4, acl.size());
 		} catch (Exception e) {
 			// Nothing to do
 		}
@@ -198,9 +198,9 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testListWorkspaces() throws Exception {
-		WSFolder[] folders = soapFolderService.listWorkspaces("");
+		List<WSFolder> folders = soapFolderService.listWorkspaces("");
 		assertNotNull(folders);
-		assertEquals(1, folders.length);
-		assertEquals("Default", folders[0].getName());
+		assertEquals(1, folders.size());
+		assertEquals("Default", folders.get(0).getName());
 	}
 }

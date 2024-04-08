@@ -1,5 +1,8 @@
 package com.logicaldoc.webservice.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlType;
 
 import com.logicaldoc.util.SnippetStripper;
@@ -16,7 +19,7 @@ public class WSSearchResult {
 
 	private long estimatedHitsNumber = 0;
 
-	private WSDocument[] hits = new WSDocument[0];
+	private List<WSDocument> hits = new ArrayList<>();
 
 	private int moreHits = 0;
 
@@ -54,13 +57,13 @@ public class WSSearchResult {
 		this.moreHits = moreHits;
 	}
 
-	public WSDocument[] getHits() {
+	public List<WSDocument> getHits() {
 		return hits;
 	}
 
-	public void setHits(WSDocument[] hits) {
+	public void setHits(List<WSDocument> hits) {
 		this.hits = hits;
-		for (WSDocument hit : hits) {
+		for (WSDocument hit : this.hits) {
 			if (hit.getSummary() != null)
 				hit.setSummary(SnippetStripper.strip(hit.getSummary()));
 		}

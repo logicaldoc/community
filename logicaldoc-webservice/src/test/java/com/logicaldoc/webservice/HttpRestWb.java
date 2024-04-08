@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -390,7 +391,7 @@ public class HttpRestWb {
 													// index violation:
 													// AK_DOCUMENT; SQL [n/a];
 													// constraint [null];
-		wsDoc.setTags(new String[] { "Invoice", "Processing", "workflow" });
+		wsDoc.setTags(Arrays.asList("Invoice", "Processing", "workflow"));
 		wsDoc.setFolderId(4L);
 		wsDoc.setFileName(f.getName());
 

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	protected static Logger log = LoggerFactory.getLogger(SoapSecurityService.class);
 
 	@Override
-	public WSUser[] listUsers(String sid, String group)
+	public List<WSUser> listUsers(String sid, String group)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
@@ -61,7 +62,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				}
 			}
 
-			return users.toArray(new WSUser[0]);
+			return users;
 		} catch (Exception t) {
 			throw new PersistenceException(t.getMessage());
 		}
@@ -90,7 +91,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	}
 
 	@Override
-	public WSGroup[] listGroups(String sid) throws WebserviceException, PersistenceException {
+	public List<WSGroup> listGroups(String sid) throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 		User user = validateSession(sid);
 
@@ -103,7 +104,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 					groups.add(WSGroup.fromGroup(grp));
 				}
 			}
-			return groups.toArray(new WSGroup[0]);
+			return groups;
 		} catch (Exception t) {
 			throw new PersistenceException(t.getMessage());
 		}
@@ -161,7 +162,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				usr.setEnforceWorkingTime(wsUser.getEnforceWorkingTime());
 				usr.setMaxInactivity(wsUser.getMaxInactivity());
 
-				if (wsUser.getWorkingTimes() != null && wsUser.getWorkingTimes().length > 0)
+				if (CollectionUtils.isNotEmpty(wsUser.getWorkingTimes()))
 					for (WSWorkingTime wswt : wsUser.getWorkingTimes()) {
 						WorkingTime wt = new WorkingTime();
 						BeanUtils.copyProperties(wt, wswt);
@@ -175,7 +176,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 			dao.store(usr);
 
-			if (wsUser.getGroupIds() != null && wsUser.getGroupIds().length > 0) {
+			if (CollectionUtils.isNotEmpty(wsUser.getGroupIds())) {
 				usr.removeGroupMemberships(null);
 				for (long groupId : wsUser.getGroupIds())
 					usr.addGroup(gDao.findById(groupId));
@@ -221,7 +222,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			if (StringUtils.isEmpty(grp.getName()))
 				throw new PersistenceException("Missing mandatory value 'Name'");
 
-			if (group.getUserIds() != null && group.getUserIds().length > 0) {
+			if (CollectionUtils.isNotEmpty(group.getUserIds())) {
 
 				UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 				for (User usr : grp.getUsers()) {

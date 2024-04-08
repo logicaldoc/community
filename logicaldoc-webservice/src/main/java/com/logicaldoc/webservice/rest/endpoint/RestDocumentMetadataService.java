@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.rest.endpoint;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -47,7 +49,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	public void setAttributeOptions(@QueryParam("setId")
 	long setId, @QueryParam("attribute")
 	String attribute, @QueryParam("options")
-	WSAttributeOption[] options) throws WebserviceException, PersistenceException {
+	List<WSAttributeOption> options) throws WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
 		super.setAttributeOptions(sid, setId, attribute, options);
 	}
@@ -119,7 +121,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@GET
 	@Path("/getAttributeOptions")
 	@Operation(summary = "Retrieves the options for the given attribute", description = "Returns the list of all the attribute's options")
-	public String[] getAttributeOptions(@Parameter(description = "Attribute set identifier (ID)")
+	public List<String> getAttributeOptions(@Parameter(description = "Attribute set identifier (ID)")
 	@QueryParam("setId")
 	long setId, @Parameter(description = "The attribute's name")
 	@QueryParam("attribute")
@@ -132,7 +134,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@GET
 	@Path("/listAttributeSets")
 	@Operation(summary = "Lists the attribute sets", description = "Gets metadata of all existing attribute sets")
-	public WSAttributeSet[] listAttributeSets()
+	public List<WSAttributeSet> listAttributeSets()
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
 		return super.listAttributeSets(sid);
@@ -164,7 +166,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@GET
 	@Path("/listTemplates")
 	@Operation(summary = "Lists all the templates", description = "Gets metadata of all existing templates")
-	public WSTemplate[] listTemplates() throws AuthenticationException, WebserviceException, PersistenceException {
+	public List<WSTemplate> listTemplates() throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
 		return super.listTemplates(sid);
 	}
@@ -178,7 +180,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	public void setAttributeOptionsPOST(@Multipart(value = "setId")
 	Long setId, @Multipart(value = "attribute")
 	String attribute, @Multipart(value = "options", type = "application/json")
-	WSAttributeOption[] options) throws WebserviceException, PersistenceException {
+	List<WSAttributeOption> options) throws WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
 		super.setAttributeOptions(sid, setId, attribute, options);
 	}
@@ -190,7 +192,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 		@Schema(type = "string", required = true, description = "Attribute name")
 		private String attribute;
 
-		private WSAttributeOption[] options;
+		private List<WSAttributeOption> options;
 
 		public String getSetId() {
 			return setId;
@@ -208,11 +210,11 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 			this.attribute = attribute;
 		}
 
-		public WSAttributeOption[] getOptions() {
+		public List<WSAttributeOption> getOptions() {
 			return options;
 		}
 
-		public void setOptions(WSAttributeOption[] options) {
+		public void setOptions(List<WSAttributeOption> options) {
 			this.options = options;
 		}
 	}

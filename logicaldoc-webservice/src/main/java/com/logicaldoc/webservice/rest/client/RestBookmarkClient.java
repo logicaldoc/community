@@ -1,6 +1,7 @@
 package com.logicaldoc.webservice.rest.client;
 
 import java.util.Arrays;
+import java.util.List;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -77,7 +78,7 @@ public class RestBookmarkClient extends AbstractRestClient {
 	/**
 	 * Retrieves all the bookmarks of the current user
 	 * 
-	 * @return array of bookmarks
+	 * @return list of bookmarks
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -87,7 +88,7 @@ public class RestBookmarkClient extends AbstractRestClient {
 	 */
 	@GET
 	@Path("/getBookmarks")
-	public WSBookmark[] getBookmarks() throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public List<WSBookmark> getBookmarks() throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.getBookmarks();

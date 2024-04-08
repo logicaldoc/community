@@ -1,6 +1,7 @@
 package com.logicaldoc.webservice.rest.client;
 
 import java.util.Arrays;
+import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
@@ -49,7 +50,7 @@ public class RestFolderClient extends AbstractRestClient {
 		}
 	}
 
-	public WSFolder[] listChildren(long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	public List<WSFolder> listChildren(long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.listChildren(folderId);

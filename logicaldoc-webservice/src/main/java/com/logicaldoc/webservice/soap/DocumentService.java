@@ -1,6 +1,7 @@
 package com.logicaldoc.webservice.soap;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.activation.DataHandler;
 import javax.jws.WebMethod;
@@ -274,17 +275,17 @@ public interface DocumentService {
 	@WebMethod(action = "getDocuments")
 	@WebResult(name = "documents")
 	@WSDoc(description = "gets document metadata of a collection of existing documents with the given identifiers; returns an array of WSDocument")
-	public WSDocument[] getDocuments(@WSDoc(description = "identifier of the session", required = true)
+	public List<WSDocument> getDocuments(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "docIds")
-	Long[] docIds) throws AuthenticationException, WebserviceException, PersistenceException;
+	List<Long> docIds) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Gets the aliases of the given document
 	 * 
 	 * @param sid identifier of the session
 	 * @param docId The master document ID
-	 * @return Arrays of aliases
+	 * @return List of aliases
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -293,7 +294,7 @@ public interface DocumentService {
 	@WebMethod(action = "getAliases")
 	@WebResult(name = "aliases")
 	@WSDoc(description = "gets the aliases of the given document; returns an array of WSDocument that are aliases")
-	public WSDocument[] getAliases(@WSDoc(description = "identifier of the session", required = true)
+	public List<WSDocument> getAliases(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WSDoc(description = "Document ID")
 	@WebParam(name = "docId")
@@ -540,8 +541,8 @@ public interface DocumentService {
 	long docId, @WebParam(name = "fileVersion")
 	String fileVersion, @WebParam(name = "comment")
 	String comment, @WebParam(name = "content")
-	DataHandler content)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException, IOException, UnexistingResourceException;
+	DataHandler content) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException,
+			IOException, UnexistingResourceException;
 
 	/**
 	 * Promotes an old version to the current default one. If you promote a
@@ -567,8 +568,8 @@ public interface DocumentService {
 	String sid, @WSDoc(description = "the document id")
 	@WebParam(name = "docId")
 	long docId, @WebParam(name = "version")
-	String version)
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException, IOException, UnexistingResourceException;
+	String version) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException,
+			IOException, UnexistingResourceException;
 
 	/**
 	 * Creates a new document or updates an existing one.
@@ -673,7 +674,7 @@ public interface DocumentService {
 	 * @param sid identifier of the session
 	 * @param docId The document id
 	 * 
-	 * @return Array of versions
+	 * @return Collection of versions
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -685,11 +686,12 @@ public interface DocumentService {
 	@WebMethod(action = "getVersions")
 	@WebResult(name = "version")
 	@WSDoc(description = "gets the versions' history of a document; returns an array of versions")
-	public WSDocument[] getVersions(@WSDoc(description = "identifier of the session", required = true)
+	public List<WSDocument> getVersions(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WSDoc(description = "the document id")
 	@WebParam(name = "docId")
-	long docId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException, UnexistingResourceException;
+	long docId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException,
+			UnexistingResourceException;
 
 	/**
 	 * Gets a specific version
@@ -716,7 +718,8 @@ public interface DocumentService {
 	@WebParam(name = "docId")
 	long docId, @WSDoc(description = "the version number")
 	@WebParam(name = "version")
-	String version) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException, UnexistingResourceException;
+	String version) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException,
+			UnexistingResourceException;
 
 	/**
 	 * Gets the documents in a specific folder
@@ -736,7 +739,7 @@ public interface DocumentService {
 	@WebMethod(action = "listDocuments")
 	@WebResult(name = "document")
 	@WSDoc(description = "gets the documents in a specific folder")
-	public WSDocument[] listDocuments(@WSDoc(description = "identifier of the session", required = true)
+	public List<WSDocument> listDocuments(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "folderId")
 	long folderId, @WSDoc(description = "file name filter", required = false)
@@ -749,7 +752,7 @@ public interface DocumentService {
 	 * @param sid identifier of the session
 	 * @param maxHits Maximum number of returned records
 	 * 
-	 * @return Array of documents
+	 * @return List of documents
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -758,7 +761,7 @@ public interface DocumentService {
 	@WebMethod(action = "getRecentDocuments")
 	@WebResult(name = "document")
 	@WSDoc(description = "lists of last modified documents in the current session")
-	public WSDocument[] getRecentDocuments(@WSDoc(description = "identifier of the session", required = true)
+	public List<WSDocument> getRecentDocuments(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WSDoc(description = "max number of returned records", required = false)
 	@WebParam(name = "maxHits")
@@ -784,7 +787,7 @@ public interface DocumentService {
 	public void sendEmail(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "docIds")
-	Long[] docIds, @WSDoc(description = "comma separated list of email addresses")
+	List<Long> docIds, @WSDoc(description = "comma separated list of email addresses")
 	@WebParam(name = "recipients")
 	String recipients, @WebParam(name = "subject")
 	String subject, @WebParam(name = "message")
@@ -870,7 +873,7 @@ public interface DocumentService {
 	@WebMethod(action = "getLinks")
 	@WebResult(name = "link")
 	@WSDoc(description = "gets all the links of a specific document; returns an array of links")
-	public WSLink[] getLinks(@WSDoc(description = "identifier of the session", required = true)
+	public List<WSLink> getLinks(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WSDoc(description = "the document id")
 	@WebParam(name = "docId")
@@ -1199,7 +1202,7 @@ public interface DocumentService {
 	 * @param sid identifier of the session
 	 * @param docId identifier of the document
 	 * 
-	 * @return array of notes
+	 * @return list of notes
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -1211,11 +1214,12 @@ public interface DocumentService {
 	@WebMethod(action = "getNotes")
 	@WebResult(name = "note")
 	@WSDoc(description = "gets the notes for the given document")
-	public WSNote[] getNotes(@WSDoc(description = "identifier of the session", required = true)
+	public List<WSNote> getNotes(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WSDoc(description = "the document id")
 	@WebParam(name = "docId")
-	long docId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException, UnexistingResourceException;
+	long docId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException,
+			UnexistingResourceException;
 
 	/**
 	 * Deletes a version of a document with the given identifiers. You can not
@@ -1266,7 +1270,8 @@ public interface DocumentService {
 	String sid, @WSDoc(description = "the document id")
 	@WebParam(name = "docId")
 	long docId, @WebParam(name = "vote")
-	int vote) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException, UnexistingResourceException;
+	int vote) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException,
+			UnexistingResourceException;
 
 	/**
 	 * Gets all the ratings of the given document
@@ -1274,7 +1279,7 @@ public interface DocumentService {
 	 * @param sid identifier of the session
 	 * @param docId identifier of the document
 	 * 
-	 * @return array of ratings
+	 * @return List of ratings
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -1286,11 +1291,12 @@ public interface DocumentService {
 	@WebMethod(action = "getRatings")
 	@WebResult(name = "rating")
 	@WSDoc(description = "gets all the ratings of the given document")
-	public WSRating[] getRatings(@WSDoc(description = "identifier of the session", required = true)
+	public List<WSRating> getRatings(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WSDoc(description = "the document id")
 	@WebParam(name = "docId")
-	long docId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException, UnexistingResourceException;
+	long docId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException,
+			UnexistingResourceException;
 
 	/**
 	 * Sets the Access Control List
@@ -1312,7 +1318,7 @@ public interface DocumentService {
 	String sid, @WebParam(name = "docId")
 	long docId, @WSDoc(description = "the complete Access Control List")
 	@WebParam(name = "acl")
-	WSAccessControlEntry[] acl)
+	List<WSAccessControlEntry> acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException;
 
 	/**
@@ -1329,7 +1335,7 @@ public interface DocumentService {
 	 */
 	@WebMethod(action = "getAccessControlList")
 	@WSDoc(description = "retrieves the access control list")
-	public WSAccessControlEntry[] getAccessControlList(
+	public List<WSAccessControlEntry> getAccessControlList(
 			@WSDoc(description = "identifier of the session", required = true)
 			@WebParam(name = "sid")
 			String sid, @WebParam(name = "docId")

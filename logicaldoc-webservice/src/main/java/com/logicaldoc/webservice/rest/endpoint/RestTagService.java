@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.rest.endpoint;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -42,7 +44,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	public void setDocumentTags(@Parameter(description = "Document ID", required = true)
 	@FormParam("docId")
 	long docId, @FormParam("tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+	List<String> tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
 			UnexistingResourceException {
 		String sid = validateSessionREST();
 		super.setDocumentTags(sid, docId, tags);
@@ -56,18 +58,20 @@ public class RestTagService extends SoapTagService implements TagService {
 	public void addDocumentTags(@Parameter(description = "Document ID", required = true)
 	@FormParam("docId")
 	long docId, @FormParam("tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, UnexistingResourceException {
+	List<String> tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			UnexistingResourceException {
 		String sid = validateSessionREST();
-			super.addDocumentTags(sid, docId, tags);
+		super.addDocumentTags(sid, docId, tags);
 	}
 
 	@Override
 	@GET
 	@Path("/getDocumentTags")
 	@Operation(summary = "Gets all the tags of a document")
-	public String[] getDocumentTags(@Parameter(description = "Document ID", required = true)
+	public List<String> getDocumentTags(@Parameter(description = "Document ID", required = true)
 	@QueryParam("docId")
-	long docId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException, UnexistingResourceException {
+	long docId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException,
+			UnexistingResourceException {
 		String sid = validateSessionREST();
 		return super.getDocumentTags(sid, docId);
 	}
@@ -80,7 +84,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	public void setFolderTags(@Parameter(description = "Folder ID", required = true)
 	@FormParam("folderId")
 	long folderId, @FormParam("tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	List<String> tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
 		super.setFolderTags(sid, folderId, tags);
 	}
@@ -93,7 +97,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	public void addFolderTags(@Parameter(description = "Folder ID", required = true)
 	@FormParam("folderId")
 	long folderId, @FormParam("tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+	List<String> tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
 		super.addFolderTags(sid, folderId, tags);
 	}
@@ -102,7 +106,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@GET
 	@Path("/getFolderTags")
 	@Operation(summary = "Gets all the tags of a folder")
-	public String[] getFolderTags(@Parameter(description = "Folder ID", required = true)
+	public List<String> getFolderTags(@Parameter(description = "Folder ID", required = true)
 	@QueryParam("folderId")
 	long folderId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException {
 		String sid = validateSessionREST();
@@ -113,7 +117,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@GET
 	@Path("/getTags")
 	@Operation(summary = "Gets all the tags used in the sysem")
-	public String[] getTags() throws AuthenticationException, PersistenceException, WebserviceException {
+	public List<String> getTags() throws AuthenticationException, PersistenceException, WebserviceException {
 		String sid = validateSessionREST();
 		return super.getTags(sid);
 	}
@@ -122,7 +126,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@GET
 	@Path("/getTagCloud")
 	@Operation(summary = "Retrieves all tag clouds in the repository")
-	public WSTagCloud[] getTagCloud() throws AuthenticationException, PersistenceException, WebserviceException {
+	public List<WSTagCloud> getTagCloud() throws AuthenticationException, PersistenceException, WebserviceException {
 		String sid = validateSessionREST();
 		return super.getTagCloud(sid);
 	}
@@ -131,7 +135,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@GET
 	@Path("/findDocumentsByTag")
 	@Operation(summary = "Finds authorized documents for the current user having a specified tag")
-	public WSDocument[] findDocumentsByTag(@Parameter(description = "The tag", required = true)
+	public List<WSDocument> findDocumentsByTag(@Parameter(description = "The tag", required = true)
 	@QueryParam("tag")
 	String tag) throws AuthenticationException, PersistenceException, WebserviceException {
 		String sid = validateSessionREST();
@@ -142,7 +146,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@GET
 	@Path("/findFoldersByTag")
 	@Operation(summary = "Finds authorized folders for the current user having a specified tag")
-	public WSFolder[] findFoldersByTag(@Parameter(description = "The tag", required = true)
+	public List<WSFolder> findFoldersByTag(@Parameter(description = "The tag", required = true)
 	@QueryParam("tag")
 	String tag) throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
@@ -153,7 +157,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@GET
 	@Path("/getTagsPreset")
 	@Operation(summary = "Retrieves all the tags in the preset", description = "Retrieves all the tags specified in the preset, empty if input mode is free")
-	public String[] getTagsPreset() throws AuthenticationException, WebserviceException, PersistenceException {
+	public List<String> getTagsPreset() throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
 		return super.getTagsPreset(sid);
 	}

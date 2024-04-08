@@ -2,7 +2,6 @@ package com.logicaldoc.webservice.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -35,12 +34,12 @@ public class WSTemplate implements Serializable {
 
 	@WSDoc(description = "the last modified date (format must be 'yyyy-MM-dd HH:mm:ss' or 'yyyy-MM-dd')", required = false)
 	private int docsCount;
-	
+
 	@WSDoc(required = false)
 	private String validation;
 
 	@WSDoc(required = false)
-	private WSAttribute[] attributes = new WSAttribute[0];
+	private List<WSAttribute> attributes = new ArrayList<>();
 
 	public long getId() {
 		return id;
@@ -82,7 +81,7 @@ public class WSTemplate implements Serializable {
 		this.docsCount = docsCount;
 	}
 
-	public WSAttribute[] getAttributes() {
+	public List<WSAttribute> getAttributes() {
 		return attributes;
 	}
 
@@ -94,8 +93,11 @@ public class WSTemplate implements Serializable {
 		return null;
 	}
 
-	public void setAttributes(WSAttribute[] attributes) {
-		this.attributes = attributes;
+	public void setAttributes(List<WSAttribute> attributes) {
+		if (attributes == null)
+			this.attributes = new ArrayList<>();
+		else
+			this.attributes = attributes;
 	}
 
 	public Collection<String> listAttributeNames() {
@@ -107,10 +109,9 @@ public class WSTemplate implements Serializable {
 	}
 
 	public void addAttribute(WSAttribute att) {
-		List<WSAttribute> buf = new ArrayList<>();
-		buf.addAll(Arrays.asList(getAttributes()));
-		buf.add(att);
-		setAttributes(buf.toArray(new WSAttribute[0]));
+		if (attributes == null)
+			attributes = new ArrayList<>();
+		attributes.add(att);
 	}
 
 	public String getValidation() {

@@ -39,7 +39,8 @@ public class SoapSearchService extends AbstractService implements SearchService 
 	protected static Logger log = LoggerFactory.getLogger(SoapSearchService.class);
 
 	@Override
-	public WSSearchResult find(String sid, WSSearchOptions opt) throws PersistenceException, AuthenticationException, WebserviceException, SearchException {
+	public WSSearchResult find(String sid, WSSearchOptions opt)
+			throws PersistenceException, AuthenticationException, WebserviceException, SearchException {
 		User user = validateSession(sid);
 
 		SearchOptions options = opt.toSearchOptions();
@@ -63,7 +64,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 		}
 
 		searchResult.setTotalHits(docs.size());
-		searchResult.setHits(docs.toArray(new WSDocument[0]));
+		searchResult.setHits(docs);
 		searchResult.setEstimatedHitsNumber(lastSearch.getEstimatedHitsNumber());
 		searchResult.setTime(lastSearch.getExecTime());
 		searchResult.setMoreHits(lastSearch.isMoreHitsPresent() ? 1 : 0);
@@ -75,43 +76,45 @@ public class SoapSearchService extends AbstractService implements SearchService 
 	}
 
 	@Override
-	public WSDocument[] findByFilename(String sid, String filename) throws AuthenticationException, WebserviceException, PersistenceException {
+	public List<WSDocument> findByFilename(String sid, String filename)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		List<Document> docs = docDao.findByFileNameAndParentFolderId(null, filename, null, user.getTenantId(), null);
-		
-		WSDocument[] wsDocs = new WSDocument[docs.size()];
-		for (int i = 0; i < docs.size(); i++) {
+
+		List<WSDocument> wsDocs = new ArrayList<>();
+		for (Document document : docs) {
 			try {
-				checkDocumentPermission(Permission.READ, user, docs.get(i).getId());
-				checkPublished(user, docs.get(i));
-				checkNotArchived(docs.get(i));
+				checkDocumentPermission(Permission.READ, user, document.getId());
+				checkPublished(user, document);
+				checkNotArchived(document);
 			} catch (Exception e) {
 				continue;
 			}
-			docDao.initialize(docs.get(i));
-			wsDocs[i] = WSUtil.toWSDocument(docs.get(i));
+			docDao.initialize(document);
+			wsDocs.add(WSUtil.toWSDocument(document));
 		}
 
 		return wsDocs;
 	}
 
 	@Override
-	public WSFolder[] findFolders(String sid, String name) throws AuthenticationException, WebserviceException, PersistenceException {
+	public List<WSFolder> findFolders(String sid, String name)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		List<Folder> folders = folderDao.find(name, user.getTenantId());
-		WSFolder[] wsFolders = new WSFolder[folders.size()];
-		for (int i = 0; i < folders.size(); i++) {
+		List<WSFolder> wsFolders = new ArrayList<>();
+		for (Folder folder : folders) {
 			try {
-				checkFolderPermission(Permission.READ, user, folders.get(i).getId());
+				checkFolderPermission(Permission.READ, user, folder.getId());
 			} catch (Exception e) {
 				continue;
 			}
-			folderDao.initialize(folders.get(i));
-			wsFolders[i] = WSFolder.fromFolder(folders.get(i));
+			folderDao.initialize(folder);
+			wsFolders.add(WSFolder.fromFolder(folder));
 		}
 
 		return wsFolders;

@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.soap;
 
+import java.util.List;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -33,7 +35,7 @@ public interface DocumentMetadataService {
 	@WebResult(name = "template")
 	@WebMethod(action = "listTemplates")
 	@WSDoc(description = "lists all the templates")
-	public WSTemplate[] listTemplates(@WebParam(name = "sid")
+	public List<WSTemplate> listTemplates(@WebParam(name = "sid")
 	String sid) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
@@ -125,7 +127,7 @@ public interface DocumentMetadataService {
 	@WebResult(name = "attributeSet")
 	@WebMethod(action = "listAttributeSets")
 	@WSDoc(description = "lists all the attribute sets")
-	public WSAttributeSet[] listAttributeSets(@WebParam(name = "sid")
+	public List<WSAttributeSet> listAttributeSets(@WebParam(name = "sid")
 	String sid) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
@@ -219,7 +221,7 @@ public interface DocumentMetadataService {
 	String sid, @WebParam(name = "setId")
 	long setId, @WebParam(name = "attribute")
 	String attribute, @WebParam(name = "options")
-	WSAttributeOption[] options) throws WebserviceException, PersistenceException;
+	List<WSAttributeOption> options) throws WebserviceException, PersistenceException;
 
 	/**
 	 * Retrieves the options for the given attribute
@@ -236,7 +238,7 @@ public interface DocumentMetadataService {
 	 */
 	@WebMethod(action = "getAttributeOptions")
 	@WSDoc(description = "retrieves the options for the given attribute")
-	public String[] getAttributeOptions(@WebParam(name = "sid")
+	public List<String> getAttributeOptions(@WebParam(name = "sid")
 	String sid, @WebParam(name = "setId")
 	long setId, @WebParam(name = "attribute")
 	String attribute) throws AuthenticationException, WebserviceException, PersistenceException;
@@ -257,7 +259,7 @@ public interface DocumentMetadataService {
 	 */
 	@WebMethod(action = "getAttributeOptionsByCategory")
 	@WSDoc(description = "retrieves the options for the given attribute inside a given category")
-	public WSAttributeOption[] getAttributeOptionsByCategory(@WebParam(name = "sid")
+	public List<WSAttributeOption> getAttributeOptionsByCategory(@WebParam(name = "sid")
 	String sid, @WebParam(name = "setId")
 	long setId, @WebParam(name = "attribute")
 	String attribute, @WebParam(name = "category")
@@ -322,7 +324,7 @@ public interface DocumentMetadataService {
 	String sid, @WebParam(name = "templateId")
 	long templateId, @WSDoc(description = "the complete Access Control List")
 	@WebParam(name = "acl")
-	WSAccessControlEntry[] acl)
+	List<WSAccessControlEntry> acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException;
 
 	/**
@@ -330,6 +332,7 @@ public interface DocumentMetadataService {
 	 * 
 	 * @param sid Session identifier
 	 * @param templateId Template id
+	 * 
 	 * @return 'error' if error occurred, the right objects collection
 	 * 
 	 * @throws PermissionException The permission has not been granted
@@ -339,10 +342,12 @@ public interface DocumentMetadataService {
 	 */
 	@WebMethod(action = "getAccessControlList")
 	@WSDoc(description = "retrieves the access control list")
-	public WSAccessControlEntry[] getAccessControlList(@WSDoc(description = "identifier of the session", required = true)
-	@WebParam(name = "sid")
-	String sid, @WebParam(name = "templateId")
-	long templateId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
+	public List<WSAccessControlEntry> getAccessControlList(
+			@WSDoc(description = "identifier of the session", required = true)
+			@WebParam(name = "sid")
+			String sid, @WebParam(name = "templateId")
+			long templateId)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Add a new option for the given attribute

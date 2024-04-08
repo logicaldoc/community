@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.soap;
 
+import java.util.List;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -52,7 +54,7 @@ public interface BookmarkService {
 	 * 
 	 * @param sid identifier of the session
 	 * 
-	 * @return array of bookmarks
+	 * @return list of bookmarks
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -61,7 +63,7 @@ public interface BookmarkService {
 	@WebMethod(action = "getBookmarks")
 	@WebResult(name = "bookmark")
 	@WSDoc(description = "retrieves all the bookmarks of the current user")
-	public WSBookmark[] getBookmarks(@WebParam(name = "sid")
+	public List<WSBookmark> getBookmarks(@WebParam(name = "sid")
 	String sid) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	@WebMethod(action = "deleteBookmark")

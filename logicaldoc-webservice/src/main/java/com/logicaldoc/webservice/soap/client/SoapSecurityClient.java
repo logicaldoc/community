@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.soap.client;
 
+import java.util.List;
+
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -21,13 +23,13 @@ public class SoapSecurityClient extends SoapClient<SecurityService> implements S
 	}
 
 	@Override
-	public WSUser[] listUsers(String sid, String group)
+	public List<WSUser> listUsers(String sid, String group)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		return client.listUsers(sid, group);
 	}
 
 	@Override
-	public WSGroup[] listGroups(String sid) throws WebserviceException, PersistenceException {
+	public List<WSGroup> listGroups(String sid) throws WebserviceException, PersistenceException {
 		return client.listGroups(sid);
 	}
 

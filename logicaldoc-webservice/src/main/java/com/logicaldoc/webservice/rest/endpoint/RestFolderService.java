@@ -1,6 +1,7 @@
 package com.logicaldoc.webservice.rest.endpoint;
 
 import java.util.HashMap;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -192,7 +193,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@Path("/listChildren")
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Operation(summary = "Lists the child folders", description = "Returns the list of child folders. Example: curl -u admin:admin -H ''Accept: application/json'' http://localhost:8080/services/rest/folder/listChildren?folderId=4")
-	public WSFolder[] listChildren(@Parameter(description = "The ID of the parent folder", required = true)
+	public List<WSFolder> listChildren(@Parameter(description = "The ID of the parent folder", required = true)
 	@QueryParam("folderId")
 	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
@@ -203,7 +204,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@GET
 	@Path("/getPath")
 	@Operation(summary = "Gets a path of folders", description = "Returns the folders that make up the path to the folder in input")
-	public WSFolder[] getPath(@Parameter(description = "Folder identifier (ID)", required = true)
+	public List<WSFolder> getPath(@Parameter(description = "Folder identifier (ID)", required = true)
 	@QueryParam("folderId")
 	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
@@ -218,7 +219,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@QueryParam("folderId")
 	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
-		WSFolder[] sss = this.getPath(sid, folderId);
+		List<WSFolder> sss = this.getPath(sid, folderId);
 		StringBuilder pathString = new StringBuilder();
 		for (WSFolder wsFolder : sss) {
 			pathString.append("/");
@@ -290,7 +291,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@GET
 	@Path("/listWorkspaces")
 	@Operation(summary = "Retrieves the list of all workspaces")
-	public WSFolder[] listWorkspaces() throws AuthenticationException, WebserviceException, PersistenceException {
+	public List<WSFolder> listWorkspaces() throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
 		return super.listWorkspaces(sid);
 	}
@@ -353,18 +354,19 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@PUT
 	@Path("/setAccessControlList")
 	@Operation(operationId = "setAccessControlList_Folder", summary = "Assigns the complete Access Control List")
-	public void setAccessControlList(@QueryParam("folderId") long folderId, WSAccessControlEntry[] acl)
+	public void setAccessControlList(@QueryParam("folderId")
+	long folderId, List<WSAccessControlEntry> acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
 		String sid = validateSessionREST();
 		super.setAccessControlList(sid, folderId, acl);
 	}
-	
+
 	@Override
 	@GET
 	@Path("/getAccessControlList")
 	@Operation(operationId = "getAccessControlList_Folder", summary = "Retrieves the access control list")
-	public WSAccessControlEntry[] getAccessControlList(@QueryParam("folderId") long folderId) 
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+	public List<WSAccessControlEntry> getAccessControlList(@QueryParam("folderId")
+	long folderId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		String sid = validateSessionREST();
 		return super.getAccessControlList(sid, folderId);
 	}

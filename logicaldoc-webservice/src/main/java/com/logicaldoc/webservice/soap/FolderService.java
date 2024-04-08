@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.soap;
 
+import java.util.List;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -303,7 +305,7 @@ public interface FolderService {
 	 * @param sid identifier of th session
 	 * @param folderId identifier of the folder
 	 * 
-	 * @return Array of folders contained in the folder
+	 * @return List of folders contained in the folder
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -314,7 +316,7 @@ public interface FolderService {
 	@WebMethod(action = "listChildren")
 	@WebResult(name = "folder")
 	@WSDoc(description = "lists all direct children of a parent folder: readable only sub-folders are returned")
-	public WSFolder[] listChildren(@WSDoc(description = "identifier of the session", required = true)
+	public List<WSFolder> listChildren(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "folderId")
 	long folderId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
@@ -385,6 +387,7 @@ public interface FolderService {
 	 * 
 	 * @param sid Session identifier
 	 * @param folderId The target folder id
+	 * 
 	 * @return The list of folder, the first is the root, the last is the target
 	 *         folder
 	 * 
@@ -397,7 +400,7 @@ public interface FolderService {
 	@WebMethod(action = "getPath")
 	@WebResult(name = "folders")
 	@WSDoc(description = "computes the path from the root to the target folder; returns the array of folders, the first is the root")
-	public WSFolder[] getPath(@WSDoc(description = "identifier of the session", required = true)
+	public List<WSFolder> getPath(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "folderId")
 	long folderId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
@@ -422,7 +425,7 @@ public interface FolderService {
 	String sid, @WebParam(name = "folderId")
 	long folderId, @WSDoc(description = "the complete Access Control List")
 	@WebParam(name = "acl")
-	WSAccessControlEntry[] acl)
+	List<WSAccessControlEntry> acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException;
 
 	/**
@@ -430,6 +433,7 @@ public interface FolderService {
 	 * 
 	 * @param sid Session identifier
 	 * @param folderId Folder id
+	 * 
 	 * @return 'error' if error occurred, the right objects collection
 	 * 
 	 * @throws PermissionException The permission has not been granted
@@ -439,7 +443,7 @@ public interface FolderService {
 	 */
 	@WebMethod(action = "getAccessControlList")
 	@WSDoc(description = "retrieves the access control list")
-	public WSAccessControlEntry[] getAccessControlList(
+	public List<WSAccessControlEntry> getAccessControlList(
 			@WSDoc(description = "identifier of the session", required = true)
 			@WebParam(name = "sid")
 			String sid, @WebParam(name = "folderId")
@@ -500,7 +504,7 @@ public interface FolderService {
 	 * 
 	 * @param sid Session identifier
 	 * 
-	 * @return array of workspaces
+	 * @return list of workspaces
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -509,7 +513,7 @@ public interface FolderService {
 	@WebMethod(action = "listWorkspaces")
 	@WebResult(name = "workspaces")
 	@WSDoc(description = "retrieves the list of all workspaces")
-	public WSFolder[] listWorkspaces(@WSDoc(description = "identifier of the session", required = true)
+	public List<WSFolder> listWorkspaces(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid) throws AuthenticationException, WebserviceException, PersistenceException;
 }

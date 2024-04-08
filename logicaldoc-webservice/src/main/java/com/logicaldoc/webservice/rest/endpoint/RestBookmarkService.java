@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.rest.endpoint;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -55,7 +57,7 @@ public class RestBookmarkService extends SoapBookmarkService implements Bookmark
 
 	@GET
 	@Path("/getBookmarks")
-	public WSBookmark[] getBookmarks() throws AuthenticationException, WebserviceException, PersistenceException {
+	public List<WSBookmark> getBookmarks() throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
 		return super.getBookmarks(sid);
 	}

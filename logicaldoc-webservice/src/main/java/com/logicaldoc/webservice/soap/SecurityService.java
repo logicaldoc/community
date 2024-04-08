@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.soap;
 
+import java.util.List;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -29,7 +31,7 @@ public interface SecurityService {
 	 * @param sid identifier of the session, must be an administrator
 	 * @param group name od the group
 	 * 
-	 * @return A value object containing the users metadata
+	 * @return the list of users
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -38,7 +40,7 @@ public interface SecurityService {
 	@WebMethod(action = "listUsers")
 	@WebResult(name = "user")
 	@WSDoc(description = "gets all existing users")
-	public WSUser[] listUsers(
+	public List<WSUser> listUsers(
 			@WSDoc(description = "identifier of the session, must be an administrator", required = true)
 			@WebParam(name = "sid")
 			String sid, @WSDoc(description = "if not null, all the users that belong to this group will be returned")
@@ -50,7 +52,7 @@ public interface SecurityService {
 	 * 
 	 * @param sid identifier of the session, must be an administrator
 	 * 
-	 * @return A value object containing the groups metadata
+	 * @return List of groups
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -58,7 +60,7 @@ public interface SecurityService {
 	@WebMethod(action = "listGroups")
 	@WebResult(name = "group")
 	@WSDoc(description = "gets all existing groups")
-	public WSGroup[] listGroups(
+	public List<WSGroup> listGroups(
 			@WSDoc(description = "identifier of the session, must be an administrator", required = true)
 			@WebParam(name = "sid")
 			String sid) throws WebserviceException, PersistenceException;
@@ -158,7 +160,7 @@ public interface SecurityService {
 	 * @return 0 if all is ok, 1 if the password is incorrect, 2 if the new
 	 *         password cannot be notified, otherwise a positive number grater
 	 *         than 2
-	 *         
+	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
 	 */

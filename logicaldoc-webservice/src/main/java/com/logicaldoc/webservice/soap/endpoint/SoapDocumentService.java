@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -587,7 +586,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	}
 
 	@Override
-	public WSDocument[] listDocuments(String sid, long folderId, String fileName)
+	public List<WSDocument> listDocuments(String sid, long folderId, String fileName)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 		checkFolderPermission(Permission.READ, user, folderId);
@@ -603,7 +602,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 				checkPublished(user, doc);
 				checkNotArchived(doc);
 
-				if (fileName != null && !FileUtil.matches(doc.getFileName(), new String[] { fileName }, null))
+				if (fileName != null && !FileUtil.matches(doc.getFileName(), List.of(fileName), null))
 					throw new ParseException("no match");
 			} catch (Exception t) {
 				continue;
@@ -613,18 +612,18 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			wsDocs.add(WSUtil.toWSDocument(doc));
 		}
 
-		return wsDocs.toArray(new WSDocument[0]);
+		return wsDocs;
 	}
 
 	@Override
-	public WSDocument[] getDocuments(String sid, Long[] docIds)
+	public List<WSDocument> getDocuments(String sid, List<Long> docIds)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		Collection<Long> folderIds = fdao.findFolderIdByUserId(user.getId(), null, true);
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		List<Document> docs = docDao.findByIds(Set.of(docIds), null);
+		List<Document> docs = docDao.findByIds(Set.copyOf(docIds), null);
 		List<WSDocument> wsDocs = new ArrayList<>();
 		for (int i = 0; i < docs.size(); i++) {
 			try {
@@ -637,11 +636,11 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 				wsDocs.add(getDoc(docs.get(i).getId()));
 		}
 
-		return wsDocs.toArray(new WSDocument[0]);
+		return wsDocs;
 	}
 
 	@Override
-	public WSDocument[] getRecentDocuments(String sid, Integer max)
+	public List<WSDocument> getRecentDocuments(String sid, Integer max)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
@@ -651,7 +650,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		query.append(" order by date desc");
 		List<Object> records = dao.findByQuery(query.toString(), (Map<String, Object>) null, max);
 
-		Set<Long> docIds = new HashSet<>();
+		List<Long> docIds = new ArrayList<>();
 
 		/*
 		 * Iterate over records composing the response XML document
@@ -663,11 +662,11 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 				docIds.add(id);
 		}
 
-		return getDocuments(sid, docIds.toArray(new Long[0]));
+		return getDocuments(sid, docIds);
 	}
 
 	@Override
-	public void sendEmail(String sid, Long[] docIds, String recipients, String subject, String message)
+	public void sendEmail(String sid, List<Long> docIds, String recipients, String subject, String message)
 			throws AuthenticationException, WebserviceException, PersistenceException, IOException, MessagingException {
 		User user = validateSession(sid);
 
@@ -696,14 +695,12 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		 * Only readable documents can be sent
 		 */
 		List<Document> docs = new ArrayList<>();
-		if (docIds != null && docIds.length > 0) {
-			for (long id : docIds) {
-				Document doc = docDao.findById(id);
-				if (doc != null && folderDao.isReadAllowed(doc.getFolder().getId(), user.getId())) {
-					doc = docDao.findDocument(id);
-					createAttachment(mail, doc);
-					docs.add(doc);
-				}
+		for (long id : docIds) {
+			Document doc = docDao.findById(id);
+			if (doc != null && folderDao.isReadAllowed(doc.getFolder().getId(), user.getId())) {
+				doc = docDao.findDocument(id);
+				createAttachment(mail, doc);
+				docs.add(doc);
 			}
 		}
 
@@ -823,7 +820,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	}
 
 	@Override
-	public WSDocument[] getAliases(String sid, long docId)
+	public List<WSDocument> getAliases(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		Collection<Long> folderIds = null;
@@ -849,7 +846,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 				wsDocs.add(WSUtil.toWSDocument(docs.get(i)));
 		}
 
-		return wsDocs.toArray(new WSDocument[0]);
+		return wsDocs;
 	}
 
 	@Override
@@ -910,7 +907,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	}
 
 	@Override
-	public WSLink[] getLinks(String sid, long docId)
+	public List<WSLink> getLinks(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 
@@ -929,7 +926,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			lnks.add(lnk);
 		}
 
-		return lnks.toArray(new WSLink[0]);
+		return lnks;
 	}
 
 	@Override
@@ -1154,7 +1151,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	}
 
 	@Override
-	public WSNote[] getNotes(String sid, long docId) throws AuthenticationException, WebserviceException,
+	public List<WSNote> getNotes(String sid, long docId) throws AuthenticationException, WebserviceException,
 			PersistenceException, PermissionException, UnexistingResourceException {
 		validateSession(sid);
 		WSDocument document = getDocument(sid, docId);
@@ -1167,7 +1164,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (notes != null)
 			for (DocumentNote note : notes)
 				wsNotes.add(WSNote.fromDocumentNote(note));
-		return wsNotes.toArray(new WSNote[0]);
+		return wsNotes;
 	}
 
 	@Override
@@ -1198,7 +1195,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	}
 
 	@Override
-	public WSRating[] getRatings(String sid, long docId) throws AuthenticationException, WebserviceException,
+	public List<WSRating> getRatings(String sid, long docId) throws AuthenticationException, WebserviceException,
 			PersistenceException, PermissionException, UnexistingResourceException {
 		validateSession(sid);
 		WSDocument document = getDocument(sid, docId);
@@ -1212,7 +1209,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			for (Rating rating : ratings)
 				wsRatings.add(WSRating.fromRating(rating));
 
-		return wsRatings.toArray(new WSRating[0]);
+		return wsRatings;
 	}
 
 	@Override
@@ -1284,7 +1281,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	}
 
 	@Override
-	public WSDocument[] getVersions(String sid, long docId) throws AuthenticationException, WebserviceException,
+	public List<WSDocument> getVersions(String sid, long docId) throws AuthenticationException, WebserviceException,
 			PersistenceException, PermissionException, UnexistingResourceException {
 		User user = validateSession(sid);
 		Document doc = retrieveReadableDocument(docId, user);
@@ -1293,11 +1290,12 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		VersionDAO versDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
 		List<Version> versions = versDao.findByDocId(doc.getId());
-		WSDocument[] wsVersions = new WSDocument[versions.size()];
-		for (int i = 0; i < versions.size(); i++) {
-			versDao.initialize(versions.get(i));
-			wsVersions[i] = WSUtil.toWSDocument(versions.get(i));
-			wsVersions[i].setComment(versions.get(i).getComment());
+		List<WSDocument> wsVersions = new ArrayList<>();
+		for (Version version : versions) {
+			versDao.initialize(version);
+			WSDocument wsVersion = WSUtil.toWSDocument(version);
+			wsVersion.setComment(version.getComment());
+			wsVersions.add(wsVersion);
 		}
 
 		return wsVersions;
@@ -1315,7 +1313,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	}
 
 	@Override
-	public void setAccessControlList(String sid, long docId, WSAccessControlEntry[] acl)
+	public void setAccessControlList(String sid, long docId, List<WSAccessControlEntry> acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
 		User sessionUser = validateSession(sid);
 
@@ -1339,7 +1337,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	}
 
 	@Override
-	public WSAccessControlEntry[] getAccessControlList(String sid, long docId)
+	public List<WSAccessControlEntry> getAccessControlList(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		validateSession(sid);
 
@@ -1352,7 +1350,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		for (AccessControlEntry ace : document.getAccessControlList())
 			acl.add(WSUtil.toWSAccessControlEntry(ace));
 
-		return acl.toArray(new WSAccessControlEntry[0]);
+		return acl;
 	}
 
 	@Override

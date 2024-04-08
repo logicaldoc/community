@@ -2,7 +2,6 @@ package com.logicaldoc.webservice.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class WSAttributeSet implements Serializable {
 	private String lastModified;
 
 	@WSDoc(required = false)
-	private WSAttribute[] attributes = new WSAttribute[0];
+	private List<WSAttribute> attributes = new ArrayList<>();
 
 	public long getId() {
 		return id;
@@ -69,7 +68,7 @@ public class WSAttributeSet implements Serializable {
 		this.lastModified = lastModified;
 	}
 
-	public WSAttribute[] getAttributes() {
+	public List<WSAttribute> getAttributes() {
 		return attributes;
 	}
 
@@ -81,8 +80,11 @@ public class WSAttributeSet implements Serializable {
 		return null;
 	}
 
-	public void setAttributes(WSAttribute[] attributes) {
-		this.attributes = attributes;
+	public void setAttributes(List<WSAttribute> attributes) {
+		if (attributes == null)
+			this.attributes = new ArrayList<>();
+		else
+			this.attributes = attributes;
 	}
 
 	public Collection<String> listAttributeNames() {
@@ -94,9 +96,8 @@ public class WSAttributeSet implements Serializable {
 	}
 
 	public void addAttribute(WSAttribute att) {
-		List<WSAttribute> buf = new ArrayList<>();
-		buf.addAll(Arrays.asList(getAttributes()));
-		buf.add(att);
-		setAttributes(buf.toArray(new WSAttribute[0]));
+		if (attributes == null)
+			attributes = new ArrayList<>();
+		attributes.add(att);
 	}
 }

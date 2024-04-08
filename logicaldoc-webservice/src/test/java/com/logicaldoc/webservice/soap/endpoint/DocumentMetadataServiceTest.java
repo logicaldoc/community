@@ -44,13 +44,12 @@ public class DocumentMetadataServiceTest extends AbstractWebserviceTestCase {
 		SoapDocumentMetadataService docMetadataServiceImpl = new SoapDocumentMetadataService();
 		docMetadataServiceImpl.setValidateSession(false);
 
-		WSTemplate[] templates = docMetadataServiceImpl.listTemplates("");
+		List<WSTemplate> templates = docMetadataServiceImpl.listTemplates("");
 		Assert.assertNotNull(templates);
-		Assert.assertEquals(3, templates.length);
-		List<WSTemplate> templatesList = Arrays.asList(templates);
-		Assert.assertEquals(-1, templatesList.get(0).getId());
-		Assert.assertEquals(2, templatesList.get(2).getId());
-		Assert.assertEquals("test2_desc", templatesList.get(2).getDescription());
+		Assert.assertEquals(3, templates.size());
+		Assert.assertEquals(-1, templates.get(0).getId());
+		Assert.assertEquals(2, templates.get(2).getId());
+		Assert.assertEquals("test2_desc", templates.get(2).getDescription());
 	}
 
 	@Test
@@ -88,23 +87,21 @@ public class DocumentMetadataServiceTest extends AbstractWebserviceTestCase {
 		SoapDocumentMetadataService docMetadataServiceImpl = new SoapDocumentMetadataService();
 		docMetadataServiceImpl.setValidateSession(false);
 
-		docMetadataServiceImpl.setAttributeOptions("xxx", 1L, "test",
-				new WSAttributeOption[] { new WSAttributeOption("val1", null), new WSAttributeOption("val2", null),
-						new WSAttributeOption("val3", null) });
-		String[] values = docMetadataServiceImpl.getAttributeOptions("xxx", 1L, "test");
-		Assert.assertEquals(3, values.length);
+		docMetadataServiceImpl.setAttributeOptions("xxx", 1L, "test", List.of(new WSAttributeOption("val1", null),
+				new WSAttributeOption("val2", null), new WSAttributeOption("val3", null)));
+		List<String> values = docMetadataServiceImpl.getAttributeOptions("xxx", 1L, "test");
+		Assert.assertEquals(3, values.size());
 
 		docMetadataServiceImpl.setAttributeOptions("xxx", 1L, "test",
-				new WSAttributeOption[] { new WSAttributeOption("val1", null), new WSAttributeOption("val2", null),
-						new WSAttributeOption("val3", null), new WSAttributeOption("val4", null) });
+				List.of(new WSAttributeOption("val1", null), new WSAttributeOption("val2", null),
+						new WSAttributeOption("val3", null), new WSAttributeOption("val4", null)));
 		values = docMetadataServiceImpl.getAttributeOptions("xxx", 1L, "test");
-		Assert.assertEquals(4, values.length);
+		Assert.assertEquals(4, values.size());
 
-		docMetadataServiceImpl.setAttributeOptions("xxx", 1L, "test",
-				new WSAttributeOption[] { new WSAttributeOption("val1", null), new WSAttributeOption("val2", null),
-						new WSAttributeOption("val4", null) });
+		docMetadataServiceImpl.setAttributeOptions("xxx", 1L, "test", List.of(new WSAttributeOption("val1", null),
+				new WSAttributeOption("val2", null), new WSAttributeOption("val4", null)));
 		values = docMetadataServiceImpl.getAttributeOptions("xxx", 1L, "test");
-		Assert.assertEquals(3, values.length);
+		Assert.assertEquals(3, values.size());
 		Assert.assertFalse(Arrays.asList(values).contains("val3"));
 	}
 }

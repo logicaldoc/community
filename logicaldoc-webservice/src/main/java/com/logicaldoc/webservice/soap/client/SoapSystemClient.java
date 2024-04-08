@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.soap.client;
 
+import java.util.List;
+
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.webservice.WebserviceException;
@@ -20,13 +22,13 @@ public class SoapSystemClient extends SoapClient<SystemService> implements Syste
 	}
 
 	@Override
-	public WSParameter[] getStatistics(String sid)
+	public List<WSParameter> getStatistics(String sid)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		return client.getStatistics(sid);
 	}
 
 	@Override
-	public String[] getLanguages(String tenantOrSid) {
+	public List<String> getLanguages(String tenantOrSid) {
 		return client.getLanguages(tenantOrSid);
 	}
 

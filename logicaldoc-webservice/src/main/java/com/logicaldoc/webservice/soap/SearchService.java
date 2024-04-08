@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.soap;
 
+import java.util.List;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -61,7 +63,7 @@ public interface SearchService {
 	@WebMethod(action = "findByFilename")
 	@WebResult(name = "document")
 	@WSDoc(description = "finds authorized documents for the current user with the given filename (like '%' operator is used)")
-	public WSDocument[] findByFilename(@WSDoc(description = "identifier of the session", required = true)
+	public List<WSDocument> findByFilename(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "filename")
 	String filename) throws AuthenticationException, WebserviceException, PersistenceException;
@@ -82,7 +84,7 @@ public interface SearchService {
 	@WebMethod(action = "findFolders")
 	@WebResult(name = "folder")
 	@WSDoc(description = "finds authorized folders for the current user containing the given name (like '%' operator is used)")
-	public WSFolder[] findFolders(@WSDoc(description = "identifier of the session", required = true)
+	public List<WSFolder> findFolders(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "name")
 	String name) throws AuthenticationException, WebserviceException, PersistenceException;

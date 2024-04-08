@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.rest;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -43,7 +45,7 @@ public interface DocumentMetadataService {
 	 * @param attribute Attribute name
 	 * @param option Attribute option
 	 * 
-	 * @throws AuthenticationException Invalid session 
+	 * @throws AuthenticationException Invalid session
 	 * @throws WebserviceException Error in the webservice
 	 * @throws PersistenceException Error in the database
 	 */
@@ -70,7 +72,7 @@ public interface DocumentMetadataService {
 	public void setAttributeOptions(@QueryParam("setId")
 	long setId, @QueryParam("attribute")
 	String attribute, @QueryParam("options")
-	WSAttributeOption[] options) throws WebserviceException, PersistenceException;
+	List<WSAttributeOption> options) throws WebserviceException, PersistenceException;
 
 	/**
 	 * Saves the options for the given attribute with a POST method. This is
@@ -89,7 +91,7 @@ public interface DocumentMetadataService {
 	public void setAttributeOptionsPOST(@Multipart(value = "setId")
 	Long setId, @Multipart(value = "attribute")
 	String attribute, @Multipart(value = "options", type = "application/json")
-	WSAttributeOption[] options) throws WebserviceException, PersistenceException;
+	List<WSAttributeOption> options) throws WebserviceException, PersistenceException;
 
 	/**
 	 * Create/Update an attribute set. You can completely customize the
@@ -123,7 +125,8 @@ public interface DocumentMetadataService {
 	 */
 	@POST
 	@Path("/storeTemplate")
-	public long storeTemplate(WSTemplate template) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	public long storeTemplate(WSTemplate template)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Gets attribute set's metadata
@@ -201,7 +204,7 @@ public interface DocumentMetadataService {
 	 */
 	@GET
 	@Path("/getAttributeOptions")
-	public String[] getAttributeOptions(@QueryParam("setId")
+	public List<String> getAttributeOptions(@QueryParam("setId")
 	long setId, @QueryParam("attribute")
 	String attribute) throws AuthenticationException, WebserviceException, PersistenceException;
 
@@ -216,7 +219,8 @@ public interface DocumentMetadataService {
 	 */
 	@GET
 	@Path("/listAttributeSets")
-	public WSAttributeSet[] listAttributeSets() throws AuthenticationException, WebserviceException, PersistenceException;
+	public List<WSAttributeSet> listAttributeSets()
+			throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Deletes an existing attribute set with the given identifier.
@@ -257,5 +261,5 @@ public interface DocumentMetadataService {
 	 */
 	@GET
 	@Path("/listTemplates")
-	public WSTemplate[] listTemplates() throws AuthenticationException, WebserviceException, PersistenceException;
+	public List<WSTemplate> listTemplates() throws AuthenticationException, WebserviceException, PersistenceException;
 }

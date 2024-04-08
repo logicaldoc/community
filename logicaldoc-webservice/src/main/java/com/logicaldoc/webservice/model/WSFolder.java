@@ -2,14 +2,13 @@ package com.logicaldoc.webservice.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,13 +77,13 @@ public class WSFolder implements Serializable {
 	private Long securityRef;
 
 	@WSDoc(description = "array of attributes", required = false)
-	private WSAttribute[] attributes = new WSAttribute[0];
+	private List<WSAttribute> attributes = new ArrayList<>();
 
 	@WSDoc(description = "the storage to use for new files. Valid only in case of workspace.", required = false)
 	private Integer storage = null;
 
 	@WSDoc(required = false, description = "tags applied to the document")
-	private String[] tags = new String[0];
+	private List<String> tags = new ArrayList<>();
 
 	@WSDoc(required = false, description = "identifier of the Zonal OCR template to use to process the documents inside this folder")
 	private Long ocrTemplateId = null;
@@ -102,19 +101,16 @@ public class WSFolder implements Serializable {
 	private String tile;
 
 	public void addAttribute(WSAttribute att) {
-		List<WSAttribute> buf = Arrays.asList(getAttributes());
-		buf.add(att);
-		setAttributes(buf.toArray(new WSAttribute[0]));
+		if (attributes == null)
+			this.attributes = new ArrayList<>();
+		attributes.add(att);
 	}
 
 	public void addTag(String tag) {
 		if (tags == null)
-			tags = new String[0];
-		List<String> buf = new ArrayList<>();
-		Collections.addAll(buf, tags);
-		if (!buf.contains(tag))
-			buf.add(tag);
-		setTags(buf.toArray(new String[0]));
+			tags = new ArrayList<>();
+		if (!tags.contains(tag))
+			tags.add(tag);
 	}
 
 	public Collection<String> listAttributeNames() {
@@ -160,7 +156,7 @@ public class WSFolder implements Serializable {
 		wsFolder.setTile(folder.getTile());
 
 		if (withCollections && folder.getTags() != null)
-			wsFolder.setTags(folder.getTagsAsWords().toArray(new String[0]));
+			wsFolder.setTags(new ArrayList<>(folder.getTagsAsWords()));
 
 		if (withCollections && folder.getTemplate() != null)
 			wsFolder.setTemplateId(folder.getTemplate().getId());
@@ -173,34 +169,32 @@ public class WSFolder implements Serializable {
 	}
 
 	private static void fillAttributes(Folder folder, WSFolder wsFolder) {
-		WSAttribute[] attributes = new WSAttribute[0];
+		List<WSAttribute> wsAttributes = new ArrayList<>();
 		if (folder.getTemplate() != null && folder.getAttributes() != null && folder.getAttributes().size() > 0) {
-			attributes = new WSAttribute[folder.getAttributeNames().size()];
-			int i = 0;
 			for (String name : folder.getAttributeNames()) {
 				Attribute attr = folder.getAttribute(name);
-				WSAttribute attribute = new WSAttribute();
-				attribute.setName(name);
-				attribute.setMandatory(attr.getMandatory());
-				attribute.setHidden(attr.getHidden());
-				attribute.setReadonly(attr.getReadonly());
-				attribute.setMultiple(attr.getMultiple());
-				attribute.setParent(attr.getParent());
-				attribute.setPosition(attr.getPosition());
-				WSAttribute.setValue(attribute, attr.getValue());
-				attribute.setStringValues(attr.getStringValues());
+				WSAttribute wsAttribute = new WSAttribute();
+				wsAttribute.setName(name);
+				wsAttribute.setMandatory(attr.getMandatory());
+				wsAttribute.setHidden(attr.getHidden());
+				wsAttribute.setReadonly(attr.getReadonly());
+				wsAttribute.setMultiple(attr.getMultiple());
+				wsAttribute.setParent(attr.getParent());
+				wsAttribute.setPosition(attr.getPosition());
+				WSAttribute.setValue(wsAttribute, attr.getValue());
+				wsAttribute.setStringValues(attr.getStringValues());
 
 				if (attr.getType() == Attribute.TYPE_USER || attr.getType() == Attribute.TYPE_FOLDER
 						|| attr.getType() == Attribute.TYPE_DOCUMENT) {
-					attribute.setIntValue(attr.getIntValue());
-					attribute.setStringValue(attr.getStringValue());
+					wsAttribute.setIntValue(attr.getIntValue());
+					wsAttribute.setStringValue(attr.getStringValue());
 				}
 
-				attribute.setType(attr.getType());
-				attributes[i++] = attribute;
+				wsAttribute.setType(attr.getType());
+				wsAttributes.add(wsAttribute);
 			}
 		}
-		wsFolder.setAttributes(attributes);
+		wsFolder.setAttributes(wsAttributes);
 	}
 
 	public void updateAttributes(Folder folder) throws PersistenceException {
@@ -209,22 +203,22 @@ public class WSFolder implements Serializable {
 			folder.getAttributes().clear();
 			TemplateDAO templDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 			template = templDao.findById(templateId);
-			if (template != null && attributes != null && attributes.length > 0) {
-				for (int i = 0; i < attributes.length; i++) {
+			if (template != null && CollectionUtils.isNotEmpty(attributes)) {
+				for (WSAttribute wsAttribute : attributes) {
 					Attribute extAttribute = new Attribute();
-					extAttribute.setMandatory(attributes[i].getMandatory());
-					extAttribute.setHidden(attributes[i].getHidden());
-					extAttribute.setReadonly(attributes[i].getReadonly());
-					extAttribute.setMultiple(attributes[i].getMultiple());
-					extAttribute.setParent(attributes[i].getParent());
-					extAttribute.setDependsOn(attributes[i].getDependsOn());
-					extAttribute.setPosition(attributes[i].getPosition());
-					extAttribute.setIntValue(attributes[i].getIntValue());
-					extAttribute.setStringValue(attributes[i].getStringValue());
-					extAttribute.setDoubleValue(attributes[i].getDoubleValue());
-					extAttribute.setDateValue(WSUtil.convertStringToDate(attributes[i].getDateValue()));
-					extAttribute.setType(attributes[i].getType());
-					folder.getAttributes().put(attributes[i].getName(), extAttribute);
+					extAttribute.setMandatory(wsAttribute.getMandatory());
+					extAttribute.setHidden(wsAttribute.getHidden());
+					extAttribute.setReadonly(wsAttribute.getReadonly());
+					extAttribute.setMultiple(wsAttribute.getMultiple());
+					extAttribute.setParent(wsAttribute.getParent());
+					extAttribute.setDependsOn(wsAttribute.getDependsOn());
+					extAttribute.setPosition(wsAttribute.getPosition());
+					extAttribute.setIntValue(wsAttribute.getIntValue());
+					extAttribute.setStringValue(wsAttribute.getStringValue());
+					extAttribute.setDoubleValue(wsAttribute.getDoubleValue());
+					extAttribute.setDateValue(WSUtil.convertStringToDate(wsAttribute.getDateValue()));
+					extAttribute.setType(wsAttribute.getType());
+					folder.getAttributes().put(wsAttribute.getName(), extAttribute);
 				}
 			}
 		}
@@ -288,12 +282,15 @@ public class WSFolder implements Serializable {
 		this.templateId = templateId;
 	}
 
-	public WSAttribute[] getAttributes() {
+	public List<WSAttribute> getAttributes() {
 		return attributes;
 	}
 
-	public void setAttributes(WSAttribute[] attributes) {
-		this.attributes = attributes;
+	public void setAttributes(List<WSAttribute> attributes) {
+		if (attributes == null)
+			this.attributes = new ArrayList<>();
+		else
+			this.attributes = attributes;
 	}
 
 	public String getCreation() {
@@ -360,11 +357,13 @@ public class WSFolder implements Serializable {
 		this.storage = storage;
 	}
 
-	public String[] getTags() {
+	public List<String> getTags() {
 		return tags;
 	}
 
-	public void setTags(String[] tags) {
+	public void setTags(List<String> tags) {
+		if (tags == null)
+			tags = new ArrayList<>();
 		this.tags = tags;
 	}
 

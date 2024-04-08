@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.rest.endpoint;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -40,7 +42,7 @@ public class RestSystemService extends SoapSystemService implements SystemServic
 	@GET
 	@Path("/getStatistics")
 	@Operation(summary = "Get system statistics", description = "Retrieves the system statistics")
-	public WSParameter[] getStatistics() throws AuthenticationException, WebserviceException, PersistenceException {
+	public List<WSParameter> getStatistics() throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
 		return super.getStatistics(sid);
 	}
@@ -49,7 +51,7 @@ public class RestSystemService extends SoapSystemService implements SystemServic
 	@GET
 	@Path("/getLanguages")
 	@Operation(summary = "Get enabled languages", description = "Retrieves the languages enabled in the server")
-	public String[] getLanguages() {
+	public List<String> getLanguages() {
 		String sid = validateSessionREST();
 		return super.getLanguages(sid);
 	}

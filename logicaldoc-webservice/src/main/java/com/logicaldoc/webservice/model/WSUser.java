@@ -1,10 +1,12 @@
 package com.logicaldoc.webservice.model;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlType;
 
@@ -127,7 +129,7 @@ public class WSUser {
 	private int type = TYPE_DEFAULT;
 
 	@WSDoc(description = "ids of the groups this user belongs to")
-	private long[] groupIds = new long[0];
+	private List<Long> groupIds = new ArrayList<>();
 
 	@WSDoc(description = "if <b>1</b> the user is enabled, if <b>0</b> the user is disabled")
 	private int enabled = 1;
@@ -178,7 +180,7 @@ public class WSUser {
 	private String expire;
 
 	@WSDoc(description = "the working time specification", required = false)
-	private WSWorkingTime[] workingTimes = null;
+	private List<WSWorkingTime> workingTimes = new ArrayList<>();
 
 	@WSDoc(description = "maximum number of inactivity days after which the account gets disabled", required = false)
 	private Integer maxInactivity;
@@ -317,11 +319,11 @@ public class WSUser {
 		telephone = phone;
 	}
 
-	public long[] getGroupIds() {
+	public List<Long> getGroupIds() {
 		return groupIds;
 	}
 
-	public void setGroupIds(long[] groupIds) {
+	public void setGroupIds(List<Long> groupIds) {
 		this.groupIds = groupIds;
 	}
 
@@ -490,7 +492,7 @@ public class WSUser {
 			user.setKey(getKey());
 			user.setSecondFactor(getSecondFactor());
 
-			if (getGroupIds().length > 0) {
+			if (CollectionUtils.isNotEmpty(groupIds)) {
 				GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 				Set<Group> groups = new HashSet<>();
 				for (long groupId : getGroupIds()) {
@@ -502,7 +504,7 @@ public class WSUser {
 					user.setGroups(groups);
 			}
 
-			if (workingTimes != null && workingTimes.length > 0)
+			if (CollectionUtils.isNotEmpty(workingTimes))
 				for (WSWorkingTime wswt : workingTimes) {
 					WorkingTime wt = new WorkingTime();
 					BeanUtils.copyProperties(wt, wswt);
@@ -565,31 +567,19 @@ public class WSUser {
 			wsUser.setTimeZone(user.getTimeZone());
 			wsUser.setKey(user.getKey());
 			wsUser.setSecondFactor(user.getSecondFactor());
+			wsUser.setGroupIds(user.getGroups().stream().map(g -> g.getId()).collect(Collectors.toList()));
 
-			if (CollectionUtils.isNotEmpty(user.getGroups())) {
-				long[] groupIds = new long[user.getGroups().size()];
-				int i = 0;
-				for (Group group : user.getGroups()) {
-					if (group.getType() == Group.TYPE_DEFAULT) {
-						groupIds[i] = group.getId();
-						i++;
-					}
+			List<WSWorkingTime> tmp = user.getWorkingTimes().stream().map(wt -> {
+				WSWorkingTime wswt = new WSWorkingTime();
+				try {
+					BeanUtils.copyProperties(wswt, wt);
+				} catch (Exception t) {
+					// Nothing to do
 				}
-				wsUser.setGroupIds(groupIds);
-			}
+				return wswt;
+			}).collect(Collectors.toList());
+			wsUser.setWorkingTimes(tmp);
 
-			if (user.getWorkingTimes() != null && !user.getWorkingTimes().isEmpty()) {
-				List<WSWorkingTime> tmp = user.getWorkingTimes().stream().map(wt -> {
-					WSWorkingTime wswt = new WSWorkingTime();
-					try {
-						BeanUtils.copyProperties(wswt, wt);
-					} catch (Exception t) {
-						// Nothing to do
-					}
-					return wswt;
-				}).toList();
-				wsUser.setWorkingTimes(tmp.toArray(new WSWorkingTime[0]));
-			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -677,11 +667,11 @@ public class WSUser {
 		this.enforceWorkingTime = enforceWorkingTime;
 	}
 
-	public WSWorkingTime[] getWorkingTimes() {
+	public List<WSWorkingTime> getWorkingTimes() {
 		return workingTimes;
 	}
 
-	public void setWorkingTimes(WSWorkingTime[] workingTimes) {
+	public void setWorkingTimes(List<WSWorkingTime> workingTimes) {
 		this.workingTimes = workingTimes;
 	}
 

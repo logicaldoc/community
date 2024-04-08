@@ -1,5 +1,8 @@
 package com.logicaldoc.webservice.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlType;
 
 import com.logicaldoc.webservice.doc.WSDoc;
@@ -68,7 +71,7 @@ public class WSSystemInfo {
 	private String hostName;
 
 	@WSDoc(required = true)
-	private String[] features;
+	private List<String> features = new ArrayList<>();
 
 	@WSDoc(required = true)
 	private String date = null;
@@ -209,11 +212,11 @@ public class WSSystemInfo {
 		this.runLevel = runLevel;
 	}
 
-	public String[] getFeatures() {
+	public List<String> getFeatures() {
 		return features;
 	}
 
-	public void setFeatures(String[] features) {
+	public void setFeatures(List<String> features) {
 		this.features = features;
 	}
 

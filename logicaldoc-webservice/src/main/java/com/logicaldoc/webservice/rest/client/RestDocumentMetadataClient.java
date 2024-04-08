@@ -1,6 +1,7 @@
 package com.logicaldoc.webservice.rest.client;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -49,12 +50,12 @@ public class RestDocumentMetadataClient extends AbstractRestClient {
 		}
 	}
 
-	public void setAttributeOptions(long setId, String attribute, WSAttributeOption[] options)
+	public void setAttributeOptions(long setId, String attribute, List<WSAttributeOption> options)
 			throws WebserviceException, PersistenceException {
 		proxy.setAttributeOptions(setId, attribute, options);
 	}
 
-	public void setAttributeOptionsPOST(long setId, String attribute, WSAttributeOption[] options)
+	public void setAttributeOptionsPOST(long setId, String attribute, List<WSAttributeOption> options)
 			throws WebserviceException, PersistenceException {
 		proxy.setAttributeOptionsPOST(setId, attribute, options);
 	}
@@ -88,12 +89,12 @@ public class RestDocumentMetadataClient extends AbstractRestClient {
 		return proxy.getTemplateById(templateId);
 	}
 
-	public String[] getAttributeOptions(long setId, String attribute)
+	public List<String> getAttributeOptions(long setId, String attribute)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		return proxy.getAttributeOptions(setId, attribute);
 	}
 
-	public WSAttributeSet[] listAttributeSets()
+	public List<WSAttributeSet> listAttributeSets()
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		return proxy.listAttributeSets();
 	}
@@ -107,7 +108,7 @@ public class RestDocumentMetadataClient extends AbstractRestClient {
 		proxy.deleteTemplate(templateId);
 	}
 
-	public WSTemplate[] listTemplates() throws AuthenticationException, WebserviceException, PersistenceException {
+	public List<WSTemplate> listTemplates() throws AuthenticationException, WebserviceException, PersistenceException {
 		return proxy.listTemplates();
 	}
 }

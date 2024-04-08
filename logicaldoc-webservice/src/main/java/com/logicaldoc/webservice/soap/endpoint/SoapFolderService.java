@@ -1,9 +1,9 @@
 package com.logicaldoc.webservice.soap.endpoint;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -82,13 +82,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		folderVO.setColor(wsFolder.getColor());
 		folderVO.setTile(wsFolder.getTile());
 
-		Set<String> tagsSet = new TreeSet<>();
-		if (wsFolder.getTags() != null) {
-			for (int i = 0; i < wsFolder.getTags().length; i++) {
-				tagsSet.add(wsFolder.getTags()[i]);
-			}
-		}
-		folderVO.setTagsFromWords(tagsSet);
+		folderVO.setTagsFromWords(Set.copyOf(wsFolder.getTags()));
 
 		wsFolder.updateAttributes(folderVO);
 
@@ -197,7 +191,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	}
 
 	@Override
-	public WSFolder[] listChildren(String sid, long folderId)
+	public List<WSFolder> listChildren(String sid, long folderId)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 
 		User user = validateSession(sid);
@@ -213,7 +207,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			}
 		}
 
-		return wsFolders.toArray(new WSFolder[0]);
+		return wsFolders;
 	}
 
 	@Override
@@ -371,7 +365,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	}
 
 	@Override
-	public WSFolder[] getPath(String sid, long folderId)
+	public List<WSFolder> getPath(String sid, long folderId)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 
@@ -398,11 +392,11 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			path.add(wsFolder);
 		}
 
-		return path.toArray(new WSFolder[0]);
+		return path;
 	}
 
 	@Override
-	public void setAccessControlList(String sid, long folderId, WSAccessControlEntry[] acl)
+	public void setAccessControlList(String sid, long folderId, List<WSAccessControlEntry> acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
 		User sessionUser = validateSession(sid);
 
@@ -427,7 +421,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	}
 
 	@Override
-	public WSAccessControlEntry[] getAccessControlList(String sid, long folderId)
+	public List<WSAccessControlEntry> getAccessControlList(String sid, long folderId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		validateSession(sid);
 
@@ -441,7 +435,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 		for (AccessControlEntry ace : folder.getAccessControlList())
 			acl.add(WSUtil.toWSAccessControlEntry(ace));
-		return acl.toArray(new WSAccessControlEntry[0]);
+		return acl;
 	}
 
 	@Override
@@ -482,13 +476,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			folder.setStorage(wsFolder.getStorage());
 			folder.setMaxVersions(wsFolder.getMaxVersions());
 
-			Set<String> tagsSet = new TreeSet<>();
-			if (wsFolder.getTags() != null) {
-				for (int i = 0; i < wsFolder.getTags().length; i++) {
-					tagsSet.add(wsFolder.getTags()[i]);
-				}
-			}
-			folder.setTagsFromWords(tagsSet);
+			folder.setTagsFromWords(new HashSet<>(wsFolder.getTags()));
 
 			wsFolder.updateAttributes(folder);
 
@@ -553,7 +541,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	}
 
 	@Override
-	public WSFolder[] listWorkspaces(String sid)
+	public List<WSFolder> listWorkspaces(String sid)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
@@ -566,7 +554,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 				wsFolders.add(WSFolder.fromFolder(folder));
 			}
 		}
-		return wsFolders.toArray(new WSFolder[0]);
+		return wsFolders;
 	}
 
 	@Override

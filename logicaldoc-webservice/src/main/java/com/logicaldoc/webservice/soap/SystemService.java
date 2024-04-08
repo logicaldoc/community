@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.soap;
 
+import java.util.List;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -39,7 +41,7 @@ public interface SystemService {
 	 * 
 	 * @param sid Session identifier
 	 * 
-	 * @return The value object containing the statistics values
+	 * @return List of stats
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -48,7 +50,7 @@ public interface SystemService {
 	@WebResult(name = "parameter")
 	@WebMethod(action = "getStatistics")
 	@WSDoc(description = "gets a set of statisticts of the system")
-	public WSParameter[] getStatistics(@WebParam(name = "sid")
+	public List<WSParameter> getStatistics(@WebParam(name = "sid")
 	String sid) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
@@ -61,7 +63,7 @@ public interface SystemService {
 	@WebResult(name = "language")
 	@WebMethod(action = "getLanguages")
 	@WSDoc(description = "retrieves the languages enabled in the server")
-	public String[] getLanguages(@WSDoc(description = "a session's identifier or a tenant's name")
+	public List<String> getLanguages(@WSDoc(description = "a session's identifier or a tenant's name")
 	@WebParam(name = "tenantOrSid")
 	String tenantOrSid);
 }

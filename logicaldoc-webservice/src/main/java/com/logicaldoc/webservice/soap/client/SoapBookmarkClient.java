@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.soap.client;
 
+import java.util.List;
+
 import javax.jws.WebService;
 
 import com.logicaldoc.core.PersistenceException;
@@ -46,7 +48,7 @@ public class SoapBookmarkClient extends SoapClient<BookmarkService> implements B
 	}
 
 	@Override
-	public WSBookmark[] getBookmarks(String sid)
+	public List<WSBookmark> getBookmarks(String sid)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		return client.getBookmarks(sid);
 	}

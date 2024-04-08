@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.soap;
 
+import java.util.List;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -31,7 +33,7 @@ public interface TagService {
 	 * 
 	 * @param sid identifier of the session
 	 * @param docId identifier of the document
-	 * @param tags array of tags
+	 * @param tags list of tags
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -47,7 +49,7 @@ public interface TagService {
 	String sid, @WSDoc(description = "identifier of the document", required = true)
 	@WebParam(name = "docId")
 	long docId, @WebParam(name = "tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+	List<String> tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
 			UnexistingResourceException;
 
 	/**
@@ -55,7 +57,7 @@ public interface TagService {
 	 * 
 	 * @param sid Session Identifier
 	 * @param docId identifier of the document
-	 * @param tags array of tags
+	 * @param tags list of tags
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -71,7 +73,7 @@ public interface TagService {
 	String sid, @WSDoc(description = "identifier of the document", required = true)
 	@WebParam(name = "docId")
 	long docId, @WebParam(name = "tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+	List<String> tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
 			UnexistingResourceException;
 
 	/**
@@ -92,7 +94,7 @@ public interface TagService {
 	@WebMethod(action = "getDocumentTags")
 	@WebResult(name = "tag")
 	@WSDoc(description = "retrieves all the tags of a document")
-	public String[] getDocumentTags(@WSDoc(description = "identifier of the session", required = true)
+	public List<String> getDocumentTags(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WSDoc(description = "identifier of the document", required = true)
 	@WebParam(name = "docId")
@@ -104,7 +106,7 @@ public interface TagService {
 	 * 
 	 * @param sid Session Identifier
 	 * @param folderId identifier of the folder
-	 * @param tags array of tags
+	 * @param tags list of tags
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -118,14 +120,14 @@ public interface TagService {
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "folderId")
 	long folderId, @WebParam(name = "tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	List<String> tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Adds tags to a folder
 	 * 
 	 * @param sid Session Identifier
 	 * @param folderId identifier of the folder
-	 * @param tags array of tags
+	 * @param tags list of tags
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -139,7 +141,7 @@ public interface TagService {
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "folderId")
 	long folderId, @WebParam(name = "tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	List<String> tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Retrieves all the tags of a folder
@@ -158,7 +160,7 @@ public interface TagService {
 	@WebMethod(action = "getFolderTags")
 	@WebResult(name = "tag")
 	@WSDoc(description = "retrieves all the tags of a folder")
-	public String[] getFolderTags(@WSDoc(description = "identifier of the session", required = true)
+	public List<String> getFolderTags(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "folderId")
 	long folderId) throws PermissionException, PersistenceException, AuthenticationException, WebserviceException;
@@ -177,7 +179,7 @@ public interface TagService {
 	@WebMethod(action = "getTags")
 	@WebResult(name = "tag")
 	@WSDoc(description = "retrieves all the tags in the repository")
-	public String[] getTags(@WSDoc(description = "identifier of the session", required = true)
+	public List<String> getTags(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid) throws PersistenceException, AuthenticationException, WebserviceException;
 
@@ -195,7 +197,7 @@ public interface TagService {
 	@WebMethod(action = "getTagsPreset")
 	@WebResult(name = "tag")
 	@WSDoc(description = "retrieves all the tags specified in the preset, empty if input mode is free")
-	public String[] getTagsPreset(@WSDoc(description = "identifier of the session", required = true)
+	public List<String> getTagsPreset(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid) throws AuthenticationException, WebserviceException, PersistenceException;
 
@@ -213,7 +215,7 @@ public interface TagService {
 	@WebMethod(action = "getTagCloud")
 	@WebResult(name = "tagCloud")
 	@WSDoc(description = "retrieves all tag clouds in the repository")
-	public WSTagCloud[] getTagCloud(@WSDoc(description = "identifier of the session", required = true)
+	public List<WSTagCloud> getTagCloud(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid) throws PersistenceException, AuthenticationException, WebserviceException;
 
@@ -232,7 +234,7 @@ public interface TagService {
 	@WebMethod(action = "findDocumentsByTag")
 	@WebResult(name = "document")
 	@WSDoc(description = "finds authorized documents for the current user having a specified tag")
-	public WSDocument[] findDocumentsByTag(@WSDoc(description = "identifier of the session", required = true)
+	public List<WSDocument> findDocumentsByTag(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "tag")
 	String tag) throws PersistenceException, AuthenticationException, WebserviceException;
@@ -252,7 +254,7 @@ public interface TagService {
 	@WebMethod(action = "findFoldersByTag")
 	@WebResult(name = "folder")
 	@WSDoc(description = "finds authorized folders for the current user having a specified tag")
-	public WSFolder[] findFoldersByTag(@WSDoc(description = "identifier of the session", required = true)
+	public List<WSFolder> findFoldersByTag(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "tag")
 	String tag) throws AuthenticationException, WebserviceException, PersistenceException;

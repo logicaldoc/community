@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.soap.client;
 
+import java.util.List;
+
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -73,7 +75,7 @@ public class SoapFolderClient extends SoapClient<FolderService> implements Folde
 	}
 
 	@Override
-	public WSFolder[] listChildren(String sid, long folderId)
+	public List<WSFolder> listChildren(String sid, long folderId)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.listChildren(sid, folderId);
 	}
@@ -97,7 +99,7 @@ public class SoapFolderClient extends SoapClient<FolderService> implements Folde
 	}
 
 	@Override
-	public WSFolder[] getPath(String sid, long folderId)
+	public List<WSFolder> getPath(String sid, long folderId)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.getPath(sid, folderId);
 	}
@@ -115,7 +117,7 @@ public class SoapFolderClient extends SoapClient<FolderService> implements Folde
 	}
 
 	@Override
-	public WSFolder[] listWorkspaces(String sid)
+	public List<WSFolder> listWorkspaces(String sid)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		return client.listWorkspaces(sid);
 	}
@@ -145,13 +147,13 @@ public class SoapFolderClient extends SoapClient<FolderService> implements Folde
 	}
 
 	@Override
-	public WSAccessControlEntry[] getAccessControlList(String sid, long folderId)
+	public List<WSAccessControlEntry> getAccessControlList(String sid, long folderId)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		return client.getAccessControlList(sid, folderId);
 	}
 
 	@Override
-	public void setAccessControlList(String sid, long folderId, WSAccessControlEntry[] acl)
+	public void setAccessControlList(String sid, long folderId, List<WSAccessControlEntry> acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
 		client.setAccessControlList(sid, folderId, acl);
 	}

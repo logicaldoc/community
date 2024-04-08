@@ -11,6 +11,7 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,7 +36,7 @@ public class RestWorkbench {
 	private static RestAuthClient authClient = null;
 
 	private static RestDocumentClient docClient = null;
-	
+
 	private static RestDocumentMetadataClient docMetadataClient = null;
 
 	private static RestFolderClient fldClient = null;
@@ -49,9 +50,19 @@ public class RestWorkbench {
 	private static String BASE_PATH = "http://localhost:9080";
 
 	public static void main(String[] args) throws Exception {
-		//String test1="<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><soap:Body><checkin xmlns=\"http://ws.logicaldoc.com\"><sid xmlns=\"\">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX2a84c8</sid><docId xmlns=\"\">723651853</docId><filename xmlns=\"\">17.01.11 - F33OC2Z.doc</filename><release xmlns=\"\">false</release><content xmlns=\"\">e1xydGYxXGFkZWZsYW5nMTAyNVx</content>";
-		
-		//System.out.println(test1.replaceAll("<content[^>]*>.*</content>", "<content>...</content>"));
+		// String test1="<?xml version=\"1.0\"
+		// encoding=\"utf-8\"?><soap:Envelope
+		// xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"
+		// xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
+		// xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><soap:Body><checkin
+		// xmlns=\"http://ws.logicaldoc.com\"><sid
+		// xmlns=\"\">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX2a84c8</sid><docId
+		// xmlns=\"\">723651853</docId><filename xmlns=\"\">17.01.11 -
+		// F33OC2Z.doc</filename><release xmlns=\"\">false</release><content
+		// xmlns=\"\">e1xydGYxXGFkZWZsYW5nMTAyNVx</content>";
+
+		// System.out.println(test1.replaceAll("<content[^>]*>.*</content>",
+		// "<content>...</content>"));
 
 		String username = "admin";
 		String password = "12345678";
@@ -62,9 +73,9 @@ public class RestWorkbench {
 		searchClient = new RestSearchClient(BASE_PATH + "/services/rest/search", username, password);
 		tagClient = new RestTagClient(BASE_PATH + "/services/rest/tag", username, password);
 		bookmarkClient = new RestBookmarkClient(BASE_PATH + "/services/rest/bookmark", username, password);
-		docMetadataClient = new RestDocumentMetadataClient(BASE_PATH + "/services/rest/documentMetadata", username, password);
+		docMetadataClient = new RestDocumentMetadataClient(BASE_PATH + "/services/rest/documentMetadata", username,
+				password);
 
-		
 		String sid = authClient.login(username, password);
 		System.err.println(sid);
 //		
@@ -72,9 +83,9 @@ public class RestWorkbench {
 //		
 //		authClient.logout(sid);
 //		System.err.println("op finished");
-		
+
 		// createDocument();
-		
+
 		// tagStuff();
 
 		// bookmarkStuff();
@@ -87,7 +98,7 @@ public class RestWorkbench {
 
 		// Note: 04L is the id of the default workspace
 
-		 listDocuments(04L);
+		listDocuments(04L);
 		// listDocuments(04L, "InvoiceProcessing01-workflow*.png"); // 4
 		// documents
 		// listDocuments(04L, "InvoiceProcessing01-workflow.png"); // 1 document
@@ -101,8 +112,8 @@ public class RestWorkbench {
 
 		// getFolder(04L);
 
-		//checkout(735L);
-		//checkin(735L);
+		// checkout(735L);
+		// checkin(735L);
 		// getVersionContent(735L, "1.2");
 
 		/*
@@ -260,16 +271,16 @@ public class RestWorkbench {
 			}
 		}
 
-		WSRating[] ratings = docClient.getRatings(doc.getId());
+		List<WSRating> ratings = docClient.getRatings(doc.getId());
 		if (ratings != null)
-			System.out.println("Found " + ratings.length + " ratings");
+			System.out.println("Found " + ratings.size() + " ratings");
 
 		WSRating rating = docClient.rateDocument(doc.getId(), 3);
 		System.out.println("Created rating: " + rating.getUsername() + " - " + rating.getVote());
 
 		ratings = docClient.getRatings(doc.getId());
 		if (ratings != null)
-			System.out.println("Found " + ratings.length + " ratings");
+			System.out.println("Found " + ratings.size() + " ratings");
 	}
 
 	private static void noteStuff() throws Exception {
@@ -286,12 +297,12 @@ public class RestWorkbench {
 		System.out.println("Created note: " + note.getId() + " - " + note.getUsername() + " - " + note.getMessage());
 		note = docClient.addNote(doc.getId(), "Test note 2");
 		System.out.println("Created note: " + note.getId() + " - " + note.getUsername() + " - " + note.getMessage());
-		WSNote[] notes = docClient.getNotes(doc.getId());
-		System.out.println("Found " + notes.length + " notes");
+		List<WSNote> notes = docClient.getNotes(doc.getId());
+		System.out.println("Found " + notes.size() + " notes");
 		docClient.deleteNote(note.getId());
 		System.out.println("Deleted note " + note.getId());
 		notes = docClient.getNotes(doc.getId());
-		System.out.println("Found " + notes.length + " notes");
+		System.out.println("Found " + notes.size() + " notes");
 	}
 
 	private static void bookmarkStuff() throws Exception {
@@ -304,38 +315,38 @@ public class RestWorkbench {
 			}
 		}
 
-		WSBookmark[] bookmarks = bookmarkClient.getBookmarks();
+		List<WSBookmark> bookmarks = bookmarkClient.getBookmarks();
 		if (bookmarks != null)
-			System.out.println("Found " + bookmarks.length + " bookmarks");
+			System.out.println("Found " + bookmarks.size() + " bookmarks");
 
 		WSBookmark bookmark = bookmarkClient.bookmarkDocument(doc.getId());
 		System.out.println("Created bookmark: " + bookmark.getTitle() + " - " + bookmark.getFileType());
 
 		bookmarks = bookmarkClient.getBookmarks();
 		if (bookmarks != null)
-			System.out.println("Found " + bookmarks.length + " bookmarks");
+			System.out.println("Found " + bookmarks.size() + " bookmarks");
 	}
 
 	private static void tagStuff() throws Exception {
-		List<String> tags = Arrays.asList(tagClient.getTags());
+		List<String> tags = tagClient.getTags();
 		System.out.println("Found tags " + tags);
 
 		for (String tag : tags) {
-			WSDocument[] docs = tagClient.findDocumentsByTag(tag);
-			if (docs != null && docs.length > 0) {
-				System.out.println("Found " + docs.length + " documents tagged with '" + tag + "'");
+			List<WSDocument> docs = tagClient.findDocumentsByTag(tag);
+			if (docs != null && docs.size() > 0) {
+				System.out.println("Found " + docs.size() + " documents tagged with '" + tag + "'");
 				for (WSDocument doc : docs)
-					tagClient.addDocumentTags(doc.getId(), new String[] { "xyz" });
+					tagClient.addDocumentTags(doc.getId(), Arrays.asList("xyz"));
 				break;
 			}
 		}
 
 		for (String tag : tags) {
-			WSFolder[] folders = tagClient.findFoldersByTag(tag);
-			if (folders != null && folders.length > 0) {
-				System.out.println("Found " + folders.length + " folders tagged with '" + tag + "'");
+			List<WSFolder> folders = tagClient.findFoldersByTag(tag);
+			if (folders != null && folders.size() > 0) {
+				System.out.println("Found " + folders.size() + " folders tagged with '" + tag + "'");
 				for (WSFolder folder : folders)
-					tagClient.addFolderTags(folder.getId(), new String[] { "xyz" });
+					tagClient.addFolderTags(folder.getId(), Arrays.asList("xyz"));
 				break;
 			}
 		}
@@ -350,12 +361,12 @@ public class RestWorkbench {
 	}
 
 	private static void checkin(long docId) throws Exception {
-		
+
 		try {
 			docClient.checkout(docId);
 		} catch (Exception e) {
 			System.err.println("Captured exception: " + e.getMessage());
-			//e.printStackTrace();
+			// e.printStackTrace();
 		}
 
 		// verify document status
@@ -374,7 +385,7 @@ public class RestWorkbench {
 		} catch (Exception e) {
 			// Captured exception
 			System.err.println("Captured exception: " + e.getMessage());
-			//e.printStackTrace();			
+			// e.printStackTrace();
 		}
 
 		// verify document status
@@ -538,42 +549,39 @@ public class RestWorkbench {
 	}
 
 	private static void listDocuments(long folderId) throws Exception {
-		WSDocument[] docs = docClient.list(folderId);
+		List<WSDocument> docs = docClient.list(folderId);
 		System.out.println("docs: " + docs);
-		System.out.println("docs.length: " + docs.length);
+		System.out.println("docs.length: " + docs.size());
 
 		// Object to JSON in String
 		ObjectMapper mapper = new ObjectMapper();
-		if (docs.length > 0) {
-			String jsonInString = mapper.writeValueAsString(docs[0]);
+		if (docs.size() > 0) {
+			String jsonInString = mapper.writeValueAsString(docs.get(0));
 			System.out.println("doc[1]: " + jsonInString);
 		}
 	}
 
 	private static void listDocuments(long folderId, String fileName) throws Exception {
-		WSDocument[] docs = docClient.listDocuments(folderId, fileName);
+		List<WSDocument> docs = docClient.listDocuments(folderId, fileName);
 		System.out.println("docs: " + docs);
 
-		if (docs != null) {
-			System.out.println("docs.length: " + docs.length);
-			if (docs.length > 0) {
-				// Object to JSON in String
-				ObjectMapper mapper = new ObjectMapper();
-				String jsonInString = mapper.writeValueAsString(docs[0]);
-				System.out.println("doc[1]: " + jsonInString);
-			}
+		if (docs.size() > 0) {
+			// Object to JSON in String
+			ObjectMapper mapper = new ObjectMapper();
+			String jsonInString = mapper.writeValueAsString(docs.get(0));
+			System.out.println("doc[1]: " + jsonInString);
 		}
 	}
 
 	private static void listFolderChildren(long folderId) throws Exception {
-		WSFolder[] dirs = fldClient.listChildren(folderId);
+		List<WSFolder> dirs = fldClient.listChildren(folderId);
 		System.out.println("docs: " + dirs);
-		System.out.println("docs.length: " + dirs.length);
+		System.out.println("docs.length: " + dirs.size());
 
 		// Object to JSON in String
-		if ((dirs != null) && (dirs.length > 0)) {
+		if (CollectionUtils.isNotEmpty(dirs)) {
 			ObjectMapper mapper = new ObjectMapper();
-			String jsonInString = mapper.writeValueAsString(dirs[0]);
+			String jsonInString = mapper.writeValueAsString(dirs.get(0));
 			System.out.println("dirs[0]: " + jsonInString);
 		}
 	}

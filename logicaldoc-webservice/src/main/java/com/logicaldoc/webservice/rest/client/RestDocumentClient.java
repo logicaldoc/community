@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.activation.DataHandler;
 import javax.ws.rs.core.MediaType;
@@ -82,13 +83,13 @@ public class RestDocumentClient extends AbstractRestClient {
 		return proxy.create(document, fileAttachment);
 	}
 
-	public WSDocument[] list(long folderId)
+	public List<WSDocument> list(long folderId)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type("*/*");
 		return proxy.list(folderId);
 	}
 
-	public WSDocument[] listDocuments(long folderId, String fileName)
+	public List<WSDocument> listDocuments(long folderId, String fileName)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type("*/*");
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
@@ -186,7 +187,7 @@ public class RestDocumentClient extends AbstractRestClient {
 	 * 
 	 * @param docId identifier of the document
 	 * 
-	 * @return array of ratings
+	 * @return list of ratings
 	 * 
 	 * @throws PersistenceException Error in the data layer
 	 * @throws WebserviceException Error in the Webservice layer
@@ -194,7 +195,7 @@ public class RestDocumentClient extends AbstractRestClient {
 	 * @throws PermissionException Not enough permissions
 	 * @throws UnexistingResourceException The specified document does not exist
 	 */
-	public WSNote[] getNotes(long docId) throws AuthenticationException, PermissionException, WebserviceException,
+	public List<WSNote> getNotes(long docId) throws AuthenticationException, PermissionException, WebserviceException,
 			PersistenceException, UnexistingResourceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
@@ -235,8 +236,8 @@ public class RestDocumentClient extends AbstractRestClient {
 	 * @throws PermissionException Not enough permissions
 	 * @throws UnexistingResourceException The specified document does not exist
 	 */
-	public WSRating[] getRatings(long docId) throws AuthenticationException, PermissionException, WebserviceException,
-			PersistenceException, UnexistingResourceException {
+	public List<WSRating> getRatings(long docId) throws AuthenticationException, PermissionException,
+			WebserviceException, PersistenceException, UnexistingResourceException {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.getRatings(docId);

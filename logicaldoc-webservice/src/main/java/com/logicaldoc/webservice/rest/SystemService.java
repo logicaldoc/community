@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.rest;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -38,7 +40,7 @@ public interface SystemService {
 	/**
 	 * Retrieves the system statistics
 	 * 
-	 * @return The value object containing the statistics values
+	 * @return List of stats
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -46,7 +48,7 @@ public interface SystemService {
 	 */
 	@GET
     @Path("/getStatistics")		
-	public WSParameter[] getStatistics() throws AuthenticationException, WebserviceException, PersistenceException;
+	public List<WSParameter> getStatistics() throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Retrieves the languages enabled in the server.
@@ -55,6 +57,6 @@ public interface SystemService {
 	 */
 	@GET
 	@Path("/getLanguages")	
-	public String[] getLanguages();	
+	public List<String> getLanguages();	
 	
 }

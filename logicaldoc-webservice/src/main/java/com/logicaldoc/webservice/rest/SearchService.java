@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.rest;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -39,7 +41,7 @@ public interface SearchService {
 	 */
 	@GET
 	@Path("/findByFilename")
-	public WSDocument[] findByFilename(String filename)
+	public List<WSDocument> findByFilename(String filename)
 			throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
@@ -56,7 +58,7 @@ public interface SearchService {
 	 */
 	@GET
 	@Path("/findFolders")
-	public WSFolder[] findFolders(String name)
+	public List<WSFolder> findFolders(String name)
 			throws AuthenticationException, WebserviceException, PersistenceException;
 
 }

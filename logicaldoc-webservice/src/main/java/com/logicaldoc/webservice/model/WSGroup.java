@@ -1,8 +1,11 @@
 package com.logicaldoc.webservice.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlType;
 
@@ -52,7 +55,7 @@ public class WSGroup implements Serializable {
 	private Long inheritGroupId;
 
 	@WSDoc(description = "set of users in this group")
-	private long[] userIds = new long[0];
+	private List<Long> userIds = new ArrayList<>();
 
 	@WSDoc(description = "the last modified date (format must be 'yyyy-MM-dd HH:mm:ss' or 'yyyy-MM-dd')", required = false)
 	private String lastModified;
@@ -92,11 +95,11 @@ public class WSGroup implements Serializable {
 		this.description = description;
 	}
 
-	public long[] getUserIds() {
+	public List<Long> getUserIds() {
 		return userIds;
 	}
 
-	public void setUserIds(long[] userIds) {
+	public void setUserIds(List<Long> userIds) {
 		this.userIds = userIds;
 	}
 
@@ -125,7 +128,7 @@ public class WSGroup implements Serializable {
 			group.setDescription(getDescription());
 			group.setType(getType());
 
-			if (getUserIds().length > 0) {
+			if (CollectionUtils.isNotEmpty(userIds)) {
 				UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 				Set<User> users = new HashSet<>();
 				for (long userId : getUserIds()) {
@@ -153,16 +156,7 @@ public class WSGroup implements Serializable {
 			wsGroup.setType(group.getType());
 			wsGroup.setLastModified(DateUtil.format(group.getLastModified()));
 			wsGroup.setSource(group.getSource());
-
-			if (CollectionUtils.isNotEmpty(group.getUsers())) {
-				long[] userIds = new long[group.getUsers().size()];
-				int i = 0;
-				for (User user : group.getUsers()) {
-					userIds[i] = user.getId();
-					i++;
-				}
-				wsGroup.setUserIds(userIds);
-			}
+			wsGroup.setUserIds(group.getUsers().stream().map(u -> u.getId()).collect(Collectors.toList()));
 		} catch (Exception e) {
 			// Nothing to do
 		}

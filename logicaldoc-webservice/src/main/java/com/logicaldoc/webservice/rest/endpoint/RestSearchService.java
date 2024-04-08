@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.rest.endpoint;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -36,16 +38,12 @@ public class RestSearchService extends SoapSearchService implements SearchServic
 	protected static Logger log = LoggerFactory.getLogger(RestSearchService.class);
 
 	@POST
-    @Path("/find")
-	//@ApiOperation(value = "Search documents", notes = "Runs a search on the server")
+	@Path("/find")
 	@Operation(summary = "Search documents", description = "Runs a search on the server")
 	public WSSearchResult find(
-			@Parameter(
-					description = "Search options", required = true,
-					example = "{\"maxHits\":50,\"expression\":\"document management system\",\"expressionLanguage\":\"en\",\"language\":\"en\"}",
-					schema = @Schema(implementation = WSSearchOptions.class))
-			WSSearchOptions opt) throws AuthenticationException, PersistenceException, WebserviceException, SearchException 
-			{
+			@Parameter(description = "Search options", required = true, example = "{\"maxHits\":50,\"expression\":\"document management system\",\"expressionLanguage\":\"en\",\"language\":\"en\"}", schema = @Schema(implementation = WSSearchOptions.class))
+			WSSearchOptions opt)
+			throws AuthenticationException, PersistenceException, WebserviceException, SearchException {
 		String sid = validateSessionREST();
 		return super.find(sid, opt);
 	}
@@ -53,9 +51,10 @@ public class RestSearchService extends SoapSearchService implements SearchServic
 	@Override
 	@GET
 	@Path("/findByFilename")
-	//@ApiOperation(value = "Search documents by Filename", notes = "Finds authorized documents for the current user containing the given filename (like operator is used)")
 	@Operation(summary = "Search documents by Filename", description = "Finds authorized documents for the current user containing the given filename (like operator is used)")
-	public WSDocument[] findByFilename(@Parameter(description = "Filename of the document", required = true) @QueryParam("filename") String filename) throws AuthenticationException, WebserviceException, PersistenceException {
+	public List<WSDocument> findByFilename(@Parameter(description = "Filename of the document", required = true)
+	@QueryParam("filename")
+	String filename) throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
 		return super.findByFilename(sid, filename);
 	}
@@ -63,9 +62,10 @@ public class RestSearchService extends SoapSearchService implements SearchServic
 	@Override
 	@GET
 	@Path("/findFolders")
-	//@ApiOperation(value = "Search folders by name", notes = "Finds authorized folders for the current user containing the given name (like operator is used)")
 	@Operation(summary = "Search folders by name", description = "Finds authorized folders for the current user containing the given name (like operator is used)")
-	public WSFolder[] findFolders(@Parameter(description = "Name of the folder", required = true) @QueryParam("name") String name) throws AuthenticationException, WebserviceException, PersistenceException {
+	public List<WSFolder> findFolders(@Parameter(description = "Name of the folder", required = true)
+	@QueryParam("name")
+	String name) throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
 		return super.findFolders(sid, name);
 	}

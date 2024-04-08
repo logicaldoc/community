@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.rest;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -33,7 +35,7 @@ public interface TagService {
 	 * Sets the tags of a document
 	 * 
 	 * @param docId identifier of the document
-	 * @param tags array of tags
+	 * @param tags list of tags
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -46,14 +48,14 @@ public interface TagService {
 	@Path("/setDocumentTags")
 	public void setDocumentTags(@FormParam("docId")
 	long docId, @FormParam("tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+	List<String> tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
 			UnexistingResourceException;
 
 	/**
 	 * Adds tags to a document
 	 * 
 	 * @param docId identifier of the document
-	 * @param tags array of tags
+	 * @param tags list of tags
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -66,7 +68,7 @@ public interface TagService {
 	@Path("/addDocumentTags")
 	public void addDocumentTags(@FormParam("docId")
 	long docId, @FormParam("tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+	List<String> tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
 			UnexistingResourceException;
 
 	/**
@@ -85,7 +87,7 @@ public interface TagService {
 	 */
 	@GET
 	@Path("/getDocumentTags")
-	public String[] getDocumentTags(@QueryParam("docId")
+	public List<String> getDocumentTags(@QueryParam("docId")
 	long docId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException,
 			UnexistingResourceException;
 
@@ -105,7 +107,7 @@ public interface TagService {
 	@Path("/setFolderTags")
 	public void setFolderTags(@FormParam("folderId")
 	long folderId, @FormParam("tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	List<String> tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Adds tags to a folder
@@ -123,7 +125,7 @@ public interface TagService {
 	@Path("/addFolderTags")
 	public void addFolderTags(@FormParam("folderId")
 	long folderId, @FormParam("tag")
-	String[] tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	List<String> tags) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Retrieves all the tags of a folder
@@ -140,24 +142,21 @@ public interface TagService {
 	 */
 	@GET
 	@Path("/getFolderTags")
-	public String[] getFolderTags(@QueryParam("folderId")
+	public List<String> getFolderTags(@QueryParam("folderId")
 	long folderId) throws PermissionException, AuthenticationException, PersistenceException, WebserviceException;
 
 	/**
 	 * Retrieves all the tags in the repository
 	 * 
 	 * @return The tags in the repository
-	 * @throws WebserviceException Error in the webservice
-	 * @throws PersistenceException Error in the database
-	 * @throws AuthenticationException Invalid session
 	 * 
-	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
+	 * @throws PersistenceException Error in the database
 	 * @throws AuthenticationException Invalid session
 	 */
 	@GET
 	@Path("/getTags")
-	public String[] getTags() throws AuthenticationException, PersistenceException, WebserviceException;
+	public List<String> getTags() throws AuthenticationException, PersistenceException, WebserviceException;
 
 	/**
 	 * Retrieves all tag clouds in the repository
@@ -170,7 +169,7 @@ public interface TagService {
 	 */
 	@GET
 	@Path("/getTagCloud")
-	public WSTagCloud[] getTagCloud() throws AuthenticationException, PersistenceException, WebserviceException;
+	public List<WSTagCloud> getTagCloud() throws AuthenticationException, PersistenceException, WebserviceException;
 
 	/**
 	 * Finds authorized documents for the current user having a specified tag
@@ -186,7 +185,7 @@ public interface TagService {
 	 */
 	@GET
 	@Path("/findDocumentsByTag")
-	public WSDocument[] findDocumentsByTag(@QueryParam("tag")
+	public List<WSDocument> findDocumentsByTag(@QueryParam("tag")
 	String tag) throws AuthenticationException, PersistenceException, WebserviceException;
 
 	/**
@@ -202,7 +201,7 @@ public interface TagService {
 	 */
 	@GET
 	@Path("/findFoldersByTag")
-	public WSFolder[] findFoldersByTag(@QueryParam("tag")
+	public List<WSFolder> findFoldersByTag(@QueryParam("tag")
 	String tag) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
@@ -216,5 +215,5 @@ public interface TagService {
 	 */
 	@GET
 	@Path("/getTagsPreset")
-	public String[] getTagsPreset() throws AuthenticationException, WebserviceException, PersistenceException;
+	public List<String> getTagsPreset() throws AuthenticationException, WebserviceException, PersistenceException;
 }

@@ -27,6 +27,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
@@ -41,6 +42,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.types.selectors.SelectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import com.logicaldoc.util.SystemUtil;
 
@@ -398,7 +400,7 @@ public class FileUtil {
 	 * @return true only if the passed filename matches the includes and not the
 	 *         excludes
 	 */
-	public static boolean matches(String filename, String[] includes, String[] excludes) {
+	public static boolean matches(String filename, Collection<String> includes, Collection<String> excludes) {
 		// First of all check if the filename must be excluded
 		boolean matchesEcludes = matchesFilters(filename, excludes);
 		if (matchesEcludes)
@@ -409,11 +411,11 @@ public class FileUtil {
 		if (matchesIncludes)
 			return true;
 
-		return includes == null || includes.length == 0;
+		return CollectionUtils.isEmpty(includes);
 	}
 
-	private static boolean matchesFilters(String str, String[] filters) {
-		if (filters != null && filters.length > 0)
+	private static boolean matchesFilters(String str, Collection<String> filters) {
+		if (!CollectionUtils.isEmpty(filters))
 			for (String s : filters)
 				if (StringUtils.isNotEmpty(s) && SelectorUtils.match(s, str, false))
 					return true;
@@ -450,7 +452,7 @@ public class FileUtil {
 				inc.add(st.nextToken().trim());
 		}
 
-		return matches(filename, inc.toArray(new String[0]), exc.toArray(new String[0]));
+		return matches(filename, inc, exc);
 	}
 
 	public static void writeUTF8(String content, File file, boolean append) {

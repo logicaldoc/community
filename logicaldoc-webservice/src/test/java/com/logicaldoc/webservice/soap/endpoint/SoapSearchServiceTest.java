@@ -3,7 +3,6 @@ package com.logicaldoc.webservice.soap.endpoint;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -35,23 +34,21 @@ public class SoapSearchServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testFindByFilename() throws Exception {
-		WSDocument[] documents = searchServiceImpl.findByFilename("", "pluto");
+		List<WSDocument> documents = searchServiceImpl.findByFilename("", "pluto");
 		Assert.assertNotNull(documents);
-		Assert.assertEquals(1, documents.length);
+		Assert.assertEquals(1, documents.size());
 
-		List<WSDocument> docsList = Arrays.asList(documents);
-		Assert.assertEquals(2, docsList.get(0).getId());
+		Assert.assertEquals(2, documents.get(0).getId());
 
 		documents = searchServiceImpl.findByFilename("", "PLUTO");
 		Assert.assertNotNull(documents);
-		Assert.assertEquals(1, documents.length);
+		Assert.assertEquals(1, documents.size());
 
-		docsList = Arrays.asList(documents);
-		Assert.assertEquals(2, docsList.get(0).getId());
+		Assert.assertEquals(2, documents.get(0).getId());
 
 		documents = searchServiceImpl.findByFilename("", "paperino");
 		Assert.assertNotNull(documents);
-		Assert.assertEquals(0, documents.length);
+		Assert.assertEquals(0, documents.size());
 
 		Document doc = docDao.findById(1);
 		Assert.assertNotNull(doc);
@@ -63,25 +60,23 @@ public class SoapSearchServiceTest extends AbstractWebserviceTestCase {
 
 		documents = searchServiceImpl.findByFilename("", "pluto");
 		Assert.assertNotNull(documents);
-		Assert.assertEquals(1, documents.length);
-	}	
+		Assert.assertEquals(1, documents.size());
+	}
 
 	@Test
 	public void testFindFolders() throws Exception {
-		WSFolder[] folders = searchServiceImpl.findFolders("", "menu.admin");
+		List<WSFolder> folders = searchServiceImpl.findFolders("", "menu.admin");
 		Assert.assertNotNull(folders);
-		Assert.assertEquals(4, folders.length);
-		List<WSFolder> foldersList = Arrays.asList(folders);
-		Assert.assertEquals(80, foldersList.get(0).getId());
-		Assert.assertEquals(99, foldersList.get(1).getId());
+		Assert.assertEquals(4, folders.size());
+		Assert.assertEquals(80, folders.get(0).getId());
+		Assert.assertEquals(99, folders.get(1).getId());
 
 		folders = searchServiceImpl.findFolders("", "menu.adminxx");
-		Assert.assertEquals(1, folders.length);
-		foldersList = Arrays.asList(folders);
-		Assert.assertEquals(80, foldersList.get(0).getId());
+		Assert.assertEquals(1, folders.size());
+		Assert.assertEquals(80, folders.get(0).getId());
 
 		folders = searchServiceImpl.findFolders("", "qqqxxx");
 		Assert.assertNotNull(folders);
-		Assert.assertEquals(0, folders.length);
+		Assert.assertEquals(0, folders.size());
 	}
 }
