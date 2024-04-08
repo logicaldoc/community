@@ -854,9 +854,15 @@ public abstract class Util {
 	 * @return the current tenant's name
 	 */
 	public static String detectTenant() {
+		String tenant = getTenantInRequest();
+		if (tenant == null)
+			tenant = Constants.TENANT_DEFAULTNAME;
+		return tenant;
+	}
+
+	public static String getTenantInRequest() {
 		RequestInfo request = WindowUtils.getRequestInfo();
-		// Tries to capture tenant parameter
-		String tenant = Constants.TENANT_DEFAULTNAME;
+		String tenant = null;
 		if (request.getParameter(Constants.TENANT) != null && !request.getParameter(Constants.TENANT).equals("")) {
 			tenant = request.getParameter(Constants.TENANT);
 		}
