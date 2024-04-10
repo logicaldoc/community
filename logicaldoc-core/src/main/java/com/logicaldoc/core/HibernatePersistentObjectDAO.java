@@ -431,6 +431,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 			if (maxRows != null)
 				jdbcTemplate.setMaxRows(maxRows);
+			logQuery(sql);
 			return jdbcTemplate.query(insertTopClause(sql, maxRows), rowMapper);
 		} catch (Exception e) {
 			throw new PersistenceException(e);

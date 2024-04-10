@@ -87,34 +87,6 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 		}
 	}
 
-	public void setFolderDao(FolderDAO folderDao) {
-		this.folderDao = folderDao;
-	}
-
-	public void setGroupDao(GroupDAO groupDao) {
-		this.groupDao = groupDao;
-	}
-
-	public void setUserDao(UserDAO userDao) {
-		this.userDao = userDao;
-	}
-
-	public void setConfig(ContextProperties config) {
-		this.config = config;
-	}
-
-	public void setGenericDao(GenericDAO genericDao) {
-		this.genericDao = genericDao;
-	}
-
-	public void setTemplateDao(TemplateDAO templateDao) {
-		this.templateDao = templateDao;
-	}
-
-	public void setDashletDao(DashletDAO dashletDao) {
-		this.dashletDao = dashletDao;
-	}
-
 	@Override
 	public Set<String> findAllNames() throws PersistenceException {
 		Set<String> names = new HashSet<>();
@@ -125,17 +97,9 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 		return names;
 	}
 
-	public void setMessageTemplateDao(MessageTemplateDAO messageTemplateDao) {
-		this.messageTemplateDao = messageTemplateDao;
-	}
-
 	@Override
 	public void store(Tenant entity) {
 		throw new IllegalArgumentException("Feature not enabled");
-	}
-
-	public void setAttributeSetDao(AttributeSetDAO attributeSetDao) {
-		this.attributeSetDao = attributeSetDao;
 	}
 
 	@Override

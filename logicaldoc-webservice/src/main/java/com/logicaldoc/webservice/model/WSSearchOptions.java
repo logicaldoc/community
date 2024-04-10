@@ -270,7 +270,7 @@ public class WSSearchOptions implements Comparable<WSSearchOptions> {
 			wopt.setDateTo(DateUtil.format(((FulltextSearchOptions) opt).getDateTo()));
 			wopt.setExpressionLanguage(((FulltextSearchOptions) opt).getExpressionLanguage());
 			wopt.setLanguage(((FulltextSearchOptions) opt).getLanguage());
-			wopt.setFields(new ArrayList<String>(((FulltextSearchOptions) opt).getFields()));
+			wopt.setFields(new ArrayList<>(((FulltextSearchOptions) opt).getFields()));
 			wopt.setFormat(((FulltextSearchOptions) opt).getFormat());
 			wopt.setSizeMax(((FulltextSearchOptions) opt).getSizeMax());
 			wopt.setSizeMin(((FulltextSearchOptions) opt).getSizeMin());

@@ -139,7 +139,11 @@ public class FulltextSearch extends Search {
 		 * Prepare the filters
 		 */
 		Set<String> filters = new HashSet<>();
-		setQueryFilters(opt, filters, tenantId, accessibleFolderIds);
+		try {
+			setQueryFilters(opt, filters, tenantId, accessibleFolderIds);
+		} catch (PersistenceException e) {
+			throw new SearchException(e);
+		} 
 
 		/*
 		 * Launch the search
@@ -295,7 +299,7 @@ public class FulltextSearch extends Search {
 	}
 
 	private void setQueryFilters(FulltextSearchOptions opt, Set<String> filters, long tenantId,
-			Collection<Long> accessibleFolderIds) throws SearchException {
+			Collection<Long> accessibleFolderIds) throws SearchException, PersistenceException {
 		TenantDAO tdao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		if (searchUser != null && tdao.count() > 1)
 			filters.add(HitField.TENANT_ID + ":" + (tenantId < 0 ? "\\" : "") + tenantId);

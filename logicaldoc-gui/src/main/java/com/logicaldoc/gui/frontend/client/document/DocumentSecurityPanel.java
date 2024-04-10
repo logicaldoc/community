@@ -43,6 +43,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class DocumentSecurityPanel extends DocumentDetailTab {
 
+	private static final String PREVIEW = "preview";
+
 	private static final String ARCHIVE = "archive";
 
 	private static final String WORKFLOW = "workflow";
@@ -119,7 +121,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		read.setType(ListGridFieldType.BOOLEAN);
 		read.setCanEdit(true);
 		
-		ListGridField preview = new ListGridField("preview", prepareHeaderLabel("preview"));
+		ListGridField preview = new ListGridField(PREVIEW, prepareHeaderLabel(PREVIEW));
 		preview.setType(ListGridFieldType.BOOLEAN);
 		preview.setCanEdit(true);
 
@@ -325,7 +327,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 			rec.setAttribute(ENTITY,
 					selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
 			rec.setAttribute("read", true);
-			rec.setAttribute("preview", true);
+			rec.setAttribute(PREVIEW, true);
 
 			list.addData(rec);
 			user.clearValue();
@@ -359,7 +361,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 			rec.setAttribute(AVATAR, "group");
 			rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
 			rec.setAttribute("read", true);
-			rec.setAttribute("preview", true);
+			rec.setAttribute(PREVIEW, true);
 			list.addData(rec);
 			group.clearValue();
 		});
@@ -406,7 +408,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 			ace.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
 			
 			ace.setRead(rec.getAttributeAsBoolean("read"));
-			ace.setPreview(rec.getAttributeAsBoolean("preview"));
+			ace.setPreview(rec.getAttributeAsBoolean(PREVIEW));
 			ace.setPrint(rec.getAttributeAsBoolean(PRINT));
 			ace.setWrite(rec.getAttributeAsBoolean(WRITE));
 			ace.setDelete(rec.getAttributeAsBoolean(DELETE));

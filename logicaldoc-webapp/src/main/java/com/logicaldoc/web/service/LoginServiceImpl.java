@@ -191,7 +191,13 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			return false;
 
 		TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
-		String tenant = tDao.getTenantName(user.getTenantId());
+		String tenant = Tenant.SYSTEM_NAME;
+		try {
+			tenant = tDao.getTenantName(user.getTenantId());
+		} catch (PersistenceException e) {
+			log.warn("Cannot retrieve tenant name of user {}", user.getUsername());
+		}
+
 		ContextProperties config = Context.get().getProperties();
 		if (!config.getBoolean(tenant + ".2fa.enabled", false)
 				|| !config.getBoolean(tenant + ".2fa." + user.getSecondFactor().toLowerCase() + ".enabled", false))
@@ -223,7 +229,12 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		}
 
 		TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
-		String tenant = tDao.getTenantName(user.getTenantId());
+		String tenant = Tenant.DEFAULT_NAME;
+		try {
+			tenant = tDao.getTenantName(user.getTenantId());
+		} catch (PersistenceException e) {
+			log.warn("Cannot retrieve tenant name of user {}", user.getUsername());
+		}
 
 		// Generate an initial password(that must be changed)
 		ContextProperties config = Context.get().getProperties();

@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.searchengine.SearchOptions;
 import com.logicaldoc.core.security.TenantDAO;
@@ -51,7 +52,7 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 		this.options = source.options;
 	}
 
-	public void saveOptions(SearchOptions opt) throws IOException {
+	public void saveOptions(SearchOptions opt) throws IOException, PersistenceException {
 		this.setType(opt.getType());
 
 		TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);

@@ -78,7 +78,7 @@ public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCharsets() throws IOException {
+	public void testCharsets() throws IOException, PersistenceException {
 		FulltextSearchOptions opt = new FulltextSearchOptions();
 
 		opt.setLanguage("it");

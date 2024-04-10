@@ -113,14 +113,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		super.log = LoggerFactory.getLogger(HibernateFolderDAO.class);
 	}
 
-	public UserDAO getUserDAO() {
-		return userDAO;
-	}
-
-	public void setUserDAO(UserDAO userDAO) {
-		this.userDAO = userDAO;
-	}
-
 	@Override
 	public void store(Folder folder) throws PersistenceException {
 		store(folder, null);
@@ -162,7 +154,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			setTags(folder);
 			
 			// Remove the sections
-			folder.getAttributes().values().removeIf(att -> att.isSection());
+			folder.getAttributes().values().removeIf(Attribute::isSection);
 
 			AccessControlUtil.removeForbiddenPermissionsForGuests(folder);
 
@@ -1133,14 +1125,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		}
 	}
 
-	public FolderHistoryDAO getHistoryDAO() {
-		return historyDAO;
-	}
-
-	public void setHistoryDAO(FolderHistoryDAO historyDAO) {
-		this.historyDAO = historyDAO;
-	}
-
 	@Override
 	public void deleteAll(Collection<Folder> folders, FolderHistory transaction) throws PersistenceException {
 		deleteAll(folders, PersistentObject.DELETED_CODE_DEFAULT, transaction);
@@ -2001,10 +1985,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			return workspaces.get(0);
 	}
 
-	public void setStorer(Storer storer) {
-		this.storer = storer;
-	}
-
 	@Override
 	public void updateSecurityRef(long folderId, long rightsFolderId, FolderHistory transaction)
 			throws PersistenceException {
@@ -2419,9 +2399,5 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			hist.setUser(transaction.getUser());
 			manager.moveToFolder(document, target, hist);
 		}
-	}
-
-	public void setListenerManager(FolderListenerManager listenerManager) {
-		this.listenerManager = listenerManager;
 	}
 }

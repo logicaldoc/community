@@ -307,17 +307,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 		for (GUIAttribute att : extensibleObject.getAttributes()) {
 			if (!att.isSection() && !att.isHidden()) {
-				FormItem item = prepareAttributeItem(att);
-				if (item != null) {
-					if (!updateEnabled)
-						item.setDisabled(true);
-					if (changedHandler != null)
-						item.addChangedHandler(changedHandler);
-					item.addChangedHandler(dependeciesHandler);
-					extendedItems.add(item);
-					if (currentSection != null)
-						sections.get(currentSection).add(item.getName());
-				}
+				displayAttributeItem(att, currentSection, sections);
 			} else if (att.isSection()) {
 				currentSection = new SectionItem();
 				currentSection.setDefaultValue(att.getLabel());
@@ -332,6 +322,21 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 		refreshAttributesForm();
 
+	}
+
+	private void displayAttributeItem(GUIAttribute attribute, SectionItem currentSection,
+			Map<SectionItem, List<String>> sections) {
+		FormItem item = prepareAttributeItem(attribute);
+		if (item != null) {
+			if (!updateEnabled)
+				item.setDisabled(true);
+			if (changedHandler != null)
+				item.addChangedHandler(changedHandler);
+			item.addChangedHandler(dependeciesHandler);
+			extendedItems.add(item);
+			if (currentSection != null)
+				sections.get(currentSection).add(item.getName());
+		}
 	}
 
 	protected FormItem prepareAttributeItem(GUIAttribute att) {

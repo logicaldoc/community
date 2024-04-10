@@ -15,6 +15,7 @@ import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
@@ -169,7 +170,12 @@ public class ParserFactory {
 			Document document, String fileVersion) throws ParseException {
 		Parser parser = getParser(filename);
 		TenantDAO dao = (TenantDAO) Context.get().getBean(TenantDAO.class);
-		String tenantName = dao.getTenantName(tenantId);
+		String tenantName;
+		try {
+			tenantName = dao.getTenantName(tenantId);
+		} catch (PersistenceException e) {
+			throw new ParseException(e);
+		}
 		return parser.parse(input, new ParseParameters(document, filename, fileVersion, encoding, locale,
 				tenantName != null ? tenantName : Tenant.DEFAULT_NAME));
 	}

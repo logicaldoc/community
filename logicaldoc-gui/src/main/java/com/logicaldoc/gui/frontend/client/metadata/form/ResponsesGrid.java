@@ -103,42 +103,43 @@ public class ResponsesGrid extends RefreshableListGrid {
 		fields.add(respondent);
 		fields.add(folder);
 
-		for (String name : form.getAttributeNames()) {
-			if(form.getAttribute(name).isSection())
-				continue;
-			
-			if (name != null && !"".equals(name)) {
-				ListGridField ext = new ListGridField("ext_" + name, Session.get().getInfo().getAttributeLabel(name),
-						100);
-				GUIAttribute attDef = Session.get().getInfo().getAttributeDefinition(name);
-				if (attDef != null) {
-					if (attDef.getType() == GUIAttribute.TYPE_DATE) {
-						ext = new DateListGridField("ext_" + name, Session.get().getInfo().getAttributeLabel(name));
-						ext.setTitle(Session.get().getInfo().getAttributeLabel(name));
-					} else if (attDef.getType() == GUIAttribute.TYPE_INT) {
-						ext.setAlign(Alignment.RIGHT);
-						ext.setType(ListGridFieldType.INTEGER);
-						ext.setCanFilter(false);
-					} else if (attDef.getType() == GUIAttribute.TYPE_DOUBLE) {
-						ext.setAlign(Alignment.RIGHT);
-						ext.setType(ListGridFieldType.FLOAT);
-						ext.setCanFilter(false);
-					} else if (attDef.getType() == GUIAttribute.TYPE_USER) {
-						ext = new UserListGridField("ext_" + name, "ext_" + name,
-								Session.get().getInfo().getAttributeLabel(name));
-						ext.setTitle(Session.get().getInfo().getAttributeLabel(name));
-					} else if (attDef.isSection()) {
-						continue;
-					}
-				}
-
-				ext.setCanFilter(true);
-				ext.setCanSort(true);
-				fields.add(ext);
-			}
-		}
+		addAttributes(fields);
 
 		setFields(fields.toArray(new ListGridField[0]));
+	}
+
+	private void addAttributes(List<ListGridField> fields) {
+		for (String name : form.getAttributeNames()) {
+			if (form.getAttribute(name).isSection() || name == null || name.isBlank())
+				continue;
+
+			ListGridField ext = new ListGridField("ext_" + name, Session.get().getInfo().getAttributeLabel(name), 100);
+			GUIAttribute attDef = Session.get().getInfo().getAttributeDefinition(name);
+			if (attDef != null) {
+				if (attDef.getType() == GUIAttribute.TYPE_DATE) {
+					ext = new DateListGridField("ext_" + name, Session.get().getInfo().getAttributeLabel(name));
+					ext.setTitle(Session.get().getInfo().getAttributeLabel(name));
+				} else if (attDef.getType() == GUIAttribute.TYPE_INT) {
+					ext.setAlign(Alignment.RIGHT);
+					ext.setType(ListGridFieldType.INTEGER);
+					ext.setCanFilter(false);
+				} else if (attDef.getType() == GUIAttribute.TYPE_DOUBLE) {
+					ext.setAlign(Alignment.RIGHT);
+					ext.setType(ListGridFieldType.FLOAT);
+					ext.setCanFilter(false);
+				} else if (attDef.getType() == GUIAttribute.TYPE_USER) {
+					ext = new UserListGridField("ext_" + name, "ext_" + name,
+							Session.get().getInfo().getAttributeLabel(name));
+					ext.setTitle(Session.get().getInfo().getAttributeLabel(name));
+				}
+				
+				if (!attDef.isSection()) {
+					ext.setCanFilter(true);
+					ext.setCanSort(true);
+					fields.add(ext);
+				}
+			}
+		}
 	}
 
 	private void showContextMenu() {

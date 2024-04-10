@@ -108,26 +108,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		super.log = LoggerFactory.getLogger(HibernateDocumentDAO.class);
 	}
 
-	public void setListenerManager(DocumentListenerManager listenerManager) {
-		this.listenerManager = listenerManager;
-	}
-
-	public void setVersionDAO(VersionDAO versionDAO) {
-		this.versionDAO = versionDAO;
-	}
-
-	public void setLinkDAO(DocumentLinkDAO linkDAO) {
-		this.linkDAO = linkDAO;
-	}
-
-	public void setUserDAO(UserDAO userDAO) {
-		this.userDAO = userDAO;
-	}
-
-	public void setDocumentHistoryDAO(DocumentHistoryDAO documentHistoryDAO) {
-		this.documentHistoryDAO = documentHistoryDAO;
-	}
-
 	@Override
 	public void archive(long docId, DocumentHistory transaction) throws PersistenceException {
 		Document doc = findById(docId);
@@ -304,7 +284,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			setType(doc);
 
 			// Remove the sections
-			doc.getAttributes().values().removeIf(att -> att.isSection());
+			doc.getAttributes().values().removeIf(Attribute::isSection);
 
 			// Count those attributes that reference other documents
 			doc.setDocAttrs((int) doc.getAttributes().values().stream().filter(
@@ -957,14 +937,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 	}
 
-	public void setNoteDAO(DocumentNoteDAO noteDAO) {
-		this.noteDAO = noteDAO;
-	}
-
-	public void setStorer(Storer storer) {
-		this.storer = storer;
-	}
-
 	@Override
 	public void saveDocumentHistory(Document doc, DocumentHistory transaction) throws PersistenceException {
 		Map<String, Object> dictionary = new HashMap<>();
@@ -1047,14 +1019,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		return query(query, docMapper, maxHits);
 	}
 
-	public void setConfig(ContextProperties config) {
-		this.config = config;
-	}
-
-	public void setFolderDAO(FolderDAO folderDAO) {
-		this.folderDAO = folderDAO;
-	}
-
 	@Override
 	public List<Document> findByIds(Set<Long> ids, Integer max) {
 		List<Document> docs = new ArrayList<>();
@@ -1121,10 +1085,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		bulkUpdate(
 				"set transactionId=null where transactionId is not null and transactionId not in " + transactionIdsStr,
 				(Map<String, Object>) null);
-	}
-
-	public void setTenantDAO(TenantDAO tenantDAO) {
-		this.tenantDAO = tenantDAO;
 	}
 
 	@Override

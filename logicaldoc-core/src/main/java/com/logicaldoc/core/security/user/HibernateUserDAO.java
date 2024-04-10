@@ -126,7 +126,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				null, null);
 	}
 
-	private static void checkPasswordStrength(User user) throws PasswordWeakException {
+	private static void checkPasswordStrength(User user) throws PasswordWeakException, PersistenceException {
 
 		// Skip the tests in case of new tenant creation
 		if (user.getId() == 0L && user.getTenantId() != Tenant.DEFAULT_ID && "Administrator".equals(user.getFirstName())
@@ -552,7 +552,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		}
 	}
 
-	private boolean isPasswordExpired(User user) {
+	private boolean isPasswordExpired(User user) throws PersistenceException {
 		// Never consider changed the password of a user imported from another
 		// system
 		if (user == null || user.getSource() != User.SOURCE_DEFAULT)
@@ -720,7 +720,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		userHistoryDAO.store(transaction);
 	}
 
-	private int getPasswordEnforce(User user) {
+	private int getPasswordEnforce(User user) throws PersistenceException {
 		TenantDAO tenantDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		String tenant = tenantDAO.getTenantName(user.getTenantId());
 		return config.getInt(tenant + ".password.enforcehistory", 10);

@@ -13,8 +13,10 @@ public interface TenantDAO extends PersistentObjectDAO<Tenant> {
 	 * @param name name of wanted tenant
 	 * 
 	 * @return Wanted tenant or null
+	 * 
+	 * @throws PersistenceException Error in the database 
 	 */
-	public Tenant findByName(String name);
+	public Tenant findByName(String name) throws PersistenceException;
 
 	/**
 	 * Retrieves the tenant's name
@@ -22,8 +24,10 @@ public interface TenantDAO extends PersistentObjectDAO<Tenant> {
 	 * @param tenantId identifier of the tenant
 	 * 
 	 * @return name of the tenant
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public String getTenantName(long tenantId);
+	public String getTenantName(long tenantId) throws PersistenceException;
 
 	/**
 	 * Retrieves all the tenant names
@@ -38,6 +42,8 @@ public interface TenantDAO extends PersistentObjectDAO<Tenant> {
 	 * Counts the total number of tenants
 	 * 
 	 * @return number of tenants
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public int count();
+	public int count() throws PersistenceException;
 }

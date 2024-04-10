@@ -124,12 +124,12 @@ public class UserUtil {
 		userDao.initialize(user);
 
 		TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
-		String tenantName = tenantDao.getTenantName(user.getTenantId());
-
-		int size = Context.get().getProperties().getInt(tenantName + ".gui.avatar.size", 128);
 
 		File tmpAvatarImage = null;
 		try {
+			String tenantName = tenantDao.getTenantName(user.getTenantId());
+			int size = Context.get().getProperties().getInt(tenantName + ".gui.avatar.size", 128);
+
 			tmpAvatarImage = FileUtil.createTempFile(AVATAR, ".png");
 			BufferedImage avatar = ImageIO.read(avatarImageFile);
 			avatar = ImageUtil.cropCenterSquare(avatar, size);
@@ -153,14 +153,14 @@ public class UserUtil {
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		userDao.initialize(user);
 
-		TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
-		String tenantName = tenantDao.getTenantName(user.getTenantId());
-
-		int size = Context.get().getProperties().getInt(tenantName + ".gui.avatar.size", 128);
-
 		File tmpAvatarImage = null;
 		try {
 			tmpAvatarImage = FileUtil.createTempFile(AVATAR, ".png");
+			
+			TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+			String tenantName = tenantDao.getTenantName(user.getTenantId());
+			int size = Context.get().getProperties().getInt(tenantName + ".gui.avatar.size", 128);
+			
 			BufferedImage avatar = UserUtil.generateDefaultAvatarImage(user, size);
 			ImageIO.write(avatar, "png", tmpAvatarImage);
 			user.setAvatar(ImageUtil.encodeImage(tmpAvatarImage));

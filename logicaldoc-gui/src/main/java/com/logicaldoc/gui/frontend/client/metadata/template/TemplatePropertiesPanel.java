@@ -244,7 +244,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		addSection.setMargin(2);
 		addSection.setHeight(30);
 		addSection.addClickHandler(click -> {
-			TextItem lbl = ItemFactory.newTextItem("label", null);
+			TextItem lbl = ItemFactory.newTextItem(LABEL, null);
 			lbl.setRequired(true);
 
 			CheckboxItem mandat = new CheckboxItem();
@@ -261,7 +261,7 @@ public class TemplatePropertiesPanel extends HLayout {
 
 				@Override
 				public void execute(Map<String, Object> values) {
-					addSection(values.get("label").toString().trim(), Boolean.TRUE.equals(values.get("mandatory")));
+					addSection(values.get(LABEL).toString().trim(), Boolean.TRUE.equals(values.get(MANDATORY)));
 				}
 			});
 		});
@@ -291,14 +291,14 @@ public class TemplatePropertiesPanel extends HLayout {
 
 	private void addSection(String label, boolean mandatory) {
 		ListGridRecord rec = new ListGridRecord();
-		rec.setAttribute("label", label);
+		rec.setAttribute(LABEL, label);
 		rec.setAttribute(SET_ID, 0);
 		rec.setAttribute(EDITOR, GUIAttribute.EDITOR_DEFAULT);
 		rec.setAttribute("type", GUIAttribute.TYPE_SECTION);
-		rec.setAttribute("mandatory", mandatory);
-		rec.setAttribute("hidden", false);
-		rec.setAttribute("readonly", false);
-		rec.setAttribute("multiple", false);
+		rec.setAttribute(MANDATORY, mandatory);
+		rec.setAttribute(HIDDEN, false);
+		rec.setAttribute(READONLY, false);
+		rec.setAttribute(MULTIPLE, false);
 
 		String name = "section1";
 		int i = 1;
@@ -339,8 +339,8 @@ public class TemplatePropertiesPanel extends HLayout {
 		MenuItem dependsOn = prepareDependsOnItem();
 
 		boolean selectionInSelection = false;
-		for (ListGridRecord record : attributesList.getSelectedRecords()) {
-			if (record.getAttributeAsInt("type") == GUIAttribute.TYPE_SECTION) {
+		for (ListGridRecord gridRecord : attributesList.getSelectedRecords()) {
+			if (gridRecord.getAttributeAsInt("type") == GUIAttribute.TYPE_SECTION) {
 				selectionInSelection = true;
 				break;
 			}
@@ -489,7 +489,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			ListGridRecord selection = attributesList.getSelectedRecord();
 			GUIAttribute attribute = template.getAttribute(selection.getAttributeAsString("name"));
 
-			TextItem lbl = ItemFactory.newTextItem("label", attribute.getLabel());
+			TextItem lbl = ItemFactory.newTextItem(LABEL, attribute.getLabel());
 			lbl.setRequired(true);
 
 			LD.askForValue(I18N.message(INITIALIZATION), I18N.message(INITIALIZATION), attribute.getLabel(), lbl, 600,

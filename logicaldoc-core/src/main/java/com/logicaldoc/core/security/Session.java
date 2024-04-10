@@ -195,7 +195,11 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.setLastRenew(getCreation());
 
 		TenantDAO tenantDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
-		this.tenantName = tenantDAO.getTenantName(tenantId);
+		try {
+			this.tenantName = tenantDAO.getTenantName(tenantId);
+		} catch (PersistenceException e) {
+			log.warn("Cannot retrieve the name of tenant {}", tenantId);
+		}
 
 		UserHistory history = saveLoginEvent(user, client);
 
@@ -250,7 +254,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 				}
 
 			} catch (PersistenceException e) {
-				log.warn("Cannot gridRecord the device {}", device);
+				log.warn("Cannot record the device {}", device);
 			}
 		}
 

@@ -141,7 +141,12 @@ public abstract class Search {
 
 		ContextProperties config = Context.get().getProperties();
 		TenantDAO tdao = (TenantDAO) Context.get().getBean(TenantDAO.class);
-		String extattrs = config.getProperty(tdao.getTenantName(searchUser.getTenantId()) + ".search.extattr");
+		String extattrs;
+		try {
+			extattrs = config.getProperty(tdao.getTenantName(searchUser.getTenantId()) + ".search.extattr");
+		} catch (PersistenceException e) {
+			throw new SearchException(e);
+		}
 
 		if (StringUtils.isNotEmpty(extattrs) && !hits.isEmpty()) {
 			// the names of the extended attributes to show

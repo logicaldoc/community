@@ -246,7 +246,9 @@ public class UpdateDialog extends StickyWindow {
 			metadata.setStatus(0);
 		}
 
-		metadata.setAllowedPermissions(permissions);
+		if(metadata!=null)
+			metadata.setAllowedPermissions(permissions);
+		
 		bulkPanel = new UpdatePanel(metadata, CONTEXT_UPLOAD.equals(context) || CHECKIN.equals(context),
 				permissions.isSecurity());
 		bulkPanel.setWidth100();

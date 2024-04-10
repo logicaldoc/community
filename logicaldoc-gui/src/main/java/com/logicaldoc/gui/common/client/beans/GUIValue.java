@@ -69,6 +69,6 @@ public class GUIValue implements Serializable {
 
 	@Override
 	public String toString() {
-		return code.toString();
+		return code;
 	}
 }

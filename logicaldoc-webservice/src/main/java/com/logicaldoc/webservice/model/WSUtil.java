@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.Tag;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
@@ -98,7 +99,7 @@ public class WSUtil {
 			setAttributesIntoWsDocument(document, wsDoc);
 
 			// Set the tags
-			wsDoc.setTags(document.getTags().stream().map(t -> t.getTag()).collect(Collectors.toList()));
+			wsDoc.setTags(document.getTags().stream().map(Tag::getTag).collect(Collectors.toList()));
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}

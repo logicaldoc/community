@@ -140,9 +140,13 @@ public class EventEndpoint implements EventListener {
 	public void newEvent(History event) {
 		ContextProperties config = Context.get().getProperties();
 
-		if (event.getTenant() == null) {
-			TenantDAO tenantDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
-			event.setTenant(tenantDAO.getTenantName(event.getTenantId()));
+		try {
+			if (event.getTenant() == null) {
+				TenantDAO tenantDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
+				event.setTenant(tenantDAO.getTenantName(event.getTenantId()));
+			}
+		} catch (PersistenceException e) {
+			log.warn("Cannot retrieve the name of tenant {}", event.getTenantId());
 		}
 
 		if (EventCollector.isEnabled() && config.getBoolean(event.getTenant() + ".gui.serverpush", false)

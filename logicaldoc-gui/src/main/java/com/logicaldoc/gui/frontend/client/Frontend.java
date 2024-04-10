@@ -73,7 +73,7 @@ public class Frontend implements EntryPoint {
 		I18N.setLocale(locale);
 
 		// Tries to capture tenant parameter
-		final String tenant = Util.getTenantInRequest();
+		final String tenantInRequest = Util.getTenantInRequest();
 
 		// Get grid of scrollbars, and clear out the window's built-in margin,
 		// because we want to take advantage of the entire client area.
@@ -87,7 +87,7 @@ public class Frontend implements EntryPoint {
 		declareDownload();
 		declareDownloadDocumentResource();
 
-		InfoService.Instance.get().getInfo(locale, tenant, false, new AsyncCallback<>() {
+		InfoService.Instance.get().getInfo(locale, tenantInRequest, false, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable error) {
 				SC.warn(error.getMessage());
@@ -99,47 +99,51 @@ public class Frontend implements EntryPoint {
 
 				init(info);
 
-				SecurityService.Instance.get().getSession(Util.getLocaleInRequest(), null, new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						SC.warn(I18N.message("accessdenied") + " - " + caught.getMessage());
-					}
-
-					@Override
-					public void onSuccess(GUISession session) {
-						if (session == null || !session.isLoggedIn()) {
-							SC.warn(I18N.message("accessdenied"));
-						} else {
-							String loc = Util.getLocaleInRequest() == null ? session.getUser().getLanguage()
-									: Util.getLocaleInRequest();
-							InfoService.Instance.get().getInfo(loc,
-									tenant != null ? tenant : session.getUser().getTenant().getName(), false,
-									new AsyncCallback<GUIInfo>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
-
-										@Override
-										public void onSuccess(GUIInfo info) {
-											session.setInfo(info);
-											init(info);
-
-											Session.get().init(session);
-
-											connectWebsockets();
-											declareReloadTrigger(Frontend.this);
-											showMain();
-										}
-									});
-						}
-					}
-				});
+				retrieveSession(tenantInRequest);
 			}
 		});
 	}
 
+	private void retrieveSession(final String tenant) {
+		SecurityService.Instance.get().getSession(Util.getLocaleInRequest(), null, new AsyncCallback<>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				SC.warn(I18N.message("accessdenied") + " - " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(GUISession session) {
+				if (session == null || !session.isLoggedIn()) {
+					SC.warn(I18N.message("accessdenied"));
+				} else {
+					String loc = Util.getLocaleInRequest() == null ? session.getUser().getLanguage()
+							: Util.getLocaleInRequest();
+					InfoService.Instance.get().getInfo(loc,
+							tenant != null ? tenant : session.getUser().getTenant().getName(), false,
+							new AsyncCallback<GUIInfo>() {
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
+
+								@Override
+								public void onSuccess(GUIInfo info) {
+									session.setInfo(info);
+									init(info);
+
+									Session.get().init(session);
+
+									connectWebsockets();
+									declareReloadTrigger(Frontend.this);
+									showMain();
+								}
+							});
+				}
+			}
+		});
+	}
+	
 	public static void showMain() {
 		// Remove the loading frame
 		RootPanel.getBodyElement().removeChild(RootPanel.get("loadingwrapper-frontend").getElement());

@@ -210,7 +210,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		mandatory.setWidth(50);
 		mandatory.setDefaultValue(false);
 		mandatory.setDisabled(attributeSet.isReadonly());
-		boolean updatingAttributeIsNotSection = attributeSet == null || updatingAttributeName == null
+		boolean updatingAttributeIsNotSection = updatingAttributeName == null
 				|| attributeSet.getAttribute(updatingAttributeName.trim()) == null
 				|| attributeSet.getAttribute(updatingAttributeName.trim()).getType() != GUIAttribute.TYPE_SECTION;
 		mandatory.setVisible(updatingAttributeIsNotSection);

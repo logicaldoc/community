@@ -1,5 +1,7 @@
 package com.logicaldoc.core.searchengine;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
 import org.junit.Test;
@@ -8,8 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 
-import junit.framework.Assert;
-
 public class TagSearchTest extends AbstractCoreTestCase {
 
 	protected static Logger log = LoggerFactory.getLogger(TagSearchTest.class);
@@ -17,8 +17,7 @@ public class TagSearchTest extends AbstractCoreTestCase {
 	@Test
 	public void testSearch() {
 		SearchOptions opt = new SearchOptions();
-		opt.setType(1);
-		Assert.assertEquals(1, opt.getType());
+		opt.setType(SearchOptions.TYPE_TAG);
 		opt.setUserId(1);
 		opt.setExpression("abc");
 
@@ -32,13 +31,12 @@ public class TagSearchTest extends AbstractCoreTestCase {
 		}
 
 		List<Hit> results = search.getHits();
-		
-		Assert.assertEquals(2, results.size());
-		Assert.assertEquals(1, results.get(0).getId());
-		
+
+		assertEquals(2, results.size());
+		assertEquals(1, results.get(0).getId());
+
 		opt = new SearchOptions();
-		opt.setType(1);
-		Assert.assertEquals(1, opt.getType());
+		opt.setType(SearchOptions.TYPE_TAG);
 		opt.setUserId(1);
 		opt.setExpression("abc");
 		opt.setMaxHits(1);
@@ -51,9 +49,9 @@ public class TagSearchTest extends AbstractCoreTestCase {
 			log.error(e.getMessage(), e);
 		}
 
-		//We should get 2 entries because document 2 is an alias
+		// We should get 2 entries because document 2 is an alias
 		results = search.getHits();
-		Assert.assertEquals(2, results.size());
-		Assert.assertEquals(1, results.get(0).getId());
+		assertEquals(2, results.size());
+		assertEquals(1, results.get(0).getId());
 	}
 }

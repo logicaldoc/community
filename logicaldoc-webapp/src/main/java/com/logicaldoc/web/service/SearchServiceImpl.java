@@ -196,7 +196,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 			dao.store(search);
 
-			log.debug("Saved query {}", opt.getName());
+			log.debug("Saved search {}", opt.getName());
 			return true;
 		} catch (Exception t) {
 			return (Boolean) throwServerException(session, log, t);

@@ -175,7 +175,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		return guiTenant;
 	}
 
-	public static GUITenant getTenant(String tenantName) {
+	public static GUITenant getTenant(String tenantName) throws PersistenceException {
 		TenantDAO dao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		Tenant tenant = dao.findByName(tenantName);
 		return fromTenant(tenant);
