@@ -33,6 +33,7 @@ import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.plugin.PluginException;
 
 /**
  * Test case for the <code>SessionManager</code>
@@ -60,7 +61,7 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 
 	@Before
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 		testSubject = SessionManager.get();
 		testSubject.addListener(this);

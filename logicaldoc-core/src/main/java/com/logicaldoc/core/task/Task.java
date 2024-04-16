@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
@@ -444,20 +445,6 @@ public abstract class Task implements Runnable {
 		return config;
 	}
 
-	public void setConfig(ContextProperties config) {
-		this.config = config;
-		sendActivityReport = "true".equals(config.getProperty("task.sendreport." + name));
-		reportRecipients = config.getProperty("task.recipients." + name);
-	}
-
-	public void setSender(EMailSender sender) {
-		this.sender = sender;
-	}
-
-	public void setUserDao(UserDAO userDao) {
-		this.userDao = userDao;
-	}
-
 	/**
 	 * Saves the task configuration
 	 * 
@@ -484,15 +471,13 @@ public abstract class Task implements Runnable {
 		this.reportRecipients = reportRecipients;
 	}
 
-	public void setLockManager(LockManager lockManager) {
-		this.lockManager = lockManager;
-	}
-
-	public void setSystemLoadMonitor(SystemLoadMonitor systemLoadMonitor) {
-		this.systemLoadMonitor = systemLoadMonitor;
-	}
-
 	public boolean isInterruptRequested() {
 		return interruptRequested;
+	}
+
+	@PostConstruct
+	protected void init() {
+		sendActivityReport = "true".equals(config.getProperty("task.sendreport." + name));
+		reportRecipients = config.getProperty("task.recipients." + name);
 	}
 }

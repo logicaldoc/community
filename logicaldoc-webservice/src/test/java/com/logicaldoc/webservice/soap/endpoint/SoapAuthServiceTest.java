@@ -9,8 +9,6 @@ import static org.mockito.Mockito.when;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -39,7 +38,7 @@ public class SoapAuthServiceTest extends AbstractWebserviceTestCase {
 	private SoapAuthService soapAuthServiceImpl;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		currentMessage = mock(Message.class, Answers.RETURNS_DEEP_STUBS);
@@ -89,11 +88,5 @@ public class SoapAuthServiceTest extends AbstractWebserviceTestCase {
 		assertNotNull(sid);
 		waiting();
 		soapAuthServiceImpl.renew(sid);
-	}
-
-	private void waiting() throws InterruptedException {
-		final int secondsToWait = 5;
-		CountDownLatch lock = new CountDownLatch(1);
-		lock.await(secondsToWait, TimeUnit.SECONDS);
 	}
 }

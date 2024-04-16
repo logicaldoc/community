@@ -21,6 +21,7 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.menu.MenuDAO;
+import com.logicaldoc.util.plugin.PluginException;
 
 /**
  * Test case for <code>HibernateGroupDAOTest</code>
@@ -36,7 +37,7 @@ public class HibernateGroupDAOTest extends AbstractCoreTestCase {
 	private GroupDAO dao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that

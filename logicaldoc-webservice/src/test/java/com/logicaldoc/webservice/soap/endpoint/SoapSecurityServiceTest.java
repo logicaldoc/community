@@ -20,6 +20,7 @@ import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
+import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSGroup;
 import com.logicaldoc.webservice.model.WSUser;
@@ -40,7 +41,7 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 	private SoapSecurityService securityServiceImpl;
 
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 		userDao = (UserDAO) context.getBean("UserDAO");
 		groupDao = (GroupDAO) context.getBean("GroupDAO");

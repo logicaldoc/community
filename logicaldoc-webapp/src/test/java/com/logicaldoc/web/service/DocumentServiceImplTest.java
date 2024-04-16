@@ -22,12 +22,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import javax.mail.MessagingException;
 
-import org.java.plugin.JpfException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -74,7 +71,6 @@ import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.web.AbstractWebappTestCase;
 import com.logicaldoc.web.UploadServlet;
 
@@ -110,7 +106,12 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	protected SearchEngine searchEngine;
 
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	protected List<String> getPluginArchives() {
+		return List.of("/logicaldoc-core-plugin.jar");
+	}
+
+	@Override
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		docDao = (DocumentDAO) context.getBean("DocumentDAO");
@@ -124,15 +125,13 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		searchEngine = (SearchEngine) context.getBean("SearchEngine");
 
-		prepareUploadedFiles();
+		prepareRepository();
 
 		emailSender = mock(EMailSender.class);
 		try {
 			doNothing().when(emailSender).send(any(EMail.class));
 			DocumentServiceImpl.setEmailSender(emailSender);
-
-			activateCorePlugin();
-		} catch (MessagingException | JpfException | IOException | PluginException e) {
+		} catch (MessagingException e) {
 			throw new IOException(e.getMessage(), e);
 		}
 	}
@@ -145,20 +144,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		super.tearDown();
 	}
 
-	private void activateCorePlugin() throws JpfException, IOException, PluginException {
-		File pluginsDir = new File(tempDir, "tests-plugins");
-		pluginsDir.mkdir();
-
-		File corePluginFile = new File(pluginsDir, "logicaldoc-core-plugin.jar");
-
-		// copy plugin file to target resources
-		FileUtil.copyResource("/logicaldoc-core-8.8.3-plugin.jar", corePluginFile);
-
-		PluginRegistry registry = PluginRegistry.getInstance();
-		registry.init(pluginsDir.getAbsolutePath());
-	}
-
-	private void prepareUploadedFiles() throws IOException {
+	private void prepareRepository() throws IOException {
 		File file3 = new File(repositoryDir.getPath() + "/docs/3/doc/1.0");
 		file3.getParentFile().mkdirs();
 		FileUtil.copyResource("/test.zip", file3);
@@ -166,6 +152,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		File file5 = new File(repositoryDir.getPath() + "/docs/5/doc/1.0");
 		file5.getParentFile().mkdirs();
 		FileUtil.copyResource("/Joyce Jinks shared the Bruce Duo post.eml", file5);
+		FileUtil.copyResource("/Joyce Jinks shared the Bruce Duo post.eml",
+				new File(repositoryDir.getPath() + "/docs/5/doc/1.0-conversion.pdf"));
 
 		File file6 = new File(repositoryDir.getPath() + "/docs/6/doc/1.0");
 		file6.getParentFile().mkdirs();
@@ -396,10 +384,10 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 			Map<String, File> uploadedFiles = new HashMap<>();
 			uploadedFiles.put(doc.getFileName(), tmpFile);
 			assertTrue(FileUtil.readFile(tmpFile).contains("replaced contents"));
-			
+
 			session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
 			service.replaceFile(doc.getId(), doc.getFileVersion(), "replace");
-			
+
 			assertTrue(service.getContentAsString(7).contains("replaced contents"));
 		} finally {
 			FileUtil.strongDelete(tmpFile);
@@ -536,7 +524,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		waiting();
 
 		service.cleanUploadedFileFolder();
-		prepareUploadedFiles();
+		prepareRepository();
 		doc = service.getById(7);
 		doc.setId(0L);
 		doc.setCustomId(null);
@@ -546,7 +534,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		createdDocs = service.addDocuments(false, UTF_8, true, doc);
 		assertEquals(4, createdDocs.size());
 
-		prepareUploadedFiles();
+		prepareRepository();
 		doc = service.getById(7);
 		doc.setId(0L);
 		doc.setCustomId(null);
@@ -575,7 +563,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertTrue(exceptionHappened);
 
 		// Try with a user without permissions
-		prepareUploadedFiles();
+		prepareRepository();
 
 		doc = service.getById(7);
 		doc.setId(0L);
@@ -583,13 +571,13 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		doc.setIndexed(0);
 		doc.setFolder(new FolderServiceImpl().getFolder(1201, false, false, false));
 		prepareSession("boss", "admin");
-		prepareUploadedFiles();
+		prepareRepository();
 
 		createdDocs = service.addDocuments(true, UTF_8, false, doc);
 		assertEquals(0, createdDocs.size());
 
 		prepareSession("admin", "admin");
-		prepareUploadedFiles();
+		prepareRepository();
 		createdDocs = service.addDocuments("en", 1201, false, UTF_8, false, null);
 		assertEquals(4, createdDocs.size());
 
@@ -1136,61 +1124,61 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	@Test
 	public void testSendAsEmail() throws Exception {
 		// Send the email as download ticket
-		GUIEmail gmail = service.extractEmail(5, "1.0");
-		log.info(gmail.getFrom().getEmail());
-		gmail.setDocIds(List.of(5L));
+		GUIEmail guiMail = service.extractEmail(5, "1.0");
+		log.info(guiMail.getFrom().getEmail());
+		guiMail.setDocIds(List.of(5L));
 
 		List<GUIContact> tos = new ArrayList<>();
 		GUIContact gc = new GUIContact("Kenneth", "Botterill", "ken-botterill@acme.com");
 		tos.add(gc);
 
-		gmail.setTos(tos);
+		guiMail.setTos(tos);
 
 		tos = new ArrayList<>();
 		gc = new GUIContact("Riley", "Arnold", "riley-arnold@acme.com");
 		tos.add(gc);
-		gmail.setBccs(tos);
+		guiMail.setBccs(tos);
 
 		tos = new ArrayList<>();
 		gc = new GUIContact("Scout", "Marsh", "s.marsh@acme.com");
 		tos.add(gc);
-		gmail.setCcs(tos);
-		gmail.setSendAsTicket(true);
+		guiMail.setCcs(tos);
+		guiMail.setSendAsTicket(true);
 
-		String retvalue = service.sendAsEmail(gmail, "en-US");
+		String retvalue = service.sendAsEmail(guiMail, "en-US");
 		log.info("returned message: {}", retvalue);
 		assertEquals("ok", retvalue);
 
 		// Send the email with attached .zip
-		gmail = service.extractEmail(5, "1.0");
-		log.info(gmail.getFrom().getEmail());
-		gmail.setDocIds(List.of(5L));
+		guiMail = service.extractEmail(5, "1.0");
+		log.info(guiMail.getFrom().getEmail());
+		guiMail.setDocIds(List.of(5L));
 
 		tos = new ArrayList<>();
 		gc = new GUIContact("Kenneth", "Botterill", "ken-botterill@acme.com");
 		tos.add(gc);
 
-		gmail.setTos(tos);
-		gmail.getBccs().clear();
-		gmail.getCcs().clear();
+		guiMail.setTos(tos);
+		guiMail.getBccs().clear();
+		guiMail.getCcs().clear();
 
-		gmail.setSendAsTicket(false);
-		gmail.setZipCompression(true);
+		guiMail.setSendAsTicket(false);
+		guiMail.setZipCompression(true);
 
-		retvalue = service.sendAsEmail(gmail, "en-US");
+		retvalue = service.sendAsEmail(guiMail, "en-US");
 		log.info("returned message: {}", retvalue);
 		assertEquals("ok", retvalue);
 
 		// Send the email with attached file
-		gmail.setZipCompression(false);
+		guiMail.setZipCompression(false);
 
-		retvalue = service.sendAsEmail(gmail, "en-US");
+		retvalue = service.sendAsEmail(guiMail, "en-US");
 		log.info("returned message: {}", retvalue);
 		assertEquals("ok", retvalue);
 
 		// Send the email with attached file as pdf conversion
-		gmail.setPdfConversion(true);
-		retvalue = service.sendAsEmail(gmail, "en-US");
+		guiMail.setPdfConversion(true);
+		retvalue = service.sendAsEmail(guiMail, "en-US");
 		log.info("returned message: {}", retvalue);
 		assertEquals("ok", retvalue);
 	}
@@ -1378,7 +1366,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		permissions = service.getAllowedPermissions(List.of(2L, 3L, 4L));
 		assertFalse(permissions.isRead());
 		assertFalse(permissions.isPreview());
-		
+
 		prepareSession("author", "admin");
 		permissions = service.getAllowedPermissions(List.of(2L, 3L, 4L));
 		assertTrue(permissions.isRead());
@@ -1386,11 +1374,5 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertTrue(permissions.isReadingreq());
 		assertTrue(permissions.isPrint());
 		assertEquals(4, permissions.getAllowedPermissions().size());
-	}
-
-	private void waiting() throws InterruptedException {
-		final int secondsToWait = 5;
-		CountDownLatch lock = new CountDownLatch(1);
-		lock.await(secondsToWait, TimeUnit.SECONDS);
 	}
 }

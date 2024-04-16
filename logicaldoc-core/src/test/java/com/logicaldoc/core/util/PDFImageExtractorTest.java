@@ -14,12 +14,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.logicaldoc.util.plugin.PluginException;
+
 public class PDFImageExtractorTest {
 
 	File destFolder = null;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		destFolder = new File("target", "destFolder");
 		if (!destFolder.exists())
 			destFolder.mkdir();

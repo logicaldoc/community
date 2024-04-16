@@ -65,7 +65,6 @@ public class JobsDataServlet extends AbstractDataServlet {
 				logger.warn(e.getMessage(), e);
 			}
 		} else {
-
 			try {
 				writeJobs(writer, session, maxRecords, group);
 			} catch (SchedulerException e) {

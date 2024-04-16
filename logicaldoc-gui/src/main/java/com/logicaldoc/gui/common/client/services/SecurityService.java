@@ -392,7 +392,7 @@ public interface SecurityService extends RemoteService {
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */
-	public void deleteTrustedDevices(List<String> deviceIds) throws ServerException;
+	public void deleteTrustedDevices(List<Long> deviceIds) throws ServerException;
 
 	/**
 	 * Downloads the most recent version of the Geolocation database

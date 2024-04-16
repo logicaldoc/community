@@ -1,11 +1,12 @@
 package com.logicaldoc.core.conversion;
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.plugin.PluginException;
 
 public class XMLConverterTest extends AbstractCoreTestCase {
 
@@ -24,7 +26,7 @@ public class XMLConverterTest extends AbstractCoreTestCase {
 	protected static Logger log = LoggerFactory.getLogger(XMLConverterTest.class);
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context.
@@ -48,7 +50,7 @@ public class XMLConverterTest extends AbstractCoreTestCase {
 			convert.internalConvert("sid1", doc, srcXMLFile, targetFile);
 		} catch (IOException e) {
 			log.error("Exception during conversion", e);
-			Assert.fail();
+			fail();
 		} finally {
 			FileUtil.strongDelete(targetFile);
 		}

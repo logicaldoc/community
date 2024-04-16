@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.plugin.PluginException;
 
 import junit.framework.Assert;
 
@@ -24,7 +25,7 @@ public class WebContextConfiguratorTest {
 	File webXml = new File("target/metainfcontext.xml");
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		FileUtil.copyResource("/metainfcontext.xml", webXml);
 	}
 

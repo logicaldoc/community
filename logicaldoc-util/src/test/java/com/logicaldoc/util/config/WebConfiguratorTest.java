@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.plugin.PluginException;
 
 import junit.framework.Assert;
 
@@ -24,7 +25,7 @@ public class WebConfiguratorTest {
 	File webXml = new File("target/web.xml");
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		FileUtil.copyResource("/web.xml", webXml);
 	}
 

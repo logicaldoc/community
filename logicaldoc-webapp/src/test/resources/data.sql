@@ -310,6 +310,8 @@ insert into ld_generic(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_type,
 values(2, '2008-11-19 00:00:00', '2008-11-19 00:00:00',0,'a','a2','str1','str2',10,11,1.5,1.6,'2008-11-20 00:00:00','2008-11-20 00:00:00',1,1);
 insert into ld_generic(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_type, ld_subtype, ld_string1, ld_string2, ld_integer1, ld_integer2, ld_double1, ld_double2, ld_date1, ld_date2,ld_tenantid,ld_recordversion)
 values(3, '2008-11-19 00:00:00', '2008-11-19 00:00:00',1,'a.3','a2.3','str1','str2',10,11,1.5,1.6,'2008-11-20 00:00:00','2008-11-20 00:00:00',1,1);
+INSERT INTO ld_generic (ld_id,ld_lastmodified,ld_deleted,ld_type,ld_subtype,ld_string1,ld_string2,ld_integer1,ld_integer2,ld_double1,ld_double2,ld_date1,ld_date2,ld_qualifier,ld_integer3,ld_string3,ld_tenantid,ld_recordversion,ld_string4,ld_string5,ld_string6,ld_string7,ld_string8,ld_creation) 
+VALUES (721125937,'2024-02-01 14:48:24',0,'guisetting','gui.welcome','hello world',null,null,null,null,null,null,null,0,null,null,1,68,null,null,null,null,null,'2023-09-21 12:44:03');
 
 insert into ld_user_history 
 				(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_notified,ld_tenantid,ld_recordversion)
@@ -337,3 +339,60 @@ values(4, '2011-04-18 00:00:00', '2011-04-18 00:00:00',1,1,'Admin',1,'2011-04-18
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
 values(500, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'test','user','en', '$product','$product',1,1);
+
+
+create table ld_workflowhistory (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null, 
+                                 ld_deleted int not null, ld_tenantid bigint not null, ld_date timestamp, ld_event varchar(255), 
+                                 ld_comment varchar(4000), ld_reason varchar(4000), ld_docid bigint, ld_folderid bigint, ld_userid bigint, 
+                                 ld_username varchar(255), ld_templateid bigint not null, ld_userlogin varchar(255), 
+                                 ld_instanceid varchar(255), ld_sessionid varchar(255), ld_transition varchar(255),
+                                 ld_new int, ld_filename varchar(255), ld_taskname varchar(255), ld_taskid varchar(255), ld_taskdisplay varchar(255),
+                                 ld_ip varchar(255), ld_path varchar(4000), ld_templateversion int not null, ld_workflowdisplay varchar(255),
+                                 ld_geolocation varchar(255), ld_device varchar(255), ld_filesize bigint, primary key (ld_id));
+
+create table ld_importfolder_history (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null, 
+                                 ld_deleted int not null, ld_tenantid bigint not null, ld_date timestamp, ld_event varchar(255), 
+                                 ld_comment varchar(4000), ld_docid bigint, ld_folderid bigint, ld_new int, ld_filename varchar(255), 
+                                 ld_filesize bigint, ld_path varchar(4000), ld_pathold varchar(4000), ld_filenameold varchar(255),
+                                 ld_color varchar(255), ld_importfolderid bigint not null, 
+                                 ld_userid bigint, ld_username varchar(255), ld_userlogin varchar(255), primary key (ld_id));
+
+create table ld_ocr_history (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null, 
+                             ld_deleted int not null, ld_tenantid bigint not null, ld_date timestamp, ld_event varchar(255), 
+                             ld_comment varchar(4000), ld_docid bigint, ld_folderid bigint, ld_new int, ld_filename varchar(255), 
+                             ld_filesize bigint, ld_path varchar(4000), ld_color varchar(255), ld_userid bigint, 
+                             ld_username varchar(255), ld_userlogin varchar(255), primary key (ld_id));
+
+create table ld_webservicecall (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null,
+                                ld_deleted int not null, ld_tenantid bigint not null, 
+                                ld_userid bigint, ld_date timestamp, ld_username varchar(255), ld_event varchar(255), 
+                                ld_comment varchar(4000), ld_path varchar(4000), ld_sessionid varchar(255),
+                                ld_userlogin varchar(255), ld_ip varchar(255), ld_geolocation varchar(255), 
+                                ld_device varchar(255), ld_protocol varchar(255), primary key (ld_id));
+                                
+INSERT INTO ld_webservicecall (ld_id,ld_lastmodified,ld_recordversion,ld_deleted,ld_tenantid,ld_userid,ld_date,ld_username,ld_event,ld_comment,ld_path,ld_sessionid,ld_userlogin,ld_ip,ld_geolocation,ld_device,ld_protocol,ld_creation) 
+VALUES (28591,'2024-04-10 16:51:54',0,0,1,1,'2024-04-10 16:51:49','Peter McKenna','event.webservice.call',null,'http://localhost:9080/services/Auth','8d7b32e8-fe82-45c4-b0e1-f69083e90133','admin','127.0.0.1',null,'Unknown on Unknown (UNKNOWN)','soap','2024-04-10 16:51:49');
+
+INSERT INTO ld_webservicecall (ld_id,ld_lastmodified,ld_recordversion,ld_deleted,ld_tenantid,ld_userid,ld_date,ld_username,ld_event,ld_comment,ld_path,ld_sessionid,ld_userlogin,ld_ip,ld_geolocation,ld_device,ld_protocol,ld_creation) 
+VALUES (28590,'2024-04-10 16:51:54',0,0,1,1,'2024-04-10 16:51:49','Peter McKenna','event.webservice.call',null,'http://localhost:9080/services/Folder','8d7b32e8-fe82-45c4-b0e1-f69083e90133','admin','127.0.0.1',null,'Unknown on Unknown (UNKNOWN)','soap','2024-04-10 16:51:49');
+
+INSERT INTO ld_webservicecall (ld_id,ld_lastmodified,ld_recordversion,ld_deleted,ld_tenantid,ld_userid,ld_date,ld_username,ld_event,ld_comment,ld_path,ld_sessionid,ld_userlogin,ld_ip,ld_geolocation,ld_device,ld_protocol,ld_creation) 
+VALUES (28589,'2024-04-10 16:51:54',0,0,1,1,'2024-04-10 16:51:48','Peter McKenna','event.webservice.call',null,'http://localhost:9080/services/Document','8d7b32e8-fe82-45c4-b0e1-f69083e90133','admin','127.0.0.1',null,'Unknown on Unknown (UNKNOWN)','soap','2024-04-10 16:51:49');
+
+INSERT INTO ld_webservicecall (ld_id,ld_lastmodified,ld_recordversion,ld_deleted,ld_tenantid,ld_userid,ld_date,ld_username,ld_event,ld_comment,ld_path,ld_sessionid,ld_userlogin,ld_ip,ld_geolocation,ld_device,ld_protocol,ld_creation) 
+VALUES (28588,'2024-04-10 16:51:53',0,0,1,1,'2024-04-10 16:51:47','Peter McKenna','event.webservice.call',null,'http://localhost:9080/services/Audit','8d7b32e8-fe82-45c4-b0e1-f69083e90133','admin','127.0.0.1',null,'Unknown on Unknown (UNKNOWN)','soap','2024-04-10 16:51:48');
+
+INSERT INTO ld_webservicecall (ld_id,ld_lastmodified,ld_recordversion,ld_deleted,ld_tenantid,ld_userid,ld_date,ld_username,ld_event,ld_comment,ld_path,ld_sessionid,ld_userlogin,ld_ip,ld_geolocation,ld_device,ld_protocol,ld_creation) 
+VALUES (28587,'2024-04-10 16:51:53',0,0,1,1,'2024-04-10 16:51:47','Peter McKenna','event.webservice.call',null,'http://localhost:9080/services/Folder','8d7b32e8-fe82-45c4-b0e1-f69083e90133','admin','127.0.0.1',null,'Unknown on Unknown (UNKNOWN)','soap','2024-04-10 16:51:48');
+
+INSERT INTO ld_webservicecall (ld_id,ld_lastmodified,ld_recordversion,ld_deleted,ld_tenantid,ld_userid,ld_date,ld_username,ld_event,ld_comment,ld_path,ld_sessionid,ld_userlogin,ld_ip,ld_geolocation,ld_device,ld_protocol,ld_creation) 
+VALUES (28586,'2024-04-10 16:51:53',0,0,1,1,'2024-04-10 16:51:47','Peter McKenna','event.webservice.call',null,'http://localhost:9080/services/Folder','8d7b32e8-fe82-45c4-b0e1-f69083e90133','admin','127.0.0.1',null,'Unknown on Unknown (UNKNOWN)','soap','2024-04-10 16:51:48');
+
+INSERT INTO ld_webservicecall (ld_id,ld_lastmodified,ld_recordversion,ld_deleted,ld_tenantid,ld_userid,ld_date,ld_username,ld_event,ld_comment,ld_path,ld_sessionid,ld_userlogin,ld_ip,ld_geolocation,ld_device,ld_protocol,ld_creation) 
+VALUES (28585,'2024-04-10 16:51:53',0,0,-1,null,'2024-04-10 16:51:47','','event.webservice.call',null,'http://localhost:9080/services/System','','','127.0.0.1',null,null,'soap','2024-04-10 16:51:48');      
+
+INSERT INTO ld_sequence (ld_id,ld_lastmodified,ld_recordversion,ld_deleted,ld_tenantid,ld_name,ld_objectid,ld_lastreset,ld_value,ld_creation) VALUES (-29360128,CURRENT_TIMESTAMP,0,0,-1,'loginfail-username-adin',0,CURRENT_TIMESTAMP,6,CURRENT_TIMESTAMP);
+INSERT INTO ld_sequence (ld_id,ld_lastmodified,ld_recordversion,ld_deleted,ld_tenantid,ld_name,ld_objectid,ld_lastreset,ld_value,ld_creation) VALUES (519504271,CURRENT_TIMESTAMP,1,0,-1,'loginfail-username-adminPowertoys',0,CURRENT_TIMESTAMP,2,CURRENT_TIMESTAMP);
+INSERT INTO ld_sequence (ld_id,ld_lastmodified,ld_recordversion,ld_deleted,ld_tenantid,ld_name,ld_objectid,ld_lastreset,ld_value,ld_creation) VALUES (519504057,CURRENT_TIMESTAMP,0,0,-1,'loginfail-username-armando',0,CURRENT_TIMESTAMP,7,CURRENT_TIMESTAMP);
+INSERT INTO ld_sequence (ld_id,ld_lastmodified,ld_recordversion,ld_deleted,ld_tenantid,ld_name,ld_objectid,ld_lastreset,ld_value,ld_creation) VALUES (-29556736,CURRENT_TIMESTAMP,0,0,-1,'loginfail-username-author',0,CURRENT_TIMESTAMP,9,CURRENT_TIMESTAMP);
+                      

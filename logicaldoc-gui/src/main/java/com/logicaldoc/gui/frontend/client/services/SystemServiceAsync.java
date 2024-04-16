@@ -15,9 +15,9 @@ public interface SystemServiceAsync {
 
 	void loadTasks(String locale, AsyncCallback<List<GUITask>> callback);
 
-	void startTask(String taskName, AsyncCallback<Boolean> callback);
+	void startTask(String taskName, AsyncCallback<Void> callback);
 
-	void stopTask(String taskName, AsyncCallback<Boolean> callback);
+	void stopTask(String taskName, AsyncCallback<Void> callback);
 
 	void getTaskByName(String taskName, String locale, AsyncCallback<GUITask> callback);
 

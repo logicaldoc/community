@@ -16,6 +16,7 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.util.plugin.PluginException;
 
 /**
  * Test case for <code>HibernateVersionDAO</code>
@@ -31,7 +32,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 	private DocumentDAO docDao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that

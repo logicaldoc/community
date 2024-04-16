@@ -207,6 +207,9 @@ public class ContextProperties extends OrderedProperties {
 	 * are maintained.
 	 */
 	protected void backup() throws IOException {
+		if (maxBackups < 1)
+			return;
+
 		checkFile();
 
 		// Backup the file first

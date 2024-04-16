@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.plugin.PluginException;
 
 import junit.framework.Assert;
 
@@ -23,7 +24,7 @@ public class ContextConfiguratorTest {
 	File contextXml = new File("target/context.xml");
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		FileUtil.copyResource("/contexttest.xml", contextXml);
 	}
 

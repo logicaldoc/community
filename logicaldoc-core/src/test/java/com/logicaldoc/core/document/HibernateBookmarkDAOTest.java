@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.util.plugin.PluginException;
 
 import junit.framework.Assert;
 
@@ -26,7 +27,7 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 	private BookmarkDAO dao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDiscussionDAO

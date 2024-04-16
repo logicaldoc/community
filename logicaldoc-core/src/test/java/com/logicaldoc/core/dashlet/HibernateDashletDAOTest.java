@@ -1,5 +1,9 @@
 package com.logicaldoc.core.dashlet;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -9,8 +13,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
-
-import junit.framework.Assert;
+import com.logicaldoc.util.plugin.PluginException;
 
 /**
  * Test case for <code>HibernateDashletDAO</code>
@@ -24,7 +27,7 @@ public class HibernateDashletDAOTest extends AbstractCoreTestCase {
 	private DashletDAO dao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDashletDAO
@@ -34,10 +37,10 @@ public class HibernateDashletDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testFindByName() throws PersistenceException {
 		Dashlet dashlet = dao.findByName("checkout", 1L);
-		Assert.assertNotNull(dashlet);
-		Assert.assertEquals(1L, dashlet.getId());
+		assertNotNull(dashlet);
+		assertEquals(1L, dashlet.getId());
 
 		dashlet = dao.findByName("xxxx", 1L);
-		Assert.assertNull(dashlet);
+		assertNull(dashlet);
 	}
 }

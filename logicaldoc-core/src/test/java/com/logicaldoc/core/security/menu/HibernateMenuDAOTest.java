@@ -18,6 +18,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
+import com.logicaldoc.util.plugin.PluginException;
 
 import junit.framework.Assert;
 
@@ -32,8 +33,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 	// Instance under test
 	private MenuDAO dao;
 
-	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	@Before	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that

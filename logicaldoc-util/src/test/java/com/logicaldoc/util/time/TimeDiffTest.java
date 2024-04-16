@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -15,8 +16,8 @@ import com.logicaldoc.util.time.TimeDiff.TimeField;
 public class TimeDiffTest extends AbstractTestCase {
 
 	@Override
-	protected String[] getSqlScripts() {
-		return new String[] { "/sql1.sql" };
+	protected List<String> getDatabaseScripts() {
+		return List.of( "/sql1.sql" );
 	}
 	
 	@Test

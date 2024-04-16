@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSBookmark;
 
@@ -18,7 +19,7 @@ public class SoapBookmarkServiceTest extends AbstractWebserviceTestCase {
 	private SoapBookmarkService bookmarkService;
 
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		bookmarkService = new SoapBookmarkService();

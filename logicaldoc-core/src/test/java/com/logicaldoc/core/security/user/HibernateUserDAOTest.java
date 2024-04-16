@@ -18,6 +18,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.plugin.PluginException;
 
 import junit.framework.Assert;
 
@@ -35,7 +36,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 	private GroupDAO groupDao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that

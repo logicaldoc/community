@@ -1,10 +1,13 @@
 package com.logicaldoc.core.communication;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
@@ -21,22 +24,22 @@ public class PSTWorkerTest extends AbstractCoreTestCase {
 	public void testPrintListing() throws FileNotFoundException, IOException {
 		PSTWorker worker = new PSTWorker(new File("src/test/resources/sample.pst"));
 		String listing = worker.printListing();
-		Assert.assertNotNull(listing);
-		Assert.assertTrue(listing.contains("New message created by"));
+		assertNotNull(listing);
+		assertTrue(listing.contains("New message created by"));
 	}
 
 	@Test
 	public void testCountEmails() throws FileNotFoundException, IOException {
 		PSTWorker worker = new PSTWorker(new File("src/test/resources/sample.pst"));
 		long count = worker.countEmails();
-		Assert.assertEquals(1, count);
+		assertEquals(1, count);
 	}
 	
 	@Test
 	public void testPrintEmails() throws FileNotFoundException, IOException {
 		PSTWorker worker = new PSTWorker(new File("src/test/resources/sample.pst"));
 		String emails = worker.printEmails();
-		Assert.assertNotNull(emails);
-		Assert.assertTrue(emails.contains("This line is in bold"));
+		assertNotNull(emails);
+		assertTrue(emails.contains("This line is in bold"));
 	}
 }

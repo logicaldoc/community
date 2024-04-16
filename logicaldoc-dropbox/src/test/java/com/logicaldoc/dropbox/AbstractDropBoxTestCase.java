@@ -1,5 +1,7 @@
 package com.logicaldoc.dropbox;
 
+import java.util.List;
+
 import com.logicaldoc.util.junit.AbstractTestCase;
 
 /**
@@ -12,7 +14,7 @@ import com.logicaldoc.util.junit.AbstractTestCase;
 public abstract class AbstractDropBoxTestCase extends AbstractTestCase {
 
 	@Override
-	protected String[] getSqlScripts() {
-		return new String[] { "/sql/logicaldoc-core.sql", "/sql/logicaldoc-dropbox.sql", "/data.sql" };
+	protected List<String> getDatabaseScripts() {
+		return List.of("/sql/logicaldoc-core.sql", "/sql/logicaldoc-dropbox.sql", "/data.sql");
 	}
 }

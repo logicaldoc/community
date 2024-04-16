@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.junit.Before;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.junit.AbstractTestCase;
+import com.logicaldoc.util.plugin.PluginException;
 
 /**
  * Abstract test case for the Core module. This class initialises a test
@@ -30,14 +32,14 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 
 	@Before
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 		prepareStore();
 	}
 
 	@Override
-	protected String[] getSqlScripts() {
-		return new String[] { "/sql/logicaldoc-core.sql", "/data.sql" };
+	protected List<String> getDatabaseScripts() {
+		return List.of("/sql/logicaldoc-core.sql", "/data.sql");
 	}
 
 	private void prepareStore() throws IOException {
@@ -45,7 +47,7 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 		File store1 = new File(storePath);
 		FileUtil.strongDelete(store1);
 		store1.mkdir();
-		
+
 		File store2 = new File(Context.get().getProperties().getProperty("store.2.dir"));
 		FileUtil.strongDelete(store2);
 		store2.mkdir();

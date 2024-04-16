@@ -21,6 +21,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
+import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSAccessControlEntry;
 import com.logicaldoc.webservice.model.WSFolder;
@@ -43,7 +44,7 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 	private SoapSecurityService soapSecurityService;
 
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 		folderDao = (FolderDAO) context.getBean("FolderDAO");
 		userDao = (UserDAO) context.getBean("UserDAO");

@@ -57,19 +57,15 @@ public interface SystemService extends RemoteService {
 	 * Starts the task execution.
 	 * 
 	 * @param taskName The task name
-	 * 
-	 * @return True, if the task is correctly started.
 	 */
-	public boolean startTask(String taskName);
+	public void startTask(String taskName);
 
 	/**
 	 * Stops the task execution.
 	 * 
 	 * @param taskName The task name
-	 * 
-	 * @return True, if the task is correctly stopped.
 	 */
-	public boolean stopTask(String taskName);
+	public void stopTask(String taskName);
 
 	/**
 	 * Retrieves a specific task by its name

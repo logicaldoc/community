@@ -442,19 +442,19 @@ public class FormatConverterManager {
 
 		String inOutkey = composeKey(inFileName, outFileName);
 
-		List<FormatConverter> convrters = getConverters().get(inOutkey);
-		if (convrters == null || convrters.isEmpty())
-			convrters = getConverters().get("*-pdf");
-		if (convrters == null || convrters.isEmpty())
+		List<FormatConverter> formatConverters = getConverters().get(inOutkey);
+		if (formatConverters == null || formatConverters.isEmpty())
+			formatConverters = getConverters().get("*-pdf");
+		if (formatConverters == null || formatConverters.isEmpty())
 			log.warn("No format converter for file {}", inFileName);
 
 		// Get the first available converter
-		FormatConverter converter = convrters != null ? convrters.get(0) : null;
+		FormatConverter converter = formatConverters != null ? formatConverters.get(0) : null;
 
 		// Check if a special binding is configured
 		String currentConverter = config.getProperty("converter." + inOutkey);
-		if (StringUtils.isNotEmpty(currentConverter))
-			for (FormatConverter formatConverter : convrters) {
+		if (StringUtils.isNotEmpty(currentConverter) && formatConverters != null)
+			for (FormatConverter formatConverter : formatConverters) {
 				if (formatConverter.getClass().getName().equals(currentConverter)) {
 					converter = formatConverter;
 				}
@@ -521,7 +521,7 @@ public class FormatConverterManager {
 	public synchronized void init() {
 		if (!converters.isEmpty())
 			return;
-		
+
 		// Acquire the 'ThumbnailBuilder' extensions of the core plugin
 		PluginRegistry registry = PluginRegistry.getInstance();
 		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "FormatConverter");

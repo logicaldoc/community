@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -11,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Client;
+import com.logicaldoc.core.security.Device;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.spring.LDAuthenticationToken;
@@ -21,6 +23,7 @@ import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.junit.AbstractTestCase;
+import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.web.service.SecurityServiceImpl;
 import com.logicaldoc.web.util.MockServletSession;
 
@@ -47,7 +50,7 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 	protected MockServletSession servletSession = new MockServletSession();
 
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		repositoryDir.mkdirs();
@@ -70,7 +73,13 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 
 		guiSession = new GUISession();
-		session = SessionManager.get().newSession(username, password, null, new Client());
+		Client client=new Client("xyz", "192.168.2.231", "ghost");
+		Device device=new Device();
+		device.setBrowser("Firefox");
+		device.setBrowserVersion("18");
+		device.setOperativeSystem("Windows");
+		client.setDevice(device);
+		session = SessionManager.get().newSession(username, password, null, client);
 		if (session != null) {
 			User user = userDao.findByUsernameIgnoreCase(username);
 			userDao.initialize(user);
@@ -89,7 +98,7 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 	}
 
 	@Override
-	protected String[] getSqlScripts() {
-		return new String[] { "/sql/logicaldoc-core.sql", "/data.sql" };
+	protected List<String> getDatabaseScripts() {
+		return List.of("/sql/logicaldoc-core.sql", "/data.sql");
 	}
 }

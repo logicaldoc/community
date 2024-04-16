@@ -12,6 +12,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.logicaldoc.util.plugin.PluginException;
+
 public class JarUtilTest {
 	private File dir = new File("target/test");
 
@@ -20,7 +22,7 @@ public class JarUtilTest {
 	private JarUtil testSubject = new JarUtil();
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		File dir = new File("target/test");
 		dir.mkdirs();
 		dir.mkdir();

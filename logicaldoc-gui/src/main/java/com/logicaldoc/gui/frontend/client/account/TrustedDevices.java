@@ -119,29 +119,28 @@ public class TrustedDevices extends com.smartgwt.client.widgets.Window {
 		final ListGridRecord[] selection = list.getSelectedRecords();
 		if (selection == null || selection.length == 0)
 			return;
-		final List<String> ids = new ArrayList<>();
+		final List<Long> ids = new ArrayList<>();
 		for (int i = 0; i < selection.length; i++)
-			ids.add(selection[i].getAttributeAsString("id"));
+			ids.add(selection[i].getAttributeAsLong("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(
-				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
-					if (Boolean.TRUE.equals(answer)) {
-						SecurityService.Instance.get().deleteTrustedDevices(ids, new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void result) {
-								list.removeSelectedData();
-								list.deselectAllRecords();
-							}
-						});
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+			if (Boolean.TRUE.equals(answer)) {
+				SecurityService.Instance.get().deleteTrustedDevices(ids, new AsyncCallback<>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
 					}
-				}));
+
+					@Override
+					public void onSuccess(Void result) {
+						list.removeSelectedData();
+						list.deselectAllRecords();
+					}
+				});
+			}
+		}));
 
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();

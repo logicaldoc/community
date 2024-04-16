@@ -20,6 +20,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.util.plugin.PluginException;
+
 public class ZipUtilTest {
 	private static Logger log = LoggerFactory.getLogger(ZipUtilTest.class);
 
@@ -30,7 +32,7 @@ public class ZipUtilTest {
 	private ZipUtil testSubject = new ZipUtil();
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		folder.mkdir();
 		FileUtil.copyResource("/test.zip", file);
 	}

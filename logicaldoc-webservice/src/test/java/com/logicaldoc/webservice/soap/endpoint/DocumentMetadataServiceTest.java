@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
+import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSAttributeOption;
 import com.logicaldoc.webservice.model.WSTemplate;
@@ -29,7 +30,7 @@ public class DocumentMetadataServiceTest extends AbstractWebserviceTestCase {
 	private SoapSecurityService securityServiceImpl;
 
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		templateDao = (TemplateDAO) context.getBean("TemplateDAO");

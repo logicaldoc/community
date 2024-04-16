@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.security.Tenant;
+import com.logicaldoc.util.plugin.PluginException;
 
 public class PDFParserTest extends AbstractCoreTestCase {
 
@@ -32,7 +33,7 @@ public class PDFParserTest extends AbstractCoreTestCase {
 	 * @throws java.lang.Exception
 	 */
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 	}
 

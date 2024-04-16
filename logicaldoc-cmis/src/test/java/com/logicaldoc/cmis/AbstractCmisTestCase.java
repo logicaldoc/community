@@ -3,6 +3,7 @@ package com.logicaldoc.cmis;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -12,6 +13,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ResourceUtil;
 import com.logicaldoc.util.junit.AbstractTestCase;
+import com.logicaldoc.util.plugin.PluginException;
 
 /**
  * Abstract test case for the Webapp module. This class initialises a test
@@ -30,7 +32,7 @@ public abstract class AbstractCmisTestCase extends AbstractTestCase {
 	}
 
 	@Override
-	public void setUp() throws IOException, SQLException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		/*
@@ -38,15 +40,15 @@ public abstract class AbstractCmisTestCase extends AbstractTestCase {
 		 */
 		String storePath = Context.get().getProperties().getProperty("store.1.dir");
 		File store = new File(storePath);
-		
+
 		FileUtil.strongDelete(store);
-		
+
 		store.mkdir();
 		new File(store, "5/doc").mkdirs();
-		
+
 		Storer storer = (Storer) context.getBean("Storer");
 		storer.init();
-		
+
 		ResourceUtil.copyResource("/data.sql", new File(store, "5/doc/1.0"));
 	}
 
@@ -56,7 +58,7 @@ public abstract class AbstractCmisTestCase extends AbstractTestCase {
 	}
 
 	@Override
-	protected String[] getSqlScripts() {
-		return new String[] { "/sql/logicaldoc-core.sql", "/data.sql" };
+	protected List<String> getDatabaseScripts() {
+		return List.of("/sql/logicaldoc-core.sql", "/data.sql");
 	}
 }

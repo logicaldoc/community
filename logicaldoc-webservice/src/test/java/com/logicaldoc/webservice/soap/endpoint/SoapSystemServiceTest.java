@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSParameter;
 import com.logicaldoc.webservice.model.WSSystemInfo;
@@ -24,7 +25,7 @@ public class SoapSystemServiceTest extends AbstractWebserviceTestCase {
 	private SoapSystemService systemServiceImpl;
 
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Make sure that this is a SoapSystemService instance

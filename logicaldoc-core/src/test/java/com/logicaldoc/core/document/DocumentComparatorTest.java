@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.util.plugin.PluginException;
 
 public class DocumentComparatorTest extends AbstractCoreTestCase {
 
@@ -22,7 +23,7 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 	private DocumentDAO dao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that

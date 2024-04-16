@@ -110,7 +110,7 @@ public class ResponsesGrid extends RefreshableListGrid {
 
 	private void addAttributes(List<ListGridField> fields) {
 		for (String name : form.getAttributeNames()) {
-			if (form.getAttribute(name).isSection() || name == null || name.isBlank())
+			if (form.getAttribute(name).isSection() || name == null || name.trim().isEmpty())
 				continue;
 
 			ListGridField ext = new ListGridField("ext_" + name, Session.get().getInfo().getAttributeLabel(name), 100);

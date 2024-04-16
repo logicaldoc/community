@@ -1,13 +1,13 @@
 package com.logicaldoc.core.automation;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
-
-import junit.framework.Assert;
 
 /**
  * Test case for the <code>MailUtil</code>
@@ -25,6 +25,6 @@ public class AutomationTest extends AbstractCoreTestCase {
 		Automation automation = new Automation();
 		String output = automation.evaluate("pippo $testval", dict);
 
-		Assert.assertEquals("pippo abc", output);
+		assertEquals("pippo abc", output);
 	}
 }

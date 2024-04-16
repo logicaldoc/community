@@ -74,7 +74,7 @@ public interface SecurityServiceAsync {
 
 	void isTrustedDevice(String device, AsyncCallback<Boolean> callback);
 
-	void deleteTrustedDevices(List<String> deviceIds, AsyncCallback<Void> callback);
+	void deleteTrustedDevices(List<Long> deviceIds, AsyncCallback<Void> callback);
 
 	void syncGeolocationDB(String key, AsyncCallback<String> callback);
 

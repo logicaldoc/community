@@ -1,13 +1,10 @@
 package com.logicaldoc.web.service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.SQLException;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,12 +19,7 @@ public class SettingServiceImplTest extends AbstractWebappTestCase {
 	private static Logger log = LoggerFactory.getLogger(SettingServiceImplTest.class);
 
 	// Instance under test
-	private SettingServiceImpl service = new SettingServiceImpl();
-
-	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
-		super.setUp();
-	}
+	private SettingServiceImpl testSubject = new SettingServiceImpl();
 
 	@Test
 	public void testSaveEmailSettings() throws ServerException {
@@ -42,12 +34,12 @@ public class SettingServiceImplTest extends AbstractWebappTestCase {
 
 		String notThrownTest = null;
 		try {
-			service.saveEmailSettings(emailSettings);
+			testSubject.saveEmailSettings(emailSettings);
 			notThrownTest = "ok";
 		} catch (Exception t) {
 			t.printStackTrace();
 		}
-		Assert.assertNotNull(notThrownTest);
+		assertNotNull(notThrownTest);
 	}
 
 	@Test
@@ -58,12 +50,12 @@ public class SettingServiceImplTest extends AbstractWebappTestCase {
 
 		String notThrownTest = null;
 		try {
-			service.saveSettings(params);
+			testSubject.saveSettings(params);
 			notThrownTest = "ok";
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}
-		Assert.assertNotNull(notThrownTest);
+		assertNotNull(notThrownTest);
 	}
 
 	@Test
@@ -78,11 +70,11 @@ public class SettingServiceImplTest extends AbstractWebappTestCase {
 
 		String notThrownTest = null;
 		try {
-			service.saveSettings(List.of(wsSettings, wdSettings));
+			testSubject.saveSettings(List.of(wsSettings, wdSettings));
 			notThrownTest = "ok";
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}
-		Assert.assertNotNull(notThrownTest);
+		assertNotNull(notThrownTest);
 	}
 }

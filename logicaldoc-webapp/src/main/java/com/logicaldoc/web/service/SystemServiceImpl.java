@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.ResultSet;
@@ -100,6 +101,8 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	private static final long serialVersionUID = 1L;
 
 	private static Logger log = LoggerFactory.getLogger(SystemServiceImpl.class);
+
+	protected static File defaultWebappRootFolder = null;
 
 	@Override
 	public boolean disableTask(String taskName) throws ServerException {
@@ -448,46 +451,47 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	}
 
 	@Override
-	public GUITask saveTask(GUITask task, String locale) throws ServerException {
+	public GUITask saveTask(GUITask guiTask, String locale) throws ServerException {
 		validateSession();
 
 		TaskManager manager = (TaskManager) Context.get().getBean(TaskManager.class);
-		Task tsk = null;
+		Task task = null;
 		for (Task t : manager.getTasks()) {
-			if (t.getName().equals(task.getName())) {
-				tsk = t;
+			if (t.getName().equals(guiTask.getName())) {
+				task = t;
 				break;
 			}
 		}
 
-		if (tsk != null) {
-			tsk.getScheduling().setEnabled(task.getScheduling().isEnabled());
-			if (task.getScheduling().isSimple()) {
-				tsk.getScheduling().setMode(TaskTrigger.MODE_SIMPLE);
-				tsk.getScheduling().setDelay(task.getScheduling().getDelay() * 1000);
-				tsk.getScheduling().setInterval(task.getScheduling().getInterval() * 1000);
-				tsk.getScheduling().setIntervalSeconds(task.getScheduling().getInterval());
-				task.setSchedulingLabel(I18N.message("each", locale) + " " + tsk.getScheduling().getIntervalSeconds()
-						+ " " + I18N.message(SECONDS, locale).toLowerCase());
+		if (task != null) {
+			task.getScheduling().setEnabled(guiTask.getScheduling().isEnabled());
+			if (guiTask.getScheduling().isSimple()) {
+				task.getScheduling().setMode(TaskTrigger.MODE_SIMPLE);
+				task.getScheduling().setDelay(guiTask.getScheduling().getDelay() * 1000);
+				task.getScheduling().setInterval(guiTask.getScheduling().getInterval() * 1000);
+				task.getScheduling().setIntervalSeconds(guiTask.getScheduling().getInterval());
+				guiTask.setSchedulingLabel(
+						I18N.message("each", locale) + " " + task.getScheduling().getIntervalSeconds() + " "
+								+ I18N.message(SECONDS, locale).toLowerCase());
 			} else {
-				tsk.getScheduling().setMode(TaskTrigger.MODE_CRON);
+				task.getScheduling().setMode(TaskTrigger.MODE_CRON);
 
 				InfoServiceImpl service = new InfoServiceImpl();
-				service.getCronDescription(task.getScheduling().getCronExpression(), locale);
+				service.getCronDescription(guiTask.getScheduling().getCronExpression(), locale);
 
-				tsk.getScheduling().setCronExpression(task.getScheduling().getCronExpression());
-				task.setSchedulingLabel(tsk.getScheduling().getCronExpression());
+				task.getScheduling().setCronExpression(guiTask.getScheduling().getCronExpression());
+				guiTask.setSchedulingLabel(task.getScheduling().getCronExpression());
 			}
-			tsk.getScheduling().setMaxLength(task.getScheduling().getMaxLength());
+			task.getScheduling().setMaxLength(guiTask.getScheduling().getMaxLength());
 
-			tsk.setSendActivityReport(task.isSendActivityReport());
-			tsk.setReportRecipients(task.getReportRecipients().stream().map(u -> Long.toString(u.getId()))
+			task.setSendActivityReport(guiTask.isSendActivityReport());
+			task.setReportRecipients(guiTask.getReportRecipients().stream().map(u -> Long.toString(u.getId()))
 					.collect(Collectors.joining(",")));
 
-			saveTask(tsk);
+			saveTask(task);
 		}
 
-		return task;
+		return guiTask;
 	}
 
 	private void saveTask(Task tsk) {
@@ -499,7 +503,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	}
 
 	@Override
-	public boolean startTask(String taskName) {
+	public void startTask(String taskName) {
 		TaskManager manager = (TaskManager) Context.get().getBean(TaskManager.class);
 
 		for (Task task : manager.getTasks()) {
@@ -509,12 +513,10 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 				break;
 			}
 		}
-
-		return true;
 	}
 
 	@Override
-	public boolean stopTask(String taskName) {
+	public void stopTask(String taskName) {
 		TaskManager manager = (TaskManager) Context.get().getBean(TaskManager.class);
 		for (Task task : manager.getTasks()) {
 			if (task.getName().equals(taskName)) {
@@ -522,8 +524,6 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 				break;
 			}
 		}
-
-		return true;
 	}
 
 	@Override
@@ -836,7 +836,11 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			} catch (SchedulerException e) {
 				throwServerException(session, log, e);
 			}
+	}
 
+	private File getPluginArchive(String pluginId) {
+		String location = PluginRegistry.getInstance().getPlugin(pluginId).getLocation().toString().substring(9);
+		return new File(location.substring(0, location.lastIndexOf('!')));
 	}
 
 	@Override
@@ -858,11 +862,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		if (plugin.getAttribute("removable") == null || "false".equals(plugin.getAttribute("removable").getValue()))
 			throw new ServerException("The plugin " + pluginId + " cannot be uninstalled");
 
-		String pluginVersion = plugin.getVersion().toString();
-		String pluginJar = pluginId + "-" + pluginVersion + "-plugin.jar";
-
-		File libFolder = new File(getThreadLocalRequest().getSession().getServletContext().getRealPath("/WEB-INF/lib"));
-		File pluginJarFile = new File(libFolder, pluginJar);
+		File pluginJarFile = getPluginArchive(pluginId);
 
 		pluginRegistry.getManager().deactivatePlugin(pluginId);
 
@@ -903,24 +903,26 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			 * Launch the plugin's install
 			 */
 			PluginDescriptor plugin = PluginRegistry.getInstance().getPlugin(pluginId);
-			LogicalDOCPlugin pluginInstance = (LogicalDOCPlugin) Class.forName(plugin.getPluginClassName())
-					.getDeclaredConstructor().newInstance();
-			pluginInstance.install();
+			if (plugin.getPluginClassName() != null) {
+				LogicalDOCPlugin pluginInstance = (LogicalDOCPlugin) Class.forName(plugin.getPluginClassName())
+						.getDeclaredConstructor().newInstance();
+				pluginInstance.install();
+			}
 
 			/*
 			 * Initialize the database
 			 */
 			ContextProperties config = Context.get().getProperties();
-			PluginDbInit init = new PluginDbInit();
-			init.setDbms(config.getProperty("jdbc.dbms"));
-			init.setDriver(config.getProperty("jdbc.driver"));
-			init.setUrl(config.getProperty("jdbc.url"));
-			init.setUsername(config.getProperty("jdbc.username"));
-			init.setPassword(config.getProperty("jdbc.password"));
+			PluginDbInit dbInit = new PluginDbInit();
+			dbInit.setDbms(config.getProperty("jdbc.dbms"));
+			dbInit.setDriver(config.getProperty("jdbc.driver"));
+			dbInit.setUrl(config.getProperty("jdbc.url"));
+			dbInit.setUsername(config.getProperty("jdbc.username"));
+			dbInit.setPassword(config.getProperty("jdbc.password"));
 
-			if (init.testConnection()) {
+			if (dbInit.testConnection()) {
 				// connection success
-				init.init(Set.of(pluginId));
+				dbInit.init(Set.of(pluginId));
 			} else {
 				// connection failure
 				log.debug("connection failure");
@@ -947,7 +949,11 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		try {
 			File pluginPackage = uploadedFilesMap.values().iterator().next();
 			ContextProperties config = Context.get().getProperties();
-			File rootFolder = new File(getThreadLocalRequest().getSession().getServletContext().getRealPath("/"));
+			File rootFolder;
+			if (getThreadLocalRequest() != null)
+				rootFolder = new File(getThreadLocalRequest().getSession().getServletContext().getRealPath("/"));
+			else
+				rootFolder = defaultWebappRootFolder;
 
 			String pluginId = null;
 			String pluginVersion = null;
@@ -990,17 +996,13 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 				log.info("Deleted existing plugin home {}", pluginHome.getAbsolutePath());
 			}
 
-			File libFolder = new File(
-					getThreadLocalRequest().getSession().getServletContext().getRealPath("/WEB-INF/lib"));
+			File libFolder = new File(new File(rootFolder, "WEB-INF"), "lib");
 			File pluginJarFile = new File(libFolder, pluginJar);
 
 			/*
 			 * Append the plugin jar in the classpath
 			 */
-			final ClassLoader sysloader = this.getClass().getClassLoader();
-			final Class<URLClassLoader> sysclass = URLClassLoader.class;
-			final Method method = sysclass.getDeclaredMethod("addURL", URL.class);
-			method.invoke(sysloader, pluginJarFile.toURI().toURL());
+			appendPluginJarInClasspath(pluginJarFile);
 
 			/*
 			 * Initialize the plugin
@@ -1020,11 +1022,24 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 			if (pluginRegistry.isRestartRequired())
 				ApplicationListener.restartRequired();
-		} catch (ServerException | IOException | NoSuchMethodException | SecurityException | IllegalAccessException
-				| IllegalArgumentException | InvocationTargetException | PluginException e) {
+		} catch (ServerException | IOException | NoSuchMethodException | SecurityException | IllegalArgumentException
+				| InvocationTargetException | PluginException e) {
 			throwServerException(session, log, e);
 		} finally {
 			UploadServlet.cleanReceivedFiles(session.getSid());
+		}
+	}
+
+	private void appendPluginJarInClasspath(File pluginJarFile)
+			throws NoSuchMethodException, InvocationTargetException, MalformedURLException {
+		final ClassLoader sysloader = this.getClass().getClassLoader();
+		final Class<URLClassLoader> sysclass = URLClassLoader.class;
+		final Method method = sysclass.getDeclaredMethod("addURL", URL.class);
+
+		try {
+			method.invoke(sysloader, pluginJarFile.toURI().toURL());
+		} catch (IllegalAccessException iae) {
+			log.warn(iae.getMessage(), iae);
 		}
 	}
 

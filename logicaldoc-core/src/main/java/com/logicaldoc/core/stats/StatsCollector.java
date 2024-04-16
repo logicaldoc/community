@@ -36,7 +36,6 @@ import com.logicaldoc.core.sequence.SequenceDAO;
 import com.logicaldoc.core.task.Task;
 import com.logicaldoc.core.task.TaskException;
 import com.logicaldoc.core.util.UserUtil;
-import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
 
@@ -220,7 +219,7 @@ public class StatsCollector extends Task {
 			/*
 			 * Collect sizing statistics
 			 */
-			
+
 			long tags = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_tag");
 			long versions = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_version");
 			long histories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_history");
@@ -844,48 +843,6 @@ public class StatsCollector extends Task {
 		return true;
 	}
 
-	public GenericDAO getGenericDAO() {
-		return genericDAO;
-	}
-
-	public void setGenericDAO(GenericDAO genericDAO) {
-		this.genericDAO = genericDAO;
-	}
-
-	@Override
-	public ContextProperties getConfig() {
-		return config;
-	}
-
-	@Override
-	public void setConfig(ContextProperties config) {
-		this.config = config;
-	}
-
-	public DocumentDAO getDocumentDAO() {
-		return documentDAO;
-	}
-
-	public void setDocumentDAO(DocumentDAO documentDAO) {
-		this.documentDAO = documentDAO;
-	}
-
-	public FolderDAO getFolderDAO() {
-		return folderDAO;
-	}
-
-	public void setFolderDAO(FolderDAO folderDAO) {
-		this.folderDAO = folderDAO;
-	}
-
-	public GroupDAO getGroupDAO() {
-		return groupDAO;
-	}
-
-	public void setGroupDAO(GroupDAO groupDAO) {
-		this.groupDAO = groupDAO;
-	}
-
 	public static void setUserno(String userno) {
 		StatsCollector.userno = userno;
 	}
@@ -900,13 +857,5 @@ public class StatsCollector extends Task {
 
 	public static void setProductName(String productName) {
 		StatsCollector.productName = productName;
-	}
-
-	public void setTenantDAO(TenantDAO tenantDAO) {
-		this.tenantDAO = tenantDAO;
-	}
-
-	public void setSequenceDAO(SequenceDAO sequenceDAO) {
-		this.sequenceDAO = sequenceDAO;
 	}
 }

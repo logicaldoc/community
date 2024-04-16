@@ -9,6 +9,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.logicaldoc.util.plugin.PluginException;
+
 import junit.framework.TestCase;
 
 /**
@@ -22,7 +24,7 @@ public class DBInitTest extends TestCase {
 	private DBInit testSubject;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		List<String> sqlList = new ArrayList<>();
 		sqlList.add("sql1.sql");
 		sqlList.add("sql2.sql");

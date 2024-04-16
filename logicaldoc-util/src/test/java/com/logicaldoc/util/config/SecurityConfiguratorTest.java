@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.plugin.PluginException;
 
 /**
  * Test case for <code>SecurityConfigurator</code>
@@ -22,7 +23,7 @@ public class SecurityConfiguratorTest {
 	File contextSecurityXml = new File("target/context-security.xml");
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		FileUtil.copyResource("/context-security.xml", contextSecurityXml);
 	}
 

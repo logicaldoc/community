@@ -14,6 +14,7 @@ import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
+import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.web.AbstractWebappTestCase;
 
 import junit.framework.Assert;
@@ -26,7 +27,7 @@ public class TemplateServiceImplTest extends AbstractWebappTestCase {
 	private TemplateDAO templateDao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		templateDao = (TemplateDAO) context.getBean("TemplateDAO");

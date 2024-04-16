@@ -14,6 +14,7 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
+import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.web.AbstractWebappTestCase;
 
 import junit.framework.Assert;
@@ -26,7 +27,7 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 	private FolderDAO folderDao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		folderDao = (FolderDAO) context.getBean("FolderDAO");

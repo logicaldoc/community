@@ -11,6 +11,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.communication.MessageTemplate;
 import com.logicaldoc.core.communication.MessageTemplateDAO;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.web.AbstractWebappTestCase;
 
 import junit.framework.Assert;
@@ -23,7 +24,7 @@ public class MessageServiceImplTest extends AbstractWebappTestCase {
 	private MessageTemplateDAO templateDao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		templateDao = (MessageTemplateDAO) context.getBean("MessageTemplateDAO");

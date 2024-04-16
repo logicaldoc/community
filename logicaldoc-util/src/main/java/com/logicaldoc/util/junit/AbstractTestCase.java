@@ -1,5 +1,6 @@
 package com.logicaldoc.util.junit;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
@@ -9,11 +10,16 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.io.FilenameUtils;
 import org.hsqldb.cmdline.SqlFile;
 import org.hsqldb.cmdline.SqlToolError;
 import org.junit.After;
@@ -23,8 +29,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.util.CollectionUtils;
 
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.plugin.PluginRegistry;
 
 /**
  * Abstract test case that of database and context initialization.
@@ -45,16 +54,18 @@ public abstract class AbstractTestCase {
 	private String userHome = System.getProperty(USER_HOME);
 
 	@Before
-	public void setUp() throws IOException, SQLException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		loadDevelSettings();
 
 		updateUserHome();
 
 		createTestDirs();
 
+		initializePlugins();
+
 		context = buildApplicationContext();
 
-		createTestDatabase();
+		createDatabase();
 	}
 
 	@After
@@ -85,13 +96,81 @@ public abstract class AbstractTestCase {
 	}
 
 	/**
+	 * Concrete implementations should return the list of plugin archives to
+	 * initialize
+	 * 
+	 * @return collection of plugin archives
+	 */
+	protected List<String> getPluginArchives() {
+		return new ArrayList<>();
+	}
+
+	/**
+	 * Initializes the declared plugins
+	 * 
+	 * @throws IOException I/O error retrieving the plugin archives
+	 * @throws PluginException Error during plugin initialization
+	 */
+	protected void initializePlugins() throws IOException, PluginException {
+		List<String> pluginArchives = getPluginArchives();
+		if (CollectionUtils.isEmpty(pluginArchives))
+			return;
+
+		File pluginsDir = new File("target/tests-plugins");
+		pluginsDir.mkdir();
+
+		for (String pluginArchive : pluginArchives) {
+			File pluginFile = new File(pluginsDir, FilenameUtils.getName(pluginArchive));
+			FileUtil.copyResource(pluginArchive, pluginFile);
+		}
+
+		PluginRegistry registry = PluginRegistry.getInstance();
+		registry.init(pluginsDir.getAbsolutePath());
+	}
+
+	/**
 	 * Concrete implementations should return the array of sql script resources
 	 * to use to setup the database
 	 * 
 	 * @return array of resources(database script files)
 	 */
-	protected String[] getSqlScripts() {
-		return new String[0];
+	protected List<String> getDatabaseScripts() {
+		return new ArrayList<>();
+	}
+
+	/**
+	 * Creates an in-memory test database
+	 * 
+	 * @throws SQLException Error in one of the SQL scripts
+	 * @throws IOException Error reading one of the SQL scripts
+	 */
+	private void createDatabase() throws SQLException, IOException {
+		final List<String> databaseScripts = getDatabaseScripts();
+		if (CollectionUtils.isEmpty(databaseScripts))
+			return;
+
+		for (String sqlScript : databaseScripts) {
+			File sqlFile = File.createTempFile("sql", ".sql");
+			FileUtil.copyResource(sqlScript, sqlFile);
+			try (Connection con = getConnection()) {
+				SqlFile sql = new SqlFile(sqlFile, "Cp1252", false);
+				sql.setConnection(con);
+				try {
+					log.info("Running script {}", sqlScript);
+					sql.execute();
+				} catch (SqlToolError e) {
+					throw new SQLException(e.getMessage(), e);
+				}
+			} finally {
+				FileUtil.strongDelete(sqlFile);
+			}
+		}
+
+		// Test the connection
+		try (Connection con = getConnection(); ResultSet rs = con.createStatement().executeQuery("CALL NOW()")) {
+			rs.next();
+			assertNotNull(rs.getObject(1));
+		}
 	}
 
 	/**
@@ -128,7 +207,7 @@ public abstract class AbstractTestCase {
 	 * @throws SQLException error at database level
 	 */
 	private void destroyDatabase() throws SQLException {
-		if (getSqlScripts().length < 1)
+		if (CollectionUtils.isEmpty(getDatabaseScripts()))
 			return;
 
 		try (Connection con = getConnection(); Statement statement = con.createStatement()) {
@@ -141,37 +220,9 @@ public abstract class AbstractTestCase {
 		return ds.getConnection();
 	}
 
-	/**
-	 * Creates an in-memory test database
-	 * 
-	 * @throws SQLException Error in one of the SQL scripts
-	 * @throws IOException Error reading one of the SQL scripts
-	 */
-	private void createTestDatabase() throws SQLException, IOException {
-		if (getSqlScripts().length < 1)
-			return;
-
-		for (String sqlScript : getSqlScripts()) {
-			File sqlFile = File.createTempFile("sql", ".sql");
-			FileUtil.copyResource(sqlScript, sqlFile);
-			try (Connection con = getConnection()) {
-				SqlFile sql = new SqlFile(sqlFile, "Cp1252", false);
-				sql.setConnection(con);
-				try {
-					log.info("Running script {}", sqlScript);
-					sql.execute();
-				} catch (SqlToolError e) {
-					throw new SQLException(e.getMessage(), e);
-				}
-			} finally {
-				FileUtil.strongDelete(sqlFile);
-			}
-		}
-
-		// Test the connection
-		try (Connection con = getConnection(); ResultSet rs = con.createStatement().executeQuery("CALL NOW()")) {
-			rs.next();
-			assertNotNull(rs.getObject(1));
-		}
+	protected void waiting() throws InterruptedException {
+		final int secondsToWait = 5;
+		CountDownLatch latch = new CountDownLatch(1);
+		assertFalse(latch.await(secondsToWait, TimeUnit.SECONDS));
 	}
 }

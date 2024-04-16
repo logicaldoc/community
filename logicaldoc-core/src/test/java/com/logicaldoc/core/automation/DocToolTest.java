@@ -23,8 +23,6 @@ import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Tenant;
 
-import junit.framework.Assert;
-
 public class DocToolTest extends AbstractCoreTestCase {
 
 	// instance under test
@@ -163,7 +161,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	@Test
 	public void testCreateAlias() throws Exception {
 		Document doc = testSubject.findById(1);
-		Assert.assertNotNull(doc);
+		assertNotNull(doc);
 		testSubject.initialize(doc);
 
 		FolderTool folderTool = new FolderTool();
@@ -171,24 +169,24 @@ public class DocToolTest extends AbstractCoreTestCase {
 		folderTool.initialize(newFolder);
 
 		Document alias = testSubject.createAlias(doc, newFolder, null, "admin");
-		Assert.assertNotSame(doc.getId(), alias.getId());
-		Assert.assertEquals(newFolder, alias.getFolder());
-		Assert.assertEquals("pippo(1).pdf", alias.getFileName());
+		assertNotSame(doc.getId(), alias.getId());
+		assertEquals(newFolder, alias.getFolder());
+		assertEquals("pippo(1).pdf", alias.getFileName());
 
 		alias = testSubject.createAlias(doc, folderTool.getPath(newFolder.getId()), null, "admin");
-		Assert.assertNotSame(doc.getId(), alias.getId());
-		Assert.assertEquals(newFolder, alias.getFolder());
-		Assert.assertEquals("pippo(2).pdf", alias.getFileName());
+		assertNotSame(doc.getId(), alias.getId());
+		assertEquals(newFolder, alias.getFolder());
+		assertEquals("pippo(2).pdf", alias.getFileName());
 	}
 
 	@Test
 	public void testLock() throws Exception {
 		Document doc = testSubject.findById(1);
-		Assert.assertNotNull(doc);
+		assertNotNull(doc);
 		testSubject.lock(doc.getId(), "admin");
 		doc = testSubject.findById(1);
-		Assert.assertEquals(2, doc.getStatus());
-		Assert.assertEquals(1L, doc.getLockUserId().longValue());
+		assertEquals(2, doc.getStatus());
+		assertEquals(1L, doc.getLockUserId().longValue());
 
 		// double lock with same user just to check that no exceptions are
 		// raised
@@ -201,27 +199,27 @@ public class DocToolTest extends AbstractCoreTestCase {
 		testSubject.lock(1L, "admin");
 
 		Document doc = testSubject.findById(1L);
-		Assert.assertEquals(2, doc.getStatus());
-		Assert.assertEquals(1L, doc.getLockUserId().longValue());
+		assertEquals(2, doc.getStatus());
+		assertEquals(1L, doc.getLockUserId().longValue());
 
 		// Locked by a different user
 		testSubject.unlock(doc.getId(), "admin");
 
 		doc = testSubject.findById(1);
-		Assert.assertEquals(0, doc.getStatus());
-		Assert.assertNull(doc.getLockUserId());
+		assertEquals(0, doc.getStatus());
+		assertNull(doc.getLockUserId());
 
 		testSubject.unlock(doc.getId(), "admin");
 
 		doc = testSubject.findById(1);
-		Assert.assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
-		Assert.assertNull(doc.getLockUserId());
+		assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+		assertNull(doc.getLockUserId());
 
 		// Already unlocked
 		testSubject.unlock(doc.getId(), "admin");
 		doc = testSubject.findById(1);
-		Assert.assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
-		Assert.assertNull(doc.getLockUserId());
+		assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+		assertNull(doc.getLockUserId());
 	}
 
 	@Test
@@ -274,23 +272,23 @@ public class DocToolTest extends AbstractCoreTestCase {
 	@Test
 	public void testMerge() throws Exception {
 		Document doc1 = testSubject.findById(1);
-		Assert.assertNotNull(doc1);
+		assertNotNull(doc1);
 		testSubject.initialize(doc1);
-		Assert.assertEquals(55, testSubject.countPages(doc1));
+		assertEquals(55, testSubject.countPages(doc1));
 
 		Document doc3 = testSubject.findById(3);
-		Assert.assertNotNull(doc3);
+		assertNotNull(doc3);
 		testSubject.initialize(doc3);
-		Assert.assertEquals(1, testSubject.countPages(doc3));
+		assertEquals(1, testSubject.countPages(doc3));
 
 		Document mergedDoc = testSubject.merge(Arrays.asList(doc1, doc3), 1200L, "merged.pdf", "admin");
-		Assert.assertNotNull(mergedDoc);
+		assertNotNull(mergedDoc);
 
 		mergedDoc = testSubject.findById(mergedDoc.getId());
-		Assert.assertNotNull(mergedDoc);
+		assertNotNull(mergedDoc);
 		testSubject.initialize(mergedDoc);
 
-		Assert.assertEquals(56, testSubject.countPages(mergedDoc));
+		assertEquals(56, testSubject.countPages(mergedDoc));
 	}
 
 	@Test
@@ -316,8 +314,8 @@ public class DocToolTest extends AbstractCoreTestCase {
 		Document doc3 = new Document();
 		doc3.setId(103L);
 		List<Long> ids = testSubject.getIds(Arrays.asList(doc1, doc2, doc3));
-		Assert.assertEquals(3, ids.size());
-		Assert.assertEquals(Long.valueOf(102L), ids.get(1));
+		assertEquals(3, ids.size());
+		assertEquals(Long.valueOf(102L), ids.get(1));
 	}
 
 	@Test
@@ -391,6 +389,6 @@ public class DocToolTest extends AbstractCoreTestCase {
 	public void testParse() throws Exception {
 		Document doc = testSubject.findById(1);
 		String text = testSubject.parse(doc, doc.getFileVersion());
-		Assert.assertTrue(text.contains("Digital Day"));
+		assertTrue(text.contains("Digital Day"));
 	}
 }

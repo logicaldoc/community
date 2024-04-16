@@ -1,5 +1,9 @@
 package com.logicaldoc.core.communication;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -13,8 +17,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
-
-import junit.framework.Assert;
+import com.logicaldoc.util.plugin.PluginException;
 
 /**
  * Test case for <code>HibernateSystemMessageDAO</code>
@@ -27,7 +30,7 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTestCase {
 	private SystemMessageDAO dao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context.
@@ -39,71 +42,71 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTestCase {
 	public void testDelete() throws PersistenceException {
 		dao.delete(1);
 		SystemMessage message = dao.findById(1);
-		Assert.assertNull(message);
+		assertNull(message);
 	}
 
 	@Test
 	public void testFindById() throws PersistenceException {
 		SystemMessage message = dao.findById(1);
-		Assert.assertNotNull(message);
-		Assert.assertEquals(1, message.getId());
-		Assert.assertEquals("message text1", message.getMessageText());
+		assertNotNull(message);
+		assertEquals(1, message.getId());
+		assertEquals("message text1", message.getMessageText());
 
 		// Try with unexisting message
 		message = dao.findById(99);
-		Assert.assertNull(message);
+		assertNull(message);
 	}
 
 	@Test
 	public void testFindByRecipient() throws PersistenceException {
 		Collection<SystemMessage> coll = dao.findByRecipient("sebastian", Message.TYPE_SYSTEM, null);
-		Assert.assertEquals(1, coll.size());
+		assertEquals(1, coll.size());
 		coll = dao.findByRecipient("marco", 1, null);
-		Assert.assertEquals(2, coll.size());
+		assertEquals(2, coll.size());
 		coll = dao.findByRecipient("paperino", 2, null);
-		Assert.assertEquals(0, coll.size());
+		assertEquals(0, coll.size());
 		coll = dao.findByRecipient("xxxx", Message.TYPE_SYSTEM, null);
-		Assert.assertEquals(0, coll.size());
+		assertEquals(0, coll.size());
 	}
 
 	@Test
 	public void testDeleteExpiredMessages() throws PersistenceException {
 		dao.deleteExpiredMessages("sebastian");
-		Assert.assertNotNull(dao.findById(1));
+		assertNotNull(dao.findById(1));
 
 		dao.deleteExpiredMessages(Message.TYPE_SYSTEM);
-		Assert.assertNotNull(dao.findById(1));
+		assertNotNull(dao.findById(1));
 	}
 
 	@Test
 	public void testGetUnreadCount() throws PersistenceException {
-		Assert.assertEquals(1, dao.getUnreadCount("sebastian", Message.TYPE_SYSTEM));
-		Assert.assertEquals(2, dao.getUnreadCount("marco", 1));
-		Assert.assertEquals(0, dao.getUnreadCount("admin", Message.TYPE_SYSTEM));
+		assertEquals(1, dao.getUnreadCount("sebastian", Message.TYPE_SYSTEM));
+		assertEquals(2, dao.getUnreadCount("marco", 1));
+		assertEquals(0, dao.getUnreadCount("admin", Message.TYPE_SYSTEM));
 	}
 
 	@Test
 	public void testFindByType() throws PersistenceException {
 		Collection<SystemMessage> coll = dao.findByType(0);
-		Assert.assertEquals(2, coll.size());
+		assertEquals(2, coll.size());
 		coll = dao.findByType(1);
-		Assert.assertEquals(2, coll.size());
+		assertEquals(2, coll.size());
 		coll = dao.findByType(2);
-		Assert.assertEquals(1, coll.size());
+		assertEquals(1, coll.size());
 		coll = dao.findByType(3);
-		Assert.assertEquals(0, coll.size());
+		assertEquals(0, coll.size());
 	}
 
 	@Test
 	public void testFindByMode() throws PersistenceException {
 		Collection<SystemMessage> coll = dao.findByMode("CC");
-		Assert.assertEquals(1, coll.size());
+		assertEquals(1, coll.size());
 		coll = dao.findByMode("sms");
-		Assert.assertEquals(2, coll.size());
+		assertEquals(2, coll.size());
 		coll = dao.findByMode("socket");
-		Assert.assertEquals(0, coll.size());
+		assertEquals(0, coll.size());
 		coll = dao.findByMode("xxxx");
-		Assert.assertEquals(0, coll.size());
+		assertEquals(0, coll.size());
 	}
 
 	@Test
@@ -130,54 +133,54 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTestCase {
 		message.setStatus(SystemMessage.STATUS_NEW);
 		message.setRecipients(recipients);
 		dao.store(message);
-		Assert.assertNotNull(message);
+		assertNotNull(message);
 		message = dao.findById(message.getId());
-		Assert.assertNotNull(message);
-		Assert.assertEquals(2, message.getRecipients().size());
+		assertNotNull(message);
+		assertEquals(2, message.getRecipients().size());
 
 		// Update an already existing message
 		message = dao.findById(1);
-		Assert.assertNotNull(message);
-		Assert.assertEquals("message text1", message.getMessageText());
+		assertNotNull(message);
+		assertEquals("message text1", message.getMessageText());
 		message.setMessageText("xxxx");
 		message.setRecipients(recipients);
 		dao.store(message);
 		message = dao.findById(1);
-		Assert.assertNotNull(message);
-		Assert.assertEquals("xxxx", message.getMessageText());
-		Assert.assertEquals(2, message.getRecipients().size());
+		assertNotNull(message);
+		assertEquals("xxxx", message.getMessageText());
+		assertEquals(2, message.getRecipients().size());
 	}
 
 	@Test
 	public void testFindMessagesToBeSent() throws PersistenceException {
 		Collection<SystemMessage> coll = dao.findMessagesToBeSent(0, 5);
-		Assert.assertEquals(1, coll.size());
+		assertEquals(1, coll.size());
 		coll = dao.findMessagesToBeSent(1, 5);
-		Assert.assertEquals(2, coll.size());
+		assertEquals(2, coll.size());
 		coll = dao.findMessagesToBeSent(2, 5);
-		Assert.assertEquals(0, coll.size());
+		assertEquals(0, coll.size());
 		coll = dao.findMessagesToBeSent(3, 5);
-		Assert.assertEquals(0, coll.size());
+		assertEquals(0, coll.size());
 
 		// Update an already existing message
 		SystemMessage message = dao.findById(1);
-		Assert.assertNotNull(message);
-		Assert.assertEquals("message text1", message.getMessageText());
+		assertNotNull(message);
+		assertEquals("message text1", message.getMessageText());
 		message.setTrials(5);
 		dao.store(message);
 		message = dao.findById(1);
-		Assert.assertNotNull(message);
+		assertNotNull(message);
 		coll = dao.findMessagesToBeSent(1, 5);
-		Assert.assertEquals(1, coll.size());
+		assertEquals(1, coll.size());
 
 		message = dao.findById(2);
-		Assert.assertNotNull(message);
-		Assert.assertEquals("message text2", message.getMessageText());
+		assertNotNull(message);
+		assertEquals("message text2", message.getMessageText());
 		message.setType(0);
 		dao.store(message);
 		message = dao.findById(2);
-		Assert.assertNotNull(message);
+		assertNotNull(message);
 		coll = dao.findMessagesToBeSent(0, 5);
-		Assert.assertEquals(2, coll.size());
+		assertEquals(2, coll.size());
 	}
 }

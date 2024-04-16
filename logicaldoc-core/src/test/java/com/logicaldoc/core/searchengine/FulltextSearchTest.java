@@ -17,6 +17,7 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.util.plugin.PluginException;
 
 import junit.framework.Assert;
 
@@ -27,7 +28,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 	protected SearchEngine engine;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 		engine = (SearchEngine) context.getBean("SearchEngine");
 		try {

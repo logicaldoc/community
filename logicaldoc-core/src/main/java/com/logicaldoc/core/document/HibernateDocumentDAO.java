@@ -528,7 +528,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			if (rs != null)
 				while (rs.next()) {
 					String file = rs.getString(1);
-					if (!fileNames.contains(file))
+					if (file!=null && !fileNames.contains(file))
 						fileNames.add(file.toLowerCase());
 				}
 		} catch (PersistenceException e) {

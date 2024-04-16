@@ -41,9 +41,7 @@ import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyStringImpl
 import org.apache.chemistry.opencmis.commons.impl.server.ObjectInfoImpl;
 import org.apache.chemistry.opencmis.commons.server.ObjectInfo;
 import org.apache.chemistry.opencmis.commons.spi.Holder;
-import org.java.plugin.JpfException;
 import org.java.plugin.PluginLifecycleException;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -70,7 +68,6 @@ import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.plugin.PluginRegistry;
 
 public class LDRepositoryTest extends AbstractCmisTestCase {
 
@@ -88,13 +85,12 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 	@Before
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		engine = (SearchEngine) context.getBean("SearchEngine");
 
 		try {
-			activateCorePlugin();
 			addHits();
 		} catch (Exception e) {
 			throw new IOException(e.getMessage(), e);
@@ -113,17 +109,9 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		testSubject = new LDRepository(folder, session.getSid());
 	}
 
-	private void activateCorePlugin() throws JpfException, IOException, PluginException {
-		File pluginsDir = new File("target/tests-plugins");
-		pluginsDir.mkdir();
-
-		File corePluginFile = new File(pluginsDir, "logicaldoc-core-plugin.jar");
-
-		// copy plugin file to target resources
-		FileUtil.copyResource("/logicaldoc-core-8.8.3-plugin.jar", corePluginFile);
-
-		PluginRegistry registry = PluginRegistry.getInstance();
-		registry.init(pluginsDir.getAbsolutePath());
+	@Override
+	protected List<String> getPluginArchives() {
+		return List.of("/logicaldoc-core-plugin.jar");
 	}
 
 	private void addHits() throws Exception {
@@ -359,7 +347,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 		LDRepository ldrep = new LDRepository(folder, session.getSid());
 		String id = ldrep.createDocument(null, props, "fld.4", contentStream);
-		Assert.assertNotNull(id);
+		assertNotNull(id);
 
 	}
 
@@ -657,7 +645,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 		LDRepository ldrep = new LDRepository(folder, session.getSid());
 		String id = ldrep.createFolder(null, props, "fld.4");
-		Assert.assertNotNull(id);
+		assertNotNull(id);
 
 		list = fdao.findAll();
 		assertEquals(8, list.size());
@@ -665,7 +653,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 		ldrep = new LDRepository(folder, null);
 		id = ldrep.createFolder(new MockCallContext(null, session.getSid()), props, "fld.4");
-		Assert.assertNotNull(id);
+		assertNotNull(id);
 
 	}
 

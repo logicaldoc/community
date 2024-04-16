@@ -77,8 +77,7 @@ public class TasksPanel extends AdminPanel {
 		MenuItem taskExecution = new MenuItem();
 		taskExecution.setTitle(I18N.message("execute"));
 		taskExecution.addClickHandler(event -> SystemService.Instance.get().getTaskByName(
-				tasksGrid.getSelectedRecord().getAttributeAsString("name"), I18N.getLocale(),
-				new AsyncCallback<>() {
+				tasksGrid.getSelectedRecord().getAttributeAsString("name"), I18N.getLocale(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -87,14 +86,14 @@ public class TasksPanel extends AdminPanel {
 					@Override
 					public void onSuccess(GUITask task) {
 						final GUITask currentTask = task;
-						SystemService.Instance.get().startTask(currentTask.getName(), new AsyncCallback<Boolean>() {
+						SystemService.Instance.get().startTask(currentTask.getName(), new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
 							}
 
 							@Override
-							public void onSuccess(Boolean result) {
+							public void onSuccess(Void result) {
 								final ListGridRecord rec = tasksGrid.getSelectedRecord();
 								rec.setAttribute(STATUS, GUITask.STATUS_RUNNING);
 								rec.setAttribute(RUNNING_ICON, RUNNING_TASK);
@@ -115,14 +114,14 @@ public class TasksPanel extends AdminPanel {
 		MenuItem taskStop = new MenuItem();
 		taskStop.setTitle(I18N.message("stop"));
 		taskStop.addClickHandler(event -> SystemService.Instance.get()
-				.stopTask(tasksGrid.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<Boolean>() {
+				.stopTask(tasksGrid.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
 					}
 
 					@Override
-					public void onSuccess(Boolean result) {
+					public void onSuccess(Void result) {
 						tasksGrid.getSelectedRecord().setAttribute(STATUS, GUITask.STATUS_STOPPING);
 						tasksGrid.refreshRow(tasksGrid.getRecordIndex(tasksGrid.getSelectedRecord()));
 					}

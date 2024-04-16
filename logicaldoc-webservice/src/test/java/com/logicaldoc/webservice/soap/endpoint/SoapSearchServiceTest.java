@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
@@ -23,7 +24,7 @@ public class SoapSearchServiceTest extends AbstractWebserviceTestCase {
 	private SoapSearchService searchServiceImpl;
 
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 		docDao = (DocumentDAO) context.getBean("DocumentDAO");
 

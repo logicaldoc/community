@@ -268,12 +268,4 @@ public class JobManager {
 	public Trigger getTrigger(String name, String group) throws SchedulerException {
 		return scheduler.getTrigger(TriggerKey.triggerKey(name, group));
 	}
-
-	public void setScheduler(Scheduler scheduler) {
-		this.scheduler = scheduler;
-	}
-
-	public void setConfig(ContextProperties config) {
-		this.config = config;
-	}
 }

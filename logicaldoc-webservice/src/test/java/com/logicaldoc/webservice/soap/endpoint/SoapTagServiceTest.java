@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
@@ -24,7 +25,7 @@ public class SoapTagServiceTest extends AbstractWebserviceTestCase {
 	private SoapTagService tagService;
 
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 		folderDao = (FolderDAO) context.getBean("FolderDAO");
 

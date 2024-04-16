@@ -115,21 +115,21 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	private static final String GUI_SAVELOGIN = ".gui.savelogin";
 
-	private static final String PASSWORD_OCCURRENCE = ".password.occurrence";
+	static final String PASSWORD_OCCURRENCE = ".password.occurrence";
 
-	private static final String PASSWORD_SEQUENCE = ".password.sequence";
+	static final String PASSWORD_SEQUENCE = ".password.sequence";
 
-	private static final String PASSWORD_SPECIAL = ".password.special";
+	static final String PASSWORD_SPECIAL = ".password.special";
 
-	private static final String PASSWORD_DIGIT = ".password.digit";
+	static final String PASSWORD_DIGIT = ".password.digit";
 
-	private static final String PASSWORD_LOWERCASE = ".password.lowercase";
+	static final String PASSWORD_LOWERCASE = ".password.lowercase";
 
-	private static final String PASSWORD_UPPERCASE = ".password.uppercase";
+	static final String PASSWORD_UPPERCASE = ".password.uppercase";
 
+	static final String PASSWORD_SIZE = ".password.size";
+	
 	private static final String ADMIN = "admin";
-
-	private static final String PASSWORD_SIZE = ".password.size";
 
 	private static final long serialVersionUID = 1L;
 
@@ -623,7 +623,6 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				} else {
 					groupDao.insert(grp, group.getInheritGroupId().longValue());
 				}
-
 			} else {
 				grp = new Group();
 				grp.setTenantId(session.getTenantId());
@@ -1190,7 +1189,6 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		} catch (PermissionException | PersistenceException | ServerException e) {
 			throwServerException(session, log, e);
 		}
-
 	}
 
 	@Override
@@ -1531,12 +1529,12 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	}
 
 	@Override
-	public void deleteTrustedDevices(List<String> ids) throws ServerException {
+	public void deleteTrustedDevices(List<Long> ids) throws ServerException {
 		Session session = validateSession();
 		DeviceDAO dDao = (DeviceDAO) Context.get().getBean(DeviceDAO.class);
-		for (String id : ids)
+		for (Long id : ids)
 			try {
-				dDao.delete(Long.parseLong(id));
+				dDao.delete(id);
 			} catch (NumberFormatException | PersistenceException e) {
 				throwServerException(session, log, e);
 			}

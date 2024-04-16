@@ -76,6 +76,14 @@ public class GUIAccessControlEntry implements Serializable {
 	public GUIAccessControlEntry() {
 	}
 
+	public GUIAccessControlEntry(long entityId, String... allowedPermissions) {
+		this.entityId = entityId;
+		permissions.clear();
+		for (String permission : allowedPermissions) {
+			permissions.add(new GUIValue(permission.toLowerCase(), "true"));
+		}
+	}
+
 	public GUIAccessControlEntry(String... allowedPermissions) {
 		permissions.clear();
 		for (String permission : allowedPermissions) {
