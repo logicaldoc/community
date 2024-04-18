@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -1273,7 +1274,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			templateDao.initialize(template);
 			docVO.setTemplate(template);
 
-			if (!guiDocument.getAttributes().isEmpty())
+			if (CollectionUtils.isNotEmpty(guiDocument.getAttributes()))
 				toAttributes(guiDocument, docVO, template);
 		}
 

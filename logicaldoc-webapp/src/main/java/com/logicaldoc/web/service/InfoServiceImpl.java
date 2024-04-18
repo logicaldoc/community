@@ -123,7 +123,12 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		TenantDAO tDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		AttributeSetDAO aDAO = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 		try {
-			Map<String, Attribute> attributes = aDAO.findAttributes(tDAO.findByName(tenantName).getId(), null);
+			Tenant tenant = tDAO.findByName(tenantName);
+			if (tenant == null) {
+				log.debug("Tenant with name {} not found, fallback to the default", tenantName);
+				tenant = tDAO.findById(Tenant.DEFAULT_ID);
+			}
+			Map<String, Attribute> attributes = aDAO.findAttributes(tenant.getId(), null);
 			List<GUIAttribute> guiAttributes = new ArrayList<>();
 
 			for (Map.Entry<String, Attribute> entry : attributes.entrySet()) {
