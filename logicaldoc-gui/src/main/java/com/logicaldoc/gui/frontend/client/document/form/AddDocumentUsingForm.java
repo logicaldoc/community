@@ -1,9 +1,13 @@
 package com.logicaldoc.gui.frontend.client.document.form;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Window;
@@ -57,7 +61,7 @@ public class AddDocumentUsingForm extends Window {
 			return;
 
 		long formId = Long.parseLong(form.getValue("form").toString());
-		String templateIdString = formSelector.getSelectedRecord().getAttributeAsString("templateId");
+		Long templateId = formSelector.getSelectedRecord().getAttributeAsLong("templateId");
 
 		final GUIDocument frm = new GUIDocument();
 		frm.setFolder(FolderController.get().getCurrentFolder());
@@ -65,9 +69,23 @@ public class AddDocumentUsingForm extends Window {
 		frm.setAttributes(null);
 		frm.setFileName(form.getValueAsString("title").trim() + ".pdf");
 		frm.setLanguage(I18N.getDefaultLocaleForDoc());
-		frm.setTemplateId(Long.parseLong(templateIdString));
-		FillForm fillForm = new FillForm(frm);
-		fillForm.show();
-		destroy();
+		frm.setTemplateId(templateId);
+
+		TemplateService.Instance.get().getTemplate(frm.getTemplateId(), new AsyncCallback<>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(GUITemplate guiTemplate) {
+				frm.setTemplate(guiTemplate.getName());
+				frm.setAttributes(guiTemplate.getAttributes());
+				FillForm fillForm = new FillForm(frm);
+				fillForm.show();
+				destroy();
+			}
+		});
 	}
 }
