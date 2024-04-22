@@ -1599,8 +1599,8 @@ public class LDRepository {
 						filter.add(st.nextToken().trim());
 				}
 			}
-		} catch (Exception e1) {
-			log.error("CMIS Exception creating filter", e1);
+		} catch (Exception e) {
+			log.error("CMIS Exception creating filter", e);
 		}
 		return filter;
 	}

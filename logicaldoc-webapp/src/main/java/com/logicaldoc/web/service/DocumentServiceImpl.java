@@ -2985,7 +2985,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 						new Object[] { movedFiles, treePath }));
 
 			} catch (Exception t) {
-				log.error("Error enforcing files storage into tree {}", treePath, t);
+				log.error("Error enforcing files storage into tree {}", treePath);
+				log.error(t.getMessage(), t);
 				try {
 					notifyEnforcement(session, I18N.message("enforcementofstorageerror", user.getLocale(),
 							new Object[] { movedFiles, treePath, t.getMessage() }));

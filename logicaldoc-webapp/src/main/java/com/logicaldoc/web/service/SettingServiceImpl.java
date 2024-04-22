@@ -108,7 +108,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 
 			log.info("Email settings data loaded successfully.");
 		} catch (Exception e) {
-			log.error("Exception loading Email settings data: {}", e.getMessage(), e);
+			log.error("Exception loading Email settings data", e);
 		}
 
 		return emailSettings;
@@ -154,7 +154,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 
 			log.info("Email settings data written successfully.");
 		} catch (Exception e) {
-			log.error("Exception writing Email settings data: {}", e.getMessage(), e);
+			log.error("Exception writing Email settings data", e);
 		}
 	}
 

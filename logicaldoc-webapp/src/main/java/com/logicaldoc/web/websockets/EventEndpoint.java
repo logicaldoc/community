@@ -241,7 +241,8 @@ public class EventEndpoint implements EventListener {
 				if (peer.getAsyncRemote() != null)
 					sendMessageToPear(message.getEvent(), serializedMessage, peer);
 		} catch (SerializationException e) {
-			log.error("Error preparing websocket message {}", message.getEvent(), e);
+			log.error("Error preparing websocket message {}", message.getEvent());
+			log.error(e.getMessage(), e);
 		}
 	}
 
@@ -249,7 +250,8 @@ public class EventEndpoint implements EventListener {
 		try {
 			peer.getBasicRemote().sendText(serializedMessage);
 		} catch (Exception e) {
-			log.error("Error sending websocket message {} to peer {}", event, peer.getRequestURI(), e);
+			log.error("Error sending websocket message {} to peer {}", event, peer.getRequestURI());
+			log.error(e.getMessage(), e);
 		}
 	}
 

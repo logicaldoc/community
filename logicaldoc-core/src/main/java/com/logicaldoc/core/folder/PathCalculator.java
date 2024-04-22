@@ -82,8 +82,9 @@ public class PathCalculator extends Task {
 			String path = folderDao.computePath(id);
 			folderDao.jdbcUpdate("update ld_folder set ld_path='" + path + "' where ld_id=" + id);
 			processed++;
-		} catch (Exception t) {
-			log.error("Error processing folder {}: {}", id, t.getMessage(), t);
+		} catch (Exception e) {
+			log.error("Error processing folder {}: {}", id, e.getMessage());
+			log.error(e.getMessage(), e);
 			errors++;
 		} finally {
 			next();

@@ -547,7 +547,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			try (InputStream in = storer.getStream(doc.getId(), resource);) {
 				doc.setDigest(FileUtil.computeDigest(in));
 			} catch (IOException e) {
-				log.error("Cannot retrieve the content of document {}", doc, e);
+				log.error("Cannot retrieve the content of document {}", doc);
+				log.error(e.getMessage(), e);
 			}
 
 			saveOrUpdate(doc);

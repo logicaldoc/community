@@ -107,7 +107,8 @@ public class ZipImport {
 				try {
 					addEntry(files[i], parentFolder);
 				} catch (PersistenceException e) {
-					log.error("Error adding entry " + files[i].getName(), e);
+					log.error("Error adding entry {}", files[i].getName());
+					log.error(e.getMessage(), e);
 				}
 		}
 	}

@@ -69,7 +69,8 @@ public class ContextProperties extends OrderedProperties {
 				if ("file".equals(url.getProtocol()))
 					this.file = new File(url.getPath());
 			} catch (Exception e) {
-				log.error("Unable to find classpath resource {}", filePath, e);
+				log.error("Unable to find classpath resource {}", filePath);
+				log.error(e.getMessage(), e);
 			}
 		}
 

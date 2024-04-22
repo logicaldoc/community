@@ -800,7 +800,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			else if (action.equals(Clipboard.COPY))
 				copy(session, docIds, folder.getId(), links, notes, security);
 		} catch (PersistenceException e) {
-			log.error("Exception moving documents: {}", e.getMessage(), e);
+			log.error("Exception moving documents", e);
 			throwServerException(session, null, e);
 		}
 	}
@@ -841,7 +841,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				docManager.moveToFolder(doc, selectedFolderFolder, transaction);
 			}
 		} catch (PermissionException | PersistenceException e) {
-			log.error("Exception moving documents: {}", e.getMessage(), e);
+			log.error("Exception moving documents", e);
 			throwServerException(session, null, e);
 		}
 
@@ -886,7 +886,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				}
 			}
 		} catch (PersistenceException | IOException e) {
-			log.error("Exception copying documents: {}", e.getMessage(), e);
+			log.error("Exception copying documents", e);
 			throwServerException(session, null, e);
 		}
 	}
@@ -914,7 +914,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 							transaction);
 			}
 		} catch (PersistenceException e) {
-			log.error("Exception copying documents alias: {}", e.getMessage(), e);
+			log.error("Exception copying documents alias", e);
 			throwServerException(session, null, e);
 		}
 	}

@@ -98,8 +98,8 @@ public class Automation {
 				RuntimeSingleton.init();
 				log.info("Automation initialized with default settings");
 			}
-		} catch (Exception t) {
-			log.error("Unable to initialize the automation engine", t);
+		} catch (Exception e) {
+			log.error("Unable to initialize the automation engine", e);
 		}
 	}
 

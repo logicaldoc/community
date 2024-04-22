@@ -237,7 +237,8 @@ public class StandardSearchEngine implements SearchEngine {
 		try {
 			server.optimize(true, true);
 		} catch (Exception e) {
-			log.error("Error during optimization: " + e.getMessage(), e);
+			log.error("Error during optimization");
+			log.error(e.getMessage(), e);
 		}
 		log.warn("Finished optimization of the index");
 	}

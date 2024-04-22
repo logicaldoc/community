@@ -424,7 +424,8 @@ public abstract class AbstractStorer implements Storer {
 		try {
 			storer = definition.getClass().getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
-			log.error("Unable to instanciate class {} / {}", definition.getClass(), e.getMessage(), e);
+			log.error("Unable to instanciate class {} / {}", definition.getClass(), e.getMessage());
+			log.error(e.getMessage(), e);
 			return null;
 		}
 		storer.setId(id);

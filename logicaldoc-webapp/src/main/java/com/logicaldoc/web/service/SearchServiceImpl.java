@@ -253,7 +253,8 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			try {
 				map.put(search.getName(), search.readOptions());
 			} catch (Exception e) {
-				log.error("Cannot process saved search {} of user {}", search.getName(), session.getUsername(), e);
+				log.error("Cannot process saved search {} of user {}", search.getName(), session.getUsername());
+				log.error(e.getMessage(), e);
 			}
 		}
 
