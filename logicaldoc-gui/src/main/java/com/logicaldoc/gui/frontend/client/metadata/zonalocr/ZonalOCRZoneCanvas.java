@@ -8,7 +8,7 @@ import com.logicaldoc.gui.frontend.client.panels.zone.ZoneCanvas;
 import com.logicaldoc.gui.frontend.client.services.ZonalOCRService;
 
 /**
- * A canvas that contains a note to be displayed in a page of a document
+ * A canvas that contains a zone to be displayed in a ZonalOCR sample
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.4.2
@@ -42,13 +42,11 @@ public class ZonalOCRZoneCanvas extends ZoneCanvas {
 
 					ZonalOCRZoneCanvas.this.zone.setSample(newZone.getSample());
 					ZonalOCRZoneCanvas.this.zone.setSampleText(newZone.getSampleText());
-					ZoneEditor editor = new ZoneEditor(zone);
-					editor.show();
+					new ZoneEditor(zone).show();
 				}
 			});
 		} else {
-			ZoneEditor editor = new ZoneEditor(zone);
-			editor.show();
+			new ZoneEditor(zone).show();
 		}
 	}
 }

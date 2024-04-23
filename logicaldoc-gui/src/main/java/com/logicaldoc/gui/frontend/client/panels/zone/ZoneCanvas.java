@@ -14,7 +14,7 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 
 /**
- * A generic panel displaying a zone
+ * A generic panel displaying a zone inside an image.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.3
@@ -101,7 +101,7 @@ public abstract class ZoneCanvas extends Label {
 	}
 
 	/**
-	 * Abstract metod invoked when the user wants to edit a zone
+	 * Abstract method invoked when the user wants to edit a zone
 	 */
 	protected abstract void onEdit();
 }

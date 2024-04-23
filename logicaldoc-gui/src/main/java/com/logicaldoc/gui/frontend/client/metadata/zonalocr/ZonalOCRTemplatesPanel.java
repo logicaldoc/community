@@ -26,7 +26,6 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -60,7 +59,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 				selectedOcrTemplate != null ? selectedOcrTemplate.getId() : null);
 	}
 
-	private void refresh(Long templateId, Long barcodeTemplateId) {
+	private void refresh(Long templateId, Long ocrTemplateId) {
 		if (toolStrip != null)
 			removeMember(toolStrip);
 
@@ -70,7 +69,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 
 		addTemplateSelector(templateId, toolBar);
 
-		addOcrTemplateSelector(templateId, barcodeTemplateId, toolBar);
+		addOcrTemplateSelector(templateId, ocrTemplateId, toolBar);
 
 		addNewButton(toolBar);
 
@@ -174,8 +173,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 
 			LinkedHashMap<String, String> map = new LinkedHashMap<>();
 			for (GUIAttribute att : selectedOcrTemplate.getTemplate().getAttributes()) {
-				if (att.getParent() == null && selectedOcrTemplate.getZone(att.getName()) == null
-						&& !att.isSection())
+				if (att.getParent() == null && selectedOcrTemplate.getZone(att.getName()) == null && !att.isSection())
 					map.put(att.getName(), att.getName() + " (" + AttributeTypeFormatter.format(att.getType()) + ")");
 			}
 			select.setValueMap(map);
@@ -297,7 +295,7 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		templateSelector.setWrapTitle(false);
 		templateSelector.setMultiple(false);
 		templateSelector.setEndRow(false);
-		templateSelector.addChangedHandler((ChangedEvent event) -> {
+		templateSelector.addChangedHandler(changed -> {
 			selectedOcrTemplate = null;
 
 			ListGridRecord rec = templateSelector.getSelectedRecord();

@@ -10,7 +10,6 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.3
- *
  */
 public abstract class ZoneTemplatePanel extends VLayout {
 
@@ -38,8 +37,7 @@ public abstract class ZoneTemplatePanel extends VLayout {
 		if (selectedOcrTemplate.getZones() != null)
 			for (GUIZone zone : selectedOcrTemplate.getZones()) {
 				zone.setTemplateId(selectedOcrTemplate.getId());
-				ZoneCanvas zoneCanvas = newZoneCanvas(zone);
-				sample.addCanvas(zoneCanvas);
+				sample.addCanvas(newZoneCanvas(zone));
 			}
 	}
 
