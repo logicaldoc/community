@@ -72,6 +72,9 @@ public class ImportFoldersPanel extends AdminPanel {
 
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);
+		
+		ListGridField targetFolderId = new ListGridField("targetFolderId", I18N.message("targetid") ,50);
+		targetFolderId.setHidden(true);
 
 		ListGridField src = new ListGridField("src", I18N.message("source"), 300);
 		src.setCanFilter(true);
@@ -98,7 +101,7 @@ public class ImportFoldersPanel extends AdminPanel {
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(enabled, id, src, type, importedDocs);
+		list.setFields(enabled, id, targetFolderId, src, type, importedDocs);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);

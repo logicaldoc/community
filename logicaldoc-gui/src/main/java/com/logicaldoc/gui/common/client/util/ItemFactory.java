@@ -1587,6 +1587,7 @@ public class ItemFactory {
 			if (changedHandler != null)
 				changedHandler.onChanged(null);
 		});
+		clear.setPrompt(I18N.message("clear"));
 
 		FormItemIcon edit = new FormItemIcon();
 		edit.setName("edit");
@@ -2079,7 +2080,7 @@ public class ItemFactory {
 	public static SelectItem newAttributesSelector(String context) {
 		return newAttributesSelector(context, false);
 	}
-	
+
 	public static SelectItem newAttributesSelector(String context, boolean sections) {
 		final SelectItem selectItem = new SelectItem("attributes", I18N.message("attributes"));
 		selectItem.setMultiple(true);
@@ -2100,7 +2101,7 @@ public class ItemFactory {
 	public static SelectItem newAttributesSelector() {
 		return newAttributesSelector(null);
 	}
-	
+
 	public static SelectItem newAttributesSelector(boolean sections) {
 		return newAttributesSelector(null, sections);
 	}

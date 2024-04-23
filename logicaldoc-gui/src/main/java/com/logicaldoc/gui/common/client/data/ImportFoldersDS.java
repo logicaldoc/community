@@ -24,8 +24,9 @@ public class ImportFoldersDS extends DataSource {
 		DataSourceTextField provider = new DataSourceTextField("provider");
 		DataSourceIntegerField docs = new DataSourceIntegerField("docs");
 		DataSourceImageField enabled = new DataSourceImageField("eenabled");
+		DataSourceTextField targetFolderId = new DataSourceTextField("targetFolderId");
 
-		setFields(id, src, type, provider, enabled, docs);
+		setFields(id, targetFolderId, src, type, provider, enabled, docs);
 		setDataURL("data/importfolders.xml?locale=" + I18N.getLocale());
 		setClientOnly(true);
 	}
