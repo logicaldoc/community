@@ -17,7 +17,7 @@ import com.logicaldoc.gui.frontend.client.account.Profile;
 import com.logicaldoc.gui.frontend.client.account.SignatureDialog;
 import com.logicaldoc.gui.frontend.client.account.TrustedDevices;
 import com.logicaldoc.gui.frontend.client.account.certificate.CertificateDialog;
-import com.logicaldoc.gui.frontend.client.personal.contacts.Contacts;
+import com.logicaldoc.gui.frontend.client.account.contacts.Contacts;
 import com.logicaldoc.gui.frontend.client.security.twofactorsauth.TwoFactorsAuthenticationDialog;
 import com.logicaldoc.gui.frontend.client.subscription.PersonalSubscriptions;
 import com.smartgwt.client.widgets.menu.Menu;

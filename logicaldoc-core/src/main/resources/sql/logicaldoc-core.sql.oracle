@@ -31,7 +31,7 @@ create table ld_document_ext (ld_docid number(19,0) not null, ld_mandatory int n
                               ld_dependson varchar(255), primary key (ld_docid, ld_name));
 create table ld_document_acl (ld_docid number(19,0) not null, ld_groupid number(19,0) not null, ld_read int not null, ld_write int not null, 
                              ld_security int not null, ld_immutable int not null, ld_delete int not null, 
-                             ld_rename int not null, ld_sign int not null, ìld_preview int not null,  
+                             ld_rename int not null, ld_sign int not null, ld_preview int not null,  
                              ld_archive int not null, ld_workflow int not null, ld_download int not null, ld_calendar int not null,
                              ld_subscription int not null, ld_print int not null, ld_password int not null, ld_move int not null,  
                              ld_email int not null, ld_automation int not null, ld_readingreq int not null, primary key (ld_docid, ld_groupid));                              

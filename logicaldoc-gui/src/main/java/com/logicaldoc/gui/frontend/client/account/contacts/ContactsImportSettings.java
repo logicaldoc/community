@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.personal.contacts;
+package com.logicaldoc.gui.frontend.client.account.contacts;
 
 import java.util.LinkedHashMap;
 import java.util.List;
