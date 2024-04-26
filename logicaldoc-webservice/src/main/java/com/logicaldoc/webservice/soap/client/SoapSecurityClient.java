@@ -1,5 +1,6 @@
 package com.logicaldoc.webservice.soap.client;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
@@ -25,12 +26,20 @@ public class SoapSecurityClient extends SoapClient<SecurityService> implements S
 	@Override
 	public List<WSUser> listUsers(String sid, String group)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		return client.listUsers(sid, group);
+		final List<WSUser> users = client.listUsers(sid, group);
+		if (users != null)
+			return users;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
 	public List<WSGroup> listGroups(String sid) throws WebserviceException, PersistenceException {
-		return client.listGroups(sid);
+		final List<WSGroup> groups = client.listGroups(sid);
+		if (groups != null)
+			return groups;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override

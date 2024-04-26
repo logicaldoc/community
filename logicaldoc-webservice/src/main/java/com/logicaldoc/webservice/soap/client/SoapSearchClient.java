@@ -1,5 +1,6 @@
 package com.logicaldoc.webservice.soap.client;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
@@ -37,12 +38,20 @@ public class SoapSearchClient extends SoapClient<SearchService> implements Searc
 	@Override
 	public List<WSDocument> findByFilename(String sid, String filename)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		return client.findByFilename(sid, filename);
+		final List<WSDocument> documents = client.findByFilename(sid, filename);
+		if (documents != null)
+			return documents;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
 	public List<WSFolder> findFolders(String sid, String name)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		return client.findFolders(sid, name);
+		final List<WSFolder> folders = client.findFolders(sid, name);
+		if (folders != null)
+			return folders;
+		else
+			return new ArrayList<>();
 	}
 }

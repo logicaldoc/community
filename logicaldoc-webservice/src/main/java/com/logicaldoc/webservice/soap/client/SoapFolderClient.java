@@ -1,5 +1,6 @@
 package com.logicaldoc.webservice.soap.client;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
@@ -77,7 +78,11 @@ public class SoapFolderClient extends SoapClient<FolderService> implements Folde
 	@Override
 	public List<WSFolder> listChildren(String sid, long folderId)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		return client.listChildren(sid, folderId);
+		final List<WSFolder> folders = client.listChildren(sid, folderId);
+		if (folders != null)
+			return folders;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
@@ -101,7 +106,11 @@ public class SoapFolderClient extends SoapClient<FolderService> implements Folde
 	@Override
 	public List<WSFolder> getPath(String sid, long folderId)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		return client.getPath(sid, folderId);
+		final List<WSFolder> folders = client.getPath(sid, folderId);
+		if (folders != null)
+			return folders;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override

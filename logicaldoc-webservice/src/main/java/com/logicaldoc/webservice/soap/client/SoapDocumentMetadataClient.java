@@ -1,5 +1,6 @@
 package com.logicaldoc.webservice.soap.client;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
@@ -31,7 +32,11 @@ public class SoapDocumentMetadataClient extends SoapClient<DocumentMetadataServi
 	@Override
 	public List<WSTemplate> listTemplates(String sid)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		return client.listTemplates(sid);
+		final List<WSTemplate> templates = client.listTemplates(sid);
+		if (templates != null)
+			return templates;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
@@ -67,19 +72,31 @@ public class SoapDocumentMetadataClient extends SoapClient<DocumentMetadataServi
 	@Override
 	public List<String> getAttributeOptions(String sid, long setId, String attribute)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		return client.getAttributeOptions(sid, setId, attribute);
+		final List<String> options = client.getAttributeOptions(sid, setId, attribute);
+		if (options != null)
+			return options;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
 	public List<WSAttributeOption> getAttributeOptionsByCategory(String sid, long setId, String attribute,
 			String category) throws AuthenticationException, WebserviceException, PersistenceException {
-		return client.getAttributeOptionsByCategory(sid, setId, attribute, category);
+		final List<WSAttributeOption> options = client.getAttributeOptionsByCategory(sid, setId, attribute, category);
+		if (options != null)
+			return options;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
 	public List<WSAttributeSet> listAttributeSets(String sid)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		return client.listAttributeSets(sid);
+		final List<WSAttributeSet> sets = client.listAttributeSets(sid);
+		if (sets != null)
+			return sets;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
@@ -126,7 +143,11 @@ public class SoapDocumentMetadataClient extends SoapClient<DocumentMetadataServi
 	@Override
 	public List<WSAccessControlEntry> getAccessControlList(String sid, long templateId)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		return client.getAccessControlList(sid, templateId);
+		final List<WSAccessControlEntry> acl = client.getAccessControlList(sid, templateId);
+		if (acl != null)
+			return acl;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package com.logicaldoc.webservice.soap.client;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jws.WebService;
@@ -69,31 +70,50 @@ public class SoapTagClient extends SoapClient<TagService> implements TagService 
 
 	@Override
 	public List<String> getTags(String sid) throws AuthenticationException, PersistenceException, WebserviceException {
-		return client.getTags(sid);
+		final List<String> tags = client.getTags(sid);
+		if (tags != null)
+			return tags;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
 	public List<WSTagCloud> getTagCloud(String sid)
 			throws AuthenticationException, PersistenceException, WebserviceException {
-		return client.getTagCloud(sid);
+		final List<WSTagCloud> tags = client.getTagCloud(sid);
+		if (tags != null)
+			return tags;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
 	public List<WSDocument> findDocumentsByTag(String sid, String tag)
 			throws AuthenticationException, PersistenceException, WebserviceException {
-		return client.findDocumentsByTag(sid, tag);
+		final List<WSDocument> documents = client.findDocumentsByTag(sid, tag);
+		if (documents != null)
+			return documents;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
 	public List<WSFolder> findFoldersByTag(String sid, String tag)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		return client.findFoldersByTag(sid, tag);
+		final List<WSFolder> folders = client.findFoldersByTag(sid, tag);
+		if (folders != null)
+			return folders;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
 	public List<String> getTagsPreset(String sid)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		return client.getTagsPreset(sid);
+		final List<String> tags = client.getTagsPreset(sid);
+		if (tags != null)
+			return tags;
+		else
+			return new ArrayList<>();
 	}
-
 }

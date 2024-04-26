@@ -3,6 +3,7 @@ package com.logicaldoc.webservice.soap.client;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.activation.DataHandler;
@@ -190,7 +191,11 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	@Override
 	public List<WSDocument> getDocuments(String sid, List<Long> docIds)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		return client.getDocuments(sid, docIds);
+		final List<WSDocument> documents = client.getDocuments(sid, docIds);
+		if (documents != null)
+			return documents;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
@@ -220,13 +225,21 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	@Override
 	public List<WSDocument> listDocuments(String sid, long folderId, String fileName)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		return client.listDocuments(sid, folderId, fileName);
+		final List<WSDocument> documents = client.listDocuments(sid, folderId, fileName);
+		if (documents != null)
+			return documents;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
 	public List<WSDocument> getAliases(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		return client.getAliases(sid, docId);
+		final List<WSDocument> documents = client.getAliases(sid, docId);
+		if (documents != null)
+			return documents;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
@@ -238,7 +251,11 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	@Override
 	public List<WSLink> getLinks(String sid, long docId)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
-		return client.getLinks(sid, docId);
+		final List<WSLink> links = client.getLinks(sid, docId);
+		if (links != null)
+			return links;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
@@ -337,7 +354,11 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	@Override
 	public List<WSRating> getRatings(String sid, long docId) throws AuthenticationException, PermissionException,
 			WebserviceException, PersistenceException, UnexistingResourceException {
-		return client.getRatings(sid, docId);
+		final List<WSRating> ratings = client.getRatings(sid, docId);
+		if (ratings != null)
+			return ratings;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
@@ -374,8 +395,12 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 
 	@Override
 	public List<WSDocument> getVersions(String sid, long docId) throws AuthenticationException, PermissionException,
-			WebserviceException, PersistenceException, UnexistingResourceException {
-		return client.getVersions(sid, docId);
+			WebserviceException, PersistenceException, UnexistingResourceException { 
+		final List<WSDocument> versions = client.getVersions(sid, docId);
+		if (versions != null)
+			return versions;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
@@ -411,7 +436,11 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	@Override
 	public List<WSAccessControlEntry> getAccessControlList(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		return client.getAccessControlList(sid, docId);
+		final List<WSAccessControlEntry> acl = client.getAccessControlList(sid, docId);
+		if (acl != null)
+			return acl;
+		else
+			return new ArrayList<>();
 	}
 
 	@Override
