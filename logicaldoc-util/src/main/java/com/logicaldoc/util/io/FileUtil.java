@@ -402,8 +402,8 @@ public class FileUtil {
 	 */
 	public static boolean matches(String filename, Collection<String> includes, Collection<String> excludes) {
 		// First of all check if the filename must be excluded
-		boolean matchesEcludes = matchesFilters(filename, excludes);
-		if (matchesEcludes)
+		boolean matchesExcludes = matchesFilters(filename, excludes);
+		if (matchesExcludes)
 			return false;
 
 		// Then check if the filename must can be included
