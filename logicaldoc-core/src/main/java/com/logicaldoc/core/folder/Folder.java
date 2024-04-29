@@ -19,7 +19,7 @@ import com.logicaldoc.util.Context;
 
 /**
  * This class represents the key concept of security of documents. The Folder is
- * used as an element to build hierarchies. With foldergroups you can associate
+ * used as an element to build hierarchies. With the AccessControlList you can associate
  * groups to a given folder and grant some permissions. Also setting the
  * recurityRef you can specify another reference folder that contains the
  * security policies.
