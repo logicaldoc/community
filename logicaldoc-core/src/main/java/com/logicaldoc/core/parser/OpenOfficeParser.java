@@ -239,8 +239,8 @@ public class OpenOfficeParser extends AbstractParser {
 		}
 
 		int pages = 1;
-		ZipUtil zipUtil = new ZipUtil();
-		try (InputStream is = zipUtil.getEntryStream(input, "meta.xml")) {
+		
+		try (ZipUtil zipUtil = new ZipUtil(); InputStream is = zipUtil.getEntryStream(input, "meta.xml")) {
 			OpenOfficeMetadataHandler metadataHandler = new OpenOfficeMetadataHandler();
 			xmlReader.setContentHandler(metadataHandler);
 			xmlReader.parse(new InputSource(is));
@@ -250,7 +250,7 @@ public class OpenOfficeParser extends AbstractParser {
 			log.warn("Failed to extract OpenOffice meta.xml entry", t);
 		}
 
-		try (InputStream is = zipUtil.getEntryStream(input, "content.xml")) {
+		try (ZipUtil zipUtil = new ZipUtil(); InputStream is = zipUtil.getEntryStream(input, "content.xml")) {
 			OpenOfficePresentationMetadataHandler metadataHandler = new OpenOfficePresentationMetadataHandler();
 			xmlReader.setContentHandler(metadataHandler);
 			xmlReader.parse(new InputSource(is));

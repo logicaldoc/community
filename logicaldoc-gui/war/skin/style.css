@@ -450,3 +450,11 @@
   border-radius: 0px;
   outline: none;
 }
+
+.update-changelog, .update-notes{
+  font-family: Arial, Bitstream Vera Sans, sans-serif; 
+  font-size: 14pt;
+  font-weight: bold;
+  white-space: nowrap;
+  color: red;
+}

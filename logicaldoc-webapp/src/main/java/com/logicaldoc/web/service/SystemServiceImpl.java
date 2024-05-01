@@ -946,7 +946,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		if (uploadedFilesMap == null || uploadedFilesMap.size() < 1)
 			throw new ServerException("Cannot find a plugin package to install");
 
-		try {
+		try (ZipUtil zipUtil = new ZipUtil();) {
 			File pluginPackage = uploadedFilesMap.values().iterator().next();
 			ContextProperties config = Context.get().getProperties();
 			File rootFolder;
@@ -959,7 +959,6 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			String pluginVersion = null;
 			String pluginJar = null;
 
-			ZipUtil zipUtil = new ZipUtil();
 			try (InputStream pluginStream = zipUtil.getEntryStream(pluginPackage, "/plugin.xml")) {
 				if (pluginStream == null)
 					throw new ServerException("The plugin package does not include the descriptor plugin.xml");

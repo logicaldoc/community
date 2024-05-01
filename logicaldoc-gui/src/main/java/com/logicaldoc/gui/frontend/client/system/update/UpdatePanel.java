@@ -22,9 +22,11 @@ import com.logicaldoc.gui.common.client.widgets.ApplicationRestarting;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.services.UpdateService;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.ContentsType;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Progressbar;
@@ -279,22 +281,49 @@ public class UpdatePanel extends VLayout {
 
 			@Override
 			public void onSuccess(List<String> infos) {
-				DynamicForm form = new DynamicForm();
-				form.setTitleOrientation(TitleOrientation.TOP);
-				form.setColWidths("*");
-				form.setNumCols(1);
+				VLayout panel = new VLayout();
 
-				TextAreaItem changelog = ItemFactory.newTextAreaItem("changelog", infos.get(0));
-				changelog.setWidth("100%");
-				changelog.setHeight(220);
+				Label notesLabel = new Label(I18N.message("updatenotes"));
+				notesLabel.setWrap(false);
+				notesLabel.setAutoFit(true);
+				notesLabel.setHeight(20);
+				notesLabel.setStyleName("update-notes");
+				String notesContent = infos.get(1);
+				if (!notesContent.contains("<p") && !notesContent.contains("<div") && !notesContent.contains("<br")
+						&& !notesContent.contains("<span") && !notesContent.contains("<table"))
+					notesContent = notesContent.replace("\n", "<br>");
 
-				TextAreaItem updatenotes = ItemFactory.newTextAreaItem("updatenotes", infos.get(1));
-				updatenotes.setWidth("100%");
-				updatenotes.setHeight(220);
+				HTMLPane notesContentPanel = new HTMLPane();
+				notesContentPanel.setWidth100();
+				notesContentPanel.setHeight("50%");
+				notesContentPanel.setShowEdges(true);
+				notesContentPanel.setContents(notesContent);
+				notesContentPanel.setContentsType(ContentsType.FRAGMENT);
 
-				form.setItems(updatenotes, changelog);
+				Label changesLabel = new Label(I18N.message("changelog"));
+				changesLabel.setWrap(false);
+				changesLabel.setAutoFit(true);
+				changesLabel.setHeight(20);
+				changesLabel.setStyleName("update-changelog");
+				String changesContent = infos.get(0);
+				if (!changesContent.contains("<p") && !changesContent.contains("<div")
+						&& !changesContent.contains("<br") && !changesContent.contains("<span")
+						&& !changesContent.contains("<table"))
+					changesContent = changesContent.replace("\n", "<br>");
 
-				notesPanel.addMember(form);
+				HTMLPane changesContentPanel = new HTMLPane();
+				changesContentPanel.setWidth100();
+				changesContentPanel.setHeight("50%");
+				changesContentPanel.setShowEdges(true);
+				changesContentPanel.setContents(changesContent);
+				changesContentPanel.setContentsType(ContentsType.FRAGMENT);
+
+				Label separator = new Label(" ");
+				separator.setHeight(10);
+
+				panel.setMembers(notesLabel, notesContentPanel, separator, changesLabel, changesContentPanel);
+
+				notesPanel.addMember(panel);
 			}
 		});
 	}

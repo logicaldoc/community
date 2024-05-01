@@ -3,6 +3,7 @@ package com.logicaldoc.util.io;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -38,7 +39,7 @@ import net.lingala.zip4j.model.enums.CompressionMethod;
  * @author Marco Meschieri - LogicalDOC
  * @version 4.0
  */
-public class ZipUtil {
+public class ZipUtil implements Closeable {
 
 	private static final String ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_ENTRIES = "Zip file %s looks like a Zip Bomb Attack: can lead to inodes exhaustion of the system and is over the maximum allowed of %d";
 
@@ -64,6 +65,8 @@ public class ZipUtil {
 	 * Maximum compression ratio, config parameter zip.maxratio
 	 */
 	private double maxCompressionRatio = 30D;
+
+	private ZipFile zFile;
 
 	public ZipUtil() {
 		try {
@@ -107,8 +110,7 @@ public class ZipUtil {
 
 	public List<String> listEntries(File zipFile) {
 		List<String> files = new ArrayList<>();
-		try {
-			ZipFile zFile = new ZipFile(zipFile);
+		try (ZipFile zFile = new ZipFile(zipFile);) {
 			setCharset(zFile);
 
 			List<FileHeader> fileHeaders = zFile.getFileHeaders();
@@ -277,6 +279,8 @@ public class ZipUtil {
 
 			bos.flush();
 			return totalSizeEntry;
+		} finally {
+			zFile.close();
 		}
 	}
 
@@ -293,8 +297,8 @@ public class ZipUtil {
 			entry = entry.substring(1);
 
 		InputStream entryStream = null;
-		try (ByteArrayOutputStream baos = new ByteArrayOutputStream();) {
-			ZipFile zFile = new ZipFile(zipFile);
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream(); ZipFile zFile = new ZipFile(zipFile);) {
+
 			setCharset(zFile);
 			FileHeader header = zFile.getFileHeader(entry);
 
@@ -332,7 +336,7 @@ public class ZipUtil {
 			entry = entry.substring(1);
 
 		try {
-			ZipFile zFile = new ZipFile(zipFile);
+			zFile = new ZipFile(zipFile);
 			setCharset(zFile);
 			FileHeader header = zFile.getFileHeader(entry);
 			return zFile.getInputStream(header);
@@ -340,6 +344,16 @@ public class ZipUtil {
 			logError(e.getMessage());
 			return null;
 		}
+	}
+
+	@Override
+	public void close() {
+		if (zFile != null)
+			try {
+				zFile.close();
+			} catch (IOException e) {
+				log.error(e.getMessage());
+			}
 	}
 
 	public String getEntryContent(File zip, String entry) throws IOException {

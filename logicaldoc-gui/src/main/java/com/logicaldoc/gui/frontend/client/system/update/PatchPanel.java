@@ -26,12 +26,14 @@ import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellF
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
 import com.logicaldoc.gui.frontend.client.services.UpdateService;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.ContentsType;
 import com.smartgwt.client.types.ExpansionMode;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Progressbar;
@@ -42,7 +44,6 @@ import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -162,9 +163,9 @@ public class PatchPanel extends VLayout {
 		list.setDetailField(DESCRIPTION);
 		list.setFields(id, name, rating, date, size, installed, restart, file, local);
 
-		list.addCellContextClickHandler((CellContextClickEvent event) -> {
+		list.addCellContextClickHandler(contextClick -> {
 			showContextMenu(list);
-			event.cancel();
+			contextClick.cancel();
 		});
 
 		List<ListGridRecord> records = new ArrayList<>();
@@ -193,7 +194,7 @@ public class PatchPanel extends VLayout {
 		addMember(listPanel);
 
 		upload.setAutoFit(true);
-		upload.addClickHandler(event -> new PatchUploader(this).show());
+		upload.addClickHandler(click -> new PatchUploader(this).show());
 	}
 
 	private void switchDetailView(GUIPatch patch) {
@@ -341,44 +342,43 @@ public class PatchPanel extends VLayout {
 			bar.setPercentDone(0);
 			download.setDisabled(true);
 
-			UpdateService.Instance.get().downloadPatch(patch.getId(), fileName, patch.getSize(),
-					new AsyncCallback<>() {
+			UpdateService.Instance.get().downloadPatch(patch.getId(), fileName, patch.getSize(), new AsyncCallback<>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-							download.setDisabled(false);
-						}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+					download.setDisabled(false);
+				}
 
-						@Override
-						public void onSuccess(Void arg) {
-							confirmPatch.setVisible(false);
+				@Override
+				public void onSuccess(Void arg) {
+					confirmPatch.setVisible(false);
 
-							new Timer() {
-								public void run() {
-									UpdateService.Instance.get().checkDownloadStatus(new AsyncCallback<>() {
+					new Timer() {
+						public void run() {
+							UpdateService.Instance.get().checkDownloadStatus(new AsyncCallback<>() {
 
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
-
-										@Override
-										public void onSuccess(List<Integer> status) {
-											bar.setPercentDone(status.get(1));
-
-											if (status.get(1) == 100) {
-												download.setDisabled(false);
-												confirmPatch.setVisible(true);
-												displayNotes(fileName);
-											} else
-												schedule(50);
-										}
-									});
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
 								}
-							}.schedule(50);
+
+								@Override
+								public void onSuccess(List<Integer> status) {
+									bar.setPercentDone(status.get(1));
+
+									if (status.get(1) == 100) {
+										download.setDisabled(false);
+										confirmPatch.setVisible(true);
+										displayNotes(fileName);
+									} else
+										schedule(50);
+								}
+							});
 						}
-					});
+					}.schedule(50);
+				}
+			});
 		});
 
 		HLayout buttonCanvas = new HLayout();
@@ -403,22 +403,49 @@ public class PatchPanel extends VLayout {
 
 			@Override
 			public void onSuccess(List<String> infos) {
-				DynamicForm form = new DynamicForm();
-				form.setTitleOrientation(TitleOrientation.TOP);
-				form.setColWidths("*");
-				form.setNumCols(1);
+				VLayout panel = new VLayout();
 
-				TextAreaItem changelog = ItemFactory.newTextAreaItem("changelog", infos.get(0));
-				changelog.setWidth("100%");
-				changelog.setHeight(220);
+				Label notesLabel = new Label(I18N.message("patchnotes"));
+				notesLabel.setWrap(false);
+				notesLabel.setAutoFit(true);
+				notesLabel.setHeight(20);
+				notesLabel.setStyleName("update-notes");
+				String notesContent = infos.get(1);
+				if (!notesContent.contains("<p") && !notesContent.contains("<div") && !notesContent.contains("<br")
+						&& !notesContent.contains("<span") && !notesContent.contains("<table"))
+					notesContent = notesContent.replace("\n", "<br>");
 
-				TextAreaItem patchNotes = ItemFactory.newTextAreaItem("patchnotes", infos.get(1));
-				patchNotes.setWidth("100%");
-				patchNotes.setHeight(220);
+				HTMLPane notesContentPanel = new HTMLPane();
+				notesContentPanel.setWidth100();
+				notesContentPanel.setHeight("50%");
+				notesContentPanel.setShowEdges(true);
+				notesContentPanel.setContents(notesContent);
+				notesContentPanel.setContentsType(ContentsType.FRAGMENT);
 
-				form.setItems(patchNotes, changelog);
+				Label changesLabel = new Label(I18N.message("changelog"));
+				changesLabel.setWrap(false);
+				changesLabel.setAutoFit(true);
+				changesLabel.setHeight(20);
+				changesLabel.setStyleName("update-changelog");
+				String changesContent = infos.get(0);
+				if (!changesContent.contains("<p") && !changesContent.contains("<div")
+						&& !changesContent.contains("<br") && !changesContent.contains("<span")
+						&& !changesContent.contains("<table"))
+					changesContent = changesContent.replace("\n", "<br>");
 
-				notesPanel.addMember(form);
+				HTMLPane changesContentPanel = new HTMLPane();
+				changesContentPanel.setWidth100();
+				changesContentPanel.setHeight("50%");
+				changesContentPanel.setShowEdges(true);
+				changesContentPanel.setContents(changesContent);
+				changesContentPanel.setContentsType(ContentsType.FRAGMENT);
+
+				Label separator = new Label(" ");
+				separator.setHeight(10);
+
+				panel.setMembers(notesLabel, notesContentPanel, separator, changesLabel, changesContentPanel);
+
+				notesPanel.addMember(panel);
 			}
 		});
 	}
