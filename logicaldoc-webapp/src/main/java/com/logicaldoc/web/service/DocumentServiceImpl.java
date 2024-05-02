@@ -1201,6 +1201,10 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			}
 			docVO.setTenantId(session.getTenantId());
 
+            // Make sure to maintain relevant flags from real document
+			docVO.setOcrd(document.getOcrd());
+			docVO.setBarcoded(document.getBarcoded());
+			
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSession(session);
