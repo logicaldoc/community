@@ -283,12 +283,13 @@ public class SystemMenu extends VLayout {
 		installationID.setWrap(true);
 		installationID.setWrapTitle(false);
 
-		StaticTextItem usernoItem = ItemFactory.newStaticTextItem("userno", userno);
+		StaticTextItem usernoItem = ItemFactory.newStaticTextItem("userno", I18N.message("clicktoshow").toLowerCase());
 		usernoItem.setWidth(250);
 		usernoItem.setRequired(true);
 		usernoItem.setShouldSaveValue(false);
 		usernoItem.setWrap(false);
 		usernoItem.setWrapTitle(false);
+		usernoItem.addClickHandler(click -> usernoItem.setValue(userno));
 
 		StaticTextItem hostName = ItemFactory.newStaticTextItem("hostname", Session.get().getInfo().getHostName());
 		hostName.setWidth(250);
