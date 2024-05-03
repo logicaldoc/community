@@ -24,8 +24,6 @@ import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.pdfbox.io.MemoryUsageSetting;
-import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -54,6 +52,7 @@ import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
+import com.logicaldoc.core.util.MergeUtil;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.html.HTMLSanitizer;
@@ -1682,7 +1681,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			Arrays.sort(pdfs, (o1, o2) -> o1.getName().compareTo(o2.getName()));
 
 			// Merge all the PDFs
-			bigPdf = mergePdf(List.of(pdfs));
+			bigPdf = MergeUtil.mergePdf(List.of(pdfs));
 
 			// Add an history entry to track the export of the document
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -1745,37 +1744,6 @@ public class DocumentManagerImpl implements DocumentManager {
 			}
 		}
 		return tempDir;
-	}
-
-	/**
-	 * Merges different PDFs into a single PDF-
-	 * 
-	 * @param pdfs ordered list of pdf files to be merged
-	 * @return The merged Pdf file
-	 * 
-	 * @throws IOException
-	 */
-	private File mergePdf(List<File> pdfs) throws IOException {
-		File tempDir = null;
-		try {
-			Path tempPath = Files.createTempDirectory(MERGE);
-			tempDir = tempPath.toFile();
-
-			File dst = FileUtil.createTempFile(MERGE, ".pdf");
-
-			PDFMergerUtility merger = new PDFMergerUtility();
-			for (File file : pdfs)
-				merger.addSource(file);
-
-			merger.setDestinationFileName(dst.getAbsolutePath());
-			MemoryUsageSetting memoryUsage = MemoryUsageSetting.setupTempFileOnly();
-			memoryUsage.setTempDir(tempDir);
-			merger.mergeDocuments(memoryUsage);
-
-			return dst;
-		} finally {
-			FileUtil.strongDelete(tempDir);
-		}
 	}
 
 	public void setDocumentLinkDAO(DocumentLinkDAO documentLinkDAO) {

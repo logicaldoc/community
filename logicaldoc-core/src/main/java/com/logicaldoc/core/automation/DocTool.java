@@ -278,13 +278,35 @@ public class DocTool {
 	 * @param username the user in whose name the method is run
 	 */
 	public void store(Document doc, String username) {
-		User user = new SecurityTool().getUser(username);
-
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setDocument(doc);
 		transaction.setDate(new Date());
-		transaction.setUser(user);
+		transaction.setUser(new SecurityTool().getUser(username));
 		store(doc, transaction);
+	}
+
+	/**
+	 * Created a new document into the database
+	 * 
+	 * @param doc the document that carries the metadata
+	 * @param file the document's content
+	 * @param username the user in whose name the method is run
+	 * 
+	 * @return the created document
+	 */
+	public Document create(Document doc, File file, String username) {
+		DocumentHistory transaction = new DocumentHistory();
+		transaction.setDocument(doc);
+		transaction.setDate(new Date());
+		transaction.setUser(new SecurityTool().getUser(username));
+
+		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+		try {
+			return manager.create(file, doc, transaction);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
 	}
 
 	/**
@@ -320,6 +342,18 @@ public class DocTool {
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
+	}
+
+	/**
+	 * Instantiate a new document that is a clone of the given one. The returned
+	 * clone is not persisted.
+	 * 
+	 * @param doc The source document to clone
+	 * 
+	 * @return The cloned document
+	 */
+	public Document clone(Document doc) {
+		return new Document(doc);
 	}
 
 	/**
