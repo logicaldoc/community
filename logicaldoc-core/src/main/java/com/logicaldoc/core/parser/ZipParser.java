@@ -65,17 +65,18 @@ public class ZipParser extends AbstractParser {
 		unpackedFileName = unpackedFileName.substring(0, unpackedFileName.lastIndexOf('.'));
 		File ungzippedFile = FileUtil.createTempFile("parsegzip",
 				"." + FileUtil.getExtension(unpackedFileName).toLowerCase());
-		ZipUtil zipUtil = new ZipUtil();
-		zipUtil.unGZip(input, ungzippedFile);
-		return ungzippedFile;
+		try (ZipUtil zipUtil = new ZipUtil()) {
+			zipUtil.unGZip(input, ungzippedFile);
+			return ungzippedFile;
+		}
 	}
 
 	private void internalParseZip(InputStream input, ParseParameters parameters, StringBuilder content)
 			throws IOException, ParseException {
 		File zipFile = FileUtil.createTempFile("parsezip", "zip");
-		try {
+		try (ZipUtil zipUtil = new ZipUtil();) {
 			FileUtil.writeFile(input, zipFile.getAbsolutePath());
-			ZipUtil zipUtil = new ZipUtil();
+
 			List<String> entries = zipUtil.listEntries(zipFile);
 
 			if (entries.size() > 1) {
@@ -176,27 +177,28 @@ public class ZipParser extends AbstractParser {
 	}
 
 	private int countPagesInZipFile(File zipFile) throws IOException {
-		ZipUtil zipUtil = new ZipUtil();
-		List<String> entries = zipUtil.listEntries(zipFile);
-		if (entries.size() > 1) {
-			return entries.size();
-		} else {
-			/*
-			 * If we have just one entry, count it's pages
-			 */
-			String entry = entries.get(0);
-			String entryExtension = FileUtil.getExtension(entry);
-			File uncompressedEntryFile = FileUtil.createTempFile("parse", "." + entryExtension);
-			try {
-				Parser entryParser = ParserFactory.getParser(entryExtension);
-				if (entryParser == null)
-					throw new IOException(String.format("Unable to find a parser for %s", entryExtension));
+		try (ZipUtil zipUtil = new ZipUtil()) {
+			List<String> entries = zipUtil.listEntries(zipFile);
+			if (entries.size() > 1) {
+				return entries.size();
+			} else {
+				/*
+				 * If we have just one entry, count it's pages
+				 */
+				String entry = entries.get(0);
+				String entryExtension = FileUtil.getExtension(entry);
+				File uncompressedEntryFile = FileUtil.createTempFile("parse", "." + entryExtension);
+				try {
+					Parser entryParser = ParserFactory.getParser(entryExtension);
+					if (entryParser == null)
+						throw new IOException(String.format("Unable to find a parser for %s", entryExtension));
 
-				zipUtil.unzip(zipFile, entry, uncompressedEntryFile);
-				return entryParser.countPages(uncompressedEntryFile, uncompressedEntryFile.getName());
-			} finally {
-				if (uncompressedEntryFile != null)
-					FileUtil.strongDelete(uncompressedEntryFile);
+					zipUtil.unzip(zipFile, entry, uncompressedEntryFile);
+					return entryParser.countPages(uncompressedEntryFile, uncompressedEntryFile.getName());
+				} finally {
+					if (uncompressedEntryFile != null)
+						FileUtil.strongDelete(uncompressedEntryFile);
+				}
 			}
 		}
 	}

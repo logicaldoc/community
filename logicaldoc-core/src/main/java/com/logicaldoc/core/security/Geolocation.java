@@ -185,7 +185,9 @@ public class Geolocation {
 			tmpDir = FileUtil.createTempFile(CONST_GEOLOCATION, null);
 			FileUtil.strongDelete(tmpDir);
 			tmpDir.mkdir();
-			new ZipUtil().unGZipUnTar(gzFile, tmpDir);
+			try (ZipUtil zipUtil = new ZipUtil()) {
+				zipUtil.unGZipUnTar(gzFile, tmpDir);
+			}
 
 			// Search for the .mmdb file
 			File mmdbFile = null;

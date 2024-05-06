@@ -86,12 +86,12 @@ public class ZipUtil implements Closeable {
 	public List<ZipEntry> listZipEntries(File zipFile) {
 		List<ZipEntry> files = new ArrayList<>();
 
-		try (java.util.zip.ZipFile zFile = new java.util.zip.ZipFile(zipFile)) {
+		try (java.util.zip.ZipFile archiveFile = new java.util.zip.ZipFile(zipFile)) {
 			if (zipFile.length() > maxSize)
 				throw new IOException(String.format(ZIP_FILE_S_LOOKS_LIKE_A_ZIP_BOMB_SIZE, zipFile.length(),
 						FileUtil.getDisplaySize(maxSize, "en")));
 
-			Enumeration<? extends ZipEntry> e = zFile.entries();
+			Enumeration<? extends ZipEntry> e = archiveFile.entries();
 			while (e.hasMoreElements()) {
 				ZipEntry zipEntry = e.nextElement();
 				files.add(zipEntry);
@@ -110,10 +110,10 @@ public class ZipUtil implements Closeable {
 
 	public List<String> listEntries(File zipFile) {
 		List<String> files = new ArrayList<>();
-		try (ZipFile zFile = new ZipFile(zipFile);) {
-			setCharset(zFile);
+		try (ZipFile archiveFile = new ZipFile(zipFile);) {
+			setCharset(archiveFile);
 
-			List<FileHeader> fileHeaders = zFile.getFileHeaders();
+			List<FileHeader> fileHeaders = archiveFile.getFileHeaders();
 			for (FileHeader fileHeader : fileHeaders) {
 				files.add(fileHeader.getFileName());
 			}
@@ -250,11 +250,11 @@ public class ZipUtil implements Closeable {
 		if (entry.startsWith("/"))
 			entry = entry.substring(1);
 
-		ZipFile zFile = new ZipFile(zipFile);
-		setCharset(zFile);
-		FileHeader header = zFile.getFileHeader(entry);
+		ZipFile archiveFile = new ZipFile(zipFile);
+		setCharset(archiveFile);
+		FileHeader header = archiveFile.getFileHeader(entry);
 
-		try (InputStream is = zFile.getInputStream(header);
+		try (InputStream is = archiveFile.getInputStream(header);
 				BufferedInputStream bis = new BufferedInputStream(is);
 				FileOutputStream fos = new FileOutputStream(target);
 				BufferedOutputStream bos = new BufferedOutputStream(fos);) {
@@ -280,7 +280,7 @@ public class ZipUtil implements Closeable {
 			bos.flush();
 			return totalSizeEntry;
 		} finally {
-			zFile.close();
+			archiveFile.close();
 		}
 	}
 
@@ -297,12 +297,12 @@ public class ZipUtil implements Closeable {
 			entry = entry.substring(1);
 
 		InputStream entryStream = null;
-		try (ByteArrayOutputStream baos = new ByteArrayOutputStream(); ZipFile zFile = new ZipFile(zipFile);) {
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream(); ZipFile archiveFile = new ZipFile(zipFile);) {
 
-			setCharset(zFile);
-			FileHeader header = zFile.getFileHeader(entry);
+			setCharset(archiveFile);
+			FileHeader header = archiveFile.getFileHeader(entry);
 
-			entryStream = zFile.getInputStream(header);
+			entryStream = archiveFile.getInputStream(header);
 			IOUtils.copy(entryStream, baos);
 			baos.flush();
 			return baos.toByteArray();

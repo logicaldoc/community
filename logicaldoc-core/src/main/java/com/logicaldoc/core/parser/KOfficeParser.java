@@ -85,8 +85,8 @@ public class KOfficeParser extends AbstractParser {
 			xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
 			File mainDocXml = FileUtil.createTempFile("koffice-maindoc", ".xml");
-			try {
-				if (new ZipUtil().unzip(input, "maindoc.xml", mainDocXml) > 0) {
+			try (ZipUtil zipUtil = new ZipUtil()) {
+				if (zipUtil.unzip(input, "maindoc.xml", mainDocXml) > 0) {
 					try (InputStream mainDocStream = new FileInputStream(mainDocXml)) {
 						KOfficeContentHandler contentHandler = new KOfficeContentHandler();
 						xmlReader.setContentHandler(contentHandler);

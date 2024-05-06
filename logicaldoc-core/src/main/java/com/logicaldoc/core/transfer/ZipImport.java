@@ -77,8 +77,7 @@ public class ZipImport {
 
 		File dir = prepareUnzipDir(userId);
 
-		try {
-			ZipUtil zipUtil = new ZipUtil();
+		try (ZipUtil zipUtil = new ZipUtil()) {
 			zipUtil.unzip(zipFile, dir);
 			File[] files = dir.listFiles();
 			addEntries(parent, files);

@@ -58,24 +58,26 @@ public class ZipConverter extends CompressedArchiveConverter {
 		unpackedFileName = unpackedFileName.substring(0, unpackedFileName.lastIndexOf('.'));
 		File ungzippedFile = FileUtil.createTempFile("parsegzip",
 				"." + FileUtil.getExtension(unpackedFileName).toLowerCase());
-		ZipUtil zipUtil = new ZipUtil();
-		zipUtil.unGZip(input, ungzippedFile);
-		return ungzippedFile;
+		try (ZipUtil zipUtil = new ZipUtil();) {
+			zipUtil.unGZip(input, ungzippedFile);
+			return ungzippedFile;
+		}
 	}
 
 	private void convertZip(String sid, Document document, File src, File dest) throws IOException {
-		ZipUtil zipUtil = new ZipUtil();
-		List<String> entries = zipUtil.listEntries(src);
-		if (entries.size() > 1)
-			convertMultipleEntries(sid, document, dest, entries);
-		else
-			convertSingleEntry(sid, document, src, dest, entries.get(0));
-
+		try (ZipUtil zipUtil = new ZipUtil();) {
+			List<String> entries = zipUtil.listEntries(src);
+			if (entries.size() > 1)
+				convertMultipleEntries(sid, document, dest, entries);
+			else
+				convertSingleEntry(sid, document, src, dest, entries.get(0));
+		}
 	}
 
 	@Override
 	protected void extractEntry(File archiveFile, String entry, File uncompressedEntryFile) throws IOException {
-		ZipUtil zipUtil = new ZipUtil();
-		zipUtil.unzip(archiveFile, entry, uncompressedEntryFile);
+		try (ZipUtil zipUtil = new ZipUtil();) {
+			zipUtil.unzip(archiveFile, entry, uncompressedEntryFile);
+		}
 	}
 }

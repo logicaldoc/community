@@ -190,8 +190,8 @@ public class OpenOfficeParser extends AbstractParser {
 			xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
 			File contentXml = FileUtil.createTempFile("openoffice-content", ".xml");
-			try {
-				if (new ZipUtil().unzip(input, "content.xml", contentXml) > 0) {
+			try (ZipUtil zipUtil = new ZipUtil()) {
+				if (zipUtil.unzip(input, "content.xml", contentXml) > 0) {
 					try (InputStream contentStream = new FileInputStream(contentXml)) {
 						OpenOfficeContentHandler contentHandler = new OpenOfficeContentHandler();
 						xmlReader.setContentHandler(contentHandler);
@@ -239,7 +239,7 @@ public class OpenOfficeParser extends AbstractParser {
 		}
 
 		int pages = 1;
-		
+
 		try (ZipUtil zipUtil = new ZipUtil(); InputStream is = zipUtil.getEntryStream(input, "meta.xml")) {
 			OpenOfficeMetadataHandler metadataHandler = new OpenOfficeMetadataHandler();
 			xmlReader.setContentHandler(metadataHandler);

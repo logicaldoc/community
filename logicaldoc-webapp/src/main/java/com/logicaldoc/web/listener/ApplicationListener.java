@@ -244,7 +244,9 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		if (archives != null)
 			for (File archive : archives) {
 				log.info("Unpack plugin {}", archive.getName());
-				new ZipUtil().unzip(archive, webappDir);
+				try (ZipUtil zipUtil = new ZipUtil()) {
+					zipUtil.unzip(archive, webappDir);
+				}
 
 				// Delete the plugin.xml file
 				FileUtils.deleteQuietly(new File(webappDir, "plugin.xml"));

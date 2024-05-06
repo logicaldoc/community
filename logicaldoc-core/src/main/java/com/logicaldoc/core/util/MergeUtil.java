@@ -2,8 +2,6 @@ package com.logicaldoc.core.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
 import org.apache.pdfbox.io.MemoryUsageSetting;
@@ -21,7 +19,7 @@ import com.logicaldoc.util.io.FileUtil;
 public class MergeUtil {
 
 	private static final String MERGE = "merge";
-	
+
 	private MergeUtil() {
 		// Not instantiable class
 	}
@@ -37,15 +35,13 @@ public class MergeUtil {
 	public static File mergePdf(List<File> pdfs) throws IOException {
 		File tempDir = null;
 		try {
-			Path tempPath = Files.createTempDirectory(MERGE);
-			tempDir = tempPath.toFile();
+			tempDir = FileUtil.createTempDirectory(MERGE);
 
 			File dst = FileUtil.createTempFile(MERGE, ".pdf");
 
 			PDFMergerUtility merger = new PDFMergerUtility();
 			for (File file : pdfs) {
 				merger.addSource(file);
-				System.out.println("Added "+file.getPath());
 			}
 
 			merger.setDestinationFileName(dst.getAbsolutePath());
