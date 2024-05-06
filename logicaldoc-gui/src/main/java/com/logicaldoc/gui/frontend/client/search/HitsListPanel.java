@@ -216,15 +216,6 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 
 		if (document) {
 			contextMenu = new ContextMenu(folder, grid);
-			if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS)) {
-				MenuItem openInFolder = new MenuItem();
-				openInFolder.setTitle(I18N.message("openinfolder"));
-				openInFolder.addClickHandler(event -> {
-					GUIDocument doc = grid.getSelectedDocument();
-					DocumentsPanel.get().openInFolder(doc.getFolder().getId(), doc.getId());
-				});
-				contextMenu.addItem(openInFolder);
-			}
 		} else {
 			if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS)) {
 				MenuItem openInFolder = new MenuItem();
