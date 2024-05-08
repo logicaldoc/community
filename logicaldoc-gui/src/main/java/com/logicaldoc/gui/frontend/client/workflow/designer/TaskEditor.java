@@ -85,7 +85,6 @@ public class TaskEditor extends Window {
 		setShowModalMask(true);
 		setMargin(3);
 		setWidth(650);
-		setHeight(600);
 		centerInPage();
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));
@@ -106,10 +105,13 @@ public class TaskEditor extends Window {
 		TabSet tabSet = new TabSet();
 		tabSet.setWidth100();
 
-		if (state.getType() == GUIWFState.TYPE_TASK)
+		if (state.getType() == GUIWFState.TYPE_TASK) {
 			tabSet.setTabs(propertiesTab, duedateTab, validationTab, automationTab, messagesTab);
-		else
+			setHeight(600);
+		} else {
 			tabSet.setTabs(propertiesTab, automationTab, messagesTab);
+			setHeight(500);	
+		}
 		addItem(tabSet);
 
 		Button save = new Button(I18N.message("save"));

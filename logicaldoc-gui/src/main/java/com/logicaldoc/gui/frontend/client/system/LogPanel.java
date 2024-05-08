@@ -120,9 +120,10 @@ public class LogPanel extends VLayout {
 	private void onSaveLogger(SelectItem levelSelector, ComboBoxItem loggerSelector) {
 		String name = loggerSelector.getValueAsString();
 		if (name != null && !name.isEmpty()) {
-			boolean additivity = loggerSelector.getSelectedRecord() != null
-					&& name.equals(loggerSelector.getSelectedRecord().getAttributeAsString("name"))
-					&& loggerSelector.getSelectedRecord().getAttributeAsBoolean("additivity");
+			boolean additivity = loggerSelector.getSelectedRecord().getAttributeAsBoolean("additivity", true) == null
+					|| (loggerSelector.getSelectedRecord() != null
+							&& name.equals(loggerSelector.getSelectedRecord().getAttributeAsString("name"))
+							&& loggerSelector.getSelectedRecord().getAttributeAsBoolean("additivity"));
 			SystemService.Instance.get().saveLogger(name, levelSelector.getValueAsString(), additivity,
 					new AsyncCallback<Void>() {
 						@Override

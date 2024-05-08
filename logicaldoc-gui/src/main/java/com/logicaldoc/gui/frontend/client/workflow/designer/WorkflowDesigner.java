@@ -121,12 +121,11 @@ public class WorkflowDesigner extends AdminPanel {
 
 	/**
 	 * Saves the current diagram into the object model.
-	 * 
-	 * @return true if the model is valid
 	 */
-	public boolean saveModel() {
+	public void saveModel() {
 		// Collect all the states as drawn in the designer.
 		int i = 0;
+
 		workflow.getStates().clear();
 		for (FunctionShape shape : getDrawingPanel().getDiagramController().getShapes()) {
 			StateWidget widget = (StateWidget) shape.getWidget();
@@ -172,7 +171,5 @@ public class WorkflowDesigner extends AdminPanel {
 
 			srcWidget.getWFState().setTransitions(transitions);
 		}
-
-		return true;
 	}
 }

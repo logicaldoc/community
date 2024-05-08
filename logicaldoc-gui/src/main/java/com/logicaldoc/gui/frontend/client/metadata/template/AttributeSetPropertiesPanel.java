@@ -43,7 +43,6 @@ import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This panel shows the properties of an attribute set.
@@ -210,10 +209,11 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		mandatory.setWidth(50);
 		mandatory.setDefaultValue(false);
 		mandatory.setDisabled(attributeSet.isReadonly());
+		mandatory.setVisible(true);
+
 		boolean updatingAttributeIsNotSection = updatingAttributeName == null
 				|| attributeSet.getAttribute(updatingAttributeName.trim()) == null
 				|| attributeSet.getAttribute(updatingAttributeName.trim()).getType() != GUIAttribute.TYPE_SECTION;
-		mandatory.setVisible(updatingAttributeIsNotSection);
 
 		// Hidden
 		final CheckboxItem hidden = new CheckboxItem();
@@ -290,7 +290,6 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		validation.setVisibleWhen(visibleCriteria);
 
 		type.addChangedHandler(changed -> {
-			mandatory.setVisible(!changed.getValue().equals("" + GUIAttribute.TYPE_SECTION));
 			readonly.setVisible(!changed.getValue().equals("" + GUIAttribute.TYPE_SECTION));
 			hidden.setVisible(!changed.getValue().equals("" + GUIAttribute.TYPE_SECTION));
 			multiple.setVisible(!changed.getValue().equals("" + GUIAttribute.TYPE_SECTION));
@@ -751,7 +750,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	private MenuItem prepareDeleteContextMenuItem() {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((MenuItemClickEvent deleteClick) -> {
+		delete.addClickHandler(click -> {
 			final ListGridRecord[] selection = attributesList.getSelectedRecords();
 			if (selection == null || selection.length == 0)
 				return;
@@ -783,7 +782,6 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			attributeSettingsForm1.setValue(READONLY, extAttr.isReadonly());
 			attributeSettingsForm1.setValue(MULTIPLE, extAttr.isMultiple());
 
-			attributeSettingsForm1.getItem(MANDATORY).setVisible(!extAttr.isSection());
 			attributeSettingsForm1.getItem(HIDDEN).setVisible(!extAttr.isSection());
 			attributeSettingsForm1.getItem(READONLY).setVisible(!extAttr.isSection());
 			attributeSettingsForm1.getItem(MULTIPLE).setVisible(!extAttr.isSection());
@@ -812,6 +810,11 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		} else if (type.getValueAsString().equals("" + GUIAttribute.TYPE_FOLDER)) {
 			editor.setVisible(false);
 			options.setVisible(false);
+			group.setVisible(false);
+			group.setValue("");
+		} else if (type.getValueAsString().equals("" + GUIAttribute.TYPE_SECTION)) {
+			editor.setVisible(false);
+			options.setVisible(true);
 			group.setVisible(false);
 			group.setValue("");
 		} else {

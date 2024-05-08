@@ -239,11 +239,13 @@ public class WorkflowToolStrip extends ToolStrip {
 		boolean taskWithoutTransitionsFound = checkTaskWithoutTransitions();
 
 		if (!taskFound)
-			SC.warn(I18N.message("workflowtaskatleast"));
+			GuiLog.error(I18N.message("workflowtaskatleast"));
 		else if (taskWithoutCandidatesFound)
-			SC.warn(I18N.message("workflowtaskcandidateatleast"));
+			GuiLog.error(I18N.message("workflowtaskcandidateatleast"));
 		else if (taskWithoutTransitionsFound)
-			SC.warn(I18N.message("workflowtransitiontarget"));
+			GuiLog.error(I18N.message("workflowtransitiontarget"));
+		else if (currentWorkflow.getStartStateId() == null)
+			GuiLog.error(I18N.message("atleastoneinitialtask"));
 		else {
 			LD.contactingServer();
 			WorkflowService.Instance.get().deploy(currentWorkflow, new AsyncCallback<>() {
@@ -270,7 +272,7 @@ public class WorkflowToolStrip extends ToolStrip {
 
 		for (GUIWFState state : currentWorkflow.getStates()) {
 			if (state.getType() != GUIWFState.TYPE_END) {
-				if (state.getTransitions() == null) {
+				if (state.getTransitions() == null || state.getTransitions().isEmpty()) {
 					transitionErrorFound = true;
 					break;
 				}
@@ -445,13 +447,10 @@ public class WorkflowToolStrip extends ToolStrip {
 
 	private void onSave() {
 		try {
-			if (!designer.saveModel())
-				return;
+			designer.saveModel();
 		} catch (Exception t) {
 			// Nothing to do
 		}
-
-		currentWorkflow = designer.getWorkflow();
 
 		LD.contactingServer();
 		WorkflowService.Instance.get().save(currentWorkflow, new AsyncCallback<>() {
