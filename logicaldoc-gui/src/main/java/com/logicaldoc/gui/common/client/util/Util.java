@@ -4,9 +4,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
@@ -61,24 +63,25 @@ public abstract class Util {
 
 	private static final String AND_FILEVERSION_EQUAL = "&fileVersion=";
 
-	private static final String[] officeExts = new String[] { ".doc", ".xls", ".xlsm", ".ppt", ".docx", ".docxm",
-			".dotm", ".xlsx", ".pptx", ".rtf", ".odt", ".ods", ".odp", ".vsd", ".vsdx", ".mpp" };
+	private static final Set<String> officeExts = new HashSet<>(Arrays.asList(".doc", ".xls", ".xlsm", ".ppt", ".docx",
+			".docxm", ".dotm", ".xlsx", ".pptx", ".rtf", ".odt", ".ods", ".odp", ".vsd", ".vsdx", ".mpp"));
 
-	private static final String[] spreadsheetExts = new String[] { ".xls", ".xlsm", ".xlsx", ".ods" };
+	private static final Set<String> spreadsheetExts = new HashSet<>(Arrays.asList(".xls", ".xlsm", ".xlsx", ".ods"));
 
-	private static final String[] imageExts = new String[] { ".gif", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".png",
-			".jfif", ".webp" };
+	private static final Set<String> imageExts = new HashSet<>(
+			Arrays.asList(".gif", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".png", ".jfif", ".webp"));
 
-	private static final String[] videoExts = new String[] { ".mp4", ".avi", ".mpg", ".wmv", ".wma", ".asf", ".mov",
-			".rm", ".flv", ".aac", ".vlc", ".ogg", ".webm", ".swf", ".mpeg", ".swf", ".m2v", ".m2ts", ".mkv", ".m4v" };
+	private static final Set<String> videoExts = new HashSet<>(
+			Arrays.asList(".mp4", ".avi", ".mpg", ".wmv", ".wma", ".asf", ".mov", ".rm", ".flv", ".aac", ".vlc", ".ogg",
+					".webm", ".swf", ".mpeg", ".swf", ".m2v", ".m2ts", ".mkv", ".m4v"));
 
-	private static final String[] audioExts = new String[] { ".mp3", ".m4p", ".m4a", ".wav" };
+	private static final Set<String> audioExts = new HashSet<>(Arrays.asList(".mp3", ".m4p", ".m4a", ".wav"));
 
-	private static final String[] webcontentExts = new String[] { ".html", ".htm", ".xhtml" };
+	private static final Set<String> webcontentExts = new HashSet<>(Arrays.asList(".html", ".htm", ".xhtml"));
 
-	private static final String[] emailExts = new String[] { ".eml", ".msg" };
+	private static final Set<String> emailExts = new HashSet<>(Arrays.asList(".eml", ".msg"));
 
-	private static final String[] dicomExts = new String[] { ".dcm", ".dicom" };
+	private static final Set<String> dicomExts = new HashSet<>(Arrays.asList(".dcm", ".dicom"));
 
 	private Util() {
 		// Empty constructor
@@ -154,10 +157,6 @@ public abstract class Util {
 		uninstallCloseWindowAlert();
 		WindowUtils.openUrl(urlToRedirectTo);
 		installCloseWindowAlert();
-	}
-
-	public static void downloadDoc(long docId) {
-		download(downloadURL(docId));
 	}
 
 	public static String downloadTicketURL(String ticketId) {
@@ -403,31 +402,20 @@ public abstract class Util {
 		return !Feature.enabled(Feature.ADDITIONAL_FORMATS);
 	}
 
+	public static boolean isOfficeFileType(String type) {
+		return officeExts.stream().anyMatch(type::equalsIgnoreCase);
+	}
+
 	public static boolean isOfficeFile(String fileName) {
-		String tmp = fileName.toLowerCase();
-		for (String ext : officeExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		return false;
+		return officeExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext));
 	}
 
 	public static boolean isSpreadsheetFile(String fileName) {
-		String tmp = fileName.toLowerCase();
-		for (String ext : spreadsheetExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		return false;
+		return spreadsheetExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext));
 	}
 
 	public static boolean isDICOMFile(String fileName) {
-		String tmp = fileName.toLowerCase();
-		for (String ext : dicomExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		return false;
+		return dicomExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext));
 	}
 
 	public static boolean isTextFile(String fileName) {
@@ -451,60 +439,23 @@ public abstract class Util {
 	}
 
 	public static boolean isImageFile(String fileName) {
-		String tmp = fileName.toLowerCase();
-		for (String ext : imageExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		return false;
+		return imageExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext));
 	}
 
 	public static boolean isWebContentFile(String fileName) {
-		String tmp = fileName.toLowerCase();
-		for (String ext : webcontentExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		return false;
+		return webcontentExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext));
 	}
 
 	public static boolean isMediaFile(String fileName) {
-		String tmp = fileName.toLowerCase();
-		for (String ext : videoExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		for (String ext : audioExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		return false;
+		return videoExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext)) || isAudioFile(fileName);
 	}
 
 	public static boolean isAudioFile(String fileName) {
-		String tmp = fileName.toLowerCase();
-		for (String ext : audioExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		return false;
-	}
-
-	public static boolean isOfficeFileType(String type) {
-		for (String ext : officeExts) {
-			if (type.equalsIgnoreCase(ext))
-				return true;
-		}
-		return false;
+		return audioExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext));
 	}
 
 	public static boolean isEmailFile(String fileName) {
-		String tmp = fileName.toLowerCase();
-		for (String ext : emailExts) {
-			if (tmp.endsWith(ext))
-				return true;
-		}
-		return false;
+		return emailExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext));
 	}
 
 	/**
@@ -785,7 +736,7 @@ public abstract class Util {
 
 	public static native void redirect(String url)
 	/*-{
-		$wnd.location.replace(url);
+	    $wnd.location.href = url;
 	}-*/;
 
 	public static String padLeft(String s, int n) {
@@ -903,9 +854,15 @@ public abstract class Util {
 	 * @return the current tenant's name
 	 */
 	public static String detectTenant() {
+		String tenant = getTenantInRequest();
+		if (tenant == null)
+			tenant = Constants.TENANT_DEFAULTNAME;
+		return tenant;
+	}
+
+	public static String getTenantInRequest() {
 		RequestInfo request = WindowUtils.getRequestInfo();
-		// Tries to capture tenant parameter
-		String tenant = Constants.TENANT_DEFAULTNAME;
+		String tenant = null;
 		if (request.getParameter(Constants.TENANT) != null && !request.getParameter(Constants.TENANT).equals("")) {
 			tenant = request.getParameter(Constants.TENANT);
 		}
@@ -1036,7 +993,7 @@ public abstract class Util {
 				url += "?locale=" + locale;
 			}
 		}
-		Util.redirect(url);
+		WindowUtils.openUrl(url);
 	}
 
 	/**
@@ -1057,12 +1014,9 @@ public abstract class Util {
 		return url;
 	}
 
-	public static String getValue(String name, GUIParameter[] parameters) {
-		if (parameters != null)
-			for (GUIParameter param : parameters)
-				if (name.equals(param.getName()))
-					return param.getValue();
-		return null;
+	public static String getValue(String name, List<GUIParameter> parameters) {
+		return parameters.stream().filter(param -> name.equals(param.getName())).map(GUIParameter::getValue).findFirst()
+				.orElse(null);
 	}
 
 	public static long[] toPrimitives(Long[] objects) {
@@ -1108,11 +1062,10 @@ public abstract class Util {
 		}
 	}
 
-	public static Map<String, String> convertToMap(GUIParameter[] parameters) {
+	public static Map<String, String> convertToMap(List<GUIParameter> parameters) {
 		Map<String, String> map = new HashMap<>();
-		if (parameters != null)
-			for (GUIParameter param : parameters)
-				map.put(param.getName(), param.getValue());
+		for (GUIParameter param : parameters)
+			map.put(param.getName(), param.getValue());
 		return map;
 	}
 
@@ -1197,15 +1150,14 @@ public abstract class Util {
 	 * 
 	 * @return the HTML content
 	 */
-	public static String getTagsHTML(String[] tags) {
+	public static String getTagsHTML(List<String> tags) {
 		StringBuilder buf = new StringBuilder(
 				"<div style='display: grid; grid-gap: 2px; padding: 1px; grid-auto-flow: row dense; grid-template-columns: auto auto auto; grid-template-rows: auto auto;'>");
-		if (tags != null)
-			for (String tag : tags) {
-				buf.append("<span class='button' style='white-space: nowrap;'>");
-				buf.append(tag);
-				buf.append("</span>");
-			}
+		for (String tag : tags) {
+			buf.append("<span class='button' style='white-space: nowrap;'>");
+			buf.append(tag);
+			buf.append("</span>");
+		}
 		buf.append(END_DIV);
 		return buf.toString();
 	}
@@ -1224,12 +1176,9 @@ public abstract class Util {
 		}
 	}
 
-	public static String getParameterValue(GUIParameter[] params, String name) {
-		for (GUIParameter param : params) {
-			if (param.getName().equals(Session.get().getTenantName() + "." + name) || param.getName().equals(name))
-				return param.getValue();
-		}
-		return null;
+	public static String getParameterValue(List<GUIParameter> params, String name) {
+		return params.stream().filter(param -> param.getName().equals(Session.get().getTenantName() + "." + name)
+				|| param.getName().equals(name)).map(p -> p.getValue()).findFirst().orElse(null);
 	}
 
 	public static void removeChildren(Layout container) {
