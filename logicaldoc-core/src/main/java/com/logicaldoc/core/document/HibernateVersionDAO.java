@@ -23,7 +23,7 @@ import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 
 /**
- * Hibernate implementation of <code>DocumentDAO</code>
+ * Hibernate implementation of <code>VersionDAO</code>
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
@@ -145,11 +145,10 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 		if (versions.size() <= maxVersions)
 			return;
 
-		// Meke sure to sort the versions by descending version spec
+		// Make sure to sort the versions by descending version spec
 		Collections.sort(versions, Collections.reverseOrder());
 
-		List<Version> oldestVersionsToDelete = versions.stream().skip(Math.max(0, versions.size() - maxVersions))
-				.toList();
+		List<Version> oldestVersionsToDelete = versions.stream().skip(maxVersions).toList();
 		for (Version versionToDelete : oldestVersionsToDelete)
 			deleteVersion(versionToDelete, PersistentObject.DELETED_CODE_DEFAULT);
 	}
@@ -163,7 +162,8 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 			try (InputStream in = storer.getStream(version.getDocId(), resource);) {
 				version.setDigest(FileUtil.computeDigest(in));
 			} catch (IOException e) {
-				log.error("Cannot retrieve the content of version {}", version, e);
+				log.error("Cannot retrieve the content of version {}", version);
+				log.error(e.getMessage(), e);
 			}
 			saveOrUpdate(version);
 		}
