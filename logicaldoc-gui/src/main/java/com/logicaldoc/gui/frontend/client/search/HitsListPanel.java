@@ -6,6 +6,7 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
@@ -215,16 +216,24 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		Menu contextMenu = new Menu();
 
 		if (document) {
-			contextMenu = new ContextMenu(folder, grid);
 			if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS)) {
-				MenuItem openInFolder = new MenuItem();
-				openInFolder.setTitle(I18N.message("openinfolder"));
-				openInFolder.addClickHandler(event -> {
-					GUIDocument doc = grid.getSelectedDocument();
-					DocumentsPanel.get().openInFolder(doc.getFolder().getId(), doc.getId());
-				});
-				contextMenu.addItem(openInFolder);
-			}
+				contextMenu = new ContextMenu(folder, grid) {
+
+					@Override
+					protected void fillContextMenu(GUIFolder folder, List<GUIDocument> selection,
+							GUIAccessControlEntry enabledPermissions) {
+						super.fillContextMenu(folder, selection, enabledPermissions);
+						MenuItem openInFolder = new MenuItem();
+						openInFolder.setTitle(I18N.message("openinfolder"));
+						openInFolder.addClickHandler(event -> {
+							GUIDocument doc = grid.getSelectedDocument();
+							DocumentsPanel.get().openInFolder(doc.getFolder().getId(), doc.getId());
+						});
+						addItem(openInFolder);
+					}
+				};
+			} else
+				new ContextMenu(folder, grid);
 		} else {
 			if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS)) {
 				MenuItem openInFolder = new MenuItem();

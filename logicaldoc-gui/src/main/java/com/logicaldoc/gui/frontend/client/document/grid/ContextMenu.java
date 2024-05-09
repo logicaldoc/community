@@ -152,141 +152,7 @@ public class ContextMenu extends Menu {
 
 			@Override
 			public void onSuccess(GUIAccessControlEntry enabledPermissions) {
-				download = new MenuItem();
-				download.setTitle(I18N.message("download"));
-				download.addClickHandler(event -> onDownload(folder, selection));
-
-				cut = prepareCutItem(selection);
-
-				copy = prepareCopyItem(selection);
-
-				rename = prepareRenameItem(selection);
-
-				delete = prepareDeleteItem(selection);
-
-				sendMail = new MenuItem();
-				sendMail.setTitle(I18N.message("sendmail"));
-				sendMail.addClickHandler(
-						event -> new EmailDialog(grid.getSelectedIds(), selection.get(0).getFileName()).show());
-
-				links = prepareLinksItem(selection);
-
-				immutable = prepareImmutableItem(selection);
-
-				setPassword = prepareSetPasswordItem(selection);
-
-				unsetPassword = prepareUnsetPasswordItem(selection);
-
-				lock = prepareLockItem(selection);
-
-				unlock = prepareUnlockItem(selection);
-
-				checkout = prepareCheckoutItem(folder, selection);
-
-				checkin = prepareCheckinItem(selection);
-
-				archive = prepareArchiveItem(selection);
-
-				bookmark = prepareBookmarkItem(selection);
-
-				markUnindexable = prepareMarkUnindexableItem(selection);
-
-				markIndexable = prepareMarkIndexableItem(selection);
-
-				markIndexableMetadataOnly = markIndexableMetadataOnlyItem(selection);
-
-				index = prepareIndexItem(selection);
-
-				sign = new MenuItem();
-				sign.setTitle(I18N.message("sign"));
-				sign.addClickHandler(event -> new DigitalSignatureDialog(getSelectionIds(selection)).show());
-
-				stamp = new MenuItem();
-				stamp.setTitle(I18N.message("stamp"));
-				stamp.addClickHandler(event -> new StampDialog(selection).show());
-
-				office = new MenuItem(I18N.message("editwithoffice"));
-				office.addClickHandler(event -> Util.openEditWithOffice(selection.get(0).getId()));
-
-				sendToExpArchive = new MenuItem(I18N.message("sendtoexparchive"));
-				sendToExpArchive
-						.addClickHandler(event -> new SendToArchiveDialog(getSelectionIds(selection), true).show());
-
-				workflow = new MenuItem(I18N.message("startworkflow"));
-				workflow.addClickHandler(event -> new StartWorkflowDialog(getSelectionIds(selection)).show());
-
-				automation = new MenuItem(I18N.message("executeautomation"));
-				automation.addClickHandler(
-						event -> new AutomationDialog(folder.getId(), getSelectionIds(selection)).show());
-
-				preview = preparePreview();
-
-				ticket = new MenuItem(I18N.message("ticket"));
-				ticket.addClickHandler(event -> new TicketDialog(selection.get(0)).show());
-
-				convert = new MenuItem(I18N.message("convert"));
-				convert.addClickHandler(event -> new ConversionDialog(selection.get(0)).show());
-
-				compare = prepareCompareItem(selection);
-
-				replaceAlias = prepareReplaceAlias();
-
-				split = new MenuItem(I18N.message("split"));
-				split.addClickHandler(event -> new SplitDialog(selection.get(0)).show());
-
-				merge = prepareMergeItem(folder, getSelectionIds(selection));
-
-				customActionsItem = prepareCustomActionsItem(folder.getId(), getSelectionIds(selection));
-
-				readingRequest = new MenuItem();
-				readingRequest.setTitle(I18N.message("requestreading"));
-				readingRequest.addClickHandler(event -> new ReadingRequestDialog(grid.getSelectedIds()).show());
-
-				setItems(download, preview, cut, copy, rename, delete, bookmark, sendMail, links, office, checkout,
-						checkin, lock, unlock);
-
-				more = new MenuItem(I18N.message("more"));
-				addItem(more);
-
-				indexingMenu = new Menu();
-				indexingMenu.setItems(index, markIndexable, markIndexableMetadataOnly, markUnindexable);
-
-				indexing = new MenuItem(I18N.message("indexing"));
-				indexing.setSubmenu(indexingMenu);
-
-				moreMenu = new Menu();
-				moreMenu.setItems(indexing, immutable, setPassword, unsetPassword, ticket, replaceAlias);
-
-				removeOfficeItem(office);
-
-				addArchiveItem(archive);
-				addCustomActionsItem(customActionsItem);
-
-				addConversionItem(convert, moreMenu);
-				addCompareItem(compare, moreMenu);
-				addSignItem(sign, moreMenu);
-				addStampItem(stamp, moreMenu);
-				addSplitItem(split, moreMenu);
-				addReadingRequestItem(readingRequest, moreMenu);
-
-				moreMenu.addItem(merge);
-
-				addSendToArchiveItem(sendToExpArchive, moreMenu);
-				addWorkflowItem(workflow, moreMenu);
-				addAutomationItem(automation, moreMenu);
-
-				more.setSubmenu(moreMenu);
-
-				/**
-				 * Now implement the security policies
-				 */
-				boolean someSelection = !selection.isEmpty();
-				boolean moreSelected = selection.size() > 1;
-				boolean justOneSelected = someSelection && selection.size() == 1;
-				boolean immutablesInSelection = someSelection && checkImmutablesInSelection(selection);
-
-				applySecurityPolicies(enabledPermissions, selection, someSelection, moreSelected, justOneSelected,
-						immutablesInSelection);
+				fillContextMenu(folder, selection, enabledPermissions);
 			}
 		});
 	}
@@ -1288,5 +1154,144 @@ public class ContextMenu extends Menu {
 				DocumentController.get().modified(doc);
 			}
 		});
+	}
+
+	protected void fillContextMenu(GUIFolder folder, final List<GUIDocument> selection,
+			GUIAccessControlEntry enabledPermissions) {
+		download = new MenuItem();
+		download.setTitle(I18N.message("download"));
+		download.addClickHandler(event -> onDownload(folder, selection));
+
+		cut = prepareCutItem(selection);
+
+		copy = prepareCopyItem(selection);
+
+		rename = prepareRenameItem(selection);
+
+		delete = prepareDeleteItem(selection);
+
+		sendMail = new MenuItem();
+		sendMail.setTitle(I18N.message("sendmail"));
+		sendMail.addClickHandler(
+				event -> new EmailDialog(grid.getSelectedIds(), selection.get(0).getFileName()).show());
+
+		links = prepareLinksItem(selection);
+
+		immutable = prepareImmutableItem(selection);
+
+		setPassword = prepareSetPasswordItem(selection);
+
+		unsetPassword = prepareUnsetPasswordItem(selection);
+
+		lock = prepareLockItem(selection);
+
+		unlock = prepareUnlockItem(selection);
+
+		checkout = prepareCheckoutItem(folder, selection);
+
+		checkin = prepareCheckinItem(selection);
+
+		archive = prepareArchiveItem(selection);
+
+		bookmark = prepareBookmarkItem(selection);
+
+		markUnindexable = prepareMarkUnindexableItem(selection);
+
+		markIndexable = prepareMarkIndexableItem(selection);
+
+		markIndexableMetadataOnly = markIndexableMetadataOnlyItem(selection);
+
+		index = prepareIndexItem(selection);
+
+		sign = new MenuItem();
+		sign.setTitle(I18N.message("sign"));
+		sign.addClickHandler(event -> new DigitalSignatureDialog(getSelectionIds(selection)).show());
+
+		stamp = new MenuItem();
+		stamp.setTitle(I18N.message("stamp"));
+		stamp.addClickHandler(event -> new StampDialog(selection).show());
+
+		office = new MenuItem(I18N.message("editwithoffice"));
+		office.addClickHandler(event -> Util.openEditWithOffice(selection.get(0).getId()));
+
+		sendToExpArchive = new MenuItem(I18N.message("sendtoexparchive"));
+		sendToExpArchive
+				.addClickHandler(event -> new SendToArchiveDialog(getSelectionIds(selection), true).show());
+
+		workflow = new MenuItem(I18N.message("startworkflow"));
+		workflow.addClickHandler(event -> new StartWorkflowDialog(getSelectionIds(selection)).show());
+
+		automation = new MenuItem(I18N.message("executeautomation"));
+		automation.addClickHandler(
+				event -> new AutomationDialog(folder.getId(), getSelectionIds(selection)).show());
+
+		preview = preparePreview();
+
+		ticket = new MenuItem(I18N.message("ticket"));
+		ticket.addClickHandler(event -> new TicketDialog(selection.get(0)).show());
+
+		convert = new MenuItem(I18N.message("convert"));
+		convert.addClickHandler(event -> new ConversionDialog(selection.get(0)).show());
+
+		compare = prepareCompareItem(selection);
+
+		replaceAlias = prepareReplaceAlias();
+
+		split = new MenuItem(I18N.message("split"));
+		split.addClickHandler(event -> new SplitDialog(selection.get(0)).show());
+
+		merge = prepareMergeItem(folder, getSelectionIds(selection));
+
+		customActionsItem = prepareCustomActionsItem(folder.getId(), getSelectionIds(selection));
+
+		readingRequest = new MenuItem();
+		readingRequest.setTitle(I18N.message("requestreading"));
+		readingRequest.addClickHandler(event -> new ReadingRequestDialog(grid.getSelectedIds()).show());
+
+		setItems(download, preview, cut, copy, rename, delete, bookmark, sendMail, links, office, checkout,
+				checkin, lock, unlock);
+
+		more = new MenuItem(I18N.message("more"));
+		addItem(more);
+
+		indexingMenu = new Menu();
+		indexingMenu.setItems(index, markIndexable, markIndexableMetadataOnly, markUnindexable);
+
+		indexing = new MenuItem(I18N.message("indexing"));
+		indexing.setSubmenu(indexingMenu);
+
+		moreMenu = new Menu();
+		moreMenu.setItems(indexing, immutable, setPassword, unsetPassword, ticket, replaceAlias);
+
+		removeOfficeItem(office);
+
+		addArchiveItem(archive);
+		addCustomActionsItem(customActionsItem);
+
+		addConversionItem(convert, moreMenu);
+		addCompareItem(compare, moreMenu);
+		addSignItem(sign, moreMenu);
+		addStampItem(stamp, moreMenu);
+		addSplitItem(split, moreMenu);
+		addReadingRequestItem(readingRequest, moreMenu);
+
+		moreMenu.addItem(merge);
+
+		addSendToArchiveItem(sendToExpArchive, moreMenu);
+		addWorkflowItem(workflow, moreMenu);
+		addAutomationItem(automation, moreMenu);
+
+		more.setSubmenu(moreMenu);
+
+		/**
+		 * Now implement the security policies
+		 */
+		boolean someSelection = !selection.isEmpty();
+		boolean moreSelected = selection.size() > 1;
+		boolean justOneSelected = someSelection && selection.size() == 1;
+		boolean immutablesInSelection = someSelection && checkImmutablesInSelection(selection);
+
+		applySecurityPolicies(enabledPermissions, selection, someSelection, moreSelected, justOneSelected,
+				immutablesInSelection);
 	}
 }
