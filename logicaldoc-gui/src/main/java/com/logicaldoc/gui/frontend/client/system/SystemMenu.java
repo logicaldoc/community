@@ -280,7 +280,7 @@ public class SystemMenu extends VLayout {
 		installationID.setWidth(250);
 		installationID.setRequired(true);
 		installationID.setShouldSaveValue(false);
-		installationID.setWrap(true);
+		installationID.setWrap(false);
 		installationID.setWrapTitle(false);
 
 		StaticTextItem usernoItem = ItemFactory.newStaticTextItem("userno", I18N.message("clicktoshow").toLowerCase());
