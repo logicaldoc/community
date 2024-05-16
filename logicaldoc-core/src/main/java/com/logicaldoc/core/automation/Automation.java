@@ -297,7 +297,7 @@ public class Automation {
 			VelocityContext context = prepareContext(prepareDictionary(clientDictionary));
 			Velocity.evaluate(context, writer, StringUtils.isNotEmpty(logTag) ? logTag : "ScriptEngine", expression);
 		} catch (Exception e) {
-			log.error("Error in the script", e);
+			log.error("Error in the script " + expression, e);
 		}
 	}
 }

@@ -110,10 +110,6 @@ public class Profile extends Window {
 		TextItem organizationalUnit = ItemFactory.newTextItem("organizationalunit", user.getOrganizationalUnit());
 		TextItem building = ItemFactory.newTextItem("building", user.getBuilding());
 
-		CheckboxItem evalForm = ItemFactory.newCheckbox("evalformenabled");
-		evalForm.setValue(user.isEvalFormEnabled());
-		evalForm.setVisible(Menu.enabled(Menu.PRODUCT_EVALUATION));
-
 		ComboBoxItem timeZone = ItemFactory.newTimeZoneSelector(TIMEZONE, user.getTimeZone());
 		timeZone.setEndRow(true);
 
@@ -125,7 +121,7 @@ public class Profile extends Window {
 		quotaCount.setWrap(false);
 
 		detailsForm.setFields(firstName, lastName, language, address, postalCode, city, country, state, phone, cell,
-				company, department, organizationalUnit, building, timeZone, quotaCount, quota, evalForm);
+				company, department, organizationalUnit, building, timeZone, quotaCount, quota);
 
 		HLayout detailsPanel = new HLayout();
 		detailsPanel.setMembers(detailsForm, new Avatar(user.getId()));
@@ -237,6 +233,10 @@ public class Profile extends Window {
 		TextItem dateFormatLong = ItemFactory.newTextItem(DATEFORMATLONG, user.getDateFormatLong());
 		dateFormatLong.setWidth(180);
 
+		CheckboxItem evalForm = ItemFactory.newCheckbox("evalformenabled");
+		evalForm.setValue(user.isEvalFormEnabled());
+		evalForm.setVisible(Menu.enabled(Menu.PRODUCT_EVALUATION));
+		
 		final DynamicForm guiForm = new DynamicForm();
 		guiForm.setHeight100();
 		guiForm.setValuesManager(vm);
@@ -244,7 +244,7 @@ public class Profile extends Window {
 		guiForm.setTitleOrientation(TitleOrientation.TOP);
 
 		guiForm.setFields(welcomeScreen, defaultWorkspace, docsGrid, hitsGrid, dateFormat, dateFormatShort,
-				dateFormatLong);
+				dateFormatLong, evalForm);
 
 		ArrayList<ListGridRecord> records = new ArrayList<>();
 		for (String search : user.orderedSearches()) {
