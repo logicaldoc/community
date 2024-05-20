@@ -34,6 +34,8 @@ public class JavaLanguageVariable {
 	}
 
 	public void setType(Class<?> type) {
+		if (type == null)
+			throw new RuntimeException("null type");
 		this.type = type;
 	}
 

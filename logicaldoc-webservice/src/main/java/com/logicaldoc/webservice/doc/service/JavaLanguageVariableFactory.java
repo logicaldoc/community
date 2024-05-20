@@ -5,6 +5,8 @@ import static com.logicaldoc.webservice.doc.util.MyClassUtils.isClassArrayOrColl
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,10 +47,15 @@ public class JavaLanguageVariableFactory {
 			variable.setRequired(isVariableRequired(annotation));
 			variable.setDescription(getVariableDescription(annotation));
 		}
-
-		if (isClassArrayOrCollection(field.getType()))
-			variable.setType(field.getType().getComponentType());
-		else
+		
+		if (isClassArrayOrCollection(field.getType())) {
+			if(field.getGenericType() instanceof ParameterizedType aType){
+			    Type[] fieldArgTypes = aType.getActualTypeArguments();
+			    variable.setType((Class)fieldArgTypes[0]);
+			}else {
+				variable.setType(field.getType().getComponentType());
+			}
+		} else
 			variable.setType(GenericsUtils.getFieldGenericType(field));
 		variable.setMultiOccurs(isClassArrayOrCollection(field.getType()));
 		return variable;
