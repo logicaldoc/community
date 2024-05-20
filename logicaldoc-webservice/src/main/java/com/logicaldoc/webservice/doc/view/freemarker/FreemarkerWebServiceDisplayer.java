@@ -73,11 +73,13 @@ public class FreemarkerWebServiceDisplayer {
 
 		if (className.startsWith("[L"))
 			className = className.substring(2, className.length() - 1);
+		else if (className.startsWith("[[L"))
+			className = className.substring(3, className.length() - 1);
 		else if (className.equals("[J"))
 			className = Long.class.getName();
 		else if (className.equals("[D"))
 			className = Double.class.getName();
-
+		
 		try {
 			return serviceStubSet.getWebServiceClass().getClassLoader().loadClass(className);
 		} catch (Exception e) {
