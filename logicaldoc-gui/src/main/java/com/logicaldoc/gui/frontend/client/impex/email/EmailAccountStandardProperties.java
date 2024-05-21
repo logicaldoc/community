@@ -3,10 +3,11 @@ package com.logicaldoc.gui.frontend.client.impex.email;
 import java.util.Map;
 
 import com.logicaldoc.gui.common.client.beans.GUIEmailAccount;
-import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
+import com.smartgwt.client.data.AdvancedCriteria;
+import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
@@ -43,10 +44,11 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		targetSelector = new FolderSelector("target", null);
 		targetSelector.setTitle(I18N.message("targetfolder"));
 		targetSelector.setWidth(250);
+		targetSelector.setStartRow(true);
 
 		if (account.getTarget() != null)
 			targetSelector.setFolder(account.getTarget());
-		targetSelector.addFolderChangeListener((GUIFolder folder) -> changedHandler.onChanged(null));
+		targetSelector.addFolderChangeListener(folder -> changedHandler.onChanged(null));
 
 		refresh();
 	}
@@ -70,7 +72,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 
 		TextItem username = ItemFactory.newTextItemPreventAutocomplete(USERNAME, USERNAME, account.getUsername());
 		username.addChangedHandler(changedHandler);
-		username.setWidth(180);
+		username.setWidth(200);
 
 		SelectItem language = ItemFactory.newLanguageSelector("language", false, false);
 		language.addChangedHandler(changedHandler);
@@ -79,11 +81,12 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 
 		TextItem server = ItemFactory.newTextItem("server", account.getHost());
 		server.setRequired(true);
-		server.setWidth(180);
+		server.setWidth(200);
 		server.addChangedHandler(changedHandler);
 
 		IntegerItem port = ItemFactory.newIntegerItem("port", "port", account.getPort());
 		port.setWidth(80);
+		port.setEndRow(true);
 		port.addChangedHandler(changedHandler);
 
 		RadioGroupItem ssl = ItemFactory.newBooleanSelector("ssl", "ssl");
@@ -100,24 +103,48 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		foldering.setRequired(true);
 		foldering.setValue("" + account.getFoldering());
 
+		TextItem clientId = ItemFactory.newTextItem("clientid", account.getClientId());
+		clientId.setWidth(200);
+		clientId.addChangedHandler(changedHandler);
+		clientId.setVisibleWhen(new AdvancedCriteria("protocol", OperatorId.CONTAINS, "365"));
+
+		TextItem clientTenant = ItemFactory.newTextItem("clienttenant", I18N.message("tenantId"),
+				account.getClientTenant());
+		clientTenant.setWidth(200);
+		clientTenant.addChangedHandler(changedHandler);
+		clientTenant.setVisibleWhen(new AdvancedCriteria("protocol", OperatorId.CONTAINS, "365"));
+
 		/*
 		 * Two invisible fields to 'mask' the real credentials to the browser
-		 * and prevent it to auto-fill the username and password we really use.
+		 * and prevent it to auto-fill the username, password and clientSecret
+		 * we really use.
 		 */
 		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", account.getUsername());
-		fakeUsername.setCellStyle(NODISPLAY);
+		fakeUsername.setHidden(true);
 		TextItem fakeUsernameAgain = ItemFactory.newTextItem("prevent_autofill2", account.getUsername());
-		fakeUsernameAgain.setCellStyle(NODISPLAY);
+		fakeUsernameAgain.setHidden(true);
 		TextItem hiddenPassword = ItemFactory.newTextItem("password_hidden", account.getPassword());
-		hiddenPassword.setCellStyle(NODISPLAY);
+		hiddenPassword.setHidden(true);
 		hiddenPassword.addChangedHandler(changedHandler);
+		TextItem hiddenClientSecret = ItemFactory.newTextItem("clientsecret_hidden", account.getClientSecret());
+		hiddenClientSecret.setHidden(true);
+		hiddenClientSecret.addChangedHandler(changedHandler);
+
 		FormItem password = ItemFactory.newSafePasswordItem("password", I18N.message("password"), account.getPassword(),
 				hiddenPassword, changedHandler);
 		password.addChangedHandler(changedHandler);
-		password.setWidth(180);
+		password.setWidth(200);
+		password.setEndRow(true);
 
-		form.setItems(mailaddress, server, targetSelector, fakeUsername, fakeUsernameAgain, hiddenPassword, username,
-				password, foldering, language, protocol, port, ssl);
+		FormItem clientSecret = ItemFactory.newSafePasswordItem("clientsecret", I18N.message("clientsecret"),
+				account.getClientSecret(), hiddenClientSecret, changedHandler);
+		clientSecret.setWidth(200);
+		clientSecret.addChangedHandler(changedHandler);
+		clientSecret.setVisibleWhen(new AdvancedCriteria("protocol", OperatorId.CONTAINS, "365"));
+
+		form.setItems(mailaddress, protocol, ssl, server, port, username, password, clientId, clientSecret,
+				clientTenant, targetSelector, foldering, language, fakeUsername, fakeUsernameAgain, hiddenPassword,
+				hiddenClientSecret);
 
 		formsContainer.addMember(form);
 	}
@@ -141,6 +168,9 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 			account.setFoldering(Integer.parseInt((String) values.get("foldering")));
 
 			account.setPassword((String) values.get("password_hidden"));
+			account.setClientId((String) values.get("clientid"));
+			account.setClientSecret((String) values.get("clientsecret_hidden"));
+			account.setClientTenant((String) values.get("clienttenant"));
 		}
 		return !form.hasErrors();
 	}

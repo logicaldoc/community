@@ -99,6 +99,10 @@ public class MailUtilTest extends AbstractCoreTestCase {
 		EMail mail = MailUtil.messageToMail(new File("src/test/resources/New email with attachments.eml"), true);
 		assertNotNull(mail);
 		assertEquals(1, mail.getAttachmentsCount());
+		
+		mail = MailUtil.messageToMail(new File("src/test/resources/test with attachment.eml"), true);
+		assertNotNull(mail);
+		assertEquals(6, mail.getAttachmentsCount());		
 	}
 
 	@Test

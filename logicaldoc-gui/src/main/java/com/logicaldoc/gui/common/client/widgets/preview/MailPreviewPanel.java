@@ -15,6 +15,7 @@ import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.IButton;
@@ -122,7 +123,7 @@ public class MailPreviewPanel extends VLayout {
 	 * email and the attachment buttons
 	 * 
 	 * @param mail The email
-	 * @param document The document that represents the emil
+	 * @param document The document that represents the email
 	 * @param form the form
 	 * 
 	 * @return the header layout
@@ -130,12 +131,13 @@ public class MailPreviewPanel extends VLayout {
 	private VLayout preparePreviewHeader(final GUIEmail mail, final GUIDocument document, DynamicForm form) {
 		FlowLayout attachmentsPanel = new FlowLayout();
 		attachmentsPanel.setWidth100();
-		attachmentsPanel.setHeight(75);
-
+		attachmentsPanel.setHeight(80);
+		attachmentsPanel.setOverflow(Overflow.SCROLL);
+		
 		VLayout header = new VLayout();
 		header.setWidth100();
 		header.setBackgroundColor("#efefef;");
-
+		
 		List<GUIDocument> attachments = prepareAttachments(mail, document, attachmentsPanel);
 		if (attachments.isEmpty())
 			header.setMembers(form);

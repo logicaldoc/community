@@ -1967,14 +1967,14 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newDueTimeSelector(String name, String title) {
-		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
-		select.setWidth(90);
-		select.setShowTitle(false);
-
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put(MINUTE, I18N.message("minutes"));
 		map.put("hour", I18N.message("hours"));
 		map.put("day", I18N.message("ddays"));
+		
+		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
+		select.setWidth(90);
+		select.setShowTitle(false);
 		select.setValueMap(map);
 		select.setValue(MINUTE);
 		return select;
@@ -2124,57 +2124,64 @@ public class ItemFactory {
 	}
 
 	public static SelectItem newCalendarEventStatusSelector() {
-		SelectItem select = new SelectItem(originalItemName("status"), I18N.message("status"));
-
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", "");
 		map.put("1", I18N.message("working"));
 		map.put("2", I18N.message("completed"));
 		map.put("3", I18N.message("canceled"));
 
+		SelectItem select = new SelectItem(originalItemName("status"), I18N.message("status"));
 		select.setValueMap(map);
 		select.setWidth(90);
 		return select;
 	}
 
 	public static SelectItem newEmailProtocolSelector() {
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
+		map.put("pop3", "POP3");
+		map.put("imap", "IMAP");
+		map.put("imapmicrosoft365", I18N.message("imapmicrosoft365"));
+		
 		SelectItem select = new SelectItem(originalItemName("protocol"), I18N.message("protocol"));
 		select.setWidth(110);
-		select.setValueMap("pop3", "imap");
+		select.setValueMap(map);
 		return select;
 	}
 
 	public static SelectItem newEmailFolderingSelector() {
-		SelectItem select = new SelectItem(originalItemName("foldering"), I18N.message("foldering"));
-		select.setWidth(110);
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", I18N.message("none"));
 		map.put("1", I18N.message("year"));
 		map.put("2", I18N.message("month"));
 		map.put("3", I18N.message("day"));
+
+		SelectItem select = new SelectItem(originalItemName("foldering"), I18N.message("foldering"));
+		select.setWidth(110);
 		select.setValueMap(map);
 		return select;
 	}
 
 	public static SelectItem newEffectSelector(String name, String title) {
-		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
-		select.setWidth(110);
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("", "");
 		map.put("move", I18N.message("move"));
 		map.put("copy", I18N.message("copy"));
+		
+		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
+		select.setWidth(110);
 		select.setValueMap(map);
 		return select;
 	}
 
 	public static SelectItem newEmailFields(String name, String title) {
-		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
-		select.setWidth(110);
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", I18N.message("subject"));
 		map.put("1", I18N.message("sender"));
 		map.put("2", I18N.message("content"));
 		map.put("3", I18N.message("recipient"));
+		
+		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
+		select.setWidth(110);
 		select.setValueMap(map);
 		return select;
 	}

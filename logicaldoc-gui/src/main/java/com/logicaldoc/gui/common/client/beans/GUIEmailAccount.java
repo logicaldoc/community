@@ -37,6 +37,21 @@ public class GUIEmailAccount implements Serializable {
 
 	private String password;
 
+	/**
+	 * In case of OAuth authentication, this field stores the client secret
+	 */
+	private String clientSecret;
+
+	/**
+	 * In case of OAuth authentication, this field stores the client id
+	 */
+	private String clientId;
+
+	/**
+	 * In case of OAuth authentication, this field stores the tenant information
+	 */
+	private String clientTenant;
+
 	private String mailFolder;
 
 	// Comma separated list of allowed extensions
@@ -253,5 +268,29 @@ public class GUIEmailAccount implements Serializable {
 
 	public void setAutomationAfter(String automationAfter) {
 		this.automationAfter = automationAfter;
+	}
+
+	public String getClientSecret() {
+		return clientSecret;
+	}
+
+	public String getClientId() {
+		return clientId;
+	}
+
+	public void setClientSecret(String clientSecret) {
+		this.clientSecret = clientSecret;
+	}
+
+	public void setClientId(String clientId) {
+		this.clientId = clientId;
+	}
+
+	public String getClientTenant() {
+		return clientTenant;
+	}
+
+	public void setClientTenant(String clientTenant) {
+		this.clientTenant = clientTenant;
 	}
 }
