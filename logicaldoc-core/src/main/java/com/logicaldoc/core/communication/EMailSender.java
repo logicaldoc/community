@@ -2,12 +2,14 @@ package com.logicaldoc.core.communication;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -20,7 +22,6 @@ import java.util.stream.Collectors;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.URLDataSource;
-import javax.mail.Address;
 import javax.mail.Authenticator;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -43,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.automation.Automation;
+import com.logicaldoc.core.communication.oauth.Microsoft365TokenProvider;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
@@ -56,6 +58,7 @@ import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
+import com.sun.mail.smtp.SMTPTransport;
 
 import net.sf.jmimemagic.Magic;
 import net.sf.jmimemagic.MagicMatch;
@@ -82,6 +85,18 @@ public class EMailSender {
 
 	public static final int SECURITY_SSL = 3;
 
+	public static final String PROTOCOL_SMTP = "smtp";
+
+	public static final String PROTOCOL_SMTP_MICROSOFT365 = "smtpmicrosoft365";
+
+	public static final int FOLDERING_NONE = 0;
+
+	public static final int FOLDERING_YEAR = 1;
+
+	public static final int FOLDERING_MONTH = 2;
+
+	public static final int FOLDERING_DAY = 3;
+
 	private String host = "localhost";
 
 	private String sender = "logicaldoc@acme.com";
@@ -92,17 +107,26 @@ public class EMailSender {
 
 	private int port = 25;
 
+	private String protocol = PROTOCOL_SMTP;
+
+	/**
+	 * In case of OAuth authentication, this field stores the client secret
+	 */
+	private String clientSecret;
+
+	/**
+	 * In case of OAuth authentication, this field stores the client id
+	 */
+	private String clientId;
+
+	/**
+	 * In case of OAuth authentication, this field stores the tenant information
+	 */
+	private String clientTenant;
+
 	private boolean authEncrypted = false;
 
 	private int connectionSecurity = SECURITY_NONE;
-
-	public static final int FOLDERING_NONE = 0;
-
-	public static final int FOLDERING_YEAR = 1;
-
-	public static final int FOLDERING_MONTH = 2;
-
-	public static final int FOLDERING_DAY = 3;
 
 	private int foldering = FOLDERING_DAY;
 
@@ -134,6 +158,7 @@ public class EMailSender {
 		try {
 			ContextProperties config = Context.get().getProperties();
 
+			protocol = config.getProperty(tenant + ".smtp.protocol");
 			host = config.getProperty(tenant + ".smtp.host");
 			port = config.getInt(tenant + ".smtp.port");
 			username = config.getProperty(tenant + ".smtp.username");
@@ -143,6 +168,9 @@ public class EMailSender {
 			connectionSecurity = config.getInt(tenant + ".smtp.connectionSecurity");
 			folderId = config.getLong(tenant + ".smtp.save.folderId", 0);
 			foldering = config.getInt(tenant + ".smtp.save.foldering", FOLDERING_DAY);
+			clientSecret = config.getProperty(tenant + ".smtp.clientSecret");
+			clientId = config.getProperty(tenant + ".smtp.clientId");
+			clientTenant = config.getProperty(tenant + ".smtp.clientTenant");
 		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 		}
@@ -221,7 +249,7 @@ public class EMailSender {
 	 */
 	public void send(EMail email, String templateName, Map<String, Object> dictionary) throws MessagingException {
 		MessageTemplateDAO templateDao = (MessageTemplateDAO) Context.get().getBean(MessageTemplateDAO.class);
-		MessageTemplate template=null;
+		MessageTemplate template = null;
 		try {
 			template = templateDao.findByNameAndLanguage(templateName, email.getLocale().toString(),
 					email.getTenantId());
@@ -267,9 +295,9 @@ public class EMailSender {
 	public void send(EMail email) throws MessagingException {
 		cleanAuthorAddress(email);
 
-		Session sess = newMailSession();
+		Session session = newMailSession();
 
-		MimeMessage message = new MimeMessage(sess);
+		MimeMessage message = new MimeMessage(session);
 
 		// The FROM field must to be the one configured for the SMTP connection.
 		// because of errors will be returned in the case the sender is not in
@@ -334,8 +362,6 @@ public class EMailSender {
 
 		message.setContent(mpMessage);
 
-		Address[] adr = message.getAllRecipients();
-
 		MailDateFormat formatter = new MailDateFormat();
 		formatter.setTimeZone(TimeZone.getTimeZone("GMT")); // always use UTC
 															// for outgoing mail
@@ -343,9 +369,11 @@ public class EMailSender {
 		message.setHeader("Date", formatter.format(now));
 
 		if (!Context.get().getProperties().getBoolean("smtp.nosend", false)) {
-			Transport trans = buildTransport(sess);
-			trans.sendMessage(message, adr);
-			trans.close();
+			try (Transport transport = buildTransport(session);) {
+				transport.sendMessage(message, message.getAllRecipients());
+			} catch (IOException e) {
+				throw new MessagingException(e.getMessage(), e);
+			}
 
 			log.info("Sent email with subject '{}' to recipients {}", email.getSubject(),
 					email.getAllRecipientsEmails());
@@ -361,6 +389,12 @@ public class EMailSender {
 		historycizeOutgoingEmail(email, message, from);
 	}
 
+	private static String tokenForSMTP(String userName, String accessToken) {
+		final String ctrlA = Character.toString((char) 1);
+		final String coded = "user=" + userName + ctrlA + "auth=Bearer " + accessToken + ctrlA + ctrlA;
+		return Base64.getEncoder().encodeToString(coded.getBytes());
+	}
+
 	private void cleanAuthorAddress(EMail email) {
 		try {
 			TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
@@ -371,34 +405,6 @@ public class EMailSender {
 			// Nothing to do, when using outside a Spring context this code
 			// fails but this is not a problem
 		}
-	}
-
-	private Session newMailSession() {
-		Properties props = prepareMailSessionProperties();
-
-		Session sess = null;
-		try {
-			if (!StringUtils.isEmpty(username))
-				sess = Session.getInstance(props, new Authenticator() {
-					@Override
-					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(username, password);
-					}
-				});
-			else
-				sess = Session.getInstance(props);
-		} catch (SecurityException e) {
-			if (!StringUtils.isEmpty(username))
-				sess = Session.getInstance(props, new Authenticator() {
-					@Override
-					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(username, password);
-					}
-				});
-			else
-				sess = Session.getInstance(props);
-		}
-		return sess;
 	}
 
 	private Properties prepareMailSessionProperties() {
@@ -437,7 +443,59 @@ public class EMailSender {
 		props.put("mail.smtp.ssl.protocols", "TLSv1.1 TLSv1.2");
 		props.put("mail.smtp.ssl.checkserveridentity", "false");
 		props.put("mail.smtp.ssl.trust", "*");
+
+		if (protocol.contains("365")) {
+			props.clear();
+			props.put("mail.smtp.auth.xoauth2.disable", "false");
+			props.put("mail.smtp.sasl.enable", "true");
+			props.put("mail.smtp.auth.mechanisms", "XOAUTH2");
+			props.put("mail.smtp.starttls.enable", "true");
+			props.put("mail.transport.protocol", "smtp");
+			props.put("mail.smtp.host", host);
+			props.put("mail.smtp.port", port);
+		}
+
 		return props;
+	}
+
+	private Session newMailSession() {
+		Properties props = prepareMailSessionProperties();
+
+		Session sess = null;
+		if (StringUtils.isNotEmpty(username) && PROTOCOL_SMTP.equals(protocol))
+			sess = Session.getInstance(props, new Authenticator() {
+				@Override
+				protected PasswordAuthentication getPasswordAuthentication() {
+					return new PasswordAuthentication(username, password);
+				}
+			});
+		else
+			sess = Session.getInstance(props);
+
+		return sess;
+	}
+
+	private Transport buildTransport(Session session) throws MessagingException, IOException {
+		Transport transport = null;
+		if (authEncrypted)
+			transport = session.getTransport("smtps");
+		else
+			transport = session.getTransport("smtp");
+
+		if (protocol.equals(PROTOCOL_SMTP_MICROSOFT365)) {
+			String token = new Microsoft365TokenProvider(clientSecret, clientId, clientTenant).getAccessToken();
+
+			transport = session.getTransport();
+			transport.connect(host, username, null);
+			((SMTPTransport) transport).issueCommand("AUTH XOAUTH2 " + tokenForSMTP(username, token), 235);
+		} else {
+			if (StringUtils.isEmpty(username)) {
+				transport.connect(host, port, null, null);
+			} else {
+				transport.connect(host, port, username, password);
+			}
+		}
+		return transport;
 	}
 
 	private MimeBodyPart buildBodyPart(EMail email) throws MessagingException {
@@ -460,21 +518,6 @@ public class EMailSender {
 			// Nothing to do
 		}
 		return mime;
-	}
-
-	private Transport buildTransport(Session sess) throws MessagingException {
-		Transport trans = null;
-		if (authEncrypted)
-			trans = sess.getTransport("smtps");
-		else
-			trans = sess.getTransport("smtp");
-
-		if (StringUtils.isEmpty(username)) {
-			trans.connect(host, port, null, null);
-		} else {
-			trans.connect(host, port, username, password);
-		}
-		return trans;
 	}
 
 	/**
@@ -614,5 +657,37 @@ public class EMailSender {
 
 	public void setFolderId(Long folderId) {
 		this.folderId = folderId;
+	}
+
+	public String getProtocol() {
+		return protocol;
+	}
+
+	public String getClientSecret() {
+		return clientSecret;
+	}
+
+	public String getClientId() {
+		return clientId;
+	}
+
+	public String getClientTenant() {
+		return clientTenant;
+	}
+
+	public void setProtocol(String protocol) {
+		this.protocol = protocol;
+	}
+
+	public void setClientSecret(String clientSecret) {
+		this.clientSecret = clientSecret;
+	}
+
+	public void setClientId(String clientId) {
+		this.clientId = clientId;
+	}
+
+	public void setClientTenant(String clientTenant) {
+		this.clientTenant = clientTenant;
 	}
 }

@@ -2148,6 +2148,17 @@ public class ItemFactory {
 		return select;
 	}
 
+	public static SelectItem newSmtpProtocolSelector() {
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
+		map.put("smtp", "SMTP");
+		map.put("smtpmicrosoft365", I18N.message("smtpmicrosoft365"));
+		
+		SelectItem select = new SelectItem(originalItemName("protocol"), I18N.message("protocol"));
+		select.setWidth(180);
+		select.setValueMap(map);
+		return select;
+	}
+	
 	public static SelectItem newEmailFolderingSelector() {
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", I18N.message("none"));

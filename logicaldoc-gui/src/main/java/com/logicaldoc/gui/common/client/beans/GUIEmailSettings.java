@@ -20,7 +20,13 @@ public class GUIEmailSettings implements Serializable {
 
 	public static final String SECURITY_SSL = "3";
 
-	private String smtpServer;
+	public static final String PROTOCOL_SMTP = "smtp";
+
+	public static final String PROTOCOL_SMTP_MICROSOFT365 = "smtpmicrosoft365";
+
+	private String server;
+
+	private String protocol = PROTOCOL_SMTP;
 
 	private boolean secureAuth = false;
 
@@ -29,6 +35,21 @@ public class GUIEmailSettings implements Serializable {
 	private String username;
 
 	private String pwd;
+
+	/**
+	 * In case of OAuth authentication, this field stores the client secret
+	 */
+	private String clientSecret;
+
+	/**
+	 * In case of OAuth authentication, this field stores the client id
+	 */
+	private String clientId;
+
+	/**
+	 * In case of OAuth authentication, this field stores the tenant information
+	 */
+	private String clientTenant;
 
 	private String connSecurity = SECURITY_NONE;
 
@@ -40,12 +61,12 @@ public class GUIEmailSettings implements Serializable {
 
 	private GUIFolder targetFolder;
 
-	public String getSmtpServer() {
-		return smtpServer;
+	public String getServer() {
+		return server;
 	}
 
-	public void setSmtpServer(String smtpServer) {
-		this.smtpServer = smtpServer;
+	public void setServer(String server) {
+		this.server = server;
 	}
 
 	public boolean isSecureAuth() {
@@ -118,5 +139,37 @@ public class GUIEmailSettings implements Serializable {
 
 	public void setTargetFolder(GUIFolder targetFolder) {
 		this.targetFolder = targetFolder;
+	}
+
+	public String getProtocol() {
+		return protocol;
+	}
+
+	public void setProtocol(String protocol) {
+		this.protocol = protocol;
+	}
+
+	public String getClientSecret() {
+		return clientSecret;
+	}
+
+	public String getClientId() {
+		return clientId;
+	}
+
+	public String getClientTenant() {
+		return clientTenant;
+	}
+
+	public void setClientSecret(String clientSecret) {
+		this.clientSecret = clientSecret;
+	}
+
+	public void setClientId(String clientId) {
+		this.clientId = clientId;
+	}
+
+	public void setClientTenant(String clientTenant) {
+		this.clientTenant = clientTenant;
 	}
 }

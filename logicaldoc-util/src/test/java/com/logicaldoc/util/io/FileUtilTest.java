@@ -61,7 +61,7 @@ public class FileUtilTest {
 			FileUtil.writeFile(this.getClass().getResourceAsStream("/context.properties"), outFile.getPath());
 			assertTrue(outFile.length() > 0);
 			assertTrue(FileUtil.readFile(outFile).contains("store.1.dir"));
-			assertEquals(166, FileUtil.countLines(outFile));
+			assertEquals(170, FileUtil.countLines(outFile));
 		} finally {
 			FileUtil.strongDelete(outFile);
 		}
@@ -70,18 +70,20 @@ public class FileUtilTest {
 	@Test
 	public void testMerge() throws IOException {
 		File merged = new File("target/merged.txt");
+		final File file1 = new File("src/test/resources/context.properties");
+		final File file2 = new File("src/test/resources/context-override.properties");
 		try {
-			FileUtil.merge(new File("src/test/resources/context.properties"),
-					new File("src/test/resources/context-override.properties"), merged);
+			long lines1 = FileUtil.countLines(file1);
+			long lines2 = FileUtil.countLines(file2);
+			FileUtil.merge(file1, file2, merged);
 			assertTrue(merged.length() > 0);
 			assertTrue(FileUtil.readFile(merged).contains("newprop"));
-			assertEquals(167, FileUtil.countLines(merged));
+			assertEquals(lines1 + lines2 - 1, FileUtil.countLines(merged));
 		} finally {
 			FileUtil.strongDelete(merged);
 		}
 
-		final List<File> mergedFiles = List.of(new File("src/test/resources/context.properties"),
-				new File("src/test/resources/context-override.properties"), new File("src/test/resources/sql1.sql"));
+		final List<File> mergedFiles = List.of(file1, file2, new File("src/test/resources/sql1.sql"));
 		FileUtil.merge(mergedFiles, merged);
 		try {
 			assertTrue(merged.length() > 0);
@@ -187,13 +189,12 @@ public class FileUtilTest {
 			outFolder.mkdir();
 			File subfolder = new File(outFolder, "subfolder");
 			subfolder.mkdir();
-			FileUtil.copy(new File("src/test/resources/context.properties"), new File(outFolder, "context.properties"),
-					0);
-			FileUtil.copy(new File("src/test/resources/context-override.properties"),
-					new File(outFolder, "context-overide.properties"), 0);
-			FileUtil.copy(new File("src/test/resources/context-override.properties"),
-					new File(subfolder, "context-overide.properties"), 0);
-			assertEquals(4664L, FileUtil.getFolderSize(outFolder));
+			File file1 = new File("src/test/resources/context.properties");
+			FileUtil.copy(file1, new File(outFolder, "context.properties"), 0);
+			File file2 = new File("src/test/resources/context-override.properties");
+			FileUtil.copy(file2, new File(outFolder, "context-overide.properties"), 0);
+			FileUtil.copy(file2, new File(subfolder, "context-overide.properties"), 0);
+			assertEquals(file1.length() + file2.length() + file2.length(), FileUtil.getFolderSize(outFolder));
 		} finally {
 			FileUtil.strongDelete(outFolder);
 			FileUtil.deleteUsingOSCommand(outFolder);

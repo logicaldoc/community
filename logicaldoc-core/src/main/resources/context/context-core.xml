@@ -165,10 +165,14 @@
    </bean>
       
    <bean id="EMailSender" class="com.logicaldoc.core.communication.EMailSender" lazy-init="default">
+      <property name="protocol" value="${default.smtp.protocol}" />
       <property name="host" value="${default.smtp.host}" />
       <property name="port" value="${default.smtp.port}" />
       <property name="username" value="${default.smtp.username}" />
       <property name="password" value="${default.smtp.password}" />
+      <property name="clientSecret" value="${default.smtp.clientSecret}" />
+      <property name="clientId" value="${default.smtp.clientId}" />
+      <property name="clientTenant" value="${default.smtp.clientTenant}" />
       <property name="sender" value="${default.smtp.sender}" />
       <property name="authEncrypted" value="${default.smtp.authEncrypted}" />
       <property name="folderId" value="${default.smtp.save.folderId}" />

@@ -24,7 +24,7 @@ public class SettingServiceImplTest extends AbstractWebappTestCase {
 	@Test
 	public void testSaveEmailSettings() throws ServerException {
 		GUIEmailSettings emailSettings = new GUIEmailSettings();
-		emailSettings.setSmtpServer("smtp.logicalobjects.it");
+		emailSettings.setServer("smtp.logicalobjects.it");
 		emailSettings.setPort(8080);
 		emailSettings.setUsername("admin");
 		emailSettings.setPwd("pippo");

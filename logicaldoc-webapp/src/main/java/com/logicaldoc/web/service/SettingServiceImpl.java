@@ -73,6 +73,14 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 
 	private static final String SMTP_USERNAME = ".smtp.username";
 
+	private static final String SMTP_CLIENTSECRET = ".smtp.clientSecret";
+
+	private static final String SMTP_CLIENTID = ".smtp.clientId";
+
+	private static final String SMTP_CLIENTTENANT = ".smtp.clientTenant";
+
+	private static final String SMTP_PROTOCOL = ".smtp.protocol";
+
 	private static final String SMTP_PORT = ".smtp.port";
 
 	private static final String SMTP_HOST = ".smtp.host";
@@ -89,22 +97,21 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		try {
 			ContextProperties conf = Context.get().getProperties();
 
-			emailSettings.setSmtpServer(conf.getProperty(session.getTenantName() + SMTP_HOST));
-			emailSettings.setPort(Integer.parseInt(conf.getProperty(session.getTenantName() + SMTP_PORT)));
-			emailSettings.setUsername(!conf.getProperty(session.getTenantName() + SMTP_USERNAME).trim().isEmpty()
-					? conf.getProperty(session.getTenantName() + SMTP_USERNAME)
-					: "");
-			emailSettings.setPwd(!conf.getProperty(session.getTenantName() + SMTP_PASSWORD).trim().isEmpty()
-					? conf.getProperty(session.getTenantName() + SMTP_PASSWORD)
-					: "");
+			emailSettings.setProtocol(conf.getProperty(session.getTenantName() + SMTP_PROTOCOL, "smtp"));
+			emailSettings.setServer(conf.getProperty(session.getTenantName() + SMTP_HOST));
+			emailSettings.setPort(conf.getInt(session.getTenantName() + SMTP_PORT));
+			emailSettings.setUsername(conf.getProperty(session.getTenantName() + SMTP_USERNAME, "").trim());
+			emailSettings.setPwd(conf.getProperty(session.getTenantName() + SMTP_PASSWORD, "").trim());
 			emailSettings.setConnSecurity(conf.getProperty(session.getTenantName() + SMTP_CONNECTION_SECURITY));
 			emailSettings.setSecureAuth("true".equals(conf.getProperty(session.getTenantName() + SMTP_AUTH_ENCRYPTED)));
 			emailSettings.setSenderEmail(conf.getProperty(session.getTenantName() + SMTP_SENDER));
 			emailSettings.setUserAsFrom(conf.getBoolean(session.getTenantName() + SMTP_USERASFROM, true));
 			emailSettings.setFoldering(conf.getInt(session.getTenantName() + SMTP_SAVE_FOLDERING, 3));
-
 			emailSettings.setTargetFolder(new FolderServiceImpl().getFolder(session,
 					conf.getLong(session.getTenantName() + SMTP_SAVE_FOLDER_ID, 0)));
+			emailSettings.setClientSecret(conf.getProperty(session.getTenantName() + SMTP_CLIENTSECRET, "").trim());
+			emailSettings.setClientId(conf.getProperty(session.getTenantName() + SMTP_CLIENTID, "").trim());
+			emailSettings.setClientTenant(conf.getProperty(session.getTenantName() + SMTP_CLIENTTENANT, "").trim());
 
 			log.info("Email settings data loaded successfully.");
 		} catch (Exception e) {
@@ -121,7 +128,8 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		try {
 			ContextProperties conf = Context.get().getProperties();
 
-			conf.setProperty(session.getTenantName() + SMTP_HOST, settings.getSmtpServer());
+			conf.setProperty(session.getTenantName() + SMTP_PROTOCOL, settings.getProtocol());
+			conf.setProperty(session.getTenantName() + SMTP_HOST, settings.getServer());
 			conf.setProperty(session.getTenantName() + SMTP_PORT, Integer.toString(settings.getPort()));
 			conf.setProperty(session.getTenantName() + SMTP_USERNAME,
 					!settings.getUsername().trim().isEmpty() ? settings.getUsername() : "");
@@ -134,10 +142,16 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 			conf.setProperty(session.getTenantName() + SMTP_SAVE_FOLDERING, Integer.toString(settings.getFoldering()));
 			conf.setProperty(session.getTenantName() + SMTP_SAVE_FOLDER_ID,
 					settings.getTargetFolder() != null ? Long.toString(settings.getTargetFolder().getId()) : "");
+			conf.setProperty(session.getTenantName() + SMTP_CLIENTID,
+					StringUtils.defaultString(settings.getClientId()));
+			conf.setProperty(session.getTenantName() + SMTP_CLIENTSECRET,
+					StringUtils.defaultString(settings.getClientSecret()));
+			conf.setProperty(session.getTenantName() + SMTP_CLIENTTENANT,
+					StringUtils.defaultString(settings.getClientTenant()));
 
 			conf.write();
 
-			// Always update the settings for the default sencer
+			// Always update the settings for the default sender
 			EMailSender sender = (EMailSender) Context.get().getBean(EMailSender.class);
 			sender.setHost(conf.getProperty(Tenant.DEFAULT_NAME + SMTP_HOST));
 			sender.setPort(Integer.parseInt(conf.getProperty(Tenant.DEFAULT_NAME + SMTP_PORT)));
@@ -381,7 +395,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		/*
 		 * Now go into the DB
 		 */
-		
+
 		try {
 			GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 			List<Generic> generics = gDao.findByTypeAndSubtype(GUISETTING, null, null, session.getTenantId());
@@ -390,7 +404,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
 		}
-		
+
 		return params;
 	}
 
