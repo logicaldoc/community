@@ -142,8 +142,8 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		clientSecret.addChangedHandler(changedHandler);
 		clientSecret.setVisibleWhen(new AdvancedCriteria("protocol", OperatorId.CONTAINS, "365"));
 
-		form.setItems(mailaddress, protocol, ssl, server, port, username, password, clientId, clientSecret,
-				clientTenant, targetSelector, foldering, language, fakeUsername, fakeUsernameAgain, hiddenPassword,
+		form.setItems(mailaddress, protocol, ssl, server, port, username, password, clientId, clientTenant,
+				clientSecret, targetSelector, foldering, language, fakeUsername, fakeUsernameAgain, hiddenPassword,
 				hiddenClientSecret);
 
 		formsContainer.addMember(form);

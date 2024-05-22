@@ -2143,7 +2143,7 @@ public class ItemFactory {
 		map.put("imapmicrosoft365", I18N.message("imapmicrosoft365"));
 		
 		SelectItem select = new SelectItem(originalItemName("protocol"), I18N.message("protocol"));
-		select.setWidth(110);
+		select.setWidth(180);
 		select.setValueMap(map);
 		return select;
 	}

@@ -202,7 +202,7 @@ public class XMLConverter extends AbstractFormatConverter {
 		String rootElmentName = domDocument.getRootElement().getName();
 		String style = getStyleByRootElement(rootElmentName);
 		if (StringUtils.isNotEmpty(style)) {
-			log.debug("Force the stylesheed {} for converting xml file {}", style, document.getFileName());
+			log.debug("Force the stylesheet {} for converting xml file {}", style, document.getFileName());
 			try {
 				FileUtils.copyURLToFile(new URL(style), xslt);
 				xsltOutFormat = "html";
