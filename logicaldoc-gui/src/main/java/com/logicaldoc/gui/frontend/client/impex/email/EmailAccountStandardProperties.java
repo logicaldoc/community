@@ -25,7 +25,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @since 6.0
  */
 public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
-	private static final String NODISPLAY = "nodisplay";
 
 	private static final String USERNAME = "username";
 
