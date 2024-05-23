@@ -1594,18 +1594,32 @@ public class ItemFactory {
 		edit.setWidth(16);
 		edit.setHeight(16);
 		edit.setSrc("[SKIN]/edit.png");
-		edit.setPrompt(I18N.message("changepassword"));
+		edit.setPrompt(I18N.message("edit"));
 		edit.addFormItemClickHandler(event -> {
-			PasswordItem password = newPasswordItem("psw", title, null);
+			PasswordItem password = newPasswordItem("psw", title,
+					hiddenPasswordItem.getValue() != null ? hiddenPasswordItem.getValue().toString() : null);
 			password.setAutoCompleteKeywords("new-password");
 			password.setShowTitle(false);
-			LD.askForValue(title, "password", null, password, (String val) -> {
+			LD.askForValue(title, "password", null, password, val -> {
 				item.setValue("*****");
 				hiddenPasswordItem.setValue(val);
 				if (changedHandler != null)
 					changedHandler.onChanged(null);
 			});
 		});
+
+//		FormItemIcon showPassword = new FormItemIcon();
+//		showPassword.setName("showpassword");
+//		showPassword.setWidth(16);
+//		showPassword.setHeight(16);
+//		showPassword.setSrc("[SKIN]/eye.png");
+//		showPassword.setPrompt(I18N.message("showpassword"));
+//		showPassword.addFormItemClickHandler(event -> {
+//			if ("*****".equals(item.getValue()))
+//				item.setValue(hiddenPasswordItem.getValue());
+//			else
+//				item.setValue(hiddenPasswordItem.getValue() != null ? "*****" : "");
+//		});
 
 		item.setIcons(edit, clear);
 		item.setIconVAlign(VerticalAlignment.CENTER);
@@ -1971,7 +1985,7 @@ public class ItemFactory {
 		map.put(MINUTE, I18N.message("minutes"));
 		map.put("hour", I18N.message("hours"));
 		map.put("day", I18N.message("ddays"));
-		
+
 		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
 		select.setWidth(90);
 		select.setShowTitle(false);
@@ -2141,7 +2155,7 @@ public class ItemFactory {
 		map.put("pop3", "POP3");
 		map.put("imap", "IMAP");
 		map.put("imapmicrosoft365", I18N.message("imapmicrosoft365"));
-		
+
 		SelectItem select = new SelectItem(originalItemName("protocol"), I18N.message("protocol"));
 		select.setWidth(180);
 		select.setValueMap(map);
@@ -2152,13 +2166,13 @@ public class ItemFactory {
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("smtp", "SMTP");
 		map.put("smtpmicrosoft365", I18N.message("smtpmicrosoft365"));
-		
+
 		SelectItem select = new SelectItem(originalItemName("protocol"), I18N.message("protocol"));
 		select.setWidth(180);
 		select.setValueMap(map);
 		return select;
 	}
-	
+
 	public static SelectItem newEmailFolderingSelector() {
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("0", I18N.message("none"));
@@ -2177,7 +2191,7 @@ public class ItemFactory {
 		map.put("", "");
 		map.put("move", I18N.message("move"));
 		map.put("copy", I18N.message("copy"));
-		
+
 		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
 		select.setWidth(110);
 		select.setValueMap(map);
@@ -2190,7 +2204,7 @@ public class ItemFactory {
 		map.put("1", I18N.message("sender"));
 		map.put("2", I18N.message("content"));
 		map.put("3", I18N.message("recipient"));
-		
+
 		SelectItem select = new SelectItem(originalItemName(name), I18N.message(title));
 		select.setWidth(110);
 		select.setValueMap(map);

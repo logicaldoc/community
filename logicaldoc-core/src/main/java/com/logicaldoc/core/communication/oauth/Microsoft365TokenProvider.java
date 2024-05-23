@@ -83,8 +83,8 @@ public class Microsoft365TokenProvider implements TokenProvider {
 					throw new IOException(
 							responseObj.get("error").asText() + " - " + responseObj.get("error_description").asText());
 
-				System.out.println("got access_token: "
-						+ new String(new Base64().decode(responseObj.get("access_token").asText().getBytes())));
+				String token = new String(new Base64().decode(responseObj.get("access_token").asText().getBytes()));
+				log.debug("got access_token: {}", token);
 
 				return responseObj.get("access_token").asText();
 			}

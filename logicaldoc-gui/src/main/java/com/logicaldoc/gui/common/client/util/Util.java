@@ -467,7 +467,7 @@ public abstract class Util {
 		writeToClipboard(text);
 		GuiLog.info(I18N.message("texthascopied"));
 	}
-
+	
 	/**
 	 * Writes a text into the client's clipboard
 	 * 

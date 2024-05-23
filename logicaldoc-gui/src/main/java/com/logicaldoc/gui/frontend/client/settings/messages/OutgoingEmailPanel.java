@@ -21,8 +21,8 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
-import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.tab.Tab;
@@ -76,12 +76,6 @@ public class OutgoingEmailPanel extends AdminPanel {
 				this.emailSettings.getUsername());
 		username.setWidth(350);
 		username.setWrapTitle(false);
-
-		// Password
-		PasswordItem password = ItemFactory.newPasswordItemPreventAutocomplete(PASSWORD, PASSWORD,
-				this.emailSettings.getPwd());
-		password.setWrapTitle(false);
-		password.setWidth(350);
 
 		SelectItem protocol = ItemFactory.newSmtpProtocolSelector();
 		protocol.setRequired(true);
@@ -157,22 +151,22 @@ public class OutgoingEmailPanel extends AdminPanel {
 		 */
 		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", this.emailSettings.getUsername());
 		fakeUsername.setHidden(true);
-		PasswordItem fakePassword = ItemFactory.newPasswordItem("password_fake", "password_fake",
-				this.emailSettings.getPwd());
-		fakePassword.setHidden(true);
-		PasswordItem fakeClientSecret = ItemFactory.newPasswordItem("clientsecret_fake", "clientsecret_fake",
+		TextItem hiddenPassword = ItemFactory.newTextItem("password_hidden", this.emailSettings.getPwd());
+		hiddenPassword.setHidden(true);
+		TextItem hiddenClientSecret = ItemFactory.newTextItem("clientsecret_hidden",
 				this.emailSettings.getClientSecret());
-		fakeClientSecret.setHidden(true);
+		hiddenClientSecret.setHidden(true);
 
-		PasswordItem clientSecret = ItemFactory.newPasswordItemPreventAutocomplete("clientsecret",
-				I18N.message("clientsecret"), this.emailSettings.getClientSecret());
-		clientSecret.setWidth(350);
-		clientSecret.setWrapTitle(false);
+		FormItem password = ItemFactory.newSafePasswordItem("password", I18N.message("password"),
+				this.emailSettings.getPwd(), hiddenPassword, null);
+
+		FormItem clientSecret = ItemFactory.newSafePasswordItem("clientsecret", I18N.message("clientsecret"),
+				this.emailSettings.getClientSecret(), hiddenClientSecret, null);
 		clientSecret.setVisibleWhen(new AdvancedCriteria("protocol", OperatorId.CONTAINS, "365"));
 
 		emailForm.setItems(protocol, server, port, connSecurity, secureAuth, username, password, clientId, clientTenant,
 				clientSecret, senderEmail, userAsSender, targetSelector, foldering, save, test, fakeUsername,
-				fakePassword, fakeClientSecret);
+				hiddenPassword, hiddenClientSecret);
 		body.setMembers(emailForm);
 
 		tabs.addTab(templates);
@@ -227,7 +221,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 				OutgoingEmailPanel.this.emailSettings.setPort(Integer.parseInt(values.get("port").toString()));
 
 			OutgoingEmailPanel.this.emailSettings.setUsername((String) values.get(USERNAME));
-			OutgoingEmailPanel.this.emailSettings.setPwd((String) values.get(PASSWORD));
+			OutgoingEmailPanel.this.emailSettings.setPwd((String) values.get("password_hidden"));
 			OutgoingEmailPanel.this.emailSettings.setConnSecurity((String) values.get("connSecurity"));
 			OutgoingEmailPanel.this.emailSettings.setSecureAuth(values.get("secureAuth").toString().equals("true"));
 			OutgoingEmailPanel.this.emailSettings.setSenderEmail((String) values.get(SENDEREMAIL));
