@@ -20,6 +20,9 @@ import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSAccessControlEntry;
 import com.logicaldoc.webservice.model.WSFolder;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+
 @Consumes({ MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public interface FolderService {
@@ -111,6 +114,17 @@ public interface FolderService {
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public List<WSFolder> listChildren(@QueryParam("folderId")
 	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+
+	@GET
+	@Path("/list")
+	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+	@Operation(summary = "Lists the sub-folders", description = "Returns the list of child folders. Example: curl -u admin:admin -H ''Accept: application/json'' http://localhost:8080/services/rest/folder/list?folderId=4")
+	public List<WSFolder> list(@Parameter(description = "The ID of the parent folder", required = true)
+	@QueryParam("folderId")
+	long folderId, @QueryParam("sort")
+	String sort, @QueryParam("page")
+	Integer page, @QueryParam("max")
+	Integer max) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	@GET
 	@Path("/getPath")
@@ -308,7 +322,6 @@ public interface FolderService {
 	String securityOption)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
-	
 	/**
 	 * Sets the Access Control List
 	 * 
@@ -323,9 +336,10 @@ public interface FolderService {
 	 */
 	@PUT
 	@Path("/setAccessControlList")
-	public void setAccessControlList(@QueryParam("folderId") long folderId, List<WSAccessControlEntry> acl)
+	public void setAccessControlList(@QueryParam("folderId")
+	long folderId, List<WSAccessControlEntry> acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException;
-	
+
 	/**
 	 * Retrieves the access control list
 	 * 
@@ -340,6 +354,6 @@ public interface FolderService {
 	 */
 	@GET
 	@Path("/getAccessControlList")
-	public List<WSAccessControlEntry> getAccessControlList(@QueryParam("folderId") long folderId) 
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
+	public List<WSAccessControlEntry> getAccessControlList(@QueryParam("folderId")
+	long folderId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 }

@@ -98,7 +98,7 @@ public class RestWorkbench {
 
 		// Note: 04L is the id of the default workspace
 
-		listDocuments(04L);
+		listDocuments(04L, null);
 		// listDocuments(04L, "InvoiceProcessing01-workflow*.png"); // 4
 		// documents
 		// listDocuments(04L, "InvoiceProcessing01-workflow.png"); // 1 document
@@ -548,8 +548,9 @@ public class RestWorkbench {
 		System.out.println(jsonStr);
 	}
 
-	private static void listDocuments(long folderId) throws Exception {
-		List<WSDocument> docs = docClient.list(folderId);
+	private static void listPaginated(long folderId, String fileName, String sort, Integer page, Integer max)
+			throws Exception {
+		List<WSDocument> docs = docClient.listPaginated(folderId, fileName, sort, page, max);
 		System.out.println("docs: " + docs);
 		System.out.println("docs.length: " + docs.size());
 

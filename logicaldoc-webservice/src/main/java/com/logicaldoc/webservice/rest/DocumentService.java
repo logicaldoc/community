@@ -222,6 +222,33 @@ public interface DocumentService {
 	@Produces({ MediaType.APPLICATION_JSON })
 	List<WSDocument> list(@QueryParam("folderId")
 	long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	
+	/**
+	 * Gets the documents in a specific folder
+	 * 
+	 * @param folderId The folder id
+	 * @param fileName Optional file name filter
+	 * @param sort Optional sort criteria
+	 * @param page Optional page number
+	 * @param max Optional maximum number of elements per page
+	 * 
+	 * @return Collection of documents
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
+	 */
+	@GET
+	@Path("/listPaginated")
+	@Produces({ MediaType.APPLICATION_JSON })
+	List<WSDocument> listPaginated(@QueryParam("folderId")
+	long folderId, @QueryParam("fileName")
+	String fileName, @QueryParam("sort")
+	String sort, @QueryParam("page")
+	Integer page, @QueryParam("max")
+	Integer max) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Lists the documents in a folder
@@ -1022,7 +1049,8 @@ public interface DocumentService {
 	 */
 	@PUT
 	@Path("/setAccessControlList")
-	public void setAccessControlList(@QueryParam("docId") long docId, List<WSAccessControlEntry> acl)
+	public void setAccessControlList(@QueryParam("docId")
+	long docId, List<WSAccessControlEntry> acl)
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException;
 
 	/**
@@ -1039,8 +1067,8 @@ public interface DocumentService {
 	 */
 	@GET
 	@Path("/getAccessControlList")
-	public List<WSAccessControlEntry> getAccessControlList(@QueryParam("docId") long docId) 
-			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
+	public List<WSAccessControlEntry> getAccessControlList(@QueryParam("docId")
+	long docId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Tests if a document is readable.

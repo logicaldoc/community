@@ -84,6 +84,17 @@ public class SoapFolderClient extends SoapClient<FolderService> implements Folde
 		else
 			return new ArrayList<>();
 	}
+	
+	
+	@Override
+	public List<WSFolder> list(String sid, long folderId, String sort, Integer page, Integer max)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+		final List<WSFolder> folders = client.list(sid, folderId, sort, page, max);
+		if (folders != null)
+			return folders;
+		else
+			return new ArrayList<>();
+	}
 
 	@Override
 	public WSFolder getRootFolder(String sid)

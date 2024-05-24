@@ -322,6 +322,38 @@ public interface FolderService {
 	long folderId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
+	 * Lists all direct folders of a parent folder.<br>
+	 * Attention: readable sub-folders only are returned.
+	 * 
+	 * @param sid identifier of th session
+	 * @param folderId identifier of the folder
+	 * @param sort Optional sort criteria (eg creation asc)
+	 * @param page Optional page number
+	 * @param max Optional maximum number of elements per page
+	 * 
+	 * @return List of folders contained in the folder
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
+	 */
+	@WebMethod(action = "listChildren")
+	@WebResult(name = "folder")
+	@WSDoc(description = "lists all direct children of a parent folder: readable sub-folders only are returned")
+	public List<WSFolder> list(@WSDoc(description = "identifier of the session", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "folderId")
+	long folderId, @WSDoc(description = "Optional sort criteria (eg creation asc)")
+	@WebParam(name = "sort")
+	String sort, @WSDoc(description = "Optional page number")
+	@WebParam(name = "page")
+	Integer page, @WSDoc(description = "Optional maximum number of elements per page")
+	@WebParam(name = "max")
+	Integer max) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
+
+	/**
 	 * Tests if a folder is readable.
 	 * 
 	 * @param sid Session identifier

@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.activation.DataHandler;
 import javax.mail.MessagingException;
@@ -26,6 +27,7 @@ import com.logicaldoc.core.communication.Recipient;
 import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentComparator;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
@@ -588,31 +590,52 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	@Override
 	public List<WSDocument> listDocuments(String sid, long folderId, String fileName)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+		return list(sid, folderId, fileName, "fileName asc", null, null);
+	}
+
+	@Override
+	public List<WSDocument> list(String sid, long folderId, String fileName, String sort, Integer page, Integer max)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 		checkFolderPermission(Permission.READ, user, folderId);
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+
+		// Get the documents in folder sorted by file name
 		List<Document> docs = docDao.findByFolder(folderId, null);
-		if (docs.size() > 1)
-			Collections.sort(docs, (doc1, doc2) -> doc1.getFileName().compareTo(doc2.getFileName()));
+		
+		// Sort based on the given criteria
+		if (StringUtils.isNotEmpty(sort))
+			Collections.sort(docs, DocumentComparator.getComparator(sort));
+
+		// Retain just those files accessible by the user that also matches the
+		// file name
+		docs = docs.stream().filter(doc -> mustList(doc, user, fileName)).collect(Collectors.toList());
+
+		// In case of pagination, extract just the wanted page
+		if (max != null && page != null && max < docs.size())
+			docs = docs.stream().skip((page - 1) * max).limit(max).collect(Collectors.toList());
 
 		List<WSDocument> wsDocs = new ArrayList<>();
 		for (Document doc : docs) {
-			try {
-				checkPublished(user, doc);
-				checkNotArchived(doc);
-
-				if (fileName != null && !FileUtil.matches(doc.getFileName(), List.of(fileName), null))
-					throw new ParseException("no match");
-			} catch (Exception t) {
-				continue;
-			}
-
 			docDao.initialize(doc);
 			wsDocs.add(WSUtil.toWSDocument(doc));
 		}
 
 		return wsDocs;
+	}
+
+	private boolean mustList(Document document, User user, String fileName) {
+		try {
+			checkPublished(user, document);
+			checkNotArchived(document);
+
+			if (fileName != null && !FileUtil.matches(document.getFileName(), List.of(fileName), null))
+				throw new ParseException("no match");
+			return true;
+		} catch (Exception t) {
+			return false;
+		}
 	}
 
 	@Override

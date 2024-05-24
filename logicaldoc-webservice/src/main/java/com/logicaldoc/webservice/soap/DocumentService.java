@@ -747,6 +747,37 @@ public interface DocumentService {
 	String fileName) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
+	 * Gets the documents in a specific folder
+	 * 
+	 * @param sid identifier of the session
+	 * @param folderId The folder id
+	 * @param fileName Optional file name filter
+	 * @param sort Optional sort criteria (eg date asc)
+	 * @param page Optional page number
+	 * @param max Optional maximum number of elements per page
+	 * 
+	 * @return Collection of documents
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
+	 */
+	@WebMethod(action = "list")
+	@WebResult(name = "document")
+	@WSDoc(description = "gets the documents in a specific folder")
+	public List<WSDocument> list(@WSDoc(description = "identifier of the session", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "folderId")
+	long folderId, @WSDoc(description = "file name filter", required = false)
+	@WebParam(name = "fileName")
+	String fileName, @WSDoc(description = "Optional sort criteria (eg date asc)")@WebParam(name = "sort")
+	String sort, @WSDoc(description = "Optional page number")@WebParam(name = "page")
+	Integer page, @WSDoc(description = "Optional maximum number of elements per page")@WebParam(name = "max")
+	Integer max) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
+
+	/**
 	 * Lists of last modified documents of the current session.
 	 * 
 	 * @param sid identifier of the session

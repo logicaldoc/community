@@ -82,11 +82,19 @@ public class RestDocumentClient extends AbstractRestClient {
 
 		return proxy.create(document, fileAttachment);
 	}
-
+	
 	public List<WSDocument> list(long folderId)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type("*/*");
 		return proxy.list(folderId);
+	}
+
+	public List<WSDocument> listPaginated(long folderId, String fileName, String sort, Integer page, Integer max)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+		WebClient.client(proxy).type("*/*");
+		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+
+		return proxy.listPaginated(folderId, fileName, sort, page, max);
 	}
 
 	public List<WSDocument> listDocuments(long folderId, String fileName)

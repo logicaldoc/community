@@ -199,6 +199,21 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 		String sid = validateSessionREST();
 		return super.listChildren(sid, folderId);
 	}
+	
+	@Override
+	@GET
+	@Path("/list")
+	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+	@Operation(summary = "Lists the sub-folders", description = "Returns the list of child folders. Example: curl -u admin:admin -H ''Accept: application/json'' http://localhost:8080/services/rest/folder/list?folderId=4")
+	public List<WSFolder> list(@Parameter(description = "The ID of the parent folder", required = true)
+	@QueryParam("folderId")
+	long folderId, @QueryParam("sort")
+	String sort, @QueryParam("page")
+	Integer page, @QueryParam("max")
+	Integer max) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+		String sid = validateSessionREST();
+		return super.list(sid, folderId, sort, page, max);
+	}
 
 	@Override
 	@GET

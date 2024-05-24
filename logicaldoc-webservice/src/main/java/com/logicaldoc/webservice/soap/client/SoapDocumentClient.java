@@ -233,6 +233,16 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
+	public List<WSDocument> list(String sid, long folderId, String fileName, String sort, Integer page, Integer max)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+		final List<WSDocument> documents = client.list(sid, folderId, fileName, sort, page, max);
+		if (documents != null)
+			return documents;
+		else
+			return new ArrayList<>();
+	}
+
+	@Override
 	public List<WSDocument> getAliases(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		final List<WSDocument> documents = client.getAliases(sid, docId);
@@ -395,7 +405,7 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 
 	@Override
 	public List<WSDocument> getVersions(String sid, long docId) throws AuthenticationException, PermissionException,
-			WebserviceException, PersistenceException, UnexistingResourceException { 
+			WebserviceException, PersistenceException, UnexistingResourceException {
 		final List<WSDocument> versions = client.getVersions(sid, docId);
 		if (versions != null)
 			return versions;

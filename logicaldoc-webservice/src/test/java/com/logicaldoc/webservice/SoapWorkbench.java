@@ -1,6 +1,5 @@
 package com.logicaldoc.webservice;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,7 +27,7 @@ import com.logicaldoc.webservice.soap.client.SoapTagClient;
 
 public class SoapWorkbench {
 
-	final static String BASE = "http://localhost:1000/services";
+	final static String BASE = "http://localhost:9080/services";
 
 	public static void main(String[] args) throws Exception {
 
@@ -56,12 +55,12 @@ public class SoapWorkbench {
 
 //		    securityStuff(sid);
 
-			documentStuff(sid);
+//			documentStuff(sid);
 
 			// This will search by filename using LIKE %filename%
 			// searchByFilename(sid, "simply");
 
-//			 folderStuff(sid);
+			 folderStuff(sid);
 
 			// searchStuff(sid);
 
@@ -153,6 +152,11 @@ public class SoapWorkbench {
 	private static void folderStuff(String sid) throws Exception {
 		SoapFolderClient folderClient = new SoapFolderClient(BASE + "/Folder", 1, false, 50);
 
+		List<WSFolder> folders = folderClient.list(sid, 4L, "creation asc", 18, 3);
+		for (WSFolder folder : folders) {
+			System.out.println(folder.getName() + "\t" + folder.getCreation());
+		}
+		
 //		folderClient.getDefaultWorkspace(sid);
 
 //		WSFolder newFolder = new WSFolder();
@@ -519,14 +523,18 @@ public class SoapWorkbench {
 
 		SoapDocumentClient documentClient = new SoapDocumentClient(BASE + "/Document");
 
-		WSDocument doc = documentClient.getDocument(sid, 723741317L);
+		List<WSDocument> documents = documentClient.list(sid, 4L, null, "date desc", 56, 3);
+		for (WSDocument doc : documents) {
+			System.out.println(doc.getFileName() + "\t" + doc.getDate());
+		}
 
-		doc.setId(0);
-		doc.setCustomId(null);
-		doc.setFileName("test2.pdf");
-		documentClient.create(sid, doc, new File("C:\\Users\\marco\\Documents\\FAX AIMAG.pdf"));
-
-		System.out.println(doc);
+//		WSDocument doc = documentClient.getDocument(sid, 723741317L);
+//
+//		doc.setId(0);
+//		doc.setCustomId(null);
+//		doc.setFileName("test2.pdf");
+//		documentClient.create(sid, doc, new File("C:\\Users\\marco\\Documents\\FAX AIMAG.pdf"));
+//		System.out.println(doc);
 
 //		documentClient.move(sid, 723734049L, 253984768L);
 

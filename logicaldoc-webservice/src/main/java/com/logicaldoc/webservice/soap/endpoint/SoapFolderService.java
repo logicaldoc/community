@@ -1,17 +1,21 @@
 package com.logicaldoc.webservice.soap.endpoint;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.folder.Folder;
+import com.logicaldoc.core.folder.FolderComparator;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderEvent;
 import com.logicaldoc.core.folder.FolderHistory;
@@ -191,14 +195,24 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	}
 
 	@Override
-	public List<WSFolder> listChildren(String sid, long folderId)
+	public List<WSFolder> list(String sid, long folderId, String sort, Integer page, Integer max)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-
 		User user = validateSession(sid);
 		checkFolderPermission(Permission.READ, user, folderId);
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+
+		// Get the folders
 		List<Folder> folders = folderDao.findChildren(folderId, user.getId());
+
+		// Sort based on the given criteria
+		if (StringUtils.isNotEmpty(sort))
+			Collections.sort(folders, FolderComparator.getComparator(sort));
+
+		// In case of pagination, extract just the wanted page
+		if (max != null && page != null && max < folders.size())
+			folders = folders.stream().skip((page - 1) * max).limit(max).collect(Collectors.toList());
+
 		List<WSFolder> wsFolders = new ArrayList<>();
 		for (Folder folder : folders) {
 			if (folder.getHidden() == 0) {
@@ -208,6 +222,12 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		}
 
 		return wsFolders;
+	}
+
+	@Override
+	public List<WSFolder> listChildren(String sid, long folderId)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+		return list(sid, folderId, "name asc", null, null);
 	}
 
 	@Override

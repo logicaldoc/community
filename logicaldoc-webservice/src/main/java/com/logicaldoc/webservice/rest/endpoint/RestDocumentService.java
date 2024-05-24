@@ -328,6 +328,37 @@ public class RestDocumentService extends SoapDocumentService implements Document
 		String sid = validateSessionREST();
 		return super.listDocuments(sid, folderId, null);
 	}
+	
+	/**
+	 * Gets the documents in a specific folder
+	 * 
+	 * @param folderId The folder id
+	 * @param fileName Optional file name filter
+	 * @param sort Optional sort criteria
+	 * @param page Optional page number
+	 * @param max Optional maximum number of elements per page
+	 * 
+	 * @return Collection of documents
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
+	 */
+	@Override
+	@GET
+	@Path("/listPaginated")
+	@Produces({ MediaType.APPLICATION_JSON })
+	public List<WSDocument> listPaginated(@QueryParam("folderId")
+	long folderId, @QueryParam("fileName")
+	String fileName, @QueryParam("sort")
+	String sort, @QueryParam("page")
+	Integer page, @QueryParam("max")
+	Integer max) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
+		String sid = validateSessionREST();
+		return super.list(sid, folderId, fileName, sort, page, max);
+	}
 
 	@Override
 	@GET
