@@ -94,7 +94,7 @@ public class Frontend implements EntryPoint {
 			}
 
 			@Override
-			public void onSuccess(final GUIInfo info) {
+			public void onSuccess(GUIInfo info) {
 				CookiesManager.saveRelease(info);
 
 				init(info);

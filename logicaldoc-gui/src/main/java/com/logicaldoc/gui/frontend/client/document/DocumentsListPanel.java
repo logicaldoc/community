@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.document;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
@@ -100,10 +101,21 @@ public class DocumentsListPanel extends VLayout {
 
 		registerSelectionHandler();
 
-		documentsGrid.registerCellContextClickHandler(event -> {
-			new ContextMenu(FolderController.get().getCurrentFolder(), documentsGrid).showContextMenu();
-			if (event != null)
-				event.cancel();
+		documentsGrid.registerCellContextClickHandler(click -> {
+			DocumentService.Instance.get().getAllowedPermissions(documentsGrid.getSelectedIds(), new AsyncCallback<>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(GUIAccessControlEntry enabledPermissions) {
+					new ContextMenu(FolderController.get().getCurrentFolder(), documentsGrid, enabledPermissions).showContextMenu();
+				}
+			});
+			if (click != null)
+				click.cancel();
 		});
 	}
 

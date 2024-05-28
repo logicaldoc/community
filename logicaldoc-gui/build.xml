@@ -82,8 +82,7 @@
 		</replace>
 		<exec executable="mvn.cmd" resolveexecutable="true"
 			searchpath="true">
-			<arg
-				line="-o -Dgwt.compiler.force=true -Dgwt.module=com.logicaldoc.gui.frontend.Frontend gwt:compile" />
+			<arg line="-o gwt:compile@frontend" />
 		</exec>
 		<antcall target="deploy-resources" />
 		<replace dir=".">
@@ -101,8 +100,7 @@
 		</replace>
 		<exec executable="mvn.cmd" resolveexecutable="true"
 			searchpath="true">
-			<arg
-				line="-o -Dgwt.compiler.force=true -Dgwt.module=com.logicaldoc.gui.login.Login gwt:compile" />
+			<arg line="-o gwt:compile@login" />
 		</exec>
 		<antcall target="deploy-resources" />
 		<replace dir=".">
@@ -120,8 +118,7 @@
 		</replace>
 		<exec executable="mvn.cmd" resolveexecutable="true"
 			searchpath="true">
-			<arg
-				line="-o -Dgwt.compiler.force=true -Dgwt.module=com.logicaldoc.gui.setup.Setup gwt:compile" />
+			<arg line="-o gwt:compile@setup" />
 		</exec>
 		<antcall target="deploy-resources" />
 		<replace dir=".">

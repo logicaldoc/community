@@ -15,13 +15,17 @@
 		<gwt.output.directory>./war</gwt.output.directory>
 	</properties>
 	<dependencies>
+        <dependency>
+          <groupId>org.gwtproject</groupId>
+          <artifactId>gwt-dev</artifactId>
+        </dependency>                
 		<dependency>
-			<groupId>com.google.gwt</groupId>
+			<groupId>org.gwtproject</groupId>
 			<artifactId>gwt-servlet</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.google.gwt</groupId>
+			<groupId>org.gwtproject</groupId>
 			<artifactId>gwt-user</artifactId>
 			<scope>provided</scope>
 		</dependency>
@@ -71,9 +75,6 @@
 			<version>1.0.3</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- dependency> <groupId>com.sksamuel.gwt</groupId>
-		<artifactId>gwt-websockets</artifactId> 
-			<version>1.0.4</version> <scope>compile</scope> </dependency -->
 		<dependency>
 			<groupId>org.realityforge.gwt.websockets</groupId>
 			<artifactId>gwt-websockets</artifactId>
@@ -81,9 +82,13 @@
 			<scope>compile</scope>
 			<exclusions>
 				<exclusion>
-					<groupId>com.google.gwt</groupId>
+					<groupId>org.gwtproject</groupId>
 					<artifactId>gwt-dev</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>com.google.gwt</groupId>
+					<artifactId>gwt-dev</artifactId>
+				</exclusion>				
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -149,7 +154,7 @@
 					<target>11</target>					
                 </configuration>
             </plugin>
-			<plugin>
+			<!--plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>gwt-maven-plugin</artifactId>
 				<version>${gwt.version}</version>
@@ -171,7 +176,43 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin -->
+            <plugin>
+              <groupId>net.ltgt.gwt.maven</groupId>
+              <artifactId>gwt-maven-plugin</artifactId>
+              <executions>
+                 <execution>
+                   <id>frontend</id>
+                   <phase>compile</phase>
+                   <goals>
+                     <goal>compile</goal>
+                   </goals>                   
+                   <configuration>
+                     <moduleName>com.logicaldoc.gui.frontend.Frontend</moduleName>
+                   </configuration>
+                 </execution>
+                 <execution>
+                   <id>login</id>
+                   <phase>compile</phase>
+                   <goals>
+                     <goal>compile</goal>
+                   </goals>
+                   <configuration>
+                     <moduleName>com.logicaldoc.gui.login.Login</moduleName>
+                   </configuration>
+                 </execution>
+                 <execution>
+                   <id>setup</id>
+                   <phase>compile</phase>
+                   <goals>
+                     <goal>compile</goal>
+                   </goals>                   
+                   <configuration>
+                     <moduleName>com.logicaldoc.gui.setup.Setup</moduleName>
+                   </configuration>
+                 </execution>                                  
+              </executions>
+            </plugin>            
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>

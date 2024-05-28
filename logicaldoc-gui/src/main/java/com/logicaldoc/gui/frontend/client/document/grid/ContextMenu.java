@@ -140,23 +140,10 @@ public class ContextMenu extends Menu {
 
 	private Menu moreMenu;
 
-	public ContextMenu(GUIFolder folder, DocumentsGrid docsGrid) {
+	public ContextMenu(GUIFolder folder, DocumentsGrid docsGrid, GUIAccessControlEntry acl) {
 		this.grid = docsGrid;
 		final List<GUIDocument> selection = grid.getSelectedDocuments();
-		List<Long> selectionIds = grid.getSelectedIds();
-
-		DocumentService.Instance.get().getAllowedPermissions(selectionIds, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
-			@Override
-			public void onSuccess(GUIAccessControlEntry enabledPermissions) {
-				fillContextMenu(folder, selection, enabledPermissions);
-			}
-		});
+		fillContextMenu(folder, selection, acl);
 	}
 
 	protected void fillContextMenu(GUIFolder folder, final List<GUIDocument> selection,
@@ -220,15 +207,13 @@ public class ContextMenu extends Menu {
 		office.addClickHandler(event -> Util.openEditWithOffice(selection.get(0).getId()));
 
 		sendToExpArchive = new MenuItem(I18N.message("sendtoexparchive"));
-		sendToExpArchive
-				.addClickHandler(event -> new SendToArchiveDialog(getSelectionIds(selection), true).show());
+		sendToExpArchive.addClickHandler(event -> new SendToArchiveDialog(getSelectionIds(selection), true).show());
 
 		workflow = new MenuItem(I18N.message("startworkflow"));
 		workflow.addClickHandler(event -> new StartWorkflowDialog(getSelectionIds(selection)).show());
 
 		automation = new MenuItem(I18N.message("executeautomation"));
-		automation.addClickHandler(
-				event -> new AutomationDialog(folder.getId(), getSelectionIds(selection)).show());
+		automation.addClickHandler(event -> new AutomationDialog(folder.getId(), getSelectionIds(selection)).show());
 
 		preview = preparePreview();
 
@@ -299,7 +284,7 @@ public class ContextMenu extends Menu {
 		applySecurityPolicies(enabledPermissions, selection, someSelection, moreSelected, justOneSelected,
 				immutablesInSelection);
 	}
-	
+
 	private void applySecurityPolicies(GUIAccessControlEntry allowedPermissions, final List<GUIDocument> selection,
 			boolean someSelection, boolean moreSelected, boolean justOneSelected, boolean immutablesInSelection) {
 		preview.setEnabled(someSelection

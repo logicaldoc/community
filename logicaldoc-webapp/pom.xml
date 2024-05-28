@@ -17,7 +17,7 @@
 			<artifactId>guava</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.google.gwt</groupId>
+			<groupId>org.gwtproject </groupId>
 			<artifactId>gwt-servlet</artifactId>
 		</dependency>
 		<dependency>
@@ -325,21 +325,21 @@
 			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
-					<groupId>com.google.gwt</groupId>
+					<groupId>org.gwtproject </groupId>
 					<artifactId>gwt-user</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>com.google.gwt</groupId>
+					<groupId>org.gwtproject </groupId>
 					<artifactId>gwt-incubator</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>com.google.gwt</groupId>
+					<groupId>org.gwtproject </groupId>
 					<artifactId>gwt-dnd</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>com.google.gwt</groupId>
+					<groupId>org.gwtproject </groupId>
 					<artifactId>gwt-dev</artifactId>
-				</exclusion>
+				</exclusion>				
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -396,6 +396,12 @@
 			<groupId>de.novanic.gwteventservice</groupId>
 			<artifactId>gwteventservice</artifactId>
 			<version>1.2.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.gwt</groupId>
+					<artifactId>gwt-servlet</artifactId>
+				</exclusion>
+			</exclusions>			
 		</dependency>
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
