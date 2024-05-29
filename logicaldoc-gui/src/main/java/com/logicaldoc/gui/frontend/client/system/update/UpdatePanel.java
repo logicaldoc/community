@@ -55,6 +55,8 @@ public class UpdatePanel extends VLayout {
 	private IButton upload;
 
 	private IButton confirmUpdate;
+	
+	private IButton delete;
 
 	private TextAreaItem log;
 
@@ -85,6 +87,8 @@ public class UpdatePanel extends VLayout {
 		upload.addClickHandler(event -> new UpdateUploader(this).show());
 
 		confirmUpdate = new IButton(I18N.message("confirmupdate"));
+		
+		delete = new IButton(I18N.message("ddelete"));
 
 		if (!Feature.enabled(Feature.UPDATES)) {
 			setMembers(new FeatureDisabled(Feature.UPDATES));
@@ -197,8 +201,11 @@ public class UpdatePanel extends VLayout {
 		bar.setLength(300);
 
 		confirmUpdate.setAutoFit(true);
-		confirmUpdate.addClickHandler(event -> onConfirm());
+		confirmUpdate.addClickHandler(click -> onConfirm());
 
+		delete.setAutoFit(true);
+		delete.addClickHandler(click -> onDelete());
+		
 		download = new IButton(I18N.message("download"));
 		download.setAutoFit(true);
 		download.addClickHandler(event -> {
@@ -256,7 +263,7 @@ public class UpdatePanel extends VLayout {
 
 		HLayout buttonCanvas = new HLayout();
 		buttonCanvas.setMembersMargin(6);
-		buttonCanvas.setMembers(download, upload, confirmUpdate);
+		buttonCanvas.setMembers(download, upload, confirmUpdate, delete);
 		layout.addMember(buttonCanvas);
 
 		if (uploadFileAlreadyAvailableLocally)
@@ -421,6 +428,25 @@ public class UpdatePanel extends VLayout {
 						Session.get().setUpdating(true);
 						switchLogView();
 						lastConfirmed = new Date();
+					}
+				});
+			}
+		});
+	}
+	
+	private void onDelete() {
+		SC.ask(I18N.message("delete"), I18N.message("deleteupdatepackagequestion"), choice -> {
+			if (Boolean.TRUE.equals(choice)) {
+				UpdateService.Instance.get().deleteUpdate(updateFileName, new AsyncCallback<>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(Void v) {
+						refresh();
 					}
 				});
 			}

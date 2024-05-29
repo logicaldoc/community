@@ -28,5 +28,9 @@ public interface UpdateServiceAsync {
 
 	void loadUpdate(AsyncCallback<String> callback);
 
+	void deleteUpdate(String pupdateFileName, AsyncCallback<Void> callback);
+
 	void loadPatch(AsyncCallback<String> callback);
+
+	void deletePatch(String patchFileName, AsyncCallback<Void> callback);
 }

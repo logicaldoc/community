@@ -351,13 +351,16 @@ public class ZipUtil implements Closeable {
 		if (zFile != null)
 			try {
 				zFile.close();
+				zFile = null;
 			} catch (IOException e) {
 				log.error(e.getMessage());
 			}
 	}
 
 	public String getEntryContent(File zip, String entry) throws IOException {
-		return IOUtil.readStream(getEntryStream(zip, entry));
+		try (InputStream is = getEntryStream(zip, entry)) {
+			return IOUtil.readStream(is);
+		}
 	}
 
 	private static void logError(String message) {

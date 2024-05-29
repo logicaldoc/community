@@ -98,6 +98,15 @@ public interface UpdateService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public String loadUpdate() throws ServerException;
+	
+	/**
+	 * Deletes a local update package
+	 * 
+	 * @param updateFileName The update file to delete
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void deleteUpdate(String updateFileName) throws ServerException;
 
 	/**
 	 * Loads a new patch
@@ -108,6 +117,15 @@ public interface UpdateService extends RemoteService {
 	 */
 	public String loadPatch() throws ServerException;
 
+	/**
+	 * Deletes a local patch
+	 * 
+	 * @param patchFileName The patch file to delete
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void deletePatch(String patchFileName) throws ServerException;
+	
 	public static class Instance {
 		private static UpdateServiceAsync inst;
 

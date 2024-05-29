@@ -82,6 +82,8 @@ public class PatchPanel extends VLayout {
 
 	private IButton cancel = new IButton(I18N.message("cancel"));
 
+	private IButton delete = new IButton(I18N.message("ddelete"));
+
 	private IButton confirmPatch = new IButton(I18N.message("confirmpatch"));
 
 	private IButton upload = new IButton(I18N.message("uploadpatch"));
@@ -108,6 +110,7 @@ public class PatchPanel extends VLayout {
 
 	private void switchListView(List<GUIPatch> patches) {
 		Util.removeChildren(this);
+		Util.removeChildren(notesPanel);
 
 		ListGridField id = new ListGridField("id", I18N.message("id"), 100);
 		id.setHidden(true);
@@ -223,12 +226,12 @@ public class PatchPanel extends VLayout {
 		size.setRequired(true);
 		size.setWrapTitle(false);
 
-		StaticTextItem restart = ItemFactory.newStaticTextItem(RESTART, "requiresrestart",
+		StaticTextItem requiresRestart = ItemFactory.newStaticTextItem(RESTART, "requiresrestart",
 				patch.isRestart() ? I18N.message("yes") : I18N.message("no"));
-		restart.setRequired(true);
-		restart.setWrapTitle(false);
+		requiresRestart.setRequired(true);
+		requiresRestart.setWrapTitle(false);
 
-		form.setItems(name, date, size, restart);
+		form.setItems(name, date, size, requiresRestart);
 
 		Label message = new Label();
 		message.setContents(I18N.message("installpatch", patch.getName()));
@@ -331,11 +334,13 @@ public class PatchPanel extends VLayout {
 		confirmPatch.setVisible(patch.isLocal());
 		confirmPatch.addClickHandler(event -> onConfirm(patch));
 
-		cancel = new IButton(I18N.message("cancel"));
 		cancel.setAutoFit(true);
 		cancel.addClickHandler(event -> showList());
 
-		download = new IButton(I18N.message("download"));
+		delete.setAutoFit(true);
+		delete.addClickHandler(event -> onDelete(fileName));
+		download.setVisible(patch.isLocal());
+
 		download.setAutoFit(true);
 		download.setVisible(!patch.isLocal());
 		download.addClickHandler(event -> {
@@ -370,6 +375,7 @@ public class PatchPanel extends VLayout {
 									if (status.get(1) == 100) {
 										download.setDisabled(false);
 										confirmPatch.setVisible(true);
+										delete.setVisible(true);
 										displayNotes(fileName);
 									} else
 										schedule(50);
@@ -383,7 +389,7 @@ public class PatchPanel extends VLayout {
 
 		HLayout buttonCanvas = new HLayout();
 		buttonCanvas.setMembersMargin(6);
-		buttonCanvas.setMembers(cancel, download, confirmPatch);
+		buttonCanvas.setMembers(cancel, download, confirmPatch, delete);
 
 		layout.addMember(buttonCanvas);
 
@@ -391,6 +397,24 @@ public class PatchPanel extends VLayout {
 			displayNotes(fileName);
 
 		return layout;
+	}
+
+	private void onDelete(String fileName) {
+		SC.ask(I18N.message("delete"), I18N.message("deletepatchquestion"), choice -> {
+			if (Boolean.TRUE.equals(choice)) {
+				UpdateService.Instance.get().deletePatch(fileName, new AsyncCallback<>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(Void ret) {
+						showList();
+					}
+				});
+			}
+		});
 	}
 
 	private void displayNotes(String fileName) {
@@ -469,7 +493,12 @@ public class PatchPanel extends VLayout {
 		install.addClickHandler(event -> switchDetailView(patch));
 		install.setEnabled(!patch.isInstalled());
 
-		contextMenu.setItems(install);
+		MenuItem delete = new MenuItem();
+		delete.setTitle(I18N.message("ddelete"));
+		delete.addClickHandler(event -> onDelete(patch.getFile()));
+		delete.setEnabled(patch.isLocal());
+
+		contextMenu.setItems(install, delete);
 		contextMenu.showContextMenu();
 	}
 
