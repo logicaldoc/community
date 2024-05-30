@@ -132,17 +132,15 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 		/**
 		 * In order to compare the actual date and the last renewal date, we
-		 * prefer to drop milliseconds and seconds.
+		 * prefer to drop milliseconds.
 		 */
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
 		calendar.set(Calendar.MILLISECOND, 0);
-		calendar.set(Calendar.SECOND, 0);
 		Date now = calendar.getTime();
 
 		calendar.setTime(lastRenew);
 		calendar.set(Calendar.MILLISECOND, 0);
-		calendar.set(Calendar.SECOND, 0);
 		Date lastRen = calendar.getTime();
 
 		long diff = now.getTime() - lastRen.getTime();
