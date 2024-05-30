@@ -6,6 +6,7 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
@@ -24,6 +25,7 @@ import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsTileGrid;
+import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -212,10 +214,20 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 	}
 
 	private void showContextMenu(GUIFolder folder, final boolean document) {
-		Menu contextMenu = new Menu();
-
 		if (document) {
-			contextMenu = new ContextMenu(folder, grid);
+			DocumentService.Instance.get().getAllowedPermissions(grid.getSelectedIds(), new AsyncCallback<>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(GUIAccessControlEntry enabledPermissions) {
+					new ContextMenu(folder, grid, enabledPermissions).showContextMenu();
+				}
+			});
+
 		} else {
 			if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS)) {
 				MenuItem openInFolder = new MenuItem();
@@ -224,11 +236,13 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 					GUIDocument doc = grid.getSelectedDocument();
 					DocumentsPanel.get().openInFolder(doc.getFolder().getId(), null);
 				});
+
+				Menu contextMenu = new Menu();
 				contextMenu.addItem(openInFolder);
+				contextMenu.showContextMenu();
 			}
 		}
 
-		contextMenu.showContextMenu();
 	}
 
 	public DocumentsGrid getList() {

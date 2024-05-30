@@ -140,23 +140,10 @@ public class ContextMenu extends Menu {
 
 	private Menu moreMenu;
 
-	public ContextMenu(GUIFolder folder, DocumentsGrid docsGrid) {
+	public ContextMenu(GUIFolder folder, DocumentsGrid docsGrid, GUIAccessControlEntry acl) {
 		this.grid = docsGrid;
 		final List<GUIDocument> selection = grid.getSelectedDocuments();
-		List<Long> selectionIds = grid.getSelectedIds();
-
-		DocumentService.Instance.get().getAllowedPermissions(selectionIds, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
-			@Override
-			public void onSuccess(GUIAccessControlEntry enabledPermissions) {
-				fillContextMenu(folder, selection, enabledPermissions);
-			}
-		});
+		fillContextMenu(folder, selection, acl);
 	}
 
 	protected void fillContextMenu(GUIFolder folder, final List<GUIDocument> selection,
