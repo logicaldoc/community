@@ -44,7 +44,7 @@ import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.document.thumbnail.ThumbnailManager;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
-import com.logicaldoc.core.parser.ParseException;
+import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
@@ -631,7 +631,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			checkNotArchived(document);
 
 			if (fileName != null && !FileUtil.matches(document.getFileName(), List.of(fileName), null))
-				throw new ParseException("no match");
+				throw new ParsingException("no match");
 			return true;
 		} catch (Exception t) {
 			return false;
@@ -832,7 +832,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 	@Override
 	public void reindex(String sid, long docId, String content)
-			throws ParseException, AuthenticationException, WebserviceException, PersistenceException {
+			throws ParsingException, AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 

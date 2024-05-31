@@ -28,7 +28,7 @@ import com.google.common.base.Strings;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
-import com.logicaldoc.core.parser.ParseException;
+import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.authorization.UnexistingResourceException;
@@ -782,7 +782,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Parameter(description = "Document ID", required = true)
 	long docId, @FormParam("content")
 	@Parameter(description = "Document ID")
-	String content) throws AuthenticationException, ParseException, WebserviceException, PersistenceException {
+	String content) throws AuthenticationException, ParsingException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
 		super.reindex(sid, docId, content);
 	}

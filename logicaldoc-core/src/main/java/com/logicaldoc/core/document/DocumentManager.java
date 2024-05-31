@@ -8,7 +8,7 @@ import java.util.Set;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
-import com.logicaldoc.core.parser.ParseException;
+import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.ticket.Ticket;
 
@@ -169,10 +169,10 @@ public interface DocumentManager {
 	 * @return the number of milliseconds required to parse the document
 	 * 
 	 * @throws PersistenceException error at data layer
-	 * @throws ParseException error during parsing
+	 * @throws ParsingException error during parsing
 	 */
 	public long index(long docId, String content, DocumentHistory transaction)
-			throws PersistenceException, ParseException;
+			throws PersistenceException, ParsingException;
 
 	/**
 	 * Rename an existing document filename.
@@ -319,9 +319,9 @@ public interface DocumentManager {
 	 * 
 	 * @return The document's content
 	 * 
-	 * @throws ParseException error in the parsing
+	 * @throws ParsingException error in the parsing
 	 */
-	public String parseDocument(Document doc, String fileVersion) throws ParseException;
+	public String parseDocument(Document doc, String fileVersion) throws ParsingException;
 
 	/**
 	 * Archives all the documents in a folder's tree

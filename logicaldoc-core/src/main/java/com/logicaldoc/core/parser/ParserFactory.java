@@ -164,17 +164,17 @@ public class ParserFactory {
 	 * 
 	 * @return the text extracted from the input
 	 * 
-	 * @throws ParseException error in the parsing
+	 * @throws ParsingException error in the parsing
 	 */
 	public static String parse(InputStream input, String filename, String encoding, Locale locale, long tenantId,
-			Document document, String fileVersion) throws ParseException {
+			Document document, String fileVersion) throws ParsingException {
 		Parser parser = getParser(filename);
 		TenantDAO dao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		String tenantName;
 		try {
 			tenantName = dao.getTenantName(tenantId);
 		} catch (PersistenceException e) {
-			throw new ParseException(e);
+			throw new ParsingException(e);
 		}
 		return parser.parse(input, new ParseParameters(document, filename, fileVersion, encoding, locale,
 				tenantName != null ? tenantName : Tenant.DEFAULT_NAME));

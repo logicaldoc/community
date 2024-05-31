@@ -46,7 +46,7 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.DocumentNoteDAO;
 import com.logicaldoc.core.metadata.Attribute;
-import com.logicaldoc.core.parser.ParseException;
+import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.parser.ParserFactory;
 import com.logicaldoc.core.searchengine.analyzer.FilteredAnalyzer;
 import com.logicaldoc.util.StringUtil;
@@ -226,7 +226,7 @@ public class StandardSearchEngine implements SearchEngine {
 				ParserFactory.parse(content, doc.getFileName(), null, locale, doc.getTenantId(), doc, null);
 
 			addHit(doc, contentString);
-		} catch (PersistenceException | ParseException | IndexException e) {
+		} catch (PersistenceException | ParsingException | IndexException e) {
 			throw new IndexException(e.getMessage(), e);
 		}
 	}

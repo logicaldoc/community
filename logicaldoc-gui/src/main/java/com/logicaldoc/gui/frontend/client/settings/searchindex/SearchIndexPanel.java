@@ -503,6 +503,12 @@ public class SearchIndexPanel extends AdminPanel {
 		timeout.setMin(0);
 		timeout.setStep(10);
 
+		// Retain extracted text on timeout
+		RadioGroupItem timeoutRetain = ItemFactory.newBooleanSelector("timeoutRetain", "ontimeoutretaintext");
+		timeoutRetain.setHint(I18N.message("ontimeoutretaintexthint"));
+		timeoutRetain.setValue(this.searchEngine.isParsingTimeoutRetain() ? "yes" : "no");
+		timeoutRetain.setRequired(true);
+		
 		// The optional max text that will be put in the index
 		SpinnerItem maxText = ItemFactory.newSpinnerItem("maxtext", this.searchEngine.getMaxText());
 		maxText.setHint(I18N.message("maxtextinindex"));
@@ -529,12 +535,13 @@ public class SearchIndexPanel extends AdminPanel {
 		RadioGroupItem skipOnError = ItemFactory.newBooleanSelector("skipOnError", "onerrormarkunindexable");
 		skipOnError.setHint(I18N.message("onerrormarkunindexablehint"));
 		skipOnError.setValue(this.searchEngine.isSkipOnError() ? "yes" : "no");
+		skipOnError.setRequired(true);
 
 		HLayout buttons = prepareButtons();
 
 		searchEngineForm.setItems(entries, status, repository, includePatterns, excludePatterns,
 				includePatternsMetadata, excludePatternsMetadata, skipOnError, sorting, customSorting, threads, batch,
-				timeout, maxText, maxTextFileSize);
+				timeout, timeoutRetain, maxText, maxTextFileSize);
 
 		buttons.setMembersMargin(5);
 		searchEngineTabPanel.setMembers(searchEngineForm, buttons);
@@ -729,6 +736,7 @@ public class SearchIndexPanel extends AdminPanel {
 		SearchIndexPanel.this.searchEngine.setSorting((String) values.get("sorting"));
 		SearchIndexPanel.this.searchEngine.setCustomSorting((String) values.get("customsorting"));
 		SearchIndexPanel.this.searchEngine.setSkipOnError("yes".equals(values.get("skipOnError")));
+		SearchIndexPanel.this.searchEngine.setParsingTimeoutRetain("yes".equals(values.get("timeoutRetain")));
 
 		String btch = vm.getValueAsString("batch");
 		if (btch == null || "".equals(btch.trim()))

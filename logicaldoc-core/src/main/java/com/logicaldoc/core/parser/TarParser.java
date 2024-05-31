@@ -24,7 +24,7 @@ public class TarParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content)
-			throws IOException, ParseException {
+			throws IOException, ParsingException {
 		File tarFile = FileUtil.createTempFile("parsetar", ".tar");
 		try {
 			FileUtil.writeFile(input, tarFile.getAbsolutePath());

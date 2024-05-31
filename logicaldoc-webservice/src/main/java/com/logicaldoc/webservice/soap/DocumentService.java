@@ -11,7 +11,7 @@ import javax.jws.WebService;
 import javax.mail.MessagingException;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.parser.ParseException;
+import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.authorization.UnexistingResourceException;
@@ -938,7 +938,7 @@ public interface DocumentService {
 	 * @throws PersistenceException Error at data layer
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
-	 * @throws ParseException Error in adding the entry into fulltext index
+	 * @throws ParsingException Error in adding the entry into fulltext index
 	 */
 	@WebMethod(action = "reindex")
 	@WSDoc(description = "re-indexes(or indexes from scratch) a document")
@@ -948,7 +948,7 @@ public interface DocumentService {
 	@WebParam(name = "docId")
 	long docId, @WSDoc(description = "the content to be used (if null the file is parsed)", required = false)
 	@WebParam(name = "content")
-	String content) throws AuthenticationException, WebserviceException, PersistenceException, ParseException;
+	String content) throws AuthenticationException, WebserviceException, PersistenceException, ParsingException;
 
 	/**
 	 * Creates the PDF conversion of the given document. If the conversion was

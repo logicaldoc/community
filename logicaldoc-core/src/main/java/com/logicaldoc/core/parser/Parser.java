@@ -27,15 +27,14 @@ public interface Parser {
 	 * 
 	 * @return the extracted text
 	 * 
-	 * @throws ParseException error in the parsing
+	 * @throws ParsingException error in the parsing
 	 */
 	public String parse(File file, String filename, String encoding, Locale locale, String tenant)
-			throws ParseException;
+			throws ParsingException;
 
 	/**
-	 * Same as
-	 * {@link #parse(InputStream, ParseParameters)},
-	 * but use this when you have a file rather than a stream.
+	 * Same as {@link #parse(InputStream, ParseParameters)}, but use this when
+	 * you have a file rather than a stream.
 	 * 
 	 * @param file the file
 	 * @param filename name of the file
@@ -47,10 +46,10 @@ public interface Parser {
 	 * 
 	 * @return the extracted text
 	 * 
-	 * @throws ParseException error in the parsing
+	 * @throws ParsingException error in the parsing
 	 */
 	public String parse(File file, String filename, String encoding, Locale locale, String tenant, Document document,
-			String fileVersion) throws ParseException;
+			String fileVersion) throws ParsingException;
 
 	/**
 	 * Extracts content for the text content of the given binary document. The
@@ -78,15 +77,21 @@ public interface Parser {
 	 * <p>
 	 * The parsing has to be completed before the seconds specified in the
 	 * <b>parser.timeout</b> config. property.
+	 * </p>
+	 * 
+	 * <p>
+	 * Depending on the value of the <b>parser.timeout.retain</b> config.
+	 * property, the already extracted text is retained or not in case of
+	 * timeout.
 	 * </p>
 	 * 
 	 * @param input binary content from which to extract the text
 	 * @param parameterObject the parameters
 	 * @return the extracted text
 	 * 
-	 * @throws ParseException error in the parsing
+	 * @throws ParsingException error in the parsing
 	 */
-	public String parse(InputStream input, ParseParameters parameterObject) throws ParseException;
+	public String parse(InputStream input, ParseParameters parameterObject) throws ParsingException;
 
 	/**
 	 * Extracts content for the text content of the given binary document. The
@@ -114,6 +119,12 @@ public interface Parser {
 	 * <p>
 	 * The parsing has to be completed before the seconds specified in the
 	 * <b>parser.timeout</b> config. property.
+	 * </p>
+	 * 
+	 * <p>
+	 * Depending on the value of the <b>parser.timeout.retain</b> config.
+	 * property, the already extracted text is retained or not in case of
+	 * timeout.
 	 * </p>
 	 * 
 	 * @param input binary content from which to extract the text
@@ -124,10 +135,10 @@ public interface Parser {
 	 * 
 	 * @return the extracted text
 	 * 
-	 * @throws ParseException error in the parsing
+	 * @throws ParsingException error in the parsing
 	 */
 	public String parse(InputStream input, String filename, String encoding, Locale locale, String tenant)
-			throws ParseException;
+			throws ParsingException;
 
 	/**
 	 * Counts the number of pages of the given binary document.

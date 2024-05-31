@@ -17,7 +17,7 @@ import com.logicaldoc.core.security.Tenant;
 public class OpenOfficeParserTest extends AbstractCoreTestCase {
 
 	@Test
-	public void testParse() throws UnsupportedEncodingException, ParseException {
+	public void testParse() throws UnsupportedEncodingException, ParsingException {
 		String inputFile = "target/test-classes/logicaldoc-user_manual-en.odt";
 		File file = new File(inputFile);
 		String filename = file.getPath();

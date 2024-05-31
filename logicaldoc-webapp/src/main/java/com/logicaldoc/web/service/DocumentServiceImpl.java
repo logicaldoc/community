@@ -80,7 +80,7 @@ import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.metadata.validation.Validator;
-import com.logicaldoc.core.parser.ParseException;
+import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
@@ -188,7 +188,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		}
 	}
 
-	private void index(Long[] docIds, Session session) throws PersistenceException, ParseException {
+	private void index(Long[] docIds, Session session) throws PersistenceException, ParsingException {
 		if (docIds == null || docIds.length < 1)
 			return;
 		else if (log.isInfoEnabled())
@@ -211,14 +211,14 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		executeLongRunningOperation("Index Documents", () -> {
 			try {
 				index(docIds.toArray(new Long[0]), session);
-			} catch (ParseException | PersistenceException e) {
+			} catch (ParsingException | PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
 		}, session);
 	}
 
 	private void indexAddedDocs(List<Long> docIdsToIndex, final Session session)
-			throws PersistenceException, ParseException {
+			throws PersistenceException, ParsingException {
 		if (!docIdsToIndex.isEmpty())
 			index(docIdsToIndex.toArray(new Long[0]), session);
 	}
@@ -240,7 +240,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		if (executeLongRunningOperation("Add Documents", () -> {
 			try {
 				addDocuments(importZip, charset, immediateIndexing, metadata, session, createdDocs);
-			} catch (ServerException | PersistenceException | ParseException | IOException e) {
+			} catch (ServerException | PersistenceException | ParsingException | IOException e) {
 				log.error(e.getMessage(), e);
 			}
 		}, session)) {
@@ -252,7 +252,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	private void addDocuments(boolean importZip, String charset, boolean immediateIndexing, final GUIDocument metadata,
 			final Session session, List<GUIDocument> createdDocs)
-			throws PersistenceException, ServerException, ParseException, IOException {
+			throws PersistenceException, ServerException, ParsingException, IOException {
 
 		checkWritePermission(metadata, session);
 

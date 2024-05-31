@@ -27,6 +27,8 @@ public class GUISearchEngine implements Serializable {
 	private Integer batch = 200;
 
 	private Integer parsingTimeout;
+	
+	private boolean parsingTimeoutRetain=true;
 
 	private Integer maxText;
 
@@ -160,5 +162,13 @@ public class GUISearchEngine implements Serializable {
 
 	public void setSkipOnError(boolean skipOnError) {
 		this.skipOnError = skipOnError;
+	}
+
+	public boolean isParsingTimeoutRetain() {
+		return parsingTimeoutRetain;
+	}
+
+	public void setParsingTimeoutRetain(boolean parsingTimeoutRetain) {
+		this.parsingTimeoutRetain = parsingTimeoutRetain;
 	}
 }

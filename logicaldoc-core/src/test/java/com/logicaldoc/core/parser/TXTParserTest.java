@@ -15,7 +15,7 @@ import com.logicaldoc.core.security.Tenant;
 public class TXTParserTest extends AbstractCoreTestCase {
 
 	@Test
-	public void testParse() throws UnsupportedEncodingException, FileNotFoundException, ParseException {
+	public void testParse() throws UnsupportedEncodingException, FileNotFoundException, ParsingException {
 		String inputFile = "src/test/resources/AnalyzeFileTest_enc.txt";
 		File file = new File(inputFile);
 		String filename = file.getPath();

@@ -7,19 +7,19 @@ package com.logicaldoc.core.parser;
  * 
  * @since 8.7.5
  */
-public class ParseException extends Exception {
+public class ParsingException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
-	public ParseException(String message, Throwable cause) {
+	public ParsingException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public ParseException(String message) {
+	public ParsingException(String message) {
 		super(message);
 	}
 
-	public ParseException(Throwable cause) {
+	public ParsingException(Throwable cause) {
 		super(cause);
 	}
 }

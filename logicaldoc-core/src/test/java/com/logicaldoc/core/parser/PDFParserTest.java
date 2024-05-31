@@ -38,7 +38,7 @@ public class PDFParserTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testParse() throws UnsupportedEncodingException, ParseException {
+	public void testParse() throws UnsupportedEncodingException, ParsingException {
 
 		// This is a pdf German document that PDFBox version 0.7.3 in not able to read
 		// The new version of PDFBox 1.3.1 is able to open such document
@@ -61,7 +61,7 @@ public class PDFParserTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testSmall() throws UnsupportedEncodingException, ParseException {
+	public void testSmall() throws UnsupportedEncodingException, ParsingException {
 		String inputFile = "src/test/resources/small.pdf";
 		File file = new File(inputFile);
 		String filename = file.getPath();
@@ -76,7 +76,7 @@ public class PDFParserTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testStress() throws UnsupportedEncodingException, ParseException {
+	public void testStress() throws UnsupportedEncodingException, ParsingException {
 		File file1 = new File("src/test/resources/Digital_Day.pdf");
 		String filename1 = file1.getPath();
 		File file2 = new File("src/test/resources/Arabic/SharePoint.pdf");
@@ -101,7 +101,7 @@ public class PDFParserTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testParseArabic() throws UnsupportedEncodingException, ParseException {
+	public void testParseArabic() throws UnsupportedEncodingException, ParsingException {
 
 		// This is a pdf document with two (2) columns, one english and one
 		// Arabic on the right
@@ -133,7 +133,7 @@ public class PDFParserTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testParseArabic2() throws UnsupportedEncodingException, ParseException {
+	public void testParseArabic2() throws UnsupportedEncodingException, ParsingException {
 
 		// This is an Arabic pdf document
 		// The text goes from right to left (Arabic)
@@ -153,7 +153,7 @@ public class PDFParserTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testForm() throws UnsupportedEncodingException, ParseException {
+	public void testForm() throws UnsupportedEncodingException, ParsingException {
 		
 		String inputFile = "src/test/resources/pdf_form_fields.pdf";
 		File file = new File(inputFile);

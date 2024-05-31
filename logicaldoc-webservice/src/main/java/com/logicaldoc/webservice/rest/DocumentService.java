@@ -22,7 +22,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.parser.ParseException;
+import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.authorization.UnexistingResourceException;
@@ -886,11 +886,11 @@ public interface DocumentService {
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
-	 * @throws ParseException Error parsing the content
+	 * @throws ParsingException Error parsing the content
 	 * @throws AuthenticationException Invalid credentials
 	 */
 	public void reindex(long docId, String content)
-			throws AuthenticationException, ParseException, WebserviceException, PersistenceException;
+			throws AuthenticationException, ParsingException, WebserviceException, PersistenceException;
 
 	/**
 	 * Uploads a new resource of the document

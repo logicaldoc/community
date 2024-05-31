@@ -14,7 +14,7 @@ import javax.mail.MessagingException;
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.parser.ParseException;
+import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.authorization.UnexistingResourceException;
@@ -218,7 +218,7 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 
 	@Override
 	public void reindex(String sid, long docId, String content)
-			throws AuthenticationException, WebserviceException, PersistenceException, ParseException {
+			throws AuthenticationException, WebserviceException, PersistenceException, ParsingException {
 		client.reindex(sid, docId, content);
 	}
 

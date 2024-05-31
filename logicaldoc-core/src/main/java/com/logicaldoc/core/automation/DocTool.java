@@ -30,7 +30,7 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
-import com.logicaldoc.core.parser.ParseException;
+import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -981,7 +981,7 @@ public class DocTool {
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		try {
 			return manager.parseDocument(document, fileVersion);
-		} catch (ParseException e) {
+		} catch (ParsingException e) {
 			log.error(e.getMessage(), e);
 			return null;
 		}

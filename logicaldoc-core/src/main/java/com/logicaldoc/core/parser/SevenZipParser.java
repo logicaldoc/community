@@ -24,7 +24,7 @@ public class SevenZipParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content)
-			throws IOException, ParseException {
+			throws IOException, ParsingException {
 		File sevenFile = FileUtil.createTempFile("parse7z", ".7z");
 		try {
 			FileUtil.writeFile(input, sevenFile.getAbsolutePath());

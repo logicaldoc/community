@@ -27,7 +27,7 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
-import com.logicaldoc.core.parser.ParseException;
+import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -279,7 +279,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testParseDocument() throws PersistenceException, ParseException {
+	public void testParseDocument() throws PersistenceException, ParsingException {
 		Document doc = docDao.findById(1);
 		String text = documentManager.parseDocument(doc, null);
 		assertTrue(text.contains("Digital Day"));
@@ -296,7 +296,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testEnforceFilesIntoFolderStorage()
-			throws PersistenceException, ParseException, IOException, InterruptedException {
+			throws PersistenceException, ParsingException, IOException, InterruptedException {
 		Folder folder = folderDao.createPath(folderDao.findById(Folder.ROOTID), "/Default/test", true, null);
 
 		DocumentHistory transaction = new DocumentHistory();
@@ -339,7 +339,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testRename() throws PersistenceException, ParseException {
+	public void testRename() throws PersistenceException, ParsingException {
 		Document doc = docDao.findById(1);
 		docDao.initialize(doc);
 		docDao.store(doc);
@@ -354,7 +354,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testReindex() throws PersistenceException, ParseException {
+	public void testReindex() throws PersistenceException, ParsingException {
 		Document doc = docDao.findById(1);
 		assertEquals(1, doc.getIndexed());
 		docDao.initialize(doc);

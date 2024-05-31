@@ -35,7 +35,7 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
-import com.logicaldoc.core.parser.ParseException;
+import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.parser.ParseParameters;
 import com.logicaldoc.core.parser.Parser;
 import com.logicaldoc.core.parser.ParserFactory;
@@ -448,7 +448,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public String parseDocument(Document doc, String fileVersion) throws ParseException {
+	public String parseDocument(Document doc, String fileVersion) throws ParsingException {
 		String content = null;
 
 		// Check if the document is an alias
@@ -457,11 +457,11 @@ public class DocumentManagerImpl implements DocumentManager {
 			try {
 				doc = documentDAO.findById(docref);
 				if (doc == null)
-					throw new ParseException(String.format("Unexisting referenced document %s", docref));
-			} catch (ParseException pe) {
+					throw new ParsingException(String.format("Unexisting referenced document %s", docref));
+			} catch (ParsingException pe) {
 				throw pe;
 			} catch (PersistenceException e) {
-				throw new ParseException(e.getMessage(), e);
+				throw new ParsingException(e.getMessage(), e);
 			}
 		}
 
@@ -480,10 +480,10 @@ public class DocumentManagerImpl implements DocumentManager {
 						doc.getFileName(), fileVersion, null, locale, tDao.findById(doc.getTenantId()).getName()));
 			} catch (Exception e) {
 				log.error("Cannot parse document {}", doc, e);
-				if (e instanceof ParseException pe)
+				if (e instanceof ParsingException pe)
 					throw pe;
 				else
-					throw new ParseException(e);
+					throw new ParsingException(e);
 			}
 		}
 
@@ -496,7 +496,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public long index(long docId, String content, DocumentHistory transaction)
-			throws PersistenceException, ParseException {
+			throws PersistenceException, ParsingException {
 		Document doc = getExistingDocument(docId);
 
 		log.debug("Indexing document {} - {}", doc.getId(), doc.getFileName());
@@ -539,7 +539,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			// This may take time
 			addHit(doc, cont);
-		} catch (PersistenceException | ParseException e) {
+		} catch (PersistenceException | ParsingException e) {
 			recordIndexingError(transaction, doc, e);
 			throw e;
 		}
@@ -576,7 +576,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		DocumentHistoryDAO hDao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 		hDao.store(transaction);
 
-		if (exception instanceof ParseException) {
+		if (exception instanceof ParsingException) {
 			TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 			String tenant = tDao.getTenantName(document.getTenantId());
 			if (Context.get().getProperties().getBoolean(tenant + ".index.skiponerror", false)) {
@@ -595,11 +595,11 @@ public class DocumentManagerImpl implements DocumentManager {
 		return doc;
 	}
 
-	private void addHit(Document doc, String cont) throws ParseException {
+	private void addHit(Document doc, String cont) throws ParsingException {
 		try {
 			indexer.addHit(doc, cont);
 		} catch (Exception e) {
-			throw new ParseException(e.getMessage(), e);
+			throw new ParsingException(e.getMessage(), e);
 		}
 	}
 

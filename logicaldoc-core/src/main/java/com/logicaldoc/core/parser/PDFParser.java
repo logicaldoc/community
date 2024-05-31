@@ -32,7 +32,7 @@ public class PDFParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content)
-			throws ParseException {
+			throws ParsingException {
 		PDDocument pdfDocument = null;
 		try {
 			pdfDocument = PDDocument.load(input);

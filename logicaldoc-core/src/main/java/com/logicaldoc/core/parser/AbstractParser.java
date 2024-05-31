@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -30,13 +31,13 @@ public abstract class AbstractParser implements Parser {
 
 	@Override
 	public String parse(File file, String filename, String encoding, Locale locale, String tenant)
-			throws ParseException {
+			throws ParsingException {
 		return parse(file, filename, encoding, locale, tenant, null, null);
 	}
 
 	@Override
 	public String parse(File file, String filename, String encoding, Locale locale, String tenant, Document document,
-			String fileVersion) throws ParseException {
+			String fileVersion) throws ParsingException {
 		try (InputStream is = new FileInputStream(file);) {
 			return parse(is, new ParseParameters(document, filename, fileVersion, encoding, locale, tenant));
 		} catch (IOException e) {
@@ -47,12 +48,12 @@ public abstract class AbstractParser implements Parser {
 
 	@Override
 	public String parse(InputStream input, String filename, String encoding, Locale locale, String tenant)
-			throws ParseException {
+			throws ParsingException {
 		return parse(input, new ParseParameters(null, filename, null, encoding, locale, tenant));
 	}
 
 	@Override
-	public String parse(final InputStream input, ParseParameters parameters) throws ParseException {
+	public String parse(final InputStream input, ParseParameters parameters) throws ParsingException {
 		if (log.isDebugEnabled())
 			log.debug("Parse started");
 		StringBuilder content = new StringBuilder();
@@ -61,16 +62,32 @@ public abstract class AbstractParser implements Parser {
 		parameters.setTenant(getTenant(parameters.getLocale(), parameters.getTenant()));
 
 		long timeout = getTimeout(parameters.getTenant());
-		
+
 		if (timeout <= 0) {
 			parseInCurrentThread(input, parameters, content);
 		} else {
-			parseInNewThread(input, parameters, content, timeout);
+			try {
+				parseInNewThreadAndWait(input, parameters, content, timeout);
+			} catch (ParsingTimeoutException pte) {
+				if (getTimeoutRetain(parameters.getTenant()))
+					log.warn("Got parsing timeout, but retain the extracted content");
+				else
+					throw pte;
+			}
 		}
 
 		if (log.isDebugEnabled())
 			log.debug("Parse Finished");
 		return content.toString();
+	}
+
+	private boolean getTimeoutRetain(String tenant) {
+		try {
+			Context context = Context.get();
+			return context != null ? context.getProperties().getBoolean(tenant + ".parser.timeout.retain", true) : true;
+		} catch (Exception e) {
+			return true;
+		}
 	}
 
 	private int getTimeout(String tenant) {
@@ -82,8 +99,8 @@ public abstract class AbstractParser implements Parser {
 		}
 	}
 
-	private void parseInNewThread(final InputStream input, ParseParameters parameters, StringBuilder content,
-			long timeout) throws ParseException {
+	private void parseInNewThreadAndWait(final InputStream input, ParseParameters parameters, StringBuilder content,
+			long timeout) throws ParsingException {
 		// Invoke in a separate thread
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		try {
@@ -93,14 +110,20 @@ public abstract class AbstractParser implements Parser {
 						TimeUnit.SECONDS).get(0).get();
 			} catch (InterruptedException ie) {
 				log.warn("Interrupted parse");
+				ret = "interrupted";
 				Thread.currentThread().interrupt();
-				ret = "Interrupted parse";
+			} catch (CancellationException e) {
+				log.warn("Parsing timeout");
+				ret = "timeout";
 			} catch (Exception e) {
 				log.warn(e.getMessage(), e);
 				ret = e.getMessage();
 			}
-			if (!"completed".equals(ret))
-				throw new ParseException(ret);
+
+			if ("interrupted".equals(ret) || "timeout".equals(ret))
+				throw new ParsingTimeoutException(ret);
+			else if (!"completed".equals(ret))
+				throw new ParsingException(ret);
 		} finally {
 			if (executor != null)
 				executor.shutdownNow();
@@ -108,13 +131,13 @@ public abstract class AbstractParser implements Parser {
 	}
 
 	private void parseInCurrentThread(final InputStream input, ParseParameters parameters, StringBuilder content)
-			throws ParseException {
+			throws ParsingException {
 		try {
 			internalParse(input, parameters, content);
-		} catch (ParseException pe) {
+		} catch (ParsingException pe) {
 			throw pe;
 		} catch (Exception e) {
-			throw new ParseException(e);
+			throw new ParsingException(e);
 		}
 	}
 
@@ -143,14 +166,14 @@ public abstract class AbstractParser implements Parser {
 			this.content = content;
 		}
 
-		public String call() throws ParseException {
+		public String call() throws ParsingException {
 			try {
 				internalParse(is, parameters, content);
 				return "completed";
-			} catch (ParseException pe) {
+			} catch (ParsingException pe) {
 				throw pe;
 			} catch (Exception ee) {
-				throw new ParseException(ee.getMessage(), ee);
+				throw new ParsingException(ee.getMessage(), ee);
 			}
 		}
 	}
@@ -159,7 +182,7 @@ public abstract class AbstractParser implements Parser {
 	 * Invoked by the parse method
 	 */
 	protected abstract void internalParse(InputStream is, ParseParameters parameters, StringBuilder output)
-			throws IOException, ParseException;
+			throws IOException, ParsingException;
 
 	@Override
 	public int countPages(InputStream input, String filename) {
