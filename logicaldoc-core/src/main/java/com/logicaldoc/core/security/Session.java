@@ -57,6 +57,8 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 	private Date lastRenew = new Date();
 
+	private Date finished;
+
 	/**
 	 * Represents the auto generated identifier of the session
 	 */
@@ -157,6 +159,8 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		logWarn("Session expired");
 
 		this.status = STATUS_EXPIRED;
+		this.finished=new Date();
+		
 		// Add a user history entry
 		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
 		userHistoryDAO.createUserHistory(user, UserEvent.TIMEOUT.toString(), null, sid, client);
@@ -167,6 +171,8 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		logInfo("Session closed");
 
 		this.status = STATUS_CLOSED;
+		this.finished=new Date();
+		
 		// Add a user history entry
 		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
 		userHistoryDAO.createUserHistory(user, UserEvent.LOGOUT.toString(), null, sid, client);
@@ -378,6 +384,16 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		return logs.isEmpty();
 	}
 
+	/**
+	 * Retrieves the total duration of the session
+	 * 
+	 * @return the duration in milliseconds
+	 */
+	public long getDuration() {
+		return Math.abs(
+				getCreation().getTime() - (getFinished() != null ? getFinished().getTime() : new Date().getTime()));
+	}
+
 	public class Log {
 		private Date date = new Date();
 
@@ -452,6 +468,14 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 	public void setLastRenew(Date lastRenew) {
 		this.lastRenew = lastRenew;
+	}
+
+	public Date getFinished() {
+		return finished;
+	}
+
+	public void setFinished(Date finished) {
+		this.finished = finished;
 	}
 
 	protected void setSid(String sid) {

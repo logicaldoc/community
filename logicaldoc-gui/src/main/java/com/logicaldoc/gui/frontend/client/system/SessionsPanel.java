@@ -101,7 +101,12 @@ public class SessionsPanel extends VLayout {
 		ListGridField created = new DateListGridField("created", "createdon");
 
 		ListGridField renew = new DateListGridField("renew", "lastrenew");
+		
+		ListGridField finished = new DateListGridField("finished", "finishedon");
+		finished.setHidden(true);
 
+		ListGridField duration = new ListGridField("duration", I18N.message("duration"), 100);
+		
 		ListGridField statusLabel = new ListGridField(STATUS_LABEL, I18N.message(STATUS), 80);
 		statusLabel.setCanFilter(false);
 
@@ -133,7 +138,7 @@ public class SessionsPanel extends VLayout {
 		sessionsGrid.setSelectionType(SelectionStyle.SINGLE);
 		sessionsGrid.setDataSource(new SessionsDS());
 
-		sessionsGrid.setFields(sid, statusLabel, username, tenant, created, renew, node, client);
+		sessionsGrid.setFields(sid, statusLabel, username, tenant, created, renew, finished, duration, node, client);
 	}
 
 	private void showContextMenu() {

@@ -21,6 +21,7 @@
 		<property name="node" type="string" column="ld_node" length="255" />
 		<property name="tenantName" type="string" column="ld_tenantname" length="255" />
 		<property name="lastRenew" type="timestamp" column="ld_lastrenew" />
+		<property name="finished" type="timestamp" column="ld_finished" />
 		<property name="status" type="int" column="ld_status" not-null="true" />
 
 		<component name="client" class="com.logicaldoc.core.security.Client">

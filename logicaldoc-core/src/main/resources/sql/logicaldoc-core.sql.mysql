@@ -225,7 +225,7 @@ create table ld_patch (ld_patch varchar(255), ld_date datetime, ld_version varch
 create table ld_session(ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                           ld_deleted int not null, ld_tenantid bigint not null, ld_sid varchar(255) not null,
                           ld_username varchar(255), ld_key varchar(255), ld_node varchar(255), ld_tenantname varchar(255),
-                          ld_creation datetime null, ld_lastrenew datetime null, ld_status int not null,
+                          ld_creation datetime null, ld_finished datetime null, ld_lastrenew datetime null, ld_status int not null,
                           ld_clientid varchar(255), ld_clientaddr varchar(255), ld_clienthost varchar(255), primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_dashlet(ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255), ld_title varchar(255), 

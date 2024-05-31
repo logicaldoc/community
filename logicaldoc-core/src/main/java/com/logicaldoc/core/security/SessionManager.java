@@ -164,6 +164,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 					dbSession.setDeleted(session.getDeleted());
 					dbSession.setLastRenew(session.getLastRenew());
 					dbSession.setStatus(session.getStatus());
+					dbSession.setFinished(session.getFinished());
 					sessionDao.store(dbSession);
 				}
 			}

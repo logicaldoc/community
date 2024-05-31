@@ -228,7 +228,7 @@ create table ld_patch (ld_patch varchar(255), ld_date timestamp, ld_version varc
 create table ld_session(ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null,
                           ld_deleted int not null, ld_tenantid bigint not null, ld_sid varchar(255) not null,
                           ld_username varchar(255), ld_key varchar(255), ld_node varchar(255), ld_tenantname varchar(255),
-                          ld_creation timestamp null, ld_lastrenew timestamp null, ld_status int not null,
+                          ld_creation timestamp null, ld_finished timestamp null, ld_lastrenew timestamp null, ld_status int not null,
                           ld_clientid varchar(255), ld_clientaddr varchar(255), ld_clienthost varchar(255), primary key (ld_id));
 create table ld_dashlet(ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255), ld_title varchar(255), 

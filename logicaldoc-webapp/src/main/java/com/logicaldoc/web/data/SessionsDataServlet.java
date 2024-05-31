@@ -23,6 +23,7 @@ import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.time.TimeDiff;
 import com.logicaldoc.web.util.ServletUtil;
 
 /**
@@ -162,9 +163,9 @@ public class SessionsDataServlet extends AbstractDataServlet {
 
 		writer.print("<session>");
 		writer.print("<sid><![CDATA[" + (showSid ? session.getSid() : "--") + "]]></sid>");
-		
+
 		printSessionStatusXml(session, locale, showSid, writer);
-		
+
 		writer.print("<username><![CDATA[" + (showSid ? session.getUsername() : "") + "]]></username>");
 		writer.print("<node><![CDATA[" + (showSid ? session.getNode() : "") + "]]></node>");
 
@@ -172,6 +173,9 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		writer.print("<client><![CDATA[" + (showSid ? client : "") + "]]></client>");
 		writer.print("<tenant><![CDATA[" + session.getTenantName() + "]]></tenant>");
 		writer.print("<created>" + df.format(session.getCreation()) + "</created>");
+		if (session.getFinished() != null)
+			writer.print("<finished>" + df.format(session.getCreation()) + "</finished>");
+		writer.print("<duration>" + TimeDiff.printDuration(session.getDuration()) + "</duration>");
 		if (SessionManager.get().get(session.getSid()) != null)
 			writer.print("<renew>" + df.format(SessionManager.get().get(session.getSid()).getLastRenew()) + "</renew>");
 		else
