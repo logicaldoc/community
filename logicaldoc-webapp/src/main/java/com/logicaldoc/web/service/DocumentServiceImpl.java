@@ -75,6 +75,7 @@ import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.document.thumbnail.ThumbnailManager;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.imaging.ImageUtil;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
@@ -221,6 +222,28 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			throws PersistenceException, ParsingException {
 		if (!docIdsToIndex.isEmpty())
 			index(docIdsToIndex.toArray(new Long[0]), session);
+	}
+
+	@Override
+	public void destroyDocuments(List<Long> docIds) throws ServerException {
+		final Session session = validateSession();
+		checkMenu(Menu.DESTROY_DOCUMENTS);
+
+		log.info("User {} requested the permanent deletion of docuemnts {}", session.getUsername(), docIds);
+		
+		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+
+		executeLongRunningOperation("Destroy Documents", () -> {
+			try {
+				for (Long docId : docIds) {
+					FolderHistory transaction = new FolderHistory();
+					transaction.setSession(session);
+					manager.destroyDocument(docId, transaction);
+				}
+			} catch (PersistenceException | PermissionException e) {
+				log.error(e.getMessage(), e);
+			}
+		}, session);
 	}
 
 	@Override
@@ -1202,10 +1225,10 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			}
 			docVO.setTenantId(session.getTenantId());
 
-            // Make sure to maintain relevant flags from real document
+			// Make sure to maintain relevant flags from real document
 			docVO.setOcrd(document.getOcrd());
 			docVO.setBarcoded(document.getBarcoded());
-			
+
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSession(session);

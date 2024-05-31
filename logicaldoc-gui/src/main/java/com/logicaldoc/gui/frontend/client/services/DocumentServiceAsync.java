@@ -28,6 +28,8 @@ public interface DocumentServiceAsync {
 	void deleteLinks(List<Long> ids, AsyncCallback<Void> callback);
 
 	void delete(List<Long> ids, AsyncCallback<Void> callback);
+	
+	void destroyDocuments(List<Long> ids, AsyncCallback<Void> callback);
 
 	void makeImmutable(List<Long> ids, String comment, AsyncCallback<Void> callback);
 

@@ -267,7 +267,7 @@ insert into ld_tag(ld_docid, ld_tenantid, ld_tag)
 values     (1, 1,'ghi');
 
 insert into ld_tag(ld_docid, ld_tenantid, ld_tag)
-values     (2, 1,'ask');
+values     (4, 1,'ask');
 
 insert into ld_tag(ld_docid, ld_tenantid, ld_tag)
 values     (3, 1,'zzz');
@@ -331,15 +331,15 @@ insert into ld_recipient
 values     (3,'paperino','topolino','sms',2, 0);
 
 insert into ld_link(ld_id, ld_lastmodified, ld_creation,ld_deleted, ld_docid1, ld_docid2,ld_type,ld_tenantid,ld_recordversion)
-values   (1,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,2,'test',1,1);
+values   (1,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,3,'test',1,1);
 insert into ld_link(ld_id, ld_lastmodified, ld_creation,ld_deleted, ld_docid1, ld_docid2,ld_type,ld_tenantid,ld_recordversion)
-values   (2,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,2,1,'xyz',1,1);
+values   (2,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,3,1,'xyz',1,1);
 insert into ld_link(ld_id, ld_lastmodified, ld_creation,ld_deleted, ld_docid1, ld_docid2,ld_type,ld_tenantid,ld_recordversion)
-values   (3,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,2,'xxx',1,1);
+values   (3,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,3,'xxx',1,1);
 insert into ld_link(ld_id, ld_lastmodified, ld_creation,ld_deleted, ld_docid1, ld_docid2,ld_type,ld_tenantid,ld_recordversion)
-values   (4,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,2,1,'',1,1);
+values   (4,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,3,1,'',1,1);
 insert into ld_link(ld_id, ld_lastmodified, ld_creation,ld_deleted, ld_docid1, ld_docid2,ld_type,ld_tenantid,ld_recordversion)
-values   (5,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,2,3,'',1,1);
+values   (5,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,4,3,'',1,1);
 
 
 

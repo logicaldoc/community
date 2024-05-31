@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
+import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.ticket.Ticket;
@@ -202,6 +203,17 @@ public interface DocumentManager {
 	 * @param doc the document to remove from the index
 	 */
 	public void deleteFromIndex(Document doc);
+	
+	/**
+	 * Permanently deletes a document from the system, the document and all the dependent resources will not be recoverable in the future.
+	 * 
+	 * @param docId the document to destroy
+	 * @param transaction the current session
+	 * 
+	 * @throws PersistenceException error at data layer
+	 * @throws PermissionException The user cannot destroy the document
+	 */
+	public void destroyDocument(long docId, FolderHistory transaction) throws PersistenceException, PermissionException;
 
 	/**
 	 * Utility method used to declare that:

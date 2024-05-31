@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,25 +28,31 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
+import com.logicaldoc.core.History;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.core.folder.FolderEvent;
+import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
-import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.parser.ParseParameters;
 import com.logicaldoc.core.parser.Parser;
 import com.logicaldoc.core.parser.ParserFactory;
+import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.core.security.menu.Menu;
+import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
@@ -107,6 +115,9 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Resource(name = "TicketDAO")
 	private TicketDAO ticketDAO;
+
+	@Resource(name = "MenuDAO")
+	private MenuDAO menuDAO;
 
 	@Resource(name = "SearchEngine")
 	private SearchEngine indexer;
@@ -210,7 +221,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		}
 	}
 
-	private void validateTransaction(DocumentHistory transaction) {
+	private void validateTransaction(History transaction) {
 		if (transaction == null)
 			throw new IllegalArgumentException(TRANSACTION_CANNOT_BE_NULL);
 		if (transaction.getUser() == null)
@@ -729,6 +740,10 @@ public class DocumentManagerImpl implements DocumentManager {
 		} else {
 			document.setTemplate(null);
 		}
+	}
+
+	public void setMenuDAO(MenuDAO menuDAO) {
+		this.menuDAO = menuDAO;
 	}
 
 	private void setBarcodeTemplate(Document document, Document docVO) {
@@ -1748,5 +1763,97 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	public void setDocumentLinkDAO(DocumentLinkDAO documentLinkDAO) {
 		this.documentLinkDAO = documentLinkDAO;
+	}
+
+	@Override
+	public void destroyDocument(long docId, FolderHistory transaction)
+			throws PersistenceException, PermissionException {
+		validateTransaction(transaction);
+
+		if (!menuDAO.isReadEnable(Menu.DESTROY_DOCUMENTS, transaction.getUserId())) {
+			String message = "User " + transaction.getUsername() + " cannot access the menu " + Menu.DESTROY_DOCUMENTS;
+			throw new PermissionException(message);
+		}
+
+		transaction.setDocId(docId);
+		transaction.setEvent(FolderEvent.DOCUMENT_DESTROYED.toString());
+
+		log.debug("Destroying document {}", docId);
+
+		// Just retrieve required informations of the document to destroy
+		documentDAO.query("select ld_folderid, ld_filename, ld_version, ld_fileversion from ld_document",
+				new RowMapper<Document>() {
+
+					@Override
+					public Document mapRow(ResultSet rs, int arg1) throws SQLException {
+						transaction.setFolderId(rs.getLong(1));
+						transaction.setDocId(docId);
+						transaction.setFilename(rs.getString(2));
+						transaction.setVersion(rs.getString(3));
+						transaction.setFileVersion(rs.getString(4));
+
+						Folder folder = folderDAO.findById(transaction.getFolderId());
+						transaction.setFolder(folder);
+
+						return null;
+					}
+				}, 1);
+
+		@SuppressWarnings("unchecked")
+		List<Long> versionIds = documentDAO.queryForList("select ld_id from ld_version where ld_documentid=" + docId,
+				Long.class);
+		if (!versionIds.isEmpty()) {
+			documentDAO.jdbcUpdate("delete from ld_version_ext where ld_versionid in ("
+					+ versionIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")) + ")");
+		}
+
+		String documentTag = docId + " - " + transaction.getFilename();
+
+		int count = documentDAO.jdbcUpdate("delete from ld_version where ld_documentid = " + docId);
+		log.info("Destroyed {} versions of document {}", count, documentTag);
+
+		count = documentDAO.jdbcUpdate("delete from ld_document_ext where ld_docid = " + docId);
+
+		count = documentDAO.jdbcUpdate("delete from ld_document where ld_docref = " + docId);
+		log.info("Destroyed {} aliases of document {}", count, documentTag);
+
+		count = documentDAO.jdbcUpdate("delete from ld_tag where ld_docid = " + docId);
+		log.info("Destroyed {} tags of document {}", documentTag);
+
+		count = documentDAO.jdbcUpdate("delete from ld_link where ld_docid1 = " + docId + " or ld_docid2 = " + docId);
+		log.info("Destroyed {} links of document {}", documentTag);
+
+		count = documentDAO.jdbcUpdate("delete from ld_bookmark where ld_type=0 and ld_docid = " + docId);
+		log.info("Destroyed {} bookmarks of document {}", documentTag);
+
+		count = documentDAO.jdbcUpdate("delete from ld_ticket where ld_docid = " + docId);
+		log.info("Destroyed {} tickets of document {}", documentTag);
+
+		count = documentDAO.jdbcUpdate("delete from ld_note where ld_docid = " + docId);
+		log.info("Destroyed {} notes of document {}", documentTag);
+
+		count = documentDAO.jdbcUpdate("delete from ld_history where ld_docid = " + docId);
+		log.info("Destroyed {} histories of document {}", documentTag);
+
+		try {
+			count = documentDAO.jdbcUpdate("delete from ld_readingrequest where ld_docid = " + docId);
+			log.info("Destroyed {} reading requests of document {}", documentTag);
+		} catch (Exception e) {
+			// Ignore because the table may not exist
+		}
+
+		count = documentDAO.jdbcUpdate("delete from ld_document where ld_id = " + docId);
+		log.info("Destroyed the record of document {}", documentTag);
+
+		indexer.deleteHit(docId);
+		log.info("Destroyed the index entry of document {}", documentTag);
+
+		storer.delete(docId);
+		log.info("Destroyed the storage of document {}", documentTag);
+
+		log.info("Document {} has been completely destroyed", documentTag);
+
+		// Record this destroy event in the parent folder history
+		folderDAO.saveFolderHistory(transaction.getFolder(), transaction);
 	}
 }

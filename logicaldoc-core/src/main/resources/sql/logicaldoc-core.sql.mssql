@@ -465,6 +465,10 @@ values     (-5,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'deleteddocs',90,'menu.png'
 
 insert into ld_menu
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (-9,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'destroydocs',-5,'menu.png',1,1,1,1,1);
+
+insert into ld_menu
+           (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
 values     (-6,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'deletedfolders',90,'menu.png',1,1,1,1,1);
 
 insert into ld_menu

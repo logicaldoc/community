@@ -10,12 +10,12 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIBookmark;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
-import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 
 /**
@@ -170,6 +170,16 @@ public interface DocumentService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public void delete(List<Long> ids) throws ServerException;
+
+	/**
+	 * Permanently deletes a selection of documents, no restore will be possible
+	 * later
+	 * 
+	 * @param ids identifiers of the documents
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void destroyDocuments(List<Long> ids) throws ServerException;
 
 	/**
 	 * Deletes a selection of documents from trash
@@ -542,7 +552,8 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public List<GUIDocumentNote> getNotes(long docId, String fileVersion, Collection<String> types) throws ServerException;
+	public List<GUIDocumentNote> getNotes(long docId, String fileVersion, Collection<String> types)
+			throws ServerException;
 
 	/**
 	 * Saves a set of notes
@@ -575,7 +586,8 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public List<GUIDocument> bulkUpdate(List<Long> ids, GUIDocument vo, boolean ignoreEmptyFields) throws ServerException;
+	public List<GUIDocument> bulkUpdate(List<Long> ids, GUIDocument vo, boolean ignoreEmptyFields)
+			throws ServerException;
 
 	/**
 	 * Creates a new empty document

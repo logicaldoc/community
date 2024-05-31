@@ -18,6 +18,8 @@ public class Menu {
 	public static final long DELETED_FOLDERS = -6;
 
 	public static final long DELETED_DOCS = -5;
+	
+	public static final long DESTROY_DOCUMENTS = -9;
 
 	public static final long ARCHIVED_DOCS = -4;
 

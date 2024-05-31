@@ -1,5 +1,10 @@
 package com.logicaldoc.core.document;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -11,8 +16,6 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.plugin.PluginException;
-
-import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateDocumentLinkDAO</code>
@@ -47,95 +50,91 @@ public class HibernateDocumentLinkDAOTest extends AbstractCoreTestCase {
 		link.setType("zzz");
 		dao.store(link);
 		link = dao.findById(link.getId());
-		Assert.assertEquals(1, link.getDocument1().getId());
-		Assert.assertEquals(2, link.getDocument2().getId());
-		Assert.assertEquals("zzz", link.getType());
+		assertEquals(1, link.getDocument1().getId());
+		assertEquals(2, link.getDocument2().getId());
+		assertEquals("zzz", link.getType());
 	}
 
 	@Test
 	public void testDelete() throws PersistenceException {
 		DocumentLink link = dao.findById(1);
-		Assert.assertNotNull(link);
+		assertNotNull(link);
 		dao.delete(1);
 		link = dao.findById(1);
-		Assert.assertNull(link);
+		assertNull(link);
 
 		// Try with unexisting link
 		dao.delete(99);
 
 		link = dao.findById(1);
-		Assert.assertNull(link);
+		assertNull(link);
 		link = dao.findById(2);
-		Assert.assertNotNull(link);
+		assertNotNull(link);
 	}
 
 	@Test
 	public void testFindById() throws PersistenceException {
 		DocumentLink link1 = dao.findById(1);
-		Assert.assertNotNull(link1);
-		Assert.assertEquals(1, link1.getDocument1().getId());
-		Assert.assertEquals(2, link1.getDocument2().getId());
-		Assert.assertEquals("test", link1.getType());
+		assertNotNull(link1);
+		assertEquals(1, link1.getDocument1().getId());
+		assertEquals(3, link1.getDocument2().getId());
+		assertEquals("test", link1.getType());
 
 		DocumentLink link2 = dao.findById(2);
-		Assert.assertNotNull(link2);
-		Assert.assertEquals(2, link2.getDocument1().getId());
-		Assert.assertEquals(1, link2.getDocument2().getId());
+		assertNotNull(link2);
+		assertEquals(3, link2.getDocument1().getId());
+		assertEquals(1, link2.getDocument2().getId());
 
 		link2 = dao.findById(99);
-		Assert.assertNull(link2);
+		assertNull(link2);
 	}
 
 	@Test
 	public void testFindByDocId() throws PersistenceException {
 		Collection<DocumentLink> links = dao.findByDocId(1, null);
-		Assert.assertNotNull(links);
-		Assert.assertEquals(4, links.size());
+		assertNotNull(links);
+		assertEquals(4, links.size());
 
-		Collection<DocumentLink> links2 = dao.findByDocId(2, null);
-		Assert.assertNotNull(links2);
-		Assert.assertEquals(4, links.size());
-
-		Collection<DocumentLink> links3 = dao.findByDocId(99, null);
-		Assert.assertNotNull(links3);
-		Assert.assertEquals(0, links3.size());
+		links = dao.findByDocId(99, null);
+		assertNotNull(links);
+		assertTrue(links.isEmpty());
 
 		links = dao.findByDocId(1, "test");
-		Assert.assertNotNull(links);
-		Assert.assertEquals(1, links.size());
+		assertNotNull(links);
+		assertEquals(1, links.size());
 
-		links2 = dao.findByDocId(99, "pippo");
-		Assert.assertNotNull(links2);
-		Assert.assertEquals(0, links2.size());
+		links = dao.findByDocId(99, "pippo");
+		assertNotNull(links);
+		assertTrue(links.isEmpty());
 
-		links2 = dao.findByDocId(1, "pippo");
-		Assert.assertNotNull(links2);
-		Assert.assertEquals(0, links2.size());
+		links = dao.findByDocId(1, "pippo");
+		assertNotNull(links);
+		assertTrue(links.isEmpty());
 	}
 
 	@Test
 	public void testFindByDocIdsAndType() throws PersistenceException {
-		DocumentLink link = dao.findByDocIdsAndType(1, 2, "test");
-		Assert.assertNotNull(link);
-		Assert.assertEquals(1, link.getId());
+		DocumentLink link = dao.findByDocIdsAndType(1, 3, "test");
+		assertNotNull(link);
+		assertEquals(1, link.getId());
 
-		link = dao.findByDocIdsAndType(2, 1, "xyz");
-		Assert.assertNotNull(link);
-		Assert.assertEquals(2, link.getId());
+		link = dao.findByDocIdsAndType(3L, 1L, "xyz");
+		assertNotNull(link);
+		assertEquals(2, link.getId());
 
-		link = dao.findByDocIdsAndType(1, 2, "xxx");
-		Assert.assertNotNull(link);
-		Assert.assertEquals(3, link.getId());
+		link = dao.findByDocIdsAndType(1L, 3L, "xxx");
+		assertNotNull(link);
+		assertEquals(3, link.getId());
 
-		link = dao.findByDocIdsAndType(2, 1, "");
-		Assert.assertNotNull(link);
-		Assert.assertEquals(4, link.getId());
+		link = dao.findByDocIdsAndType(3, 1, "");
+		assertNotNull(link);
+		assertEquals(4, link.getId());
 
-		link = dao.findByDocIdsAndType(2, 1, null);
-		Assert.assertNull(link);
+		link = dao.findByDocIdsAndType(3, 1, null);
+		assertNull(link);
 
 		link = dao.findByDocIdsAndType(1, 2, "zzz");
-		Assert.assertNull(link);
+		assertNull(link);
 
 	}
 }

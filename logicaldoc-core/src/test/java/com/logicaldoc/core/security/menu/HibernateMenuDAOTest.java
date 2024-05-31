@@ -171,7 +171,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 	public void testFindByParentId() {
 		List<Menu> menus = dao.findByParentId(2, false);
 		Assert.assertNotNull(menus);
-		Assert.assertEquals(34, menus.size());
+		Assert.assertEquals(35, menus.size());
 
 		// Try with unexisting parent
 		menus = dao.findByParentId(999, false);

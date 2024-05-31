@@ -528,7 +528,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			if (rs != null)
 				while (rs.next()) {
 					String file = rs.getString(1);
-					if (file!=null && !fileNames.contains(file))
+					if (file != null && !fileNames.contains(file))
 						fileNames.add(file.toLowerCase());
 				}
 		} catch (PersistenceException e) {
@@ -786,8 +786,12 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 		@SuppressWarnings("unchecked")
 		List<Long> ids = queryForList(query.toString(), params, Long.class, null);
-		return findByWhere(ENTITY + ".id in (" + ids.stream().map(Object::toString).collect(Collectors.joining(","))
-				+ ") and not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED, null, null);
+
+		if (ids.isEmpty())
+			return new ArrayList<>();
+		else
+			return findByWhere(ENTITY + ".id in (" + ids.stream().map(Object::toString).collect(Collectors.joining(","))
+					+ ") and not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED, null, null);
 	}
 
 	@Override

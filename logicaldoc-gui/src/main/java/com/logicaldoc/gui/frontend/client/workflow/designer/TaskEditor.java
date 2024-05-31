@@ -110,7 +110,7 @@ public class TaskEditor extends Window {
 			setHeight(600);
 		} else {
 			tabSet.setTabs(propertiesTab, automationTab, messagesTab);
-			setHeight(500);	
+			setHeight(550);	
 		}
 		addItem(tabSet);
 

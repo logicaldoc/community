@@ -69,6 +69,8 @@ public class Menu extends SecurablePersistentObject implements Comparable<Menu> 
 
 	public static final int TYPE_CUSTOM_ACTION = 2;
 
+	public static final long DESTROY_DOCUMENTS = -9;
+	
 	private String name = "";
 
 	private long parentId = 0;
