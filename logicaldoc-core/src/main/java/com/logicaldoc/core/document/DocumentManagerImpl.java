@@ -116,9 +116,6 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Resource(name = "TicketDAO")
 	private TicketDAO ticketDAO;
 
-	@Resource(name = "MenuDAO")
-	private MenuDAO menuDAO;
-
 	@Resource(name = "SearchEngine")
 	private SearchEngine indexer;
 
@@ -740,10 +737,6 @@ public class DocumentManagerImpl implements DocumentManager {
 		} else {
 			document.setTemplate(null);
 		}
-	}
-
-	public void setMenuDAO(MenuDAO menuDAO) {
-		this.menuDAO = menuDAO;
 	}
 
 	private void setBarcodeTemplate(Document document, Document docVO) {
@@ -1770,6 +1763,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			throws PersistenceException, PermissionException {
 		validateTransaction(transaction);
 
+		MenuDAO menuDAO = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		if (!menuDAO.isReadEnable(Menu.DESTROY_DOCUMENTS, transaction.getUserId())) {
 			String message = "User " + transaction.getUsername() + " cannot access the menu " + Menu.DESTROY_DOCUMENTS;
 			throw new PermissionException(message);
@@ -1793,7 +1787,8 @@ public class DocumentManagerImpl implements DocumentManager {
 						transaction.setFileVersion(rs.getString(4));
 
 						Folder folder = folderDAO.findById(transaction.getFolderId());
-						transaction.setFolder(folder);
+						if (folder != null)
+							transaction.setFolder(folder);
 
 						return null;
 					}
@@ -1854,6 +1849,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		log.info("Document {} has been completely destroyed", documentTag);
 
 		// Record this destroy event in the parent folder history
-		folderDAO.saveFolderHistory(transaction.getFolder(), transaction);
+		if (transaction.getFolder() != null)
+			folderDAO.saveFolderHistory(transaction.getFolder(), transaction);
 	}
 }
