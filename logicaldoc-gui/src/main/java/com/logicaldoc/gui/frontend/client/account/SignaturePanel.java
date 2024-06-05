@@ -10,7 +10,7 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -89,7 +89,7 @@ public class SignaturePanel extends StampProperties {
 		if (changedHandler != null)
 			pageSelection.addChangedHandler(changedHandler);
 
-		final RadioGroupItem pageOption = ItemFactory.newRadioGroup("pageOption", "stampin");
+		final SelectItem pageOption = ItemFactory.newSelectItem("pageOption", "stampin");
 		LinkedHashMap<String, String> pageOptions = new LinkedHashMap<>();
 		pageOptions.put("" + GUIStamp.PAGE_OPT_ALL, I18N.message("allpages"));
 		pageOptions.put("" + GUIStamp.PAGE_OPT_FIRST, I18N.message("firstpage"));
@@ -97,7 +97,6 @@ public class SignaturePanel extends StampProperties {
 		pageOptions.put("" + GUIStamp.PAGE_OPT_SEL, I18N.message("selection"));
 		pageOption.setValueMap(pageOptions);
 		pageOption.setValue("" + stamp.getPageOption());
-		pageOption.setWrap(false);
 		pageOption.addChangedHandler(event -> {
 			if (event.getValue().equals("" + GUIStamp.PAGE_OPT_SEL))
 				pageSelection.show();

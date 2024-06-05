@@ -103,7 +103,7 @@ public class CronExpressionComposer extends Window {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("cronexpressioncomposer"));
 		setWidth(650);
-		setHeight(340);
+		setHeight(400);
 
 		setCanDragResize(true);
 		setIsModal(true);

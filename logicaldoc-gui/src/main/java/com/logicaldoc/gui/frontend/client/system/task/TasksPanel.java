@@ -236,7 +236,7 @@ public class TasksPanel extends AdminPanel {
 		progressbar.setAlign(Alignment.LEFT);
 		progressbar.setCellFormatter((value, rec, rowNum, colNum) -> "");
 
-		ListGridField completion = new ListGridField(COMPLETION, " ", 35);
+		ListGridField completion = new ListGridField(COMPLETION, " ", 60);
 		completion.setCanFilter(false);
 		completion.setCanSort(false);
 		completion.setAlign(Alignment.LEFT);

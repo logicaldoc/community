@@ -1304,10 +1304,9 @@ public class ItemFactory {
 		composer.setSrc("[SKIN]/DynamicForm/date_control.png");
 		composer.setWidth(16);
 		composer.setHeight(16);
-		composer.addFormItemClickHandler((FormItemIconClickEvent event) -> {
-			CronExpressionComposer comp = new CronExpressionComposer(cron, handler);
-			comp.show();
-			event.cancel();
+		composer.addFormItemClickHandler(click -> {
+			new CronExpressionComposer(cron, handler).show();
+			click.cancel();
 		});
 
 		FormItemIcon validate = new FormItemIcon();
@@ -1315,7 +1314,7 @@ public class ItemFactory {
 		validate.setSrc("[SKIN]/actions/approve.png");
 		validate.setWidth(16);
 		validate.setHeight(16);
-		validate.addFormItemClickHandler((FormItemIconClickEvent event) -> InfoService.Instance.get()
+		validate.addFormItemClickHandler(click -> InfoService.Instance.get()
 				.getCronDescription(cron.getValueAsString(), I18N.getLocale(), new AsyncCallback<>() {
 
 					@Override
@@ -1332,7 +1331,7 @@ public class ItemFactory {
 					}
 				}));
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent event) -> {
+		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, click -> {
 			cron.setValue((String) null);
 			cron.clearErrors();
 			if (handler != null)

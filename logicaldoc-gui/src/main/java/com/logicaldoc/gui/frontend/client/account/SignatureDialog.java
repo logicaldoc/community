@@ -44,7 +44,7 @@ public class SignatureDialog extends Window {
 				SignaturePanel signaturePanel = new SignaturePanel(stamp);
 
 				ToolStripButton save = new ToolStripButton(I18N.message("save"));
-				save.addClickHandler(event -> {
+				save.addClickHandler(click -> {
 					if (signaturePanel.validate())
 						StampService.Instance.get().save(signaturePanel.getStamp(), new AsyncCallback<>() {
 
@@ -61,13 +61,10 @@ public class SignatureDialog extends Window {
 				});
 
 				ToolStripButton uploadSignaure = new ToolStripButton(I18N.message("uploadyoursignature"));
-				uploadSignaure.addClickHandler(event -> {
-					StampUploader uploader = new StampUploader(stamp.getId(), signaturePanel);
-					uploader.show();
-				});
+				uploadSignaure.addClickHandler(click -> new StampUploader(stamp.getId(), signaturePanel).show());
 
 				ToolStripButton close = new ToolStripButton(I18N.message("close"));
-				close.addClickHandler(event -> destroy());
+				close.addClickHandler(click -> destroy());
 
 				ToolStrip toolStrip = new ToolStrip();
 				toolStrip.setWidth100();
