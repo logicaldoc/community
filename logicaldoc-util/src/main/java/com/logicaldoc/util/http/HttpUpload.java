@@ -4,15 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.mime.FileBody;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,21 +60,28 @@ public class HttpUpload {
 		filePost.setEntity(reqEntity);
 
 		CloseableHttpClient client = HttpUtil.getNotValidatingClient(TIMEOUT);
-		try (CloseableHttpResponse response = client.execute(filePost);) {
+		client.execute(filePost, new StringHttpClientResponseHandler() {
+			@Override
+			public String handleResponse(ClassicHttpResponse response) throws IOException {
+				int status = response.getCode();
+				String respBody = "";
+				HttpEntity rent = response.getEntity();
+				if (rent != null)
+					try {
+						respBody = EntityUtils.toString(rent, UTF_8);
+					} catch (ParseException e) {
+						throw new IOException(e);
+					}
+				if (status == HttpStatus.SC_OK) {
+					log.debug("Upload complete, response: {}", respBody);
+				} else {
+					log.debug("Upload failed, response: {}", status);
+					throw new IOException("" + status);
+				}
 
-			int status = response.getStatusLine().getStatusCode();
-			String respBody = "";
-			HttpEntity rent = response.getEntity();
-			if (rent != null)
-				respBody = EntityUtils.toString(rent, UTF_8);
-
-			if (status == HttpStatus.SC_OK) {
-				log.debug("Upload complete, response: {}", respBody);
-			} else {
-				log.debug("Upload failed, response: {}", status);
-				throw new IOException("" + status);
+				return respBody;
 			}
-		}
+		});
 	}
 
 	public String getURL() {

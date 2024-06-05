@@ -1,20 +1,18 @@
 package com.logicaldoc.core.communication.oauth;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.Consts;
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,38 +54,41 @@ public class Microsoft365TokenProvider implements TokenProvider {
 		try (CloseableHttpClient httpClient = HttpUtil.getNotValidatingClient(60);) {
 
 			// Prepare the post parameters
-			List<NameValuePair> postParams = new ArrayList<NameValuePair>();
-
-			// Application LogicalDOC
-			postParams.add(new BasicNameValuePair("client_id", clientId));
-			postParams.add(new BasicNameValuePair("client_secret", clientSecret));
-			postParams.add(new BasicNameValuePair("grant_type", "client_credentials"));
-			postParams.add(new BasicNameValuePair("scope", "https://outlook.office365.com/.default"));
-
-			HttpPost request = new HttpPost(
+			HttpPost post = new HttpPost(
 					String.format("https://login.microsoftonline.com/%s/oauth2/v2.0/token", clientTenant));
-			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(postParams, Consts.UTF_8);
-			request.setEntity(entity);
+			UrlEncodedFormEntity entity = (new UrlEncodedFormEntity(
+					List.of(new BasicNameValuePair("client_id", clientId),
+							new BasicNameValuePair("client_secret", clientSecret),
+							new BasicNameValuePair("grant_type", "client_credentials"),
+							new BasicNameValuePair("scope", "https://outlook.office365.com/.default"))));
+			post.setEntity(entity);
 
-			// Make request
-			try (CloseableHttpResponse response = httpClient.execute(request);) {
-				// Extract body from response
-				HttpEntity responseContent = response.getEntity();
-				String result = EntityUtils.toString(responseContent, "UTF-8");
+			String token = httpClient.execute(post, new BasicHttpClientResponseHandler() {
 
-				log.debug("got 365 response: {}", StringUtils.substring(result, 150));
+				@Override
+				public String handleResponse(ClassicHttpResponse response) throws IOException {
+					String content;
+					try {
+						content = EntityUtils.toString(response.getEntity(), "UTF-8");
+					} catch (ParseException e) {
+						throw new IOException(e);
+					}
 
-				ObjectMapper mapper = new ObjectMapper();
-				JsonNode responseObj = mapper.readTree(result);
-				if (result.contains("error"))
-					throw new IOException(
-							responseObj.get("error").asText() + " - " + responseObj.get("error_description").asText());
+					log.debug("got 365 response: {}", StringUtils.substring(content, 150));
 
-				String token = new String(new Base64().decode(responseObj.get("access_token").asText().getBytes()));
-				log.debug("got access_token: {}", token);
+					ObjectMapper mapper = new ObjectMapper();
+					JsonNode responseObj = mapper.readTree(content);
+					if (content.contains("error"))
+						throw new IOException(responseObj.get("error").asText() + " - "
+								+ responseObj.get("error_description").asText());
 
-				return responseObj.get("access_token").asText();
-			}
+					String token = new String(new Base64().decode(responseObj.get("access_token").asText().getBytes()));
+					log.debug("got access_token: {}", token);
+					return responseObj.get("access_token").asText();
+				}
+			});
+
+			return token;
 		}
 	}
 }

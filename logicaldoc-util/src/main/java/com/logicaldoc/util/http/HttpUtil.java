@@ -2,26 +2,33 @@ package com.logicaldoc.util.http;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
-import org.apache.http.ssl.SSLContextBuilder;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.auth.AuthCache;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.CredentialsProvider;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
+import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
+import org.apache.hc.client5.http.impl.auth.BasicScheme;
+import org.apache.hc.client5.http.impl.auth.CredentialsProviderBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.impl.routing.DefaultProxyRoutePlanner;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder;
+import org.apache.hc.client5.http.ssl.TrustAllStrategy;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
 
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
@@ -64,36 +71,59 @@ public class HttpUtil {
 
 	public static CloseableHttpClient getNotValidatingClient(int timeout, String proxyServer, Integer proxyPort,
 			String proxyUser, String proxyPassword) {
-		try {
-			HttpClientBuilder clientBuilder = HttpClients.custom();
 
-			RequestConfig.Builder requestBuilder = RequestConfig.custom().setConnectTimeout(timeout * 1000)
-					.setSocketTimeout(timeout * 1000).setConnectionRequestTimeout(timeout * 1000)
-					.setRedirectsEnabled(true);
+		try {
+			ConnectionConfig connectionConfig = ConnectionConfig.custom().setConnectTimeout(timeout, TimeUnit.SECONDS)
+					.setSocketTimeout(timeout, TimeUnit.SECONDS).build();
+
+			RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(timeout, TimeUnit.SECONDS)
+					.setResponseTimeout(timeout, TimeUnit.SECONDS).build();
+
+			SocketConfig socketConfig = SocketConfig.custom().setSoTimeout(timeout, TimeUnit.SECONDS).build();
+
+			PoolingHttpClientConnectionManager poolingHttpClientConnectionManager = PoolingHttpClientConnectionManagerBuilder
+					.create().setDefaultConnectionConfig(connectionConfig).setDefaultSocketConfig(socketConfig).build();
+
+			HttpClientBuilder clientBuilder = HttpClientBuilder.create()
+					.setRedirectStrategy(new DefaultRedirectStrategy())
+					.setConnectionManager(poolingHttpClientConnectionManager).setDefaultRequestConfig(requestConfig);
 
 			if (StringUtils.isNotEmpty(proxyServer)) {
 				HttpHost proxyHost = new HttpHost(proxyServer, proxyPort);
-				requestBuilder.setProxy(proxyHost);
-
 				DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHost);
-				clientBuilder.setRoutePlanner(routePlanner);
 
 				if (StringUtils.isNotEmpty(proxyUser)) {
-					CredentialsProvider credentialProvider = new BasicCredentialsProvider();
-					credentialProvider.setCredentials(AuthScope.ANY,
-							new UsernamePasswordCredentials(proxyUser, proxyPassword));
-					clientBuilder.setRoutePlanner(routePlanner);
+					// Client credentials
+					CredentialsProvider credentialsProvider = CredentialsProviderBuilder.create()
+							.add(new AuthScope(proxyHost), proxyUser, proxyPassword.toCharArray()).build();
+
+					// Create AuthCache instance
+					AuthCache authCache = new BasicAuthCache();
+
+					// Generate BASIC scheme object and add it to the local auth
+					// cache
+					BasicScheme basicAuth = new BasicScheme();
+					authCache.put(proxyHost, basicAuth);
+					HttpClientContext context = HttpClientContext.create();
+					context.setCredentialsProvider(credentialsProvider);
+					context.setAuthCache(authCache);
+
+					clientBuilder = clientBuilder.setRoutePlanner(routePlanner)
+							.setDefaultCredentialsProvider(credentialsProvider);
+				} else {
+					clientBuilder = clientBuilder.setRoutePlanner(routePlanner);
 				}
 			}
 
-			RequestConfig requestConfig = requestBuilder.build();
+			// Non validating SSL policies
+			clientBuilder = clientBuilder.setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()
+					.setSSLSocketFactory(SSLConnectionSocketFactoryBuilder.create()
+							.setSslContext(
+									SSLContextBuilder.create().loadTrustMaterial(TrustAllStrategy.INSTANCE).build())
+							.setHostnameVerifier(NoopHostnameVerifier.INSTANCE).build())
+					.build());
 
-			return clientBuilder.setSSLHostnameVerifier(new NoopHostnameVerifier())
-					.setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
-						public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-							return true;
-						}
-					}).build()).setDefaultRequestConfig(requestConfig).build();
+			return clientBuilder.build();
 		} catch (Exception t) {
 			return null;
 		}
@@ -104,7 +134,7 @@ public class HttpUtil {
 		return getNotValidatingClient(timeout, proxy[0], Integer.parseInt(proxy[1]), proxy[2], proxy[3]);
 	}
 
-	public static void close(CloseableHttpResponse response) {
+	public static void close(ClassicHttpResponse response) {
 		if (response != null)
 			try {
 				response.close();
@@ -113,7 +143,7 @@ public class HttpUtil {
 			}
 	}
 
-	public static String getBodyString(CloseableHttpResponse response) {
+	public static String getBodyString(ClassicHttpResponse response) {
 		HttpEntity rent = response.getEntity();
 		if (rent != null) {
 			String respBody = "";
@@ -127,7 +157,7 @@ public class HttpUtil {
 		return "";
 	}
 
-	public static InputStream getBodyStream(CloseableHttpResponse response) throws IllegalStateException, IOException {
+	public static InputStream getBodyStream(ClassicHttpResponse response) throws IllegalStateException, IOException {
 		HttpEntity rent = response.getEntity();
 		if (rent != null)
 			return rent.getContent();

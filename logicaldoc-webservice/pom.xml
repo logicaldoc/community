@@ -191,8 +191,8 @@
 			<version>1.5.4</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
+			<groupId>org.apache.httpcomponents.client5</groupId>
+			<artifactId>httpclient5</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -242,7 +242,7 @@
 			<artifactId>jaxws-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.glassfish</groupId>
+			<groupId>org.glassfish.main.javaee-api</groupId>
 			<artifactId>javax.jws</artifactId>
 		</dependency>
 		<dependency>

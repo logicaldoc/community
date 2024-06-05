@@ -5,8 +5,10 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.content.FileBody;
+import org.apache.hc.client5.http.entity.mime.FileBody;
+import org.apache.hc.core5.http.ContentType;
+
+
 
 /**
  * This is a file body that notifies about the progess a given listener

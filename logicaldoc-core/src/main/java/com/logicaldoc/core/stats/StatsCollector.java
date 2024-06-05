@@ -11,13 +11,11 @@ import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.Consts;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
@@ -37,6 +35,8 @@ import com.logicaldoc.core.task.Task;
 import com.logicaldoc.core.task.TaskException;
 import com.logicaldoc.core.util.UserUtil;
 import com.logicaldoc.util.http.HttpUtil;
+import com.logicaldoc.util.http.StringHttpClientResponseHandler;
+import com.logicaldoc.util.io.CharsetUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
 
 /**
@@ -327,19 +327,12 @@ public class StatsCollector extends Task {
 
 	private void postStatistics(List<NameValuePair> postParams) {
 		try {
-			HttpPost post = new HttpPost("http://stat.logicaldoc.com/stats/collect");
-			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(postParams, Consts.UTF_8);
-			post.setEntity(entity);
-
-			CloseableHttpClient httpclient = HttpUtil.getNotValidatingClient(60);
-
 			// Execute request
-			try (CloseableHttpResponse response = httpclient.execute(post)) {
-				int responseStatusCode = response.getStatusLine().getStatusCode();
-				// log status code
-				log.debug("Response status code: {}", responseStatusCode);
-				if (responseStatusCode != 200)
-					throw new IOException(HttpUtil.getBodyString(response));
+			try (CloseableHttpClient httpClient = HttpUtil.getNotValidatingClient(60)) {
+				HttpPost post = new HttpPost("http://stat.logicaldoc.com/stats/collect");
+				UrlEncodedFormEntity entity = new UrlEncodedFormEntity(postParams, CharsetUtil.utf8());
+				post.setEntity(entity);
+				httpClient.execute(post, new StringHttpClientResponseHandler());
 			}
 			log.info("Statistics packaged");
 		} catch (IOException e) {

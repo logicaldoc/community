@@ -2,48 +2,39 @@ package com.logicaldoc.webservice;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.http.Consts;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.ClientProtocolException;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.CredentialsProvider;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.entity.mime.FileBody;
+import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.entity.mime.StringBody;
+import org.apache.hc.client5.http.impl.auth.CredentialsProviderBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicHeader;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.net.URIBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.logicaldoc.util.http.StringHttpClientResponseHandler;
+import com.logicaldoc.util.io.CharsetUtil;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSSearchOptions;
 
@@ -56,177 +47,121 @@ public class HttpRestWb {
 
 	public static String PASSWORD = "admin";
 
+	protected static CloseableHttpClient getHttpClient() {
+		// Client credentials
+		CredentialsProvider credentialsProvider = CredentialsProviderBuilder.create()
+				.add(new AuthScope(null, null, -1, null, null), USERNAME, PASSWORD.toCharArray()).build();
+		return HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
+	}
+
 	public static void main(String[] args) throws Exception {
 
 		// String sid = loginJSON();
 
-		CredentialsProvider credsProvider = new BasicCredentialsProvider();
-		credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(USERNAME, PASSWORD));
+		try (CloseableHttpClient httpClient = getHttpClient()) {
 
-		CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider)
-				.setConnectionTimeToLive(1, TimeUnit.MINUTES).build();
+			// uploadDocument(httpclient);
 
-		URL url = new URL(BASE_PATH);
+			// createFolderSimpleForm(httpclient);
+			// createFolderSimpleJSON(httpclient);
 
-		HttpHost targetHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
+			createDocument(httpClient);
+			/*
+			 * 
+			 * //listDocuments(httpclient, 04L); //listChildren(httpclient,
+			 * 04L);
+			 * 
+			 * //long start_time = System.nanoTime();
+			 * 
+			 * // WSSearchOptions wsso = buildSearchOptions("en",
+			 * "document management system"); // find(httpclient, wsso);
+			 * 
+			 * 
+			 * 
+			 * /* wsso = buildSearchOptions("en", "document management");
+			 * find(sid, wsso);
+			 * 
+			 * wsso = buildSearchOptions("en", "Document Management"); find(sid,
+			 * wsso);
+			 * 
+			 * wsso = buildSearchOptions("en", "Document Management system");
+			 * find(sid, wsso);
+			 * 
+			 * wsso = buildSearchOptions("en", "Management system"); find(sid,
+			 * wsso);
+			 * 
+			 * wsso = buildSearchOptions("en", "document system"); find(sid,
+			 * wsso);
+			 * 
+			 * wsso = buildSearchOptions("en", "documental system"); find(sid,
+			 * wsso);
+			 * 
+			 * wsso = buildSearchOptions("en", "documental system"); find(sid,
+			 * wsso);
+			 * 
+			 * wsso = buildSearchOptions("en", "electronic document system");
+			 * find(sid, wsso);
+			 * 
+			 * wsso = buildSearchOptions("en",
+			 * "electronic document management system"); find(sid, wsso);
+			 * 
+			 * wsso = buildSearchOptions("en",
+			 * "electronic system for document management"); find(sid, wsso);
+			 * 
+			 * long end_time = System.nanoTime(); double difference = (end_time
+			 * - start_time)/1e6; System.out.println("Total Exec. time (ms): "
+			 * +difference);
+			 */
 
-		AuthCache authCache = new BasicAuthCache();
-		authCache.put(targetHost, new BasicScheme());
+			// Total Exec. time (ms): 681.909198
+			// Total Exec. time (ms): 737.044408
+			// Total Exec. time (ms): 705.149953
+			// Total Exec. time (ms): 739.934107
+			// Total Exec. time (ms): 767.015352
 
-		// Add AuthCache to the execution context
-		HttpClientContext context = HttpClientContext.create();
-		context.setCredentialsProvider(credsProvider);
-		context.setAuthCache(authCache);
+			// Con deserializzazione in Java object e riserializzaione in json
+			// (per
+			// system out)
+			// Total Exec. time (ms): 1114.652089
+			// Total Exec. time (ms): 951.179299
+			// Total Exec. time (ms): 1080.464628
+			// Total Exec. time (ms): 973.297579
+			// Total Exec. time (ms): 1062.980412
+			// Total Exec. time (ms): 1064.021243
 
-		// uploadDocument(httpclient);
+			// createPath(httpclient, 04L, "/sgsgsgs/Barisoni/rurururu");
+			// if (1 == 1) return;
 
-		// createFolderSimpleForm(httpclient);
-		// createFolderSimpleJSON(httpclient);
+			String sid = getSid(httpClient);
 
-		createDocument(httpclient);
-		/*
-		 * 
-		 * //listDocuments(httpclient, 04L); //listChildren(httpclient, 04L);
-		 * 
-		 * //long start_time = System.nanoTime();
-		 * 
-		 * // WSSearchOptions wsso = buildSearchOptions("en",
-		 * "document management system"); // find(httpclient, wsso);
-		 * 
-		 * 
-		 * 
-		 * /* wsso = buildSearchOptions("en", "document management"); find(sid,
-		 * wsso);
-		 * 
-		 * wsso = buildSearchOptions("en", "Document Management"); find(sid,
-		 * wsso);
-		 * 
-		 * wsso = buildSearchOptions("en", "Document Management system");
-		 * find(sid, wsso);
-		 * 
-		 * wsso = buildSearchOptions("en", "Management system"); find(sid,
-		 * wsso);
-		 * 
-		 * wsso = buildSearchOptions("en", "document system"); find(sid, wsso);
-		 * 
-		 * wsso = buildSearchOptions("en", "documental system"); find(sid,
-		 * wsso);
-		 * 
-		 * wsso = buildSearchOptions("en", "documental system"); find(sid,
-		 * wsso);
-		 * 
-		 * wsso = buildSearchOptions("en", "electronic document system");
-		 * find(sid, wsso);
-		 * 
-		 * wsso = buildSearchOptions("en",
-		 * "electronic document management system"); find(sid, wsso);
-		 * 
-		 * wsso = buildSearchOptions("en",
-		 * "electronic system for document management"); find(sid, wsso);
-		 * 
-		 * long end_time = System.nanoTime(); double difference = (end_time -
-		 * start_time)/1e6; System.out.println("Total Exec. time (ms): "
-		 * +difference);
-		 */
-
-		// Total Exec. time (ms): 681.909198
-		// Total Exec. time (ms): 737.044408
-		// Total Exec. time (ms): 705.149953
-		// Total Exec. time (ms): 739.934107
-		// Total Exec. time (ms): 767.015352
-
-		// Con deserializzazione in Java object e riserializzaione in json (per
-		// system out)
-		// Total Exec. time (ms): 1114.652089
-		// Total Exec. time (ms): 951.179299
-		// Total Exec. time (ms): 1080.464628
-		// Total Exec. time (ms): 973.297579
-		// Total Exec. time (ms): 1062.980412
-		// Total Exec. time (ms): 1064.021243
-
-		// createPath(httpclient, 04L, "/sgsgsgs/Barisoni/rurururu");
-		// if (1 == 1) return;
-
-		String sid = getSid(httpclient);
-
-		logout(httpclient, sid);
-	}
-
-	private static String getSid(CloseableHttpClient httpclient) throws ClientProtocolException, IOException {
-		URL url = new URL(BASE_PATH);
-
-		HttpHost targetHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
-		CredentialsProvider credsProvider = new BasicCredentialsProvider();
-		credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(USERNAME, PASSWORD));
-
-		AuthCache authCache = new BasicAuthCache();
-		authCache.put(targetHost, new BasicScheme());
-
-		// Add AuthCache to the execution context
-		HttpClientContext context = HttpClientContext.create();
-		context.setCredentialsProvider(credsProvider);
-		context.setAuthCache(authCache);
-
-		HttpGet getg = new HttpGet(BASE_PATH + "/services/rest/auth/getSid");
-		String sid = null;
-
-		CloseableHttpResponse response = httpclient.execute(getg, context);
-		try {
-			HttpEntity rent = response.getEntity();
-			if (rent != null) {
-				String respoBody = EntityUtils.toString(rent, "UTF-8");
-				System.out.println("SID: " + respoBody);
-				sid = respoBody;
-			}
-		} finally {
-			response.close();
-		}
-		return sid;
-	}
-
-	private static void logout(CloseableHttpClient httpclient, String sid) throws ClientProtocolException, IOException {
-
-		HttpDelete deletem = new HttpDelete(BASE_PATH + "/services/rest/auth/logout?sid=" + sid);
-
-		CloseableHttpResponse response = httpclient.execute(deletem);
-		try {
-			HttpEntity rent = response.getEntity();
-			if (rent != null) {
-				String respoBody = EntityUtils.toString(rent, "UTF-8");
-				System.out.println(respoBody);
-			}
-		} finally {
-			response.close();
+			logout(httpClient, sid);
 		}
 	}
 
-	private static void createPath(CloseableHttpClient httpclient, long parentId, String path) throws Exception {
+	private static String getSid(CloseableHttpClient httpClient) throws ClientProtocolException, IOException {
+		return httpClient.execute(new HttpGet(BASE_PATH + "/services/rest/auth/getSid"),
+				new StringHttpClientResponseHandler());
+	}
 
-		// CloseableHttpClient httpclient = HttpClients.createDefault();
+	private static void logout(CloseableHttpClient httpClient, String sid) throws ClientProtocolException, IOException {
+		httpClient.execute(new HttpDelete(BASE_PATH + "/services/rest/auth/logout?sid=" + sid),
+				new StringHttpClientResponseHandler());
+	}
 
+	private static void createPath(CloseableHttpClient httpClient, long parentId, String path) throws Exception {
 		List<NameValuePair> formparams = new ArrayList<>();
 		formparams.add(new BasicNameValuePair("parentId", String.valueOf(parentId)));
 		formparams.add(new BasicNameValuePair("path", path));
 
-		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, Consts.UTF_8);
+		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, CharsetUtil.utf8());
 
 		HttpPost httppost = new HttpPost(BASE_PATH + "/services/rest/folder/createPath");
 		httppost.setEntity(entity);
 
-		CloseableHttpResponse response = httpclient.execute(httppost);
-		try {
-			HttpEntity rent = response.getEntity();
-			if (rent != null) {
-				String respoBody = EntityUtils.toString(rent, "UTF-8");
-				System.out.println(respoBody);
-			}
-		} finally {
-			response.close();
-		}
+		httpClient.execute(httppost, new StringHttpClientResponseHandler());
 	}
 
 	private static WSSearchOptions buildSearchOptions(String lang1, String expression) {
-
 		WSSearchOptions options = new WSSearchOptions();
 
 		String lang = lang1;
@@ -245,7 +180,7 @@ public class HttpRestWb {
 		return options;
 	}
 
-	private static void find(CloseableHttpClient httpclient, WSSearchOptions wsso) throws Exception {
+	private static void find(CloseableHttpClient httpClient, WSSearchOptions wsso) throws Exception {
 
 		System.out.println("find");
 		// CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -260,124 +195,49 @@ public class HttpRestWb {
 		String jsonStr = ow.writeValueAsString(wsso);
 		System.out.println(jsonStr);
 
-		StringEntity entity = new StringEntity(jsonStr, ContentType.create("application/json", Consts.UTF_8));
+		StringEntity entity = new StringEntity(jsonStr, ContentType.create("application/json", CharsetUtil.utf8()));
 		httppost.setEntity(entity);
 
-		CloseableHttpResponse response = httpclient.execute(httppost);
-
-		int code = response.getStatusLine().getStatusCode();
-		System.out.println("HTTPstatus code: " + code);
-
-		if (code == HttpStatus.SC_OK) {
-			// Nothing to do
-		} else {
-			// log.warn("status code is invalid: {}", code);
-			System.err.println("status code is invalid: " + code);
-			throw new Exception(response.getStatusLine().getReasonPhrase());
-		}
-
-		try {
-			HttpEntity rent = response.getEntity();
-			if (rent != null) {
-				String respoBody = EntityUtils.toString(rent, "UTF-8");
-				System.out.println(respoBody);
-
-				// JSON from String to Object
-				// WSSearchResult obj = mapper.readValue(respoBody,
-				// WSSearchResult.class);
-				// System.out.println(ow.writeValueAsString(obj) );
-			}
-		} finally {
-			response.close();
-		}
+		String body = httpClient.execute(httppost, new StringHttpClientResponseHandler());
+		System.out.println(body);
 	}
 
-	private static void listDocuments(CloseableHttpClient httpclient, long parentId)
-			throws ClientProtocolException, IOException {
+	private static void listDocuments(CloseableHttpClient httpClient, long parentId)
+			throws ClientProtocolException, IOException, URISyntaxException {
 
 		System.out.println("listDocuments");
 
-		List<NameValuePair> params = new LinkedList<NameValuePair>();
-		params.add(new BasicNameValuePair("folderId", String.valueOf(parentId)));
-		// params.add(new BasicNameValuePair("fileName", "gjhghjgj")); // this
-		// should result nothing
-		// params.add(new BasicNameValuePair("fileName",
-		// "InvoiceProcessing01-workflow.png"));
-		// params.add(new BasicNameValuePair("fileName", "*.png"));
-		params.add(new BasicNameValuePair("fileName", "*"));
+		URIBuilder uriBuilder = new URIBuilder(BASE_PATH + "/services/rest/document/listDocuments");
+		uriBuilder.setParameter("folderId", String.valueOf(parentId)).setParameter("fileName", "*");
 
-		StringBuilder requestUrl = new StringBuilder(BASE_PATH + "/services/rest/document/listDocuments");
-		String querystring = URLEncodedUtils.format(params, "utf-8");
-		requestUrl.append("?");
-		requestUrl.append(querystring);
+		HttpGet get = new HttpGet(uriBuilder.build());
+		get.setHeader("Accept", "application/json");
 
-		System.out.println(requestUrl);
-
-		// CloseableHttpClient httpclient = HttpClients.createDefault();
-		HttpGet method = new HttpGet(requestUrl.toString());
-		method.setHeader("Accept", "application/json");
-
-		CloseableHttpResponse response1 = httpclient.execute(method);
-
-		try {
-			System.out.println(response1.getStatusLine());
-			HttpEntity entity2 = response1.getEntity();
-
-			String respoBody = EntityUtils.toString(entity2, "UTF-8");
-			System.out.println(respoBody);
-
-			// do something useful with the response body
-			// and ensure it is fully consumed
-			EntityUtils.consume(entity2);
-		} finally {
-			response1.close();
-		}
+		String body = httpClient.execute(get, new StringHttpClientResponseHandler());
+		System.out.println(body);
 	}
 
 	private static void listChildren(CloseableHttpClient httpclient, long parentId)
-			throws ClientProtocolException, IOException {
+			throws ClientProtocolException, IOException, URISyntaxException {
 
-		// System.out.println("sid: " + httpclient);
+		URIBuilder uriBuilder = new URIBuilder(BASE_PATH + "/services/rest/folder/listChildren");
+		uriBuilder.setParameter("folderId", String.valueOf(parentId)).setParameter("fileName", "*");
 
-		List<NameValuePair> params = new LinkedList<NameValuePair>();
-		params.add(new BasicNameValuePair("folderId", String.valueOf(parentId)));
+		HttpGet get = new HttpGet(uriBuilder.build());
+		get.setHeader("Accept", "application/json");
 
-		StringBuilder requestUrl = new StringBuilder(BASE_PATH + "/services/rest/folder/listChildren");
-		String querystring = URLEncodedUtils.format(params, "utf-8");
-		requestUrl.append("?");
-		requestUrl.append(querystring);
-
-		System.out.println(requestUrl);
-
-		// CloseableHttpClient httpclient = HttpClients.createDefault();
-		HttpGet method = new HttpGet(requestUrl.toString());
-		method.setHeader("Accept", "application/json");
-
-		CloseableHttpResponse response1 = httpclient.execute(method);
-
-		try {
-			System.out.println(response1.getStatusLine());
-			HttpEntity entity2 = response1.getEntity();
-
-			String respoBody = EntityUtils.toString(entity2, "UTF-8");
-			System.out.println(respoBody);
-
-			// do something useful with the response body
-			// and ensure it is fully consumed
-			EntityUtils.consume(entity2);
-		} finally {
-			response1.close();
-		}
+		String body = httpclient.execute(get, new StringHttpClientResponseHandler());
+		System.out.println(body);
 	}
 
-	private static void createDocument(CloseableHttpClient httpclient) throws IOException {
+	private static void createDocument(CloseableHttpClient httpClient) throws IOException {
 
 		System.out.println("createDocument(CloseableHttpClient)");
 		// CloseableHttpClient httpclient = HttpClients.createDefault();
 
 		// HttpPost httppost = new HttpPost(BASE_PATH +
 		// "/services/rest/document/create");
-		HttpPost httppost = new HttpPost(BASE_PATH + "/services/rest/document/createDocument02");
+		HttpPost post = new HttpPost(BASE_PATH + "/services/rest/document/createDocument02");
 
 		File f = new File("C:/tmp/InvoiceProcessing01-workflow.png");
 		System.out.println(f.getName());
@@ -404,99 +264,62 @@ public class HttpRestWb {
 		HttpEntity reqEntity = MultipartEntityBuilder.create().addPart("document", jsonPart).addPart("content", binPart)
 				.build();
 
-		httppost.setEntity(reqEntity);
+		post.setEntity(reqEntity);
 
-		CloseableHttpResponse response = httpclient.execute(httppost);
-		try {
-			HttpEntity rent = response.getEntity();
-			if (rent != null) {
-				String respoBody = EntityUtils.toString(rent, "UTF-8");
-				System.out.println(respoBody);
-			}
-		} finally {
-			response.close();
-		}
+		String body = httpClient.execute(post, new StringHttpClientResponseHandler());
+		System.out.println(body);
 	}
 
-	private static void createFolderSimpleForm(CloseableHttpClient httpclient) throws Exception {
+	private static void createFolderSimpleForm(CloseableHttpClient httpClient) throws Exception {
 
 		// This will create a tree starting from the Root folder (not in the
 		// Default workspace)
 		List<NameValuePair> formparams = new ArrayList<>();
 		formparams.add(new BasicNameValuePair("folderPath", "/LogicalDOC/USA/NJ/Fair Lawn/createSimple"));
 
-		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, Consts.UTF_8);
+		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, CharsetUtil.utf8());
 
-		HttpPost httppost = new HttpPost(BASE_PATH + "/services/rest/folder/createSimpleForm");
-		httppost.setEntity(entity);
+		HttpPost post = new HttpPost(BASE_PATH + "/services/rest/folder/createSimpleForm");
+		post.setEntity(entity);
 
-		try (CloseableHttpResponse response = httpclient.execute(httppost);) {
-			int code = response.getStatusLine().getStatusCode();
-			System.out.println("HTTPstatus code: " + code);
-			if (code == HttpStatus.SC_OK) {
-				// Nothing to do
-			} else {
-				// log.warn("status code is invalid: {}", code);
-				System.err.println("status code is invalid: " + code);
-				throw new Exception(response.getStatusLine().getReasonPhrase());
-			}
-
-			HttpEntity rent = response.getEntity();
-			if (rent != null) {
-				String respoBody = EntityUtils.toString(rent, "UTF-8");
-				System.out.println(respoBody);
-			}
-		}
+		String respoBody = httpClient.execute(post, new StringHttpClientResponseHandler());
+		System.out.println(respoBody);
 	}
 
-	private static void createFolderSimpleJSON(CloseableHttpClient httpclient)
-			throws UnsupportedEncodingException, IOException {
+	private static void createFolderSimpleJSON(CloseableHttpClient httpClient) throws IOException {
 		// This will create a tree starting from the Default workspace
 		String folderPath = "/Default/USA/NJ/Fair Lawn/createFolder/Simple/JSON";
 		String input = "{ \"folderPath\" : \"" + folderPath + "\" }";
 		System.out.println(input);
 
-		HttpPost httppost = new HttpPost(BASE_PATH + "/services/rest/folder/createSimpleJSON");
-		StringEntity entity = new StringEntity(input, ContentType.create("application/json", Consts.UTF_8));
-		httppost.setEntity(entity);
+		HttpPost post = new HttpPost(BASE_PATH + "/services/rest/folder/createSimpleJSON");
+		StringEntity entity = new StringEntity(input, ContentType.create("application/json", CharsetUtil.utf8()));
+		post.setEntity(entity);
 
-		try (CloseableHttpResponse response = httpclient.execute(httppost);) {
-			HttpEntity rent = response.getEntity();
-			if (rent != null) {
-				String respoBody = EntityUtils.toString(rent, "UTF-8");
-				System.out.println(respoBody);
-			}
+		String body = httpClient.execute(post, new StringHttpClientResponseHandler());
+		System.out.println(body);
+	}
+
+	private static String loginJSON() throws IOException {
+		try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+			String input = "{ \"username\" : \"admin\", \"password\" : \"admin\" }";
+			System.out.println(input);
+
+			StringEntity entity = new StringEntity(input, ContentType.create("application/json", CharsetUtil.utf8()));
+			HttpPost post = new HttpPost(BASE_PATH + "/services/rest/auth/login");
+			post.setEntity(entity);
+
+			String body = httpclient.execute(post, new StringHttpClientResponseHandler());
+			System.out.println(body);
+			return body;
 		}
 	}
 
-	private static String loginJSON() throws UnsupportedEncodingException, IOException {
-
-		CloseableHttpClient httpclient = HttpClients.createDefault();
-
-		String input = "{ \"username\" : \"admin\", \"password\" : \"admin\" }";
-		System.out.println(input);
-
-		StringEntity entity = new StringEntity(input, ContentType.create("application/json", Consts.UTF_8));
-		HttpPost httppost = new HttpPost(BASE_PATH + "/services/rest/auth/login");
-		httppost.setEntity(entity);
-
-		try (CloseableHttpResponse response = httpclient.execute(httppost);) {
-			HttpEntity rent = response.getEntity();
-			if (rent != null) {
-				String respoBody = EntityUtils.toString(rent, "UTF-8");
-				System.out.println(respoBody);
-				return respoBody;
-			}
-		}
-
-		return null;
-	}
-
-	private static void uploadDocument02(CloseableHttpClient httpclient) throws IOException {
+	private static void uploadDocument02(CloseableHttpClient httpClient) throws IOException {
 
 		System.out.println("uploadDocument(CloseableHttpClient)");
 
-		HttpPost httppost = new HttpPost(BASE_PATH + "/services/rest/document/upload");
+		HttpPost post = new HttpPost(BASE_PATH + "/services/rest/document/upload");
 
 		// File file = new File("C:/tmp/InvoiceProcessing01-workflow.png");
 		File file = new File("c:/users/shatz/Downloads/SimpleTestProject.zip");
@@ -513,7 +336,7 @@ public class HttpRestWb {
 		HttpEntity reqEntity = MultipartEntityBuilder.create().addPart("filename", fnamePart)
 				.addPart("filedata", binPart).addPart("folderId", folderPart).build();
 
-		httppost.setEntity(reqEntity);
+		post.setEntity(reqEntity);
 
 		/*
 		 * int timeout = 5; // seconds HttpParams httpParams =
@@ -523,41 +346,14 @@ public class HttpRestWb {
 		 * http.socket.timeout
 		 */
 
-		CloseableHttpResponse response = httpclient.execute(httppost);
-
-		int code = response.getStatusLine().getStatusCode();
-		System.out.println("HTTPstatus code: " + code);
-
-		try {
-			HttpEntity rent = response.getEntity();
-			if (rent != null) {
-				String respoBody = EntityUtils.toString(rent, "UTF-8");
-				System.out.println(respoBody);
-			}
-		} finally {
-			response.close();
-		}
+		String respoBody = httpClient.execute(post, new StringHttpClientResponseHandler());
+		System.out.println(respoBody);
 	}
 
-	private static void uploadDocument(CloseableHttpClient httpclient) throws IOException {
-
+	private static void uploadDocument(CloseableHttpClient httpClient) throws IOException {
 		System.out.println("uploadDocument(CloseableHttpClient)");
 
-		URL url = new URL(BASE_PATH);
-
-		HttpHost targetHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
-		CredentialsProvider credsProvider = new BasicCredentialsProvider();
-		credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(USERNAME, PASSWORD));
-
-		AuthCache authCache = new BasicAuthCache();
-		authCache.put(targetHost, new BasicScheme());
-
-		// Add AuthCache to the execution context
-		HttpClientContext context = HttpClientContext.create();
-		context.setCredentialsProvider(credsProvider);
-		context.setAuthCache(authCache);
-
-		HttpPost httppost = new HttpPost(BASE_PATH + "/services/rest/document/upload");
+		HttpPost post = new HttpPost(BASE_PATH + "/services/rest/document/upload");
 
 		File file = new File("C:/tmp/serv.txt");
 
@@ -567,25 +363,15 @@ public class HttpRestWb {
 		long folderID = 100L;
 
 		MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-		builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+		builder.setMode(HttpMultipartMode.EXTENDED);
 		builder.addTextBody("filename", file.getName(), ContentType.TEXT_PLAIN);
 		builder.addBinaryBody("filedata", file, ContentType.DEFAULT_BINARY, file.getName());
 		builder.addTextBody("folderId", Long.toString(folderID), ContentType.TEXT_PLAIN);
 
-		//
 		HttpEntity entity = builder.build();
-		httppost.setEntity(entity);
+		post.setEntity(entity);
 
-		try (CloseableHttpResponse response = httpclient.execute(httppost, context);) {
-			int code = response.getStatusLine().getStatusCode();
-			System.out.println("HTTPstatus code: " + code);
-
-			HttpEntity rent = response.getEntity();
-			if (rent != null) {
-				String respoBody = EntityUtils.toString(rent, "UTF-8");
-				System.out.println(respoBody);
-			}
-		}
+		String body = httpClient.execute(post, new StringHttpClientResponseHandler());
+		System.out.println(body);
 	}
-
 }

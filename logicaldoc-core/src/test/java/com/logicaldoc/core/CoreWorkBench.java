@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.management.ManagementFactory;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
@@ -17,24 +16,21 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
-import javax.management.MBeanServerConnection;
 
-import org.apache.http.Consts;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.ClientProtocolException;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.MailUtil;
 import com.logicaldoc.util.http.HttpUtil;
+import com.logicaldoc.util.io.CharsetUtil;
 import com.logicaldoc.util.io.FileUtil;
-import com.sun.management.OperatingSystemMXBean;
 import com.talanlabs.avatargenerator.Avatar;
 import com.talanlabs.avatargenerator.IdenticonAvatar;
 
@@ -42,7 +38,8 @@ public class CoreWorkBench {
 
 	/**
 	 * Test sending e-mail with attachments
-	 * @throws IOException 
+	 * 
+	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
 //		OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
@@ -50,28 +47,30 @@ public class CoreWorkBench {
 //		System.out.println(osBean.getProcessCpuLoad());
 //		
 //		System.out.println(osBean.getProcessCpuTime());
+//
+//		MBeanServerConnection mbsc = ManagementFactory.getPlatformMBeanServer();
+//
+//		OperatingSystemMXBean osMBean = ManagementFactory.newPlatformMXBeanProxy(mbsc,
+//				ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
+//
+//		long nanoBefore = System.nanoTime();
+//		long cpuBefore = osMBean.getProcessCpuTime();
+//
+//		// Call an expensive task, or sleep if you are monitoring a remote
+//		// process
+//
+//		long cpuAfter = osMBean.getProcessCpuTime();
+//		long nanoAfter = System.nanoTime();
+//
+//		long percent;
+//		if (nanoAfter > nanoBefore)
+//			percent = ((cpuAfter - cpuBefore) * 100L) / (nanoAfter - nanoBefore);
+//		else
+//			percent = 0;
+//
+//		System.out.println("Cpu usage: " + percent + "%");
 
-	
-		MBeanServerConnection mbsc = ManagementFactory.getPlatformMBeanServer();
-
-		OperatingSystemMXBean osMBean = ManagementFactory.newPlatformMXBeanProxy(
-		mbsc, ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
-
-		long nanoBefore = System.nanoTime();
-		long cpuBefore = osMBean.getProcessCpuTime();
-
-		// Call an expensive task, or sleep if you are monitoring a remote process
-
-		long cpuAfter = osMBean.getProcessCpuTime();
-		long nanoAfter = System.nanoTime();
-
-		long percent;
-		if (nanoAfter > nanoBefore)
-		 percent = ((cpuAfter-cpuBefore)*100L)/
-		   (nanoAfter-nanoBefore);
-		else percent = 0;
-
-		System.out.println("Cpu usage: "+percent+"%");
+//		statsStuff();
 	}
 
 	private static void avatarStuff() {
@@ -80,7 +79,7 @@ public class CoreWorkBench {
 		System.out.println(image);
 	}
 
-	static void statsStuff() throws ClientProtocolException, IOException {
+	private static void statsStuff() throws ClientProtocolException, IOException {
 		List<NameValuePair> postParams = new ArrayList<>();
 
 		// Add all statistics as parameters
@@ -136,18 +135,14 @@ public class CoreWorkBench {
 //		postParams.add(new BasicNameValuePair("reg_website", regWebsite != null ? regWebsite : ""));
 
 		HttpPost post = new HttpPost("http://stat.logicaldoc.com/stats/collect");
-		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(postParams, Consts.UTF_8);
+		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(postParams, CharsetUtil.utf8());
 		post.setEntity(entity);
 
-		CloseableHttpClient httpclient = HttpUtil.getNotValidatingClient(60);
-
-		// Execute request
-		try (CloseableHttpResponse response = httpclient.execute(post)) {
-			int responseStatusCode = response.getStatusLine().getStatusCode();
-			// log status code
-			if (responseStatusCode != 200)
-				throw new IOException(HttpUtil.getBodyString(response));
+		try (CloseableHttpClient httpClient = HttpUtil.getNotValidatingClient(60)) {
+			httpClient.execute(post, new BasicHttpClientResponseHandler());
 		}
+
+		System.out.println("stats has been sent");
 	}
 
 	static void emailStuff() throws MessagingException, IOException {
