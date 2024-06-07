@@ -55,7 +55,7 @@ public class HttpUtil {
 			proxy[1] = config.getProperty("proxy.port");
 			proxy[2] = config.getProperty("proxy.username");
 			proxy[3] = config.getProperty("proxy.password");
-		} catch (Exception t) {
+		} catch (NoClassDefFoundError | Exception t) {
 			// Nothing to do
 		}
 
