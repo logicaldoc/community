@@ -86,13 +86,13 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	@Override
-	public void saveACL(GUIFolder folder, boolean subtree) throws ServerException {
+	public void saveACL(GUIFolder guiFolder, boolean subtree) throws ServerException {
 		Session session = validateSession();
 
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		try {
-			Folder f = fdao.findById(folder.getId());
-			fdao.initialize(f);
+			Folder folder = fdao.findById(guiFolder.getId());
+			fdao.initialize(folder);
 
 			if (subtree) {
 				/*
@@ -103,13 +103,13 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 					history.setSession(session);
 					history.setEvent(FolderEvent.PERMISSION.toString());
 					try {
-						fdao.applySecurityToTree(folder.getId(), history);
+						fdao.applySecurityToTree(guiFolder.getId(), history);
 					} catch (PersistenceException e) {
 						log.error(e.getMessage(), e);
 					}
 				}, session);
 			} else {
-				saveACL(session, f, folder.getAccessControlList());
+				saveACL(session, folder, guiFolder.getAccessControlList());
 			}
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
@@ -349,6 +349,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				guiAce.setEntityId(ace.getGroupId());
 				guiAce.setAdd(ace.getAdd() == 1);
 				guiAce.setWrite(ace.getWrite() == 1);
+				guiAce.setCustomid(ace.getCustomid() == 1);
 				guiAce.setSecurity(ace.getSecurity() == 1);
 				guiAce.setImmutable(ace.getImmutable() == 1);
 				guiAce.setDelete(ace.getDelete() == 1);
@@ -769,6 +770,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			fg.setAutomation(booleanToInt(ace.isAutomation()));
 			fg.setStorage(booleanToInt(ace.isStorage()));
 			fg.setReadingreq(booleanToInt(ace.isReadingreq()));
+			fg.setCustomid(booleanToInt(ace.isCustomid()));
 		}
 
 		folder.getAccessControlList().clear();

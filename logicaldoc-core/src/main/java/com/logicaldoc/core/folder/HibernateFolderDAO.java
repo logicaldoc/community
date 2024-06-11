@@ -1265,7 +1265,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 						+ " and ld_id in " + treeIdsString,
 				params);
 
-		log.warn("Applied rights to {} folders in tree {}", records, rootId);
+		log.warn("Applied security to {} folders in tree {}", records, rootId);
 
 		/*
 		 * Delete all the specific rights associated to the folders in the tree

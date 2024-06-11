@@ -72,6 +72,8 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 	private static final String SECURITY = "security";
 
 	private static final String WRITE = "write";
+	
+	private static final String CUSTOMID = "customid";
 
 	private static final String DOWNLOAD = "download";
 
@@ -136,6 +138,10 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		ListGridField write = new ListGridField(WRITE, prepareHeaderLabel(WRITE));
 		write.setType(ListGridFieldType.BOOLEAN);
 		write.setCanEdit(true);
+		
+		ListGridField customid = new ListGridField(CUSTOMID, prepareHeaderLabel(CUSTOMID));
+		customid.setType(ListGridFieldType.BOOLEAN);
+		customid.setCanEdit(true);
 
 		ListGridField security = new ListGridField(SECURITY, prepareHeaderLabel(SECURITY));
 		security.setType(ListGridFieldType.BOOLEAN);
@@ -185,6 +191,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		fields.add(email);
 		fields.add(write);
 		fields.add(rename);
+		fields.add(customid);
 		fields.add(delete);
 		fields.add(move);
 		fields.add(security);
@@ -411,6 +418,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 			ace.setPreview(rec.getAttributeAsBoolean(PREVIEW));
 			ace.setPrint(rec.getAttributeAsBoolean(PRINT));
 			ace.setWrite(rec.getAttributeAsBoolean(WRITE));
+			ace.setCustomid(rec.getAttributeAsBoolean(CUSTOMID));
 			ace.setDelete(rec.getAttributeAsBoolean(DELETE));
 			ace.setWorkflow(rec.getAttributeAsBoolean(WORKFLOW));
 			ace.setSign(rec.getAttributeAsBoolean("sign"));

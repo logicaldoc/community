@@ -22,6 +22,7 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.VerticalAlignment;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.Img;
@@ -81,6 +82,8 @@ public class FolderSecurityPanel extends FolderDetailTab {
 	private static final String SECURITY = "security";
 
 	private static final String WRITE = "write";
+	
+	private static final String CUSTOMID = "customid";
 
 	private static final String DOWNLOAD = "download";
 
@@ -142,7 +145,6 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		preview.setType(ListGridFieldType.BOOLEAN);
 		preview.setCanEdit(true);
 
-
 		ListGridField print = new ListGridField(PRINT, prepareHeaderLabel(PRINT));
 		print.setType(ListGridFieldType.BOOLEAN);
 		print.setCanEdit(true);
@@ -154,6 +156,10 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		ListGridField write = new ListGridField(WRITE, prepareHeaderLabel(WRITE));
 		write.setType(ListGridFieldType.BOOLEAN);
 		write.setCanEdit(true);
+		
+		ListGridField customid = new ListGridField(CUSTOMID, prepareHeaderLabel(CUSTOMID));
+		customid.setType(ListGridFieldType.BOOLEAN);
+		customid.setCanEdit(true);
 
 		ListGridField add = new ListGridField("add", prepareHeaderLabel("addfolder"));
 		add.setType(ListGridFieldType.BOOLEAN);
@@ -217,6 +223,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		fields.add(write);
 		fields.add(add);
 		fields.add(rename);
+		fields.add(customid);
 		fields.add(delete);
 		fields.add(move);
 		fields.add(security);
@@ -541,6 +548,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			ace.setPreview(rec.getAttributeAsBoolean(PREVIEW));
 			ace.setPrint(rec.getAttributeAsBoolean(PRINT));
 			ace.setWrite(rec.getAttributeAsBoolean(WRITE));
+			ace.setCustomid(rec.getAttributeAsBoolean(CUSTOMID));		
 			ace.setDelete(rec.getAttributeAsBoolean(DELETE));
 			ace.setAdd(rec.getAttributeAsBoolean("add"));
 			ace.setWorkflow(rec.getAttributeAsBoolean(WORKFLOW));
