@@ -411,8 +411,7 @@
 
 								<!-- Delete all the sources from the smartgwt
 								jar -->
-								<delete dir="target/plugin/WEB-INF/lib/smartgwt"
-									failonerror="false" />
+								<delete dir="target/plugin/WEB-INF/lib/smartgwt" failonerror="false" />
 								<unzip dest="target/plugin/WEB-INF/lib/smartgwt"
 									src="target/plugin/WEB-INF/lib/smartgwt-${smartgwt.version}.jar" />
 								<delete
@@ -437,6 +436,8 @@
 								<copy
 									todir="target/plugin/setup/sc/skins/standard/images/"
 									file="./war/skin/images/blank.gif" />
+								<delete
+									file="target/${project.artifactId}-${project.version}-plugin2.zip" failonerror="false" />
 								<zip
 									destfile="target/${project.artifactId}-${project.version}-plugin2.zip"
 									basedir="target/plugin" />

@@ -19,7 +19,7 @@ public class AutomationRoutineParametersPanel extends AutomationRoutineDetailsTa
 		setHeight100();
 		setMembersMargin(1);
 
-		propertiesPanel = new ExtendedPropertiesPanel(routine, changedHandler, true, false, true);
+		propertiesPanel = new ExtendedPropertiesPanel(routine, changedHandler, true, false, true, true);
 		setMembers(propertiesPanel);
 	}
 

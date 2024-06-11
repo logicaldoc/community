@@ -67,7 +67,7 @@ public class FolderExtendedPropertiesPanel extends FolderDetailTab {
 		form1.setItems(locked, applyMetadata);
 
 		propertiesPanel = new ExtendedPropertiesPanel(folder, changedHandler, templateChangedHandler, folder.isWrite(),
-				false, true);
+				false, true, folder.isCustomid());
 		setMembers(form1, propertiesPanel);
 	}
 

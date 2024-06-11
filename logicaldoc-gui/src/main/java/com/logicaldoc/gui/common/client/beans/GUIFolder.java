@@ -139,6 +139,10 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 		this.allowedPermissions = permissions;
 	}
 
+	public boolean isCustomid() {
+		return allowedPermissions.isCustomid();
+	}
+	
 	public boolean isWrite() {
 		return allowedPermissions.isWrite();
 	}

@@ -47,6 +47,7 @@
 				<property name="groupId" type="long" column="ld_groupid" not-null="true" />
 				<property name="read" type="int" column="ld_read" not-null="true" />
 				<property name="preview" type="int" column="ld_preview" not-null="true" />
+				<property name="customid" type="int" column="ld_customid" not-null="true" />
 				<property name="write" type="int" column="ld_write" not-null="true" />
 				<property name="add" type="int" column="ld_add" not-null="true" />
 				<property name="security" type="int" column="ld_security" not-null="true" />

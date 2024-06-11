@@ -88,6 +88,9 @@ public class WSAccessControlEntry {
 	@WSDoc(description = "permission to send reading requests")
 	private int readingreq = 0;
 
+	@WSDoc(description = "permission to edit the Custom ID")
+	private int customid = 0;
+	
 	public long getGroupId() {
 		return groupId;
 	}
@@ -286,5 +289,13 @@ public class WSAccessControlEntry {
 
 	public void setPreview(int preview) {
 		this.preview = preview;
+	}
+
+	public int getCustomid() {
+		return customid;
+	}
+
+	public void setCustomid(int customid) {
+		this.customid = customid;
 	}
 }

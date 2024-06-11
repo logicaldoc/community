@@ -1415,9 +1415,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 						select ld_read as LDREAD, ld_write as LDWRITE, ld_security as LDSECURITY, ld_immutable as LDIMMUTABLE, ld_delete as LDDELETE,
 						ld_rename as LDRENAME, ld_sign as LDSIGN, ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD,
 						ld_calendar as LDCALENDAR, ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD,
-						ld_move as LDMOVE, ld_email as LDEMAIL, ld_automation as LDAUTOMATION, ld_readingreq as LDREADINGREQ, ld_preview as LDPREVIEW
-						from ld_document_acl where
-						ld_docid=
+						ld_move as LDMOVE, ld_email as LDEMAIL, ld_automation as LDAUTOMATION, ld_readingreq as LDREADINGREQ, ld_preview as LDPREVIEW,
+						ld_customid as LDCUSTOMID from ld_document_acl where ld_docid=
 						""");
 		query.append(Long.toString(docId));
 		query.append(" and ld_groupid in (");
@@ -1444,6 +1443,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		permissionColumn.put("LDAUTOMATION", Permission.AUTOMATION);
 		permissionColumn.put("LDREADINGREQ", Permission.READINGREQ);
 		permissionColumn.put("LDPREVIEW", Permission.PREVIEW);
+		permissionColumn.put("LDCUSTOMID", Permission.CUSTOMID);
 
 		/**
 		 * IMPORTANT: the connection MUST be explicitly closed, otherwise it is
@@ -1490,7 +1490,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				                              ld_immutable,ld_delete,ld_rename,ld_sign,ld_archive,
 				                              ld_workflow,ld_download,ld_calendar,ld_subscription,
 				                              ld_print,ld_password,ld_move,ld_email,ld_automation,
-				                              ld_readingreq)
+				                              ld_readingreq, ld_customid)
 				""");
 		update.append(" select ");
 		update.append(Long.toString(docId));
@@ -1499,7 +1499,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				                              ld_immutable,ld_delete,ld_rename,ld_sign,ld_archive,
 				                              ld_workflow,ld_download,ld_calendar,ld_subscription,
 				                              ld_print,ld_password,ld_move,ld_email,ld_automation,
-				                              ld_readingreq from ld_folder_acl where ld_folderid=
+				                              ld_readingreq, ld_customid from ld_folder_acl where ld_folderid=
 				""");
 		update.append(Long.toString(folder.getId()));
 		count = jdbcUpdate(update.toString());

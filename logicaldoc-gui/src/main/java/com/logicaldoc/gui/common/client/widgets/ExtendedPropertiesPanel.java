@@ -57,6 +57,8 @@ public class ExtendedPropertiesPanel extends HLayout {
 	protected boolean checkMandatory = false;
 
 	protected boolean allowTemplateSelection = true;
+	
+	protected boolean customidEnabled = true;
 
 	protected DynamicForm templateForm = new DynamicForm();
 
@@ -74,12 +76,13 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	public ExtendedPropertiesPanel(GUIExtensibleObject object, ChangedHandler changedHandler,
 			ChangedHandler templateChangedHandler, boolean updateEnabled, boolean checkMandatory,
-			boolean allowTemplateSelection) {
+			boolean allowTemplateSelection, boolean customidEnabled) {
 		super();
 		this.extensibleObject = object;
 		this.changedHandler = changedHandler;
 		this.templateChangedHandler = templateChangedHandler;
 		this.updateEnabled = updateEnabled;
+		this.customidEnabled = customidEnabled;
 		this.checkMandatory = checkMandatory;
 		this.allowTemplateSelection = allowTemplateSelection;
 
@@ -92,8 +95,8 @@ public class ExtendedPropertiesPanel extends HLayout {
 	}
 
 	public ExtendedPropertiesPanel(GUIExtensibleObject object, ChangedHandler changedHandler, boolean updateEnabled,
-			boolean checkMandatory, boolean allowTemplateSelection) {
-		this(object, changedHandler, null, updateEnabled, checkMandatory, allowTemplateSelection);
+			boolean checkMandatory, boolean allowTemplateSelection, boolean customidEnabled) {
+		this(object, changedHandler, null, updateEnabled, checkMandatory, allowTemplateSelection, customidEnabled);
 	}
 
 	protected void adaptForms() {
@@ -170,7 +173,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 			TextItem customId = ItemFactory.newTextItem("customid", ((GUIDocument) extensibleObject).getCustomId());
 			if (changedHandler != null)
 				customId.addChangedHandler(changedHandler);
-			customId.setDisabled(!updateEnabled);
+			customId.setDisabled(!updateEnabled || !customidEnabled);
 			standardItems.add(customId);
 		}
 	}

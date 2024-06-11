@@ -48,9 +48,10 @@ public class AccessControlListDS extends DataSource {
 		DataSourceBooleanField automation = new DataSourceBooleanField("automation");
 		DataSourceBooleanField storage = new DataSourceBooleanField("storage");
 		DataSourceBooleanField readingreq = new DataSourceBooleanField("readingreq");
+		DataSourceBooleanField customid = new DataSourceBooleanField("customid");
 		DataSourceTextField type = new DataSourceTextField("type");
 
-		setFields(entityId, entity, read, preview, print, write, delete, move, add, workflow, sign, importField, export, rename,
+		setFields(entityId, entity, read, preview, print, write, customid, delete, move, add, workflow, sign, importField, export, rename,
 				immutable, security, password, archive, type, download, email, calendar, subscription, automation,
 				storage, readingreq);
 		setClientOnly(true);

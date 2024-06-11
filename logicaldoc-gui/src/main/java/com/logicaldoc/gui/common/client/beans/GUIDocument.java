@@ -148,7 +148,7 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	/**
 	 * Just to indicate if this document is being used for collecting the
-	 * metadata of a bulp update
+	 * metadata of a bulk update
 	 */
 	private boolean bulkUpdate = false;
 
@@ -631,6 +631,10 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 		this.allowedPermissions = permissions;
 	}
 
+	public boolean isCustomid() {
+		return allowedPermissions.isCustomid();
+	}
+	
 	public boolean isRead() {
 		return allowedPermissions.isRead();
 	}

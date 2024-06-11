@@ -170,13 +170,13 @@ public class AclDataServlet extends AbstractDataServlet {
 
 		// Prepare the query on the ACL in join with groups
 		StringBuilder query = new StringBuilder(
-				"""
-						select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write, 0, A.ld_security, A.ld_immutable, A.ld_delete,
-						       A.ld_rename, 0, 0, A.ld_sign, A.ld_archive, A.ld_workflow, A.ld_download,
-						       A.ld_calendar, A.ld_subscription, A.ld_print, A.ld_password, A.ld_move, A.ld_email, A.ld_automation,
-						       0, A.ld_readingreq, A.ld_read, A.ld_preview
-						  from ld_document_acl A, ld_group B 
-						 where A.ld_docid =
+				        """
+						 select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write, 0, A.ld_security, A.ld_immutable, A.ld_delete,
+						        A.ld_rename, 0, 0, A.ld_sign, A.ld_archive, A.ld_workflow, A.ld_download,
+						        A.ld_calendar, A.ld_subscription, A.ld_print, A.ld_password, A.ld_move, A.ld_email, A.ld_automation,
+						        0, A.ld_readingreq, A.ld_read, A.ld_preview, A.ld_customid
+						   from ld_document_acl A, ld_group B 
+						  where A.ld_docid =
 						""");
 		query.append(Long.toString(documentId));
 		query.append(AND_B_LD_TENANTID + document.getTenantId());
@@ -212,11 +212,11 @@ public class AclDataServlet extends AbstractDataServlet {
 
 		// Prepare the query on the ACL in join with groups
 		StringBuilder query = new StringBuilder(
-				"""
+				       """
 						select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write, A.ld_add, A.ld_security, A.ld_immutable, A.ld_delete,
 						       A.ld_rename, A.ld_import, A.ld_export, A.ld_sign, A.ld_archive, A.ld_workflow, A.ld_download,
 						       A.ld_calendar, A.ld_subscription, A.ld_print, A.ld_password, A.ld_move, A.ld_email, A.ld_automation,
-						       A.ld_storage, A.ld_readingreq, A.ld_read, A.ld_preview
+						       A.ld_storage, A.ld_readingreq, A.ld_read, A.ld_preview, A.ld_customid
 						  from ld_folder_acl A, ld_group B 
 						 where A.ld_folderid =
 						""");
@@ -328,6 +328,7 @@ public class AclDataServlet extends AbstractDataServlet {
 		writer.print("<readingreq>" + intToBoolean(set.getInt(24)) + "</readingreq>");
 		writer.print(READ + intToBoolean(set.getInt(25)) + READ_CLOSED);
 		writer.print("<preview>" + intToBoolean(set.getInt(26)) + "</preview>");
+		writer.print("<customid>" + intToBoolean(set.getInt(27)) + "</customid>");
 		writer.print(TYPE + groupType + TYPE_CLOSED);
 		writer.print(ACE_CLOSED);
 	}

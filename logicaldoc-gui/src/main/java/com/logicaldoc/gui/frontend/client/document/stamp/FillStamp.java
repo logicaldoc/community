@@ -54,7 +54,7 @@ public class FillStamp extends StickyWindow {
 		buttonsBar.setWidth100();
 		buttonsBar.addButton(save);
 
-		propertiesPanel = new ExtendedPropertiesPanel(stamp, null, true, true, false);
+		propertiesPanel = new ExtendedPropertiesPanel(stamp, null, true, true, false, true);
 
 		VLayout propertiesContainer = new VLayout();
 		propertiesContainer.setWidth100();

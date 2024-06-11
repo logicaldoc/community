@@ -72,6 +72,8 @@ public class GUIAccessControlEntry implements Serializable {
 	public static final String PERMISSION_READINGREQ = "readingreq";
 
 	public static final String PERMISSION_PRINT = "print";
+	
+	public static final String PERMISSION_CUSTOMID = "customid";
 
 	public GUIAccessControlEntry() {
 	}
@@ -298,6 +300,14 @@ public class GUIAccessControlEntry implements Serializable {
 
 	public void setReadingreq(boolean readingreq) {
 		setPermissionValue(PERMISSION_READINGREQ, readingreq);
+	}
+	
+	public boolean isCustomid() {
+		return isPermissionAllowed(PERMISSION_CUSTOMID);
+	}
+	
+	public void setCustomid(boolean customid) {
+		setPermissionValue(PERMISSION_CUSTOMID, customid);
 	}
 
 	public boolean isPermissionAllowed(String permission) {

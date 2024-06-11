@@ -19,7 +19,7 @@ public class StampParameters extends StampDetailsTab {
 		setHeight100();
 		setMembersMargin(1);
 
-		propertiesPanel = new ExtendedPropertiesPanel(stamp, changedHandler, true, false, true);
+		propertiesPanel = new ExtendedPropertiesPanel(stamp, changedHandler, true, false, true, true);
 		setMembers(propertiesPanel);
 	}
 

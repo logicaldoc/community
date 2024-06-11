@@ -20,6 +20,8 @@ public class AccessControlEntry implements Serializable {
 
 	private int write = 0;
 
+	private int customid = 0;
+
 	private int download = 1;
 
 	private int add = 0;
@@ -90,6 +92,7 @@ public class AccessControlEntry implements Serializable {
 		this.subscription = source.subscription;
 		this.workflow = source.workflow;
 		this.write = source.write;
+		this.customid = source.customid;
 	}
 
 	public AccessControlEntry(long groupId) {
@@ -288,6 +291,14 @@ public class AccessControlEntry implements Serializable {
 		this.readingreq = readingreq;
 	}
 
+	public int getCustomid() {
+		return customid;
+	}
+
+	public void setCustomid(int customid) {
+		this.customid = customid;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof AccessControlEntry ace)
@@ -331,7 +342,8 @@ public class AccessControlEntry implements Serializable {
 			granted.add(Permission.SUBSCRIPTION);
 		if (workflow == 1)
 			granted.add(Permission.WORKFLOW);
-
+		if (customid == 1)
+			granted.add(Permission.CUSTOMID);
 		return granted;
 	}
 
@@ -341,7 +353,7 @@ public class AccessControlEntry implements Serializable {
 		if (read == 1)
 			granted.add(Permission.READ);
 		if (preview == 1)
-			granted.add(Permission.PREVIEW);		
+			granted.add(Permission.PREVIEW);
 		if (write == 1)
 			granted.add(Permission.WRITE);
 		if (rename == 1)
@@ -356,6 +368,8 @@ public class AccessControlEntry implements Serializable {
 			granted.add(Permission.PRINT);
 		if (email == 1)
 			granted.add(Permission.EMAIL);
+		if (customid == 1)
+			granted.add(Permission.CUSTOMID);
 	}
 
 	public void grantPermissions(Set<Permission> permissions) {
@@ -382,6 +396,7 @@ public class AccessControlEntry implements Serializable {
 		subscription = booleanToInt(permissions.contains(Permission.SUBSCRIPTION));
 		workflow = booleanToInt(permissions.contains(Permission.WORKFLOW));
 		write = booleanToInt(permissions.contains(Permission.WRITE));
+		customid = booleanToInt(permissions.contains(Permission.CUSTOMID));
 	}
 
 	private int booleanToInt(boolean bool) {

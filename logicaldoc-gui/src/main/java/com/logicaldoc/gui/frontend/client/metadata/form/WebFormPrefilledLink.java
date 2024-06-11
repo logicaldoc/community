@@ -64,7 +64,7 @@ public class WebFormPrefilledLink extends StickyWindow {
 
 			@Override
 			public void onSuccess(GUIForm frm) {
-				extPanel = new ExtendedPropertiesPanel(frm, null, true, false, false);
+				extPanel = new ExtendedPropertiesPanel(frm, null, true, false, false, true);
 				addItem(extPanel);
 
 				prefilledLink = ItemFactory.newStaticTextItem("prefilledlink", null);

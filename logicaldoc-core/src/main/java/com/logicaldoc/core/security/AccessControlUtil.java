@@ -42,6 +42,7 @@ public class AccessControlUtil {
 				ace.setSign(0);
 				ace.setWorkflow(0);
 				ace.setWrite(0);
+				ace.setCustomid(0);
 				ace.setReadingreq(0);
 			}
 		}

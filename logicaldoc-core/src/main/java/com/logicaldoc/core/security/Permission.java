@@ -31,6 +31,7 @@ import java.util.Set;
  * <li>STORAGE: permission to handle the storage</li>
  * <li>READINGREQ: permission to send reading requests</li>
  * <li>PREVIEW: permission to preview a document</li>
+ * <li>CUSTOMID: permission to edit the Custom ID</li>
  * </ul>
  * 
  * @author Marco Meschieri - LogicalDOC
@@ -41,7 +42,8 @@ public enum Permission {
 			"immutable"), DELETE("delete"), RENAME("rename"), IMPORT("import"), EXPORT("export"), SIGN("sign"), ARCHIVE(
 					"archive"), WORKFLOW("workflow"), CALENDAR("calendar"), SUBSCRIPTION("subscription"), PRINT(
 							"print"), PASSWORD("password"), MOVE("move"), EMAIL("email"), AUTOMATION(
-									"automation"), STORAGE("storage"), READINGREQ("readingreq"), PREVIEW("preview");
+									"automation"), STORAGE("storage"), READINGREQ(
+											"readingreq"), PREVIEW("preview"), CUSTOMID("customid");
 
 	private final String name;
 

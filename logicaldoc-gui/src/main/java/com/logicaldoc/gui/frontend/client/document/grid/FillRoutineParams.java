@@ -54,7 +54,7 @@ public class FillRoutineParams extends Window {
 		buttonsBar.setHeight(25);
 		buttonsBar.setMembers(execute);
 
-		propertiesPanel = new ExtendedPropertiesPanel(routine, null, true, true, false);
+		propertiesPanel = new ExtendedPropertiesPanel(routine, null, true, true, false, true);
 
 		VLayout layout = new VLayout();
 		layout.setMargin(3);

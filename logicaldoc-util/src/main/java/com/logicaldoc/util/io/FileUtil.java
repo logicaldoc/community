@@ -601,12 +601,12 @@ public class FileUtil {
 		}
 	}
 
-	static void deleteUsingOSCommand(File file) {
+	private static void deleteUsingOSCommand(File file) {
 		try {
 			String command = "";
 			if (SystemUtil.isWindows()) {
 				if (file.isDirectory())
-					command = "cmd /C rmdir /S /Q \"" + file.getCanonicalPath() + "\"";
+					command = "cmd /C deltree /Y \"" + file.getCanonicalPath() + "\"";
 				else
 					command = "cmd /C del /F /Q \"" + file.getCanonicalPath() + "\"";
 			} else {

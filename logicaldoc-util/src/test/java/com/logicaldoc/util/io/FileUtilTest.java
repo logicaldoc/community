@@ -197,7 +197,6 @@ public class FileUtilTest {
 			assertEquals(file1.length() + file2.length() + file2.length(), FileUtil.getFolderSize(outFolder));
 		} finally {
 			FileUtil.strongDelete(outFolder);
-			FileUtil.deleteUsingOSCommand(outFolder);
 		}
 	}
 
@@ -239,7 +238,6 @@ public class FileUtilTest {
 			assertTrue(tempFolder.exists());
 			assertTrue(FileUtil.getName(tempFolder.getName()).startsWith("pippo"));
 		} finally {
-			FileUtil.deleteUsingOSCommand(tempFile);
 			FileUtil.strongDelete(tempFile);
 			FileUtil.strongDelete(tempFolder);
 		}

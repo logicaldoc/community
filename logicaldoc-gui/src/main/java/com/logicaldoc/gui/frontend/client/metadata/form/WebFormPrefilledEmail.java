@@ -61,7 +61,7 @@ public class WebFormPrefilledEmail extends StickyWindow {
 
 			@Override
 			public void onSuccess(GUIForm frm) {
-				extPanel = new ExtendedPropertiesPanel(frm, null, true, false, false);
+				extPanel = new ExtendedPropertiesPanel(frm, null, true, false, false, true);
 				addItem(extPanel);
 
 				SubmitItem send = new SubmitItem();
