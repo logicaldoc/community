@@ -587,6 +587,8 @@ public class FileUtil {
 		if (file != null && file.exists())
 			if (!FileUtils.deleteQuietly(file)) {
 				log.debug("Cannot delete file/folder {}", file.getAbsolutePath());
+				
+				// We could not delete the file so at least try to append .DELETE suffix
 				moveQuitely(file, new File(file.getParent(), file.getName() + ".DELETE"));
 			}
 	}
