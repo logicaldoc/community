@@ -7,11 +7,16 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Window;
+import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.layout.VStack;
+import com.smartgwt.client.widgets.tab.Tab;
+import com.smartgwt.client.widgets.tab.TabSet;
 
 /**
  * This is the about dialog.
@@ -31,12 +36,13 @@ public class AboutDialog extends Window {
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("about") + " " + Session.get().getInfo().getBranding().getProductName());
-		setWidth(400);
-		setPadding(2);
-		setAutoSize(true);
+		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
 		centerInPage();
+		setMinWidth(550);
+		setMinHeight(350);
+		setAutoSize(true);
 
 		HTMLPane vspacer1 = new HTMLPane();
 		vspacer1.setContents("<div>&nbsp;</div>");
@@ -65,7 +71,6 @@ public class AboutDialog extends Window {
 
 		Label trademark = new Label(I18N.message("copyrights", Session.get().getInfo().getBranding().getProduct(),
 				Session.get().getInfo().getBranding().getProduct(), Session.get().getInfo().getBranding().getVendor()));
-		trademark.setWidth("80%");
 		trademark.setHeight(40);
 		trademark.setAlign(Alignment.CENTER);
 
@@ -98,16 +103,39 @@ public class AboutDialog extends Window {
 		vspacer2.setPixelSize(100, 10);
 		vspacer2.setOverflow(Overflow.HIDDEN);
 
-		VStack content = new VStack();
-		content.setWidth("100%");
-		content.setMembersMargin(5);
-		content.setMargin(4);
-		content.setAlign(Alignment.CENTER);
-		content.setDefaultLayoutAlign(Alignment.CENTER);
-		content.setBackgroundColor("#ffffff");
-		content.setMembers(vspacer1, logoImage, productName, version, copyright, trademark, sitelink, maillink,
-				vspacer2);
+		VStack about = new VStack();
+		about.setWidth100();
+		about.setMembersMargin(5);
+		about.setMargin(4);
+		about.setAlign(Alignment.CENTER);
+		about.setDefaultLayoutAlign(Alignment.CENTER);
+		about.setBackgroundColor("#ffffff");
+		about.setMembers(vspacer1, logoImage, productName, version, copyright, trademark, sitelink, maillink, vspacer2);
 
-		addItem(content);
+		Tab aboutTab = new Tab(I18N.message("about"));
+		aboutTab.setPane(about);
+
+		Tab changelogTab = new Tab(I18N.message("changelog"));
+
+		TextAreaItem changelogItem = ItemFactory.newTextAreaItem("changelog",
+				Session.get().getInfo().getChangelog().replace(
+						"================================================================================",
+						"============================================================"));
+		changelogItem.setWidth("*");
+		changelogItem.setShowTitle(false);
+		DynamicForm form = new DynamicForm();
+		form.setWidth100();
+		form.setHeight100();
+		form.setTitleOrientation(TitleOrientation.TOP);
+		form.setItems(changelogItem);
+		form.setNumCols(1);
+		changelogTab.setPane(form);
+
+		TabSet tabs = new TabSet();
+		tabs.setWidth100();
+		tabs.setHeight100();
+		tabs.setTabs(aboutTab, changelogTab);
+
+		addItem(tabs);
 	}
 }

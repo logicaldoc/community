@@ -34,6 +34,8 @@ public class GUIInfo implements Serializable {
 
 	private String hostName;
 
+	private String changelog;
+
 	private Date date = new Date();
 
 	private GUITenant tenant = null;
@@ -64,6 +66,14 @@ public class GUIInfo implements Serializable {
 
 	public String getRelease() {
 		return release;
+	}
+
+	public String getChangelog() {
+		return changelog;
+	}
+
+	public void setChangelog(String changelog) {
+		this.changelog = changelog;
 	}
 
 	public void setRelease(String release) {

@@ -1,5 +1,6 @@
 package com.logicaldoc.web.service;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -44,6 +45,7 @@ import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.io.IOUtil;
 import com.logicaldoc.web.listener.ApplicationListener;
 
 /**
@@ -116,6 +118,15 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 			return info;
 		} catch (Exception t) {
 			throw new ServerException(t.getMessage());
+		}
+	}
+
+	private static String loadChangelog() {
+		try (InputStream is = IOUtil.getLimitedStream(InfoServiceImpl.class.getResourceAsStream("/CHANGELOG.txt"),
+				4096)) {
+			return IOUtil.readStream(is);
+		} catch (Exception e) {
+			return "";
 		}
 	}
 
@@ -281,6 +292,8 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		} catch (Exception t) {
 			// Nothing to do
 		}
+
+		guiInfo.setChangelog(loadChangelog());
 
 		return guiInfo;
 	}
