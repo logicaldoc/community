@@ -606,7 +606,7 @@ public class FileUtil {
 			String command = "";
 			if (SystemUtil.isWindows()) {
 				if (file.isDirectory())
-					command = "cmd /C deltree /Y \"" + file.getCanonicalPath() + "\"";
+					command = "cmd /C rd /S /Q \"" + file.getCanonicalPath() + "\"";
 				else
 					command = "cmd /C del /F /Q \"" + file.getCanonicalPath() + "\"";
 			} else {
