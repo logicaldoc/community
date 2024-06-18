@@ -878,7 +878,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				storeFile(docVO, file);
 			} catch (Exception e) {
 				String message = String.format("Unable to store the file of document %d", docVO.getId());
-				log.error(message);
+				log.error(message, e);
 				documentDAO.delete(docVO.getId());
 				throw new PersistenceException(message, e);
 			}
