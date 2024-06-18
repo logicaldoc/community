@@ -188,6 +188,7 @@ public class ExecTest {
 				assertEquals(0, retval);
 				log.info("sb: {}", sb);
 				String out = sb.toString();
+				System.out.println(">>" + out);
 				assertTrue(out.contains("TaylorSwift"));
 			}
 		} catch (IOException e) {

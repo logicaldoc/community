@@ -44,8 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
-import com.logicaldoc.util.SystemUtil;
-
 /**
  * This class manages I/O operations with files.
  * 
@@ -583,13 +581,14 @@ public class FileUtil {
 	public static void strongDelete(File file) {
 		/*
 		 * Better to deleteQuitely first because the forceDelete seems to cause
-		 * locks at least on Windows when there are frequent deletions.
+		 * locks at least on Windows when there are frequent deletions. Even
+		 * directly using the Windows command rd produces the same behavior
 		 */
 		if (file != null && file.exists())
-			FileUtils.deleteQuietly(file);
-
-		if (file != null && file.exists())
-			deleteUsingOSCommand(file);
+			if (!FileUtils.deleteQuietly(file)) {
+				log.debug("Cannot delete file/folder {}", file.getAbsolutePath());
+				moveQuitely(file, new File(file.getParent(), file.getName() + ".DELETE"));
+			}
 	}
 
 	public static void moveQuitely(File source, File target) {
@@ -598,24 +597,6 @@ public class FileUtil {
 					StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			log.warn("Cannot move {} into {}", source.getAbsolutePath(), target.getAbsolutePath());
-		}
-	}
-
-	private static void deleteUsingOSCommand(File file) {
-		try {
-			String command = "";
-			if (SystemUtil.isWindows()) {
-				if (file.isDirectory())
-					command = "cmd /C rd /S /Q \"" + file.getCanonicalPath() + "\"";
-				else
-					command = "cmd /C del /F /Q \"" + file.getCanonicalPath() + "\"";
-			} else {
-				command = "rm -rf \"" + file.getCanonicalPath() + "\"";
-			}
-			log.debug("Deleting file {} using OS command {}", file.getAbsolutePath(), command);
-			java.lang.Runtime.getRuntime().exec(command);
-		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
 		}
 	}
 

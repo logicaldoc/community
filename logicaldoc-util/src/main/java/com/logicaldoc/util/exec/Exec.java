@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -178,9 +179,11 @@ public class Exec {
 			}
 		}
 
-		StreamEater errEater = new StreamEater(errPrefix, process.getErrorStream());
+		String commandForLog = " (" + commandForLog(commandLine.stream().collect(Collectors.joining(" "))) + ")";
 
-		StreamEater outEater = new StreamEater(outPrefix, process.getInputStream());
+		StreamEater errEater = new StreamEater(errPrefix + commandForLog, process.getErrorStream());
+
+		StreamEater outEater = new StreamEater(outPrefix + commandForLog, process.getInputStream());
 
 		Thread a = new Thread(errEater);
 		a.start();
@@ -201,6 +204,21 @@ public class Exec {
 		}
 
 		return exit;
+	}
+
+	/**
+	 * Takes the first part and the last part of a command line to make it
+	 * usable in the logs
+	 * 
+	 * @param commandLine the command line to process
+	 * 
+	 * @return The elaboration suitable for log
+	 */
+	protected String commandForLog(final String commandLine) {
+		if (commandLine.length() <= 60)
+			return commandLine;
+		else
+			return StringUtils.left(commandLine, 30) + "..." + StringUtils.right(commandLine, 30);
 	}
 
 	/**
@@ -255,9 +273,10 @@ public class Exec {
 			}
 		}
 
-		StreamEater errEater = new StreamEater(errPrefix, process.getErrorStream());
+		String commandForLog = " (" + commandForLog(commandLine) + ")";
+		StreamEater errEater = new StreamEater(errPrefix + commandForLog, process.getErrorStream());
 
-		StreamEater outEater = new StreamEater(outPrefix, process.getInputStream(), buffer);
+		StreamEater outEater = new StreamEater(outPrefix + commandForLog, process.getInputStream(), buffer);
 
 		Thread a = new Thread(errEater);
 		a.start();
@@ -308,9 +327,11 @@ public class Exec {
 			}
 		}
 
-		StreamEater errEater = new StreamEater(errPrefix, process.getErrorStream());
+		String commandForLog = " (" + commandForLog(commandLine) + ")";
 
-		StreamEater outEater = new StreamEater(outPrefix, process.getInputStream(), outputWriter);
+		StreamEater errEater = new StreamEater(errPrefix + commandForLog, process.getErrorStream());
+
+		StreamEater outEater = new StreamEater(outPrefix + commandForLog, process.getInputStream(), outputWriter);
 
 		Thread a = new Thread(errEater);
 		a.start();
