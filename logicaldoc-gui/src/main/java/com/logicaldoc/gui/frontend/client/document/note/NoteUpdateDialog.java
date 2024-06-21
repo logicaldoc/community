@@ -4,13 +4,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.NoteChangeListener;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.RichTextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -34,10 +34,10 @@ public class NoteUpdateDialog extends Window {
 
 	private DynamicForm noteForm;
 
-	private ChangedHandler saveHandler;
+	private NoteChangeListener saveHandler;
 
 	public NoteUpdateDialog(final long docId, final long noteId, String fileVersion, String noteMessage,
-			final ChangedHandler saveHandler) {
+			final NoteChangeListener saveHandler) {
 		super();
 		this.saveHandler = saveHandler;
 		this.noteId = noteId;
@@ -73,10 +73,12 @@ public class NoteUpdateDialog extends Window {
 		close.addClickHandler(event -> destroy());
 
 		toolStrip = new ToolStrip();
-		toolStrip.setWidth100();
 		toolStrip.addButton(save);
 		toolStrip.addSeparator();
 		toolStrip.addButton(close);
+		toolStrip.addFill();
+		toolStrip.setWidth100();
+		toolStrip.setMinWidth(590);
 
 		message = ItemFactory.newRichTextItemForNote("message", "message", noteMessage);
 		message.setBrowserSpellCheck(false);
@@ -94,26 +96,26 @@ public class NoteUpdateDialog extends Window {
 		if (!noteForm.validate())
 			return;
 
-		DocumentService.Instance.get().updateNote(docId, noteId, fileVersion, message.getValue().toString(), new AsyncCallback<>() {
+		DocumentService.Instance.get().updateNote(docId, noteId, fileVersion, message.getValue().toString(),
+				new AsyncCallback<>() {
 
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-				destroy();
-			}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+						destroy();
+					}
 
-			@Override
-			public void onSuccess(Void result) {
-				if (saveHandler != null)
-					saveHandler.onChanged(null);
-				destroy();
-			}
-		});
+					@Override
+					public void onSuccess(Void result) {
+						if (saveHandler != null)
+							saveHandler.onChanged();
+						destroy();
+					}
+				});
 	}
 
 	private void resetDimensions() {
-		setWidth(580);
-		setHeight(300);
+		setAutoSize(true);
 		centerInPage();
 	}
 }

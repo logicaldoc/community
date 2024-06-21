@@ -2739,7 +2739,7 @@ public class ItemFactory {
 		item.setShowTitle(false);
 		item.setRequired(true);
 		item.setWidth("*");
-		item.setHeight("*");
+		item.setHeight(300);
 
 		addNoteValidator(item);
 		return item;

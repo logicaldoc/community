@@ -133,7 +133,7 @@ public interface DocumentServiceAsync {
 	void getNotes(long docId, String fileVersion, Collection<String> types,
 			AsyncCallback<List<GUIDocumentNote>> callback);
 
-	void saveNotes(long docId, List<GUIDocumentNote> notes, Collection<String> types, AsyncCallback<Void> callback);
+	void saveNotes(long docId, String fileVersion, List<GUIDocumentNote> notes, Collection<String> types, AsyncCallback<Void> callback);
 
 	void deleteTicket(long ticketId, AsyncCallback<Void> callback);
 

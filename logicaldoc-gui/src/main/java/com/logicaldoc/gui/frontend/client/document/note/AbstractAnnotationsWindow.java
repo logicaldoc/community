@@ -184,7 +184,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 	 */
 	protected void onSave() {
 		captureNotesPosition();
-		DocumentService.Instance.get().saveNotes(document.getId(), notes, types, new AsyncCallback<>() {
+		DocumentService.Instance.get().saveNotes(document.getId(), fileVersion, notes, types, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

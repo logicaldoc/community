@@ -560,12 +560,14 @@ public interface DocumentService extends RemoteService {
 	 * Saves a set of notes
 	 * 
 	 * @param docId identifier of the document
+	 * @param fileVersion optional file version all the notes are bound to
 	 * @param notes the notes to save
 	 * @param types optional filter for the note type
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void saveNotes(long docId, List<GUIDocumentNote> notes, Collection<String> types) throws ServerException;
+	public void saveNotes(long docId, String fileVersion, List<GUIDocumentNote> notes, Collection<String> types)
+			throws ServerException;
 
 	/**
 	 * Deletes a selection of document notes

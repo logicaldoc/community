@@ -1923,7 +1923,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void saveNotes(long docId, List<GUIDocumentNote> notes, Collection<String> types) throws ServerException {
+	public void saveNotes(long docId, String fileVersion, List<GUIDocumentNote> notes, Collection<String> types)
+			throws ServerException {
 		Session session = validateSession();
 
 		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
@@ -1936,8 +1937,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			/*
 			 * Check for deletions
 			 */
-			List<DocumentNote> documentNotes = dao.findByDocIdAndTypes(document.getId(), document.getFileVersion(),
-					types);
+			List<DocumentNote> documentNotes = dao.findByDocIdAndTypes(document.getId(),
+					fileVersion != null ? fileVersion : document.getFileVersion(), types);
 			List<Long> actualNoteIds = documentNotes.stream().map(PersistentObject::getId).toList();
 			List<Long> noteIds = notes.stream().map(GUIDocumentNote::getId).toList();
 			for (Long actualNoteId : actualNoteIds)
@@ -1971,6 +1972,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			note = new DocumentNote();
 			note.setTenantId(session.getTenantId());
 			note.setDocId(document.getId());
+			note.setFileVersion(guiNote.getFileVersion()!=null? guiNote.getFileVersion() : document.getFileVersion());
 			note.setUserId(session.getUserId());
 			note.setUsername(session.getUser().getFullName());
 			note.setDate(new Date());
@@ -1978,7 +1980,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		}
 
 		note.setFileName(document.getFileName());
-		note.setFileVersion(document.getFileVersion());
 		note.setMessage(guiNote.getMessage());
 		note.setColor(guiNote.getColor());
 		note.setTop(guiNote.getTop());

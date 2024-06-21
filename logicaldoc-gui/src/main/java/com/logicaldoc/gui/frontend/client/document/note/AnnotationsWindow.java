@@ -5,11 +5,11 @@ import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.widgets.NoteChangeListener;
 import com.smartgwt.client.widgets.drawing.DrawItem;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
@@ -34,9 +34,9 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 
 	private static final String COMMENT_FLIPPED = "comment-flipped";
 
-	private NotesPanel notesPanel;
-
 	private boolean editEnabled = true;
+
+	private NoteChangeListener saveHandler;
 
 	/**
 	 * Constructor
@@ -44,13 +44,13 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 	 * @param doc the document to be displayed
 	 * @param fileVer file version specification, null to use the current
 	 *        version
-	 * @param notesPanel the notes panel associated to this window, optional
+	 * @param saveHandler the handler to invoke on save
 	 * @param editEnabled if the user can edit the annotations
 	 */
-	public AnnotationsWindow(GUIDocument doc, String fileVer, NotesPanel notesPanel, boolean editEnabled) {
+	public AnnotationsWindow(GUIDocument doc, String fileVer, NoteChangeListener saveHandler, boolean editEnabled) {
 		super(doc, fileVer != null ? fileVer : doc.getFileVersion(), null);
 
-		this.notesPanel = notesPanel;
+		this.saveHandler = saveHandler;
 		this.editEnabled = editEnabled;
 	}
 
@@ -125,13 +125,13 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 		menu.setShadowDepth(3);
 
 		MenuItem arrow = new MenuItem(AwesomeFactory.getIconHtml("arrow-alt-right"));
-		arrow.addClickHandler((MenuItemClickEvent event) -> addNewNote("thickarrow"));
+		arrow.addClickHandler(click -> addNewNote("thickarrow"));
 
 		MenuItem comment = new MenuItem(AwesomeFactory.getIconHtml(COMMENT_ALT));
-		comment.addClickHandler((MenuItemClickEvent event) -> addNewNote(COMMENT));
+		comment.addClickHandler(click -> addNewNote(COMMENT));
 
 		MenuItem commentFlipped = new MenuItem(AwesomeFactory.getIconHtml(COMMENT_ALT, "fa-rotate-180", null));
-		commentFlipped.addClickHandler((MenuItemClickEvent event) -> addNewNote(COMMENT_FLIPPED));
+		commentFlipped.addClickHandler(click -> addNewNote(COMMENT_FLIPPED));
 
 		menu.setData(comment, commentFlipped, arrow);
 
@@ -144,10 +144,10 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 		menu.setShadowDepth(3);
 
 		MenuItem square = new MenuItem(AwesomeFactory.getIconHtml(SQUARE2));
-		square.addClickHandler((MenuItemClickEvent event) -> addNewNote(SQUARE2));
+		square.addClickHandler(click -> addNewNote(SQUARE2));
 
 		MenuItem circle = new MenuItem(AwesomeFactory.getIconHtml(CIRCLE));
-		circle.addClickHandler((MenuItemClickEvent event) -> addNewNote(CIRCLE));
+		circle.addClickHandler(click -> addNewNote(CIRCLE));
 
 		menu.setItems(square, circle);
 
@@ -160,10 +160,10 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 		menu.setShadowDepth(3);
 
 		MenuItem line = new MenuItem(AwesomeFactory.getIconHtml("horizontal-rule"));
-		line.addClickHandler((MenuItemClickEvent event) -> addNewNote("line"));
+		line.addClickHandler(click -> addNewNote("line"));
 
 		MenuItem arrow = new MenuItem(AwesomeFactory.getIconHtml("long-arrow-right"));
-		arrow.addClickHandler((MenuItemClickEvent event) -> addNewNote("arrow"));
+		arrow.addClickHandler(click -> addNewNote("arrow"));
 
 		menu.setItems(line, arrow);
 
@@ -172,8 +172,8 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 
 	@Override
 	protected void onNotesSaved() {
-		if (notesPanel != null)
-			notesPanel.refresh();
+		if (saveHandler != null)
+			saveHandler.onChanged();
 		destroy();
 	}
 }

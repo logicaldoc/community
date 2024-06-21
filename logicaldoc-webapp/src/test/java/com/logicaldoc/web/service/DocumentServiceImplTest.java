@@ -1224,7 +1224,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		boolean exceptionHappened = false;
 		try {
 			List<GUIDocumentNote> notes = new ArrayList<>();
-			service.saveNotes(888, notes, null);
+			service.saveNotes(888, null, notes, null);
 		} catch (ServerException e) {
 			exceptionHappened = true;
 		}
@@ -1241,7 +1241,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		gdn02.setRecipientEmail("ken-botterill@acme.com");
 		notes.add(gdn01);
 		notes.add(gdn02);
-		service.saveNotes(5, notes, null);
+		service.saveNotes(5, null, notes, null);
 	}
 
 	@Test

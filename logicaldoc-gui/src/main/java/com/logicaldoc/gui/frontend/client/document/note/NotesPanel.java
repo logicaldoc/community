@@ -90,12 +90,12 @@ public class NotesPanel extends DocumentDetailTab {
 
 		ToolStripButton addNote = new ToolStripButton(I18N.message("addnote"));
 		addNote.addClickHandler(
-				click -> new NoteUpdateDialog(document.getId(), 0L, null, null, save -> refresh()).show());
+				click -> new NoteUpdateDialog(document.getId(), 0L, null, null, () -> refresh()).show());
 
 		ToolStripButton annotations = new ToolStripButton(I18N.message("annotations"));
 		annotations.addClickHandler(
 				click -> new com.logicaldoc.gui.frontend.client.document.note.AnnotationsWindow(document, null,
-						NotesPanel.this, true).show());
+						() -> refresh(), true).show());
 
 		ToolStripButton export = new ToolStripButton(I18N.message("export"));
 		export.addClickHandler(click -> GridUtil.exportCSV(notesGrid, true));
@@ -132,12 +132,9 @@ public class NotesPanel extends DocumentDetailTab {
 			MenuItem edit = new MenuItem();
 			edit.setTitle(I18N.message("edit"));
 			edit.setEnabled(false);
-			edit.addClickHandler(clickEvent -> {
-				NoteUpdateDialog note = new NoteUpdateDialog(document.getId(),
-						notesGrid.getSelectedRecord().getAttributeAsLong("id"), null,
-						notesGrid.getSelectedRecord().getAttribute(MESSAGE), save -> refresh());
-				note.show();
-			});
+			edit.addClickHandler(clickEvent -> new NoteUpdateDialog(document.getId(),
+					notesGrid.getSelectedRecord().getAttributeAsLong("id"), null,
+					notesGrid.getSelectedRecord().getAttribute(MESSAGE), () -> refresh()).show());
 
 			MenuItem prnt = new MenuItem();
 			prnt.setTitle(I18N.message("print"));
