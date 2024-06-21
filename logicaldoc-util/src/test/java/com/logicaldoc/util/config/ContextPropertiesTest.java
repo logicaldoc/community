@@ -35,9 +35,9 @@ public class ContextPropertiesTest {
 
 	@After
 	public void trearDown() throws IOException {
-		FileUtil.strongDelete(propsFile);
+		FileUtil.delete(propsFile);
 		for (File backupFile : contextProperties.getBackups()) {
-			FileUtil.strongDelete(backupFile);
+			FileUtil.delete(backupFile);
 		}
 	}
 

@@ -174,48 +174,34 @@ public class ExecTest {
 	}
 
 	@Test
-	public void testExecStringStringArrayFileStringBufferInt() {
-		File exeFile = new File("target\\test-classes\\nothing.bat @TaylorSwift #Midnights");
+	public void testExecStringStringArrayFileStringBufferInt() throws IOException {
+		File exeFile = new File("target\\test-classes\\nothing.bat \"@TaylorSwift\" \"#Midnights\"");
 
 		String[] envp = { "TS10=MidnightTS" };
 
-		try {
-			if (new Exec().isWindows()) {
-				File userDir = new File(System.getProperty("user.dir"));
-				StringBuilder sb = new StringBuilder();
-				int retval = new Exec().exec(exeFile.getPath(), envp, userDir, sb, 20);
-				log.info("retval: {}", retval);
-				assertEquals(0, retval);
-				log.info("sb: {}", sb);
-				String out = sb.toString();
-				System.out.println(">>" + out);
-				assertTrue(out.contains("TaylorSwift"));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail("Unexpected exception was thrown");
+		if (new Exec().isWindows()) {
+			File userDir = new File(System.getProperty("user.dir"));
+			StringBuilder sb = new StringBuilder();
+			int retval = new Exec().exec(exeFile.getPath(), envp, userDir, sb, 20);
+			assertEquals(0, retval);
+			assertTrue(sb.toString().toLowerCase().contains("taylorswift"));
 		}
 	}
 
 	@Test
-	public void testExecStringStringArrayFileWriterInt() {
+	public void testExecStringStringArrayFileWriterInt() throws IOException {
 		File exeFile = new File("target\\test-classes\\loop.bat");
 
 		String[] envp = { "TS10loopcount=1000000" };
 
-		try {
-			if (new Exec().isWindows()) {
-				File userDir = new File(System.getProperty("user.dir"));
-				StringWriter sw = new StringWriter();
-				int retval = new Exec().exec(exeFile.getPath(), envp, userDir, sw, 5);
-				log.info("retval: {}", retval);
-				assertEquals(1, retval);
-				String out = sw.toString();
-				assertTrue(out.isEmpty() || out.contains("1000000") || out.contains("Hello World!"));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail("Unexpected exception was thrown");
+		if (new Exec().isWindows()) {
+			File userDir = new File(System.getProperty("user.dir"));
+			StringWriter sw = new StringWriter();
+			int retval = new Exec().exec(exeFile.getPath(), envp, userDir, sw, 5);
+			log.info("retval: {}", retval);
+			assertEquals(1, retval);
+			String out = sw.toString();
+			assertTrue(out.isEmpty() || out.contains("1000000") || out.contains("Hello World!"));
 		}
 	}
 

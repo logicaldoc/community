@@ -137,7 +137,7 @@ public class ExportContextImpl extends AbstractExportContext {
 			writeFile(hasContentLength);
 		}
 
-		FileUtil.strongDelete(outFile);
+		FileUtil.delete(outFile);
 	}
 
 	private void writeFile(boolean hasContentLength) {

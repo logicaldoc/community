@@ -33,7 +33,7 @@ public class RarUtilTest {
 
 	@After
 	public void tearDown() throws Exception {
-		FileUtil.strongDelete(dir);
+		FileUtil.delete(dir);
 	}
 
 	@Test

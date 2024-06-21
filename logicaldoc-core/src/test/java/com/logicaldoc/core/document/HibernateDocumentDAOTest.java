@@ -110,9 +110,9 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		dao.initialize(doc);
 		assertEquals("xx", doc.getDigest());
 
-		String filePath = "target/store/1/doc/" + doc.getFileVersion();
-		assertTrue(new File(filePath).exists());
-		String digest = FileUtil.computeDigest(new File(filePath));
+		File file = new File(rootStoreOne.getAbsolutePath() + "/1/doc/" + doc.getFileVersion());
+		assertTrue(file.exists());
+		String digest = FileUtil.computeDigest(file);
 
 		dao.updateDigest(doc);
 		assertEquals(digest, doc.getDigest());

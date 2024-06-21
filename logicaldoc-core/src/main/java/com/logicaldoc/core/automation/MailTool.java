@@ -335,7 +335,7 @@ public class MailTool {
 							createdDocs.add(attDoc);
 						} finally {
 							if (tmpFile != null)
-								FileUtil.strongDelete(tmpFile);
+								FileUtil.delete(tmpFile);
 						}
 					}
 				}

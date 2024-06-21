@@ -27,7 +27,7 @@ public class TarUtilTest {
 			assertTrue(out.exists());
 			assertTrue(FileUtil.readFile(out).contains("<BatchHeader>"));
 		} finally {
-			FileUtil.strongDelete(out);
+			FileUtil.delete(out);
 		}
 	}
 }

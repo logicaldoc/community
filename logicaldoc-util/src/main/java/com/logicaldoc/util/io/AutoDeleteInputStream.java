@@ -71,7 +71,7 @@ public class AutoDeleteInputStream extends InputStream {
 	public void close() throws IOException {
 		wrappedStream.close();
 		if (file != null)
-			FileUtil.strongDelete(file);
+			FileUtil.delete(file);
 	}
 
 	@Override

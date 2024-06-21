@@ -26,7 +26,7 @@ public class ResourceUtilTest {
 			ResourceUtil.copyResource("/context.xml", out);
 			assertTrue(out.length() > 0);
 		} finally {
-			FileUtil.strongDelete(out);
+			FileUtil.delete(out);
 		}
 	}
 
@@ -43,7 +43,7 @@ public class ResourceUtilTest {
 			IOUtil.write(new ByteArrayInputStream(ResourceUtil.readAsBytes("/context.xml")), out);
 			assertTrue(out.length() > 0);
 		} finally {
-			FileUtil.strongDelete(out);
+			FileUtil.delete(out);
 		}
 	}
 }

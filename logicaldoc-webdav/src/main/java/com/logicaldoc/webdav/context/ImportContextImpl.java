@@ -112,7 +112,7 @@ public class ImportContextImpl implements ImportContext {
 	public void informCompleted(boolean success) {
 		checkCompleted();
 		completed = true;
-		FileUtil.strongDelete(inputFile);
+		FileUtil.delete(inputFile);
 	}
 
 	public boolean isCompleted() {

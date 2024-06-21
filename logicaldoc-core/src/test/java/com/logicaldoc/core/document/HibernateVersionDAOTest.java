@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -87,52 +88,58 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		user.setUsername("admin");
 		user.setName("xx");
 		user.setFirstName("xx");
-		
-		int versionsCap=Context.get().getProperties().getInt("document.maxversions");
+
+		int versionsCap = Context.get().getProperties().getInt("document.maxversions");
 		assertEquals(versionsCap, testSubject.findByDocId(doc.getId()).size());
 		Storer storer = (Storer) Context.get().getBean(Storer.class);
 		for (Version ver : testSubject.findByDocId(doc.getId())) {
 			String res = storer.getResourceName(doc.getId(), ver.getFileVersion(), null);
-			storer.store(this.getClass().getResourceAsStream("/data.sql"), doc.getId(), res);	
+			storer.store(this.getClass().getResourceAsStream("/data.sql"), doc.getId(), res);
 		}
 		for (Version ver : testSubject.findByDocId(doc.getId())) {
 			String res = storer.getResourceName(doc.getId(), ver.getFileVersion(), null);
 			storer.exists(doc.getId(), res);
 		}
-		
+
 		Version version = Version.create(doc, user, "", DocumentEvent.STORED.toString(), true);
 		testSubject.store(version);
 		assertEquals("1.0", testSubject.findById(version.getId()).getVersion());
-		
+
 		String resourceName = storer.getResourceName(doc.getId(), version.getFileVersion(), null);
-		storer.store(this.getClass().getResourceAsStream("/data.sql"), doc.getId(), resourceName);
-				
-		assertEquals(versionsCap, testSubject.findByDocId(doc.getId()).size());
-		for (Version ver : testSubject.findByDocId(doc.getId())) {
-			String res = storer.getResourceName(doc.getId(), ver.getFileVersion(), null);
-			storer.exists(doc.getId(), res);
-		}		
-		
-		version = Version.create(doc, user, "", DocumentEvent.CHANGED.toString(), true);
-		testSubject.store(version);
-		assertEquals("2.0", version.getVersion());
-		
-		resourceName = storer.getResourceName(doc.getId(), version.getFileVersion(), null);
-		storer.store(this.getClass().getResourceAsStream("/data.sql"), doc.getId(), resourceName);
-		
+		try (InputStream is = this.getClass().getResourceAsStream("/data.sql")) {
+			storer.store(is, doc.getId(), resourceName);
+		}
+
 		assertEquals(versionsCap, testSubject.findByDocId(doc.getId()).size());
 		for (Version ver : testSubject.findByDocId(doc.getId())) {
 			String res = storer.getResourceName(doc.getId(), ver.getFileVersion(), null);
 			storer.exists(doc.getId(), res);
 		}
-		
+
+		version = Version.create(doc, user, "", DocumentEvent.CHANGED.toString(), true);
+		testSubject.store(version);
+		assertEquals("2.0", version.getVersion());
+
+		resourceName = storer.getResourceName(doc.getId(), version.getFileVersion(), null);
+		try (InputStream is = this.getClass().getResourceAsStream("/data.sql")) {
+			storer.store(is, doc.getId(), resourceName);
+		}
+
+		assertEquals(versionsCap, testSubject.findByDocId(doc.getId()).size());
+		for (Version ver : testSubject.findByDocId(doc.getId())) {
+			String res = storer.getResourceName(doc.getId(), ver.getFileVersion(), null);
+			storer.exists(doc.getId(), res);
+		}
+
 		version = Version.create(doc, user, "", DocumentEvent.CHECKEDIN.toString(), false);
 		testSubject.store(version);
 		assertEquals("2.1", version.getVersion());
-		
+
 		resourceName = storer.getResourceName(doc.getId(), version.getFileVersion(), null);
-		storer.store(this.getClass().getResourceAsStream("/data.sql"), doc.getId(), resourceName);
-		
+		try (InputStream is = this.getClass().getResourceAsStream("/data.sql")) {
+			storer.store(is, doc.getId(), resourceName);
+		}
+
 		assertEquals(versionsCap, testSubject.findByDocId(doc.getId()).size());
 		for (Version ver : testSubject.findByDocId(doc.getId())) {
 			String res = storer.getResourceName(doc.getId(), ver.getFileVersion(), null);

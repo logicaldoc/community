@@ -87,7 +87,7 @@ public class ImageUtil {
 			saveImage(content, tmpFile);
 			cropImageToFile(tmpFile, zone, file);
 		} finally {
-			FileUtil.strongDelete(tmpFile);
+			FileUtil.delete(tmpFile);
 		}
 	}
 
@@ -288,7 +288,7 @@ public class ImageUtil {
 				}
 				GhostUtil.print(pdfFile, out, 1);
 			} finally {
-				FileUtil.strongDelete(pdfFile);
+				FileUtil.delete(pdfFile);
 			}
 		}
 	}

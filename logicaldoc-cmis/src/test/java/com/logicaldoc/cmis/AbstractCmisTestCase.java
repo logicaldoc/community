@@ -41,7 +41,7 @@ public abstract class AbstractCmisTestCase extends AbstractTestCase {
 		String storePath = Context.get().getProperties().getProperty("store.1.dir");
 		File store = new File(storePath);
 
-		FileUtil.strongDelete(store);
+		FileUtil.delete(store);
 
 		store.mkdir();
 		new File(store, "5/doc").mkdirs();

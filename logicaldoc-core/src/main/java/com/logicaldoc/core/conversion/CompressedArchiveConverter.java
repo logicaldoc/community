@@ -55,7 +55,7 @@ public abstract class CompressedArchiveConverter extends AbstractFormatConverter
 			throw new IOException("Error in Zip conversion", e);
 		} finally {
 			if (tempFile != null)
-				FileUtil.strongDelete(tempFile);
+				FileUtil.delete(tempFile);
 		}
 	}
 
@@ -79,7 +79,7 @@ public abstract class CompressedArchiveConverter extends AbstractFormatConverter
 			converter.convert(sid, document, uncompressedEntryFile, dest);
 		} finally {
 			if (uncompressedEntryFile != null)
-				FileUtil.strongDelete(uncompressedEntryFile);
+				FileUtil.delete(uncompressedEntryFile);
 		}
 	}
 

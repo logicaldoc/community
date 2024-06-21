@@ -248,7 +248,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 		Document doc = testSubject.findById(1L);
 		String result = testSubject.readAsString(doc.getId(), doc.getFileVersion(), null);
 		assertNotNull(result);
-		assertTrue(result.contains("Linearized"));
+		assertTrue(result.contains("DocChecksum"));
 	}
 
 	@Test
@@ -389,6 +389,6 @@ public class DocToolTest extends AbstractCoreTestCase {
 	public void testParse() throws Exception {
 		Document doc = testSubject.findById(1);
 		String text = testSubject.parse(doc, doc.getFileVersion());
-		assertTrue(text.contains("Digital Day"));
+		assertTrue(text.contains("dolor"));
 	}
 }

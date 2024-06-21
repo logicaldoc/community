@@ -230,7 +230,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		checkMenu(Menu.DESTROY_DOCUMENTS);
 
 		log.info("User {} requested the permanent deletion of docuemnts {}", session.getUsername(), docIds);
-		
+
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 
 		executeLongRunningOperation("Destroy Documents", () -> {
@@ -329,7 +329,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 					docs.add(doc);
 				}
 			} finally {
-				FileUtil.strongDelete(file);
+				FileUtil.delete(file);
 			}
 		}
 
@@ -353,7 +353,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	private void cleanUploadedFiles(Session session) {
 		Map<String, File> uploadedFilesMap = getUploadedFiles(session.getSid());
 		for (File uploadedEntry : uploadedFilesMap.values())
-			FileUtil.strongDelete(uploadedEntry);
+			FileUtil.delete(uploadedEntry);
 	}
 
 	private void importZip(String charset, final GUIDocument metadata, final Session session, Folder parent,
@@ -373,7 +373,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		} catch (PersistenceException e) {
 			log.error("Unable to delete temporary file", e);
 		} finally {
-			FileUtil.strongDelete(zipFile);
+			FileUtil.delete(zipFile);
 		}
 	}
 
@@ -1540,7 +1540,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		} catch (IOException | PersistenceException t) {
 			log.error(t.getMessage(), t);
 		} finally {
-			FileUtil.strongDelete(zipFile);
+			FileUtil.delete(zipFile);
 		}
 	}
 
@@ -1555,7 +1555,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		} catch (IOException ioe) {
 			log.warn(ioe.getMessage());
 		} finally {
-			FileUtil.strongDelete(thumbnailFile);
+			FileUtil.delete(thumbnailFile);
 		}
 	}
 
@@ -1776,7 +1776,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 		File dir = new File(System.getProperty("java.io.tmpdir") + "/upload/" + session.getSid());
 		if (dir.exists())
-			FileUtil.strongDelete(dir);
+			FileUtil.delete(dir);
 	}
 
 	@Override
@@ -2157,7 +2157,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void updateNote(long docId, long noteId, String message) throws ServerException {
+	public void updateNote(long docId, long noteId, String fileVersion, String message) throws ServerException {
 		Session session = validateSession();
 
 		try {
@@ -2178,7 +2178,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			}
 
 			note.setFileName(document.getFileName());
-			note.setFileVersion(document.getFileVersion());
+			note.setFileVersion(StringUtils.defaultIfEmpty(fileVersion, document.getFileVersion()));
 			note.setMessage(message);
 			note.setUserId(session.getUser().getId());
 			note.setUsername(session.getUser().getFullName());
@@ -2798,7 +2798,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			return (GUIDocument) throwServerException(session, log, e);
 		} finally {
 			IOUtils.closeQuietly(is);
-			FileUtil.strongDelete(tmp);
+			FileUtil.delete(tmp);
 		}
 	}
 
@@ -3155,7 +3155,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		} catch (IOException e) {
 			log.warn("Cannot generate tile of document {}", doc, e);
 		} finally {
-			FileUtil.strongDelete(tileFile);
+			FileUtil.delete(tileFile);
 		}
 		return tile;
 	}

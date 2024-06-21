@@ -32,7 +32,7 @@ public class JarUtilTest {
 
 	@After
 	public void tearDown() throws Exception {
-		FileUtil.strongDelete(dir);
+		FileUtil.delete(dir);
 	}
 
 	@Test
@@ -43,7 +43,7 @@ public class JarUtilTest {
 			testSubject.unjar(file.getPath(), "target/test");
 			assertTrue(test.exists());
 		} finally {
-			FileUtil.strongDelete(test);
+			FileUtil.delete(test);
 		}
 	}
 

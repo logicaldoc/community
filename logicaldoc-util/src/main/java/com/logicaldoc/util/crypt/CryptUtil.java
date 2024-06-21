@@ -78,7 +78,7 @@ public class CryptUtil {
 			byte[] clearContent = FileUtils.readFileToByteArray(inputFile);
 			byte[] encryptedContent = cipher.doFinal(clearContent);
 			outputFile.mkdirs();
-			FileUtil.strongDelete(outputFile);
+			FileUtil.delete(outputFile);
 			boolean created = outputFile.createNewFile();
 			if (!created)
 				throw new IOException("Cannot create file " + outputFile.getAbsolutePath());
@@ -99,7 +99,7 @@ public class CryptUtil {
 			byte[] encryptedContent = FileUtils.readFileToByteArray(inputFile);
 			byte[] clearContent = cipher.doFinal(encryptedContent);
 			outputFile.mkdirs();
-			FileUtil.strongDelete(outputFile);
+			FileUtil.delete(outputFile);
 			boolean created = outputFile.createNewFile();
 			if (!created)
 				throw new IOException("Cannot create file " + outputFile.getAbsolutePath());

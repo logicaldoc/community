@@ -87,9 +87,9 @@ public class XMLConverter extends AbstractFormatConverter {
 			}
 		} finally {
 			if (xslt != null)
-				FileUtil.strongDelete(xslt);
+				FileUtil.delete(xslt);
 			if (xml != null)
-				FileUtil.strongDelete(xml);
+				FileUtil.delete(xml);
 		}
 	}
 
@@ -152,7 +152,7 @@ public class XMLConverter extends AbstractFormatConverter {
 					converter.convert(sid, document, transformedFile, dest);
 				} finally {
 					if (transformedFile != null)
-						FileUtil.strongDelete(transformedFile);
+						FileUtil.delete(transformedFile);
 				}
 			}
 		} catch (FileNotFoundException | TransformerException e) {

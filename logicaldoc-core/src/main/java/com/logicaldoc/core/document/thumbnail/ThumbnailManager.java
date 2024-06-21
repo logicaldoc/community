@@ -151,8 +151,8 @@ public class ThumbnailManager {
 			log.warn("Error rendering image for document: {} - {}", document.getId(), document.getFileName(), e);
 		} finally {
 			// Delete temporary resources
-			FileUtil.strongDelete(src);
-			FileUtil.strongDelete(dest);
+			FileUtil.delete(src);
+			FileUtil.delete(dest);
 		}
 	}
 

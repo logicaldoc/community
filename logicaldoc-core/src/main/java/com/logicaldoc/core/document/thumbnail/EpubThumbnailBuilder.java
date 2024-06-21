@@ -90,14 +90,14 @@ public class EpubThumbnailBuilder extends ImageThumbnailBuilder {
 						if (pdfBuilder != null)
 							pdfBuilder.buildThumbnail(sid, document, fileVersion, pdf, dest, size, compression);
 					} finally {
-						FileUtil.strongDelete(pdf);
+						FileUtil.delete(pdf);
 					}
 				}
 			}
 		} catch (Exception e) {
 			throw new IOException("Thumbnail building " + e.getMessage(), e);
 		} finally {
-			FileUtil.strongDelete(tmp);
+			FileUtil.delete(tmp);
 		}
 	}
 }

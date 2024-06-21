@@ -68,13 +68,13 @@ public class ZipUtilTest {
 
 			testSubject.unzip(this.getClass().getResourceAsStream("/test.zip"), "abc/test.txt", test);
 			assertTrue(test.exists());
-			FileUtil.strongDelete(test);
+			FileUtil.delete(test);
 
 			testSubject.unzip(new File("src/test/resources/test.zip"), "/abc/test.txt", test);
 			assertTrue(test.exists());
 		} finally {
-			FileUtil.strongDelete(test);
-			FileUtil.strongDelete(indexXml);
+			FileUtil.delete(test);
+			FileUtil.delete(indexXml);
 		}
 	}
 
@@ -139,7 +139,7 @@ public class ZipUtilTest {
 			testSubject.zipFile(new File("src/test/resources/context.properties"), context);
 			assertNotNull(testSubject.getEntryContent(context, "/context.properties"));
 		} finally {
-			FileUtil.strongDelete(context);
+			FileUtil.delete(context);
 		}
 	}
 

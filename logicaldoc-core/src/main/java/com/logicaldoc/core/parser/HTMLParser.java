@@ -39,7 +39,7 @@ public class HTMLParser extends AbstractParser {
 			else
 				log.warn("Failed to extract HTML text content");
 		} finally {
-			FileUtil.strongDelete(tempFile);
+			FileUtil.delete(tempFile);
 		}
 	}
 }

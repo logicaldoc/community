@@ -176,8 +176,8 @@ public class CoreWorkBench {
 
 			// copyFileUsingJava7Files(file, copy);
 			// System.out.println("Copied file " + copy.getPath());
-			FileUtil.strongDelete(file);
-			FileUtil.strongDelete(copy);
+			FileUtil.delete(file);
+			FileUtil.delete(copy);
 			return 0L;
 		}
 	}

@@ -41,7 +41,7 @@ public class EpubParser extends AbstractParser {
 		} catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
 		} finally {
-			FileUtil.strongDelete(tmpFile);
+			FileUtil.delete(tmpFile);
 		}
 	}
 

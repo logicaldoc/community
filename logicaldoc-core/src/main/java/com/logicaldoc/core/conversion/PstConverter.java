@@ -45,7 +45,7 @@ public class PstConverter extends AbstractFormatConverter {
 				FileUtil.writeFile(listing, tempFile.getAbsolutePath());
 				converter.convert(sid, document, tempFile, dest);
 			} finally {
-				FileUtil.strongDelete(tempFile);
+				FileUtil.delete(tempFile);
 			}
 		}
 

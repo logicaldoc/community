@@ -119,7 +119,7 @@ public class SoapMultithreadWorkbench extends SoapWorkbench {
 								documentClient.checkin(sid, docId, "soap massive test", wsDoc.getFileName(), false,
 										tmp);
 							} finally {
-								FileUtil.strongDelete(tmp);
+								FileUtil.delete(tmp);
 							}
 						}
 

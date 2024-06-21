@@ -525,7 +525,7 @@ public class ZipUtil implements Closeable {
 			}
 		} finally {
 			if (tarFile != null && tarFile.exists())
-				FileUtil.strongDelete(tarFile);
+				FileUtil.delete(tarFile);
 		}
 	}
 

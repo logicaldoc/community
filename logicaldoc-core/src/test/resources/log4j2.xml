@@ -43,10 +43,17 @@
 		<Logger name="org.hsqldb" level="error" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
+        <Logger name="com.logicaldoc.core.document.DocumentManagerImpl" level="info" additivity="false">
+			<AppenderRef ref="file" />
+		</Logger>
+		<Logger name="com.logicaldoc.util.io.FileUtil" level="debug" additivity="false">
+			<AppenderRef ref="file" />
+		</Logger>
 
 		<Root level="fatal">
 			<AppenderRef ref="console" />
 		</Root>
 	</Loggers>
+
 
 </Configuration>	

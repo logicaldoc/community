@@ -573,7 +573,7 @@ public class LDRepository {
 				transaction.setSessionId(sid);
 				manager.replaceFile(doc.getId(), doc.getFileVersion(), mergeFile, transaction);
 			} finally {
-				FileUtil.strongDelete(chunksFolder);
+				FileUtil.delete(chunksFolder);
 			}
 		}
 	}
@@ -600,7 +600,7 @@ public class LDRepository {
 		for (Path path : chunks) {
 			File chunk = path.toFile();
 			Files.write(merge.toPath(), Files.readAllBytes(chunk.toPath()), StandardOpenOption.APPEND);
-			FileUtil.strongDelete(chunk);
+			FileUtil.delete(chunk);
 		}
 
 		return merge;

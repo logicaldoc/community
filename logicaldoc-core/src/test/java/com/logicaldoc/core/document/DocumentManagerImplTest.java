@@ -283,7 +283,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 	public void testParseDocument() throws PersistenceException, ParsingException {
 		Document doc = docDao.findById(1);
 		String text = testSubject.parseDocument(doc, null);
-		assertTrue(text.contains("Digital Day"));
+		assertTrue(text.contains("dolor"));
 
 		Folder folder = folderDao.createPath(folderDao.findById(Folder.ROOTID), "/Default/test", true, null);
 
@@ -292,7 +292,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		transaction.setUser(userDao.findByUsername("admin"));
 		Document alias = testSubject.createAlias(doc, folder, null, transaction);
 		text = testSubject.parseDocument(alias, null);
-		assertTrue(text.contains("Digital Day"));
+		assertTrue(text.contains("dolor"));
 	}
 
 	@Test
@@ -328,7 +328,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		String store2Root = Context.get().getProperties().getProperty("store.2.dir");
 
 		assertTrue(new File(storeRoot + "/1/doc/" + doc.getFileVersion()).exists());
-		FileUtil.strongDelete(new File(store2Root + "/1/doc/"));
+		FileUtil.delete(new File(store2Root + "/1/doc/"));
 
 		transaction = new DocumentHistory();
 		transaction.setUser(user);
@@ -858,7 +858,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 			testSubject.promoteVersion(3L, "1.3", history);
 		} finally {
 			storer.setUseDummyFile(false);
-			FileUtil.strongDelete(dummyFile);
+			FileUtil.delete(dummyFile);
 		}
 
 		doc = docDao.findById(3L);

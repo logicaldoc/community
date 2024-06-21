@@ -64,14 +64,14 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 				XMLEncoder encoder = new XMLEncoder(out, charset, false, 0)) {
 			encoder.writeObject(opt);
 		} catch (IOException ioe) {
-			FileUtil.strongDelete(tmpFile);
+			FileUtil.delete(tmpFile);
 			throw ioe;
 		}
 
 		try {
 			setOptions(FileUtil.readFile(tmpFile).trim());
 		} finally {
-			FileUtil.strongDelete(tmpFile);
+			FileUtil.delete(tmpFile);
 		}
 	}
 

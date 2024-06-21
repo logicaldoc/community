@@ -139,7 +139,7 @@ public class UserUtil {
 		} catch (Exception t) {
 			log.warn(ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER, user, t);
 		} finally {
-			FileUtil.strongDelete(tmpAvatarImage);
+			FileUtil.delete(tmpAvatarImage);
 		}
 	}
 
@@ -177,7 +177,7 @@ public class UserUtil {
 			if (log.isDebugEnabled())
 				log.debug(ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER, user, t);
 		} finally {
-			FileUtil.strongDelete(tmpAvatarImage);
+			FileUtil.delete(tmpAvatarImage);
 		}
 	}
 

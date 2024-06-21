@@ -30,7 +30,7 @@ public class PdfThumbnailBuilder extends ImageThumbnailBuilder {
 		} catch (Exception e) {
 			throw new IOException("Thumbnail building " + e.getMessage(), e);
 		} finally {
-			FileUtil.strongDelete(tmp);
+			FileUtil.delete(tmp);
 		}
 	}
 }

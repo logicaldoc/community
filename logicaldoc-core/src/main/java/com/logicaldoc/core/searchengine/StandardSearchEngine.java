@@ -419,7 +419,7 @@ public class StandardSearchEngine implements SearchEngine {
 				directory.obtainLock(IndexWriter.WRITE_LOCK_NAME).close();
 		} catch (Exception e) {
 			log.warn("unlock {}", e.getMessage());
-			FileUtil.strongDelete(new File(getIndexDataFolder(), "write.lock"));
+			FileUtil.delete(new File(getIndexDataFolder(), "write.lock"));
 		}
 	}
 
@@ -556,7 +556,7 @@ public class StandardSearchEngine implements SearchEngine {
 			unlock();
 			server.getCoreContainer().shutdown();
 			server.close();
-			FileUtil.strongDelete(new File(getIndexDataFolder(), IndexWriter.WRITE_LOCK_NAME));
+			FileUtil.delete(new File(getIndexDataFolder(), IndexWriter.WRITE_LOCK_NAME));
 		} catch (Exception e) {
 			log.warn(e.getMessage(), e);
 		}
@@ -619,7 +619,7 @@ public class StandardSearchEngine implements SearchEngine {
 			}
 
 			// Delete the lock file if it exists
-			FileUtil.strongDelete(new File(indexHome, "logicaldoc/data/index/" + IndexWriter.WRITE_LOCK_NAME));
+			FileUtil.delete(new File(indexHome, "logicaldoc/data/index/" + IndexWriter.WRITE_LOCK_NAME));
 
 			CoreContainer container = new CoreContainer(indexHome.toPath(), null);
 			server = new EmbeddedSolrServer(container, LOGICALDOC);

@@ -165,7 +165,7 @@ public class LogDownload extends HttpServlet {
 			FileUtil.writeFile(env, buf.getPath());
 
 			writeEntry(out, "logicaldoc/conf/environment.txt", buf);
-			FileUtil.strongDelete(buf);
+			FileUtil.delete(buf);
 
 			/*
 			 * Discover the tomcat's folder
@@ -292,7 +292,7 @@ public class LogDownload extends HttpServlet {
 
 			writeEntry(out, "logicaldoc/updates/updates.csv", buf);
 		} finally {
-			FileUtil.strongDelete(buf);
+			FileUtil.delete(buf);
 		}
 	}
 
@@ -332,7 +332,7 @@ public class LogDownload extends HttpServlet {
 
 			writeEntry(out, "logicaldoc/patches/patches.csv", buf);
 		} finally {
-			FileUtil.strongDelete(buf);
+			FileUtil.delete(buf);
 		}
 	}
 
@@ -364,7 +364,7 @@ public class LogDownload extends HttpServlet {
 		}
 		prop.store(new FileOutputStream(buf), "Support Request");
 		writeEntry(out, "logicaldoc/conf/context-dump.properties", buf);
-		FileUtil.strongDelete(buf);
+		FileUtil.delete(buf);
 		return prop;
 	}
 

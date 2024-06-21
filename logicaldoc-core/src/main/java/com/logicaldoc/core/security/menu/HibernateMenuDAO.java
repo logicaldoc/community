@@ -104,18 +104,6 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				query.append(")");
 
 				coll = findByQuery(query.toString(), (Map<String, Object>) null, null);
-
-				// Now collect all menus that references the policies of the
-				// previously found menus
-				query = new StringBuilder("select _menu from Menu _menu  where _menu.securityRef in (");
-				query.append(coll.stream().map(m -> Long.toString(m.getId())).collect(Collectors.joining(",")));
-				query.append(")");
-				List<Menu> tmp = findByQuery(query.toString(), (Map<String, Object>) null, null);
-
-				for (Menu menu : tmp) {
-					if (!coll.contains(menu))
-						coll.add(menu);
-				}
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);

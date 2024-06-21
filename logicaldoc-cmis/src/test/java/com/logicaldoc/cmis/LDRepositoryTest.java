@@ -695,7 +695,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 					"text/plain; fileNameCharset=UTF-8", fis);
 			testSubject.appendContent(null, "doc.5", contentStream, false);
 		} finally {
-			FileUtil.strongDelete(content);
+			FileUtil.delete(content);
 		}
 
 		// Upload a second chunk
@@ -706,7 +706,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 					"text/plain; fileNameCharset=UTF-8", fis);
 			testSubject.appendContent(null, "doc.5", contentStream, true);
 		} finally {
-			FileUtil.strongDelete(content);
+			FileUtil.delete(content);
 		}
 
 		Storer storer = (Storer) context.getBean("Storer");

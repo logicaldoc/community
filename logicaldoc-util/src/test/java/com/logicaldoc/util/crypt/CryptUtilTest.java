@@ -41,8 +41,8 @@ public class CryptUtilTest {
 			Assert.assertEquals(clearFile.length(), decryptedFile.length());
 
 		} finally {
-			FileUtil.strongDelete(cryptedFile);
-			FileUtil.strongDelete(decryptedFile);
+			FileUtil.delete(cryptedFile);
+			FileUtil.delete(decryptedFile);
 		}
 	}
 

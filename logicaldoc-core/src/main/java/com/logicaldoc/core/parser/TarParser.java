@@ -59,11 +59,11 @@ public class TarParser extends AbstractParser {
 					content.append(text);
 				} finally {
 					if (uncompressedEntryFile != null)
-						FileUtil.strongDelete(uncompressedEntryFile);
+						FileUtil.delete(uncompressedEntryFile);
 				}
 			}
 		} finally {
-			FileUtil.strongDelete(tarFile);
+			FileUtil.delete(tarFile);
 		}
 	}
 
@@ -81,7 +81,7 @@ public class TarParser extends AbstractParser {
 			log.error(t.getMessage(), t);
 		} finally {
 			if (tarFile != null)
-				FileUtil.strongDelete(tarFile);
+				FileUtil.delete(tarFile);
 		}
 		return 1;
 	}
@@ -108,7 +108,7 @@ public class TarParser extends AbstractParser {
 					return entryParser.countPages(uncompressedEntryFile, uncompressedEntryFile.getName());
 				} finally {
 					if (uncompressedEntryFile != null)
-						FileUtil.strongDelete(uncompressedEntryFile);
+						FileUtil.delete(uncompressedEntryFile);
 				}
 			}
 		} catch (Exception e) {

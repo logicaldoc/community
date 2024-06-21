@@ -24,7 +24,7 @@ public class IOUtilTest {
 			assertTrue(content.endsWith("store.1.dir=targe"));
 			assertFalse(content.contains("default.password.occurrence"));
 		} finally {
-			FileUtil.strongDelete(file);
+			FileUtil.delete(file);
 		}
 	}
 
@@ -37,7 +37,7 @@ public class IOUtilTest {
 			assertEquals(new File("src/test/resources/context.properties").length(), file.length());
 		} finally {
 			IOUtil.close(is);
-			FileUtil.strongDelete(file);
+			FileUtil.delete(file);
 		}
 
 		assertFalse(file.exists());
@@ -47,7 +47,7 @@ public class IOUtilTest {
 			assertEquals(new File("src/test/resources/context.properties").length(), file.length());
 		} finally {
 			IOUtil.close(is);
-			FileUtil.strongDelete(file);
+			FileUtil.delete(file);
 		}
 	}
 

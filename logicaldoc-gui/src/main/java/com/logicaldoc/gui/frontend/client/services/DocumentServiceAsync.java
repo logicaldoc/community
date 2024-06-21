@@ -28,7 +28,7 @@ public interface DocumentServiceAsync {
 	void deleteLinks(List<Long> ids, AsyncCallback<Void> callback);
 
 	void delete(List<Long> ids, AsyncCallback<Void> callback);
-	
+
 	void destroyDocuments(List<Long> ids, AsyncCallback<Void> callback);
 
 	void makeImmutable(List<Long> ids, String comment, AsyncCallback<Void> callback);
@@ -70,12 +70,13 @@ public interface DocumentServiceAsync {
 
 	void addNote(long docId, String message, AsyncCallback<Long> callback);
 
-	void bulkUpdate(List<Long> ids, GUIDocument vo, boolean ignoreEmptyFields, AsyncCallback<List<GUIDocument>> callback);
+	void bulkUpdate(List<Long> ids, GUIDocument vo, boolean ignoreEmptyFields,
+			AsyncCallback<List<GUIDocument>> callback);
 
 	void addDocuments(boolean importZip, String charset, boolean immediateIndexing, GUIDocument metadata,
 			AsyncCallback<List<GUIDocument>> callback);
 
-	void updateNote(long docId, long noteId, String message, AsyncCallback<Void> callback);
+	void updateNote(long docId, long noteId, String fileVersion, String message, AsyncCallback<Void> callback);
 
 	void deleteVersions(List<Long> ids, AsyncCallback<GUIDocument> callback);
 
@@ -129,7 +130,8 @@ public interface DocumentServiceAsync {
 
 	void promoteVersion(long docId, String version, AsyncCallback<GUIDocument> callback);
 
-	void getNotes(long docId, String fileVersion, Collection<String> types, AsyncCallback<List<GUIDocumentNote>> callback);
+	void getNotes(long docId, String fileVersion, Collection<String> types,
+			AsyncCallback<List<GUIDocumentNote>> callback);
 
 	void saveNotes(long docId, List<GUIDocumentNote> notes, Collection<String> types, AsyncCallback<Void> callback);
 

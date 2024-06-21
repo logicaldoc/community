@@ -82,9 +82,9 @@ public class CatchAllParser extends AbstractParser {
 			log.error(t.getMessage(), t);
 		} finally {
 			if (inputFile != null && inputFile.exists())
-				FileUtil.strongDelete(inputFile);
+				FileUtil.delete(inputFile);
 			if (outputPdf != null && outputPdf.exists())
-				FileUtil.strongDelete(outputPdf);
+				FileUtil.delete(outputPdf);
 		}
 	}
 }

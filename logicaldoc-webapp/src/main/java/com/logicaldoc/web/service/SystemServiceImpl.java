@@ -866,8 +866,8 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 		pluginRegistry.getManager().deactivatePlugin(pluginId);
 
-		FileUtil.strongDelete(PluginRegistry.getPluginHome(pluginId));
-		FileUtil.strongDelete(pluginJarFile);
+		FileUtil.delete(PluginRegistry.getPluginHome(pluginId));
+		FileUtil.delete(pluginJarFile);
 		if (pluginJarFile.exists())
 			try {
 				FileUtils.forceDelete(pluginJarFile);
@@ -991,7 +991,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 			File pluginHome = PluginRegistry.getPluginHome(pluginId);
 			if (pluginHome.exists()) {
-				FileUtil.strongDelete(pluginHome);
+				FileUtil.delete(pluginHome);
 				log.info("Deleted existing plugin home {}", pluginHome.getAbsolutePath());
 			}
 

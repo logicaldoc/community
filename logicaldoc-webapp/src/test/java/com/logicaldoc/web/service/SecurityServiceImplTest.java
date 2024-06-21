@@ -430,7 +430,7 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 			user = userDAO.findById(1L);
 			assertNotSame(oldAvatar, user.getAvatar());
 		} finally {
-			FileUtil.strongDelete(avatarFile);
+			FileUtil.delete(avatarFile);
 		}
 	}
 

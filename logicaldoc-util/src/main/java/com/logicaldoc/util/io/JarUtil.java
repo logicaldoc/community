@@ -67,7 +67,7 @@ public class JarUtil {
 		File targetDir = new File(target);
 
 		if (targetDir.exists() && targetDir.isFile())
-			FileUtil.strongDelete(targetDir);
+			FileUtil.delete(targetDir);
 
 		if (!targetDir.exists())
 			FileUtils.forceMkdir(targetDir);

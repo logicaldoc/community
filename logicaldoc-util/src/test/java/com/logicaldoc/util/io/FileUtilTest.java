@@ -10,10 +10,60 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 public class FileUtilTest {
+
+	@Test
+	public void testDelete() throws IOException {
+		File root = new File("target/test-destroy");
+
+		int total = 1000;
+
+		for (int i = 0; i < total; i++) {
+			String x = Integer.toString(i);
+			String result = IntStream.iterate(0, j -> j + 3).limit((int) Math.ceil(x.length() / 3.0))
+					.mapToObj(j -> x.substring(j, Math.min(j + 3, x.length()))).collect(Collectors.joining("/"));
+			File dir = new File(root.getPath() + "/" + result);
+			dir.mkdirs();
+			dir.mkdir();
+
+			FileUtil.copyResource("/kofax.rar", new File(root.getPath() + "/1/doc/1.0"));
+		}
+
+		assertEquals(total, root.listFiles().length);
+
+		for (File dir : root.listFiles()) {
+			FileUtil.delete(dir);
+		}
+
+		assertEquals(0, root.listFiles().length);
+	}
+
+	@Test
+	public void testWriteFile() throws IOException {
+		File root = new File("target/test-writefile");
+		FileUtils.forceMkdir(root);
+		int total = 1000;
+
+		for (int i = 0; i < total; i++) {
+			File outFile =  new File(root+"/"+Integer.toString(i));
+			FileUtil.writeFile(this.getClass().getResourceAsStream("/kofax.rar") , outFile.getPath() );
+			assertTrue(outFile.length() > 0);
+			assertEquals(new File("src/test/resources/kofax.rar").length(), outFile.length());
+		}
+
+		assertEquals(total, root.listFiles().length);
+
+		for (File file : root.listFiles()) {
+			FileUtil.delete(file);
+		}
+
+		assertEquals(0, root.listFiles().length);
+	}
 
 	@Test
 	public void testMatch() throws IOException {
@@ -55,19 +105,6 @@ public class FileUtilTest {
 	}
 
 	@Test
-	public void testWriteFile() throws IOException {
-		File outFile = new File("target/testwrite.txt");
-		try {
-			FileUtil.writeFile(this.getClass().getResourceAsStream("/context.properties"), outFile.getPath());
-			assertTrue(outFile.length() > 0);
-			assertTrue(FileUtil.readFile(outFile).contains("store.1.dir"));
-			assertEquals(170, FileUtil.countLines(outFile));
-		} finally {
-			FileUtil.strongDelete(outFile);
-		}
-	}
-
-	@Test
 	public void testMerge() throws IOException {
 		File merged = new File("target/merged.txt");
 		final File file1 = new File("src/test/resources/context.properties");
@@ -80,7 +117,7 @@ public class FileUtilTest {
 			assertTrue(FileUtil.readFile(merged).contains("newprop"));
 			assertEquals(lines1 + lines2 - 1, FileUtil.countLines(merged));
 		} finally {
-			FileUtil.strongDelete(merged);
+			FileUtil.delete(merged);
 		}
 
 		final List<File> mergedFiles = List.of(file1, file2, new File("src/test/resources/sql1.sql"));
@@ -96,7 +133,7 @@ public class FileUtilTest {
 				}
 			})).getSum() - mergedFiles.size() + 1, FileUtil.countLines(merged));
 		} finally {
-			FileUtil.strongDelete(merged);
+			FileUtil.delete(merged);
 		}
 	}
 
@@ -114,7 +151,7 @@ public class FileUtilTest {
 			assertEquals(source.length() - (chunkSize * (chunks.size() - 1)), chunks.get(chunks.size() - 1).length());
 		} finally {
 			for (File chunk : chunks)
-				FileUtil.strongDelete(chunk);
+				FileUtil.delete(chunk);
 		}
 
 		try {
@@ -127,7 +164,7 @@ public class FileUtilTest {
 			assertEquals(source.length() - (chunkSize * (chunks.size() - 1)), chunks.get(chunks.size() - 1).length());
 		} finally {
 			for (File chunk : chunks)
-				FileUtil.strongDelete(chunk);
+				FileUtil.delete(chunk);
 		}
 	}
 
@@ -142,7 +179,7 @@ public class FileUtilTest {
 			FileUtil.appendFile("pippo", outFile.getPath());
 			assertTrue(FileUtil.readFile(outFile).endsWith("pippo"));
 		} finally {
-			FileUtil.strongDelete(outFile);
+			FileUtil.delete(outFile);
 		}
 	}
 
@@ -157,7 +194,7 @@ public class FileUtilTest {
 			FileUtil.writeUTF8("pippo", outFile, true);
 			assertTrue(FileUtil.readFile(outFile).endsWith("pippo"));
 		} finally {
-			FileUtil.strongDelete(outFile);
+			FileUtil.delete(outFile);
 		}
 	}
 
@@ -196,7 +233,7 @@ public class FileUtilTest {
 			FileUtil.copy(file2, new File(subfolder, "context-overide.properties"), 0);
 			assertEquals(file1.length() + file2.length() + file2.length(), FileUtil.getFolderSize(outFolder));
 		} finally {
-			FileUtil.strongDelete(outFolder);
+			FileUtil.delete(outFolder);
 		}
 	}
 
@@ -220,7 +257,7 @@ public class FileUtilTest {
 			assertFalse(source.exists());
 			assertTrue(target.exists());
 		} finally {
-			FileUtil.strongDelete(outFolder);
+			FileUtil.delete(outFolder);
 		}
 	}
 
@@ -238,8 +275,8 @@ public class FileUtilTest {
 			assertTrue(tempFolder.exists());
 			assertTrue(FileUtil.getName(tempFolder.getName()).startsWith("pippo"));
 		} finally {
-			FileUtil.strongDelete(tempFile);
-			FileUtil.strongDelete(tempFolder);
+			FileUtil.delete(tempFile);
+			FileUtil.delete(tempFolder);
 		}
 	}
 

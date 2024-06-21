@@ -49,7 +49,7 @@ public class ZipParser extends AbstractParser {
 			}
 		} finally {
 			if (ungzippedFile != null)
-				FileUtil.strongDelete(ungzippedFile);
+				FileUtil.delete(ungzippedFile);
 		}
 	}
 
@@ -109,11 +109,11 @@ public class ZipParser extends AbstractParser {
 					content.append(text);
 				} finally {
 					if (uncompressedEntryFile != null)
-						FileUtil.strongDelete(uncompressedEntryFile);
+						FileUtil.delete(uncompressedEntryFile);
 				}
 			}
 		} finally {
-			FileUtil.strongDelete(zipFile);
+			FileUtil.delete(zipFile);
 		}
 	}
 
@@ -129,7 +129,7 @@ public class ZipParser extends AbstractParser {
 				log.error(t.getMessage(), t);
 			} finally {
 				if (zipFile != null)
-					FileUtil.strongDelete(zipFile);
+					FileUtil.delete(zipFile);
 			}
 		} else {
 			File ungzippedFile = null;
@@ -142,7 +142,7 @@ public class ZipParser extends AbstractParser {
 				log.error(t.getMessage(), t);
 			} finally {
 				if (ungzippedFile != null)
-					FileUtil.strongDelete(ungzippedFile);
+					FileUtil.delete(ungzippedFile);
 			}
 		}
 		return 1;
@@ -170,7 +170,7 @@ public class ZipParser extends AbstractParser {
 				log.error(t.getMessage(), t);
 			} finally {
 				if (ungzippedFile != null)
-					FileUtil.strongDelete(ungzippedFile);
+					FileUtil.delete(ungzippedFile);
 			}
 		}
 		return 1;
@@ -197,7 +197,7 @@ public class ZipParser extends AbstractParser {
 					return entryParser.countPages(uncompressedEntryFile, uncompressedEntryFile.getName());
 				} finally {
 					if (uncompressedEntryFile != null)
-						FileUtil.strongDelete(uncompressedEntryFile);
+						FileUtil.delete(uncompressedEntryFile);
 				}
 			}
 		}

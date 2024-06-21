@@ -30,6 +30,10 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractCoreTestCase.class);
 
+	protected File rootStoreOne;
+
+	protected File rootStoreTwo;
+
 	@Before
 	@Override
 	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
@@ -43,32 +47,34 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 	}
 
 	private void prepareStore() throws IOException {
-		String storePath = Context.get().getProperties().getProperty("store.1.dir");
-		File store1 = new File(storePath);
-		FileUtil.strongDelete(store1);
-		store1.mkdir();
-
-		File store2 = new File(Context.get().getProperties().getProperty("store.2.dir"));
-		FileUtil.strongDelete(store2);
-		store2.mkdir();
+		/**
+		 * For each test we must prepare different storage folders because
+		 * re-using the same paths cause locks
+		 */
+		rootStoreOne = new File(Context.get().getProperties().getProperty("store.1.dir"));
+		rootStoreTwo = new File(Context.get().getProperties().getProperty("store.2.dir"));
 
 		Storer storer = (Storer) context.getBean("Storer");
 		storer.init();
 
+		/*
+		 * In order to minimize the locks, we write the file only if really
+		 * needed
+		 */
+
 		// Store the file of document 1
-		FileUtil.copyResource("/Digital_Day.pdf", new File(storePath + "/1/doc/1.0"));
-		try {
-			FileUtil.copyResource("/Digital_Day.pdf", new File(storePath + "/1/doc/1.0-conversion.pdf"));
-		} catch (Exception e) {
-			log.warn(e.getMessage(), e);
-		}
+		FileUtil.copyResource("/loremipsum.pdf", new File(rootStoreOne.getPath() + "/1/doc/1.0"));
+		FileUtil.copyResource("/loremipsum.pdf", new File(rootStoreOne.getPath() + "/1/doc/1.0-conversion.pdf"));
 
 		// Store the file of document 3
-		FileUtil.copyResource("/small.pdf", new File(storePath + "/3/doc/1.3"));
+		FileUtil.copyResource("/small.pdf", new File(rootStoreOne.getPath() + "/3/doc/1.3"));
 	}
 
 	@Override
 	public void tearDown() throws SQLException {
 		super.tearDown();
+
+		FileUtil.delete(rootStoreOne);
+		FileUtil.delete(rootStoreTwo);
 	}
 }

@@ -65,15 +65,15 @@ public class NotesPanel extends DocumentDetailTab {
 		ListGridField id = new ListGridField("id", I18N.message("id"), 50);
 		id.setHidden(true);
 
-		ListGridField userId = new ListGridField(USER_ID, "userid", 50);
-		userId.setHidden(true);
-
 		UserListGridField user = new UserListGridField("user", USER_ID, "author");
 		ListGridField date = new DateListGridField("date", "date");
 
 		ListGridField page = new ListGridField("page", I18N.message("page"), 50);
 		page.setAutoFitWidth(true);
 		page.setAlign(Alignment.CENTER);
+
+		ListGridField fileVersion = new ListGridField("fileVersion", I18N.message("fileversion"), 50);
+		fileVersion.setHidden(true);
 
 		ListGridField content = new ListGridField(MESSAGE, I18N.message("content"), 70);
 		content.setWidth("*");
@@ -83,24 +83,25 @@ public class NotesPanel extends DocumentDetailTab {
 		notesGrid.setCanFreezeFields(true);
 		notesGrid.setAutoFetchData(true);
 		notesGrid.setDataSource(new NotesDS(null, document.getId(), document.getFileVersion(), null));
-		notesGrid.setFields(id, userId, user, date, page, content);
+		notesGrid.setFields(id, user, date, page, fileVersion, content);
 
 		toolStrip = new ToolStrip();
 		toolStrip.setWidth100();
 
 		ToolStripButton addNote = new ToolStripButton(I18N.message("addnote"));
-		addNote.addClickHandler(event -> new NoteUpdateDialog(document.getId(), 0L, null, NotesPanel.this).show());
+		addNote.addClickHandler(
+				click -> new NoteUpdateDialog(document.getId(), 0L, null, null, save -> refresh()).show());
 
 		ToolStripButton annotations = new ToolStripButton(I18N.message("annotations"));
 		annotations.addClickHandler(
-				event -> new com.logicaldoc.gui.frontend.client.document.note.AnnotationsWindow(document, null,
+				click -> new com.logicaldoc.gui.frontend.client.document.note.AnnotationsWindow(document, null,
 						NotesPanel.this, true).show());
 
 		ToolStripButton export = new ToolStripButton(I18N.message("export"));
-		export.addClickHandler(event -> GridUtil.exportCSV(notesGrid, true));
+		export.addClickHandler(click -> GridUtil.exportCSV(notesGrid, true));
 
 		ToolStripButton print = new ToolStripButton(I18N.message("print"));
-		print.addClickHandler(event -> GridUtil.print(notesGrid));
+		print.addClickHandler(click -> GridUtil.print(notesGrid));
 
 		if (document.getFolder().isWrite()) {
 			toolStrip.addButton(addNote);
@@ -133,8 +134,8 @@ public class NotesPanel extends DocumentDetailTab {
 			edit.setEnabled(false);
 			edit.addClickHandler(clickEvent -> {
 				NoteUpdateDialog note = new NoteUpdateDialog(document.getId(),
-						notesGrid.getSelectedRecord().getAttributeAsLong("id"),
-						notesGrid.getSelectedRecord().getAttribute(MESSAGE), NotesPanel.this);
+						notesGrid.getSelectedRecord().getAttributeAsLong("id"), null,
+						notesGrid.getSelectedRecord().getAttribute(MESSAGE), save -> refresh());
 				note.show();
 			});
 

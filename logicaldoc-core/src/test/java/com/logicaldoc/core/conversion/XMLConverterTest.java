@@ -52,7 +52,7 @@ public class XMLConverterTest extends AbstractCoreTestCase {
 			log.error("Exception during conversion", e);
 			fail();
 		} finally {
-			FileUtil.strongDelete(targetFile);
+			FileUtil.delete(targetFile);
 		}
 	}
 }

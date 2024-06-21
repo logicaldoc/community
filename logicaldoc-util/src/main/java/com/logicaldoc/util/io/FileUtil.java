@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
+import java.net.URL;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -28,6 +29,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
@@ -43,6 +45,8 @@ import org.apache.tools.ant.types.selectors.SelectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
+
+import com.logicaldoc.util.time.TimeDiff;
 
 /**
  * This class manages I/O operations with files.
@@ -99,7 +103,8 @@ public class FileUtil {
 	}
 
 	public static void writeFile(String text, String filepath) {
-		try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filepath));) {
+		try (FileOutputStream fos = new FileOutputStream(filepath);
+				BufferedOutputStream bos = new BufferedOutputStream(fos);) {
 			bos.write(text.getBytes(StandardCharsets.UTF_8));
 			bos.flush();
 		} catch (Exception e) {
@@ -120,6 +125,7 @@ public class FileUtil {
 	public static void appendFile(String text, String filepath) {
 		try (OutputStream bos = new FileOutputStream(filepath, true);) {
 			bos.write(text.getBytes());
+			bos.flush();
 		} catch (Exception e) {
 			logError(e.getLocalizedMessage());
 		}
@@ -220,26 +226,23 @@ public class FileUtil {
 	 */
 	public static void copyResource(String resourceName, File out) throws IOException {
 		out.getParentFile().mkdirs();
-		InputStream is = null;
-		try {
-			try {
-				is = new BufferedInputStream(FileUtil.class.getResource(resourceName).openStream());
-			} catch (Exception e) {
-				is = new BufferedInputStream(
-						Thread.currentThread().getContextClassLoader().getResource(resourceName).openStream());
-			}
 
-			try (OutputStream os = new BufferedOutputStream(new FileOutputStream(out));) {
-				for (;;) {
-					int b = is.read();
-					if (b == -1)
-						break;
-					os.write(b);
-				}
+		URL resourceUrl = FileUtil.class.getResource(resourceName);
+		if (resourceUrl == null)
+			resourceUrl = Thread.currentThread().getContextClassLoader().getResource(resourceName);
+		if (resourceUrl == null)
+			throw new IOException("Resource cannot be found: " + resourceName);
+
+		try (InputStream is = resourceUrl.openStream();
+				BufferedInputStream bis = new BufferedInputStream(is);
+				OutputStream os = new FileOutputStream(out);
+				BufferedOutputStream bos = new BufferedOutputStream(os);) {
+			for (;;) {
+				int b = is.read();
+				if (b == -1)
+					break;
+				os.write(b);
 			}
-		} finally {
-			if (is != null)
-				is.close();
 		}
 	}
 
@@ -578,27 +581,40 @@ public class FileUtil {
 		}
 	}
 
-	public static void strongDelete(File file) {
+	/**
+	 * 
+	 * Deletes a file doing the best effort
+	 * 
+	 * @param file the file to delete
+	 * @return true inly if the deletion has been done successfully
+	 */
+	public static boolean delete(File file) {
 		/*
 		 * Better to deleteQuitely first because the forceDelete seems to cause
 		 * locks at least on Windows when there are frequent deletions. Even
 		 * directly using the Windows command rd produces the same behavior
 		 */
-		if (file != null && file.exists())
-			if (!FileUtils.deleteQuietly(file)) {
-				log.debug("Cannot delete file/folder {}", file.getAbsolutePath());
-				
-				// We could not delete the file so at least try to append .DELETE suffix
-				moveQuitely(file, new File(file.getParent(), file.getName() + ".DELETE"));
-			}
+		Date start = new Date();
+		try {
+			return FileUtils.deleteQuietly(file);
+		} finally {
+			if (log.isDebugEnabled())
+				log.debug("Deleted path {} in {}", file.getAbsolutePath(), TimeDiff.printDuration(start, new Date()));
+		}
 	}
 
 	public static void moveQuitely(File source, File target) {
+		Date start = new Date();
 		try {
 			Files.move(source.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE,
 					StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.warn("Cannot move {} into {}", source.getAbsolutePath(), target.getAbsolutePath());
+			log.warn(e.getMessage(), e);
+		} finally {
+			if (log.isDebugEnabled())
+				log.debug("Moved path {} into {}", source.getAbsolutePath(), target.getAbsolutePath(),
+						TimeDiff.printDuration(start, new Date()));
 		}
 	}
 
@@ -653,7 +669,8 @@ public class FileUtil {
 			int maxReadBufferSize = 8 * 1024; // 8KB
 			for (int destIx = 1; destIx <= numSplits; destIx++) {
 				File chunkFile = new File(destDir, nf.format(destIx));
-				try (BufferedOutputStream bw = new BufferedOutputStream(new FileOutputStream(chunkFile));) {
+				try (FileOutputStream fos = new FileOutputStream(chunkFile);
+						BufferedOutputStream bw = new BufferedOutputStream(fos);) {
 					if (chunkSize > maxReadBufferSize) {
 						long numReads = chunkSize / maxReadBufferSize;
 						long numRemainingRead = chunkSize % maxReadBufferSize;
@@ -672,9 +689,10 @@ public class FileUtil {
 
 			if (remainingBytes > 0) {
 				File chunkFile = new File(destDir, nf.format(numSplits + 1));
-				BufferedOutputStream bw = new BufferedOutputStream(new FileOutputStream(chunkFile));
-				readWrite(raf, bw, remainingBytes);
-				bw.close();
+				try (FileOutputStream fos = new FileOutputStream(chunkFile);
+						BufferedOutputStream bos = new BufferedOutputStream(fos);) {
+					readWrite(raf, bos, remainingBytes);
+				}
 				chunks.add(chunkFile);
 			}
 		}
@@ -733,8 +751,8 @@ public class FileUtil {
 	 * Creates an empty folder in the default temporary-file directory, using
 	 * the given prefix to generate its name.
 	 * 
-	 * @param prefix The prefix string to be used in generating the file'sname;
-	 *        must be at least three characters longsuffix
+	 * @param prefix The prefix string to be used in generating the folder's
+	 *        name; must be at least three characters longsuffix
 	 * 
 	 * @return An abstract pathname denoting a newly-created empty folder
 	 * 

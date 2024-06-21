@@ -110,7 +110,7 @@ public class DownloadAttachmentServlet extends HttpServlet {
 				FileUtils.writeByteArrayToFile(tmp, attachment.getData());
 				ServletUtil.downloadFile(request, response, tmp, filename);
 			} finally {
-				FileUtil.strongDelete(tmp);
+				FileUtil.delete(tmp);
 			}
 		}
 	}

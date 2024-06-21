@@ -99,7 +99,7 @@ public class StatChartServlet extends HttpServlet {
 		} catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
 		} finally {
-			FileUtil.strongDelete(chartFile);
+			FileUtil.delete(chartFile);
 		}
 	}
 

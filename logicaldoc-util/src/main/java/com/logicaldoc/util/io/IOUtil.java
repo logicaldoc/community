@@ -52,10 +52,10 @@ public class IOUtil {
 	}
 
 	public static void write(InputStream input, OutputStream output) throws IOException {
-		int letter = 0;
+		int totalBytes = 0;
 		byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-		while ((letter = input.read(buffer)) != -1) {
-			output.write(buffer, 0, letter);
+		while ((totalBytes = input.read(buffer)) != -1) {
+			output.write(buffer, 0, totalBytes);
 		}
 	}
 

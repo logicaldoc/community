@@ -48,7 +48,7 @@ public class ZipConverter extends CompressedArchiveConverter {
 				converter.convert(sid, document, ungzippedFile, dest);
 		} finally {
 			if (ungzippedFile != null)
-				FileUtil.strongDelete(ungzippedFile);
+				FileUtil.delete(ungzippedFile);
 		}
 	}
 

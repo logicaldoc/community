@@ -623,7 +623,7 @@ public class EMailSender {
 			log.warn("Cannot historycize the email with subject '{}' sent to {}", email.getSubject(),
 					email.getAllRecipientsEmails(), t);
 		} finally {
-			FileUtil.strongDelete(emlFile);
+			FileUtil.delete(emlFile);
 		}
 	}
 

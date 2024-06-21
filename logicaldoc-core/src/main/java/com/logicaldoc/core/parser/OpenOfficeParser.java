@@ -200,7 +200,7 @@ public class OpenOfficeParser extends AbstractParser {
 					}
 				}
 			} finally {
-				FileUtil.strongDelete(contentXml);
+				FileUtil.delete(contentXml);
 			}
 		} catch (Exception e) {
 			log.warn("Failed to extract OpenOffice text content", e);

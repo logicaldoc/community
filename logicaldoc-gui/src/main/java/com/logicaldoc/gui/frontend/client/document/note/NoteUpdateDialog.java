@@ -10,6 +10,7 @@ import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.RichTextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -21,11 +22,11 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class NoteUpdateDialog extends Window {
 
-	private NotesPanel notesPanel;
-
 	private ToolStrip toolStrip;
 
 	private long noteId;
+
+	private String fileVersion;
 
 	private RichTextItem message;
 
@@ -33,11 +34,15 @@ public class NoteUpdateDialog extends Window {
 
 	private DynamicForm noteForm;
 
-	public NoteUpdateDialog(final long docId, final long noteId, String noteMessage, final NotesPanel notesPanel) {
+	private ChangedHandler saveHandler;
+
+	public NoteUpdateDialog(final long docId, final long noteId, String fileVersion, String noteMessage,
+			final ChangedHandler saveHandler) {
 		super();
-		this.notesPanel = notesPanel;
+		this.saveHandler = saveHandler;
 		this.noteId = noteId;
 		this.docId = docId;
+		this.fileVersion = fileVersion;
 
 		HeaderControl maximize = new HeaderControl(HeaderControl.MAXIMIZE, event -> maximize());
 
@@ -89,21 +94,21 @@ public class NoteUpdateDialog extends Window {
 		if (!noteForm.validate())
 			return;
 
-		DocumentService.Instance.get().updateNote(docId, noteId, message.getValue().toString(),
-				new AsyncCallback<>() {
+		DocumentService.Instance.get().updateNote(docId, noteId, fileVersion, message.getValue().toString(), new AsyncCallback<>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-						destroy();
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+				destroy();
+			}
 
-					@Override
-					public void onSuccess(Void result) {
-						notesPanel.refresh();
-						destroy();
-					}
-				});
+			@Override
+			public void onSuccess(Void result) {
+				if (saveHandler != null)
+					saveHandler.onChanged(null);
+				destroy();
+			}
+		});
 	}
 
 	private void resetDimensions() {

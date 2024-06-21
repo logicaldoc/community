@@ -124,7 +124,7 @@ public class WebserviceChartServlet extends HttpServlet {
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		} finally {
-			FileUtil.strongDelete(chartFile);
+			FileUtil.delete(chartFile);
 		}
 	}
 }

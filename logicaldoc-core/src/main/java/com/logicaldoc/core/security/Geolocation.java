@@ -162,7 +162,7 @@ public class Geolocation {
 			 * Prepare a temporary folder and hunzip the downloaded file in it
 			 */
 			tmpDir = FileUtil.createTempFile(CONST_GEOLOCATION, null);
-			FileUtil.strongDelete(tmpDir);
+			FileUtil.delete(tmpDir);
 			tmpDir.mkdir();
 			try (ZipUtil zipUtil = new ZipUtil()) {
 				zipUtil.unGZipUnTar(gzFile, tmpDir);
@@ -180,12 +180,12 @@ public class Geolocation {
 
 			FileUtil.copyFile(mmdbFile, getDatabaseFile());
 
-			FileUtil.strongDelete(mmdbFile);
+			FileUtil.delete(mmdbFile);
 
 			dispose();
 		} finally {
-			FileUtil.strongDelete(gzFile);
-			FileUtil.strongDelete(tmpDir);
+			FileUtil.delete(gzFile);
+			FileUtil.delete(tmpDir);
 		}
 	}
 

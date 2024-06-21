@@ -192,7 +192,7 @@ public class ContextProperties extends OrderedProperties {
 
 			FileUtil.moveQuitely(tmpFile, file);
 		} finally {
-			FileUtil.strongDelete(tmpFile);
+			FileUtil.delete(tmpFile);
 		}
 	}
 
@@ -239,7 +239,7 @@ public class ContextProperties extends OrderedProperties {
 			List<File> backupsToRetain = oldBackups.stream().limit(maxBackups).toList();
 			for (File backupFile : oldBackups)
 				if (!backupsToRetain.contains(backupFile))
-					FileUtil.strongDelete(backupFile);
+					FileUtil.delete(backupFile);
 		}
 	}
 

@@ -535,11 +535,12 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @param docId identifier of the document
 	 * @param noteId identifier of the note
+	 * @param fileVersion file version to bind the note to
 	 * @param note text of the note
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void updateNote(long docId, long noteId, String note) throws ServerException;
+	public void updateNote(long docId, long noteId, String fileVersion, String note) throws ServerException;
 
 	/**
 	 * Retrieves the notes of a document

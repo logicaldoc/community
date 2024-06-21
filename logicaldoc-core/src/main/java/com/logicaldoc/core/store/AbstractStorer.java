@@ -311,7 +311,7 @@ public abstract class AbstractStorer implements Storer {
 			log.error(e.getMessage(), e);
 			return false;
 		} finally {
-			FileUtil.strongDelete(tmpFile);
+			FileUtil.delete(tmpFile);
 			try {
 				if (exists(0L, resource))
 					delete(0L, resource);

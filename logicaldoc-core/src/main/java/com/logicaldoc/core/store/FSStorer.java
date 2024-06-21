@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.io.IOUtil;
 
 /**
  * This class is an implementation of the Storer interface to persist documents
@@ -37,19 +38,15 @@ public class FSStorer extends AbstractStorer {
 	@Override
 	public void delete(long docId) {
 		File docDir = getContainer(docId);
-		while (docDir.exists()) {
-			FileUtil.strongDelete(docDir);
+		if (FileUtil.delete(docDir))
 			logDeletion(docId, docDir.getAbsolutePath());
-		}
 	}
 
 	@Override
 	public void delete(long docId, String resource) {
 		File file = new File(getContainer(docId), resource);
-		while (file.exists()) {
-			FileUtil.strongDelete(file);
+		if (FileUtil.delete(file))
 			logDeletion(docId, file.getAbsolutePath());
-		}
 	}
 
 	/**
@@ -71,7 +68,7 @@ public class FSStorer extends AbstractStorer {
 	@Override
 	public void store(File file, long docId, String resource) throws IOException {
 		checkEnabled();
-		
+
 		checkNotEmpty(file);
 
 		File dir = getContainer(docId);
@@ -98,11 +95,7 @@ public class FSStorer extends AbstractStorer {
 		} catch (Exception e) {
 			throw new IOException(e.getMessage(), e);
 		} finally {
-			try {
-				stream.close();
-			} catch (IOException e) {
-				// Nothing to do
-			}
+			IOUtil.close(stream);
 		}
 	}
 

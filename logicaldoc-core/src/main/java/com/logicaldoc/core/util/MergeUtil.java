@@ -51,7 +51,7 @@ public class MergeUtil {
 
 			return dst;
 		} finally {
-			FileUtil.strongDelete(tempDir);
+			FileUtil.delete(tempDir);
 		}
 	}
 }

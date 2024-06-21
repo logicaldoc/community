@@ -1708,8 +1708,8 @@ public class DocumentManagerImpl implements DocumentManager {
 			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 			return manager.create(bigPdf, docVO, transaction);
 		} finally {
-			FileUtil.strongDelete(bigPdf);
-			FileUtil.strongDelete(tempDir);
+			FileUtil.delete(bigPdf);
+			FileUtil.delete(tempDir);
 		}
 	}
 
@@ -1813,26 +1813,26 @@ public class DocumentManagerImpl implements DocumentManager {
 		log.info("Destroyed {} aliases of document {}", count, documentTag);
 
 		count = documentDAO.jdbcUpdate("delete from ld_tag where ld_docid = " + docId);
-		log.info("Destroyed {} tags of document {}", documentTag);
+		log.info("Destroyed {} tags of document {}", count, documentTag);
 
 		count = documentDAO.jdbcUpdate("delete from ld_link where ld_docid1 = " + docId + " or ld_docid2 = " + docId);
-		log.info("Destroyed {} links of document {}", documentTag);
+		log.info("Destroyed {} links of document {}", count, documentTag);
 
 		count = documentDAO.jdbcUpdate("delete from ld_bookmark where ld_type=0 and ld_docid = " + docId);
-		log.info("Destroyed {} bookmarks of document {}", documentTag);
+		log.info("Destroyed {} bookmarks of document {}", count, documentTag);
 
 		count = documentDAO.jdbcUpdate("delete from ld_ticket where ld_docid = " + docId);
-		log.info("Destroyed {} tickets of document {}", documentTag);
+		log.info("Destroyed {} tickets of document {}", count, documentTag);
 
 		count = documentDAO.jdbcUpdate("delete from ld_note where ld_docid = " + docId);
-		log.info("Destroyed {} notes of document {}", documentTag);
+		log.info("Destroyed {} notes of document {}", count, documentTag);
 
 		count = documentDAO.jdbcUpdate("delete from ld_history where ld_docid = " + docId);
-		log.info("Destroyed {} histories of document {}", documentTag);
+		log.info("Destroyed {} histories of document {}", count, documentTag);
 
 		try {
 			count = documentDAO.jdbcUpdate("delete from ld_readingrequest where ld_docid = " + docId);
-			log.info("Destroyed {} reading requests of document {}", documentTag);
+			log.info("Destroyed {} reading requests of document {}", documentTag, docId);
 		} catch (Exception e) {
 			// Ignore because the table may not exist
 		}

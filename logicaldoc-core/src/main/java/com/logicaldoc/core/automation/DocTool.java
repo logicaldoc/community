@@ -583,7 +583,7 @@ public class DocTool {
 			log.error(e.getMessage(), e);
 			return null;
 		} finally {
-			FileUtil.strongDelete(tmpFile);
+			FileUtil.delete(tmpFile);
 		}
 	}
 

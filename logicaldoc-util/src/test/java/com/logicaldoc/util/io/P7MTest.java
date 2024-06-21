@@ -23,14 +23,14 @@ public class P7MTest {
 			String content = FileUtil.readFile(file);
 			assertTrue(content.contains("p:FatturaElettronica xmlns"));
 		} finally {
-			FileUtil.strongDelete(file);
+			FileUtil.delete(file);
 		}
 
 		try {
 			new P7M((byte[]) null).read();
 			fail("no exception if null content was specified?");
 		} catch (Exception e) {
-			FileUtil.strongDelete(file);
+			FileUtil.delete(file);
 		}
 
 		try {
@@ -40,7 +40,7 @@ public class P7MTest {
 			String content = FileUtil.readFile(file);
 			assertTrue(content.contains("p:FatturaElettronica xmlns"));
 		} finally {
-			FileUtil.strongDelete(file);
+			FileUtil.delete(file);
 		}
 
 		try {
@@ -53,7 +53,7 @@ public class P7MTest {
 			String content = FileUtil.readFile(file);
 			assertTrue(content.contains("p:FatturaElettronica xmlns"));
 		} finally {
-			FileUtil.strongDelete(file);
+			FileUtil.delete(file);
 		}
 
 		P7M p7m = new P7M(this.getClass().getResourceAsStream("/test.p7m"));
@@ -61,7 +61,7 @@ public class P7MTest {
 			String content = IOUtil.readStream(is);
 			assertTrue(content.contains("p:FatturaElettronica xmlns"));
 		} finally {
-			FileUtil.strongDelete(file);
+			FileUtil.delete(file);
 		}
 	}
 }

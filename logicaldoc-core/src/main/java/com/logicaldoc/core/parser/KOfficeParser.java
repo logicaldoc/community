@@ -95,7 +95,7 @@ public class KOfficeParser extends AbstractParser {
 					}
 				}
 			} finally {
-				FileUtil.strongDelete(mainDocXml);
+				FileUtil.delete(mainDocXml);
 			}
 		} catch (Exception e) {
 			log.warn("Failed to extract KOffice text content", e);

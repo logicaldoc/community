@@ -6,7 +6,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class StreamEater implements Runnable {
+
+	protected static Logger log = LoggerFactory.getLogger(StreamEater.class);
 
 	private InputStream inputStream;
 
@@ -35,19 +40,17 @@ public class StreamEater implements Runnable {
 	}
 
 	public void run() {
-		try (InputStreamReader isr = new InputStreamReader(inputStream); BufferedReader br = new BufferedReader(isr);) {
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));) {
 			String line = br.readLine();
-			boolean firstLine = true;
 			while (line != null) {
-				writeLine(line, firstLine);
+				writeLine(line);
 
 				if (buffer != null) {
-					if (!firstLine)
+					if(!buffer.isEmpty())
 						buffer.append("\n");
 					buffer.append(line);
 				}
 
-				firstLine = false;
 				line = br.readLine();
 			}
 		} catch (IOException e) {
@@ -55,13 +58,11 @@ public class StreamEater implements Runnable {
 		}
 	}
 
-	private void writeLine(String line, boolean firstLine) throws IOException {
+	private void writeLine(String line) throws IOException {
 		if (prefix != null)
-			System.out.println(prefix + ": " + line);
+			log.debug("{}: {}", prefix, line);
 
 		if (output != null && line != null) {
-			if (!firstLine)
-				output.write("\n");
 			output.write(line);
 			output.flush();
 		}

@@ -390,7 +390,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 			assertTrue(service.getContentAsString(7).contains("replaced contents"));
 		} finally {
-			FileUtil.strongDelete(tmpFile);
+			FileUtil.delete(tmpFile);
 		}
 	}
 
@@ -621,8 +621,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 			assertNotNull(mergedDoc);
 			assertEquals("merged.pdf", mergedDoc.getFileName());
 		} finally {
-			FileUtil.strongDelete(pdf1);
-			FileUtil.strongDelete(pdf2);
+			FileUtil.delete(pdf1);
+			FileUtil.delete(pdf2);
 		}
 	}
 
@@ -648,7 +648,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 			assertEquals(2, service.updatePages(createdDocs.get(0).getId()));
 		} finally {
-			FileUtil.strongDelete(pdf2);
+			FileUtil.delete(pdf2);
 		}
 	}
 
@@ -1212,7 +1212,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertEquals(1, notes.size());
 		assertEquals("message for note 3", notes.get(0).getMessage());
 
-		service.updateNote(4, notes.get(0).getId(), "updated message");
+		service.updateNote(4, notes.get(0).getId(), null, "updated message");
 		List<GUIDocumentNote> notes2 = service.getNotes(4, null, null);
 		assertEquals(1, notes2.size());
 		assertEquals(notes.get(0).getId(), notes2.get(0).getId());

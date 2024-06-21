@@ -170,8 +170,8 @@ public class FormatConverterManager {
 			storer.store(dest, document.getId(), resource);
 		} finally {
 			// Delete temporary resources
-			FileUtil.strongDelete(src);
-			FileUtil.strongDelete(dest);
+			FileUtil.delete(src);
+			FileUtil.delete(dest);
 		}
 	}
 
@@ -229,7 +229,7 @@ public class FormatConverterManager {
 				throw new IOException("The conversion was not done");
 		} finally {
 			// Delete temporary resources
-			FileUtil.strongDelete(out);
+			FileUtil.delete(out);
 		}
 	}
 
@@ -251,7 +251,7 @@ public class FormatConverterManager {
 		if (converter == null)
 			return;
 
-		FileUtil.strongDelete(out);
+		FileUtil.delete(out);
 
 		// Prepare I/O files
 		File src = null;
@@ -279,7 +279,7 @@ public class FormatConverterManager {
 			}
 		} finally {
 			// Delete temporary resources
-			FileUtil.strongDelete(src);
+			FileUtil.delete(src);
 		}
 	}
 
@@ -304,7 +304,7 @@ public class FormatConverterManager {
 		if (!in.exists() || in.length() == 0)
 			throw new IOException(String.format("Unexisting source file %s", in));
 
-		FileUtil.strongDelete(out);
+		FileUtil.delete(out);
 
 		converter.convert(in, out);
 

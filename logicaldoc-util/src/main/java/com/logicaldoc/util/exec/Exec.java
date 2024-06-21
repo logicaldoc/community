@@ -253,6 +253,17 @@ public class Exec {
 
 		final Process process = Runtime.getRuntime().exec(commandLine, env, dir);
 
+		String commandForLog = " (" + commandForLog(commandLine) + ")";
+		StreamEater errEater = new StreamEater(errPrefix + commandForLog, process.getErrorStream());
+
+		StreamEater outEater = new StreamEater(outPrefix + commandForLog, process.getInputStream(), buffer);
+
+		Thread a = new Thread(errEater);
+		a.start();
+
+		Thread b = new Thread(outEater);
+		b.start();
+		
 		if (timeout > 0) {
 			ExecutorService service = Executors.newSingleThreadExecutor();
 			try {
@@ -272,17 +283,6 @@ public class Exec {
 				service.shutdown();
 			}
 		}
-
-		String commandForLog = " (" + commandForLog(commandLine) + ")";
-		StreamEater errEater = new StreamEater(errPrefix + commandForLog, process.getErrorStream());
-
-		StreamEater outEater = new StreamEater(outPrefix + commandForLog, process.getInputStream(), buffer);
-
-		Thread a = new Thread(errEater);
-		a.start();
-
-		Thread b = new Thread(outEater);
-		b.start();
 
 		try {
 			exit = process.waitFor();

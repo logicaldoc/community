@@ -63,7 +63,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			onShutdown();
 		} finally {
 			if (pidCreated)
-				FileUtil.strongDelete(getPidFile());
+				FileUtil.delete(getPidFile());
 		}
 	}
 

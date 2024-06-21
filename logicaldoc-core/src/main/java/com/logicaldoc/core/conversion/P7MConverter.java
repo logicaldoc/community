@@ -46,7 +46,7 @@ public class P7MConverter extends AbstractFormatConverter {
 		} catch (Exception e) {
 			throw new IOException(e.getMessage(), e);
 		} finally {
-			FileUtil.strongDelete(tmp);
+			FileUtil.delete(tmp);
 		}
 	}
 }

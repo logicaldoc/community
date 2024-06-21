@@ -162,7 +162,7 @@ public abstract class AbstractTestCase {
 					throw new SQLException(e.getMessage(), e);
 				}
 			} finally {
-				FileUtil.strongDelete(sqlFile);
+				FileUtil.delete(sqlFile);
 			}
 		}
 
@@ -181,8 +181,7 @@ public abstract class AbstractTestCase {
 	 */
 	private void loadDevelSettings() throws IOException {
 		Properties devSettings = new Properties();
-		try (FileReader reader = new FileReader(
-				new File(System.getProperty(USER_HOME) + "/logicaldoc-dev.properties"))) {
+		try (FileReader reader = new FileReader(new File(userHome + "/logicaldoc-dev.properties"))) {
 			devSettings.load(reader);
 			for (Map.Entry<Object, Object> entry : devSettings.entrySet())
 				System.setProperty(entry.getKey().toString(), entry.getValue().toString());
@@ -190,9 +189,7 @@ public abstract class AbstractTestCase {
 	}
 
 	protected void createTestDirs() {
-		FileUtil.strongDelete(tempDir);
-		FileUtil.strongDelete(tempDir);
-		FileUtil.strongDelete(tempDir);
+		FileUtil.delete(tempDir);
 		tempDir.mkdirs();
 	}
 

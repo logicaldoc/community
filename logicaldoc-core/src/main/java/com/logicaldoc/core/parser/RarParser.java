@@ -59,11 +59,11 @@ public class RarParser extends AbstractParser {
 					content.append(text);
 				} finally {
 					if (uncompressedEntryFile != null)
-						FileUtil.strongDelete(uncompressedEntryFile);
+						FileUtil.delete(uncompressedEntryFile);
 				}
 			}
 		} finally {
-			FileUtil.strongDelete(rarFile);
+			FileUtil.delete(rarFile);
 		}
 	}
 
@@ -81,7 +81,7 @@ public class RarParser extends AbstractParser {
 			log.error(t.getMessage(), t);
 		} finally {
 			if (rarFile != null)
-				FileUtil.strongDelete(rarFile);
+				FileUtil.delete(rarFile);
 		}
 		return 1;
 	}
@@ -111,7 +111,7 @@ public class RarParser extends AbstractParser {
 					return entryParser.countPages(uncompressedEntryFile, uncompressedEntryFile.getName());
 				} finally {
 					if (uncompressedEntryFile != null)
-						FileUtil.strongDelete(uncompressedEntryFile);
+						FileUtil.delete(uncompressedEntryFile);
 				}
 			}
 		} catch (Exception e) {

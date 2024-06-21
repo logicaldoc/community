@@ -6,9 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
-
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * This is basically a {@link FSStorer} but with a flag that if active makes the
@@ -45,12 +44,17 @@ public class MockStorer extends FSStorer {
 
 	@Override
 	public void store(InputStream stream, long docId, String resource) throws IOException {
-		if (errorOnStore)
+		if (errorOnStore) {
+			stream.close();
 			throw new IOException("error");
-		if (useDummyFile)
+		}
+		
+		if (useDummyFile) {
+			stream.close();
 			super.store(new FileInputStream(dummyFile), docId, resource);
-		else
+		} else {
 			super.store(stream, docId, resource);
+		}
 	}
 
 	@Override
@@ -92,7 +96,7 @@ public class MockStorer extends FSStorer {
 			moved++;
 
 			// Delete the original resource
-			FileUtils.deleteQuietly(sourceFile);
+			FileUtil.delete(sourceFile);
 		}
 
 		return moved;

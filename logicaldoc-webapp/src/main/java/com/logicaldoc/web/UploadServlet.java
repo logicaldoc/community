@@ -190,7 +190,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 * @param sid The current session ID
 	 */
 	public static void cleanReceivedFiles(String sid) {
-		FileUtil.strongDelete(getUploadDir(sid));
+		FileUtil.delete(getUploadDir(sid));
 		Map<String, File> receivedFiles = getReceivedFiles(sid);
 		receivedFiles.clear();
 	}
@@ -201,7 +201,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 * @param httpSession The current session
 	 */
 	public static void cleanReceivedFiles(HttpSession httpSession) {
-		FileUtil.strongDelete(getUploadDir(httpSession));
+		FileUtil.delete(getUploadDir(httpSession));
 		getReceivedFiles(httpSession).clear();
 	}
 

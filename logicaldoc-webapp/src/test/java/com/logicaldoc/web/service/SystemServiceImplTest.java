@@ -60,7 +60,7 @@ public class SystemServiceImplTest extends AbstractWebappTestCase {
 	@Override
 	public void tearDown() throws SQLException {
 		super.tearDown();
-		FileUtil.strongDelete(SystemServiceImpl.defaultWebappRootFolder);
+		FileUtil.delete(SystemServiceImpl.defaultWebappRootFolder);
 	}
 
 	@Override
@@ -144,7 +144,7 @@ public class SystemServiceImplTest extends AbstractWebappTestCase {
 		try {
 			assertTrue(restartFile.exists());
 		} finally {
-			FileUtil.strongDelete(restartFile);
+			FileUtil.delete(restartFile);
 		}
 	}
 
