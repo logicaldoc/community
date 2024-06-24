@@ -613,7 +613,7 @@ public class FileUtil {
 			log.warn(e.getMessage(), e);
 		} finally {
 			if (log.isDebugEnabled())
-				log.debug("Moved path {} into {}", source.getAbsolutePath(), target.getAbsolutePath(),
+				log.debug("Moved path {} into {} in {}", source.getAbsolutePath(), target.getAbsolutePath(),
 						TimeDiff.printDuration(start, new Date()));
 		}
 	}
