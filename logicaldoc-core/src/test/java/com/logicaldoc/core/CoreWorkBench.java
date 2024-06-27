@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,7 +30,6 @@ import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.MailUtil;
 import com.logicaldoc.util.http.HttpUtil;
-import com.logicaldoc.util.io.CharsetUtil;
 import com.logicaldoc.util.io.FileUtil;
 import com.talanlabs.avatargenerator.Avatar;
 import com.talanlabs.avatargenerator.IdenticonAvatar;
@@ -135,7 +135,7 @@ public class CoreWorkBench {
 //		postParams.add(new BasicNameValuePair("reg_website", regWebsite != null ? regWebsite : ""));
 
 		HttpPost post = new HttpPost("http://stat.logicaldoc.com/stats/collect");
-		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(postParams, CharsetUtil.utf8());
+		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(postParams, StandardCharsets.UTF_8);
 		post.setEntity(entity);
 
 		try (CloseableHttpClient httpClient = HttpUtil.getNotValidatingClient(60)) {

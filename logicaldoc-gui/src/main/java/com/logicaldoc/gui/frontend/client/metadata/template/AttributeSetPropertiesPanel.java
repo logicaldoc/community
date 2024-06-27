@@ -257,7 +257,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		group.setHint(I18N.message("groupname"));
 		group.setDisabled(attributeSet.isReadonly());
 		group.setVisible(updatingAttributeIsNotSection);
-
+		group.setVisibleWhen(new AdvancedCriteria("type", OperatorId.EQUALS, "" + GUIAttribute.TYPE_USER));
+		
 		// Options (for preset editor)
 		addOptionsItem(attributeName);
 

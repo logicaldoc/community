@@ -1,8 +1,12 @@
 package com.logicaldoc.web.util;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -26,13 +30,25 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class MockServletRequest implements HttpServletRequest {
 
+	private static final String CONTENT_LENGTH = "Content-Length";
+
 	private HttpSession session;
 
 	private String code;
 
-	private String userAgent = "Mozilla";
-
 	private String pathInfo = "/";
+
+	private String method = "GET";
+
+	private String contextPath = "";
+
+	private String requestURI;
+
+	private String body;
+
+	private InputStream payload;
+
+	private Map<String, String> headers = new HashMap<>();
 
 	private Map<String, String> parameters = new HashMap<>();
 
@@ -40,17 +56,18 @@ public class MockServletRequest implements HttpServletRequest {
 
 	public MockServletRequest() {
 		super();
+		setUserAgent("Mozilla");
 	}
 
 	public MockServletRequest(HttpSession session) {
-		super();
+		this();
 		this.session = session;
 	}
 
 	public MockServletRequest(HttpSession session, String userAgent) {
 		super();
 		this.session = session;
-		this.userAgent = userAgent;
+		setUserAgent(userAgent);
 	}
 
 	public void setPathInfo(String pathInfo) {
@@ -66,11 +83,15 @@ public class MockServletRequest implements HttpServletRequest {
 	}
 
 	public String getUserAgent() {
-		return userAgent;
+		return headers.get("User-Agent");
 	}
 
 	public void setUserAgent(String userAgent) {
-		this.userAgent = userAgent;
+		headers.put("User-Agent", userAgent);
+	}
+
+	public void setContentType(String contentType) {
+		headers.put("Content-Type", contentType);
 	}
 
 	public void setSession(HttpSession session) {
@@ -103,30 +124,45 @@ public class MockServletRequest implements HttpServletRequest {
 
 	@Override
 	public int getContentLength() {
-		return 0;
+		return headers.get(CONTENT_LENGTH) != null ? Integer.parseInt(headers.get(CONTENT_LENGTH)) : 0;
+	}
+
+	public void setContentLength(int length) {
+		headers.put(CONTENT_LENGTH, Integer.toString(length));
 	}
 
 	@Override
 	public String getContentType() {
-
 		return null;
 	}
 
 	@Override
 	public ServletInputStream getInputStream() throws IOException {
+		if (body != null) {
+			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
+			return new ServletInputStream() {
+				public int read() throws IOException {
+					return byteArrayInputStream.read();
+				}
+			};
+		} else if (payload != null) {
+			return new ServletInputStream() {
+				public int read() throws IOException {
+					return payload.read();
+				}
+			};
+		}
 
 		return null;
 	}
 
 	@Override
 	public String getLocalAddr() {
-
 		return null;
 	}
 
 	@Override
 	public String getLocalName() {
-
 		return null;
 	}
 
@@ -178,13 +214,14 @@ public class MockServletRequest implements HttpServletRequest {
 
 	@Override
 	public BufferedReader getReader() throws IOException {
-
-		return null;
+		if (body != null)
+			return new BufferedReader(new StringReader(body));
+		else
+			return null;
 	}
 
 	@Override
 	public String getRealPath(String arg0) {
-
 		return null;
 	}
 
@@ -255,7 +292,7 @@ public class MockServletRequest implements HttpServletRequest {
 
 	@Override
 	public String getContextPath() {
-		return null;
+		return contextPath;
 	}
 
 	@Override
@@ -270,10 +307,7 @@ public class MockServletRequest implements HttpServletRequest {
 
 	@Override
 	public String getHeader(String header) {
-		if ("User-Agent".equals(header))
-			return userAgent;
-		else
-			return null;
+		return headers.get(header);
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -295,7 +329,7 @@ public class MockServletRequest implements HttpServletRequest {
 
 	@Override
 	public String getMethod() {
-		return null;
+		return method;
 	}
 
 	@Override
@@ -320,7 +354,7 @@ public class MockServletRequest implements HttpServletRequest {
 
 	@Override
 	public String getRequestURI() {
-		return null;
+		return requestURI;
 	}
 
 	@Override
@@ -378,5 +412,46 @@ public class MockServletRequest implements HttpServletRequest {
 	@Override
 	public boolean isUserInRole(String arg0) {
 		return false;
+	}
+
+	public void setMethod(String method) {
+		this.method = method;
+	}
+
+	public String getBody() {
+		return body;
+	}
+
+	public void setBody(String body) {
+		this.body = body;
+		setContentLength(body.getBytes().length);
+	}
+
+	public void setContextPath(String contextPath) {
+		this.contextPath = contextPath;
+	}
+
+	public void setRequestURI(String requestURI) {
+		this.requestURI = requestURI;
+	}
+
+	public Map<String, String> getHeaders() {
+		return headers;
+	}
+
+	public void setHeader(String name, String value) {
+		this.headers.put(name, value);
+	}
+	
+	public void setHeaders(Map<String, String> headers) {
+		this.headers = headers;
+	}
+
+	public InputStream getPayload() {
+		return payload;
+	}
+
+	public void setPayload(InputStream payload) {
+		this.payload = payload;
 	}
 }

@@ -893,12 +893,12 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		}
 
 		StringBuilder query = new StringBuilder("""
-                       select ld_read as LDREAD, ld_write as LDWRITE, ld_add as LDADD, ld_security as LDSECURITY, ld_immutable as LDIMMUTABLE, 
-                              ld_delete as LDDELETE, ld_rename as LDRENAME, ld_import as LDIMPORT, ld_export as LDEXPORT, ld_sign as LDSIGN, 
-                              ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD, ld_calendar as LDCALENDAR, 
-                              ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD, ld_move as LDMOVE, ld_email as LDEMAIL, 
-                              ld_automation LDAUTOMATION, ld_storage LDSTORAGE, ld_readingreq LDREADINGREQ, ld_preview LDPREVIEW, ld_customid LDCUSTOMID
-	                   """);
+                 select ld_read as LDREAD, ld_write as LDWRITE, ld_add as LDADD, ld_security as LDSECURITY, ld_immutable as LDIMMUTABLE, 
+                 ld_delete as LDDELETE, ld_rename as LDRENAME, ld_import as LDIMPORT, ld_export as LDEXPORT, ld_sign as LDSIGN, 
+                 ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD, ld_calendar as LDCALENDAR, 
+                 ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD, ld_move as LDMOVE, ld_email as LDEMAIL, 
+                 ld_automation LDAUTOMATION, ld_storage LDSTORAGE, ld_readingreq LDREADINGREQ, ld_preview LDPREVIEW, ld_customid LDCUSTOMID
+""");
 		query.append(" from ld_folder_acl ");
 		query.append(WHERE);
 		query.append(" ld_folderid=" + id);

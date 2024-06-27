@@ -127,6 +127,8 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class ItemFactory {
 
+	private static final String PROTOCOL = "protocol";
+
 	private static final String LEVEL = "level";
 
 	private static final String LOGGER = "logger";
@@ -1314,8 +1316,8 @@ public class ItemFactory {
 		validate.setSrc("[SKIN]/actions/approve.png");
 		validate.setWidth(16);
 		validate.setHeight(16);
-		validate.addFormItemClickHandler(click -> InfoService.Instance.get()
-				.getCronDescription(cron.getValueAsString(), I18N.getLocale(), new AsyncCallback<>() {
+		validate.addFormItemClickHandler(click -> InfoService.Instance.get().getCronDescription(cron.getValueAsString(),
+				I18N.getLocale(), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -1606,19 +1608,6 @@ public class ItemFactory {
 					changedHandler.onChanged(null);
 			});
 		});
-
-//		FormItemIcon showPassword = new FormItemIcon();
-//		showPassword.setName("showpassword");
-//		showPassword.setWidth(16);
-//		showPassword.setHeight(16);
-//		showPassword.setSrc("[SKIN]/eye.png");
-//		showPassword.setPrompt(I18N.message("showpassword"));
-//		showPassword.addFormItemClickHandler(event -> {
-//			if ("*****".equals(item.getValue()))
-//				item.setValue(hiddenPasswordItem.getValue());
-//			else
-//				item.setValue(hiddenPasswordItem.getValue() != null ? "*****" : "");
-//		});
 
 		item.setIcons(edit, clear);
 		item.setIconVAlign(VerticalAlignment.CENTER);
@@ -2155,7 +2144,7 @@ public class ItemFactory {
 		map.put("imap", "IMAP");
 		map.put("imapmicrosoft365", I18N.message("imapmicrosoft365"));
 
-		SelectItem select = new SelectItem(originalItemName("protocol"), I18N.message("protocol"));
+		SelectItem select = new SelectItem(originalItemName(PROTOCOL), I18N.message(PROTOCOL));
 		select.setWidth(180);
 		select.setValueMap(map);
 		return select;
@@ -2166,7 +2155,7 @@ public class ItemFactory {
 		map.put("smtp", "SMTP");
 		map.put("smtpmicrosoft365", I18N.message("smtpmicrosoft365"));
 
-		SelectItem select = new SelectItem(originalItemName("protocol"), I18N.message("protocol"));
+		SelectItem select = new SelectItem(originalItemName(PROTOCOL), I18N.message(PROTOCOL));
 		select.setWidth(180);
 		select.setValueMap(map);
 		return select;

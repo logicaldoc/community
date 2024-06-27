@@ -1972,7 +1972,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			note = new DocumentNote();
 			note.setTenantId(session.getTenantId());
 			note.setDocId(document.getId());
-			note.setFileVersion(guiNote.getFileVersion()!=null? guiNote.getFileVersion() : document.getFileVersion());
+			note.setFileVersion(
+					guiNote.getFileVersion() != null ? guiNote.getFileVersion() : document.getFileVersion());
 			note.setUserId(session.getUserId());
 			note.setUsername(session.getUser().getFullName());
 			note.setDate(new Date());
@@ -2993,9 +2994,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	@Override
 	public void enforceFilesIntoFolderStorage(long folderId) throws ServerException {
 		Session session = validateSession();
-		User user = session.getUser();
-
-		new Thread(() -> {
+		executeLongRunningOperation("Enforce Files Into Folder Storage", () -> {
+			User user = session.getUser();
 			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 			int movedFiles = 0;
 
@@ -3022,7 +3022,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 					log.warn(e.getMessage(), e);
 				}
 			}
-		}).start();
+		}, session);
 	}
 
 	private void notifyEnforcement(Session session, String message) {

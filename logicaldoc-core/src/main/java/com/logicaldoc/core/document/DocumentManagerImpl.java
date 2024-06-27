@@ -877,10 +877,9 @@ public class DocumentManagerImpl implements DocumentManager {
 			try {
 				storeFile(docVO, file);
 			} catch (Exception e) {
-				String message = String.format("Unable to store the file of document %d", docVO.getId());
-				log.error(message, e);
 				documentDAO.delete(docVO.getId());
-				throw new PersistenceException(message, e);
+				throw new PersistenceException(String.format("Unable to store the file of document %d", docVO.getId()),
+						e);
 			}
 
 			// The document record has been written, now store the initial
@@ -1807,7 +1806,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		int count = documentDAO.jdbcUpdate("delete from ld_version where ld_documentid = " + docId);
 		log.info("Destroyed {} versions of document {}", count, documentTag);
 
-		count = documentDAO.jdbcUpdate("delete from ld_document_ext where ld_docid = " + docId);
+		documentDAO.jdbcUpdate("delete from ld_document_ext where ld_docid = " + docId);
 
 		count = documentDAO.jdbcUpdate("delete from ld_document where ld_docref = " + docId);
 		log.info("Destroyed {} aliases of document {}", count, documentTag);
@@ -1832,12 +1831,12 @@ public class DocumentManagerImpl implements DocumentManager {
 
 		try {
 			count = documentDAO.jdbcUpdate("delete from ld_readingrequest where ld_docid = " + docId);
-			log.info("Destroyed {} reading requests of document {}", documentTag, docId);
+			log.info("Destroyed {} reading requests of document {}", count, documentTag);
 		} catch (Exception e) {
 			// Ignore because the table may not exist
 		}
 
-		count = documentDAO.jdbcUpdate("delete from ld_document where ld_id = " + docId);
+		documentDAO.jdbcUpdate("delete from ld_document where ld_id = " + docId);
 		log.info("Destroyed the record of document {}", documentTag);
 
 		indexer.deleteHit(docId);

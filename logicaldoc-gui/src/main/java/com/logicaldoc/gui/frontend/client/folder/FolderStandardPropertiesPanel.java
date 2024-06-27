@@ -231,21 +231,24 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		enforceStorage.setSrc("[SKIN]/data_into.png");
 		enforceStorage.setWidth(16);
 		enforceStorage.setHeight(16);
+		
 		enforceStorage.addFormItemClickHandler(event -> {
 			LD.ask(I18N.message("enforcementofstorage"),
 					I18N.message("enforcefilesintofolderstorage") + ".\n" + I18N.message("doyouwanttoproceed"), yes -> {
 						if (Boolean.TRUE.equals(yes)) {
+							LD.contactingServer();
 							DocumentService.Instance.get().enforceFilesIntoFolderStorage(folder.getId(),
 									new AsyncCallback<>() {
 
 										@Override
 										public void onFailure(Throwable caught) {
+											LD.clearPrompt();
 											GuiLog.serverError(caught);
 										}
 
 										@Override
 										public void onSuccess(Void v) {
-											GuiLog.info(I18N.message("processstartedwillbenotified"));
+											LD.clearPrompt();
 										}
 									});
 						}

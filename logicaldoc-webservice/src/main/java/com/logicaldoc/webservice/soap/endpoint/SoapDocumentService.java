@@ -614,7 +614,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		// In case of pagination, extract just the wanted page
 		if (max != null && page != null && max < docs.size())
-			docs = docs.stream().skip((page - 1) * max).limit(max).collect(Collectors.toList());
+			docs = docs.stream().skip((page - 1) * (long)max).limit(max).collect(Collectors.toList());
 
 		List<WSDocument> wsDocs = new ArrayList<>();
 		for (Document doc : docs) {

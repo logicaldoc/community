@@ -94,13 +94,9 @@ public class ContextMenu extends Menu {
 
 	private MenuItem archive;
 
-	private MenuItem bookmark;
-
 	private MenuItem markUnindexable;
 
 	private MenuItem markIndexable;
-
-	private MenuItem markIndexableMetadataOnly;
 
 	private MenuItem index;
 
@@ -129,16 +125,6 @@ public class ContextMenu extends Menu {
 	private MenuItem split;
 
 	private MenuItem merge;
-
-	private MenuItem customActionsItem;
-
-	private MenuItem more;
-
-	private Menu indexingMenu;
-
-	private MenuItem indexing;
-
-	private Menu moreMenu;
 
 	public ContextMenu(GUIFolder folder, DocumentsGrid docsGrid, GUIAccessControlEntry acl) {
 		this.grid = docsGrid;
@@ -185,54 +171,54 @@ public class ContextMenu extends Menu {
 
 		archive = prepareArchiveItem(selection);
 
-		bookmark = prepareBookmarkItem(selection);
+		MenuItem bookmark = prepareBookmarkItem(selection);
 
 		markUnindexable = prepareMarkUnindexableItem(selection);
 
 		markIndexable = prepareMarkIndexableItem(selection);
 
-		markIndexableMetadataOnly = markIndexableMetadataOnlyItem(selection);
+		MenuItem markIndexableMetadataOnly = markIndexableMetadataOnlyItem(selection);
 
 		index = prepareIndexItem(selection);
 
 		sign = new MenuItem();
 		sign.setTitle(I18N.message("sign"));
-		sign.addClickHandler(event -> new DigitalSignatureDialog(getSelectionIds(selection)).show());
+		sign.addClickHandler(click -> new DigitalSignatureDialog(getSelectionIds(selection)).show());
 
 		stamp = new MenuItem();
 		stamp.setTitle(I18N.message("stamp"));
 		stamp.addClickHandler(event -> new StampDialog(selection).show());
 
 		office = new MenuItem(I18N.message("editwithoffice"));
-		office.addClickHandler(event -> Util.openEditWithOffice(selection.get(0).getId()));
+		office.addClickHandler(click -> Util.openEditWithOffice(selection.get(0).getId()));
 
 		sendToExpArchive = new MenuItem(I18N.message("sendtoexparchive"));
 		sendToExpArchive.addClickHandler(event -> new SendToArchiveDialog(getSelectionIds(selection), true).show());
 
 		workflow = new MenuItem(I18N.message("startworkflow"));
-		workflow.addClickHandler(event -> new StartWorkflowDialog(getSelectionIds(selection)).show());
+		workflow.addClickHandler(click -> new StartWorkflowDialog(getSelectionIds(selection)).show());
 
 		automation = new MenuItem(I18N.message("executeautomation"));
-		automation.addClickHandler(event -> new AutomationDialog(folder.getId(), getSelectionIds(selection)).show());
+		automation.addClickHandler(click -> new AutomationDialog(folder.getId(), getSelectionIds(selection)).show());
 
 		preview = preparePreview();
 
 		ticket = new MenuItem(I18N.message("ticket"));
-		ticket.addClickHandler(event -> new TicketDialog(selection.get(0)).show());
+		ticket.addClickHandler(click -> new TicketDialog(selection.get(0)).show());
 
 		convert = new MenuItem(I18N.message("convert"));
-		convert.addClickHandler(event -> new ConversionDialog(selection.get(0)).show());
+		convert.addClickHandler(click -> new ConversionDialog(selection.get(0)).show());
 
 		compare = prepareCompareItem(selection);
 
 		replaceAlias = prepareReplaceAlias();
 
 		split = new MenuItem(I18N.message("split"));
-		split.addClickHandler(event -> new SplitDialog(selection.get(0)).show());
+		split.addClickHandler(click -> new SplitDialog(selection.get(0)).show());
 
 		merge = prepareMergeItem(folder, getSelectionIds(selection));
 
-		customActionsItem = prepareCustomActionsItem(folder.getId(), getSelectionIds(selection));
+		MenuItem customActionsItem = prepareCustomActionsItem(folder.getId(), getSelectionIds(selection));
 
 		readingRequest = new MenuItem();
 		readingRequest.setTitle(I18N.message("requestreading"));
@@ -241,16 +227,16 @@ public class ContextMenu extends Menu {
 		setItems(download, preview, openInFolder, cut, copy, rename, delete, bookmark, sendMail, links, office,
 				checkout, checkin, lock, unlock);
 
-		more = new MenuItem(I18N.message("more"));
+		MenuItem more = new MenuItem(I18N.message("more"));
 		addItem(more);
 
-		indexingMenu = new Menu();
+		Menu indexingMenu = new Menu();
 		indexingMenu.setItems(index, markIndexable, markIndexableMetadataOnly, markUnindexable);
 
-		indexing = new MenuItem(I18N.message("indexing"));
+		MenuItem indexing = new MenuItem(I18N.message("indexing"));
 		indexing.setSubmenu(indexingMenu);
 
-		moreMenu = new Menu();
+		Menu moreMenu = new Menu();
 		moreMenu.setItems(indexing, immutable, setPassword, unsetPassword, ticket, replaceAlias);
 
 		removeOfficeItem(office);

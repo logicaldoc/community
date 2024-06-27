@@ -30,17 +30,17 @@ public class ResourceImpl implements Resource {
 
 	private Long contentLength;
 
-	private boolean isFolder;
+	private boolean folder;
 
-	private boolean isWorkspace;
+	private boolean workspace;
 
-	private boolean isLocked = false;
+	private boolean locked = false;
 
+	private boolean checkedOut = false;
+	
 	private InputStream is;
 
 	private long personRequest;
-
-	private boolean isCheckedOut = false;
 
 	private String versionLabel;
 
@@ -92,28 +92,28 @@ public class ResourceImpl implements Resource {
 		this.name = name;
 	}
 
-	public void isFolder(boolean isFolder) {
-		this.isFolder = isFolder;
+	public void setFolder(boolean folder) {
+		this.folder = folder;
 	}
 
-	public void isWorkspace(boolean isWorkspace) {
-		this.isFolder = isWorkspace;
+	public void setWorkspace(boolean workspace) {
+		this.workspace = workspace;
 	}
 
 	public boolean isFolder() {
-		return this.isFolder;
+		return this.folder;
 	}
 
 	public boolean isWorkspace() {
-		return this.isWorkspace;
+		return this.workspace;
 	}
 
-	public void setLocked(boolean isLocked) {
-		this.isLocked = isLocked;
+	public void setLocked(boolean locked) {
+		this.locked = locked;
 	}
 
 	public boolean isLocked() {
-		return this.isLocked || this.isCheckedOut;
+		return this.locked || this.checkedOut;
 	}
 
 	public String getID() {
@@ -146,12 +146,12 @@ public class ResourceImpl implements Resource {
 
 	@Override
 	public boolean isCheckedOut() {
-		return this.isCheckedOut;
+		return this.checkedOut;
 	}
 
 	@Override
 	public void setCheckedOut(boolean isCheckedOut) {
-		this.isCheckedOut = isCheckedOut;
+		this.checkedOut = isCheckedOut;
 	}
 
 	@Override
@@ -283,23 +283,23 @@ public class ResourceImpl implements Resource {
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		Set<Permission> permissions = new HashSet<>();
 		long fid = 0;
-		if (isFolder)
+		if (folder)
 			fid = Long.parseLong(id);
 		else
 			fid = Long.parseLong(folderId);
 
-		Folder folder;
+		Folder fold;
 		try {
-			folder = fdao.findById(fid);
+			fold = fdao.findById(fid);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return;
 		}
-		isWorkspace = folder.getType() == Folder.TYPE_WORKSPACE;
+		workspace = fold.getType() == Folder.TYPE_WORKSPACE;
 
 		long rootId = 0;
 		try {
-			rootId = fdao.findRoot(folder.getTenantId()).getId();
+			rootId = fdao.findRoot(fold.getTenantId()).getId();
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return;

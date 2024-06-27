@@ -46,7 +46,7 @@ public interface Resource {
 	public boolean isWriteEnabled();
 
 	public boolean isMoveEnabled();
-	
+
 	public boolean isAddChildEnabled();
 
 	public void setDeleteEnabled(boolean deleteEnabled);
@@ -61,9 +61,9 @@ public interface Resource {
 
 	public void setLocked(boolean locked);
 
-	public void isFolder(boolean isFolder);
+	public void setFolder(boolean folder);
 
-	public void isWorkspace(boolean isWorkspace);
+	public void setWorkspace(boolean workspace);
 
 	public void setInputStream(InputStream is);
 
@@ -118,6 +118,6 @@ public interface Resource {
 	public void setLockUser(String lockUser);
 
 	public void setETag(String string);
-	
+
 	public String getETag();
 }

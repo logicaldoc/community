@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
@@ -18,7 +19,6 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.searchengine.FulltextSearchOptions;
 import com.logicaldoc.core.searchengine.SearchOptions;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.util.io.CharsetUtil;
 import com.logicaldoc.util.plugin.PluginException;
 
 import junit.framework.Assert;
@@ -104,7 +104,7 @@ public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 		saved = new SavedSearch();
 		saved.setOptions(xml);
 
-		ch = CharsetUtil.utf8();
+		ch = StandardCharsets.UTF_8;
 		Context.get().getProperties().setProperty("default.charset", ch.name());
 		saved = new SavedSearch();
 		saved.setName("manca l'umiltà");
@@ -116,7 +116,7 @@ public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 		saved.setOptions(xml);
 
 		opt.setExpression("我正在寻找每月200欧元的工人，没有人回答：缺乏谦虚");
-		ch = CharsetUtil.utf8();
+		ch = StandardCharsets.UTF_8;
 		Context.get().getProperties().setProperty("default.charset", ch.name());
 		saved = new SavedSearch();
 		saved.setName("缺乏谦卑");

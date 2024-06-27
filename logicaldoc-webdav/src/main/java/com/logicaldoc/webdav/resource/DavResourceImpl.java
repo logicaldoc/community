@@ -49,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.MimeType;
 import com.logicaldoc.webdav.context.ExportContext;
 import com.logicaldoc.webdav.context.ExportContextImpl;
 import com.logicaldoc.webdav.context.ImportContext;
@@ -58,7 +59,6 @@ import com.logicaldoc.webdav.io.manager.IOManager;
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.resource.service.ResourceService;
 import com.logicaldoc.webdav.session.WebdavSession;
-import com.logicaldoc.webdav.web.AbstractWebdavServlet;
 
 /**
  * For more informations, please visit
@@ -251,7 +251,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 		outputContext.setModificationTime(this.resource.getLastModified().getTime());
 		outputContext.setETag(this.resource.getETag());
-		outputContext.setContentType(AbstractWebdavServlet.getContext().getMimeType(this.resource.getName()));
+		outputContext.setContentType(MimeType.getByFilename(this.resource.getName()));
 
 		if (exists()) {
 			ExportContext exportCtx = getExportContext(outputContext);
@@ -699,9 +699,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		}
 	}
 
-	/**
-	 * @see DavResource#removeMember(DavResource)
-	 */
+	@Override
 	public void removeMember(DavResource member) throws DavException {
 
 		if (!exists() || !member.exists()) {
@@ -722,9 +720,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		resourceService.deleteResource(res, session);
 	}
 
-	/**
-	 * @see DavResource#move(DavResource)
-	 */
+	@Override
 	public void move(DavResource destination) throws DavException {
 
 		if (!exists()) {
@@ -741,7 +737,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 				res.setName(this.resource.getName());
 				Resource parentResource = resourceService.getParentResource(res);
 
-				resourceService.move(this.resource, parentResource, session);
+				resourceService.move(this.resource, parentResource, res.isFolder() ? null : res.getName(), session);
 			} else {
 				String name = destination.getLocator().getResourcePath();
 				log.debug("name before: {}", name);
@@ -752,7 +748,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 						this.resource.getRequestedPerson(), session);
 
 				this.resource.setName(name);
-				resourceService.move(this.resource, parentResource, session);
+				resourceService.move(this.resource, parentResource, name, session);
 			}
 		} catch (DavException de) {
 			throw de;
@@ -761,11 +757,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 		}
 	}
 
-	/**
-	 * @see DavResource#copy(DavResource, boolean)
-	 */
+	@Override
 	public void copy(DavResource destination, boolean shallow) throws DavException {
-
 		if (!exists()) {
 			throw new DavException(HttpServletResponse.SC_NOT_FOUND);
 		}
@@ -794,7 +787,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 					destResource.setRequestedPerson((Long.parseLong(session.getObject("id").toString())));
 				}
 
-				resourceService.copyResource(destResource, this.resource, session);
+				resourceService.copy(this.resource, destResource, destResource.getName(), session);
 			} else {
 				log.debug("res IS NULL");
 				String name = destination.getLocator().getResourcePath();
@@ -814,7 +807,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 				log.debug("this.resource.getName() = {}", this.resource.getName());
 				log.debug("this.resource.getID() = {}", this.resource.getID());
 
-				resourceService.copyResource(destResource, this.resource, session);
+				resourceService.copy(this.resource, destResource, name, session);
 			}
 		} catch (DavException de) {
 			throw de;

@@ -35,6 +35,8 @@ import com.smartgwt.client.widgets.tab.Tab;
  */
 public class OutgoingEmailPanel extends AdminPanel {
 
+	private static final String PROTOCOL = "protocol";
+
 	private static final String USERASFROM = "userasfrom";
 
 	private static final String SENDEREMAIL = "senderemail";
@@ -137,12 +139,12 @@ public class OutgoingEmailPanel extends AdminPanel {
 
 		TextItem clientId = ItemFactory.newTextItem("clientid", emailSettings.getClientId());
 		clientId.setWidth(350);
-		clientId.setVisibleWhen(new AdvancedCriteria("protocol", OperatorId.CONTAINS, "365"));
+		clientId.setVisibleWhen(new AdvancedCriteria(PROTOCOL, OperatorId.CONTAINS, "365"));
 
 		TextItem clientTenant = ItemFactory.newTextItem("clienttenant", I18N.message("tenantId"),
 				emailSettings.getClientTenant());
 		clientTenant.setWidth(350);
-		clientTenant.setVisibleWhen(new AdvancedCriteria("protocol", OperatorId.CONTAINS, "365"));
+		clientTenant.setVisibleWhen(new AdvancedCriteria(PROTOCOL, OperatorId.CONTAINS, "365"));
 
 		/*
 		 * Two invisible fields to 'mask' the real credentials to the browser
@@ -157,12 +159,12 @@ public class OutgoingEmailPanel extends AdminPanel {
 				this.emailSettings.getClientSecret());
 		hiddenClientSecret.setHidden(true);
 
-		FormItem password = ItemFactory.newSafePasswordItem("password", I18N.message("password"),
+		FormItem password = ItemFactory.newSafePasswordItem(PASSWORD, I18N.message(PASSWORD),
 				this.emailSettings.getPwd(), hiddenPassword, null);
 
 		FormItem clientSecret = ItemFactory.newSafePasswordItem("clientsecret", I18N.message("clientsecret"),
 				this.emailSettings.getClientSecret(), hiddenClientSecret, null);
-		clientSecret.setVisibleWhen(new AdvancedCriteria("protocol", OperatorId.CONTAINS, "365"));
+		clientSecret.setVisibleWhen(new AdvancedCriteria(PROTOCOL, OperatorId.CONTAINS, "365"));
 
 		emailForm.setItems(protocol, server, port, connSecurity, secureAuth, username, password, clientId, clientTenant,
 				clientSecret, senderEmail, userAsSender, targetSelector, foldering, save, test, fakeUsername,
@@ -213,7 +215,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 			@SuppressWarnings("unchecked")
 			Map<String, Object> values = vm.getValues();
 
-			OutgoingEmailPanel.this.emailSettings.setProtocol((String) values.get("protocol"));
+			OutgoingEmailPanel.this.emailSettings.setProtocol((String) values.get(PROTOCOL));
 			OutgoingEmailPanel.this.emailSettings.setServer((String) values.get("server"));
 			if (values.get("port") instanceof Integer)
 				OutgoingEmailPanel.this.emailSettings.setPort((Integer) values.get("port"));

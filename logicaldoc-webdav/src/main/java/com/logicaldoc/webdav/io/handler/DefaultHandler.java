@@ -161,7 +161,7 @@ public class DefaultHandler implements IOHandler {
 			InputStream is = resourceService.streamOut(resource);
 			if (is != null)
 				IOUtil.spool(is, context.getOutputStream());
-		} catch (FileNotFoundException e) {
+		} catch (DavException | FileNotFoundException e) {
 			throw new IOException("Can't find file " + resource.getName() + "(" + resource.getID() + ")");
 		}
 	}
@@ -243,7 +243,7 @@ public class DefaultHandler implements IOHandler {
 			if (is != null) {
 				IOUtils.copyLarge(is, context.getOutputStream(), left, rangeLength);
 			}
-		} catch (FileNotFoundException e) {
+		} catch (DavException | FileNotFoundException e) {
 			throw new IOException("Can't find file " + resource.getName() + "(" + resource.getID() + ")");
 		}
 	}

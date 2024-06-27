@@ -63,7 +63,7 @@ public class Microsoft365TokenProvider implements TokenProvider {
 							new BasicNameValuePair("scope", "https://outlook.office365.com/.default"))));
 			post.setEntity(entity);
 
-			String token = httpClient.execute(post, new BasicHttpClientResponseHandler() {
+			return httpClient.execute(post, new BasicHttpClientResponseHandler() {
 
 				@Override
 				public String handleResponse(ClassicHttpResponse response) throws IOException {
@@ -87,8 +87,6 @@ public class Microsoft365TokenProvider implements TokenProvider {
 					return responseObj.get("access_token").asText();
 				}
 			});
-
-			return token;
 		}
 	}
 }

@@ -54,9 +54,14 @@
 			<AppenderRef ref="file" />
 		</Logger>				
 		
-		<Logger name="com.logicaldoc.util.spring.DatabasePropertySource" level="fataò" additivity="false">
+		<Logger name="com.logicaldoc.util.spring.DatabasePropertySource" level="fatal" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>		
+		
+		<Logger name="com.logicaldoc.webdav" level="debug" additivity="false">
+			<AppenderRef ref="file" />
+		</Logger>
+		
 		
 		<Root level="fatal">
 			<AppenderRef ref="console" />

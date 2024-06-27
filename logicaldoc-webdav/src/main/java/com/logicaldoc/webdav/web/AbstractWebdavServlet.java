@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
@@ -55,8 +54,11 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.webdav.context.ExportContext;
+import com.logicaldoc.webdav.context.ImportContextImpl;
 import com.logicaldoc.webdav.resource.DavResourceFactory;
 import com.logicaldoc.webdav.resource.DavResourceImpl;
+import com.logicaldoc.webdav.resource.model.Resource;
+import com.logicaldoc.webdav.resource.service.ResourceService;
 import com.logicaldoc.webdav.session.DavSessionImpl;
 import com.logicaldoc.webdav.session.WebdavSession;
 
@@ -111,8 +113,7 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 	public void service(HttpServletRequest request, HttpServletResponse response) {
 		log.debug("Received WebDAV request");
 
-		// DeltaV requires 'Cache-Control' header for all methods except
-		// 'VERSION-CONTROL' and 'REPORT'.
+		// DeltaV requires 'Cache-Control' header for all methods
 		int methodCode = DavMethods.getMethodCode(request.getMethod());
 
 		WebdavRequest webdavRequest = new EncodingWebdavRequest(request, getLocatorFactory());
@@ -139,7 +140,7 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 			getPath(webdavRequest);
 
-			// check matching if=header for lock-token relevant operations
+			// check matching if header for lock-token relevant operations
 			DavResource resource = getResourceFactory().createResource(webdavRequest.getRequestLocator(), webdavRequest,
 					davSession);
 
@@ -437,7 +438,6 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 */
 	protected void doPropFind(WebdavRequest request, WebdavResponse response, DavResource resource)
 			throws IOException, DavException {
-
 		log.debug("doPropFind");
 
 		log.debug("[READ] FINDING {} {}",
@@ -476,7 +476,6 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 		MultiStatus mstatus = new MultiStatus();
 		mstatus.addResourceProperties(resource, requestProperties, propfindType, depth);
-
 		response.sendMultiStatus(mstatus);
 	}
 
@@ -559,7 +558,6 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 			response.setStatus(status);
 		} catch (DavException dave) {
-
 			log.debug("A DavException occurred!", dave);
 
 			// return the status code
@@ -785,10 +783,12 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 				// matching if-header required for existing resources
 				if (!request.matchesIfHeader(destResource)) {
 					return HttpServletResponse.SC_PRECONDITION_FAILED;
-				} else {
+				} else if (!destResource.isCollection()) {
 					// overwrite existing resource
 					destResource.getCollection().removeMember(destResource);
 					status = HttpServletResponse.SC_NO_CONTENT;
+				} else {
+					status = HttpServletResponse.SC_CREATED;
 				}
 			} else {
 				// cannot copy/move to an existing item, if overwrite is not
@@ -822,6 +822,7 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 				response.addHeader(SearchConstants.HEADER_DASL, "<" + langs[i] + ">");
 			}
 		}
+
 		// with DeltaV the OPTIONS request may contain a Xml body.
 		OptionsResponse oR = null;
 		OptionsInfo oInfo = request.getOptionsInfo();
@@ -903,11 +904,11 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			throws DavException, IOException {
 		log.debug("doCheckin");
 
-		try {
-			response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-		} catch (Exception t) {
-			// Nothing to do
-		}
+		ResourceService resourceService = (ResourceService) Context.get().getBean(ResourceService.class);
+		WebdavSession session = (com.logicaldoc.webdav.session.WebdavSession) request.getDavSession();
+		Resource repositoryResource = resourceService.getResource(resource.getResourcePath(), session);
+		
+		resourceService.updateResource(repositoryResource, new ImportContextImpl(repositoryResource, null, request.getInputStream()), session);
 	}
 
 	/**

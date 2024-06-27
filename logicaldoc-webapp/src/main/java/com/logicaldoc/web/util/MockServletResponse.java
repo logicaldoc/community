@@ -5,11 +5,16 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.io.FileUtil;
 
@@ -21,9 +26,19 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class MockServletResponse implements HttpServletResponse {
 
+	protected static Logger log = LoggerFactory.getLogger(MockServletResponse.class);
+
 	private File output;
 
 	private PrintWriter outputWriter;
+
+	private int contentLength = 0;
+
+	private String contentType;
+
+	private String characterEncoding;
+
+	private Map<String, String> headers = new HashMap<>();
 
 	public MockServletResponse(File output) {
 		super();
@@ -43,12 +58,12 @@ public class MockServletResponse implements HttpServletResponse {
 
 	@Override
 	public String getCharacterEncoding() {
-		return null;
+		return characterEncoding;
 	}
 
 	@Override
 	public String getContentType() {
-		return null;
+		return contentType;
 	}
 
 	@Override
@@ -58,12 +73,35 @@ public class MockServletResponse implements HttpServletResponse {
 
 	@Override
 	public ServletOutputStream getOutputStream() throws IOException {
+		log.debug("getOutputStream");
 		return new ServletOutputStream() {
-			private FileOutputStream fileOutputStream = new FileOutputStream(output);
+			private FileOutputStream fileOutputStream = new FileOutputStream(output, true);
 
 			@Override
 			public void write(int b) throws IOException {
 				fileOutputStream.write(b);
+			}
+
+			@Override
+			public void write(byte[] b) throws IOException {
+				fileOutputStream.write(b);
+			}
+
+			@Override
+			public void write(byte[] b, int off, int len) throws IOException {
+				fileOutputStream.write(b, off, len);
+				if (log.isDebugEnabled())
+					log.debug("Wrote {}", new String(b));
+			}
+
+			@Override
+			public void flush() throws IOException {
+				fileOutputStream.flush();
+			}
+
+			@Override
+			public void close() throws IOException {
+				fileOutputStream.close();
 			}
 		};
 	}
@@ -82,7 +120,7 @@ public class MockServletResponse implements HttpServletResponse {
 
 	@Override
 	public void reset() {
-// Nothing to do
+		// Nothing to do
 	}
 
 	@Override
@@ -96,18 +134,18 @@ public class MockServletResponse implements HttpServletResponse {
 	}
 
 	@Override
-	public void setCharacterEncoding(String arg0) {
-		// Nothing to do
+	public void setCharacterEncoding(String characterEncoding) {
+		this.characterEncoding = characterEncoding;
 	}
 
 	@Override
-	public void setContentLength(int arg0) {
-		// Nothing to do
+	public void setContentLength(int contentLength) {
+		this.contentLength = contentLength;
 	}
 
 	@Override
-	public void setContentType(String arg0) {
-		// Nothing to do
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
 	}
 
 	@Override
@@ -126,8 +164,12 @@ public class MockServletResponse implements HttpServletResponse {
 	}
 
 	@Override
-	public void addHeader(String arg0, String arg1) {
-		// Nothing to do
+	public void addHeader(String name, String value) {
+		setHeader(name, value);
+	}
+
+	public String getHeader(String name) {
+		return headers.get(name);
 	}
 
 	@Override
@@ -181,8 +223,8 @@ public class MockServletResponse implements HttpServletResponse {
 	}
 
 	@Override
-	public void setHeader(String arg0, String arg1) {
-		// Nothing to do
+	public void setHeader(String name, String value) {
+		headers.put(name, value);
 	}
 
 	@Override
@@ -200,10 +242,18 @@ public class MockServletResponse implements HttpServletResponse {
 		// Nothing to do
 	}
 
+	public int getContentLength() {
+		return contentLength;
+	}
+
 	public String getOutputString() throws IOException {
 		if (output != null)
 			return FileUtil.readFile(output);
 		else
 			return "";
+	}
+
+	public Map<String, String> getHeaders() {
+		return headers;
 	}
 }

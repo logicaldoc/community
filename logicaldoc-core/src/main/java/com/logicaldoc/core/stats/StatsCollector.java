@@ -2,6 +2,7 @@ package com.logicaldoc.core.stats;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,7 +37,6 @@ import com.logicaldoc.core.task.TaskException;
 import com.logicaldoc.core.util.UserUtil;
 import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.http.StringHttpClientResponseHandler;
-import com.logicaldoc.util.io.CharsetUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
 
 /**
@@ -330,7 +330,7 @@ public class StatsCollector extends Task {
 			// Execute request
 			try (CloseableHttpClient httpClient = HttpUtil.getNotValidatingClient(60)) {
 				HttpPost post = new HttpPost("http://stat.logicaldoc.com/stats/collect");
-				UrlEncodedFormEntity entity = new UrlEncodedFormEntity(postParams, CharsetUtil.utf8());
+				UrlEncodedFormEntity entity = new UrlEncodedFormEntity(postParams, StandardCharsets.UTF_8);
 				post.setEntity(entity);
 				httpClient.execute(post, new StringHttpClientResponseHandler());
 			}

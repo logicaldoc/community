@@ -26,6 +26,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 
+	private static final String PROTOCOL = "protocol";
+
 	private static final String USERNAME = "username";
 
 	private DynamicForm form = new DynamicForm();
@@ -105,13 +107,13 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		TextItem clientId = ItemFactory.newTextItem("clientid", account.getClientId());
 		clientId.setWidth(200);
 		clientId.addChangedHandler(changedHandler);
-		clientId.setVisibleWhen(new AdvancedCriteria("protocol", OperatorId.CONTAINS, "365"));
+		clientId.setVisibleWhen(new AdvancedCriteria(PROTOCOL, OperatorId.CONTAINS, "365"));
 
 		TextItem clientTenant = ItemFactory.newTextItem("clienttenant", I18N.message("tenantId"),
 				account.getClientTenant());
 		clientTenant.setWidth(200);
 		clientTenant.addChangedHandler(changedHandler);
-		clientTenant.setVisibleWhen(new AdvancedCriteria("protocol", OperatorId.CONTAINS, "365"));
+		clientTenant.setVisibleWhen(new AdvancedCriteria(PROTOCOL, OperatorId.CONTAINS, "365"));
 
 		/*
 		 * Two invisible fields to 'mask' the real credentials to the browser
@@ -139,7 +141,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 				account.getClientSecret(), hiddenClientSecret, changedHandler);
 		clientSecret.setWidth(200);
 		clientSecret.addChangedHandler(changedHandler);
-		clientSecret.setVisibleWhen(new AdvancedCriteria("protocol", OperatorId.CONTAINS, "365"));
+		clientSecret.setVisibleWhen(new AdvancedCriteria(PROTOCOL, OperatorId.CONTAINS, "365"));
 
 		form.setItems(mailaddress, protocol, ssl, server, port, username, password, clientId, clientTenant,
 				clientSecret, targetSelector, foldering, language, fakeUsername, fakeUsernameAgain, hiddenPassword,
@@ -158,7 +160,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 			account.setUsername((String) values.get(USERNAME));
 			account.setTarget(targetSelector.getFolder());
 			account.setLanguage((String) values.get("language"));
-			account.setProvider((String) values.get("protocol"));
+			account.setProvider((String) values.get(PROTOCOL));
 			if (values.get("port") instanceof Integer)
 				account.setPort((Integer) values.get("port"));
 			else

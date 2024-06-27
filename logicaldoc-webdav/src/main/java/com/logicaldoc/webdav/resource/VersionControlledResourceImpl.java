@@ -30,10 +30,10 @@ import org.apache.jackrabbit.webdav.xml.Namespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.util.MimeType;
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.session.WebdavSession;
 import com.logicaldoc.webdav.version.VersionHistoryResourceImpl;
-import com.logicaldoc.webdav.web.AbstractWebdavServlet;
 
 public class VersionControlledResourceImpl extends DeltaVResourceImpl
 		implements VersionControlledResource, Serializable {
@@ -226,7 +226,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 * @return the {@link VersionHistoryResource} associated with this resource.
 	 * 
 	 * @throws DavException Some error
-	 *  
+	 * 
 	 * @see org.apache.jackrabbit.webdav.version.VersionControlledResource#getVersionHistory()
 	 * @see javax.jcr.Node#getVersionHistory()
 	 */
@@ -240,7 +240,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 			log.warn(e.getMessage(), e);
 		}
 
-		throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"");
+		throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "");
 	}
 
 	// --------------------------------------------------------------------------
@@ -281,8 +281,9 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 				return;
 
 			properties.add(new DefaultDavProperty<>(DavPropertyName.DISPLAYNAME, resource.getName(), false));
+
 			properties.add(new DefaultDavProperty<>(DavPropertyName.GETCONTENTTYPE,
-					AbstractWebdavServlet.getContext().getMimeType(resource.getName()), false));
+					MimeType.getByFilename(resource.getName()), false));
 
 			if (resource.isFolder())
 				return;

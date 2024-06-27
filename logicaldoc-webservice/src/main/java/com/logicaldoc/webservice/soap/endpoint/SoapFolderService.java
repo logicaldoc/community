@@ -211,7 +211,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 		// In case of pagination, extract just the wanted page
 		if (max != null && page != null && max < folders.size())
-			folders = folders.stream().skip((page - 1) * max).limit(max).collect(Collectors.toList());
+			folders = folders.stream().skip((page - 1) * (long)max).limit(max).collect(Collectors.toList());
 
 		List<WSFolder> wsFolders = new ArrayList<>();
 		for (Folder folder : folders) {

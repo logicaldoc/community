@@ -3,7 +3,7 @@ package com.logicaldoc.webservice;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +34,6 @@ import org.apache.hc.core5.net.URIBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.logicaldoc.util.http.StringHttpClientResponseHandler;
-import com.logicaldoc.util.io.CharsetUtil;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSSearchOptions;
 
@@ -153,7 +152,7 @@ public class HttpRestWb {
 		formparams.add(new BasicNameValuePair("parentId", String.valueOf(parentId)));
 		formparams.add(new BasicNameValuePair("path", path));
 
-		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, CharsetUtil.utf8());
+		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, StandardCharsets.UTF_8);
 
 		HttpPost httppost = new HttpPost(BASE_PATH + "/services/rest/folder/createPath");
 		httppost.setEntity(entity);
@@ -195,7 +194,7 @@ public class HttpRestWb {
 		String jsonStr = ow.writeValueAsString(wsso);
 		System.out.println(jsonStr);
 
-		StringEntity entity = new StringEntity(jsonStr, ContentType.create("application/json", CharsetUtil.utf8()));
+		StringEntity entity = new StringEntity(jsonStr, ContentType.create("application/json", StandardCharsets.UTF_8));
 		httppost.setEntity(entity);
 
 		String body = httpClient.execute(httppost, new StringHttpClientResponseHandler());
@@ -277,7 +276,7 @@ public class HttpRestWb {
 		List<NameValuePair> formparams = new ArrayList<>();
 		formparams.add(new BasicNameValuePair("folderPath", "/LogicalDOC/USA/NJ/Fair Lawn/createSimple"));
 
-		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, CharsetUtil.utf8());
+		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, StandardCharsets.UTF_8);
 
 		HttpPost post = new HttpPost(BASE_PATH + "/services/rest/folder/createSimpleForm");
 		post.setEntity(entity);
@@ -293,7 +292,7 @@ public class HttpRestWb {
 		System.out.println(input);
 
 		HttpPost post = new HttpPost(BASE_PATH + "/services/rest/folder/createSimpleJSON");
-		StringEntity entity = new StringEntity(input, ContentType.create("application/json", CharsetUtil.utf8()));
+		StringEntity entity = new StringEntity(input, ContentType.create("application/json", StandardCharsets.UTF_8));
 		post.setEntity(entity);
 
 		String body = httpClient.execute(post, new StringHttpClientResponseHandler());
@@ -305,7 +304,8 @@ public class HttpRestWb {
 			String input = "{ \"username\" : \"admin\", \"password\" : \"admin\" }";
 			System.out.println(input);
 
-			StringEntity entity = new StringEntity(input, ContentType.create("application/json", CharsetUtil.utf8()));
+			StringEntity entity = new StringEntity(input,
+					ContentType.create("application/json", StandardCharsets.UTF_8));
 			HttpPost post = new HttpPost(BASE_PATH + "/services/rest/auth/login");
 			post.setEntity(entity);
 

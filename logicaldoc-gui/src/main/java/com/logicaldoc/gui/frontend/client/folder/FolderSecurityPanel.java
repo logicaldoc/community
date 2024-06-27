@@ -22,7 +22,6 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.Img;
@@ -82,7 +81,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 	private static final String SECURITY = "security";
 
 	private static final String WRITE = "write";
-	
+
 	private static final String CUSTOMID = "customid";
 
 	private static final String DOWNLOAD = "download";
@@ -140,7 +139,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		ListGridField read = new ListGridField("read", prepareHeaderLabel("read"));
 		read.setType(ListGridFieldType.BOOLEAN);
 		read.setCanEdit(true);
-		
+
 		ListGridField preview = new ListGridField(PREVIEW, prepareHeaderLabel(PREVIEW));
 		preview.setType(ListGridFieldType.BOOLEAN);
 		preview.setCanEdit(true);
@@ -156,7 +155,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		ListGridField write = new ListGridField(WRITE, prepareHeaderLabel(WRITE));
 		write.setType(ListGridFieldType.BOOLEAN);
 		write.setCanEdit(true);
-		
+
 		ListGridField customid = new ListGridField(CUSTOMID, prepareHeaderLabel(CUSTOMID));
 		customid.setType(ListGridFieldType.BOOLEAN);
 		customid.setCanEdit(true);
@@ -548,7 +547,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			ace.setPreview(rec.getAttributeAsBoolean(PREVIEW));
 			ace.setPrint(rec.getAttributeAsBoolean(PRINT));
 			ace.setWrite(rec.getAttributeAsBoolean(WRITE));
-			ace.setCustomid(rec.getAttributeAsBoolean(CUSTOMID));		
+			ace.setCustomid(rec.getAttributeAsBoolean(CUSTOMID));
 			ace.setDelete(rec.getAttributeAsBoolean(DELETE));
 			ace.setAdd(rec.getAttributeAsBoolean("add"));
 			ace.setWorkflow(rec.getAttributeAsBoolean(WORKFLOW));

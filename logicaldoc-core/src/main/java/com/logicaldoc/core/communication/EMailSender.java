@@ -71,6 +71,8 @@ import net.sf.jmimemagic.MagicMatch;
  */
 public class EMailSender {
 
+	private static final String MAIL_TRANSPORT_PROTOCOL = "mail.transport.protocol";
+
 	private static final String UTF_8 = "UTF-8";
 
 	private static final String THREAD_POOL = "Email";
@@ -302,13 +304,7 @@ public class EMailSender {
 		// The FROM field must to be the one configured for the SMTP connection.
 		// because of errors will be returned in the case the sender is not in
 		// the SMTP domain.
-		InternetAddress from = new InternetAddress(sender);
-		if (StringUtils.isNotEmpty(email.getAuthorAddress()))
-			try {
-				from = new InternetAddress(email.getAuthorAddress());
-			} catch (AddressException t) {
-				// Nothing to do
-			}
+		InternetAddress from = prepareFrom(email);
 		Set<InternetAddress> to = email.getAddresses();
 		Set<InternetAddress> cc = email.getAddressesCC();
 		Set<InternetAddress> bcc = email.getAddressesBCC();
@@ -389,6 +385,17 @@ public class EMailSender {
 		historycizeOutgoingEmail(email, message, from);
 	}
 
+	protected InternetAddress prepareFrom(EMail email) throws AddressException {
+		InternetAddress from = new InternetAddress(sender);
+		if (StringUtils.isNotEmpty(email.getAuthorAddress()))
+			try {
+				from = new InternetAddress(email.getAuthorAddress());
+			} catch (AddressException t) {
+				// Nothing to do
+			}
+		return from;
+	}
+
 	private static String tokenForSMTP(String userName, String accessToken) {
 		final String ctrlA = Character.toString((char) 1);
 		final String coded = "user=" + userName + ctrlA + "auth=Bearer " + accessToken + ctrlA + ctrlA;
@@ -414,7 +421,7 @@ public class EMailSender {
 
 		if (authEncrypted) {
 			// The 'smtps' protocol must be used
-			props.put("mail.transport.protocol", "smtps");
+			props.put(MAIL_TRANSPORT_PROTOCOL, "smtps");
 			props.put("mail.smtps.host", host);
 			props.put("mail.smtps.port", port);
 			props.put("mail.smtps.ssl.protocols", "TLSv1.1 TLSv1.2");
@@ -427,7 +434,7 @@ public class EMailSender {
 				props.put("mail.smtps.ssl.enable", "true");
 			}
 		} else {
-			props.put("mail.transport.protocol", "smtp");
+			props.put(MAIL_TRANSPORT_PROTOCOL, "smtp");
 			props.put("mail.smtp.host", host);
 			props.put("mail.smtp.port", port);
 			if (connectionSecurity == SECURITY_STARTTLS)
@@ -444,18 +451,22 @@ public class EMailSender {
 		props.put("mail.smtp.ssl.checkserveridentity", "false");
 		props.put("mail.smtp.ssl.trust", "*");
 
+		putOffice365settings(props);
+
+		return props;
+	}
+
+	protected void putOffice365settings(Properties props) {
 		if (protocol.contains("365")) {
 			props.clear();
 			props.put("mail.smtp.auth.xoauth2.disable", "false");
 			props.put("mail.smtp.sasl.enable", "true");
 			props.put("mail.smtp.auth.mechanisms", "XOAUTH2");
 			props.put("mail.smtp.starttls.enable", "true");
-			props.put("mail.transport.protocol", "smtp");
+			props.put(MAIL_TRANSPORT_PROTOCOL, "smtp");
 			props.put("mail.smtp.host", host);
 			props.put("mail.smtp.port", port);
 		}
-
-		return props;
 	}
 
 	private Session newMailSession() {

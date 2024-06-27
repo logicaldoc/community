@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.workflow.designer;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
@@ -270,18 +271,17 @@ public class WorkflowToolStrip extends ToolStrip {
 	private boolean checkTaskWithoutTransitions() {
 		boolean transitionErrorFound = false;
 
-		for (GUIWFState state : currentWorkflow.getStates()) {
-			if (state.getType() != GUIWFState.TYPE_END) {
-				if (state.getTransitions() == null || state.getTransitions().isEmpty()) {
+		for (GUIWFState state : currentWorkflow.getStates().stream().filter(s -> s.getType() != GUIWFState.TYPE_END)
+				.collect(Collectors.toList())) {
+			if (state.getTransitions() == null || state.getTransitions().isEmpty()) {
+				transitionErrorFound = true;
+				break;
+			}
+			for (GUITransition transition : state.getTransitions()) {
+				if (transition.getTargetState() == null || (transition.getTargetState() != null
+						&& transition.getTargetState().getType() == GUIWFState.TYPE_UNDEFINED)) {
 					transitionErrorFound = true;
 					break;
-				}
-				for (GUITransition transition : state.getTransitions()) {
-					if (transition.getTargetState() == null || (transition.getTargetState() != null
-							&& transition.getTargetState().getType() == GUIWFState.TYPE_UNDEFINED)) {
-						transitionErrorFound = true;
-						break;
-					}
 				}
 			}
 		}

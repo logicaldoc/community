@@ -28,7 +28,8 @@ public interface ResourceService extends Serializable {
 	 * On passing a location as well as the current session you gettin back the
 	 * appropriated resource.
 	 * 
-	 * @param location The location retrieved through (@see DavResourceLocator#getResourcePath())
+	 * @param location The location retrieved through (@see
+	 *        DavResourceLocator#getResourcePath())
 	 * @param session The current session
 	 * 
 	 * @return the DAV resource
@@ -44,8 +45,7 @@ public interface ResourceService extends Serializable {
 	 *      returned - unsorted.
 	 * 
 	 * @param parentResource The resource(mostly a folder) from which are all
-	 *        direct childs has to be fetched and turned back
-	 *        s
+	 *        direct childs has to be fetched and turned back s
 	 * @return direct childs of the parent resource
 	 * 
 	 * @throws DavException error in the DAV communication
@@ -75,32 +75,12 @@ public interface ResourceService extends Serializable {
 	 * valid resource in logicalDOC.
 	 * 
 	 * @param resource The updateable resource
-	 * 
-	 * @return the updated resource
-	 */
-	public Resource updateResource(Resource resource);
-
-	/**
-	 * Updating a resource on passing all new properties though a valid resource
-	 * object. This resource object must correspond on the ID attribute with a
-	 * valid resource in logicalDOC.
-	 * 
-	 * @param resource The updateable resource
 	 * @param context the ImportContext
 	 * @param session the current session
 	 * 
 	 * @throws DavException error in the DAV communication
 	 */
 	public void updateResource(Resource resource, ImportContext context, WebdavSession session) throws DavException;
-
-	/**
-	 * Check for existing resource(logically)
-	 * 
-	 * @param resource The Resource
-	 * 
-	 * @return True if found else false
-	 */
-	public boolean resourceExists(Resource resource);
 
 	/**
 	 * Based on the parent resource it will be tried to get a child by a
@@ -110,8 +90,10 @@ public interface ResourceService extends Serializable {
 	 * @param name name of the child must be
 	 * 
 	 * @return The resource that matches, else it will be returned null
+	 * 
+	 * @throws DavException error in the DAV communication
 	 */
-	public Resource getChildByName(Resource parentResource, String name);
+	public Resource getChildByName(Resource parentResource, String name) throws DavException;
 
 	/**
 	 * Based on the current resource location it will be turned back the upper
@@ -120,8 +102,10 @@ public interface ResourceService extends Serializable {
 	 * @param resource the current resource
 	 * 
 	 * @return the parent resource
+	 * 
+	 * @throws DavException error in the DAV communication
 	 */
-	public Resource getParentResource(Resource resource);
+	public Resource getParentResource(Resource resource) throws DavException;
 
 	/**
 	 * Based on a location path
@@ -134,28 +118,24 @@ public interface ResourceService extends Serializable {
 	 * @param session the current session
 	 * 
 	 * @return the parent resource
+	 * 
+	 * @throws DavException error in the DAV communication
 	 */
-	public Resource getParentResource(String location, long userId, WebdavSession session);
+	public Resource getParentResource(String location, long userId, WebdavSession session) throws DavException;
 
 	/**
 	 * Moves a resource named target to the folder dictionary destination
 	 * 
 	 * @param target the resource that is involved
-	 * @param destination the destination of the move operation
+	 * @param destination the destination folder of the move operation
+	 * @param newName optional different name to give to the moved item
 	 * @param session the current session
+	 * 
 	 * @return the moved resource
 	 * 
 	 * @throws DavException error in the DAV communication
 	 */
-	public Resource move(Resource target, Resource destination, WebdavSession session) throws DavException;
-
-	/**
-	 * Sets the stream for a resource
-	 * 
-	 * @param resource the DAV resource
-	 * @param is the stream gor the resource
-	 */
-	public void streamIn(Resource resource, InputStream is);
+	public Resource move(Resource target, Resource destination, String newName, WebdavSession session) throws DavException;
 
 	/**
 	 * Gets the stream for a resource
@@ -163,8 +143,10 @@ public interface ResourceService extends Serializable {
 	 * @param resource the DAV resource
 	 * 
 	 * @return the stream of the resource
+	 * 
+	 * @throws DavException error in the DAV communicationn
 	 */
-	public InputStream streamOut(Resource resource);
+	public InputStream streamOut(Resource resource) throws DavException;
 
 	/**
 	 * Deletion of a resource within logicalDOC.
@@ -177,15 +159,16 @@ public interface ResourceService extends Serializable {
 	public void deleteResource(Resource resource, WebdavSession session) throws DavException;
 
 	/**
-	 * Copying of a resource within logicalDOC. Not supported those days.
+	 * Copying of a resource within logicalDOC.
 	 * 
-	 * @param destinResource target resource
-	 * @param resource the DAV resource
+	 * @param source the DAV resource
+	 * @param destination target resource (must be a folder)
+	 * @param newName optional new name for the copied resource
 	 * @param session the current session
 	 * 
 	 * @throws DavException error in the DAV communication
 	 */
-	public void copyResource(Resource destinResource, Resource resource, WebdavSession session) throws DavException;
+	public void copy(Resource source, Resource destination, String newName, WebdavSession session) throws DavException;
 
 	/**
 	 * Versioning-part. Checkout causes the system to make a version

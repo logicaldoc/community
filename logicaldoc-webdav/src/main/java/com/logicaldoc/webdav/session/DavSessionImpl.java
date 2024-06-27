@@ -2,6 +2,8 @@ package com.logicaldoc.webdav.session;
 
 import java.util.HashMap;
 
+import com.logicaldoc.core.security.Tenant;
+
 /**
  * For more informations, please visit
  * {@link org.apache.jackrabbit.webdav.simple.DavSessionImpl}
@@ -12,7 +14,7 @@ public class DavSessionImpl implements WebdavSession {
 
 	private HashMap<String, Object> map = new HashMap<>();
 
-	private long tenantId;
+	private long tenantId = Tenant.DEFAULT_ID;
 
 	/**
 	 * @see WebdavSession#getObject(String)

@@ -72,12 +72,12 @@ public class VersionNotesWindow extends Window {
 		ToolStripButton annotations = new ToolStripButton();
 		annotations.setTitle(I18N.message("annotations"));
 		annotations.addClickHandler(
-				event -> new AnnotationsWindow(document, fileVersion, () -> refresh(), document.getFolder().isWrite())
+				event -> new AnnotationsWindow(document, fileVersion, this::refresh, document.getFolder().isWrite())
 						.show());
 
 		ToolStripButton addNote = new ToolStripButton(I18N.message("addnote"));
 		addNote.addClickHandler(
-				event -> new NoteUpdateDialog(document.getId(), 0L, fileVersion, null, () -> refresh()).show());
+				event -> new NoteUpdateDialog(document.getId(), 0L, fileVersion, null, this::refresh).show());
 
 		if (document.getFolder().isWrite())
 			toolStrip.addButton(addNote);
@@ -119,7 +119,7 @@ public class VersionNotesWindow extends Window {
 			edit.setEnabled(false);
 			edit.addClickHandler(click -> new NoteUpdateDialog(document.getId(),
 					notesGrid.getSelectedRecord().getAttributeAsLong("id"), null,
-					notesGrid.getSelectedRecord().getAttribute(MESSAGE), () -> refresh()).show());
+					notesGrid.getSelectedRecord().getAttribute(MESSAGE), this::refresh).show());
 
 			MenuItem prnt = new MenuItem();
 			prnt.setTitle(I18N.message("print"));

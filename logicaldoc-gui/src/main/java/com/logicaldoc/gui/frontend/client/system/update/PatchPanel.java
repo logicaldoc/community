@@ -82,7 +82,7 @@ public class PatchPanel extends VLayout {
 
 	private IButton cancel = new IButton(I18N.message("cancel"));
 
-	private IButton delete = new IButton(I18N.message("ddelete"));
+	private IButton deleteButton = new IButton(I18N.message("ddelete"));
 
 	private IButton confirmPatch = new IButton(I18N.message("confirmpatch"));
 
@@ -337,8 +337,8 @@ public class PatchPanel extends VLayout {
 		cancel.setAutoFit(true);
 		cancel.addClickHandler(event -> showList());
 
-		delete.setAutoFit(true);
-		delete.addClickHandler(event -> onDelete(fileName));
+		deleteButton.setAutoFit(true);
+		deleteButton.addClickHandler(event -> onDelete(fileName));
 		download.setVisible(patch.isLocal());
 
 		download.setAutoFit(true);
@@ -375,7 +375,7 @@ public class PatchPanel extends VLayout {
 									if (status.get(1) == 100) {
 										download.setDisabled(false);
 										confirmPatch.setVisible(true);
-										delete.setVisible(true);
+										deleteButton.setVisible(true);
 										displayNotes(fileName);
 									} else
 										schedule(50);
@@ -389,7 +389,7 @@ public class PatchPanel extends VLayout {
 
 		HLayout buttonCanvas = new HLayout();
 		buttonCanvas.setMembersMargin(6);
-		buttonCanvas.setMembers(cancel, download, confirmPatch, delete);
+		buttonCanvas.setMembers(cancel, download, confirmPatch, deleteButton);
 
 		layout.addMember(buttonCanvas);
 
