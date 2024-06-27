@@ -11,15 +11,11 @@ import java.sql.SQLException;
 
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
-import com.logicaldoc.core.document.BookmarkDAO;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
-import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.web.util.MockServletRequest;
@@ -32,23 +28,16 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 
 	private static final String PROPFIND_SPEC = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><propfind xmlns=\"DAV:\"  xmlns:srtns=\"http://www.southrivertech.com/\"><prop><creationdate/><getlastmodified/><getcontentlength/><href/><resourcetype/><locktoken/><lockdiscovery/><collection/><getetag/><activelock/><isreadonly/><ishidden/><Win32FileAttributes/><srtns:srt_modifiedtime/><srtns:srt_creationtime/><srtns:srt_lastaccesstime/><srtns:srt_proptimestamp/><BSI_isreadonly/><SRT_fileattributes/></prop></propfind>";
 
-	private static Logger log = LoggerFactory.getLogger(WebdavServletTest.class);
-
 	// Instance under test
 	private WebdavServlet testSubject = new WebdavServlet();
 
 	private DocumentDAO docDao;
-
-	private FolderDAO folderDao;
-
-	private BookmarkDAO bookmarkDao;
 
 	@Override
 	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 
 		docDao = (DocumentDAO) context.getBean("DocumentDAO");
-		folderDao = (FolderDAO) context.getBean("FolderDAO");
 	}
 
 	@Test
@@ -59,34 +48,34 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		 */
 
 		testPROPFIND();
-		
+
 		testGET();
 
 		testLOCK();
-		
+
 		testCHECKIN();
-		
+
 		testHEAD();
 
 		testPROPPATCH();
 
 		testPUT();
-	
+
 		testCOPY();
-		
+
 		testMOVE();
-		
+
 		testMKCOL();
 
 		testOPTIONS();
-		
+
 		testREPORT();
-		
+
 		testVERSIONCONTROL();
-		
+
 		testDELETE();
 	}
-	
+
 	public void testVERSIONCONTROL() throws IOException, PersistenceException {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
@@ -98,7 +87,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 			FileUtil.delete(tempFile);
 		}
 	}
-	
+
 	public void testREPORT() throws IOException, PersistenceException {
 		// This WebDAV mehod is not really implemented
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
@@ -137,7 +126,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 
 			request = prepareRequest("CHECKIN", "/five.pdf");
 			request.setPayload(this.getClass().getResourceAsStream("/pdf2.pdf"));
-			
+
 			testSubject.service(request, response);
 
 			doc = docDao.findById(5L);
@@ -146,7 +135,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 			FileUtil.delete(tempFile);
 		}
 	}
-	
+
 	public void testLOCK() throws IOException, PersistenceException {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
