@@ -15,6 +15,7 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
 import com.smartgwt.client.data.AdvancedCriteria;
+import com.smartgwt.client.data.Criterion;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
@@ -256,9 +257,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		group = ItemFactory.newTextItem(GROUP_STR, null);
 		group.setHint(I18N.message("groupname"));
 		group.setDisabled(attributeSet.isReadonly());
-		group.setVisible(updatingAttributeIsNotSection);
 		group.setVisibleWhen(new AdvancedCriteria("type", OperatorId.EQUALS, "" + GUIAttribute.TYPE_USER));
-		
+
 		// Options (for preset editor)
 		addOptionsItem(attributeName);
 
@@ -283,18 +283,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		 * Make sure that all the controls are not visible when editing a
 		 * Section, but not the initialization
 		 */
-		AdvancedCriteria visibleCriteria = new AdvancedCriteria("type", OperatorId.INOT_EQUAL,
-				"" + GUIAttribute.TYPE_SECTION);
-		editor.setVisibleWhen(visibleCriteria);
-		group.setVisibleWhen(visibleCriteria);
-		options.setVisibleWhen(visibleCriteria);
-		validation.setVisibleWhen(visibleCriteria);
-
-		type.addChangedHandler(changed -> {
-			readonly.setVisible(!changed.getValue().equals("" + GUIAttribute.TYPE_SECTION));
-			hidden.setVisible(!changed.getValue().equals("" + GUIAttribute.TYPE_SECTION));
-			multiple.setVisible(!changed.getValue().equals("" + GUIAttribute.TYPE_SECTION));
-		});
+		validation.setVisibleWhen(new AdvancedCriteria("type", OperatorId.INOT_EQUAL, "" + GUIAttribute.TYPE_SECTION));
 
 		attributesLayout.setMembers(attributeSettingsForm1, attributeSettingsForm2, attributeButtonsForm);
 		attributesLayout.setMembersMargin(10);
@@ -448,6 +437,9 @@ public class AttributeSetPropertiesPanel extends HLayout {
 				attributeOptions.show();
 			}
 		});
+		options.setVisibleWhen(new AdvancedCriteria(OperatorId.AND,
+				new Criterion[] { new AdvancedCriteria("type", OperatorId.EQUALS, "" + GUIAttribute.TYPE_STRING),
+						new AdvancedCriteria(EDITOR_STR, OperatorId.EQUALS, "" + GUIAttribute.EDITOR_LISTBOX) }));
 	}
 
 	private void addTypeSelector() {
@@ -481,6 +473,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		editor.setDefaultValue("" + GUIAttribute.EDITOR_DEFAULT);
 		editor.setDisabled(attributeSet.isReadonly());
 		editor.addChangedHandler(editorChanged -> refreshFieldForm());
+		editor.setVisibleWhen(new AdvancedCriteria("type", OperatorId.EQUALS, "" + GUIAttribute.TYPE_STRING));
 	}
 
 	private TextItem addAttributeNameItem() {
