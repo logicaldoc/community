@@ -568,7 +568,7 @@ public class ResourceServiceImpl implements ResourceService {
 				transaction.setEvent(DocumentEvent.SHORTCUT_MOVED.toString());
 			documentManager.moveToFolder(document, folder, transaction);
 
-			if (!document.getFileName().equals(newName)) {
+			if (StringUtils.isNotEmpty(newName) && !document.getFileName().equals(newName)) {
 				documentManager.rename(document.getId(), newName, new DocumentHistory(transaction));
 				document = documentDAO.findById(Long.parseLong(source.getID()));
 				documentDAO.initialize(document);
