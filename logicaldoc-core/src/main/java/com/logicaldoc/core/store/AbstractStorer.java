@@ -202,12 +202,16 @@ public abstract class AbstractStorer implements Storer {
 	@Override
 	public void writeToStream(long docId, String resource, OutputStream output, long start, long length)
 			throws IOException {
-		IOUtils.copyLarge(getStream(docId, resource), output, start, length);
+		try (InputStream input = getStream(docId, resource)) {
+			IOUtils.copyLarge(input, output, start, length);
+		}
 	}
 
 	@Override
 	public void writeToStream(long docId, String resource, OutputStream output) throws IOException {
-		IOUtils.copyLarge(getStream(docId, resource), output);
+		try (InputStream input = getStream(docId, resource)) {
+			IOUtils.copyLarge(input, output);
+		}
 	}
 
 	@Override
@@ -227,8 +231,8 @@ public abstract class AbstractStorer implements Storer {
 	@Override
 	public String getString(long docId, String resource) {
 		StringWriter writer = new StringWriter();
-		try {
-			IOUtils.copy(getStream(docId, resource), writer, StandardCharsets.UTF_8);
+		try (InputStream input = getStream(docId, resource)) {
+			IOUtils.copy(input, writer, StandardCharsets.UTF_8);
 			return writer.toString();
 		} catch (Exception e) {
 			log.error(e.getMessage());

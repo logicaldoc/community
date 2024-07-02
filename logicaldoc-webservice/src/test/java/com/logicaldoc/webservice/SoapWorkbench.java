@@ -27,7 +27,7 @@ import com.logicaldoc.webservice.soap.client.SoapTagClient;
 
 public class SoapWorkbench {
 
-	final static String BASE = "http://localhost:9080/services";
+	final static String BASE = "http://localhost:8080/services";
 
 	public static void main(String[] args) throws Exception {
 
@@ -40,7 +40,7 @@ public class SoapWorkbench {
 		SoapDocumentMetadataClient metadataClient = new SoapDocumentMetadataClient(BASE + "/DocumentMetadata");
 
 		// Open a session
-		String sid = auth.login("admin", "12345678");
+		String sid = auth.login("admin", "admin");
 		System.out.println("Server date: " + systemClient.getInfo().getDate());
 		System.out.println("Sid: " + sid);
 
@@ -55,12 +55,12 @@ public class SoapWorkbench {
 
 //		    securityStuff(sid);
 
-//			documentStuff(sid);
+			documentStuff(sid);
 
 			// This will search by filename using LIKE %filename%
 			// searchByFilename(sid, "simply");
 
-			 folderStuff(sid);
+//			 folderStuff(sid);
 
 			// searchStuff(sid);
 
@@ -152,7 +152,7 @@ public class SoapWorkbench {
 	private static void folderStuff(String sid) throws Exception {
 		SoapFolderClient folderClient = new SoapFolderClient(BASE + "/Folder", 1, false, 50);
 
-		List<WSFolder> folders = folderClient.list(sid, 4L, "creation asc", 18, 3);
+		List<WSFolder> folders = folderClient.list(sid, 4L, "creation asc", 6, 3);
 		for (WSFolder folder : folders) {
 			System.out.println(folder.getName() + "\t" + folder.getCreation());
 		}
@@ -523,7 +523,7 @@ public class SoapWorkbench {
 
 		SoapDocumentClient documentClient = new SoapDocumentClient(BASE + "/Document");
 
-		List<WSDocument> documents = documentClient.list(sid, 4L, null, "date desc", 56, 3);
+		List<WSDocument> documents = documentClient.list(sid, 103L, null, "fileName desc", 1, 3);
 		for (WSDocument doc : documents) {
 			System.out.println(doc.getFileName() + "\t" + doc.getDate());
 		}

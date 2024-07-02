@@ -38,13 +38,22 @@ public class FSStorer extends AbstractStorer {
 	@Override
 	public void delete(long docId) {
 		File docDir = getContainer(docId);
-		if (FileUtil.delete(docDir))
-			logDeletion(docId, docDir.getAbsolutePath());
+
+		for (File file : docDir.listFiles()) {
+			log.info("Deleting stored file {}", file.getAbsolutePath());
+			if (FileUtil.delete(file))
+				logDeletion(docId, file.getAbsolutePath());
+		}
+
+		log.info("Deleting stored folder {}", docDir.getAbsolutePath());
+		FileUtil.delete(docDir);
+		logDeletion(docId, docDir.getAbsolutePath());
 	}
 
 	@Override
 	public void delete(long docId, String resource) {
 		File file = new File(getContainer(docId), resource);
+		log.info("Deleting stored file {}", file.getAbsolutePath());
 		if (FileUtil.delete(file))
 			logDeletion(docId, file.getAbsolutePath());
 	}
