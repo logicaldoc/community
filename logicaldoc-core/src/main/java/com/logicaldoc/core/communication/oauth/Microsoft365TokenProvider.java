@@ -39,9 +39,9 @@ public class Microsoft365TokenProvider implements TokenProvider {
 	/**
 	 * Constructor
 	 * 
-	 * @param clientId the client ID
-	 * @param clientTenmant the client Tenant
 	 * @param clienSecret the client Secret
+	 * @param clientId the client ID
+	 * @param clientTenant the client Tenant
 	 */
 	public Microsoft365TokenProvider(String clientSecret, String clientId, String clientTenant) {
 		this.clientSecret = clientSecret;
