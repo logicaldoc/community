@@ -1,5 +1,5 @@
 <project name="logicaldoc-gui" default="deploy" basedir="."
-	xmlns:artifact="urn:maven-artifact-ant">
+	xmlns:resolver="antlib:org.apache.maven.resolver.ant">
 	<property file="${user.home}/logicaldoc-dev.properties" />
 	<import file="${logicaldoc.devroot}/build/ant/build.xml" />
 

@@ -1,4 +1,4 @@
-<project name="logicaldoc-i18n" default="po2prop" basedir="." xmlns:artifact="urn:maven-artifact-ant">
+<project name="logicaldoc-i18n" default="po2prop" basedir="." xmlns:resolver="antlib:org.apache.maven.resolver.ant">
 	<property file="${user.home}/logicaldoc-dev.properties" />
 	<property file="src/main/resources/i18n/i18n.properties" />
 	<property file="src/main/resources/i18n/messages.properties" prefix="messages" />
