@@ -47,7 +47,7 @@ public class RestWorkbench {
 
 	private static RestBookmarkClient bookmarkClient = null;
 
-	private static String BASE_PATH = "http://localhost:9080";
+	private static String BASE_PATH = "http://localhost:1000";
 
 	public static void main(String[] args) throws Exception {
 		// String test1="<?xml version=\"1.0\"
@@ -98,7 +98,7 @@ public class RestWorkbench {
 
 		// Note: 04L is the id of the default workspace
 
-		listDocuments(04L, null);
+		// listDocuments(04L, null);
 		// listDocuments(04L, "InvoiceProcessing01-workflow*.png"); // 4
 		// documents
 		// listDocuments(04L, "InvoiceProcessing01-workflow.png"); // 1 document
@@ -171,9 +171,16 @@ public class RestWorkbench {
 
 		// long start_time = System.nanoTime();
 
-		// WSSearchOptions wsso = buildSearchOptions("en",
-		// "document management system");
-		// find(wsso);
+		WSSearchOptions options = new WSSearchOptions();
+		options.setLanguage("en");
+		options.setExpression("release");
+		options.setExpressionLanguage("en");
+		options.setFields(List.of("fileName", "content"));
+		options.setFolderId(4L);
+		options.setSearchInSubPath(1);
+		options.setMaxHits(50);
+		
+		find(options);
 
 		/*
 		 * WSSearchOptions wsso = buildSearchOptions("en",
@@ -517,26 +524,6 @@ public class RestWorkbench {
 		System.out.println("sss: " + jsonInString);
 	}
 
-	private static WSSearchOptions buildSearchOptions(String lang1, String expression) {
-
-		WSSearchOptions options = new WSSearchOptions();
-
-		String lang = lang1;
-
-		// This is the language of the document
-		options.setLanguage(lang);
-		options.setExpression(expression);
-
-		// This is the language of the query
-		options.setExpressionLanguage(lang);
-
-		// This is required and it is the maximum number of results that we want
-		// for this search
-		options.setMaxHits(50);
-
-		return options;
-	}
-
 	private static void find(WSSearchOptions options) throws Exception {
 
 		WSSearchResult res = searchClient.find(options);
@@ -547,6 +534,7 @@ public class RestWorkbench {
 		String jsonStr = ow.writeValueAsString(res);
 		System.out.println(jsonStr);
 	}
+	
 
 	private static void listPaginated(long folderId, String fileName, String sort, Integer page, Integer max)
 			throws Exception {
