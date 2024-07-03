@@ -4,6 +4,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.validators.MinLengthValidator;
 import com.logicaldoc.gui.frontend.client.services.TenantService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.util.SC;
@@ -12,7 +13,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
-import com.smartgwt.client.widgets.form.validator.LengthRangeValidator;
 import com.smartgwt.client.widgets.form.validator.MatchesFieldValidator;
 
 /**
@@ -45,16 +45,11 @@ public class SetAdminPassword extends Window {
 		equalsValidator.setOtherField(NEWPASSWORDAGAIN);
 		equalsValidator.setErrorMessage(I18N.message("passwordnotmatch"));
 
-		LengthRangeValidator sizeValidator = new LengthRangeValidator();
-		sizeValidator.setErrorMessage(
-				I18N.message("errorfieldminlenght", Integer.toString(Session.get().getUser().getPasswordMinLenght())));
-		sizeValidator.setMin(Session.get().getUser().getPasswordMinLenght());
-
 		PasswordItem newPass = new PasswordItem();
 		newPass.setName(NEWPASSWORD);
 		newPass.setTitle(I18N.message(NEWPASSWORD));
 		newPass.setRequired(true);
-		newPass.setValidators(equalsValidator, sizeValidator);
+		newPass.setValidators(equalsValidator, new MinLengthValidator(Session.get().getUser().getPasswordMinLenght()));
 
 		PasswordItem newPassAgain = new PasswordItem();
 		newPassAgain.setName(NEWPASSWORDAGAIN);

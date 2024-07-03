@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.validators.MinLengthValidator;
 import com.logicaldoc.gui.frontend.client.services.SignService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
@@ -92,6 +93,7 @@ public class TenantKeystorePanel extends VLayout {
 		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "keystorepasswd", null);
 		password.setRequired(true);
 		password.setWrapTitle(false);
+		password.setValidators(new MinLengthValidator(6));
 
 		PasswordItem passwordAgain = ItemFactory.newPasswordItemPreventAutocomplete("passwordagain",
 				"keystorepasswdagain", null);

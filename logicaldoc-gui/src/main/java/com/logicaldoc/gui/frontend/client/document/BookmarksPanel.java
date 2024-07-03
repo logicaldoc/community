@@ -9,6 +9,7 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.validators.MinLengthValidator;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
@@ -51,8 +52,7 @@ public class BookmarksPanel extends VLayout {
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
 
-		LengthRangeValidator validator = new LengthRangeValidator();
-		validator.setMin(1);
+		LengthRangeValidator validator = new MinLengthValidator(1);
 
 		FileNameListGridField name = new FileNameListGridField("name", "icon", I18N.message("name"), 200);
 		name.setWidth("*");
@@ -129,18 +129,17 @@ public class BookmarksPanel extends VLayout {
 
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 				if (Boolean.TRUE.equals(answer)) {
-					DocumentService.Instance.get().deleteBookmarks(GridUtil.getIds(selection),
-							new AsyncCallback<>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+					DocumentService.Instance.get().deleteBookmarks(GridUtil.getIds(selection), new AsyncCallback<>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							GuiLog.serverError(caught);
+						}
 
-								@Override
-								public void onSuccess(Void result) {
-									list.removeSelectedData();
-								}
-							});
+						@Override
+						public void onSuccess(Void result) {
+							list.removeSelectedData();
+						}
+					});
 				}
 			});
 		});

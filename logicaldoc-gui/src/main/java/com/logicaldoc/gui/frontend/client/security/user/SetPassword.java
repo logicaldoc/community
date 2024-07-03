@@ -7,6 +7,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.validators.MinLengthValidator;
 import com.smartgwt.client.types.AutoComplete;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.util.SC;
@@ -17,7 +18,6 @@ import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.validator.LengthRangeValidator;
 import com.smartgwt.client.widgets.form.validator.MatchesFieldValidator;
 
 /**
@@ -56,16 +56,11 @@ public class SetPassword extends Window {
 		equalsValidator.setOtherField(NEWPASSWORDAGAIN);
 		equalsValidator.setErrorMessage(I18N.message("passwordnotmatch"));
 
-		LengthRangeValidator sizeValidator = new LengthRangeValidator();
-		sizeValidator.setErrorMessage(
-				I18N.message("errorfieldminlenght", Integer.toString(Session.get().getUser().getPasswordMinLenght())));
-		sizeValidator.setMin(Session.get().getUser().getPasswordMinLenght());
-
 		PasswordItem newPass = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORD, NEWPASSWORD, null, true);
 		newPass.setRequired(true);
 		newPass.setAutoComplete(AutoComplete.NONE);
 		newPass.setWrapTitle(false);
-		newPass.setValidators(equalsValidator, sizeValidator);
+		newPass.setValidators(equalsValidator, new MinLengthValidator(Session.get().getUser().getPasswordMinLenght()));
 
 		PasswordItem newPassAgain = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORDAGAIN, NEWPASSWORDAGAIN,
 				null);

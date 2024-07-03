@@ -19,6 +19,7 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.validators.MinLengthValidator;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
@@ -49,7 +50,6 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.validator.LengthRangeValidator;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -157,9 +157,6 @@ public class SearchIndexPanel extends AdminPanel {
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
 
-		LengthRangeValidator validator = new LengthRangeValidator();
-		validator.setMin(1);
-
 		ListGridField icon = new ListGridField("icon", " ", 24);
 		icon.setType(ListGridFieldType.IMAGE);
 		icon.setCanSort(false);
@@ -172,11 +169,11 @@ public class SearchIndexPanel extends AdminPanel {
 
 		ListGridField extension = new ListGridField(EXTENSION, I18N.message(EXTENSION), 80);
 		extension.setCanEdit(false);
-		extension.setValidators(validator);
+		extension.setValidators(new MinLengthValidator(1));
 
 		ListGridField name = new ListGridField("name", I18N.message("name"), 180);
 		name.setCanEdit(false);
-		name.setValidators(validator);
+		name.setValidators(new MinLengthValidator(1));
 
 		ListGridField aliases = new ListGridField(ALIASES, I18N.message(ALIASES));
 		aliases.setCanEdit(true);
