@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -76,40 +75,58 @@ public class SoapSystemService extends AbstractService implements SystemService 
 			 * Document statistics
 			 */
 			GenericDAO genDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
-			Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexeddocs", null, Tenant.DEFAULT_ID);
+			Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexeddocs", null, Tenant.SYSTEM_ID);
 			WSParameter notIndexed = new WSParameter();
 			notIndexed.setName("docs_notindexed");
 			notIndexed.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
 			parameters.add(notIndexed);
 
-			gen = genDao.findByAlternateKey(StatsCollector.STAT, "indexeddocs", null, Tenant.DEFAULT_ID);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "indexeddocs", null, Tenant.SYSTEM_ID);
 			WSParameter indexed = new WSParameter();
 			indexed.setName("docs_indexed");
 			indexed.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
 			parameters.add(indexed);
 
-			gen = genDao.findByAlternateKey(StatsCollector.STAT, "deleteddocs", null, Tenant.DEFAULT_ID);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "deleteddocs", null, Tenant.SYSTEM_ID);
 			WSParameter deletedDocs = new WSParameter();
 			deletedDocs.setName("docs_trash");
 			deletedDocs.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
 			parameters.add(deletedDocs);
 
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "archiveddocs", null, Tenant.SYSTEM_ID);
+			WSParameter archivedDocs = new WSParameter();
+			archivedDocs.setName("docs_archived");
+			archivedDocs.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
+			parameters.add(archivedDocs);
+
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexabledocs", null, Tenant.SYSTEM_ID);
+			WSParameter notIndexableDocs = new WSParameter();
+			notIndexableDocs.setName("docs_notindexable");
+			notIndexableDocs.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
+			parameters.add(notIndexableDocs);
+
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "totaldocs", null, Tenant.SYSTEM_ID);
+			WSParameter totalDocs = new WSParameter();
+			totalDocs.setName("docs_total");
+			totalDocs.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
+			parameters.add(totalDocs);
+
 			/*
 			 * Folders statistics
 			 */
-			gen = genDao.findByAlternateKey(StatsCollector.STAT, "withdocs", null, Tenant.DEFAULT_ID);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "withdocs", null, Tenant.SYSTEM_ID);
 			WSParameter notEmptyFolders = new WSParameter();
 			notEmptyFolders.setName("folder_withdocs");
 			notEmptyFolders.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
 			parameters.add(notEmptyFolders);
 
-			gen = genDao.findByAlternateKey(StatsCollector.STAT, "empty", null, Tenant.DEFAULT_ID);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "empty", null, Tenant.SYSTEM_ID);
 			WSParameter emptyFolders = new WSParameter();
 			emptyFolders.setName("folder_empty");
 			emptyFolders.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
 			parameters.add(emptyFolders);
 
-			gen = genDao.findByAlternateKey(StatsCollector.STAT, "deletedfolders", null, Tenant.DEFAULT_ID);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "deletedfolders", null, Tenant.SYSTEM_ID);
 			WSParameter deletedFolders = new WSParameter();
 			deletedFolders.setName("folder_trash");
 			deletedFolders.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
@@ -118,13 +135,12 @@ public class SoapSystemService extends AbstractService implements SystemService 
 			/*
 			 * Last run
 			 */
-			gen = genDao.findByAlternateKey(StatsCollector.STAT, "lastrun", null, Tenant.DEFAULT_ID);
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "lastrun", null, Tenant.SYSTEM_ID);
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			Date date = gen != null ? df.parse(gen.getString1()) : null;
 			WSParameter lastrun = new WSParameter();
 			lastrun.setName("stats_lastrun");
-			if (date != null) {
-				lastrun.setValue(df.format(date));
+			if (gen.getDate1() != null) {
+				lastrun.setValue(df.format(gen.getDate1()));
 			} else {
 				lastrun.setValue("");
 			}
@@ -138,14 +154,14 @@ public class SoapSystemService extends AbstractService implements SystemService 
 
 	private WSParameter getStat(String statSubtype, String paramName) throws PersistenceException {
 		GenericDAO genDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
-		Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, statSubtype, null, Tenant.DEFAULT_ID);
-		WSParameter logsDirSize = new WSParameter();
-		logsDirSize.setName(paramName);
+		Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, statSubtype, null, Tenant.SYSTEM_ID);
+		WSParameter parameter = new WSParameter();
+		parameter.setName(paramName);
 		if (gen != null)
-			logsDirSize.setValue(gen.getString1());
+			parameter.setValue(Long.toString(gen.getInteger1()));
 		else
-			logsDirSize.setValue("0");
-		return logsDirSize;
+			parameter.setValue("0");
+		return parameter;
 	}
 
 	private WSParameter getLogsDirSize() throws PersistenceException {
