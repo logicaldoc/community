@@ -589,6 +589,9 @@ public class FileUtil {
 	 * @return true inly if the deletion has been done successfully
 	 */
 	public static boolean delete(File file) {
+		if (file == null)
+			return true;
+
 		/*
 		 * Better to deleteQuitely first because the forceDelete seems to cause
 		 * locks at least on Windows when there are frequent deletions. Even
