@@ -2,8 +2,6 @@ package com.logicaldoc.gui.frontend.client.tenant;
 
 import java.util.Map;
 
-import org.apache.bcel.generic.NEW;
-
 import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.data.UsersDS;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
