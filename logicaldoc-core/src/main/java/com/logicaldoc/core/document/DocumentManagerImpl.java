@@ -840,7 +840,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		} catch (Exception ioe) {
 			throw new PersistenceException(ioe.getMessage(), ioe);
 		} finally {
-			FileUtils.deleteQuietly(tmp);
+			FileUtil.delete(tmp);
 		}
 	}
 

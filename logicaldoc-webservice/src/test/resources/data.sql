@@ -337,23 +337,23 @@ values     (3,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,3,'2006-12-27 00:00:
 insert into ld_generic
 		(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_type, ld_subtype, ld_string1, ld_string2, ld_integer1,ld_tenantid,ld_recordversion)
 values
-		(6,'2008-11-19 00:00:00','2008-10-22 00:00:00',0,'stat','docdir','5437281','str2',0,1,1);
+		(6,'2008-11-19 00:00:00','2008-10-22 00:00:00',0,'stat','docdir','5437281','str2',5437281,-1,1);
 insert into ld_generic
 		(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_type, ld_subtype, ld_string1, ld_string2, ld_integer1,ld_tenantid,ld_recordversion)
 values
-		(7,'2008-11-19 00:00:00','2008-10-22 00:00:00',0,'stat','dbdir','986753','str2',10,1,1);
+		(7,'2008-11-19 00:00:00','2008-10-22 00:00:00',0,'stat','dbdir','986753','str2',986753,-1,1);
 insert into ld_generic
 		(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_type, ld_subtype, ld_string1, ld_string2, ld_integer1,ld_tenantid,ld_recordversion)
 values
-		(8,'2008-11-19 00:00:00','2008-10-22 00:00:00',0,'stat','indexeddocs','str1','str2',181,1,1);
+		(8,'2008-11-19 00:00:00','2008-10-22 00:00:00',0,'stat','indexeddocs','str1','str2',181,-1,1);
 insert into ld_generic
 		(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_type, ld_subtype, ld_string1, ld_string2, ld_integer1,ld_tenantid,ld_recordversion)
 values
-		(9,'2010-04-23 00:00:00','2008-10-22 00:00:00',0,'stat','withdocs','str1','str2',45,1,1);
+		(9,'2010-04-23 00:00:00','2008-10-22 00:00:00',0,'stat','withdocs','str1','str2',45,-1,1);
 insert into ld_generic
-		(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_type, ld_subtype, ld_string1, ld_string2, ld_integer1,ld_tenantid,ld_recordversion)
+		(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_type, ld_subtype, ld_date1, ld_string2, ld_integer1,ld_tenantid,ld_recordversion)
 values
-		(10,'2010-04-23 00:00:00','2008-10-22 00:00:00',0,'stat','lastrun','2011-02-15 10:46:27','str2',10,1,1);
+		(10,'2010-04-23 00:00:00','2008-10-22 00:00:00',0,'stat','lastrun','2011-02-15 10:46:27','str2',10,-1,1);
 		
 insert into ld_note (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message,ld_tenantid,ld_recordversion,ld_page,ld_opacity,ld_top,ld_left,ld_width,ld_height,ld_linewidth,ld_lineopacity,ld_rotation)
 values(1, '2011-04-18 00:00:00', '2011-04-18 00:00:00',0,1,'Admin',1,'2011-04-18 00:00:00','message for note 1',1,1,0,80,0.5,0.5,0.15,0.10,1,80,0);
