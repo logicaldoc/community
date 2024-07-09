@@ -39,7 +39,7 @@ public class Microsoft365TokenProvider implements TokenProvider {
 	/**
 	 * Constructor
 	 * 
-	 * @param clienSecret the client Secret
+	 * @param clientSecret the client Secret
 	 * @param clientId the client ID
 	 * @param clientTenant the client Tenant
 	 */
