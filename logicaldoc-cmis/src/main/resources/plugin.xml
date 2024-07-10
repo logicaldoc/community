@@ -88,7 +88,7 @@
 <!ELEMENT value (#PCDATA)>
 ]>
 
-<plugin id="logicaldoc-cmis" version="8.9.3" class="com.logicaldoc.cmis.CmisPlugin">
+<plugin id="logicaldoc-cmis" version="8.9.4" class="com.logicaldoc.cmis.CmisPlugin">
 	<requires>
 		<import plugin-id="logicaldoc-core" />
 	</requires>

@@ -24,8 +24,8 @@ import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.junit.AbstractTestCase;
 import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.servlet.MockServletSession;
 import com.logicaldoc.web.service.SecurityServiceImpl;
-import com.logicaldoc.web.util.MockServletSession;
 
 import junit.framework.Assert;
 

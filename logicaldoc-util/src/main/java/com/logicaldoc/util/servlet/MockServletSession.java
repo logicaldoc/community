@@ -1,4 +1,4 @@
-package com.logicaldoc.web.util;
+package com.logicaldoc.util.servlet;
 
 import java.util.Enumeration;
 import java.util.HashMap;

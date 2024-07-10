@@ -54,6 +54,25 @@ public interface SystemService {
 	String sid) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
+	 * Retrieves the statistics of a tenenat
+	 * 
+	 * @param sid Session identifier
+	 * @param tenantId Identifier of the tenant
+	 * 
+	 * @return List of stats
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 */
+	@WebResult(name = "parameter")
+	@WebMethod(action = "getStatistics")
+	@WSDoc(description = "gets a set of statisticts of the system")
+	public List<WSParameter> getTenantStatistics(@WebParam(name = "sid")
+	String sid, @WebParam(name = "tenantId")
+	long tenantId) throws AuthenticationException, WebserviceException, PersistenceException;
+
+	/**
 	 * Retrieves the languages enabled in the server.
 	 * 
 	 * @return Array of active languages (en, it, es ....)

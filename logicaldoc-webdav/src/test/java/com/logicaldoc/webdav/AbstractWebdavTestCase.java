@@ -26,7 +26,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.junit.AbstractTestCase;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.web.util.MockServletSession;
+import com.logicaldoc.util.servlet.MockServletSession;
 import com.logicaldoc.webdav.session.DavSessionImpl;
 import com.logicaldoc.webdav.session.WebdavSession;
 
@@ -55,7 +55,7 @@ public abstract class AbstractWebdavTestCase extends AbstractTestCase {
 		super.setUp();
 
 		prepareRepository();
-		
+
 		try {
 			prepareSession("admin", "admin");
 		} catch (ServerException e) {
@@ -93,7 +93,7 @@ public abstract class AbstractWebdavTestCase extends AbstractTestCase {
 	private void prepareRepository() throws IOException {
 		repositoryDir.mkdirs();
 		repositoryDir.mkdir();
-		
+
 		File file3 = new File(repositoryDir.getPath() + "/docs/1/doc/1.0");
 		file3.getParentFile().mkdirs();
 		FileUtil.copyResource("/pdf1.pdf", file3);

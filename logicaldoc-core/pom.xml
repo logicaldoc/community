@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>8.9.3</version>
+		<version>8.9.4</version>
 	</parent>
 	<artifactId>logicaldoc-core</artifactId>
 	<name>logicaldoc-core</name>
@@ -557,7 +557,12 @@
 		<dependency>
 			<groupId>com.pff</groupId>
 			<artifactId>java-libpst</artifactId>
-		</dependency>		
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<scope>compile</scope>
+		</dependency>				
 	</dependencies>
 	<build>
 		<plugins>

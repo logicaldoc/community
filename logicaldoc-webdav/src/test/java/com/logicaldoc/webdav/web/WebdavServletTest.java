@@ -18,8 +18,8 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.web.util.MockServletRequest;
-import com.logicaldoc.web.util.MockServletResponse;
+import com.logicaldoc.util.servlet.MockServletRequest;
+import com.logicaldoc.util.servlet.MockServletResponse;
 import com.logicaldoc.webdav.AbstractWebdavTestCase;
 
 public class WebdavServletTest extends AbstractWebdavTestCase {
