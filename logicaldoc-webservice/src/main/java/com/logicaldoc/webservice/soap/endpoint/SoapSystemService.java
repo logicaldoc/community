@@ -19,6 +19,7 @@ import com.logicaldoc.core.i18n.LanguageManager;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.stats.StatsCollector;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.webservice.AbstractService;
@@ -53,14 +54,14 @@ public class SoapSystemService extends AbstractService implements SystemService 
 			/*
 			 * Repository statistics
 			 */
-			parameters.add(getStat("docdir", "repo_docs", tenantId));
-			parameters.add(getStat("userdir", "repo_users", tenantId));
-			parameters.add(getStat("indexdir", "repo_fulltextindex", tenantId));
-			parameters.add(getStat("importdir", "repo_import", tenantId));
-			parameters.add(getStat("exportdir", "repo_export", tenantId));
-			parameters.add(getStat("plugindir", "repo_plugins", tenantId));
-			parameters.add(getStat("dbdir", "repo_database", tenantId));
-			parameters.add(getStat("logdir", "repo_logs", tenantId));
+			parameters.add(getStat("docdir", "repo_storage", tenantId));
+			parameters.add(getStat("userdir", "repo_users", Tenant.SYSTEM_ID));
+			parameters.add(getStat("indexdir", "repo_fulltextindex", Tenant.SYSTEM_ID));
+			parameters.add(getStat("importdir", "repo_import", Tenant.SYSTEM_ID));
+			parameters.add(getStat("exportdir", "repo_export", Tenant.SYSTEM_ID));
+			parameters.add(getStat("plugindir", "repo_plugins", Tenant.SYSTEM_ID));
+			parameters.add(getStat("dbdir", "repo_database", Tenant.SYSTEM_ID));
+			parameters.add(getStat("logdir", "repo_logs", Tenant.SYSTEM_ID));
 
 			/*
 			 * Document statistics
@@ -71,7 +72,6 @@ public class SoapSystemService extends AbstractService implements SystemService 
 			parameters.add(getStat("deleteddocs", "docs_trash", tenantId));
 			parameters.add(getStat("archiveddocs", "docs_archived", tenantId));
 			parameters.add(getStat("totaldocs", "docs_total", tenantId));
-			
 
 			/*
 			 * Folders statistics
@@ -80,11 +80,24 @@ public class SoapSystemService extends AbstractService implements SystemService 
 			parameters.add(getStat("empty", "folder_empty", tenantId));
 			parameters.add(getStat("deletedfolders", "folder_trash", tenantId));
 
+			/*
+			 * Users statistics
+			 */
+			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+			WSParameter users = new WSParameter();
+			users.setName("users_regular");
+			users.setValue(Long.toString(userDao.count(tenantId != Tenant.SYSTEM_ID ? tenantId : null)));
+			parameters.add(users);
 			
+			WSParameter readonly = new WSParameter();
+			readonly.setName("users_readonly");
+			readonly.setValue(Long.toString(userDao.countGuests(tenantId != Tenant.SYSTEM_ID ? tenantId : null)));
+			parameters.add(readonly);
+					
 			/*
 			 * Last run
 			 */
-			GenericDAO genDao = (GenericDAO)Context.get().getBean(GenericDAO.class);
+			GenericDAO genDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 			Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, "lastrun", null, Tenant.SYSTEM_ID);
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			WSParameter lastrun = new WSParameter();

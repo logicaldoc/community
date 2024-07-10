@@ -32,7 +32,7 @@ public class SoapSystemClient extends SoapClient<SystemService> implements Syste
 	@Override
 	public List<WSParameter> getTenantStatistics(String sid, long tenantId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		final List<WSParameter> params = client.getStatistics(sid);
+		final List<WSParameter> params = client.getTenantStatistics(sid, tenantId);
 		if (params != null)
 			return params;
 		else

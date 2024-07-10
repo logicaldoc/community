@@ -6,6 +6,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import com.logicaldoc.core.PersistenceException;
@@ -24,7 +25,6 @@ import com.logicaldoc.webservice.model.WSSystemInfo;
 @Consumes({ MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public interface SystemService {
-	
 
 	/**
 	 * Retrieves the Installation informations
@@ -34,7 +34,7 @@ public interface SystemService {
 	 * @throws WebserviceException Error in the webservice
 	 */
 	@GET
-    @Path("/getInfo")	
+	@Path("/getInfo")
 	public WSSystemInfo getInfo() throws WebserviceException;
 
 	/**
@@ -47,8 +47,24 @@ public interface SystemService {
 	 * @throws AuthenticationException Invalid session
 	 */
 	@GET
-    @Path("/getStatistics")		
+	@Path("/getStatistics")
 	public List<WSParameter> getStatistics() throws AuthenticationException, WebserviceException, PersistenceException;
+
+	/**
+	 * Retrieves the statistics of a tenant
+	 * 
+	 * @param tenantId identifier of the tenant
+	 * 
+	 * @return List of stats
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 */
+	@GET
+	@Path("/getTenantStatistics")
+	public List<WSParameter> getTenantStatistics(@QueryParam("tenantId")
+	long tenantId) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Retrieves the languages enabled in the server.
@@ -56,7 +72,7 @@ public interface SystemService {
 	 * @return Array of active languages (en, it, es ....)
 	 */
 	@GET
-	@Path("/getLanguages")	
-	public List<String> getLanguages();	
-	
+	@Path("/getLanguages")
+	public List<String> getLanguages();
+
 }

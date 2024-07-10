@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.logicaldoc.core.searchengine.SearchOptions;
+import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.webservice.model.WSAttribute;
 import com.logicaldoc.webservice.model.WSBookmark;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.model.WSNote;
+import com.logicaldoc.webservice.model.WSParameter;
 import com.logicaldoc.webservice.model.WSRating;
 import com.logicaldoc.webservice.model.WSSearchOptions;
 import com.logicaldoc.webservice.model.WSSearchResult;
@@ -27,7 +29,7 @@ import com.logicaldoc.webservice.soap.client.SoapTagClient;
 
 public class SoapWorkbench {
 
-	final static String BASE = "http://localhost:8080/services";
+	final static String BASE = "http://localhost:9080/services";
 
 	public static void main(String[] args) throws Exception {
 
@@ -40,12 +42,14 @@ public class SoapWorkbench {
 		SoapDocumentMetadataClient metadataClient = new SoapDocumentMetadataClient(BASE + "/DocumentMetadata");
 
 		// Open a session
-		String sid = auth.login("admin", "admin");
+		String sid = auth.login("admin", "12345678");
 		System.out.println("Server date: " + systemClient.getInfo().getDate());
 		System.out.println("Sid: " + sid);
 
 		try {
 			System.out.println(info.getInfo().getProductName() + "  " + info.getInfo().getDate());
+
+			systemStuff(sid);
 
 //			String[] features = systemClient.getInfo().getFeatures();
 //			System.out.println("Features:");
@@ -55,7 +59,7 @@ public class SoapWorkbench {
 
 //		    securityStuff(sid);
 
-			documentStuff(sid);
+//			documentStuff(sid);
 
 			// This will search by filename using LIKE %filename%
 			// searchByFilename(sid, "simply");
@@ -149,6 +153,22 @@ public class SoapWorkbench {
 		}
 	}
 
+	private static void systemStuff(String sid) throws Exception {
+		SoapSystemClient systemClient = new SoapSystemClient(BASE + "/System");
+
+		System.out.println("\n========\nTenant " + Tenant.DEFAULT_ID + "\n========");
+		List<WSParameter> stats = systemClient.getTenantStatistics(sid, Tenant.DEFAULT_ID);
+		for (WSParameter stat : stats) {
+			System.out.println(stat.getName() + ": " + stat.getValue());
+		}
+
+		System.out.println("\n========\nTenant 704446464\n========");
+		stats = systemClient.getTenantStatistics(sid, 704446464L);
+		for (WSParameter stat : stats) {
+			System.out.println(stat.getName() + ": " + stat.getValue());
+		}
+	}
+
 	private static void folderStuff(String sid) throws Exception {
 		SoapFolderClient folderClient = new SoapFolderClient(BASE + "/Folder", 1, false, 50);
 
@@ -156,7 +176,7 @@ public class SoapWorkbench {
 		for (WSFolder folder : folders) {
 			System.out.println(folder.getName() + "\t" + folder.getCreation());
 		}
-		
+
 //		folderClient.getDefaultWorkspace(sid);
 
 //		WSFolder newFolder = new WSFolder();
