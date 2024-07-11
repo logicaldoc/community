@@ -535,7 +535,7 @@ public class PatchPanel extends VLayout {
 		try {
 			builder.sendRequest(null, new RequestCallback() {
 				public void onError(Request request, Throwable exception) {
-					// Nothing to do
+					scheduleGetStatus(patch);
 				}
 
 				public void onResponseReceived(Request request, Response response) {
@@ -556,17 +556,18 @@ public class PatchPanel extends VLayout {
 							GuiLog.info(I18N.message("patchinstalled"));
 							if (patch.isRestart())
 								Util.waitForUpAndRunning(Session.get().getTenantName(), I18N.getLocale());
-						} else if (!"running".equals(statusLabel) && elapsedTime > MAX_WAIT_TIME) {
+						} else if (!"running".equals(statusLabel) && elapsedTime > MAX_WAIT_TIME && command != null
+								&& !command.isEmpty()) {
 							LD.clearPrompt();
 							ApplicationRestarting.get(I18N.message("patchnotstarted", command)).show();
-						} else {
-							scheduleGetStatus(patch);
-						}
+						} 
+
+						scheduleGetStatus(patch);
 					}
 				}
 			});
 		} catch (RequestException e) {
-			// Nothing to do
+			scheduleGetStatus(patch);
 		}
 	}
 

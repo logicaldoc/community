@@ -55,7 +55,7 @@ public class UpdatePanel extends VLayout {
 	private IButton upload;
 
 	private IButton confirmUpdate;
-	
+
 	private IButton delete;
 
 	private TextAreaItem log;
@@ -87,7 +87,7 @@ public class UpdatePanel extends VLayout {
 		upload.addClickHandler(event -> new UpdateUploader(this).show());
 
 		confirmUpdate = new IButton(I18N.message("confirmupdate"));
-		
+
 		delete = new IButton(I18N.message("ddelete"));
 
 		if (!Feature.enabled(Feature.UPDATES)) {
@@ -106,7 +106,7 @@ public class UpdatePanel extends VLayout {
 			}
 
 			@Override
-			public void onSuccess(List<GUIParameter>parameters) {
+			public void onSuccess(List<GUIParameter> parameters) {
 				LD.clearPrompt();
 
 				if (parameters.isEmpty()) {
@@ -205,7 +205,7 @@ public class UpdatePanel extends VLayout {
 
 		delete.setAutoFit(true);
 		delete.addClickHandler(click -> onDelete());
-		
+
 		download = new IButton(I18N.message("download"));
 		download.setAutoFit(true);
 		download.addClickHandler(event -> {
@@ -368,7 +368,7 @@ public class UpdatePanel extends VLayout {
 		try {
 			builder.sendRequest(null, new RequestCallback() {
 				public void onError(Request request, Throwable exception) {
-					// Nothing to do
+					scheduleGetStatus();
 				}
 
 				public void onResponseReceived(Request request, Response response) {
@@ -389,17 +389,18 @@ public class UpdatePanel extends VLayout {
 							Util.uninstallCloseWindowAlert();
 							GuiLog.info(I18N.message("updateinstalled"));
 							Util.waitForUpAndRunning(Session.get().getTenantName(), I18N.getLocale());
-						} else if (!"running".equals(statusLabel) && elapsedTime > MAX_WAIT_TIME) {
+						} else if (!"running".equals(statusLabel) && elapsedTime > MAX_WAIT_TIME && command != null
+								&& !command.isEmpty()) {
 							LD.clearPrompt();
 							ApplicationRestarting.get(I18N.message("updatenotstarted", command)).show();
-						} else {
-							scheduleGetStatus();
 						}
+
+						scheduleGetStatus();
 					}
 				}
 			});
 		} catch (RequestException e) {
-			// Nothing to do
+			scheduleGetStatus();
 		}
 	}
 
@@ -408,7 +409,7 @@ public class UpdatePanel extends VLayout {
 			public void run() {
 				getStatus();
 			}
-		}.schedule(500);
+		}.schedule(1000);
 	}
 
 	private void onConfirm() {
@@ -433,7 +434,7 @@ public class UpdatePanel extends VLayout {
 			}
 		});
 	}
-	
+
 	private void onDelete() {
 		SC.ask(I18N.message("delete"), I18N.message("deleteupdatepackagequestion"), choice -> {
 			if (Boolean.TRUE.equals(choice)) {
