@@ -8,20 +8,30 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
+import javax.servlet.ReadListener;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
+import javax.servlet.http.Part;
 
 import org.apache.commons.lang.StringUtils;
-
 
 /**
  * A servlet created for tests
@@ -145,11 +155,39 @@ public class MockServletRequest implements HttpServletRequest {
 				public int read() throws IOException {
 					return byteArrayInputStream.read();
 				}
+
+				@Override
+				public boolean isFinished() {
+					return false;
+				}
+
+				@Override
+				public boolean isReady() {
+					return false;
+				}
+
+				@Override
+				public void setReadListener(ReadListener arg0) {
+				}
 			};
 		} else if (payload != null) {
 			return new ServletInputStream() {
 				public int read() throws IOException {
 					return payload.read();
+				}
+
+				@Override
+				public boolean isFinished() {
+					return false;
+				}
+
+				@Override
+				public boolean isReady() {
+					return false;
+				}
+
+				@Override
+				public void setReadListener(ReadListener arg0) {
 				}
 			};
 		}
@@ -443,7 +481,7 @@ public class MockServletRequest implements HttpServletRequest {
 	public void setHeader(String name, String value) {
 		this.headers.put(name, value);
 	}
-	
+
 	public void setHeaders(Map<String, String> headers) {
 		this.headers = headers;
 	}
@@ -454,5 +492,95 @@ public class MockServletRequest implements HttpServletRequest {
 
 	public void setPayload(InputStream payload) {
 		this.payload = payload;
+	}
+
+	@Override
+	public AsyncContext getAsyncContext() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public long getContentLengthLong() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public DispatcherType getDispatcherType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ServletContext getServletContext() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isAsyncStarted() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAsyncSupported() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public AsyncContext startAsync() throws IllegalStateException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public AsyncContext startAsync(ServletRequest arg0, ServletResponse arg1) throws IllegalStateException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean authenticate(HttpServletResponse arg0) throws IOException, ServletException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public String changeSessionId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Part getPart(String arg0) throws IOException, ServletException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<Part> getParts() throws IOException, ServletException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void login(String arg0, String arg1) throws ServletException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void logout() throws ServletException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public <T extends HttpUpgradeHandler> T upgrade(Class<T> arg0) throws IOException, ServletException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

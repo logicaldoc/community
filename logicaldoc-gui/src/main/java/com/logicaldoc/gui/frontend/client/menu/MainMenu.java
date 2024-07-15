@@ -1,8 +1,9 @@
 package com.logicaldoc.gui.frontend.client.menu;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.google.gwt.core.client.GWT;
@@ -13,12 +14,11 @@ import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
-import com.logicaldoc.gui.common.client.beans.GUICriterion;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
-import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.beans.GUITenant;
+import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.controllers.DocumentObserver;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -30,8 +30,9 @@ import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.util.ValuesCallback;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
+import com.logicaldoc.gui.frontend.client.chatgpt.ChatGPTTray;
 import com.logicaldoc.gui.frontend.client.docusign.DocuSignSettings;
 import com.logicaldoc.gui.frontend.client.docusign.EnvelopeDetails;
 import com.logicaldoc.gui.frontend.client.docusign.Envelopes;
@@ -40,7 +41,7 @@ import com.logicaldoc.gui.frontend.client.dropbox.DropboxDialog;
 import com.logicaldoc.gui.frontend.client.gdrive.GDriveMenuItem;
 import com.logicaldoc.gui.frontend.client.menu.features.Features;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
-import com.logicaldoc.gui.frontend.client.search.Search;
+import com.logicaldoc.gui.frontend.client.services.ChatGPTService;
 import com.logicaldoc.gui.frontend.client.services.DocuSignService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.DropboxService;
@@ -56,9 +57,11 @@ import com.logicaldoc.gui.frontend.client.webcontent.WebcontentEditor;
 import com.logicaldoc.gui.frontend.client.zoho.ZohoMenuItem;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Img;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
@@ -77,19 +80,15 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 	private static final String BLANK = "_blank";
 
-	private static final String SEARCH = "search";
-
-	private static final String FULLTEXT = "fulltext";
-
 	private ToolStripButton tools;
 
 	private static MainMenu instance = null;
 
-	private SelectItem searchType = new SelectItem();
-
-	private TextItem searchBox = new TextItem();
-
 	private ToolStripButton evaluation;
+
+	private List<MenuTray> trays = new ArrayList<>();
+
+	private int currentTray = 0;
 
 	public static MainMenu get() {
 		if (instance == null)
@@ -104,6 +103,11 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		DocumentController.get().addObserver(this);
 
 		setWidth100();
+
+		trays.add(new ChatGPTTray());
+		if (Feature.enabled(Feature.CHATGPT)
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.CHATGPT))
+			trays.add(new QuickSearchTray());
 
 		boolean banner = Session.get().getConfigAsBoolean("gui.banner");
 
@@ -155,7 +159,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		addFill();
 
-		addSearchBox();
+		addTrayBar();
 
 		onFolderSelected(FolderController.get().getCurrentFolder());
 	}
@@ -180,84 +184,26 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		addButton(account, 1);
 	}
 
-	private void onSearch() {
-		GUISearchOptions options = new GUISearchOptions();
+	/**
+	 * Adds a tray bar that displays one of the registered trays
+	 */
+	private void addTrayBar() {
+		HLayout trayPanel = new HLayout();
+		trayPanel.setAutoWidth();
+		trayPanel.addMember(new ChatGPTTray());
+		addMember(trayPanel);
 
-		Integer pageSize = DocumentGridUtil.getPageSizeFromSpec(Session.get().getUser().getHitsGrid());
-		if (pageSize == null)
-			pageSize = Session.get().getConfigAsInt("search.hits");
-		options.setMaxHits(pageSize);
-
-		String field = searchType.getValueAsString();
-		String value = searchBox.getValueAsString().trim();
-		if (FULLTEXT.equals(field)) {
-			options.setType(GUISearchOptions.TYPE_FULLTEXT);
-			options.setExpression(value);
-			options.setExpressionLanguage(I18N.getLocale());
-			options.setType(GUISearchOptions.TYPE_FULLTEXT);
-			options.setFields(Constants.getFulltextDefaultFields());
-			options.setCriteria(null);
-		} else {
-			options.setType(GUISearchOptions.TYPE_PARAMETRIC);
-			options.setTopOperator("matchall");
-			GUICriterion criterion = new GUICriterion();
-			criterion.setField(field);
-			criterion.setOperator("contains");
-			if ("id".equals(field)) {
-				criterion.setOperator("equals");
-				try {
-					criterion.setLongValue(Long.parseLong(value));
-				} catch (Exception t) {
-					criterion.setLongValue(0L);
-				}
-			} else
-				criterion.setStringValue(value);
-			options.setCaseSensitive(0);
-			options.setCriteria(Arrays.asList(criterion));
-		}
-
-		Search.get().setOptions(options);
-		Search.get().search();
-	}
-
-	private void addSearchBox() {
-
-		searchBox.setShowTitle(false);
-		searchBox.setDefaultValue(I18N.message(SEARCH) + "...");
-		searchBox.setWidth(160);
-		searchBox.addKeyPressHandler(event -> {
-			if (event.getKeyName() == null)
-				return;
-			if (Constants.KEY_ENTER.equalsIgnoreCase(event.getKeyName())) {
-				onSearch();
-			}
+		ToolStripButton rotateTrays = AwesomeFactory.newToolStripButton("exchange-alt", null, null);
+		rotateTrays.addClickHandler(click -> {
+			if (currentTray >= trays.size() - 1)
+				currentTray = 0;
+			else
+				currentTray++;
+			trayPanel.removeMembers(trayPanel.getMembers());
+			trayPanel.addMember(trays.get(currentTray));
 		});
-		searchBox.addClickHandler(event -> {
-			if ((I18N.message(SEARCH) + "...").equals(event.getItem().getValue())) {
-				event.getItem().setValue("");
-			}
-		});
-
-		LinkedHashMap<String, String> valueMap = new LinkedHashMap<>();
-		valueMap.put(FULLTEXT, I18N.message(FULLTEXT));
-		valueMap.put("filename", I18N.message("filename"));
-		valueMap.put("id", I18N.message("id"));
-		valueMap.put("customId", I18N.message("customid"));
-		searchType.setWidth(130);
-		searchType.setShowTitle(false);
-		searchType.setValueMap(valueMap);
-		searchType.setValue(FULLTEXT);
-
-		addFormItem(searchBox);
-
-		if (Feature.enabled(Feature.PARAMETRIC_SEARCHES)) {
-			addFormItem(searchType);
-		}
-
-		ToolStripButton searchButton = AwesomeFactory.newToolStripButton(SEARCH, SEARCH);
-		searchButton.addClickHandler(event -> onSearch());
-
-		addButton(searchButton);
+		if (trays.size() > 1)
+			addButton(rotateTrays);
 	}
 
 	private MenuItem getWebContentMenuItem(GUIFolder folder, final GUIDocument document) {
@@ -428,6 +374,66 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		return dropboxItem;
 	}
 
+	private MenuItem getChatGPTMenuItem(GUIFolder folder) {
+		final MenuItem settings = new MenuItem(I18N.message("settings"));
+		settings.addClickHandler(click -> {
+			ChatGPTService.Instance.get().loadSettings(new AsyncCallback<List<GUIValue>>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(List<GUIValue> settings) {
+					TextItem apiKey = ItemFactory.newPasswordItem("apikey", "apikey",
+							GUIValue.getValue("apikey", settings));
+					apiKey.setWidth(360);
+
+					TextItem model = ItemFactory.newTextItem("model", GUIValue.getValue("model", settings));
+
+					LD.askForValues(I18N.message("chatgpt"), null, Arrays.asList(new FormItem[] { apiKey, model }), 400,
+							new ValuesCallback() {
+								@Override
+								public void execute(Map<String, Object> values) {
+									List<GUIValue> settings = new ArrayList<>();
+									for (Map.Entry<String, Object> val : values.entrySet())
+										settings.add(new GUIValue(val.getKey(), "" + val.getValue()));
+
+									ChatGPTService.Instance.get().saveSettings(settings, new AsyncCallback<Void>() {
+										@Override
+										public void onFailure(Throwable caught) {
+											GuiLog.serverError(caught);
+										}
+
+										@Override
+										public void onSuccess(Void arg0) {
+											// Nothing to do
+										}
+									});
+								}
+
+								@Override
+								public void execute(String value) {
+									// Ignore
+								}
+							});
+				}
+			});
+
+		});
+
+		Menu menu = new Menu();
+		menu.setShowShadow(true);
+		menu.setShadowDepth(3);
+		menu.setItems(settings);
+
+		MenuItem chatgptItem = new MenuItem(I18N.message("chatgpt"));
+		chatgptItem.setSubmenu(menu);
+
+		return chatgptItem;
+	}
+
 	private MenuItem getShareFileMenuItem(GUIFolder folder) {
 		final MenuItem exportTo = new MenuItem(I18N.message("exporttosharefile"));
 		exportTo.addClickHandler((MenuItemClickEvent event) -> new ShareFileDialog(true).show());
@@ -475,7 +481,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 	private MenuItem getDocuSignMenuItem(GUIDocument document) {
 		final MenuItem authorize = new MenuItem(I18N.message("authorize"));
-		authorize.addClickHandler((MenuItemClickEvent event) -> new DocuSignSettings().show());
+		authorize.addClickHandler(click -> new DocuSignSettings().show());
 
 		final MenuItem sendEnvelope = new MenuItem(I18N.message("sendenvelope"));
 		sendEnvelope.addClickHandler(event -> {
@@ -570,10 +576,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 	private void addToolsButton(GUIFolder folder, GUIDocument document) {
 		tools = AwesomeFactory.newToolStripButton("toolbox", I18N.message("tools"), I18N.message("tools"));
-		tools.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> {
-			Menu menu = buildToolsMenu(folder, document);
-			menu.showContextMenu();
-		});
+		tools.addClickHandler(click -> buildToolsMenu(folder, document).showContextMenu());
 
 		addButton(tools, 2);
 	}
@@ -622,6 +625,10 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			menu.addItem(getWebContentMenuItem(folder, document));
 		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.TEXTCONTENT))
 			menu.addItem(getTextContentMenuItem(folder, document));
+		if (Feature.enabled(Feature.CHATGPT)
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.CHATGPT))
+			menu.addItem(getChatGPTMenuItem(folder));
+
 	}
 
 	private void addRegistration(Menu menu, MenuItem develConsole) {

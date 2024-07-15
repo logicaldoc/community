@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.9.3
  */
-public class FileHttpClientResponseHandler extends LoggingHttpClientResponseHandler<String> {
+public class FileHttpClientResponseHandler extends BaseHttpClientResponseHandler<String> {
 
 	protected static Logger log = LoggerFactory.getLogger(FileHttpClientResponseHandler.class);
 

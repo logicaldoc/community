@@ -475,7 +475,8 @@ public abstract class Util {
 	 * @return The formated file size.
 	 */
 	private static native void writeToClipboard(String text) /*-{
-  		 navigator.clipboard.writeText(text);
+  		 // navigator.clipboard.writeText(text);
+  		 copy(text);g
 	}-*/;
 
 	/**

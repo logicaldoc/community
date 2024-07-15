@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.common.client.controllers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -26,9 +27,14 @@ public class DocumentController {
 	private Set<DocumentObserver> observers = new HashSet<>();
 
 	/**
-	 * The currently selected document
+	 * The currently selected document, the one you are currently working onwha
 	 */
 	private GUIDocument currentDocument = null;
+
+	/**
+	 * The current selection
+	 */
+	private List<GUIDocument> currentSelection = new ArrayList<>();
 
 	/**
 	 * If the current document under editing
@@ -228,6 +234,14 @@ public class DocumentController {
 	public void setCurrentDocument(GUIDocument document) {
 		this.currentDocument = document;
 		selected(document);
+	}
+
+	public void setCurrentSelection(List<GUIDocument> documents) {
+		this.currentSelection = documents;
+	}
+
+	public List<GUIDocument> getCurrentSelection() {
+		return currentSelection;
 	}
 
 	public GUIDocument getCurrentDocument() {

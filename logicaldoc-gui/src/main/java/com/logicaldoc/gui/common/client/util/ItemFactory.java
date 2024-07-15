@@ -1146,7 +1146,7 @@ public class ItemFactory {
 		if (handler != null)
 			select.addChangedHandler(handler);
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent event) -> {
+		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, click -> {
 			select.clearValue();
 			select.setValue((String) null);
 			if (handler != null)
@@ -1938,8 +1938,7 @@ public class ItemFactory {
 		editAutomation.setHeight(16);
 		editAutomation.setSrc("[SKIN]/java.png");
 		editAutomation.setPrompt(I18N.message("openautomationeditor"));
-		editAutomation.addFormItemClickHandler(
-				(FormItemIconClickEvent event) -> new AutomationItemEditor(item, handler).show());
+		editAutomation.addFormItemClickHandler(click -> new AutomationItemEditor(item, handler).show());
 
 		if (withHtmlEditor)
 			item.setIcons(editAutomation, prepareEditHtmlIcon(item, handler));
@@ -1955,7 +1954,7 @@ public class ItemFactory {
 		editHtml.setHeight(16);
 		editHtml.setSrc("[SKIN]/html.png");
 		editHtml.setPrompt(I18N.message("openhtmleditor"));
-		editHtml.addFormItemClickHandler((FormItemIconClickEvent event) -> new HtmlItemEditor(item, handler).show());
+		editHtml.addFormItemClickHandler(click -> new HtmlItemEditor(item, handler).show());
 		return editHtml;
 	}
 
@@ -2683,7 +2682,7 @@ public class ItemFactory {
 			editHtml.setHeight(16);
 			editHtml.setSrc("[SKIN]/html.png");
 			editHtml.setPrompt(I18N.message("openhtmleditor"));
-			editHtml.addFormItemClickHandler((FormItemIconClickEvent event) -> {
+			editHtml.addFormItemClickHandler(click -> {
 				RichTextItem htmlItem = newRichTextItemForNote("html", "html", item.getValueAsString());
 				htmlItem.setBrowserSpellCheck(true);
 				htmlItem.setShowTitle(false);

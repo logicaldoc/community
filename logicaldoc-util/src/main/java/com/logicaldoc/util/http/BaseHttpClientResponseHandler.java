@@ -12,33 +12,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An extension of the starndard HttpClientReponseHandler that also logs the
- * content of the response in case of error
+ * An extension of the standard HttpClientReponseHandler with utility methods
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.9.3
  */
-public abstract class LoggingHttpClientResponseHandler<T> extends AbstractHttpClientResponseHandler<T> {
+public abstract class BaseHttpClientResponseHandler<T> extends AbstractHttpClientResponseHandler<T> {
 
-	protected static Logger log = LoggerFactory.getLogger(LoggingHttpClientResponseHandler.class);
+	protected static Logger log = LoggerFactory.getLogger(BaseHttpClientResponseHandler.class);
 
 	private static final String UTF_8 = "UTF-8";
-
-	@Override
-	public T handleResponse(final ClassicHttpResponse response) throws IOException {
-		if (log.isDebugEnabled()) {
-			// Log the response
-			log.debug("Got response: {}", getResponseBody(response, 200));
-		}
-
-		try {
-			return super.handleResponse(response);
-		} catch (IOException e) {
-			// Throw an exception that reports the returned content chaned with
-			// the original exception from the parent
-			throw new IOException(getResponseBody(response, 200), e);
-		}
-	}
 
 	public static String getResponseBody(ClassicHttpResponse response) throws IOException {
 		return getResponseBody(response, null);
@@ -46,6 +29,7 @@ public abstract class LoggingHttpClientResponseHandler<T> extends AbstractHttpCl
 
 	public static String getResponseBody(ClassicHttpResponse response, Integer maxLength) throws IOException {
 		HttpEntity responseContent = response.getEntity();
+
 		String content;
 		try {
 			content = EntityUtils.toString(responseContent, UTF_8);

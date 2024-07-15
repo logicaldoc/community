@@ -5,11 +5,14 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
@@ -102,6 +105,16 @@ public class MockServletResponse implements HttpServletResponse {
 			@Override
 			public void close() throws IOException {
 				fileOutputStream.close();
+			}
+
+			@Override
+			public boolean isReady() {
+				return true;
+			}
+
+			@Override
+			public void setWriteListener(WriteListener arg0) {
+				// Ignore
 			}
 		};
 	}
@@ -255,5 +268,25 @@ public class MockServletResponse implements HttpServletResponse {
 
 	public Map<String, String> getHeaders() {
 		return headers;
+	}
+
+	@Override
+	public void setContentLengthLong(long arg0) {
+		// Ignore
+	}
+
+	@Override
+	public Collection<String> getHeaderNames() {
+		return new ArrayList<>();
+	}
+
+	@Override
+	public Collection<String> getHeaders(String arg0) {
+		return new ArrayList<>();
+	}
+
+	@Override
+	public int getStatus() {
+		return 0;
 	}
 }

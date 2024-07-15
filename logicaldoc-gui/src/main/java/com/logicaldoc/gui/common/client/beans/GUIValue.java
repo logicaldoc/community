@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * General purpose value bean
@@ -9,11 +10,11 @@ import java.io.Serializable;
  * @since 6.0
  */
 public class GUIValue implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	private String code;
-	
+
 	private String value;
 
 	public GUIValue() {
@@ -25,7 +26,7 @@ public class GUIValue implements Serializable {
 		this.code = code;
 		this.value = value;
 	}
-	
+
 	public String getCode() {
 		return code;
 	}
@@ -70,5 +71,13 @@ public class GUIValue implements Serializable {
 	@Override
 	public String toString() {
 		return code;
+	}
+
+	public static String getValue(String code, List<GUIValue> values) {
+		for (GUIValue guiValue : values) {
+			if (code.equals(guiValue.getCode()))
+				return guiValue.getValue();
+		}
+		return null;
 	}
 }

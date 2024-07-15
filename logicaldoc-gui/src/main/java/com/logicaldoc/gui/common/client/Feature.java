@@ -216,6 +216,8 @@ public class Feature {
 	public static final int READING_CONFIRMATION = 102;
 
 	public static final int TECHNICAL_SUPPORT = 103;
+	
+	public static final int CHATGPT = 104;
 
 	private static Set<String> features = new HashSet<>();
 
