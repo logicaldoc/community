@@ -1,8 +1,7 @@
 package com.logicaldoc.gui.common.client.data;
 
-import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.fields.DataSourceImageField;
+import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -19,11 +18,13 @@ public class OnlineUsersDS extends DataSource {
 		setRecordXPath("/list/user");
 
 		DataSourceTextField username = new DataSourceTextField("username");
-		username.setPrimaryKey(true);
+		
+		DataSourceTextField user = new DataSourceTextField("user");
+		
+		DataSourceIntegerField id = new DataSourceIntegerField("id");
+		id.setPrimaryKey(true);
 
-		DataSourceImageField avatar = new DataSourceImageField("avatar", I18N.message("avatar"), 25);
-
-		setFields(avatar, username);
+		setFields(id, user, username);
 		setDataURL("data/onlineusers.xml");
 		setClientOnly(true);
 	}

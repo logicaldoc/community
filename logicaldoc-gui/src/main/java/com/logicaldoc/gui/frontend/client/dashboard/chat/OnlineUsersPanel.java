@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.controllers.UserController;
 import com.logicaldoc.gui.common.client.controllers.UserObserver;
@@ -45,16 +46,20 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 
 	@Override
 	public void onDraw() {
-		ListGridField username = new ListGridField(USERNAME, I18N.message("onlineusers"), 150);
-		username.setCanFilter(true);
-		username.setWidth("100%");
-
-		UserListGridField avatar = new UserListGridField();
+		ListGridField user = new UserListGridField("user", "id", "user",
+				Session.get().getConfigAsBoolean("gui.avatar.showingrids"));
+		user.setShowTitle(false);
+		user.setWidth("100%");
+		
+		ListGridField username = new ListGridField("username", I18N.message("username"));
+		username.setShowTitle(false);
+		username.setWidth(80);
+		username.setHidden(true);
 
 		onlineUsers = new RefreshableListGrid(new OnlineUsersDS());
 		onlineUsers.setEmptyMessage(I18N.message("nousers"));
 		onlineUsers.setAutoFetchData(true);
-		onlineUsers.setFields(avatar, username);
+		onlineUsers.setFields(user, username);
 		onlineUsers.setSortField(USERNAME);
 
 		onlineUsers.addVisibilityChangedHandler(event -> {

@@ -48,14 +48,14 @@ public class OnlineUsersDataServlet extends AbstractDataServlet {
 				users.add(user);
 			}
 		}
-
+		
 		PrintWriter writer = response.getWriter();
 		writer.print("<list>");
 		for (User user : users) {
 			writer.print("<user>");
 			writer.print("<id>" + user.getId() + "</id>");
 			writer.print("<username><![CDATA[" + user.getUsername() + "]]></username>");
-			writer.print("<avatar>" + user.getId() + "</avatar>");
+			writer.print("<user><![CDATA[" + user.getFullName() + "]]></user>");
 			writer.print("</user>");
 		}
 		writer.print("</list>");

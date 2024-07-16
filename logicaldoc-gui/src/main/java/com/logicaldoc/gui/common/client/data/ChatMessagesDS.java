@@ -20,9 +20,11 @@ public class ChatMessagesDS extends DataSource {
 		id.setRequired(true);
 
 		DataSourceTextField username = new DataSourceTextField("username");
+		DataSourceTextField userId = new DataSourceTextField("userId");
+		DataSourceTextField user = new DataSourceTextField("user");
 		DataSourceTextField message = new DataSourceTextField("message");
 		DataSourceDateTimeField date = new DataSourceDateTimeField("date");
-		setFields(id, date, username, message);
+		setFields(id, date, user, userId, username, message);
 		setClientOnly(true);
 		setDataURL("data/chatmessages.xml");
 	}
