@@ -38,7 +38,7 @@ public class ChatGPTTray extends MenuTray {
 	private void onAsk(String question) {
 		if (DocumentController.get().getCurrentSelection().isEmpty())
 			SC.warn("nodocsselected");
-		else
-			ChatGPTWindow.get().init(question);
+		else 
+			ThreadWindow.get().open(question);
 	}
 }

@@ -31,7 +31,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.9.4
  */
-public class ChatGPTWindow extends Window {
+public class ThreadWindow extends Window {
 
 	private VLayout contents = new VLayout();
 
@@ -39,15 +39,15 @@ public class ChatGPTWindow extends Window {
 
 	private MessageBox lastMessage;
 
-	private static ChatGPTWindow instance = new ChatGPTWindow();
+	private static ThreadWindow instance = new ThreadWindow();
 
 	private Timer answerPolling;
 
-	public static ChatGPTWindow get() {
+	public static ThreadWindow get() {
 		return instance;
 	}
 
-	private ChatGPTWindow() {
+	private ThreadWindow() {
 		HeaderControl maximize = new HeaderControl(HeaderControl.MAXIMIZE, click -> maximize());
 		HeaderControl minimize = new HeaderControl(HeaderControl.MINIMIZE, click -> minimize());
 		HeaderControl close = new HeaderControl(HeaderControl.CLOSE, click -> close());
@@ -57,7 +57,7 @@ public class ChatGPTWindow extends Window {
 		setCanDragResize(true);
 		setIsModal(false);
 		setPosition(Positioning.ABSOLUTE);
-		setTop(MainMenu.get().getHeight() + 15);
+		setTop(MainMenu.get().getBottom() + 5);
 		setLeft(WindowUtils.getWidth() - 505);
 		setWidth(500);
 		setHeight(500);
@@ -72,7 +72,7 @@ public class ChatGPTWindow extends Window {
 		});
 	}
 
-	public void init(String initialQuestion) {
+	public void open(String initialQuestion) {
 		messagesBoard.removeMembers(messagesBoard.getMembers());
 		contents.removeMembers(contents.getMembers());
 
@@ -147,7 +147,7 @@ public class ChatGPTWindow extends Window {
 
 	private void startThread(String question) {
 		appendMessage(question, "user");
-		appendMessage(AwesomeFactory.getSpinnerIconHtml("pulse", ""), "chatgpt");
+		appendMessage("", "chatgpt");
 		answerPolling = null;
 
 		ChatGPTService.Instance.get().startThread(question, DocumentController.get().getCurrentSelection(),

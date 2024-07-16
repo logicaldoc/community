@@ -104,10 +104,10 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		setWidth100();
 
-		trays.add(new ChatGPTTray());
+		trays.add(new QuickSearchTray());
 		if (Feature.enabled(Feature.CHATGPT)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.CHATGPT))
-			trays.add(new QuickSearchTray());
+			trays.add(new ChatGPTTray());
 
 		boolean banner = Session.get().getConfigAsBoolean("gui.banner");
 
