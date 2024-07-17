@@ -562,7 +562,11 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<scope>compile</scope>
-		</dependency>				
+		</dependency>
+		<dependency>
+			<groupId>org.commonmark</groupId>
+			<artifactId>commonmark</artifactId>
+		</dependency>						
 	</dependencies>
 	<build>
 		<plugins>
@@ -650,7 +654,8 @@
 									<exclude name="commons-math*" />
 									<exclude name="xz-*" />
 									<exclude name="*smime*" />
-									<exclude name="java-libpst*" />			
+									<exclude name="java-libpst*" />	
+									<exclude name="*commonmark*" />		
 								</delete>
 								<delete dir="target/plugin/WEB-INF/lib">
 									<include name="opencv-*-android-*" />

@@ -20,9 +20,7 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.util.io.FileUtil;
 
 /**
  * This servlet is responsible for locked documents data retrieval
@@ -106,9 +104,7 @@ public class LockedDocsDataServlet extends AbstractDataServlet {
 				writer.print("<customId><![CDATA[" + doc.getCustomId() + "]]></customId>");
 			else
 				writer.print("<customId> </customId>");
-			writer.print("<icon>"
-					+ FileUtil.getBaseName(IconSelector.selectIcon(doc.getType(), doc.getDocRef() != null))
-					+ "</icon>");
+			writer.print("<icon>" + doc.getIcon() + "</icon>");
 			writer.print("<version>" + doc.getVersion() + "</version>");
 			writer.print("<fileVersion>" + doc.getFileVersion() + "</fileVersion>");
 			writer.print("<lastModified>" + df.format(doc.getLastModified()) + "</lastModified>");

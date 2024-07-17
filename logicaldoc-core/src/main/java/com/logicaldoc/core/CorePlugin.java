@@ -1,13 +1,16 @@
 package com.logicaldoc.core;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.dashlet.DashletContent;
+import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.plugin.LogicalDOCPlugin;
 import com.logicaldoc.util.plugin.PluginException;
@@ -33,6 +36,13 @@ public class CorePlugin extends LogicalDOCPlugin {
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 		}
+
+		// Initialize the IconSelector
+		File dest = new File(getPluginPath());
+		dest = dest.getParentFile().getParentFile().getParentFile();
+		dest = new File(dest.getAbsolutePath() + "/frontend/sc/skins/Tahoe/images/FileIcons");
+		for (File icon : dest.listFiles((File dir, String name) -> name.endsWith(".svg")))
+			IconSelector.getAvailableIconFiles().add(FilenameUtils.getBaseName(icon.getName().toLowerCase()));
 	}
 
 	@Override
@@ -59,7 +69,7 @@ public class CorePlugin extends LogicalDOCPlugin {
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
-		
+
 		setRestartRequired();
 	}
 }

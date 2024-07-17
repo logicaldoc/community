@@ -1,6 +1,7 @@
 package com.logicaldoc.core.parser;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.jsoup.Jsoup;
@@ -24,7 +25,8 @@ public class HTMLParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(HTMLParser.class);
 
 	@Override
-	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {
+	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content)
+			throws ParsingException {
 		File tempFile = null;
 		try {
 			tempFile = FileUtil.createTempFile("html", ".html");
@@ -33,11 +35,8 @@ public class HTMLParser extends AbstractParser {
 			String title = doc.title();
 			String body = doc.body().text();
 			content.append(title + "\n" + body);
-		} catch (Exception e) {
-			if (log.isDebugEnabled())
-				log.debug("Failed to extract HTML text content", e);
-			else
-				log.warn("Failed to extract HTML text content");
+		} catch (IOException e) {
+			throw new ParsingException(e);
 		} finally {
 			FileUtil.delete(tempFile);
 		}

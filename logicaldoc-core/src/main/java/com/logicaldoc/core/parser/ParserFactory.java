@@ -57,61 +57,70 @@ public class ParserFactory {
 		parsers.clear();
 
 		// First of all register all standard parsers
-		parsers.put("doc", new DOCParser());
-		parsers.put("dot", new DOCParser());
+		final DOCParser doc = new DOCParser();
+		parsers.put("doc", doc);
+		parsers.put("dot", doc);
 
-		parsers.put("htm", new HTMLParser());
-		parsers.put("html", new HTMLParser());
+		final HTMLParser html = new HTMLParser();
+		parsers.put("htm", html);
+		parsers.put("html", html);
 
 		parsers.put("pdf", new PDFParser());
 		parsers.put("rtf", new RTFParser());
 
 		// StarOffice, OpenOffice 1.0 - 1.1 extensions
-		parsers.put("sxw", new OpenOfficeParser());
-		parsers.put("sxc", new OpenOfficeParser());
-		parsers.put("sxi", new OpenOfficeParser()); // Presentation
+		final OpenOfficeParser openOffice = new OpenOfficeParser();
+		parsers.put("sxw", openOffice);
+		parsers.put("sxc", openOffice);
+		parsers.put("sxi", openOffice); // Presentation
 
 		// OpenOffice 2.3/3.0 extensions
-		parsers.put("odt", new OpenOfficeParser());
-		parsers.put("ods", new OpenOfficeParser());
-		parsers.put("odp", new OpenOfficeParser());
+		parsers.put("odt", openOffice);
+		parsers.put("ods", openOffice);
+		parsers.put("odp", openOffice);
 
 		// OpenDocument template extensions
-		parsers.put("ott", new OpenOfficeParser());
-		parsers.put("ots", new OpenOfficeParser());
-		parsers.put("otp", new OpenOfficeParser());
+		parsers.put("ott", openOffice);
+		parsers.put("ots", openOffice);
+		parsers.put("otp", openOffice);
 
 		// KOffice 1.6.x extensions
-		parsers.put("kwd", new KOfficeParser());
-		parsers.put("ksp", new KOfficeParser());
-		parsers.put("kpr", new KOfficeParser());
+		final KOfficeParser koffice = new KOfficeParser();
+		parsers.put("kwd", koffice);
+		parsers.put("ksp", koffice);
+		parsers.put("kpr", koffice);
 
 		// AbiWord http://www.abisource.com/
 		parsers.put("abw", new AbiWordParser());
 		parsers.put("zabw", new ZABWParser()); // Compressed AbiWord document
 
-		parsers.put("java", new TXTParser());
-		parsers.put("json", new TXTParser());
-		parsers.put("c", new TXTParser());
-		parsers.put("cpp", new TXTParser());
-		parsers.put("log", new TXTParser());
-		parsers.put("txt", new TXTParser());
-		parsers.put("csv", new TXTParser());
-		parsers.put("dbf", new TXTParser());
+		final TXTParser txt = new TXTParser();
+		parsers.put("java", txt);
+		parsers.put("json", txt);
+		parsers.put("c", txt);
+		parsers.put("cpp", txt);
+		parsers.put("log", txt);
+		parsers.put("txt", txt);
+		parsers.put("csv", txt);
+		parsers.put("dbf", txt);
 
-		parsers.put("xml", new XMLParser());
-		parsers.put("xls", new XLSParser());
-		parsers.put("xlt", new XLSParser());
+		final XMLParser xml = new XMLParser();
+		parsers.put("xml", xml);
+		final XLSParser xls = new XLSParser();
+		parsers.put("xls", xls);
+		parsers.put("xlt", xls);
 
 		// MS Office 2003 Powerpoint
-		parsers.put("ppt", new PPTParser());
-		parsers.put("pps", new PPTParser());
-		parsers.put("pot", new PPTParser());
+		final PPTParser ppt = new PPTParser();
+		parsers.put("ppt", ppt);
+		parsers.put("pps", ppt);
+		parsers.put("pot", ppt);
 
 		// Zip and GZip
-		parsers.put("zip", new ZipParser());
-		parsers.put("gz", new ZipParser());
-		parsers.put("tgz", new ZipParser());
+		final ZipParser zip = new ZipParser();
+		parsers.put("zip", zip);
+		parsers.put("gz", zip);
+		parsers.put("tgz", zip);
 
 		// Rar
 		parsers.put("rar", new RarParser());
@@ -124,6 +133,16 @@ public class ParserFactory {
 
 		// Epub
 		parsers.put("epub", new EpubParser());
+
+		// Markdown
+		final MarkdownParser markdown = new MarkdownParser();
+		parsers.put("md", markdown);
+		parsers.put("mkd", markdown);
+		parsers.put("mdwn", markdown);
+		parsers.put("mdown", markdown);
+		parsers.put("mdtxt", markdown);
+		parsers.put("mdtext", markdown);
+		parsers.put("markdown", markdown);
 
 		// Acquire the 'Parse' extensions of the core plugin and add defined
 		// parsers

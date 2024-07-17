@@ -73,7 +73,7 @@ public class GUISettingsPanel extends AdminPanel {
 		parametersForm.setAutoWidth();
 
 		body.setMembers(parametersForm);
-
+		
 		Tab languages = new Tab();
 		languages.setTitle(I18N.message("languages"));
 		languages.setPane(new GUILanguagesPanel());
@@ -109,7 +109,7 @@ public class GUISettingsPanel extends AdminPanel {
 		TextItem welcome = ItemFactory.newTextItemForAutomation("welcome", I18N.message("welcomemessage"),
 				Util.getParameterValue(settings, "gui.welcome"), null);
 		welcome.setWidth(400);
-
+		
 		SelectItem density = ItemFactory.newDensitySelector();
 		density.setValue(Util.getParameterValue(settings, "gui.density").trim());
 

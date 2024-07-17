@@ -21,7 +21,7 @@ public class IconGridField extends ListGridField {
 		setHidden(true);
 		setAlign(Alignment.CENTER);
 		setShowDefaultContextMenu(false);
-		setImageURLPrefix(Util.imagePrefix());
-		setImageURLSuffix(".png");
+		setImageURLPrefix(Util.imagePrefix()+"/FileIcons/vivid/");
+		setImageURLSuffix(".svg");
 	}
 }

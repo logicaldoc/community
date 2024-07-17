@@ -488,23 +488,23 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 	 * @return name of the icon file
 	 */
 	public String getIcon() {
-		String icon = IconSelector.selectIcon("", docRef != null && docRef.longValue() != 0L);
+		String icon = IconSelector.selectIcon("");
 		try {
 			String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
-			icon = IconSelector.selectIcon(extension, docRef != null && docRef.longValue() != 0L);
-			if ((getFileName().toLowerCase().endsWith(".eml") || getFileName().toLowerCase().endsWith(".msg"))
+			icon = IconSelector.selectIcon(extension);
+			if (docRef != null && docRef.longValue() != 0L && "pdf".equals(getDocRefType())) {
+				icon = IconSelector.selectIcon("pdf");
+			} else if ((getFileName().toLowerCase().endsWith(".eml") || getFileName().toLowerCase().endsWith(".msg"))
 					&& getPages() > 1) {
-				if (docRef != null && docRef.longValue() != 0L) {
-					icon = "email_attach-sc.png";
-				} else {
-					icon = "email_attach.png";
-				}
+				icon += "-clip";
 			}
-			if (docRef != null && docRef.longValue() != 0L && "pdf".equals(getDocRefType()))
-				icon = IconSelector.selectIcon("pdf", true);
 		} catch (Exception e) {
 			// Nothing to do
 		}
+
+		if (docRef != null && docRef.longValue() != 0L)
+			icon += "-shortcut";
+
 		return icon;
 	}
 
@@ -884,7 +884,7 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 	 * 
 	 * @param pwd The password in readable format
 	 * 
-	 * @throws NoSuchAlgorithmException Cripting error 
+	 * @throws NoSuchAlgorithmException Cripting error
 	 */
 	public void setDecodedPassword(String pwd) throws NoSuchAlgorithmException {
 		if (org.apache.commons.lang.StringUtils.isNotEmpty(pwd)) {

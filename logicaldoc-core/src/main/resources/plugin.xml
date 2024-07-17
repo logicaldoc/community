@@ -507,7 +507,12 @@
 		<parameter id="in" value="pst"/>
 		<parameter id="out" value="txt,pdf"/>
 		<parameter id="class" value="com.logicaldoc.core.conversion.PstConverter"/>
-  </extension>  
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="mdConv">
+		<parameter id="in" value="md,mkd,mdwn,mdown,mdtxt,mdtext,markdown"/>
+		<parameter id="out" value="html,pdf"/>
+		<parameter id="class" value="com.logicaldoc.core.conversion.MarkdownConverter"/>
+  </extension>    
 
 
   <extension plugin-id="logicaldoc-core" point-id="DocumentListener" id="documentInitializationListener">

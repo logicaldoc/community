@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.chatgpt;
 
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
+import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.menu.MenuTray;
@@ -37,8 +38,8 @@ public class ChatGPTTray extends MenuTray {
 
 	private void onAsk(String question) {
 		if (DocumentController.get().getCurrentSelection().isEmpty())
-			SC.warn("nodocsselected");
-		else 
+			SC.warn(I18N.message("nodocsselected"));
+		else
 			ThreadWindow.get().open(question);
 	}
 }

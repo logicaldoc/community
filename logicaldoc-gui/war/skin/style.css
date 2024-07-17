@@ -237,16 +237,6 @@
     -webkit-touch-callout:none
 }
 
-.filenameIcon {
-	vertical-align:middle;
-	margin-top:0px;
-	margin-bottom:0px;
-	margin-left:2px;
-	margin-right:2px;
-	display:block;
-    -webkit-touch-callout:none
-}
-
 .box {
    display: flex;
    align-items:center;
@@ -458,3 +448,40 @@
   white-space: nowrap;
   color: red;
 }
+
+
+.filenameIcon {
+	vertical-align:middle;
+	margin-top:0px;
+	margin-bottom:0px;
+	margin-left:2px;
+	margin-right:2px;
+	display:block;
+    -webkit-touch-callout:none
+}
+
+
+.container{
+  position: relative;
+}
+.container > img {
+  position: absolute;
+  top:0;
+  left:0;
+}
+
+
+.icon-container{
+  position: relative;
+}
+.icon-container > img{
+  top:0;
+  left:0;
+}
+
+/*.icon-container > img:first-child{
+  position: absolute;
+}
+.icon-container > img:first-child{
+  position: absolute;
+}*/

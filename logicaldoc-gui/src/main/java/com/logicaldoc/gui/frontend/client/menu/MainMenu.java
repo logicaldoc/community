@@ -190,7 +190,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	private void addTrayBar() {
 		HLayout trayPanel = new HLayout();
 		trayPanel.setAutoWidth();
-		trayPanel.addMember(new ChatGPTTray());
+		trayPanel.addMember(trays.get(0));
 		addMember(trayPanel);
 
 		ToolStripButton rotateTrays = AwesomeFactory.newToolStripButton("exchange-alt", null, null);

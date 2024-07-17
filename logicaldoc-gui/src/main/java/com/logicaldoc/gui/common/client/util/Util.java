@@ -280,11 +280,43 @@ public abstract class Util {
 		return imagePrefix() + imageName;
 	}
 
+	public static String fileIconUrl(String iconName) {
+		return imagePrefix() + "FileIcons/" + iconName;
+	}
+
 	public static String fileNameIcon(String iconName, int size) {
-		if (!iconName.toLowerCase().endsWith(".png"))
-			iconName += ".png";
-		return "<img class='filenameIcon' src='" + imageUrl(iconName) + "' width='" + size + "px' height='" + size
-				+ "px' />";
+
+		StringBuilder sb = new StringBuilder("<div class='icon-container filenameIcon'>");
+
+		if (iconName.contains("-")) {
+			String baseIconName = iconName.substring(0, iconName.indexOf('-'));
+
+			if (iconName.contains("-shortcut")) {
+				long shortcutSize = Math.round(size * 0.625D);
+				long shortcutMarginTop = Math.round(size * 0.4375D);
+				long shortcutMarginLeft = Math.round(size * 0.6D);
+				sb.append("<img src='" + fileIconUrl("shortcut.svg") + "' width='" + shortcutSize + "px' height='"
+						+ shortcutSize + "px' style='position:absolute; z-index:1; margin-top: " + shortcutMarginTop
+						+ "px; margin-left:" + shortcutMarginLeft + "px'/>");
+			}
+
+			if (iconName.contains("-clip")) {
+				long clipSize = Math.round(size * 0.625D);
+				long clipMarginTop = Math.round(size * 0.125D);
+				long clipMarginLeft = 0;
+				sb.append("<img src='" + fileIconUrl("clip.svg") + "' width='" + clipSize + "px' height='" + clipSize
+						+ "px' style='position:absolute; z-index:2; margin-top: " + clipMarginTop + "px; margin-left:"
+						+ clipMarginLeft + "px'/>");
+			}
+
+			iconName = baseIconName;
+		}
+
+		sb.append("<img class='filenameIcon' src='" + fileIconUrl(iconName + ".svg") + "' width='" + size
+				+ "px' height='" + size + "px' />");
+
+		sb.append("</div>");
+		return sb.toString();
 	}
 
 	public static String iconWithFilename(String iconName, String fileName) {
@@ -467,7 +499,7 @@ public abstract class Util {
 		writeToClipboard(text);
 		GuiLog.info(I18N.message("texthascopied"));
 	}
-	
+
 	/**
 	 * Writes a text into the client's clipboard
 	 * 
@@ -1178,8 +1210,12 @@ public abstract class Util {
 	}
 
 	public static String getParameterValue(List<GUIParameter> params, String name) {
-		return params.stream().filter(param -> param.getName().equals(Session.get().getTenantName() + "." + name)
-				|| param.getName().equals(name)).map(p -> p.getValue()).findFirst().orElse(null);
+		try {
+			return params.stream().filter(param -> param.getName().equals(Session.get().getTenantName() + "." + name)
+					|| param.getName().equals(name)).map(p -> p.getValue()).findFirst().orElse(null);
+		} catch (RuntimeException re) {
+			return null;
+		}
 	}
 
 	public static void removeChildren(Layout container) {
