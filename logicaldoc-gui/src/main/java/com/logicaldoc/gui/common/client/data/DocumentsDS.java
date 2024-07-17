@@ -84,7 +84,7 @@ public class DocumentsDS extends DataSource {
 
 		DataSourceTextField filename = new DataSourceTextField("filename");
 
-		DataSourceImageField icon = new DataSourceImageField("icon");
+		DataSourceTextField icon = new DataSourceTextField("icon");
 		icon.setHidden(true);
 		DataSourceTextField customId = new DataSourceTextField("customId");
 		DataSourceTextField type = new DataSourceTextField("type");

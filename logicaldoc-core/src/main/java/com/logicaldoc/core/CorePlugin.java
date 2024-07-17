@@ -42,7 +42,9 @@ public class CorePlugin extends LogicalDOCPlugin {
 		dest = dest.getParentFile().getParentFile().getParentFile();
 		dest = new File(dest.getAbsolutePath() + "/frontend/sc/skins/Tahoe/images/FileIcons");
 		for (File icon : dest.listFiles((File dir, String name) -> name.endsWith(".svg")))
-			IconSelector.getAvailableIconFiles().add(FilenameUtils.getBaseName(icon.getName().toLowerCase()));
+			IconSelector.getAvailableIcons().add(FilenameUtils.getBaseName(icon.getName().toLowerCase()));
+		
+		System.out.println("added icons: "+IconSelector.getAvailableIcons());
 	}
 
 	@Override
