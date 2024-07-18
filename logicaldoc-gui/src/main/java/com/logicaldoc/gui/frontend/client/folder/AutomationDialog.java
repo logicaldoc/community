@@ -7,6 +7,7 @@ import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.ExtendedPropertiesPanel;
 import com.logicaldoc.gui.frontend.client.services.AutomationService;
 import com.smartgwt.client.types.HeaderControls;
@@ -68,15 +69,15 @@ public class AutomationDialog extends Window {
 		tabSet.addTab(prepareParametersTab());
 		tabSet.disableTab(1);
 
-		ChangedHandler changeHandler = event -> {
-			if (event == null
-					|| (event != null && (event.getValue() == null || event.getValue().toString().isEmpty()))) {
+		ChangedHandler changeHandler = changed -> {
+			if (changed == null
+					|| (changed != null && (changed.getValue() == null || changed.getValue().toString().isEmpty()))) {
 				tabSet.enableTab(0);
 				tabSet.selectTab(0);
 				tabSet.disableTab(1);
 				routine = new GUIAutomationRoutine();
 			} else {
-				AutomationService.Instance.get().getRoutine(Long.parseLong(event.getValue().toString()),
+				AutomationService.Instance.get().getRoutine(Long.parseLong(changed.getValue().toString()),
 						new AsyncCallback<>() {
 
 							@Override
@@ -145,17 +146,20 @@ public class AutomationDialog extends Window {
 		if (routine.getId() == 0L)
 			routine.setAutomation(scriptForm.getValueAsString("automation"));
 
+		LD.contactingServer();
+		AutomationDialog.this.destroy();
+		GuiLog.info(I18N.message("automationlaunched"));
 		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
+				LD.clearPrompt();
 			}
 
 			@Override
 			public void onSuccess(Void arg0) {
-				AutomationDialog.this.destroy();
-				GuiLog.info(I18N.message("automationlaunched"));
+				LD.clearPrompt();
 			}
 		});
 	}

@@ -497,4 +497,15 @@ public class AutomationDateTool extends org.apache.velocity.tools.generic.DateTo
 		this.timeZone = TimeZone.getTimeZone(timeZone);
 	}
 
+	/**
+	 * Interrupts the current execution thread for a given time
+	 * 
+	 * @param milliseconds Number of milliseconds to wait
+	 * 
+	 * @throws InterruptedException Raised if any thread has interrupted the
+	 *         current thread
+	 */
+	public void sleep(long milliseconds) throws InterruptedException {
+		Thread.sleep(milliseconds);
+	}
 }

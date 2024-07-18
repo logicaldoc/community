@@ -21,16 +21,22 @@ public abstract class IconSelector {
 	 * system
 	 */
 	private static Set<String> availableIcons = new HashSet<>();
-	
+
 	/**
 	 * A map of aliases, key is the alias, value is the rel icon to use
 	 */
 	private static Map<String, String> aliases = new HashMap<>();
-	
+
 	static {
 		aliases.put("vsdx", "vsd");
+
+		aliases.put("mkd", "md");
+		aliases.put("mdwn", "md");
+		aliases.put("mdown", "md");
+		aliases.put("mdtxt", "md");
+		aliases.put("mdtext", "md");
+		aliases.put("markdown", "md");
 	}
-	
 
 	public static Set<String> getAvailableIcons() {
 		return availableIcons;
@@ -47,9 +53,9 @@ public abstract class IconSelector {
 		ext = normalizeExtension(ext);
 
 		String icon = ext;
-		if(aliases.containsKey(icon))
+		if (aliases.containsKey(icon))
 			icon = aliases.get(icon);
-		
+
 		if (StringUtils.isEmpty(ext) || (!availableIcons.isEmpty() && !availableIcons.contains(icon)))
 			icon = "blank";
 

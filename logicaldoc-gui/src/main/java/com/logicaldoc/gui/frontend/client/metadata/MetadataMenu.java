@@ -87,7 +87,7 @@ public class MetadataMenu extends VLayout {
 		Button forms = new Button(I18N.message("forms"));
 		forms.setWidth100();
 		forms.setHeight(25);
-		forms.addClickHandler(formsClick -> AdminScreen.get().setContent(new FormsPanel()));
+		forms.addClickHandler(click -> AdminScreen.get().setContent(new FormsPanel()));
 		if (Feature.visible(Feature.FORM) && Menu.enabled(Menu.FORMS)) {
 			addMember(forms);
 			if (!Feature.enabled(Feature.FORM))
@@ -99,7 +99,7 @@ public class MetadataMenu extends VLayout {
 		Button stamps = new Button(I18N.message("stamps"));
 		stamps.setWidth100();
 		stamps.setHeight(25);
-		stamps.addClickHandler(stampsClick -> AdminScreen.get().setContent(new StampsPanel()));
+		stamps.addClickHandler(click -> AdminScreen.get().setContent(new StampsPanel()));
 		if (Feature.visible(Feature.STAMP) && Menu.enabled(Menu.STAMPS)) {
 			addMember(stamps);
 			if (!Feature.enabled(Feature.STAMP))
@@ -112,7 +112,7 @@ public class MetadataMenu extends VLayout {
 		retentionPolicies.setWidth100();
 		retentionPolicies.setHeight(25);
 		retentionPolicies
-				.addClickHandler(retentionPoliciesClick -> AdminScreen.get().setContent(new RetentionPoliciesPanel()));
+				.addClickHandler(click -> AdminScreen.get().setContent(new RetentionPoliciesPanel()));
 		if (Feature.visible(Feature.RETENTION_POLICIES) && Menu.enabled(Menu.RETENTION_POLICIES)) {
 			addMember(retentionPolicies);
 			if (!Feature.enabled(Feature.RETENTION_POLICIES))
@@ -125,7 +125,7 @@ public class MetadataMenu extends VLayout {
 		folderTemplates.setWidth100();
 		folderTemplates.setHeight(25);
 		folderTemplates
-				.addClickHandler(folderTemplatesClick -> AdminScreen.get().setContent(new FolderTemplatesPanel()));
+				.addClickHandler(click -> AdminScreen.get().setContent(new FolderTemplatesPanel()));
 		if (Feature.visible(Feature.FOLDER_TEMPLATE)) {
 			addMember(folderTemplates);
 			if (!Feature.enabled(Feature.FOLDER_TEMPLATE))
