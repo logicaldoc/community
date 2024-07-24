@@ -412,16 +412,46 @@ public interface SecurityService extends RemoteService {
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */
-	void saveAvatar(long userId) throws ServerException;
+	public void saveAvatar(long userId) throws ServerException;
 
 	/**
-	 * Resets tha avatar to the default one
+	 * Resets the avatar to the default one
 	 * 
 	 * @param userId Identifier of the user
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */
-	void resetAvatar(long userId) throws ServerException;
+	public void resetAvatar(long userId) throws ServerException;
+
+	/**
+	 * Creates a new API Key for the current user
+	 * 
+	 * @param name The name to give to the new key
+	 * 
+	 * @return The newly generated key
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	public String createApiKey(String name) throws ServerException;
+
+	/**
+	 * Deletes an API Key
+	 * 
+	 * @param keyId Identifier of the API Key
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	public void deleteApiKey(long keyId) throws ServerException;
+
+	/**
+	 * Updates an API Key
+	 * 
+	 * @param keyId Identifier of the API Key
+	 * @param newName The new name to assign
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	public void updateApiKey(long keyId, String newName) throws ServerException;
 
 	/**
 	 * Clones a work time to a set of other users

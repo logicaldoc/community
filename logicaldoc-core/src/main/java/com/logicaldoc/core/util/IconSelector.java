@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.logicaldoc.util.io.FileUtil;
 
 /**
@@ -53,10 +51,10 @@ public abstract class IconSelector {
 		ext = normalizeExtension(ext);
 
 		String icon = ext;
-		if (aliases.containsKey(icon))
-			icon = aliases.get(icon);
+		if (aliases.containsKey(ext))
+			icon = aliases.get(ext);
 
-		if (StringUtils.isEmpty(ext) || (!availableIcons.isEmpty() && !availableIcons.contains(icon)))
+		if (!availableIcons.contains(icon))
 			icon = "blank";
 
 		return icon;

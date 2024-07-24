@@ -93,4 +93,10 @@ public interface SecurityServiceAsync {
 
 	void validatePassword(String password, int length, int uppercaseChars, int lowercaseChars, int digits,
 			int specialChars, int maxSequenceSize, int maxOccurrences, AsyncCallback<List<String>> callback);
+
+	void createApiKey(String name, AsyncCallback<String> callback);
+
+	void updateApiKey(long keyId, String name, AsyncCallback<Void> callback);
+	
+	void deleteApiKey(long keyId, AsyncCallback<Void> callback);
 }

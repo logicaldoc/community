@@ -16,6 +16,7 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
@@ -317,7 +318,7 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testSetPassword() throws Exception {
-		Session session = SessionManager.get().newSession("admin", "admin", null);
+		Session session = SessionManager.get().newSession("admin", "admin", (Client) null);
 		docService.setPassword(session.getSid(), 1L, "test");
 
 		try {
@@ -331,7 +332,7 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testUnprotect() throws Exception {
-		Session session = SessionManager.get().newSession("admin", "admin", null);
+		Session session = SessionManager.get().newSession("admin", "admin", (Client) null);
 		docService.setPassword(session.getSid(), 1L, "test");
 
 		Assert.assertTrue(docService.unprotect(session.getSid(), 1L, "test"));

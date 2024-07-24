@@ -707,6 +707,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		}
 
 		jdbcUpdate("delete from ld_usergroup where ld_userid=" + userId);
+		
+		jdbcUpdate("delete from ld_apikey where ld_userid=" + userId);
 
 		saveUserHistory(user, transaction);
 	}

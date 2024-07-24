@@ -155,7 +155,7 @@
    </bean>
    <bean id="DeviceDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean class="com.logicaldoc.core.security.user.HibernateDeviceDAO" />
+         <bean class="com.logicaldoc.core.security.HibernateDeviceDAO" />
       </property>
    </bean>
    <bean id="SearchDAO" parent="ApplicationBaseTransactionProxy">
@@ -163,6 +163,11 @@
          <bean class="com.logicaldoc.core.searchengine.saved.HibernateSearchDAO" />
       </property>
    </bean>
+   <bean id="ApiKeyDAO" abstract="false" parent="ApplicationBaseTransactionProxy">
+      <property name="target">
+         <bean class="com.logicaldoc.core.security.apikey.HibernateApiKeyDAO" />
+      </property>
+   </bean>   
       
    <bean id="EMailSender" class="com.logicaldoc.core.communication.EMailSender" lazy-init="default">
       <property name="protocol" value="${default.smtp.protocol}" />

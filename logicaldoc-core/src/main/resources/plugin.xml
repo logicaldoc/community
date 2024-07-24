@@ -161,6 +161,10 @@
     <parameter id="authenticatorId" value="DefaultAuthenticator" />
     <parameter id="position" value="100" />
   </extension>
+  <extension plugin-id="logicaldoc-core" point-id="Authentication" id="ApiKeyAuthentication">
+    <parameter id="authenticatorId" value="ApiKeyAuthenticator" />
+    <parameter id="position" value="110" />
+  </extension>
 
   <extension plugin-id="logicaldoc-core" point-id="Language" id="standardLanguage">
     <parameter id="locale" value="standard" />

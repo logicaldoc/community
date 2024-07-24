@@ -57,7 +57,25 @@ public class AbstractService {
 	@Autowired
 	protected Message currentMessage;
 
+	
 	/**
+	 * Interprets the given parameter as session ID or an API Key and gives the real session id
+	 * 
+	 * @param sidOrApikey The SID or an API Key
+	 * 
+	 * @return the SID of the session
+	 */
+	protected String sessionId(String sidOrApikey) {
+		if(!sidOrApikey.startsWith("ld-")) {
+			return sidOrApikey;
+		} else {
+			// It is an API Key so go with Client ID (that also contains the API Key)
+			return SessionManager.get().getSessionId(getCurrentRequest());
+		}
+	}
+	
+	/**
+	 * 
 	 * Utility method that validates the session and retrieve the associated
 	 * user
 	 * 
@@ -194,6 +212,7 @@ public class AbstractService {
 	 * <li>Request header sid</li>
 	 * <li>Request cookie ldoc-sid</li>
 	 * <li>SecurityContextHolder</li>
+	 * <li>Client ID</li>
 	 * </ol>
 	 * 
 	 * @return The current Session ID

@@ -1,11 +1,13 @@
 package com.logicaldoc.webservice;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -47,7 +49,7 @@ public class RestWorkbench {
 
 	private static RestBookmarkClient bookmarkClient = null;
 
-	private static String BASE_PATH = "http://localhost:1000";
+	private static String BASE_PATH = "http://localhost:9080";
 
 	public static void main(String[] args) throws Exception {
 		// String test1="<?xml version=\"1.0\"
@@ -76,7 +78,9 @@ public class RestWorkbench {
 		docMetadataClient = new RestDocumentMetadataClient(BASE_PATH + "/services/rest/documentMetadata", username,
 				password);
 
-		String sid = authClient.login(username, password);
+		Properties develProps = new Properties();
+		develProps.load(new FileInputStream(new File(System.getProperty("user.home")+"/logicaldoc-dev.properties")));
+		String sid = authClient.loginApiKey(develProps.getProperty("apikey.Development"));
 		System.err.println(sid);
 //		
 //		docMetadataClient.setAttributeOptions(188055552L, "test", new String[] {"value1", "value2", "value3"});

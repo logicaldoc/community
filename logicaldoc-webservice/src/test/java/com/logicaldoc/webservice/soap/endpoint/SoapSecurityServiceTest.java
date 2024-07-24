@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.user.Group;
@@ -66,7 +67,7 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 
 		securityServiceImpl.setValidateSession(true);
 		SessionManager sm = SessionManager.get();
-		Session session1 = sm.newSession("author", "admin", null);
+		Session session1 = sm.newSession("author", "admin", (Client) null);
 
 		users = securityServiceImpl.listUsers(session1.getSid(), "admin");
 

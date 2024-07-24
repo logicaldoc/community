@@ -4,6 +4,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -25,6 +26,10 @@ public interface AuthService {
 	@GET
     @Path("/login")
 	public String login(@QueryParam("u") String username, @QueryParam("pw") String password);
+	
+	@GET
+    @Path("/loginApiKey")
+	public String loginApiKey(@HeaderParam("X-API-KEY") String apiKey);
 
 	@POST
     @Path("/loginForm")

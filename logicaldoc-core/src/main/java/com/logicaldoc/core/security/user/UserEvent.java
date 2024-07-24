@@ -20,7 +20,8 @@ public enum UserEvent {
     CREATED("event.user.created"),
     UPDATED("event.user.updated"),
     DISABLED("event.user.disabled"),
-    ENABLED("event.user.enabled");
+    ENABLED("event.user.enabled"),
+    NEWAPIKEY("event.user.newapikey");
 	
     private String event;
 

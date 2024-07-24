@@ -508,7 +508,7 @@ public abstract class Util {
 	 */
 	private static native void writeToClipboard(String text) /*-{
   		 // navigator.clipboard.writeText(text);
-  		 copy(text);g
+  		 copy(text);
 	}-*/;
 
 	/**

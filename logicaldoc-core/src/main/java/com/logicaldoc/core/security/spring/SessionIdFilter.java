@@ -8,7 +8,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,8 +25,8 @@ import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.user.Group;
 
 /**
- * This filter looks for a sid parameter in the request and auto-authenticate
- * the user.
+ * This filter looks for a sid parameter in the request or X-API-KEY header and
+ * auto-authenticate the user.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.1.1
@@ -60,10 +59,19 @@ public class SessionIdFilter extends GenericFilterBean {
 			return;
 		}
 
-		String sid = getSidFromRequest(request);
+		String sid = SessionManager.get().getSessionId(request);
+		if (StringUtils.isEmpty(sid) && StringUtils.isNotEmpty(request.getHeader(SessionManager.HEADER_APIKEY))) {
+			try {
+				Session session = SessionManager.get().newSession(null, null,
+						request.getHeader(SessionManager.HEADER_APIKEY), request);
+				sid = session.getSid();
+			} catch (AuthenticationException ae) {
+				log.error(ae.getMessage(), ae);
+			}
+		}
 
 		if (StringUtils.isNotEmpty(sid)) {
-			log.debug("The request specifies the sid {}", sid);
+			log.debug("The request refers the sid {}", sid);
 
 			try {
 				Session session = SessionManager.get().get(sid);
@@ -97,20 +105,5 @@ public class SessionIdFilter extends GenericFilterBean {
 		}
 
 		chain.doFilter(request, response);
-	}
-
-	private String getSidFromRequest(HttpServletRequest request) {
-		String sid = request.getParameter(SessionManager.PARAM_SID);
-		if (StringUtils.isEmpty(sid)) {
-			Cookie[] cookies = request.getCookies();
-			if (cookies != null)
-				for (Cookie cookie : cookies) {
-					if (SessionManager.COOKIE_SID.equals(cookie.getName())) {
-						sid = cookie.getValue();
-						break;
-					}
-				}
-		}
-		return sid;
 	}
 }

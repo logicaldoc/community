@@ -22,6 +22,11 @@ public class SoapAuthClient extends SoapClient<AuthService> implements AuthServi
 	public String login(String username, String password) throws AuthenticationException {
 		return client.login(username, password);
 	}
+	
+	@Override
+	public String loginApiKey(String apiKey) throws AuthenticationException {
+		return client.loginApiKey(apiKey);
+	}
 
 	@Override
 	public void logout(String sid) {

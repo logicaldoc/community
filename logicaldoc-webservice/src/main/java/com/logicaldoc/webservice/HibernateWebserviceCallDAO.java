@@ -6,7 +6,7 @@ import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 
 /**
- * Hibernate implementation of <code>ChatMessageyDAO</code>
+ * Hibernate implementation of {@link WebserviceCallDAO}
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.7

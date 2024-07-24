@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -398,7 +399,7 @@ public class User extends PersistentObject implements Serializable {
 	 * @throws NoSuchAlgorithmException Cripting error
 	 */
 	public void setDecodedPassword(String pwd) throws NoSuchAlgorithmException {
-		if (org.apache.commons.lang.StringUtils.isNotEmpty(pwd)) {
+		if (StringUtils.isNotEmpty(pwd)) {
 			decodedPassword = pwd;
 			password = CryptUtil.encryptSHA256(pwd);
 		}

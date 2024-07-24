@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
+import com.logicaldoc.gui.frontend.client.account.ApiKeys;
 import com.logicaldoc.gui.frontend.client.account.ChangePassword;
 import com.logicaldoc.gui.frontend.client.account.LastLogins;
 import com.logicaldoc.gui.frontend.client.account.Profile;
@@ -38,8 +39,8 @@ public class AccountMenu extends Menu {
 		setShadowDepth(3);
 
 		MenuItem profile = new MenuItem(I18N.message("profile"));
-		profile.addClickHandler(event -> SecurityService.Instance.get().getUser(Session.get().getUser().getId(),
-				new AsyncCallback<>() {
+		profile.addClickHandler(
+				event -> SecurityService.Instance.get().getUser(Session.get().getUser().getId(), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -84,7 +85,9 @@ public class AccountMenu extends Menu {
 
 		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ACCOUNT)) {
 			items.add(profile);
-			items.add(getSecurityMenuItem());
+
+			if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PROFILE_SECURITY))
+				items.add(getSecurityMenuItem());
 
 			if (Feature.enabled(Feature.STAMP) && com.logicaldoc.gui.common.client.Menu
 					.enabled(com.logicaldoc.gui.common.client.Menu.ACCOUNT_SIGNATURE))
@@ -124,33 +127,42 @@ public class AccountMenu extends Menu {
 	}
 
 	private MenuItem getSecurityMenuItem() {
+		List<MenuItem> items = new ArrayList<>();
+
 		MenuItem changePswd = new MenuItem(I18N.message("changepassword"));
 		changePswd.addClickHandler(event -> new ChangePassword().show());
 		changePswd.setEnabled(!Session.get().isDemo() && Session.get().getUser().getSource() == 0);
+		items.add(changePswd);
 
 		MenuItem lastLogins = new MenuItem(I18N.message("lastlogins"));
 		lastLogins.addClickHandler(event -> new LastLogins().show());
+		items.add(lastLogins);
 
 		MenuItem twofactorsauth = new MenuItem(I18N.message("twofactorsauth"));
 		twofactorsauth
 				.addClickHandler(event -> new TwoFactorsAuthenticationDialog(Session.get().getUser(), false).show());
-		twofactorsauth.setEnabled(!Session.get().isDemo() && Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION)
-				&& Session.get().getTenantConfigAsBoolean(TWOFA_ENABLED));
+		twofactorsauth.setEnabled(!Session.get().isDemo());
 
 		MenuItem trustedDevices = new MenuItem(I18N.message("trusteddevices"));
 		trustedDevices.addClickHandler(event -> new TrustedDevices().show());
-		trustedDevices.setEnabled(!Session.get().isDemo() && Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION)
-				&& Session.get().getTenantConfigAsBoolean(TWOFA_ENABLED));
+		trustedDevices.setEnabled(!Session.get().isDemo());
+
+		if (Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION) && Session.get().getTenantConfigAsBoolean(TWOFA_ENABLED)
+				&& com.logicaldoc.gui.common.client.Menu
+						.enabled(com.logicaldoc.gui.common.client.Menu.PROFILE_TWO_FACTORS_AUTHENTICATION)) {
+			items.add(twofactorsauth);
+			items.add(trustedDevices);
+		}
+
+		MenuItem apiKeys = new MenuItem(I18N.message("apikeys"));
+		apiKeys.addClickHandler(click -> new ApiKeys().show());
+		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.APIKEYS))
+			items.add(apiKeys);
 
 		Menu menu = new Menu();
 		menu.setShowShadow(true);
 		menu.setShadowDepth(3);
-
-		if (Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION)
-				&& Session.get().getTenantConfigAsBoolean(TWOFA_ENABLED))
-			menu.setItems(changePswd, lastLogins, twofactorsauth, trustedDevices);
-		else
-			menu.setItems(changePswd, lastLogins);
+		menu.setItems(items.toArray(new MenuItem[0]));
 
 		MenuItem securityItem = new MenuItem(I18N.message("security"));
 		securityItem.setSubmenu(menu);

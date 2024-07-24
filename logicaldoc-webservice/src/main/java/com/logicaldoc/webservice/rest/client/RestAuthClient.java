@@ -48,5 +48,9 @@ public class RestAuthClient extends AbstractRestClient implements AuthService {
 	public String loginForm(String username, String password) {
 		return proxy.loginForm(username, password);
 	}
-
+	
+	@Override
+	public String loginApiKey(String apiKey) {
+		return proxy.loginApiKey(apiKey);
+	}
 }

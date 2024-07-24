@@ -442,7 +442,15 @@
   	<servlet-name>LogData</servlet-name>
     <servlet-class>com.logicaldoc.web.data.LogDataServlet</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>ApiKeysData</servlet-name>
+    <servlet-class>com.logicaldoc.web.data.ApiKeysDataServlet</servlet-class>
+  </servlet>
   
+  <servlet-mapping>
+    <servlet-name>ApiKeysData</servlet-name>
+    <url-pattern>/data/apikeys.xml</url-pattern>
+  </servlet-mapping>  
   <servlet-mapping>
     <servlet-name>LogData</servlet-name>
     <url-pattern>/data/log.xml</url-pattern>

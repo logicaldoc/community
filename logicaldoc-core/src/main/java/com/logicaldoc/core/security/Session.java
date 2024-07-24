@@ -65,13 +65,8 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	private String sid;
 
 	/**
-	 * The password given by the user at login time
-	 */
-	private String password;
-
-	/**
 	 * A third parameter(other than the username and password) given by the
-	 * client at login time
+	 * client at login time, or an API Key generated in LogicalDOC
 	 */
 	private String key;
 
@@ -159,8 +154,8 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		logWarn("Session expired");
 
 		this.status = STATUS_EXPIRED;
-		this.finished=new Date();
-		
+		this.finished = new Date();
+
 		// Add a user history entry
 		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
 		userHistoryDAO.createUserHistory(user, UserEvent.TIMEOUT.toString(), null, sid, client);
@@ -171,18 +166,18 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		logInfo("Session closed");
 
 		this.status = STATUS_CLOSED;
-		this.finished=new Date();
-		
+		this.finished = new Date();
+
 		// Add a user history entry
 		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
 		userHistoryDAO.createUserHistory(user, UserEvent.LOGOUT.toString(), null, sid, client);
 	}
 
 	private Session() {
-
+		// Just o avoid standard constructor
 	}
 
-	Session(User user, String password, String key, Client client) {
+	Session(User user, String key, Client client) {
 		super();
 
 		if (user == null)
@@ -192,7 +187,6 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.tenantId = user.getTenantId();
 		this.user = user;
 		this.username = user.getUsername();
-		this.password = password;
 		this.key = key;
 		this.client = client;
 		this.node = SystemInfo.get().getInstallationId();
@@ -264,6 +258,19 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 		log.info("Session {} has been started", getSid());
 		logInfo("Session started");
+	}
+
+	Session(Session other) {
+		this.setId(other.getId());
+		this.setTenantId(other.getTenantId());
+		this.setTenantName(other.tenantName);
+		this.setSid(other.sid);
+		this.key = other.key;
+		this.setNode(other.node);
+		this.username = other.username;
+		this.setCreation(other.getCreation());
+		this.setLastRenew(other.lastRenew);
+		this.setClient(other.client);
 	}
 
 	private UserHistory saveLoginEvent(User user, Client client) {
@@ -348,10 +355,6 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 	public String getTenantName() {
 		return tenantName;
-	}
-
-	public String getPassword() {
-		return password;
 	}
 
 	public void logError(String message) {
@@ -445,6 +448,10 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		return user;
 	}
 
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
 	@Override
 	public void setTenantId(long tenantId) {
 		this.tenantId = tenantId;
@@ -485,29 +492,4 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	protected void setStatus(int status) {
 		this.status = status;
 	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	Session getClone() {
-		Session clone = new Session();
-		clone.setId(getId());
-		clone.setTenantId(getTenantId());
-		clone.setTenantName(tenantName);
-		clone.setSid(sid);
-		clone.setKey(key);
-		clone.setNode(node);
-		clone.setUsername(username);
-		clone.setPassword(password);
-		clone.setCreation(getCreation());
-		clone.setLastRenew(lastRenew);
-		clone.setClient(client);
-		return clone;
-	}
-
 }

@@ -1,7 +1,5 @@
 package com.logicaldoc.webservice.soap.endpoint;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,29 +20,34 @@ public class SoapAuthService extends AbstractService implements AuthService {
 
 	@Override
 	public String login(String username, String password) throws AuthenticationException {
-		HttpServletRequest request = getCurrentRequest();
-
-		Session session = SessionManager.get().newSession(username, password,
-				SessionManager.get().buildClient(request));
+		Session session = SessionManager.get().newSession(username, password, getCurrentRequest());
 		return session.getSid();
 	}
 
 	@Override
-	public void logout(String sid) {
-		SessionManager.get().kill(sid);
+	public String loginApiKey(String apiKey) throws AuthenticationException {
+		Session session = SessionManager.get().newSession(apiKey, getCurrentRequest());
+		return session.getSid();
 	}
 
 	@Override
-	public boolean valid(String sid) {
+	public void logout(String sidOrApiKey) {
+		SessionManager.get().kill(sessionId(sidOrApiKey));
+	}
+
+	@Override
+	public boolean valid(String sidOrApiKey) {
 		if (!isWebserviceEnabled())
 			return false;
-		return SessionManager.get().isOpen(sid);
+
+		return SessionManager.get().isOpen(sessionId(sidOrApiKey));
 	}
 
 	@Override
-	public void renew(String sid) {
+	public void renew(String sidOrApiKey) {
 		if (!isWebserviceEnabled())
 			return;
+		String sid = sessionId(sidOrApiKey);
 		if (SessionManager.get().isOpen(sid))
 			SessionManager.get().renew(sid);
 	}

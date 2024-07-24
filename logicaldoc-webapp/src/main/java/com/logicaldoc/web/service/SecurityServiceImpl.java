@@ -46,6 +46,8 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
+import com.logicaldoc.core.security.apikey.ApiKey;
+import com.logicaldoc.core.security.apikey.ApiKeyDAO;
 import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
 import com.logicaldoc.core.security.authentication.PasswordWeakException;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -57,6 +59,7 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
+import com.logicaldoc.core.security.user.UserHistoryDAO;
 import com.logicaldoc.core.security.user.WorkingTime;
 import com.logicaldoc.core.sequence.Sequence;
 import com.logicaldoc.core.sequence.SequenceDAO;
@@ -128,7 +131,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	static final String PASSWORD_UPPERCASE = ".password.uppercase";
 
 	static final String PASSWORD_SIZE = ".password.size";
-	
+
 	private static final String ADMIN = "admin";
 
 	private static final long serialVersionUID = 1L;
@@ -1684,5 +1687,58 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 		PasswordValidator validator = new PasswordValidator(criteria, null);
 		return validator.validate(password);
+	}
+
+	@Override
+	public String createApiKey(String name) throws ServerException {
+		Session session = validateSession();
+
+		try {
+			ApiKeyDAO dao = (ApiKeyDAO) Context.get().getBean(ApiKeyDAO.class);
+			ApiKey apiKey = dao.findByName(name, session.getUserId());
+			if (apiKey != null)
+				throw new ServerException("A key with same name already exists");
+
+			apiKey = new ApiKey(session.getUserId(), name);
+			dao.store(apiKey);
+
+			UserHistory transaction = new UserHistory();
+			transaction.setSession(session);
+			transaction.setComment(name + " (" + apiKey.getLabel() + ")");
+			transaction.setEvent(UserEvent.NEWAPIKEY.toString());
+
+			UserHistoryDAO historyDao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
+			historyDao.store(transaction);
+
+			return apiKey.getDecodedKey();
+		} catch (PersistenceException e) {
+			return (String) throwServerException(session, log, e);
+		}
+	}
+
+	@Override
+	public void deleteApiKey(long keyId) throws ServerException {
+		Session session = validateSession();
+
+		try {
+			ApiKeyDAO dao = (ApiKeyDAO) Context.get().getBean(ApiKeyDAO.class);
+			dao.delete(keyId);
+		} catch (PersistenceException e) {
+			throwServerException(session, log, e);
+		}
+	}
+
+	@Override
+	public void updateApiKey(long keyId, String newName) throws ServerException {
+		Session session = validateSession();
+
+		try {
+			ApiKeyDAO dao = (ApiKeyDAO) Context.get().getBean(ApiKeyDAO.class);
+			ApiKey apiKey = dao.findById(keyId);
+			apiKey.setName(newName);
+			dao.store(apiKey);
+		} catch (PersistenceException e) {
+			throwServerException(session, log, e);
+		}
 	}
 }

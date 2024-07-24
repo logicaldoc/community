@@ -32,6 +32,7 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.lock.LockManager;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
+import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -93,7 +94,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testGetTagCloud() throws PersistenceException {
-		Session session = SessionManager.get().newSession("admin", "admin", null);
+		Session session = SessionManager.get().newSession("admin", "admin", (Client) null);
 		try {
 			List<TagCloud> cloud = dao.getTagCloud(session.getSid());
 			assertNotNull(cloud);

@@ -29,6 +29,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.parser.ParsingException;
+import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -796,7 +797,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		history.setUsername("admin");
 		docDao.setPassword(3L, "test", history);
 
-		Session session = SessionManager.get().newSession("admin", "admin", null);
+		Session session = SessionManager.get().newSession("admin", "admin", (Client) null);
 
 		assertTrue(testSubject.unprotect(session.getSid(), 3L, "test"));
 		assertFalse(testSubject.unprotect(session.getSid(), 3L, "test2"));
@@ -814,7 +815,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		history.setUserId(1L);
 		history.setUsername("admin");
 
-		history.setSession(SessionManager.get().newSession("admin", "admin", null));
+		history.setSession(SessionManager.get().newSession("admin", "admin", (Client) null));
 
 		try (InputStream is = getClass().getResourceAsStream("/abel.eml")) {
 			testSubject.replaceFile(doc.getId(), "1.3", is, history);
@@ -839,7 +840,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		DocumentHistory history = new DocumentHistory();
 		history.setUserId(1L);
 		history.setUsername("admin");
-		history.setSession(SessionManager.get().newSession("admin", "admin", null));
+		history.setSession(SessionManager.get().newSession("admin", "admin", (Client) null));
 
 		doc = docDao.findById(3L);
 		assertNotNull(doc);
@@ -876,7 +877,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		DocumentHistory history = new DocumentHistory();
 		history.setUserId(1L);
 		history.setUsername("admin");
-		history.setSession(SessionManager.get().newSession("admin", "admin", null));
+		history.setSession(SessionManager.get().newSession("admin", "admin", (Client) null));
 		assertEquals(4, testSubject.archiveFolder(6L, history));
 
 		doc = docDao.findById(1L);
@@ -893,7 +894,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		DocumentHistory history = new DocumentHistory();
 		history.setUserId(1L);
 		history.setUsername("admin");
-		history.setSession(SessionManager.get().newSession("admin", "admin", null));
+		history.setSession(SessionManager.get().newSession("admin", "admin", (Client) null));
 
 		FileInputStream fis = new FileInputStream("pom.xml");
 

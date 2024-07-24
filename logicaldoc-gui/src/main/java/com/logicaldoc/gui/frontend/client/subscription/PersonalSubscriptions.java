@@ -11,15 +11,15 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.IconGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.AuditService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -92,16 +92,9 @@ public class PersonalSubscriptions extends com.smartgwt.client.widgets.Window {
 		id.setWidth(50);
 		id.setHidden(true);
 
-		ListGridField icon = new ListGridField("icon", " ", 25);
-		icon.setType(ListGridFieldType.IMAGE);
-		icon.setCanSort(false);
-		icon.setAlign(Alignment.CENTER);
-		icon.setShowDefaultContextMenu(false);
-		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setImageURLSuffix(".png");
-		icon.setCanFilter(false);
+		ListGridField icon = new IconGridField();
 
-		ListGridField name = new ColoredListGridField("name", I18N.message("name"));
+		FileNameListGridField name = new FileNameListGridField("name", "icon", "name", 210);
 		name.setWidth("*");
 		name.setCanFilter(true);
 
@@ -114,6 +107,8 @@ public class PersonalSubscriptions extends com.smartgwt.client.widgets.Window {
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(false);
+		list.setShowRecordComponents(true);
+		list.setShowRecordComponentsByCell(true);
 		list.setDataSource(new SubscriptionsDS(null, null));
 		list.setFields(id, icon, name, created);
 

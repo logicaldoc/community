@@ -1,7 +1,10 @@
 package com.logicaldoc.webservice;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import com.logicaldoc.core.searchengine.SearchOptions;
@@ -41,8 +44,12 @@ public class SoapWorkbench {
 
 		SoapDocumentMetadataClient metadataClient = new SoapDocumentMetadataClient(BASE + "/DocumentMetadata");
 
+		Properties develProps = new Properties();
+		develProps.load(new FileInputStream(new File(System.getProperty("user.home")+"/logicaldoc-dev.properties")));
+		
+		
 		// Open a session
-		String sid = auth.login("admin", "12345678");
+		String sid = auth.loginApiKey(develProps.getProperty("apikey.Development"));
 		System.out.println("Server date: " + systemClient.getInfo().getDate());
 		System.out.println("Sid: " + sid);
 

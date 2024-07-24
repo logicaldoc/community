@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.common.client.widgets.grid;
 
+import com.logicaldoc.gui.common.client.beans.GUIFolder;
+import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -47,7 +49,17 @@ public class IconGridField extends ListGridField {
 			if (iconName == null || iconName.isEmpty())
 				return "";
 
-			return Util.fileNameIcon(iconName, size);
+			if (iconName.contains("folder") || iconName.contains("workspace")) {
+				if (iconName.contains("alias"))
+					return DocUtil.getFolderIcon(false, GUIFolder.TYPE_ALIAS, "", null);
+				else if (iconName.contains("workspace"))
+					return DocUtil.getFolderIcon(false, GUIFolder.TYPE_WORKSPACE, "", null);
+				else
+					return DocUtil.getFolderIcon(false, GUIFolder.TYPE_DEFAULT, "", null);
+			} else {
+				return Util.fileNameIcon(iconName, size);
+			}
+
 		}
 	}
 }

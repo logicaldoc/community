@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -146,7 +147,7 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 		// trying to get a folder for which the user does not have read
 		// permission
 		SessionManager sm = SessionManager.get();
-		Session session1 = sm.newSession("guest", "admin", null);
+		Session session1 = sm.newSession("guest", "admin", (Client) null);
 
 		try {
 			soapFolderService.setValidateSession(true);

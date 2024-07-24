@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-lazy="false">
+	<class name="com.logicaldoc.core.security.apikey.ApiKey" table="ld_apikey" where="ld_deleted=0">
+		<cache usage="read-write" />
+		<id name="id" type="long" column="ld_id" unsaved-value="0">
+			<generator class="org.hibernate.id.enhanced.TableGenerator">
+				<param name="segment_value">ld_apikey</param>
+				<param name="optimizer">org.hibernate.id.enhanced.HiLoOptimizer</param>
+			</generator>
+		</id>
+        <version name="recordVersion" column="ld_recordversion"  type="long" />   
+        <property name="lastModified" type="timestamp" column="ld_lastmodified" not-null="true"/>
+        <property name="creation" type="timestamp" column="ld_creation" />
+        <property name="deleted" type="int" column="ld_deleted" not-null="true" />
+        <property name="tenantId" type="long" column="ld_tenantid" not-null="true" />        
+		<property name="userId" type="long" column="ld_userid" not-null="true" />
+		<property name="name" type="string" column="ld_name" length="255" not-null="true" />
+		<property name="lastUsed" type="timestamp" column="ld_lastused" />
+		<property name="key" type="string" column="ld_key" length="255" not-null="true" />
+		<property name="label" type="string" column="ld_label" length="255" not-null="true" />
+	</class>
+</hibernate-mapping>

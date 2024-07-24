@@ -443,7 +443,7 @@ public class LD {
 	public static void askForString(String title, String message, String defaultValue, final ValueCallback callback) {
 		askForValue(title, message, defaultValue, new TextItem(), null, callback);
 	}
-
+	
 	public static void askForStringMandatory(String title, String message, String defaultValue,
 			final ValueCallback callback) {
 		TextItem item = new TextItem();

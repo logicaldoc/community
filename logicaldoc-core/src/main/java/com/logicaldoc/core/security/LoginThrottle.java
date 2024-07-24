@@ -21,6 +21,7 @@ import com.logicaldoc.core.communication.MessageTemplateDAO;
 import com.logicaldoc.core.communication.Recipient;
 import com.logicaldoc.core.communication.SystemMessage;
 import com.logicaldoc.core.communication.SystemMessageDAO;
+import com.logicaldoc.core.security.authentication.ApiKeyBlockedException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authentication.IPBlockedException;
 import com.logicaldoc.core.security.authentication.UsernameBlockedException;
@@ -44,6 +45,8 @@ import com.logicaldoc.util.config.ContextProperties;
 public class LoginThrottle {
 	private static final String THROTTLE_ENABLED = "throttle.enabled";
 
+	public static final String LOGINFAIL_APIKEY = "loginfail-apikey-";
+	
 	public static final String LOGINFAIL_IP = "loginfail-ip-";
 
 	public static final String LOGINFAIL_USERNAME = "loginfail-username-";
@@ -81,10 +84,11 @@ public class LoginThrottle {
 	 * Saves the login failure in the database
 	 * 
 	 * @param username the username
+	 * @param apikey the API Key
 	 * @param client the client address from which the login intent comes from
 	 * @param exception the authentication exception
 	 */
-	public static void recordFailure(String username, Client client, AuthenticationException exception) {
+	public static void recordFailure(String username, String apiKey, Client client, AuthenticationException exception) {
 		if (exception == null || !exception.mustRecordFailure())
 			return;
 
@@ -96,6 +100,8 @@ public class LoginThrottle {
 			}
 			if (StringUtils.isNotEmpty(client.getAddress()))
 				sDao.next(LOGINFAIL_IP + client.getAddress(), 0L, Tenant.SYSTEM_ID);
+			if (StringUtils.isNotEmpty(apiKey))
+				sDao.next(LOGINFAIL_APIKEY + apiKey, 0L, Tenant.SYSTEM_ID);
 		}
 
 		// Record the failed login attempt
@@ -118,11 +124,12 @@ public class LoginThrottle {
 	 * Performs anti brute force attack checks
 	 * 
 	 * @param username the username
+	 * @param apikey the API Key
 	 * @param ip the IP address from which the login intent comes from
 	 * 
 	 * @throws AuthenticationException if the authentication fails
 	 */
-	public static void checkLoginThrottle(String username, String ip) throws AuthenticationException {
+	public static void checkLoginThrottle(String username, String apikey, String ip) throws AuthenticationException {
 		if (!Context.get().getProperties().getBoolean(THROTTLE_ENABLED))
 			return;
 
@@ -136,6 +143,9 @@ public class LoginThrottle {
 
 		// Check if the IP is temporarily blocked
 		checkIp(ip);
+		
+		// Check if the IP is temporarily blocked
+		checkApikey(apikey);
 	}
 
 	private static void checkIp(String ip) throws IPBlockedException {
@@ -192,6 +202,38 @@ public class LoginThrottle {
 						throw new UsernameBlockedException();
 					} else {
 						log.info("Login block for username {} expired", username);
+						deleteSequence(seq);
+					}
+				}
+			}
+		}
+	}
+	
+	private static void checkApikey(String apikey) throws ApiKeyBlockedException {
+		if(StringUtils.isEmpty(apikey))
+			return;
+		
+		SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
+		Calendar cal = Calendar.getInstance();
+
+		ContextProperties config = Context.get().getProperties();
+		int wait = config.getInt("throttle.apikey.wait", 0);
+		int maxTrials = config.getInt("throttle.apikey.max", 0);
+
+		if (maxTrials > 0 && wait > 0) {
+			String counterName = LOGINFAIL_APIKEY + apikey;
+			Sequence seq = sDao.findByAlternateKey(counterName, 0L, Tenant.SYSTEM_ID);
+			if (seq != null) {
+				long count = seq.getValue();
+				if (count >= maxTrials) {
+					cal.add(Calendar.MINUTE, -wait);
+					Date oldestDate = cal.getTime();
+					if (oldestDate.before(seq.getLastModified())) {
+						log.warn("Possible brute force attack detected for ApiKey {}", apikey);
+						notifyBruteForceAttack(null, apikey);
+						throw new ApiKeyBlockedException();
+					} else {
+						log.info("Login block for ApiKey {} expired", apikey);
 						deleteSequence(seq);
 					}
 				}

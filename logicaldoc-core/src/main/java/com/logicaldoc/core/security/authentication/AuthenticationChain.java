@@ -242,8 +242,11 @@ public class AuthenticationChain extends AbstractAuthenticator {
 					.add((Authenticator) context.getBean(extension.getParameter("authenticatorId").valueAsString()));
 		}
 
-		if (sortedExts.isEmpty())
+		if (sortedExts.isEmpty()) {
 			authenticators.add((Authenticator) context.getBean(DefaultAuthenticator.class));
+			authenticators.add((Authenticator) context.getBean(ApiKeyAuthenticator.class));
+		}
+		
 
 		for (Authenticator auth : authenticators) {
 			log.warn("Added authenticator {}", auth.getClass().getSimpleName());

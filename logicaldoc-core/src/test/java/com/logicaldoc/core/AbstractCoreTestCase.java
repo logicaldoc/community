@@ -10,6 +10,8 @@ import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.security.apikey.ApiKey;
+import com.logicaldoc.core.security.apikey.ApiKeyDAO;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
@@ -33,12 +35,19 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 	protected File rootStoreOne;
 
 	protected File rootStoreTwo;
+	
+	protected ApiKey apiKey;
 
 	@Before
 	@Override
 	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
 		super.setUp();
 		prepareStore();
+		
+		// Prepare an API Key
+		ApiKeyDAO dao = (ApiKeyDAO) Context.get().getBean(ApiKeyDAO.class);
+		apiKey = new ApiKey(1L, "MyKey");
+		dao.store(apiKey);
 	}
 
 	@Override

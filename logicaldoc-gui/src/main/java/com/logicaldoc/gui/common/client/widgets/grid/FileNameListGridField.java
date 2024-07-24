@@ -25,7 +25,7 @@ public class FileNameListGridField extends ColoredListGridField {
 
 	public FileNameListGridField(String name) {
 		this(name, null);
-	}
+	}	
 
 	public FileNameListGridField(String name, String iconFieldName, String title, int width) {
 		super(name, "color", title != null ? title : I18N.message(FILENAME), width);

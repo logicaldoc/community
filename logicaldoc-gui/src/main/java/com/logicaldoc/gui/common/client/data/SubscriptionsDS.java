@@ -2,7 +2,6 @@ package com.logicaldoc.gui.common.client.data;
 
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceDateTimeField;
-import com.smartgwt.client.data.fields.DataSourceImageField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -45,7 +44,7 @@ public class SubscriptionsDS extends DataSource {
 		id.setPrimaryKey(true);
 		id.setRequired(true);
 
-		DataSourceImageField icon = new DataSourceImageField("icon");
+		DataSourceTextField icon = new DataSourceTextField("icon");
 		DataSourceTextField name = new DataSourceTextField("name");
 		DataSourceDateTimeField created = new DataSourceDateTimeField("created");
 		DataSourceTextField type = new DataSourceTextField("type");

@@ -246,7 +246,9 @@ create table ld_search (ld_id bigint not null, ld_lastmodified timestamp not nul
                         ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint not null, 
                         ld_name varchar(255), ld_description varchar(1000), ld_options varchar(4000),
                         ld_date timestamp, ld_type int not null, primary key (ld_id));
-
+create table ld_apikey (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null,
+                        ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint not null, ld_lastused timestamp, ld_key varchar(255) not null,
+                        ld_name varchar(255) not null, ld_label varchar(255), primary key (ld_id));
                           
 create table hibernate_sequences (sequence_name varchar(40) NOT NULL, next_val bigint NOT NULL, primary key (sequence_name));
 
@@ -281,6 +283,7 @@ alter table ld_folder_acl add constraint FK_FOLDACL_GROUP foreign key (ld_groupi
 alter table ld_folder_storage add constraint FK_FOLDER_STORAGE foreign key (ld_folderid) references ld_folder(ld_id) on delete cascade;
 alter table ld_foldertag add constraint FK_TAG_FOLDER foreign key (ld_folderid) references ld_folder(ld_id);
 alter table ld_workingtime add constraint FK_WRKTIME_USER foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
+alter table ld_apikey add constraint FK_APIKEY_USER foreign key (ld_userid) references ld_user(ld_id) on delete cascade;
 
 create unique index AK_DOCUMENT on ld_document (ld_customid, ld_tenantid);
 create unique index AK_USER on ld_user (ld_username);
@@ -300,6 +303,9 @@ create unique index AK_SESSION on ld_session (ld_sid);
 create unique index AK_DASHLET on ld_dashlet (ld_name, ld_tenantid);
 create unique index AK_DEVICE on ld_device (ld_deviceid);
 create unique index AK_SEARCH on ld_search (ld_userid, ld_name);
+create unique index AK_APIKEY on ld_apikey (ld_key);
+create unique index AK_APIKEY2 on ld_apikey (ld_name, ld_userid);
+
 
 
 --Prepare some indexes
@@ -323,6 +329,7 @@ create index LD_FLD_FOLDREF on ld_folder (ld_foldref);
 create index LD_RCP_MID_NAME on ld_recipient (ld_messageid, ld_name);
 create index LD_DEV_USERID on ld_device (ld_userid);
 create index LD_PHIST_USERID on ld_password_history (ld_userid);
+create index LD_APIKEY_USERID on ld_apikey (ld_userid);
 
 
 insert into ld_tenant(ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_tenantid,ld_name,ld_displayname,ld_type,ld_enabled,ld_expire,ld_recordversion)
@@ -537,6 +544,14 @@ insert into ld_menu
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
 values     (12,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'dropspot',1500,'menu.png',1,1,1,1,1);
 
+insert into ld_menu
+           (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (41,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'security',40,'menu.png',1,1,1,1,1);
+
+insert into ld_menu
+           (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (42,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'apikeys',41,'menu.png',1,1,1,1,1);
+
 
 
 insert into ld_group
@@ -662,6 +677,8 @@ insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 10,ld_i
 insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 11,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';
 insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 12,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';
 insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 40,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 41,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 42,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';
 insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 1610,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';
 
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_creation,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
@@ -810,3 +827,4 @@ insert into hibernate_sequences(sequence_name, next_val) values ('ld_dashlet', 1
 insert into hibernate_sequences(sequence_name, next_val) values ('ld_device', 100);
 insert into hibernate_sequences(sequence_name, next_val) values ('ld_password_history', 100);
 insert into hibernate_sequences(sequence_name, next_val) values ('ld_search', 100);
+insert into hibernate_sequences(sequence_name, next_val) values ('ld_apikey', 100);

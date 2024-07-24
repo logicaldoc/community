@@ -61,6 +61,7 @@ import com.logicaldoc.core.folder.FolderEvent;
 import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.folder.FolderHistoryDAO;
 import com.logicaldoc.core.searchengine.SearchEngine;
+import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
@@ -100,7 +101,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 		ddao = (DocumentDAO) context.getBean("DocumentDAO");
 
-		session = SessionManager.get().newSession("admin", "admin", null);
+		session = SessionManager.get().newSession("admin", "admin", (Client) null);
 
 		Folder folder = fdao.findDefaultWorkspace(Tenant.DEFAULT_ID);
 		assertNotNull(folder);
@@ -343,7 +344,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		Folder folder = fdao.findDefaultWorkspace(Tenant.DEFAULT_ID);
 		log.info(folder.getName());
 
-		Session session = SessionManager.get().newSession("admin", "admin", null);
+		Session session = SessionManager.get().newSession("admin", "admin", (Client) null);
 
 		LDRepository ldrep = new LDRepository(folder, session.getSid());
 		String id = ldrep.createDocument(null, props, "fld.4", contentStream);
@@ -638,7 +639,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		props.addProperty(p);
 
 		Folder folder = fdao.findDefaultWorkspace(Tenant.DEFAULT_ID);
-		Session session = SessionManager.get().newSession("admin", "admin", null);
+		Session session = SessionManager.get().newSession("admin", "admin", (Client) null);
 
 		List<Folder> list = fdao.findAll();
 		assertEquals(7, list.size());

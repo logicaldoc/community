@@ -207,6 +207,12 @@ public class Menu {
 
 	public static final long CHATGPT = -2130;
 
+	public static final long PROFILE_SECURITY = 41;
+	
+	public static final long APIKEYS = 42;
+	
+	public static final long PROFILE_TWO_FACTORS_AUTHENTICATION = 43;
+
 	private static Set<Long> menus = new HashSet<>();
 
 	private Menu() {

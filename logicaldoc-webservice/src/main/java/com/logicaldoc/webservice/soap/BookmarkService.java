@@ -52,7 +52,7 @@ public interface BookmarkService {
 	/**
 	 * Retrieves all the bookmarks of the current user
 	 * 
-	 * @param sid identifier of the session
+	 * @param sid identifier of the session or an API Key
 	 * 
 	 * @return list of bookmarks
 	 * 

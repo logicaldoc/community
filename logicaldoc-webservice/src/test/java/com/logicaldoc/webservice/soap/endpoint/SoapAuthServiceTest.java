@@ -54,6 +54,12 @@ public class SoapAuthServiceTest extends AbstractWebserviceTestCase {
 		String sid = soapAuthServiceImpl.login("author", "admin");
 		assertNotNull(sid);
 	}
+	
+	@Test
+	public void testLoginApiKey() {
+		String sid = soapAuthServiceImpl.loginApiKey(apiKey.getDecodedKey());
+		assertNotNull(sid);
+	}
 
 	@Test
 	public void testLogout() {

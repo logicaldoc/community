@@ -4,6 +4,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -37,7 +38,7 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	String password) throws AuthenticationException {
 		return super.login(username, password);
 	}
-
+	
 	@POST
 	@Path("/loginForm")
 	@Operation(operationId = "loginForm", summary = "Login with POST", description = "Login with the credentials in a form POST")
@@ -56,6 +57,13 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	@Override
 	public String loginPostJSON(WSCredentials cred) {
 		return super.login(cred.getUsername(), cred.getPassword());
+	}
+	
+	@GET
+	@Path("/loginApiKey")
+	@Override
+	public String loginApiKey(@HeaderParam("X-API-KEY") String apikey) {
+		return super.loginApiKey(apikey);
 	}
 
 	@DELETE
