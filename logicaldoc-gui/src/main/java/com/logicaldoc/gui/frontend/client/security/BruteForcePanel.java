@@ -50,6 +50,10 @@ public class BruteForcePanel extends AdminPanel {
 
 	private static final String THROTTLE_IP_MAX = "throttle.ip.max";
 
+	private static final String THROTTLE_APIKEY_WAIT = "throttle.apikey.wait";
+
+	private static final String THROTTLE_APIKEY_MAX = "throttle.apikey.max";
+
 	private static final String THROTTLE_ALERT_RECIPIENTS = "throttle.alert.recipients";
 
 	private static final String THROTTLE_USERNAME_WAIT = "throttle.username.wait";
@@ -75,9 +79,11 @@ public class BruteForcePanel extends AdminPanel {
 		addMember(save);
 
 		SettingService.Instance.get()
-				.loadSettingsByNames(Arrays.asList(THROTTLE_ENABLED, THROTTLE_USERNAME_MAX, THROTTLE_USERNAME_WAIT,
-						THROTTLE_USERNAME_DISABLEUSER, THROTTLE_USERNAME_WAIT, THROTTLE_IP_MAX, THROTTLE_IP_WAIT,
-						THROTTLE_ALERT_RECIPIENTS), new AsyncCallback<>() {
+				.loadSettingsByNames(
+						Arrays.asList(THROTTLE_ENABLED, THROTTLE_USERNAME_MAX, THROTTLE_USERNAME_WAIT,
+								THROTTLE_USERNAME_DISABLEUSER, THROTTLE_USERNAME_WAIT, THROTTLE_IP_MAX,
+								THROTTLE_IP_WAIT, THROTTLE_APIKEY_MAX, THROTTLE_APIKEY_WAIT, THROTTLE_ALERT_RECIPIENTS),
+						new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
@@ -93,6 +99,14 @@ public class BruteForcePanel extends AdminPanel {
 						});
 	}
 
+	private int intValue(String str) {
+		try {
+			return Integer.parseInt(str);
+		} catch (Exception t) {
+			return 0;
+		}
+	}
+
 	private void initForm(Map<String, String> params) {
 		DynamicForm form = new DynamicForm();
 		form.setValuesManager(vm);
@@ -104,24 +118,16 @@ public class BruteForcePanel extends AdminPanel {
 		enabled.setTitleOrientation(TitleOrientation.LEFT);
 
 		SpinnerItem usernameMax = ItemFactory.newSpinnerItem("usernamemax", "maxsameusernamefailedattempts",
-				(Integer) null);
+				intValue(params.get(THROTTLE_USERNAME_MAX)));
 		usernameMax.setMin(0);
 		usernameMax.setWrapTitle(false);
-		try {
-			usernameMax.setValue(Integer.parseInt(params.get(THROTTLE_USERNAME_MAX)));
-		} catch (Exception t) {
-			// Nothing to do
-		}
 
-		SpinnerItem usernameWait = ItemFactory.newSpinnerItem("usernamewait", "sameusernamewait", (Integer) null);
+		SpinnerItem usernameWait = ItemFactory.newSpinnerItem("usernamewait", "sameusernamewait",
+				intValue(params.get(THROTTLE_USERNAME_WAIT)));
 		usernameWait.setMin(0);
 		usernameWait.setHint(I18N.message("minutes"));
 		usernameWait.setWrapTitle(false);
-		try {
-			usernameWait.setValue(Integer.parseInt(params.get(THROTTLE_USERNAME_WAIT)));
-		} catch (Exception t) {
-			// Nothing to do
-		}
+
 		usernameWait.setDisabled("true".equals(params.get(THROTTLE_USERNAME_DISABLEUSER)));
 
 		RadioGroupItem usernameDisableUser = ItemFactory.newBooleanSelector("usernamedisableuser",
@@ -131,24 +137,27 @@ public class BruteForcePanel extends AdminPanel {
 		usernameDisableUser.setTitleOrientation(TitleOrientation.LEFT);
 		usernameDisableUser.addChangedHandler(event -> usernameWait.setDisabled("yes".equals(event.getValue())));
 
-		SpinnerItem ipMax = ItemFactory.newSpinnerItem("ipmax", "maxsameipfailedattempts", (Integer) null);
+		SpinnerItem ipMax = ItemFactory.newSpinnerItem("ipmax", "maxsameipfailedattempts",
+				intValue(params.get(THROTTLE_IP_MAX)));
 		ipMax.setMin(0);
 		ipMax.setWrapTitle(false);
-		try {
-			ipMax.setValue(Integer.parseInt(params.get(THROTTLE_IP_MAX)));
-		} catch (Exception t) {
-			// Nothing to do
-		}
 
-		SpinnerItem ipWait = ItemFactory.newSpinnerItem("ipwait", "sameipwait", (Integer) null);
+		SpinnerItem ipWait = ItemFactory.newSpinnerItem("ipwait", "sameipwait", intValue(params.get(THROTTLE_IP_WAIT)));
 		ipWait.setMin(0);
 		ipWait.setWrapTitle(false);
 		ipWait.setHint(I18N.message("minutes"));
-		try {
-			ipWait.setValue(Integer.parseInt(params.get(THROTTLE_IP_WAIT)));
-		} catch (Exception t) {
-			// Nothing to do
-		}
+
+		
+		SpinnerItem apikeyMax = ItemFactory.newSpinnerItem("apikeymax", "maxsameapikeyfailedattempts",
+				intValue(params.get(THROTTLE_APIKEY_MAX)));
+		apikeyMax.setMin(0);
+		apikeyMax.setWrapTitle(false);
+		
+		SpinnerItem apikeyWait = ItemFactory.newSpinnerItem("apikeywait", "sameapikeywait",
+				intValue(params.get(THROTTLE_APIKEY_WAIT)));
+		apikeyWait.setMin(0);
+		apikeyWait.setWrapTitle(false);
+		apikeyWait.setHint(I18N.message("minutes"));
 
 		MultiComboBoxItem recipients = ItemFactory.newMultiComboBoxItem(RECIPIENTS, "alertrecipients",
 				new UsersDS(null, false, false),
@@ -158,7 +167,8 @@ public class BruteForcePanel extends AdminPanel {
 		recipients.setValueField("username");
 		recipients.setDisplayField("username");
 
-		form.setItems(enabled, usernameMax, usernameDisableUser, usernameWait, ipMax, ipWait, recipients);
+		form.setItems(enabled, usernameMax, usernameDisableUser, usernameWait, ipMax, ipWait, apikeyMax, apikeyWait,
+				recipients);
 
 		body.addMember(form);
 
@@ -263,6 +273,8 @@ public class BruteForcePanel extends AdminPanel {
 		params.add(new GUIParameter(THROTTLE_USERNAME_WAIT, values.get("usernamewait").toString()));
 		params.add(new GUIParameter(THROTTLE_IP_MAX, values.get("ipmax").toString()));
 		params.add(new GUIParameter(THROTTLE_IP_WAIT, values.get("ipwait").toString()));
+		params.add(new GUIParameter(THROTTLE_APIKEY_MAX, values.get("apikeymax").toString()));
+		params.add(new GUIParameter(THROTTLE_APIKEY_WAIT, values.get("apikeywait").toString()));
 		params.add(new GUIParameter(THROTTLE_USERNAME_DISABLEUSER,
 				"yes".equals(values.get("usernamedisableuser").toString()) ? "true" : "false"));
 

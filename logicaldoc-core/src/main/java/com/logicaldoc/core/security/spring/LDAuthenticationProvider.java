@@ -88,9 +88,6 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 			String message = String.format("Username %s not found", username);
 			log.warn(message);
 
-			// Register a new login failure
-			LoginThrottle.recordFailure(username, key, client, nf);
-
 			// Hide the real exception reason to not disclose that the username
 			// doesn't exist
 			throw new CredentialsExpiredException("Bad credentials");
@@ -98,24 +95,15 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 			String message = String.format("User %s is disabled", username);
 			log.warn(message);
 
-			// Register a new login failure
-			LoginThrottle.recordFailure(username, key, client, ad);
-
 			throw new DisabledException(ad.getMessage());
 		} catch (PasswordExpiredException pe) {
 			String message = String.format("Credentials expired for user %s", username);
 			log.warn(message);
 
-			// Register a new login failure
-			LoginThrottle.recordFailure(username, key, client, pe);
-
 			throw new CredentialsExpiredException(pe.getMessage());
 		} catch (AccountExpiredException aee) {
 			String message = String.format("User %s expired on %s", username, aee.getDate());
 			log.warn(message);
-
-			// Register a new login failure
-			LoginThrottle.recordFailure(username, key, client, aee);
 
 			throw new CredentialsExpiredException(aee.getMessage());
 		} catch (AccountInactiveException aie) {
@@ -123,20 +111,13 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 					"User %s was considered inactive because there were no interactions for too many days", username);
 			log.warn(message);
 
-			// Register a new login failure
-			LoginThrottle.recordFailure(username, key, client, aie);
-
 			throw new CredentialsExpiredException(aie.getMessage());
 		} catch (OutsideWorkingTimeException owte) {
 			String message = String.format("User %s tried to enter outside his working hours", username);
 			log.warn(message);
 
-			// Register a new login failure
-			LoginThrottle.recordFailure(username, key, client, owte);
-
 			throw new CredentialsExpiredException(owte.getMessage());
 		} catch (com.logicaldoc.core.security.authentication.AuthenticationException ae) {
-			LoginThrottle.recordFailure(username, key, client, ae);
 			throw new CredentialsExpiredException(ae.getMessage() != null
 					? String.format("Security checks failed for user %s - %s", username, ae.getMessage())
 					: "badcredentials");

@@ -116,6 +116,9 @@
         <security:intercept-url pattern="/**"
             access="isAuthenticated()" />
            
+        <!-- Some session-related custom filters -->
+        <security:custom-filter ref="SessionIdFilter" before="PRE_AUTH_FILTER" />   
+           
         <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
     </security:http>
     

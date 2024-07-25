@@ -106,29 +106,6 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * 
 	 * @param username the username
 	 * @param password the passowrd
-	 * @param key the secret key
-	 * @param client client informations
-	 * 
-	 * @return the session created after the successful login
-	 *
-	 * @throws AuthenticationException raised in case of failed login
-	 */
-	public synchronized Session newSession(String username, String password, String key, Client client)
-			throws AuthenticationException {
-		User user = authenticationChain.authenticate(username, password, key, client);
-		if (user == null)
-			return null;
-		else {
-			return createSession(user, key, client);
-		}
-	}
-
-	/**
-	 * Creates a new session by authenticating the given user and stores it in
-	 * the pool of opened sessions
-	 * 
-	 * @param username the username
-	 * @param password the passowrd
 	 * @param request the current request
 	 * 
 	 * @return the session created after the successful login
@@ -158,18 +135,31 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	}
 
 	/**
-	 * Creates a new session by authenticating through an API Key and stores it
-	 * in the pool of opened sessions
+	 * Creates a new session by authenticating the given user and stores it in
+	 * the pool of opened sessions
 	 * 
-	 * @param apikey the API Key
-	 * @param request the current request
+	 * @param username the username
+	 * @param password the passowrd
+	 * @param key the secret key
+	 * @param client client informations
 	 * 
 	 * @return the session created after the successful login
 	 *
 	 * @throws AuthenticationException raised in case of failed login
 	 */
-	public synchronized Session newSession(String apikey, HttpServletRequest request) throws AuthenticationException {
-		return newSession(apikey, buildClient(request));
+	public synchronized Session newSession(String username, String password, String key, Client client)
+			throws AuthenticationException {
+		try {
+			User user = authenticationChain.authenticate(username, password, key, client);
+			if (user == null)
+				return null;
+			else {
+				return createSession(user, key, client);
+			}
+		} catch (AuthenticationException e) {
+			LoginThrottle.recordFailure(username, key, client, e);
+			throw e;
+		}
 	}
 
 	/**
@@ -184,11 +174,31 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * @throws AuthenticationException raised in case of failed login
 	 */
 	public synchronized Session newSession(String apikey, Client client) throws AuthenticationException {
-		User user = authenticationChain.authenticate("", "", apikey, client);
-		if (user == null)
-			return null;
-		else
-			return createSession(user, apikey, client);
+		try {
+			User user = authenticationChain.authenticate("", "", apikey, client);
+			if (user == null)
+				return null;
+			else
+				return createSession(user, apikey, client);
+		} catch (AuthenticationException e) {
+			LoginThrottle.recordFailure(null, apikey, client, e);
+			throw e;
+		}
+	}
+
+	/**
+	 * Creates a new session by authenticating through an API Key and stores it
+	 * in the pool of opened sessions
+	 * 
+	 * @param apikey the API Key
+	 * @param request the current request
+	 * 
+	 * @return the session created after the successful login
+	 *
+	 * @throws AuthenticationException raised in case of failed login
+	 */
+	public synchronized Session newSession(String apikey, HttpServletRequest request) throws AuthenticationException {
+		return newSession(apikey, buildClient(request));
 	}
 
 	/**

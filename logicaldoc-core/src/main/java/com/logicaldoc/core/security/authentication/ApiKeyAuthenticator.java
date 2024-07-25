@@ -45,7 +45,6 @@ public class ApiKeyAuthenticator extends DefaultAuthenticator {
 	@Override
 	public User authenticate(String username, String password, String apikey, Client client)
 			throws AuthenticationException {
-
 		// Skip whatever key that is not an API Key
 		if (StringUtils.isEmpty(apikey) || !apikey.startsWith("ld-"))
 			return null;

@@ -1407,7 +1407,16 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 						"_entity.name like '" + LoginThrottle.LOGINFAIL_IP
 								+ "%' and _entity.value >= :max and _entity.lastModified >= :oldestDate",
 						params, null, null));
-
+			
+			max = config.getInt("throttle.apikey.max", 0);
+			cal = Calendar.getInstance();
+			cal.add(Calendar.MINUTE, -config.getInt("throttle.apikey.wait", 0));
+			if (max > 0)
+				seqs.addAll(dao.findByWhere(
+						"_entity.name like '" + LoginThrottle.LOGINFAIL_APIKEY
+								+ "%' and _entity.value >= :max and _entity.lastModified >= :oldestDate",
+						params, null, null));
+			
 			ArrayList<GUISequence> ret = new ArrayList<>();
 			for (Sequence seq : seqs) {
 				GUISequence guiSeq = new GUISequence();

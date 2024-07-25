@@ -46,7 +46,7 @@ public class LoginThrottle {
 	private static final String THROTTLE_ENABLED = "throttle.enabled";
 
 	public static final String LOGINFAIL_APIKEY = "loginfail-apikey-";
-	
+
 	public static final String LOGINFAIL_IP = "loginfail-ip-";
 
 	public static final String LOGINFAIL_USERNAME = "loginfail-username-";
@@ -95,9 +95,8 @@ public class LoginThrottle {
 		// Update the failed login counters
 		if (Context.get().getProperties().getBoolean(THROTTLE_ENABLED)) {
 			SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
-			if (StringUtils.isNotEmpty(username)) {
+			if (StringUtils.isNotEmpty(username))
 				sDao.next(LOGINFAIL_USERNAME + username, 0L, Tenant.SYSTEM_ID);
-			}
 			if (StringUtils.isNotEmpty(client.getAddress()))
 				sDao.next(LOGINFAIL_IP + client.getAddress(), 0L, Tenant.SYSTEM_ID);
 			if (StringUtils.isNotEmpty(apiKey))
@@ -143,7 +142,7 @@ public class LoginThrottle {
 
 		// Check if the IP is temporarily blocked
 		checkIp(ip);
-		
+
 		// Check if the IP is temporarily blocked
 		checkApikey(apikey);
 	}
@@ -208,11 +207,11 @@ public class LoginThrottle {
 			}
 		}
 	}
-	
+
 	private static void checkApikey(String apikey) throws ApiKeyBlockedException {
-		if(StringUtils.isEmpty(apikey))
+		if (StringUtils.isEmpty(apikey))
 			return;
-		
+
 		SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
 		Calendar cal = Calendar.getInstance();
 
