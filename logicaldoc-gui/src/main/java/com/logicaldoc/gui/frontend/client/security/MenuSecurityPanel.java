@@ -16,7 +16,6 @@ import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.smartgwt.client.types.ListGridEditEvent;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -102,7 +101,7 @@ public class MenuSecurityPanel extends VLayout {
 
 		Button save = new Button(I18N.message("applyrights"));
 		save.setAutoFit(true);
-		save.addClickHandler((ClickEvent event) -> onSave());
+		save.addClickHandler(click -> onSave());
 		if (withSaveButton)
 			buttons.addMember(save);
 
@@ -153,7 +152,7 @@ public class MenuSecurityPanel extends VLayout {
 		groupForm.setItems(group);
 		buttons.addMember(groupForm);
 
-		group.addChangedHandler((ChangedEvent event) -> {
+		group.addChangedHandler(changed -> {
 			ListGridRecord selectedRecord = group.getSelectedRecord();
 			if (selectedRecord == null)
 				return;
@@ -173,7 +172,7 @@ public class MenuSecurityPanel extends VLayout {
 			rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("id"));
 			rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
 			rec.setAttribute(AVATAR, "group");
-			rec.setAttribute(READ, selectedRecord.getAttribute(READ));
+			rec.setAttribute(READ, true);
 			aclGrid.addData(rec);
 			group.clearValue();
 		});
