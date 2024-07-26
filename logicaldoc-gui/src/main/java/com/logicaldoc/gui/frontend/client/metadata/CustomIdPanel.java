@@ -241,6 +241,7 @@ public class CustomIdPanel extends AdminPanel {
 		VLayout sequencesPanel = new VLayout();
 		sequencesPanel.setMembers(toolStrip, sequences);
 
+		sequences.refresh(new SequencesDS("customid-"));
 		return sequencesPanel;
 	}
 
