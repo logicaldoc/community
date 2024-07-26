@@ -9,12 +9,6 @@ public class GUISequence implements Serializable {
 
 	private long id;
 
-	private String frequency = "";
-
-	private String template = "";
-	
-	private String folder = "";
-
 	private long value;
 
 	// If the current sequence year is = 0, it is not a year sequence.
@@ -22,26 +16,10 @@ public class GUISequence implements Serializable {
 
 	// If the current sequence month is = 0, it is not a month sequence.
 	private int month = 0;
-	
+
 	private String name;
 
 	private Date lastModified;
-	
-	public String getFrequency() {
-		return frequency;
-	}
-
-	public void setFrequency(String frequency) {
-		this.frequency = frequency;
-	}
-
-	public String getTemplate() {
-		return template;
-	}
-
-	public void setTemplate(String template) {
-		this.template = template;
-	}
 
 	public long getValue() {
 		return value;
@@ -73,14 +51,6 @@ public class GUISequence implements Serializable {
 
 	public void setId(long id) {
 		this.id = id;
-	}
-
-	public String getFolder() {
-		return folder;
-	}
-
-	public void setFolder(String folder) {
-		this.folder = folder;
 	}
 
 	public String getName() {

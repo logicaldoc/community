@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIScheme;
-import com.logicaldoc.gui.common.client.beans.GUISequence;
 
 public interface SchemeServiceAsync {
 
@@ -18,8 +17,5 @@ public interface SchemeServiceAsync {
 
 	void resetSequence(long sequenceId, long value, AsyncCallback<Void> callback);
 
-	void loadSequences(AsyncCallback<List<GUISequence>> callback);
-
 	void deleteSequence(long sequenceId, AsyncCallback<Void> callback);
-
 }

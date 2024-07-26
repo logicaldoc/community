@@ -9,7 +9,6 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIScheme;
-import com.logicaldoc.gui.common.client.beans.GUISequence;
 
 /**
  * The client side stub for the SchemeService Service. This service gives all
@@ -67,15 +66,6 @@ public interface SchemeService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public void resetSequence(long sequenceId, long value) throws ServerException;
-
-	/**
-	 * Loads the list of sequences
-	 * 
-	 * @return all the sequences
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public List<GUISequence> loadSequences() throws ServerException;
 
 	/**
 	 * Deletes the given sequence

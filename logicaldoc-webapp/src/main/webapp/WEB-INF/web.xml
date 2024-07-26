@@ -446,7 +446,15 @@
   	<servlet-name>ApiKeysData</servlet-name>
     <servlet-class>com.logicaldoc.web.data.ApiKeysDataServlet</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>SequencesData</servlet-name>
+    <servlet-class>com.logicaldoc.web.data.SequencesDataServlet</servlet-class>
+  </servlet>
   
+  <servlet-mapping>
+    <servlet-name>SequencesData</servlet-name>
+    <url-pattern>/data/sequences.xml</url-pattern>
+  </servlet-mapping>   
   <servlet-mapping>
     <servlet-name>ApiKeysData</servlet-name>
     <url-pattern>/data/apikeys.xml</url-pattern>
