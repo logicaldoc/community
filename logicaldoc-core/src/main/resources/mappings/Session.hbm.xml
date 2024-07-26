@@ -18,6 +18,7 @@
 		<property name="sid" type="string" column="ld_sid" not-null="true" length="255" />
 		<property name="username" type="string" column="ld_username" length="255" />
 		<property name="key" type="string" column="ld_key" length="255" />
+		<property name="keylabel" type="string" column="ld_keylabel" length="255" />
 		<property name="node" type="string" column="ld_node" length="255" />
 		<property name="tenantName" type="string" column="ld_tenantname" length="255" />
 		<property name="lastRenew" type="timestamp" column="ld_lastrenew" />

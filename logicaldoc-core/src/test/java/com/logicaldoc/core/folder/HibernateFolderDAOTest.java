@@ -156,8 +156,8 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		folder = dao.findById(1210L);
 		dao.initialize(folder);
-		Assert.assertEquals(2, folder.getStorages().keySet().size());
-		Assert.assertEquals(3, folder.getStorage().intValue());
+		Assert.assertEquals(2, folder.getStores().keySet().size());
+		Assert.assertEquals(3, folder.getStore().intValue());
 	}
 
 	@Test
@@ -646,7 +646,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		// Try a folder with extended attributes
 		folder = dao.findById(1202);
 		dao.initialize(folder);
-		folder.setStorage(9);
+		folder.setStore(9);
 		Assert.assertNotNull(folder);
 		Assert.assertEquals("test_val_1", folder.getValue("val1"));
 		folder.setValue("val1", "xyz");
@@ -656,7 +656,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		dao.initialize(folder);
 		Assert.assertNotNull(folder);
 		Assert.assertEquals("xyz", folder.getValue("val1"));
-		Assert.assertEquals(9, folder.getStorage().intValue());
+		Assert.assertEquals(9, folder.getStore().intValue());
 	}
 
 	@Test
@@ -1536,28 +1536,28 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testApplyStorageToTree() throws PersistenceException {
+	public void testApplyStoreToTree() throws PersistenceException {
 		Folder folder = dao.findById(1200);
 		dao.initialize(folder);
-		Assert.assertNull(folder.getStorage());
-		folder.setStorage(1);
+		Assert.assertNull(folder.getStore());
+		folder.setStore(1);
 		dao.store(folder);
 		folder = dao.findById(1200);
 		dao.initialize(folder);
-		Assert.assertEquals(Integer.valueOf(1), folder.getStorage());
+		Assert.assertEquals(Integer.valueOf(1), folder.getStore());
 
 		folder = dao.findById(1201);
 		dao.initialize(folder);
-		Assert.assertNull(folder.getStorage());
+		Assert.assertNull(folder.getStore());
 
 		FolderHistory transaction = new FolderHistory();
 		transaction.setUser(userDao.findById(User.USERID_ADMIN));
 		transaction.setNotified(0);
-		dao.applyStorageToTree(1200, transaction);
+		dao.applyStoreToTree(1200, transaction);
 
 		folder = dao.findById(1201);
 		dao.initialize(folder);
-		Assert.assertEquals(Integer.valueOf(1), folder.getStorage());
+		Assert.assertEquals(Integer.valueOf(1), folder.getStore());
 	}
 
 	@Test

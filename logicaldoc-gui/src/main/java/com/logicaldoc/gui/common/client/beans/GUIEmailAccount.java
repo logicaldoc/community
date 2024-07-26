@@ -72,7 +72,7 @@ public class GUIEmailAccount implements Serializable {
 	private Date startDate;
 
 	/**
-	 * This attribute defines the EmailAccount storage format.
+	 * This attribute defines the EmailAccount store format.
 	 * 
 	 * @see #FORMAT_MULTIPLE
 	 * @see #FORMAT_EML

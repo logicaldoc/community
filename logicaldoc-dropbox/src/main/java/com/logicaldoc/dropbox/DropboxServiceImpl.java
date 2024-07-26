@@ -34,7 +34,7 @@ import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.gui.common.client.InvalidSessionServerException;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.frontend.client.services.DropboxService;
@@ -209,7 +209,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 	private void uploadDocument(Long docId, String path, Dropbox dropbox, Session session)
 			throws IOException, PersistenceException {
-		Storer store = (Storer) Context.get().getBean(Storer.class);
+		Store store = (Store) Context.get().getBean(Store.class);
 		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
 		File temp = null;

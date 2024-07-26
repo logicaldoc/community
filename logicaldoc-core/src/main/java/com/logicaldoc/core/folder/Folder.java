@@ -83,10 +83,10 @@ public class Folder extends SecurableExtensibleObject implements Comparable<Fold
 	private Long foldRef;
 
 	/**
-	 * The default storages to use for this folder in the nodes(key: nodeId -
-	 * value: storageId)
+	 * The default stores to use for this folder in the nodes(key: nodeId -
+	 * value: storeId)
 	 */
-	private Map<String, Integer> storages = new HashMap<>();
+	private Map<String, Integer> stores = new HashMap<>();
 
 	private Integer maxVersions;
 
@@ -152,7 +152,7 @@ public class Folder extends SecurableExtensibleObject implements Comparable<Fold
 		this.quotaThreshold = source.quotaThreshold;
 		this.quotaAlertRecipients = source.quotaAlertRecipients;
 		this.foldRef = source.foldRef;
-		this.storages = source.storages;
+		this.stores = source.stores;
 		this.maxVersions = source.maxVersions;
 		this.color = source.color;
 		this.tags = source.tags;
@@ -195,10 +195,10 @@ public class Folder extends SecurableExtensibleObject implements Comparable<Fold
 			// may happen do nothing
 		}
 
-		setStorages(new HashMap<>());
+		setStores(new HashMap<>());
 		try {
-			for (String nodeId : source.getStorages().keySet()) {
-				getStorages().put(nodeId, source.getStorages().get(nodeId));
+			for (String nodeId : source.getStores().keySet()) {
+				getStores().put(nodeId, source.getStores().get(nodeId));
 			}
 		} catch (LazyInitializationException x) {
 			// may happen do nothing
@@ -342,30 +342,30 @@ public class Folder extends SecurableExtensibleObject implements Comparable<Fold
 	}
 
 	/**
-	 * Gets the default storage to use from this folder in the current node
+	 * Gets the default store to use from this folder in the current node
 	 * 
-	 * @return identifier of the default storage
+	 * @return identifier of the default store
 	 */
-	public Integer getStorage() {
+	public Integer getStore() {
 		try {
-			return storages.get(Context.get().getProperties().get("id"));
+			return stores.get(Context.get().getProperties().get("id"));
 		} catch (Exception t) {
 			return null;
 		}
 	}
 
 	/**
-	 * Gets the default storage to use from this folder in the current node
+	 * Gets the default store to use from this folder in the current node
 	 * 
-	 * @param storage identifier of the default storage
+	 * @param store identifier of the default store
 	 */
-	public void setStorage(Integer storage) {
+	public void setStore(Integer store) {
 		try {
 			String nodeId = Context.get().getProperties().getProperty("id");
-			if (storage == null)
-				storages.remove(nodeId);
+			if (store == null)
+				stores.remove(nodeId);
 			else
-				storages.put(nodeId, storage);
+				stores.put(nodeId, store);
 		} catch (Exception t) {
 			// Nothing to do
 		}
@@ -563,12 +563,12 @@ public class Folder extends SecurableExtensibleObject implements Comparable<Fold
 		return getName() + "(" + getId() + ")";
 	}
 
-	public Map<String, Integer> getStorages() {
-		return storages;
+	public Map<String, Integer> getStores() {
+		return stores;
 	}
 
-	public void setStorages(Map<String, Integer> storages) {
-		this.storages = storages;
+	public void setStores(Map<String, Integer> stores) {
+		this.stores = stores;
 	}
 
 	public String getTile() {

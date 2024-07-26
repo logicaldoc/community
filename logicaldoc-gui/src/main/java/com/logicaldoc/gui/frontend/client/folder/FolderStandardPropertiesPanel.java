@@ -81,17 +81,17 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 		TextItem name = prepareNameItem();
 
-		FormItemIcon applyStorageToSubfolders = prepareApplyStorageToSubfoldersItem();
+		FormItemIcon applyStoreToSubfolders = prepareApplyStoreToSubfoldersItem();
 
-		FormItemIcon enforceStorage = prepareEnforceStorage();
+		FormItemIcon enforceStore = prepareEnforceStore();
 
-		SelectItem storage = ItemFactory.newStorageSelector("storage", folder.getStorage());
-		storage.setDisabled(!folder.hasPermission(GUIAccessControlEntry.PERMISSION_STORAGE));
-		boolean storageVisible = folder.getFoldRef() == null && Feature.enabled(Feature.MULTI_STORAGE);
-		storage.setVisible(storageVisible);
-		if (folder.hasPermission(GUIAccessControlEntry.PERMISSION_STORAGE) && storageVisible) {
-			storage.addChangedHandler(changedHandler);
-			storage.setIcons(applyStorageToSubfolders, enforceStorage);
+		SelectItem store = ItemFactory.newStoreSelector("store", folder.getStore());
+		store.setDisabled(!folder.hasPermission(GUIAccessControlEntry.PERMISSION_STORE));
+		boolean storeVisible = folder.getFoldRef() == null && Feature.enabled(Feature.MULTI_STORE);
+		store.setVisible(storeVisible);
+		if (folder.hasPermission(GUIAccessControlEntry.PERMISSION_STORE) && storeVisible) {
+			store.addChangedHandler(changedHandler);
+			store.setIcons(applyStoreToSubfolders, enforceStore);
 		}
 
 		SpinnerItem maxVersions = prepareMaxVersionsItem();
@@ -143,13 +143,13 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		addComputeStatsIcons(documents, subfolders, size);
 
 		List<FormItem> items = new ArrayList<>();
-		items.addAll(Arrays.asList(idItem, pathItem, name, description, storage, maxVersions, creation, documents,
+		items.addAll(Arrays.asList(idItem, pathItem, name, description, store, maxVersions, creation, documents,
 				subfolders, size, barcode));
 
 		if (!Feature.enabled(Feature.BARCODES))
 			items.remove(barcode);
-		if (!Feature.enabled(Feature.MULTI_STORAGE))
-			items.remove(storage);
+		if (!Feature.enabled(Feature.MULTI_STORE))
+			items.remove(store);
 		if (folder.isDefaultWorkspace())
 			items.remove(name);
 
@@ -225,19 +225,19 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		return pathItem;
 	}
 
-	private FormItemIcon prepareEnforceStorage() {
-		FormItemIcon enforceStorage = new FormItemIcon();
-		enforceStorage.setPrompt(I18N.message("enforcefilesintofolderstorage"));
-		enforceStorage.setSrc("[SKIN]/data_into.png");
-		enforceStorage.setWidth(16);
-		enforceStorage.setHeight(16);
+	private FormItemIcon prepareEnforceStore() {
+		FormItemIcon enforceStore = new FormItemIcon();
+		enforceStore.setPrompt(I18N.message("enforcefilesintofolderstorage"));
+		enforceStore.setSrc("[SKIN]/data_into.png");
+		enforceStore.setWidth(16);
+		enforceStore.setHeight(16);
 		
-		enforceStorage.addFormItemClickHandler(event -> {
+		enforceStore.addFormItemClickHandler(event -> {
 			LD.ask(I18N.message("enforcementofstorage"),
 					I18N.message("enforcefilesintofolderstorage") + ".\n" + I18N.message("doyouwanttoproceed"), yes -> {
 						if (Boolean.TRUE.equals(yes)) {
 							LD.contactingServer();
-							DocumentService.Instance.get().enforceFilesIntoFolderStorage(folder.getId(),
+							DocumentService.Instance.get().enforceFilesIntoFolderStore(folder.getId(),
 									new AsyncCallback<>() {
 
 										@Override
@@ -256,18 +256,18 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 			event.cancel();
 		});
-		return enforceStorage;
+		return enforceStore;
 	}
 
-	private FormItemIcon prepareApplyStorageToSubfoldersItem() {
-		FormItemIcon applyStorageToSubfolders = new FormItemIcon();
-		applyStorageToSubfolders.setPrompt(I18N.message("applytosubfolders"));
-		applyStorageToSubfolders.setSrc("[SKIN]/page_save.png");
-		applyStorageToSubfolders.setWidth(16);
-		applyStorageToSubfolders.setHeight(16);
-		applyStorageToSubfolders.addFormItemClickHandler(applyStorageToSubfoldersClick -> {
+	private FormItemIcon prepareApplyStoreToSubfoldersItem() {
+		FormItemIcon applyStoreToSubfolders = new FormItemIcon();
+		applyStoreToSubfolders.setPrompt(I18N.message("applytosubfolders"));
+		applyStoreToSubfolders.setSrc("[SKIN]/page_save.png");
+		applyStoreToSubfolders.setWidth(16);
+		applyStoreToSubfolders.setHeight(16);
+		applyStoreToSubfolders.addFormItemClickHandler(applyStoreToSubfoldersClick -> {
 			LD.contactingServer();
-			FolderService.Instance.get().applyStorage(folder.getId(), new AsyncCallback<>() {
+			FolderService.Instance.get().applyStore(folder.getId(), new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -280,9 +280,9 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 					LD.clearPrompt();
 				}
 			});
-			applyStorageToSubfoldersClick.cancel();
+			applyStoreToSubfoldersClick.cancel();
 		});
-		return applyStorageToSubfolders;
+		return applyStoreToSubfolders;
 	}
 
 	private TextItem prepareNameItem() {
@@ -462,11 +462,11 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		if (vm.getValueAsString("name") != null)
 			folder.setName(vm.getValueAsString("name").replace("/", ""));
 
-		if (folder.hasPermission(GUIAccessControlEntry.PERMISSION_STORAGE))
+		if (folder.hasPermission(GUIAccessControlEntry.PERMISSION_STORE))
 			try {
-				folder.setStorage(Integer.parseInt(vm.getValueAsString("storage")));
+				folder.setStore(Integer.parseInt(vm.getValueAsString("store")));
 			} catch (Exception t) {
-				folder.setStorage(null);
+				folder.setStore(null);
 			}
 
 		if (folder.isWorkspace())

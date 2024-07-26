@@ -1,6 +1,6 @@
 /**
  * The store sub-system responsible for persisting the binaries of the
- * documents. Implementations of {@link com.logicaldoc.core.store.Storer} work
+ * documents. Implementations of {@link com.logicaldoc.core.store.Store} work
  * with different storing technologies
  *
  * @since 1.0

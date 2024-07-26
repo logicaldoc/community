@@ -92,7 +92,7 @@ public class TaskScheduling {
 	}
 
 	/**
-	 * Loads scheduling configurations from persistent storage
+	 * Loads scheduling configurations from persistent store
 	 * 
 	 * @throws IOException error reading the configuration file
 	 * 
@@ -114,7 +114,7 @@ public class TaskScheduling {
 	}
 
 	/**
-	 * Saves scheduling configurations in the persistent storage
+	 * Saves scheduling configurations in the persistent store
 	 * 
 	 * @throws IOException raised is an I/O problem occurs
 	 * @throws ParseException raised if the scheduling expression is invalid

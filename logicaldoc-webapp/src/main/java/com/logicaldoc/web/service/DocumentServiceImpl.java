@@ -90,7 +90,7 @@ import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.core.transfer.InMemoryZipImport;
@@ -1642,11 +1642,11 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	private File createTile(Document doc, String sid) throws IOException {
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
-		String tileResource = storer.getResourceName(doc, doc.getFileVersion(), ThumbnailManager.SUFFIX_TILE);
+		Store store = (Store) Context.get().getBean(Store.class);
+		String tileResource = store.getResourceName(doc, doc.getFileVersion(), ThumbnailManager.SUFFIX_TILE);
 
 		// In any case try to produce the thumbnail
-		if (storer.size(doc.getId(), tileResource) <= 0L) {
+		if (store.size(doc.getId(), tileResource) <= 0L) {
 			ThumbnailManager thumbManager = (ThumbnailManager) Context.get().getBean(ThumbnailManager.class);
 			try {
 				thumbManager.createTile(doc, doc.getFileVersion(), sid);
@@ -1655,9 +1655,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			}
 		}
 
-		if (storer.exists(doc.getId(), tileResource)) {
+		if (store.exists(doc.getId(), tileResource)) {
 			File file = FileUtil.createTempFile("tile-", ".png");
-			storer.writeToFile(doc.getId(), tileResource, file);
+			store.writeToFile(doc.getId(), tileResource, file);
 			return file;
 		}
 
@@ -1667,9 +1667,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	private void createAttachment(EMail email, long docId, boolean pdfConversion, String sid)
 			throws IOException, PersistenceException {
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
+		Store store = (Store) Context.get().getBean(Store.class);
 		Document doc = docDao.findDocument(docId);
-		String resource = storer.getResourceName(doc, null, null);
+		String resource = store.getResourceName(doc, null, null);
 
 		boolean convertToPdf = pdfConversion;
 		if ((doc.getDocRef() != null) && ("pdf".equals(doc.getDocRefType()))) {
@@ -1689,13 +1689,13 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				FormatConverterManager manager = (FormatConverterManager) Context.get()
 						.getBean(FormatConverterManager.class);
 				manager.convertToPdf(doc, sid);
-				resource = storer.getResourceName(doc, null, "conversion.pdf");
+				resource = store.getResourceName(doc, null, "conversion.pdf");
 			}
 			att.setMimeType(MimeType.get("pdf"));
 			att.setFileName(FileUtil.getBaseName(doc.getFileName()) + ".pdf");
 		}
 
-		att.setData(storer.getBytes(doc.getId(), resource));
+		att.setData(store.getBytes(doc.getId(), resource));
 
 		email.addAttachment(2 + email.getAttachments().size(), att);
 	}
@@ -2474,10 +2474,10 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				doc = docDao.findById(doc.getDocRef());
 
 			// Obtain the document's file stream
-			Storer storer = (Storer) Context.get().getBean(Storer.class);
-			String resource = storer.getResourceName(doc, null, null);
+			Store store = (Store) Context.get().getBean(Store.class);
+			String resource = store.getResourceName(doc, null, null);
 
-			return storer.getString(doc.getId(), resource);
+			return store.getString(doc.getId(), resource);
 		} catch (PersistenceException | ServerException | IOException e) {
 			return (String) throwServerException(session, log, e);
 		}
@@ -2668,12 +2668,12 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			return (GUIEmail) throwServerException(session, log, e1);
 		}
 
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
-		String resource = storer.getResourceName(docId, fileVersion, null);
+		Store store = (Store) Context.get().getBean(Store.class);
+		String resource = store.getResourceName(docId, fileVersion, null);
 
 		GUIDocument guiDocument = getById(docId);
 
-		try (InputStream is = storer.getStream(emailDocument.getId(), resource)) {
+		try (InputStream is = store.getStream(emailDocument.getId(), resource)) {
 			GUIEmail guiMail = new GUIEmail();
 			EMail email = readEmail(is, emailDocument.getId(), guiDocument);
 			if (email != null) {
@@ -2765,9 +2765,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				throw new ServerException("Not an email file");
 			checkPermission(Permission.WRITE, session.getUser(), doc.getFolder().getId());
 
-			Storer storer = (Storer) Context.get().getBean(Storer.class);
-			String resource = storer.getResourceName(docId, fileVersion, null);
-			is = storer.getStream(docId, resource);
+			Store store = (Store) Context.get().getBean(Store.class);
+			String resource = store.getResourceName(docId, fileVersion, null);
+			is = store.getStream(docId, resource);
 
 			EMail email = MailUtil.messageToMail(is, true);
 			EMailAttachment attachment = null;
@@ -2992,9 +2992,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public void enforceFilesIntoFolderStorage(long folderId) throws ServerException {
+	public void enforceFilesIntoFolderStore(long folderId) throws ServerException {
 		Session session = validateSession();
-		executeLongRunningOperation("Enforce Files Into Folder Storage", () -> {
+		executeLongRunningOperation("Enforce Files Into Folder Store", () -> {
 			User user = session.getUser();
 			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 			int movedFiles = 0;
@@ -3005,15 +3005,15 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				treePath = fDao.computePathExtended(folderId);
 				DocumentHistory transaction = new DocumentHistory();
 				transaction.setSession(session);
-				movedFiles = manager.enforceFilesIntoFolderStorage(folderId, transaction);
+				movedFiles = manager.enforceFilesIntoFolderStore(folderId, transaction);
 
-				log.info("Notify the move of {} files to the right storage in the tree {}", movedFiles, treePath);
+				log.info("Notify the move of {} files to the right store in the tree {}", movedFiles, treePath);
 
 				notifyEnforcement(session, I18N.message("enforcementofstoragereport", user.getLocale(),
 						new Object[] { movedFiles, treePath }));
 
 			} catch (Exception t) {
-				log.error("Error enforcing files storage into tree {}", treePath);
+				log.error("Error enforcing files store into tree {}", treePath);
 				log.error(t.getMessage(), t);
 				try {
 					notifyEnforcement(session, I18N.message("enforcementofstorageerror", user.getLocale(),

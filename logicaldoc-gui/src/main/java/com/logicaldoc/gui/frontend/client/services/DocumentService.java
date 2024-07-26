@@ -682,7 +682,7 @@ public interface DocumentService extends RemoteService {
 	public void deDuplicate(Long folderId, boolean retainNewest) throws ServerException;
 
 	/**
-	 * Enforces that all the files in the given tree are stored in the storage
+	 * Enforces that all the files in the given tree are stored in the store
 	 * configured in the owning folder. The process is asynchronous, at the end
 	 * an internal message to the user will be sent to alert him about its end.
 	 * 
@@ -690,7 +690,7 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void enforceFilesIntoFolderStorage(long folderId) throws ServerException;
+	public void enforceFilesIntoFolderStore(long folderId) throws ServerException;
 
 	/**
 	 * Merges a set of documents into a single PDF

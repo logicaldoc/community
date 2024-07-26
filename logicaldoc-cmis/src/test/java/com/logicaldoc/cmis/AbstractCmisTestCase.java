@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ResourceUtil;
@@ -39,17 +39,17 @@ public abstract class AbstractCmisTestCase extends AbstractTestCase {
 		 * Prepare a test store file
 		 */
 		String storePath = Context.get().getProperties().getProperty("store.1.dir");
-		File store = new File(storePath);
+		File storeRoot = new File(storePath);
 
-		FileUtil.delete(store);
+		FileUtil.delete(storeRoot);
 
-		store.mkdir();
-		new File(store, "5/doc").mkdirs();
+		storeRoot.mkdir();
+		new File(storeRoot, "5/doc").mkdirs();
 
-		Storer storer = (Storer) context.getBean("Storer");
-		storer.init();
+		Store store = (Store) context.getBean("Store");
+		store.init();
 
-		ResourceUtil.copyResource("/data.sql", new File(store, "5/doc/1.0"));
+		ResourceUtil.copyResource("/data.sql", new File(storeRoot, "5/doc/1.0"));
 	}
 
 	@Override

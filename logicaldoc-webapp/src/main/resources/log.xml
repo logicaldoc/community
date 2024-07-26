@@ -519,14 +519,14 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
-    <RollingFile name="STORAGE_DELETIONS_WEB" fileName="${root}/storage_deletions_web.log.html" filePattern="${root}/storage_deletions_web.log.html.%i">
+    <RollingFile name="STORE_DELETIONS_WEB" fileName="${root}/store_deletions_web.log.html" filePattern="${root}/store_deletions_web.log.html.%i">
       <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>    
-    <RollingFile name="STORAGE_DELETIONS" fileName="${root}/storage_deletions.log" filePattern="${root}/storage_deletions.log.%i">
+    <RollingFile name="STORE_DELETIONS" fileName="${root}/store_deletions.log" filePattern="${root}/store_deletions.log.%i">
       <PatternLayout>
         <Pattern>%d{dd.MM.yyyy HH:mm:ss,SSS} - %m%n</Pattern>
       </PatternLayout>
@@ -557,9 +557,9 @@
       <AppenderRef ref="DB" />
       <AppenderRef ref="DB_WEB" />
     </Logger>    
-    <Logger name="STORAGE_DELETIONS" level="info" additivity="false">
-      <AppenderRef ref="STORAGE_DELETIONS" />
-      <AppenderRef ref="STORAGE_DELETIONS_WEB" />
+    <Logger name="STORE_DELETIONS" level="info" additivity="false">
+      <AppenderRef ref="STORE_DELETIONS" />
+      <AppenderRef ref="STORE_DELETIONS_WEB" />
     </Logger>    
     <Logger name="com.logicaldoc.core" level="info" additivity="true" />
     <Logger name="com.logicaldoc.web" level="info" additivity="true" />
@@ -583,7 +583,7 @@
       <Appender-Ref ref="Cleaner" />
       <Appender-Ref ref="Cleaner_WEB" />
     </Logger>
-    <Logger name="com.logicaldoc.enterprise.storer.FSCleanerTask" level="info" additivity="false">
+    <Logger name="com.logicaldoc.enterprise.store.FSCleanerTask" level="info" additivity="false">
       <Appender-Ref ref="FSCleaner" />
       <Appender-Ref ref="FSCleaner_WEB" />
     </Logger>

@@ -1,5 +1,6 @@
 package com.logicaldoc.core.security;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -26,6 +27,7 @@ import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.core.security.user.UserHistoryDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.crypt.CryptUtil;
 
 /**
  * A single user session with it's unique identifier and the reference to the
@@ -66,9 +68,16 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 	/**
 	 * A third parameter(other than the username and password) given by the
-	 * client at login time, or an API Key generated in LogicalDOC
+	 * client at login time, or an API Key generated in LogicalDOC.
 	 */
 	private String key;
+
+	private String decodedKey;
+
+	/**
+	 * A human readable visualization of part of the key
+	 */
+	private String keyLabel;
 
 	private String username;
 
@@ -173,6 +182,26 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		userHistoryDAO.createUserHistory(user, UserEvent.LOGOUT.toString(), null, sid, client);
 	}
 
+	public String getDecodedKey() {
+		return decodedKey;
+	}
+
+	/**
+	 * Sets the key and encode it
+	 * 
+	 * @param key The key in readable format
+	 * @throws NoSuchAlgorithmException Cripting error
+	 */
+	public void setDecodedKey(String decodedKey) throws NoSuchAlgorithmException {
+		if (StringUtils.isNotEmpty(decodedKey)) {
+			this.decodedKey = decodedKey;
+			this.key = CryptUtil.encryptSHA256(decodedKey);
+			this.keyLabel = StringUtils.abbreviate(decodedKey, 10)
+					+ (decodedKey.length() > 14 ? StringUtils.right(decodedKey, 4) : "");
+		}
+	}
+
+	@SuppressWarnings("unused")
 	private Session() {
 		// Just o avoid standard constructor
 	}
@@ -187,7 +216,11 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.tenantId = user.getTenantId();
 		this.user = user;
 		this.username = user.getUsername();
-		this.key = key;
+		try {
+			setDecodedKey(key);
+		} catch (NoSuchAlgorithmException e) {
+			log.warn("Cannot save the key", e);
+		}
 		this.client = client;
 		this.node = SystemInfo.get().getInstallationId();
 		this.setLastRenew(getCreation());
@@ -266,6 +299,8 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.setTenantName(other.tenantName);
 		this.setSid(other.sid);
 		this.key = other.key;
+		this.keyLabel = other.keyLabel;
+		this.decodedKey = other.decodedKey;
 		this.setNode(other.node);
 		this.username = other.username;
 		this.setCreation(other.getCreation());
@@ -491,5 +526,13 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 	protected void setStatus(int status) {
 		this.status = status;
+	}
+
+	public String getKeyLabel() {
+		return keyLabel;
+	}
+
+	public void setKeyLabel(String keyLabel) {
+		this.keyLabel = keyLabel;
 	}
 }

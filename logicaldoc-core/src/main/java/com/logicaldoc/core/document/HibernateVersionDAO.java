@@ -18,7 +18,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -32,8 +32,8 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 
 	private static final String DOC_ID = ".docId=";
 
-	@Resource(name = "Storer")
-	private Storer storer;
+	@Resource(name = "Store")
+	private Store store;
 
 	@Resource(name = "FolderDAO")
 	private FolderDAO folderDAO;
@@ -125,7 +125,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	}
 
 	private void cleanUnusedFiles(Version version, Set<String> filesToBeRetained) {
-		List<String> resources = storer.listResources(version.getDocId(), null);
+		List<String> resources = store.listResources(version.getDocId(), null);
 		for (String resource : resources) {
 			boolean toDelete = true;
 			for (String fileVersionToRetain : filesToBeRetained) {
@@ -136,7 +136,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 				}
 			}
 			if (toDelete) {
-				storer.delete(version.getDocId(), resource);
+				store.delete(version.getDocId(), resource);
 			}
 		}
 	}
@@ -156,10 +156,10 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	@Override
 	public void updateDigest(Version version) {
 		initialize(version);
-		String resource = storer.getResourceName(version.getDocId(), version.getFileVersion(), null);
-		if (storer.exists(version.getDocId(), resource)) {
+		String resource = store.getResourceName(version.getDocId(), version.getFileVersion(), null);
+		if (store.exists(version.getDocId(), resource)) {
 
-			try (InputStream in = storer.getStream(version.getDocId(), resource);) {
+			try (InputStream in = store.getStream(version.getDocId(), resource);) {
 				version.setDigest(FileUtil.computeDigest(in));
 			} catch (IOException e) {
 				log.error("Cannot retrieve the content of version {}", version);
@@ -169,8 +169,8 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 		}
 	}
 
-	public void setStorer(Storer storer) {
-		this.storer = storer;
+	public void setStore(Store store) {
+		this.store = store;
 	}
 
 	@Override

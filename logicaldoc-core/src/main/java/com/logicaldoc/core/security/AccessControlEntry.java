@@ -58,7 +58,7 @@ public class AccessControlEntry implements Serializable {
 
 	private int automation = 0;
 
-	private int storage = 0;
+	private int store = 0;
 
 	private int readingreq = 0;
 
@@ -88,7 +88,7 @@ public class AccessControlEntry implements Serializable {
 		this.rename = source.rename;
 		this.security = source.security;
 		this.sign = source.sign;
-		this.storage = source.storage;
+		this.store = source.store;
 		this.subscription = source.subscription;
 		this.workflow = source.workflow;
 		this.write = source.write;
@@ -267,12 +267,12 @@ public class AccessControlEntry implements Serializable {
 		this.automation = automation;
 	}
 
-	public int getStorage() {
-		return storage;
+	public int getStore() {
+		return store;
 	}
 
-	public void setStorage(int storage) {
-		this.storage = storage;
+	public void setStore(int store) {
+		this.store = store;
 	}
 
 	public int getReadingreq() {
@@ -336,8 +336,8 @@ public class AccessControlEntry implements Serializable {
 			granted.add(Permission.SECURITY);
 		if (sign == 1)
 			granted.add(Permission.SIGN);
-		if (storage == 1)
-			granted.add(Permission.STORAGE);
+		if (store == 1)
+			granted.add(Permission.STORE);
 		if (subscription == 1)
 			granted.add(Permission.SUBSCRIPTION);
 		if (workflow == 1)
@@ -392,7 +392,7 @@ public class AccessControlEntry implements Serializable {
 		rename = booleanToInt(permissions.contains(Permission.RENAME));
 		security = booleanToInt(permissions.contains(Permission.SECURITY));
 		sign = booleanToInt(permissions.contains(Permission.SIGN));
-		storage = booleanToInt(permissions.contains(Permission.STORAGE));
+		store = booleanToInt(permissions.contains(Permission.STORE));
 		subscription = booleanToInt(permissions.contains(Permission.SUBSCRIPTION));
 		workflow = booleanToInt(permissions.contains(Permission.WORKFLOW));
 		write = booleanToInt(permissions.contains(Permission.WRITE));

@@ -42,8 +42,8 @@ import com.logicaldoc.gui.common.client.data.LoggersDS;
 import com.logicaldoc.gui.common.client.data.OCRTemplatesDS;
 import com.logicaldoc.gui.common.client.data.SkinsDS;
 import com.logicaldoc.gui.common.client.data.StampsDS;
-import com.logicaldoc.gui.common.client.data.StoragesDS;
-import com.logicaldoc.gui.common.client.data.StoragesTypesDS;
+import com.logicaldoc.gui.common.client.data.StoresDS;
+import com.logicaldoc.gui.common.client.data.StoreTypesDS;
 import com.logicaldoc.gui.common.client.data.TagsDS;
 import com.logicaldoc.gui.common.client.data.TemplatesDS;
 import com.logicaldoc.gui.common.client.data.TenantsDS;
@@ -662,10 +662,10 @@ public class ItemFactory {
 		return item;
 	}
 
-	public static SelectItem newStorageSelector(String name, Integer value) {
+	public static SelectItem newStoreSelector(String name, Integer value) {
 		SelectItem item = new SelectItem();
 		item.setName(originalItemName(name));
-		item.setTitle(I18N.message("storage"));
+		item.setTitle(I18N.message("store"));
 		item.setWrapTitle(false);
 		item.setDisplayField("name");
 		item.setValueField("id");
@@ -676,7 +676,7 @@ public class ItemFactory {
 		nameField.setShowTitle(false);
 
 		item.setPickListFields(nameField);
-		item.setOptionDataSource(new StoragesDS(true, false));
+		item.setOptionDataSource(new StoresDS(true, false));
 
 		if (value != null)
 			item.setValue(value.toString());
@@ -684,13 +684,13 @@ public class ItemFactory {
 		return item;
 	}
 
-	public static SelectItem newStorageTypeSelector() {
+	public static SelectItem newStoreTypeSelector() {
 		SelectItem item = new SelectItem("type", I18N.message("type"));
 		item.setWidth(140);
 		item.setWrapTitle(false);
 		item.setDisplayField("name");
 		item.setValueField("id");
-		item.setOptionDataSource(new StoragesTypesDS());
+		item.setOptionDataSource(new StoreTypesDS());
 		return item;
 	}
 

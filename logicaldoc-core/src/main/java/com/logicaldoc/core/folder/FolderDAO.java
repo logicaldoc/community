@@ -706,14 +706,14 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	public void applyTagsToTree(long id, FolderHistory transaction) throws PersistenceException;
 
 	/**
-	 * Propagates the storage setting to the whole subree
+	 * Propagates the store setting to the whole subree
 	 * 
 	 * @param id identifier of the folder
 	 * @param transaction session informations
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
-	public void applyStorageToTree(long id, FolderHistory transaction) throws PersistenceException;
+	public void applyStoreToTree(long id, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Propagates the OCR settings to the whole subree

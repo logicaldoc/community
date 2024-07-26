@@ -319,7 +319,7 @@ public abstract class Task implements Runnable {
 
 	/**
 	 * Concrete implementations must insert here the code needed to save the
-	 * elaboration state in a persistent storage
+	 * elaboration state in a persistent store
 	 */
 	public void saveWork() {
 		// By default do nothing

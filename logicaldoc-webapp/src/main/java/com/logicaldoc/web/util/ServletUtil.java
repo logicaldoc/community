@@ -47,7 +47,7 @@ import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.MimeType;
 import com.logicaldoc.util.io.FileUtil;
@@ -226,18 +226,18 @@ public class ServletUtil {
 
 		String filename = getFilename(fileName, suffix, document);
 
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
-		String resource = storer.getResourceName(document, fileVersion, null);
-		if (!storer.exists(document.getId(), resource)) {
+		Store store = (Store) Context.get().getBean(Store.class);
+		String resource = store.getResourceName(document, fileVersion, null);
+		if (!store.exists(document.getId(), resource)) {
 			throw new FileNotFoundException(resource);
 		}
 
 		if (StringUtils.isNotEmpty(suffix)) {
-			resource = storer.getResourceName(document, fileVersion, suffix);
+			resource = store.getResourceName(document, fileVersion, suffix);
 			filename = filename + "." + suffix.substring(suffix.lastIndexOf('.') + 1);
 		}
 
-		long length = storer.size(document.getId(), resource);
+		long length = store.size(document.getId(), resource);
 		String contentType = MimeType.getByFilename(filename);
 		long lastModified = document.getDate().getTime();
 		String eTag = document.getId() + "_" + document.getVersion() + "_" + lastModified;
@@ -280,7 +280,7 @@ public class ServletUtil {
 			if (gstreamRequired) {
 				// The browser accepts GZIP, so GZIP the content.
 				response.setHeader("Content-Encoding", "gzip");
-				storer.writeToStream(docId, resource, output);
+				store.writeToStream(docId, resource, output);
 			} else if (ranges.size() == 1) {
 				// Return single part of file.
 				Range r = ranges.get(0);
@@ -292,7 +292,7 @@ public class ServletUtil {
 					response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
 
 				// Copy single part range.
-				storer.writeToStream(docId, resource, output, r.start, r.length);
+				store.writeToStream(docId, resource, output, r.start, r.length);
 			} else {
 				// Return multiple parts of file.
 				response.setContentType("multipart/byteranges; boundary=" + MULTIPART_BOUNDARY);
@@ -312,7 +312,7 @@ public class ServletUtil {
 					sos.println("Content-Range: bytes " + r.start + "-" + r.end + "/" + r.total);
 
 					// Copy single part range of multi part range.
-					storer.writeToStream(docId, resource, sos, r.start, r.length);
+					store.writeToStream(docId, resource, sos, r.start, r.length);
 
 					// End with multipart boundary.
 					sos.println();
@@ -727,7 +727,7 @@ public class ServletUtil {
 		if (StringUtils.isEmpty(ver))
 			ver = doc.getFileVersion();
 
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
+		Store store = (Store) Context.get().getBean(Store.class);
 
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		// Configure the factory here, if desired.
@@ -742,8 +742,8 @@ public class ServletUtil {
 				InputStream is = null;
 				try {
 					is = item.getInputStream();
-					storer.store(item.getInputStream(), Long.parseLong(docId),
-							storer.getResourceName(doc, ver, suffix));
+					store.store(item.getInputStream(), Long.parseLong(docId),
+							store.getResourceName(doc, ver, suffix));
 				} finally {
 					if (is != null)
 						is.close();

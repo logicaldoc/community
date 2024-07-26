@@ -26,7 +26,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.sequence.SequenceDAO;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIEmailSettings;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
@@ -295,30 +295,30 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 	}
 
 	@Override
-	public void saveStorageSettings(List<GUIParameter> settings) throws ServerException {
+	public void saveStoreSettings(List<GUIParameter> settings) throws ServerException {
 		saveSettings(settings);
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
-		storer.init();
+		Store store = (Store) Context.get().getBean(Store.class);
+		store.init();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<String> removeStorage(int storageId) throws ServerException {
+	public List<String> removeStore(int storeId) throws ServerException {
 		Session session = checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
 
 		try {
 			ContextProperties config = Context.get().getProperties();
-			if (storageId == config.getInt("store.write"))
+			if (storeId == config.getInt("store.write"))
 				throw new ServerException(
-						"You cannot delete the storage " + storageId + " because it is the current default");
+						"You cannot delete the store " + storeId + " because it is the current default");
 
 			FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 			/*
-			 * Search for those folders that refer this storage
+			 * Search for those folders that refer this store
 			 */
 			List<Long> folderIds = dao.queryForList(
-					"select ld_folderid from ld_folder_storage where ld_storageid = " + storageId + " and ld_nodeid = '"
+					"select ld_folderid from ld_folder_store where ld_storeid = " + storeId + " and ld_nodeid = '"
 							+ SqlUtil.doubleQuotesAndBackslashes(config.getProperty("id")) + "'",
 					Long.class);
 			if (!folderIds.isEmpty()) {
@@ -333,9 +333,9 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 				paths.sort(null);
 				return paths;
 			} else {
-				Map<String, String> settings = config.getProperties("store." + storageId + ".");
+				Map<String, String> settings = config.getProperties("store." + storeId + ".");
 				for (String setting : settings.keySet())
-					config.remove("store." + storageId + "." + setting);
+					config.remove("store." + storeId + "." + setting);
 				config.write();
 				return new ArrayList<>();
 			}
@@ -438,13 +438,13 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 	}
 
 	@Override
-	public boolean testStorage(int id) throws ServerException {
+	public boolean testStore(int id) throws ServerException {
 		validateSession();
 		try {
-			Storer manager = (Storer) Context.get().getBean(Storer.class);
-			Storer storer = manager.newStorer(id);
-			log.info("Testing storer {}", storer);
-			return storer.test();
+			Store manager = (Store) Context.get().getBean(Store.class);
+			Store store = manager.newStore(id);
+			log.info("Testing store {}", store);
+			return store.test();
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return false;

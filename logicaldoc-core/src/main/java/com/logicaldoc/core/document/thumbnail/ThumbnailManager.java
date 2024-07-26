@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.security.TenantDAO;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.core.util.DocUtil;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.MimeType;
@@ -45,8 +45,8 @@ public class ThumbnailManager {
 
 	protected static Logger log = LoggerFactory.getLogger(ThumbnailManager.class);
 
-	@Resource(name = "Storer")
-	private Storer storer;
+	@Resource(name = "Store")
+	private Store store;
 
 	// Key is the extension, value is the associated builder
 	private Map<String, ThumbnailBuilder> builders = new HashMap<>();
@@ -145,8 +145,8 @@ public class ThumbnailManager {
 					quality != null ? quality : getQuality("thumbnail", tDao.getTenantName(document.getTenantId())));
 
 			// Put the resource
-			String resource = storer.getResourceName(document, getSuitableFileVersion(document, fileVersion), suffix);
-			storer.store(dest, document.getId(), resource);
+			String resource = store.getResourceName(document, getSuitableFileVersion(document, fileVersion), suffix);
+			store.store(dest, document.getId(), resource);
 		} catch (Exception e) {
 			log.warn("Error rendering image for document: {} - {}", document.getId(), document.getFileName(), e);
 		} finally {
@@ -239,8 +239,8 @@ public class ThumbnailManager {
 		File target = FileUtil.createTempFile("scr",
 				"." + FileUtil.getExtension(DocUtil.getFileName(document, fileVersion)));
 		String fver = getSuitableFileVersion(document, fileVersion);
-		String resource = storer.getResourceName(document, fver, null);
-		storer.writeToFile(document.getId(), resource, target);
+		String resource = store.getResourceName(document, fver, null);
+		store.writeToFile(document.getId(), resource, target);
 		return target;
 	}
 
@@ -298,7 +298,7 @@ public class ThumbnailManager {
 		return builders;
 	}
 
-	public void setStorer(Storer storer) {
-		this.storer = storer;
+	public void setStore(Store store) {
+		this.store = store;
 	}
 }

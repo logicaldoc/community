@@ -17,8 +17,8 @@ import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.IOUtil;
 
 /**
- * This class is an implementation of the Storer interface to persist documents
- * in the filesystem. From the root of the documents storage, this
+ * This class is an implementation of the Store interface to persist documents
+ * in the filesystem. From the root of the documents store, this
  * implementation saves all document's files into a defined directory using the
  * following logic. The document's id is tokenized by three chars tokens, than
  * the doc/ dir is appended, so if the docId=12345, the document's path will
@@ -27,11 +27,11 @@ import com.logicaldoc.util.io.IOUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
-public class FSStorer extends AbstractStorer {
+public class FSStore extends AbstractStore {
 
-	protected static Logger log = LoggerFactory.getLogger(FSStorer.class);
+	protected static Logger log = LoggerFactory.getLogger(FSStore.class);
 
-	public FSStorer() {
+	public FSStore() {
 		super();
 	}
 
@@ -93,7 +93,7 @@ public class FSStorer extends AbstractStorer {
 		File file = null;
 		try {
 			if (!isEnabled())
-				throw new IOException("Storer not enabled");
+				throw new IOException("Store not enabled");
 
 			File dir = getContainer(docId);
 			FileUtils.forceMkdir(dir);
@@ -185,7 +185,7 @@ public class FSStorer extends AbstractStorer {
 	}
 
 	@Override
-	public int moveResourcesToStore(long docId, int targetStorageId) throws IOException {
+	public int moveResourcesToStore(long docId, int targetStoreId) throws IOException {
 		throw new UnsupportedOperationException();
 	}
 }

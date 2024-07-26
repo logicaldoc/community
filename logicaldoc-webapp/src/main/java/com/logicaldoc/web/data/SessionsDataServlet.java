@@ -140,6 +140,8 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		}
 
 		writer.print(",");
+		writer.print(session.getKeyLabel());
+		writer.print(",");
 		if (showSid)
 			writer.print(session.getNode());
 		writer.print("\n");
@@ -163,7 +165,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
 
 		writer.print("<session>");
 		writer.print("<sid><![CDATA[" + (showSid ? session.getSid() : "--") + "]]></sid>");
-
+		writer.print("<key><![CDATA[" + session.getKeyLabel() + "]]></key>");
 		printSessionStatusXml(session, locale, showSid, writer);
 
 		writer.print("<username><![CDATA[" + (showSid ? session.getUsername() : "") + "]]></username>");

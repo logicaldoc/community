@@ -147,7 +147,7 @@ import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.config.ContextProperties;
@@ -549,14 +549,14 @@ public class LDRepository {
 
 		NumberFormat nd = new DecimalFormat("0000000000");
 
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
+		Store store = (Store) Context.get().getBean(Store.class);
 
 		File chunksFolder = getChunksFolder(documentId);
-		String resourceName = storer.getResourceName(doc.getId(), doc.getFileVersion(), null);
+		String resourceName = store.getResourceName(doc.getId(), doc.getFileVersion(), null);
 		if (FileUtils.isEmptyDirectory(chunksFolder)) {
 			// Copy the current file's content
 			File firstChunk = new File(chunksFolder, "chunk-" + nd.format(1));
-			storer.writeToFile(doc.getId(), resourceName, firstChunk);
+			store.writeToFile(doc.getId(), resourceName, firstChunk);
 		}
 
 		int totalChunks = chunksFolder.list().length;
@@ -1187,13 +1187,13 @@ public class LDRepository {
 			AbstractDocument doc = getDocument(objectId);
 
 			InputStream stream = null;
-			Storer storer = (Storer) Context.get().getBean(Storer.class);
+			Store store = (Store) Context.get().getBean(Store.class);
 			InputStream is = null;
 			if (doc instanceof Document document) {
-				is = storer.getStream(doc.getId(), storer.getResourceName(document, null, null));
+				is = store.getStream(doc.getId(), store.getResourceName(document, null, null));
 			} else {
 				Version v = (Version) doc;
-				is = storer.getStream(v.getDocId(), storer.getResourceName(v.getDocId(), v.getFileVersion(), null));
+				is = store.getStream(v.getDocId(), store.getResourceName(v.getDocId(), v.getFileVersion(), null));
 			}
 			stream = new BufferedInputStream(is, BUFFER_SIZE);
 

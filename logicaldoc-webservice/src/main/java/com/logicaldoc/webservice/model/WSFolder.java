@@ -79,8 +79,8 @@ public class WSFolder implements Serializable {
 	@WSDoc(description = "array of attributes", required = false)
 	private List<WSAttribute> attributes = new ArrayList<>();
 
-	@WSDoc(description = "the storage to use for new files. Valid only in case of workspace.", required = false)
-	private Integer storage = null;
+	@WSDoc(description = "the store to use for new files. Valid only in case of workspace.", required = false)
+	private Integer store = null;
 
 	@WSDoc(required = false, description = "tags applied to the document")
 	private List<String> tags = new ArrayList<>();
@@ -147,7 +147,7 @@ public class WSFolder implements Serializable {
 		wsFolder.setPosition(folder.getPosition());
 		wsFolder.setTemplateLocked(folder.getTemplateLocked());
 		wsFolder.setHidden(folder.getHidden());
-		wsFolder.setStorage(folder.getStorage());
+		wsFolder.setStore(folder.getStore());
 		wsFolder.setMaxVersions(folder.getMaxVersions());
 		wsFolder.setSecurityRef(folder.getSecurityRef());
 		wsFolder.setOcrTemplateId(folder.getOcrTemplateId());
@@ -349,12 +349,12 @@ public class WSFolder implements Serializable {
 		this.foldRef = foldRef;
 	}
 
-	public Integer getStorage() {
-		return storage;
+	public Integer getStore() {
+		return store;
 	}
 
-	public void setStorage(Integer storage) {
-		this.storage = storage;
+	public void setStore(Integer store) {
+		this.store = store;
 	}
 
 	public List<String> getTags() {

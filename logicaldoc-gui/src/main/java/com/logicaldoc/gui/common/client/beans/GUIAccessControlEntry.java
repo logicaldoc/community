@@ -67,7 +67,7 @@ public class GUIAccessControlEntry implements Serializable {
 
 	public static final String PERMISSION_AUTOMATION = "automation";
 
-	public static final String PERMISSION_STORAGE = "storage";
+	public static final String PERMISSION_STORE = "store";
 
 	public static final String PERMISSION_READINGREQ = "readingreq";
 
@@ -286,12 +286,12 @@ public class GUIAccessControlEntry implements Serializable {
 		setPermissionValue(PERMISSION_AUTOMATION, automation);
 	}
 
-	public boolean isStorage() {
-		return isPermissionAllowed(PERMISSION_STORAGE);
+	public boolean isStore() {
+		return isPermissionAllowed(PERMISSION_STORE);
 	}
 
-	public void setStorage(boolean storage) {
-		setPermissionValue(PERMISSION_STORAGE, storage);
+	public void setStore(boolean store) {
+		setPermissionValue(PERMISSION_STORE, store);
 	}
 
 	public boolean isReadingreq() {

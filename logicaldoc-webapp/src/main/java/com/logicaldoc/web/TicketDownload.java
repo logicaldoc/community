@@ -22,7 +22,7 @@ import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.TenantDAO;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.util.Context;
@@ -224,15 +224,15 @@ public class TicketDownload extends HttpServlet {
 		 */
 		DownloadServlet.processSafeHtml(suffix, null, document);
 
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
-		String resource = storer.getResourceName(document, fileVersion, suffix);
+		Store store = (Store) Context.get().getBean(Store.class);
+		String resource = store.getResourceName(document, fileVersion, suffix);
 		OutputStream os = null;
-		try (InputStream is = storer.getStream(document.getId(), resource)) {
+		try (InputStream is = store.getStream(document.getId(), resource)) {
 			String filename = document.getFileName();
 			if (suffix != null && suffix.contains("pdf"))
 				filename = document.getFileName() + ".pdf";
 
-			long size = storer.size(document.getId(), resource);
+			long size = store.size(document.getId(), resource);
 
 			// get the mimetype
 			String mimetype = MimeType.getByFilename(filename);

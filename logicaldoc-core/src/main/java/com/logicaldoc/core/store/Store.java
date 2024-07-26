@@ -13,24 +13,24 @@ import javax.annotation.PreDestroy;
 import com.logicaldoc.core.document.Document;
 
 /**
- * The Storer manages the repository where document files are maintained and all
+ * The Store manages the repository where document files are maintained and all
  * general resources are stored.
  * 
  * @author Michael Scholz, Marco Meschieri
  */
-public interface Storer extends Comparable<Storer> {
+public interface Store extends Comparable<Store> {
 
 	/**
 	 * The unique identifier
 	 * 
-	 * @return the storer identifier
+	 * @return the store identifier
 	 */
 	public int getId();
 
 	/**
 	 * Sets the unique identifier
 	 * 
-	 * @param id the storer identifier
+	 * @param id the store identifier
 	 */
 	public void setId(int id);
 
@@ -62,14 +62,14 @@ public interface Storer extends Comparable<Storer> {
 	public void store(File file, long docId, String resource) throws IOException;
 
 	/**
-	 * Deletes all resources of a document from the storage.
+	 * Deletes all resources of a document from the store.
 	 * 
 	 * @param docId The document identifier
 	 */
 	public void delete(long docId);
 
 	/**
-	 * Deletes a specific resource of a document from the storage.
+	 * Deletes a specific resource of a document from the store.
 	 * 
 	 * @param docId The document identifier
 	 * @param resource Name of the resource to be deleted
@@ -204,17 +204,17 @@ public interface Storer extends Comparable<Storer> {
 
 	/**
 	 * Moves all the resources of a document from it's original location to a
-	 * different storage
+	 * different store
 	 * 
 	 * @param docId identifier of the document to process
-	 * @param targetStorageId identifier of the storage that will receive the
+	 * @param targetStoreId identifier of the store that will receive the
 	 *        files
 	 * 
 	 * @return number of moved resources
 	 * 
 	 * @throws IOException In case of error during the process
 	 */
-	public int moveResourcesToStore(long docId, int targetStorageId) throws IOException;
+	public int moveResourcesToStore(long docId, int targetStoreId) throws IOException;
 
 	/**
 	 * Obtains the document's content as string for the specified resource
@@ -235,7 +235,7 @@ public interface Storer extends Comparable<Storer> {
 
 	/**
 	 * Implementations should return the list of the required parameters. A
-	 * parameter is stored in the context as storer.<b>id</b>.parameter = value
+	 * parameter is stored in the context as store.<b>id</b>.parameter = value
 	 * 
 	 * @return list of parameter names
 	 */
@@ -249,16 +249,16 @@ public interface Storer extends Comparable<Storer> {
 	public Map<String, String> getParameters();
 
 	/**
-	 * Tests if the storer can read and write
+	 * Tests if the store can read and write
 	 * 
-	 * @return if the storer can read and write
+	 * @return if the store can read and write
 	 */
 	public boolean test();
 
 	/**
-	 * Tests if the storer is enabled
+	 * Tests if the store is enabled
 	 * 
-	 * @return if the storer is enabled
+	 * @return if the store is enabled
 	 */
 	public boolean isEnabled();
 
@@ -275,18 +275,18 @@ public interface Storer extends Comparable<Storer> {
 	public void destroy();
 
 	/**
-	 * Instantiate a new storer and fully configures it.
+	 * Instantiate a new store and fully configures it.
 	 * 
-	 * @param id identifier of the storer to create
+	 * @param id identifier of the store to create
 	 * 
 	 * @return the created instance
 	 */
-	public Storer newStorer(int id);
+	public Store newStore(int id);
 	
 	/**
-	 * Retrieves the storers definitions grouped by type 
+	 * Retrieves the stores definitions grouped by type 
 	 * 
-	 * @return a map with definitions  <b>type</b> - <b>storer prototype</b>
+	 * @return a map with definitions  <b>type</b> - <b>store prototype</b>
 	 */
-	public Map<String, Storer> getStorerDefinitions();
+	public Map<String, Store> getStoreDefinitions();
 }

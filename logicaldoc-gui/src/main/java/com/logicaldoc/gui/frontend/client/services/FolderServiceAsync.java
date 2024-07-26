@@ -57,7 +57,7 @@ public interface FolderServiceAsync {
 
 	void applyOCR(long parentId, AsyncCallback<Void> callback);
 
-	void applyStorage(long parentId, AsyncCallback<Void> callback);
+	void applyStore(long parentId, AsyncCallback<Void> callback);
 
 	void merge(List<Long> folderIds, long targetId, AsyncCallback<Void> callback);
 

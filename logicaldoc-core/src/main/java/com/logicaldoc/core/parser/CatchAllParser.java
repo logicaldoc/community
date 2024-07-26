@@ -6,7 +6,7 @@ import java.io.InputStream;
 import org.apache.commons.io.FileUtils;
 
 import com.logicaldoc.core.conversion.FormatConverterManager;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -35,15 +35,15 @@ public class CatchAllParser extends AbstractParser {
 					.getBean(FormatConverterManager.class);
 			manager.convertToPdf(parameters.getDocument(), parameters.getFileVersion(), null);
 
-			Storer storer = (Storer) Context.get().getBean(Storer.class);
-			String pdfResource = storer
+			Store store = (Store) Context.get().getBean(Store.class);
+			String pdfResource = store
 					.getResourceName(parameters.getDocument(),
 							parameters.getFileVersion() != null ? parameters.getFileVersion()
 									: parameters.getDocument().getFileVersion(),
 							FormatConverterManager.PDF_CONVERSION_SUFFIX);
-			if (storer.exists(parameters.getDocument().getId(), pdfResource)) {
+			if (store.exists(parameters.getDocument().getId(), pdfResource)) {
 				Parser parser = ParserFactory.getParser("pdf");
-				content.append(parser.parse(storer.getStream(parameters.getDocument().getId(), pdfResource),
+				content.append(parser.parse(store.getStream(parameters.getDocument().getId(), pdfResource),
 						new ParseParameters(null, "output.pdf", null, parameters.getEncoding(), parameters.getLocale(),
 								parameters.getTenant())));
 			} else

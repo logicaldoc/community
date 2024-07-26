@@ -14,24 +14,24 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.menu.MenuDAO;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 
 /**
- * This servlet is responsible for storages data.
+ * This servlet is responsible for stores data.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5.3
  */
-public class StoragesDataServlet extends AbstractDataServlet {
+public class StoresDataServlet extends AbstractDataServlet {
 
 	private static final String STORE = "store.";
 
-	private static final String CLOSE_STORAGE = "</storage>";
+	private static final String CLOSE_STORE = "</store>";
 
-	private static final String STORAGE = "<storage>";
+	private static final String START_STORE = "<store>";
 
 	private static final long serialVersionUID = 1L;
 
@@ -45,47 +45,47 @@ public class StoragesDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		if (types) {
-			// Just list the different storers (types of storages)
-			Storer manager = (Storer) Context.get().getBean(Storer.class);
-			Set<String> set = manager.getStorerDefinitions().keySet();
+			// Just list the different stores(types of stores)
+			Store manager = (Store) Context.get().getBean(Store.class);
+			Set<String> set = manager.getStoreDefinitions().keySet();
 			for (String type : set.stream().sorted().toList()) {
-				if (!manager.getStorerDefinitions().get(type).isEnabled())
+				if (!manager.getStoreDefinitions().get(type).isEnabled())
 					continue;
 
-				writer.print(STORAGE);
+				writer.print(START_STORE);
 				writer.print("<id>" + type + "</id>");
-				writer.print("<name><![CDATA[" + I18N.message("storer." + type, locale) + "]]></name>");
+				writer.print("<name><![CDATA[" + I18N.message("store." + type, locale) + "]]></name>");
 				writer.print("<type>" + type + "</type>");
-				writer.print(CLOSE_STORAGE);
+				writer.print(CLOSE_STORE);
 			}
 		} else {
-			// List the storages
+			// List the stores
 			if ("true".equals(request.getParameter("empty"))) {
-				writer.print(STORAGE);
+				writer.print(START_STORE);
 				writer.print("<id />");
 				writer.print("<name />");
 				writer.print("<path />");
 				writer.print("<write>blank</write>");
 				writer.print("<type>fs</type>");
-				writer.print(CLOSE_STORAGE);
+				writer.print(CLOSE_STORE);
 			}
 
 			// Prepare the stores
-			printStorages(writer, request, session);
+			printStores(writer, request, session);
 		}
 		writer.write("</list>");
 	}
 
-	private void printStorages(PrintWriter writer, HttpServletRequest request, Session session) {
+	private void printStores(PrintWriter writer, HttpServletRequest request, Session session) {
 		ContextProperties conf = Context.get().getProperties();
 		for (int i = 1; i <= 99; i++) {
 			String path = conf.getProperty(STORE + i + ".dir");
 			if (StringUtils.isEmpty(path))
 				continue;
 
-			writer.print(STORAGE);
+			writer.print(START_STORE);
 			writer.print("<id>" + i + "</id>");
-			writer.print("<name>Storage " + i + "</name>");
+			writer.print("<name>Store " + i + "</name>");
 			writer.print("<path><![CDATA[" + path + "]]></path>");
 			writer.print("<write>" + (conf.getInt("store.write") == i ? "database_edit" : "blank") + "</write>");
 			String type = conf.getProperty(STORE + i + ".type");
@@ -95,7 +95,7 @@ public class StoragesDataServlet extends AbstractDataServlet {
 
 			printParameters(writer, request, session, i, type);
 
-			writer.print(CLOSE_STORAGE);
+			writer.print(CLOSE_STORE);
 
 		}
 	}
@@ -103,8 +103,8 @@ public class StoragesDataServlet extends AbstractDataServlet {
 	private void printParameters(PrintWriter writer, HttpServletRequest request, Session session, int i, String type) {
 		ContextProperties conf = Context.get().getProperties();
 		if (isParameters(request, session)) {
-			Storer manager = (Storer) Context.get().getBean(Storer.class);
-			Storer st = manager.getStorerDefinitions().get(type);
+			Store manager = (Store) Context.get().getBean(Store.class);
+			Store st = manager.getStoreDefinitions().get(type);
 			if (st != null) {
 				for (String name : st.getParameterNames()) {
 					String value = conf.getProperty(STORE + i + "." + name, "");

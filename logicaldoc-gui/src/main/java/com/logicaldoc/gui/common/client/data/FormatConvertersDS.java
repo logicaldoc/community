@@ -6,7 +6,7 @@ import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
- * DataSource to retrieve all the storages. It is based on Xml parsing.
+ * DataSource to retrieve all the converters. It is based on Xml parsing.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5.3

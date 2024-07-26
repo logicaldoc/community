@@ -148,7 +148,7 @@
   	<parameter-def id="name" />
     <parameter-def id="factory" />
   </extension-point>  
-  <extension-point id="Storer">
+  <extension-point id="Store">
     <parameter-def id="type" />
     <parameter-def id="class" />
   </extension-point>  

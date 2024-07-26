@@ -5,7 +5,7 @@ import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.smartgwt.client.util.Offline;
 
 /**
- * Here we handle the storage of informations in the broeserk
+ * Here we handle the store of informations in the broeserk
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.7.2

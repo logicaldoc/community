@@ -52,7 +52,7 @@ import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserGroup;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.html.HTMLSanitizer;
@@ -102,8 +102,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Resource(name = "FolderHistoryDAO")
 	private FolderHistoryDAO historyDAO;
 
-	@Resource(name = "Storer")
-	private Storer storer;
+	@Resource(name = "Store")
+	private Store store;
 
 	@Resource(name = "FolderListenerManager")
 	private FolderListenerManager listenerManager;
@@ -897,7 +897,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
                  ld_delete as LDDELETE, ld_rename as LDRENAME, ld_import as LDIMPORT, ld_export as LDEXPORT, ld_sign as LDSIGN, 
                  ld_archive as LDARCHIVE, ld_workflow as LDWORKFLOW, ld_download as LDDOWNLOAD, ld_calendar as LDCALENDAR, 
                  ld_subscription as LDSUBSCRIPTION, ld_print as LDPRINT, ld_password as LDPASSWORD, ld_move as LDMOVE, ld_email as LDEMAIL, 
-                 ld_automation LDAUTOMATION, ld_storage LDSTORAGE, ld_readingreq LDREADINGREQ, ld_preview LDPREVIEW, ld_customid LDCUSTOMID
+                 ld_automation LDAUTOMATION, ld_store LDSTORE, ld_readingreq LDREADINGREQ, ld_preview LDPREVIEW, ld_customid LDCUSTOMID
 """);
 		query.append(" from ld_folder_acl ");
 		query.append(WHERE);
@@ -927,7 +927,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		permissionColumn.put("LDMOVE", Permission.MOVE);
 		permissionColumn.put("LDEMAIL", Permission.EMAIL);
 		permissionColumn.put("LDAUTOMATION", Permission.AUTOMATION);
-		permissionColumn.put("LDSTORAGE", Permission.STORAGE);
+		permissionColumn.put("LDSTORE", Permission.STORE);
 		permissionColumn.put("LDREADINGREQ", Permission.READINGREQ);
 		permissionColumn.put("LDPREVIEW", Permission.PREVIEW);
 		permissionColumn.put("LDCUSTOMID", Permission.CUSTOMID);
@@ -1591,8 +1591,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				documentTransaction.setComment(transaction.getComment());
 				documentTransaction.setEvent(DocumentEvent.STORED.toString());
 
-				String oldDocResource = storer.getResourceName(srcDoc, null, null);
-				try (InputStream is = storer.getStream(srcDoc.getId(), oldDocResource);) {
+				String oldDocResource = store.getResourceName(srcDoc, null, null);
+				try (InputStream is = store.getStream(srcDoc.getId(), oldDocResource);) {
 					docMan.create(is, newDoc, documentTransaction);
 				} catch (IOException e) {
 					log.error(e.getMessage(), e);
@@ -1933,8 +1933,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		if (folder.getAttributes() != null)
 			log.trace("Initialized {} attributes", folder.getAttributes().keySet().size());
 
-		if (folder.getStorages() != null)
-			log.trace("Initialized {} storages", folder.getStorages().keySet().size());
+		if (folder.getStores() != null)
+			log.trace("Initialized {} stores", folder.getStores().keySet().size());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -2184,7 +2184,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public void applyStorageToTree(long id, FolderHistory transaction) throws PersistenceException {
+	public void applyStoreToTree(long id, FolderHistory transaction) throws PersistenceException {
 		Folder parent = getExistingFolder(id);
 		initialize(parent);
 
@@ -2196,7 +2196,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		List<Folder> children = findChildren(id, null);
 		for (Folder folder : children) {
 			initialize(folder);
-			folder.setStorage(parent.getStorage());
+			folder.setStore(parent.getStore());
 
 			FolderHistory tr = new FolderHistory(transaction);
 			tr.setFolderId(folder.getId());
@@ -2204,7 +2204,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			store(folder, tr);
 			flush();
 
-			applyStorageToTree(folder.getId(), transaction);
+			applyStoreToTree(folder.getId(), transaction);
 		}
 	}
 

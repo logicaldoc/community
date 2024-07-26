@@ -92,24 +92,24 @@ public interface SettingService extends RemoteService {
 	public boolean testEmail(String email) throws ServerException;
 
 	/**
-	 * Tests a storage (read/write access)
+	 * Tests a store (read/write access)
 	 * 
-	 * @param id identifier of the storage to test
+	 * @param id identifier of the store to test
 	 * 
-	 * @return True only if the storage has read/write permission
+	 * @return True only if the store has read/write permission
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public boolean testStorage(int id) throws ServerException;
+	public boolean testStore(int id) throws ServerException;
 
 	/**
-	 * Saves settings related to the storage
+	 * Saves settings related to the store
 	 * 
-	 * @param settings the storage settings
+	 * @param settings the store settings
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void saveStorageSettings(List<GUIParameter> settings) throws ServerException;
+	public void saveStoreSettings(List<GUIParameter> settings) throws ServerException;
 
 	/**
 	 * Saves settings related to the firewall
@@ -121,16 +121,16 @@ public interface SettingService extends RemoteService {
 	public void saveFirewallSettings(List<GUIParameter> settings) throws ServerException;
 
 	/**
-	 * Tries to delete a storage and fails in case at least one folder is using
-	 * it and also if the storage is marked as the default write one
+	 * Tries to delete a store and fails in case at least one folder is using
+	 * it and also if the store is marked as the default write one
 	 * 
-	 * @param storageId identifier of the storage to remove
+	 * @param storeId identifier of the store to remove
 	 * 
-	 * @return list of paths using the storage
+	 * @return list of paths using the store
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public List<String> removeStorage(int storageId) throws ServerException;
+	public List<String> removeStore(int storeId) throws ServerException;
 
 	/**
 	 * Saves email settings (SMTP connection)

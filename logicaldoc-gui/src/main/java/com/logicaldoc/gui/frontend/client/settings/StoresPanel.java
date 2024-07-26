@@ -8,7 +8,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
-import com.logicaldoc.gui.common.client.data.StoragesDS;
+import com.logicaldoc.gui.common.client.data.StoresDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -33,12 +33,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
- * This class shows the storagesGrid list and informations.
+ * This class shows the storesGrid list and informations.
  * 
  * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
-public class StoragesPanel extends VLayout {
+public class StoresPanel extends VLayout {
 
 	private static final String STORE = "store.";
 
@@ -54,9 +54,9 @@ public class StoragesPanel extends VLayout {
 
 	public static final int OPERATION_CUMPUTESIZE = 2;
 
-	private RefreshableListGrid storagesGrid;
+	private RefreshableListGrid storesGrid;
 
-	public StoragesPanel() {
+	public StoresPanel() {
 		setWidth100();
 		setHeight100();
 		setMembersMargin(5);
@@ -80,9 +80,9 @@ public class StoragesPanel extends VLayout {
 
 		toolStrip.addFill();
 
-		prepareStoragesGrid();
+		prepareStoresGrid();
 
-		setMembers(toolStrip, storagesGrid);
+		setMembers(toolStrip, storesGrid);
 
 		refresh();
 	}
@@ -105,29 +105,29 @@ public class StoragesPanel extends VLayout {
 	private void addAddButton(ToolStrip toolStrip) {
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("addstore"));
-		add.addClickHandler(event -> onAddStorage());
+		add.addClickHandler(event -> onAddStore());
 		add.setDisabled(Session.get().isDemo());
-		if (Feature.visible(Feature.MULTI_STORAGE)) {
+		if (Feature.visible(Feature.MULTI_STORE)) {
 			toolStrip.addButton(add);
 			toolStrip.addSeparator();
-			if (!Feature.enabled(Feature.MULTI_STORAGE)) {
+			if (!Feature.enabled(Feature.MULTI_STORE)) {
 				add.setDisabled(true);
 				add.setTooltip(I18N.message("featuredisabled"));
 			}
 		}
 	}
 
-	private void prepareStoragesGrid() {
-		storagesGrid = new RefreshableListGrid() {
+	private void prepareStoresGrid() {
+		storesGrid = new RefreshableListGrid() {
 
 			@Override
 			protected Canvas getExpansionComponent(final ListGridRecord rec) {
 				return buildExpansionComponent(rec);
 			}
 		};
-		storagesGrid.setEmptyMessage(I18N.message("notitemstoshow"));
-		storagesGrid.setSelectionType(SelectionStyle.SINGLE);
-		storagesGrid.setCanExpandRecords(true);
+		storesGrid.setEmptyMessage(I18N.message("notitemstoshow"));
+		storesGrid.setSelectionType(SelectionStyle.SINGLE);
+		storesGrid.setCanExpandRecords(true);
 
 		ListGridField id = new ListGridField("id", " ", 20);
 		ListGridField name = new ListGridField("name", I18N.message("name"), 150);
@@ -146,19 +146,19 @@ public class StoragesPanel extends VLayout {
 		write.setImageURLSuffix(".png");
 		write.setCanFilter(false);
 
-		storagesGrid.setFields(id, write, name, type, path);
-		storagesGrid.setAutoFetchData(true);
-		storagesGrid.addCellContextClickHandler(event -> {
+		storesGrid.setFields(id, write, name, type, path);
+		storesGrid.setAutoFetchData(true);
+		storesGrid.addCellContextClickHandler(event -> {
 			showContextMenu();
 			event.cancel();
 		});
-		storagesGrid.setEditorCustomizer(context -> {
+		storesGrid.setEditorCustomizer(context -> {
 			ListGridField field = context.getEditField();
 			if (field.getName().equals("type")) {
-				SelectItem item = ItemFactory.newStorageTypeSelector();
+				SelectItem item = ItemFactory.newStoreTypeSelector();
 				item.addChangedHandler(event -> {
-					storagesGrid.getSelectedRecord().setAttribute("type", event.getValue().toString());
-					storagesGrid.collapseRecord(storagesGrid.getSelectedRecord());
+					storesGrid.getSelectedRecord().setAttribute("type", event.getValue().toString());
+					storesGrid.collapseRecord(storesGrid.getSelectedRecord());
 				});
 				return item;
 			} else
@@ -194,7 +194,7 @@ public class StoragesPanel extends VLayout {
 		if (attrs != null && attrs.length > 0) {
 			List<ListGridRecord> records = new ArrayList<>();
 			for (String attr : attrs) {
-				if (!StoragesPanel.isParameterAttribute(attr))
+				if (!StoresPanel.isParameterAttribute(attr))
 					continue;
 				ListGridRecord recd = new ListGridRecord();
 				recd.setAttribute("name", attr);
@@ -214,8 +214,8 @@ public class StoragesPanel extends VLayout {
 		type.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			if (value == null)
 				return "";
-			String label = I18N.message("storer." + value);
-			if (label.equals("storer." + value))
+			String label = I18N.message("store." + value);
+			if (label.equals("store." + value))
 				return value.toString();
 			else
 				return label;
@@ -229,7 +229,7 @@ public class StoragesPanel extends VLayout {
 	}
 
 	private void refresh() {
-		storagesGrid.refresh(new StoragesDS(false, true));
+		storesGrid.refresh(new StoresDS(false, true));
 	}
 
 	/**
@@ -248,22 +248,22 @@ public class StoragesPanel extends VLayout {
 	}
 
 	private MenuItem prepareDeleteMenuItem() {
-		ListGridRecord selectedRecord = storagesGrid.getSelectedRecord();
-		int selectedStorageId = selectedRecord.getAttributeAsInt("id");
+		ListGridRecord selectedRecord = storesGrid.getSelectedRecord();
+		int selectedStoreId = selectedRecord.getAttributeAsInt("id");
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), yes -> {
 			if (Boolean.TRUE.equals(yes)) {
-				doRemoveStorage(selectedStorageId);
+				doRemoveStore(selectedStoreId);
 			}
 		}));
 		delete.setEnabled(!Session.get().isDemo() && !DATABASE_EDIT.equals(selectedRecord.getAttributeAsString(WRITE)));
 		return delete;
 	}
 
-	private void doRemoveStorage(int selectedStorageId) {
-		SettingService.Instance.get().removeStorage(selectedStorageId, new AsyncCallback<>() {
+	private void doRemoveStore(int selectedStoreId) {
+		SettingService.Instance.get().removeStore(selectedStoreId, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -273,7 +273,7 @@ public class StoragesPanel extends VLayout {
 			@Override
 			public void onSuccess(List<String> paths) {
 				if (!paths.isEmpty()) {
-					SC.warn(I18N.message("foldersusingstorage", "" + selectedStorageId) + Util.padLeft("<ul>"
+					SC.warn(I18N.message("foldersusingstorage", "" + selectedStoreId) + Util.padLeft("<ul>"
 							+ paths.stream().map(p -> "<li>" + p + "</li>").collect(Collectors.joining()) + "</ul>",
 							1000));
 				} else {
@@ -284,11 +284,11 @@ public class StoragesPanel extends VLayout {
 	}
 
 	private MenuItem prepareTestMenuItem() {
-		ListGridRecord selectedRecord = storagesGrid.getSelectedRecord();
+		ListGridRecord selectedRecord = storesGrid.getSelectedRecord();
 
 		MenuItem test = new MenuItem();
 		test.setTitle(I18N.message("testconnection"));
-		test.addClickHandler(event -> SettingService.Instance.get().testStorage(selectedRecord.getAttributeAsInt("id"),
+		test.addClickHandler(event -> SettingService.Instance.get().testStore(selectedRecord.getAttributeAsInt("id"),
 				new AsyncCallback<Boolean>() {
 
 					@Override
@@ -312,14 +312,14 @@ public class StoragesPanel extends VLayout {
 		MenuItem makeWrite = new MenuItem();
 		makeWrite.setTitle(I18N.message("makedefwritestore"));
 		makeWrite.addClickHandler(event -> {
-			ListGridRecord[] recs = storagesGrid.getRecords();
+			ListGridRecord[] recs = storesGrid.getRecords();
 			for (ListGridRecord rec : recs) {
 				rec.setAttribute(WRITE, "blank");
-				storagesGrid.refreshRow(storagesGrid.getRowNum(rec));
+				storesGrid.refreshRow(storesGrid.getRowNum(rec));
 			}
-			ListGridRecord selectedRecord = storagesGrid.getSelectedRecord();
+			ListGridRecord selectedRecord = storesGrid.getSelectedRecord();
 			selectedRecord.setAttribute(WRITE, DATABASE_EDIT);
-			storagesGrid.refreshRow(storagesGrid.getRowNum(storagesGrid.getSelectedRecord()));
+			storesGrid.refreshRow(storesGrid.getRowNum(storesGrid.getSelectedRecord()));
 		});
 		makeWrite.setEnabled(!Session.get().isDemo());
 		return makeWrite;
@@ -328,7 +328,7 @@ public class StoragesPanel extends VLayout {
 	private void onSave(boolean alertInclusion) {
 		List<GUIParameter> settings = collectSettings();
 
-		SettingService.Instance.get().saveStorageSettings(settings,
+		SettingService.Instance.get().saveStoreSettings(settings,
 				new AsyncCallback<>() {
 
 					@Override
@@ -354,19 +354,19 @@ public class StoragesPanel extends VLayout {
 
 	private List<GUIParameter> collectSettings() {
 		List<GUIParameter> settings = new ArrayList<>();
-		ListGridRecord[] records = storagesGrid.getRecords();
-		for (ListGridRecord storageRecord : records) {
+		ListGridRecord[] records = storesGrid.getRecords();
+		for (ListGridRecord storeRecord : records) {
 			try {
-				String storageId = storageRecord.getAttributeAsString("id").trim();
-				settings.add(new GUIParameter(STORE + storageId + ".dir",
-						storageRecord.getAttributeAsString("path").trim()));
-				settings.add(new GUIParameter(STORE + storageId + ".type",
-						storageRecord.getAttributeAsString("type").trim()));
-				if (DATABASE_EDIT.equals(storageRecord.getAttributeAsString(WRITE))) {
-					settings.add(new GUIParameter("store.write", storageId));
+				String storeId = storeRecord.getAttributeAsString("id").trim();
+				settings.add(new GUIParameter(STORE + storeId + ".dir",
+						storeRecord.getAttributeAsString("path").trim()));
+				settings.add(new GUIParameter(STORE + storeId + ".type",
+						storeRecord.getAttributeAsString("type").trim()));
+				if (DATABASE_EDIT.equals(storeRecord.getAttributeAsString(WRITE))) {
+					settings.add(new GUIParameter("store.write", storeId));
 				}
 
-				collectAttribute(settings, storageRecord);
+				collectAttribute(settings, storeRecord);
 			} catch (Exception t) {
 				/*
 				 * the extensions table is lazy loaded so we may have null
@@ -377,16 +377,16 @@ public class StoragesPanel extends VLayout {
 		return settings;
 	}
 
-	private void collectAttribute(List<GUIParameter> settings, ListGridRecord storageRecord) {
-		String[] attrs = storageRecord.getAttributes();
+	private void collectAttribute(List<GUIParameter> settings, ListGridRecord storeRecord) {
+		String[] attrs = storeRecord.getAttributes();
 		if (attrs != null && attrs.length > 0) {
 			try {
 				for (String attr : attrs) {
-					if (!StoragesPanel.isParameterAttribute(attr))
+					if (!StoresPanel.isParameterAttribute(attr))
 						continue;
-					String storageId = storageRecord.getAttributeAsString("id").trim();
-					settings.add(new GUIParameter(STORE + storageId + "." + attr,
-							storageRecord.getAttributeAsString(attr).trim()));
+					String storeId = storeRecord.getAttributeAsString("id").trim();
+					settings.add(new GUIParameter(STORE + storeId + "." + attr,
+							storeRecord.getAttributeAsString(attr).trim()));
 				}
 			} catch (Exception t) {
 				/*
@@ -397,20 +397,20 @@ public class StoragesPanel extends VLayout {
 		}
 	}
 
-	private void onAddStorage() {
+	private void onAddStore() {
 		for (int i = 1; i < 99; i++) {
-			Record rec = storagesGrid.getRecordList().find("id", Integer.toString(i));
+			Record rec = storesGrid.getRecordList().find("id", Integer.toString(i));
 			if (rec == null) {
 				ListGridRecord newStore = new ListGridRecord();
 				newStore.setAttribute("id", Integer.toString(i));
-				newStore.setAttribute("name", "Storage " + i);
+				newStore.setAttribute("name", "Store " + i);
 				newStore.setAttribute("type", "fs");
 				newStore.setAttribute("encryption", "false");
 				newStore.setAttribute("compression", "5");
 				newStore.setAttribute(WRITE, "blank");
 
-				storagesGrid.getDataSource().addData(newStore);
-				storagesGrid.redraw();
+				storesGrid.getDataSource().addData(newStore);
+				storesGrid.redraw();
 				break;
 			}
 		}

@@ -36,7 +36,7 @@ public class RepositoriesPanel extends AdminPanel {
 
 	@Override
 	public void onDraw() {
-		body.setMembers(new StoragesPanel());
+		body.setMembers(new StoresPanel());
 
 		// The Folders Tab
 		Tab foldersTab = new Tab();

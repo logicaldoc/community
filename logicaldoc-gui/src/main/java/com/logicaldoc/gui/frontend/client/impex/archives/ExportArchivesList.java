@@ -113,7 +113,7 @@ public class ExportArchivesList extends VLayout {
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		if (this.archivesType == GUIArchive.TYPE_STORAGE)
+		if (this.archivesType == GUIArchive.TYPE_STORE)
 			list.setFields(id, created, name, size, status, creator, closer, aosManager, pathOnServer);
 		else
 			list.setFields(id, created, name, size, status, creator, closer, pathOnServer);
@@ -123,7 +123,7 @@ public class ExportArchivesList extends VLayout {
 		list.setCanFreezeFields(true);
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
-		if (this.archivesType == GUIArchive.TYPE_STORAGE && this.showHistory)
+		if (this.archivesType == GUIArchive.TYPE_STORE && this.showHistory)
 			list.setDataSource(new ArchivesDS(GUIArchive.MODE_EXPORT, this.archivesType, GUIArchive.STATUS_FINALIZED,
 					Session.get().getUser().getId()));
 		else
@@ -305,7 +305,7 @@ public class ExportArchivesList extends VLayout {
 	}
 
 	public void refresh() {
-		if (archivesType == GUIArchive.TYPE_STORAGE && showHistory)
+		if (archivesType == GUIArchive.TYPE_STORE && showHistory)
 			list.refresh(new ArchivesDS(GUIArchive.MODE_EXPORT, archivesType, GUIArchive.STATUS_FINALIZED,
 					Session.get().getUser().getId()));
 		else

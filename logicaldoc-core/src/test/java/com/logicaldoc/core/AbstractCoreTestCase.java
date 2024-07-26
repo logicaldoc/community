@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.security.apikey.ApiKey;
 import com.logicaldoc.core.security.apikey.ApiKeyDAO;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.junit.AbstractTestCase;
@@ -57,14 +57,14 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 
 	private void prepareStore() throws IOException {
 		/**
-		 * For each test we must prepare different storage folders because
+		 * For each test we must prepare different stores folders because
 		 * re-using the same paths cause locks
 		 */
 		rootStoreOne = new File(Context.get().getProperties().getProperty("store.1.dir"));
 		rootStoreTwo = new File(Context.get().getProperties().getProperty("store.2.dir"));
 
-		Storer storer = (Storer) context.getBean("Storer");
-		storer.init();
+		Store store = (Store) context.getBean("Store");
+		store.init();
 
 		/*
 		 * In order to minimize the locks, we write the file only if really

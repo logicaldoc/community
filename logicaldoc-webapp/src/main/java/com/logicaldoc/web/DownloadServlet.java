@@ -23,7 +23,7 @@ import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.authentication.InvalidSessionException;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.html.HTMLSanitizer;
 import com.logicaldoc.web.util.ServletUtil;
@@ -226,16 +226,16 @@ public class DownloadServlet extends HttpServlet {
 
 	static void processSafeHtml(String suffix, Version version, Document doc) throws IOException {
 		if ("safe.html".equals(suffix)) {
-			Storer storer = (Storer) Context.get().getBean(Storer.class);
+			Store store = (Store) Context.get().getBean(Store.class);
 			if (doc != null) {
-				String safeResource = storer.getResourceName(doc,
+				String safeResource = store.getResourceName(doc,
 						version == null ? doc.getFileVersion() : version.getFileVersion(), suffix);
-				if (!storer.exists(doc.getId(), safeResource)) {
-					String unsafeResource = storer.getResourceName(doc,
+				if (!store.exists(doc.getId(), safeResource)) {
+					String unsafeResource = store.getResourceName(doc,
 							version == null ? doc.getFileVersion() : version.getFileVersion(), null);
-					String unsafe = storer.getString(doc.getId(), unsafeResource);
+					String unsafe = store.getString(doc.getId(), unsafeResource);
 					String safe = HTMLSanitizer.sanitize(unsafe);
-					storer.store(new ByteArrayInputStream(safe.getBytes(StandardCharsets.UTF_8)), doc.getId(),
+					store.store(new ByteArrayInputStream(safe.getBytes(StandardCharsets.UTF_8)), doc.getId(),
 							safeResource);
 				}
 			}

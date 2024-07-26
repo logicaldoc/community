@@ -28,7 +28,7 @@ public class GUIArchive implements Serializable {
 
 	public static final int TYPE_DEFAULT = 0;
 
-	public static final int TYPE_STORAGE = 1;
+	public static final int TYPE_STORE = 1;
 
 	public static final int MODE_IMPORT = 0;
 
@@ -146,7 +146,7 @@ public class GUIArchive implements Serializable {
 	 * The archive type
 	 * 
 	 * @see #TYPE_DEFAULT
-	 * @see #TYPE_STORAGE
+	 * @see #TYPE_STORE
 	 * 
 	 * @return the type
 	 */

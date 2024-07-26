@@ -35,7 +35,7 @@ import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
@@ -562,14 +562,14 @@ public class DocTool {
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
 
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
-		String resource = storer.getResourceName(doc, fileVersion, suffix);
+		Store store = (Store) Context.get().getBean(Store.class);
+		String resource = store.getResourceName(doc, fileVersion, suffix);
 
 		File tmpFile = null;
 
 		try {
 			tmpFile = FileUtil.createTempFile("res-", suffix);
-			storer.writeToFile(doc.getId(), resource, tmpFile);
+			store.writeToFile(doc.getId(), resource, tmpFile);
 
 			Document docVO = new Document();
 			docVO.setFileName(newFileName);
@@ -597,9 +597,9 @@ public class DocTool {
 	 * @return the file content as string
 	 */
 	public String readAsString(long docId, String fileVersion, String suffix) {
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
-		String resource = storer.getResourceName(docId, fileVersion, suffix);
-		return storer.getString(docId, resource);
+		Store store = (Store) Context.get().getBean(Store.class);
+		String resource = store.getResourceName(docId, fileVersion, suffix);
+		return store.getString(docId, resource);
 	}
 
 	/**
@@ -611,10 +611,10 @@ public class DocTool {
 	 * @param outputFile the user in name of which to take this action
 	 */
 	public void writeToFile(long docId, String fileVersion, String suffix, String outputFile) {
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
-		String resource = storer.getResourceName(docId, fileVersion, suffix);
+		Store store = (Store) Context.get().getBean(Store.class);
+		String resource = store.getResourceName(docId, fileVersion, suffix);
 		try {
-			storer.writeToFile(docId, resource, new File(outputFile));
+			store.writeToFile(docId, resource, new File(outputFile));
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 		}

@@ -81,13 +81,11 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 	public List<Session> findByNode(String node) {
 		try {
 			if (StringUtils.isEmpty(node))
-				return findByWhere(" 1=1 ", (Map<String, Object>) null, "order by " + ENTITY + ".creation desc",
-						null);
+				return findByWhere(" 1=1 ", (Map<String, Object>) null, "order by " + ENTITY + ".creation desc", null);
 			else {
 				Map<String, Object> params = new HashMap<>();
 				params.put("node", node);
-				return findByWhere(ENTITY + ".node = :node", params,
-						"order by " + ENTITY + ".creation desc", null);
+				return findByWhere(ENTITY + ".node = :node", params, "order by " + ENTITY + ".creation desc", null);
 			}
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);

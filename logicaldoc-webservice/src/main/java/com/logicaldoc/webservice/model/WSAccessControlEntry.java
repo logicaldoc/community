@@ -82,8 +82,8 @@ public class WSAccessControlEntry {
 	@WSDoc(description = "permission to handle the automation")
 	private int automation = 0;
 
-	@WSDoc(description = "permission to handle the storage")
-	private int storage = 0;
+	@WSDoc(description = "permission to handle the store")
+	private int store = 0;
 
 	@WSDoc(description = "permission to send reading requests")
 	private int readingreq = 0;
@@ -259,12 +259,12 @@ public class WSAccessControlEntry {
 		this.automation = automation;
 	}
 
-	public int getStorage() {
-		return storage;
+	public int getStore() {
+		return store;
 	}
 
-	public void setStorage(int storage) {
-		this.storage = storage;
+	public void setStore(int store) {
+		this.store = store;
 	}
 
 	public int getReadingreq() {

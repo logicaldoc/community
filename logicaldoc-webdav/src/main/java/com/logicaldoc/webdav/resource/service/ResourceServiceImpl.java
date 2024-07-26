@@ -40,7 +40,7 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.webdav.context.ImportContext;
 import com.logicaldoc.webdav.resource.model.Resource;
@@ -71,8 +71,8 @@ public class ResourceServiceImpl implements ResourceService {
 	@javax.annotation.Resource(name = "DocumentManager")
 	private transient DocumentManager documentManager;
 
-	@javax.annotation.Resource(name = "Storer")
-	private transient Storer storer;
+	@javax.annotation.Resource(name = "Store")
+	private transient Store store;
 
 	@javax.annotation.Resource(name = "UserDAO")
 	private transient UserDAO userDAO;
@@ -97,8 +97,8 @@ public class ResourceServiceImpl implements ResourceService {
 		this.folderDAO = folderDAO;
 	}
 
-	public void setStorer(Storer storer) {
-		this.storer = storer;
+	public void setStore(Store store) {
+		this.store = store;
 	}
 
 	private Resource marshallFolder(Folder folder, WebdavSession session) {
@@ -830,11 +830,11 @@ public class ResourceServiceImpl implements ResourceService {
 		InputStream is = null;
 		try {
 			if (version == null || version.equals("")) {
-				String res = storer.getResourceName(document, null, null);
-				is = storer.getStream(document.getId(), res);
+				String res = store.getResourceName(document, null, null);
+				is = store.getStream(document.getId(), res);
 			} else {
-				String res = storer.getResourceName(document, resource.getVersionLabel(), null);
-				is = storer.getStream(document.getId(), res);
+				String res = store.getResourceName(document, resource.getVersionLabel(), null);
+				is = store.getStream(document.getId(), res);
 			}
 		} catch (IOException e) {
 			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);

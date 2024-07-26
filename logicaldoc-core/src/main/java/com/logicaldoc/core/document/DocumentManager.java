@@ -389,7 +389,7 @@ public interface DocumentManager {
 
 	/**
 	 * Moves all the files of the documents in the given tree from it's original
-	 * location to the storage defined in the owning folder
+	 * location to the store defined in the owning folder
 	 * 
 	 * @param rootFolderId identifier of the root of the tree to process
 	 * @param transaction informations about the transaction, optional
@@ -399,7 +399,7 @@ public interface DocumentManager {
 	 * @throws PersistenceException error at data layer
 	 * @throws IOException I/O error
 	 */
-	public int enforceFilesIntoFolderStorage(long rootFolderId, DocumentHistory transaction)
+	public int enforceFilesIntoFolderStore(long rootFolderId, DocumentHistory transaction)
 			throws PersistenceException, IOException;
 
 	/**

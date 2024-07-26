@@ -403,8 +403,8 @@
     <servlet-class>de.novanic.eventservice.service.EventServiceImpl</servlet-class>
   </servlet>
   <servlet>
-    <servlet-name>StoragesData</servlet-name>
-    <servlet-class>com.logicaldoc.web.data.StoragesDataServlet</servlet-class>
+    <servlet-name>StoresData</servlet-name>
+    <servlet-class>com.logicaldoc.web.data.StoresDataServlet</servlet-class>
   </servlet>  
   <servlet>
     <servlet-name>DashletContent</servlet-name>
@@ -812,8 +812,8 @@
 	<url-pattern>/display</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>StoragesData</servlet-name>
-    <url-pattern>/data/storages.xml</url-pattern>
+    <servlet-name>StoresData</servlet-name>
+    <url-pattern>/data/stores.xml</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>Avatar</servlet-name>

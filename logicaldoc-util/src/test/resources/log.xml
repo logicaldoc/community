@@ -522,7 +522,7 @@
             <Appender-Ref ref="Cleaner" />
             <Appender-Ref ref="Cleaner_WEB" />
         </Logger>
-        <Logger name="com.logicaldoc.enterprise.storer.FSCleanerTask" level="info" additivity="false">
+        <Logger name="com.logicaldoc.enterprise.store.FSCleanerTask" level="info" additivity="false">
             <Appender-Ref ref="FSCleaner" />
             <Appender-Ref ref="FSCleaner_WEB" />
         </Logger>

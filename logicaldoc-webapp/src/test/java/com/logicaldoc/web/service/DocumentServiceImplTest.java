@@ -55,7 +55,7 @@ import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.gui.common.client.ServerException;
@@ -91,7 +91,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	private FolderDAO folderDao;
 
-	private Storer storer;
+	private Store store;
 
 	private TemplateDAO templateDao;
 
@@ -121,7 +121,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		bookDao = (BookmarkDAO) context.getBean("BookmarkDAO");
 		templateDao = (TemplateDAO) context.getBean("TemplateDAO");
 		folderDao = (FolderDAO) context.getBean("FolderDAO");
-		storer = (Storer) context.getBean("Storer");
+		store = (Store) context.getBean("Store");
 
 		searchEngine = (SearchEngine) context.getBean("SearchEngine");
 
@@ -318,7 +318,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		doc = service.getById(doc.getId());
 		assertNotNull(doc);
-		assertEquals("text content", storer.getString(doc.getId(), storer.getResourceName(doc.getId(), null, null)));
+		assertEquals("text content", store.getString(doc.getId(), store.getResourceName(doc.getId(), null, null)));
 		service.checkout(List.of(doc.getId()));
 
 		doc.setId(0);
@@ -330,7 +330,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		doc = service.getById(doc.getId());
 		assertNotNull(doc);
-		assertEquals(" ", storer.getString(doc.getId(), storer.getResourceName(doc.getId(), null, null)));
+		assertEquals(" ", store.getString(doc.getId(), store.getResourceName(doc.getId(), null, null)));
 		service.checkout(List.of(doc.getId()));
 	}
 
@@ -408,10 +408,10 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testEnforceFilesIntoFolderStorage() throws ServerException, PersistenceException, InterruptedException {
+	public void testEnforceFilesIntoFolderStore() throws ServerException, PersistenceException, InterruptedException {
 		Folder folder = folderDao.findById(1200);
 		folderDao.initialize(folder);
-		assertEquals(Integer.valueOf(2), folder.getStorage());
+		assertEquals(Integer.valueOf(2), folder.getStore());
 
 		Document doc = docDao.findById(5);
 		docDao.initialize(doc);
@@ -419,9 +419,9 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		docDao.store(doc);
 
 		doc = docDao.findById(5);
-		assertNull(doc.getFolder().getStorage());
+		assertNull(doc.getFolder().getStore());
 
-		service.enforceFilesIntoFolderStorage(1200);
+		service.enforceFilesIntoFolderStore(1200);
 
 		waiting();
 

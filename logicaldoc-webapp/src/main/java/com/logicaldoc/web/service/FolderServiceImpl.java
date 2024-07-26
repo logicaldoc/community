@@ -173,7 +173,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		guiFolder.setQuotaDocs(folder.getQuotaDocs());
 		guiFolder.setQuotaSize(folder.getQuotaSize());
 		guiFolder.setFoldRef(folder.getFoldRef());
-		guiFolder.setStorage(folder.getStorage());
+		guiFolder.setStore(folder.getStore());
 		guiFolder.setMaxVersions(folder.getMaxVersions());
 		guiFolder.setColor(folder.getColor());
 		guiFolder.setTile(folder.getTile());
@@ -369,7 +369,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				guiAce.setMove(ace.getMove() == 1);
 				guiAce.setEmail(ace.getEmail() == 1);
 				guiAce.setAutomation(ace.getAutomation() == 1);
-				guiAce.setStorage(ace.getStorage() == 1);
+				guiAce.setStore(ace.getStore() == 1);
 
 				acl.add(guiAce);
 			}
@@ -610,7 +610,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			} else {
 				// The user is editing a real folder
 				folder.setType(guiFolder.getType());
-				folder.setStorage(guiFolder.getStorage());
+				folder.setStore(guiFolder.getStore());
 				folder.setPosition(guiFolder.getPosition());
 				folder.setColor(guiFolder.getColor());
 
@@ -771,7 +771,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			fg.setMove(booleanToInt(ace.isMove()));
 			fg.setEmail(booleanToInt(ace.isEmail()));
 			fg.setAutomation(booleanToInt(ace.isAutomation()));
-			fg.setStorage(booleanToInt(ace.isStorage()));
+			fg.setStore(booleanToInt(ace.isStore()));
 			fg.setReadingreq(booleanToInt(ace.isReadingreq()));
 			fg.setCustomid(booleanToInt(ace.isCustomid()));
 		}
@@ -1150,16 +1150,16 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	@Override
-	public void applyStorage(long parentId) throws ServerException {
+	public void applyStore(long parentId) throws ServerException {
 		Session session = validateSession();
 
-		executeLongRunningOperation("Apply Storage", () -> {
+		executeLongRunningOperation("Apply Store", () -> {
 			try {
-				checkPermission(Permission.STORAGE, session.getUser(), parentId);
+				checkPermission(Permission.STORE, session.getUser(), parentId);
 				FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 				FolderHistory transaction = new FolderHistory();
 				transaction.setSession(session);
-				fdao.applyStorageToTree(parentId, transaction);
+				fdao.applyStoreToTree(parentId, transaction);
 			} catch (PersistenceException | AccessDeniedException e) {
 				log.error(e.getMessage(), e);
 			}

@@ -56,7 +56,7 @@ import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
@@ -119,8 +119,8 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Resource(name = "SearchEngine")
 	private SearchEngine indexer;
 
-	@Resource(name = "Storer")
-	private Storer storer;
+	@Resource(name = "Store")
+	private Store store;
 
 	@Resource(name = "ContextProperties")
 	private ContextProperties config;
@@ -145,8 +145,8 @@ public class DocumentManagerImpl implements DocumentManager {
 		this.versionDAO = versionDAO;
 	}
 
-	public void setStorer(Storer storer) {
-		this.storer = storer;
+	public void setStore(Store store) {
+		this.store = store;
 	}
 
 	public void setConfig(ContextProperties config) {
@@ -183,13 +183,13 @@ public class DocumentManagerImpl implements DocumentManager {
 
 		if (document.getImmutable() == 0 && document.getStatus() == AbstractDocument.DOC_UNLOCKED) {
 			// Remove the ancillary files of the same fileVersion
-			final String newFilerResourceName = storer.getResourceName(document, fileVersion, null);
-			for (String resource : storer.listResources(document.getId(), fileVersion).stream()
+			final String newFilerResourceName = store.getResourceName(document, fileVersion, null);
+			for (String resource : store.listResources(document.getId(), fileVersion).stream()
 					.filter(r -> !r.equals(newFilerResourceName)).toList())
-				storer.delete(document.getId(), resource);
+				store.delete(document.getId(), resource);
 
 			// Store the new file
-			storer.store(newFile, document.getId(), newFilerResourceName);
+			store.store(newFile, document.getId(), newFilerResourceName);
 
 			long fileSize = newFile.length();
 
@@ -340,7 +340,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				document.setComment(oldDocument.getComment());
 				documentDAO.store(document);
 				throw new PersistenceException(
-						String.format("Cannot save the new version %s into the storage", document), ioe);
+						String.format("Cannot save the new version %s into the store", document), ioe);
 			}
 
 			version.setFileSize(document.getFileSize());
@@ -429,8 +429,8 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	private void storeFile(Document doc, File file) throws IOException {
-		String resource = storer.getResourceName(doc, null, null);
-		storer.store(file, doc.getId(), resource);
+		String resource = store.getResourceName(doc, null, null);
+		store.store(file, doc.getId(), resource);
 	}
 
 	/**
@@ -475,7 +475,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 		// Parses the file where it is already stored
 		Locale locale = doc.getLocale();
-		String resource = storer.getResourceName(doc, fileVersion, null);
+		String resource = store.getResourceName(doc, fileVersion, null);
 		Parser parser = ParserFactory.getParser(doc.getFileName());
 
 		// and gets some fields
@@ -484,7 +484,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 			try {
-				content = parser.parse(storer.getStream(doc.getId(), resource), new ParseParameters(doc,
+				content = parser.parse(store.getStream(doc.getId(), resource), new ParseParameters(doc,
 						doc.getFileName(), fileVersion, null, locale, tDao.findById(doc.getTenantId()).getName()));
 			} catch (Exception e) {
 				log.error("Cannot parse document {}", doc, e);
@@ -998,7 +998,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	public int countPages(Document doc) {
 		try {
 			Parser parser = ParserFactory.getParser(doc.getFileName());
-			Storer strt = (Storer) Context.get().getBean(Storer.class);
+			Store strt = (Store) Context.get().getBean(Store.class);
 			return parser.countPages(strt.getStream(doc.getId(), strt.getResourceName(doc, null, null)),
 					doc.getFileName());
 		} catch (Exception e) {
@@ -1018,8 +1018,8 @@ public class DocumentManagerImpl implements DocumentManager {
 			return createAlias(doc, folder, doc.getDocRefType(), transaction);
 		}
 
-		String resource = storer.getResourceName(doc, null, null);
-		try (InputStream is = storer.getStream(doc.getId(), resource);) {
+		String resource = store.getResourceName(doc, null, null);
+		try (InputStream is = store.getStream(doc.getId(), resource);) {
 			Document cloned = new Document(doc);
 			cloned.setId(0);
 			if (doc.getFolder().getId() != folder.getId())
@@ -1329,10 +1329,10 @@ public class DocumentManagerImpl implements DocumentManager {
 
 		// If no more referenced, can delete the document's resources
 		if (!referenced) {
-			List<String> resources = storer.listResources(versionToDelete.getDocId(), versionToDelete.getFileVersion());
+			List<String> resources = store.listResources(versionToDelete.getDocId(), versionToDelete.getFileVersion());
 			for (String resource : resources)
 				try {
-					storer.delete(versionToDelete.getDocId(), resource);
+					store.delete(versionToDelete.getDocId(), resource);
 				} catch (Exception t) {
 					log.warn("Unable to delete resource {} of document {}", resource, versionToDelete.getDocId());
 				}
@@ -1588,7 +1588,7 @@ public class DocumentManagerImpl implements DocumentManager {
 					docVO.setTagsFromWords(tags);
 				}
 
-				storer.writeToFile(document.getId(), storer.getResourceName(document, ver.getFileVersion(), null), tmp);
+				store.writeToFile(document.getId(), store.getResourceName(document, ver.getFileVersion(), null), tmp);
 				DocumentHistory checkinTransaction = new DocumentHistory(transaction);
 				checkinTransaction.setDate(new Date());
 				checkin(document.getId(), tmp, ver.getFileName(), false, docVO, checkinTransaction);
@@ -1601,7 +1601,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public int enforceFilesIntoFolderStorage(long rootFolderId, DocumentHistory transaction)
+	public int enforceFilesIntoFolderStore(long rootFolderId, DocumentHistory transaction)
 			throws PersistenceException, IOException {
 		Folder rootFolder = folderDAO.findFolder(rootFolderId);
 		if (rootFolder == null)
@@ -1621,23 +1621,23 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			folderDAO.initialize(folder);
 
-			// Retrieve the storage specification from the current folder
-			int targetStorage = getStorage(folder);
+			// Retrieve the store specification from the current folder
+			int targetStore = getStore(folder);
 
-			log.info("Move the files of all the documents inside the folder {} into the target storage {}", rootFolder,
-					targetStorage);
+			log.info("Move the files of all the documents inside the folder {} into the target store {}", rootFolder,
+					targetStore);
 
 			List<Document> documents = documentDAO.findByFolder(folderId, null);
 
 			for (Document document : documents) {
-				int movedFiles = storer.moveResourcesToStore(document.getId(), targetStorage);
+				int movedFiles = store.moveResourcesToStore(document.getId(), targetStore);
 
 				if (movedFiles > 0) {
 					totalMovedFiles += movedFiles;
 					try {
 						DocumentHistory storedTransaction = new DocumentHistory(transaction);
 						storedTransaction
-								.setComment(String.format("%d files moved to storage %d", movedFiles, targetStorage));
+								.setComment(String.format("%d files moved to store %d", movedFiles, targetStore));
 						documentDAO.saveDocumentHistory(document, transaction);
 					} catch (Exception t) {
 						log.warn("Cannot gridRecord history for document {}", document, t);
@@ -1649,20 +1649,20 @@ public class DocumentManagerImpl implements DocumentManager {
 		return totalMovedFiles;
 	}
 
-	private int getStorage(Folder folder) {
-		int targetStorage = config.getInt("store.write", 1);
-		if (folder.getStorage() != null)
-			targetStorage = folder.getStorage().intValue();
+	private int getStore(Folder folder) {
+		int targetStore = config.getInt("store.write", 1);
+		if (folder.getStore() != null)
+			targetStore = folder.getStore().intValue();
 		else {
 			try {
-				// Check if one of the parent folders references the storer
+				// Check if one of the parent folders references the store
 				List<Folder> parents = folderDAO.findParents(folder.getId());
 				Collections.reverse(parents);
 
 				for (Folder parentFolder : parents) {
 					folderDAO.initialize(parentFolder);
-					if (parentFolder.getStorage() != null) {
-						targetStorage = parentFolder.getStorage().intValue();
+					if (parentFolder.getStore() != null) {
+						targetStore = parentFolder.getStore().intValue();
 						break;
 					}
 				}
@@ -1670,7 +1670,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				log.error(e.getMessage(), e);
 			}
 		}
-		return targetStorage;
+		return targetStore;
 	}
 
 	@Override
@@ -1842,8 +1842,8 @@ public class DocumentManagerImpl implements DocumentManager {
 		indexer.deleteHit(docId);
 		log.info("Destroyed the index entry of document {}", documentTag);
 
-		storer.delete(docId);
-		log.info("Destroyed the storage of document {}", documentTag);
+		store.delete(docId);
+		log.info("Destroyed the store of document {}", documentTag);
 
 		log.info("Document {} has been completely destroyed", documentTag);
 

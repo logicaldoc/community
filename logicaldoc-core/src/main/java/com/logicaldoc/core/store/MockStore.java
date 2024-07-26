@@ -10,13 +10,13 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 
 /**
- * This is basically a {@link FSStorer} but with a flag that if active makes the
+ * This is basically a {@link FSStore} but with a flag that if active makes the
  * store method to return an exception
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.4.2
  */
-public class MockStorer extends FSStorer {
+public class MockStore extends FSStore {
 
 	private File dummyFile = new File("pom.xml");
 
@@ -74,9 +74,9 @@ public class MockStorer extends FSStorer {
 	}
 
 	@Override
-	public int moveResourcesToStore(long docId, int targetStorageId) throws IOException {
+	public int moveResourcesToStore(long docId, int targetStoreId) throws IOException {
 
-		String targetRoot = Context.get().getProperties().getProperty("store." + targetStorageId + ".dir");
+		String targetRoot = Context.get().getProperties().getProperty("store." + targetStoreId + ".dir");
 
 		int moved = 0;
 

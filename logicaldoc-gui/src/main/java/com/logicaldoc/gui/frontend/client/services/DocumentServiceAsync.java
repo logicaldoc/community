@@ -141,7 +141,7 @@ public interface DocumentServiceAsync {
 
 	void disableTicket(long ticketId, AsyncCallback<Void> callback);
 
-	void enforceFilesIntoFolderStorage(long folderId, AsyncCallback<Void> callback);
+	void enforceFilesIntoFolderStore(long folderId, AsyncCallback<Void> callback);
 
 	void merge(List<Long> docIds, long targetFolderId, String fileName, AsyncCallback<GUIDocument> callback);
 

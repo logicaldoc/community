@@ -216,7 +216,7 @@ public class AclDataServlet extends AbstractDataServlet {
 						select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write, A.ld_add, A.ld_security, A.ld_immutable, A.ld_delete,
 						       A.ld_rename, A.ld_import, A.ld_export, A.ld_sign, A.ld_archive, A.ld_workflow, A.ld_download,
 						       A.ld_calendar, A.ld_subscription, A.ld_print, A.ld_password, A.ld_move, A.ld_email, A.ld_automation,
-						       A.ld_storage, A.ld_readingreq, A.ld_read, A.ld_preview, A.ld_customid
+						       A.ld_store, A.ld_readingreq, A.ld_read, A.ld_preview, A.ld_customid
 						  from ld_folder_acl A, ld_group B 
 						 where A.ld_folderid =
 						""");
@@ -324,7 +324,7 @@ public class AclDataServlet extends AbstractDataServlet {
 		writer.print("<move>" + intToBoolean(set.getInt(20)) + "</move>");
 		writer.print("<email>" + intToBoolean(set.getInt(21)) + "</email>");
 		writer.print("<automation>" + intToBoolean(set.getInt(22)) + "</automation>");
-		writer.print("<storage>" + intToBoolean(set.getInt(23)) + "</storage>");
+		writer.print("<store>" + intToBoolean(set.getInt(23)) + "</store>");
 		writer.print("<readingreq>" + intToBoolean(set.getInt(24)) + "</readingreq>");
 		writer.print(READ + intToBoolean(set.getInt(25)) + READ_CLOSED);
 		writer.print("<preview>" + intToBoolean(set.getInt(26)) + "</preview>");

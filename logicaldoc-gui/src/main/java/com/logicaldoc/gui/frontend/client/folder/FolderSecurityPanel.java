@@ -60,7 +60,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private static final String AUTOMATION = "automation";
 
-	private static final String STORAGE = "storage";
+	private static final String STORE = "store";
 
 	private static final String READINGREQ = "readingreq";
 
@@ -236,7 +236,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		addCalendar(fields);
 		addSubscription(fields);
 		addAutomation(fields);
-		addStorage(fields);
+		addStore(fields);
 		addReadingReq(fields);
 
 		list.setFields(fields.toArray(new ListGridField[0]));
@@ -302,13 +302,13 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		}
 	}
 
-	private void addStorage(List<ListGridField> fields) {
-		if (Feature.enabled(Feature.MULTI_STORAGE)) {
-			ListGridField storage = new ListGridField(STORAGE, prepareHeaderLabel(STORAGE));
-			storage.setType(ListGridFieldType.BOOLEAN);
-			storage.setCanEdit(true);
-			storage.setAutoFitWidth(true);
-			fields.add(storage);
+	private void addStore(List<ListGridField> fields) {
+		if (Feature.enabled(Feature.MULTI_STORE)) {
+			ListGridField store = new ListGridField(STORE, prepareHeaderLabel(STORE));
+			store.setType(ListGridFieldType.BOOLEAN);
+			store.setCanEdit(true);
+			store.setAutoFitWidth(true);
+			fields.add(store);
 		}
 	}
 
@@ -565,7 +565,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			ace.setMove(rec.getAttributeAsBoolean("move"));
 			ace.setEmail(rec.getAttributeAsBoolean(EMAIL));
 			ace.setAutomation(rec.getAttributeAsBoolean(AUTOMATION));
-			ace.setStorage(rec.getAttributeAsBoolean(STORAGE));
+			ace.setStore(rec.getAttributeAsBoolean(STORE));
 			ace.setReadingreq(rec.getAttributeAsBoolean(READINGREQ));
 
 			acl.add(ace);

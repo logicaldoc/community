@@ -17,7 +17,7 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
@@ -91,59 +91,59 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 
 		int versionsCap = Context.get().getProperties().getInt("document.maxversions");
 		assertEquals(versionsCap, testSubject.findByDocId(doc.getId()).size());
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
+		Store store = (Store) Context.get().getBean(Store.class);
 		for (Version ver : testSubject.findByDocId(doc.getId())) {
-			String res = storer.getResourceName(doc.getId(), ver.getFileVersion(), null);
-			storer.store(this.getClass().getResourceAsStream("/data.sql"), doc.getId(), res);
+			String res = store.getResourceName(doc.getId(), ver.getFileVersion(), null);
+			store.store(this.getClass().getResourceAsStream("/data.sql"), doc.getId(), res);
 		}
 		for (Version ver : testSubject.findByDocId(doc.getId())) {
-			String res = storer.getResourceName(doc.getId(), ver.getFileVersion(), null);
-			storer.exists(doc.getId(), res);
+			String res = store.getResourceName(doc.getId(), ver.getFileVersion(), null);
+			store.exists(doc.getId(), res);
 		}
 
 		Version version = Version.create(doc, user, "", DocumentEvent.STORED.toString(), true);
 		testSubject.store(version);
 		assertEquals("1.0", testSubject.findById(version.getId()).getVersion());
 
-		String resourceName = storer.getResourceName(doc.getId(), version.getFileVersion(), null);
+		String resourceName = store.getResourceName(doc.getId(), version.getFileVersion(), null);
 		try (InputStream is = this.getClass().getResourceAsStream("/data.sql")) {
-			storer.store(is, doc.getId(), resourceName);
+			store.store(is, doc.getId(), resourceName);
 		}
 
 		assertEquals(versionsCap, testSubject.findByDocId(doc.getId()).size());
 		for (Version ver : testSubject.findByDocId(doc.getId())) {
-			String res = storer.getResourceName(doc.getId(), ver.getFileVersion(), null);
-			storer.exists(doc.getId(), res);
+			String res = store.getResourceName(doc.getId(), ver.getFileVersion(), null);
+			store.exists(doc.getId(), res);
 		}
 
 		version = Version.create(doc, user, "", DocumentEvent.CHANGED.toString(), true);
 		testSubject.store(version);
 		assertEquals("2.0", version.getVersion());
 
-		resourceName = storer.getResourceName(doc.getId(), version.getFileVersion(), null);
+		resourceName = store.getResourceName(doc.getId(), version.getFileVersion(), null);
 		try (InputStream is = this.getClass().getResourceAsStream("/data.sql")) {
-			storer.store(is, doc.getId(), resourceName);
+			store.store(is, doc.getId(), resourceName);
 		}
 
 		assertEquals(versionsCap, testSubject.findByDocId(doc.getId()).size());
 		for (Version ver : testSubject.findByDocId(doc.getId())) {
-			String res = storer.getResourceName(doc.getId(), ver.getFileVersion(), null);
-			storer.exists(doc.getId(), res);
+			String res = store.getResourceName(doc.getId(), ver.getFileVersion(), null);
+			store.exists(doc.getId(), res);
 		}
 
 		version = Version.create(doc, user, "", DocumentEvent.CHECKEDIN.toString(), false);
 		testSubject.store(version);
 		assertEquals("2.1", version.getVersion());
 
-		resourceName = storer.getResourceName(doc.getId(), version.getFileVersion(), null);
+		resourceName = store.getResourceName(doc.getId(), version.getFileVersion(), null);
 		try (InputStream is = this.getClass().getResourceAsStream("/data.sql")) {
-			storer.store(is, doc.getId(), resourceName);
+			store.store(is, doc.getId(), resourceName);
 		}
 
 		assertEquals(versionsCap, testSubject.findByDocId(doc.getId()).size());
 		for (Version ver : testSubject.findByDocId(doc.getId())) {
-			String res = storer.getResourceName(doc.getId(), ver.getFileVersion(), null);
-			storer.exists(doc.getId(), res);
+			String res = store.getResourceName(doc.getId(), ver.getFileVersion(), null);
+			store.exists(doc.getId(), res);
 		}
 	}
 }

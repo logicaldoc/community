@@ -34,7 +34,7 @@ import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.MimeType;
 import com.logicaldoc.util.io.FileUtil;
@@ -103,8 +103,8 @@ public class MailTool {
 			att.setFileName(document.getFileName());
 			String extension = document.getFileExtension();
 			att.setMimeType(MimeType.get(extension));
-			Storer storer = (Storer) Context.get().getBean(Storer.class);
-			att.setData(storer.getBytes(document.getId(), storer.getResourceName(document, null, null)));
+			Store store = (Store) Context.get().getBean(Store.class);
+			att.setData(store.getBytes(document.getId(), store.getResourceName(document, null, null)));
 			email.addAttachment(2 + email.getAttachments().size(), att);
 		}
 
@@ -224,15 +224,15 @@ public class MailTool {
 			throw new IllegalArgumentException("Filename must end with .msg or .eml");
 
 		EMail email = null;
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
+		Store store = (Store) Context.get().getBean(Store.class);
 		if (document.getFileName().toLowerCase().endsWith(".eml"))
 			email = MailUtil.messageToMail(
-					storer.getStream(document.getId(), storer.getResourceName(document, null, null)),
+					store.getStream(document.getId(), store.getResourceName(document, null, null)),
 					extractAttachments);
 		else
 			try {
 				email = MailUtil.msgToMail(
-						storer.getStream(document.getId(), storer.getResourceName(document, null, null)),
+						store.getStream(document.getId(), store.getResourceName(document, null, null)),
 						extractAttachments);
 			} catch (CMSException e) {
 				throw new MessagingException(e.getMessage(), e);
@@ -299,9 +299,9 @@ public class MailTool {
 		InputStream is = null;
 		try {
 			long docId = doc.getId();
-			Storer storer = (Storer) Context.get().getBean(Storer.class);
-			String resource = storer.getResourceName(docId, doc.getFileVersion(), null);
-			is = storer.getStream(docId, resource);
+			Store store = (Store) Context.get().getBean(Store.class);
+			String resource = store.getResourceName(docId, doc.getFileVersion(), null);
+			is = store.getStream(docId, resource);
 
 			EMail email = null;
 

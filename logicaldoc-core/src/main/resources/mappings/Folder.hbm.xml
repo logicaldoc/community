@@ -67,7 +67,7 @@
 				<property name="move" type="int" column="ld_move" not-null="true" />
 				<property name="email" type="int" column="ld_email" not-null="true" />
 				<property name="automation" type="int" column="ld_automation" not-null="true" />
-				<property name="storage" type="int" column="ld_storage" not-null="true" />
+				<property name="store" type="int" column="ld_store" not-null="true" />
 				<property name="readingreq" type="int" column="ld_readingreq" not-null="true" />
 			</composite-element>
 		</set>
@@ -104,10 +104,10 @@
 				<property name="dateValue" type="timestamp" column="ld_datevalue" />
 			</composite-element>
 		</map>
-		<map name="storages" table="ld_folder_storage" lazy="true" cascade="all">
+		<map name="stores" table="ld_folder_store" lazy="true" cascade="all">
       		<key column="ld_folderid"/>
       		<map-key type="string" column="ld_nodeid" length="255" />
-      		<element type="int" column="ld_storageid" />
+      		<element type="int" column="ld_storeid" />
         </map>
 	</class>
 </hibernate-mapping>

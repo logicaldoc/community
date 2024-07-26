@@ -99,11 +99,11 @@ public class Feature {
 
 	public static final int GDRIVE = 43;
 
-	public static final int SMB_STORAGE = 44;
+	public static final int SMB_STORE = 44;
 
 	public static final int FORMAT_CONVERSION = 45;
 
-	public static final int CLOUD_STORAGE = 46;
+	public static final int CLOUD_STORE = 46;
 
 	public static final int VIA = 47;
 
@@ -115,7 +115,7 @@ public class Feature {
 
 	public static final int PREVIEW = 51;
 
-	public static final int MULTI_STORAGE = 52;
+	public static final int MULTI_STORE = 52;
 
 	public static final int BOOKMARKS = 53;
 

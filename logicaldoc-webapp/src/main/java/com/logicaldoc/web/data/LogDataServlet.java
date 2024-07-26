@@ -53,7 +53,7 @@ public class LogDataServlet extends AbstractDataServlet {
 	private void printLoggers(PrintWriter writer) {
 		LogConfigurator conf = new LogConfigurator();
 		for (Element logger : conf.getLoggers().stream()
-				.filter(l -> !"STORAGE_DELETIONS".equals(l.getAttributeValue("name")))
+				.filter(l -> !"STORE_DELETIONS".equals(l.getAttributeValue("name")))
 				.sorted((l1, l2) -> StringUtils.defaultString(l1.getAttributeValue("name"))
 						.compareTo(StringUtils.defaultString(l2.getAttributeValue("name"))))
 				.toList()) {
@@ -90,7 +90,7 @@ public class LogDataServlet extends AbstractDataServlet {
 	 * @return if the given logger is reserved
 	 */
 	public static boolean isLoggerReserved(String name) {
-		List<String> reservedNames = List.of("root", "STORAGE_DELETIONS");
+		List<String> reservedNames = List.of("root", "STORE_DELETIONS");
 		if (reservedNames.contains(name))
 			return true;
 

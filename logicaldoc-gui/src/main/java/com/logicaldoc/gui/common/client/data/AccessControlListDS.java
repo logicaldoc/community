@@ -46,14 +46,14 @@ public class AccessControlListDS extends DataSource {
 		DataSourceBooleanField move = new DataSourceBooleanField("move");
 		DataSourceBooleanField email = new DataSourceBooleanField("email");
 		DataSourceBooleanField automation = new DataSourceBooleanField("automation");
-		DataSourceBooleanField storage = new DataSourceBooleanField("storage");
+		DataSourceBooleanField store = new DataSourceBooleanField("store");
 		DataSourceBooleanField readingreq = new DataSourceBooleanField("readingreq");
 		DataSourceBooleanField customid = new DataSourceBooleanField("customid");
 		DataSourceTextField type = new DataSourceTextField("type");
 
 		setFields(entityId, entity, read, preview, print, write, customid, delete, move, add, workflow, sign, importField, export, rename,
 				immutable, security, password, archive, type, download, email, calendar, subscription, automation,
-				storage, readingreq);
+				store, readingreq);
 		setClientOnly(true);
 		setDataURL("data/acl.xml?id=" + id + "&type=" + objectType + "&locale=" + I18N.getLocale());
 	}

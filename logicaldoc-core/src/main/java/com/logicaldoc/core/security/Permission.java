@@ -28,7 +28,7 @@ import java.util.Set;
  * <li>MOVE: permission to move</li>
  * <li>EMAIL: permission to send emails</li>
  * <li>AUTOMATION: permission to handle the automation</li>
- * <li>STORAGE: permission to handle the storage</li>
+ * <li>STORE: permission to handle the store</li>
  * <li>READINGREQ: permission to send reading requests</li>
  * <li>PREVIEW: permission to preview a document</li>
  * <li>CUSTOMID: permission to edit the Custom ID</li>
@@ -42,7 +42,7 @@ public enum Permission {
 			"immutable"), DELETE("delete"), RENAME("rename"), IMPORT("import"), EXPORT("export"), SIGN("sign"), ARCHIVE(
 					"archive"), WORKFLOW("workflow"), CALENDAR("calendar"), SUBSCRIPTION("subscription"), PRINT(
 							"print"), PASSWORD("password"), MOVE("move"), EMAIL("email"), AUTOMATION(
-									"automation"), STORAGE("storage"), READINGREQ(
+									"automation"), STORE("store"), READINGREQ(
 											"readingreq"), PREVIEW("preview"), CUSTOMID("customid");
 
 	private final String name;

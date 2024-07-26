@@ -42,20 +42,20 @@ import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
 
 /**
- * Common methods for all the Storer implementations.
+ * Common methods for all the Store implementations.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.6.4
  */
-public abstract class AbstractStorer implements Storer {
+public abstract class AbstractStore implements Store {
 
 	private static final String STORE = "store.";
 
 	protected static final int DEFAULT_BUFFER_SIZE = 1024;
 
-	protected static Logger log = LoggerFactory.getLogger(AbstractStorer.class);
+	protected static Logger log = LoggerFactory.getLogger(AbstractStore.class);
 
-	protected static Logger deletionsLog = LoggerFactory.getLogger("STORAGE_DELETIONS");
+	protected static Logger deletionsLog = LoggerFactory.getLogger("STORE_DELETIONS");
 
 	@Resource(name = "ContextProperties")
 	protected ContextProperties config;
@@ -64,10 +64,10 @@ public abstract class AbstractStorer implements Storer {
 
 	protected Map<String, String> parameters = new HashMap<>();
 
-	// Key is the type, value is the associated storer
-	protected Map<String, Storer> storerDefinitions = new HashMap<>();
+	// Key is the type, value is the associated store
+	protected Map<String, Store> storeDefinitions = new HashMap<>();
 
-	protected AbstractStorer() {
+	protected AbstractStore() {
 	}
 
 	public ContextProperties getConfig() {
@@ -89,7 +89,7 @@ public abstract class AbstractStorer implements Storer {
 	}
 
 	@Override
-	public int compareTo(Storer o) {
+	public int compareTo(Store o) {
 		return Integer.compare(id, o.getId());
 	}
 
@@ -106,7 +106,7 @@ public abstract class AbstractStorer implements Storer {
 		if (this.getClass() != obj.getClass())
 			return false;
 
-		return id == ((Storer) obj).getId();
+		return id == ((Store) obj).getId();
 	}
 
 	@Override
@@ -157,15 +157,15 @@ public abstract class AbstractStorer implements Storer {
 	/**
 	 * Checks if the current store is enabled
 	 * 
-	 * @throws IOException raised just in case of disabled storer
+	 * @throws IOException raised just in case of disabled store
 	 */
 	protected void checkEnabled() throws IOException {
 		if (!isEnabled())
-			throw new IOException("Storer not enabled");
+			throw new IOException("Store not enabled");
 	}
 
 	/**
-	 * Computes the relative path of a document's folder inside the storage
+	 * Computes the relative path of a document's folder inside the store
 	 * root. The document's id is tokenized by three chars tokens, than the doc/
 	 * dir is appended, so if the docId=12345, the document's path will be:
 	 * 123/45/doc.
@@ -175,7 +175,7 @@ public abstract class AbstractStorer implements Storer {
 	}
 
 	/**
-	 * Computes the relative path of a document's resource inside the storage
+	 * Computes the relative path of a document's resource inside the store
 	 * root. The document's id is tokenized by three chars tokens, than the doc/
 	 * dir is appended, so if the docId=12345, the document's path will be:
 	 * 123/45/doc/1.0.
@@ -338,12 +338,12 @@ public abstract class AbstractStorer implements Storer {
 	@Override
 	@PostConstruct
 	public void init() {
-		if (!storerDefinitions.isEmpty())
+		if (!storeDefinitions.isEmpty())
 			return;
 
-		// Acquire the 'Storer' extensions
+		// Acquire the 'Store' extensions
 		PluginRegistry registry = PluginRegistry.getInstance();
-		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "Storer");
+		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "Store");
 
 		for (Extension ext : exts) {
 			String type = ext.getParameter("type").valueAsString();
@@ -354,17 +354,17 @@ public abstract class AbstractStorer implements Storer {
 				Class clazz = Class.forName(className);
 				// Try to instantiate the builder
 				@SuppressWarnings("unchecked")
-				Object storer = clazz.getDeclaredConstructor().newInstance();
-				if (!(storer instanceof Storer))
+				Object store = clazz.getDeclaredConstructor().newInstance();
+				if (!(store instanceof Store))
 					throw new ClassNotFoundException(
-							String.format("The specified storer %s doesn't implement the Storer interface", className));
-				storerDefinitions.put(type, (Storer) storer);
+							String.format("The specified store %s doesn't implement the Store interface", className));
+				storeDefinitions.put(type, (Store) store);
 
-				Storer st = (Storer) storer;
+				Store st = (Store) store;
 				for (String name : st.getParameterNames())
 					st.getParameters().put(name, null);
 
-				log.info("Added new storer {} for type {}", clazz.getSimpleName(), type);
+				log.info("Added new store {} for type {}", clazz.getSimpleName(), type);
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				log.error(e.getMessage(), e);
@@ -410,39 +410,39 @@ public abstract class AbstractStorer implements Storer {
 	}
 
 	/**
-	 * Instantiate a new storer and fully configures it.
+	 * Instantiate a new store and fully configures it.
 	 * 
-	 * @param id identifier of the storer to create
+	 * @param id identifier of the store to create
 	 * 
 	 * @return the created instance
 	 */
-	public Storer newStorer(int id) {
+	public Store newStore(int id) {
 		String type = config.getProperty(STORE + id + ".type", "fs");
-		Storer definition = storerDefinitions.get(type);
+		Store definition = storeDefinitions.get(type);
 		if (definition == null) {
 			log.error("Unexisting definition for {}", type);
 			return null;
 		}
 
-		Storer storer = null;
+		Store store = null;
 		try {
-			storer = definition.getClass().getDeclaredConstructor().newInstance();
+			store = definition.getClass().getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
 			log.error("Unable to instanciate class {} / {}", definition.getClass(), e.getMessage());
 			log.error(e.getMessage(), e);
 			return null;
 		}
-		storer.setId(id);
+		store.setId(id);
 
 		Set<String> params = definition.getParameters().keySet();
 		for (String param : params)
-			storer.getParameters().put(param, config.getProperty(STORE + id + "." + param, ""));
+			store.getParameters().put(param, config.getProperty(STORE + id + "." + param, ""));
 
-		return storer;
+		return store;
 	}
 
 	@Override
-	public Map<String, Storer> getStorerDefinitions() {
-		return storerDefinitions;
+	public Map<String, Store> getStoreDefinitions() {
+		return storeDefinitions;
 	}
 }

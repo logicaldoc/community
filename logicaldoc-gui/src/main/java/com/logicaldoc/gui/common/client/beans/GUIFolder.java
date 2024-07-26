@@ -80,7 +80,7 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 
 	private Long foldRef = null;
 
-	private Integer storage = null;
+	private Integer store = null;
 
 	private Integer maxVersions = null;
 
@@ -341,12 +341,12 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 		this.foldRef = foldRef;
 	}
 
-	public Integer getStorage() {
-		return storage;
+	public Integer getStore() {
+		return store;
 	}
 
-	public void setStorage(Integer storage) {
-		this.storage = storage;
+	public void setStore(Integer store) {
+		this.store = store;
 	}
 
 	public Integer getMaxVersions() {

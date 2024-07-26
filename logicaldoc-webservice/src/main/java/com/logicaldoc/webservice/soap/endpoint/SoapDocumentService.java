@@ -55,7 +55,7 @@ import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.MimeType;
@@ -292,10 +292,10 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 				throw new PermissionException(String.format("The document is protected by a password %s", doc));
 		}
 
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
-		String resourceName = storer.getResourceName(doc, fileVersion, suffix);
+		Store store = (Store) Context.get().getBean(Store.class);
+		String resourceName = store.getResourceName(doc, fileVersion, suffix);
 
-		if (!storer.exists(doc.getId(), resourceName)) {
+		if (!store.exists(doc.getId(), resourceName)) {
 			throw new WebserviceException("Resource " + resourceName + " not found");
 		}
 
@@ -305,7 +305,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (StringUtils.isNotEmpty(suffix))
 			fileName = suffix;
 		String mime = MimeType.getByFilename(fileName);
-		return new DataHandler(new InputStreamDataSource(storer.getStream(doc.getId(), resourceName), mime));
+		return new DataHandler(new InputStreamDataSource(store.getStream(doc.getId(), resourceName), mime));
 	}
 
 	@Override
@@ -328,14 +328,14 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		validateSession(sid);
 
 		ThumbnailManager manager = (ThumbnailManager) Context.get().getBean(ThumbnailManager.class);
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
+		Store store = (Store) Context.get().getBean(Store.class);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		Document doc = docDao.findDocument(docId);
 
 		if (!type.toLowerCase().endsWith(".png"))
 			type += ".png";
-		String resource = storer.getResourceName(doc, fileVersion, type);
-		if (!storer.exists(docId, resource)) {
+		String resource = store.getResourceName(doc, fileVersion, type);
+		if (!store.exists(docId, resource)) {
 			if (type.equals(ThumbnailManager.SUFFIX_THUMB))
 				manager.createTumbnail(doc, fileVersion, sid);
 			else if (type.equals(ThumbnailManager.SUFFIX_TILE))
@@ -376,12 +376,12 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if ("sign.p7m".equalsIgnoreCase(suffix))
 			throw new PermissionException("You cannot upload a signature");
 
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
-		String resource = storer.getResourceName(doc, fileVersion, suffix);
+		Store store = (Store) Context.get().getBean(Store.class);
+		String resource = store.getResourceName(doc, fileVersion, suffix);
 
 		log.debug("Attach file {}", resource);
 
-		storer.store(content.getInputStream(), doc.getId(), resource);
+		store.store(content.getInputStream(), doc.getId(), resource);
 	}
 
 	@Override
@@ -783,9 +783,9 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	private void createAttachment(EMail email, Document doc) throws IOException {
 		EMailAttachment att = new EMailAttachment();
 		att.setIcon(doc.getIcon());
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
-		String resource = storer.getResourceName(doc, null, null);
-		att.setData(storer.getBytes(doc.getId(), resource));
+		Store store = (Store) Context.get().getBean(Store.class);
+		String resource = store.getResourceName(doc, null, null);
+		att.setData(store.getBytes(doc.getId(), resource));
 		att.setFileName(doc.getFileName());
 		String extension = doc.getFileExtension();
 		att.setMimeType(MimeType.get(extension));

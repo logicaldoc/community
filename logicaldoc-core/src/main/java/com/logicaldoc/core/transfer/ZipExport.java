@@ -27,7 +27,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderEvent;
 import com.logicaldoc.core.folder.FolderHistory;
-import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -274,8 +274,8 @@ public class ZipExport {
 	 * @param pdfConversion if the PDF conversion has to be used instead
 	 */
 	private void addDocument(String path, Document document, boolean pdfConversion) {
-		Storer storer = (Storer) Context.get().getBean(Storer.class);
-		String resource = storer.getResourceName(document, null, null);
+		Store store = (Store) Context.get().getBean(Store.class);
+		String resource = store.getResourceName(document, null, null);
 
 		if (pdfConversion && !"pdf".equals(FileUtil.getExtension(document.getFileName().toLowerCase()))) {
 			FormatConverterManager manager = (FormatConverterManager) Context.get()
@@ -286,10 +286,10 @@ public class ZipExport {
 				log.warn(e.getMessage(), e);
 				return;
 			}
-			resource = storer.getResourceName(document, null, FormatConverterManager.PDF_CONVERSION_SUFFIX);
+			resource = store.getResourceName(document, null, FormatConverterManager.PDF_CONVERSION_SUFFIX);
 		}
 
-		try (BufferedInputStream bis = new BufferedInputStream(storer.getStream(document.getId(), resource))) {
+		try (BufferedInputStream bis = new BufferedInputStream(store.getStream(document.getId(), resource))) {
 			String fileName = document.getFileName();
 			if (pdfConversion)
 				fileName = FileUtil.getBaseName(fileName) + ".pdf";
