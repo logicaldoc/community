@@ -598,7 +598,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 		// Search in the document/folder history
 		StringBuilder query = new StringBuilder(
-				"select A.ld_username, A.ld_event, A.ld_date, A.ld_filename, A.ld_folderid, A.ld_path, A.ld_sessionid, A.ld_docid, A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment, A.ld_reason, A.ld_device, A.ld_geolocation from ld_history A where A.ld_tenantid = "
+				"select A.ld_username, A.ld_event, A.ld_date, A.ld_filename, A.ld_folderid, A.ld_path, A.ld_sessionid, A.ld_docid, A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment, A.ld_reason, A.ld_device, A.ld_geolocation, A.ld_keylabel from ld_history A where A.ld_tenantid = "
 						+ session.getTenantId());
 		appendUserCondition("A", userId, query);
 		appendSessionCondition("A", historySid, query);
@@ -608,7 +608,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 		// Search in the folder history
 		query.append(
-				" union select B.ld_username, B.ld_event, B.ld_date, B.ld_filename, B.ld_folderid, B.ld_path, B.ld_sessionid, B.ld_docid, B.ld_userid, B.ld_ip as ip, B.ld_userlogin, B.ld_comment, B.ld_reason, B.ld_device, B.ld_geolocation from ld_folder_history B where B.ld_tenantid = "
+				" union select B.ld_username, B.ld_event, B.ld_date, B.ld_filename, B.ld_folderid, B.ld_path, B.ld_sessionid, B.ld_docid, B.ld_userid, B.ld_ip as ip, B.ld_userlogin, B.ld_comment, B.ld_reason, B.ld_device, B.ld_geolocation, B.ld_keylabel from ld_folder_history B where B.ld_tenantid = "
 						+ session.getTenantId());
 		appendUserCondition("B", userId, query);
 		appendSessionCondition("B", historySid, query);
@@ -619,7 +619,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		// Search in the user history
 		if (rootFolderId == null) {
 			query.append(
-					" union select C.ld_username, C.ld_event, C.ld_date, null, null, null, C.ld_sessionid, null, C.ld_userid, C.ld_ip as ip, C.ld_userlogin, C.ld_comment, C.ld_reason, C.ld_device, C.ld_geolocation from ld_user_history C where C.ld_tenantid = "
+					" union select C.ld_username, C.ld_event, C.ld_date, null, null, null, C.ld_sessionid, null, C.ld_userid, C.ld_ip as ip, C.ld_userlogin, C.ld_comment, C.ld_reason, C.ld_device, C.ld_geolocation, C.ld_keylabel from ld_user_history C where C.ld_tenantid = "
 							+ session.getTenantId());
 			appendUserCondition("C", userId, query);
 			appendSessionCondition("C", historySid, query);
@@ -631,7 +631,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 			// Search in the workflow history
 			query.append(
-					" union select D.ld_username, D.ld_event, D.ld_date, null, null, null, D.ld_sessionid, D.ld_docid, D.ld_userid, '' as ip, D.ld_userlogin, D.ld_comment, D.ld_reason, D.ld_device, D.ld_geolocation from ld_workflowhistory D where D.ld_tenantid = "
+					" union select D.ld_username, D.ld_event, D.ld_date, null, null, null, D.ld_sessionid, D.ld_docid, D.ld_userid, '' as ip, D.ld_userlogin, D.ld_comment, D.ld_reason, D.ld_device, D.ld_geolocation, D.ld_keylabel from ld_workflowhistory D where D.ld_tenantid = "
 							+ session.getTenantId());
 			appendUserCondition("D", userId, query);
 			appendSessionCondition("D", historySid, query);
@@ -643,7 +643,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		if (SystemInfo.get().getFeatures().contains("Feature_1")) {
 			// Search in the workflow history
 			query.append(
-					" union select E.ld_username, E.ld_event, E.ld_date, E.ld_filename, E.ld_folderid, E.ld_path, null, E.ld_docid, E.ld_userid, null as ip, E.ld_userlogin, E.ld_comment, null, null, null  from ld_importfolder_history E where E.ld_tenantid = "
+					" union select E.ld_username, E.ld_event, E.ld_date, E.ld_filename, E.ld_folderid, E.ld_path, null, E.ld_docid, E.ld_userid, null as ip, E.ld_userlogin, E.ld_comment, null, null, null, null  from ld_importfolder_history E where E.ld_tenantid = "
 							+ session.getTenantId());
 			appendUserCondition("E", userId, query);
 			if (StringUtils.isNotEmpty(historySid))
@@ -656,7 +656,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		if (SystemInfo.get().getFeatures().contains("Feature_3")) {
 			// Search in the OCR history
 			query.append(
-					" union select F.ld_username, F.ld_event, F.ld_date, F.ld_filename, F.ld_folderid, F.ld_path, null, F.ld_docid, F.ld_userid, null as ip, F.ld_userlogin, F.ld_comment, null, null, null  from ld_ocr_history F where F.ld_tenantid = "
+					" union select F.ld_username, F.ld_event, F.ld_date, F.ld_filename, F.ld_folderid, F.ld_path, null, F.ld_docid, F.ld_userid, null as ip, F.ld_userlogin, F.ld_comment, null, null, null, null  from ld_ocr_history F where F.ld_tenantid = "
 							+ session.getTenantId());
 			appendUserCondition("F", userId, query);
 			if (StringUtils.isNotEmpty(historySid))
@@ -728,6 +728,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 				history.setReason(rs.getString(13));
 				history.setDevice(rs.getString(14));
 				history.setGeolocation(rs.getString(15));
+				history.setKeyLabel(rs.getString(16));
 
 				if (history.getFileName() != null && history.getDocId() != 0L)
 					history.setIcon(IconSelector.selectIcon(history.getFileName()));
@@ -778,7 +779,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 			// Search in the document/folder history
 			StringBuilder query = new StringBuilder(
-					"select ld_username, ld_date, ld_path, ld_sessionid, ld_userid, ld_ip as ip, ld_userlogin, ld_comment, ld_device, ld_geolocation, ld_protocol, ld_tenantId from ld_webservicecall where 1 = 1 ");
+					"select ld_username, ld_date, ld_path, ld_sessionid, ld_userid, ld_ip as ip, ld_userlogin, ld_comment, ld_device, ld_geolocation, ld_protocol, ld_tenantId, ld_keylabel from ld_webservicecall where 1 = 1 ");
 			if (userId != null)
 				query.append(" and ld_userid = " + userId);
 			if (callSid != null && StringUtils.isNotEmpty(callSid))
@@ -816,6 +817,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 					history.setProtocol(rs.getString(11));
 					history.setTenantId(rs.getLong(12));
 					history.setTenant(tenants.get(history.getTenantId()));
+					history.setKeyLabel(rs.getString(13));
 
 					return history;
 				}

@@ -32,11 +32,12 @@ public class FolderHistoryDS extends DataSource {
 		DataSourceTextField fileName = new DataSourceTextField("filename");
 		DataSourceTextField path = new DataSourceTextField("path");
 		DataSourceTextField sid = new DataSourceTextField("sid");
+		DataSourceTextField key = new DataSourceTextField("key");
 		DataSourceTextField ip = new DataSourceTextField("ip");
 		DataSourceTextField device = new DataSourceTextField("device");
 		DataSourceTextField geolocation = new DataSourceTextField("geolocation");
 
-		setFields(userId, user, date, event, comment, reason, fileName, path, sid, ip, device, geolocation);
+		setFields(userId, user, date, event, comment, reason, fileName, path, sid, key, ip, device, geolocation);
 		setClientOnly(true);
 
 		setDataURL("data/folderhistory.xml?id=" + folderId + "&locale=" + I18N.getLocale() + "&max="

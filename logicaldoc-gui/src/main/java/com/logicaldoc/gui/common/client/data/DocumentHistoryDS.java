@@ -70,12 +70,13 @@ public class DocumentHistoryDS extends DataSource {
 		DataSourceTextField userId = new DataSourceTextField("userId");
 		DataSourceTextField path = new DataSourceTextField("path");
 		DataSourceTextField sid = new DataSourceTextField("sid");
+		DataSourceTextField key = new DataSourceTextField("key");
 		DataSourceTextField ip = new DataSourceTextField("ip");
 		DataSourceTextField device = new DataSourceTextField("device");
 		DataSourceTextField geolocation = new DataSourceTextField("geolocation");
 
 		setFields(user, filename, date, event, comment, reason, version, fileVersion, fileSize, icon, newField, documentId,
-				folderId, userId, path, sid, ip, device, geolocation);
+				folderId, userId, path, sid, key, ip, device, geolocation);
 		setClientOnly(true);
 
 		setDataURL(url);

@@ -57,7 +57,7 @@
         <security:authentication-provider ref='LDAuthenticationProvider' />
     </security:authentication-manager>
     <bean id="AnonymousLoginFilter" class="com.logicaldoc.core.security.spring.AnonymousLoginFilter" />
-    <bean id="SessionIdFilter" class="com.logicaldoc.core.security.spring.SessionIdFilter" />
+    <bean id="SessionFilter" class="com.logicaldoc.core.security.spring.SessionFilter" />
     <bean id="LDSecurityContextRepository"
         class="com.logicaldoc.core.security.spring.LDSecurityContextRepository" />
     <security:authentication-manager id="AdminAuthenticationManager">
@@ -124,7 +124,7 @@
             access="isAuthenticated()" />            
             
         <!-- Some session-related custom filters -->
-        <security:custom-filter ref="SessionIdFilter" before="PRE_AUTH_FILTER" />            
+        <security:custom-filter ref="SessionFilter" before="PRE_AUTH_FILTER" />            
             
         <security:custom-filter ref="WebserviceBasicAuthenticationFilter" before="BASIC_AUTH_FILTER" />
     </security:http>
@@ -240,9 +240,7 @@
         <!-- Exclude the default session management -->
         <!-- security:session-management session-fixation-protection="none" / -->
         <!-- Some session-related custom filters -->
-        <security:custom-filter ref="SessionIdFilter"
-            before="PRE_AUTH_FILTER" />
-        <security:custom-filter ref="AnonymousLoginFilter"
-            before="ANONYMOUS_FILTER" />
+        <security:custom-filter ref="SessionFilter" before="PRE_AUTH_FILTER" />
+        <security:custom-filter ref="AnonymousLoginFilter" before="ANONYMOUS_FILTER" />
     </security:http>
 </beans>

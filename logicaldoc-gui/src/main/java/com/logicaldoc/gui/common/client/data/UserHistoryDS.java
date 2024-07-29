@@ -41,11 +41,12 @@ public class UserHistoryDS extends DataSource {
 		DataSourceTextField comment = new DataSourceTextField("comment");
 		DataSourceTextField reason = new DataSourceTextField("reason");
 		DataSourceTextField sid = new DataSourceTextField("sid");
+		DataSourceTextField key = new DataSourceTextField("key");
 		DataSourceTextField ip = new DataSourceTextField("id");
 		DataSourceTextField device = new DataSourceTextField("device");
 		DataSourceTextField geolocation = new DataSourceTextField("geolocation");
 
-		setFields(user, date, evnt, ip, device, geolocation, comment, reason, sid, folderId);
+		setFields(user, date, evnt, ip, device, geolocation, comment, reason, sid, key, folderId);
 		setClientOnly(true);
 
 		String url = "data/userhistory.xml?id=" + userId + "&locale=" + I18N.getLocale();

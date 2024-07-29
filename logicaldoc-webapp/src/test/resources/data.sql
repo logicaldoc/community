@@ -345,7 +345,7 @@ create table ld_workflowhistory (ld_id bigint not null, ld_lastmodified timestam
                                  ld_deleted int not null, ld_tenantid bigint not null, ld_date timestamp, ld_event varchar(255), 
                                  ld_comment varchar(4000), ld_reason varchar(4000), ld_docid bigint, ld_folderid bigint, ld_userid bigint, 
                                  ld_username varchar(255), ld_templateid bigint not null, ld_userlogin varchar(255), 
-                                 ld_instanceid varchar(255), ld_sessionid varchar(255), ld_transition varchar(255),
+                                 ld_instanceid varchar(255), ld_sessionid varchar(255), ld_transition varchar(255), ld_keylabel varchar(255),
                                  ld_new int, ld_filename varchar(255), ld_taskname varchar(255), ld_taskid varchar(255), ld_taskdisplay varchar(255),
                                  ld_ip varchar(255), ld_path varchar(4000), ld_templateversion int not null, ld_workflowdisplay varchar(255),
                                  ld_geolocation varchar(255), ld_device varchar(255), ld_filesize bigint, primary key (ld_id));
@@ -364,7 +364,7 @@ create table ld_ocr_history (ld_id bigint not null, ld_lastmodified timestamp no
                              ld_username varchar(255), ld_userlogin varchar(255), primary key (ld_id));
 
 create table ld_webservicecall (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null,
-                                ld_deleted int not null, ld_tenantid bigint not null, 
+                                ld_deleted int not null, ld_tenantid bigint not null, ld_keylabel varchar(255),
                                 ld_userid bigint, ld_date timestamp, ld_username varchar(255), ld_event varchar(255), 
                                 ld_comment varchar(4000), ld_path varchar(4000), ld_sessionid varchar(255),
                                 ld_userlogin varchar(255), ld_ip varchar(255), ld_geolocation varchar(255), 

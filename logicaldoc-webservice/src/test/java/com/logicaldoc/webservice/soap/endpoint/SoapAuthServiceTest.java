@@ -63,14 +63,14 @@ public class SoapAuthServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testLogout() {
-		String sid = soapAuthServiceImpl.login("author", "admin");
+		String sid = soapAuthServiceImpl.loginApiKey(apiKey.getDecodedKey());
 		assertNotNull(sid);
 		soapAuthServiceImpl.logout(sid);
 	}
 
 	@Test
 	public void testValid() {
-		String sid = soapAuthServiceImpl.login("author", "admin");
+		String sid = soapAuthServiceImpl.loginApiKey(apiKey.getDecodedKey());
 		assertNotNull(sid);
 		boolean isValid = soapAuthServiceImpl.valid(sid);
 		assertTrue(isValid);
@@ -89,7 +89,7 @@ public class SoapAuthServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testRenew() throws InterruptedException {
-		String sid = soapAuthServiceImpl.login("author", "admin");
+		String sid = soapAuthServiceImpl.loginApiKey(apiKey.getDecodedKey());
 		System.err.println(sid);
 		assertNotNull(sid);
 		waiting();

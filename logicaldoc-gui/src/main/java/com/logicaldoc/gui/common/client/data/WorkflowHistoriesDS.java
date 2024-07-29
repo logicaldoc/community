@@ -36,6 +36,7 @@ public class WorkflowHistoriesDS extends DataSource {
 		DataSourceTextField filename = new DataSourceTextField("filename");
 		DataSourceTextField documentId = new DataSourceTextField("documentId");
 		DataSourceTextField sessionId = new DataSourceTextField("sessionid");
+		DataSourceTextField key = new DataSourceTextField("key");
 		DataSourceTextField transition = new DataSourceTextField("transition");
 		DataSourceImageField icon = new DataSourceImageField("icon");
 		icon.setHidden(true);
@@ -44,7 +45,7 @@ public class WorkflowHistoriesDS extends DataSource {
 		DataSourceIntegerField templateId = new DataSourceIntegerField("templateId");
 
 		setFields(id, taskId, name, tag, startDate, endDate, documents, initiator, initiatorId, event, date, user,
-				userId, comment, icon, filename, transition, documentId, sessionId, templateId, templateVersion,
+				userId, comment, icon, filename, transition, documentId, sessionId, key, templateId, templateVersion,
 				display, wfDisplay);
 		setDataURL("data/workflowhistories.xml?locale=" + I18N.getLocale()
 				+ (instanceId != null ? "&instanceId=" + instanceId : "")

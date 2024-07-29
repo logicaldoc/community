@@ -23,6 +23,7 @@
 		<property name="comment" type="string" column="ld_comment" length="4000" />
 		<property name="path" type="string" column="ld_path" length="4000" />
         <property name="sessionId" type="string" column="ld_sessionid" length="255" />
+        <property name="keyLabel" type="string" column="ld_keylabel" length="255" />
         <property name="ip" type="string" column="ld_ip" length="255" />
         <property name="geolocation" type="string" column="ld_geolocation" length="255" />
         <property name="device" type="string" column="ld_device" length="255" />

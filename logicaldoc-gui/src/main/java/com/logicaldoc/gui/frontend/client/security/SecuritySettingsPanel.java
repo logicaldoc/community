@@ -5,6 +5,7 @@ import java.util.Map;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUISecuritySettings;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
@@ -17,6 +18,7 @@ import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.common.client.widgets.PasswordGenerator;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
+import com.logicaldoc.gui.frontend.client.system.SessionsPanel;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
@@ -237,6 +239,12 @@ public class SecuritySettingsPanel extends AdminPanel {
 			Tab geolocation = prepareGeolocationTab(settings);
 			tabs.addTab(geolocation);
 		}
+		
+		Tab sessions = new Tab();
+		sessions.setTitle(I18N.message("sessions"));
+		sessions.setPane(new SessionsPanel());
+		if (Menu.enabled(Menu.ADMIN_SESSIONS))
+			tabs.addTab(sessions);
 
 		addSaveButton();
 	}

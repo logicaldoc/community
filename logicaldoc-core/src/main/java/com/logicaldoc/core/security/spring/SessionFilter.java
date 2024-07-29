@@ -31,11 +31,11 @@ import com.logicaldoc.core.security.user.Group;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.1.1
  */
-public class SessionIdFilter extends GenericFilterBean {
+public class SessionFilter extends GenericFilterBean {
 
-	private static Logger log = LoggerFactory.getLogger(SessionIdFilter.class);
+	private static Logger log = LoggerFactory.getLogger(SessionFilter.class);
 
-	static final String FILTER_APPLIED = "__com_logicaldoc_core_security_spring_SessionIdFilter_applied";
+	static final String FILTER_APPLIED = "__com_logicaldoc_core_security_spring_SessionFilter_applied";
 
 	@Override
 	public void doFilter(ServletRequest rec, ServletResponse res, FilterChain chain)

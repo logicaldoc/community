@@ -91,6 +91,8 @@ public class WorkflowHistoriesPanel extends VLayout {
 		documentId.setHidden(true);
 		ListGridField historySid = new ListGridField("sessionid", I18N.message("sid"), 240);
 		historySid.setHidden(true);
+		ListGridField key = new ListGridField("key", I18N.message("key"), 90);
+		key.setHidden(true);
 		ListGridField transition = new ListGridField("transition", I18N.message("transition"), 120);
 		transition.setHidden(true);
 
@@ -113,10 +115,10 @@ public class WorkflowHistoriesPanel extends VLayout {
 			historiesGrid.setDataSource(new WorkflowHistoriesDS(wfInstanceId, wfTemplateId, null, null, null));
 		if (Menu.enabled(Menu.SESSIONS))
 			historiesGrid.setFields(historyId, templateVersion, templateId, historyEvent, historyName, historyDate,
-					historyUser, historyComment, historyFilename, transition, documentId, historySid);
+					historyUser, historyComment, historyFilename, transition, documentId, historySid, key);
 		else
 			historiesGrid.setFields(historyId, templateVersion, templateId, historyEvent, historyName, historyDate,
-					historyUser, historyComment, historyFilename, transition, documentId);
+					historyUser, historyComment, historyFilename, transition, documentId, key);
 		historiesGrid.addCellContextClickHandler(event -> {
 			event.cancel();
 			showHistoryContextMenu();

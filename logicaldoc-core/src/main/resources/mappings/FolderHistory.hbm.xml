@@ -31,6 +31,7 @@
 		<property name="pathOld" type="string" column="ld_pathold" length="4000" />
 		<property name="notified" type="int" column="ld_notified" not-null="true" />
 		<property name="sessionId" type="string" column="ld_sessionid" length="255" />
+		<property name="keyLabel" type="string" column="ld_keylabel" length="255" />
 		<property name="isNew" type="int" column="ld_new" />
 		<property name="filename" type="string" column="ld_filename" length="255" />
 		<property name="fileSize" type="long" column="ld_filesize"/>

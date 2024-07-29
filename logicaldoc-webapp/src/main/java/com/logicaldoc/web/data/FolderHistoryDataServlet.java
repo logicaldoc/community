@@ -37,13 +37,12 @@ public class FolderHistoryDataServlet extends AbstractDataServlet {
 
 		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 		StringBuilder query = new StringBuilder(
-				"select A.username, A.event, A.date, A.comment, A.filename, A.path, A.sessionId, A.id, A.reason, A.ip, A.device, A.geolocation, A.userId, A.color from FolderHistory A where A.deleted = 0 ");
+				"select A.username, A.event, A.date, A.comment, A.filename, A.path, A.sessionId, A.id, A.reason, A.ip, A.device, A.geolocation, A.userId, A.color, A.keyLabel from FolderHistory A where A.deleted = 0 ");
 		if (request.getParameter("id") != null)
 			query.append(" and A.folderId=" + request.getParameter("id"));
 		query.append(" order by A.date desc ");
 
-		List<Object> records = dao.findByQuery(query.toString(), (Map<String, Object>) null,
-				max != null ? max : 100);
+		List<Object> records = dao.findByQuery(query.toString(), (Map<String, Object>) null, max != null ? max : 100);
 
 		/*
 		 * Iterate over records composing the response XML document
@@ -80,10 +79,11 @@ public class FolderHistoryDataServlet extends AbstractDataServlet {
 		writer.print("<userId>" + cols[12] + "</userId>");
 
 		printGeolocation(writer, cols);
-		
-		if(cols[13]!=null)
-			writer.print("<color>" + cols[12] + "</color>");	
-		
+
+		if (cols[13] != null)
+			writer.print("<color>" + cols[13] + "</color>");
+		if (cols[14] != null)
+			writer.print("<key><![CDATA[" + cols[14] + "]]></key>");
 		writer.print("</history>");
 	}
 

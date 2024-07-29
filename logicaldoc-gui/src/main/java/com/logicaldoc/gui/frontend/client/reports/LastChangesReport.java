@@ -19,9 +19,9 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -225,6 +225,11 @@ public class LastChangesReport extends AdminPanel {
 		sid.setCanFilter(true);
 		sid.setAlign(Alignment.CENTER);
 
+		ListGridField key = new ListGridField("key", I18N.message("key"), 90);
+		key.setCanFilter(true);
+		key.setHidden(true);
+		key.setAlign(Alignment.CENTER);
+
 		ListGridField docId = new ListGridField(DOC_ID, I18N.message("documentid"), 100);
 		docId.setCanFilter(true);
 		docId.setHidden(true);
@@ -262,8 +267,8 @@ public class LastChangesReport extends AdminPanel {
 		histories.setEmptyMessage(I18N.message("notitemstoshow"));
 		histories.setWidth100();
 		histories.setHeight100();
-		histories.setFields(eventField, date, userField, name, folderField, sid, docId, folderId, userId, username, ip,
-				device, geolocation, comment, reason);
+		histories.setFields(eventField, date, userField, name, folderField, sid, key, docId, folderId, userId, username,
+				ip, device, geolocation, comment, reason);
 		histories.setSelectionType(SelectionStyle.SINGLE);
 		histories.setShowRecordComponents(true);
 		histories.setShowRecordComponentsByCell(true);
@@ -390,6 +395,7 @@ public class LastChangesReport extends AdminPanel {
 							rec.setAttribute(NAME, hist.getFileName());
 							rec.setAttribute(FOLDER_STR, hist.getPath());
 							rec.setAttribute("sid", hist.getSessionId());
+							rec.setAttribute("key", hist.getKeyLabel());
 							rec.setAttribute(DOC_ID, hist.getDocId());
 							rec.setAttribute(FOLDER_ID, hist.getFolderId());
 							rec.setAttribute(USER_ID, hist.getUserId());
@@ -452,20 +458,19 @@ public class LastChangesReport extends AdminPanel {
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
 		if (docId != null)
-			preview.addClickHandler(
-					event -> DocumentService.Instance.get().getById(docId, new AsyncCallback<>() {
+			preview.addClickHandler(event -> DocumentService.Instance.get().getById(docId, new AsyncCallback<>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-						@Override
-						public void onSuccess(GUIDocument doc) {
-							PreviewPopup iv = new PreviewPopup(doc);
-							iv.show();
-						}
-					}));
+				@Override
+				public void onSuccess(GUIDocument doc) {
+					PreviewPopup iv = new PreviewPopup(doc);
+					iv.show();
+				}
+			}));
 		return preview;
 	}
 }

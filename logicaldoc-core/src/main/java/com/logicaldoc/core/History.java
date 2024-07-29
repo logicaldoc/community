@@ -65,6 +65,8 @@ public abstract class History extends PersistentObject implements Comparable<His
 	private int notified = 0;
 
 	private String sessionId = "";
+	
+	private String keyLabel = "";
 
 	private int isNew = 1;
 
@@ -234,6 +236,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 		if (session != null) {
 			setUser(session.getUser());
 			setSessionId(session.getSid());
+			setKeyLabel(session.getKeyLabel());
 			setTenantId(session.getTenantId());
 			setTenant(session.getTenantName());
 			if (session.getClient() != null)
@@ -429,6 +432,14 @@ public abstract class History extends PersistentObject implements Comparable<His
 	public void setColor(String color) {
 		this.color = color;
 	}
+	
+	public String getKeyLabel() {
+		return keyLabel;
+	}
+
+	public void setKeyLabel(String keyLabel) {
+		this.keyLabel = keyLabel;
+	}
 
 	protected void copyAttributesFrom(History source) {
 		setTenantId(source.getTenantId());
@@ -460,6 +471,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 		setGeolocation(source.getGeolocation());
 		setFileSize(source.getFileSize());
 		setColor(source.getColor());
+		setKeyLabel(source.getKeyLabel());
 	}
 
 	@Override

@@ -94,6 +94,11 @@ public class ProtocolsPanel extends AdminPanel {
 		webservicesPanel = new WebservicesPanel(settings, vm);
 		body.setMembers(webservicesPanel);
 
+		Tab apiCalls = new Tab();
+		apiCalls.setTitle("apicalls");
+		apiCalls.setPane(new ApiCallsPanel());
+		tabs.addTab(apiCalls);
+		
 		Tab cmis = new Tab();
 		cmis.setTitle("CMIS");
 

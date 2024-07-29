@@ -37,6 +37,8 @@ public class GUIHistory implements Serializable {
 	private int notified = 0;
 
 	private String sessionId = "";
+	
+	private String keyLabel = "";
 
 	private String ip = null;
 
@@ -220,5 +222,13 @@ public class GUIHistory implements Serializable {
 
 	public void setTenantId(Long tenantId) {
 		this.tenantId = tenantId;
+	}
+
+	public String getKeyLabel() {
+		return keyLabel;
+	}
+
+	public void setKeyLabel(String keyLabel) {
+		this.keyLabel = keyLabel;
 	}
 }

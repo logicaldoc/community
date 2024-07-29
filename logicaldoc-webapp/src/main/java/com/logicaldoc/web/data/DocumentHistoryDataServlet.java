@@ -55,7 +55,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		StringBuilder query = new StringBuilder(
-				"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color, A.fileVersion, A.fileSize from DocumentHistory A where A.deleted = 0 ");
+				"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color, A.fileVersion, A.fileSize, A.keyLabel from DocumentHistory A where A.deleted = 0 ");
 		Map<String, Object> params = prepareQueryParams(request, query);
 
 		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
@@ -122,6 +122,8 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 
 		writer.print("<fileVersion>" + (historyRecord[17] == null ? "" : historyRecord[17]) + "</fileVersion>");
 		writer.print("<fileSize>" + (historyRecord[18] == null ? "" : historyRecord[18]) + "</fileSize>");
+		if (historyRecord[19] != null)
+			writer.write("<key><![CDATA[" + historyRecord[19] + "]]></key>");
 		writer.print("</history>");
 	}
 

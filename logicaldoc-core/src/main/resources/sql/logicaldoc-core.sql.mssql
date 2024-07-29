@@ -53,7 +53,7 @@ create table ld_group (ld_id bigint not null, ld_lastmodified datetime not null,
                        ld_deleted int not null, ld_tenantid bigint not null, ld_name nvarchar(255) not null, 
                        ld_description nvarchar(255), ld_type int not null, ld_source nvarchar(255), primary key (ld_id));
 create table ld_history (ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null,
-                         ld_deleted int not null, ld_tenantid bigint not null, ld_docid bigint, 
+                         ld_deleted int not null, ld_tenantid bigint not null, ld_docid bigint, ld_keylabel nvarchar(255), 
                          ld_folderid bigint, ld_userid bigint, ld_date datetime2(3), ld_username nvarchar(255), ld_event nvarchar(255), 
                          ld_comment nvarchar(4000), ld_reason nvarchar(4000), ld_version nvarchar(255), ld_fileversion varchar(10), ld_path nvarchar(4000), 
                          ld_pathold nvarchar(4000), ld_notified int not null, ld_sessionid nvarchar(255), ld_new int, ld_filename nvarchar(255),
@@ -125,7 +125,7 @@ create table ld_workingtime (ld_userid bigint not null, ld_dayofweek int not nul
                              ld_hourend int not null, ld_minuteend int not null, ld_label varchar(255), ld_description varchar(1000),
                              primary key(ld_userid, ld_dayofweek, ld_hourstart, ld_minutestart));
 create table ld_user_history (ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null,
-                              ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint, 
+                              ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint, ld_keylabel varchar(255), 
                               ld_date datetime2(3), ld_username nvarchar(255), ld_event nvarchar(255), 
                               ld_comment nvarchar(4000), ld_reason nvarchar(4000), ld_notified int not null, ld_sessionid nvarchar(255), 
                               ld_new int, ld_filename nvarchar(255), ld_userlogin nvarchar(255), ld_ip nvarchar(255), 
@@ -169,7 +169,7 @@ create table ld_folder_ext (ld_folderid bigint not null, ld_mandatory int not nu
                             ld_parent nvarchar(255), ld_dependson varchar(255), primary key (ld_folderid, ld_name));
 create table ld_folder_store (ld_folderid bigint not null, ld_nodeid varchar(255) not null, ld_storeid int not null, primary key (ld_folderid, ld_nodeid));                            
 create table ld_folder_history (ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null,
-                                ld_deleted int not null, ld_tenantid bigint not null, ld_docid bigint, 
+                                ld_deleted int not null, ld_tenantid bigint not null, ld_docid bigint, ld_keylabel nvarchar(255), 
                                 ld_folderid bigint, ld_userid bigint, ld_date datetime2(3), ld_username nvarchar(255), 
                                 ld_event nvarchar(255), ld_comment nvarchar(4000), ld_reason nvarchar(4000), ld_version nvarchar(255), ld_fileversion varchar(10), 
                                 ld_path nvarchar(4000), ld_pathold nvarchar(4000), ld_notified int not null, ld_sessionid nvarchar(255),
