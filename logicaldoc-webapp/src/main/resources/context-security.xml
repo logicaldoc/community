@@ -28,9 +28,14 @@
 	</bean>
 	<security:http-firewall ref="HttpFirewall"/>   
    
-    <bean id="LDBasicAuthenticationEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
+    <bean id="DefaultBasicAuthenticationEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
       <property name="realmName" value="Security Realm" />
-    </bean>        
+    </bean>
+    <bean id="WebserviceBasicAuthenticationFilter" class="com.logicaldoc.core.security.spring.ConditionalBasicAuthenticationFilter">
+        <constructor-arg index="0" ref="AuthenticationManager"/>
+        <constructor-arg index="1" ref="DefaultBasicAuthenticationEntryPoint"/>
+        <property name="enableParam" value="webservice.basicauth.enabled" />
+     </bean>
     
     <bean id="LDAuthenticationDetailsSource" class="com.logicaldoc.core.security.spring.LDAuthenticationDetailsSource" />
     <bean id="LDAuthenticationProvider" class="com.logicaldoc.core.security.spring.LDAuthenticationProvider" />
@@ -70,7 +75,7 @@
         <!-- Protected areas -->
         <security:intercept-url pattern="/**"
             access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+        <security:http-basic entry-point-ref="DefaultBasicAuthenticationEntryPoint" />
     </security:http>
     <security:http pattern="/license/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
@@ -84,7 +89,7 @@
         <!-- Protected areas -->
         <security:intercept-url pattern="/**"
             access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+        <security:http-basic entry-point-ref="DefaultBasicAuthenticationEntryPoint" />
     </security:http>
     <security:http pattern="/sessions/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
@@ -98,7 +103,7 @@
         <!-- Protected areas -->
         <security:intercept-url pattern="/**"
             access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+        <security:http-basic entry-point-ref="DefaultBasicAuthenticationEntryPoint" />
     </security:http>
     
     <security:http pattern="/services/rest/auth/**" security="none" />
@@ -107,19 +112,21 @@
         create-session="never" disable-url-rewriting="true" auto-config="false"
         access-decision-manager-ref="LDAccessDecisionManager"
         authentication-manager-ref="AuthenticationManager"
-        security-context-repository-ref="LDSecurityContextRepository">
+        security-context-repository-ref="LDSecurityContextRepository"
+        entry-point-ref="DefaultBasicAuthenticationEntryPoint">
         
         <security:headers disabled="true" />
         <security:csrf disabled="true" />
         
         <!-- Protected areas -->
-        <security:intercept-url pattern="/**"
-            access="isAuthenticated()" />
-           
+        <security:intercept-url pattern="/auth" access="permitAll" />
+        <security:intercept-url pattern="^(?!/auth).*$"
+            access="isAuthenticated()" />            
+            
         <!-- Some session-related custom filters -->
-        <security:custom-filter ref="SessionIdFilter" before="PRE_AUTH_FILTER" />   
-           
-        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+        <security:custom-filter ref="SessionIdFilter" before="PRE_AUTH_FILTER" />            
+            
+        <security:custom-filter ref="WebserviceBasicAuthenticationFilter" before="BASIC_AUTH_FILTER" />
     </security:http>
     
     <security:http pattern="/webdav/**" use-expressions="true"
@@ -134,7 +141,7 @@
         <!-- Protected areas -->
         <security:intercept-url pattern="/**"
             access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+        <security:http-basic entry-point-ref="DefaultBasicAuthenticationEntryPoint" />
     </security:http>
     <security:http pattern="/webdavb/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
@@ -148,7 +155,7 @@
         <!-- Protected areas -->
         <security:intercept-url pattern="/**"
             access="isAuthenticated()" />       
-        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+        <security:http-basic entry-point-ref="DefaultBasicAuthenticationEntryPoint" />
     </security:http>    
     <security:http pattern="/service/cmis/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
@@ -162,7 +169,7 @@
         <!-- Protected areas -->
         <security:intercept-url pattern="/**"
             access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+        <security:http-basic entry-point-ref="DefaultBasicAuthenticationEntryPoint" />
     </security:http>
        
     <security:http pattern="/download-ticket/**" use-expressions="true"
@@ -177,7 +184,7 @@
         <!-- We do not want any protection -->
         <security:intercept-url pattern="/nosecurity"
             access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+        <security:http-basic entry-point-ref="DefaultBasicAuthenticationEntryPoint" />
     </security:http>    
     
     <security:http pattern="/webform/**" use-expressions="true"
@@ -192,7 +199,7 @@
         <!-- We do not want any protection -->
         <security:intercept-url pattern="/nosecurity"
             access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+        <security:http-basic entry-point-ref="DefaultBasicAuthenticationEntryPoint" />
     </security:http>  
     
     <security:http use-expressions="true" create-session="never"

@@ -130,7 +130,7 @@ public class StoresPanel extends VLayout {
 		storesGrid.setCanExpandRecords(true);
 
 		ListGridField id = new ListGridField("id", " ", 20);
-		ListGridField name = new ListGridField("name", I18N.message("name"), 150);
+		ListGridField name = new ListGridField("name", I18N.message("store"), 150);
 		ListGridField path = new ListGridField("path", I18N.message("path"));
 		path.setWidth("100%");
 		path.setCanEdit(true);

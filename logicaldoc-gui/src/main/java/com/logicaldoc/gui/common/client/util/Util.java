@@ -1209,10 +1209,19 @@ public abstract class Util {
 		}
 	}
 
-	public static String getParameterValue(List<GUIParameter> params, String name) {
+	public static GUIParameter getParameter(List<GUIParameter> params, String name) {
 		try {
 			return params.stream().filter(param -> param.getName().equals(Session.get().getTenantName() + "." + name)
-					|| param.getName().equals(name)).map(p -> p.getValue()).findFirst().orElse(null);
+					|| param.getName().equals(name)).findFirst().orElse(null);
+		} catch (RuntimeException re) {
+			return null;
+		}
+	}
+
+	public static String getParameterValue(List<GUIParameter> params, String name) {
+		try {
+			GUIParameter param = getParameter(params, name);
+			return param != null ? param.getValue() : null;
 		} catch (RuntimeException re) {
 			return null;
 		}

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.soap.AuthService;
 
@@ -20,8 +21,10 @@ public class SoapAuthService extends AbstractService implements AuthService {
 
 	@Override
 	public String login(String username, String password) throws AuthenticationException {
-		Session session = SessionManager.get().newSession(username, password, getCurrentRequest());
-		return session.getSid();
+		if (Context.get().getProperties().getBoolean("webservice.basicauth.enabled", false))
+			return SessionManager.get().newSession(username, password, getCurrentRequest()).getSid();
+		else
+			throw new AuthenticationException("Basic Authentication is disabled");
 	}
 
 	@Override
