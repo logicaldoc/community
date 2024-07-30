@@ -89,11 +89,6 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 		assertNotSame(session1, session2);
 		assertEquals(2, testSubject.getSessions().size());
 
-		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		Session session3 = testSubject.createSession(uDao.findById(1L), client);
-		assertNotNull(session3);
-		assertEquals(3, testSubject.getSessions().size());
-
 		Session session4 = testSubject.newSession(apiKey.getDecodedKey(), (Client) null);
 		assertNotNull(session4);
 	}

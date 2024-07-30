@@ -18,11 +18,10 @@ import com.logicaldoc.core.security.apikey.ApiKeyDAO;
 import com.logicaldoc.core.security.user.User;
 
 /**
- * This is the basic authentication mechanism, that searches for the user in the
- * LogicalDOC database.
+ * This authenticator uses the API Key
  * 
- * @author Sebastian Wenzky
- * @since 4.5
+ * @author Marco Meschieri - LogicalDOC
+ * @since 8.9.4
  */
 @Component("ApiKeyAuthenticator")
 public class ApiKeyAuthenticator extends DefaultAuthenticator {

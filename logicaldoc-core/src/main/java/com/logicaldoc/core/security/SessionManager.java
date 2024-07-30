@@ -202,7 +202,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	}
 
 	/**
-	 * Creates a new session by authenticating the given user and stores it in
+	 * Creates a new session for the given user and stores it in
 	 * the pool of opened sessions
 	 * 
 	 * @param username the username
@@ -225,32 +225,6 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 			}
 
 		return session;
-	}
-
-	/**
-	 * Creates a new session by authenticating the given user and stores it in
-	 * the pool of opened sessions
-	 * 
-	 * @param user the user
-	 * @param client client informations
-	 * 
-	 * @return the session created after the successful login
-	 */
-	public synchronized Session createSession(User user, HttpServletRequest request) throws AuthenticationException {
-		return createSession(user, buildClient(request));
-	}
-
-	/**
-	 * Creates a new session by authenticating the given user and stores it in
-	 * the pool of opened sessions
-	 * 
-	 * @param user the user
-	 * @param request the current request
-	 * 
-	 * @return the session created after the successful login
-	 */
-	public synchronized Session createSession(User user, Client client) throws AuthenticationException {
-		return createSession(user, null, client);
 	}
 
 	private void storeSession(Session session) {
