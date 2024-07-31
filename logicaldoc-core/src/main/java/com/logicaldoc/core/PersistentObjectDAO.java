@@ -329,6 +329,24 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
 	public int queryForInt(String sql) throws PersistenceException;
+	
+	/**
+	 * Execute a query that results in an int value, given static SQL. Uses a
+	 * JDBC Statement, not a PreparedStatement. If you want to execute a static
+	 * query with a PreparedStatement, use the overloaded queryForInt method
+	 * with null as argument array. This method is useful for running static SQL
+	 * with a known outcome. The query is expected to be a single row/single
+	 * column query that results in an int value.
+	 * 
+	 * @param sql SQL query to execute
+	 * @param parameters Parameters used in the where expression (map
+	 *        name-value)
+	 * 
+	 * @return the int value, or 0 in case of SQL NULL
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
+	 */
+	public int queryForInt(String sql, Map<String, Object> parameters) throws PersistenceException;
 
 	/**
 	 * Execute a query that results in an long value, given static SQL. Uses a

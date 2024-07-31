@@ -20,18 +20,18 @@ import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 
 /**
- * This popup window is used to handle Google Drive settings.
+ * This popup window is used to handle Google API credentials.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.3
  */
-public class GDriveAuthorization extends Window {
+public class GoogleApiAuthorization extends Window {
 
 	private DynamicForm form = new DynamicForm();
 
-	public GDriveAuthorization() {
+	public GoogleApiAuthorization() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("googledrive"));
+		setTitle(I18N.message("googleapi"));
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);

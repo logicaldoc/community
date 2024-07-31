@@ -40,7 +40,7 @@
 
 	<target name="purify" depends="init-all">
 		<echo>Purify all bundles</echo>
-		<java classname="com.logicaldoc.i18n.PurifyRB">
+		<java fork="yes" classname="com.logicaldoc.i18n.PurifyRB">
 			<classpath>
 				<pathelement location="target/classes" />
 			</classpath>

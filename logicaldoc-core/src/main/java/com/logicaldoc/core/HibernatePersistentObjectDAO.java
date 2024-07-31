@@ -101,7 +101,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	public List<Long> findAllIds(long tenantId) throws PersistenceException {
-			return findIdsByWhere(" " + ENTITY + ".tenantId=" + tenantId, "", null);
+		return findIdsByWhere(" " + ENTITY + ".tenantId=" + tenantId, "", null);
 	}
 
 	@Override
@@ -528,6 +528,11 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	@Override
 	public int queryForInt(String sql) throws PersistenceException {
 		return (int) queryForLong(sql);
+	}
+
+	@Override
+	public int queryForInt(String sql, Map<String, Object> parameters) throws PersistenceException {
+		return (int) queryForLong(sql, parameters);
 	}
 
 	@Override

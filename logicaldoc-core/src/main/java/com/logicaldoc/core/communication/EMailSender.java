@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.communication.oauth.Microsoft365TokenProvider;
 import com.logicaldoc.core.document.Document;
@@ -250,6 +251,11 @@ public class EMailSender {
 	 * @throws MessagingException raised if the email cannot be sent
 	 */
 	public void send(EMail email, String templateName, Map<String, Object> dictionary) throws MessagingException {
+		if (RunLevel.current().aspectEnabled("sendingMessages")) {
+			log.error("Aspect not enabled");
+			throw new MessagingException("Aspect sendingMessages not enabled");
+		}
+
 		MessageTemplateDAO templateDao = (MessageTemplateDAO) Context.get().getBean(MessageTemplateDAO.class);
 		MessageTemplate template = null;
 		try {

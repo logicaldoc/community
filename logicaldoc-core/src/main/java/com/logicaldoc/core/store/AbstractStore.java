@@ -60,6 +60,7 @@ public abstract class AbstractStore implements Store {
 	@Resource(name = "ContextProperties")
 	protected ContextProperties config;
 
+
 	protected int id = 1;
 
 	protected Map<String, String> parameters = new HashMap<>();
@@ -79,7 +80,7 @@ public abstract class AbstractStore implements Store {
 	public void setConfig(ContextProperties config) {
 		this.config = config;
 	}
-
+	
 	public int getId() {
 		return id;
 	}
@@ -165,9 +166,9 @@ public abstract class AbstractStore implements Store {
 	}
 
 	/**
-	 * Computes the relative path of a document's folder inside the store
-	 * root. The document's id is tokenized by three chars tokens, than the doc/
-	 * dir is appended, so if the docId=12345, the document's path will be:
+	 * Computes the relative path of a document's folder inside the store root.
+	 * The document's id is tokenized by three chars tokens, than the doc/ dir
+	 * is appended, so if the docId=12345, the document's path will be:
 	 * 123/45/doc.
 	 */
 	protected String computeRelativePath(long docId) {
@@ -216,7 +217,6 @@ public abstract class AbstractStore implements Store {
 
 	@Override
 	public void writeToFile(long docId, String resource, File out) throws IOException {
-
 		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(out, false), DEFAULT_BUFFER_SIZE);
 				InputStream is = getStream(docId, resource);) {
 			FileUtil.writeFile(is, out.getPath());
@@ -410,7 +410,8 @@ public abstract class AbstractStore implements Store {
 	}
 
 	/**
-	 * Instantiate a new store and fully configures it.
+	 * Instantiate a new store and fully configures it.+
+	 * 
 	 * 
 	 * @param id identifier of the store to create
 	 * 
