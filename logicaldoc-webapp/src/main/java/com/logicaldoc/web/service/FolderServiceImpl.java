@@ -322,13 +322,16 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			setAllowedPermissions(session, folderId, guiFolder);
 
 			Folder securityRef = folder;
-			if (test.getSecurityRef() != null)
-				securityRef = dao.findById(test.getSecurityRef());
+			if (test.getSecurityRef() != null) {
+				Folder f = dao.findById(test.getSecurityRef());
+				if (f != null)
+					securityRef = f;
+			}
 			dao.initialize(securityRef);
 
 			setACL(securityRef, guiFolder);
 			return guiFolder;
-		} catch (PersistenceException e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 		return null;

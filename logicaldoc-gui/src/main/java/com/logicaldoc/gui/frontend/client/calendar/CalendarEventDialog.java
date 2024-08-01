@@ -106,16 +106,16 @@ public class CalendarEventDialog extends Window {
 
 	private AsyncCallback<Void> onChangedCallback;
 
-	public CalendarEventDialog(GUICalendarEvent calEvent, AsyncCallback<Void> onChangedCallback) {
-		this.calendarEvent = calEvent;
+	public CalendarEventDialog(GUICalendarEvent calendarEvent, AsyncCallback<Void> onChangedCallback) {
+		this.calendarEvent = calendarEvent;
 		this.onChangedCallback = onChangedCallback;
 
-		readOnly = Session.get().getUser().getId() != calEvent.getCreatorId()
+		readOnly = Session.get().getUser().getId() != calendarEvent.getCreatorId()
 				&& !Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN);
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		if (calEvent.getId() != 0)
-			setTitle(I18N.message("editevent") + " - " + calEvent.getTitle());
+		if (calendarEvent.getId() != 0)
+			setTitle(I18N.message("editevent") + " - " + calendarEvent.getTitle());
 		else
 			setTitle(I18N.message("newevent"));
 		setWidth(600);
@@ -125,7 +125,7 @@ public class CalendarEventDialog extends Window {
 		setShowModalMask(true);
 		centerInPage();
 		setPadding(5);
-
+		
 		Tab detailsTab = prepareDetails();
 		Tab participantsTab = prepareParticipants();
 		Tab documentsTab = prepareDocumentsTab();
@@ -235,6 +235,7 @@ public class CalendarEventDialog extends Window {
 		remindersGrid.setEmptyMessage(I18N.message("notitemstoshow"));
 		remindersGrid.setWidth100();
 		remindersGrid.setHeight100();
+		remindersGrid.setShowAllRecords(true);
 		remindersGrid.setAutoFetchData(true);
 		remindersGrid.setCanSelectAll(false);
 		remindersGrid.setSelectionType(SelectionStyle.SINGLE);
@@ -299,8 +300,9 @@ public class CalendarEventDialog extends Window {
 			rec.setAttribute("when", BEFORE);
 			rec.setAttribute("date", reminder.getDate());
 			rec.setAttribute(REMINDED, reminder.getReminded());
+			records.add(rec);
 		}
-		remindersGrid.setRecords(records.toArray(new ListGridRecord[0]));
+		remindersGrid.setData(records.toArray(new ListGridRecord[0]));
 	}
 
 	private Tab prepareParticipants() {
@@ -314,6 +316,7 @@ public class CalendarEventDialog extends Window {
 		UserListGridField avatar = new UserListGridField();
 
 		final ListGrid participantsGrid = new ListGrid();
+		participantsGrid.setShowAllRecords(true);
 		participantsGrid.setHeight100();
 		participantsGrid.setWidth100();
 		participantsGrid.setFields(id, avatar, username, name);
@@ -401,8 +404,9 @@ public class CalendarEventDialog extends Window {
 			rec.setAttribute("avatar", participant.getId());
 			rec.setAttribute("name", participant.getFullName());
 			rec.setAttribute(USERNAME, participant.getUsername());
+			records.add(rec);
 		}
-		participantsGrid.setRecords(records.toArray(new ListGridRecord[0]));
+		participantsGrid.setData(records.toArray(new ListGridRecord[0]));
 	}
 
 	private Tab prepareDocumentsTab() {
@@ -420,6 +424,7 @@ public class CalendarEventDialog extends Window {
 		documentsGrid.setAutoFetchData(true);
 		documentsGrid.setShowHeader(true);
 		documentsGrid.setCanSelectAll(false);
+		documentsGrid.setShowAllRecords(true);
 		documentsGrid.setSelectionType(SelectionStyle.SINGLE);
 		documentsGrid.setFields(fileName, lastModified);
 		refreshDocumentsGrid(documentsGrid);
@@ -441,8 +446,7 @@ public class CalendarEventDialog extends Window {
 
 				@Override
 				public void onSuccess(GUIDocument doc) {
-					PreviewPopup iv = new PreviewPopup(doc);
-					iv.show();
+					new PreviewPopup(doc).show();
 				}
 			});
 		});
@@ -549,8 +553,9 @@ public class CalendarEventDialog extends Window {
 			rec.setAttribute("lastModified", document.getLastModified());
 			rec.setAttribute("docRef", document.getDocRef());
 			rec.setAttribute("color", document.getColor());
+			records.add(rec);
 		}
-		list.setRecords(records.toArray(new ListGridRecord[0]));
+		list.setData(records.toArray(new ListGridRecord[0]));
 	}
 
 	private Tab prepareDetails() {
