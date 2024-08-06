@@ -73,8 +73,6 @@ public class CalendarEventDialog extends Window {
 
 	private static final String AUTOMATION = "automation";
 
-	private static final String COMPLETION_DATE = "completionDate";
-
 	private static final String DEADLINE = "deadline";
 
 	private static final String EXPIRATION_TIME = "expirationTime";
@@ -610,6 +608,16 @@ public class CalendarEventDialog extends Window {
 		subType.setLength(255);
 		subType.setCanEdit(!readOnly);
 
+		TextItem location = ItemFactory.newTextItem("location", calendarEvent.getLocation());
+		location.setRequired(false);
+		location.setEndRow(true);
+		location.setWrapTitle(false);
+		location.setColSpan(5);
+		location.setWidth(350);
+		location.setTitleOrientation(TitleOrientation.LEFT);
+		location.setLength(255);
+		location.setCanEdit(!readOnly);
+
 		DateItem startDate = ItemFactory.newDateItem("startDate", "begin");
 		startDate.setRequired(true);
 		startDate.setTitleOrientation(TitleOrientation.LEFT);
@@ -662,27 +670,11 @@ public class CalendarEventDialog extends Window {
 				deadline.setValue((Date) null);
 		});
 
-		final DateItem completionDate = ItemFactory.newDateItem(COMPLETION_DATE, "completedon");
-		completionDate.setRequired(false);
-		completionDate.setShowTitle(false);
-		completionDate.setTitleOrientation(TitleOrientation.LEFT);
-		completionDate.setCanEdit(!readOnly);
-		completionDate.setDisabled(calendarEvent.getStatus() != GUICalendarEvent.STATUS_COMPLETED);
-		if (calendarEvent.getCompletionDate() != null)
-			completionDate.setValue(calendarEvent.getCompletionDate());
-
 		SelectItem status = ItemFactory.newCalendarEventStatusSelector();
 		status.setTitleOrientation(TitleOrientation.LEFT);
 		status.setWrapTitle(false);
 		status.setValue(Integer.toString(calendarEvent.getStatus()));
 		status.setCanEdit(!readOnly);
-		status.addChangedHandler(changed -> {
-			completionDate.setDisabled(!"2".equals(changed.getValue()));
-			if ("2".equals(changed.getValue()))
-				completionDate.setValue(new Date());
-			else
-				completionDate.setValue((Date) null);
-		});
 
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", calendarEvent.getDescription());
 		description.setWidth("*");
@@ -690,9 +682,9 @@ public class CalendarEventDialog extends Window {
 		description.setColSpan(formColumns);
 		description.setCanEdit(!readOnly);
 
-		detailsForm.setFields(title, relatedLink, type, subType, ItemFactory.newRowSpacer(), startDate, startTime,
-				expirationDate, expirationTime, ItemFactory.newRowSpacer(), frequency, deadline,
-				ItemFactory.newRowSpacer(), status, completionDate, ItemFactory.newRowSpacer(), description);
+		detailsForm.setFields(title, relatedLink, type, subType, location, ItemFactory.newRowSpacer(), startDate,
+				startTime, expirationDate, expirationTime, ItemFactory.newRowSpacer(), frequency, deadline,
+				ItemFactory.newRowSpacer(), status, ItemFactory.newRowSpacer(), description);
 		details.setPane(detailsForm);
 		return details;
 	}
@@ -727,6 +719,7 @@ public class CalendarEventDialog extends Window {
 			calendarEvent.setTitle(vm.getValueAsString("title"));
 			calendarEvent.setType(vm.getValueAsString("type"));
 			calendarEvent.setSubType(vm.getValueAsString("subtype"));
+			calendarEvent.setLocation(vm.getValueAsString("location"));
 			calendarEvent.setDescription(vm.getValueAsString("description"));
 			calendarEvent.setAutomation(vm.getValueAsString(AUTOMATION));
 
@@ -789,11 +782,6 @@ public class CalendarEventDialog extends Window {
 							df.parse(str + " " + dfTime.format((Date) vm.getValue(EXPIRATION_TIME))));
 				}
 		}
-
-		if (vm.getValue(COMPLETION_DATE) != null)
-			calendarEvent.setCompletionDate((Date) vm.getValue(COMPLETION_DATE));
-		else
-			calendarEvent.setCompletionDate(null);
 	}
 
 	private void saveReminders(GUICalendarEvent calendarEvent) {

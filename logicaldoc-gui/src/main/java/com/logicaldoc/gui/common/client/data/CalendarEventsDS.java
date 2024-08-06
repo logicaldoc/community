@@ -19,12 +19,13 @@ public class CalendarEventsDS extends DataSource {
 
 		DataSourceTextField name = new DataSourceTextField("name");
 		DataSourceTextField description = new DataSourceTextField("description");
+		DataSourceTextField location = new DataSourceTextField("location");
 		DataSourceDateTimeField start = new DataSourceDateTimeField("startDate");
 		DataSourceDateTimeField end = new DataSourceDateTimeField("endDate");
 		DataSourceDateTimeField eventWindowStyle = new DataSourceDateTimeField("eventWindowStyle");
 		DataSourceTextField parentId = new DataSourceTextField("parentId");
 
-		setFields(id, name, description, start, end, eventWindowStyle, parentId);
+		setFields(id, name, description, location, start, end, eventWindowStyle, parentId);
 		setClientOnly(true);
 		setDataURL("data/calendarevents.xml" + (docId != null ? "?docId=" + docId : ""));
 	}

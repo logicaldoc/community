@@ -29,9 +29,9 @@ public class GUICalendarEvent implements Serializable {
 	private Long parentId = null;
 
 	private String externalId = "";
-	
+
 	private String externalUrl = "";
-	
+
 	private String title = "";
 
 	private String type = "";
@@ -39,6 +39,8 @@ public class GUICalendarEvent implements Serializable {
 	private String subType = "";
 
 	private String description = "";
+
+	private String location = "";
 
 	private Date startDate = new Date();
 
@@ -67,8 +69,6 @@ public class GUICalendarEvent implements Serializable {
 	private String creator;
 
 	private int status = 0;
-
-	private Date completionDate;
 
 	private Date deadline;
 
@@ -249,14 +249,6 @@ public class GUICalendarEvent implements Serializable {
 		this.status = status;
 	}
 
-	public Date getCompletionDate() {
-		return completionDate;
-	}
-
-	public void setCompletionDate(Date completionDate) {
-		this.completionDate = completionDate;
-	}
-
 	public Date getDeadline() {
 		return deadline;
 	}
@@ -311,5 +303,13 @@ public class GUICalendarEvent implements Serializable {
 
 	public void setExternalUrl(String externalUrl) {
 		this.externalUrl = externalUrl;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 }
