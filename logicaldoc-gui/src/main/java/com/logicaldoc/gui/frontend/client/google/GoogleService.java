@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.services;
+package com.logicaldoc.gui.frontend.client.google;
 
 import java.util.List;
 
@@ -11,13 +11,13 @@ import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 
 /**
- * The client side stub for the Google Drive Service.
+ * The client side stub for the Google Service.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.3
  */
-@RemoteServiceRelativePath("gdrive")
-public interface GDriveService extends RemoteService {
+@RemoteServiceRelativePath("google")
+public interface GoogleService extends RemoteService {
 
 	/**
 	 * Uploads a document to Google Drive
@@ -118,15 +118,31 @@ public interface GDriveService extends RemoteService {
 	 */
 	public List<GUIDocument> search(String expression) throws ServerException;
 
+	/**
+	 * Synchronize the user's calendar with it's external one
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void synchronizeCalendar() throws ServerException;
+
+	/**
+	 * Deletes an event in the Google Calendar
+	 * 
+	 * @param eventId identifier of the event
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void deleteCalendarEvent(String eventId) throws ServerException;
+	
 	public static class Instance {
-		private static GDriveServiceAsync inst;
+		private static GoogleServiceAsync inst;
 
 		private Instance() {
 		}
 
-		public static GDriveServiceAsync get() {
+		public static GoogleServiceAsync get() {
 			if (inst == null) {
-				inst = GWT.create(GDriveService.class);
+				inst = GWT.create(GoogleService.class);
 				((ServiceDefTarget) inst).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
 			return inst;

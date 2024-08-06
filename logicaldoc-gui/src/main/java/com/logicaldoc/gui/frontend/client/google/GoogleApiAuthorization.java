@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.gdrive;
+package com.logicaldoc.gui.frontend.client.google;
 
 import java.util.List;
 
@@ -8,7 +8,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.frontend.client.services.GDriveService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.OperatorId;
@@ -27,9 +26,15 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
  */
 public class GoogleApiAuthorization extends Window {
 
+	private static GoogleApiAuthorization instance = new GoogleApiAuthorization();
+
 	private DynamicForm form = new DynamicForm();
 
-	public GoogleApiAuthorization() {
+	private TextItem clientId = ItemFactory.newPasswordItem("clientid", "clientid", null);
+
+	private TextItem clientSecret = ItemFactory.newPasswordItem("clientsecret", "clientsecret", null);
+
+	private GoogleApiAuthorization() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("googleapi"));
 		setCanDragResize(true);
@@ -41,12 +46,10 @@ public class GoogleApiAuthorization extends Window {
 
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		final TextItem clientId = ItemFactory.newTextItem("clientid", null);
 		clientId.setWidth(370);
 		clientId.setRequired(true);
 		clientId.setEndRow(true);
 
-		final TextItem clientSecret = ItemFactory.newTextItem("clientsecret", null);
 		clientSecret.setWidth(370);
 		clientSecret.setRequired(true);
 		clientSecret.setEndRow(true);
@@ -66,8 +69,11 @@ public class GoogleApiAuthorization extends Window {
 		form.setFields(clientId, clientSecret, acceptPrivacyPolicy, authorize);
 
 		addItem(form);
+	}
 
-		GDriveService.Instance.get().loadSettings(new AsyncCallback<>() {
+	@Override
+	protected void onDraw() {
+		GoogleService.Instance.get().loadSettings(new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -80,10 +86,11 @@ public class GoogleApiAuthorization extends Window {
 				clientSecret.setValue(settings.get(1));
 			}
 		});
+		;
 	}
 
 	public void onAuthenticate() {
-		GDriveService.Instance.get().saveSettings(form.getValueAsString("clientid"),
+		GoogleService.Instance.get().saveSettings(form.getValueAsString("clientid"),
 				form.getValueAsString("clientsecret"), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
@@ -93,8 +100,12 @@ public class GoogleApiAuthorization extends Window {
 					@Override
 					public void onSuccess(String consentUrl) {
 						WindowUtils.openUrl(consentUrl, "_blank", null);
-						destroy();
+						hide();
 					}
 				});
+	}
+
+	public static GoogleApiAuthorization get() {
+		return instance;
 	}
 }

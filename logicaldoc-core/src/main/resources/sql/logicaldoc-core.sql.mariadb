@@ -37,7 +37,7 @@ create table ld_generic (ld_id bigint not null, ld_lastmodified datetime not nul
                          ld_string2 varchar(4000), ld_string3 varchar(4000), ld_string4 varchar(4000),
                          ld_string5 varchar(1000), ld_string6 varchar(1000), ld_string7 varchar(1000), ld_string8 varchar(1000),
                          ld_integer1 bigint null, ld_integer2 bigint null, ld_integer3 bigint null, 
-                         ld_double1 double, ld_double2 double, 
+                         ld_double1 double, ld_double2 double, ld_text1 mediumtext,
                          ld_date1 datetime null, ld_date2 datetime null, primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_generic_ext (ld_genid bigint not null, ld_mandatory int not null, ld_type int not null, 
                              ld_editor bigint not null, ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 

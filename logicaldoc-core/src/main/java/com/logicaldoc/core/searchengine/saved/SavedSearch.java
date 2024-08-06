@@ -1,12 +1,6 @@
 package com.logicaldoc.core.searchengine.saved;
 
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -15,7 +9,7 @@ import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.searchengine.SearchOptions;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.io.IOUtil;
 
 /**
  * A search saved in the database
@@ -59,29 +53,14 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 		String tenantName = tenantDao.getTenantName(getTenantId());
 		String charset = Context.get().getProperties().getProperty(tenantName + ".charset", "UTF-8");
 
-		File tmpFile = FileUtil.createTempFile("ser", ".txt");
-		try (OutputStream out = new FileOutputStream(tmpFile);
-				XMLEncoder encoder = new XMLEncoder(out, charset, false, 0)) {
-			encoder.writeObject(opt);
-		} catch (IOException ioe) {
-			FileUtil.delete(tmpFile);
-			throw ioe;
-		}
-
-		try {
-			setOptions(FileUtil.readFile(tmpFile).trim());
-		} finally {
-			FileUtil.delete(tmpFile);
-		}
+		setOptions(IOUtil.serialize(opt, charset));
 	}
 
 	public SearchOptions readOptions() {
-		try (XMLDecoder decoder = new XMLDecoder(new ByteArrayInputStream(getOptions().getBytes()))) {
-			SearchOptions searchOptions = (SearchOptions) decoder.readObject();
-			searchOptions.setName(getName());
-			searchOptions.setDescription(getDescription());
-			return searchOptions;
-		}
+		SearchOptions searchOptions = (SearchOptions) IOUtil.deserialize(getOptions());
+		searchOptions.setName(getName());
+		searchOptions.setDescription(getDescription());
+		return searchOptions;
 	}
 
 	@Override

@@ -39,7 +39,7 @@ create table ld_generic (ld_id bigint not null, ld_lastmodified timestamp not nu
                          ld_string2 varchar(4000), ld_string3 varchar(4000), ld_string4 varchar(4000),
                          ld_string5 varchar(1000), ld_string6 varchar(1000), ld_string7 varchar(1000), ld_string8 varchar(1000),
                          ld_integer1 bigint null, ld_integer2 bigint null, ld_integer3 bigint null, 
-                         ld_double1 float, ld_double2 float,
+                         ld_double1 float, ld_double2 float, ld_text1 varchar(100000),
                          ld_date1 timestamp null, ld_date2 timestamp null, primary key (ld_id));
 create table ld_generic_ext (ld_genid bigint not null, ld_mandatory int not null, ld_type int not null, 
                              ld_editor bigint not null, ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 

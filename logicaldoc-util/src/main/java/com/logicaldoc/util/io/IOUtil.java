@@ -1,17 +1,22 @@
 package com.logicaldoc.util.io;
 
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 
 public class IOUtil {
 	private static final int DEFAULT_BUFFER_SIZE = 10240; // ..bytes = 10KB.
@@ -77,6 +82,35 @@ public class IOUtil {
 			}
 			bos.flush();
 			return baos.toByteArray();
+		}
+	}
+
+	/**
+	 * Serializes an object into XML string
+	 * 
+	 * @param object The object to serialize
+	 * @param charset The charset to use for the output, if not provided UTF-8
+	 *        is used instead
+	 * @return The serialized string
+	 * @throws IOException In case of I/O issue
+	 */
+	public static String serialize(Serializable object, String charset) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try (XMLEncoder encoder = new XMLEncoder(baos, StringUtils.defaultString(charset, "UTF-8"), false, 0);) {
+			encoder.writeObject(object);
+		}
+		return baos.toString().trim().replace("\n", "");
+	}
+
+	/**
+	 * Deserializes an XML serialization to obtain the object
+	 * 
+	 * @param xml The XML content
+	 * @return The recovered object
+	 */
+	public static Object deserialize(String xml) {
+		try (XMLDecoder decoder = new XMLDecoder(new ByteArrayInputStream(xml.getBytes()))) {
+			return decoder.readObject();
 		}
 	}
 }

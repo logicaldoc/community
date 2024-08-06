@@ -42,8 +42,8 @@ public class DropboxTree extends TreeGrid {
 		}
 
 		addDataArrivedHandler((DataArrivedEvent event) -> {
-				TreeNode node = getTree().getChildren(getTree().getRoot())[0];
-				getTree().openFolder(node);
+			TreeNode node = getTree().getChildren(getTree().getRoot())[0];
+			getTree().openFolder(node);
 		});
 
 	}
@@ -51,7 +51,7 @@ public class DropboxTree extends TreeGrid {
 	@Override
 	protected String getIcon(Record rec, boolean defaultState) {
 		if (!"folder".equals(rec.getAttributeAsString("iicon"))) {
-			setCustomNodeIcon(rec, Util.imageUrl(rec.getAttribute("iicon") + ".png"));
+			setCustomNodeIcon(rec, Util.fileIconUrl(rec.getAttribute("iicon") + ".svg"));
 		}
 		return super.getIcon(rec, defaultState);
 	}

@@ -93,8 +93,7 @@ public class EventsCalendar extends Calendar {
 											}
 										});
 							} else {
-								CalendarEventDialog eventDialog = new CalendarEventDialog(ev, onChangeCallback);
-								eventDialog.show();
+								new CalendarEventDialog(ev, onChangeCallback).show();
 							}
 						}
 					});

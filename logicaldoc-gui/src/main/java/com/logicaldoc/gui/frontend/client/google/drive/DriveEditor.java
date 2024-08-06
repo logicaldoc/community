@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.gdrive;
+package com.logicaldoc.gui.frontend.client.google.drive;
 
 import java.util.Arrays;
 
@@ -13,8 +13,9 @@ import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
+import com.logicaldoc.gui.frontend.client.google.GoogleService;
+import com.logicaldoc.gui.frontend.client.google.GoogleUtil;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
-import com.logicaldoc.gui.frontend.client.services.GDriveService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.HTMLFlow;
@@ -29,7 +30,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.3
  */
-public class GDriveEditor extends Window {
+public class DriveEditor extends Window {
 
 	private HTMLFlow html = new HTMLFlow();
 
@@ -37,7 +38,7 @@ public class GDriveEditor extends Window {
 
 	private GUIDocument document;
 
-	public GDriveEditor(final GUIDocument document) {
+	public DriveEditor(final GUIDocument document) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		if (document.getId() > 0)
 			setTitle(I18N.message("editdoc") + ": " + document.getFileName());
@@ -61,13 +62,11 @@ public class GDriveEditor extends Window {
 				// Creating a new document document, so delete the temporary
 				// doc in Google Drive
 				LD.contactingServer();
-				GDriveService.Instance.get().delete(GDriveEditor.this.document.getExtResId(),
+				GoogleService.Instance.get().delete(DriveEditor.this.document.getExtResId(),
 						new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								LD.clearPrompt();
-								GuiLog.serverError(caught);
-								destroy();
+								GoogleUtil.handleGoogleServiceError(caught);
 							}
 
 							@Override
@@ -127,7 +126,7 @@ public class GDriveEditor extends Window {
 		toolStrip.addButton(cancel);
 		toolStrip.addSeparator();
 		cancel.addClickHandler(event -> DocumentService.Instance.get()
-				.unlock(Arrays.asList(GDriveEditor.this.document.getId()), new AsyncCallback<>() {
+				.unlock(Arrays.asList(DriveEditor.this.document.getId()), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -139,7 +138,7 @@ public class GDriveEditor extends Window {
 						DocUtil.markUnlocked(document);
 						DocumentController.get().setCurrentDocument(document);
 						LD.contactingServer();
-						GDriveService.Instance.get().delete(GDriveEditor.this.document.getExtResId(),
+						GoogleService.Instance.get().delete(DriveEditor.this.document.getExtResId(),
 								new AsyncCallback<>() {
 									@Override
 									public void onFailure(Throwable caught) {
@@ -162,17 +161,15 @@ public class GDriveEditor extends Window {
 		toolStrip.addButton(checkin);
 		checkin.addClickHandler(event -> {
 			if (document.getId() != 0) {
-				new GDriveCheckin(document, GDriveEditor.this).show();
+				new DriveCheckin(document, DriveEditor.this).show();
 			} else {
 				LD.contactingServer();
-				GDriveService.Instance.get().importDocuments(Arrays.asList(document.getExtResId()),
+				GoogleService.Instance.get().importDocuments(Arrays.asList(document.getExtResId()),
 						FolderController.get().getCurrentFolder().getId(), document.getType(),
 						new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								LD.clearPrompt();
-								GuiLog.serverError(caught);
-								destroy();
+								GoogleUtil.handleGoogleServiceError(caught);
 							}
 
 							@Override
@@ -180,7 +177,7 @@ public class GDriveEditor extends Window {
 								DocumentsPanel.get().refresh();
 
 								// Delete the temporary resource in GDrive
-								GDriveService.Instance.get().delete(document.getExtResId(), new AsyncCallback<>() {
+								GoogleService.Instance.get().delete(document.getExtResId(), new AsyncCallback<>() {
 
 									@Override
 									public void onFailure(Throwable caught) {

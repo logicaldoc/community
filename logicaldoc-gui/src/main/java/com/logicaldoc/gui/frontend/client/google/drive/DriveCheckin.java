@@ -1,13 +1,13 @@
-package com.logicaldoc.gui.frontend.client.gdrive;
+package com.logicaldoc.gui.frontend.client.google.drive;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.frontend.client.services.GDriveService;
+import com.logicaldoc.gui.frontend.client.google.GoogleService;
+import com.logicaldoc.gui.frontend.client.google.GoogleUtil;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Window;
@@ -24,14 +24,14 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.3
  */
-public class GDriveCheckin extends Window {
+public class DriveCheckin extends Window {
 	private static final String MAJORVERSION = "majorversion";
 
 	private SubmitItem checkin;
 
 	private ValuesManager vm;
 
-	public GDriveCheckin(final GUIDocument document, final GDriveEditor parentDialog) {
+	public DriveCheckin(final GUIDocument document, final DriveEditor parentDialog) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("checkin"));
 		setWidth(400);
@@ -64,17 +64,15 @@ public class GDriveCheckin extends Window {
 		addItem(form);
 	}
 
-	public void onCheckin(final GUIDocument document, final GDriveEditor parentDialog) {
+	public void onCheckin(final GUIDocument document, final DriveEditor parentDialog) {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 		LD.contactingServer();
-		GDriveService.Instance.get().checkin(document.getId(), vm.getValueAsString("comment"),
+		GoogleService.Instance.get().checkin(document.getId(), vm.getValueAsString("comment"),
 				"true".equals(vm.getValueAsString(MAJORVERSION)), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
-						destroy();
+						GoogleUtil.handleGoogleServiceError(caught);
 					}
 
 					@Override

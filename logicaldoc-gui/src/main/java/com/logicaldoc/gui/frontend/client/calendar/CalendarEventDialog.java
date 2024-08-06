@@ -27,6 +27,8 @@ import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.selector.DocumentSelectorDialog;
+import com.logicaldoc.gui.frontend.client.google.GoogleService;
+import com.logicaldoc.gui.frontend.client.google.GoogleUtil;
 import com.logicaldoc.gui.frontend.client.services.CalendarService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
@@ -42,6 +44,7 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.DateItem;
+import com.smartgwt.client.widgets.form.fields.LinkItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
@@ -106,16 +109,16 @@ public class CalendarEventDialog extends Window {
 
 	private AsyncCallback<Void> onChangedCallback;
 
-	public CalendarEventDialog(GUICalendarEvent calEvent, AsyncCallback<Void> onChangedCallback) {
-		this.calendarEvent = calEvent;
+	public CalendarEventDialog(GUICalendarEvent calendarEvent, AsyncCallback<Void> onChangedCallback) {
+		this.calendarEvent = calendarEvent;
 		this.onChangedCallback = onChangedCallback;
 
-		readOnly = Session.get().getUser().getId() != calEvent.getCreatorId()
+		readOnly = Session.get().getUser().getId() != calendarEvent.getCreatorId()
 				&& !Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN);
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		if (calEvent.getId() != 0)
-			setTitle(I18N.message("editevent") + " - " + calEvent.getTitle());
+		if (calendarEvent.getId() != 0)
+			setTitle(I18N.message("editevent") + " - " + calendarEvent.getTitle());
 		else
 			setTitle(I18N.message("newevent"));
 		setWidth(600);
@@ -235,6 +238,7 @@ public class CalendarEventDialog extends Window {
 		remindersGrid.setEmptyMessage(I18N.message("notitemstoshow"));
 		remindersGrid.setWidth100();
 		remindersGrid.setHeight100();
+		remindersGrid.setShowAllRecords(true);
 		remindersGrid.setAutoFetchData(true);
 		remindersGrid.setCanSelectAll(false);
 		remindersGrid.setSelectionType(SelectionStyle.SINGLE);
@@ -299,8 +303,9 @@ public class CalendarEventDialog extends Window {
 			rec.setAttribute("when", BEFORE);
 			rec.setAttribute("date", reminder.getDate());
 			rec.setAttribute(REMINDED, reminder.getReminded());
+			records.add(rec);
 		}
-		remindersGrid.setRecords(records.toArray(new ListGridRecord[0]));
+		remindersGrid.setData(records.toArray(new ListGridRecord[0]));
 	}
 
 	private Tab prepareParticipants() {
@@ -314,6 +319,7 @@ public class CalendarEventDialog extends Window {
 		UserListGridField avatar = new UserListGridField();
 
 		final ListGrid participantsGrid = new ListGrid();
+		participantsGrid.setShowAllRecords(true);
 		participantsGrid.setHeight100();
 		participantsGrid.setWidth100();
 		participantsGrid.setFields(id, avatar, username, name);
@@ -401,8 +407,9 @@ public class CalendarEventDialog extends Window {
 			rec.setAttribute("avatar", participant.getId());
 			rec.setAttribute("name", participant.getFullName());
 			rec.setAttribute(USERNAME, participant.getUsername());
+			records.add(rec);
 		}
-		participantsGrid.setRecords(records.toArray(new ListGridRecord[0]));
+		participantsGrid.setData(records.toArray(new ListGridRecord[0]));
 	}
 
 	private Tab prepareDocumentsTab() {
@@ -420,6 +427,7 @@ public class CalendarEventDialog extends Window {
 		documentsGrid.setAutoFetchData(true);
 		documentsGrid.setShowHeader(true);
 		documentsGrid.setCanSelectAll(false);
+		documentsGrid.setShowAllRecords(true);
 		documentsGrid.setSelectionType(SelectionStyle.SINGLE);
 		documentsGrid.setFields(fileName, lastModified);
 		refreshDocumentsGrid(documentsGrid);
@@ -441,8 +449,7 @@ public class CalendarEventDialog extends Window {
 
 				@Override
 				public void onSuccess(GUIDocument doc) {
-					PreviewPopup iv = new PreviewPopup(doc);
-					iv.show();
+					new PreviewPopup(doc).show();
 				}
 			});
 		});
@@ -549,8 +556,9 @@ public class CalendarEventDialog extends Window {
 			rec.setAttribute("lastModified", document.getLastModified());
 			rec.setAttribute("docRef", document.getDocRef());
 			rec.setAttribute("color", document.getColor());
+			records.add(rec);
 		}
-		list.setRecords(records.toArray(new ListGridRecord[0]));
+		list.setData(records.toArray(new ListGridRecord[0]));
 	}
 
 	private Tab prepareDetails() {
@@ -572,6 +580,15 @@ public class CalendarEventDialog extends Window {
 		title.setTitleOrientation(TitleOrientation.LEFT);
 		title.setLength(255);
 		title.setCanEdit(!readOnly);
+
+		LinkItem relatedLink = ItemFactory.newLinkItem("relatedlink", "relatedlink", calendarEvent.getExternalId(),
+				calendarEvent.getExternalUrl(), calendarEvent.getExternalUrl());
+		relatedLink.setEndRow(true);
+		relatedLink.setWrapTitle(false);
+		relatedLink.setColSpan(5);
+		relatedLink.setWidth(350);
+		relatedLink.setTitleOrientation(TitleOrientation.LEFT);
+		relatedLink.setVisible(calendarEvent.getExternalUrl() != null);
 
 		TextItem type = ItemFactory.newTextItem("type", calendarEvent.getType());
 		type.setRequired(false);
@@ -639,9 +656,9 @@ public class CalendarEventDialog extends Window {
 		frequency.setValue(Integer.toString(calendarEvent.getFrequency()));
 		frequency.setCanEdit(!readOnly);
 		frequency.setWrapTitle(false);
-		frequency.addChangedHandler((ChangedEvent event) -> {
-			deadline.setDisabled("0".equals(event.getValue()));
-			if ("0".equals(event.getValue()))
+		frequency.addChangedHandler(changed -> {
+			deadline.setDisabled("0".equals(changed.getValue()));
+			if ("0".equals(changed.getValue()))
 				deadline.setValue((Date) null);
 		});
 
@@ -659,9 +676,9 @@ public class CalendarEventDialog extends Window {
 		status.setWrapTitle(false);
 		status.setValue(Integer.toString(calendarEvent.getStatus()));
 		status.setCanEdit(!readOnly);
-		status.addChangedHandler((ChangedEvent event) -> {
-			completionDate.setDisabled(!"2".equals(event.getValue()));
-			if ("2".equals(event.getValue()))
+		status.addChangedHandler(changed -> {
+			completionDate.setDisabled(!"2".equals(changed.getValue()));
+			if ("2".equals(changed.getValue()))
 				completionDate.setValue(new Date());
 			else
 				completionDate.setValue((Date) null);
@@ -673,9 +690,9 @@ public class CalendarEventDialog extends Window {
 		description.setColSpan(formColumns);
 		description.setCanEdit(!readOnly);
 
-		detailsForm.setFields(title, type, subType, ItemFactory.newRowSpacer(), startDate, startTime, expirationDate,
-				expirationTime, ItemFactory.newRowSpacer(), frequency, deadline, ItemFactory.newRowSpacer(), status,
-				completionDate, ItemFactory.newRowSpacer(), description);
+		detailsForm.setFields(title, relatedLink, type, subType, ItemFactory.newRowSpacer(), startDate, startTime,
+				expirationDate, expirationTime, ItemFactory.newRowSpacer(), frequency, deadline,
+				ItemFactory.newRowSpacer(), status, completionDate, ItemFactory.newRowSpacer(), description);
 		details.setPane(detailsForm);
 		return details;
 	}
@@ -806,7 +823,7 @@ public class CalendarEventDialog extends Window {
 				return;
 
 			if (calendarEvent.getParentId() != null) {
-				LD.ask(I18N.message("delevent"), I18N.message("douwantdeletealloccurrences"), (Boolean answer) -> {
+				LD.ask(I18N.message("delevent"), I18N.message("douwantdeletealloccurrences"), answer -> {
 					Long id = Boolean.TRUE.equals(answer) ? calendarEvent.getParentId() : calendarEvent.getId();
 					CalendarService.Instance.get().deleteEvent(id, new AsyncCallback<>() {
 						@Override
@@ -817,6 +834,7 @@ public class CalendarEventDialog extends Window {
 						@Override
 						public void onSuccess(Void arg) {
 							destroy();
+							onDeleteRemoteCalendarEvent();
 						}
 					});
 				});
@@ -833,10 +851,29 @@ public class CalendarEventDialog extends Window {
 						destroy();
 						if (onChangedCallback != null)
 							onChangedCallback.onSuccess(arg);
+						onDeleteRemoteCalendarEvent();
 					}
 
 				});
 		});
+	}
+
+	private void onDeleteRemoteCalendarEvent() {
+		if (calendarEvent.getExternalId() != null || !calendarEvent.getExternalId().isEmpty())
+			LD.ask(I18N.message("delevent"), I18N.message("douwantdeleteeventinremotecal"), answer -> {
+				GoogleService.Instance.get().deleteCalendarEvent(calendarEvent.getExternalId(),
+						new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GoogleUtil.handleGoogleServiceError(caught);
+							}
+
+							@Override
+							public void onSuccess(Void arg) {
+								destroy();
+							}
+						});
+			});
 	}
 
 	private void addParticipant(final ListGrid list, String id, String username, String name) {

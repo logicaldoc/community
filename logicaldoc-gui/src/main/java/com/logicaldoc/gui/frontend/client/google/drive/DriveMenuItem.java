@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.gdrive;
+package com.logicaldoc.gui.frontend.client.google.drive;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,9 +15,11 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
+import com.logicaldoc.gui.frontend.client.google.GoogleApiAuthorization;
+import com.logicaldoc.gui.frontend.client.google.GoogleService;
+import com.logicaldoc.gui.frontend.client.google.GoogleUtil;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
-import com.logicaldoc.gui.frontend.client.services.GDriveService;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
@@ -29,9 +31,9 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.4
  */
-public class GDriveMenuItem extends MenuItem {
+public class DriveMenuItem extends MenuItem {
 
-	public GDriveMenuItem(GUIFolder folder, GUIDocument document) {
+	public DriveMenuItem(GUIFolder folder, GUIDocument document) {
 		super(I18N.message("googledrive"));
 
 		final MenuItem importDocs = prepareGDriveImportDocsMenuItem(folder);
@@ -54,16 +56,16 @@ public class GDriveMenuItem extends MenuItem {
 
 	private MenuItem prepareGDriveCreateMenuItem(GUIFolder folder) {
 		final MenuItem create = new MenuItem(I18N.message("createdoc"));
-		create.addClickHandler(event -> new GDriveCreate().show());
-		create.setEnabled(folder != null && folder.isWrite() && Feature.enabled(Feature.GDRIVE)
+		create.addClickHandler(event -> new DriveCreate().show());
+		create.setEnabled(folder != null && folder.isWrite() && Feature.enabled(Feature.GOOGLE_DRIVE)
 				&& MainPanel.get().isOnDocumentsTab());
 		return create;
 	}
 
 	private MenuItem prepareGDriveAuthorizeMenuItem() {
 		final MenuItem authorize = new MenuItem(I18N.message("authorize"));
-		authorize.addClickHandler((MenuItemClickEvent authorizeClick) -> new GoogleApiAuthorization().show());
-		authorize.setEnabled(Feature.enabled(Feature.GDRIVE));
+		authorize.addClickHandler(authorizeClick -> GoogleApiAuthorization.get().show());
+		authorize.setEnabled(Feature.enabled(Feature.GOOGLE_DRIVE));
 		return authorize;
 	}
 
@@ -74,11 +76,10 @@ public class GDriveMenuItem extends MenuItem {
 			List<Long> ids = grid.getSelectedIds();
 
 			LD.contactingServer();
-			GDriveService.Instance.get().exportDocuments(ids, new AsyncCallback<>() {
+			GoogleService.Instance.get().exportDocuments(ids, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-					LD.clearPrompt();
+					GoogleUtil.handleGoogleServiceError(caught);
 				}
 
 				@Override
@@ -88,18 +89,18 @@ public class GDriveMenuItem extends MenuItem {
 				}
 			});
 		});
-		exportDocs.setEnabled(folder != null && folder.isDownload() && Feature.enabled(Feature.GDRIVE));
+		exportDocs.setEnabled(folder != null && folder.isDownload() && Feature.enabled(Feature.GOOGLE_DRIVE));
 		return exportDocs;
 	}
 
 	private MenuItem prepareGDriveImportDocsMenuItem(GUIFolder folder) {
 		final MenuItem importDocs = new MenuItem(I18N.message("importfromgdrive"));
 		importDocs.addClickHandler((MenuItemClickEvent importDocsClick) -> {
-			GDriveImport popup = new GDriveImport();
+			DriveImport popup = new DriveImport();
 			popup.show();
 		});
 		importDocs.setEnabled(folder != null && folder.isDownload() && folder.isWrite()
-				&& Feature.enabled(Feature.GDRIVE) && MainPanel.get().isOnDocumentsTab());
+				&& Feature.enabled(Feature.GOOGLE_DRIVE) && MainPanel.get().isOnDocumentsTab());
 		return importDocs;
 	}
 
@@ -113,7 +114,7 @@ public class GDriveMenuItem extends MenuItem {
 				checkoutAndUploadToGDrive(document);
 			} else {
 				if (document.getStatus() == 1 && document.getExtResId() != null) {
-					GDriveEditor popup = new GDriveEditor(document);
+					DriveEditor popup = new DriveEditor(document);
 					popup.show();
 				} else {
 					SC.warn(I18N.message("event.locked"));
@@ -121,7 +122,7 @@ public class GDriveMenuItem extends MenuItem {
 			}
 		});
 		edit.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
-				&& folder.isWrite() && Feature.enabled(Feature.GDRIVE));
+				&& folder.isWrite() && Feature.enabled(Feature.GOOGLE_DRIVE));
 		return edit;
 	}
 
@@ -144,11 +145,10 @@ public class GDriveMenuItem extends MenuItem {
 				GuiLog.info(I18N.message("documentcheckedout"), null);
 
 				LD.contactingServer();
-				GDriveService.Instance.get().upload(document.getId(), new AsyncCallback<>() {
+				GoogleService.Instance.get().upload(document.getId(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
+						GoogleUtil.handleGoogleServiceError(caught);
 					}
 
 					@Override
@@ -160,7 +160,7 @@ public class GDriveMenuItem extends MenuItem {
 						}
 						document.setExtResId(resourceId);
 						DocumentController.get().modified(document);
-						GDriveEditor popup = new GDriveEditor(document);
+						DriveEditor popup = new DriveEditor(document);
 						popup.show();
 					}
 				});

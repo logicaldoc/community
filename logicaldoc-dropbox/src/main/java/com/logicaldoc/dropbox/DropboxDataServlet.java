@@ -76,20 +76,18 @@ public class DropboxDataServlet extends HttpServlet {
 	private void printEntries(Dropbox dbox, boolean folders, String parent, PrintWriter writer) throws DbxException {
 		Metadata ent = dbox.get(parent);
 		if ((ent == null && "/".equals(parent)) || ent instanceof FolderMetadata) {
-			printEntries(dbox, folders, parent, writer);
-		}
-
-		List<Metadata> entries = dbox.list(parent);
-		for (Metadata entry : entries) {
-			if (folders && entry instanceof FileMetadata)
-				continue;
-			writer.print("<entry>");
-			writer.print("<path><![CDATA[" + entry.getPathDisplay() + "]]></path>");
-			writer.print("<parent><![CDATA[" + parent + "]]></parent>");
-			writer.print("<name><![CDATA[" + entry.getName() + "]]></name>");
-			writer.print("<type>" + ((entry instanceof FileMetadata) ? "file" : "folder") + "</type>");
-			printIcon(writer, entry);
-			writer.print("</entry>");
+			List<Metadata> entries = dbox.list(parent);
+			for (Metadata entry : entries) {
+				if (folders && entry instanceof FileMetadata)
+					continue;
+				writer.print("<entry>");
+				writer.print("<path><![CDATA[" + entry.getPathDisplay() + "]]></path>");
+				writer.print("<parent><![CDATA[" + parent + "]]></parent>");
+				writer.print("<name><![CDATA[" + entry.getName() + "]]></name>");
+				writer.print("<type>" + ((entry instanceof FileMetadata) ? "file" : "folder") + "</type>");
+				printIcon(writer, entry);
+				writer.print("</entry>");
+			}
 		}
 	}
 

@@ -97,7 +97,7 @@ public class Feature {
 
 	public static final int FOLDER_TEMPLATE = 42;
 
-	public static final int GDRIVE = 43;
+	public static final int GOOGLE_DRIVE = 43;
 
 	public static final int SMB_STORE = 44;
 
@@ -218,6 +218,8 @@ public class Feature {
 	public static final int TECHNICAL_SUPPORT = 103;
 	
 	public static final int CHATGPT = 104;
+	
+	public static final int GOOGLE_CALENDAR = 105;
 
 	private static Set<String> features = new HashSet<>();
 

@@ -1,11 +1,11 @@
-package com.logicaldoc.gui.frontend.client.services;
+package com.logicaldoc.gui.frontend.client.google;
 
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 
-public interface GDriveServiceAsync {
+public interface GoogleServiceAsync {
 
 	void checkin(long docId, String comment, boolean major, AsyncCallback<GUIDocument> callback);
 
@@ -25,4 +25,7 @@ public interface GDriveServiceAsync {
 
 	void loadSettings(AsyncCallback<List<String>> callback);
 
+	void synchronizeCalendar(AsyncCallback<Void> callback);
+
+	void deleteCalendarEvent(String eventId, AsyncCallback<Void> callback);
 }

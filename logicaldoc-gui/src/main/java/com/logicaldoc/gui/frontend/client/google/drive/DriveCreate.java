@@ -1,14 +1,14 @@
-package com.logicaldoc.gui.frontend.client.gdrive;
+package com.logicaldoc.gui.frontend.client.google.drive;
 
 import java.util.LinkedHashMap;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.frontend.client.services.GDriveService;
+import com.logicaldoc.gui.frontend.client.google.GoogleService;
+import com.logicaldoc.gui.frontend.client.google.GoogleUtil;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
@@ -25,12 +25,12 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.3
  */
-public class GDriveCreate extends Window {
+public class DriveCreate extends Window {
 	private SubmitItem create;
 
 	private ValuesManager vm;
 
-	public GDriveCreate() {
+	public DriveCreate() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("createdoc"));
 		setCanDragResize(true);
@@ -83,12 +83,10 @@ public class GDriveCreate extends Window {
 			filename = filename + "." + type;
 		final String fn = filename;
 
-		GDriveService.Instance.get().create(filename, new AsyncCallback<>() {
+		GoogleService.Instance.get().create(filename, new AsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				LD.clearPrompt();
-				GuiLog.serverError(caught);
-				destroy();
+				GoogleUtil.handleGoogleServiceError(caught);
 			}
 
 			@Override
@@ -98,7 +96,7 @@ public class GDriveCreate extends Window {
 				document.setFileName(fn);
 				document.setType(type);
 				document.setExtResId(resId);
-				GDriveEditor editor = new GDriveEditor(document);
+				DriveEditor editor = new DriveEditor(document);
 				editor.show();
 				destroy();
 			}

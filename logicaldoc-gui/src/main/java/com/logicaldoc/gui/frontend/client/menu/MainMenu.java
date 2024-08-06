@@ -38,7 +38,7 @@ import com.logicaldoc.gui.frontend.client.docusign.EnvelopeDetails;
 import com.logicaldoc.gui.frontend.client.docusign.Envelopes;
 import com.logicaldoc.gui.frontend.client.dropbox.DropboxAuthorizationWizard;
 import com.logicaldoc.gui.frontend.client.dropbox.DropboxDialog;
-import com.logicaldoc.gui.frontend.client.gdrive.GDriveMenuItem;
+import com.logicaldoc.gui.frontend.client.google.drive.DriveMenuItem;
 import com.logicaldoc.gui.frontend.client.menu.features.Features;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.services.ChatGPTService;
@@ -608,9 +608,9 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		if (Feature.enabled(Feature.SHAREFILE)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.SHAREFILE))
 			menu.addItem(getShareFileMenuItem(folder));
-		if (Feature.enabled(Feature.GDRIVE)
+		if (Feature.enabled(Feature.GOOGLE_DRIVE)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.GDOCS))
-			menu.addItem(new GDriveMenuItem(folder, document));
+			menu.addItem(new DriveMenuItem(folder, document));
 		if (Feature.enabled(Feature.ZOHO)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ZOHO))
 			menu.addItem(new ZohoMenuItem(folder, document));

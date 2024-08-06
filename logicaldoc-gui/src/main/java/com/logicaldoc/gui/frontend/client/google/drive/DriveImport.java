@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.gdrive;
+package com.logicaldoc.gui.frontend.client.google.drive;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,15 +9,16 @@ import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.IconGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
-import com.logicaldoc.gui.frontend.client.services.GDriveService;
+import com.logicaldoc.gui.frontend.client.google.GoogleService;
+import com.logicaldoc.gui.frontend.client.google.GoogleUtil;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -36,7 +37,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.3
  */
-public class GDriveImport extends Window {
+public class DriveImport extends Window {
 
 	private static final String FILENAME = "filename";
 
@@ -44,7 +45,7 @@ public class GDriveImport extends Window {
 
 	private VLayout layout = null;
 
-	public GDriveImport() {
+	public DriveImport() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("importfromgdrive"));
 
@@ -68,7 +69,7 @@ public class GDriveImport extends Window {
 		ListGridField resourceId = new ListGridField(RESOURCE_ID, "id", 200);
 		resourceId.setHidden(true);
 
-		ListGridField fileName = new ListGridField(FILENAME, I18N.message(FILENAME));
+		FileNameListGridField fileName = new FileNameListGridField();
 		fileName.setCanFilter(true);
 		fileName.setWidth("*");
 
@@ -76,13 +77,8 @@ public class GDriveImport extends Window {
 		size.setCanFilter(false);
 		size.setHidden(true);
 
-		ListGridField icon = new ListGridField("icon", " ", 24);
-		icon.setType(ListGridFieldType.IMAGE);
-		icon.setCanSort(false);
-		icon.setAlign(Alignment.CENTER);
-		icon.setShowDefaultContextMenu(false);
-		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setCanFilter(false);
+		ListGridField icon = new IconGridField();
+		icon.setHidden(true);
 
 		ListGridField version = new VersionListGridField();
 		version.setCanFilter(true);
@@ -114,11 +110,10 @@ public class GDriveImport extends Window {
 			@Override
 			protected void onSearch() {
 				LD.contactingServer();
-				GDriveService.Instance.get().search(this.getValueAsString(), new AsyncCallback<>() {
+				GoogleService.Instance.get().search(this.getValueAsString(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
+						GoogleUtil.handleGoogleServiceError(caught);
 					}
 
 					@Override
@@ -156,12 +151,11 @@ public class GDriveImport extends Window {
 				resIds.add(selection[i].getAttributeAsString(RESOURCE_ID));
 
 			LD.contactingServer();
-			GDriveService.Instance.get().importDocuments(resIds, FolderController.get().getCurrentFolder().getId(),
+			GoogleService.Instance.get().importDocuments(resIds, FolderController.get().getCurrentFolder().getId(),
 					null, new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							LD.clearPrompt();
-							GuiLog.serverError(caught);
+							GoogleUtil.handleGoogleServiceError(caught);
 						}
 
 						@Override

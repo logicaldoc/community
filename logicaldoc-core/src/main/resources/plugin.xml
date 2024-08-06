@@ -455,7 +455,10 @@
   </extension>
   <extension plugin-id="logicaldoc-core" point-id="Aspect" id="aspWriteCheck">
     <parameter id="code" value="writeCheck" />
-  </extension>  
+  </extension> 
+    <extension plugin-id="logicaldoc-core" point-id="Aspect" id="aspSendingMessages">
+    <parameter id="code" value="sendingMessages" />
+  </extension> 
 
   <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="imageConv">
 		<parameter id="in" value="png,gif,jpg,jpeg,jfif,tif,tiff,bmp,psd,webp,heic"/>

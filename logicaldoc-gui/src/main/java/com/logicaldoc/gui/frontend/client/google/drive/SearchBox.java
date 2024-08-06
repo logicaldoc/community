@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.gdrive;
+package com.logicaldoc.gui.frontend.client.google.drive;
 
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.i18n.I18N;

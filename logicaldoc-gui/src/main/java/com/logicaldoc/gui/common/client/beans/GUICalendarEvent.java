@@ -28,6 +28,10 @@ public class GUICalendarEvent implements Serializable {
 
 	private Long parentId = null;
 
+	private String externalId = "";
+	
+	private String externalUrl = "";
+	
 	private String title = "";
 
 	private String type = "";
@@ -291,5 +295,21 @@ public class GUICalendarEvent implements Serializable {
 
 	public void setAutomation(String automation) {
 		this.automation = automation;
+	}
+
+	public String getExternalId() {
+		return externalId;
+	}
+
+	public void setExternalId(String externalId) {
+		this.externalId = externalId;
+	}
+
+	public String getExternalUrl() {
+		return externalUrl;
+	}
+
+	public void setExternalUrl(String externalUrl) {
+		this.externalUrl = externalUrl;
 	}
 }

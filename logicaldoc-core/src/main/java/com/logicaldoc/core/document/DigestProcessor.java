@@ -70,7 +70,7 @@ public class DigestProcessor extends Task {
 			if (max != null && max.intValue() < 1)
 				max = null;
 
-			log.info("Found a total of {} documents to be processed", size);
+			log.info("Found a total of {} documents to process", size);
 
 			List<Long> ids = documentDao.findIdsByWhere(PersistentObjectDAO.ENTITY + ".docRef is null and "
 					+ PersistentObjectDAO.ENTITY + ".digest is null and deleted = 0", null, max);

@@ -156,11 +156,11 @@ public class UserUtil {
 		File tmpAvatarImage = null;
 		try {
 			tmpAvatarImage = FileUtil.createTempFile(AVATAR, ".png");
-			
+
 			TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 			String tenantName = tenantDao.getTenantName(user.getTenantId());
 			int size = Context.get().getProperties().getInt(tenantName + ".gui.avatar.size", 128);
-			
+
 			BufferedImage avatar = UserUtil.generateDefaultAvatarImage(user, size);
 			ImageIO.write(avatar, "png", tmpAvatarImage);
 			user.setAvatar(ImageUtil.encodeImage(tmpAvatarImage));
@@ -182,37 +182,11 @@ public class UserUtil {
 	}
 
 	private static BufferedImage generateDefaultAvatarImage(User user, int size) throws IOException {
-		Gravatar gravatar = new Gravatar();
-		gravatar.setRating(GravatarRating.GENERAL_AUDIENCES);
-		gravatar.setDefaultImage(GravatarDefaultImage.GRAVATAR_ICON);
-		gravatar.setSize(size);
-
 		/*
 		 * Check Gravatar with main email
 		 */
-		BufferedImage avatarImage = null;
-		byte[] bytes;
-		try {
-			bytes = gravatar.download(user.getEmail());
-			if (bytes != null && bytes.length > 0)
-				avatarImage = ImageIO.read(new ByteArrayInputStream(bytes));
-		} catch (Exception t) {
-			log.warn("Cannot download gravatar for email {}", user.getEmail(), t);
-		}
-
-		/*
-		 * Check Gravatar with secondary email
-		 */
-		if (avatarImage == null && StringUtils.isNotEmpty(user.getEmail2())) {
-			try {
-				bytes = gravatar.download(user.getEmail2());
-				if (bytes != null && bytes.length > 0)
-					avatarImage = ImageIO.read(new ByteArrayInputStream(bytes));
-			} catch (Exception t) {
-				log.warn("Cannot download gravatar for email {}", user.getEmail2(), t);
-			}
-		}
-
+		BufferedImage avatarImage = getImageFromGravatar(user, size);
+		
 		/*
 		 * Now generate one from scratch
 		 */
@@ -227,6 +201,39 @@ public class UserUtil {
 
 		avatarImage = getImageCentralSquare(size, avatarImage);
 
+		return avatarImage;
+	}
+
+	protected static BufferedImage getImageFromGravatar(User user, int size) {
+		BufferedImage avatarImage = null;
+		if (Context.get().getProperties().getBoolean("gravatar.enabled", false)) {
+			Gravatar gravatar = new Gravatar();
+			gravatar.setRating(GravatarRating.GENERAL_AUDIENCES);
+			gravatar.setDefaultImage(GravatarDefaultImage.GRAVATAR_ICON);
+			gravatar.setSize(size);
+
+			byte[] bytes;
+			try {
+				bytes = gravatar.download(user.getEmail());
+				if (bytes != null && bytes.length > 0)
+					avatarImage = ImageIO.read(new ByteArrayInputStream(bytes));
+			} catch (Exception t) {
+				log.warn("Cannot download gravatar for email {}", user.getEmail(), t);
+			}
+
+			/*
+			 * Check Gravatar with secondary email
+			 */
+			if (avatarImage == null && StringUtils.isNotEmpty(user.getEmail2())) {
+				try {
+					bytes = gravatar.download(user.getEmail2());
+					if (bytes != null && bytes.length > 0)
+						avatarImage = ImageIO.read(new ByteArrayInputStream(bytes));
+				} catch (Exception t) {
+					log.warn("Cannot download gravatar for email {}", user.getEmail2(), t);
+				}
+			}
+		}
 		return avatarImage;
 	}
 
