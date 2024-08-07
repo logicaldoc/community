@@ -55,7 +55,7 @@ public class EventsCalendar extends Calendar {
 			setChosenDate(new Date());
 
 		addEventClickHandler(event -> {
-			CalendarService.Instance.get().getEvent(Long.parseLong(event.getEvent().getAttribute("eventId")),
+			CalendarService.Instance.get().getEvent(event.getEvent().getAttributeAsLong("eventId"),
 					new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
@@ -64,10 +64,10 @@ public class EventsCalendar extends Calendar {
 
 						@Override
 						public void onSuccess(final GUICalendarEvent ev) {
-							long creatorId = Long.parseLong(event.getEvent().getAttribute("creatorId"));
+							long organizerId = Long.parseLong(event.getEvent().getAttribute("organizerId"));
 							GUIUser currentUser = Session.get().getUser();
 
-							if (ev.getParentId() != null && (currentUser.getId() == creatorId
+							if (ev.getParentId() != null && (currentUser.getId() == organizerId
 									|| currentUser.isMemberOf(Constants.GROUP_ADMIN))) {
 								LD.ask(I18N.message("editevent"), I18N.message("douwantmodifyalloccurrences"),
 										editAllOccurrences -> {
@@ -85,9 +85,7 @@ public class EventsCalendar extends Calendar {
 
 															@Override
 															public void onSuccess(GUICalendarEvent calEv) {
-																CalendarEventDialog eventDialog = new CalendarEventDialog(
-																		calEv, onChangeCallback);
-																eventDialog.show();
+																new CalendarEventDialog(calEv, onChangeCallback).show();
 															}
 														});
 											}

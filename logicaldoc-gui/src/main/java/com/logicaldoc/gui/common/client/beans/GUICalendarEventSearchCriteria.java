@@ -76,7 +76,7 @@ public class GUICalendarEventSearchCriteria implements Serializable {
 		this.frequency = frequency;
 	}
 
-	public Date getStartDate() {
+	public Date getStart() {
 		return startDate;
 	}
 
@@ -84,7 +84,7 @@ public class GUICalendarEventSearchCriteria implements Serializable {
 		this.startDate = startDate;
 	}
 
-	public Date getEndDate() {
+	public Date getEnd() {
 		return endDate;
 	}
 

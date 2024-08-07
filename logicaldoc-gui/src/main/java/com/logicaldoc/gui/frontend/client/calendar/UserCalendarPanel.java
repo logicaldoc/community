@@ -5,8 +5,11 @@ import java.util.Date;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
+import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
+import com.logicaldoc.gui.common.client.beans.GUIReminder;
+import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.google.GoogleApiAuthorization;
 import com.logicaldoc.gui.frontend.client.google.GoogleService;
@@ -58,7 +61,13 @@ public class UserCalendarPanel extends VLayout {
 		refresh.addClickHandler(click -> refresh());
 		toolStrip.addButton(refresh);
 
+		ToolStripButton newEvent = new ToolStripButton();
+		newEvent.setTitle(I18N.message("newevent"));
+		newEvent.addClickHandler(click -> newEvent());
+		toolStrip.addButton(newEvent);
+
 		if (Feature.enabled(Feature.GOOGLE_CALENDAR) && Menu.enabled(Menu.GOOGLE_CALENDAR)) {
+			toolStrip.addSeparator();
 			ToolStripButton synchronize = new ToolStripButton();
 			synchronize.setTitle(I18N.message("synchronize"));
 			synchronize.addClickHandler(click -> synchronize());
@@ -76,19 +85,24 @@ public class UserCalendarPanel extends VLayout {
 		initCalendar();
 	}
 
+	private void newEvent() {
+		GUICalendarEvent calEvent = new GUICalendarEvent();
+		calEvent.setOrganizer(Session.get().getUser().getFullName());
+		calEvent.setOrganizerId(Session.get().getUser().getId());
+
+		GUIUser user = new GUIUser();
+		user.setId(Session.get().getUser().getId());
+		user.setUsername(Session.get().getUser().getUsername());
+		user.setFirstName(Session.get().getUser().getFirstName());
+		user.setName(Session.get().getUser().getName());
+		calEvent.addAttendee(user);
+
+		calEvent.addReminder(new GUIReminder(0, GUIReminder.TIME_UNIT_MINUTE));
+		new CalendarEventDialog(calEvent, new refreshCallback()).show();
+	}
+
 	private void initCalendar() {
-		calendar = new EventsCalendar(null, choosenDate, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
-			@Override
-			public void onSuccess(Void arg0) {
-				refresh();
-			}
-		});
+		calendar = new EventsCalendar(null, choosenDate, new refreshCallback());
 		calendar.setChosenDate(choosenDate);
 		calendar.setCurrentViewName(choosenView);
 		addMember(calendar);
@@ -96,18 +110,7 @@ public class UserCalendarPanel extends VLayout {
 
 	public void synchronize() {
 		LD.contactingServer();
-		GoogleService.Instance.get().synchronizeCalendar(new AsyncCallback<Void>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GoogleUtil.handleGoogleServiceError(caught);
-			}
-
-			@Override
-			public void onSuccess(Void arg0) {
-				LD.clearPrompt();
-				refresh();
-			}
-		});
+		GoogleService.Instance.get().synchronizeCalendar(new refreshCallback());
 	}
 
 	public void refresh() {
@@ -117,5 +120,18 @@ public class UserCalendarPanel extends VLayout {
 			choosenView = calendar.getCurrentViewName();
 		}
 		initCalendar();
+	}
+
+	private final class refreshCallback implements AsyncCallback<Void> {
+		@Override
+		public void onFailure(Throwable caught) {
+			GoogleUtil.handleGoogleServiceError(caught);
+		}
+
+		@Override
+		public void onSuccess(Void arg0) {
+			LD.clearPrompt();
+			refresh();
+		}
 	}
 }

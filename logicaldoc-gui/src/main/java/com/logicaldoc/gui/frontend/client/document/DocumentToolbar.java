@@ -290,14 +290,14 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 					event -> checkPermissionsAndRun(new String[] { GUIAccessControlEntry.PERMISSION_CALENDAR }, () -> {
 						DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
 						GUICalendarEvent calEvent = new GUICalendarEvent();
-						calEvent.setCreator(Session.get().getUser().getFullName());
-						calEvent.setCreatorId(Session.get().getUser().getId());
+						calEvent.setOrganizer(Session.get().getUser().getFullName());
+						calEvent.setOrganizerId(Session.get().getUser().getId());
 						GUIUser user = new GUIUser();
 						user.setId(Session.get().getUser().getId());
 						user.setUsername(Session.get().getUser().getUsername());
 						user.setFirstName(Session.get().getUser().getFirstName());
 						user.setName(Session.get().getUser().getName());
-						calEvent.addParticipant(user);
+						calEvent.addAttendee(user);
 
 						List<GUIDocument> docs = grid.getSelectedDocuments();
 						if (!docs.isEmpty()) {
@@ -307,8 +307,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 						}
 
 						calEvent.addReminder(new GUIReminder(0, GUIReminder.TIME_UNIT_MINUTE));
-						CalendarEventDialog eventDialog = new CalendarEventDialog(calEvent, null);
-						eventDialog.show();
+						new CalendarEventDialog(calEvent, null).show();
 					}));
 		}
 	}

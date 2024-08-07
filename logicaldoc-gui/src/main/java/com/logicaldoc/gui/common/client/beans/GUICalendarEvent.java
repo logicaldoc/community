@@ -42,21 +42,13 @@ public class GUICalendarEvent implements Serializable {
 
 	private String location = "";
 
-	private Date startDate = new Date();
+	private Date start = new Date();
 
-	private Date expirationDate = null;
+	private Date end = null;
 
-	private List<GUIUser> participants = new ArrayList<>();
+	private List<GUIUser> attendees = new ArrayList<>();
 
-	private List<GUIGroup> participantsGroups = new ArrayList<>();
-
-	public List<GUIGroup> getParticipantsGroups() {
-		return participantsGroups;
-	}
-
-	public void setParticipantsGroups(List<GUIGroup> participantsGroups) {
-		this.participantsGroups = participantsGroups;
-	}
+	private List<GUIGroup> attendeesGroups = new ArrayList<>();
 
 	private List<GUIDocument> documents = new ArrayList<>();
 
@@ -64,9 +56,9 @@ public class GUICalendarEvent implements Serializable {
 
 	private int frequency = 0;
 
-	private long creatorId;
+	private long organizerId;
 
-	private String creator;
+	private String organizer;
 
 	private int status = 0;
 
@@ -111,20 +103,20 @@ public class GUICalendarEvent implements Serializable {
 		this.description = description;
 	}
 
-	public Date getStartDate() {
-		return startDate;
+	public Date getStart() {
+		return start;
 	}
 
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
+	public void setStart(Date startDate) {
+		this.start = startDate;
 	}
 
-	public Date getExpirationDate() {
-		return expirationDate;
+	public Date getEnd() {
+		return end;
 	}
 
-	public void setExpirationDate(Date expirationDate) {
-		this.expirationDate = expirationDate;
+	public void setEnd(Date expirationDate) {
+		this.end = expirationDate;
 	}
 
 	public List<GUIDocument> getDocuments() {
@@ -143,50 +135,50 @@ public class GUICalendarEvent implements Serializable {
 		this.frequency = frequency;
 	}
 
-	public GUIUser getParticipant(long id) {
-		for (GUIUser guiUser : participants) {
+	public GUIUser getAttendee(long id) {
+		for (GUIUser guiUser : attendees) {
 			if (guiUser.getId() == id)
 				return guiUser;
 		}
 		return null;
 	}
 
-	public GUIGroup getParticipantGroup(long id) {
-		for (GUIGroup guiGroup : participantsGroups) {
+	public GUIGroup getAttendeeGroup(long id) {
+		for (GUIGroup guiGroup : attendeesGroups) {
 			if (guiGroup.getId() == id)
 				return guiGroup;
 		}
 		return null;
 	}
 
-	public void addParticipant(GUIUser newPart) {
-		if (getParticipant(newPart.getId()) != null)
+	public void addAttendee(GUIUser newPart) {
+		if (getAttendee(newPart.getId()) != null)
 			return;
-		participants.add(newPart);
+		attendees.add(newPart);
 	}
 
-	public void addParticipant(GUIGroup newPart) {
-		if (getParticipantGroup(newPart.getId()) != null)
+	public void addAttendee(GUIGroup newPart) {
+		if (getAttendeeGroup(newPart.getId()) != null)
 			return;
-		participantsGroups.add(newPart);
+		attendeesGroups.add(newPart);
 	}
 
-	public void removeParticipant(long id) {
+	public void removeAttendee(long id) {
 		List<GUIUser> newParts = new ArrayList<>();
-		for (GUIUser guiUser : participants) {
+		for (GUIUser guiUser : attendees) {
 			if (id != guiUser.getId())
 				newParts.add(guiUser);
 		}
-		participants = newParts;
+		attendees = newParts;
 	}
 
-	public void removeParticipantGroup(long id) {
+	public void removeAttendeeGroup(long id) {
 		List<GUIGroup> newParts = new ArrayList<>();
-		for (GUIGroup guiGroup : participantsGroups) {
+		for (GUIGroup guiGroup : attendeesGroups) {
 			if (id != guiGroup.getId())
 				newParts.add(guiGroup);
 		}
-		participantsGroups = newParts;
+		attendeesGroups = newParts;
 
 	}
 
@@ -217,28 +209,28 @@ public class GUICalendarEvent implements Serializable {
 		reminders.add(reminder);
 	}
 
-	public long getCreatorId() {
-		return creatorId;
+	public long getOrganizerId() {
+		return organizerId;
 	}
 
-	public void setCreatorId(long creatorId) {
-		this.creatorId = creatorId;
+	public void setOrganizerId(long creatorId) {
+		this.organizerId = creatorId;
 	}
 
-	public String getCreator() {
-		return creator;
+	public String getOrganizer() {
+		return organizer;
 	}
 
-	public void setCreator(String creator) {
-		this.creator = creator;
+	public void setOrganizer(String creator) {
+		this.organizer = creator;
 	}
 
-	public List<GUIUser> getParticipants() {
-		return participants;
+	public List<GUIUser> getAttendees() {
+		return attendees;
 	}
 
-	public void setParticipants(List<GUIUser> participants) {
-		this.participants = participants;
+	public void setAttendees(List<GUIUser> attendees) {
+		this.attendees = attendees;
 	}
 
 	public int getStatus() {
@@ -311,5 +303,13 @@ public class GUICalendarEvent implements Serializable {
 
 	public void setLocation(String location) {
 		this.location = location;
+	}
+	
+	public List<GUIGroup> getAttendeesGroups() {
+		return attendeesGroups;
+	}
+
+	public void setAttendeesGroups(List<GUIGroup> attendeesGroups) {
+		this.attendeesGroups = attendeesGroups;
 	}
 }

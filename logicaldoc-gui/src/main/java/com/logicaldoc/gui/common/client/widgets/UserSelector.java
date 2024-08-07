@@ -26,15 +26,19 @@ public class UserSelector extends SelectItem {
 	private static final String USERNAME = "username";
 
 	public UserSelector(String name, String title, String groupIdOrName, boolean allowNull, boolean skipDisabled) {
-		this(name, title, groupIdOrName, allowNull, skipDisabled, null);
+		this(name, title, groupIdOrName, allowNull, skipDisabled, true, null);
+	}
+	
+	public UserSelector(String name, String title, String groupIdOrName, boolean allowNull, boolean skipDisabled, boolean withClear) {
+		this(name, title, groupIdOrName, allowNull, skipDisabled, withClear, null);
 	}
 
 	public UserSelector(String name, String title, String groupIdOrName, boolean allowNull, boolean skipDisabled,
-			List<FormItemIcon> additionalIcons) {
+			boolean withClear, List<FormItemIcon> additionalIcons) {
 		setName(name);
 		setTitle(I18N.message(title));
 		setWrapTitle(false);
-		
+
 		ListGridField id = new ListGridField("id", I18N.message("id"));
 		id.setHidden(true);
 		ListGridField username = new ListGridField(USERNAME, I18N.message(USERNAME));
@@ -64,7 +68,8 @@ public class UserSelector extends SelectItem {
 		search.setHeight(12);
 
 		List<FormItemIcon> icons = new ArrayList<>();
-		icons.add(clear);
+		if (withClear)
+			icons.add(clear);
 		if (groupIdOrName == null || "".equals(groupIdOrName))
 			icons.add(search);
 		if (additionalIcons != null && !additionalIcons.isEmpty())

@@ -95,7 +95,7 @@ public class ProtocolsPanel extends AdminPanel {
 		body.setMembers(webservicesPanel);
 
 		Tab apiCalls = new Tab();
-		apiCalls.setTitle("apicalls");
+		apiCalls.setTitle(I18N.message("apicalls"));
 		apiCalls.setPane(new ApiCallsPanel());
 		tabs.addTab(apiCalls);
 		

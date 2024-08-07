@@ -50,7 +50,7 @@ public class CalendarReport extends AdminPanel {
 
 	private static final String DESCRIPTION = "description";
 
-	private static final String PARTICIPANTS = "participants";
+	private static final String ATTENDEES = "attendees";
 
 	private static final String STATUS = "status";
 
@@ -208,7 +208,7 @@ public class CalendarReport extends AdminPanel {
 		description.setWidth(400);
 		description.setHidden(true);
 
-		ListGridField participants = new ListGridField(PARTICIPANTS, I18N.message(PARTICIPANTS));
+		ListGridField participants = new ListGridField(ATTENDEES, I18N.message(ATTENDEES));
 		participants.setWidth(300);
 
 		list = new ListGrid();
@@ -339,7 +339,7 @@ public class CalendarReport extends AdminPanel {
 				List<ListGridRecord> records = new ArrayList<>();
 				for (GUICalendarEvent event : result) {
 					ListGridRecord rec = new ListGridRecord();
-					rec.setAttribute("date", event.getStartDate());
+					rec.setAttribute("date", event.getStart());
 					rec.setAttribute(TITLE, event.getTitle());
 					rec.setAttribute("type", event.getType());
 					rec.setAttribute(SUBTYPE, event.getSubType());
@@ -347,8 +347,8 @@ public class CalendarReport extends AdminPanel {
 					rec.setAttribute(STATUS, event.getStatus());
 					rec.setAttribute(DESCRIPTION, event.getDescription());
 					rec.setAttribute("endDate", event.getDeadline());
-					rec.setAttribute(PARTICIPANTS,
-							event.getParticipants().stream().map(Object::toString).collect(Collectors.joining(", ")));
+					rec.setAttribute(ATTENDEES,
+							event.getAttendees().stream().map(Object::toString).collect(Collectors.joining(", ")));
 					records.add(rec);
 				}
 				list.setData(records.toArray(new ListGridRecord[0]));

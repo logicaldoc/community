@@ -464,7 +464,7 @@ public class ItemFactory {
 	public static SelectItem newUserSelectorForAttribute(String name, String title, String groupIdOrName,
 			List<FormItemIcon> additionalIcons) {
 		return new UserSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER), title, groupIdOrName, false, true,
-				additionalIcons);
+				true, additionalIcons);
 	}
 
 	public static StaticTextItem newDocumentSelectorForAttribute(String name, String title,
@@ -883,7 +883,12 @@ public class ItemFactory {
 
 	public static SelectItem newUserSelector(String name, String title, String groupIdOrName, boolean required,
 			boolean skipDisabled) {
-		return new UserSelector(name, title, groupIdOrName, !required, skipDisabled, null);
+		return newUserSelector(name, title, groupIdOrName, !required, skipDisabled, true);
+	}
+	
+	public static SelectItem newUserSelector(String name, String title, String groupIdOrName, boolean required,
+			boolean skipDisabled, boolean withClear) {
+		return new UserSelector(name, title, groupIdOrName, !required, skipDisabled, withClear, null);
 	}
 
 	public static SelectItem newTenantSelector() {
