@@ -155,7 +155,7 @@ public class JobManager {
 	 * @return JobManager.MISSFIRE_RUNNOW or JobManager.MISSFIRE_IGNORE
 	 */
 	public String getMissfireInstruction(String group) {
-		return config.getProperty("job.calendar.missfire", MISSFIRE_RUNNOW);
+		return config.getProperty("job." + group + ".missfire", MISSFIRE_RUNNOW);
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class JobManager {
 	 * @return max number of days
 	 */
 	public int getMissfireMax(String group) {
-		return config.getInt("job.calendar.missfire.max", 2);
+		return config.getInt("job." + group + ".missfire.max", 2);
 	}
 
 	/**
