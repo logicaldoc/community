@@ -325,7 +325,7 @@ public class CalendarEventDialog extends Window {
 			@Override
 			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
 				String val = value != null ? value.toString() : "";
-				if (record.getAttributeAsString("id").equals(calendarEvent.getOrganizer()))
+				if (record.getAttributeAsString("id").equals(Long.toString(calendarEvent.getOrganizerId())))
 					return val + " (" + I18N.message("organizer") + ")";
 				else
 					return val;
@@ -471,7 +471,6 @@ public class CalendarEventDialog extends Window {
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
 		preview.addClickHandler(event -> {
-			// Detect the selected rec
 			ListGridRecord selection = documentsGrid.getSelectedRecord();
 
 			long id = Long.parseLong(selection.getAttribute("id"));
@@ -495,7 +494,6 @@ public class CalendarEventDialog extends Window {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message(DDELETE));
 		delete.addClickHandler(event -> {
-			// Detect selected records
 			for (ListGridRecord rec : documentsGrid.getSelectedRecords()) {
 				calendarEvent.removeDocument(Long.parseLong(rec.getAttribute("id")));
 			}
@@ -845,7 +843,6 @@ public class CalendarEventDialog extends Window {
 			for (ListGridRecord rec : records) {
 				if (rec.getAttributeAsString("id").startsWith("g")) {
 					GUIGroup attendee = new GUIGroup();
-					GuiLog.info(rec.getAttributeAsString("id"));
 					attendee.setId(Long.parseLong(rec.getAttributeAsString("id").substring(2)));
 					attendee.setName(rec.getAttributeAsString("name"));
 					groupAttendees.add(attendee);
@@ -940,6 +937,8 @@ public class CalendarEventDialog extends Window {
 		// Update the table
 		ListGridRecord rec = new ListGridRecord();
 
+		if (!id.startsWith("g") && !"0".equals(id))
+			rec.setAttribute("avatar", id);
 		rec.setAttribute("id", id);
 		rec.setAttribute("name", name);
 		rec.setAttribute("email", email);

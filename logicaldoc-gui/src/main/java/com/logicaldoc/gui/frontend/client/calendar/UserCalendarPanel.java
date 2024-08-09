@@ -95,6 +95,7 @@ public class UserCalendarPanel extends VLayout {
 		user.setUsername(Session.get().getUser().getUsername());
 		user.setFirstName(Session.get().getUser().getFirstName());
 		user.setName(Session.get().getUser().getName());
+		user.setEmail(Session.get().getUser().getEmail());
 		calEvent.addAttendee(user);
 
 		calEvent.addReminder(new GUIReminder(0, GUIReminder.TIME_UNIT_MINUTE));
