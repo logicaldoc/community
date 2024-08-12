@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.services;
+package com.logicaldoc.gui.frontend.client.dropbox;
 
 import java.util.List;
 
@@ -16,4 +16,7 @@ public interface DropboxServiceAsync {
 
 	void importDocuments(long targetFolder, List<String> paths, AsyncCallback<Integer> callback);
 
+	void saveSettings(String clientId, String clientSecret, AsyncCallback<Void> callback);
+	
+	void loadSettings(AsyncCallback<List<String>> callback);
 }

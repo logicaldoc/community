@@ -35,10 +35,17 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class MailPreviewPanel extends VLayout {
 
-	public MailPreviewPanel(final GUIEmail mail, final GUIDocument document, final int width) {
+	private GUIEmail mail;
+
+	private GUIDocument document;
+
+	public MailPreviewPanel(GUIEmail mail, GUIDocument document, int width) {
 		setWidth100();
 		setHeight100();
 
+		this.mail = mail;
+		this.document = document;
+		
 		/**
 		 * Prepare the form that contains the email data
 		 */
@@ -79,8 +86,8 @@ public class MailPreviewPanel extends VLayout {
 			HTMLPane html = new HTMLPane();
 			html.setWidth100();
 			html.setHeight100();
-			html.setContents("<iframe style='border:0px solid white; width:100%; height:100%;' sandbox srcdoc='"
-					+ mail.getMessage() + "'></iframe>");
+			html.setContents("<iframe id='htmlmailpreview-" + getID()
+					+ "' style='border:0px solid white; width:100%; height:100%;'></iframe>");
 			body = html;
 		} else {
 			if (document.getFileName().toLowerCase().endsWith(".msg") && mail.getMessage().contains("\\rtf1")) {
@@ -118,6 +125,31 @@ public class MailPreviewPanel extends VLayout {
 		setMembers(header, body);
 	}
 
+	@Override
+	protected void onDraw() {
+		super.onDraw();
+
+		String content = mail.getMessage();
+		if (!content.startsWith("<html>"))
+			content = "<!doctype html><head></head>" + content + "</html>";
+		updateIframePreview("htmlmailpreview-" + getID(), content);
+	}
+
+	/**
+	 * Javascript code to put the iframe content. We do not use the srcdoc=''
+	 * because the first apostrophe inside the same content will interrupt the
+	 * HTML
+	 * 
+	 * @param content the HTML content of the message
+	 */
+	private static native void updateIframePreview(String id, String content) /*-{
+	    var frame = $wnd.document.getElementById(id);
+	    if(frame!=null){
+	    	var fdoc = frame.contentDocument;
+			fdoc.write(content);
+		}
+	}-*/;
+
 	/**
 	 * Prepares the header that shows the most important informations about the
 	 * email and the attachment buttons
@@ -133,11 +165,11 @@ public class MailPreviewPanel extends VLayout {
 		attachmentsPanel.setWidth100();
 		attachmentsPanel.setHeight(80);
 		attachmentsPanel.setOverflow(Overflow.SCROLL);
-		
+
 		VLayout header = new VLayout();
 		header.setWidth100();
 		header.setBackgroundColor("#efefef;");
-		
+
 		List<GUIDocument> attachments = prepareAttachments(mail, document, attachmentsPanel);
 		if (attachments.isEmpty())
 			header.setMembers(form);
@@ -152,7 +184,7 @@ public class MailPreviewPanel extends VLayout {
 		for (final GUIDocument doc : attachments) {
 			IButton button = new IButton(doc.getFileName() + " (" + Util.formatSizeCompact(doc.getFileSize()) + ")");
 			button.setAutoFit(true);
-			button.setIcon("[SKIN]/" + doc.getIcon());
+			button.setIcon("[SKIN]/FileIcons/" + doc.getIcon() + ".svg");
 			if (doc.getFolder().isDownload())
 				button.addClickHandler(event -> {
 					String filename = doc.getFileName();

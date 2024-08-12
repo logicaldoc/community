@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.services;
+package com.logicaldoc.gui.frontend.client.dropbox;
 
 import java.util.List;
 
@@ -64,6 +64,27 @@ public interface DropboxService extends RemoteService {
 
 	public int importDocuments(long targetFolder, List<String> paths) throws ServerException;
 
+	/**
+	 * Save the settings used by the Dropbox API
+	 *
+	 * @param apiKey identifier of the client
+	 * @param apiSecret the secret key specified by he user
+	 * 
+	 * @return The URL of the consent page
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void saveSettings(String apiKey, String apiSecret) throws ServerException;
+
+	/**
+	 * Save the settings used by the Dropbox module
+	 * 
+	 * @return apiKey, apiSecret
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public List<String> loadSettings() throws ServerException;
+	
 	public static class Instance {
 		private static DropboxServiceAsync inst;
 

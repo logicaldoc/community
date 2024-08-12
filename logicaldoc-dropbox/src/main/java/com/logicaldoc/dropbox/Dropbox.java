@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,14 @@ import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.files.SearchMatch;
 import com.dropbox.core.v2.files.SearchResult;
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.generic.Generic;
+import com.logicaldoc.core.generic.GenericDAO;
+import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
+import com.logicaldoc.util.Context;
+import com.logicaldoc.util.security.StringEncrypter;
+import com.logicaldoc.util.security.StringEncrypter.EncryptionException;
 
 /**
  * Our Dropbox facade
@@ -33,17 +42,27 @@ import com.dropbox.core.v2.files.SearchResult;
 public class Dropbox {
 	protected Logger log = LoggerFactory.getLogger(Dropbox.class);
 
+	private static final String SECRET_KEY = "5bNgqYzl80v7OV4p6L/4Hnj2zh93Jh472P,@q}*UTGVRf)0j-ta-8rhMr53rXj1[BQds`ZVIF?Y0'M2dh*Ti-CtS^5jAp9[";
+
 	// Get your app key and secret from the Dropbox developers website -
 	// https://www.dropbox.com/developers/apps
-	private static final String APP_KEY = "s7erzz9am7ikbl2";
+	private String apiKey;
 
-	private static final String APP_SECRET = "9shfsbeilgfizam";
+	private String apiSecret;
 
 	private String accessToken;
 
 	private DbxClientV2 client;
 
-	public boolean login(String accessToken) {
+	private long userId;
+
+	public Dropbox(long userId) throws PersistenceException, EncryptionException {
+		super();
+		this.userId = userId;
+		loadSettings();
+	}
+
+	public boolean login() {
 		try {
 			DbxRequestConfig config = new DbxRequestConfig("LogicalDOC");
 			this.client = new DbxClientV2(config, accessToken);
@@ -61,7 +80,7 @@ public class Dropbox {
 	}
 
 	private DbxWebAuth prepareWebAuth() {
-		DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
+		DbxAppInfo appInfo = new DbxAppInfo(apiKey, apiSecret);
 		DbxRequestConfig config = new DbxRequestConfig("LogicalDOC");
 		return new DbxWebAuth(config, appInfo);
 	}
@@ -93,7 +112,8 @@ public class Dropbox {
 		DbxWebAuth webAuth = prepareWebAuth();
 		try {
 			DbxAuthFinish authFinish = webAuth.finishFromCode(authorizationCode);
-			return authFinish.getAccessToken();
+			accessToken = authFinish.getAccessToken();
+			return accessToken;
 		} catch (DbxException e) {
 			log.debug(e.getMessage());
 		}
@@ -186,5 +206,70 @@ public class Dropbox {
 
 	public String getAccessToken() {
 		return accessToken;
+	}
+
+	public void setAccessToken(String accessToken) {
+		this.accessToken = accessToken;
+	}
+
+	Generic loadSettings() throws PersistenceException, EncryptionException {
+		Generic settings = getGeneric();
+
+		StringEncrypter encrypter = new StringEncrypter(StringEncrypter.DES_ENCRYPTION_SCHEME, SECRET_KEY);
+		if (StringUtils.isNotEmpty(settings.getString1()))
+			apiKey = encrypter.decrypt(settings.getString1());
+		if (StringUtils.isNotEmpty(settings.getString2()))
+			apiSecret = encrypter.decrypt(settings.getString2());
+		if (StringUtils.isNotEmpty(settings.getString3()))
+			accessToken = encrypter.decrypt(settings.getString3());
+
+		return settings;
+	}
+
+	private Generic getGeneric() throws PersistenceException {
+		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		User user = uDao.findById(userId);
+
+		GenericDAO genericDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
+		Generic settings = genericDao.findByAlternateKey("usersetting", "dropbox", userId, user.getTenantId());
+		if (settings == null) {
+			settings = new Generic("usersetting", "dropbox", userId, user.getTenantId());
+			settings.setInteger1(1L);
+		} else {
+			genericDao.initialize(settings);
+		}
+		return settings;
+	}
+
+	void saveSettings() throws PersistenceException, EncryptionException {
+		Generic settings = getGeneric();
+
+		StringEncrypter encrypter = new StringEncrypter(StringEncrypter.DES_ENCRYPTION_SCHEME, SECRET_KEY);
+		settings.setString1(encrypter.encrypt(apiKey));
+		settings.setString2(encrypter.encrypt(apiSecret));
+		if (StringUtils.isNotEmpty(accessToken))
+			settings.setString3(encrypter.encrypt(accessToken));
+		GenericDAO genericDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
+		genericDao.store(settings);
+	}
+
+	boolean gotAccessToken() {
+		return StringUtils.isNotEmpty(accessToken);
+	}
+
+	public String getApiKey() {
+		return apiKey;
+	}
+
+	public String getApiSecret() {
+		return apiSecret;
+	}
+
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
+	}
+
+	public void setApiSecret(String apiSecret) {
+		this.apiSecret = apiSecret;
 	}
 }

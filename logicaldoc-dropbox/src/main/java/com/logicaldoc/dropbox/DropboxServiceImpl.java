@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +29,6 @@ import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
-import com.logicaldoc.core.generic.Generic;
-import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -37,7 +36,7 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.gui.common.client.InvalidSessionServerException;
 import com.logicaldoc.gui.common.client.ServerException;
-import com.logicaldoc.gui.frontend.client.services.DropboxService;
+import com.logicaldoc.gui.frontend.client.dropbox.DropboxService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -48,9 +47,6 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 7.0
  */
 public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxService {
-	private static final String TOKEN = "token";
-
-	private static final String DROPBOX = "dropbox";
 
 	private static final long serialVersionUID = 1L;
 
@@ -72,11 +68,10 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 		Session session = DropboxServiceImpl.validateSession(getThreadLocalRequest());
 
 		try {
-			Dropbox dbox = new Dropbox();
-			String accessToken = loadAccessToken(session.getUser());
-			if (accessToken == null)
+			Dropbox dbox = new Dropbox(session.getUserId());
+			if (!dbox.gotAccessToken())
 				return false;
-			return dbox.login(accessToken);
+			return dbox.login();
 		} catch (Exception e) {
 			throw new ServerException(e.getMessage(), e);
 		}
@@ -87,7 +82,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 		Session session = DropboxServiceImpl.validateSession(getThreadLocalRequest());
 
 		try {
-			Dropbox dbox = new Dropbox();
+			Dropbox dbox = new Dropbox(session.getUserId());
 			return dbox.startAuthorization(session.getUser().getLocale());
 		} catch (Exception t) {
 			throw new ServerException(t.getMessage(), t);
@@ -100,11 +95,11 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 		try {
 			User user = session.getUser();
-			Dropbox dbox = new Dropbox();
+			Dropbox dbox = new Dropbox(user.getId());
 			String token = dbox.finishAuthorization(authorizationCode);
 			if (token == null)
 				return null;
-			dbox.login(token);
+			dbox.login();
 			String account = dbox.getAccountName();
 			saveAccessToken(user, token, account);
 			return account;
@@ -114,35 +109,16 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 	}
 
 	/**
-	 * Loads the access token saved for the given user.
-	 * 
-	 * @throws PersistenceException Error in the database
-	 */
-	static String loadAccessToken(User user) throws PersistenceException {
-		GenericDAO dao = (GenericDAO) Context.get().getBean(GenericDAO.class);
-		Generic generic = dao.findByAlternateKey(DROPBOX, TOKEN, user.getId(), user.getTenantId());
-		if (generic == null)
-			return null;
-		else
-			return generic.getString1();
-	}
-
-	/**
 	 * Saves the access token saved for the given user. The token is saved in a
 	 * Generic(type: dropbox, subtype: token)
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 */
 	protected void saveAccessToken(User user, String token, String account) throws PersistenceException {
-		GenericDAO dao = (GenericDAO) Context.get().getBean(GenericDAO.class);
-		Generic generic = dao.findByAlternateKey(DROPBOX, TOKEN, user.getId(), user.getTenantId());
-		if (generic == null)
-			generic = new Generic(DROPBOX, TOKEN, user.getId(), user.getTenantId());
-		generic.setString1(token);
-		generic.setString2(account);
-
 		try {
-			dao.store(generic);
+			Dropbox dBox = new Dropbox(user.getId());
+			dBox.setAccessToken(token);
+			dBox.saveSettings();
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}
@@ -154,11 +130,10 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 		try {
 			User user = session.getUser();
-			Dropbox dbox = new Dropbox();
-			String token = loadAccessToken(user);
-			if (token == null)
+			Dropbox dbox = new Dropbox(user.getId());
+			if (!dbox.gotAccessToken())
 				return false;
-			dbox.login(token);
+			dbox.login();
 
 			Metadata entry = dbox.get(targetPath);
 			if (entry == null || entry instanceof FileMetadata)
@@ -266,11 +241,10 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 				return 0;
 
 			User user = session.getUser();
-			Dropbox dbox = new Dropbox();
-			String token = loadAccessToken(user);
-			if (token == null)
+			Dropbox dbox = new Dropbox(user.getId());
+			if (StringUtils.isEmpty(dbox.getAccessToken()))
 				return 0;
-			dbox.login(token);
+			dbox.login();
 
 			Folder root = fdao.findById(targetFolder);
 
@@ -380,5 +354,25 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 		} finally {
 			FileUtils.deleteQuietly(temp);
 		}
+	}
+
+	@Override
+	public void saveSettings(String apiKey, String apiSecret) throws ServerException {
+		Session session = DropboxServiceImpl.validateSession(getThreadLocalRequest());
+		try {
+			User user = session.getUser();
+			Dropbox dbox = new Dropbox(user.getId());
+			dbox.setApiKey(apiKey);
+			dbox.setApiSecret(apiSecret);
+			dbox.saveSettings();
+		} catch (Exception t) {
+			log.error(t.getMessage(), t);
+		}
+	}
+
+	@Override
+	public List<String> loadSettings() throws ServerException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

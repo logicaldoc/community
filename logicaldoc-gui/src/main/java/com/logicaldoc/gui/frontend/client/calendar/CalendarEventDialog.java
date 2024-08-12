@@ -27,8 +27,6 @@ import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.selector.DocumentSelectorDialog;
-import com.logicaldoc.gui.frontend.client.google.GoogleService;
-import com.logicaldoc.gui.frontend.client.google.GoogleUtil;
 import com.logicaldoc.gui.frontend.client.services.CalendarService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
@@ -884,7 +882,6 @@ public class CalendarEventDialog extends Window {
 						@Override
 						public void onSuccess(Void arg) {
 							destroy();
-							onDeleteRemoteCalendarEvent();
 						}
 					});
 				});
@@ -901,29 +898,9 @@ public class CalendarEventDialog extends Window {
 						destroy();
 						if (onChangedCallback != null)
 							onChangedCallback.onSuccess(arg);
-						onDeleteRemoteCalendarEvent();
 					}
-
 				});
 		});
-	}
-
-	private void onDeleteRemoteCalendarEvent() {
-		if (calendarEvent.getExternalId() != null || !calendarEvent.getExternalId().isEmpty())
-			LD.ask(I18N.message("delevent"), I18N.message("douwantdeleteeventinremotecal"), answer -> {
-				GoogleService.Instance.get().deleteCalendarEvent(calendarEvent.getExternalId(),
-						new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GoogleUtil.handleGoogleServiceError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void arg) {
-								destroy();
-							}
-						});
-			});
 	}
 
 	private void addAttendee(final ListGrid list, String id, String name, String email) {

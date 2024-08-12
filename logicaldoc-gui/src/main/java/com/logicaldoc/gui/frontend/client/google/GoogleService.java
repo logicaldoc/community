@@ -76,7 +76,7 @@ public interface GoogleService extends RemoteService {
 	public List<String> exportDocuments(List<Long> ids) throws ServerException;
 
 	/**
-	 * Save the settings used by the Google Drive module
+	 * Save the settings used by the Google API
 	 *
 	 * @param clientId identifier of the client
 	 * @param clientSecret the secret key specified by he user
@@ -90,7 +90,7 @@ public interface GoogleService extends RemoteService {
 	/**
 	 * Save the settings used by the Google Drive module
 	 * 
-	 * @return clientId, clientSecret
+	 * @return clientId, clientSecret, calendar enabled
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
@@ -119,21 +119,19 @@ public interface GoogleService extends RemoteService {
 	public List<GUIDocument> search(String expression) throws ServerException;
 
 	/**
-	 * Synchronize the user's calendar with it's external one
+	 * Synchronizes the user's calendar with it's external one
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
 	public void synchronizeCalendar() throws ServerException;
 
 	/**
-	 * Deletes an event in the Google Calendar
-	 * 
-	 * @param eventId identifier of the event
+	 * Enables or disables the connection with Google Calendar
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void deleteCalendarEvent(String eventId) throws ServerException;
-	
+	public void enableCalendar(boolean enable) throws ServerException;
+
 	public static class Instance {
 		private static GoogleServiceAsync inst;
 

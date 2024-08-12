@@ -36,15 +36,15 @@ import com.logicaldoc.gui.frontend.client.chatgpt.ChatGPTTray;
 import com.logicaldoc.gui.frontend.client.docusign.DocuSignSettings;
 import com.logicaldoc.gui.frontend.client.docusign.EnvelopeDetails;
 import com.logicaldoc.gui.frontend.client.docusign.Envelopes;
-import com.logicaldoc.gui.frontend.client.dropbox.DropboxAuthorizationWizard;
+import com.logicaldoc.gui.frontend.client.dropbox.DropboxAuthorization;
 import com.logicaldoc.gui.frontend.client.dropbox.DropboxDialog;
+import com.logicaldoc.gui.frontend.client.dropbox.DropboxService;
 import com.logicaldoc.gui.frontend.client.google.drive.DriveMenuItem;
 import com.logicaldoc.gui.frontend.client.menu.features.Features;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.services.ChatGPTService;
 import com.logicaldoc.gui.frontend.client.services.DocuSignService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
-import com.logicaldoc.gui.frontend.client.services.DropboxService;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.logicaldoc.gui.frontend.client.services.ShareFileService;
 import com.logicaldoc.gui.frontend.client.services.TenantService;
@@ -309,23 +309,9 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			@Override
 			public void onSuccess(Boolean connected) {
 				if (Boolean.FALSE.equals(connected))
-					DropboxService.Instance.get().startAuthorization(new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(String authorizationUrl) {
-							DropboxAuthorizationWizard wizard = new DropboxAuthorizationWizard(authorizationUrl);
-							wizard.show();
-						}
-					});
-				else {
-					DropboxDialog dialog = new DropboxDialog(true);
-					dialog.show();
-				}
+					DropboxAuthorization.get().show();
+				else
+					new DropboxDialog(true).show();
 			}
 		}));
 
@@ -340,29 +326,19 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			@Override
 			public void onSuccess(Boolean connected) {
 				if (Boolean.FALSE.equals(connected))
-					DropboxService.Instance.get().startAuthorization(new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(String authorizationUrl) {
-							DropboxAuthorizationWizard wizard = new DropboxAuthorizationWizard(authorizationUrl);
-							wizard.show();
-						}
-					});
-				else {
+					DropboxAuthorization.get().show();
+				else
 					new DropboxDialog(false).show();
-				}
 			}
 		}));
+
+		final MenuItem authrorize = new MenuItem(I18N.message("authorize"));
+		authrorize.addClickHandler(event -> DropboxAuthorization.get().show());
 
 		Menu menu = new Menu();
 		menu.setShowShadow(true);
 		menu.setShadowDepth(3);
-		menu.setItems(exportTo, importFrom);
+		menu.setItems(authrorize, exportTo, importFrom);
 
 		exportTo.setEnabled(folder != null && folder.isDownload() && Feature.enabled(Feature.DROPBOX));
 		importFrom.setEnabled(folder != null && folder.isWrite() && Feature.enabled(Feature.DROPBOX)
@@ -467,7 +443,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		Menu menu = new Menu();
 		menu.setShowShadow(true);
 		menu.setShadowDepth(3);
-		menu.setItems(exportTo, importFrom, authorize);
+		menu.setItems(authorize, exportTo, importFrom);
 
 		exportTo.setEnabled(folder != null && folder.isDownload() && Feature.enabled(Feature.SHAREFILE));
 		importFrom.setEnabled(folder != null && folder.isWrite() && Feature.enabled(Feature.SHAREFILE)
@@ -541,7 +517,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		Menu menu = new Menu();
 		menu.setShowShadow(true);
 		menu.setShadowDepth(3);
-		menu.setItems(sendEnvelope, envelopes, authorize);
+		menu.setItems(authorize, sendEnvelope, envelopes);
 
 		MenuItem docuSignItem = new MenuItem(I18N.message("docusign"));
 		docuSignItem.setSubmenu(menu);
@@ -590,7 +566,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			folder = document.getFolder();
 
 		MenuItem develConsole = new MenuItem(I18N.message("develconsole"));
-		develConsole.addClickHandler((MenuItemClickEvent event) -> SC.showConsole());
+		develConsole.addClickHandler(click -> SC.showConsole());
 
 		if (document != null || folder != null)
 			addItemsWhenFolderOrDocumentSelected(folder, document, menu);

@@ -13,8 +13,6 @@ public interface GoogleServiceAsync {
 
 	void delete(String resourceId, AsyncCallback<Void> callback);
 
-	void saveSettings(String clientId, String clientSecret, AsyncCallback<String> callback);
-
 	void importDocuments(List<String> resourceIds, long targetFolderId, String type, AsyncCallback<Void> callback);
 
 	void exportDocuments(List<Long> ids, AsyncCallback<List<String>> callback);
@@ -23,9 +21,11 @@ public interface GoogleServiceAsync {
 
 	void create(String fileName, AsyncCallback<String> callback);
 
+	void saveSettings(String clientId, String clientSecret, AsyncCallback<String> callback);
+	
 	void loadSettings(AsyncCallback<List<String>> callback);
 
 	void synchronizeCalendar(AsyncCallback<Void> callback);
 
-	void deleteCalendarEvent(String eventId, AsyncCallback<Void> callback);
+	void enableCalendar(boolean enabled, AsyncCallback<Void> callback);
 }
