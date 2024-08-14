@@ -60,7 +60,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	protected static Logger log = LoggerFactory.getLogger(HibernateFolderDAOTest.class);
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that
@@ -70,7 +70,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		docDao = (DocumentDAO) context.getBean("DocumentDAO");
 		historyDao = (FolderHistoryDAO) context.getBean("FolderHistoryDAO");
 		templateDao = (TemplateDAO) context.getBean("TemplateDAO");
-		docManager = (DocumentManager) context.getBean("DocumentManager");
+		docManager = (DocumentManager) context.getBean("documentManager");
 	}
 
 	@Test
@@ -132,7 +132,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCount() throws PersistenceException {
+	public void testCount() {
 		int docCount = dao.count(false);
 		int docCountDelete = dao.count(true);
 		assertEquals(4, docCount);
@@ -662,7 +662,6 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testCreate() throws PersistenceException {
 		Folder parent = dao.findById(1202L);
-//		dao.initialize(parent);
 
 		Folder folderVO = new Folder();
 		folderVO.setName("xxxx");
@@ -707,7 +706,6 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		Folder folder = dao.findById(12012);
 		Assert.assertNull(folder);
 
-		DocumentDAO docDao = (DocumentDAO) context.getBean("DocumentDAO");
 		docDao.delete(1202);
 
 		// Delete a folder with documents
@@ -812,7 +810,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		alias = dao.createAlias(1200L, 6L, null);
 		Assert.assertNotNull(alias);
 
-		alias = dao.createAlias(6L, 1201L, null);
+		dao.createAlias(6L, 1201L, null);
 		folders = dao.findByUserId(4L);
 		Assert.assertNotNull(folders);
 		Assert.assertEquals(4, folders.size());
@@ -829,7 +827,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		// Unexisting user
 		String runOk = null;
 		try {
-			folders = dao.findByUserId(99, Folder.ROOTID);
+			dao.findByUserId(99, Folder.ROOTID);
 			runOk = "ok";
 		} catch (PersistenceException e) {
 			Assert.assertEquals("Unexisting user 99", e.getMessage());
@@ -999,7 +997,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		// Try with unexisting user
 		String runOk = null;
 		try {
-			ids = dao.findFolderIdByUserId(99, null, true);
+			dao.findFolderIdByUserId(99, null, true);
 			runOk = "ok";
 		} catch (PersistenceException e) {
 			Assert.assertEquals("Unexisting user 99", e.getMessage());
@@ -1029,7 +1027,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		// Try with unexisting user
 		String runOk = null;
 		try {
-			ids = dao.findIdByUserId(99, 1201);
+			dao.findIdByUserId(99, 1201);
 			runOk = "ok";
 		} catch (PersistenceException e) {
 			Assert.assertEquals("Unexisting user 99", e.getMessage());
@@ -1053,7 +1051,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		// Try with unexisting user
 		boolean runOk = false;
 		try {
-			ids = dao.findFolderIdByUserIdInPath(99, Long.valueOf(1200));
+			dao.findFolderIdByUserIdInPath(99, Long.valueOf(1200));
 			runOk = true;
 		} catch (PersistenceException e) {
 			Assert.assertEquals("Unexisting user 99", e.getMessage());
@@ -1063,7 +1061,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		// Try with unexisting folder
 		runOk = false;
 		try {
-			ids = dao.findFolderIdByUserIdInPath(4, Long.valueOf(999));
+			dao.findFolderIdByUserIdInPath(4, Long.valueOf(999));
 			runOk = true;
 		} catch (PersistenceException e) {
 			Assert.assertEquals("Unexisting folder 999", e.getMessage());
@@ -1072,7 +1070,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindTags() throws PersistenceException {
+	public void testFindTags() {
 		List<String> tags = dao.findTags(1200);
 		Assert.assertEquals(2, tags.size());
 		Assert.assertTrue(tags.contains("ftag1"));
@@ -1082,7 +1080,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindIdByParentId() throws PersistenceException {
+	public void testFindIdByParentId() {
 		Collection<Long> ids = dao.findIdsByParentId(1200);
 		Assert.assertNotNull(ids);
 		Assert.assertEquals(2, ids.size());
@@ -1113,7 +1111,6 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		Assert.assertEquals(9, folders.size());
 		folders = dao.findByGroupId(10);
 		Assert.assertEquals(0, folders.size());
-		folders = dao.findByGroupId(2);
 	}
 
 	@Test
@@ -1295,21 +1292,19 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		Assert.assertNull(folder.getSecurityRef());
 		dao.applySecurityToTree(1200, transaction);
 
-		folder = dao.findById(1201);
+		folder = dao.findById(1201L);
 		Assert.assertEquals(1200L, folder.getSecurityRef().longValue());
-		folder = dao.findById(1202);
+		folder = dao.findById(1202L);
 		Assert.assertEquals(1200L, folder.getSecurityRef().longValue());
 
 		// The root has its own policies
-		folder = dao.findById(1200);
+		dao.updateSecurityRef(1200L, 5L, transaction);
 
-		dao.updateSecurityRef(1200, 5L, transaction);
-
-		folder = dao.findById(1200);
+		folder = dao.findById(1200L);
 		Assert.assertEquals(5L, folder.getSecurityRef().longValue());
-		folder = dao.findById(1201);
+		folder = dao.findById(1201L);
 		Assert.assertEquals(5L, folder.getSecurityRef().longValue());
-		folder = dao.findById(1202);
+		folder = dao.findById(1202L);
 		Assert.assertEquals(5L, folder.getSecurityRef().longValue());
 	}
 
@@ -1436,7 +1431,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testMerge() throws FileNotFoundException, Exception {
+	public void testMerge() throws PersistenceException, FileNotFoundException {
 		Folder root = dao.findById(5L);
 		dao.createPath(root, "/Default/Target/Pippo", false, null);
 		dao.createPath(root, "/Default/Target/Pluto", false, null);

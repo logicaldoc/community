@@ -9,7 +9,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
@@ -62,7 +61,7 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 	private GroupDAO groupDAO;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		userDAO = (UserDAO) context.getBean("UserDAO");

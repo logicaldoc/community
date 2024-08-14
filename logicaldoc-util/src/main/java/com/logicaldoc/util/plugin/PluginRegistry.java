@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ import org.java.plugin.registry.PluginDescriptor;
 import org.java.plugin.util.ExtendedProperties;
 
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.http.UrlUtil;
 import com.logicaldoc.util.io.FileUtil;
 
 /**
@@ -142,9 +144,8 @@ public abstract class PluginRegistry {
 					throw new IOException("file not Found:" + pluginZIPFile.getAbsolutePath());
 
 				try {
-
-					final URL manifestURL = new URL("jar:file:" + pluginZIPFile.getAbsolutePath() + "!/plugin.xml");
-
+					final URL manifestURL = UrlUtil
+							.toURL("jar:file:" + pluginZIPFile.getAbsolutePath() + "!/plugin.xml");
 					final URL contextURL = pluginZIPFile.toURI().toURL();
 
 					System.out.println("Found plugin file: " + pluginZIPFile.getName());
@@ -158,7 +159,7 @@ public abstract class PluginRegistry {
 							return contextURL;
 						}
 					});
-				} catch (MalformedURLException e) {
+				} catch (MalformedURLException | URISyntaxException e) {
 					System.err.println(e.getMessage());
 				}
 			}

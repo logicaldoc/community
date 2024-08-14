@@ -5,7 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -58,6 +58,7 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.http.UrlUtil;
 import com.logicaldoc.util.io.FileUtil;
 import com.sun.mail.smtp.SMTPTransport;
 
@@ -335,9 +336,9 @@ public class EMailSender {
 			MimeBodyPart imageBodyPart = new MimeBodyPart();
 
 			try {
-				DataSource ds = new URLDataSource(new URL(image));
+				DataSource ds = new URLDataSource(UrlUtil.toURL(image));
 				imageBodyPart.setDataHandler(new DataHandler(ds));
-			} catch (MalformedURLException e) {
+			} catch (MalformedURLException | URISyntaxException e) {
 				throw new MessagingException(e.getMessage(), e);
 			}
 

@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -30,7 +29,7 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTestCase {
 	private SystemMessageDAO dao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context.

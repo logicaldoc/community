@@ -1,6 +1,5 @@
 package com.logicaldoc.core.lock;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -24,6 +23,7 @@ import junit.framework.Assert;
  * @since 6.5
  */
 public class LockManagerTest extends AbstractCoreTestCase {
+	
 	private LockManager manager;
 
 	private GenericDAO dao;
@@ -31,10 +31,10 @@ public class LockManagerTest extends AbstractCoreTestCase {
 	private ContextProperties config;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		manager = (LockManager) context.getBean("LockManager");
+		manager = (LockManager) context.getBean("lockManager");
 		dao = (GenericDAO) context.getBean("GenericDAO");
 		config = (ContextProperties) context.getBean("ContextProperties");
 	}

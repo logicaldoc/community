@@ -69,6 +69,10 @@ import com.smartgwt.client.widgets.tab.TabSet;
  */
 public class CalendarEventDialog extends Window {
 
+	private static final String NOTIFY = "notify";
+
+	private static final String EMAIL = "email";
+
 	private static final String START = "start";
 
 	private static final String AUTOMATION = "automation";
@@ -312,32 +316,11 @@ public class CalendarEventDialog extends Window {
 		id.setHidden(true);
 		id.setCanEdit(false);
 
-		ListGridField name = new ListGridField("name", I18N.message("name"));
-		name.setWidth(110);
-		name.addEditorExitHandler(exit -> {
-			if (!"0".equals(exit.getRecord().getAttributeAsString("id")))
-				exit.getGrid().cancelEditing();
-		});
-		name.setCellFormatter(new CellFormatter() {
+		ListGridField name = prepareNameField();
 
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				String val = value != null ? value.toString() : "";
-				if (record.getAttributeAsString("id").equals(Long.toString(calendarEvent.getOrganizerId())))
-					return val + " (" + I18N.message("organizer") + ")";
-				else
-					return val;
-			}
-		});
+		ListGridField email = prepareEmailField();
 
-		ListGridField email = new ListGridField("email", I18N.message("email"));
-		email.setWidth("*");
-		email.addEditorExitHandler(exit -> {
-			if (!"0".equals(exit.getRecord().getAttributeAsString("id")))
-				exit.getGrid().cancelEditing();
-		});
-
-		ListGridField notify = new ListGridField("notify", I18N.message("notify"));
+		ListGridField notify = new ListGridField(NOTIFY, I18N.message(NOTIFY));
 		notify.setType(ListGridFieldType.BOOLEAN);
 		notify.setWidth(70);
 
@@ -355,6 +338,23 @@ public class CalendarEventDialog extends Window {
 
 		prepareAttendeesContextMenu(attendeesGrid);
 
+		DynamicForm form = prepareAttendeeForm();
+
+		Tab attendeesTab = new Tab();
+		attendeesTab.setTitle(I18N.message("attendees"));
+		VLayout layout = new VLayout();
+		layout.setWidth100();
+		layout.setHeight100();
+
+		if (readOnly)
+			layout.setMembers(attendeesGrid);
+		else
+			layout.setMembers(attendeesGrid, form);
+		attendeesTab.setPane(layout);
+		return attendeesTab;
+	}
+
+	private DynamicForm prepareAttendeeForm() {
 		DynamicForm form = new DynamicForm();
 		form.setTitleOrientation(TitleOrientation.LEFT);
 		form.setNumCols(6);
@@ -366,7 +366,7 @@ public class CalendarEventDialog extends Window {
 
 			String idValue = selectedRecord.getAttribute("id");
 			String labelValue = selectedRecord.getAttribute("label");
-			String emailValue = selectedRecord.getAttribute("email");
+			String emailValue = selectedRecord.getAttribute(EMAIL);
 
 			addAttendee(attendeesGrid, idValue, labelValue, emailValue);
 			newUser.clearValue();
@@ -406,19 +406,38 @@ public class CalendarEventDialog extends Window {
 		});
 
 		form.setItems(newUser, newGroup, newAttendee);
+		return form;
+	}
 
-		Tab attendeesTab = new Tab();
-		attendeesTab.setTitle(I18N.message("attendees"));
-		VLayout layout = new VLayout();
-		layout.setWidth100();
-		layout.setHeight100();
+	private ListGridField prepareEmailField() {
+		ListGridField email = new ListGridField(EMAIL, I18N.message(EMAIL));
+		email.setWidth("*");
+		email.addEditorExitHandler(exit -> {
+			if (!"0".equals(exit.getRecord().getAttributeAsString("id")))
+				exit.getGrid().cancelEditing();
+		});
+		return email;
+	}
 
-		if (readOnly)
-			layout.setMembers(attendeesGrid);
-		else
-			layout.setMembers(attendeesGrid, form);
-		attendeesTab.setPane(layout);
-		return attendeesTab;
+	private ListGridField prepareNameField() {
+		ListGridField name = new ListGridField("name", I18N.message("name"));
+		name.setWidth(110);
+		name.addEditorExitHandler(exit -> {
+			if (!"0".equals(exit.getRecord().getAttributeAsString("id")))
+				exit.getGrid().cancelEditing();
+		});
+		name.setCellFormatter(new CellFormatter() {
+
+			@Override
+			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+				String val = value != null ? value.toString() : "";
+				if (record.getAttributeAsString("id").equals(Long.toString(calendarEvent.getOrganizerId())))
+					return val + " (" + I18N.message("organizer") + ")";
+				else
+					return val;
+			}
+		});
+		return name;
 	}
 
 	private void prepareAttendeesContextMenu(final ListGrid attendeesGrid) {
@@ -439,8 +458,8 @@ public class CalendarEventDialog extends Window {
 			rec.setAttribute("id", attender.getId());
 			rec.setAttribute("avatar", attender.getId());
 			rec.setAttribute("name", attender.getFullName());
-			rec.setAttribute("email", attender.getEmail());
-			rec.setAttribute("notify", attender.isEnabled());
+			rec.setAttribute(EMAIL, attender.getEmail());
+			rec.setAttribute(NOTIFY, attender.isEnabled());
 			records.add(rec);
 		}
 		attendeesGrid.setData(records.toArray(new ListGridRecord[0]));
@@ -847,9 +866,9 @@ public class CalendarEventDialog extends Window {
 				} else {
 					GUIUser attendee = new GUIUser();
 					attendee.setId(rec.getAttributeAsLong("id"));
-					attendee.setEmail(rec.getAttributeAsString("email"));
+					attendee.setEmail(rec.getAttributeAsString(EMAIL));
 					attendee.setName(rec.getAttributeAsString("name"));
-					attendee.setEnabled(rec.getAttributeAsBoolean("notify"));
+					attendee.setEnabled(rec.getAttributeAsBoolean(NOTIFY));
 					userAttendees.add(attendee);
 				}
 			}
@@ -918,8 +937,8 @@ public class CalendarEventDialog extends Window {
 			rec.setAttribute("avatar", id);
 		rec.setAttribute("id", id);
 		rec.setAttribute("name", name);
-		rec.setAttribute("email", email);
-		rec.setAttribute("notify", true);
+		rec.setAttribute(EMAIL, email);
+		rec.setAttribute(NOTIFY, true);
 		list.addData(rec);
 	}
 

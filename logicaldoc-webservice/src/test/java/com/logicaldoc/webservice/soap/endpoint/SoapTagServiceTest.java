@@ -1,6 +1,5 @@
 package com.logicaldoc.webservice.soap.endpoint;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -25,7 +24,7 @@ public class SoapTagServiceTest extends AbstractWebserviceTestCase {
 	private SoapTagService tagService;
 
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		folderDao = (FolderDAO) context.getBean("FolderDAO");
 

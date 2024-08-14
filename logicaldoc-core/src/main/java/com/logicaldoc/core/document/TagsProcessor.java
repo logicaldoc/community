@@ -16,7 +16,7 @@ import com.logicaldoc.core.task.TaskException;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
-@Component("TagsProcessor")
+@Component("tagsProcessor")
 public class TagsProcessor extends Task {
 
 	public static final String NAME = "TagsProcessor";

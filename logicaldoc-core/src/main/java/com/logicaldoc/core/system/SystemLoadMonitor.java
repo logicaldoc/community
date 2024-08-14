@@ -24,7 +24,7 @@ import com.sun.management.OperatingSystemMXBean;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.7.1
  */
-@Component("SystemLoadMonitor")
+@Component("systemLoadMonitor")
 public class SystemLoadMonitor {
 
 	protected static Logger log = LoggerFactory.getLogger(SystemLoadMonitor.class);

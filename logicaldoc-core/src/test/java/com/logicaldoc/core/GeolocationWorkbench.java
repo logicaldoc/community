@@ -13,7 +13,7 @@ import com.maxmind.geoip2.model.CityResponse;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.5.3
  */
-public class GeolocationTestbench {
+public class GeolocationWorkbench {
 
 	public static void main(String[] args) throws IOException, GeoIp2Exception {
 		File database = new File("C:\\Users\\marco\\Downloads\\GeoLite2-City_20201201\\GeoLite2-City.mmdb");

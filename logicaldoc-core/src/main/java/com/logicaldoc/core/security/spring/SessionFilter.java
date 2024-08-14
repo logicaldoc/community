@@ -59,16 +59,7 @@ public class SessionFilter extends GenericFilterBean {
 			return;
 		}
 
-		String sid = SessionManager.get().getSessionId(request);
-		if (StringUtils.isEmpty(sid) && StringUtils.isNotEmpty(request.getHeader(SessionManager.HEADER_APIKEY))) {
-			try {
-				Session session = SessionManager.get().newSession(null, null,
-						request.getHeader(SessionManager.HEADER_APIKEY), request);
-				sid = session.getSid();
-			} catch (AuthenticationException ae) {
-				log.error(ae.getMessage(), ae);
-			}
-		}
+		String sid = getSidFromRequest(request);
 
 		if (StringUtils.isNotEmpty(sid)) {
 			log.debug("The request refers the sid {}", sid);
@@ -105,5 +96,19 @@ public class SessionFilter extends GenericFilterBean {
 		}
 
 		chain.doFilter(request, response);
+	}
+
+	private String getSidFromRequest(HttpServletRequest request) {
+		String sid = SessionManager.get().getSessionId(request);
+		if (StringUtils.isEmpty(sid) && StringUtils.isNotEmpty(request.getHeader(SessionManager.HEADER_APIKEY))) {
+			try {
+				Session session = SessionManager.get().newSession(null, null,
+						request.getHeader(SessionManager.HEADER_APIKEY), request);
+				sid = session.getSid();
+			} catch (AuthenticationException ae) {
+				log.error(ae.getMessage(), ae);
+			}
+		}
+		return sid;
 	}
 }

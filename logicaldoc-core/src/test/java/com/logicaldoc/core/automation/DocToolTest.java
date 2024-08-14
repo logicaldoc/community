@@ -13,6 +13,7 @@ import java.util.List;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
@@ -29,7 +30,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	private DocTool testSubject = new DocTool();
 
 	@Test
-	public void testDownloadUrl() throws Exception {
+	public void testDownloadUrl() {
 		String url = testSubject.downloadUrl(1L);
 		assertEquals("http://localhost:8080/download?docId=1", url);
 
@@ -40,7 +41,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testDisplayUrl() throws Exception {
+	public void testDisplayUrl() {
 		String url = testSubject.displayUrl(new Document());
 		assertEquals("http://localhost:8080/display?tenant=default&docId=0", url);
 
@@ -51,13 +52,13 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testDownloadTicket() throws Exception {
+	public void testDownloadTicket() {
 		String url = testSubject.downloadTicket(1L, true, 1, null, 3, "admin");
 		assertTrue(url.startsWith("http://localhost:8080/download-ticket?ticketId="));
 	}
 
 	@Test
-	public void testDisplayFileSize() throws Exception {
+	public void testDisplayFileSize() {
 		final long kb = 1024L;
 		String result = testSubject.displayFileSize(kb);
 		assertEquals("1 KB", result);
@@ -73,7 +74,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testStore() throws Exception {
+	public void testStore() {
 		Document doc = new Document();
 		doc.setFileName("test.pdf");
 		final Folder folder = new FolderTool().findById(4L);
@@ -102,7 +103,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testInitialize() throws Exception {
+	public void testInitialize() throws PersistenceException {
 		TemplateDAO templateDao = (TemplateDAO) context.getBean("TemplateDAO");
 		Template template = templateDao.findById(-1L);
 
@@ -124,7 +125,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testMove() throws Exception {
+	public void testMove() {
 		FolderTool ft = new FolderTool();
 		Folder testFolder = ft.createPath(ft.findById(4L), "/Default/test", "admin");
 		Document doc = testSubject.findById(1L);
@@ -138,7 +139,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCopy() throws Exception {
+	public void testCopy() {
 		FolderTool ft = new FolderTool();
 		Folder testFolder = ft.createPath(ft.findById(4L), "/Default/test", "admin");
 		Document doc = testSubject.findById(1L);
@@ -150,7 +151,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testLink() throws Exception {
+	public void testLink() {
 		Document doc1 = testSubject.findById(1);
 		Document doc2 = testSubject.findById(2);
 		DocumentLink link = testSubject.link(doc1, doc2, "test");
@@ -159,7 +160,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCreateAlias() throws Exception {
+	public void testCreateAlias() throws PersistenceException {
 		Document doc = testSubject.findById(1);
 		assertNotNull(doc);
 		testSubject.initialize(doc);
@@ -180,7 +181,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testLock() throws Exception {
+	public void testLock() {
 		Document doc = testSubject.findById(1);
 		assertNotNull(doc);
 		testSubject.lock(doc.getId(), "admin");
@@ -195,7 +196,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testUnlock() throws Exception {
+	public void testUnlock() {
 		testSubject.lock(1L, "admin");
 
 		Document doc = testSubject.findById(1L);
@@ -223,7 +224,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testDelete() throws Exception {
+	public void testDelete() {
 		Document doc = testSubject.findById(1L);
 		assertNotNull(doc);
 		assertTrue(doc.getId() > 0L);
@@ -234,7 +235,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCopyResource() throws Exception {
+	public void testCopyResource() {
 		Document doc = testSubject.findById(1L);
 		Document result = testSubject.copyResource(doc, doc.getFileVersion(), "conversion.pdf", "xxx.pdf", "admin");
 		assertNotNull(result);
@@ -244,7 +245,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testReadAsString() throws Exception {
+	public void testReadAsString() {
 		Document doc = testSubject.findById(1L);
 		String result = testSubject.readAsString(doc.getId(), doc.getFileVersion(), null);
 		assertNotNull(result);
@@ -252,7 +253,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testWriteToFile() throws Exception {
+	public void testWriteToFile() {
 		Document doc = testSubject.findById(1L);
 		testSubject.writeToFile(1L, doc.getFileVersion(), "conversion.pdf", "target/test.pdf");
 		File extraction = new File("target/test.pdf");
@@ -262,7 +263,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testConvert() throws Exception {
+	public void testConvert() {
 		Document doc = testSubject.findById(1L);
 		testSubject.convertPDF(doc);
 		Document result = testSubject.convert(doc, "pdf", "admin");
@@ -270,7 +271,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testMerge() throws Exception {
+	public void testMerge() {
 		Document doc1 = testSubject.findById(1);
 		assertNotNull(doc1);
 		testSubject.initialize(doc1);
@@ -292,7 +293,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByPath() throws Exception {
+	public void testFindByPath() {
 		Document doc = testSubject.findById(1L);
 		String path = testSubject.getPath(doc);
 		Document pathDoc = testSubject.findByPath(path);
@@ -300,13 +301,13 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testGetPath() throws Exception {
+	public void testGetPath() {
 		String result = testSubject.getPath(testSubject.findById(1L));
 		assertEquals("/Workspace X/folder6/pippo.pdf", result);
 	}
 
 	@Test
-	public void testGetIds() throws Exception {
+	public void testGetIds() {
 		Document doc1 = new Document();
 		doc1.setId(101L);
 		Document doc2 = new Document();
@@ -319,7 +320,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCreatePath() throws Exception {
+	public void testCreatePath() {
 		Document doc = testSubject.findById(1L);
 		Folder result = testSubject.createPath(doc, "/Default/xxx", "admin");
 		FolderTool ft = new FolderTool();
@@ -333,7 +334,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testGetHistories() throws Exception {
+	public void testGetHistories() {
 		List<DocumentHistory> result = testSubject.getHistories(1L, null);
 		assertEquals(3, result.size());
 
@@ -342,7 +343,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testAddNote() throws Exception {
+	public void testAddNote() {
 		Document doc = testSubject.findById(1L);
 		assertEquals(2, testSubject.getNotes(1L, null).size());
 
@@ -352,7 +353,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCalculateNextVersion() throws Exception {
+	public void testCalculateNextVersion() {
 		String result = testSubject.calculateNextVersion("1.1", true);
 		assertEquals("2.0", result);
 		result = testSubject.calculateNextVersion("1.1", false);
@@ -360,7 +361,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindTemplateByName() throws Exception {
+	public void testFindTemplateByName() {
 		Template template = testSubject.findTemplateByName("email", Tenant.DEFAULT_ID);
 		assertNotNull(template);
 		assertEquals("email", template.getName());
@@ -370,7 +371,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindTemplateById() throws Exception {
+	public void testFindTemplateById() {
 		Template template = testSubject.findTemplateById(-1L);
 		assertNotNull(template);
 		assertEquals("default", template.getName());
@@ -380,13 +381,13 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCountPages() throws Exception {
+	public void testCountPages() {
 		Document doc = testSubject.findById(1L);
 		assertEquals(55, testSubject.countPages(doc));
 	}
 
 	@Test
-	public void testParse() throws Exception {
+	public void testParse() {
 		Document doc = testSubject.findById(1);
 		String text = testSubject.parse(doc, doc.getFileVersion());
 		assertTrue(text.contains("dolor"));

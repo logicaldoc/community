@@ -8,7 +8,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -40,10 +39,10 @@ public class ResourceServiceImplTest extends AbstractWebdavTestCase {
 	private BookmarkDAO bookmarkDao;
 
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		testSubject = (ResourceServiceImpl) context.getBean("ResourceService");
+		testSubject = (ResourceServiceImpl) context.getBean("resourceService");
 
 		docDao = (DocumentDAO) context.getBean("DocumentDAO");
 		bookmarkDao = (BookmarkDAO) context.getBean("BookmarkDAO");

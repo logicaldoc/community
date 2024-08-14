@@ -29,7 +29,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @author Sebastian Wenzky
  * @since 4.5
  */
-@Component("AuthenticationChain")
+@Component("authenticationChain")
 public class AuthenticationChain extends AbstractAuthenticator {
 
 	private static Logger log = LoggerFactory.getLogger(AuthenticationChain.class);

@@ -1,6 +1,5 @@
 package com.logicaldoc.core.security;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -25,7 +24,7 @@ public class HibernateSessionDAOTest extends AbstractCoreTestCase {
 	private SessionDAO dao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that

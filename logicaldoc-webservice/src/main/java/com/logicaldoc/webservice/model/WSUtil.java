@@ -28,6 +28,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.AttributeSet;
+import com.logicaldoc.core.metadata.AttributeSetDAO;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.AccessControlEntry;
@@ -320,6 +321,9 @@ public class WSUtil {
 		wsAttributeSet.setName(attributeSet.getName());
 		wsAttributeSet.setDescription(attributeSet.getDescription());
 		wsAttributeSet.setLastModified(DateUtil.format(attributeSet.getLastModified()));
+
+		AttributeSetDAO setDao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+		setDao.initialize(attributeSet);
 
 		// Populate extended attributes
 		List<WSAttribute> wsAttributes;

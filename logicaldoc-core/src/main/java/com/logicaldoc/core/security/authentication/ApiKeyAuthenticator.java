@@ -23,7 +23,7 @@ import com.logicaldoc.core.security.user.User;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.9.4
  */
-@Component("ApiKeyAuthenticator")
+@Component("apiKeyAuthenticator")
 public class ApiKeyAuthenticator extends DefaultAuthenticator {
 
 	protected static Logger log = LoggerFactory.getLogger(ApiKeyAuthenticator.class);

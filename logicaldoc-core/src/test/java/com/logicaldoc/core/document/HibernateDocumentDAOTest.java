@@ -7,7 +7,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -61,7 +60,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 	private TemplateDAO templateDao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that
@@ -69,7 +68,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		dao = (DocumentDAO) context.getBean("DocumentDAO");
 
 		folderDao = (FolderDAO) context.getBean("FolderDAO");
-		lockManager = (LockManager) context.getBean("LockManager");
+		lockManager = (LockManager) context.getBean("lockManager");
 		templateDao = (TemplateDAO) context.getBean("TemplateDAO");
 	}
 
@@ -105,7 +104,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testUpdateDigest() throws PersistenceException, IOException {
+	public void testUpdateDigest() throws PersistenceException {
 		Document doc = dao.findById(1);
 		assertNotNull(doc);
 		dao.initialize(doc);
@@ -372,7 +371,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testMultipleValues() throws IOException, PersistenceException {
+	public void testMultipleValues() throws PersistenceException {
 		Folder folder = folderDao.findById(Folder.ROOTID);
 		Template template = templateDao.findById(-1L);
 
@@ -404,16 +403,13 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testStore() throws IOException, PersistenceException {
-		Document doc = new Document();
-		Folder folder = folderDao.findById(Folder.ROOTID);
-
-		doc = dao.findById(1);
+	public void testStore() throws PersistenceException {
+		Document doc = dao.findById(1);
 		assertNotNull(doc);
 		dao.initialize(doc);
 
 		// Try to store it inside a folder with extended attributes
-		folder = folderDao.findById(1202);
+		Folder folder = folderDao.findById(1202);
 		doc.setFolder(folder);
 
 		doc.setValue("object", "test");
@@ -444,7 +440,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testFindTags() throws PersistenceException {
-		TagsProcessor processor = (TagsProcessor) context.getBean("TagsProcessor");
+		TagsProcessor processor = (TagsProcessor) context.getBean("tagsProcessor");
 		processor.run();
 
 		Collection<String> tags = dao.findTags("a", 1L).keySet();
@@ -463,7 +459,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testFindAllTags() throws PersistenceException {
-		TagsProcessor processor = (TagsProcessor) context.getBean("TagsProcessor");
+		TagsProcessor processor = (TagsProcessor) context.getBean("tagsProcessor");
 		processor.run();
 
 		Collection<String> tags = dao.findAllTags("a", 1L);

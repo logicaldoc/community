@@ -235,4 +235,16 @@ public class StringUtil {
 		// Append the measure unit
 		return numberPart + String.format(" %sB", " KMGTPE".charAt(z));
 	}
+
+	/**
+	 * Returns the default string in case the input is empty or null
+	 * 
+	 * @param input the input string
+	 * @param def the default string
+	 * 
+	 * @return input or default
+	 */
+	public static String defaultString(String input, String def) {
+		return StringUtils.defaultString(input, def);
+	}
 }

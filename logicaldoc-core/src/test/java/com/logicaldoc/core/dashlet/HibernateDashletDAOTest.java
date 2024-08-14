@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -27,7 +26,7 @@ public class HibernateDashletDAOTest extends AbstractCoreTestCase {
 	private DashletDAO dao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDashletDAO

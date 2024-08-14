@@ -26,13 +26,17 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
  */
 public class GoogleApiAuthorization extends Window {
 
+	private static final String CONSTANT_A = "clientsecret";
+
+	private static final String CONSTSNT_B = "clientid";
+
 	private static GoogleApiAuthorization instance = new GoogleApiAuthorization();
 
 	private DynamicForm form = new DynamicForm();
 
-	private TextItem clientId = ItemFactory.newPasswordItem("clientid", "clientid", null);
+	private TextItem clientId = ItemFactory.newPasswordItem(CONSTSNT_B, CONSTSNT_B, null);
 
-	private TextItem clientSecret = ItemFactory.newPasswordItem("clientsecret", "clientsecret", null);
+	private TextItem clientSecret = ItemFactory.newPasswordItem(CONSTANT_A, CONSTANT_A, null);
 
 	private GoogleApiAuthorization() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
@@ -90,8 +94,8 @@ public class GoogleApiAuthorization extends Window {
 	}
 
 	public void onAuthenticate() {
-		GoogleService.Instance.get().saveSettings(form.getValueAsString("clientid"),
-				form.getValueAsString("clientsecret"), new AsyncCallback<>() {
+		GoogleService.Instance.get().saveSettings(form.getValueAsString(CONSTSNT_B),
+				form.getValueAsString(CONSTANT_A), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);

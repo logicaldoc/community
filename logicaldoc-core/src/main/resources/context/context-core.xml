@@ -186,32 +186,32 @@
    
    <!-- Tasks -->
    <bean id="IndexOptimizerJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-      <property name="targetObject" ref="IndexOptimizer" />
+      <property name="targetObject" ref="indexOptimizer" />
       <property name="targetMethod" value="run" />
       <property name="concurrent" value="false" />
    </bean>
    <bean id="IndexOptimizerTrigger" class="com.logicaldoc.core.task.TaskTrigger">
-      <property name="task" ref="IndexOptimizer" />
+      <property name="task" ref="indexOptimizer" />
       <property name="jobDetail" ref="IndexOptimizerJob" />
    </bean>
    
    <bean id="TagsProcessorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-      <property name="targetObject" ref="TagsProcessor" />
+      <property name="targetObject" ref="tagsProcessor" />
       <property name="targetMethod" value="run" />
       <property name="concurrent" value="false" />
    </bean>
    <bean id="TagsProcessorTrigger" class="com.logicaldoc.core.task.TaskTrigger">
-      <property name="task" ref="TagsProcessor" />
+      <property name="task" ref="tagsProcessor" />
       <property name="jobDetail" ref="TagsProcessorJob" />
    </bean>
    
    <bean id="IndexerTaskJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-      <property name="targetObject" ref="IndexerTask" />
+      <property name="targetObject" ref="indexerTask" />
       <property name="targetMethod" value="run" />
       <property name="concurrent" value="false" />
    </bean>
    <bean id="IndexerTaskTrigger" class="com.logicaldoc.core.task.TaskTrigger">
-      <property name="task" ref="IndexerTask" />
+      <property name="task" ref="indexerTask" />
       <property name="jobDetail" ref="IndexerTaskJob" />
    </bean>
    
@@ -227,22 +227,22 @@
    </bean>
    
    <bean id="DigestProcessorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-      <property name="targetObject" ref="DigestProcessor" />
+      <property name="targetObject" ref="digestProcessor" />
       <property name="targetMethod" value="run" />
       <property name="concurrent" value="false" />
    </bean>
    <bean id="DigestProcessorTrigger" class="com.logicaldoc.core.task.TaskTrigger">
-      <property name="task" ref="DigestProcessor" />
+      <property name="task" ref="digestProcessor" />
       <property name="jobDetail" ref="DigestProcessorJob" />
    </bean>
    
    <bean id="PathCalculatorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-      <property name="targetObject" ref="PathCalculator" />
+      <property name="targetObject" ref="pathCalculator" />
       <property name="targetMethod" value="run" />
       <property name="concurrent" value="false" />
    </bean>
    <bean id="PathCalculatorTrigger" class="com.logicaldoc.core.task.TaskTrigger">
-      <property name="task" ref="PathCalculator" />
+      <property name="task" ref="pathCalculator" />
       <property name="jobDetail" ref="PathCalculatorJob" />
    </bean>
 </beans>

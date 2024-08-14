@@ -3,7 +3,6 @@ package com.logicaldoc.core.document;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -23,7 +22,7 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 	private DocumentDAO dao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that

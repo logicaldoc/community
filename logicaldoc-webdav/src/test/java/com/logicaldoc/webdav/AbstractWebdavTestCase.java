@@ -3,7 +3,6 @@ package com.logicaldoc.webdav;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.rmi.ServerException;
 import java.sql.SQLException;
@@ -51,7 +50,7 @@ public abstract class AbstractWebdavTestCase extends AbstractTestCase {
 	protected MockServletSession servletSession = new MockServletSession();
 
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		prepareRepository();

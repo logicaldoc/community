@@ -51,7 +51,7 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 		user.setShowTitle(false);
 		user.setWidth("100%");
 		
-		ListGridField username = new ListGridField("username", I18N.message("username"));
+		ListGridField username = new ListGridField(USERNAME, I18N.message(USERNAME));
 		username.setShowTitle(false);
 		username.setWidth(80);
 		username.setHidden(true);

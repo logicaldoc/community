@@ -1,11 +1,24 @@
 package com.logicaldoc.util;
 
-import javax.net.ssl.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * Class used to add the server's certificate to the Java KeyStore
@@ -89,8 +102,8 @@ public class InstallCert {
         for (int i = 0; i < chain.length; i++) {
             X509Certificate cert = chain[i];
             System.out.println
-                    (" " + (i + 1) + " Subject " + cert.getSubjectDN());
-            System.out.println("   Issuer  " + cert.getIssuerDN());
+                    (" " + (i + 1) + " Subject " + cert.getSubjectX500Principal());
+            System.out.println("   Issuer  " + cert.getIssuerX500Principal());
             sha1.update(cert.getEncoded());
             System.out.println("   sha1    " + toHexString(sha1.digest()));
             md5.update(cert.getEncoded());

@@ -45,6 +45,12 @@ import com.smartgwt.client.widgets.layout.Layout;
  */
 public abstract class Util {
 
+	private static final String WIDTH = "' width='";
+
+	private static final String PX_HEIGHT = "px' height='";
+
+	private static final String IMG_SRC = "<img src='";
+
 	private static final String FORMAT_PATTERN_ONE_DIGIT = "###.#";
 
 	private static final String FORMAT_PATTERN_TWO_DIGITS = "###.##";
@@ -259,7 +265,7 @@ public abstract class Util {
 		if (height != null)
 			style += "height:" + height + "px; ";
 
-		return "<img src='" + thumbnailUrl(docId, fileVersion) + "' style='" + style + "' />";
+		return IMG_SRC + thumbnailUrl(docId, fileVersion) + "' style='" + style + "' />";
 	}
 
 	public static String tileUrl(long docId, String fileVersion) {
@@ -273,7 +279,7 @@ public abstract class Util {
 		if (height != null)
 			style += "height:" + height + "px; ";
 
-		return "<img src='" + tileUrl(docId, fileVersion) + "' style='" + style + "' />";
+		return IMG_SRC + tileUrl(docId, fileVersion) + "' style='" + style + "' />";
 	}
 
 	public static String imageUrl(String imageName) {
@@ -295,7 +301,7 @@ public abstract class Util {
 				long shortcutSize = Math.round(size * 0.625D);
 				long shortcutMarginTop = Math.round(size * 0.4375D);
 				long shortcutMarginLeft = Math.round(size * 0.6D);
-				sb.append("<img src='" + fileIconUrl("shortcut.svg") + "' width='" + shortcutSize + "px' height='"
+				sb.append(IMG_SRC + fileIconUrl("shortcut.svg") + WIDTH + shortcutSize + PX_HEIGHT
 						+ shortcutSize + "px' style='position:absolute; z-index:1; margin-top: " + shortcutMarginTop
 						+ "px; margin-left:" + shortcutMarginLeft + "px'/>");
 			}
@@ -304,7 +310,7 @@ public abstract class Util {
 				long clipSize = Math.round(size * 0.625D);
 				long clipMarginTop = Math.round(size * 0.125D);
 				long clipMarginLeft = 0;
-				sb.append("<img src='" + fileIconUrl("clip.svg") + "' width='" + clipSize + "px' height='" + clipSize
+				sb.append(IMG_SRC + fileIconUrl("clip.svg") + WIDTH + clipSize + PX_HEIGHT + clipSize
 						+ "px' style='position:absolute; z-index:2; margin-top: " + clipMarginTop + "px; margin-left:"
 						+ clipMarginLeft + "px'/>");
 			}
@@ -312,10 +318,10 @@ public abstract class Util {
 			iconName = baseIconName;
 		}
 
-		sb.append("<img class='filenameIcon' src='" + fileIconUrl(iconName + ".svg") + "' width='" + size
-				+ "px' height='" + size + "px' />");
+		sb.append("<img class='filenameIcon' src='" + fileIconUrl(iconName + ".svg") + WIDTH + size
+				+ PX_HEIGHT + size + "px' />");
 
-		sb.append("</div>");
+		sb.append(END_DIV);
 		return sb.toString();
 	}
 
@@ -341,7 +347,7 @@ public abstract class Util {
 
 	public static String avatarImg(String userIdOrName, int size) {
 		String url = avatarUrl(userIdOrName != null ? "" + userIdOrName : "0", false);
-		return "<img class='avatarIcon' src='" + url + "' width='" + size + "px' height='" + size + "px' />";
+		return "<img class='avatarIcon' src='" + url + WIDTH + size + PX_HEIGHT + size + "px' />";
 	}
 
 	public static String avatarUrl(long userId) {

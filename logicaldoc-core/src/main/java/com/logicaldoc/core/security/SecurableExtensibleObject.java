@@ -39,17 +39,4 @@ public abstract class SecurableExtensibleObject extends ExtensibleObject impleme
 			acl.add(ace);
 		}
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof SecurableExtensibleObject other)
-			return other.getId() == this.getId();
-		else
-			return false;
-	}
-	
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
 }

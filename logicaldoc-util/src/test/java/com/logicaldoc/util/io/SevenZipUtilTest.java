@@ -5,7 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -23,7 +22,7 @@ public class SevenZipUtilTest {
 	private SevenZipUtil testSubject = new SevenZipUtil();
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		File dir = new File("target/test");
 		dir.mkdirs();
 		dir.mkdir();

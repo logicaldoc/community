@@ -141,7 +141,7 @@ public class TicketDialog extends Window {
 		Integer expireHours = null;
 		if (form.getValue(DUEDATENUMBER) != null)
 			expireHours = Integer.parseInt(form.getValueAsString(DUEDATENUMBER));
-		if ("day".equals(form.getValueAsString("duedatetime")))
+		if (expireHours!=null && "day".equals(form.getValueAsString("duedatetime")))
 			expireHours = expireHours * 24;
 
 		if (date == null && (expireHours == null || expireHours.intValue() < 1))

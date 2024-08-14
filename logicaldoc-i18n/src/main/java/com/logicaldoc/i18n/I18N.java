@@ -33,7 +33,8 @@ public class I18N {
 		String[] languages = Locale.getISOLanguages();
 		iso3LocaleMap = new HashMap<>(languages.length);
 		for (String language : languages) {
-			Locale locale = new Locale(language);
+			Locale locale = Locale.of(language);
+
 			iso3LocaleMap.put(locale.getISO3Language().toLowerCase(), locale);
 		}
 	}
@@ -45,10 +46,10 @@ public class I18N {
 		return message(key, Locale.getDefault());
 	}
 
-	public static String message(String key, String lang) {
-		if (lang == null)
-			lang = "en";
-		return message(key, new Locale(lang));
+	public static String message(String key, String language) {
+		if (language == null)
+			language = "en";
+		return message(key, Locale.of(language));
 	}
 
 	public static String message(String key, Locale locale) {

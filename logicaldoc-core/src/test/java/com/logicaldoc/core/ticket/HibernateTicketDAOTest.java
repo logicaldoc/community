@@ -1,9 +1,7 @@
 package com.logicaldoc.core.ticket;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.List;
 
 import org.junit.Before;
@@ -27,7 +25,7 @@ public class HibernateTicketDAOTest extends AbstractCoreTestCase {
 	private TicketDAO dao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that
@@ -61,7 +59,7 @@ public class HibernateTicketDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testDeleteExpired() throws ParseException, PersistenceException {
+	public void testDeleteExpired() throws PersistenceException {
 		List<Ticket> tickets = dao.findAll();
 		Assert.assertEquals(3, tickets.size());
 

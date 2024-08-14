@@ -2,7 +2,6 @@ package com.logicaldoc.webdav.web;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

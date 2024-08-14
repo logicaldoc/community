@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -28,19 +27,20 @@ import com.logicaldoc.util.plugin.PluginException;
 public class PDFParserTest extends AbstractCoreTestCase {
 
 	protected static Logger log = LoggerFactory.getLogger(PDFParserTest.class);
-	
+
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 	}
 
 	@Test
-	public void testParse() throws UnsupportedEncodingException, ParsingException {
+	public void testParse() throws ParsingException {
 
-		// This is a pdf German document that PDFBox version 0.7.3 in not able to read
+		// This is a pdf German document that PDFBox version 0.7.3 in not able
+		// to read
 		// The new version of PDFBox 1.3.1 is able to open such document
 		// This pdf has been created with Adobe PDF Library 9.0
 		String inputFile = "src/test/resources/Digital_Day.pdf";
@@ -49,7 +49,7 @@ public class PDFParserTest extends AbstractCoreTestCase {
 
 		Parser parser = ParserFactory.getParser(filename);
 		PDFParser pdfp = (PDFParser) parser;
-		
+
 		inputFile = "src/test/resources/probiotic-1.4.pdf";
 		file = new File(inputFile);
 		filename = file.getPath();
@@ -61,7 +61,7 @@ public class PDFParserTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testSmall() throws UnsupportedEncodingException, ParsingException {
+	public void testSmall() throws ParsingException {
 		String inputFile = "src/test/resources/small.pdf";
 		File file = new File(inputFile);
 		String filename = file.getPath();
@@ -76,7 +76,7 @@ public class PDFParserTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testStress() throws UnsupportedEncodingException, ParsingException {
+	public void testStress() throws ParsingException {
 		File file1 = new File("src/test/resources/Digital_Day.pdf");
 		String filename1 = file1.getPath();
 		File file2 = new File("src/test/resources/Arabic/SharePoint.pdf");
@@ -101,7 +101,7 @@ public class PDFParserTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testParseArabic() throws UnsupportedEncodingException, ParsingException {
+	public void testParseArabic() throws ParsingException {
 
 		// This is a pdf document with two (2) columns, one english and one
 		// Arabic on the right
@@ -133,7 +133,7 @@ public class PDFParserTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testParseArabic2() throws UnsupportedEncodingException, ParsingException {
+	public void testParseArabic2() throws ParsingException {
 
 		// This is an Arabic pdf document
 		// The text goes from right to left (Arabic)
@@ -153,8 +153,8 @@ public class PDFParserTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testForm() throws UnsupportedEncodingException, ParsingException {
-		
+	public void testForm() throws ParsingException {
+
 		String inputFile = "src/test/resources/pdf_form_fields.pdf";
 		File file = new File(inputFile);
 		String filename = file.getPath();
@@ -163,9 +163,9 @@ public class PDFParserTest extends AbstractCoreTestCase {
 		PDFParser pdfp = (PDFParser) parser;
 		String x = pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
 		assertNotNull(x);
-		log.debug("Extracted text size: " + x.length());
+		log.debug("Extracted text size: {}", x.length());
 		assertTrue(x.length() > 2000);
-		
+
 		inputFile = "src/test/resources/fillablePDF1.pdf";
 		file = new File(inputFile);
 		filename = file.getPath();
@@ -174,7 +174,7 @@ public class PDFParserTest extends AbstractCoreTestCase {
 		pdfp = (PDFParser) parser;
 		x = pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
 		assertNotNull(x);
-		log.debug("Extracted text size: " + x.length());
-		assertTrue(x.length() > 2500);		
+		log.debug("Extracted text size: {}", x.length());
+		assertTrue(x.length() > 2500);
 	}
 }

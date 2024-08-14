@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -31,7 +30,7 @@ public class HibernateDocumentLinkDAOTest extends AbstractCoreTestCase {
 	private DocumentDAO docDao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDocumentLinkDAO

@@ -1,6 +1,5 @@
 package com.logicaldoc.webservice.soap.endpoint;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -19,7 +18,7 @@ public class SoapBookmarkServiceTest extends AbstractWebserviceTestCase {
 	private SoapBookmarkService bookmarkService;
 
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		bookmarkService = new SoapBookmarkService();

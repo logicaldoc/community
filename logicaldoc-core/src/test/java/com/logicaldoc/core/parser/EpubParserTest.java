@@ -1,7 +1,6 @@
 package com.logicaldoc.core.parser;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 import org.junit.Assert;
@@ -11,9 +10,9 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.security.Tenant;
 
 public class EpubParserTest extends AbstractCoreTestCase {
-	
+
 	@Test
-	public void testParse() throws UnsupportedEncodingException, ParsingException {
+	public void testParse() throws ParsingException {
 		String inputFile = "src/test/resources/aliceDynamic.epub";
 		File file = new File(inputFile);
 		String filename = file.getPath();

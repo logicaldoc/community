@@ -19,9 +19,9 @@ import com.logicaldoc.util.Context;
 
 /**
  * This class represents the key concept of security of documents. The Folder is
- * used as an element to build hierarchies. With the AccessControlList you can associate
- * groups to a given folder and grant some permissions. Also setting the
- * recurityRef you can specify another reference folder that contains the
+ * used as an element to build hierarchies. With the AccessControlList you can
+ * associate groups to a given folder and grant some permissions. Also setting
+ * the recurityRef you can specify another reference folder that contains the
  * security policies.
  * <p>
  * Folders have a type: 0 for standard folders, 1 for workspaces.
@@ -227,14 +227,6 @@ public class Folder extends SecurableExtensibleObject implements Comparable<Fold
 		if (comparison != 0)
 			return comparison;
 		return this.name.compareTo(o.name);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof Folder))
-			return false;
-		Folder other = (Folder) obj;
-		return other.getId() == this.getId();
 	}
 
 	public String getName() {

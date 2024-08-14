@@ -11,6 +11,7 @@ import java.util.Set;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.bouncycastle.cms.CMSException;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
@@ -24,7 +25,7 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 public class MailUtilTest extends AbstractCoreTestCase {
 
 	@Test
-	public void testMsgToMail() throws Exception {
+	public void testMsgToMail() throws IOException, MessagingException, CMSException  {
 		EMail mail = MailUtil.msgToMail(new File("src/test/resources/test.msg"), true);
 
 		assertNotNull(mail);
@@ -39,26 +40,26 @@ public class MailUtilTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testSignedMsg() throws Exception {
+	public void testSignedMsg() throws IOException, MessagingException, CMSException  {
 		EMail mail = MailUtil.msgToMail(new File("src/test/resources/signed.msg"), true);
 		assertEquals("Invio messaggio SMIME (signed and clear text)", mail.getSubject());
 		assertEquals("3 crucial benefits of Cloud computing.docx", mail.getAttachments().get(1).getFileName());
 	}
 
 	@Test
-	public void testContainsAttachments() throws Exception {
+	public void testContainsAttachments()  {
 		assertTrue(MailUtil.msgContainsAttachments(new File("src/test/resources/signed.msg")));
 		assertTrue(MailUtil.emlContainsAttachments(new File("src/test/resources/fattura.eml")));
 	}
 
 	@Test
-	public void testReadMime() throws Exception {
+	public void testReadMime() throws MessagingException, IOException  {
 		EMail mail = MailUtil.messageToMail(new File("src/test/resources/fattura.eml"), false);
 		assertNotNull(mail);
 	}
 
 	@Test
-	public void testMessageToMail() throws Exception {
+	public void testMessageToMail() throws MessagingException, IOException  {
 		{
 			EMail mail = MailUtil.messageToMail(new File("src/test/resources/abel.eml"), true);
 			assertNotNull(mail);
@@ -95,7 +96,7 @@ public class MailUtilTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testMessageToMailWithAttachments() throws Exception {
+	public void testMessageToMailWithAttachments() throws MessagingException, IOException  {
 		EMail mail = MailUtil.messageToMail(new File("src/test/resources/New email with attachments.eml"), true);
 		assertNotNull(mail);
 		assertEquals(1, mail.getAttachmentsCount());
@@ -106,7 +107,7 @@ public class MailUtilTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testMessageToMailB() throws Exception {
+	public void testMessageToMailB() throws MessagingException, IOException  {
 		EMail mail = MailUtil.messageToMail(new File("src/test/resources/parche 2.eml"), true);
 		assertNotNull(mail);
 		assertEquals("RE: parche 2", mail.getSubject());

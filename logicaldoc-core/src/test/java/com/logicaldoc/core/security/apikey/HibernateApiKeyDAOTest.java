@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
@@ -27,8 +26,9 @@ import com.logicaldoc.util.plugin.PluginException;
 public class HibernateApiKeyDAOTest extends AbstractCoreTestCase {
 
 	private ApiKeyDAO testSubject;
+
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that
@@ -47,31 +47,31 @@ public class HibernateApiKeyDAOTest extends AbstractCoreTestCase {
 	public void testFindByName() throws PersistenceException {
 		assertNotNull(testSubject.findByName(apiKey.getName(), 1L));
 		assertNull(testSubject.findByName(apiKey.getName(), 2L));
-		assertNull(testSubject.findByName("xx", 1L));		
+		assertNull(testSubject.findByName("xx", 1L));
 	}
-	
+
 	@Test
 	public void testFindByKey() throws PersistenceException, NoSuchAlgorithmException {
 		assertNotNull(testSubject.findByKey(apiKey.getDecodedKey()));
-		assertNull(testSubject.findByKey("test"));		
+		assertNull(testSubject.findByKey("test"));
 	}
-	
+
 	@Test
 	public void testFindByUser() throws PersistenceException {
 		List<ApiKey> keys = testSubject.findByUser(1L);
 		assertEquals(1, keys.size());
-		assertTrue(keys.stream().anyMatch(k->apiKey.getName().equals(k.getName())));
-		
+		assertTrue(keys.stream().anyMatch(k -> apiKey.getName().equals(k.getName())));
+
 		ApiKey key2 = new ApiKey();
 		key2.setName("test2");
 		key2.setUserId(1L);
 		testSubject.store(key2);
-		
+
 		keys = testSubject.findByUser(1L);
 		assertEquals(2, keys.size());
-		assertTrue(keys.stream().anyMatch(k->apiKey.getName().equals(k.getName())));
-		assertTrue(keys.stream().anyMatch(k->"test2".equals(k.getName())));
-		
+		assertTrue(keys.stream().anyMatch(k -> apiKey.getName().equals(k.getName())));
+		assertTrue(keys.stream().anyMatch(k -> "test2".equals(k.getName())));
+
 		assertTrue(testSubject.findByUser(99L).isEmpty());
 	}
 }

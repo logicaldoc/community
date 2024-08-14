@@ -1,7 +1,6 @@
 package com.logicaldoc.core;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -35,15 +34,15 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 	protected File rootStoreOne;
 
 	protected File rootStoreTwo;
-	
+
 	protected ApiKey apiKey;
 
 	@Before
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		prepareStore();
-		
+
 		// Prepare an API Key
 		ApiKeyDAO dao = (ApiKeyDAO) Context.get().getBean(ApiKeyDAO.class);
 		apiKey = new ApiKey(1L, "MyKey");

@@ -3,7 +3,6 @@ package com.logicaldoc.core.parser;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -50,7 +49,7 @@ public class MarkdownParser extends HTMLParser {
 	}
 
 	protected void parseHtml(File html, ParseParameters parameters, StringBuilder content)
-			throws ParsingException, IOException, FileNotFoundException {
+			throws ParsingException, IOException {
 		try (InputStream htmlInput = new BufferedInputStream(new FileInputStream(html))) {
 			super.internalParse(htmlInput, parameters, content);
 		}

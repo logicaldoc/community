@@ -3,7 +3,6 @@ package com.logicaldoc.core.parser;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 import org.junit.Assert;
@@ -15,7 +14,7 @@ import com.logicaldoc.core.security.Tenant;
 public class TXTParserTest extends AbstractCoreTestCase {
 
 	@Test
-	public void testParse() throws UnsupportedEncodingException, FileNotFoundException, ParsingException {
+	public void testParse() throws FileNotFoundException, ParsingException {
 		String inputFile = "src/test/resources/AnalyzeFileTest_enc.txt";
 		File file = new File(inputFile);
 		String filename = file.getPath();

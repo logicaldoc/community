@@ -70,7 +70,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 
 	@Before
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		docDao = (DocumentDAO) context.getBean("DocumentDAO");
@@ -82,7 +82,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		store = (MockStore) context.getBean("Store");
 
 		// Make sure that this is a DocumentManagerImpl instance
-		testSubject = (DocumentManager) context.getBean("DocumentManager");
+		testSubject = (DocumentManager) context.getBean("documentManager");
 	}
 
 	@Test
@@ -119,7 +119,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCreateTicket() throws PersistenceException, PermissionException, InterruptedException {
+	public void testCreateTicket() throws PersistenceException, PermissionException {
 		Document doc = docDao.findById(1);
 		assertNotNull(doc);
 
@@ -297,15 +297,14 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testEnforceFilesIntoFolderStore()
-			throws PersistenceException, ParsingException, IOException, InterruptedException {
-		Folder folder = folderDao.createPath(folderDao.findById(Folder.ROOTID), "/Default/test", true, null);
+	public void testEnforceFilesIntoFolderStore() throws PersistenceException, IOException, InterruptedException {
+		folderDao.createPath(folderDao.findById(Folder.ROOTID), "/Default/test", true, null);
 
 		DocumentHistory transaction = new DocumentHistory();
 		User user = userDao.findByUsername("admin");
 		transaction.setUser(user);
 
-		folder = folderDao.createPath(folderDao.findById(Folder.ROOTID), "/Default/test/subfolder", true, null);
+		Folder folder = folderDao.createPath(folderDao.findById(Folder.ROOTID), "/Default/test/subfolder", true, null);
 		assertNull(folder.getStore());
 
 		folder = folderDao.findByPathExtended("/Default/test", 1L);
@@ -341,7 +340,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testRename() throws PersistenceException, ParsingException {
+	public void testRename() throws PersistenceException {
 		Document doc = docDao.findById(1);
 		docDao.initialize(doc);
 		docDao.store(doc);
@@ -821,18 +820,17 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 			testSubject.replaceFile(doc.getId(), "1.3", is, history);
 		}
 
-		Store store = (Store) Context.get().getBean(Store.class);
+		Store str = (Store) Context.get().getBean(Store.class);
 
 		doc = docDao.findById(3L);
 		assertNotNull(doc);
 		assertEquals("1.3", doc.getVersion());
 		assertEquals("1.3", doc.getFileVersion());
-		assertTrue(
-				store.getString(doc.getId(), store.getResourceName(doc, null, null)).contains("invoice calculation"));
+		assertTrue(str.getString(doc.getId(), str.getResourceName(doc, null, null)).contains("invoice calculation"));
 	}
 
 	@Test
-	public void testPromoteVersion() throws PersistenceException, IOException, InterruptedException {
+	public void testPromoteVersion() throws PersistenceException, IOException {
 		Document doc = docDao.findById(3L);
 		assertNotNull(doc);
 		assertEquals("1.3", doc.getVersion());
@@ -869,7 +867,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testArchiveFolder() throws PersistenceException, FileNotFoundException {
+	public void testArchiveFolder() throws PersistenceException {
 		Document doc = docDao.findById(1L);
 		assertNotNull(doc);
 		assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());

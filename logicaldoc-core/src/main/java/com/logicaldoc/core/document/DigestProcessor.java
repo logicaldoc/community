@@ -20,7 +20,7 @@ import com.logicaldoc.i18n.I18N;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
-@Component("DigestProcessor")
+@Component("digestProcessor")
 public class DigestProcessor extends Task {
 	public static final String NAME = "DigestProcessor";
 

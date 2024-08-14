@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -38,7 +37,7 @@ public class SoapAuthServiceTest extends AbstractWebserviceTestCase {
 	private SoapAuthService soapAuthServiceImpl;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		currentMessage = mock(Message.class, Answers.RETURNS_DEEP_STUBS);

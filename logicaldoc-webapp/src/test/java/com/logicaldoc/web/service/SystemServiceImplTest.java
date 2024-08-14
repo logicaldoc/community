@@ -9,7 +9,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -48,7 +47,7 @@ public class SystemServiceImplTest extends AbstractWebappTestCase {
 	private SystemServiceImpl testSubject = new SystemServiceImpl();
 
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		Context.get().getProperties().setMaxBackups(0);
 

@@ -82,10 +82,10 @@ public abstract class Task implements Runnable {
 	@Resource(name = "UserDAO")
 	protected UserDAO userDao = null;
 
-	@Resource(name = "LockManager")
+	@Resource(name = "lockManager")
 	protected LockManager lockManager;
 
-	@Resource(name = "SystemLoadMonitor")
+	@Resource(name = "systemLoadMonitor")
 	protected SystemLoadMonitor systemLoadMonitor;
 
 	protected boolean sendActivityReport = false;
@@ -432,7 +432,7 @@ public abstract class Task implements Runnable {
 	/**
 	 * Concrete implementations must override this method declaring if the task
 	 * supports multiple instances running concurrently.
-	 * 
+	 * tHIbernat
 	 * @return true if the task is concurrent
 	 */
 	public abstract boolean isConcurrent();

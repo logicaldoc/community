@@ -71,7 +71,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 	private static final String HTTP_LOGICALDOC_COM_NS = "http://logicaldoc.com/ns";
 
-	private static final String RESOURCE_SERVICE = "ResourceService";
+	private static final String RESOURCE_SERVICE = "resourceService";
 
 	private static final long serialVersionUID = 1L;
 

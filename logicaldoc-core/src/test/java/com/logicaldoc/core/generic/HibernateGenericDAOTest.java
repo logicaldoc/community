@@ -1,6 +1,5 @@
 package com.logicaldoc.core.generic;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -27,7 +26,7 @@ public class HibernateGenericDAOTest extends AbstractCoreTestCase {
 	private GenericDAO dao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateGenericDAO

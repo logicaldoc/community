@@ -214,8 +214,8 @@ public class StoresPanel extends VLayout {
 		type.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			if (value == null)
 				return "";
-			String label = I18N.message("store." + value);
-			if (label.equals("store." + value))
+			String label = I18N.message(STORE + value);
+			if (label.equals(STORE + value))
 				return value.toString();
 			else
 				return label;
@@ -328,28 +328,27 @@ public class StoresPanel extends VLayout {
 	private void onSave(boolean alertInclusion) {
 		List<GUIParameter> settings = collectSettings();
 
-		SettingService.Instance.get().saveStoreSettings(settings,
-				new AsyncCallback<>() {
+		SettingService.Instance.get().saveStoreSettings(settings, new AsyncCallback<>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(Void arg) {
-						GuiLog.info(I18N.message("settingssaved"), null);
+			@Override
+			public void onSuccess(Void arg) {
+				GuiLog.info(I18N.message("settingssaved"), null);
 
-						// Replicate the settings in the current session
-						for (GUIParameter setting : settings)
-							Session.get().setConfig(setting.getName(), setting.getValue());
+				// Replicate the settings in the current session
+				for (GUIParameter setting : settings)
+					Session.get().setConfig(setting.getName(), setting.getValue());
 
-						refresh();
+				refresh();
 
-						if (alertInclusion)
-							SC.warn(I18N.message("importantnotice"), I18N.message("makesurenotnestedstorage"));
-					}
-				});
+				if (alertInclusion)
+					SC.warn(I18N.message("importantnotice"), I18N.message("makesurenotnestedstorage"));
+			}
+		});
 	}
 
 	private List<GUIParameter> collectSettings() {
@@ -358,10 +357,10 @@ public class StoresPanel extends VLayout {
 		for (ListGridRecord storeRecord : records) {
 			try {
 				String storeId = storeRecord.getAttributeAsString("id").trim();
-				settings.add(new GUIParameter(STORE + storeId + ".dir",
-						storeRecord.getAttributeAsString("path").trim()));
-				settings.add(new GUIParameter(STORE + storeId + ".type",
-						storeRecord.getAttributeAsString("type").trim()));
+				settings.add(
+						new GUIParameter(STORE + storeId + ".dir", storeRecord.getAttributeAsString("path").trim()));
+				settings.add(
+						new GUIParameter(STORE + storeId + ".type", storeRecord.getAttributeAsString("type").trim()));
 				if (DATABASE_EDIT.equals(storeRecord.getAttributeAsString(WRITE))) {
 					settings.add(new GUIParameter("store.write", storeId));
 				}

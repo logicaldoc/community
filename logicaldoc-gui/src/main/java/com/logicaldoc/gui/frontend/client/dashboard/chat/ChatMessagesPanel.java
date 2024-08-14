@@ -26,6 +26,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 8.0.1
  */
 public class ChatMessagesPanel extends VLayout implements ChatObserver {
+	private static final String USERNAME = "username";
+
 	private static final String MESSAGE = "message";
 
 	private RefreshableListGrid messages = null;
@@ -48,11 +50,11 @@ public class ChatMessagesPanel extends VLayout implements ChatObserver {
 				Session.get().getConfigAsBoolean("gui.avatar.showingrids"));
 		user.setShowTitle(false);
 
-		ListGridField username = new ListGridField("username", I18N.message("username"));
+		ListGridField username = new ListGridField(USERNAME, I18N.message(USERNAME));
 		username.setShowTitle(false);
 		username.setWidth(80);
 		username.setHidden(true);
-		
+
 		ListGridField date = new DateListGridField("date", "date");
 		date.setHidden(true);
 		date.setShowTitle(false);
@@ -114,7 +116,7 @@ public class ChatMessagesPanel extends VLayout implements ChatObserver {
 
 			ListGridRecord r = new ListGridRecord();
 			r.setAttribute("id", id);
-			r.setAttribute("username", username);
+			r.setAttribute(USERNAME, username);
 			r.setAttribute("date", date);
 			r.setAttribute(MESSAGE, message);
 			recd.add(r);

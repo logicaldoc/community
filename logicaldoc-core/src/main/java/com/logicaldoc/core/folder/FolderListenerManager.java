@@ -22,7 +22,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.7.4
  */
-@Component("FolderListenerManager")
+@Component("folderListenerManager")
 public class FolderListenerManager {
 
 	private static final String POSITION = "position";

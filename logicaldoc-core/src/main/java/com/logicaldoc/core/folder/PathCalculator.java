@@ -18,7 +18,7 @@ import com.logicaldoc.core.task.TaskException;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.3.3
  */
-@Component("PathCalculator")
+@Component("pathCalculator")
 public class PathCalculator extends Task {
 
 	public static final String NAME = "PathCalculator";

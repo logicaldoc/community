@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.security.Tenant;
@@ -17,7 +18,7 @@ public class FolderToolTest extends AbstractCoreTestCase {
 	private FolderTool testSubject = new FolderTool();
 
 	@Test
-	public void testDisplayUrl() throws Exception {
+	public void testDisplayUrl()  {
 		String result = testSubject.displayUrl(Tenant.DEFAULT_ID, 6L);
 		assertEquals("http://localhost:8080/display?tenant=default&folderId=6", result);
 
@@ -34,20 +35,20 @@ public class FolderToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testGetPath() throws Exception {
+	public void testGetPath() throws PersistenceException  {
 		String result = testSubject.getPath(6L);
 		assertEquals("/Workspace X/folder6", result);
 	}
 
 	@Test
-	public void testFindByPath() throws Exception {
+	public void testFindByPath()  {
 		Folder result = testSubject.findByPath("/Workspace X/folder6");
 		assertNotNull(result);
 		assertEquals(6L, result.getId());
 	}
 
 	@Test
-	public void testFindById() throws Exception {
+	public void testFindById()  {
 		Folder result = testSubject.findById(6L);
 		assertNotNull(result);
 		assertEquals(6L, result.getId());
@@ -55,7 +56,7 @@ public class FolderToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testStore() throws Exception {
+	public void testStore()  {
 		Folder folder = new Folder();
 		folder.setParentId(6L);
 		folder.setName("newfolder");
@@ -68,7 +69,7 @@ public class FolderToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testDelete() throws Exception {
+	public void testDelete() throws PersistenceException  {
 		Folder folder = testSubject.findById(6L);
 		assertNotNull(folder);
 
@@ -78,7 +79,7 @@ public class FolderToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testMove() throws Exception {
+	public void testMove() throws PersistenceException  {
 		Folder folder = testSubject.findById(1202L);
 		assertNotNull(folder);
 		assertEquals("xyz", folder.getName());
@@ -89,7 +90,7 @@ public class FolderToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCopy() throws Exception {
+	public void testCopy() throws PersistenceException  {
 		Folder folder = testSubject.findById(1202L);
 		Folder copied = testSubject.copy(folder, "/Workspace X/folder6", true, "inherit", "admin");
 		Folder movedFolder = testSubject.findByPath("/Workspace X/folder6/xyz");
@@ -97,7 +98,7 @@ public class FolderToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testMerge() throws Exception {
+	public void testMerge() throws PersistenceException  {
 		Folder source = testSubject.findById(6L);
 		assertNotNull(source);
 		assertEquals("/Workspace X/folder6", testSubject.getPath(source.getId()));
@@ -115,7 +116,7 @@ public class FolderToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCreatePath() throws Exception {
+	public void testCreatePath() throws PersistenceException  {
 		Folder folder = testSubject.findById(6L);
 		assertNotNull(folder);
 

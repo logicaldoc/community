@@ -52,32 +52,34 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 		/*
 		 * Iterate over the collection of user histories
 		 */
-		for (Object gridRecord : records) {
-			Object[] cols = (Object[]) gridRecord;
-
-			writer.print("<history>");
-			writer.print("<id>" + cols[0] + "</id>");
-			writer.print("<user><![CDATA[" + cols[1] + "]]></user>");
-			writer.print("<event><![CDATA[" + I18N.message((String) cols[2], locale) + "]]></event>");
-			writer.print("<date>" + df.format((Date) cols[3]) + "</date>");
-			if (cols[4] != null)
-				writer.print("<comment><![CDATA[" + cols[4] + "]]></comment>");
-			if (cols[5] != null)
-				writer.print("<reason><![CDATA[" + cols[5] + "]]></reason>");
-			if (cols[6] != null && showSid)
-				writer.print("<sid><![CDATA[" + cols[6] + "]]></sid>");
-			writer.print("<userId>" + cols[7] + "</userId>");
-			if (cols[8] != null)
-				writer.print("<ip><![CDATA[" + cols[8] + "]]></ip>");
-			if (cols[9] != null)
-				writer.print("<device><![CDATA[" + cols[9] + "]]></device>");
-			if (cols[10] != null)
-				writer.print("<geolocation><![CDATA[" + cols[10] + "]]></geolocation>");
-			if (cols[11] != null)
-				writer.print("<geolocation><![CDATA[" + cols[11] + "]]></geolocation>");			
-			writer.print("</history>");
-		}
+		for (Object gridRecord : records)
+			printHistory(writer, (Object[]) gridRecord, locale, showSid, df);
+		
 		writer.write("</list>");
+	}
+
+	private void printHistory(PrintWriter writer, Object[] columns, Locale locale, boolean showSid, DateFormat df) {
+		writer.print("<history>");
+		writer.print("<id>" + columns[0] + "</id>");
+		writer.print("<user><![CDATA[" + columns[1] + "]]></user>");
+		writer.print("<event><![CDATA[" + I18N.message((String) columns[2], locale) + "]]></event>");
+		writer.print("<date>" + df.format((Date) columns[3]) + "</date>");
+		if (columns[4] != null)
+			writer.print("<comment><![CDATA[" + columns[4] + "]]></comment>");
+		if (columns[5] != null)
+			writer.print("<reason><![CDATA[" + columns[5] + "]]></reason>");
+		if (columns[6] != null && showSid)
+			writer.print("<sid><![CDATA[" + columns[6] + "]]></sid>");
+		writer.print("<userId>" + columns[7] + "</userId>");
+		if (columns[8] != null)
+			writer.print("<ip><![CDATA[" + columns[8] + "]]></ip>");
+		if (columns[9] != null)
+			writer.print("<device><![CDATA[" + columns[9] + "]]></device>");
+		if (columns[10] != null)
+			writer.print("<geolocation><![CDATA[" + columns[10] + "]]></geolocation>");
+		if (columns[11] != null)
+			writer.print("<geolocation><![CDATA[" + columns[11] + "]]></geolocation>");			
+		writer.print("</history>");
 	}
 
 	private List<Object> executeQuery(Integer max, long userId, String event) throws PersistenceException {

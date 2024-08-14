@@ -209,6 +209,26 @@ public interface DocumentMetadataService {
 	String attribute) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
+	 * Retrieves the options for the given attribute inside a given category
+	 * 
+	 * @param setId The attribute set's id
+	 * @param attribute The attribute's name
+	 * @param category The options category (not mandatory)
+	 * 
+	 * @return the list of all the attribute's options
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 */
+	@GET
+	@Path("/getAttributeOptionsByCategory")
+	public List<WSAttributeOption> getAttributeOptionsByCategory(@QueryParam("setId")
+	long setId, @QueryParam("attribute")
+	String attribute, @QueryParam("category")
+	String category) throws AuthenticationException, WebserviceException, PersistenceException;
+
+	/**
 	 * Gets metadata of all existing attribute sets.
 	 * 
 	 * @return The list of all attribute sets

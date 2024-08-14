@@ -56,9 +56,9 @@ public class PasswordHistory extends PersistentObject implements Serializable, C
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof PasswordHistory))
+		if (obj instanceof UserHistory other)
+			return super.equals(other);
+		else
 			return false;
-		PasswordHistory other = (PasswordHistory) obj;
-		return other.getId() == this.getId();
 	}
 }

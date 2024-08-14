@@ -59,6 +59,16 @@ public class UserTool {
 	}
 
 	/**
+	 * Initializes lazy loaded collections
+	 * 
+	 * @param doc the document to initialize
+	 */
+	public void initialize(User user) {
+		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		uDao.initialize(user);
+	}
+
+	/**
 	 * Generates and retrieves the avatar image for a given user
 	 * 
 	 * @param username username of the user

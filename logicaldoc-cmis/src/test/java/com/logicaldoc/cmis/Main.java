@@ -68,15 +68,6 @@ public class Main {
         }
     }
 
-//    static void renameDocument(Session session, String id, String newName) {
-//        CmisObject object = session.getObject(id);
-//        if (object instanceof Document) {
-//        	Document doc =(Document) object;
-//            LOG.info("Rename: " + doc.getId() + " | " + doc.getName() + " => " + newName);
-//            doc.rename(newName);
-//            LOG.info("Renamed to " + doc.getName());
-//        }
-//    }
 
     static org.apache.chemistry.opencmis.client.api.Document createDocument(Session session, String id) {
         CmisObject object = session.getObject(id);

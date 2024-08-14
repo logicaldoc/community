@@ -2,7 +2,6 @@ package com.logicaldoc.web.websockets;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -30,7 +29,7 @@ public class EventEndpointTest extends AbstractWebappTestCase {
 	private Session websocketSession = new MockWebsocketSession();
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		endpoint.error(websocketSession, new Exception("test exception"));
 		endpoint.onOpen(websocketSession);

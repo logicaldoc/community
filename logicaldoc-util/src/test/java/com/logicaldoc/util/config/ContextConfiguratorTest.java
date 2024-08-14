@@ -1,7 +1,6 @@
 package com.logicaldoc.util.config;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -24,7 +23,7 @@ public class ContextConfiguratorTest {
 	File contextXml = new File("target/context.xml");
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		FileUtil.copyResource("/contexttest.xml", contextXml);
 	}
 

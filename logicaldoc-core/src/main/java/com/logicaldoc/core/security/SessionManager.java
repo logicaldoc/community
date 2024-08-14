@@ -41,7 +41,7 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.6
  */
-@Component("SessionManager")
+@Component("sessionManager")
 public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 	public static final String COOKIE_SID = "ldoc-sid";
@@ -57,7 +57,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	// The maximum number of closed session maintained in memory
 	private static final int MAX_CLOSED_SESSIONS = 50;
 
-	@Resource(name = "AuthenticationChain")
+	@Resource(name = "authenticationChain")
 	private transient AuthenticationChain authenticationChain;
 
 	@Resource(name = "SessionDAO")

@@ -94,7 +94,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Resource(name = "DocumentLinkDAO")
 	private DocumentLinkDAO linkDAO;
 
-	@Resource(name = "DocumentListenerManager")
+	@Resource(name = "documentListenerManager")
 	private DocumentListenerManager listenerManager;
 
 	@Resource(name = "Store")

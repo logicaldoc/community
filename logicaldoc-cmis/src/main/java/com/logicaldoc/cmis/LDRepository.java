@@ -1569,8 +1569,7 @@ public class LDRepository {
 		// Iterate through the list of results
 		for (Hit hit : hits) {
 			try {
-				// filtro i risultati (lasciando solo le colonne
-				// richieste)
+				// filer the results (leaving just required columns)
 				ObjectData result = compileObjectType(null, hit, filter, false, false, null);
 				results.add(result);
 			} catch (Exception t) {

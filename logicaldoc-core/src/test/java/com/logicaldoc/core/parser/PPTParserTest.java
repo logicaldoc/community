@@ -13,7 +13,7 @@ import com.logicaldoc.core.security.Tenant;
 public class PPTParserTest extends AbstractCoreTestCase {
 
 	@Test
-	public void testParse() throws UnsupportedEncodingException, ParsingException {
+	public void testParse() throws ParsingException {
 		String inputFile = "src/test/resources/accessibility.ppt";
 		File file = new File(inputFile);
 		String filename = file.getPath();

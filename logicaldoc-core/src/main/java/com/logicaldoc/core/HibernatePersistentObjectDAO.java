@@ -540,7 +540,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		try {
 			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-			return jdbcTemplate.queryForObject(sql, Long.class);
+			Long result =jdbcTemplate.queryForObject(sql, Long.class); 
+			return result !=null ? result : 0L;
 		} catch (NullPointerException | EmptyResultDataAccessException e) {
 			return 0L;
 		} catch (Exception e) {
@@ -556,7 +557,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		try {
 			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
 			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			return jdbcTemplate.queryForObject(sql, parameters, Long.class);
+			Long result = jdbcTemplate.queryForObject(sql, parameters, Long.class);
+			return result !=null ? result : 0L;
 		} catch (NullPointerException | EmptyResultDataAccessException e) {
 			return 0L;
 		} catch (Exception e) {
@@ -569,7 +571,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		try {
 			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-			return jdbcTemplate.queryForObject(sql, Double.class);
+			Double result = jdbcTemplate.queryForObject(sql, Double.class);
+			return result !=null ? result : 0D;
 		} catch (NullPointerException | EmptyResultDataAccessException e) {
 			return 0D;
 		} catch (Exception e) {
@@ -585,7 +588,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		try {
 			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
 			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			return jdbcTemplate.queryForObject(sql, parameters, Double.class);
+			Double result = jdbcTemplate.queryForObject(sql, parameters, Double.class);
+			return result !=null ? result : 0D;
 		} catch (NullPointerException | EmptyResultDataAccessException e) {
 			return 0D;
 		} catch (Exception e) {

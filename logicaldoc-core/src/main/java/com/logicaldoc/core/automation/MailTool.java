@@ -78,7 +78,7 @@ public class MailTool {
 	 * @param message message printed in the body of the email
 	 * 
 	 * @throws IOException I/O error
-	 * @throws MessagingException Cannot send the email
+	 * 
 	 */
 	public void sendDocuments(Collection<Document> documents, String from, Collection<String> to, String subject,
 			String message) throws IOException, MessagingException {
@@ -201,7 +201,7 @@ public class MailTool {
 	 */
 	public void sendMessage(long tenantId, String from, String to, String subject, String message)
 			throws MessagingException {
-		this.sendMessage(tenantId, from, to != null ? Arrays.asList( to ) : null, subject, message);
+		this.sendMessage(tenantId, from, to != null ? Arrays.asList(to) : null, subject, message);
 	}
 
 	/**
@@ -227,8 +227,7 @@ public class MailTool {
 		Store store = (Store) Context.get().getBean(Store.class);
 		if (document.getFileName().toLowerCase().endsWith(".eml"))
 			email = MailUtil.messageToMail(
-					store.getStream(document.getId(), store.getResourceName(document, null, null)),
-					extractAttachments);
+					store.getStream(document.getId(), store.getResourceName(document, null, null)), extractAttachments);
 		else
 			try {
 				email = MailUtil.msgToMail(

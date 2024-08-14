@@ -1,7 +1,6 @@
 package com.logicaldoc.core.searchengine;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
@@ -28,7 +27,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 	protected SearchEngine engine;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		engine = (SearchEngine) context.getBean("SearchEngine");
 		try {
@@ -39,7 +38,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testWrite() throws FileNotFoundException, IOException, ClassNotFoundException {
+	public void testWrite() throws IOException, ClassNotFoundException {
 		File file = new File(tempDir, "query.ser");
 
 		FulltextSearchOptions opt = new FulltextSearchOptions();

@@ -354,9 +354,9 @@ public class FileUtil {
 	 */
 	public static String getDisplaySize(long size, String language) {
 		String displaySize = "";
-		Locale locale = new Locale("en");
+		Locale locale = Locale.of("en");
 		if (StringUtils.isNotEmpty(language))
-			locale = new Locale(language);
+			locale = Locale.of(language);
 		NumberFormat nf = new DecimalFormat("###,###,###.0", new DecimalFormatSymbols(locale));
 		if (size > 1000000000) {
 			displaySize = nf.format((double) size / 1024 / 1024 / 1024) + " GB";
@@ -382,9 +382,9 @@ public class FileUtil {
 	 */
 	public static String getDisplaySizeKB(long size, String language) {
 		String displaySize = "";
-		Locale locale = new Locale("en");
+		Locale locale = Locale.of("en");
 		if (StringUtils.isNotEmpty(language))
-			locale = new Locale(language);
+			locale = Locale.of(language);
 		NumberFormat nf = new DecimalFormat("###,###,##0.0", new DecimalFormatSymbols(locale));
 		displaySize = nf.format((double) size / 1024) + " KB";
 		return displaySize;

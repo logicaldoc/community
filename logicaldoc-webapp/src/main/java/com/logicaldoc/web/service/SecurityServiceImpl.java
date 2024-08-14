@@ -1392,11 +1392,14 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		params.put("oldestDate", oldestDate);
 		params.put("max", max);
 
+		final String NAME_CONDITION = "_entity.name like '";
+		final String MORE_CONDITIONS = "%' and _entity.value >= :max and _entity.lastModified >= :oldestDate";
+		
 		try {
 			if (max > 0)
 				seqs.addAll(dao.findByWhere(
-						"_entity.name like '" + LoginThrottle.LOGINFAIL_USERNAME
-								+ "%' and _entity.value >= :max and _entity.lastModified >= :oldestDate",
+						NAME_CONDITION + LoginThrottle.LOGINFAIL_USERNAME
+								+ MORE_CONDITIONS,
 						params, null, null));
 
 			max = config.getInt("throttle.ip.max", 0);
@@ -1404,8 +1407,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			cal.add(Calendar.MINUTE, -config.getInt("throttle.ip.wait", 0));
 			if (max > 0)
 				seqs.addAll(dao.findByWhere(
-						"_entity.name like '" + LoginThrottle.LOGINFAIL_IP
-								+ "%' and _entity.value >= :max and _entity.lastModified >= :oldestDate",
+						NAME_CONDITION + LoginThrottle.LOGINFAIL_IP
+								+ MORE_CONDITIONS,
 						params, null, null));
 			
 			max = config.getInt("throttle.apikey.max", 0);
@@ -1413,8 +1416,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			cal.add(Calendar.MINUTE, -config.getInt("throttle.apikey.wait", 0));
 			if (max > 0)
 				seqs.addAll(dao.findByWhere(
-						"_entity.name like '" + LoginThrottle.LOGINFAIL_APIKEY
-								+ "%' and _entity.value >= :max and _entity.lastModified >= :oldestDate",
+						NAME_CONDITION + LoginThrottle.LOGINFAIL_APIKEY
+								+ MORE_CONDITIONS,
 						params, null, null));
 			
 			ArrayList<GUISequence> ret = new ArrayList<>();

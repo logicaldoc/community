@@ -13,7 +13,7 @@ public class Value<V extends Object> {
 	/**
 	 * Value of this this <code>Value</code>.
 	 */
-	private V value;
+	private V val;
 
 	/**
 	 * Creates a new Value
@@ -26,8 +26,8 @@ public class Value<V extends Object> {
 	 * 
 	 * @param value The value to use for this pair
 	 */
-	public Value(V value) {
-		this.value = value;
+	public Value(V val) {
+		this.val = val;
 	}
 
 	/**
@@ -36,7 +36,7 @@ public class Value<V extends Object> {
 	 * @return value for this Value
 	 */
 	public V getValue() {
-		return value;
+		return val;
 	}
 
 	/**
@@ -48,18 +48,18 @@ public class Value<V extends Object> {
 	 */
 	@Override
 	public String toString() {
-		return "" + value;
+		return "" + val;
 	}
 
-	public void setValue(V value) {
-		this.value = value;
+	public void setValue(V val) {
+		this.val = val;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		result = prime * result + ((val == null) ? 0 : val.hashCode());
 		return result;
 	}
 
@@ -72,10 +72,10 @@ public class Value<V extends Object> {
 		if (getClass() != obj.getClass())
 			return false;
 		if (obj instanceof Value other) {
-			if (value == null) {
-				if (other.value != null)
+			if (val == null) {
+				if (other.val != null)
 					return false;
-			} else if (!value.equals(other.value))
+			} else if (!val.equals(other.val))
 				return false;
 		}
 		return false;

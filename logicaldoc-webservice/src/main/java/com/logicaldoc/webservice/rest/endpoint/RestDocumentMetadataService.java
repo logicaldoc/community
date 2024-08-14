@@ -129,6 +129,17 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 		String sid = validateSessionREST();
 		return super.getAttributeOptions(sid, setId, attribute);
 	}
+	
+	
+	@Override
+	@GET
+	@Path("/getAttributeOptionsByCategory")
+	@Operation(summary = "Retrieves the options for the given attribute and related to the given category", description = "Returns the list of all the attribute's options in the given category")
+	public List<WSAttributeOption> getAttributeOptionsByCategory(long setId, String attribute, String category)
+			throws AuthenticationException, WebserviceException, PersistenceException {
+		String sid = validateSessionREST();
+		return super.getAttributeOptionsByCategory(sid, setId, attribute,category);
+	}
 
 	@Override
 	@GET

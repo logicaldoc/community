@@ -1,6 +1,6 @@
 package com.logicaldoc.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.security.NoSuchAlgorithmException;
 

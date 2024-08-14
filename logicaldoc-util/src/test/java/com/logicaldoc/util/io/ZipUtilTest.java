@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -32,7 +31,7 @@ public class ZipUtilTest {
 	private ZipUtil testSubject = new ZipUtil();
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		folder.mkdir();
 		FileUtil.copyResource("/test.zip", file);
 	}

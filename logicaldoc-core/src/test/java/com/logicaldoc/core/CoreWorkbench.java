@@ -34,7 +34,7 @@ import com.logicaldoc.util.io.FileUtil;
 import com.talanlabs.avatargenerator.Avatar;
 import com.talanlabs.avatargenerator.IdenticonAvatar;
 
-public class CoreWorkBench {
+public class CoreWorkbench {
 
 	/**
 	 * Test sending e-mail with attachments
@@ -146,7 +146,7 @@ public class CoreWorkBench {
 	}
 
 	static void emailStuff() throws MessagingException, IOException {
-		EMail email = MailUtil.messageToMail(CoreWorkBench.class.getResourceAsStream("/GENNAIO2020.eml"), true);
+		EMail email = MailUtil.messageToMail(CoreWorkbench.class.getResourceAsStream("/GENNAIO2020.eml"), true);
 		Map<Integer, EMailAttachment> attachments = email.getAttachments();
 		for (Integer index : attachments.keySet()) {
 			EMailAttachment attachment = attachments.get(index);

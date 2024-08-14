@@ -1,6 +1,5 @@
 package com.logicaldoc.web.service;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -24,7 +23,7 @@ public class MessageServiceImplTest extends AbstractWebappTestCase {
 	private MessageTemplateDAO templateDao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		templateDao = (MessageTemplateDAO) context.getBean("MessageTemplateDAO");

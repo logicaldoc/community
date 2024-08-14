@@ -12,7 +12,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -111,7 +110,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		docDao = (DocumentDAO) context.getBean("DocumentDAO");
@@ -654,7 +653,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testReplaceAlias() throws ServerException, IOException, InterruptedException, PersistenceException {
-		DocumentManager manager = (DocumentManager) context.getBean("DocumentManager");
+		DocumentManager manager = (DocumentManager) context.getBean("documentManager");
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(session.getUser());
 		transaction.setSession(session);

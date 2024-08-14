@@ -2,6 +2,7 @@ package com.logicaldoc.core.conversion;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,27 +28,33 @@ public class GhostscriptConverter extends AbstractFormatConverter {
 		String ext = FileUtil.getExtension(dest.getName()).toLowerCase();
 
 		try {
-			String pages = "";
+			String arguments = getParameter("arguments");
+			List<String> commandLine = new ArrayList<>();
+			commandLine.add(getParameter("path"));
+			if (arguments != null)
+				commandLine.addAll(Arrays.asList(arguments.split(" ")));
+
+			List<String> pages = null;
 			String device = "jpeg";
 			if ("tif".equals(ext) || "tiff".equals(ext))
 				device = "tiff24nc";
 			else if ("png".equals(ext)) {
 				device = "png16m";
-				pages = "-dFirstPage=1 -dLastPage=1";
+				pages = List.of("-dFirstPage=1", "-dLastPage=1");
 			} else if ("ps".equals(ext)) {
 				device = "ps2write";
-				pages = "-dFirstPage=1 -dLastPage=1";
+				pages = List.of("-dFirstPage=1", "-dLastPage=1");
 			} else if ("txt".equals(ext))
 				device = "txtwrite";
 			else if ("eps".equals(ext))
 				device = "eps2write ";
 
-			int timeout = getTimeout();
+			commandLine.add("-sDEVICE=" + device);
+			if (pages != null)
+				commandLine.addAll(pages);
+			commandLine.addAll(List.of("-sOutputFile=" + dest.getPath(), src.getPath()));
 
-			String arguments = getParameter("arguments");
-			String commandLine = getParameter("path") + " " + (arguments != null ? arguments : "") + " -sDEVICE="
-					+ device + " " + pages + " -sOutputFile=" + dest.getPath() + " " + src.getPath();
-			new Exec().exec(commandLine, null, null, timeout);
+			new Exec().exec(commandLine, null, null, getTimeout());
 
 			if (!dest.exists() || dest.length() < 1)
 				throw new IOException("Empty conversion");

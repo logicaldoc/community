@@ -5,7 +5,7 @@ import java.util.Date;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailSender;
 
-public class EMailSenderTestbench {
+public class EMailSenderWorkbench {
 
 	public static void main(String[] args) throws Exception {
 		EMail mail;

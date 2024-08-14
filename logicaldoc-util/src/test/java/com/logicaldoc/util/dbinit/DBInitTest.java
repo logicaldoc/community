@@ -1,6 +1,5 @@
 package com.logicaldoc.util.dbinit;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ public class DBInitTest extends TestCase {
 	private DBInit testSubject;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		List<String> sqlList = new ArrayList<>();
 		sqlList.add("sql1.sql");
 		sqlList.add("sql2.sql");

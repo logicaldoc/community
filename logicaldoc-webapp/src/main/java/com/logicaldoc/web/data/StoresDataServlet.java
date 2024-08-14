@@ -54,7 +54,7 @@ public class StoresDataServlet extends AbstractDataServlet {
 
 				writer.print(START_STORE);
 				writer.print("<id>" + type + "</id>");
-				writer.print("<name><![CDATA[" + I18N.message("store." + type, locale) + "]]></name>");
+				writer.print("<name><![CDATA[" + I18N.message(STORE + type, locale) + "]]></name>");
 				writer.print("<type>" + type + "</type>");
 				writer.print(CLOSE_STORE);
 			}

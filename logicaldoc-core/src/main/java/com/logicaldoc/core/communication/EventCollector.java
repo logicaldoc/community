@@ -28,7 +28,7 @@ import com.logicaldoc.util.config.ContextProperties;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.7.1
  */
-@Component("EventCollector")
+@Component("eventCollector")
 public class EventCollector {
 
 	private static final int FIFO_SIZE = 1000;

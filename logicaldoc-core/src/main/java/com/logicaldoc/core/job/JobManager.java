@@ -38,7 +38,7 @@ import com.logicaldoc.util.config.ContextProperties;
  * 
  * @since 8.7.4
  */
-@Component("JobManager")
+@Component("jobManager")
 public class JobManager {
 
 	public static final String TENANT_ID = "tenantId";

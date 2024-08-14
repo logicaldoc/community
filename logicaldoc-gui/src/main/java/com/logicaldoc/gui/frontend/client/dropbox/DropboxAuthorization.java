@@ -21,13 +21,17 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
  */
 public class DropboxAuthorization extends Window {
 
+	private static final String CONSTANT_A = "apisecret";
+
+	private static final String CONSTANT_B = "apikey";
+
 	private static DropboxAuthorization instance = new DropboxAuthorization();
 
 	private DynamicForm form = new DynamicForm();
 
-	private TextItem apiKey = ItemFactory.newPasswordItem("apikey", "apikey", null);
+	private TextItem apiKey = ItemFactory.newPasswordItem(CONSTANT_B, CONSTANT_B, null);
 
-	private TextItem apiSecret = ItemFactory.newPasswordItem("apisecret", "apisecret", null);
+	private TextItem apiSecret = ItemFactory.newPasswordItem(CONSTANT_A, CONSTANT_A, null);
 
 	private DropboxAuthorization() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
@@ -77,7 +81,7 @@ public class DropboxAuthorization extends Window {
 	}
 
 	public void onAuthenticate() {
-		DropboxService.Instance.get().saveSettings(form.getValueAsString("apikey"), form.getValueAsString("apisecret"),
+		DropboxService.Instance.get().saveSettings(form.getValueAsString(CONSTANT_B), form.getValueAsString(CONSTANT_A),
 				new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {

@@ -1,6 +1,5 @@
 package com.logicaldoc.core.searchengine;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -27,7 +26,7 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
 	protected SearchEngine engine;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		engine = (SearchEngine) context.getBean("SearchEngine");
 	}

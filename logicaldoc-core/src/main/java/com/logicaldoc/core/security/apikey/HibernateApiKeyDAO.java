@@ -68,7 +68,7 @@ public class HibernateApiKeyDAO extends HibernatePersistentObjectDAO<ApiKey> imp
 
 	private String generateKey(int keyLen) {
 		SecureRandom random = new SecureRandom();
-		byte bytes[] = new byte[keyLen / 8];
+		byte[] bytes = new byte[keyLen / 8];
 		random.nextBytes(bytes);
 		return "ld-" + DatatypeConverter.printHexBinary(bytes).toLowerCase();
 	}

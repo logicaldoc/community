@@ -101,7 +101,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 				return null;
 			dbox.login();
 			String account = dbox.getAccountName();
-			saveAccessToken(user, token, account);
+			saveAccessToken(user, token);
 			return account;
 		} catch (Exception t) {
 			throw new ServerException(t.getMessage(), t);
@@ -109,12 +109,11 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 	}
 
 	/**
-	 * Saves the access token saved for the given user. The token is saved in a
-	 * Generic(type: dropbox, subtype: token)
+	 * Saves the access token saved for the given user.
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	protected void saveAccessToken(User user, String token, String account) throws PersistenceException {
+	private void saveAccessToken(User user, String token) throws PersistenceException {
 		try {
 			Dropbox dBox = new Dropbox(user.getId());
 			dBox.setAccessToken(token);
@@ -366,13 +365,19 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			dbox.setApiSecret(apiSecret);
 			dbox.saveSettings();
 		} catch (Exception t) {
-			log.error(t.getMessage(), t);
+			throw new ServerException(t.getMessage(), t);
 		}
 	}
 
 	@Override
 	public List<String> loadSettings() throws ServerException {
-		// TODO Auto-generated method stub
-		return null;
+		Session session = DropboxServiceImpl.validateSession(getThreadLocalRequest());
+		try {
+			User user = session.getUser();
+			Dropbox dbox = new Dropbox(user.getId());
+			return List.of(dbox.getApiKey(), dbox.getApiSecret());
+		} catch (Exception t) {
+			throw new ServerException(t.getMessage(), t);
+		}
 	}
 }

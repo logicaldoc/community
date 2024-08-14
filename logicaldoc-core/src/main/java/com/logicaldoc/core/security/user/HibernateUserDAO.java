@@ -60,7 +60,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	@Resource(name = "PasswordHistoryDAO")
 	private PasswordHistoryDAO passwordHistoryDAO;
 
-	@Resource(name = "UserListenerManager")
+	@Resource(name = "userListenerManager")
 	private UserListenerManager userListenerManager;
 
 	@Resource(name = "ContextProperties")

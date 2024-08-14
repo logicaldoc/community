@@ -42,6 +42,8 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class BruteForcePanel extends AdminPanel {
 
+	private static final String MINUTES = "minutes";
+
 	private static final String RECIPIENTS = "recipients";
 
 	private static final String ATTEMPTS = "attempts";
@@ -125,7 +127,7 @@ public class BruteForcePanel extends AdminPanel {
 		SpinnerItem usernameWait = ItemFactory.newSpinnerItem("usernamewait", "sameusernamewait",
 				intValue(params.get(THROTTLE_USERNAME_WAIT)));
 		usernameWait.setMin(0);
-		usernameWait.setHint(I18N.message("minutes"));
+		usernameWait.setHint(I18N.message(MINUTES));
 		usernameWait.setWrapTitle(false);
 
 		usernameWait.setDisabled("true".equals(params.get(THROTTLE_USERNAME_DISABLEUSER)));
@@ -145,7 +147,7 @@ public class BruteForcePanel extends AdminPanel {
 		SpinnerItem ipWait = ItemFactory.newSpinnerItem("ipwait", "sameipwait", intValue(params.get(THROTTLE_IP_WAIT)));
 		ipWait.setMin(0);
 		ipWait.setWrapTitle(false);
-		ipWait.setHint(I18N.message("minutes"));
+		ipWait.setHint(I18N.message(MINUTES));
 
 		
 		SpinnerItem apikeyMax = ItemFactory.newSpinnerItem("apikeymax", "maxsameapikeyfailedattempts",
@@ -157,7 +159,7 @@ public class BruteForcePanel extends AdminPanel {
 				intValue(params.get(THROTTLE_APIKEY_WAIT)));
 		apikeyWait.setMin(0);
 		apikeyWait.setWrapTitle(false);
-		apikeyWait.setHint(I18N.message("minutes"));
+		apikeyWait.setHint(I18N.message(MINUTES));
 
 		MultiComboBoxItem recipients = ItemFactory.newMultiComboBoxItem(RECIPIENTS, "alertrecipients",
 				new UsersDS(null, false, false),

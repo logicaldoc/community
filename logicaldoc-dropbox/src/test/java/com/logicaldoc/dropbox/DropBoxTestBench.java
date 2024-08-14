@@ -18,15 +18,11 @@ import com.logicaldoc.util.security.StringEncrypter.EncryptionException;
 public class DropBoxTestBench {
 
 	public static void main(String[] args) throws IOException, URISyntaxException, DbxException, PersistenceException, EncryptionException {
-		String accessToken = "****access_token****";
-
 		Dropbox client = new Dropbox(1L);
 		boolean entered = client.login();
 		System.out.println("entered " + entered);
 		System.out.println(client.getAccountName());
 
-		if (!entered)
-			accessToken = authorization();
 
 		Metadata root = client.get("/");
 		System.out.println("" + root);

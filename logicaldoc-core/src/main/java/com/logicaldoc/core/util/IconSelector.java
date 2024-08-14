@@ -36,6 +36,10 @@ public abstract class IconSelector {
 		aliases.put("markdown", "md");
 	}
 
+	private IconSelector() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static Set<String> getAvailableIcons() {
 		return availableIcons;
 	}

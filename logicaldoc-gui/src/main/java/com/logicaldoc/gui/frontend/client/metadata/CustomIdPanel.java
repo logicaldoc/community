@@ -34,6 +34,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class CustomIdPanel extends AdminPanel {
 
+	private static final String CUSTOMID = "customid-";
+
 	private static final String VALUE = "value";
 
 	private static final String TEMPLATE_ID = "templateId";
@@ -180,7 +182,7 @@ public class CustomIdPanel extends AdminPanel {
 
 		ToolStripButton refresh = new ToolStripButton(I18N.message("refresh"));
 		refresh.setAutoFit(true);
-		refresh.addClickHandler(event -> sequences.refresh(new SequencesDS("customid-")));
+		refresh.addClickHandler(event -> sequences.refresh(new SequencesDS(CUSTOMID)));
 		toolStrip.addButton(refresh);
 
 		ListGridField id = new ListGridField("id", I18N.message("id"));
@@ -194,8 +196,8 @@ public class CustomIdPanel extends AdminPanel {
 		name.setRequired(true);
 		name.setCanFilter(true);
 		name.setCellFormatter((value, rec, rowNum, colNum) -> {
-			if (value.toString().startsWith("customid-"))
-				return value.toString().substring("customid-".length());
+			if (value.toString().startsWith(CUSTOMID))
+				return value.toString().substring(CUSTOMID.length());
 			else
 				return value.toString();
 		});
@@ -206,7 +208,7 @@ public class CustomIdPanel extends AdminPanel {
 		value.setRequired(true);
 		value.setCanFilter(true);
 
-		sequences = new RefreshableListGrid(new SequencesDS("customid-"));
+		sequences = new RefreshableListGrid(new SequencesDS(CUSTOMID));
 		sequences.setShowAllRecords(true);
 		sequences.setCanEdit(true);
 		sequences.setWidth100();
@@ -241,7 +243,7 @@ public class CustomIdPanel extends AdminPanel {
 		VLayout sequencesPanel = new VLayout();
 		sequencesPanel.setMembers(toolStrip, sequences);
 
-		sequences.refresh(new SequencesDS("customid-"));
+		sequences.refresh(new SequencesDS(CUSTOMID));
 		return sequencesPanel;
 	}
 

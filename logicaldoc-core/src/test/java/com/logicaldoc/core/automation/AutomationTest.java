@@ -18,10 +18,10 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 public class AutomationTest extends AbstractCoreTestCase {
 
 	@Test
-	public void testAutomation() throws Exception {
+	public void testAutomation() {
 		Map<String, Object> dict = new HashMap<>();
 		dict.put("testval", "abc");
-		
+
 		Automation automation = new Automation();
 		String output = automation.evaluate("pippo $testval", dict);
 

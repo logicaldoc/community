@@ -48,11 +48,11 @@ import com.logicaldoc.webdav.resource.model.ResourceImpl;
 import com.logicaldoc.webdav.session.WebdavSession;
 
 /**
- * Base implementation of a ResourceService
+ * Base implementation of a {@link ResourceService}
  * 
  * @author Sebastian Wenzky
  */
-@Component("ResourceService")
+@Component("resourceService")
 public class ResourceServiceImpl implements ResourceService {
 
 	private static final long serialVersionUID = 1L;
@@ -68,7 +68,7 @@ public class ResourceServiceImpl implements ResourceService {
 	@javax.annotation.Resource(name = "FolderDAO")
 	private transient FolderDAO folderDAO;
 
-	@javax.annotation.Resource(name = "DocumentManager")
+	@javax.annotation.Resource(name = "documentManager")
 	private transient DocumentManager documentManager;
 
 	@javax.annotation.Resource(name = "Store")

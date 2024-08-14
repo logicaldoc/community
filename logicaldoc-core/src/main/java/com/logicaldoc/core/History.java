@@ -483,17 +483,4 @@ public abstract class History extends PersistentObject implements Comparable<His
 	public int compareTo(History other) {
 		return getDate().compareTo(other.getDate());
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof History))
-			return false;
-		History other = (History) obj;
-		return other.getId() == this.getId();
-	}
-
-	@Override
-	public int hashCode() {
-		return Long.valueOf(getId()).hashCode();
-	}
 }

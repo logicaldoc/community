@@ -3,7 +3,6 @@ package com.logicaldoc.core.security.menu;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -33,7 +32,8 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 	// Instance under test
 	private MenuDAO dao;
 
-	@Before	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	@Before
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that
@@ -74,7 +74,6 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 		menu.setName("pippo2");
 		dao.store(menu);
 		Assert.assertNotNull(menu);
-		menu = dao.findById(102);
 
 		menu = dao.findById(102);
 		dao.store(menu);

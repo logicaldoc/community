@@ -30,15 +30,15 @@ public class LocaleUtil {
 
 		str = str.replace('-', '_');
 
-		String lang = "";
+		String language = "";
 		String country = "";
 		String variant = "";
 		StringTokenizer st = new StringTokenizer(str, "_", false);
-		lang = st.nextToken();
+		language = st.nextToken();
 		if (st.hasMoreTokens())
 			country = st.nextToken();
 		if (st.hasMoreTokens())
 			variant = st.nextToken();
-		return new Locale(lang, country, variant);
+		return Locale.of(language, country, variant);
 	}
 }

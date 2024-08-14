@@ -76,6 +76,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class MainMenu extends ToolStrip implements FolderObserver, DocumentObserver {
 
+	private static final String APIKEY = "apikey";
+
+	private static final String AUTHORIZE = "authorize";
+
 	private static final String WINDOW_SETTNGS = "location=no,status=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes";
 
 	private static final String BLANK = "_blank";
@@ -332,7 +336,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			}
 		}));
 
-		final MenuItem authrorize = new MenuItem(I18N.message("authorize"));
+		final MenuItem authrorize = new MenuItem(I18N.message(AUTHORIZE));
 		authrorize.addClickHandler(event -> DropboxAuthorization.get().show());
 
 		Menu menu = new Menu();
@@ -362,8 +366,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 				@Override
 				public void onSuccess(List<GUIValue> settings) {
-					TextItem apiKey = ItemFactory.newPasswordItem("apikey", "apikey",
-							GUIValue.getValue("apikey", settings));
+					TextItem apiKey = ItemFactory.newPasswordItem(APIKEY, APIKEY, GUIValue.getValue(APIKEY, settings));
 					apiKey.setWidth(360);
 
 					TextItem model = ItemFactory.newTextItem("model", GUIValue.getValue("model", settings));
@@ -437,7 +440,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			}
 		}));
 
-		final MenuItem authorize = new MenuItem(I18N.message("authorize"));
+		final MenuItem authorize = new MenuItem(I18N.message(AUTHORIZE));
 		authorize.addClickHandler(event -> new ShareFileSettings().show());
 
 		Menu menu = new Menu();
@@ -456,7 +459,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	}
 
 	private MenuItem getDocuSignMenuItem(GUIDocument document) {
-		final MenuItem authorize = new MenuItem(I18N.message("authorize"));
+		final MenuItem authorize = new MenuItem(I18N.message(AUTHORIZE));
 		authorize.addClickHandler(click -> new DocuSignSettings().show());
 
 		final MenuItem sendEnvelope = new MenuItem(I18N.message("sendenvelope"));
@@ -596,15 +599,22 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		if (Feature.enabled(Feature.OFFICE)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.OFFICE))
 			menu.addItem(getOfficeMenuItem(folder, document));
+		addTextAndWebContentItems(menu, document, folder);
+		addChatGPTItem(menu, folder);
+	}
+
+	private void addTextAndWebContentItems(Menu menu, GUIDocument document, GUIFolder folder) {
 		if (Feature.enabled(Feature.WEBCONTENT)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.WEBCONTENT))
 			menu.addItem(getWebContentMenuItem(folder, document));
 		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.TEXTCONTENT))
 			menu.addItem(getTextContentMenuItem(folder, document));
+	}
+
+	private void addChatGPTItem(Menu menu, GUIFolder folder) {
 		if (Feature.enabled(Feature.CHATGPT)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.CHATGPT))
 			menu.addItem(getChatGPTMenuItem(folder));
-
 	}
 
 	private void addRegistration(Menu menu, MenuItem develConsole) {

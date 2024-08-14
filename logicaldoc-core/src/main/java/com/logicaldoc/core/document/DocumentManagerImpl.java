@@ -74,7 +74,7 @@ import com.logicaldoc.util.time.TimeDiff.TimeField;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.5
  */
-@Component("DocumentManager")
+@Component("documentManager")
 public class DocumentManagerImpl implements DocumentManager {
 
 	private static final String NO_VALUE_OBJECT_HAS_BEEN_PROVIDED = "No value object has been provided";
@@ -104,7 +104,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Resource(name = "TemplateDAO")
 	private TemplateDAO templateDAO;
 
-	@Resource(name = "DocumentListenerManager")
+	@Resource(name = "documentListenerManager")
 	private DocumentListenerManager listenerManager;
 
 	@Resource(name = "VersionDAO")

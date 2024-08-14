@@ -1,6 +1,5 @@
 package com.logicaldoc.core.document;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -27,7 +26,7 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 	private BookmarkDAO dao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDiscussionDAO

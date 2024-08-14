@@ -18,7 +18,6 @@ import com.logicaldoc.gui.frontend.client.google.GoogleApiAuthorization;
 import com.logicaldoc.gui.frontend.client.google.GoogleService;
 import com.logicaldoc.gui.frontend.client.google.GoogleUtil;
 import com.smartgwt.client.types.ViewName;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.calendar.Calendar;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -73,6 +72,13 @@ public class UserCalendarPanel extends VLayout {
 
 		if (Feature.enabled(Feature.GOOGLE_CALENDAR) && Menu.enabled(Menu.GOOGLE_CALENDAR)) {
 			toolStrip.addSeparator();
+			
+			ToolStripButton authorize = new ToolStripButton();
+			authorize.setTitle(I18N.message("authorize"));
+			authorize.setTooltip(I18N.message("authorizegooglecal"));
+			authorize.addClickHandler(click -> GoogleApiAuthorization.get().show());
+			toolStrip.addButton(authorize);
+			
 			ToolStripButton synchronize = new ToolStripButton();
 			synchronize.setTitle(I18N.message("synchronize"));
 			synchronize.setTooltip(I18N.message("synchronizegooglecal"));
@@ -82,12 +88,6 @@ public class UserCalendarPanel extends VLayout {
 			CheckboxItem enableSynchronization = ItemFactory.newCheckbox("enabled");
 			enableSynchronization.setTooltip(I18N.message("calendarenabledtip"));
 			toolStrip.addFormItem(enableSynchronization);
-
-			ToolStripButton authorize = new ToolStripButton();
-			authorize.setTitle(I18N.message("authorize"));
-			authorize.setTooltip(I18N.message("authorizegooglecal"));
-			authorize.addClickHandler(click -> GoogleApiAuthorization.get().show());
-			toolStrip.addButton(authorize);
 
 			GoogleService.Instance.get().loadSettings(new AsyncCallback<List<String>>() {
 
@@ -135,11 +135,11 @@ public class UserCalendarPanel extends VLayout {
 		calEvent.addAttendee(user);
 
 		calEvent.addReminder(new GUIReminder(0, GUIReminder.TIME_UNIT_MINUTE));
-		new CalendarEventDialog(calEvent, new refreshCallback()).show();
+		new CalendarEventDialog(calEvent, new RefreshCallback()).show();
 	}
 
 	private void initCalendar() {
-		calendar = new EventsCalendar(null, choosenDate, new refreshCallback());
+		calendar = new EventsCalendar(null, choosenDate, new RefreshCallback());
 		calendar.setChosenDate(choosenDate);
 		calendar.setCurrentViewName(choosenView);
 		addMember(calendar);
@@ -147,7 +147,7 @@ public class UserCalendarPanel extends VLayout {
 
 	public void synchronize() {
 		LD.contactingServer();
-		GoogleService.Instance.get().synchronizeCalendar(new refreshCallback());
+		GoogleService.Instance.get().synchronizeCalendar(new RefreshCallback());
 	}
 
 	public void refresh() {
@@ -159,7 +159,7 @@ public class UserCalendarPanel extends VLayout {
 		initCalendar();
 	}
 
-	private final class refreshCallback implements AsyncCallback<Void> {
+	private final class RefreshCallback implements AsyncCallback<Void> {
 		@Override
 		public void onFailure(Throwable caught) {
 			GoogleUtil.handleGoogleServiceError(caught);

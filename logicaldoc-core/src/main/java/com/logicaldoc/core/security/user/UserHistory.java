@@ -11,9 +11,9 @@ import com.logicaldoc.core.History;
 public class UserHistory extends History {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private String author;
-	
+
 	public UserHistory() {
 		super();
 	}
@@ -22,7 +22,7 @@ public class UserHistory extends History {
 		copyAttributesFrom(source);
 		setAuthor(source.getAuthor());
 	}
-	
+
 	public String getAuthor() {
 		return author;
 	}

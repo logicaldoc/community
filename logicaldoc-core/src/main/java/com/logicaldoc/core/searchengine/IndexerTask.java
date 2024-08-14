@@ -46,7 +46,7 @@ import com.logicaldoc.util.time.TimeDiff.TimeField;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
-@Component("IndexerTask")
+@Component("indexerTask")
 public class IndexerTask extends Task {
 
 	private static Logger lg = LoggerFactory.getLogger(IndexerTask.class);
@@ -58,7 +58,7 @@ public class IndexerTask extends Task {
 
 	public static final String NAME = "IndexerTask";
 
-	@Resource(name = "DocumentManager")
+	@Resource(name = "documentManager")
 	private DocumentManager documentManager;
 
 	@Resource(name = "DocumentDAO")

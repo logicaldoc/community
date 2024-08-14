@@ -24,7 +24,7 @@ import com.logicaldoc.util.config.ContextProperties;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
-@Component("LockManager")
+@Component("lockManager")
 public class LockManager {
 	private static final String LOCK = "lock";
 

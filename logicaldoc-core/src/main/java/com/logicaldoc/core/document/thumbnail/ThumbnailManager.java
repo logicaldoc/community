@@ -30,7 +30,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
-@Component("ThumbnailManager")
+@Component("thumbnailManager")
 public class ThumbnailManager {
 
 	public static final String SUFFIX_PREVIEW = "conversion.pdf";

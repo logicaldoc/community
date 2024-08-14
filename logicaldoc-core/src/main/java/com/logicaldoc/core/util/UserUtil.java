@@ -181,12 +181,12 @@ public class UserUtil {
 		}
 	}
 
-	private static BufferedImage generateDefaultAvatarImage(User user, int size) throws IOException {
+	private static BufferedImage generateDefaultAvatarImage(User user, int size) {
 		/*
 		 * Check Gravatar with main email
 		 */
 		BufferedImage avatarImage = getImageFromGravatar(user, size);
-		
+
 		/*
 		 * Now generate one from scratch
 		 */
@@ -205,33 +205,34 @@ public class UserUtil {
 	}
 
 	protected static BufferedImage getImageFromGravatar(User user, int size) {
-		BufferedImage avatarImage = null;
-		if (Context.get().getProperties().getBoolean("gravatar.enabled", false)) {
-			Gravatar gravatar = new Gravatar();
-			gravatar.setRating(GravatarRating.GENERAL_AUDIENCES);
-			gravatar.setDefaultImage(GravatarDefaultImage.GRAVATAR_ICON);
-			gravatar.setSize(size);
+		if (!Context.get().getProperties().getBoolean("gravatar.enabled", false))
+			return null;
 
-			byte[] bytes;
+		BufferedImage avatarImage = null;
+		Gravatar gravatar = new Gravatar();
+		gravatar.setRating(GravatarRating.GENERAL_AUDIENCES);
+		gravatar.setDefaultImage(GravatarDefaultImage.GRAVATAR_ICON);
+		gravatar.setSize(size);
+
+		byte[] bytes;
+		try {
+			bytes = gravatar.download(user.getEmail());
+			if (bytes != null && bytes.length > 0)
+				avatarImage = ImageIO.read(new ByteArrayInputStream(bytes));
+		} catch (Exception t) {
+			log.warn("Cannot download gravatar for email {}", user.getEmail(), t);
+		}
+
+		/*
+		 * Check Gravatar with secondary email
+		 */
+		if (avatarImage == null && StringUtils.isNotEmpty(user.getEmail2())) {
 			try {
-				bytes = gravatar.download(user.getEmail());
+				bytes = gravatar.download(user.getEmail2());
 				if (bytes != null && bytes.length > 0)
 					avatarImage = ImageIO.read(new ByteArrayInputStream(bytes));
 			} catch (Exception t) {
-				log.warn("Cannot download gravatar for email {}", user.getEmail(), t);
-			}
-
-			/*
-			 * Check Gravatar with secondary email
-			 */
-			if (avatarImage == null && StringUtils.isNotEmpty(user.getEmail2())) {
-				try {
-					bytes = gravatar.download(user.getEmail2());
-					if (bytes != null && bytes.length > 0)
-						avatarImage = ImageIO.read(new ByteArrayInputStream(bytes));
-				} catch (Exception t) {
-					log.warn("Cannot download gravatar for email {}", user.getEmail2(), t);
-				}
+				log.warn("Cannot download gravatar for email {}", user.getEmail2(), t);
 			}
 		}
 		return avatarImage;

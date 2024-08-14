@@ -3,7 +3,6 @@ package com.logicaldoc.core.conversion;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -26,7 +25,7 @@ public class XMLConverterTest extends AbstractCoreTestCase {
 	protected static Logger log = LoggerFactory.getLogger(XMLConverterTest.class);
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context.

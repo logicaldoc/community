@@ -37,13 +37,13 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 	private ResourceService resourceService;
 
 	public DavResourceFactoryImpl() {
-		this.resourceConfig = (ResourceConfig) Context.get().getBean("ResourceConfig");
+		this.resourceConfig = (ResourceConfig) Context.get().getBean("resourceConfig");
 		this.resourceService = (ResourceService) Context.get().getBean("ResourceService");
 	}
 
 	public DavResourceFactoryImpl(ResourceConfig resourceConfig) {
 		this.resourceConfig = (resourceConfig != null) ? resourceConfig
-				: (ResourceConfig) Context.get().getBean("ResourceConfig");
+				: (ResourceConfig) Context.get().getBean("resourceConfig");
 		this.resourceService = (ResourceService) Context.get().getBean("ResourceService");
 	}
 

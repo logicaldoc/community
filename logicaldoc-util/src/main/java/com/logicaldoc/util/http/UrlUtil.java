@@ -56,8 +56,8 @@ public class UrlUtil {
 	}
 
 	public static Map<String, String> getParams(String urlString)
-			throws UnsupportedEncodingException, MalformedURLException {
-		URL url = new URL(urlString);
+			throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+		URL url = UrlUtil.toURL(urlString);
 		Map<String, String> queryPairs = new LinkedHashMap<>();
 		String query = url.getQuery();
 		String[] pairs = query.split("&");
@@ -69,7 +69,7 @@ public class UrlUtil {
 		return queryPairs;
 	}
 
-	public static String getQueryParam(String url, String parameter) throws MalformedURLException {
+	public static String getQueryParam(String url, String parameter) throws MalformedURLException, URISyntaxException {
 		try {
 			return getParams(url).get(parameter);
 		} catch (UnsupportedEncodingException ex) {
@@ -92,9 +92,13 @@ public class UrlUtil {
 		return URLEncoder.encode(s, enc);
 	}
 
-	public static String normalize(String inputUrl) throws URISyntaxException {
-		URI inputUri = new URI(inputUrl);
+	public static String normalize(String inputUrl) throws URISyntaxException, MalformedURLException {
+		return toURL(inputUrl).toString();
+	}
+
+	public static URL toURL(String urlSpec) throws MalformedURLException, URISyntaxException {
+		URI inputUri = new URI(urlSpec.replace("\\", "/"));
 		URI normalizedUri = inputUri.normalize();
-		return normalizedUri.toString();
+		return normalizedUri.toURL();
 	}
 }

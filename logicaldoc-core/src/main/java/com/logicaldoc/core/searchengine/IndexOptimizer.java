@@ -18,7 +18,7 @@ import com.logicaldoc.core.task.TaskException;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.5.0
  */
-@Component("IndexOptimizer")
+@Component("indexOptimizer")
 public class IndexOptimizer extends Task {
 	public static final String NAME = "IndexOptimizer";
 

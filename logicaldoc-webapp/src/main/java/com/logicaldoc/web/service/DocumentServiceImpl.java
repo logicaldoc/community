@@ -2687,9 +2687,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				guiMail.setMessage(
 						email.isHtml() ? HTMLSanitizer.sanitize(email.getMessageText()) : email.getMessageText());
 				
-				System.out.println(email.getMessageText());
-				System.out.println("\n------------\n" + guiMail.getMessage());
-				
 				guiMail.setSigned(email.isSigned());
 
 				setEmailRecipients(email, guiMail);

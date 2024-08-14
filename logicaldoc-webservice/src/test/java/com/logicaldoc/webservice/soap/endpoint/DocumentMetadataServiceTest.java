@@ -1,6 +1,5 @@
 package com.logicaldoc.webservice.soap.endpoint;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -30,7 +29,7 @@ public class DocumentMetadataServiceTest extends AbstractWebserviceTestCase {
 	private SoapSecurityService securityServiceImpl;
 
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		templateDao = (TemplateDAO) context.getBean("TemplateDAO");

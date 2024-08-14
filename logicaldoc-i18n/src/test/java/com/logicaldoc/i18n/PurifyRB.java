@@ -125,6 +125,6 @@ public class PurifyRB {
 			country = st.nextToken();
 		if (st.hasMoreTokens())
 			variant = st.nextToken();
-		return new Locale(lang, country, variant);
+		return Locale.of(lang, country, variant);
 	}
 }

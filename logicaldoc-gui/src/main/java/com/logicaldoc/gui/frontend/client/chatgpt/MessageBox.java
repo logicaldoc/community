@@ -14,6 +14,8 @@ import com.smartgwt.client.widgets.Label;
  */
 class MessageBox extends Label {
 
+	private static final String CHATGPT = "chatgpt";
+
 	private String avatarIcon;
 
 	private String role;
@@ -24,12 +26,12 @@ class MessageBox extends Label {
 
 		this.role = role;
 
-		String url = "chatgpt".equals(role) ? Util.imageUrl("chatgpt.png")
+		String url = CHATGPT.equals(role) ? Util.imageUrl("chatgpt.png")
 				: Util.avatarUrl(Session.get().getUser().getId());
 		avatarIcon = "<img src='" + url
 				+ "' style='border: 0px; height: 32px; width: 32px  margin-right: 5px; margin-bottom: 3px' />";
 
-		String color = "chatgpt".equals(role) ? "white" : "MintCream";
+		String color = CHATGPT.equals(role) ? "white" : "MintCream";
 		setBackgroundColor(color);
 		setHeight("*");
 
@@ -48,7 +50,7 @@ class MessageBox extends Label {
 					+ "').innerText);\" style='width:32px'>" + copyIcon + "</button>";
 
 			return "<table border='0' width='100%'><tr><td style='width:36px; align:center; vertical-align: top;'>"
-					+ avatarIcon + ("chatgpt".equals(role) ? copyButton : "") + "</td><td><span id='"
+					+ avatarIcon + (CHATGPT.equals(role) ? copyButton : "") + "</td><td><span id='"
 					+ messageTextElementId + "'>" + message + "</span></td></tr></table>";
 		}
 	}

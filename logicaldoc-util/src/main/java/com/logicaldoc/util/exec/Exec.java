@@ -11,6 +11,7 @@ import java.io.Writer;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -25,6 +26,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Utility class used to execute system commands
@@ -78,19 +80,23 @@ public class Exec {
 	 * 
 	 * @param commandLine The command line to process. The path of the command
 	 *        must be listed in the allowed-commands.txt
+	 * @param environment The environemnt variables
 	 * @param directory The folder where the command will be executed
 	 * @param timeout The timeout in seconds
 	 * 
 	 * @throws IOException raised in case of errors during execution
 	 */
-	public int exec2(List<String> commandLine, File directory, int timeout) throws IOException {
-		checkAllowed(commandLine.get(0));
+	public int execPB(List<String> commandLine, Map<String, String> environment, File directory, int timeout)
+			throws IOException {
+		checkAllowed(commandLine);
 
 		log.debug("Executing command: {}", commandLine);
 		ProcessBuilder pb = new ProcessBuilder();
 		pb.redirectErrorStream(true);
 		pb.command(commandLine);
 		pb.directory(directory);
+		if (!CollectionUtils.isEmpty(environment))
+			pb.environment().putAll(environment);
 
 		Process process = pb.start();
 
@@ -126,6 +132,22 @@ public class Exec {
 	}
 
 	/**
+	 * Executes the command by using the process builder.
+	 * 
+	 * @return the return value
+	 * 
+	 * @param commandLine The command line to process. The path of the command
+	 *        must be listed in the allowed-commands.txt
+	 * @param directory The folder where the command will be executed
+	 * @param timeout The timeout in seconds
+	 * 
+	 * @throws IOException raised in case of errors during execution
+	 */
+	public int execPB(List<String> commandLine, File directory, int timeout) throws IOException {
+		return execPB(commandLine, null, directory, timeout);
+	}
+
+	/**
 	 * Execute the command by using the Runtime.getRuntime().exec()
 	 * 
 	 * @param commandLine the list of elements in the command line. The path of
@@ -140,7 +162,7 @@ public class Exec {
 	}
 
 	/**
-	 * Execute the command by using the Runtime.getRuntime().exec()
+	 * Executes the command by using the Runtime.getRuntime().exec()
 	 * 
 	 * @param commandLine the list of elements in the command line. The path of
 	 *        the command must be listed in the allowed-commands.txt
@@ -152,12 +174,13 @@ public class Exec {
 	 * 
 	 * @return the return code of the command
 	 */
-	public int exec(final List<String> commandLine, String[] env, File dir, int timeout) throws IOException {
-		checkAllowed(commandLine.get(0));
+	public int exec(List<String> commandLine, List<String> env, File dir, int timeout) throws IOException {
+		checkAllowed(commandLine);
 
 		int exit = 0;
 
-		final Process process = Runtime.getRuntime().exec(commandLine.toArray(new String[0]), env, dir);
+		final Process process = Runtime.getRuntime().exec(commandLine.toArray(new String[0]),
+				env != null ? env.toArray(new String[0]) : null, dir);
 
 		if (timeout > 0) {
 			ExecutorService service = Executors.newSingleThreadExecutor();
@@ -207,6 +230,55 @@ public class Exec {
 	}
 
 	/**
+	 * Executes the command by using the Runtime.getRuntime().exec()
+	 * 
+	 * @param commandLine the list of elements in the command line. The path of
+	 *        the command must be listed in the allowed-commands.txt
+	 * @param env the environment variables
+	 * @param dir the current folder
+	 * @param timeout maximum execution time expressed in seconds
+	 * 
+	 * @throws IOException raised in case of errors during execution
+	 * 
+	 * @return The output of the command
+	 */
+	public String execGetOutput(List<String> commandLine, List<String> env, File dir, int timeout) throws IOException {
+		checkAllowed(commandLine);
+
+		final Process process = Runtime.getRuntime().exec(commandLine.toArray(new String[0]),
+				env != null ? env.toArray(new String[0]) : null, dir);
+		if (timeout > 0) {
+			ExecutorService service = Executors.newSingleThreadExecutor();
+			try {
+				Callable<Integer> call = new CallableProcess(process);
+				Future<Integer> future = service.submit(call);
+				future.get(timeout, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				process.destroy();
+				Thread.currentThread().interrupt();
+			} catch (TimeoutException e) {
+				process.destroy();
+				log.warn(TIMEOUT_COMMAND, commandLine);
+			} catch (Exception e) {
+				log.warn(COMMAND_FAILED_TO_EXECUTE, commandLine);
+			} finally {
+				service.shutdown();
+			}
+		}
+
+		return getProcessOutput(process);
+	}
+
+	private String getProcessOutput(final Process process) throws IOException {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		StringBuilder out = new StringBuilder();
+		String s;
+		while ((s = reader.readLine()) != null)
+			out.append(s);
+		return out.toString();
+	}
+
+	/**
 	 * Takes the first part and the last part of a command line to make it
 	 * usable in the logs
 	 * 
@@ -233,25 +305,21 @@ public class Exec {
 	 * 
 	 * @throws IOException If the execution caused an error
 	 */
-	public String exec(String commandLine, String[] env, File dir) throws IOException {
+	public String execGetOutput(String commandLine, List<String> env, File dir) throws IOException {
 		checkAllowed(commandLine);
-
-		Process process = Runtime.getRuntime().exec(commandLine, env, dir != null ? dir : null);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-		StringBuilder out = new StringBuilder();
-		String s;
-		while ((s = reader.readLine()) != null)
-			out.append(s);
-		return out.toString();
+		Process process = Runtime.getRuntime().exec(commandLine.split(" "),
+				env != null ? env.toArray(new String[0]) : null, dir != null ? dir : null);
+		return getProcessOutput(process);
 	}
 
-	public int exec(final String commandLine, String[] env, File dir, StringBuilder buffer, int timeout)
+	public int exec(String commandLine, List<String> env, File dir, StringBuilder buffer, int timeout)
 			throws IOException {
 		checkAllowed(commandLine);
 
 		int exit = 0;
 
-		final Process process = Runtime.getRuntime().exec(commandLine, env, dir);
+		final Process process = Runtime.getRuntime().exec(commandLine.split(" "),
+				env != null ? env.toArray(new String[0]) : null, dir);
 
 		String commandForLog = " (" + commandForLog(commandLine) + ")";
 		StreamEater errEater = new StreamEater(errPrefix + commandForLog, process.getErrorStream());
@@ -263,7 +331,7 @@ public class Exec {
 
 		Thread b = new Thread(outEater);
 		b.start();
-		
+
 		if (timeout > 0) {
 			ExecutorService service = Executors.newSingleThreadExecutor();
 			try {
@@ -299,13 +367,14 @@ public class Exec {
 		return exit;
 	}
 
-	public int exec(final String commandLine, String[] env, File dir, Writer outputWriter, int timeout)
+	public int exec(String commandLine, List<String> env, File dir, Writer outputWriter, int timeout)
 			throws IOException {
 		checkAllowed(commandLine);
 
 		int exit = 0;
 
-		final Process process = Runtime.getRuntime().exec(commandLine, env, dir);
+		final Process process = Runtime.getRuntime().exec(commandLine.split(" "),
+				env != null ? env.toArray(new String[0]) : null, dir);
 
 		if (timeout > 0) {
 			ExecutorService service = Executors.newSingleThreadExecutor();
@@ -371,7 +440,7 @@ public class Exec {
 	 * 
 	 * @throws IOException raised if the command produced an error
 	 */
-	public int exec(final String commandLine, String[] env, File dir, int timeout) throws IOException {
+	public int exec(String commandLine, List<String> env, File dir, int timeout) throws IOException {
 		return exec(commandLine, env, dir, (Writer) null, timeout);
 	}
 
@@ -385,6 +454,10 @@ public class Exec {
 		public Integer call() throws Exception {
 			return p.waitFor();
 		}
+	}
+
+	private static void checkAllowed(List<String> commandLine) throws IOException {
+		checkAllowed(commandLine.stream().collect(Collectors.joining(" ")));
 	}
 
 	/**

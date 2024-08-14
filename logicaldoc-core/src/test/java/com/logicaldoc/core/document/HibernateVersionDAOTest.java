@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -35,7 +34,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 	private DocumentDAO docDao;
 
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that
@@ -79,7 +78,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testStore() throws PersistenceException, InterruptedException, IOException {
+	public void testStore() throws PersistenceException, IOException {
 		Document doc = docDao.findById(1);
 		docDao.initialize(doc);
 		assertEquals("1.0", doc.getVersion());

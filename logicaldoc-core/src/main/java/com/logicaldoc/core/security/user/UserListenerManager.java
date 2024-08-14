@@ -22,7 +22,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.1
  */
-@Component("UserListenerManager")
+@Component("userListenerManager")
 public class UserListenerManager {
 	private static final String POSITION = "position";
 

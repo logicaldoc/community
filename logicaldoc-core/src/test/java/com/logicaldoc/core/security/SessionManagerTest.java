@@ -8,7 +8,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -26,11 +25,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
-import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.spring.LDAuthenticationToken;
 import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
-import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.plugin.PluginException;
@@ -61,7 +58,7 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 
 	@Before
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		testSubject = SessionManager.get();
 		testSubject.addListener(this);
@@ -80,7 +77,7 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 	}
 
 	@Test
-	public void testNewSession() throws AuthenticationException, PersistenceException {
+	public void testNewSession() throws AuthenticationException {
 		testSubject.clear();
 		Session session1 = testSubject.newSession("admin", "admin", (Client) null);
 		assertNotNull(session1);
@@ -144,8 +141,8 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 
 	@Test
 	public void testBuildClient() {
-		Client client = testSubject.buildClient(request);
-		assertEquals("admin", client.getUsername());
+		Client clnt = testSubject.buildClient(request);
+		assertEquals("admin", clnt.getUsername());
 	}
 
 	@Test

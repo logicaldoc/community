@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.junit.Test;
@@ -21,7 +20,7 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 public class PSTWorkerTest extends AbstractCoreTestCase {
 
 	@Test
-	public void testPrintListing() throws FileNotFoundException, IOException {
+	public void testPrintListing() throws IOException {
 		PSTWorker worker = new PSTWorker(new File("src/test/resources/sample.pst"));
 		String listing = worker.printListing();
 		assertNotNull(listing);
@@ -29,14 +28,14 @@ public class PSTWorkerTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCountEmails() throws FileNotFoundException, IOException {
+	public void testCountEmails() throws IOException {
 		PSTWorker worker = new PSTWorker(new File("src/test/resources/sample.pst"));
 		long count = worker.countEmails();
 		assertEquals(1, count);
 	}
-	
+
 	@Test
-	public void testPrintEmails() throws FileNotFoundException, IOException {
+	public void testPrintEmails() throws IOException {
 		PSTWorker worker = new PSTWorker(new File("src/test/resources/sample.pst"));
 		String emails = worker.printEmails();
 		assertNotNull(emails);

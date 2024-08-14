@@ -48,7 +48,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.1.3
  */
-@Component("FormatConverterManager")
+@Component("formatConverterManager")
 public class FormatConverterManager {
 
 	/*
@@ -64,7 +64,7 @@ public class FormatConverterManager {
 	@Resource(name = "TenantDAO")
 	private TenantDAO tenantDao;
 
-	@Resource(name = "DocumentManager")
+	@Resource(name = "documentManager")
 	private DocumentManager documentManager;
 
 	@Resource(name = "ContextProperties")

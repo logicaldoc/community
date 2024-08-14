@@ -22,7 +22,7 @@ import com.logicaldoc.util.crypt.CryptUtil;
  * @author Sebastian Wenzky
  * @since 4.5
  */
-@Component("DefaultAuthenticator")
+@Component("defaultAuthenticator")
 public class DefaultAuthenticator extends AbstractAuthenticator {
 
 	protected static Logger log = LoggerFactory.getLogger(DefaultAuthenticator.class);

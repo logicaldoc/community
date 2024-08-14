@@ -1,7 +1,6 @@
 package com.logicaldoc.webservice.soap.endpoint;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -46,7 +45,7 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 	private SoapDocumentService docService;
 
 	@Override
-	public void setUp() throws FileNotFoundException, IOException, SQLException, PluginException {
+	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		docDao = (DocumentDAO) context.getBean("DocumentDAO");
 		folderDao = (FolderDAO) context.getBean("FolderDAO");

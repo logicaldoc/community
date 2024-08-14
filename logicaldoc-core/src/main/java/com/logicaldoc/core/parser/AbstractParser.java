@@ -119,8 +119,7 @@ public abstract class AbstractParser implements Parser {
 			else if (!"completed".equals(ret))
 				throw new ParsingException(ret);
 		} finally {
-			if (executor != null)
-				executor.shutdownNow();
+			executor.shutdownNow();
 		}
 	}
 
