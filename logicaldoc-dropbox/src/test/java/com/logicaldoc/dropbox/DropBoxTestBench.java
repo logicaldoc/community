@@ -17,7 +17,7 @@ import com.logicaldoc.util.security.StringEncrypter.EncryptionException;
 
 public class DropBoxTestBench {
 
-	public static void main(String[] args) throws IOException, URISyntaxException, DbxException, PersistenceException, EncryptionException {
+	public static void main(String[] args) throws IOException, DbxException, PersistenceException, EncryptionException {
 		Dropbox client = new Dropbox(1L);
 		boolean entered = client.login();
 		System.out.println("entered " + entered);

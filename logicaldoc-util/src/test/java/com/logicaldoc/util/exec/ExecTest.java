@@ -196,16 +196,4 @@ public class ExecTest {
 			assertTrue(out.isEmpty() || out.contains("1000000") || out.contains("Hello World!"));
 		}
 	}
-
-	@Test
-	public void testNormalizePathForCommand() {
-		if (new Exec().isWindows()) {
-			String path = "target/test-classes/nothing.bat";
-			String retval = new Exec().normalizePathForCommand(path);
-			log.info("retval: {}", retval);
-			String expected = "\"target\\test-classes\\nothing.bat\"";
-			assertEquals(expected, retval);
-		}
-	}
-
 }

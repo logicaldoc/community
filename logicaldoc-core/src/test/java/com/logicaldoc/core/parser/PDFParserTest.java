@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.Locale;
 
@@ -38,24 +37,11 @@ public class PDFParserTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testParse() throws ParsingException {
-
-		// This is a pdf German document that PDFBox version 0.7.3 in not able
-		// to read
-		// The new version of PDFBox 1.3.1 is able to open such document
-		// This pdf has been created with Adobe PDF Library 9.0
-		String inputFile = "src/test/resources/Digital_Day.pdf";
-		File file = new File(inputFile);
+		File file = new File("src/test/resources/probiotic-1.4.pdf");
 		String filename = file.getPath();
 
 		Parser parser = ParserFactory.getParser(filename);
 		PDFParser pdfp = (PDFParser) parser;
-
-		inputFile = "src/test/resources/probiotic-1.4.pdf";
-		file = new File(inputFile);
-		filename = file.getPath();
-
-		parser = ParserFactory.getParser(filename);
-		pdfp = (PDFParser) parser;
 		String content = pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
 		Assert.assertTrue(content.contains("adequate"));
 	}

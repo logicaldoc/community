@@ -230,7 +230,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testCreateDownloadTicket() throws ServerException, PersistenceException {
+	public void testCreateDownloadTicket() throws ServerException {
 		List<String> ticket = service.createDownloadTicket(5L, 0, null, null, null, null, null);
 		// We do not have a HTTP request so expect that the first string is the
 		// exact ticket ID
@@ -243,7 +243,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testDeleteEnableDisableTicket() throws ServerException, PersistenceException {
+	public void testDeleteEnableDisableTicket() throws ServerException {
 		List<String> ticket = service.createDownloadTicket(5, 0, null, null, null, null, null);
 
 		// We do not have a HTTP request so expect that the first string is the
@@ -268,7 +268,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testRename() throws ServerException, PersistenceException {
+	public void testRename() throws ServerException {
 		GUIDocument doc = service.getById(7);
 		System.out.println(doc.getFileName());
 		assertEquals("New error indexing documents.eml", doc.getFileName());
@@ -429,7 +429,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testMakeImmutable() throws ServerException, IOException, InterruptedException {
+	public void testMakeImmutable() throws ServerException {
 		GUIDocument doc = service.getById(7);
 		assertEquals(0, doc.getImmutable());
 
@@ -440,7 +440,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testPromoteVersion() throws ServerException, IOException, InterruptedException {
+	public void testPromoteVersion() throws ServerException {
 		testCheckin();
 		GUIDocument doc = service.getById(7);
 		assertEquals(GUIDocument.DOC_UNLOCKED, doc.getStatus());
@@ -477,7 +477,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testCheckout() throws ServerException, IOException, InterruptedException {
+	public void testCheckout() throws ServerException {
 		GUIDocument doc = service.getById(7);
 		assertEquals(Document.DOC_UNLOCKED, doc.getStatus());
 
@@ -487,7 +487,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testCheckin() throws ServerException, IOException, InterruptedException {
+	public void testCheckin() throws ServerException {
 		testCheckout();
 
 		// Prepare the file to checkin
@@ -592,7 +592,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testMerge() throws ServerException, IOException, InterruptedException {
+	public void testMerge() throws ServerException, IOException {
 		GUIDocument doc = service.getById(7);
 		doc.setId(0L);
 		doc.setCustomId(null);
@@ -626,7 +626,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testUpdatePages() throws ServerException, IOException, InterruptedException {
+	public void testUpdatePages() throws ServerException, IOException {
 		GUIDocument doc = service.getById(7);
 		doc.setId(0L);
 		doc.setCustomId(null);
@@ -652,7 +652,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testReplaceAlias() throws ServerException, IOException, InterruptedException, PersistenceException {
+	public void testReplaceAlias() throws ServerException, PersistenceException {
 		DocumentManager manager = (DocumentManager) context.getBean("documentManager");
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(session.getUser());
@@ -670,7 +670,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testDeduplicate() throws ServerException, IOException, InterruptedException, PersistenceException {
+	public void testDeduplicate() throws ServerException, PersistenceException {
 		Document doc5 = docDao.findById(5);
 		docDao.initialize(doc5);
 		doc5.setDigest("pippo");
@@ -693,7 +693,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testConvert() throws ServerException, IOException {
+	public void testConvert() throws ServerException {
 		GUIDocument doc = service.getById(7);
 		GUIDocument conversion = service.convert(doc.getId(), doc.getFileVersion(), "pdf");
 		conversion = service.getById(conversion.getId());
@@ -765,14 +765,13 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	@Test
 	public void testDeleteVersions() throws ServerException {
 		List<Long> ids = List.of(21L, 22L, 23L);
-		GUIDocument gdoc;
-		boolean exceptionHappened = false;
+		GUIDocument gdoc;s
 		try {
-			gdoc = service.deleteVersions(ids);
+			service.deleteVersions(ids);
+			fail("No exception here");
 		} catch (AssertionError | ServerException e) {
-			exceptionHappened = true;
+			// All ok
 		}
-		assertTrue(exceptionHappened);
 
 		ids = List.of(1L, 2L);
 		gdoc = service.deleteVersions(ids);

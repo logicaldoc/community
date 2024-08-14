@@ -50,7 +50,8 @@ public class SessionsDataServlet extends AbstractDataServlet {
 		if (request.getParameter("kill") != null) {
 			// Kill a specific session
 			SessionManager.get().kill(request.getParameter("kill"));
-			log.debug("Killed session {}", request.getParameter("kill"));
+			if (log.isDebugEnabled())
+				log.debug("Killed session {}", request.getParameter("kill"));
 			PrintWriter writer = response.getWriter();
 			writer.println("ok");
 		} else {

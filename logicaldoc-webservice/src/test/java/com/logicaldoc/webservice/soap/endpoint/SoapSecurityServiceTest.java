@@ -147,7 +147,7 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 		wsUserTest.setType(User.TYPE_SYSTEM);
 
 		try {
-			userId = securityServiceImpl.storeUser("", wsUserTest);
+			securityServiceImpl.storeUser("", wsUserTest);
 			fail("Expected exception was not thrown");
 		} catch (Exception e) {
 			// nothing to do here

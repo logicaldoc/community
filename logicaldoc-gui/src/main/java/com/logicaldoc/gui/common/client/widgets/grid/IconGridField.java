@@ -46,7 +46,7 @@ public class IconGridField extends ListGridField {
 				return "";
 
 			String iconName = (String) value;
-			if (iconName == null || iconName.isEmpty())
+			if (iconName.isEmpty())
 				return "";
 
 			if (iconName.contains("folder") || iconName.contains("workspace")) {

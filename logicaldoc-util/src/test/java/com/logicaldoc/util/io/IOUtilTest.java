@@ -71,7 +71,7 @@ public class IOUtilTest {
 	}
 
 	@Test
-	public void testSerialize() throws IOException {
+	public void testSerialize() {
 		HashMap<String, Object> map = new HashMap<>();
 		map.put("1", "value1");
 

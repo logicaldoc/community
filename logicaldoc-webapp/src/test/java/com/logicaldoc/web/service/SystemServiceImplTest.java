@@ -107,16 +107,14 @@ public class SystemServiceImplTest extends AbstractWebappTestCase {
 	@Test
 	public void testStartStop() throws ServerException, InterruptedException {
 		testSubject.startTask("IndexerTask");
-		GUITask task = testSubject.getTaskByName("IndexerTask", "en");
-
 		testSubject.stopTask("IndexerTask");
 		waiting();
-		task = testSubject.getTaskByName("IndexerTask", "en");
+		GUITask task = testSubject.getTaskByName("IndexerTask", "en");
 		assertEquals(Task.STATUS_IDLE, task.getStatus());
 	}
 
 	@Test
-	public void testEnableDisable() throws ServerException, InterruptedException {
+	public void testEnableDisable() throws ServerException {
 		testSubject.disableTask("IndexerTask");
 		GUITask task = testSubject.getTaskByName("IndexerTask", "en");
 		assertFalse(task.getScheduling().isEnabled());
@@ -169,7 +167,7 @@ public class SystemServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testSearch() throws ServerException, InterruptedException {
+	public void testSearch() throws ServerException {
 		List<GUIHistory> hits = testSubject.search(null, null, null, 100, null, new ArrayList<>(), null);
 		assertEquals(7, hits.size());
 
@@ -182,7 +180,7 @@ public class SystemServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testSearchApiCalls() throws ServerException, InterruptedException {
+	public void testSearchApiCalls() throws ServerException {
 		List<GUIHistory> hits = testSubject.searchApiCalls(null, null, null, null, null, null, 100);
 		assertEquals(7, hits.size());
 
@@ -231,7 +229,7 @@ public class SystemServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testInstallPlugin() throws ServerException, IOException, PluginException {
+	public void testInstallPlugin() throws ServerException, IOException {
 		testSubject.uninstallPlugin("logicaldoc-dummy");
 
 		File libFolder = new File(new File(SystemServiceImpl.defaultWebappRootFolder, "WEB-INF"), "lib");

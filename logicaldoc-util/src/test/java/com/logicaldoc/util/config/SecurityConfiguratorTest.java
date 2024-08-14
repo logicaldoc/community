@@ -2,14 +2,12 @@ package com.logicaldoc.util.config;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.plugin.PluginException;
 
 /**
  * Test case for <code>SecurityConfigurator</code>
@@ -22,7 +20,7 @@ public class SecurityConfiguratorTest {
 	File contextSecurityXml = new File("target/context-security.xml");
 
 	@Before
-	public void setUp() throws IOException, SQLException, PluginException {
+	public void setUp() throws IOException {
 		FileUtil.copyResource("/context-security.xml", contextSecurityXml);
 	}
 

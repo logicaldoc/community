@@ -66,30 +66,30 @@ public class FileUtilTest {
 	}
 
 	@Test
-	public void testMatch() throws IOException {
+	public void testMatch() {
 		assertTrue(FileUtil.matches("ReleaseNotes.txt", "*.doc,*.txt", ""));
 	}
 
 	@Test
-	public void testGetName() throws IOException {
+	public void testGetName() {
 		String file = "/abc/def/pollo:test.pdf";
 		assertEquals("pollo:test.pdf", FileUtil.getName(file));
 	}
 
 	@Test
-	public void testGetBaseName() throws IOException {
+	public void testGetBaseName() {
 		String file = "/abc/def/pollo:test.pdf";
 		assertEquals("pollo:test", FileUtil.getBaseName(file));
 	}
 
 	@Test
-	public void testGetExtension() throws IOException {
+	public void testGetExtension() {
 		String file = "/abc/def/pollo:test.pdf";
 		assertEquals("pdf", FileUtil.getExtension(file));
 	}
 
 	@Test
-	public void testGetPath() throws IOException {
+	public void testGetPath() {
 		String file = "/abc/def/pollo:test.pdf";
 		assertEquals("abc/def/", FileUtil.getPath(file));
 	}
@@ -215,8 +215,6 @@ public class FileUtilTest {
 
 		bytes = FileUtil.toByteArray(file, 0, 40);
 		assertEquals(40, bytes.length);
-
-		bytes = FileUtil.toByteArray(file, 0, file.length());
 	}
 
 	@Test

@@ -3,24 +3,22 @@ package com.logicaldoc.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-
 import org.junit.Test;
 
 public class SystemUtilTest {
 
 	@Test
-	public void testPrintEnvironment() throws IOException {
+	public void testPrintEnvironment() {
 		assertTrue(SystemUtil.printEnvironment().contains("java.version"));
 	}
 
 	@Test
-	public void testPrintStackTrace() throws IOException {
+	public void testPrintStackTrace() {
 		assertTrue(SystemUtil.printStackTrace().contains(SystemUtilTest.class.getName()));
 	}
 
 	@Test
-	public void testGetOS() throws IOException {
+	public void testGetOS() {
 		String originalOsName = System.getProperty("os.name");
 		try {
 			System.setProperty("os.name", "Unix");

@@ -6,13 +6,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.logicaldoc.util.plugin.PluginException;
 
 public class SevenZipUtilTest {
 	private File dir = new File("target/test");
@@ -22,8 +19,7 @@ public class SevenZipUtilTest {
 	private SevenZipUtil testSubject = new SevenZipUtil();
 
 	@Before
-	public void setUp() throws IOException, SQLException, PluginException {
-		File dir = new File("target/test");
+	public void setUp() throws IOException {
 		dir.mkdirs();
 		dir.mkdir();
 
@@ -31,7 +27,7 @@ public class SevenZipUtilTest {
 	}
 
 	@After
-	public void tearDown() throws Exception {
+	public void tearDown() {
 		FileUtil.delete(dir);
 	}
 

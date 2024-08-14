@@ -43,7 +43,7 @@ public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindByUserId() throws PersistenceException, IOException {
+	public void testFindByUserId() throws PersistenceException {
 		FulltextSearchOptions opt = new FulltextSearchOptions();
 
 		opt.setLanguage("it");
@@ -79,7 +79,7 @@ public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCharsets() throws IOException, PersistenceException {
+	public void testCharsets() throws PersistenceException {
 		FulltextSearchOptions opt = new FulltextSearchOptions();
 
 		opt.setLanguage("it");
@@ -121,7 +121,7 @@ public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 		saved.setName("缺乏谦卑");
 		saved.saveOptions(opt);
 		xml = saved.getOptions();
-		
+
 		assertNotNull(xml);
 		System.out.println(xml);
 		assertTrue(xml.length() > 600);

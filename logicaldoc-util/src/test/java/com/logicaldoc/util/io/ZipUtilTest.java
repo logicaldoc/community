@@ -8,7 +8,6 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.zip.ZipEntry;
 
@@ -18,8 +17,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.logicaldoc.util.plugin.PluginException;
 
 public class ZipUtilTest {
 	private static Logger log = LoggerFactory.getLogger(ZipUtilTest.class);
@@ -31,7 +28,7 @@ public class ZipUtilTest {
 	private ZipUtil testSubject = new ZipUtil();
 
 	@Before
-	public void setUp() throws IOException, SQLException, PluginException {
+	public void setUp() throws IOException {
 		folder.mkdir();
 		FileUtil.copyResource("/test.zip", file);
 	}
@@ -47,7 +44,7 @@ public class ZipUtilTest {
 	}
 
 	@Test
-	public void testListZipEntries() throws IOException {
+	public void testListZipEntries() {
 		List<ZipEntry> entries = testSubject.listZipEntries(file);
 		assertEquals(5, entries.size());
 	}
@@ -78,14 +75,14 @@ public class ZipUtilTest {
 	}
 
 	@Test
-	public void testListEntries() throws IOException {
+	public void testListEntries(){
 		List<String> entries = testSubject.listEntries(file);
 		assertEquals(5, entries.size());
 		assertTrue(entries.contains("impex.xsd"));
 	}
 
 	@Test
-	public void testGetEntryBytes() throws IOException {
+	public void testGetEntryBytes() {
 		testSubject.setFileNameCharset("UTF-8");
 		byte[] in = testSubject.getEntryBytes(file, "/index.xml");
 		assertEquals(132997526, in.length);
@@ -95,10 +92,10 @@ public class ZipUtilTest {
 	public void testUmlauts() {
 		String notThrownTest = null;
 		try {
-			File file = new File("target/NeuesZip.zip");
-			FileUtil.copyResource("/NeuesZip.zip", file);
+			File zipFile = new File("target/NeuesZip.zip");
+			FileUtil.copyResource("/NeuesZip.zip", zipFile);
 			testSubject.setFileNameCharset("utf-8");
-			List<String> entries = testSubject.listEntries(file);
+			List<String> entries = testSubject.listEntries(zipFile);
 			log.debug("Found {} entries", entries.size());
 			notThrownTest = "ok";
 		} catch (Exception t) {

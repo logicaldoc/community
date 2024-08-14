@@ -5,13 +5,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.logicaldoc.util.plugin.PluginException;
 
 public class JarUtilTest {
 	private File dir = new File("target/test");
@@ -21,8 +18,7 @@ public class JarUtilTest {
 	private JarUtil testSubject = new JarUtil();
 
 	@Before
-	public void setUp() throws IOException, SQLException, PluginException {
-		File dir = new File("target/test");
+	public void setUp() throws IOException {
 		dir.mkdirs();
 		dir.mkdir();
 
@@ -30,7 +26,7 @@ public class JarUtilTest {
 	}
 
 	@After
-	public void tearDown() throws Exception {
+	public void tearDown() {
 		FileUtil.delete(dir);
 	}
 

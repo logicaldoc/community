@@ -90,7 +90,6 @@ public class GoogleApiAuthorization extends Window {
 				clientSecret.setValue(settings.get(1));
 			}
 		});
-		;
 	}
 
 	public void onAuthenticate() {

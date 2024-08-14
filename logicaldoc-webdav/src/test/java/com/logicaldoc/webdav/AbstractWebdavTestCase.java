@@ -4,7 +4,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.rmi.ServerException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -54,17 +53,11 @@ public abstract class AbstractWebdavTestCase extends AbstractTestCase {
 		super.setUp();
 
 		prepareRepository();
-
-		try {
-			prepareSession("admin", "admin");
-		} catch (ServerException e) {
-			throw new IOException(e);
-		}
-
+		prepareSession("admin", "admin");
 		assertNotNull(session);
 	}
 
-	protected void prepareSession(String username, String password) throws ServerException, PersistenceException {
+	protected void prepareSession(String username, String password) throws PersistenceException {
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 
 		Client client = new Client("xyz", "192.168.2.231", "ghost");

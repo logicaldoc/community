@@ -230,7 +230,7 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 	public void testSaveProfile() throws ServerException {
 		GUIUser user = testSubject.getUser(3);
 		user.setCity("Carpi");
-		user = testSubject.saveProfile(user);
+		testSubject.saveProfile(user);
 
 		user = testSubject.getUser(3);
 		assertEquals("Carpi", user.getCity());
@@ -240,7 +240,7 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 	public void testSaveInterfaceSettings() throws ServerException {
 		GUIUser user = testSubject.getUser(3);
 		user.setDefaultWorkspace(99L);
-		user = testSubject.saveInterfaceSettings(user);
+		testSubject.saveInterfaceSettings(user);
 
 		user = testSubject.getUser(3);
 		assertEquals(99L, user.getDefaultWorkspace().longValue());
@@ -450,7 +450,7 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testCloneWorkTimes() throws ServerException, PersistenceException {
+	public void testCloneWorkTimes() throws ServerException {
 		GUIUser user = testSubject.getUser(3L);
 		assertTrue(user.getWorkingTimes().isEmpty());
 
@@ -489,7 +489,7 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testGenerateAndValidatePassword() throws ServerException, PersistenceException {
+	public void testGenerateAndValidatePassword() throws ServerException {
 		ContextProperties config = Context.get().getProperties();
 		String password = testSubject.generatePassword();
 

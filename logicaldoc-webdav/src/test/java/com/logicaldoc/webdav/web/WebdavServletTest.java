@@ -75,7 +75,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		testDELETE();
 	}
 
-	public void testVERSIONCONTROL() throws IOException, PersistenceException {
+	public void testVERSIONCONTROL() throws IOException {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
 			MockServletResponse response = new MockServletResponse(tempFile);
@@ -87,7 +87,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		}
 	}
 
-	public void testREPORT() throws IOException, PersistenceException {
+	public void testREPORT() throws IOException {
 		// This WebDAV mehod is not really implemented
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
@@ -158,7 +158,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		}
 	}
 
-	public void testOPTIONS() throws IOException, PersistenceException {
+	public void testOPTIONS() throws IOException {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
 			MockServletResponse response = new MockServletResponse(tempFile);
@@ -172,7 +172,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		}
 	}
 
-	public void testMKCOL() throws IOException, PersistenceException {
+	public void testMKCOL() throws IOException {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
 			assertFalse(callPROPFIND().contains(PREFIX + "/folder6/newfolder"));
@@ -187,7 +187,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		}
 	}
 
-	public void testMOVE() throws IOException, PersistenceException {
+	public void testMOVE() throws IOException {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
 			assertTrue(callPROPFIND().contains(PREFIX + "/five.pdf"));
@@ -205,7 +205,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		}
 	}
 
-	public void testCOPY() throws IOException, PersistenceException {
+	public void testCOPY() throws IOException {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
 			assertTrue(callPROPFIND().contains(PREFIX + "/one.pdf"));

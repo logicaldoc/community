@@ -8,6 +8,7 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -168,6 +169,7 @@ public class MockServletRequest implements HttpServletRequest {
 
 				@Override
 				public void setReadListener(ReadListener arg0) {
+					// Do nothing
 				}
 			};
 		} else if (payload != null) {
@@ -188,6 +190,7 @@ public class MockServletRequest implements HttpServletRequest {
 
 				@Override
 				public void setReadListener(ReadListener arg0) {
+					// Do nothing
 				}
 			};
 		}
@@ -496,91 +499,76 @@ public class MockServletRequest implements HttpServletRequest {
 
 	@Override
 	public AsyncContext getAsyncContext() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public long getContentLengthLong() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public DispatcherType getDispatcherType() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public ServletContext getServletContext() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean isAsyncStarted() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean isAsyncSupported() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public AsyncContext startAsync() throws IllegalStateException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public AsyncContext startAsync(ServletRequest arg0, ServletResponse arg1) throws IllegalStateException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean authenticate(HttpServletResponse arg0) throws IOException, ServletException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public String changeSessionId() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Part getPart(String arg0) throws IOException, ServletException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Collection<Part> getParts() throws IOException, ServletException {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<>();
 	}
 
 	@Override
 	public void login(String arg0, String arg1) throws ServletException {
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void logout() throws ServletException {
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public <T extends HttpUpgradeHandler> T upgrade(Class<T> arg0) throws IOException, ServletException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

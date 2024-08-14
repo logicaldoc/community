@@ -84,8 +84,8 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 		Document doc = docDao.findById(1);
 		Assert.assertNotNull(doc);
 
-		WSNote note = docService.addNote("", doc.getId(), "note1");
-		note = docService.addNote("", doc.getId(), "note2");
+		docService.addNote("", doc.getId(), "note1");
+		WSNote note = docService.addNote("", doc.getId(), "note2");
 
 		List<WSNote> notes = docService.getNotes("", doc.getId());
 		Assert.assertEquals(4, notes.size());
@@ -201,8 +201,6 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 		Assert.assertNotNull(doc);
 		docDao.initialize(doc);
 
-		// Assert.assertEquals(AbstractDocument.INDEX_TO_INDEX,
-		// doc.getIndexed());
 		Assert.assertEquals(0, doc.getSigned());
 		Assert.assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
 	}

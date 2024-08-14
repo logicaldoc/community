@@ -71,7 +71,7 @@ public class Value<V extends Object> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		if (obj instanceof Value other) {
+		if (obj instanceof Value<?> other) {
 			if (val == null) {
 				if (other.val != null)
 					return false;

@@ -100,7 +100,7 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 		try {
 			folder = service.getFolder(9999, false, false, false);
 		} catch (ServerException e) {
-			// We expect an exception here;
+			// We expect an exception here
 		}
 		Assert.assertNull(folder);
 	}

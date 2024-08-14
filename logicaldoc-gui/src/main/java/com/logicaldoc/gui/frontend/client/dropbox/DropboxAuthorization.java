@@ -77,7 +77,6 @@ public class DropboxAuthorization extends Window {
 				apiSecret.setValue(settings.get(1));
 			}
 		});
-		;
 	}
 
 	public void onAuthenticate() {

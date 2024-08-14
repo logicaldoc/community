@@ -80,9 +80,6 @@ public class ApiCallsPanel extends VLayout {
 
 	private InfoPanel infoPanel;
 
-	public ApiCallsPanel() {
-	}
-
 	@Override
 	public void onDraw() {
 		SelectItem userSelector = ItemFactory.newUserSelector("user", "user", null, false, false);

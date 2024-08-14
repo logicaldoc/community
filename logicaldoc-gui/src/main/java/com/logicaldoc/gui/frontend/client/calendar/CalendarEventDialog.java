@@ -49,7 +49,6 @@ import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.TimeItem;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -426,16 +425,12 @@ public class CalendarEventDialog extends Window {
 			if (!"0".equals(exit.getRecord().getAttributeAsString("id")))
 				exit.getGrid().cancelEditing();
 		});
-		name.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				String val = value != null ? value.toString() : "";
-				if (record.getAttributeAsString("id").equals(Long.toString(calendarEvent.getOrganizerId())))
-					return val + " (" + I18N.message("organizer") + ")";
-				else
-					return val;
-			}
+		name.setCellFormatter((value, rec, rowNum, colNum) -> {
+			String val = value != null ? value.toString() : "";
+			if (rec.getAttributeAsString("id").equals(Long.toString(calendarEvent.getOrganizerId())))
+				return val + " (" + I18N.message("organizer") + ")";
+			else
+				return val;
 		});
 		return name;
 	}

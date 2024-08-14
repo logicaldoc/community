@@ -37,7 +37,7 @@ import com.logicaldoc.util.http.StringHttpClientResponseHandler;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSSearchOptions;
 
-public class HttpRestWb {
+public class HttpRestWorkbench {
 
 	// public static String BASE_PATH = "http://localhost/logicaldoc";
 	public static String BASE_PATH = "http://localhost:8086";

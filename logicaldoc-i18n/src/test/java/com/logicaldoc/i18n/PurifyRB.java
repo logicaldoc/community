@@ -73,16 +73,13 @@ public class PurifyRB {
 			try {
 				String masterValue = master.getString(key);
 
-				if (masterValue != null) {
+				if (masterValue != null && !value.equals(masterValue)) {
 					// la chiave esiste anche nel master
-					if (!value.equals(masterValue)) {
-						// il valore e diverso da quello iniziale
-						// copio l'accoppiata chiave valore nel properties di
-						// destinazione
-						destprop.put(key, value);
-						// System.out.println("trans <> master");
-						counter++;
-					}
+					// il valore e diverso da quello iniziale
+					// copio l'accoppiata chiave valore nel properties di
+					// destinazione
+					destprop.put(key, value);
+					counter++;
 				}
 			} catch (MissingResourceException e) {
 				mre++;
@@ -106,8 +103,6 @@ public class PurifyRB {
 			destprop.store(ow, "comments");
 			ow.flush();
 			out.flush();
-			// out.close();
-			// ow.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

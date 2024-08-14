@@ -725,7 +725,8 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 		WebdavSession session = (com.logicaldoc.webdav.session.WebdavSession) request.getDavSession();
 		DavResource destResource = null;
 		try {
-			log.debug("Destination: {}", request.getHeader("Destination"));
+			if (log.isDebugEnabled())
+				log.debug("Destination: {}", request.getHeader("Destination"));
 			destResource = getResourceFactory().createResource(request.getDestinationLocator(), request, session);
 		} catch (Exception e) {
 			destResource = resource.getCollection();
@@ -907,8 +908,9 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 		ResourceService resourceService = (ResourceService) Context.get().getBean(ResourceService.class);
 		WebdavSession session = (com.logicaldoc.webdav.session.WebdavSession) request.getDavSession();
 		Resource repositoryResource = resourceService.getResource(resource.getResourcePath(), session);
-		
-		resourceService.updateResource(repositoryResource, new ImportContextImpl(repositoryResource, null, request.getInputStream()), session);
+
+		resourceService.updateResource(repositoryResource,
+				new ImportContextImpl(repositoryResource, null, request.getInputStream()), session);
 	}
 
 	/**

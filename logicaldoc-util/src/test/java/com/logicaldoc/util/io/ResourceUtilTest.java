@@ -13,7 +13,7 @@ import org.junit.Test;
 public class ResourceUtilTest {
 
 	@Test
-	public void testExistsResource() throws IOException {
+	public void testExistsResource() {
 		Assert.assertTrue(ResourceUtil.existsResource("/context.xml"));
 		Assert.assertFalse(ResourceUtil.existsResource("/test.txt"));
 	}

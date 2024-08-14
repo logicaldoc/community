@@ -78,9 +78,8 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	 */
 	public Object getBean(String id) {
 		// If not found with give ID try to lowercase the first char
-		Object obj = applicationContext.containsBean(id) ? applicationContext.getBean(id)
+		return applicationContext.containsBean(id) ? applicationContext.getBean(id)
 				: applicationContext.getBean(Character.toLowerCase(id.charAt(0)) + id.substring(1));
-		return obj;
 	}
 
 	/**

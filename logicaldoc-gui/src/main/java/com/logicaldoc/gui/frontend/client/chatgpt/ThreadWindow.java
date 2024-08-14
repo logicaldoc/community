@@ -18,8 +18,6 @@ import com.smartgwt.client.types.Positioning;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -62,14 +60,8 @@ public class ThreadWindow extends Window {
 		setWidth(500);
 		setHeight(500);
 		setMembersMargin(2);
-		
-		addResizedHandler(new ResizedHandler() {
-			
-			@Override
-			public void onResized(ResizedEvent event) {
-				messagesBoard.reflow();
-			}
-		});
+
+		addResizedHandler(resize -> messagesBoard.reflow());
 	}
 
 	public void open(String initialQuestion) {

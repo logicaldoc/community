@@ -1,7 +1,6 @@
 package com.logicaldoc.core.parser;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 import org.junit.Assert;

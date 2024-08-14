@@ -57,7 +57,6 @@ import com.logicaldoc.gui.frontend.client.webcontent.WebcontentEditor;
 import com.logicaldoc.gui.frontend.client.zoho.ZohoMenuItem;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Img;
-import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -354,53 +353,54 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		return dropboxItem;
 	}
 
-	private MenuItem getChatGPTMenuItem(GUIFolder folder) {
+	private MenuItem getChatGPTMenuItem() {
 		final MenuItem settings = new MenuItem(I18N.message("settings"));
-		settings.addClickHandler(click -> {
-			ChatGPTService.Instance.get().loadSettings(new AsyncCallback<List<GUIValue>>() {
+		settings.addClickHandler(
+				click -> ChatGPTService.Instance.get().loadSettings(new AsyncCallback<List<GUIValue>>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-				@Override
-				public void onSuccess(List<GUIValue> settings) {
-					TextItem apiKey = ItemFactory.newPasswordItem(APIKEY, APIKEY, GUIValue.getValue(APIKEY, settings));
-					apiKey.setWidth(360);
+					@Override
+					public void onSuccess(List<GUIValue> settings) {
+						TextItem apiKey = ItemFactory.newPasswordItem(APIKEY, APIKEY,
+								GUIValue.getValue(APIKEY, settings));
+						apiKey.setWidth(360);
 
-					TextItem model = ItemFactory.newTextItem("model", GUIValue.getValue("model", settings));
+						TextItem model = ItemFactory.newTextItem("model", GUIValue.getValue("model", settings));
 
-					LD.askForValues(I18N.message("chatgpt"), null, Arrays.asList(new FormItem[] { apiKey, model }), 400,
-							new ValuesCallback() {
-								@Override
-								public void execute(Map<String, Object> values) {
-									List<GUIValue> settings = new ArrayList<>();
-									for (Map.Entry<String, Object> val : values.entrySet())
-										settings.add(new GUIValue(val.getKey(), "" + val.getValue()));
+						LD.askForValues(I18N.message("chatgpt"), null, Arrays.asList(apiKey, model), 400,
+								new ValuesCallback() {
+									@Override
+									public void execute(Map<String, Object> values) {
+										List<GUIValue> settings = new ArrayList<>();
+										for (Map.Entry<String, Object> val : values.entrySet())
+											settings.add(new GUIValue(val.getKey(), "" + val.getValue()));
 
-									ChatGPTService.Instance.get().saveSettings(settings, new AsyncCallback<Void>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
+										ChatGPTService.Instance.get().saveSettings(settings, new AsyncCallback<Void>() {
+											@Override
+											public void onFailure(Throwable caught) {
+												GuiLog.serverError(caught);
+											}
 
-										@Override
-										public void onSuccess(Void arg0) {
-											// Nothing to do
-										}
-									});
-								}
+											@Override
+											public void onSuccess(Void arg0) {
+												// Nothing to do
+											}
+										});
+									}
 
-								@Override
-								public void execute(String value) {
-									// Ignore
-								}
-							});
-				}
-			});
+									@Override
+									public void execute(String value) {
+										// Ignore
+									}
+								});
+					}
+				})
 
-		});
+		);
 
 		Menu menu = new Menu();
 		menu.setShowShadow(true);
@@ -600,7 +600,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.OFFICE))
 			menu.addItem(getOfficeMenuItem(folder, document));
 		addTextAndWebContentItems(menu, document, folder);
-		addChatGPTItem(menu, folder);
+		addChatGPTItem(menu);
 	}
 
 	private void addTextAndWebContentItems(Menu menu, GUIDocument document, GUIFolder folder) {
@@ -611,10 +611,10 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			menu.addItem(getTextContentMenuItem(folder, document));
 	}
 
-	private void addChatGPTItem(Menu menu, GUIFolder folder) {
+	private void addChatGPTItem(Menu menu) {
 		if (Feature.enabled(Feature.CHATGPT)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.CHATGPT))
-			menu.addItem(getChatGPTMenuItem(folder));
+			menu.addItem(getChatGPTMenuItem());
 	}
 
 	private void addRegistration(Menu menu, MenuItem develConsole) {

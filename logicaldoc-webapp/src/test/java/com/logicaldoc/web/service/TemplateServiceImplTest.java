@@ -49,7 +49,7 @@ public class TemplateServiceImplTest extends AbstractWebappTestCase {
 		template.setName("pippo");
 		template.setDescription("paperino");
 
-		template = service.save(template);
+		service.save(template);
 
 		template = service.getTemplate(5);
 		Assert.assertNotNull(template);

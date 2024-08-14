@@ -2,14 +2,12 @@ package com.logicaldoc.util.config;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.plugin.PluginException;
 
 import junit.framework.Assert;
 
@@ -24,7 +22,7 @@ public class WebConfiguratorTest {
 	File webXml = new File("target/web.xml");
 
 	@Before
-	public void setUp() throws IOException, SQLException, PluginException {
+	public void setUp() throws IOException {
 		FileUtil.copyResource("/web.xml", webXml);
 	}
 

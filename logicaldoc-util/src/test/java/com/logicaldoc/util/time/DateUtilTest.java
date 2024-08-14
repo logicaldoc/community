@@ -1,7 +1,6 @@
 package com.logicaldoc.util.time;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -16,7 +15,7 @@ import junit.framework.TestCase;
 public class DateUtilTest extends TestCase {
 
 	@Test
-	public void testFormat() throws ParseException {
+	public void testFormat() {
 		Calendar calendar = Calendar.getInstance(Locale.getDefault());
 		calendar.set(Calendar.YEAR, 1992);
 		calendar.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
@@ -40,7 +39,7 @@ public class DateUtilTest extends TestCase {
 	}
 
 	@Test
-	public void testParse() throws ParseException {
+	public void testParse() {
 		Date date = DateUtil.parse("1978-02-15 12:50:13.000 +0000");
 		assertNotNull(date);
 
@@ -59,7 +58,7 @@ public class DateUtilTest extends TestCase {
 	}
 
 	@Test
-	public void testTruncateToDay() throws ParseException {
+	public void testTruncateToDay() {
 		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 		calendar.set(Calendar.YEAR, 1978);
 		calendar.set(Calendar.MONTH, Calendar.FEBRUARY);

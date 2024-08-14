@@ -92,9 +92,8 @@ public class IOUtil {
 	 * @param charset The charset to use for the output, if not provided UTF-8
 	 *        is used instead
 	 * @return The serialized string
-	 * @throws IOException In case of I/O issue
 	 */
-	public static String serialize(Serializable object, String charset) throws IOException {
+	public static String serialize(Serializable object, String charset) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try (XMLEncoder encoder = new XMLEncoder(baos, StringUtils.defaultString(charset, "UTF-8"), false, 0);) {
 			encoder.writeObject(object);

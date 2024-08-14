@@ -10,6 +10,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
  */
 public abstract class MenuTray extends DynamicForm {
 
-	public MenuTray() {
+	protected MenuTray() {
 	}
 }

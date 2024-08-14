@@ -131,7 +131,7 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 
 		// trying to get a non existent folder
 		try {
-			wsFolder = soapFolderService.getFolder("", 2510);
+			soapFolderService.getFolder("", 2510);
 			fail("Expected exception was not thrown");
 		} catch (Exception e) {
 			// nothing to do here
@@ -150,7 +150,7 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 
 		try {
 			soapFolderService.setValidateSession(true);
-			wsFolder = soapFolderService.getFolder(session1.getSid(), 99);
+			soapFolderService.getFolder(session1.getSid(), 99);
 			fail("Expected exception was not thrown");
 		} catch (Exception e) {
 			// nothing to do here
@@ -177,14 +177,6 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 		ace.setGroupId(user.getUserGroup().getId());
 
 		soapFolderService.setAccessControlList("", 80L, List.of(ace));
-
-		// Because of these methods use JDBC directly, they fails when the test
-		// is executed by maven. Probably the folder groups are not already
-		// persisted in the DB
-		// assertTrue(folderDao.isPermissionEnabled(Permission.IMMUTABLE,
-		// 80, user.getId()));
-		// assertFalse(folderDao.isPermissionEnabled(Permission.ADD, 80,
-		// user.getId()));
 	}
 
 	@Test
