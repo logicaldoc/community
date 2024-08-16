@@ -39,6 +39,6 @@ public class LocaleUtil {
 			country = st.nextToken();
 		if (st.hasMoreTokens())
 			variant = st.nextToken();
-		return Locale.of(language, country, variant);
+		return new Locale(language, country, variant);
 	}
 }

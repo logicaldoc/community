@@ -883,7 +883,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 					Runtime.getRuntime().exec(
 							new String[] { "cmd.exe", "/c", "del /F /Q \"" + pluginJarFile.getAbsolutePath() + "\"" });
 				else
-					new Exec().exec(List.of("rm", "-rf", pluginJarFile.getAbsolutePath()), null, null, -1);
+					Runtime.getRuntime().exec(new String[] { "rm", "-rf", pluginJarFile.getAbsolutePath() });
 			}
 		} catch (IOException e) {
 			throwServerException(session, log, e);

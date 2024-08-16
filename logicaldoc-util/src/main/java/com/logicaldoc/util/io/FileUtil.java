@@ -38,6 +38,7 @@ import java.util.stream.Stream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.LocaleUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -354,9 +355,9 @@ public class FileUtil {
 	 */
 	public static String getDisplaySize(long size, String language) {
 		String displaySize = "";
-		Locale locale = Locale.of("en");
+		Locale locale = LocaleUtils.toLocale("en");
 		if (StringUtils.isNotEmpty(language))
-			locale = Locale.of(language);
+			locale = LocaleUtils.toLocale(language);
 		NumberFormat nf = new DecimalFormat("###,###,###.0", new DecimalFormatSymbols(locale));
 		if (size > 1000000000) {
 			displaySize = nf.format((double) size / 1024 / 1024 / 1024) + " GB";
@@ -382,9 +383,9 @@ public class FileUtil {
 	 */
 	public static String getDisplaySizeKB(long size, String language) {
 		String displaySize = "";
-		Locale locale = Locale.of("en");
+		Locale locale = LocaleUtils.toLocale("en");
 		if (StringUtils.isNotEmpty(language))
-			locale = Locale.of(language);
+			locale = LocaleUtils.toLocale(language);
 		NumberFormat nf = new DecimalFormat("###,###,##0.0", new DecimalFormatSymbols(locale));
 		displaySize = nf.format((double) size / 1024) + " KB";
 		return displaySize;

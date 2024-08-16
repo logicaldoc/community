@@ -14,13 +14,13 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-public class PurifyRB {
+public class PurifyWorkbench {
 
 	public static void main(String[] args) throws IOException {
 
 		List<Locale> locales = new ArrayList<Locale>();
 		Properties loc = new Properties();
-		loc.load(PurifyRB.class.getResourceAsStream("/i18n/i18n.properties"));
+		loc.load(PurifyWorkbench.class.getResourceAsStream("/i18n/i18n.properties"));
 		StringTokenizer st = new StringTokenizer(loc.getProperty("locales"), ",", false);
 		while (st.hasMoreElements()) {
 			String elem = (String) st.nextElement();
@@ -120,6 +120,6 @@ public class PurifyRB {
 			country = st.nextToken();
 		if (st.hasMoreTokens())
 			variant = st.nextToken();
-		return Locale.of(lang, country, variant);
+		return new Locale(lang, country, variant);
 	}
 }

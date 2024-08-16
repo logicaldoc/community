@@ -215,14 +215,14 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
-    <RollingFile name="Audit_WEB" fileName="${root}/audit_web.log.html" filePattern="${root}/audit_web.log.html.%i">
+    <RollingFile name="AuditTask_WEB" fileName="${root}/audit_web.log.html" filePattern="${root}/audit_web.log.html.%i">
       <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
-    <RollingFile name="Audit" fileName="${root}/audit.log" filePattern="${root}/audit.log.%i">
+    <RollingFile name="AuditTask" fileName="${root}/audit.log" filePattern="${root}/audit.log.%i">
       <PatternLayout>
         <Pattern>${pattern}</Pattern>
       </PatternLayout>
@@ -607,9 +607,9 @@
       <Appender-Ref ref="Notifier" />
       <Appender-Ref ref="Notifier_WEB" />
     </Logger>
-    <Logger name="com.logicaldoc.audit.Audit" level="info" additivity="false">
-      <Appender-Ref ref="Audit" />
-      <Appender-Ref ref="Audit_WEB" />
+    <Logger name="com.logicaldoc.audit.AuditTask" level="info" additivity="false">
+      <Appender-Ref ref="AuditTask" />
+      <Appender-Ref ref="AuditTask_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.impex.ArchiveBuilder" level="info" additivity="false">
       <Appender-Ref ref="ArchiveBuilder" />

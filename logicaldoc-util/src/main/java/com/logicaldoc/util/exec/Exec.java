@@ -35,6 +35,8 @@ import org.springframework.util.CollectionUtils;
  */
 public class Exec {
 
+	private static final String EXECUTING_COMMAND = "Executing command {}";
+
 	private static final String COMMAND_FAILED_TO_EXECUTE = "Command failed to execute - {}";
 
 	private static final String TIMEOUT_COMMAND = "Timeout command {}";
@@ -89,7 +91,8 @@ public class Exec {
 			throws IOException {
 		checkAllowed(commandLine);
 
-		log.debug("Executing command: {}", commandLine);
+		if(log.isDebugEnabled())
+			log.debug("Executing command: {}", commandLine);
 		ProcessBuilder pb = new ProcessBuilder();
 		pb.redirectErrorStream(true);
 		pb.command(commandLine);
@@ -176,6 +179,9 @@ public class Exec {
 	public int exec(List<String> commandLine, List<String> env, File dir, int timeout) throws IOException {
 		checkAllowed(commandLine);
 
+		if(log.isDebugEnabled())
+			log.debug(EXECUTING_COMMAND, commandLine);
+		
 		int exit = 0;
 
 		final Process process = Runtime.getRuntime().exec(commandLine.toArray(new String[0]),
@@ -243,7 +249,10 @@ public class Exec {
 	 */
 	public String execGetOutput(List<String> commandLine, List<String> env, File dir, int timeout) throws IOException {
 		checkAllowed(commandLine);
-
+		
+		if(log.isDebugEnabled())
+			log.debug(EXECUTING_COMMAND, commandLine);
+		
 		final Process process = Runtime.getRuntime().exec(commandLine.toArray(new String[0]),
 				env != null ? env.toArray(new String[0]) : null, dir);
 		if (timeout > 0) {
@@ -315,6 +324,9 @@ public class Exec {
 			throws IOException {
 		checkAllowed(commandLine);
 
+		if(log.isDebugEnabled())
+			log.debug(EXECUTING_COMMAND, commandLine);
+		
 		int exit = 0;
 
 		final Process process = Runtime.getRuntime().exec(commandLine.split(" "),
@@ -370,6 +382,9 @@ public class Exec {
 			throws IOException {
 		checkAllowed(commandLine);
 
+		if(log.isDebugEnabled())
+			log.debug(EXECUTING_COMMAND, commandLine);
+		
 		int exit = 0;
 
 		final Process process = Runtime.getRuntime().exec(commandLine.split(" "),

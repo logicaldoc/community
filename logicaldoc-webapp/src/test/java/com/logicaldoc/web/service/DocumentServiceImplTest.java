@@ -765,11 +765,11 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	@Test
 	public void testDeleteVersions() throws ServerException {
 		List<Long> ids = List.of(21L, 22L, 23L);
-		GUIDocument gdoc;s
+		GUIDocument gdoc;
 		try {
 			service.deleteVersions(ids);
 			fail("No exception here");
-		} catch (AssertionError | ServerException e) {
+		} catch (ServerException e) {
 			// All ok
 		}
 
@@ -1354,7 +1354,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testGetEnabledPermissions() throws ParseException, PersistenceException, ServerException {
+	public void testGetEnabledPermissions() throws PersistenceException, ServerException {
 		GUIAccessControlEntry permissions = service.getAllowedPermissions(List.of(2L, 3L, 4L));
 		for (Permission permission : Permission.all())
 			assertTrue("Does not allow " + permission.name(),
