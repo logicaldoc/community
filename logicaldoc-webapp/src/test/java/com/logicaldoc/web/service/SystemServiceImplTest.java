@@ -240,7 +240,7 @@ public class SystemServiceImplTest extends AbstractWebappTestCase {
 
 		Map<String, File> uploadedFilesMap = new HashMap<>();
 		uploadedFilesMap.put(pluginFile.getName(), pluginFile);
-		session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFilesMap);
+		session.getDictionary().put(UploadServlet.UPLOADS, uploadedFilesMap);
 
 		testSubject.installPlugin();
 

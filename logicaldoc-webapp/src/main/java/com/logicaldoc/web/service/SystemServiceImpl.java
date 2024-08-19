@@ -945,7 +945,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		if (!session.getUser().isMemberOf(Group.GROUP_ADMIN) || session.getTenantId() != Tenant.DEFAULT_ID)
 			throw new AccessDeniedException();
 
-		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
+		Map<String, File> uploadedFilesMap = UploadServlet.getUploads(session.getSid());
 		if (uploadedFilesMap == null || uploadedFilesMap.size() < 1)
 			throw new ServerException("Cannot find a plugin package to install");
 
@@ -1028,7 +1028,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 				| InvocationTargetException | PluginException e) {
 			throwServerException(session, log, e);
 		} finally {
-			UploadServlet.cleanReceivedFiles(session.getSid());
+			UploadServlet.cleanUploads(session.getSid());
 		}
 	}
 

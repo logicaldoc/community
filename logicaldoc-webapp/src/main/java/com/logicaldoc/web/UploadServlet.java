@@ -40,7 +40,7 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class UploadServlet extends HttpServlet implements SessionListener {
 
-	public static final String RECEIVED_FILES = "receivedFiles";
+	public static final String UPLOADS = "uploads";
 
 	private static final long serialVersionUID = 1L;
 
@@ -134,15 +134,15 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 * @return the files map where the key is the original file name and the
 	 *         value is the real file
 	 */
-	public static Map<String, File> getReceivedFiles(String sid) {
+	public static Map<String, File> getUploads(String sid) {
 		Session session = SessionManager.get().get(sid);
 
 		if (session != null && session.isOpen()) {
 			@SuppressWarnings("unchecked")
-			Map<String, File> uploadedFiles = (Map<String, File>) session.getDictionary().get(RECEIVED_FILES);
+			Map<String, File> uploadedFiles = (Map<String, File>) session.getDictionary().get(UPLOADS);
 			if (uploadedFiles == null) {
 				uploadedFiles = new HashMap<>();
-				session.getDictionary().put(RECEIVED_FILES, uploadedFiles);
+				session.getDictionary().put(UPLOADS, uploadedFiles);
 			}
 			return uploadedFiles;
 		} else
@@ -157,14 +157,14 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 * @return the files map where the key is the original file name and the
 	 *         value is the real file
 	 */
-	private static Map<String, File> getReceivedFiles(HttpSession httpSession) {
+	private static Map<String, File> getUploads(HttpSession httpSession) {
 		@SuppressWarnings("unchecked")
-		Map<String, File> uploadedFiles = (Map<String, File>) httpSession.getAttribute(RECEIVED_FILES);
-		if (uploadedFiles == null) {
-			uploadedFiles = new HashMap<>();
-			httpSession.setAttribute(RECEIVED_FILES, uploadedFiles);
+		Map<String, File> uploads = (Map<String, File>) httpSession.getAttribute(UPLOADS);
+		if (uploads == null) {
+			uploads = new HashMap<>();
+			httpSession.setAttribute(UPLOADS, uploads);
 		}
-		return uploadedFiles;
+		return uploads;
 	}
 
 	/**
@@ -175,13 +175,13 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 * @return the files map where the key is the original file name and the
 	 *         value is the real file
 	 */
-	public static Map<String, File> getReceivedFiles(HttpServletRequest request) {
+	public static Map<String, File> getUploads(HttpServletRequest request) {
 		String sid = getSid(request);
 		if (StringUtils.isNotEmpty(sid) && SessionManager.get().get(sid) != null
 				&& SessionManager.get().get(sid).isOpen())
-			return getReceivedFiles(sid);
+			return getUploads(sid);
 		else
-			return getReceivedFiles(request.getSession(true));
+			return getUploads(request.getSession(true));
 	}
 
 	/**
@@ -189,9 +189,9 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 * 
 	 * @param sid The current session ID
 	 */
-	public static void cleanReceivedFiles(String sid) {
+	public static void cleanUploads(String sid) {
 		FileUtil.delete(getUploadDir(sid));
-		Map<String, File> receivedFiles = getReceivedFiles(sid);
+		Map<String, File> receivedFiles = getUploads(sid);
 		receivedFiles.clear();
 	}
 
@@ -200,9 +200,9 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 * 
 	 * @param httpSession The current session
 	 */
-	public static void cleanReceivedFiles(HttpSession httpSession) {
+	public static void cleanUploads(HttpSession httpSession) {
 		FileUtil.delete(getUploadDir(httpSession));
-		getReceivedFiles(httpSession).clear();
+		getUploads(httpSession).clear();
 	}
 
 	protected static String getSid(HttpServletRequest request) {
@@ -271,7 +271,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 			// maximum file size to be uploaded (in bytes)
 			upload.setFileSizeMax(Context.get().getProperties().getLong(tenant + ".upload.maxsize", 10L) * 1024 * 1024);
 
-			Map<String, File> uploadedFiles = getReceivedFiles(request);
+			Map<String, File> uploadedFiles = getUploads(request);
 
 			// Parse the request to get uploaded file items.
 			List<FileItem> fileItems = upload.parseRequest(request);

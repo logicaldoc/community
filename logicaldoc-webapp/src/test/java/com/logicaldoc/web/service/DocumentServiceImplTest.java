@@ -168,7 +168,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		uploadedFiles.put("file6.msg", file6);
 		uploadedFiles.put("file7.eml", file7);
 
-		session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
+		session.getDictionary().put(UploadServlet.UPLOADS, uploadedFiles);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -384,7 +384,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 			uploadedFiles.put(doc.getFileName(), tmpFile);
 			assertTrue(FileUtil.readFile(tmpFile).contains("replaced contents"));
 
-			session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
+			session.getDictionary().put(UploadServlet.UPLOADS, uploadedFiles);
 			service.replaceFile(doc.getId(), doc.getFileVersion(), "replace");
 
 			assertTrue(service.getContentAsString(7).contains("replaced contents"));
@@ -494,7 +494,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		Map<String, File> uploadedFiles = new HashMap<>();
 		File file3 = new File(repositoryDir, "docs/3/doc/1.0");
 		uploadedFiles.put("test.zip", file3);
-		session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
+		session.getDictionary().put(UploadServlet.UPLOADS, uploadedFiles);
 
 		GUIDocument doc = service.getById(7);
 		assertEquals("1.0", doc.getVersion());
@@ -546,7 +546,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		// Remove the uploaded files
 		@SuppressWarnings("unchecked")
-		Map<String, File> uploadedFiles = (Map<String, File>) session.getDictionary().get(UploadServlet.RECEIVED_FILES);
+		Map<String, File> uploadedFiles = (Map<String, File>) session.getDictionary().get(UploadServlet.UPLOADS);
 		uploadedFiles.clear();
 
 		doc.setId(0L);
@@ -609,7 +609,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 			uploadedFiles.put(pdf1.getName(), pdf1);
 			uploadedFiles.put(pdf2.getName(), pdf2);
 
-			session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
+			session.getDictionary().put(UploadServlet.UPLOADS, uploadedFiles);
 
 			List<GUIDocument> createdDocs = service.addDocuments(false, UTF_8, false, doc);
 			assertEquals(2, createdDocs.size());
@@ -639,7 +639,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 			Map<String, File> uploadedFiles = new HashMap<>();
 			uploadedFiles.put(pdf2.getName(), pdf2);
 
-			session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFiles);
+			session.getDictionary().put(UploadServlet.UPLOADS, uploadedFiles);
 
 			List<GUIDocument> createdDocs = service.addDocuments(false, UTF_8, false, doc);
 			assertEquals(1, createdDocs.size());

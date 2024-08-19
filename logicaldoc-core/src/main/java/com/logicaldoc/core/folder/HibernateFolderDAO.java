@@ -122,7 +122,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public void store(Folder folder, FolderHistory transaction) throws PersistenceException {
 		if (!checkStoringAspect())
 			return;
-
+		
 		if (folder.getId() != 0L && getCurrentSession().contains(folder))
 			getCurrentSession().merge(folder);
 
@@ -157,15 +157,17 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			folder.getAttributes().values().removeIf(Attribute::isSection);
 
 			AccessControlUtil.removeForbiddenPermissionsForGuests(folder);
-
-			if (folder.getTemplate() == null)
+			
+			if (folder.getTemplate() == null) {
 				folder.setOcrTemplateId(null);
+				folder.setBarcodeTemplateId(null);
+			}
 
 			log.debug("Invoke listeners before store");
 			Map<String, Object> dictionary = new HashMap<>();
 			for (FolderListener listener : listenerManager.getListeners())
 				listener.beforeStore(folder, transaction, dictionary);
-
+			
 			saveOrUpdate(folder);
 			if (StringUtils.isEmpty(folder.getPath())) {
 				folder.setPath(computePath(folder.getId()));
@@ -829,7 +831,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	@Override
 	public boolean isPermissionAllowed(Permission permission, long folderId, long userId) throws PersistenceException {
-		Set<Permission> permissions = getEnabledPermissions(folderId, userId);
+		Set<Permission> permissions = getAllowedPermissions(folderId, userId);
 		return permissions.contains(permission);
 	}
 
@@ -871,7 +873,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public Set<Permission> getEnabledPermissions(long folderId, long userId) throws PersistenceException {
+	public Set<Permission> getAllowedPermissions(long folderId, long userId) throws PersistenceException {
 		Set<Permission> permissions = new HashSet<>();
 		User user = getExistingtUser(userId);
 
@@ -2193,7 +2195,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		transaction.setNotifyEvent(false);
 
 		// Iterate over all children setting the template and field values
-		List<Folder> children = findChildren(id, null);
+		List<Folder> children = findByParentId(id);
 		for (Folder folder : children) {
 			initialize(folder);
 			folder.setStore(parent.getStore());
@@ -2211,13 +2213,13 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public void applyOCRToTree(long id, FolderHistory transaction) throws PersistenceException {
 		Folder parent = getExistingFolder(id);
-
+		
 		transaction.setEvent(FolderEvent.CHANGED.toString());
 		transaction.setTenantId(parent.getTenantId());
 		transaction.setNotifyEvent(false);
 
 		// Iterate over all children setting the template and field values
-		List<Folder> children = findChildren(id, null);
+		List<Folder> children = findByParentId(id);
 		for (Folder folder : children) {
 			initialize(folder);
 			folder.setOcrTemplateId(parent.getOcrTemplateId());

@@ -1574,7 +1574,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	public void saveAvatar(long userId) throws ServerException {
 		Session session = validateSession();
 
-		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
+		Map<String, File> uploadedFilesMap = UploadServlet.getUploads(session.getSid());
 		File file = uploadedFilesMap.values().iterator().next();
 		try {
 			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
@@ -1584,7 +1584,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		} catch (PersistenceException e) {
 			log.error("Unable to store the avatar", e);
 		} finally {
-			UploadServlet.cleanReceivedFiles(session.getSid());
+			UploadServlet.cleanUploads(session.getSid());
 		}
 	}
 

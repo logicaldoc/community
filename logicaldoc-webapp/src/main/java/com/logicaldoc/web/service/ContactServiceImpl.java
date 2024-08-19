@@ -109,7 +109,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 	public List<GUIContact> parseContacts(boolean preview, GUIParseContactsParameters parameters) throws ServerException {
 		final Session session = validateSession();
 
-		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
+		Map<String, File> uploadedFilesMap = UploadServlet.getUploads(session.getSid());
 		File file = uploadedFilesMap.values().iterator().next();
 
 		ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
@@ -163,7 +163,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 		} catch (IOException | PersistenceException e) {
 			log.error("Unable to parse contacs in CSV file", e);
 		} finally {
-			UploadServlet.cleanReceivedFiles(session.getSid());
+			UploadServlet.cleanUploads(session.getSid());
 		}
 
 		return contacts;

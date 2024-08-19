@@ -314,7 +314,7 @@ public class ResourceImpl implements Resource {
 			moveEnabled = true;
 		} else {
 			try {
-				permissions = fdao.getEnabledPermissions(fid, personRequest);
+				permissions = fdao.getAllowedPermissions(fid, personRequest);
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}

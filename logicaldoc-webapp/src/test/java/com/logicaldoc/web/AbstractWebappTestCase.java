@@ -21,6 +21,7 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.junit.AbstractTestCase;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.servlet.MockServletSession;
@@ -55,6 +56,18 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 		repositoryDir.mkdirs();
 		repositoryDir.mkdir();
 
+		File docs = new File(repositoryDir, "docs");
+		docs.mkdir();
+		File docDir = new File(docs+"/1/doc");
+		docDir.mkdirs();
+		docDir.mkdir();
+		FileUtil.copyResource("/pdf1.pdf", new File(docDir, "1.0"));
+		docDir = new File(docs+"/3/doc");
+		docDir.mkdirs();
+		docDir.mkdir();
+		FileUtil.copyResource("/pdf2.pdf", new File(docDir, "1.1"));
+		
+		
 		File docs2 = new File(repositoryDir, "docs2");
 		docs2.mkdir();
 

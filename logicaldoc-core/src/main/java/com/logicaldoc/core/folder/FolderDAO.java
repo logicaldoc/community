@@ -281,7 +281,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
-	public Set<Permission> getEnabledPermissions(long folderId, long userId) throws PersistenceException;
+	public Set<Permission> getAllowedPermissions(long folderId, long userId) throws PersistenceException;
 
 	/**
 	 * This method selects only the folder ID from the folders for which a user

@@ -427,7 +427,7 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 		try {
 			Map<String, File> uploadedFilesMap = new HashMap<>();
 			uploadedFilesMap.put(avatarFile.getName(), avatarFile);
-			session.getDictionary().put(UploadServlet.RECEIVED_FILES, uploadedFilesMap);
+			session.getDictionary().put(UploadServlet.UPLOADS, uploadedFilesMap);
 
 			testSubject.saveAvatar(1L);
 			user = userDAO.findById(1L);

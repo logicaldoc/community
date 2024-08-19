@@ -973,18 +973,18 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testGetEnabledPermissions() throws PersistenceException {
-		Set<Permission> permissions = dao.getEnabledPermissions(Folder.ROOTID, 1);
+		Set<Permission> permissions = dao.getAllowedPermissions(Folder.ROOTID, 1);
 		Assert.assertEquals(Permission.all().size(), permissions.size());
 		Assert.assertTrue(permissions.contains(Permission.READ));
 		Assert.assertTrue(permissions.contains(Permission.SECURITY));
 		Assert.assertTrue(permissions.contains(Permission.SIGN));
-		permissions = dao.getEnabledPermissions(6, 4);
+		permissions = dao.getAllowedPermissions(6, 4);
 		Assert.assertEquals(11, permissions.size());
 		Assert.assertTrue(permissions.contains(Permission.READ));
 		Assert.assertTrue(permissions.contains(Permission.WRITE));
 		Assert.assertTrue(permissions.contains(Permission.MOVE));
 		Assert.assertTrue(permissions.contains(Permission.EMAIL));
-		permissions = dao.getEnabledPermissions(999, 1);
+		permissions = dao.getAllowedPermissions(999, 1);
 		Assert.assertEquals(Permission.all().size(), permissions.size());
 	}
 

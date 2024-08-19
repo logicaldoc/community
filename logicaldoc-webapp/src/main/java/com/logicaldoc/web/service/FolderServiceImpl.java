@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -120,7 +121,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	public void applyMetadata(long parentId) throws ServerException {
 		Session session = validateSession();
 
-		executeLongRunningOperation("Apply Folder Metadata", () -> {
+		executeLongRunningOperation("Apply Metadata to Tree", () -> {
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			FolderHistory transaction = new FolderHistory();
 			transaction.setSession(session);
@@ -380,7 +381,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			throws PersistenceException {
 		if (session != null) {
 			FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			Set<Permission> permissions = dao.getEnabledPermissions(folderId, session.getUserId());
+			Set<Permission> permissions = dao.getAllowedPermissions(folderId, session.getUserId());
 			guiFolder.setAllowedPermissions(new GUIAccessControlEntry(
 					permissions.stream().map(p -> p.name().toLowerCase()).toList().toArray(new String[0])));
 		}
@@ -605,7 +606,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				folder.setColor(guiFolder.getColor());
 				folderDao.store(folder);
 
-				folder = folderDao.findById(folder.getFoldRef());
+				folder = folderDao.findById(guiFolder.getFoldRef());
 				folderDao.initialize(folder);
 			} else {
 				// The user is editing a real folder
@@ -1075,14 +1076,15 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		if (ids.isEmpty())
 			return;
 
-		String idsStr = Arrays.asList(ids).toString().replace('[', '(').replace(']', ')');
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		try {
-			dao.bulkUpdate("set ld_deleted=2 where ld_id in " + idsStr, (Map<String, Object>) null);
+			dao.bulkUpdate(
+					"set ld_deleted=2 where ld_id in ("
+							+ ids.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")) + ")",
+					(Map<String, Object>) null);
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
 		}
-
 	}
 
 	@Override
@@ -1216,5 +1218,29 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		}
 
 		throw new ServerException(I18N.message("unsupportedformat", session.getUser().getLocale()));
+	}
+
+	@Override
+	public GUIAccessControlEntry getAllowedPermissions(List<Long> folderIds) throws ServerException {
+		Session session = validateSession();
+
+		try {
+			Set<Permission> commonPermissions = Permission.all();
+			if (!session.getUser().isAdmin()) {
+				FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+				for (long folderId : folderIds) {
+					Set<Permission> folderPermissions = folderDao.getAllowedPermissions(folderId, session.getUserId());
+					for (Permission permission : Permission.all()) {
+						if (!folderPermissions.contains(permission))
+							commonPermissions.remove(permission);
+					}
+				}
+			}
+			
+			return new GUIAccessControlEntry(commonPermissions.stream().map(p -> p.name().toLowerCase())
+					.collect(Collectors.toSet()).toArray(new String[0]));
+		} catch (PersistenceException e) {
+			return (GUIAccessControlEntry) throwServerException(session, log, e);
+		}
 	}
 }

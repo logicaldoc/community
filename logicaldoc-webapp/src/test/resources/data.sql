@@ -140,21 +140,24 @@ values     (10,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'testGroup',0,1);
 
 
 insert into ld_folder (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
-values (6,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'folder6',5,1,0,1,1,1,0);
+values (6,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'folder6',5,0,0,1,1,1,0);
 insert into ld_folder (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
-values (7,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'folder7',5,1,0,1,1,1,0);
+values (7,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'folder7',5,0,0,1,1,1,0);
 insert into ld_folder (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
-values (8,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1,'folder8',7,1,0,1,1,1,0);
+values (8,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1,'folder8',7,0,0,1,1,1,0);
 insert into ld_folder (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
-values (1200,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'test',5,1,0,1,1,1,0);
+values (9,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'folder9',7,0,0,1,1,1,0);
+insert into ld_folder (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
+values (1200,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'test',5,0,0,1,1,1,0);
 insert into ld_folder_store(ld_folderid, ld_nodeid, ld_storeid) values (1200, '', 2);
 
+
 insert into ld_folder (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
-values (1201,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'ABC',1200,1,0,1,1,1,0);
+values (1201,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'ABC',1200,0,0,1,1,1,0);
 insert into ld_folder (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
-values (1202,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'xyz',1201,1,0,1,1,1,0);
+values (1202,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'xyz',1201,0,0,1,1,1,0);
 insert into ld_folder (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
-values (1204,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1,'deleted',1201,1,0,1,1,1,0);
+values (1204,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1,'deleted',1201,0,0,1,1,1,0);
 
 insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_store, ld_readingreq, ld_preview, ld_customid)
 values (6,2,1,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0,1,1);

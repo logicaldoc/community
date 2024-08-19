@@ -422,7 +422,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			return (GUIDocument) throwServerException(session, log, e);
 		}
 
-		UploadServlet.cleanReceivedFiles(session.getSid());
+		UploadServlet.cleanUploads(session.getSid());
 		GUIDocument checkedInDocument = getById(doc.getId());
 
 		/*
@@ -779,7 +779,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 			if (session != null && folder != null) {
 				FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-				Set<Permission> permissions = fdao.getEnabledPermissions(document.getFolder().getId(),
+				Set<Permission> permissions = fdao.getAllowedPermissions(document.getFolder().getId(),
 						session.getUserId());
 				List<String> permissionsList = new ArrayList<>();
 				for (Permission permission : permissions)
@@ -1772,7 +1772,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	@Override
 	public void cleanUploadedFileFolder() throws ServerException {
 		Session session = validateSession();
-		UploadServlet.cleanReceivedFiles(session.getSid());
+		UploadServlet.cleanUploads(session.getSid());
 
 		File dir = new File(System.getProperty("java.io.tmpdir") + "/upload/" + session.getSid());
 		if (dir.exists())
@@ -2547,7 +2547,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 			manager.replaceFile(doc.getId(), fileVersion, file, transaction);
 
-			UploadServlet.cleanReceivedFiles(session.getSid());
+			UploadServlet.cleanUploads(session.getSid());
 		} catch (PersistenceException | ServerException | IOException e) {
 			throwServerException(session, log, e);
 		}

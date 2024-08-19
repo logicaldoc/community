@@ -1468,7 +1468,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			// The document does not specify its own permissions so use the
 			// folder's ones
 			long folderId = queryForLong("select ld_folderid from ld_document where ld_id = " + docId);
-			permissions = folderDAO.getEnabledPermissions(folderId, userId);
+			permissions = folderDAO.getAllowedPermissions(folderId, userId);
 		}
 
 		return permissions;

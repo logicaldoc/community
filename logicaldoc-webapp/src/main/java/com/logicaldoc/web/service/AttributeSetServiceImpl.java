@@ -327,7 +327,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	public List<GUIValue> parseOptions(long setId, String attribute) throws ServerException {
 		Session session = validateSession();
 
-		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
+		Map<String, File> uploadedFilesMap = UploadServlet.getUploads(session.getSid());
 		File file = uploadedFilesMap.values().iterator().next();
 		List<GUIValue> options = new ArrayList<>();
 
@@ -346,7 +346,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		} catch (Exception e) {
 			log.error("Unable to parse options in CSV file", e);
 		} finally {
-			UploadServlet.cleanReceivedFiles(session.getSid());
+			UploadServlet.cleanUploads(session.getSid());
 		}
 
 		saveOptions(setId, attribute, options);

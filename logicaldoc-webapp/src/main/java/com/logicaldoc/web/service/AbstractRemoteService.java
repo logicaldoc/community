@@ -74,7 +74,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	}
 
 	protected Map<String, File> getUploadedFiles(String sid) {
-		return UploadServlet.getReceivedFiles(sid);
+		return UploadServlet.getUploads(sid);
 	}
 
 	protected Session validateSession() throws InvalidSessionServerException {
