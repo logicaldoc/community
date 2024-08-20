@@ -46,6 +46,8 @@ public class WebsocketMessage implements Serializable {
 	private String payload;
 
 	private String target;
+	
+	private long tenantId;
 
 	public WebsocketMessage(String sid, String event) {
 		super();
@@ -174,5 +176,13 @@ public class WebsocketMessage implements Serializable {
 
 	public void setCommand(String command) {
 		this.command = command;
+	}
+
+	public long getTenantId() {
+		return tenantId;
+	}
+
+	public void setTenantId(long tenantId) {
+		this.tenantId = tenantId;
 	}
 }

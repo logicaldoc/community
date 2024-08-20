@@ -122,9 +122,19 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public void store(Folder folder, FolderHistory transaction) throws PersistenceException {
 		if (!checkStoringAspect())
 			return;
-		
+
 		if (folder.getId() != 0L && getCurrentSession().contains(folder))
 			getCurrentSession().merge(folder);
+
+		if (folder.getType() == Folder.TYPE_WORKSPACE) {
+			Folder defaultWs = findDefaultWorkspace(folder.getTenantId());
+			if (defaultWs != null && defaultWs.equals(folder) && !folder.getName().equals(Folder.DEFAULTWORKSPACENAME))
+				throw new PersistenceException("You cannot rename the default workspace");
+
+			Folder root = findRoot(folder.getTenantId());
+			if (root != null && folder.getParentId() != root.getId())
+				throw new PersistenceException("You cannot move a workspace");
+		}
 
 		if (!folder.getName().equals(SLASH)) {
 			// To avoid java script and xml injection
@@ -157,7 +167,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			folder.getAttributes().values().removeIf(Attribute::isSection);
 
 			AccessControlUtil.removeForbiddenPermissionsForGuests(folder);
-			
+
 			if (folder.getTemplate() == null) {
 				folder.setOcrTemplateId(null);
 				folder.setBarcodeTemplateId(null);
@@ -167,7 +177,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			Map<String, Object> dictionary = new HashMap<>();
 			for (FolderListener listener : listenerManager.getListeners())
 				listener.beforeStore(folder, transaction, dictionary);
-			
+
 			saveOrUpdate(folder);
 			if (StringUtils.isEmpty(folder.getPath())) {
 				folder.setPath(computePath(folder.getId()));
@@ -1159,7 +1169,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		if (folderId == rootId)
 			throw new PersistenceException("You cannot delete folder " + folder.getName() + " - " + folderId);
 
-		if (folder.getName().equals("Default") && folder.getParentId() == rootId)
+		if (folder.getName().equals(Folder.DEFAULTWORKSPACENAME) && folder.getParentId() == rootId)
 			throw new PersistenceException("You cannot delete folder " + folder.getName() + " - " + folderId);
 	}
 
@@ -2213,7 +2223,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public void applyOCRToTree(long id, FolderHistory transaction) throws PersistenceException {
 		Folder parent = getExistingFolder(id);
-		
+
 		transaction.setEvent(FolderEvent.CHANGED.toString());
 		transaction.setTenantId(parent.getTenantId());
 		transaction.setNotifyEvent(false);

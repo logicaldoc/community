@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.frontend.client.folder.browser;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -28,9 +30,11 @@ import com.smartgwt.client.widgets.tree.TreeNode;
  */
 public class FolderTree extends TreeGrid {
 
-	protected static final String FOLDER_ID = "folderId";
+	public static final String FOLDER_ID = "folderId";
 
 	protected static final String OPENED = "opened";
+
+	public static final String PARENT_ID = "parentId";
 
 	/**
 	 * String typed by the user inside the tree, to quickly select folders
@@ -94,18 +98,17 @@ public class FolderTree extends TreeGrid {
 
 			addCellClickHandler(event ->
 
-			FolderService.Instance.get().getFolder(getSelectedFolderId(), false, false, true,
-					new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+			FolderService.Instance.get().getFolder(getSelectedFolderId(), false, false, true, new AsyncCallback<>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
 
-						@Override
-						public void onSuccess(GUIFolder folder) {
-							cursor.onFolderSelected(folder);
-						}
-					}));
+				@Override
+				public void onSuccess(GUIFolder folder) {
+					cursor.onFolderSelected(folder);
+				}
+			}));
 		}
 
 		/*
@@ -226,6 +229,38 @@ public class FolderTree extends TreeGrid {
 
 	public long getSelectedFolderId() {
 		return getSelectedRecord().getAttributeAsLong(FOLDER_ID);
+	}
+
+	/**
+	 * Gets all the IDs of the selected folders
+	 * 
+	 * @return identifiers of folders
+	 */
+	public List<Long> getSelectedIds() {
+		ListGridRecord[] selection = getSelectedRecords();
+		List<Long> ids = new ArrayList<>();
+		for (ListGridRecord rec : selection) {
+			ids.add(rec.getAttributeAsLong(FOLDER_ID));
+		}
+		return ids;
+	}
+
+	/**
+	 * Gets all the selected folders
+	 * 
+	 * @return list of folders
+	 */
+	public List<GUIFolder> getSelectedFolders() {
+		ListGridRecord[] selection = getSelectedRecords();
+		List<GUIFolder> folders = new ArrayList<>();
+		for (ListGridRecord rec : selection) {
+			GUIFolder folder = new GUIFolder();
+			folder.setId(rec.getAttributeAsLong(FOLDER_ID));
+			folder.setName(rec.getAttributeAsString("name"));
+			folder.setParentId(rec.getAttributeAsLong(PARENT_ID));
+			folders.add(folder);
+		}
+		return folders;
 	}
 
 	/**

@@ -45,6 +45,9 @@ public class FoldersDS extends DataSource {
 
 		DataSourceTextField folderId = new DataSourceTextField("folderId", I18N.message("id"));
 		folderId.setHidden(true);
+		
+		DataSourceTextField parentId = new DataSourceTextField("parentId", I18N.message("parentid"));
+		parentId.setHidden(true);
 
 		DataSourceTextField foldRef = new DataSourceTextField("foldRef");
 		foldRef.setHidden(true);
@@ -59,7 +62,7 @@ public class FoldersDS extends DataSource {
 		parent.setForeignKey(dsId + ".id");
 		parent.setRootValue("/");
 
-		setFields(recordId, name, folderId, foldRef, parent, type, size, color);
+		setFields(recordId, name, folderId, parentId, foldRef, parent, type, size, color);
 
 		setDataURL(
 				"data/folders.xml" + (nopagination ? "?nopagination=true" : "") + (max != null ? "&max=" + max : ""));

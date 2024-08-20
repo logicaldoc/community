@@ -85,11 +85,11 @@ public interface AutomationService extends RemoteService {
 	 *        database and the extended attributes of <code>routine</code> are
 	 *        used as input parameters.
 	 * @param docIds selected documents (optional)
-	 * @param folderId selected folders (optional)
+	 * @param folderIds selected folders
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void execute(GUIAutomationRoutine routine, List<Long> docIds, Long folderId) throws ServerException;
+	public void execute(GUIAutomationRoutine routine, List<Long> docIds, List<Long> folderIds) throws ServerException;
 
 	public static class Instance {
 		private static AutomationServiceAsync inst;

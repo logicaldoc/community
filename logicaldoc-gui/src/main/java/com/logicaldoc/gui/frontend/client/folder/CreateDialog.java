@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.folder;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
+import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -14,7 +15,6 @@ import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.tree.TreeNode;
 
 /**
  * This is the form used to create a new Folder
@@ -91,27 +91,7 @@ public class CreateDialog extends Dialog {
 
 						@Override
 						public void onSuccess(GUIFolder newFolder) {
-							TreeNode newNode = new TreeNode(newFolder.getName());
-							newNode.setAttribute("name", newFolder.getName());
-							newNode.setAttribute("folderId", Long.toString(newFolder.getId()));
-							newNode.setAttribute("type", Long.toString(newFolder.getType()));
-
-							if (newFolder.getType() == 1) {
-								newNode.setAttribute("id",
-										FolderNavigator.get().getRootNode().getAttributeAsString("id") + "-"
-												+ Long.toString(newFolder.getId()));
-								FolderNavigator.get().getTree().add(newNode, FolderNavigator.get().getTree().getRoot());
-							} else {
-								TreeNode selectedNode = FolderNavigator.get().getSelectedRecord();
-
-								newNode.setAttribute("id", selectedNode.getAttributeAsString("id") + "-"
-										+ Long.toString(newFolder.getId()));
-
-								if (Boolean.FALSE.equals(FolderNavigator.get().getTree().isOpen(selectedNode)))
-									FolderNavigator.get().getTree().openFolder(selectedNode);
-								FolderNavigator.get().getTree().add(newNode, selectedNode);
-							}
-
+							FolderController.get().created(newFolder);
 							destroy();
 						}
 					});

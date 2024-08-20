@@ -2,13 +2,17 @@ package com.logicaldoc.gui.frontend.client.folder;
 
 import java.util.List;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.folder.browser.FolderBrowser;
+import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Dialog;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import com.smartgwt.client.widgets.tree.TreeNode;
 
 /**
  * This is the form used to copy some folders into another target folder
@@ -45,12 +49,9 @@ public class MergeDialog extends Dialog {
 				label = selectedIds.size() + " " + I18N.message("folders").toLowerCase();
 
 			LD.ask(I18N.message(MERGE),
-					I18N.message("mergeask", label, folders.getSelectedRecord().getAttributeAsString("name")),
-					(Boolean value) -> {
-						if (Boolean.TRUE.equals(value)) {
-							FolderNavigator.get().mergeTo(
-									Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")));
-						}
+					I18N.message("mergeask", label, folders.getSelectedRecord().getAttributeAsString("name")), yes -> {
+						if (Boolean.TRUE.equals(yes))
+							merge(folders.getSelectedRecord().getAttributeAsLong("folderId"));
 						destroy();
 					});
 		});
@@ -61,5 +62,37 @@ public class MergeDialog extends Dialog {
 
 		addMember(folders);
 		addMember(buttons);
+	}
+
+	/**
+	 * Merges the currently selected folders to a target folder
+	 * 
+	 * @param targetFolderId The target folder
+	 */
+	private void merge(long targetFolderId) {
+		List<Long> ids = FolderNavigator.get().getSelectedIds();
+		for (Long id : ids) {
+			TreeNode node = FolderNavigator.get().getTree().find(FolderNavigator.FOLDER_ID, (Object) id);
+			FolderNavigator.get().getTree().remove(node);
+		}
+
+		LD.contactingServer();
+		FolderService.Instance.get().merge(ids, targetFolderId, new AsyncCallback<>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				LD.clearPrompt();
+				GuiLog.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(Void ret) {
+				LD.clearPrompt();
+				TreeNode target = FolderNavigator.get().getTree().find(FolderNavigator.FOLDER_ID,
+						Long.toString(targetFolderId));
+				if (target != null)
+					FolderNavigator.get().getTree().reloadChildren(target);
+			}
+		});
 	}
 }

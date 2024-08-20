@@ -22,5 +22,5 @@ public interface AutomationServiceAsync {
 
 	void applyTriggersToTree(long rootId, AsyncCallback<Void> callback);
 
-	void execute(GUIAutomationRoutine routine, List<Long> docIds, Long folderId, AsyncCallback<Void> callback);
+	void execute(GUIAutomationRoutine routine, List<Long> docIds,  List<Long> folderIds, AsyncCallback<Void> callback);
 }

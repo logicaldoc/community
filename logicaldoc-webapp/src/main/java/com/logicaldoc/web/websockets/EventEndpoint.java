@@ -174,6 +174,7 @@ public class EventEndpoint implements EventListener {
 		message.setComment(event.getComment());
 		message.setDate(event.getDate());
 		message.setId(event.getId());
+		message.setTenantId(event.getTenantId());
 
 		if (event instanceof UserHistory userHistory)
 			message.setAuthor(userHistory.getAuthor());

@@ -22,6 +22,7 @@ import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.tree.TreeGrid;
+import com.smartgwt.client.widgets.tree.TreeNode;
 
 /**
  * This is the form used to copy a folder into another path
@@ -110,9 +111,9 @@ public class FolderCopyDialog extends Dialog {
 
 		LD.ask(I18N.message("copy"),
 				I18N.message("copyask", Arrays.asList(label, folders.getSelectedRecord().getAttributeAsString("name"))),
-				(Boolean yes) -> {
+				yes -> {
 					if (Boolean.TRUE.equals(yes)) {
-						FolderNavigator.get().copyTo(tagetFolderId, "true".equals(form.getValueAsString(FOLDERS_ONLY)),
+						copy(tagetFolderId, "true".equals(form.getValueAsString(FOLDERS_ONLY)),
 								!securityOptionEnabled ? "inheritparentsec" : form.getValueAsString(SECURITY));
 						hide();
 						destroy();
@@ -134,12 +135,41 @@ public class FolderCopyDialog extends Dialog {
 				sourceFolder.setAllowedPermissions(new GUIAccessControlEntry(GUIAccessControlEntry.PERMISSION_READ,
 						GUIAccessControlEntry.PERMISSION_WRITE));
 
-				FolderCopyDetailsDialog dialog = new FolderCopyDetailsDialog(sourceFolder, tagetFolderId,
-						form.getValueAsString(SECURITY), "true".equals(form.getValueAsString(FOLDERS_ONLY)));
-				dialog.show();
+				new FolderCopyDetailsDialog(sourceFolder, tagetFolderId, form.getValueAsString(SECURITY),
+						"true".equals(form.getValueAsString(FOLDERS_ONLY))).show();
 				hide();
 				destroy();
 			}
 		});
+	}
+
+	/**
+	 * Copies the currently selected folders to the new parent folder
+	 * 
+	 * @param targetFolderId identifier of the parent folder
+	 * @param foldersOnly to create just the folders
+	 * @param securityOption how to setup the security for the new folder'none',
+	 *        'inherit' or 'replicate'
+	 */
+	private void copy(long targetFolderId, boolean foldersOnly, String securityOption) {
+		final TreeNode target = FolderNavigator.get().getTree().findById(Long.toString(targetFolderId));
+
+		LD.contactingServer();
+		FolderService.Instance.get().copyFolders(FolderNavigator.get().getSelectedIds(), targetFolderId, foldersOnly,
+				securityOption, null, new AsyncCallback<>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						LD.clearPrompt();
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(Void ret) {
+						LD.clearPrompt();
+						if (target != null)
+							FolderNavigator.get().reload();
+					}
+				});
 	}
 }

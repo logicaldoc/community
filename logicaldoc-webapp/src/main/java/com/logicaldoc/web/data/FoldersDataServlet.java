@@ -112,6 +112,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 				writer.print("<folder>");
 				writer.print("<id>" + parent + "-" + rs.getLong(1) + "</id>");
 				writer.print("<folderId>" + rs.getLong(1) + "</folderId>");
+				writer.print("<parentId>" + rs.getLong(2) + "</parentId>");
 				writer.print("<parent>" + parent + "</parent>");
 				writer.print("<name><![CDATA[" + rs.getString(3) + "]]></name>");
 				writer.print("<type>" + rs.getInt(4) + "</type>");
@@ -160,11 +161,11 @@ public class FoldersDataServlet extends AbstractDataServlet {
 			params.put("parentId", parentFolder.getId());
 			SqlRowSet rs = folderDao.queryForRowSet(query.toString(), params, null);
 			if (rs != null)
-				printFoldersWithDocs(writer, rs, parent);
+				printFoldersWithDocs(writer, rs, parent, parentFolder.getId());
 		}
 	}
 
-	private void printFoldersWithDocs(PrintWriter writer, SqlRowSet rs, String parent) {
+	private void printFoldersWithDocs(PrintWriter writer, SqlRowSet rs, String parent, long parentId) {
 		while (rs.next()) {
 			Date now = new Date();
 			boolean published = (rs.getInt(4) == 1) && (rs.getDate(5) == null || now.after(rs.getDate(5)))
@@ -172,6 +173,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 			writer.print("<folder>");
 			writer.print("<id>d-" + rs.getLong(1) + "</id>");
 			writer.print("<folderId>d-" + rs.getLong(1) + "</folderId>");
+			writer.print("<parentId>" + parentId + "</parentId>");
 			writer.print("<parent>" + parent + "</parent>");
 			writer.print("<name><![CDATA[" + rs.getString(2) + "]]></name>");
 			writer.print("<type>file</type>");

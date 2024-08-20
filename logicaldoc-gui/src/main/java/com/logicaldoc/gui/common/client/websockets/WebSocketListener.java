@@ -116,6 +116,10 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 	}
 
 	private void onEvent(WebsocketMessage event) {
+		// Skip events related to other tenants
+		if (event.getTenantId() != Session.get().getInfo().getTenant().getId())
+			return;
+
 		if (!moniteredEvents.contains(event.getEvent()))
 			return;
 
@@ -149,19 +153,18 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 		} else if ("event.reading.requested".equals(event.getEvent())) {
 			String recipient = event.getComment().substring(event.getComment().indexOf(':') + 1).trim();
 			if (Session.get().getUser().getUsername().equals(recipient)) {
-				ReadingRequestService.Instance.get()
-						.getUnconfimedReadings(new AsyncCallback<>() {
+				ReadingRequestService.Instance.get().getUnconfimedReadings(new AsyncCallback<>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-							@Override
-							public void onSuccess(List<GUIReadingRequest> readings) {
-								ReadingRequestController.get().addUnconfirmedReadings(readings);
-							}
-						});
+					@Override
+					public void onSuccess(List<GUIReadingRequest> readings) {
+						ReadingRequestController.get().addUnconfirmedReadings(readings);
+					}
+				});
 			}
 		} else if (isCommandEvent(event)) {
 			processCommand(event);

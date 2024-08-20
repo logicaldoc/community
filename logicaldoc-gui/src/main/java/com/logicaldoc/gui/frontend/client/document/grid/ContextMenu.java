@@ -199,7 +199,9 @@ public class ContextMenu extends Menu {
 		workflow.addClickHandler(click -> new StartWorkflowDialog(getSelectionIds(selection)).show());
 
 		automation = new MenuItem(I18N.message("executeautomation"));
-		automation.addClickHandler(click -> new AutomationDialog(folder.getId(), getSelectionIds(selection)).show());
+		automation.addClickHandler(
+				click -> new AutomationDialog(Arrays.asList(new Long[] { folder.getId() }), getSelectionIds(selection))
+						.show());
 
 		preview = preparePreview();
 
@@ -1192,8 +1194,8 @@ public class ContextMenu extends Menu {
 								 * A routine with parameters is referenced, so
 								 * open the input popup
 								 */
-								FillRoutineParams dialog = new FillRoutineParams(action.getName(), routine, folderId,
-										selectedDocIds);
+								FillRoutineParams dialog = new FillRoutineParams(action.getName(), routine,
+										Arrays.asList(new Long[] { folderId }), selectedDocIds);
 								dialog.show();
 							} else {
 								/*
@@ -1254,18 +1256,19 @@ public class ContextMenu extends Menu {
 	}
 
 	private void executeRoutine(long folderId, List<Long> docIds, GUIAutomationRoutine routine) {
-		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<>() {
+		AutomationService.Instance.get().execute(routine, docIds, Arrays.asList(new Long[] { folderId }),
+				new AsyncCallback<>() {
 
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-			@Override
-			public void onSuccess(Void arg0) {
-				// Nothing to do
-			}
-		});
+					@Override
+					public void onSuccess(Void arg0) {
+						// Nothing to do
+					}
+				});
 	}
 
 	private void onRename(long docId, String newFilename) {

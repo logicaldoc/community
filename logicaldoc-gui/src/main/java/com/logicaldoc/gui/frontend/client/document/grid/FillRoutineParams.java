@@ -24,17 +24,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 public class FillRoutineParams extends Window {
 	private ExtendedPropertiesPanel propertiesPanel;
 
-	private GUIAutomationRoutine routine;
-
-	private long folderId;
-
-	private List<Long> docIds;
-
-	public FillRoutineParams(String title, GUIAutomationRoutine routine, long folderId, List<Long> docIds) {
-		this.routine = routine;
-		this.folderId = folderId;
-		this.docIds = docIds;
-
+	public FillRoutineParams(String title, GUIAutomationRoutine routine, List<Long> folderIds, List<Long> docIds) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(title);
 		setWidth(500);
@@ -47,7 +37,7 @@ public class FillRoutineParams extends Window {
 		IButton execute = new IButton();
 		execute.setTitle(I18N.message("execute"));
 		execute.setAutoFit(true);
-		execute.addClickHandler(event -> onExecute());
+		execute.addClickHandler(event -> onExecute(routine, docIds, folderIds));
 
 		HLayout buttonsBar = new HLayout();
 		buttonsBar.setWidth100();
@@ -64,11 +54,11 @@ public class FillRoutineParams extends Window {
 		addItem(layout);
 	}
 
-	public void onExecute() {
+	public void onExecute(GUIAutomationRoutine routine, List<Long> folderIds, List<Long> docIds) {
 		if (!propertiesPanel.validate())
 			return;
 
-		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<>() {
+		AutomationService.Instance.get().execute(routine, docIds, folderIds, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

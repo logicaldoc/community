@@ -44,7 +44,7 @@ public class AutomationDialog extends Window {
 
 	private TabSet tabSet = new TabSet();
 
-	public AutomationDialog(Long folderId, List<Long> docIds) {
+	public AutomationDialog(List<Long> folderIds, List<Long> docIds) {
 		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, (ClickEvent event) -> destroy());
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, closeIcon);
@@ -59,7 +59,7 @@ public class AutomationDialog extends Window {
 
 		ToolStripButton execute = new ToolStripButton();
 		execute.setTitle(I18N.message("execute"));
-		execute.addClickHandler(event -> onExecute(folderId, docIds));
+		execute.addClickHandler(event -> onExecute(folderIds, docIds));
 
 		ToolStripButton close = new ToolStripButton();
 		close.setTitle(I18N.message("close"));
@@ -136,7 +136,7 @@ public class AutomationDialog extends Window {
 		return new Tab(I18N.message("parameters"));
 	}
 
-	private void onExecute(Long folderId, List<Long> docIds) {
+	private void onExecute(List<Long> folderIds, List<Long> docIds) {
 		if (routine.getId() == 0L && !scriptForm.validate())
 			return;
 
@@ -149,7 +149,7 @@ public class AutomationDialog extends Window {
 		LD.contactingServer();
 		AutomationDialog.this.destroy();
 		GuiLog.info(I18N.message("automationlaunched"));
-		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<>() {
+		AutomationService.Instance.get().execute(routine, docIds, folderIds, new AsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
