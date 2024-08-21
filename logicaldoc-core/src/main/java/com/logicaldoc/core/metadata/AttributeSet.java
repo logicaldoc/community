@@ -10,5 +10,4 @@ public class AttributeSet extends AbstractAttributeSet {
 
 	private static final long serialVersionUID = 1L;
 
-
 }

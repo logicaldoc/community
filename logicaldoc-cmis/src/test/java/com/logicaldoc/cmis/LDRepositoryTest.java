@@ -676,12 +676,12 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		assertEquals(5, folder6.getParentId());
 
 		stringHolder = new Holder<String>("fld.6");
-		testSubject.moveObject(null, stringHolder, "fld.4", null);
-
-		folder6 = fdao.findById(6L);
-		fdao.initialize(folder6);
-		assertEquals(4, folder6.getParentId());
-
+		try {
+			testSubject.moveObject(null, stringHolder, "fld.4", null);
+			fail("cannot move a workspace");
+		} catch (Exception e) {
+			// All ok
+		}
 	}
 
 	@Test

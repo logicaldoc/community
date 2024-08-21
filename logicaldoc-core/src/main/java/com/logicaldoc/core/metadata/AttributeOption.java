@@ -100,9 +100,15 @@ public class AttributeOption extends PersistentObject implements Comparable<Attr
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof AttributeOption))
+		if (this == obj)
+			return true;
+		
+		if (obj == null)
 			return false;
-		AttributeOption other = (AttributeOption) obj;
-		return other.getId() == this.getId();
+
+		if (obj instanceof AttributeOption other)
+			return other.getId() == this.getId();
+		else
+			return false;
 	}
 }

@@ -162,22 +162,6 @@ public class Generic extends ExtensibleObject implements Comparable<Generic> {
 		this.date2 = date2;
 	}
 
-	@Override
-	public int compareTo(Generic o) {
-		if (getType().compareTo(o.getType()) != 0)
-			return getType().compareTo(o.getType());
-		else
-			return getSubtype().compareTo(o.getSubtype());
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof Generic))
-			return false;
-		Generic other = (Generic) obj;
-		return other.getId() == this.getId();
-	}
-
 	public String getDisplayString1() {
 		return StringUtils.abbreviate(getString1(), 65);
 	}
@@ -245,12 +229,34 @@ public class Generic extends ExtensibleObject implements Comparable<Generic> {
 	public void setString8(String string8) {
 		this.string8 = string8;
 	}
-	
+
 	public String getText1() {
 		return text1;
 	}
 
 	public void setText1(String text1) {
 		this.text1 = text1;
+	}
+
+	@Override
+	public int compareTo(Generic o) {
+		if (getType().compareTo(o.getType()) != 0)
+			return getType().compareTo(o.getType());
+		else
+			return getSubtype().compareTo(o.getSubtype());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+
+		if (obj == null)
+			return false;
+
+		if (obj instanceof Generic other)
+			return other.getId() == this.getId();
+		else
+			return false;
 	}
 }

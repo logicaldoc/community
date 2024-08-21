@@ -232,13 +232,16 @@ public class Device extends PersistentObject implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof Device))
+		if (this == obj)
+			return true;
+		
+		if (obj == null)
 			return false;
-		Device other = (Device) obj;
-		if (deviceId != null)
-			return deviceId.equals(other.getDeviceId()) || super.equals(obj);
+
+		if (obj instanceof Device other)
+			return other.getId() == this.getId();
 		else
-			return super.equals(obj);
+			return false;
 	}
 
 	@Override

@@ -53,7 +53,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	private boolean firstTime = true;
 
 	// Indicates if the Navigator is in the process of opening this path
-	GUIFolder[] pathToOpen = null;
+	private GUIFolder[] pathToOpen = null;
 
 	int currentIndexInPathToOpen = 0;
 

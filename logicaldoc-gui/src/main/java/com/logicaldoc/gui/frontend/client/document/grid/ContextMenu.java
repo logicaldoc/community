@@ -200,8 +200,7 @@ public class ContextMenu extends Menu {
 
 		automation = new MenuItem(I18N.message("executeautomation"));
 		automation.addClickHandler(
-				click -> new AutomationDialog(Arrays.asList(new Long[] { folder.getId() }), getSelectionIds(selection))
-						.show());
+				click -> new AutomationDialog(Arrays.asList(folder.getId()), getSelectionIds(selection)).show());
 
 		preview = preparePreview();
 
@@ -901,6 +900,7 @@ public class ContextMenu extends Menu {
 					else
 						DocumentService.Instance.get().unsetPassword(selection.get(0).getId(), value,
 								new AsyncCallback<>() {
+
 									@Override
 									public void onFailure(Throwable caught) {
 										GuiLog.serverError(caught);
@@ -911,6 +911,7 @@ public class ContextMenu extends Menu {
 										selection.get(0).setPasswordProtected(false);
 										grid.updateDocument(selection.get(0));
 									}
+
 								});
 				});
 		});
@@ -1195,7 +1196,7 @@ public class ContextMenu extends Menu {
 								 * open the input popup
 								 */
 								FillRoutineParams dialog = new FillRoutineParams(action.getName(), routine,
-										Arrays.asList(new Long[] { folderId }), selectedDocIds);
+										Arrays.asList(folderId), selectedDocIds);
 								dialog.show();
 							} else {
 								/*
@@ -1256,19 +1257,18 @@ public class ContextMenu extends Menu {
 	}
 
 	private void executeRoutine(long folderId, List<Long> docIds, GUIAutomationRoutine routine) {
-		AutomationService.Instance.get().execute(routine, docIds, Arrays.asList(new Long[] { folderId }),
-				new AsyncCallback<>() {
+		AutomationService.Instance.get().execute(routine, docIds, Arrays.asList(folderId), new AsyncCallback<>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(Void arg0) {
-						// Nothing to do
-					}
-				});
+			@Override
+			public void onSuccess(Void arg0) {
+				// Nothing to do
+			}
+		});
 	}
 
 	private void onRename(long docId, String newFilename) {
@@ -1284,5 +1284,18 @@ public class ContextMenu extends Menu {
 				DocumentController.get().modified(doc);
 			}
 		});
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof ContextMenu)
+			return super.equals(obj);
+		else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

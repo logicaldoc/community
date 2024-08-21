@@ -70,7 +70,7 @@ public class Menu extends SecurablePersistentObject implements Comparable<Menu> 
 	public static final int TYPE_CUSTOM_ACTION = 2;
 
 	public static final long DESTROY_DOCUMENTS = -9;
-	
+
 	private String name = "";
 
 	private long parentId = 0;
@@ -172,23 +172,35 @@ public class Menu extends SecurablePersistentObject implements Comparable<Menu> 
 	}
 
 	@Override
-	public int compareTo(Menu o) {
-		int comparison = Integer.compare(this.position, o.position);
+	public int compareTo(Menu other) {
+		if (this.equals(other))
+			return 0;
+
+		int comparison = Integer.compare(this.position, other.position);
 		if (comparison != 0)
 			return comparison;
-		return this.name.compareTo(o.name);
+		return this.name.compareTo(other.name);
+	}
+
+	@Override
+	public int hashCode() {
+		int result;
+		result = getClass().getName().hashCode();
+		result = 29 * result + Long.valueOf(getId()).hashCode();
+		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+
+		if (obj == null)
+			return false;
+
 		if (obj instanceof Menu other)
 			return other.getId() == this.getId();
 		else
 			return false;
-	}
-	
-	@Override
-	public int hashCode() {
-		return super.hashCode();
 	}
 }

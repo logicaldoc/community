@@ -67,8 +67,8 @@ public class CreateAliasDialog extends Dialog {
 	 */
 	public void createAlias(long referencedFolderId) {
 		final TreeNode parent = FolderNavigator.get().getSelectedRecord();
-		FolderService.Instance.get().createAlias(parent.getAttributeAsLong(FolderNavigator.FOLDER_ID),
-				referencedFolderId, new AsyncCallback<>() {
+		FolderService.Instance.get().createAlias(parent.getAttributeAsLong(com.logicaldoc.gui.frontend.client.folder.browser.FolderTree.FOLDER_ID), referencedFolderId,
+				new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

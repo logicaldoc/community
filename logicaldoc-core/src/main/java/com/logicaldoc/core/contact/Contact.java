@@ -112,7 +112,7 @@ public class Contact extends PersistentObject {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	
+
 	@Override
 	public String toString() {
 		return getFullName() + (email != null ? " - " + email : "");

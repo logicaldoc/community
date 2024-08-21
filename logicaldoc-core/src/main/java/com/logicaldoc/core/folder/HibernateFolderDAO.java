@@ -123,18 +123,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		if (!checkStoringAspect())
 			return;
 
-		if (folder.getId() != 0L && getCurrentSession().contains(folder))
-			getCurrentSession().merge(folder);
-
-		if (folder.getType() == Folder.TYPE_WORKSPACE) {
-			Folder defaultWs = findDefaultWorkspace(folder.getTenantId());
-			if (defaultWs != null && defaultWs.equals(folder) && !folder.getName().equals(Folder.DEFAULTWORKSPACENAME))
-				throw new PersistenceException("You cannot rename the default workspace");
-
-			Folder root = findRoot(folder.getTenantId());
-			if (root != null && folder.getParentId() != root.getId())
-				throw new PersistenceException("You cannot move a workspace");
-		}
+		workspaceChecks(folder);
 
 		if (!folder.getName().equals(SLASH)) {
 			// To avoid java script and xml injection
@@ -196,6 +185,23 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			saveFolderHistory(new Folder(folder), transaction);
 		} catch (PersistenceException e) {
 			handleStoreError(transaction, e);
+		}
+	}
+
+	private void workspaceChecks(Folder folder) throws PersistenceException {
+		if (folder.getId() != 0L && folder.getType() == Folder.TYPE_WORKSPACE) {
+			Folder root = findRoot(folder.getTenantId());
+			if(root==null)
+				return;
+			
+			if (folder.getParentId() != root.getId())
+				throw new PersistenceException("You cannot move a workspace");
+
+			long defaultWorkspaceId = queryForLong(
+					"select ld_id from ld_folder where ld_parentid = :rootId and ld_name = :name",
+					Map.of("rootId", root.getId(), "name", Folder.DEFAULTWORKSPACENAME));
+			if (folder.getId() == defaultWorkspaceId && !folder.getName().equals(Folder.DEFAULTWORKSPACENAME))
+				throw new PersistenceException("You cannot rename the default workspace");
 		}
 	}
 
@@ -1993,9 +1999,10 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		if (root == null)
 			return null;
 
-		List<Folder> workspaces = findByWhere(ENTITY + PARENTID_EQUAL + root.getId() + AND + ENTITY + ".name = '"
-				+ SqlUtil.doubleQuotes(Folder.DEFAULTWORKSPACENAME) + "' and " + ENTITY + TENANT_ID_EQUAL + tenantId
-				+ AND + ENTITY + ".type=" + Folder.TYPE_WORKSPACE, null, null);
+		List<Folder> workspaces = findByWhere(
+				ENTITY + PARENTID_EQUAL + root.getId() + AND + ENTITY + ".name = :wfName" + " and " + ENTITY
+						+ TENANT_ID_EQUAL + tenantId + AND + ENTITY + ".type=" + Folder.TYPE_WORKSPACE,
+				Map.of("wfName", Folder.DEFAULTWORKSPACENAME), null, null);
 
 		if (workspaces.isEmpty())
 			return null;

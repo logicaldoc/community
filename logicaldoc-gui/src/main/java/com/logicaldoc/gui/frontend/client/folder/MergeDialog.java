@@ -51,7 +51,8 @@ public class MergeDialog extends Dialog {
 			LD.ask(I18N.message(MERGE),
 					I18N.message("mergeask", label, folders.getSelectedRecord().getAttributeAsString("name")), yes -> {
 						if (Boolean.TRUE.equals(yes))
-							merge(folders.getSelectedRecord().getAttributeAsLong("folderId"));
+							merge(folders.getSelectedRecord().getAttributeAsLong(
+									com.logicaldoc.gui.frontend.client.folder.browser.FolderTree.FOLDER_ID));
 						destroy();
 					});
 		});
@@ -72,7 +73,8 @@ public class MergeDialog extends Dialog {
 	private void merge(long targetFolderId) {
 		List<Long> ids = FolderNavigator.get().getSelectedIds();
 		for (Long id : ids) {
-			TreeNode node = FolderNavigator.get().getTree().find(FolderNavigator.FOLDER_ID, (Object) id);
+			TreeNode node = FolderNavigator.get().getTree()
+					.find(com.logicaldoc.gui.frontend.client.folder.browser.FolderTree.FOLDER_ID, (Object) id);
 			FolderNavigator.get().getTree().remove(node);
 		}
 
@@ -88,7 +90,8 @@ public class MergeDialog extends Dialog {
 			@Override
 			public void onSuccess(Void ret) {
 				LD.clearPrompt();
-				TreeNode target = FolderNavigator.get().getTree().find(FolderNavigator.FOLDER_ID,
+				TreeNode target = FolderNavigator.get().getTree().find(
+						com.logicaldoc.gui.frontend.client.folder.browser.FolderTree.FOLDER_ID,
 						Long.toString(targetFolderId));
 				if (target != null)
 					FolderNavigator.get().getTree().reloadChildren(target);

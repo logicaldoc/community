@@ -66,15 +66,7 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 	public int compareTo(SavedSearch other) {
 		return this.getOptions().compareTo(other.getOptions());
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof SavedSearch))
-			return false;
-		SavedSearch other = (SavedSearch) obj;
-		return getOptions().equals(other.getOptions());
-	}
-
+	
 	public long getUserId() {
 		return userId;
 	}
@@ -121,5 +113,19 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 
 	public void setType(int type) {
 		this.type = type;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+
+		if (obj == null)
+			return false;
+
+		if (obj instanceof SavedSearch other)
+			return other.getId() == this.getId();
+		else
+			return false;
 	}
 }

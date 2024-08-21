@@ -59,9 +59,9 @@ public class ContextMenu extends Menu {
 		this.tree = tree;
 		this.acl = acl;
 		this.selectedFolders = tree.getSelectedFolders();
-		
+
 		GUIFolder firstSelectedFolder = selectedFolders.get(0);
-		
+
 		MenuItem search = prepareSearchMenuItem(firstSelectedFolder);
 
 		MenuItem delete = prepareDeleteMenuItem();
@@ -70,7 +70,7 @@ public class ContextMenu extends Menu {
 
 		MenuItem createAlias = prepareCreateAliasMenuItem();
 
-		MenuItem rename = prepareRenameMenuItem(firstSelectedFolder);
+		MenuItem rename = prepareRenameMenuItem();
 
 		MenuItem createWorkspace = new MenuItem();
 		createWorkspace.setTitle(I18N.message("newworkspace"));
@@ -93,7 +93,7 @@ public class ContextMenu extends Menu {
 		MenuItem pasteAsAlias = new MenuItem();
 		pasteAsAlias.setTitle(I18N.message("pasteasalias"));
 		pasteAsAlias.addClickHandler(click -> onPasteAsAlias(firstSelectedFolder));
-		
+
 		MenuItem exportZip = prepareExportZipMenuItem(firstSelectedFolder);
 
 		MenuItem addBookmark = new MenuItem();
@@ -114,7 +114,7 @@ public class ContextMenu extends Menu {
 			setItems(reload, search, create, createAlias, rename, delete, addBookmark, paste, pasteAsAlias, move, copy,
 					merge, exportZip);
 		}
-		
+
 		addSubscribeMenuItem();
 
 		addApplyTemplateMenuItem();
@@ -126,7 +126,7 @@ public class ContextMenu extends Menu {
 		addAutomationMenuItem();
 
 		addCustomActionsMenuItem();
-		
+
 		if (selectedFolders.size() == 1)
 			FolderService.Instance.get().getFolder(firstSelectedFolder.getId(), false, false, false,
 					new AsyncCallback<GUIFolder>() {
@@ -355,7 +355,7 @@ public class ContextMenu extends Menu {
 		return search;
 	}
 
-	private MenuItem prepareRenameMenuItem(final GUIFolder folder) {
+	private MenuItem prepareRenameMenuItem() {
 		MenuItem rename = new MenuItem();
 		rename.setTitle(I18N.message("rename"));
 		rename.addClickHandler(event -> onRename());
@@ -366,8 +366,8 @@ public class ContextMenu extends Menu {
 	private MenuItem prepareCreateMenuItem(final GUIFolder folder) {
 		MenuItem create = new MenuItem();
 		create.setTitle(I18N.message("newfolder"));
-		
-		GUIFolder newFolder=new GUIFolder();
+
+		GUIFolder newFolder = new GUIFolder();
 		newFolder.setParentId(folder.getId());
 		create.addClickHandler(event -> new CreateDialog(newFolder).show());
 		create.setEnabled(acl.isAdd());
@@ -595,5 +595,18 @@ public class ContextMenu extends Menu {
 					}
 				});
 		});
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof ContextMenu)
+			return super.equals(obj);
+		else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

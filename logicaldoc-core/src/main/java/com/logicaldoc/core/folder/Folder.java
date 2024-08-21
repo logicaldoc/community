@@ -221,14 +221,6 @@ public class Folder extends SecurableExtensibleObject implements Comparable<Fold
 		this.parentId = parentId;
 	}
 
-	@Override
-	public int compareTo(Folder o) {
-		int comparison = Integer.compare(this.position, o.position);
-		if (comparison != 0)
-			return comparison;
-		return this.name.compareTo(o.name);
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -569,5 +561,38 @@ public class Folder extends SecurableExtensibleObject implements Comparable<Fold
 
 	public void setTile(String tile) {
 		this.tile = tile;
+	}
+
+	@Override
+	public int compareTo(Folder other) {
+		if (this.equals(other))
+			return 0;
+
+		int comparison = Integer.compare(this.position, other.position);
+		if (comparison != 0)
+			return comparison;
+		return this.name.compareTo(other.name);
+	}
+
+	@Override
+	public int hashCode() {
+		int result;
+		result = getClass().getName().hashCode();
+		result = 29 * result + Long.valueOf(getId()).hashCode();
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+
+		if (obj == null)
+			return false;
+
+		if (obj instanceof Folder other)
+			return other.getId() == this.getId();
+		else
+			return false;
 	}
 }

@@ -60,10 +60,24 @@ public class Hit extends Document implements Comparable<Hit> {
 	}
 
 	@Override
+	public int hashCode() {
+		int result;
+		result = getClass().getName().hashCode();
+		result = 29 * result + Long.valueOf(getId()).hashCode();
+		return result;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof Hit))
+		if (this == obj)
+			return true;
+
+		if (obj == null)
 			return false;
-		Hit other = (Hit) obj;
-		return other.getId() == this.getId();
+
+		if (obj instanceof Hit other)
+			return other.getId() == this.getId();
+		else
+			return false;
 	}
 }

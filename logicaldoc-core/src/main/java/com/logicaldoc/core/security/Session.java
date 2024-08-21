@@ -376,7 +376,6 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		} else {
 			return sid.equals(other.sid);
 		}
-
 	}
 
 	public long getUserId() {

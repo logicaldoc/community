@@ -37,7 +37,7 @@ public class FillRoutineParams extends Window {
 		IButton execute = new IButton();
 		execute.setTitle(I18N.message("execute"));
 		execute.setAutoFit(true);
-		execute.addClickHandler(event -> onExecute(routine, docIds, folderIds));
+		execute.addClickHandler(event -> onExecute(routine, folderIds, docIds));
 
 		HLayout buttonsBar = new HLayout();
 		buttonsBar.setWidth100();

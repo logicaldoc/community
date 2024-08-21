@@ -108,19 +108,24 @@ public abstract class PersistentObject implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null || this.getClass() != obj.getClass()) {
-			return false;
-		}
-
-		return ((PersistentObject) obj).getId() == this.getId();
+	public int hashCode() {
+		int result;
+		result = getClass().getName().hashCode();
+		result = 29 * result + Long.valueOf(getId()).hashCode();
+		return result;
 	}
 
 	@Override
-	public int hashCode() {
-		return this.getClass().getSimpleName().hashCode() + Long.valueOf(getId()).hashCode();
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+
+		if (obj == null)
+			return false;
+
+		if (obj instanceof PersistentObject other && this.getClass().equals(obj.getClass()))
+			return other.getId() == this.getId();
+		else
+			return false;
 	}
 }

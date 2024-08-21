@@ -126,8 +126,9 @@ public class SoapTagServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testFindFoldersByTag() throws Exception {
-		Folder folder = folderDao.findById(4L);
-		folderDao.initialize(folder);
+		Folder folder = new Folder();
+		folder.setName("test");
+		folder.setParentId(5L);
 		folder.addTag("xyz");
 		folderDao.store(folder);
 
