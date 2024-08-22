@@ -48,6 +48,8 @@ public class PasswordHistory extends PersistentObject implements Serializable, C
 
 	@Override
 	public int compareTo(PasswordHistory other) {
+		if(equals(other))
+			return 0;
 		if (other.userId == userId)
 			return this.date.compareTo(other.date);
 		else
@@ -55,16 +57,30 @@ public class PasswordHistory extends PersistentObject implements Serializable, C
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((password == null) ? 0 : password.hashCode());
+		result = prime * result + (int) (userId ^ (userId >>> 32));
+		return result;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-
-		if (obj == null)
+		if (!super.equals(obj))
 			return false;
-
-		if (obj instanceof PasswordHistory other)
-			return other.getId() == this.getId();
-		else
+		if (getClass() != obj.getClass())
 			return false;
+		PasswordHistory other = (PasswordHistory) obj;
+		if (password == null) {
+			if (other.password != null)
+				return false;
+		} else if (!password.equals(other.password))
+			return false;
+		if (userId != other.userId)
+			return false;
+		return true;
 	}
 }

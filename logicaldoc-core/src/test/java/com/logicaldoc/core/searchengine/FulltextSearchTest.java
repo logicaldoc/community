@@ -75,7 +75,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 		fold.setId(Folder.DEFAULTWORKSPACEID);
 		fold.setName("test");
 		document.setFolder(fold);
-		engine.addHit(document, "Questo è un documento di prova. Per fortuna che esistono i test. document");
+		engine.addHit(document, "Questo e un documento di prova. Per fortuna che esistono i test. document");
 
 		// Adding unexisting document 111
 		document = new Document();

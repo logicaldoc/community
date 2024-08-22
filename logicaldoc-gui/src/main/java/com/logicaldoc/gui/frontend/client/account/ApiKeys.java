@@ -153,4 +153,17 @@ public class ApiKeys extends com.smartgwt.client.widgets.Window {
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof ApiKeys)
+			return super.equals(obj);
+		else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

@@ -26,6 +26,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @since 8.1.2
  */
 public class SyndicationStandardProperties extends SyndicationDetailsTab {
+	private static final String APIKEY = "apikey";
+
 	private static final String REPLICATECUSTOMID = "replicatecustomid";
 
 	private static final String TIMEOUT = "timeout";
@@ -104,6 +106,13 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 				hiddenPassword, changedHandler);
 		password.addChangedHandler(changedHandler);
 
+		TextItem hiddenApiKey = ItemFactory.newTextItem("apikey_hidden", syndication.getApiKey());
+		hiddenApiKey.setCellStyle("nodisplay");
+		hiddenApiKey.addChangedHandler(changedHandler);
+		FormItem apiKey = ItemFactory.newSafePasswordItem(APIKEY, I18N.message(APIKEY), syndication.getApiKey(),
+				hiddenApiKey, changedHandler);
+		apiKey.addChangedHandler(changedHandler);
+
 		TextItem include = ItemFactory.newTextItem("include", syndication.getIncludes());
 		include.addChangedHandler(changedHandler);
 
@@ -155,7 +164,7 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		replicateCustomId.addChangedHandler(changedHandler);
 
 		form.setItems(name, sourceSelector, remoteUrl, targetPath, fakeUsername, hiddenPassword, username, password,
-				include, exclude, maxPacketSize, batch, timeout, startDate, replicateCustomId);
+				apiKey, replicateCustomId, include, exclude, maxPacketSize, batch, timeout, startDate);
 
 		formsContainer.addMember(form);
 
@@ -169,6 +178,7 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 			syndication.setName((String) values.get("name"));
 			syndication.setUsername((String) values.get(USERNAME));
 			syndication.setPassword((String) values.get(PASSWORD));
+			syndication.setApiKey((String) values.get(APIKEY));
 			syndication.setTargetPath((String) values.get("targetpath"));
 			syndication.setUrl((String) values.get("url"));
 			syndication.setSourceFolder(sourceSelector.getFolder());

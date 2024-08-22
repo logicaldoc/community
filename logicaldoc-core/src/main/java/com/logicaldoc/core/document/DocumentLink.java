@@ -42,4 +42,41 @@ public class DocumentLink extends PersistentObject {
 	public void setDocument2(Document document2) {
 		this.document2 = document2;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((document1 == null) ? 0 : document1.hashCode());
+		result = prime * result + ((document2 == null) ? 0 : document2.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DocumentLink other = (DocumentLink) obj;
+		if (document1 == null) {
+			if (other.document1 != null)
+				return false;
+		} else if (!document1.equals(other.document1))
+			return false;
+		if (document2 == null) {
+			if (other.document2 != null)
+				return false;
+		} else if (!document2.equals(other.document2))
+			return false;
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!type.equals(other.type))
+			return false;
+		return true;
+	}
 }

@@ -217,14 +217,16 @@ public class SystemServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testSaveLogger() throws ServerException {
+		final String loggerName = "pippo.pluto";
 		try {
-			assertFalse(new LogConfigurator().getLoggers().stream()
-					.anyMatch(l -> "pippo.pluto".equals(l.getAttributeValue("name"))));
-			testSubject.saveLogger("pippo.pluto", "warn", true);
+			assertFalse(new LogConfigurator().getLoggers().stream().anyMatch(l -> {
+				return loggerName.equals(l.getAttributeValue("name"));
+			}));
+			testSubject.saveLogger(loggerName, "warn", true);
 			assertTrue(new LogConfigurator().getLoggers().stream()
-					.anyMatch(l -> "pippo.pluto".equals(l.getAttributeValue("name"))));
+					.anyMatch(l -> loggerName.equals(l.getAttributeValue("name"))));
 		} finally {
-			testSubject.removeLogger("pippo.pluto");
+			testSubject.removeLogger(loggerName);
 		}
 	}
 

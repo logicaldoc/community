@@ -1078,4 +1078,41 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 	public void setDocAttrs(int docAttrs) {
 		this.docAttrs = docAttrs;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((customId == null) ? 0 : customId.hashCode());
+		result = prime * result + ((fileVersion == null) ? 0 : fileVersion.hashCode());
+		result = prime * result + ((version == null) ? 0 : version.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AbstractDocument other = (AbstractDocument) obj;
+		if (customId == null) {
+			if (other.customId != null)
+				return false;
+		} else if (!customId.equals(other.customId))
+			return false;
+		if (fileVersion == null) {
+			if (other.fileVersion != null)
+				return false;
+		} else if (!fileVersion.equals(other.fileVersion))
+			return false;
+		if (version == null) {
+			if (other.version != null)
+				return false;
+		} else if (!version.equals(other.version))
+			return false;
+		return true;
+	}
 }

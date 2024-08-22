@@ -109,4 +109,17 @@ public class DropboxAuthorization extends Window {
 	public static DropboxAuthorization get() {
 		return instance;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof DropboxAuthorization)
+			return super.equals(obj);
+		else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

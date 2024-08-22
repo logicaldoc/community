@@ -87,7 +87,7 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 		Assert.assertNotNull(newUserHistory);
 
 		// Test the stored history
-		Collection<UserHistory> histories = (Collection<UserHistory>) dao.findByUserId(3);
+		Collection<UserHistory> histories = (Collection<UserHistory>) dao.findByUserId(3L);
 		Assert.assertNotNull(histories);
 		Assert.assertFalse(histories.isEmpty());
 
@@ -98,7 +98,7 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 				break;
 			}
 		}
-
+		
 		Assert.assertEquals(hStored, newUserHistory);
 		Assert.assertEquals(hStored.getDate().getTime(), DateBean.dateFromCompactString("20061220").getTime());
 		Assert.assertEquals(hStored.getUsername(), "sebastian");

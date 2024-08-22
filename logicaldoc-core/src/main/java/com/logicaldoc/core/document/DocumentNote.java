@@ -299,4 +299,42 @@ public class DocumentNote extends PersistentObject {
 	public String toString() {
 		return StringUtils.abbreviate(message, 40) + "(" + getId() + ")";
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((date == null) ? 0 : date.hashCode());
+		result = prime * result + (int) (docId ^ (docId >>> 32));
+		result = prime * result + ((fileVersion == null) ? 0 : fileVersion.hashCode());
+		result = prime * result + page;
+		result = prime * result + (int) (userId ^ (userId >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DocumentNote other = (DocumentNote) obj;
+		if (date == null) {
+			if (other.date != null)
+				return false;
+		} else if (!date.equals(other.date))
+			return false;
+		if (docId != other.docId)
+			return false;
+		if (fileVersion == null) {
+			if (other.fileVersion != null)
+				return false;
+		} else if (!fileVersion.equals(other.fileVersion))
+			return false;
+		if (page != other.page)
+			return false;
+		return userId == other.userId;
+	}
 }

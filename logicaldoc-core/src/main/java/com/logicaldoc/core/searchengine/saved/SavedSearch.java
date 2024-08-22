@@ -116,16 +116,30 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 	}
 	
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + (int) (userId ^ (userId >>> 32));
+		return result;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-
-		if (obj == null)
+		if (!super.equals(obj))
 			return false;
-
-		if (obj instanceof SavedSearch other)
-			return other.getId() == this.getId();
-		else
+		if (getClass() != obj.getClass())
 			return false;
+		SavedSearch other = (SavedSearch) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (userId != other.userId)
+			return false;
+		return true;
 	}
 }

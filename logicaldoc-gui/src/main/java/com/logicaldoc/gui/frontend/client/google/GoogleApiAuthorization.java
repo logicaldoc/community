@@ -111,4 +111,17 @@ public class GoogleApiAuthorization extends Window {
 	public static GoogleApiAuthorization get() {
 		return instance;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof GoogleApiAuthorization)
+			return super.equals(obj);
+		else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

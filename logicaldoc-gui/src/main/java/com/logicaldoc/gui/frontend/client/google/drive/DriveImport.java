@@ -169,4 +169,17 @@ public class DriveImport extends Window {
 		layout.setMembers(toolStrip, grid);
 		addItem(layout);
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof DriveImport)
+			return super.equals(obj);
+		else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

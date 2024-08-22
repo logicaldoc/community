@@ -25,6 +25,8 @@ public class GUISyndication implements Serializable {
 
 	private String password;
 
+	private String apiKey;
+
 	private int enabled = 1;
 
 	private GUIFolder sourceFolder;
@@ -38,13 +40,13 @@ public class GUISyndication implements Serializable {
 	private long maxPacketSize = 1024;
 
 	private long batch = 1000;
-	
+
 	private int timeout = 120;
-	
+
 	private Date startDate = null;
-	
+
 	private int replicateCustomId = 1;
-	
+
 	public Date getStartDate() {
 		return startDate;
 	}
@@ -171,5 +173,13 @@ public class GUISyndication implements Serializable {
 
 	public void setTimeout(int timeout) {
 		this.timeout = timeout;
+	}
+
+	public String getApiKey() {
+		return apiKey;
+	}
+
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
 	}
 }

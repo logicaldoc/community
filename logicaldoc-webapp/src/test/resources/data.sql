@@ -14,11 +14,18 @@ values (-1,0,0,4,'object', 'Object', 0, -1, 0, 0, 0);
 insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
 values (-1,0,0,5,'coverage', 'Coverage', 0, -1, 0, 0, 0);
 insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
-values (-1,0,0,6,'recipient', 'Recipient', 0, -1, 0, 0, 0);
+values (-1,0,0,6,'recipient', 'Recipient', 1, -1, 0, 0, 0);
 insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
 values (-1,0,3,7,'sourceDate', 'Date', 0, -1, 0, 0, 0);
 insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
 values (-1,0,3,7,'multi', 'Multi', 0, -1, 0, 1, 0);
+
+insert into ld_extoption (ld_id, ld_lastmodified, ld_creation, ld_recordversion, ld_deleted, ld_tenantid, ld_setid, ld_attribute, ld_value, ld_position)
+                  values (1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 0, 1, -1, 'recipient', 'a', 1);       
+insert into ld_extoption (ld_id, ld_lastmodified, ld_creation, ld_recordversion, ld_deleted, ld_tenantid, ld_setid, ld_attribute, ld_value, ld_position)
+                  values (2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 0, 1, -1, 'recipient', 'b', 2);
+insert into ld_extoption (ld_id, ld_lastmodified, ld_creation, ld_recordversion, ld_deleted, ld_tenantid, ld_setid, ld_attribute, ld_value, ld_position)
+                  values (3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 0, 1, -1, 'recipient', 'c', 3);
 
 insert into ld_template
 			(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid, ld_recordversion)
@@ -233,7 +240,7 @@ insert into ld_tag(ld_docid, ld_tenantid, ld_tag)
 values     (1, 1,'ghi');
 
 insert into ld_tag(ld_docid, ld_tenantid, ld_tag)
-values     (2, 1,'ask');
+values     (3, 1,'ask');
 
 insert into ld_tag(ld_docid, ld_tenantid, ld_tag)
 values     (3, 1,'zzz');
@@ -283,13 +290,13 @@ insert into ld_recipient
 values     (3,'paperino','topolino','sms',2,0)
 
 insert into ld_link(ld_id, ld_lastmodified, ld_creation,ld_deleted, ld_docid1, ld_docid2,ld_type,ld_tenantid,ld_recordversion)
-values   (1,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,2,'test',1,1);
+values   (1,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,3,'test',1,1);
 insert into ld_link(ld_id, ld_lastmodified, ld_creation,ld_deleted, ld_docid1, ld_docid2,ld_type,ld_tenantid,ld_recordversion)
-values   (2,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,2,1,'xyz',1,1);
+values   (2,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,3,1,'xyz',1,1);
 insert into ld_link(ld_id, ld_lastmodified, ld_creation,ld_deleted, ld_docid1, ld_docid2,ld_type,ld_tenantid,ld_recordversion)
-values   (3,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,2,'xxx',1,1);
+values   (3,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,3,'xxx',1,1);
 insert into ld_link(ld_id, ld_lastmodified, ld_creation,ld_deleted, ld_docid1, ld_docid2,ld_type,ld_tenantid,ld_recordversion)
-values   (4,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,2,1,'',1,1);
+values   (4,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,3,1,'',1,1);
 
 insert into ld_template (ld_id, ld_lastmodified, ld_creation,ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid,ld_recordversion)
 values (5, '2008-11-07 00:00:00', '2008-11-07 00:00:00',0,'test1','test1_desc',0,0,1,1);

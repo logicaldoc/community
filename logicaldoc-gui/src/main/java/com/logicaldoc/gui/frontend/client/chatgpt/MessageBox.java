@@ -58,4 +58,17 @@ class MessageBox extends Label {
 	public void updateMessage(String message) {
 		setContents(prepareContent(message));
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof MessageBox)
+			return super.equals(obj);
+		else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

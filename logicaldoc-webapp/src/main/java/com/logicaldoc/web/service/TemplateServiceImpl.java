@@ -381,6 +381,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 					Document dummyDoc = new Document();
 					dummyDoc.setFileName("webform");
 					dummyDoc.setTenantId(template.getTenantId());
+					dummyDoc.setTemplate(template);
 					attributes = prepareGUIAttributes(template, dummyDoc, sessionUser);
 				} else
 					attributes = prepareGUIAttributes(template, null, sessionUser);
@@ -394,7 +395,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		}
 	}
 
-	public List<GUIAttribute> prepareGUIAttributes(Template template, ExtensibleObject extensibleObject,
+	List<GUIAttribute> prepareGUIAttributes(Template template, ExtensibleObject extensibleObject,
 			User sessionUser) {
 		List<GUIAttribute> attributes = new ArrayList<>();
 		if (template == null)

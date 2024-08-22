@@ -63,4 +63,29 @@ public class WebserviceCall extends History {
 	public String toString() {
 		return "WebserviceCall [uri=" + getUri() + ", date=" + getDate() + "]";
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((protocol == null) ? 0 : protocol.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		WebserviceCall other = (WebserviceCall) obj;
+		if (protocol == null) {
+			if (other.protocol != null)
+				return false;
+		} else if (!protocol.equals(other.protocol))
+			return false;
+		return true;
+	}
 }

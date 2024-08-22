@@ -576,9 +576,10 @@ public class Folder extends SecurableExtensibleObject implements Comparable<Fold
 
 	@Override
 	public int hashCode() {
-		int result;
-		result = getClass().getName().hashCode();
-		result = 29 * result + Long.valueOf(getId()).hashCode();
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + (int) (parentId ^ (parentId >>> 32));
 		return result;
 	}
 
@@ -586,13 +587,18 @@ public class Folder extends SecurableExtensibleObject implements Comparable<Fold
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-
-		if (obj == null)
+		if (!super.equals(obj))
 			return false;
-
-		if (obj instanceof Folder other)
-			return other.getId() == this.getId();
-		else
+		if (getClass() != obj.getClass())
 			return false;
+		Folder other = (Folder) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (parentId != other.parentId)
+			return false;
+		return true;
 	}
 }

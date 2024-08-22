@@ -83,22 +83,34 @@ public class DropboxAccessTokenWizard extends Window {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
-		DropboxService.Instance.get().finishAuthorization(vm.getValueAsString("code").trim(),
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+		DropboxService.Instance.get().finishAuthorization(vm.getValueAsString("code").trim(), new AsyncCallback<>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(String account) {
-						if (account != null) {
-							destroy();
-							SC.say(I18N.message("correctlyauthorized",
-									Session.get().getInfo().getBranding().getProductName(), account));
-						} else
-							SC.warn(I18N.message("unabletoauthorize"));
-					}
-				});
+			@Override
+			public void onSuccess(String account) {
+				if (account != null) {
+					destroy();
+					SC.say(I18N.message("correctlyauthorized", Session.get().getInfo().getBranding().getProductName(),
+							account));
+				} else
+					SC.warn(I18N.message("unabletoauthorize"));
+			}
+		});
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof DropboxAccessTokenWizard)
+			return super.equals(obj);
+		else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

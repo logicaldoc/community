@@ -128,7 +128,7 @@ public abstract class ExtensibleObject extends PersistentObject {
 	public List<String> getAttributeNames() {
 		List<String> names = new ArrayList<>();
 		if (attributes != null)
-			names.addAll(attributes.keySet());
+			names = attributes.keySet().stream().toList();
 		return names;
 	}
 

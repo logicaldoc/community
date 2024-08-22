@@ -181,4 +181,29 @@ public class Ticket extends PersistentObject {
 	public void setExpireHours(Integer expireHours) {
 		this.expireHours = expireHours;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((ticketId == null) ? 0 : ticketId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Ticket other = (Ticket) obj;
+		if (ticketId == null) {
+			if (other.ticketId != null)
+				return false;
+		} else if (!ticketId.equals(other.ticketId))
+			return false;
+		return true;
+	}
 }

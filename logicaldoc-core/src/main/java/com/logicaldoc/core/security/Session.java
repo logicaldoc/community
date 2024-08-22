@@ -348,36 +348,6 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		return getSid();
 	}
 
-	@Override
-	public int compareTo(Session o) {
-		int compare = Integer.compare(status, o.status);
-		if (compare == 0)
-			compare = o.getCreation().compareTo(getCreation());
-		return compare;
-	}
-
-	@Override
-	public int hashCode() {
-		return sid.hashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-
-		final Session other = (Session) obj;
-		if (sid == null) {
-			return false;
-		} else {
-			return sid.equals(other.sid);
-		}
-	}
-
 	public long getUserId() {
 		return user.getId();
 	}
@@ -533,5 +503,40 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 	public void setKeyLabel(String keyLabel) {
 		this.keyLabel = keyLabel;
+	}
+	
+	@Override
+	public int compareTo(Session other) {
+		if(equals(other))
+			return 0;
+		int compare = Integer.compare(status, other.status);
+		if (compare == 0)
+			compare = other.getCreation().compareTo(getCreation());
+		return compare;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((sid == null) ? 0 : sid.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Session other = (Session) obj;
+		if (sid == null) {
+			if (other.sid != null)
+				return false;
+		} else if (!sid.equals(other.sid))
+			return false;
+		return true;
 	}
 }

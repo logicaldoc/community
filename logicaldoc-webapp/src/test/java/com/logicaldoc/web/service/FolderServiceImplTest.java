@@ -440,6 +440,7 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 		List<Folder> folderList = folderDao.findChildren(folderA.getId(), null);
 		assertEquals(1, folderList.size());
 
+		folderC = folderDao.findById(folderC.getId());
 		assertTrue(folderList.contains(folderC));
 	}
 
@@ -456,8 +457,10 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 
 		List<Folder> folderList = folderDao.findChildren(folderA.getId(), null);
 		assertEquals(1, folderList.size());
+		folderC = folderDao.findById(folderC.getId());
 		assertTrue(folderList.contains(folderC));
 
+		folderB = folderDao.findById(folderB.getId());
 		folderList = folderDao.findChildren(folderB.getId(), null);
 		assertEquals(0, folderList.size());
 	}
@@ -475,6 +478,7 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 
 		List<Folder> folderList = folderDao.findChildren(folderD.getId(), null);
 		assertEquals(1, folderList.size());
+		folderE = folderDao.findById(folderE.getId());
 		assertTrue(folderList.contains(folderE));
 
 		folderList = folderDao.findChildren(folderC.getId(), null);

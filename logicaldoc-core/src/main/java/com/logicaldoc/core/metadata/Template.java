@@ -20,4 +20,29 @@ public class Template extends AbstractAttributeSet {
 	public void setValidation(String validation) {
 		this.validation = validation;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((validation == null) ? 0 : validation.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Template other = (Template) obj;
+		if (validation == null) {
+			if (other.validation != null)
+				return false;
+		} else if (!validation.equals(other.validation))
+			return false;
+		return true;
+	}
 }

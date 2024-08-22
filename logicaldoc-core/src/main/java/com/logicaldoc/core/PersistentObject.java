@@ -109,9 +109,9 @@ public abstract class PersistentObject implements Serializable {
 
 	@Override
 	public int hashCode() {
-		int result;
-		result = getClass().getName().hashCode();
-		result = 29 * result + Long.valueOf(getId()).hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
 		return result;
 	}
 
@@ -119,13 +119,11 @@ public abstract class PersistentObject implements Serializable {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-
 		if (obj == null)
 			return false;
-
-		if (obj instanceof PersistentObject other && this.getClass().equals(obj.getClass()))
-			return other.getId() == this.getId();
-		else
+		if (getClass() != obj.getClass())
 			return false;
+		PersistentObject other = (PersistentObject) obj;
+		return id == other.id;
 	}
 }

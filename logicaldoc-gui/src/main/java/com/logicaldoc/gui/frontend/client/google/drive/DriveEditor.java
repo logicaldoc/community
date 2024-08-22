@@ -62,19 +62,18 @@ public class DriveEditor extends Window {
 				// Creating a new document document, so delete the temporary
 				// doc in Google Drive
 				LD.contactingServer();
-				GoogleService.Instance.get().delete(DriveEditor.this.document.getExtResId(),
-						new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GoogleUtil.handleGoogleServiceError(caught);
-							}
+				GoogleService.Instance.get().delete(DriveEditor.this.document.getExtResId(), new AsyncCallback<>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GoogleUtil.handleGoogleServiceError(caught);
+					}
 
-							@Override
-							public void onSuccess(Void result) {
-								LD.clearPrompt();
-								destroy();
-							}
-						});
+					@Override
+					public void onSuccess(Void result) {
+						LD.clearPrompt();
+						destroy();
+					}
+				});
 			}
 		});
 
@@ -165,8 +164,7 @@ public class DriveEditor extends Window {
 			} else {
 				LD.contactingServer();
 				GoogleService.Instance.get().importDocuments(Arrays.asList(document.getExtResId()),
-						FolderController.get().getCurrentFolder().getId(), document.getType(),
-						new AsyncCallback<>() {
+						FolderController.get().getCurrentFolder().getId(), document.getType(), new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								GoogleUtil.handleGoogleServiceError(caught);
@@ -198,5 +196,18 @@ public class DriveEditor extends Window {
 		});
 
 		layout.setMembers(toolStrip, html);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof DriveEditor)
+			return super.equals(obj);
+		else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

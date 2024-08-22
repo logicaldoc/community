@@ -22,11 +22,11 @@ import com.logicaldoc.util.Context;
 public abstract class History extends PersistentObject implements Comparable<History> {
 
 	public static final String ASPECT = "saveHistory";
-	
+
 	private static final long serialVersionUID = 1L;
 
 	private static Logger log = LoggerFactory.getLogger(History.class);
-	
+
 	protected Long docId;
 
 	private Long folderId;
@@ -65,7 +65,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 	private int notified = 0;
 
 	private String sessionId = "";
-	
+
 	private String keyLabel = "";
 
 	private int isNew = 1;
@@ -107,7 +107,6 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	private String color;
 
-
 	public String getFileVersion() {
 		return fileVersion;
 	}
@@ -115,7 +114,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 	public void setFileVersion(String fileVersion) {
 		this.fileVersion = fileVersion;
 	}
-	
+
 	public String getVersion() {
 		return version;
 	}
@@ -432,7 +431,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 	public void setColor(String color) {
 		this.color = color;
 	}
-	
+
 	public String getKeyLabel() {
 		return keyLabel;
 	}
@@ -482,5 +481,42 @@ public abstract class History extends PersistentObject implements Comparable<His
 	@Override
 	public int compareTo(History other) {
 		return getDate().compareTo(other.getDate());
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((date == null) ? 0 : date.hashCode());
+		result = prime * result + ((docId == null) ? 0 : docId.hashCode());
+		result = prime * result + ((event == null) ? 0 : event.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		History other = (History) obj;
+		if (date == null) {
+			if (other.date != null)
+				return false;
+		} else if (date.getTime() != other.date.getTime())
+			return false;
+		if (docId == null) {
+			if (other.docId != null)
+				return false;
+		} else if (!docId.equals(other.docId))
+			return false;
+		if (event == null) {
+			if (other.event != null)
+				return false;
+		} else if (!event.equals(other.event))
+			return false;
+		return true;
 	}
 }

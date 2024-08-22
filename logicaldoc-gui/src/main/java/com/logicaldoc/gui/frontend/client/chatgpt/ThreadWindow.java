@@ -176,4 +176,17 @@ public class ThreadWindow extends Window {
 					}
 				});
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof ThreadWindow)
+			return super.equals(obj);
+		else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

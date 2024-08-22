@@ -76,7 +76,13 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 					guiHit.setIcon(hit.getType());
 				} else {
 					Document doc = docDao.findById(hit.getId());
+					docDao.initialize(doc);
 					if (doc != null) {
+						/*
+						 * Apply the extended attributes. The template object in
+						 * search hits may have not been fully compiled so the
+						 * DocumentServiceImpl.fromDocument doesn't do the job
+						 */
 						guiHit = documentServiceImpl.fromDocument(doc, null, null);
 					} else {
 						log.debug("Unexisting document {}", hit.getId());
@@ -110,9 +116,8 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			guiHit.setIcon(FileUtil.getBaseName(hit.getIcon()));
 
 		/*
-		 * Apply the extended attributes. The template object in search hits may
-		 * have not been fully compiled so the DocumentServiceImpl.fromDocument
-		 * doesn't do the job
+		 * If any extended attribute was retrieved from the fulltext index,
+		 * apply them
 		 */
 		List<GUIAttribute> extList = new ArrayList<>();
 		for (String name : hit.getAttributeNames()) {
@@ -323,9 +328,11 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			if (search == null)
 				return;
 
-			addUsersFromGroups(groupIds, userIds);
+			List<Long> allUsers = new ArrayList<>();
+			allUsers.addAll(userIds);
+			addUsersFromGroups(groupIds, allUsers);
 
-			for (Long userId : userIds)
+			for (Long userId : allUsers)
 				store(search, userId);
 		} catch (Exception t) {
 			throwServerException(session, log, t);

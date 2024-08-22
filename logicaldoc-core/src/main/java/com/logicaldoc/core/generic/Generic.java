@@ -240,6 +240,9 @@ public class Generic extends ExtensibleObject implements Comparable<Generic> {
 
 	@Override
 	public int compareTo(Generic o) {
+		if(equals(o))
+			return 0;
+		
 		if (getType().compareTo(o.getType()) != 0)
 			return getType().compareTo(o.getType());
 		else
@@ -247,16 +250,39 @@ public class Generic extends ExtensibleObject implements Comparable<Generic> {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((qualifier == null) ? 0 : qualifier.hashCode());
+		result = prime * result + ((subtype == null) ? 0 : subtype.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-
-		if (obj == null)
+		if (!super.equals(obj))
 			return false;
-
-		if (obj instanceof Generic other)
-			return other.getId() == this.getId();
-		else
+		if (getClass() != obj.getClass())
 			return false;
+		Generic other = (Generic) obj;
+		if (qualifier == null) {
+			if (other.qualifier != null)
+				return false;
+		} else if (!qualifier.equals(other.qualifier))
+			return false;
+		if (subtype == null) {
+			if (other.subtype != null)
+				return false;
+		} else if (!subtype.equals(other.subtype))
+			return false;
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!type.equals(other.type))
+			return false;
+		return true;
 	}
 }

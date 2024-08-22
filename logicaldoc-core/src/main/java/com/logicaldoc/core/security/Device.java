@@ -231,21 +231,28 @@ public class Device extends PersistentObject implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		
-		if (obj == null)
-			return false;
-
-		if (obj instanceof Device other)
-			return other.getId() == this.getId();
-		else
-			return false;
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((deviceId == null) ? 0 : deviceId.hashCode());
+		result = prime * result + (int) (userId ^ (userId >>> 32));
+		return result;
 	}
 
 	@Override
-	public int hashCode() {
-		return deviceId.hashCode();
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Device other = (Device) obj;
+		if (deviceId == null) {
+			if (other.deviceId != null)
+				return false;
+		} else if (!deviceId.equals(other.deviceId))
+			return false;
+		return userId == other.userId;
 	}
 }
