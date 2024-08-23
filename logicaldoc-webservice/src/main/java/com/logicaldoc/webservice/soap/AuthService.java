@@ -17,7 +17,7 @@ import com.logicaldoc.webservice.doc.WSDoc;
 @WebService(name = "Auth", serviceName = "Auth", targetNamespace = "http://ws.logicaldoc.com")
 public interface AuthService {
 	/**
-	 * Starts a new session.
+	 *  Starts a new session.
 	 * 
 	 * @param username The username
 	 * @param password The password
@@ -27,7 +27,7 @@ public interface AuthService {
 	 * @throws AuthenticationException the user was not authenticated
 	 */
 	@WebMethod(action = "login")
-	@WSDoc(description = "starts a new session; returns the session identifier(SID)")
+	@WSDoc(description = "deprecated, use loginApiKey instead.")
 	public String login(@WebParam(name = "username")
 	String username, @WebParam(name = "password")
 	String password) throws AuthenticationException;
