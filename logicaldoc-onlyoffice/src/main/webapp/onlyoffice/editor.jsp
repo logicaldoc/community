@@ -29,7 +29,7 @@
         var onDocumentStateChange = function (event) {
             var title = document.title.replace(/\*$/g, "");
             document.title = title + (event.data ? "*" : "");
-        };
+        };        
 
         // the user is trying to switch the document from the viewing into the editing mode
         var onRequestEditRights = function () {

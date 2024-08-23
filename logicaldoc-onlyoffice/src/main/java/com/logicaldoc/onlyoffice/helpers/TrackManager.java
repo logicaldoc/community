@@ -76,7 +76,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.onlyoffice.IndexServlet;
+import com.logicaldoc.onlyoffice.controllers.OnlyOfficeIndex;
 import com.logicaldoc.onlyoffice.manager.DocumentManagerImpl;
 import com.logicaldoc.util.Context;
 
@@ -243,7 +243,7 @@ public final class TrackManager {
         User ldUser = session.getUser();
         
         long documentID = Long.parseLong(key.substring(0, key.indexOf("-")));
-        Document dldDoc = IndexServlet.getDocument(documentID, ldUser);
+        Document dldDoc = OnlyOfficeIndex.getDocument(documentID, ldUser);
         
         DocumentHistory transaction = new DocumentHistory();
 		transaction.setFolderId(dldDoc.getFolder().getId());
@@ -444,7 +444,7 @@ public final class TrackManager {
         
         //long documentID = Long.parseLong(key);
         long documentID = Long.parseLong(key.substring(0, key.indexOf("-")));
-        Document dldDoc = IndexServlet.getDocument(documentID, ldUser);
+        Document dldDoc = OnlyOfficeIndex.getDocument(documentID, ldUser);
         
         DocumentHistory transaction = new DocumentHistory();
 		transaction.setFolderId(dldDoc.getFolder().getId());

@@ -1,4 +1,4 @@
-package com.logicaldoc.onlyoffice;
+package com.logicaldoc.onlyoffice.controllers;
 
 import java.io.IOException;
 import java.util.List;
@@ -39,7 +39,7 @@ import com.onlyoffice.model.documenteditor.config.editorconfig.Mode;
 import com.onlyoffice.service.documenteditor.config.ConfigService;
 
 /**
- * This servlet is responsible for composing the OnlyOfficeEditor.
+ * This servlet is responsible for composing the OnlyOffice editor.
  * 
  * @author Alessandro Gasparini - LogicalDOC
  * @since 7.0
@@ -93,7 +93,7 @@ public class OnlyOfficeEditor extends HttpServlet {
 			
 			// Set the key to something unique
 			long documentID = Long.parseLong(docId);
-	        var dldDoc = IndexServlet.getDocument(documentID, session.getUser());
+	        var dldDoc = OnlyOfficeIndex.getDocument(documentID, session.getUser());
 	        String xxx = docId +"-" +dldDoc.getVersion();
 	        myDoc.setKey(xxx);			
 			

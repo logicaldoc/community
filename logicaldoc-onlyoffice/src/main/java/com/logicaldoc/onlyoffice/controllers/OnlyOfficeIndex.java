@@ -16,7 +16,7 @@
  *
  */
 
-package com.logicaldoc.onlyoffice;
+package com.logicaldoc.onlyoffice.controllers;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -65,9 +65,9 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.MimeType;
 import com.logicaldoc.util.io.FileUtil;
 
-@WebServlet(name = "IndexServlet", urlPatterns = {"/onlyoffice/IndexServlet"})
+@WebServlet(name = "IndexServlet", urlPatterns = {"/onlyoffice/OnlyOfficeIndex"})
 @MultipartConfig
-public class IndexServlet extends HttpServlet {
+public class OnlyOfficeIndex extends HttpServlet {
 	
     private static final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
 

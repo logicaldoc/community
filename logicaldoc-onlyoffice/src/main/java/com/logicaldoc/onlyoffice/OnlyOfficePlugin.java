@@ -1,5 +1,7 @@
 package com.logicaldoc.onlyoffice;
 
+import com.logicaldoc.onlyoffice.controllers.OnlyOfficeIndex;
+import com.logicaldoc.onlyoffice.controllers.OnlyOfficeEditor;
 import com.logicaldoc.util.plugin.LogicalDOCPlugin;
 import com.logicaldoc.util.plugin.PluginException;
 
@@ -16,7 +18,7 @@ public class OnlyOfficePlugin extends LogicalDOCPlugin {
 		super.install();
 
 		addServlet("OnlyOfficeEditor", OnlyOfficeEditor.class.getName(), "/onlyoffice/editor");
-		addServlet("IndexServlet", IndexServlet.class.getName(), "/onlyoffice/IndexServlet");
+		addServlet("OnlyOfficeIndex", OnlyOfficeIndex.class.getName(), "/onlyoffice/IndexServlet");
 
 		setRestartRequired();
 	}
