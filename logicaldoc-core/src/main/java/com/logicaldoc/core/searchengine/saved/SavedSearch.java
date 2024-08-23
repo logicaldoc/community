@@ -138,8 +138,6 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
-		if (userId != other.userId)
-			return false;
-		return true;
+		return userId == other.userId;
 	}
 }

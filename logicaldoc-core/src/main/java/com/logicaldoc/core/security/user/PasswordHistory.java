@@ -79,8 +79,6 @@ public class PasswordHistory extends PersistentObject implements Serializable, C
 				return false;
 		} else if (!password.equals(other.password))
 			return false;
-		if (userId != other.userId)
-			return false;
-		return true;
+		return userId == other.userId;
 	}
 }

@@ -26,6 +26,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @since 8.1.2
  */
 public class SyndicationStandardProperties extends SyndicationDetailsTab {
+	private static final String NODISPLAY = "nodisplay";
+
 	private static final String APIKEY = "apikey";
 
 	private static final String REPLICATECUSTOMID = "replicatecustomid";
@@ -98,16 +100,16 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		 * and prevent it to auto-fill the username and password we really use.
 		 */
 		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", syndication.getUsername());
-		fakeUsername.setCellStyle("nodisplay");
+		fakeUsername.setCellStyle(NODISPLAY);
 		TextItem hiddenPassword = ItemFactory.newTextItem("password_hidden", syndication.getPassword());
-		hiddenPassword.setCellStyle("nodisplay");
+		hiddenPassword.setCellStyle(NODISPLAY);
 		hiddenPassword.addChangedHandler(changedHandler);
 		FormItem password = ItemFactory.newSafePasswordItem(PASSWORD, I18N.message(PASSWORD), syndication.getPassword(),
 				hiddenPassword, changedHandler);
 		password.addChangedHandler(changedHandler);
-
+		
 		TextItem hiddenApiKey = ItemFactory.newTextItem("apikey_hidden", syndication.getApiKey());
-		hiddenApiKey.setCellStyle("nodisplay");
+		hiddenApiKey.setCellStyle(NODISPLAY);
 		hiddenApiKey.addChangedHandler(changedHandler);
 		FormItem apiKey = ItemFactory.newSafePasswordItem(APIKEY, I18N.message(APIKEY), syndication.getApiKey(),
 				hiddenApiKey, changedHandler);

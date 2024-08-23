@@ -136,8 +136,6 @@ public class SystemMessage extends Message {
 		if (getClass() != obj.getClass())
 			return false;
 		SystemMessage other = (SystemMessage) obj;
-		if (status != other.status)
-			return false;
-		return true;
+		return status == other.status;
 	}
 }

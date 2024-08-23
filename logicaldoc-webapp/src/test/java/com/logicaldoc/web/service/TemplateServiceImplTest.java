@@ -52,7 +52,7 @@ public class TemplateServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testCountDocuments() throws ServerException, PersistenceException {
+	public void testCountDocuments() throws ServerException {
 		assertEquals(0L, testSubject.countDocuments(-1L));
 		assertEquals(0L, testSubject.countDocuments(99L));
 	}

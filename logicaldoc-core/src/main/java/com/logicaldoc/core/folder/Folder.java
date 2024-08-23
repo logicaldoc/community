@@ -597,8 +597,6 @@ public class Folder extends SecurableExtensibleObject implements Comparable<Fold
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
-		if (parentId != other.parentId)
-			return false;
-		return true;
+		return parentId == other.parentId;
 	}
 }

@@ -441,7 +441,7 @@ public class FormatConverterManager {
 			return new NoConversionConverter();
 
 		String inOutkey = composeKey(inFileName, outFileName);
-
+		
 		List<FormatConverter> formatConverters = getConverters().get(inOutkey);
 		if (formatConverters == null || formatConverters.isEmpty())
 			formatConverters = getConverters().get("*-pdf");
@@ -522,14 +522,14 @@ public class FormatConverterManager {
 		if (!converters.isEmpty())
 			return;
 
-		// Acquire the 'ThumbnailBuilder' extensions of the core plugin
+		// Acquire the 'FormatConverter' extensions of the core plugin
 		PluginRegistry registry = PluginRegistry.getInstance();
 		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "FormatConverter");
 
 		for (Extension ext : exts) {
 			String className = ext.getParameter("class").valueAsString();
 
-			// Try to instantiate the builder
+			// Try to instantiate the converter
 			Object converter;
 			try {
 				Class<?> clazz = Class.forName(className);
@@ -539,8 +539,8 @@ public class FormatConverterManager {
 							"The specified converter %s doesn't implement FormatConverter interface", className));
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				log.error(e.getMessage(), e);
-				break;
+				log.warn(e.getMessage(), e);
+				continue;
 			}
 
 			FormatConverter cnvrt = (FormatConverter) converter;
