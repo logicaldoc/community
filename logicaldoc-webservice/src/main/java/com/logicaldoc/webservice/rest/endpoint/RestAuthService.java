@@ -41,7 +41,7 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	
 	@POST
 	@Path("/loginForm")
-	@Operation(operationId = "loginForm", summary = "Login with POST", description = "Login with the credentials in a form POST")
+	@Operation(operationId = "loginForm", summary = "Login with POST", description = "Deprecated, use loginApiKey instead")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Override
 	public String loginForm(@FormParam("username")
@@ -52,7 +52,7 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 
 	@POST
 	@Path("/login")
-	@Operation(operationId = "loginPostJSON", summary = "Login with POST in JSON format", description = "Login posting the credentials in JSON format")
+	@Operation(operationId = "loginPostJSON", summary = "Login with POST in JSON format", description = "Deprecated, use loginApiKey instead")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Override
 	public String loginPostJSON(WSCredentials cred) {
