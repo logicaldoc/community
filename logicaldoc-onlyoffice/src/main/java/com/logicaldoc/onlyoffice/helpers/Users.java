@@ -139,7 +139,7 @@ public final class Users {
                 data.put("id", user.getId());
                 data.put("name", user.getName());
                 data.put("email", user.getEmail());
-                data.put("image", user.getAvatar() ? DocumentManager.getServerUrl(false)
+                data.put("image", user.getAvatar() ? OODocumentManager.getServerUrl(false)
                 + "/css/img/" + user.getId() + ".png" : null);
                 usersData.add(data);
             }

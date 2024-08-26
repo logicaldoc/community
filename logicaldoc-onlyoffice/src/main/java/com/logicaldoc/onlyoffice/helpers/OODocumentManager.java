@@ -54,16 +54,27 @@ import org.primeframework.jwt.Verifier;
 import org.primeframework.jwt.domain.JWT;
 import org.primeframework.jwt.hmac.HMACSigner;
 import org.primeframework.jwt.hmac.HMACVerifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.document.DocumentHistory;
+import com.logicaldoc.core.folder.Folder;
+import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.onlyoffice.entities.FileType;
+import com.logicaldoc.onlyoffice.entities.User;
 import com.logicaldoc.onlyoffice.format.FormatManager;
+import com.logicaldoc.util.Context;
 
-public final class DocumentManager {
+public final class OODocumentManager {
+	
+	private static Logger log = LoggerFactory.getLogger(OODocumentManager.class);
 	
     private static HttpServletRequest request;
     private static FormatManager formatManager = new FormatManager();
 
-    private DocumentManager() { }
+    private OODocumentManager() { }
 
     public static void init(final HttpServletRequest req, final HttpServletResponse resp) {
         request = req;
@@ -84,26 +95,26 @@ public final class DocumentManager {
 
     // get all the supported file extensions
     public static List<String> getFileExts() {
-        return DocumentManager.formatManager.allExtensions();
+        return OODocumentManager.formatManager.allExtensions();
     }
 
     public static List<String> getFillExts() {
-        return DocumentManager.formatManager.fillableExtensions();
+        return OODocumentManager.formatManager.fillableExtensions();
     }
 
     // get file extensions that can be viewed
     public static List<String> getViewedExts() {
-        return DocumentManager.formatManager.viewableExtensions();
+        return OODocumentManager.formatManager.viewableExtensions();
     }
 
     // get file extensions that can be edited
     public static List<String> getEditedExts() {
-        return DocumentManager.formatManager.editableExtensions();
+        return OODocumentManager.formatManager.editableExtensions();
     }
 
     // get file extensions that can be converted
     public static List<String> getConvertExts() {
-        return DocumentManager.formatManager.autoConvertExtensions();
+        return OODocumentManager.formatManager.autoConvertExtensions();
     }
 
     // get current user host address
@@ -649,4 +660,84 @@ public final class DocumentManager {
         } catch (Exception e) { }
         return output;
     }
+
+    // create demo document
+    public static String createDemo(final String fileExt, final Boolean sample, final User user) throws Exception {
+        // create sample or new template file with the necessary extension
+        String demoName = (sample ? "sample." : "new.") + fileExt;
+
+        // get the path to the sample document
+        String demoPath = "assets"
+            + File.separator
+            + "document-templates"
+            + File.separator
+            + (sample ? "sample" : "new")
+            + File.separator;
+
+        // get a file name with an index if the file with such a name already exists
+        String fileName = getCorrectName(demoName, null);
+
+        // get the input file stream
+        InputStream stream = Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream(demoPath + demoName);
+
+        createFile(Paths.get(storagePath(fileName, null)), stream);
+
+        // create meta information of the demo file
+        createMeta(fileName, user.getId(), user.getName(), null);
+
+        return fileName;
+    }
+
+	public static com.logicaldoc.core.document.Document createDemoLD(com.logicaldoc.core.security.user.User user, String fileExt, String docId, final Boolean sample) throws PersistenceException {
+        // create sample or new template file with the necessary extension
+        String demoName = (sample ? "sample." : "new.") + fileExt;
+
+        // get the path to the sample document
+        String demoPath = "assets"
+            + File.separator
+            + "document-templates"
+            + File.separator
+            + (sample ? "sample" : "new")
+            + File.separator;
+
+        // get a file name with an index if the file with such a name already exists
+        //String fileName = getCorrectName(demoName, null);
+        String fileName = demoName;
+
+        // get the input file stream
+        InputStream stream = Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream(demoPath + demoName);
+
+        return createDocumentLD(user, fileName, docId, stream);
+	}
+
+	private static com.logicaldoc.core.document.Document createDocumentLD(com.logicaldoc.core.security.user.User user, String fileName, String docId, InputStream stream) throws PersistenceException {
+				
+		com.logicaldoc.core.document.DocumentManager dmi = (com.logicaldoc.core.document.DocumentManager) Context.get().getBean("documentManager");
+		
+		DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+
+		Folder saveFolder = null;
+		try {
+			com.logicaldoc.core.document.Document fDoc = documentDao.findDocument(Long.parseLong(docId));
+			saveFolder = fDoc.getFolder();
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+		
+		com.logicaldoc.core.document.Document docVo = new com.logicaldoc.core.document.Document();
+		docVo.setFileName(fileName);
+		docVo.setFolder(saveFolder);
+				
+		DocumentHistory transact = new DocumentHistory();
+		transact.setDocument(docVo);
+		transact.setDate(new Date());
+		transact.setUser(user);		
+		
+		return dmi.create(stream, docVo, transact);
+	}
+	
 }

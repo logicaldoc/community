@@ -77,7 +77,7 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.onlyoffice.controllers.OnlyOfficeIndex;
-import com.logicaldoc.onlyoffice.manager.DocumentManagerImpl;
+import com.logicaldoc.onlyoffice.manager.OODocumentManagerImpl;
 import com.logicaldoc.util.Context;
 
 public final class TrackManager {
@@ -120,7 +120,7 @@ public final class TrackManager {
         }
 
         // if the secret key to generate token exists
-        if (DocumentManager.tokenEnabled() && DocumentManager.tokenUseForRequest()) {
+        if (OODocumentManager.tokenEnabled() && OODocumentManager.tokenUseForRequest()) {
             String token = (String) body.get("token");  // get the document token
 
             if (token == null) {  // if JSON web token is not received
@@ -139,7 +139,7 @@ public final class TrackManager {
                 throw new Exception("{\"error\":1,\"message\":\"JWT expected\"}");
             }
 
-            JWT jwt = DocumentManager.readToken(token);  // read token
+            JWT jwt = OODocumentManager.readToken(token);  // read token
             if (jwt == null) {
                 writer.write("{\"error\":1,\"message\":\"JWT validation failed\"}");  // an error occurs
                 throw new Exception("{\"error\":1,\"message\":\"JWT validation failed\"}");
@@ -218,14 +218,14 @@ public final class TrackManager {
                 if (newFileUri.isEmpty()) {
 
                     // get the correct file name if it already exists
-                    newFileName = DocumentManager
+                    newFileName = OODocumentManager
                             .getCorrectName(FileUtility
                                     .getFileNameWithoutExtension(fileName) + "." + downloadExt, userAddress);
                 } else {
                     downloadUri = newFileUri;
                 }
             } catch (Exception e) {
-                newFileName = DocumentManager.getCorrectName(FileUtility
+                newFileName = OODocumentManager.getCorrectName(FileUtility
                         .getFileNameWithoutExtension(fileName) + "." + downloadExt, userAddress);
             }
         }
@@ -377,24 +377,24 @@ public final class TrackManager {
         	System.out.println("the form is submitted");
             // new file
             if (newFileName) {
-                fileName = DocumentManager.getCorrectName(FileUtility.getFileNameWithoutExtension(fileName)
+                fileName = OODocumentManager.getCorrectName(FileUtility.getFileNameWithoutExtension(fileName)
                         + "-form." + downloadExt, userAddress);  // get the correct file name if it already exists
             } else {
-                fileName = DocumentManager.getCorrectName(FileUtility.getFileNameWithoutExtension(fileName)
+                fileName = OODocumentManager.getCorrectName(FileUtility.getFileNameWithoutExtension(fileName)
                         + "-form." + curExt, userAddress);
             }
-            forcesavePath = DocumentManager.storagePath(fileName, userAddress);
+            forcesavePath = OODocumentManager.storagePath(fileName, userAddress);
         } else {
             if (newFileName) {
-                fileName = DocumentManager.getCorrectName(FileUtility
+                fileName = OODocumentManager.getCorrectName(FileUtility
                         .getFileNameWithoutExtension(fileName) + downloadExt, userAddress);
             }
 
             // create forcesave path if it doesn't exist
-            forcesavePath = DocumentManager.forcesavePath(fileName, userAddress, false);
-            if (forcesavePath == "") {
-                forcesavePath = DocumentManager.forcesavePath(fileName, userAddress, true);
-            }
+//            forcesavePath = OODocumentManager.forcesavePath(fileName, userAddress, false);
+//            if (forcesavePath == "") {
+//                forcesavePath = OODocumentManager.forcesavePath(fileName, userAddress, true);
+//            }
         }
         
         System.out.println("newFileName: " +newFileName);
@@ -568,16 +568,16 @@ public final class TrackManager {
 
         String headerToken = "";
         // check if a secret key to generate token exists or not
-        if (DocumentManager.tokenEnabled() && DocumentManager.tokenUseForRequest()) {
+        if (OODocumentManager.tokenEnabled() && OODocumentManager.tokenUseForRequest()) {
             Map<String, Object> payloadMap = new HashMap<String, Object>();
             payloadMap.put("payload", params);
-            headerToken = DocumentManager.createToken(payloadMap);  // encode a payload object into a header token
+            headerToken = OODocumentManager.createToken(payloadMap);  // encode a payload object into a header token
 
             // add a header Authorization with a header token and Authorization prefix in it
             connection.setRequestProperty(DOCUMENT_JWT_HEADER.equals("")
                     ? "Authorization" : DOCUMENT_JWT_HEADER, "Bearer " + headerToken);
 
-            String token = DocumentManager.createToken(params);  // encode a payload object into a body token
+            String token = OODocumentManager.createToken(params);  // encode a payload object into a body token
             params.put("token", token);
         }
 

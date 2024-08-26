@@ -61,7 +61,7 @@ import com.logicaldoc.core.store.Store;
 import com.logicaldoc.gui.common.client.InvalidSessionServerException;
 import com.logicaldoc.onlyoffice.helpers.ConfigManager;
 import com.logicaldoc.onlyoffice.helpers.CookieManager;
-import com.logicaldoc.onlyoffice.helpers.DocumentManager;
+import com.logicaldoc.onlyoffice.helpers.OODocumentManager;
 import com.logicaldoc.onlyoffice.helpers.FileUtility;
 import com.logicaldoc.onlyoffice.helpers.TrackManager;
 import com.logicaldoc.onlyoffice.helpers.Users;
@@ -176,8 +176,10 @@ public class OnlyOfficeIndex extends HttpServlet {
             JSONParser parser = new JSONParser();
             JSONObject body = (JSONObject) parser.parse(bodyString);
 
+            /*
             CookieManager cm = new CookieManager(request);
             com.logicaldoc.onlyoffice.entities.User user = Users.getUser(cm.getCookie("uid"));
+            */
 
             String title = (String) body.get("title");
             String saveAsFileUrl = (String) body.get("url");
@@ -249,7 +251,7 @@ public class OnlyOfficeIndex extends HttpServlet {
 			history.setSessionId(sid);
         	
         	// creates a new document into the same folder
-        	com.logicaldoc.core.document.DocumentManager dmi = (com.logicaldoc.core.document.DocumentManager) Context.get().getBean(DocumentManager.class);        	
+        	com.logicaldoc.core.document.DocumentManager dmi = (com.logicaldoc.core.document.DocumentManager) Context.get().getBean("documentManager");        	
         	dmi.create(stream, cloned, history);
 
             writer.write("{\"file\":  \"" + fileName + "\"}");
@@ -630,12 +632,12 @@ public class OnlyOfficeIndex extends HttpServlet {
         try {
         	// enable the verification of the document token before allowing the download of the document.
  
-            String fileName = FileUtility.getFileName(request.getParameter("fileName"));
+            //String fileName = FileUtility.getFileName(request.getParameter("fileName"));
             String userAddress = request.getParameter("userAddress");
             String isEmbedded = request.getParameter("dmode");
 
-            if (DocumentManager.tokenEnabled() && isEmbedded == null && userAddress != null
-                    && DocumentManager.tokenUseForRequest()) {
+            if (OODocumentManager.tokenEnabled() && isEmbedded == null && userAddress != null
+                    && OODocumentManager.tokenUseForRequest()) {
 
                 String documentJwtHeader = ConfigManager.getProperty("Authorization");
 
@@ -647,8 +649,8 @@ public class OnlyOfficeIndex extends HttpServlet {
                     token = header.startsWith(bearerPrefix) ? header.substring(bearerPrefix.length()) : header;
                 }
                 try {
-                    Verifier verifier = HMACVerifier.newVerifier(DocumentManager.getTokenSecret());
-                    JWT jwt = JWT.getDecoder().decode(token, verifier);
+                    Verifier verifier = HMACVerifier.newVerifier(OODocumentManager.getTokenSecret());
+                    JWT.getDecoder().decode(token, verifier);
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "JWT validation failed");
                     return;

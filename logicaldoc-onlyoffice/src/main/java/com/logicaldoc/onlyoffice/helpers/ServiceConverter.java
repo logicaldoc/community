@@ -171,7 +171,7 @@ public final class ServiceConverter {
         }
 
         String headerToken = "";
-        if (DocumentManager.tokenEnabled() && DocumentManager.tokenUseForRequest()) {
+        if (OODocumentManager.tokenEnabled() && OODocumentManager.tokenUseForRequest()) {
             HashMap<String, Object> map = new HashMap<String, Object>();
             map.put("region", lang);
             map.put("url", body.getUrl());
@@ -185,12 +185,12 @@ public final class ServiceConverter {
             }
 
             // add token to the body if it is enabled
-            String token = DocumentManager.createToken(map);
+            String token = OODocumentManager.createToken(map);
             body.setToken(token);
 
             Map<String, Object> payloadMap = new HashMap<String, Object>();
             payloadMap.put("payload", map);  // create payload object
-            headerToken = DocumentManager.createToken(payloadMap);  // create header token
+            headerToken = OODocumentManager.createToken(payloadMap);  // create header token
         }
 
         Gson gson = new Gson();
@@ -209,7 +209,7 @@ public final class ServiceConverter {
         connection.setConnectTimeout(convertTimeout);
 
         // write header token to the request
-        if (DocumentManager.tokenEnabled()) {
+        if (OODocumentManager.tokenEnabled()) {
             connection.setRequestProperty(DOCUMENT_JWT_HEADER.equals("")
                     ? "Authorization" : DOCUMENT_JWT_HEADER, "Bearer " + headerToken);
         }

@@ -24,7 +24,7 @@ import com.onlyoffice.manager.document.DefaultDocumentManager;
 import com.onlyoffice.manager.settings.SettingsManager;
 
 @Component
-public class DocumentManagerImpl extends DefaultDocumentManager {
+public class OODocumentManagerImpl extends DefaultDocumentManager {
 	
 	private String fileName;	
 	
@@ -32,7 +32,7 @@ public class DocumentManagerImpl extends DefaultDocumentManager {
 		this.fileName = fileName;
 	}
 
-	public DocumentManagerImpl(final SettingsManager settingsManager) {
+	public OODocumentManagerImpl(final SettingsManager settingsManager) {
         super(settingsManager);
     }
 

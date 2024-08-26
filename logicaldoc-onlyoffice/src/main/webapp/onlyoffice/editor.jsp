@@ -1,16 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
-  String sid = (String)request.getParameter("sid");
-  String docserviceApiUrl = (String)request.getAttribute("docserviceApiUrl"); 
-  String configJSON = (String)request.getAttribute("config");
-  
-  String dataInsertImage = (String)request.getAttribute("dataInsertImage"); 
-  String dataDocument = (String)request.getAttribute("dataDocument"); 
-  String dataSpreadsheet = (String)request.getAttribute("dataSpreadsheet");  
+  String configJSON = (String)request.getAttribute("config"); 
 %>	
 <html>
 <head>
-<script type="text/javascript" src="<%=docserviceApiUrl%>"></script>
+<script type="text/javascript" src="${docserviceApiUrl}"></script>
 <script type="text/javascript" language="javascript">
 
 		var docEditor;
@@ -91,20 +85,20 @@
         var onRequestInsertImage = function(event) {
             docEditor.insertImage({  // insert an image into the file
                 "c": event.data.c,
-                <%=dataInsertImage%>
+                ${dataInsertImage}
             })
         };
 
         // the user is trying to select document for comparing by clicking the Document from Storage button
         var onRequestSelectDocument = function(event) {
-            var data = <%=dataDocument%>;
+            var data = ${dataDocument};
             data.c = event.data.c;
             docEditor.setRequestedDocument(data);  // select a document for comparing
         };
 
         // the user is trying to select recipients data by clicking the Mail merge button
         var onRequestSelectSpreadsheet = function (event) {
-            var data = <%=dataSpreadsheet%>;
+            var data = ${dataSpreadsheet};
             data.c = event.data.c;
             docEditor.setRequestedSpreadsheet(data);  // insert recipient data for mail merge into the file
         };        
@@ -117,7 +111,7 @@
                 url: url
             };
             let xhr = new XMLHttpRequest();
-            xhr.open("POST", "/logicaldoc/onlyoffice/IndexServlet?type=saveas&sid=<%=sid%>");
+            xhr.open("POST", "${pageContext.request.contextPath}/onlyoffice/IndexServlet?type=saveas&sid=${sid}");
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.send(JSON.stringify(data));
             xhr.onload = function () {
@@ -137,7 +131,7 @@
                 ext: config.document.fileType
             };
             let xhr = new XMLHttpRequest();
-            xhr.open("POST", "/logicaldoc/onlyoffice/IndexServlet?type=rename");
+            xhr.open("POST", "${pageContext.request.contextPath}/onlyoffice/IndexServlet?type=rename");
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.send(JSON.stringify(data));
             xhr.onload = function () {
@@ -174,7 +168,7 @@
             data.directUrl = !!config.document.directUrl;
 
             let xhr = new XMLHttpRequest();
-            xhr.open("POST", "/logicaldoc/onlyoffice/IndexServlet?type=reference");
+            xhr.open("POST", "${pageContext.request.contextPath}/onlyoffice/IndexServlet?type=reference");
             xhr.setRequestHeader("Content-Type", "application/json");
             xhr.send(JSON.stringify(data));
             xhr.onload = function () {
@@ -191,12 +185,12 @@
             userId: config.editorConfig.user.id
           }
           const request = new XMLHttpRequest()
-          request.open('PUT', '/logicaldoc/onlyoffice/IndexServlet?type=restore')
+          request.open('PUT', '${pageContext.request.contextPath}/onlyoffice/IndexServlet?type=restore')
           request.send(JSON.stringify(payload))
           request.onload = function () {
             const response = JSON.parse(request.responseText);
             if (response.success && !response.error) {
-              var historyInfoUri = "/onlyoffice/IndexServlet?type=history&filename=" + config.document.title;
+              var historyInfoUri = "${pageContext.request.contextPath}/IndexServlet?type=history&filename=" + config.document.title;
               var xhr = new XMLHttpRequest();
               xhr.open("GET", historyInfoUri, false);
               xhr.send();
@@ -212,7 +206,7 @@
         }
 
         var onRequestHistory = function () {
-            var historyInfoUri = "/logicaldoc/onlyoffice/IndexServlet?type=history&filename=" + config.document.title;
+            var historyInfoUri = "${pageContext.request.contextPath}/onlyoffice/IndexServlet?type=history&filename=" + config.document.title;
             var xhr = new XMLHttpRequest();
             xhr.open("GET", historyInfoUri, false);
             xhr.send();
@@ -225,7 +219,7 @@
 
         var onRequestHistoryData = function (event) {
             var version = event.data;
-            var historyDataUri = "/logicaldoc/onlyoffice/IndexServlet?type=historyData&filename=" + config.document.title
+            var historyDataUri = "${pageContext.request.contextPath}/onlyoffice/IndexServlet?type=historyData&filename=" + config.document.title
                 + "&version=" + version
                 + "&directUrl=" + !!config.document.directUrl;
             var xhr = new XMLHttpRequest();
