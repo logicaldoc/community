@@ -444,7 +444,7 @@ public final class DocumentManager {
                     + "&userAddress=" + URLEncoder
                     .encode(hostAddress, java.nio.charset.StandardCharsets.UTF_8.toString());
 
-            return serverPath + "/IndexServlet" + query;
+            return serverPath + "/onlyoffice/IndexServlet" + query;
         } catch (UnsupportedEncodingException e) {
             return "";
         }
@@ -474,7 +474,7 @@ public final class DocumentManager {
         String fileExt = getInternalExtension(fileType).replace(".", "");
         String query = "?fileExt=" + fileExt;
 
-        return serverPath + "/EditorServlet" + query;
+        return serverPath + "/onlyoffice/editor" + query;
     }
 
     // get url to download a file
@@ -487,7 +487,7 @@ public final class DocumentManager {
             String query = "?type=download&fileName=" + URLEncoder
                     .encode(fileName, java.nio.charset.StandardCharsets.UTF_8.toString()) + userAddress;
 
-            return serverPath + "/IndexServlet" + query;
+            return serverPath + "/onlyoffice/IndexServlet" + query;
         } catch (UnsupportedEncodingException e) {
             return "";
         }

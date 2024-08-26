@@ -1,9 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="javax.servlet.*" %>
-<%@ page import="javax.servlet.http.*" %>
 <%
+  String sid = (String)request.getParameter("sid");
   String docserviceApiUrl = (String)request.getAttribute("docserviceApiUrl"); 
-  String configJSON = (String)request.getAttribute("config"); 
+  String configJSON = (String)request.getAttribute("config");
+  
+  String dataInsertImage = (String)request.getAttribute("dataInsertImage"); 
+  String dataDocument = (String)request.getAttribute("dataDocument"); 
+  String dataSpreadsheet = (String)request.getAttribute("dataSpreadsheet");  
 %>	
 <html>
 <head>
@@ -82,6 +85,29 @@
 
             innerAlert("onMetaChange: " + JSON.stringify(event.data));
         };
+        
+
+        // the user is trying to insert an image by clicking the Image from Storage button
+        var onRequestInsertImage = function(event) {
+            docEditor.insertImage({  // insert an image into the file
+                "c": event.data.c,
+                <%=dataInsertImage%>
+            })
+        };
+
+        // the user is trying to select document for comparing by clicking the Document from Storage button
+        var onRequestSelectDocument = function(event) {
+            var data = <%=dataDocument%>;
+            data.c = event.data.c;
+            docEditor.setRequestedDocument(data);  // select a document for comparing
+        };
+
+        // the user is trying to select recipients data by clicking the Mail merge button
+        var onRequestSelectSpreadsheet = function (event) {
+            var data = <%=dataSpreadsheet%>;
+            data.c = event.data.c;
+            docEditor.setRequestedSpreadsheet(data);  // insert recipient data for mail merge into the file
+        };        
 		
         var onRequestSaveAs = function (event) {  //  the user is trying to save file by clicking Save Copy as... button
             var title = event.data.title;
@@ -91,7 +117,7 @@
                 url: url
             };
             let xhr = new XMLHttpRequest();
-            xhr.open("POST", "/logicaldoc/onlyoffice/IndexServlet?type=saveas");
+            xhr.open("POST", "/logicaldoc/onlyoffice/IndexServlet?type=saveas&sid=<%=sid%>");
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.send(JSON.stringify(data));
             xhr.onload = function () {
@@ -227,6 +253,9 @@
             "onOutdatedVersion": onOutdatedVersion,
             "onMakeActionLink": onMakeActionLink,
             "onMetaChange": onMetaChange,
+            "onRequestInsertImage": onRequestInsertImage,
+            "onRequestSelectDocument": onRequestSelectDocument,
+            "onRequestSelectSpreadsheet": onRequestSelectSpreadsheet,            
             "onRequestRestore": onRequestRestore,
             "onRequestHistory": onRequestHistory,
             "onRequestHistoryData": onRequestHistoryData,

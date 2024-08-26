@@ -6,10 +6,10 @@ import com.logicaldoc.util.plugin.LogicalDOCPlugin;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
- * Entry-point for the Dropbox plug-in
+ * Entry-point for the OnlyOffice plug-in
  * 
  * @author Alessandro Gasparini - LogicalDOC
- * @since 7.0
+ * @since 9.1
  */
 public class OnlyOfficePlugin extends LogicalDOCPlugin {
 

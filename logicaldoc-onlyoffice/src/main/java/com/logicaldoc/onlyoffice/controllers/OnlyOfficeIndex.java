@@ -20,8 +20,6 @@ package com.logicaldoc.onlyoffice.controllers;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +28,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import javax.servlet.ServletException;
@@ -44,10 +43,16 @@ import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.primeframework.jwt.Verifier;
+import org.primeframework.jwt.domain.JWT;
+import org.primeframework.jwt.hmac.HMACVerifier;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.document.DocumentEvent;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.user.Group;
@@ -69,7 +74,9 @@ import com.logicaldoc.util.io.FileUtil;
 @MultipartConfig
 public class OnlyOfficeIndex extends HttpServlet {
 	
-    private static final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
+    private static final long serialVersionUID = 6515971809987514671L;
+    
+	private static final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
 
 	protected void processRequest(final HttpServletRequest request,
                                   final HttpServletResponse response) throws ServletException, IOException {
@@ -124,10 +131,10 @@ public class OnlyOfficeIndex extends HttpServlet {
                 files(request, response, writer);
                 break;
 */                
-            /*    
+  
             case "saveas":
                 saveAs(request, response, writer);
-                break;    */            
+                break; 
             case "rename":
             	// non funziona! (22/08/2024) 
                 rename(request, response, writer);
@@ -151,7 +158,7 @@ public class OnlyOfficeIndex extends HttpServlet {
         }
     }
 
-    /* 
+
     private static void saveAs(final HttpServletRequest request,
                                final HttpServletResponse response,
                                final PrintWriter writer) {
@@ -163,13 +170,14 @@ public class OnlyOfficeIndex extends HttpServlet {
             Scanner scanner = new Scanner(request.getInputStream());
             scanner.useDelimiter("\\A");
             String bodyString = scanner.hasNext() ? scanner.next() : "";
+            System.out.println("bodyString: " +bodyString);
             scanner.close();
 
             JSONParser parser = new JSONParser();
             JSONObject body = (JSONObject) parser.parse(bodyString);
 
             CookieManager cm = new CookieManager(request);
-            entities.User user = Users.getUser(cm.getCookie("uid"));
+            com.logicaldoc.onlyoffice.entities.User user = Users.getUser(cm.getCookie("uid"));
 
             String title = (String) body.get("title");
             String saveAsFileUrl = (String) body.get("url");
@@ -183,10 +191,66 @@ public class OnlyOfficeIndex extends HttpServlet {
                 writer.write("{\"error\":\"File size is incorrect\"}");
             }
 
-            String fileName = DocumentManager.getCorrectName(title, null);
+            //String fileName = DocumentManager.getCorrectName(title, null);
+            //System.out.println("fileName: " +fileName);
+            
+            /*
+            // create the file on the FS
             DocumentManager.createFile(Paths.get(DocumentManager.storagePath(fileName, null)), stream);
 
+            // create the metadata file for the new document
             DocumentManager.createMeta(fileName, user.getId(), user.getName(), null);
+            */
+            
+            // Saves the new document into LogicalDOC
+
+        	//list all the parameters of the request
+        	Map<String, String[]> allMap = request.getParameterMap();
+        	for (String key : allMap.keySet()) {
+        	    String[] strArr = (String[]) allMap.get(key);
+        	    for (String val : strArr) {
+        	        System.out.println(key + " = " + val);
+        	    }
+        	}
+        	
+        	String fileName = title;
+        	
+        	Map<String, String> urlParams = FileUtility.getUrlParams(saveAsFileUrl);
+        	
+        	String shardkey = (String) urlParams.get("shardkey");
+        	String docIdStr = shardkey.substring(0, shardkey.indexOf("-"));
+        	long docId = Long.parseLong(docIdStr);
+        	
+        	// find original document
+        	
+        	String sid = request.getParameter("sid");
+        	Session session = SessionManager.get().get(sid);
+        	User lduser = session.getUser();    
+        	
+        	Document docVo = getDocument(docId, lduser);        	
+        	
+			Document cloned = new Document(docVo);
+			cloned.setId(0L);
+			cloned.setFileName(fileName);
+			cloned.setFolder(docVo.getFolder());			
+			cloned.setLastModified(null);
+			cloned.setDate(null);
+			cloned.setIndexed(AbstractDocument.INDEX_TO_INDEX);
+			cloned.setStamped(0);
+			cloned.setSigned(0);
+			cloned.setLinks(0);
+			cloned.setOcrd(0);
+			cloned.setBarcoded(0);			
+
+			DocumentHistory history = new DocumentHistory();
+			history.setEvent(DocumentEvent.STORED.toString());
+			history.setComment("");
+			history.setUser(lduser);
+			history.setSessionId(sid);
+        	
+        	// creates a new document into the same folder
+        	com.logicaldoc.core.document.DocumentManager dmi = (com.logicaldoc.core.document.DocumentManager) Context.get().getBean(DocumentManager.class);        	
+        	dmi.create(stream, cloned, history);
 
             writer.write("{\"file\":  \"" + fileName + "\"}");
         } catch (Exception e) {
@@ -194,7 +258,7 @@ public class OnlyOfficeIndex extends HttpServlet {
             writer.write("{ \"error\" : 1, \"message\" : \"" + e.getMessage() + "\"}");
         }
     }
-*/
+
 
 /* 
     // upload a file  
@@ -564,17 +628,14 @@ public class OnlyOfficeIndex extends HttpServlet {
                                  final HttpServletResponse response,
                                  final PrintWriter writer) {
         try {
-        	// TODO: enable the verification of the document token before committin a new version of the document.
-        	// this is a security measure that definitely prevents hackers from ovveriding document files
-        	
-        	
-            /*
+        	// enable the verification of the document token before allowing the download of the document.
+ 
             String fileName = FileUtility.getFileName(request.getParameter("fileName"));
             String userAddress = request.getParameter("userAddress");
             String isEmbedded = request.getParameter("dmode");
 
-            if (DocumentManagerImpl.tokenEnabled() && isEmbedded == null && userAddress != null
-                    && DocumentManagerImpl.tokenUseForRequest()) {
+            if (DocumentManager.tokenEnabled() && isEmbedded == null && userAddress != null
+                    && DocumentManager.tokenUseForRequest()) {
 
                 String documentJwtHeader = ConfigManager.getProperty("Authorization");
 
@@ -593,15 +654,15 @@ public class OnlyOfficeIndex extends HttpServlet {
                     return;
                 } 
             }
-            */
 
-            // get the path to the force saved document version
             /*
+            // get the path to the force saved document version
             String filePath = DocumentManager.forcesavePath(fileName, userAddress, false);
             if (filePath.equals("")) {
                 filePath = DocumentManager.storagePath(fileName, userAddress);  // or to the original document
-            } */
-            //download(filePath, response, writer);
+            } 
+            download(filePath, response, writer);
+             */
         	
   	
             download02(request, response, writer);

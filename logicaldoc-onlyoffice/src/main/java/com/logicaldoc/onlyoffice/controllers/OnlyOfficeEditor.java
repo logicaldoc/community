@@ -1,11 +1,9 @@
 package com.logicaldoc.onlyoffice.controllers;
 
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +21,7 @@ import com.logicaldoc.gui.common.client.InvalidSessionServerException;
 import com.logicaldoc.onlyoffice.entities.User;
 import com.logicaldoc.onlyoffice.helpers.ConfigManager;
 import com.logicaldoc.onlyoffice.helpers.DocumentManager;
+import com.logicaldoc.onlyoffice.helpers.FileUtility;
 import com.logicaldoc.onlyoffice.helpers.Users;
 import com.logicaldoc.onlyoffice.manager.DocumentManagerImpl;
 import com.logicaldoc.onlyoffice.manager.SettingsManagerImpl;
@@ -42,7 +41,7 @@ import com.onlyoffice.service.documenteditor.config.ConfigService;
  * This servlet is responsible for composing the OnlyOffice editor.
  * 
  * @author Alessandro Gasparini - LogicalDOC
- * @since 7.0
+ * @since 9.1
  */
 @WebServlet(name = "OnlyOfficeEditor", urlPatterns = {"/onlyoffice/OnlyOfficeEditor"})
 public class OnlyOfficeEditor extends HttpServlet {
@@ -63,9 +62,17 @@ public class OnlyOfficeEditor extends HttpServlet {
 		try {
 			Session session = OnlyOfficeEditor.validateSession(request);
 			
+			DocumentManager.init(request, response);
+			
 			String sid = session.getSid();
 			String docId = request.getParameter("docId");
 			String fileName = request.getParameter("fileName");
+			
+			Boolean isEnableDirectUrl = true;
+			try {
+				isEnableDirectUrl = Boolean.valueOf(request.getParameter("directUrl"));
+			} catch (Exception e) {
+			}
 			
 			//com.logicaldoc.core.security.user.User userLD = session.getUser();
 			
@@ -81,8 +88,7 @@ public class OnlyOfficeEditor extends HttpServlet {
 			dm.setFileName(fileName);
 			
 			config.setDocumentType(dm.getDocumentType(fileName));
-			
-			DocumentManager.init(request, response);
+						
 			
 			//Setup document data
 			Document myDoc = config.getDocument();
@@ -92,17 +98,10 @@ public class OnlyOfficeEditor extends HttpServlet {
 			//myDoc.setKey(docId); 
 			
 			// Set the key to something unique
-			long documentID = Long.parseLong(docId);
-	        var dldDoc = OnlyOfficeIndex.getDocument(documentID, session.getUser());
-	        String xxx = docId +"-" +dldDoc.getVersion();
-	        myDoc.setKey(xxx);			
-			
-			// set document permissions 
-			//myDoc.getPermissions().setEdit(true);
-			//myDoc.getPermissions().setModifyContentControl(true);
-			
-			String perm = om.writeValueAsString(myDoc.getPermissions());
-			System.out.println("Permissions: \r\n" + perm);
+			//long documentID = Long.parseLong(docId);
+//	        var dldDoc = OnlyOfficeIndex.getDocument(documentID, session.getUser());
+//	        String xxx = docId +"-" +dldDoc.getVersion();
+	        myDoc.setKey(docId +"-" + System.currentTimeMillis());		
 						
 			config.getEditorConfig().setCallbackUrl(DocumentManager.getCallback02(fileName, docId, sid));
 			// disable all customizations
@@ -126,6 +125,11 @@ public class OnlyOfficeEditor extends HttpServlet {
 			edUser.setEmail(user.getEmail());
 			config.getEditorConfig().setUser(edUser);
 			
+			// Setup createUrl to enable save as
+			String createUrl = DocumentManager.getCreateUrl(FileUtility.getFileType(fileName));
+			createUrl += "?sid=" + sid;
+			config.getEditorConfig().setCreateUrl(!user.getId().equals("uid-0") ? createUrl : null);
+			
 			// rebuild the verification token
 	        if (settingsManager.isSecurityEnabled()) {
 	            config.setToken(jwtManager.createToken(config));
@@ -141,6 +145,34 @@ public class OnlyOfficeEditor extends HttpServlet {
 
 			request.setAttribute("config", om.writeValueAsString(config));
 			
+	        // an image that will be inserted into the document
+	        Map<String, Object> dataInsertImage = new HashMap<>();
+	        dataInsertImage.put("fileType", "png");
+	        dataInsertImage.put("url", DocumentManager.getServerUrl(true) + "/css/img/logo.png");
+	        if (isEnableDirectUrl) {
+	            dataInsertImage.put("directUrl", DocumentManager.getServerUrl(false) + "/css/img/logo.png");
+	        }
+
+	        // a document that will be compared with the current document
+	        Map<String, Object> dataDocument = new HashMap<>();
+	        dataDocument.put("fileType", "docx");
+	        dataDocument.put("url", DocumentManager.getServerUrl(true) + "/onlyoffice/IndexServlet?type=assets&"
+	                + "name=sample.docx");
+	        if (isEnableDirectUrl) {
+	            dataDocument.put("directUrl", DocumentManager.getServerUrl(false) + "/onlyoffice/IndexServlet?"
+	                    + "type=assets&name=sample.docx");
+	        }
+
+	        // recipients data for mail merging
+	        Map<String, Object> dataSpreadsheet = new HashMap<>();
+	        dataSpreadsheet.put("fileType", "csv");
+	        dataSpreadsheet.put("url", DocumentManager.getServerUrl(true) + "/onlyoffice/IndexServlet?"
+	                + "type=csv");
+	        if (isEnableDirectUrl) {
+	            dataSpreadsheet.put("directUrl", DocumentManager.getServerUrl(false)
+	                    + "/onlyoffice/IndexServlet?type=csv");
+	        }			
+			
 	        // users data for mentions
 	        List<Map<String, Object>> usersForMentions = Users.getUsersForMentions(user.getId());
 	        List<Map<String, Object>> usersForProtect = Users.getUsersForProtect(user.getId());
@@ -148,7 +180,12 @@ public class OnlyOfficeEditor extends HttpServlet {
 			
 			Gson gson = new Gson();
 	        request.setAttribute("docserviceApiUrl", ConfigManager.getProperty("files.docservice.url.site")
-	                + ConfigManager.getProperty("files.docservice.url.api"));			
+	                + ConfigManager.getProperty("files.docservice.url.api"));
+	        
+	        request.setAttribute("dataInsertImage",  gson.toJson(dataInsertImage).substring(1, gson.toJson(dataInsertImage).length() - 1));
+	        request.setAttribute("dataDocument",  gson.toJson(dataDocument));
+	        request.setAttribute("dataSpreadsheet", gson.toJson(dataSpreadsheet));
+	        
 	        request.setAttribute("usersForMentions", !user.getId().equals("uid-0") ? gson.toJson(usersForMentions) : null);
 	        request.setAttribute("usersInfo", gson.toJson(usersInfo));
 	        request.setAttribute("usersForProtect", !user.getId().equals("uid-0") ? gson.toJson(usersForProtect) : null);			
