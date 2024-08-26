@@ -246,7 +246,7 @@ create table ld_search (ld_id bigint not null, ld_lastmodified datetime not null
                         ld_date datetime, ld_type int not null, primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;                                                                                  
 create table ld_apikey (ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint not null, ld_lastused datetime, ld_key varchar(255) not null,
-                        ld_name varchar(255) not null, ld_label varchar(255), primary key (ld_id));
+                        ld_name varchar(255) not null, ld_label varchar(255), primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
                           
 create table hibernate_sequences (sequence_name varchar(40) NOT NULL, next_val bigint NOT NULL, primary key (sequence_name)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
