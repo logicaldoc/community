@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -12,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -21,8 +21,8 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.gui.common.client.InvalidSessionServerException;
 import com.logicaldoc.onlyoffice.entities.User;
 import com.logicaldoc.onlyoffice.helpers.ConfigManager;
-import com.logicaldoc.onlyoffice.helpers.OODocumentManager;
 import com.logicaldoc.onlyoffice.helpers.FileUtility;
+import com.logicaldoc.onlyoffice.helpers.OODocumentManager;
 import com.logicaldoc.onlyoffice.helpers.Users;
 import com.logicaldoc.onlyoffice.manager.OODocumentManagerImpl;
 import com.logicaldoc.onlyoffice.manager.SettingsManagerImpl;
@@ -31,7 +31,6 @@ import com.logicaldoc.onlyoffice.model.LDOOUSer;
 import com.logicaldoc.onlyoffice.service.ConfigServiceImpl;
 import com.onlyoffice.manager.security.DefaultJwtManager;
 import com.onlyoffice.manager.security.JwtManager;
-import com.onlyoffice.manager.settings.SettingsManager;
 import com.onlyoffice.model.documenteditor.Config;
 import com.onlyoffice.model.documenteditor.config.Document;
 import com.onlyoffice.model.documenteditor.config.document.Type;
@@ -44,7 +43,7 @@ import com.onlyoffice.service.documenteditor.config.ConfigService;
  * @author Alessandro Gasparini - LogicalDOC
  * @since 9.1
  */
-@WebServlet(name = "OnlyOfficeEditor", urlPatterns = {"/onlyoffice/OnlyOfficeEditor"})
+@WebServlet(name = "OnlyOfficeEditor", urlPatterns = {"/onlyoffice/editor"})
 public class OnlyOfficeEditor extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -55,7 +54,17 @@ public class OnlyOfficeEditor extends HttpServlet {
 
 	private ObjectMapper om = new ObjectMapper();
 	
-	private ConfigService configService;
+	private OODocumentManagerImpl dm;
+
+	private JwtManager jwtManager;
+	
+	@Override
+	public void init() throws ServletException {
+		super.init();
+		this.settingsManager = new SettingsManagerImpl(ConfigManager.getProperty("files.docservice.url.site"), ConfigManager.getProperty("files.docservice.secret"));
+		this.dm = new OODocumentManagerImpl(settingsManager);
+		this.jwtManager = new DefaultJwtManager(settingsManager);
+	}	
 	
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response) {
@@ -99,11 +108,8 @@ public class OnlyOfficeEditor extends HttpServlet {
 	            }
 	        }			
 			
-			settingsManager = new SettingsManagerImpl(ConfigManager.getProperty("files.docservice.url.site"), ConfigManager.getProperty("files.docservice.secret"));
-			OODocumentManagerImpl dm = new OODocumentManagerImpl(settingsManager);
-			UrlMangerImpl um = new UrlMangerImpl(settingsManager, request, sid);
-			JwtManager jwtManager = this.jwtManager(settingsManager);
-			configService = new ConfigServiceImpl(dm, um, jwtManager, settingsManager);
+			UrlMangerImpl um = new UrlMangerImpl(settingsManager, request, sid);			
+			ConfigService configService = new ConfigServiceImpl(dm, um, jwtManager, settingsManager);
 			Config config = configService.createConfig(docId, Mode.EDIT, Type.DESKTOP);
 			
 			System.out.println("fileName: " +fileName);
@@ -120,9 +126,6 @@ public class OnlyOfficeEditor extends HttpServlet {
 			//myDoc.setKey(docId); 
 			
 			// Set the key to something unique
-			//long documentID = Long.parseLong(docId);
-//	        var dldDoc = OnlyOfficeIndex.getDocument(documentID, session.getUser());
-//	        String xxx = docId +"-" +dldDoc.getVersion();
 	        myDoc.setKey(docId +"-" + System.currentTimeMillis());		
 						
 			config.getEditorConfig().setCallbackUrl(OODocumentManager.getCallback02(fileName, docId, sid));
@@ -230,11 +233,6 @@ public class OnlyOfficeEditor extends HttpServlet {
 			// Nothing to do
 		}
 	}
-	
-    @Bean
-    public JwtManager jwtManager(final SettingsManager settingsManager) {
-        return new DefaultJwtManager(settingsManager);
-    }
     
 	public static Session validateSession(HttpServletRequest request) throws InvalidSessionServerException {
 		String sid = SessionManager.get().getSessionId(request);

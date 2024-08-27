@@ -61,7 +61,6 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.folder.Folder;
-import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.onlyoffice.entities.FileType;
 import com.logicaldoc.onlyoffice.entities.User;
 import com.logicaldoc.onlyoffice.format.FormatManager;

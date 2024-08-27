@@ -18,43 +18,17 @@
 
 package com.logicaldoc.onlyoffice.helpers;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Scanner;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import static com.logicaldoc.onlyoffice.utils.Constants.BUFFER_SIZE;
 import static com.logicaldoc.onlyoffice.utils.Constants.FILE_SAVE_TIMEOUT;
-import static com.logicaldoc.onlyoffice.utils.Constants.KILOBYTE_SIZE;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -63,7 +37,6 @@ import java.util.Scanner;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.primeframework.jwt.domain.JWT;
@@ -75,9 +48,7 @@ import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.onlyoffice.controllers.OnlyOfficeIndex;
-import com.logicaldoc.onlyoffice.manager.OODocumentManagerImpl;
 import com.logicaldoc.util.Context;
 
 public final class TrackManager {
@@ -469,27 +440,6 @@ public final class TrackManager {
 		}        
         
     } 
-    
-    // create a new file if it does not exist
-    private static boolean createFile(final byte[] byteArray, final Path path) {
-        if (Files.exists(path)) {
-            return true;
-        }
-        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray)) {
-            File file = Files.createFile(path).toFile();  // create a new file in the specified path
-            try (FileOutputStream out = new FileOutputStream(file)) {
-                int read;
-                final byte[] bytes = new byte[KILOBYTE_SIZE];
-                while ((read = byteArrayInputStream.read(bytes)) != -1) {
-                    out.write(bytes, 0, read);  // write bytes to the output stream
-                }
-                out.flush();  // force write data to the output stream that can be cached in the current thread
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
 
     // get byte array from stream
     private static byte[] getAllBytes(final InputStream is) throws IOException {
@@ -500,24 +450,6 @@ public final class TrackManager {
         }
         return os.toByteArray();
     }
-    
-    // save file
-    private static boolean saveFile(final byte[] byteArray, final Path path) {
-        if (path == null) {
-            throw new RuntimeException("Path argument is not specified");  // file isn't specified
-        }
-        if (!Files.exists(path)) { // if the specified file does not exist
-            return createFile(byteArray, path);  // create it in the specified directory
-        } else {
-            try {
-                Files.write(path, byteArray);  // otherwise, write new information in the bytes format to the file
-                return true;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return false;
-    }  
 
     // download file from url
     private static byte[] getDownloadFile(final String url) throws Exception {

@@ -68,7 +68,7 @@ public class GlobalServletContextListener implements ServletContextListener {
         if (!ConfigManager.getProperty("files.docservice.verify-peer-off").isEmpty()) {
              try {
                 // register the all-trusting trust manager for HTTPS
-                sc = SSLContext.getInstance("SSL");
+                sc = SSLContext.getInstance("TLSv1.2");
                 sc.init(null, trustAllCerts, new java.security.SecureRandom());
                 HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
             } catch (NoSuchAlgorithmException | KeyManagementException ex) {

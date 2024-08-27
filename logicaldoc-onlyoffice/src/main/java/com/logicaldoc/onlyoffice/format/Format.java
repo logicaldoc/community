@@ -22,10 +22,6 @@ import java.util.List;
 
 import com.logicaldoc.onlyoffice.entities.FileType;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 public final class Format {
 
     private String name;
