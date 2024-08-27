@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.gui.common.client.InvalidSessionServerException;
@@ -52,7 +52,7 @@ public class OnlyOfficeEditor extends HttpServlet {
 
 	private SettingsManagerImpl settingsManager;
 
-	private ObjectMapper om = new ObjectMapper();
+	private ObjectMapper objectMapper = new ObjectMapper();
 	
 	private OODocumentManagerImpl dm;
 
@@ -168,52 +168,27 @@ public class OnlyOfficeEditor extends HttpServlet {
 			} catch (Exception e) { e.printStackTrace(); 
 			}	
 
-			request.setAttribute("config", om.writeValueAsString(config));
+			request.setAttribute("config", objectMapper.writeValueAsString(config));
 			
-	        // an image that will be inserted into the document
-	        Map<String, Object> dataInsertImage = new HashMap<>();
-	        dataInsertImage.put("fileType", "png");
-	        dataInsertImage.put("url", OODocumentManager.getServerUrl(true) + "/css/img/logo.png");
-	        if (isEnableDirectUrl) {
-	            dataInsertImage.put("directUrl", OODocumentManager.getServerUrl(false) + "/css/img/logo.png");
-	        }
-
-	        // a document that will be compared with the current document
-	        Map<String, Object> dataDocument = new HashMap<>();
-	        dataDocument.put("fileType", "docx");
-	        dataDocument.put("url", OODocumentManager.getServerUrl(true) + "/onlyoffice/IndexServlet?type=assets&"
-	                + "name=sample.docx");
-	        if (isEnableDirectUrl) {
-	            dataDocument.put("directUrl", OODocumentManager.getServerUrl(false) + "/onlyoffice/IndexServlet?"
-	                    + "type=assets&name=sample.docx");
-	        }
-
-	        // recipients data for mail merging
-	        Map<String, Object> dataSpreadsheet = new HashMap<>();
-	        dataSpreadsheet.put("fileType", "csv");
-	        dataSpreadsheet.put("url", OODocumentManager.getServerUrl(true) + "/onlyoffice/IndexServlet?"
-	                + "type=csv");
-	        if (isEnableDirectUrl) {
-	            dataSpreadsheet.put("directUrl", OODocumentManager.getServerUrl(false)
-	                    + "/onlyoffice/IndexServlet?type=csv");
-	        }			
-			
-	        // users data for mentions
-	        List<Map<String, Object>> usersForMentions = Users.getUsersForMentions(user.getId());
-	        List<Map<String, Object>> usersForProtect = Users.getUsersForProtect(user.getId());
-	        List<Map<String, Object>> usersInfo = Users.getUsersInfo(user.getId());
-			
-			Gson gson = new Gson();
 	        request.setAttribute("docserviceApiUrl", ConfigManager.getProperty("files.docservice.url.site")
 	                + ConfigManager.getProperty("files.docservice.url.api"));
 	        
-	        request.setAttribute("dataInsertImage",  gson.toJson(dataInsertImage).substring(1, gson.toJson(dataInsertImage).length() - 1));
-	        request.setAttribute("dataDocument",  gson.toJson(dataDocument));
-	        request.setAttribute("dataSpreadsheet", gson.toJson(dataSpreadsheet));
+	        // get an image and add it to the model
+	        request.setAttribute("dataInsertImage", getInsertImage(isEnableDirectUrl));
 	        
-	        request.setAttribute("usersForMentions", !user.getId().equals("uid-0") ? gson.toJson(usersForMentions) : null);
-	        request.setAttribute("usersInfo", gson.toJson(usersInfo));
-	        request.setAttribute("usersForProtect", !user.getId().equals("uid-0") ? gson.toJson(usersForProtect) : null);			
+	        // get a document for comparison and add it to the model
+	        request.setAttribute("dataDocument", getCompareFile(isEnableDirectUrl));
+	        
+	        // get recipients data for mail merging and add it to the model
+	        request.setAttribute("dataSpreadsheet", getSpreadsheet(isEnableDirectUrl));
+	        
+	        // get user data for mentions and add it to the model
+	        request.setAttribute("usersForMentions", getUserMentions(user.getId()));
+	        
+	        request.setAttribute("usersInfo", getUsersInfo(user.getId()));
+	        
+	        // get user data for protect and add it to the model
+	        request.setAttribute("usersForProtect", getUserProtect(user.getId()));	
 			
 			request.getRequestDispatcher("/onlyoffice/editor.jsp").forward(request, response);
 			
@@ -222,6 +197,62 @@ public class OnlyOfficeEditor extends HttpServlet {
 			System.err.println(e);
 			handleError(response, e);
 		}
+	}
+
+	private String getUserMentions(final String uid) throws JsonProcessingException {
+		List<Map<String, Object>> usersForMentions = Users.getUsersForMentions(uid);		
+		return !uid.equals("uid-0") ? objectMapper.writeValueAsString(usersForMentions) : null;
+	}
+	
+	private String getUsersInfo(final String uid) throws JsonProcessingException {
+		List<Map<String, Object>> usersInfo = Users.getUsersInfo(uid);
+		return objectMapper.writeValueAsString(usersInfo);
+	}	
+	
+	private String getUserProtect(final String uid) throws JsonProcessingException {
+		List<Map<String, Object>> usersForProtect = Users.getUsersForProtect(uid);
+		return !uid.equals("uid-0") ? objectMapper.writeValueAsString(usersForProtect) : null;
+	}	
+
+	// get recipients data for mail merging and add it to the model
+	private String getSpreadsheet(Boolean isEnableDirectUrl) throws JsonProcessingException {
+		Map<String, Object> dataSpreadsheet = new HashMap<>();
+		dataSpreadsheet.put("fileType", "csv");
+		dataSpreadsheet.put("url", OODocumentManager.getServerUrl(true) + "/onlyoffice/IndexServlet?"
+		        + "type=csv");
+		if (isEnableDirectUrl) {
+		    dataSpreadsheet.put("directUrl", OODocumentManager.getServerUrl(false)
+		            + "/onlyoffice/IndexServlet?type=csv");
+		}
+        return objectMapper.writeValueAsString(dataSpreadsheet);
+	}
+
+	// get a document that will be compared with the current document
+	private String getCompareFile(Boolean isEnableDirectUrl) throws JsonProcessingException {
+		
+		Map<String, Object> dataDocument = new HashMap<>();
+		dataDocument.put("fileType", "docx");
+		dataDocument.put("url", OODocumentManager.getServerUrl(true) + "/onlyoffice/IndexServlet?type=assets&"
+		        + "name=sample.docx");
+		if (isEnableDirectUrl) {
+		    dataDocument.put("directUrl", OODocumentManager.getServerUrl(false) + "/onlyoffice/IndexServlet?"
+		            + "type=assets&name=sample.docx");
+		}
+		
+        return objectMapper.writeValueAsString(dataDocument);
+	}
+
+	// get an image that will be inserted into the document
+	private String getInsertImage(Boolean isEnableDirectUrl) throws JsonProcessingException {
+		Map<String, Object> dataInsertImage = new HashMap<>();
+		dataInsertImage.put("fileType", "png");
+		dataInsertImage.put("url", OODocumentManager.getServerUrl(true) + "/onlyoffice/css/img/logo.png");
+		if (isEnableDirectUrl) {
+		    dataInsertImage.put("directUrl", OODocumentManager.getServerUrl(false) + "/onlyoffice/css/img/logo.png");
+		}
+		
+        return objectMapper.writeValueAsString(dataInsertImage)
+                .substring(1, objectMapper.writeValueAsString(dataInsertImage).length() - 1);
 	}	
 
 	private void handleError(HttpServletResponse response, Throwable e) {

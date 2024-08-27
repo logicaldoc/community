@@ -140,7 +140,7 @@ public final class Users {
                 data.put("name", user.getName());
                 data.put("email", user.getEmail());
                 data.put("image", user.getAvatar() ? OODocumentManager.getServerUrl(false)
-                + "/css/img/" + user.getId() + ".png" : null);
+                + "/onlyoffice/css/img/" + user.getId() + ".png" : null);
                 usersData.add(data);
             }
         }

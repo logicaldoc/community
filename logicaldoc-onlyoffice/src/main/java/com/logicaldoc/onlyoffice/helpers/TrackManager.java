@@ -476,10 +476,9 @@ public final class TrackManager {
 
         return getAllBytes(stream);
     }
- 
-
+    
     // create a command request
-    public static void commandRequest(final String method, final String key, final HashMap meta) throws Exception {
+    public static void commandRequest(final String method, final String key, final HashMap<String, String> meta) throws Exception {
     	
     	System.out.println("TrackManager commandRequest()");
     	

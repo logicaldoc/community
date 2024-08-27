@@ -276,7 +276,8 @@ public final class OODocumentManager {
     }
 
     // create meta information
-    public static void createMeta(final String fileName, final String uid, final String uname,
+    @SuppressWarnings("unchecked")
+	public static void createMeta(final String fileName, final String uid, final String uname,
                                   final String userAddress) throws Exception {
         String histDir = historyDir(storagePath(fileName, userAddress));
 
