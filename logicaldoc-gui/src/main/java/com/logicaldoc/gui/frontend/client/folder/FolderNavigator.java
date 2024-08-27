@@ -332,7 +332,8 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			/*
 			 * Check if the user has specified a different default workspace
 			 */
-			if (Session.get().getUser().getDefaultWorkspace() != null) {
+			if (Session.get().getTenantId() == Session.get().getUser().getTenant().getTenantId()
+					&& Session.get().getUser().getDefaultWorkspace() != null) {
 				folderId = Session.get().getUser().getDefaultWorkspace();
 				for (TreeNode child : children) {
 					long val = Long.parseLong(child.getAttributeAsString(FOLDER_ID));

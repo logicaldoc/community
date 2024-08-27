@@ -39,10 +39,6 @@ public class DocumentsListPanel extends VLayout {
 
 	protected int visualizationMode = DocumentsGrid.MODE_LIST;
 
-	public DocumentsListPanel(GUIFolder folder) {
-		this(folder, DocumentsGrid.MODE_LIST);
-	}
-
 	public DocumentsListPanel(GUIFolder folder, int visualizationMode) {
 		this.visualizationMode = visualizationMode;
 
