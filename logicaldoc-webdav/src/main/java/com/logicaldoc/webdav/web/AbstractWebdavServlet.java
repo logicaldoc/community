@@ -784,10 +784,12 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 				// matching if-header required for existing resources
 				if (!request.matchesIfHeader(destResource)) {
 					return HttpServletResponse.SC_PRECONDITION_FAILED;
-				} else {
+				} else if (!destResource.isCollection()) {
 					// overwrite existing resource
 					destResource.getCollection().removeMember(destResource);
 					status = HttpServletResponse.SC_NO_CONTENT;
+				} else {
+					status = HttpServletResponse.SC_CREATED;
 				}
 			} else {
 				// cannot copy/move to an existing item, if overwrite is not
