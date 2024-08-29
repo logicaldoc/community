@@ -1587,7 +1587,7 @@ public class ItemFactory {
 			FormItem hiddenPasswordItem, ChangedHandler changedHandler) {
 		StaticTextItem item = newStaticTextItem(name, title, value == null || value.isEmpty() ? "" : "*****");
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, event -> {
+		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, pick -> {
 			item.setValue((String) null);
 			hiddenPasswordItem.setValue((String) null);
 			if (changedHandler != null)

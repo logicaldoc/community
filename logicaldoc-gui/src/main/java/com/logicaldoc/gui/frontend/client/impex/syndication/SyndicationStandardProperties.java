@@ -6,6 +6,7 @@ import java.util.Map;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUISyndication;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.smartgwt.client.types.DateDisplayFormat;
@@ -107,13 +108,15 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		FormItem password = ItemFactory.newSafePasswordItem(PASSWORD, I18N.message(PASSWORD), syndication.getPassword(),
 				hiddenPassword, changedHandler);
 		password.addChangedHandler(changedHandler);
-		
+
 		TextItem hiddenApiKey = ItemFactory.newTextItem("apikey_hidden", syndication.getApiKey());
 		hiddenApiKey.setCellStyle(NODISPLAY);
 		hiddenApiKey.addChangedHandler(changedHandler);
 		FormItem apiKey = ItemFactory.newSafePasswordItem(APIKEY, I18N.message(APIKEY), syndication.getApiKey(),
 				hiddenApiKey, changedHandler);
 		apiKey.addChangedHandler(changedHandler);
+
+		GuiLog.info("key: " + syndication.getApiKey());
 
 		TextItem include = ItemFactory.newTextItem("include", syndication.getIncludes());
 		include.addChangedHandler(changedHandler);
@@ -166,7 +169,7 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		replicateCustomId.addChangedHandler(changedHandler);
 
 		form.setItems(name, sourceSelector, remoteUrl, targetPath, fakeUsername, hiddenPassword, username, password,
-				apiKey, replicateCustomId, include, exclude, maxPacketSize, batch, timeout, startDate);
+				hiddenApiKey, apiKey, replicateCustomId, include, exclude, maxPacketSize, batch, timeout, startDate);
 
 		formsContainer.addMember(form);
 
@@ -179,14 +182,13 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		if (Boolean.FALSE.equals(form.hasErrors())) {
 			syndication.setName((String) values.get("name"));
 			syndication.setUsername((String) values.get(USERNAME));
-			syndication.setPassword((String) values.get(PASSWORD));
-			syndication.setApiKey((String) values.get(APIKEY));
 			syndication.setTargetPath((String) values.get("targetpath"));
 			syndication.setUrl((String) values.get("url"));
 			syndication.setSourceFolder(sourceSelector.getFolder());
 			syndication.setIncludes((String) values.get("include"));
 			syndication.setExcludes((String) values.get("exclude"));
 			syndication.setPassword((String) values.get("password_hidden"));
+			syndication.setApiKey((String) values.get("apikey_hidden"));
 
 			if (values.get(MAX_PACKET_SIZE) instanceof Long)
 				syndication.setMaxPacketSize((Long) values.get(MAX_PACKET_SIZE));

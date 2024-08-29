@@ -187,25 +187,30 @@ public class SyndicationsPanel extends AdminPanel {
 
 		MenuItem test = new MenuItem();
 		test.setTitle(I18N.message("testconnection"));
-		test.addClickHandler(event -> SyndicationService.Instance.get()
-				.test(Long.parseLong(rec.getAttributeAsString("id")), new AsyncCallback<Boolean>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+		test.addClickHandler(click -> {
+			LD.contactingServer();
+			SyndicationService.Instance.get().test(Long.parseLong(rec.getAttributeAsString("id")),
+					new AsyncCallback<Boolean>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							LD.clearPrompt();
+							GuiLog.serverError(caught);
+						}
 
-					@Override
-					public void onSuccess(Boolean result) {
-						if (result.booleanValue())
-							SC.say(I18N.message("connectionestablished"));
-						else
-							SC.warn(I18N.message("connectionfailed"));
-					}
-				}));
+						@Override
+						public void onSuccess(Boolean result) {
+							LD.clearPrompt();
+							if (result.booleanValue())
+								SC.say(I18N.message("connectionestablished"));
+							else
+								SC.warn(I18N.message("connectionfailed"));
+						}
+					});
+		});
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler(event -> SyndicationService.Instance.get()
+		enable.addClickHandler(click -> SyndicationService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new AsyncCallback<>() {
 
 					@Override
