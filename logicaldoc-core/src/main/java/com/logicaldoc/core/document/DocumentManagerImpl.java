@@ -339,8 +339,8 @@ public class DocumentManagerImpl implements DocumentManager {
 				document.setSigned(oldDocument.getSigned());
 				document.setComment(oldDocument.getComment());
 				documentDAO.store(document);
-				throw new PersistenceException(
-						String.format("Cannot save the new version %s into the store", document), ioe);
+				throw new PersistenceException(String.format("Cannot save the new version %s into the store", document),
+						ioe);
 			}
 
 			version.setFileSize(document.getFileSize());
@@ -487,7 +487,8 @@ public class DocumentManagerImpl implements DocumentManager {
 				content = parser.parse(store.getStream(doc.getId(), resource), new ParseParameters(doc,
 						doc.getFileName(), fileVersion, null, locale, tDao.findById(doc.getTenantId()).getName()));
 			} catch (Exception e) {
-				log.error("Cannot parse document {}", doc, e);
+				log.error("Cannot parse document {}", doc);
+				log.error(e.getMessage(), e);
 				if (e instanceof ParsingException pe)
 					throw pe;
 				else

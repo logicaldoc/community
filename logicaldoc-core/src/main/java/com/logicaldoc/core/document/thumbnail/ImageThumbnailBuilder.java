@@ -31,11 +31,15 @@ public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
 		String outExt = FileUtil.getExtension(dest.getName().toLowerCase());
 		ContextProperties conf = Context.get().getProperties();
 		List<String> commandLine = new ArrayList<>();
-		new StringBuilder(conf.getProperty("converter.ImageConverter.path"));
-		if ("png".equals(outExt))
-			commandLine.add("-alpha on");
-		commandLine.addAll(List.of("-compress JPEG", "-quality " + quality, "-resize x" + Integer.toString(size),
-				src.getPath(), dest.getPath()));
+		commandLine.add(conf.getProperty("converter.ImageConverter.path"));
+		if ("png".equals(outExt)) {
+			commandLine.add("-alpha");
+			commandLine.add("on");
+		}
+		commandLine.addAll(List.of("-compress", "JPEG", "-quality", Integer.toString(quality), "-resize",
+				"x" + Integer.toString(size), src.getPath(), dest.getPath()));
+
+		log.debug("Executing: {}", commandLine);
 
 		new Exec().exec(commandLine, null, null, conf.getInt("converter.ImageConverter.timeout", 10));
 

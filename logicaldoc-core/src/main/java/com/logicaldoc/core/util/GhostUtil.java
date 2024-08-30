@@ -75,7 +75,7 @@ public class GhostUtil {
 						srcPdf.getPath() };
 		}
 
-		log.debug("Executing: {}", ghostCommand);
+		log.debug("Executing: {}", Arrays.asList(cmd));
 
 		ProcessBuilder pb = new ProcessBuilder();
 		pb.redirectErrorStream(true);

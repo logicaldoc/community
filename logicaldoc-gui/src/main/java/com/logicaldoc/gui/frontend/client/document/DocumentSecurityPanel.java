@@ -172,7 +172,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		email.setCanEdit(true);
 
 		list = new RefreshableListGrid();
-		list.setEmptyMessage(I18N.message("notitemstoshow"));
+		list.setEmptyMessage(I18N.message("thisdocsecurityparent"));
 		list.setCanFreezeFields(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setAutoFetchData(true);

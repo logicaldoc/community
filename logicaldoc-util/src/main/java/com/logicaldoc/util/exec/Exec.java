@@ -91,28 +91,32 @@ public class Exec {
 			throws IOException {
 		checkAllowed(commandLine);
 
-		if(log.isDebugEnabled())
+		if (log.isDebugEnabled())
 			log.debug("Executing command: {}", commandLine);
+		
 		ProcessBuilder pb = new ProcessBuilder();
 		pb.redirectErrorStream(true);
-		pb.command(commandLine);
+		pb.command(commandLine.toArray(new String[0]));
 		pb.directory(directory);
 		if (!CollectionUtils.isEmpty(environment))
 			pb.environment().putAll(environment);
-
-		Process process = pb.start();
-
-		StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream());
-		outputGobbler.start();
-
-		Worker worker = new Worker(process);
-		worker.start();
-
+		
+		Worker worker = null;
+		Process process = null;
 		try {
+			process = pb.start();
+
+			StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream());
+			outputGobbler.start();
+
+			worker = new Worker(process);
+			worker.start();
+
 			if (timeout > 0)
 				worker.join(timeout * 1000L);
 			else
 				worker.join();
+			
 			if (worker.getExit() == null)
 				throw new TimeoutException();
 			else
@@ -123,11 +127,8 @@ public class Exec {
 			worker.interrupt();
 			Thread.currentThread().interrupt();
 		} finally {
-			try {
+			if (process != null)
 				process.destroy();
-			} catch (Exception t) {
-				// Nothing to do
-			}
 		}
 
 		return 1;
@@ -179,9 +180,9 @@ public class Exec {
 	public int exec(List<String> commandLine, List<String> env, File dir, int timeout) throws IOException {
 		checkAllowed(commandLine);
 
-		if(log.isDebugEnabled())
+		if (log.isDebugEnabled())
 			log.debug(EXECUTING_COMMAND, commandLine);
-		
+
 		int exit = 0;
 
 		final Process process = Runtime.getRuntime().exec(commandLine.toArray(new String[0]),
@@ -193,6 +194,7 @@ public class Exec {
 				Callable<Integer> call = new CallableProcess(process);
 				Future<Integer> future = service.submit(call);
 				exit = future.get(timeout, TimeUnit.SECONDS);
+				log.debug("{} returned {}", commandLine.get(0), exit);
 			} catch (InterruptedException e) {
 				process.destroy();
 				Thread.currentThread().interrupt();
@@ -213,11 +215,9 @@ public class Exec {
 
 		StreamEater outEater = new StreamEater(outPrefix + commandForLog, process.getInputStream());
 
-		Thread a = new Thread(errEater);
-		a.start();
+		new Thread(errEater).start();
 
-		Thread b = new Thread(outEater);
-		b.start();
+		new Thread(outEater).start();
 
 		try {
 			exit = process.waitFor();
@@ -249,10 +249,10 @@ public class Exec {
 	 */
 	public String execGetOutput(List<String> commandLine, List<String> env, File dir, int timeout) throws IOException {
 		checkAllowed(commandLine);
-		
-		if(log.isDebugEnabled())
+
+		if (log.isDebugEnabled())
 			log.debug(EXECUTING_COMMAND, commandLine);
-		
+
 		final Process process = Runtime.getRuntime().exec(commandLine.toArray(new String[0]),
 				env != null ? env.toArray(new String[0]) : null, dir);
 		if (timeout > 0) {
@@ -324,9 +324,9 @@ public class Exec {
 			throws IOException {
 		checkAllowed(commandLine);
 
-		if(log.isDebugEnabled())
+		if (log.isDebugEnabled())
 			log.debug(EXECUTING_COMMAND, commandLine);
-		
+
 		int exit = 0;
 
 		final Process process = Runtime.getRuntime().exec(commandLine.split(" "),
@@ -382,9 +382,9 @@ public class Exec {
 			throws IOException {
 		checkAllowed(commandLine);
 
-		if(log.isDebugEnabled())
+		if (log.isDebugEnabled())
 			log.debug(EXECUTING_COMMAND, commandLine);
-		
+
 		int exit = 0;
 
 		final Process process = Runtime.getRuntime().exec(commandLine.split(" "),

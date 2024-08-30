@@ -29,7 +29,8 @@ public class ImageConverter extends AbstractFormatConverter {
 			throw new IOException("Unable to convert image to " + ext);
 
 		try {
-			new Exec().exec(List.of(getParameter("path"), "-compress JPEG", src.getPath(), dest.getPath()), null, null, getTimeout());
+			new Exec().exec(List.of(getParameter("path"), "-compress", "JPEG", src.getPath(), dest.getPath()), null,
+					null, getTimeout());
 
 			if (!dest.exists() || dest.length() < 1)
 				throw new IOException("Empty conversion");
