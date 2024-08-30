@@ -41,6 +41,7 @@ import com.logicaldoc.gui.frontend.client.dropbox.DropboxDialog;
 import com.logicaldoc.gui.frontend.client.dropbox.DropboxService;
 import com.logicaldoc.gui.frontend.client.google.drive.DriveMenuItem;
 import com.logicaldoc.gui.frontend.client.menu.features.Features;
+import com.logicaldoc.gui.frontend.client.onlyoffice.OnlyOfficeEditor;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.services.ChatGPTService;
 import com.logicaldoc.gui.frontend.client.services.DocuSignService;
@@ -552,6 +553,30 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		return officeItem;
 	}
+	
+	private MenuItem getOnlyOfficeMenuItem(GUIFolder folder, final GUIDocument document) {
+		Menu menu = new Menu();
+		menu.setShowShadow(true);
+		menu.setShadowDepth(3);
+
+		final MenuItem edit = new MenuItem("Edit with OnlyOffice");
+		edit.addClickHandler(event -> {
+			if (document == null)
+				return;
+			
+			OnlyOfficeEditor popup = new OnlyOfficeEditor(document);
+			popup.show();
+		});
+
+		menu.setItems(edit);
+
+		edit.setEnabled(true);
+
+		MenuItem onlyOfficeItem = new MenuItem("OnlyOffice");
+		onlyOfficeItem.setSubmenu(menu);
+
+		return onlyOfficeItem;
+	}	
 
 	private void addToolsButton(GUIFolder folder, GUIDocument document) {
 		tools = AwesomeFactory.newToolStripButton("toolbox", I18N.message("tools"), I18N.message("tools"));
@@ -598,7 +623,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			menu.addItem(getDocuSignMenuItem(document));
 		if (Feature.enabled(Feature.OFFICE)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.OFFICE))
-			menu.addItem(getOfficeMenuItem(folder, document));
+			menu.addItem(getOfficeMenuItem(folder, document));						
 		addTextAndWebContentItems(menu, document, folder);
 		addChatGPTItem(menu);
 	}
@@ -609,6 +634,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			menu.addItem(getWebContentMenuItem(folder, document));
 		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.TEXTCONTENT))
 			menu.addItem(getTextContentMenuItem(folder, document));
+		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ONLYOFFICE))
+			menu.addItem(getOnlyOfficeMenuItem(folder, document));
 	}
 
 	private void addChatGPTItem(Menu menu) {

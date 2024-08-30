@@ -1,0 +1,20 @@
+package com.logicaldoc.onlyoffice;
+
+import java.util.List;
+
+import com.logicaldoc.util.junit.AbstractTestCase;
+
+/**
+ * Abstract test case for the Calendar module. This class initialises a test
+ * database and prepares the spring test context.
+ * 
+ * @author Alessandro Gasparini - LogicalDOC
+ * @since 6.7
+ */
+public abstract class AbstractOnlyOfficeTestCase extends AbstractTestCase {
+
+	@Override
+	protected List<String> getDatabaseScripts() {
+		return List.of("/sql/logicaldoc-core.sql", "/sql/logicaldoc-onlyoffice.sql", "/data.sql");
+	}
+}

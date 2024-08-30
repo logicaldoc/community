@@ -152,6 +152,8 @@ public class Menu {
 	public static final long WEBCONTENT = -2100;
 
 	public static final long TEXTCONTENT = 200;
+	
+	public static final long ONLYOFFICE = 201;
 
 	public static final long RETENTION_POLICIES = -2110;
 
