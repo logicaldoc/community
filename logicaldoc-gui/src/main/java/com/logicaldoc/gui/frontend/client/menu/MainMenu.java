@@ -634,8 +634,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			menu.addItem(getWebContentMenuItem(folder, document));
 		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.TEXTCONTENT))
 			menu.addItem(getTextContentMenuItem(folder, document));
-		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ONLYOFFICE))
-			menu.addItem(getOnlyOfficeMenuItem(folder, document));
+//		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ONLYOFFICE))
+//			menu.addItem(getOnlyOfficeMenuItem(folder, document));
 	}
 
 	private void addChatGPTItem(Menu menu) {
