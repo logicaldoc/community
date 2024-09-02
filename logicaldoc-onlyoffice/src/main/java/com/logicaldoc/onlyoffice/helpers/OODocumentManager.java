@@ -58,9 +58,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.folder.Folder;
+import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.onlyoffice.entities.FileType;
 import com.logicaldoc.onlyoffice.entities.User;
 import com.logicaldoc.onlyoffice.format.FormatManager;
@@ -462,13 +462,14 @@ public final class OODocumentManager {
     }
     
     // get the callback url
-    public static String getCallback02(final String fileName, String docId, String sid) {
+    public static String getCallback02(final String fileName, String docId, long folderId, String sid) {
         String serverPath = getServerUrl(true);
         String hostAddress = curUserHostAddress(null);
         try {
             String query = "?type=track&fileName="
                     + URLEncoder.encode(fileName, java.nio.charset.StandardCharsets.UTF_8.toString())
                     + "&docId=" + docId
+                    + "&folderId=" + folderId
                     + "&sid=" + sid
                     + "&userAddress=" + URLEncoder
                     .encode(hostAddress, java.nio.charset.StandardCharsets.UTF_8.toString());
@@ -690,7 +691,7 @@ public final class OODocumentManager {
         return fileName;
     }
 
-	public static com.logicaldoc.core.document.Document createDemoLD(com.logicaldoc.core.security.user.User user, String fileExt, String docId, final Boolean sample) throws PersistenceException {
+	public static com.logicaldoc.core.document.Document createDemoLD(com.logicaldoc.core.security.user.User user, String fileExt, long folderId, final Boolean sample) throws PersistenceException {
         // create sample or new template file with the necessary extension
         String demoName = (sample ? "sample." : "new.") + fileExt;
 
@@ -711,19 +712,18 @@ public final class OODocumentManager {
                 .getContextClassLoader()
                 .getResourceAsStream(demoPath + demoName);
 
-        return createDocumentLD(user, fileName, docId, stream);
+        return createDocumentLD(user, fileName, folderId, stream);
 	}
 
-	private static com.logicaldoc.core.document.Document createDocumentLD(com.logicaldoc.core.security.user.User user, String fileName, String docId, InputStream stream) throws PersistenceException {
+	private static com.logicaldoc.core.document.Document createDocumentLD(com.logicaldoc.core.security.user.User user, String fileName, long folderId, InputStream stream) throws PersistenceException {
 				
 		com.logicaldoc.core.document.DocumentManager dmi = (com.logicaldoc.core.document.DocumentManager) Context.get().getBean("documentManager");
 		
-		DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 		Folder saveFolder = null;
 		try {
-			com.logicaldoc.core.document.Document fDoc = documentDao.findDocument(Long.parseLong(docId));
-			saveFolder = fDoc.getFolder();
+			saveFolder = fDao.findById(folderId);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -735,7 +735,7 @@ public final class OODocumentManager {
 		DocumentHistory transact = new DocumentHistory();
 		transact.setDocument(docVo);
 		transact.setDate(new Date());
-		transact.setUser(user);		
+		transact.setUser(user);	
 		
 		return dmi.create(stream, docVo, transact);
 	}

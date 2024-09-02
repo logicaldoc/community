@@ -13,10 +13,11 @@
 				<include>com.onlyoffice:*</include>
 				<include>com.fasterxml.jackson.core:*</include>
 				<include>com.auth0:*</include>
-				<!-- opzionale, solo per la verifica dei token jwt (protezione dei documenti) -->
 				<include>com.fasterxml.jackson.dataformat:*</include>		
-				<include>org.json:*</include>
 				<include>com.inversoft:*</include>
+				<include>com.googlecode.json-simple:*</include>			
+				<include>org.json:*</include>
+				<include>com.google.code.gson:*</include>				
 			</includes>
 		</dependencySet>
 	</dependencySets>

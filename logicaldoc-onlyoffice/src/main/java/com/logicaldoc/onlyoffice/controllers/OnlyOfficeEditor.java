@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ import com.onlyoffice.service.documenteditor.config.ConfigService;
 @WebServlet(name = "OnlyOfficeEditor", urlPatterns = {"/onlyoffice/editor"})
 public class OnlyOfficeEditor extends HttpServlet {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 7982449398452850052L;
 
 	private static Logger log = LoggerFactory.getLogger(OnlyOfficeEditor.class);
 
@@ -78,12 +79,17 @@ public class OnlyOfficeEditor extends HttpServlet {
 			String docId = request.getParameter("docId");
 			String fileName = request.getParameter("fileName");
 			String fileExt = request.getParameter("fileExt");
+			String folderIdRQ = request.getParameter("folderId");
 			
 			Boolean isEnableDirectUrl = true;
 			try {
 				isEnableDirectUrl = Boolean.valueOf(request.getParameter("directUrl"));
 			} catch (Exception e) {
 			}
+			
+			long folderId = 4;
+			if (StringUtils.isNotEmpty(folderIdRQ)) 
+				folderId = Long.parseLong(folderIdRQ);
 			
 			//com.logicaldoc.core.security.user.User userLD = session.getUser();
 			
@@ -92,16 +98,13 @@ public class OnlyOfficeEditor extends HttpServlet {
 	        if (fileExt != null) {
 	        	System.out.println("fileExt: " +fileExt);
 	            try {
-	                //fileName = DocumentManager.createDemo(fileExt, false, user);
-	            	
 	                // Create New demo document into LogicalDOC
-	            	// get the folderId from the previous docId 
-	            	com.logicaldoc.core.document.Document ldDocument = OODocumentManager.createDemoLD(session.getUser(), fileExt, docId, false);
+	            	com.logicaldoc.core.document.Document ldDocument = OODocumentManager.createDemoLD(session.getUser(), fileExt, folderId, false);
 	            	fileName = ldDocument.getFileName();
 	                System.out.println("created fileName: " +fileName);
 
 	                // redirect the request
-	                response.sendRedirect(request.getContextPath() +"/onlyoffice/editor?fileName=" + URLEncoder.encode(fileName, "UTF-8") +"&sid" +sid +"&docId=" +ldDocument.getId());
+	                response.sendRedirect(request.getContextPath() +"/onlyoffice/editor?fileName=" + URLEncoder.encode(fileName, "UTF-8") +"&docId=" +ldDocument.getId() +"&folderId=" +folderId + "&sid=" +sid);
 	                return;
 	            } catch (Exception ex) {
 	                response.getWriter().write("Error: " + ex.getMessage());
@@ -123,12 +126,13 @@ public class OnlyOfficeEditor extends HttpServlet {
 			myDoc.setFileType(dm.getExtension(fileName));
 			myDoc.setTitle(fileName);
 			myDoc.setUrl(OODocumentManager.getDownloadUrl02(fileName, docId, sid, true));
+			System.out.println("DownloadUrl: " +myDoc.getUrl());
 			//myDoc.setKey(docId); 
 			
 			// Set the key to something unique
 	        myDoc.setKey(docId +"-" + System.currentTimeMillis());		
 						
-			config.getEditorConfig().setCallbackUrl(OODocumentManager.getCallback02(fileName, docId, sid));
+			config.getEditorConfig().setCallbackUrl(OODocumentManager.getCallback02(fileName, docId, folderId, sid));
 			// disable all customizations
 			//config.getEditorConfig().setCustomization(null);
 			
@@ -152,7 +156,7 @@ public class OnlyOfficeEditor extends HttpServlet {
 			
 			// Setup createUrl to enable save as
 			String createUrl = OODocumentManager.getCreateUrl(FileUtility.getFileType(fileName));
-			createUrl += "&sid=" + sid +"&docId=" +docId;
+			createUrl += "&sid=" + sid +"&docId=" +docId +"&folderId=" +folderId;;
 			config.getEditorConfig().setCreateUrl(!user.getId().equals("uid-0") ? createUrl : null);
 			
 			// rebuild the verification token
