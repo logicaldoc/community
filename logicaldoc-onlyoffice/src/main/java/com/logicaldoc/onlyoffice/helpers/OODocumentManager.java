@@ -691,7 +691,7 @@ public final class OODocumentManager {
         return fileName;
     }
 
-	public static com.logicaldoc.core.document.Document createDemoLD(com.logicaldoc.core.security.user.User user, String fileExt, long folderId, final Boolean sample) throws PersistenceException {
+	public static com.logicaldoc.core.document.Document createDemoLD(com.logicaldoc.core.security.user.User user, String fileExt, String fileName, long folderId, final Boolean sample) throws PersistenceException {
         // create sample or new template file with the necessary extension
         String demoName = (sample ? "sample." : "new.") + fileExt;
 
@@ -702,10 +702,6 @@ public final class OODocumentManager {
             + File.separator
             + (sample ? "sample" : "new")
             + File.separator;
-
-        // get a file name with an index if the file with such a name already exists
-        //String fileName = getCorrectName(demoName, null);
-        String fileName = demoName;
 
         // get the input file stream
         InputStream stream = Thread.currentThread()

@@ -1,20 +1,26 @@
 package com.logicaldoc.gui.frontend.client.onlyoffice;
 
+import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
 
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
 
 /**
- * This popup window is used to create a new web content.
+ * This popup window is used to create a new document using OnlyOffice plugin.
  * 
  * @author Alessandro Gasparini - LogicalDOC
  * @since 9.1
@@ -26,12 +32,12 @@ public class OnlyOfficeCreate extends Window {
 	private ValuesManager vm;
 
 	public OnlyOfficeCreate() {
-		
+
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle("Select document type");
 		setCanDragResize(true);
 		setIsModal(true);
-		setShowModalMask(true);		
+		setShowModalMask(true);
 		setAutoSize(true);
 		centerInPage();
 
@@ -41,30 +47,46 @@ public class OnlyOfficeCreate extends Window {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(1);
 
-		SelectItem template = OnlyOfficeCreate.newDoctypeSelector("docx");
+		TextItem fnameField = ItemFactory.newTextItem("filename", null);
+		fnameField.setRequired(true);
+		fnameField.setWidth(200);
+
+		SelectItem typeSelector = OnlyOfficeCreate.newDoctypeSelector("docx");
 
 		create = new SubmitItem();
 		create.setTitle(I18N.message("create"));
-		create.addClickHandler(event -> onCreate());
+		create.addClickHandler(click -> {
+			try {
+				onCreate();
+			} catch (UnsupportedEncodingException e) {
+				GuiLog.error(e.getMessage());
+			}
+			click.cancel();
+		});
 
-		form.setItems(template, create);
+		form.setItems(fnameField, typeSelector, create);
 
 		addItem(form);
 	}
 
-	public void onCreate() {
+	private void onCreate() throws UnsupportedEncodingException {
+		
+		if (Boolean.FALSE.equals(vm.validate()))
+			return;
+
+		String filename = vm.getValueAsString("filename").trim();
 				
 		String docType = vm.getValueAsString("doctype");
 		
 		GUIDocument vo = new GUIDocument();
 		vo.setId(0);
-		vo.setFileName("new." + docType);
+		//vo.setFileName("new." + docType);		
+		vo.setFileName(Util.getBaseName(filename) + "." + docType);
 		vo.setType(docType);			
 		vo.setFolder(FolderController.get().getCurrentFolder());
 		
-		OnlyOfficeEditor popup = new OnlyOfficeEditor(vo);
-		popup.show();		
-
+		new OnlyOfficeEditor(vo).show();		
+		
 		destroy();
 	}
 

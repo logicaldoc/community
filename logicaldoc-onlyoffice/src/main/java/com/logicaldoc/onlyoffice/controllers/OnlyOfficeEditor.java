@@ -99,12 +99,12 @@ public class OnlyOfficeEditor extends HttpServlet {
 	        	System.out.println("fileExt: " +fileExt);
 	            try {
 	                // Create New demo document into LogicalDOC
-	            	com.logicaldoc.core.document.Document ldDocument = OODocumentManager.createDemoLD(session.getUser(), fileExt, folderId, false);
+	            	com.logicaldoc.core.document.Document ldDocument = OODocumentManager.createDemoLD(session.getUser(), fileExt, fileName, folderId, false);
 	            	fileName = ldDocument.getFileName();
 	                System.out.println("created fileName: " +fileName);
 
 	                // redirect the request
-	                response.sendRedirect(request.getContextPath() +"/onlyoffice/editor?fileName=" + URLEncoder.encode(fileName, "UTF-8") +"&docId=" +ldDocument.getId() +"&folderId=" +folderId + "&sid=" +sid);
+	                response.sendRedirect(request.getContextPath() +"/onlyoffice/editor?fileName=" + URLEncoder.encode(fileName, "UTF-8") +"&docId=" +ldDocument.getId() +"&folderId=" +folderId + "&sid=" +sid);	                
 	                return;
 	            } catch (Exception ex) {
 	                response.getWriter().write("Error: " + ex.getMessage());
@@ -126,7 +126,7 @@ public class OnlyOfficeEditor extends HttpServlet {
 			myDoc.setFileType(dm.getExtension(fileName));
 			myDoc.setTitle(fileName);
 			myDoc.setUrl(OODocumentManager.getDownloadUrl02(fileName, docId, sid, true));
-			System.out.println("DownloadUrl: " +myDoc.getUrl());
+			//System.out.println("DownloadUrl: " +myDoc.getUrl());
 			//myDoc.setKey(docId); 
 			
 			// Set the key to something unique
