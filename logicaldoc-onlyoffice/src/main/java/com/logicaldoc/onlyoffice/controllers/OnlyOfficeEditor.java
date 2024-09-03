@@ -82,18 +82,12 @@ public class OnlyOfficeEditor extends HttpServlet {
 			String folderIdRQ = request.getParameter("folderId");
 			
 			Boolean isEnableDirectUrl = true;
-			try {
+			if (StringUtils.isNotEmpty("directUrl")) 
 				isEnableDirectUrl = Boolean.valueOf(request.getParameter("directUrl"));
-			} catch (Exception e) {
-			}
 			
 			long folderId = 4;
 			if (StringUtils.isNotEmpty(folderIdRQ)) 
-				folderId = Long.parseLong(folderIdRQ);
-			
-			//com.logicaldoc.core.security.user.User userLD = session.getUser();
-			
-			User user = Users.getUser("uid-1");
+				folderId = Long.parseLong(folderIdRQ);						
 			
 	        if (fileExt != null) {
 	        	System.out.println("fileExt: " +fileExt);
@@ -146,12 +140,20 @@ public class OnlyOfficeEditor extends HttpServlet {
 			config.getEditorConfig().getCustomization().setForcesave(true);		
 			
 			// Set the user for editing
-			//com.onlyoffice.model.common.User edUser = new com.onlyoffice.model.common.User();
+			User user = Users.getUser("uid-1"); // fallback
 			LDOOUSer edUser = new LDOOUSer();
 			edUser.setId(user.getId());
 			edUser.setGroup("");
 			edUser.setName(user.getName());
 			edUser.setEmail(user.getEmail());
+			
+			// Setup LD user info
+			com.logicaldoc.core.security.user.User userLD = session.getUser();
+			if (userLD != null) {
+				edUser.setId("uid-" +userLD.getId());
+				edUser.setName(userLD.getFullName());
+				edUser.setEmail(userLD.getEmail());							
+			}
 			config.getEditorConfig().setUser(edUser);
 			
 			// Setup createUrl to enable save as
@@ -187,12 +189,12 @@ public class OnlyOfficeEditor extends HttpServlet {
 	        request.setAttribute("dataSpreadsheet", getSpreadsheet(isEnableDirectUrl));
 	        
 	        // get user data for mentions and add it to the model
-	        request.setAttribute("usersForMentions", getUserMentions(user.getId()));
+	        request.setAttribute("usersForMentions", getUserMentions(edUser.getId()));
 	        
-	        request.setAttribute("usersInfo", getUsersInfo(user.getId()));
+	        request.setAttribute("usersInfo", getUsersInfo(edUser));
 	        
 	        // get user data for protect and add it to the model
-	        request.setAttribute("usersForProtect", getUserProtect(user.getId()));	
+	        request.setAttribute("usersForProtect", getUserProtect(edUser.getId()));	
 			
 			request.getRequestDispatcher("/onlyoffice/editor.jsp").forward(request, response);
 			
@@ -208,8 +210,19 @@ public class OnlyOfficeEditor extends HttpServlet {
 		return !uid.equals("uid-0") ? objectMapper.writeValueAsString(usersForMentions) : null;
 	}
 	
-	private String getUsersInfo(final String uid) throws JsonProcessingException {
-		List<Map<String, Object>> usersInfo = Users.getUsersInfo(uid);
+	private String getUsersInfo(LDOOUSer edUser) throws JsonProcessingException {
+		
+		List<Map<String, Object>> usersInfo = Users.getUsersInfo(edUser.getId());
+
+	    // replace the info of the user from the one coming from LD.
+		// Perhaps unnecessary, just overkill...
+		for (Map<String, Object> data : usersInfo) {
+			if (((String)data.get("id")).equals(edUser.getId())) {
+				data.put("name", edUser.getName());
+				data.put("email", edUser.getEmail());
+			}
+		}
+		
 		return objectMapper.writeValueAsString(usersInfo);
 	}	
 	
