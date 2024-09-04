@@ -130,9 +130,6 @@ public class OnlyOfficeEditor extends HttpServlet {
 			// disable all customizations
 			//config.getEditorConfig().setCustomization(null);
 			
-			// check if the Submit form button is displayed or not
-			config.getEditorConfig().getCustomization().setSubmitForm(false);
-			
 			// Disable Autosave
 			config.getEditorConfig().getCustomization().setAutosave(false);
 			
@@ -159,7 +156,10 @@ public class OnlyOfficeEditor extends HttpServlet {
 			// Setup createUrl to enable save as
 			String createUrl = OODocumentManager.getCreateUrl(FileUtility.getFileType(fileName));
 			createUrl += "&sid=" + sid +"&docId=" +docId +"&folderId=" +folderId;;
-			config.getEditorConfig().setCreateUrl(!user.getId().equals("uid-0") ? createUrl : null);
+			config.getEditorConfig().setCreateUrl(!edUser.getId().equals("uid-0") ? createUrl : null);
+			
+	        // change type parameter if needed
+	        changeMode(config, request.getParameter("mode"));
 			
 			// rebuild the verification token
 	        if (settingsManager.isSecurityEnabled()) {
@@ -202,6 +202,18 @@ public class OnlyOfficeEditor extends HttpServlet {
 			e.printStackTrace();
 			System.err.println(e);
 			handleError(response, e);
+		}
+	}
+
+	// change customization to show the save button (for the forms) on the top
+	private void changeMode(Config config, String modeParam) {
+		if (StringUtils.isNotEmpty(modeParam)) {
+			System.out.println("modeParam: " +modeParam);
+			config.getEditorConfig().getCustomization().setSubmitForm(true);
+			config.getDocument().getPermissions().setEdit(false);
+			config.getDocument().getPermissions().setFillForms(true);
+			config.getDocument().getPermissions().setComment(false);
+			config.getDocument().getPermissions().setReview(false);
 		}
 	}
 

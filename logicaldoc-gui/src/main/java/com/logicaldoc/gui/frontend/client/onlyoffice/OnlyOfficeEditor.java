@@ -1,12 +1,11 @@
 package com.logicaldoc.gui.frontend.client.onlyoffice;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
+import com.google.gwt.http.client.URL;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.HTMLFlow;
@@ -27,7 +26,7 @@ public class OnlyOfficeEditor extends Window {
 
 	private GUIDocument document;
 
-	public OnlyOfficeEditor(final GUIDocument document) throws UnsupportedEncodingException {
+	public OnlyOfficeEditor(final GUIDocument document) {
 		
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		if (document.getId() > 0)
@@ -48,11 +47,7 @@ public class OnlyOfficeEditor extends Window {
 		addCloseClickHandler(event -> destroy());
 
 		addResizedHandler(event -> {
-			try {
-				reloadBody();
-			} catch (UnsupportedEncodingException e) {
-				GuiLog.error(e.getMessage());
-			}
+			reloadBody();
 		});
 
 		layout = new VLayout();
@@ -68,7 +63,7 @@ public class OnlyOfficeEditor extends Window {
 	 * Reloads a preview.
 	 * @throws UnsupportedEncodingException 
 	 */
-	private void reloadBody() throws UnsupportedEncodingException {
+	private void reloadBody() {
 	
 		String url = getOnlyOfficeEditorUrl();
 
@@ -84,16 +79,24 @@ public class OnlyOfficeEditor extends Window {
 		layout.setMembers(html);
 	}
 	
-	private String getOnlyOfficeEditorUrl() throws UnsupportedEncodingException {
+	private String getOnlyOfficeEditorUrl() {
 		
 		String finalUrl;
 		
 		if (document.getId() > 0) {
 			finalUrl = Util.contextPath() + "onlyoffice/editor?docId=" + document.getId() 
-			+ "&fileName=" + document.getFileName() + "&sid=" + Session.get().getSid();
+			+ "&fileName=" + URL.encode(document.getFileName()) + "&sid=" + Session.get().getSid();
+			
+			// fillforms mode
+			if ((document.getComment() != null) && document.getComment().equals("fillForms")) {
+				finalUrl = Util.contextPath() + "onlyoffice/editor?docId=" + document.getId() 
+				+ "&fileName=" + URL.encode(document.getFileName())
+				+ "&mode=fillForms" 
+				+ "&sid=" + Session.get().getSid();				
+			}
 		} else {
 			finalUrl = Util.contextPath() + "onlyoffice/editor?docId=" + document.getId() 
-			+ "&fileName=" + URLEncoder.encode(document.getFileName(), "UTF-8") + "&fileExt=" +document.getType() +"&folderId=" +document.getFolder().getId() + "&sid=" + Session.get().getSid();
+			+ "&fileName=" + URL.encode(document.getFileName()) + "&fileExt=" +document.getType() +"&folderId=" +document.getFolder().getId() + "&sid=" + Session.get().getSid();
 		}
 		
 		return finalUrl;

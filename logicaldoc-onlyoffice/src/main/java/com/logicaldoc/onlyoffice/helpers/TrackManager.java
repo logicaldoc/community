@@ -43,6 +43,7 @@ import org.primeframework.jwt.domain.JWT;
 
 import com.google.gson.Gson;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.security.Session;
@@ -413,24 +414,53 @@ public final class TrackManager {
         Session session = SessionManager.get().get(sid);
         User ldUser = session.getUser();
         
-        //long documentID = Long.parseLong(key);
         long documentID = Long.parseLong(key.substring(0, key.indexOf("-")));
         Document dldDoc = OnlyOfficeIndex.getDocument(documentID, ldUser);
         
         DocumentHistory transaction = new DocumentHistory();
-		transaction.setFolderId(dldDoc.getFolder().getId());
-		transaction.setUser(ldUser);
-		transaction.setDocId(documentID);
-		transaction.setUserId(ldUser.getId());
-		transaction.setNotified(0);
-		transaction.setComment("onlyoffice checkin");
-		
+        		
 		com.logicaldoc.core.document.DocumentManager ldDM = (com.logicaldoc.core.document.DocumentManager)Context.get().getBean("documentManager");
 	
         try (InputStream is = new ByteArrayInputStream(byteArrayFile)) {
-			ldDM.checkin(documentID, is, fileName, false, dldDoc, transaction);
-			
-			System.out.println("Operation completed");
+        	if (isSubmitForm) {
+				// create new document
+        		
+    			Document docVO = new Document(dldDoc);
+    			docVO.setId(0);
+    			docVO.setFolder(dldDoc.getFolder());
+    			docVO.setFileName(fileName);
+    			docVO.setLastModified(null);
+    			docVO.setDate(null);
+    			docVO.setIndexed(AbstractDocument.INDEX_TO_INDEX);
+    			docVO.setStamped(0);
+    			docVO.setSigned(0);
+    			docVO.setLinks(0);
+    			docVO.setOcrd(0);
+    			docVO.setBarcoded(0);        		
+        		
+        		transaction.setFolderId(dldDoc.getFolder().getId());
+        		transaction.setUser(ldUser);
+        		transaction.setDocId(0L);
+        		transaction.setUserId(ldUser.getId());
+        		transaction.setNotified(0);
+        		transaction.setComment("created by onlyoffice plugin");        		
+        		
+        		ldDM.create(is, docVO, transaction);
+        		System.out.println("Creation action performed");
+        	} else {        		
+        		// Checkin the old doc                
+                
+        		transaction.setFolderId(dldDoc.getFolder().getId());
+        		transaction.setUser(ldUser);
+        		transaction.setDocId(documentID);
+        		transaction.setUserId(ldUser.getId());
+        		transaction.setNotified(0);
+        		transaction.setComment("onlyoffice checkin");
+        		
+        		ldDM.checkin(documentID, is, fileName, false, dldDoc, transaction);
+        		System.out.println("Checkin action performed");
+        	}
+        	System.out.println("Operation completed");
 		} catch (PersistenceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
