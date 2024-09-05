@@ -554,9 +554,9 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		return officeItem;
 	}
-	
+
 	private MenuItem getOnlyOfficeMenuItem(GUIFolder folder, final GUIDocument document) {
-		
+
 		Menu menu = new Menu();
 		menu.setShowShadow(true);
 		menu.setShadowDepth(3);
@@ -565,33 +565,33 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		edit.addClickHandler(event -> {
 			if (document == null)
 				return;
-			
+
 			new OnlyOfficeEditor(document).show();
 		});
-		
+
 		final MenuItem create = new MenuItem(I18N.message("createdoc"));
 		create.addClickHandler(event -> new OnlyOfficeCreate().show());
-		
+
 		// This should be enabled only on PDF
 		final MenuItem fillForms = new MenuItem("Fill in PDF forms");
 		fillForms.addClickHandler(event -> {
 			if (document == null)
 				return;
-			
-			// Setup something in the document that we will check later in the editor
+
+			// Setup something in the document that we will check later in the
+			// editor
 			document.setComment("fillForms");
 			new OnlyOfficeEditor(document).show();
-		});		
+		});
 
 		menu.setItems(edit, create, fillForms);
-		
-		// TODO limit the editing only on supported file types 
+
+		// TODO limit the editing only on supported file types
 		edit.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
 				&& folder.isWrite());
-		
-		create.setEnabled(folder != null && folder.isDownload()
-				&& folder.isWrite());
-		
+
+		create.setEnabled(folder != null && folder.isDownload() && folder.isWrite());
+
 		// enabled only on PDF
 		fillForms.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
 				&& folder.isWrite() && (document.getType().toLowerCase().endsWith("pdf")));
@@ -600,7 +600,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		onlyOfficeItem.setSubmenu(menu);
 
 		return onlyOfficeItem;
-	}	
+	}
 
 	private void addToolsButton(GUIFolder folder, GUIDocument document) {
 		tools = AwesomeFactory.newToolStripButton("toolbox", I18N.message("tools"), I18N.message("tools"));
@@ -647,7 +647,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			menu.addItem(getDocuSignMenuItem(document));
 		if (Feature.enabled(Feature.OFFICE)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.OFFICE))
-			menu.addItem(getOfficeMenuItem(folder, document));						
+			menu.addItem(getOfficeMenuItem(folder, document));
 		addTextAndWebContentItems(menu, document, folder);
 		addChatGPTItem(menu);
 	}

@@ -46,7 +46,7 @@ public class GUIBranding implements Serializable {
 
 	private String url = "https://www.logicaldoc.com";
 
-	private String forum = "https://forums.logicaldoc.com";
+	private String forum = "https://github.com/logicaldoc/community/discussions";
 
 	private String evaluation = "";
 
