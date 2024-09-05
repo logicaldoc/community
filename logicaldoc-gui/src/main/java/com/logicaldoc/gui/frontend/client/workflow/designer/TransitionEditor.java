@@ -13,6 +13,7 @@ import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -39,8 +40,9 @@ public class TransitionEditor extends Window {
 		setIsModal(true);
 		setShowModalMask(true);
 		setMargin(3);
-		setWidth(600);
-		setHeight(420);
+//		setWidth(600);
+		setMinWidth(600);
+		setAutoSize(true);
 		centerInPage();
 
 		TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", "execscriptontranschosen",
@@ -105,7 +107,24 @@ public class TransitionEditor extends Window {
 		toolStrip.addButton(save);
 		toolStrip.addSeparator();
 		toolStrip.addButton(close);
-		addItem(toolStrip);
-		addItem(form);
+		
+		VLayout layout = new VLayout();
+		layout.setMembersMargin(1);
+		layout.setWidth100();
+		layout.setHeight100();
+		layout.setMembers(toolStrip, form);
+		
+		addItem(layout);
+//		
+//		addItem(toolStrip);
+//		addItem(form);
 	}
+
+	@Override
+	protected void onDraw() {
+		// TODO Auto-generated method stub
+		super.onDraw();
+	}
+	
+	
 }

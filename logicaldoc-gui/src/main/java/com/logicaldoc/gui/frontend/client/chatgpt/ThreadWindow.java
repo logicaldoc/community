@@ -16,7 +16,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.Positioning;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
@@ -31,7 +30,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class ThreadWindow extends Window {
 
-	private VLayout contents = new VLayout();
+	private VLayout contents;
 
 	private VLayout messagesBoard = new VLayout();
 
@@ -46,11 +45,7 @@ public class ThreadWindow extends Window {
 	}
 
 	private ThreadWindow() {
-		HeaderControl maximize = new HeaderControl(HeaderControl.MAXIMIZE, click -> maximize());
-		HeaderControl minimize = new HeaderControl(HeaderControl.MINIMIZE, click -> minimize());
-		HeaderControl close = new HeaderControl(HeaderControl.CLOSE, click -> close());
-
-		setHeaderControls(HeaderControls.HEADER_LABEL, minimize, maximize, close);
+		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.MINIMIZE_BUTTON, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("chatgpt"));
 		setCanDragResize(true);
 		setIsModal(false);
@@ -62,15 +57,24 @@ public class ThreadWindow extends Window {
 		setMembersMargin(2);
 
 		addResizedHandler(resize -> messagesBoard.reflow());
+		addRestoreClickHandler(restore -> {
+			setWidth(500);
+			setHeight(500);
+			setTop(MainMenu.get().getBottom() + 5);
+			setLeft(WindowUtils.getWidth() - 505);
+		});
 	}
 
 	public void open(String initialQuestion) {
-		messagesBoard.removeMembers(messagesBoard.getMembers());
-		contents.removeMembers(contents.getMembers());
+		if (contents != null) {
+			removeItem(contents);
+			contents.removeMembers(contents.getMembers());
+			messagesBoard.removeMembers(messagesBoard.getMembers());
+		}
 
 		messagesBoard = new VLayout();
 		messagesBoard.setWidth100();
-		messagesBoard.setHeight("*");
+		messagesBoard.setHeight100();
 		messagesBoard.setOverflow(Overflow.SCROLL);
 		messagesBoard.setMembersMargin(2);
 
@@ -78,6 +82,7 @@ public class ThreadWindow extends Window {
 		contents.setWidth100();
 		contents.setHeight100();
 		contents.setAlign(VerticalAlignment.TOP);
+		contents.setOverflow(Overflow.SCROLL);
 		contents.addMember(messagesBoard);
 
 		lastMessage = null;
@@ -97,8 +102,9 @@ public class ThreadWindow extends Window {
 		question.setBrowserSpellCheck(true);
 		question.setWidth("100%");
 		question.addKeyPressHandler(event -> {
-			if (event.getKeyName() != null && "enter".equalsIgnoreCase(event.getKeyName()))
-				startThread(question.getValueAsString());
+			if (event.getKeyName() != null && "enter".equalsIgnoreCase(event.getKeyName())) {
+				onAsk(question);
+			}
 		});
 
 		FormItemIcon ask = new FormItemIcon();
@@ -106,7 +112,7 @@ public class ThreadWindow extends Window {
 		ask.setInlineIconAlign(Alignment.RIGHT);
 		ask.setText(AwesomeFactory.getIconHtml("paper-plane"));
 		question.setIcons(ask);
-		ask.addFormItemClickHandler(click -> startThread(question.getValueAsString()));
+		ask.addFormItemClickHandler(click -> onAsk(question));
 
 		DynamicForm questionForm = new DynamicForm();
 		questionForm.setHeight(30);
@@ -115,6 +121,11 @@ public class ThreadWindow extends Window {
 		questionForm.setItems(question);
 
 		contents.addMember(questionForm);
+	}
+
+	private void onAsk(TextItem question) {
+		ask(question.getValueAsString());
+		question.clearValue();
 	}
 
 	public void appendMessage(String message, String role) {
@@ -137,6 +148,25 @@ public class ThreadWindow extends Window {
 		timer.schedule(100);
 	}
 
+	private void ask(String question) {
+		appendMessage(question, "user");
+		appendMessage("", "chatgpt");
+		answerPolling = null;
+
+		ChatGPTService.Instance.get().ask(question, new AsyncCallback<Void>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(Void result) {
+				collectAnswer();
+			}
+		});
+	}
+
 	private void startThread(String question) {
 		appendMessage(question, "user");
 		appendMessage("", "chatgpt");
@@ -146,37 +176,41 @@ public class ThreadWindow extends Window {
 				new AsyncCallback<Void>() {
 
 					@Override
-					public void onFailure(Throwable arg0) {
-						GuiLog.serverError(arg0);
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(Void arg0) {
-						answerPolling = new Timer() {
-							public void run() {
-								ChatGPTService.Instance.get().getAnswer(new AsyncCallback<GUIValue>() {
-
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
-
-									@Override
-									public void onSuccess(GUIValue answer) {
-										if (answer.getValue() != null) {
-											updateLastMessage(answer.getValue());
-											if (!"complete".equals(answer.getCode()))
-												answerPolling.schedule(200);
-										}
-									}
-								});
-							}
-						};
-						answerPolling.schedule(200);
+						collectAnswer();
 					}
 				});
 	}
-	
+
+	private void collectAnswer() {
+		answerPolling = new Timer() {
+			public void run() {
+				ChatGPTService.Instance.get().getAnswer(new AsyncCallback<GUIValue>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(GUIValue answer) {
+						if (answer.getValue() != null) {
+							updateLastMessage(answer.getValue());
+							if (!"complete".equals(answer.getCode()))
+								answerPolling.schedule(100);
+						}
+					}
+				});
+			}
+		};
+		answerPolling.schedule(200);
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof ThreadWindow)
