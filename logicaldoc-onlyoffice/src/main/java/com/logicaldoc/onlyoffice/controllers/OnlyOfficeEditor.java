@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ import com.onlyoffice.service.documenteditor.config.ConfigService;
 @WebServlet(name = "OnlyOfficeEditor", urlPatterns = {"/onlyoffice/editor"})
 public class OnlyOfficeEditor extends HttpServlet {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 7982449398452850052L;
 
 	private static Logger log = LoggerFactory.getLogger(OnlyOfficeEditor.class);
 
@@ -78,30 +79,26 @@ public class OnlyOfficeEditor extends HttpServlet {
 			String docId = request.getParameter("docId");
 			String fileName = request.getParameter("fileName");
 			String fileExt = request.getParameter("fileExt");
+			String folderIdRQ = request.getParameter("folderId");
 			
 			Boolean isEnableDirectUrl = true;
-			try {
+			if (StringUtils.isNotEmpty("directUrl")) 
 				isEnableDirectUrl = Boolean.valueOf(request.getParameter("directUrl"));
-			} catch (Exception e) {
-			}
 			
-			//com.logicaldoc.core.security.user.User userLD = session.getUser();
-			
-			User user = Users.getUser("uid-1");
+			long folderId = 4;
+			if (StringUtils.isNotEmpty(folderIdRQ)) 
+				folderId = Long.parseLong(folderIdRQ);						
 			
 	        if (fileExt != null) {
 	        	System.out.println("fileExt: " +fileExt);
 	            try {
-	                //fileName = DocumentManager.createDemo(fileExt, false, user);
-	            	
 	                // Create New demo document into LogicalDOC
-	            	// get the folderId from the previous docId 
-	            	com.logicaldoc.core.document.Document ldDocument = OODocumentManager.createDemoLD(session.getUser(), fileExt, docId, false);
+	            	com.logicaldoc.core.document.Document ldDocument = OODocumentManager.createDemoLD(session.getUser(), fileExt, fileName, folderId, false);
 	            	fileName = ldDocument.getFileName();
 	                System.out.println("created fileName: " +fileName);
 
 	                // redirect the request
-	                response.sendRedirect(request.getContextPath() +"/onlyoffice/editor?fileName=" + URLEncoder.encode(fileName, "UTF-8") +"&sid" +sid +"&docId=" +ldDocument.getId());
+	                response.sendRedirect(request.getContextPath() +"/onlyoffice/editor?fileName=" + URLEncoder.encode(fileName, "UTF-8") +"&docId=" +ldDocument.getId() +"&folderId=" +folderId + "&sid=" +sid);	                
 	                return;
 	            } catch (Exception ex) {
 	                response.getWriter().write("Error: " + ex.getMessage());
@@ -123,17 +120,15 @@ public class OnlyOfficeEditor extends HttpServlet {
 			myDoc.setFileType(dm.getExtension(fileName));
 			myDoc.setTitle(fileName);
 			myDoc.setUrl(OODocumentManager.getDownloadUrl02(fileName, docId, sid, true));
+			//System.out.println("DownloadUrl: " +myDoc.getUrl());
 			//myDoc.setKey(docId); 
 			
 			// Set the key to something unique
 	        myDoc.setKey(docId +"-" + System.currentTimeMillis());		
 						
-			config.getEditorConfig().setCallbackUrl(OODocumentManager.getCallback02(fileName, docId, sid));
+			config.getEditorConfig().setCallbackUrl(OODocumentManager.getCallback02(fileName, docId, folderId, sid));
 			// disable all customizations
 			//config.getEditorConfig().setCustomization(null);
-			
-			// check if the Submit form button is displayed or not
-			config.getEditorConfig().getCustomization().setSubmitForm(false);
 			
 			// Disable Autosave
 			config.getEditorConfig().getCustomization().setAutosave(false);
@@ -142,18 +137,29 @@ public class OnlyOfficeEditor extends HttpServlet {
 			config.getEditorConfig().getCustomization().setForcesave(true);		
 			
 			// Set the user for editing
-			//com.onlyoffice.model.common.User edUser = new com.onlyoffice.model.common.User();
+			User user = Users.getUser("uid-1"); // fallback
 			LDOOUSer edUser = new LDOOUSer();
 			edUser.setId(user.getId());
 			edUser.setGroup("");
 			edUser.setName(user.getName());
 			edUser.setEmail(user.getEmail());
+			
+			// Setup LD user info
+			com.logicaldoc.core.security.user.User userLD = session.getUser();
+			if (userLD != null) {
+				edUser.setId("uid-" +userLD.getId());
+				edUser.setName(userLD.getFullName());
+				edUser.setEmail(userLD.getEmail());							
+			}
 			config.getEditorConfig().setUser(edUser);
 			
 			// Setup createUrl to enable save as
 			String createUrl = OODocumentManager.getCreateUrl(FileUtility.getFileType(fileName));
-			createUrl += "&sid=" + sid +"&docId=" +docId;
-			config.getEditorConfig().setCreateUrl(!user.getId().equals("uid-0") ? createUrl : null);
+			createUrl += "&sid=" + sid +"&docId=" +docId +"&folderId=" +folderId;;
+			config.getEditorConfig().setCreateUrl(!edUser.getId().equals("uid-0") ? createUrl : null);
+			
+	        // change type parameter if needed
+	        changeMode(config, request.getParameter("mode"));
 			
 			// rebuild the verification token
 	        if (settingsManager.isSecurityEnabled()) {
@@ -183,12 +189,12 @@ public class OnlyOfficeEditor extends HttpServlet {
 	        request.setAttribute("dataSpreadsheet", getSpreadsheet(isEnableDirectUrl));
 	        
 	        // get user data for mentions and add it to the model
-	        request.setAttribute("usersForMentions", getUserMentions(user.getId()));
+	        request.setAttribute("usersForMentions", getUserMentions(edUser.getId()));
 	        
-	        request.setAttribute("usersInfo", getUsersInfo(user.getId()));
+	        request.setAttribute("usersInfo", getUsersInfo(edUser));
 	        
 	        // get user data for protect and add it to the model
-	        request.setAttribute("usersForProtect", getUserProtect(user.getId()));	
+	        request.setAttribute("usersForProtect", getUserProtect(edUser.getId()));	
 			
 			request.getRequestDispatcher("/onlyoffice/editor.jsp").forward(request, response);
 			
@@ -199,13 +205,36 @@ public class OnlyOfficeEditor extends HttpServlet {
 		}
 	}
 
+	// change customization to show the save button (for the forms) on the top
+	private void changeMode(Config config, String modeParam) {
+		if (StringUtils.isNotEmpty(modeParam)) {
+			System.out.println("modeParam: " +modeParam);
+			config.getEditorConfig().getCustomization().setSubmitForm(true);
+			config.getDocument().getPermissions().setEdit(false);
+			config.getDocument().getPermissions().setFillForms(true);
+			config.getDocument().getPermissions().setComment(false);
+			config.getDocument().getPermissions().setReview(false);
+		}
+	}
+
 	private String getUserMentions(final String uid) throws JsonProcessingException {
 		List<Map<String, Object>> usersForMentions = Users.getUsersForMentions(uid);		
 		return !uid.equals("uid-0") ? objectMapper.writeValueAsString(usersForMentions) : null;
 	}
 	
-	private String getUsersInfo(final String uid) throws JsonProcessingException {
-		List<Map<String, Object>> usersInfo = Users.getUsersInfo(uid);
+	private String getUsersInfo(LDOOUSer edUser) throws JsonProcessingException {
+		
+		List<Map<String, Object>> usersInfo = Users.getUsersInfo(edUser.getId());
+
+	    // replace the info of the user from the one coming from LD.
+		// Perhaps unnecessary, just overkill...
+		for (Map<String, Object> data : usersInfo) {
+			if (((String)data.get("id")).equals(edUser.getId())) {
+				data.put("name", edUser.getName());
+				data.put("email", edUser.getEmail());
+			}
+		}
+		
 		return objectMapper.writeValueAsString(usersInfo);
 	}	
 	

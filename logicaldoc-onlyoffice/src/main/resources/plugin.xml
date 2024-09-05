@@ -88,7 +88,7 @@
 <!ELEMENT value (#PCDATA)>
 ]>
 
-<plugin id="logicaldoc-onlyoffice" version="8.9.4" class="com.logicaldoc.onlyoffice.OnlyOfficePlugin">
+<plugin id="logicaldoc-onlyoffice" version="9.0.0" class="com.logicaldoc.onlyoffice.OnlyOfficePlugin">
 	<requires>
 		<import plugin-id="logicaldoc-core" />
 	</requires>

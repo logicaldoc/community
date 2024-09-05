@@ -41,6 +41,7 @@ import com.logicaldoc.gui.frontend.client.dropbox.DropboxDialog;
 import com.logicaldoc.gui.frontend.client.dropbox.DropboxService;
 import com.logicaldoc.gui.frontend.client.google.drive.DriveMenuItem;
 import com.logicaldoc.gui.frontend.client.menu.features.Features;
+import com.logicaldoc.gui.frontend.client.onlyoffice.OnlyOfficeCreate;
 import com.logicaldoc.gui.frontend.client.onlyoffice.OnlyOfficeEditor;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.services.ChatGPTService;
@@ -555,22 +556,45 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	}
 	
 	private MenuItem getOnlyOfficeMenuItem(GUIFolder folder, final GUIDocument document) {
+		
 		Menu menu = new Menu();
 		menu.setShowShadow(true);
 		menu.setShadowDepth(3);
 
-		final MenuItem edit = new MenuItem("Edit with OnlyOffice");
+		final MenuItem edit = new MenuItem(I18N.message("editdoc"));
 		edit.addClickHandler(event -> {
 			if (document == null)
 				return;
 			
-			OnlyOfficeEditor popup = new OnlyOfficeEditor(document);
-			popup.show();
+			new OnlyOfficeEditor(document).show();
 		});
+		
+		final MenuItem create = new MenuItem(I18N.message("createdoc"));
+		create.addClickHandler(event -> new OnlyOfficeCreate().show());
+		
+		// This should be enabled only on PDF
+		final MenuItem fillForms = new MenuItem("Fill in PDF forms");
+		fillForms.addClickHandler(event -> {
+			if (document == null)
+				return;
+			
+			// Setup something in the document that we will check later in the editor
+			document.setComment("fillForms");
+			new OnlyOfficeEditor(document).show();
+		});		
 
-		menu.setItems(edit);
-
-		edit.setEnabled(true);
+		menu.setItems(edit, create, fillForms);
+		
+		// TODO limit the editing only on supported file types 
+		edit.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
+				&& folder.isWrite());
+		
+		create.setEnabled(folder != null && folder.isDownload()
+				&& folder.isWrite());
+		
+		// enabled only on PDF
+		fillForms.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
+				&& folder.isWrite() && (document.getType().toLowerCase().endsWith("pdf")));
 
 		MenuItem onlyOfficeItem = new MenuItem("OnlyOffice");
 		onlyOfficeItem.setSubmenu(menu);
