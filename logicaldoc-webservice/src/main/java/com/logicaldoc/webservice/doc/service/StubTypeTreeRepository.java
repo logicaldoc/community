@@ -6,11 +6,6 @@ import java.util.Map;
 
 import com.logicaldoc.webservice.doc.model.StubTypeTree;
 
-/**
- * 
- * @author chenjianjx
- *
- */
 public class StubTypeTreeRepository {
 
 	private Map<Class<?>, StubTypeTree> repository = new HashMap<>();

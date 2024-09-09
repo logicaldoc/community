@@ -16,6 +16,8 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.webdav.session.WebdavSession;
 
 /**
+ * Implementation of a generic WebDAV resource
+ * 
  * @see Resource
  * 
  * @author Sebastian Wenzky

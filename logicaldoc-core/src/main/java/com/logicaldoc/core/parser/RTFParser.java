@@ -26,6 +26,8 @@ import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.io.FileUtil;
 
 /**
+ * A parser for the Rich Text Format
+ * 
  * @author Michael Scholz
  * @author Alessandro Gasparini
  * @since 3.5

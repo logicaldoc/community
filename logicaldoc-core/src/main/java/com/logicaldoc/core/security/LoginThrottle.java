@@ -84,7 +84,7 @@ public class LoginThrottle {
 	 * Saves the login failure in the database
 	 * 
 	 * @param username the username
-	 * @param apikey the API Key
+	 * @param apiKey the API Key
 	 * @param client the client address from which the login intent comes from
 	 * @param exception the authentication exception
 	 */

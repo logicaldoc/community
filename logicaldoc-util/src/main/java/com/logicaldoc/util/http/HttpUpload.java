@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.util.MimeType;
 
 /**
- * 
+ * Utility class to handle uploads.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 4.5

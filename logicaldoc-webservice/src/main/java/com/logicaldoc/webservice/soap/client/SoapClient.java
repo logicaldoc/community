@@ -18,6 +18,8 @@ import com.logicaldoc.util.security.EasyX509TrustManager;
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5
+ *
+ * @param <T> the class type of the SOAP service
  */
 public abstract class SoapClient<T> {
 
@@ -28,7 +30,7 @@ public abstract class SoapClient<T> {
 	/**
 	 * Constructor
 	 * 
-	 * @param endpoint Connection URL
+	 * @param endpoint Connection URLs
 	 * @param serviceClass The class of the service
 	 * @param gzipThreshold threshold in KB, all packets greater than this one
 	 *        will be gzipped(use -1 to disable in any case)

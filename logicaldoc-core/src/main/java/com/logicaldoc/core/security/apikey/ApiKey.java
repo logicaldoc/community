@@ -79,7 +79,7 @@ public class ApiKey extends PersistentObject {
 	/**
 	 * Sets the key and encode it
 	 * 
-	 * @param key The key in readable format
+	 * @param decodedKey The key in readable format
 	 * @throws NoSuchAlgorithmException Cripting error
 	 */
 	public void setDecodedKey(String decodedKey) throws NoSuchAlgorithmException {

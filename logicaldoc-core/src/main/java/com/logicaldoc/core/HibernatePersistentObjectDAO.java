@@ -39,6 +39,8 @@ import com.logicaldoc.util.config.ContextProperties;
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 4.0
+ * 
+ * @param <T> Class of the implementation of a {@link PersistentObject} this DAO handles
  */
 public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> implements PersistentObjectDAO<T> {
 

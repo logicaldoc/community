@@ -18,6 +18,9 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.folder.Folder;
 
 /**
+ * A represetnation of an Email message.
+ * 
+ * 
  * @author Michael Scholz
  * @author Marco Meschieri - LogicalDOC
  */

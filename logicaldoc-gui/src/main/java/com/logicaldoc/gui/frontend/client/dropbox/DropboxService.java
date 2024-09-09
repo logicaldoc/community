@@ -70,8 +70,6 @@ public interface DropboxService extends RemoteService {
 	 * @param apiKey identifier of the client
 	 * @param apiSecret the secret key specified by he user
 	 * 
-	 * @return The URL of the consent page
-	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
 	public void saveSettings(String apiKey, String apiSecret) throws ServerException;

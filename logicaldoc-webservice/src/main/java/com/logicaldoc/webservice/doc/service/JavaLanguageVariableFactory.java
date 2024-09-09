@@ -17,11 +17,6 @@ import com.logicaldoc.webservice.doc.WSDoc;
 import com.logicaldoc.webservice.doc.model.JavaLanguageVariable;
 import com.logicaldoc.webservice.doc.util.GenericsUtils;
 
-/**
- * 
- * @author chenjianjx
- * 
- */
 public class JavaLanguageVariableFactory {
 
 	private JavaLanguageVariableFactory() {

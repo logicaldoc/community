@@ -24,7 +24,7 @@ public class Value<V extends Object> {
 	/**
 	 * Creates a new Value
 	 * 
-	 * @param value The value to use for this pair
+	 * @param val The value to use for this pair
 	 */
 	public Value(V val) {
 		this.val = val;

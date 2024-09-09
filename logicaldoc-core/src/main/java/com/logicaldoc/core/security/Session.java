@@ -189,7 +189,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	/**
 	 * Sets the key and encode it
 	 * 
-	 * @param key The key in readable format
+	 * @param decodedKey The key in readable format
 	 * @throws NoSuchAlgorithmException Cripting error
 	 */
 	public void setDecodedKey(String decodedKey) throws NoSuchAlgorithmException {

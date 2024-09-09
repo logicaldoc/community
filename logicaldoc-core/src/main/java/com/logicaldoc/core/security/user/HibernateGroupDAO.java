@@ -17,6 +17,8 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**
+ * Hibernate implementation of {@link GroupDAO}
+ * 
  * @author Alessandro Gasparini - LogicalDOC
  * @since 3.0
  */

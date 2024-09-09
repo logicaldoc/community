@@ -61,7 +61,7 @@ public class UserTool {
 	/**
 	 * Initializes lazy loaded collections
 	 * 
-	 * @param doc the document to initialize
+	 * @param user the user to initialize
 	 */
 	public void initialize(User user) {
 		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);

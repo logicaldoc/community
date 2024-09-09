@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.9.3
+ * 
+ * @param <T> The type of attended response content
  */
 public abstract class BaseHttpClientResponseHandler<T> extends AbstractHttpClientResponseHandler<T> {
 

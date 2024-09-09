@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.common.client.util;
 
 /**
+ * A base64 encoder
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5.1

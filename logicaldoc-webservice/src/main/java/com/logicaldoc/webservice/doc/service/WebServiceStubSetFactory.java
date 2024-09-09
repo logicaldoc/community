@@ -10,11 +10,6 @@ import javax.jws.WebMethod;
 
 import com.logicaldoc.webservice.doc.model.WebServiceStubSet;
 
-/**
- * 
- * @author chenjianjx
- * 
- */
 public class WebServiceStubSetFactory {
 
 	private WebServiceStubSetFactory() {

@@ -11,11 +11,6 @@ import com.logicaldoc.webservice.doc.model.JavaLanguageVariable;
 import com.logicaldoc.webservice.doc.model.Stub;
 import com.logicaldoc.webservice.doc.model.WebMethodStubSet;
 
-/**
- * 
- * @author chenjianjx
- * 
- */
 public class WebMethodStubSetFactory {
 
 	private WebMethodStubSetFactory() {

@@ -5,6 +5,8 @@ import java.io.Serializable;
 import org.apache.commons.lang3.StringUtils;
 
 /**
+ * A generic recipient of a message or email
+ * 
  * @author Michael Scholz
  */
 public class Recipient implements Serializable {

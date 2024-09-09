@@ -8,6 +8,9 @@ import java.util.Collection;
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.1.2
+ *
+ * @param <K> the key
+ * @param <V> the value
  */
 public interface Cache<K extends Serializable, V> {
 
@@ -24,6 +27,6 @@ public interface Cache<K extends Serializable, V> {
 	public void clear();
 
 	public void flush();
-	
+
 	public long getSize();
 }

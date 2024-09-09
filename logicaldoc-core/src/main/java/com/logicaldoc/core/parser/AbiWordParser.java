@@ -26,6 +26,12 @@ public class AbiWordParser extends AbstractParser {
 
 	protected static Logger log = LoggerFactory.getLogger(AbiWordParser.class);
 
+	/**
+	 * Special Handler for AbiWord
+	 * 
+	 * @author Marco Meschieri - LogicalDOC
+	 * @since 1.0
+	 */
 	private class AbiWordContentHandler extends DefaultHandler {
 
 		private StringBuilder content;
@@ -44,7 +50,7 @@ public class AbiWordParser extends AbstractParser {
 			String tmp = content.toString();
 			if (tmp != null && tmp.length() > 0) {
 				// Clean all the unwanted characters
-				tmp = tmp.replaceAll("[<>\"“”`]", "");
+				tmp = tmp.replaceAll("[<>\"â€œâ€�`]", "");
 			}
 			return tmp;
 		}

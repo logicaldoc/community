@@ -3,7 +3,7 @@ package com.logicaldoc.gui.common.client.beans;
 import java.io.Serializable;
 
 /**
- * 
+ * A template use to compose the outgoing messages
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 6.5

@@ -12,6 +12,8 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 4.0
+ *
+ * @param <T> Class of the implementation of a {@link PersistentObject} this DAO handles
  */
 public interface PersistentObjectDAO<T extends PersistentObject> {
 

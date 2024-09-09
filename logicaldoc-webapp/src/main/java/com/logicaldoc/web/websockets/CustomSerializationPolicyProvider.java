@@ -4,6 +4,7 @@ import com.google.gwt.user.server.rpc.SerializationPolicy;
 import com.google.gwt.user.server.rpc.SerializationPolicyProvider;
 
 /**
+ * A custom serializer with simple policy
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.1.1

@@ -17,10 +17,15 @@ import net.sf.ehcache.Element;
  * A thin adapter for <b>Ehcache</b> support.
  * <p>
  * Thread-safety is taken care of by the underlying <b>Ehcache</b> instance.
- * 
  * <p>
  * see org.springframework.cache.ehcache.EhCacheFactoryBean <br>
  * see org.springframework.cache.ehcache.EhCacheManagerFactoryBean
+ * 
+ * @author Marco Meschieri - LogicalDOC
+ * @since 5.0
+ *
+ * @param <K> The object identifier
+ * @param <V> The object instance
  */
 public class EhCache<K extends Serializable, V extends Object> implements com.logicaldoc.util.cache.Cache<K, V> {
 	

@@ -16,6 +16,8 @@ import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.util.Context;
 
 /**
+ * An attachment of an email message
+ * 
  * @author Michael Scholz
  * @author Alessandro Gasparini - LogicalDOC
  */
