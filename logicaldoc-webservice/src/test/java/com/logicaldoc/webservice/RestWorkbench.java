@@ -66,21 +66,19 @@ public class RestWorkbench {
 		// System.out.println(test1.replaceAll("<content[^>]*>.*</content>",
 		// "<content>...</content>"));
 
-		String username = "admin";
-		String password = "12345678";
-
-		authClient = new RestAuthClient(BASE_PATH + "/services/rest/auth");
-		docClient = new RestDocumentClient(BASE_PATH + "/services/rest/document", username, password);
-		fldClient = new RestFolderClient(BASE_PATH + "/services/rest/folder", username, password);
-		searchClient = new RestSearchClient(BASE_PATH + "/services/rest/search", username, password);
-		tagClient = new RestTagClient(BASE_PATH + "/services/rest/tag", username, password);
-		bookmarkClient = new RestBookmarkClient(BASE_PATH + "/services/rest/bookmark", username, password);
-		docMetadataClient = new RestDocumentMetadataClient(BASE_PATH + "/services/rest/documentMetadata", username,
-				password);
-
 		Properties develProps = new Properties();
 		develProps.load(new FileInputStream(new File(System.getProperty("user.home")+"/logicaldoc-dev.properties")));
-		String sid = authClient.loginApiKey(develProps.getProperty("apikey.Development"));
+		String apiKey = develProps.getProperty("apikey.Development");
+
+		authClient = new RestAuthClient(BASE_PATH + "/services/rest/auth");
+		docClient = new RestDocumentClient(BASE_PATH + "/services/rest/document", apiKey);
+		fldClient = new RestFolderClient(BASE_PATH + "/services/rest/folder", apiKey);
+		searchClient = new RestSearchClient(BASE_PATH + "/services/rest/search", apiKey);
+		tagClient = new RestTagClient(BASE_PATH + "/services/rest/tag", apiKey);
+		bookmarkClient = new RestBookmarkClient(BASE_PATH + "/services/rest/bookmark", apiKey);
+		docMetadataClient = new RestDocumentMetadataClient(BASE_PATH + "/services/rest/documentMetadata", apiKey);
+
+		String sid = authClient.loginApiKey(apiKey);
 		System.err.println(sid);
 //		
 //		docMetadataClient.setAttributeOptions(188055552L, "test", new String[] {"value1", "value2", "value3"});

@@ -4,23 +4,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.activation.DataHandler;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.AttachmentBuilder;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
-import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -31,34 +26,16 @@ import com.logicaldoc.webservice.model.WSNote;
 import com.logicaldoc.webservice.model.WSRating;
 import com.logicaldoc.webservice.rest.DocumentService;
 
-public class RestDocumentClient extends AbstractRestClient {
+public class RestDocumentClient extends AbstractRestClient<DocumentService> {
 
 	protected static Logger log = LoggerFactory.getLogger(RestDocumentClient.class);
 
-	private DocumentService proxy = null;
-
-	public RestDocumentClient(String endpoint, String username, String password) {
-		this(endpoint, username, password, -1);
+	public RestDocumentClient(String endpoint, String apiKey) {
+		this(endpoint, apiKey, -1);
 	}
 
-	public RestDocumentClient(String endpoint, String username, String password, int timeout) {
-		super(endpoint, username, password, timeout);
-
-		JacksonJsonProvider provider = new JacksonJsonProvider();
-
-		if ((username == null) || (password == null)) {
-			proxy = JAXRSClientFactory.create(endpoint, DocumentService.class, Arrays.asList(provider));
-		} else {
-			proxy = JAXRSClientFactory.create(endpoint, DocumentService.class, Arrays.asList(provider), username,
-					password, null);
-		}
-
-		if (timeout > 0) {
-			HTTPConduit conduit = WebClient.getConfig(proxy).getHttpConduit();
-			HTTPClientPolicy policy = new HTTPClientPolicy();
-			policy.setReceiveTimeout(timeout);
-			conduit.setClient(policy);
-		}
+	public RestDocumentClient(String endpoint, String apiKey, int timeout) {
+		super(DocumentService.class, endpoint, apiKey, timeout);
 	}
 
 	public WSDocument create(WSDocument document, File packageFile) throws FileNotFoundException {
@@ -82,7 +59,7 @@ public class RestDocumentClient extends AbstractRestClient {
 
 		return proxy.create(document, fileAttachment);
 	}
-	
+
 	public List<WSDocument> list(long folderId)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		WebClient.client(proxy).type("*/*");

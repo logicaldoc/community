@@ -1,16 +1,10 @@
 package com.logicaldoc.webservice.rest.client;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -20,34 +14,16 @@ import com.logicaldoc.webservice.model.WSAttributeSet;
 import com.logicaldoc.webservice.model.WSTemplate;
 import com.logicaldoc.webservice.rest.DocumentMetadataService;
 
-public class RestDocumentMetadataClient extends AbstractRestClient {
+public class RestDocumentMetadataClient extends AbstractRestClient<DocumentMetadataService> {
 
 	protected static Logger log = LoggerFactory.getLogger(RestDocumentMetadataClient.class);
 
-	private DocumentMetadataService proxy = null;
-
-	public RestDocumentMetadataClient(String endpoint, String username, String password) {
-		this(endpoint, username, password, -1);
+	public RestDocumentMetadataClient(String endpoint, String apiKey) {
+		this(endpoint, apiKey, -1);
 	}
 
-	public RestDocumentMetadataClient(String endpoint, String username, String password, int timeout) {
-		super(endpoint, username, password, timeout);
-
-		JacksonJsonProvider provider = new JacksonJsonProvider();
-
-		if ((username == null) || (password == null)) {
-			proxy = JAXRSClientFactory.create(endpoint, DocumentMetadataService.class, Arrays.asList(provider));
-		} else {
-			proxy = JAXRSClientFactory.create(endpoint, DocumentMetadataService.class, Arrays.asList(provider),
-					username, password, null);
-		}
-
-		if (timeout > 0) {
-			HTTPConduit conduit = WebClient.getConfig(proxy).getHttpConduit();
-			HTTPClientPolicy policy = new HTTPClientPolicy();
-			policy.setReceiveTimeout(timeout);
-			conduit.setClient(policy);
-		}
+	public RestDocumentMetadataClient(String endpoint, String apiKey, int timeout) {
+		super(DocumentMetadataService.class, endpoint, apiKey, timeout);
 	}
 
 	public void setAttributeOptions(long setId, String attribute, List<WSAttributeOption> options)

@@ -1,18 +1,13 @@
 package com.logicaldoc.webservice.rest.client;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
-import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -22,34 +17,16 @@ import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.rest.TagService;
 
-public class RestTagClient extends AbstractRestClient {
+public class RestTagClient extends AbstractRestClient<TagService> {
 
 	protected static Logger log = LoggerFactory.getLogger(RestTagClient.class);
 
-	private TagService proxy = null;
-
-	public RestTagClient(String endpoint, String username, String password) {
-		this(endpoint, username, password, -1);
+	public RestTagClient(String endpoint, String apiKey) {
+		this(endpoint, apiKey, -1);
 	}
 
-	public RestTagClient(String endpoint, String username, String password, int timeout) {
-		super(endpoint, username, password, timeout);
-
-		JacksonJsonProvider provider = new JacksonJsonProvider();
-
-		if ((username == null) || (password == null)) {
-			proxy = JAXRSClientFactory.create(endpoint, TagService.class, Arrays.asList(provider));
-		} else {
-			proxy = JAXRSClientFactory.create(endpoint, TagService.class, Arrays.asList(provider), username, password,
-					null);
-		}
-
-		if (timeout > 0) {
-			HTTPConduit conduit = WebClient.getConfig(proxy).getHttpConduit();
-			HTTPClientPolicy policy = new HTTPClientPolicy();
-			policy.setReceiveTimeout(timeout);
-			conduit.setClient(policy);
-		}
+	public RestTagClient(String endpoint, String apiKey, int timeout) {
+		super(TagService.class, endpoint, apiKey, timeout);
 	}
 
 	public void addDocumentTags(long docId, List<String> tags) throws AuthenticationException, PermissionException,

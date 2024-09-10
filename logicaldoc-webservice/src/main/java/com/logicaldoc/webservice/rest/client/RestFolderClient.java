@@ -1,18 +1,13 @@
 package com.logicaldoc.webservice.rest.client;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
-import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -20,34 +15,16 @@ import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.rest.FolderService;
 
-public class RestFolderClient extends AbstractRestClient {
+public class RestFolderClient extends AbstractRestClient<FolderService> {
 
 	protected static Logger log = LoggerFactory.getLogger(RestFolderClient.class);
 
-	private FolderService proxy = null;
-
-	public RestFolderClient(String endpoint, String username, String password) {
-		this(endpoint, username, password, -1);
+	public RestFolderClient(String endpoint, String apiKey) {
+		this(endpoint, apiKey, -1);
 	}
 
-	public RestFolderClient(String endpoint, String username, String password, int timeout) {
-		super(endpoint, username, password, timeout);
-
-		JacksonJsonProvider provider = new JacksonJsonProvider();
-
-		if ((username == null) || (password == null)) {
-			proxy = JAXRSClientFactory.create(endpoint, FolderService.class, Arrays.asList(provider));
-		} else {
-			proxy = JAXRSClientFactory.create(endpoint, FolderService.class, Arrays.asList(provider), username,
-					password, null);
-		}
-
-		if (timeout > 0) {
-			HTTPConduit conduit = WebClient.getConfig(proxy).getHttpConduit();
-			HTTPClientPolicy policy = new HTTPClientPolicy();
-			policy.setReceiveTimeout(timeout);
-			conduit.setClient(policy);
-		}
+	public RestFolderClient(String endpoint, String apiKey, int timeout) {
+		super(FolderService.class, endpoint, apiKey, timeout);
 	}
 
 	public List<WSFolder> listChildren(long folderId)
