@@ -1,120 +1,112 @@
 package com.logicaldoc.webservicesamples.junit;
 
-import java.io.IOException;
+import org.junit.Test;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.searchengine.SearchException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSSearchOptions;
 import com.logicaldoc.webservice.model.WSSearchResult;
 import com.logicaldoc.webservice.soap.client.SoapSearchClient;
 
-public class TstSearch extends BaseUnit {
+public class TstSearch extends BaseTestCase {
 
-	public TstSearch(String arg0) {
-		super(arg0);
+	private SoapSearchClient searchClient;
+
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+
+		searchClient = new SoapSearchClient(settings.getProperty("url") + "/services/Search");
 	}
 
 	/**
-	 * WARNING: because a search returns the results there must be documents indexed. 
-	 * By default the documents via web-service are indexed in the
-	 * background and then it is possible that the search returns no results. 
-	 * If you want you can force the indexing from the GUI of LogicalDOC.
+	 * WARNING: because a search returns the results there must be documents
+	 * indexed. By default the documents via web-service are indexed in the
+	 * background and then it is possible that the search returns no results. If
+	 * you want you can force the indexing from the GUI of LogicalDOC.
 	 * 
-	 * @throws IOException
+	 * @throws SearchException Error inside the search
+	 * @throws WebserviceException Error in the webservice layer
+	 * @throws PersistenceException Error in the database layer
+	 * @throws AuthenticationException Cannot authenticate
 	 */
-	public void testSearch() throws IOException {
-
-		SoapSearchClient searchc = new SoapSearchClient(SEARCH_ENDPOINT);
-
+	@Test
+	public void testSearch()
+			throws AuthenticationException, PersistenceException, WebserviceException, SearchException {
 		String query = "Commercial";
 
-		try {
-			//FulltextSearchOptions options = new FulltextSearchOptions();
-			WSSearchOptions options = new WSSearchOptions();
-			
-            // This is the language of the document
-            options.setLanguage("en");
-            options.setExpression(query);
-            // This is the language of the query
-            options.setExpressionLanguage("en");
+		// FulltextSearchOptions options = new FulltextSearchOptions();
+		WSSearchOptions options = new WSSearchOptions();
 
-            // This is required and it is the maximum number of results that we want for this search
-            options.setMaxHits(50);	
-            
-			WSSearchResult sr = searchc.find(sid, options);
-			
-			System.out.println("HITS: " + sr.getTotalHits());
-			System.out.println("search completed in ms: " + sr.getTime());
-			
-			if (sr.getHits() != null) {
-				for (WSDocument res : sr.getHits()) {
-					System.out.println("file name: " + res.getFileName());
-					System.out.println("res.id: " + res.getId());
-					System.out.println("res.summary: " + res.getSummary());
-					System.out.println("res.size: " + res.getFileSize());
-					System.out.println("res.date: " + res.getDate());
-					System.out.println("res.type: " + res.getType());
-					System.out.println("res.score: " + res.getScore());					
-				}
+		// This is the language of the document
+		options.setLanguage("en");
+		options.setExpression(query);
+		// This is the language of the query
+		options.setExpressionLanguage("en");
+
+		// This is required and it is the maximum number of results that we want
+		// for this search
+		options.setMaxHits(50);
+
+		WSSearchResult result = searchClient.find(sid, options);
+
+		System.out.println("HITS: " + result.getTotalHits());
+		System.out.println("search completed in ms: " + result.getTime());
+
+		if (result.getHits() != null) {
+			for (WSDocument res : result.getHits()) {
+				System.out.println("file name: " + res.getFileName());
+				System.out.println("res.id: " + res.getId());
+				System.out.println("res.summary: " + res.getSummary());
+				System.out.println("res.size: " + res.getFileSize());
+				System.out.println("res.date: " + res.getDate());
+				System.out.println("res.type: " + res.getType());
+				System.out.println("res.score: " + res.getScore());
 			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
-	
-	
-	/**
-	 * WARNING: because a search returns the results there must be documents indexed. 
-	 * By default the documents via web-service are indexed in the
-	 * background and then it is possible that the search returns no results. 
-	 * If you want you can force the indexing from the GUI of LogicalDOC.
-	 * 
-	 * @throws IOException
-	 */
-	public void testSearchByTemplateFields() throws IOException {
 
-		SoapSearchClient searchc = new SoapSearchClient(SEARCH_ENDPOINT);
-
+	@Test
+	public void testSearchByTemplateFields() throws AuthenticationException, PersistenceException, WebserviceException, SearchException {
 		String query = "Windows";
 
-		try {
-			//FulltextSearchOptions options = new FulltextSearchOptions();
-			WSSearchOptions options = new WSSearchOptions();
-			
-            // This is the language of the document
-            options.setLanguage("en");
-            options.setExpression(query);
-            // This is the language of the query
-            options.setExpressionLanguage("en");
+		// FulltextSearchOptions options = new FulltextSearchOptions();
+		WSSearchOptions options = new WSSearchOptions();
 
-            // This is required and it is the maximum number of results that we want for this search
-            options.setMaxHits(50);
-            
-            options.setTemplate(1L); // Email template
-            
-            // Setting the template fields in which to search 
-            //String[] fields = new String[]{"fhgfgh", "fhgfgh", "fhgfgh"};
-            //options.setFields(fields);
-            
-			WSSearchResult sr = searchc.find(sid, options);
-			
-			System.out.println("HITS: " + sr.getTotalHits());
-			System.out.println("search completed in ms: " + sr.getTime());
-			
-			if (sr.getHits() != null) {
-				for (WSDocument res : sr.getHits()) {
-					System.out.println("file name: " + res.getFileName());
-					System.out.println("res.id: " + res.getId());
-					System.out.println("res.summary: " + res.getSummary());
-					System.out.println("res.size: " + res.getFileSize());
-					System.out.println("res.date: " + res.getDate());
-					System.out.println("res.type: " + res.getType());
-					System.out.println("res.score: " + res.getScore());					
-				}
+		// This is the language of the document
+		options.setLanguage("en");
+		options.setExpression(query);
+		// This is the language of the query
+		options.setExpressionLanguage("en");
+
+		// This is required and it is the maximum number of results that we
+		// want for this search
+		options.setMaxHits(50);
+
+		options.setTemplate(1L); // Email template
+
+		// Setting the template fields in which to search
+		// String[] fields = new String[]{"fhgfgh", "fhgfgh", "fhgfgh"};
+		// options.setFields(fields);
+
+		WSSearchResult result = searchClient.find(sid, options);
+
+		System.out.println("HITS: " + result.getTotalHits());
+		System.out.println("search completed in ms: " + result.getTime());
+
+		if (result.getHits() != null) {
+			for (WSDocument res : result.getHits()) {
+				System.out.println("file name: " + res.getFileName());
+				System.out.println("res.id: " + res.getId());
+				System.out.println("res.summary: " + res.getSummary());
+				System.out.println("res.size: " + res.getFileSize());
+				System.out.println("res.date: " + res.getDate());
+				System.out.println("res.type: " + res.getType());
+				System.out.println("res.score: " + res.getScore());
 			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-	}	
+	}
 }

@@ -1,6 +1,7 @@
 package com.logicaldoc.webservicesamples.junit;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,14 +13,19 @@ import javax.activation.FileDataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSAttribute;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.soap.client.SoapDocumentClient;
 import com.logicaldoc.webservice.soap.client.SoapFolderClient;
 
-public class TstMassiveImport extends BaseUnit{
+public class TstMassiveImport extends BaseTestCase {
 
 	private static final int TIME_ATTENTION_TRESHOLD = 30000;
 
@@ -27,65 +33,60 @@ public class TstMassiveImport extends BaseUnit{
 
 	protected static Log log = LogFactory.getLog(TstMassiveImport.class);
 
-	private static SoapDocumentClient dclient;
-	private static SoapFolderClient fclient;
-	
 	private long startTime;
+
 	public int docsInserted = 0;
+
 	public int foldersCreated = 0;
 
-	public TstMassiveImport(String arg0) {
-		super(arg0);
-	}
+	private SoapFolderClient folderClient;
 
+	private SoapDocumentClient documentClient;
+
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		dclient = new SoapDocumentClient(DOC_ENDPOINT);
-		fclient = new SoapFolderClient(FOLDER_ENDPOINT);
+
+		folderClient = new SoapFolderClient(settings.getProperty("url") + "/services/Folder");
+		documentClient = new SoapDocumentClient(settings.getProperty("url") + "/services/Document");
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 
 		log.error("Inserted Documents: " + docsInserted);
 		log.error("Created Folders: " + foldersCreated);
 		long elapsedTime = System.currentTimeMillis() - startTime;
-		double seconds = elapsedTime / 1000;		
+		double seconds = elapsedTime / 1000;
 		log.error("Job ended in: " + Math.round(seconds) + " seconds");
 		log.error("Job started at: " + new java.util.Date(startTime));
 		log.error("Job ended at: " + new java.util.Date());
 	}
 
-	public void testMassiveImport() {
+	@Test
+	public void testMassiveImport() throws AuthenticationException, PermissionException, PersistenceException,
+			WebserviceException, IOException {
 		docsInserted = 0;
 		startTime = System.currentTimeMillis();
-		try {
-			// String sDir = "C:/Users/Cecio/Documents/Logical"; // 1866
-			// documents, 270 folders
-			String sDir = "C:/Users/alle/Desktop/LogicalDOC_site"; // 9220 files,
-																	// 1096
-																	// folders
-			importFolder(sDir, DEFAULT_WORKSPACE);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println("Documents currently Created: " + docsInserted);
-		}
+
+		String sDir = "C:/Users/alle/Desktop/LogicalDOC_site";
+
+		importFolder(sDir, DEFAULT_WORKSPACE);
 	}
 
 	/**
-There must be in the system a template with ID number: 2, with the following fields:
-
-name: docid; type: String
-name: deldate; type: Date
-name: delroute; type: String
-name: outlet; type: Integer
-name: salesrep; type: String
-name: driver; type: String
+	 * There must be in the system a template with ID number: 2, with the
+	 * following fields:
 	 * 
-	 * @param templateid
+	 * name: docid; type: String name: deldate; type: Date name: delroute; type:
+	 * String name: outlet; type: Integer name: salesrep; type: String name:
+	 * driver; type: String
+	 * 
+	 * @param templateid identifier of the template
 	 * @return
 	 */
-	private WSAttribute[] getAttributes(long templateid) {
+	private List<WSAttribute> getAttributes(long templateid) {
 
 		List<WSAttribute> attributes = new ArrayList<WSAttribute>();
 		Date deldate = new Date();
@@ -114,7 +115,7 @@ name: driver; type: String
 			WSAttribute attr4 = new WSAttribute();
 			attr4.setName("outlet");
 			attr4.setType(WSAttribute.TYPE_INT);
-			attr4.setIntValue(new Long(966838));
+			attr4.setIntValue(Long.valueOf(966838L));
 			attributes.add(attr4);
 
 			WSAttribute attr5 = new WSAttribute();
@@ -130,19 +131,17 @@ name: driver; type: String
 			attributes.add(attr6);
 		}
 
-		return attributes.toArray(new WSAttribute[0]);
+		return attributes;
 	}
 
-	private long createFolder(String name, long parentId) throws Exception {
+	private long createFolder(String name, long parentId)
+			throws AuthenticationException, PermissionException, PersistenceException, WebserviceException {
 
 		// Check if a subfolder of the parent folder has the same name
-		WSFolder[] dsds = fclient.listChildren(sid, parentId);
-		if (dsds != null) {
-			for (int i = 0; i < dsds.length; i++) {
-				if (dsds[i].getName().equals(name)) {
-					// System.out.println("FOLDER EXIST");
-					return dsds[i].getId();
-				}
+		List<WSFolder> folders = folderClient.listChildren(sid, parentId);
+		for (WSFolder wsFolder : folders) {
+			if (wsFolder.getName().equals(name)) {
+				return wsFolder.getId();
 			}
 		}
 
@@ -152,20 +151,14 @@ name: driver; type: String
 		folder.setName(name);
 		folder.setParentId(parentId);
 
-		long startTime = System.currentTimeMillis();
-		try {
-			WSFolder fcreated = fclient.create(sid, folder);
-			foldersCreated++;
-			System.out.println("Created folderID = " + fcreated.getId());
-			return fcreated.getId();
-		} catch (Exception e) {
-			long timeElapsed = System.currentTimeMillis() - startTime;
-			System.err.println("TimeOut after: " + timeElapsed + " ms");
-			throw e;
-		}
+		WSFolder createdFolder = folderClient.create(sid, folder);
+		foldersCreated++;
+		System.out.println("Created folderID = " + createdFolder.getId());
+		return createdFolder.getId();
 	}
 
-	private void importFolder(String sDir, long parentId) throws Exception {
+	private void importFolder(String sDir, long parentId) throws AuthenticationException, PermissionException,
+			PersistenceException, WebserviceException, IOException {
 
 		File[] faFiles = new File(sDir).listFiles();
 
@@ -191,17 +184,17 @@ name: driver; type: String
 					System.out.println(file.getAbsolutePath());
 					// Import document
 					long templateid = 2L;
-					WSAttribute[] attributes = getAttributes(templateid);
 
-					createDocument(parentId, file, templateid, attributes);
+					createDocument(parentId, file, templateid, getAttributes(templateid));
 					docsInserted++;
 				}
 			}
 		}
 	}
 
-	private void createDocument(long targetFolder, File file, long templateid, WSAttribute[] attributes)
-			throws Exception {
+	private void createDocument(long targetFolder, File file, long templateid, List<WSAttribute> attributes)
+			throws AuthenticationException, PermissionException, PersistenceException, IOException,
+			WebserviceException {
 
 		DataSource ds = new FileDataSource(file);
 		DataHandler content = new DataHandler(ds);
@@ -212,23 +205,17 @@ name: driver; type: String
 		document.setFolderId(targetFolder);
 		document.setLanguage("en");
 
-		if (attributes != null && attributes.length > 0) {
+		if (attributes != null && attributes.size() > 0) {
 			document.setTemplateId(templateid);
 			document.setAttributes(attributes);
 		}
 
 		long startTime = System.currentTimeMillis();
-		try {
-			WSDocument docRes = dclient.create(sid, document, content);
-			System.out.println("Created documentID = " + docRes.getId());
-			long timeElapsed = System.currentTimeMillis() - startTime;
-			if (timeElapsed > TIME_ATTENTION_TRESHOLD)
-				System.err.println("Document created in: " + timeElapsed + " ms");
-		} catch (Exception e) {
-			long timeElapsed = System.currentTimeMillis() - startTime;
-			System.err.println("Error after: " + timeElapsed + " ms");
-			throw e;
-		}
+		WSDocument docRes = documentClient.create(sid, document, content);
+		System.out.println("Created documentID = " + docRes.getId());
+		long timeElapsed = System.currentTimeMillis() - startTime;
+		if (timeElapsed > TIME_ATTENTION_TRESHOLD)
+			System.err.println("Document created in: " + timeElapsed + " ms");
 	}
 
 }

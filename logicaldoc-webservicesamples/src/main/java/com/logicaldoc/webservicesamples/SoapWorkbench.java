@@ -3,20 +3,18 @@ package com.logicaldoc.webservicesamples;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.activation.DataHandler;
 
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.searchengine.SearchOptions;
+import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.webservice.model.WSAttribute;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.model.WSGroup;
 import com.logicaldoc.webservice.model.WSParameter;
-import com.logicaldoc.webservice.model.WSRight;
 import com.logicaldoc.webservice.model.WSSearchOptions;
 import com.logicaldoc.webservice.model.WSSearchResult;
 import com.logicaldoc.webservice.model.WSSystemInfo;
@@ -33,29 +31,28 @@ import com.logicaldoc.webservice.soap.client.SoapTagClient;
 public class SoapWorkbench {
 
 	public static void main(String[] args) throws Exception {
+		ContextProperties settings = new ContextProperties();
 
-		String base = "http://eva00:9080/services";
-
-		SoapAuthClient auth = new SoapAuthClient(base + "/Auth");
-		SoapDocumentClient documentClient = new SoapDocumentClient(base + "/Document");
-		SoapFolderClient folderClient = new SoapFolderClient(base + "/Folder", 1, false, 50);
-		SoapSearchClient searchClient = new SoapSearchClient(base + "/Search");
-		SoapSystemClient systemClient = new SoapSystemClient(base + "/System");
-		SoapSecurityClient securityClient = new SoapSecurityClient(base + "/Security");
-
-		SoapTagClient tagClient = new SoapTagClient(base + "/Tag");
+		SoapAuthClient auth = new SoapAuthClient(settings.getProperty("url") + "/services/Auth");
+		SoapDocumentClient documentClient = new SoapDocumentClient(settings.getProperty("url") + "/services/Document");
+		SoapFolderClient folderClient = new SoapFolderClient(settings.getProperty("url") + "/services/Folder", 1, false,
+				50);
+		SoapSearchClient searchClient = new SoapSearchClient(settings.getProperty("url") + "/services/Search");
+		SoapSystemClient systemClient = new SoapSystemClient(settings.getProperty("url") + "/services/System");
+		SoapSecurityClient securityClient = new SoapSecurityClient(settings.getProperty("url") + "/services/Security");
+		SoapTagClient tagClient = new SoapTagClient(settings.getProperty("url") + "/services/Tag");
 
 		// Open a session
-		String sid = auth.login("admin", "admin");
+		String sid = auth.loginApiKey(settings.getProperty("apiKey"));
 		System.out.println("Server date: " + systemClient.getInfo().getDate());
 		System.out.println("Sid: " + sid);
 
 		try {
-			// usersAndGroupsManagement(securityClient, sid);
+			usersAndGroupsManagement(securityClient, sid);
 
-			// foldersAndDocuments01(documentClient, folderClient, sid);
+			foldersAndDocuments01(documentClient, folderClient, sid);
 
-			// systemInfo(systemClient, sid);
+			systemInfo(systemClient, sid);
 
 			searchFeatures(searchClient, sid);
 
@@ -91,7 +88,7 @@ public class SoapWorkbench {
 		WSFolder wsFolder2 = folderClient.getFolder(sid, 14);
 		System.out.println("folder name: " + wsFolder2.getName());
 
-		WSFolder[] folders2 = folderClient.listChildren(sid, 4);
+		List<WSFolder> folders2 = folderClient.listChildren(sid, 4);
 		for (WSFolder wsFolderc : folders2) {
 			System.out.println("folder id: " + wsFolderc.getId());
 			System.out.println("folder name: " + wsFolderc.getName());
@@ -99,22 +96,12 @@ public class SoapWorkbench {
 			System.out.println("**************************************");
 		}
 
-		WSFolder[] folders3 = folderClient.getPath(sid, 14);
+		List<WSFolder> folders3 = folderClient.getPath(sid, 14);
 		for (WSFolder wsFolderc2 : folders3) {
 			System.out.println("folder id: " + wsFolderc2.getId());
 			System.out.println("folder name: " + wsFolderc2.getName());
 			System.out.println("folder descr: " + wsFolderc2.getDescription());
 			System.out.println("**************************************");
-		}
-
-		folderClient.grantGroup(sid, 13, 2, 4091, true);
-		folderClient.grantGroup(sid, 13, 3, 4091, true);
-		folderClient.grantGroup(sid, 13, -20, 0, true);
-		folderClient.grantUser(sid, 13, 2, 0, false);
-		WSRight[] rights = folderClient.getGrantedUsers(sid, 14);
-		System.out.println("--- " + rights.length);
-		for (WSRight right : rights) {
-			System.out.println("+++ " + right.getId());
 		}
 
 		WSDocument wsDoc = documentClient.getDocument(sid, 1);
@@ -124,11 +111,9 @@ public class SoapWorkbench {
 		wsDoc.setFolderId(14L);
 
 		DataHandler data = documentClient.getContent(sid, 1);
-		// File file = new
-		// File("/C:/Users/Matteo/Desktop/doctest/signdoc_en.pdf");
 		documentClient.create(sid, wsDoc, data);
 
-		WSDocument[] docs = documentClient.listDocuments(sid, 14, null);
+		List<WSDocument> docs = documentClient.listDocuments(sid, 14, null);
 		for (WSDocument wsDocument : docs) {
 			System.out.println("doc id: " + wsDocument.getId());
 			System.out.println("doc file name: " + wsDocument.getFileName());
@@ -136,7 +121,7 @@ public class SoapWorkbench {
 
 		documentClient.delete(sid, 32);
 
-		docs = documentClient.getDocuments(sid, new Long[] { 100L, 101L, 102L, 103L });
+		docs = documentClient.getDocuments(sid, List.of(100L, 101L, 102L, 103L));
 		for (WSDocument wsDocument : docs) {
 			System.out.println("doc: " + wsDocument.getFileName());
 		}
@@ -172,7 +157,7 @@ public class SoapWorkbench {
 		wsDoc = documentClient.getDocument(sid, 30);
 		System.out.println("doc file name: " + wsDoc.getFileName());
 
-		docs = documentClient.getDocuments(sid, new Long[] { 55L, 30L, 32L, 29L });
+		docs = documentClient.getDocuments(sid, List.of(55L, 30L, 32L, 29L));
 		for (WSDocument wsDocument : docs) {
 			System.out.println("doc: " + wsDocument.getFileName());
 		}
@@ -211,7 +196,7 @@ public class SoapWorkbench {
 		}
 
 		docs = documentClient.getRecentDocuments(sid, 4);
-		System.out.println("docs: " + docs.length);
+		System.out.println("docs: " + docs.size());
 		for (WSDocument wsDocument : docs) {
 			System.out.println("doc id: " + wsDocument.getId());
 			System.out.println("doc file name: " + wsDocument.getFileName());
@@ -219,40 +204,28 @@ public class SoapWorkbench {
 			System.out.println("--------------------------------------");
 		}
 
-		// doc = documentClient.createAlias(sid, 30, 14);
 		doc = documentClient.createAlias(sid, 30, 40, "0");
 		System.out.println("doc id: " + doc.getId());
 		System.out.println("doc file name: " + doc.getFileName());
 		System.out.println("doc customid: " + doc.getCustomId());
 
-		documentClient.sendEmail("ciccio", new Long[] { 690L, 32L, 29L }, "test@logicaldoc.com", "Test Invio Mail 2",
-				"Questa mail è un test");
-
-		// History method is in the enterprise audit webservices
-		// WSHistory[] history = documentClient.getHistory(sid, 12724);
-		// for (WSHistory h : history) {
-		// System.out.println(h.getDate() + "->" + h.getEvent() + " - " +
-		// h.getVersion());
-		// }
+		documentClient.sendEmail(sid, List.of(690L, 32L, 29L), "test@logicaldoc.com", "Test Send Mail 2",
+				"This email is a test");
 
 		WSFolder f = folderClient.findByPath(sid, "/Default/scomar/folder1x3z/folder6");
 		System.out.println(f.getId() + " - " + f.getName());
 
 		doc = documentClient.getDocument(sid, 535494657L);
 		for (WSAttribute att : doc.getAttributes()) {
-			if (att.getName().equals("utente")) {
-				WSUser user = new WSUser();
-				user.setId(51L);
-				user.setName("Meschieri");
-				user.setFirstName("Marco");
-				att.setValue(user);
+			if (att.getName().equals("user")) {
+				att.setIntValue(55L);
 			}
 		}
 
 		documentClient.update(sid, doc);
 
 		for (WSAttribute att : doc.getAttributes()) {
-			System.out.println(att.getName() + "(" + att.getType() + ")=" + att.getValue()
+			System.out.println(att.getName() + "(" + att.getType() + ")=" + WSAttribute.getValue(att)
 					+ (att.getType() == WSAttribute.TYPE_USER ? " " + att.getStringValue() : ""));
 		}
 
@@ -266,11 +239,10 @@ public class SoapWorkbench {
 
 	private static void searchFeatures(SoapSearchClient searchClient, String sid) throws Exception {
 
-		WSDocument[] documents = searchClient.findByFilename(sid, "pizzo.ods");
-		System.out.println("---- " + documents.length);
+		List<WSDocument> documents = searchClient.findByFilename(sid, "pizzo.ods");
+		System.out.println("---- " + documents.size());
 
-		List<WSDocument> docsList = Arrays.asList(documents);
-		for (WSDocument doc : docsList) {
+		for (WSDocument doc : documents) {
 			System.out.println("file name: " + doc.getFileName());
 			System.out.println("custom id: " + doc.getCustomId());
 			System.out.println("version: " + doc.getVersion());
@@ -279,12 +251,11 @@ public class SoapWorkbench {
 		}
 
 		documents = searchClient.findByFilename(sid, "marketing.txt");
-		System.out.println("---- " + documents.length);
+		System.out.println("---- " + documents.size());
 
-		WSFolder[] folders = searchClient.findFolders(sid, "xxx");
-		System.out.println("---- " + folders.length);
-		List<WSFolder> foldersList = Arrays.asList(folders);
-		for (WSFolder folder : foldersList) {
+		List<WSFolder> folders = searchClient.findFolders(sid, "xxx");
+		System.out.println("---- " + folders.size());
+		for (WSFolder folder : folders) {
 			System.out.println("id: " + folder.getId());
 			System.out.println("title: " + folder.getName());
 			System.out.println("++++++++++++++++++++++++++++++++");
@@ -297,7 +268,7 @@ public class SoapWorkbench {
 		opt.setType(SearchOptions.TYPE_FULLTEXT);
 		opt.setMaxHits(10);
 		WSSearchResult result = searchClient.find(sid, opt);
-		System.out.println("---- " + result.getHits().length);
+		System.out.println("---- " + result.getHits().size());
 		for (WSDocument hit : result.getHits()) {
 			System.out.println("hit customid: " + hit.getCustomId());
 			System.out.println("hit score: " + hit.getScore());
@@ -333,7 +304,7 @@ public class SoapWorkbench {
 	private static void foldersAndDocuments01(SoapDocumentClient documentClient, SoapFolderClient folderClient,
 			String sid) throws Exception {
 
-		WSFolder[] path = folderClient.getPath(sid, 20L);
+		List<WSFolder> path = folderClient.getPath(sid, 20L);
 		System.out.println("\n");
 		for (WSFolder wsFolder : path) {
 			System.out.print(wsFolder.getName() + "/");
@@ -350,7 +321,7 @@ public class SoapWorkbench {
 		newFolder.setDescription("new folder ddddd");
 		newFolder.setParentId(5);
 		newFolder = folderClient.create(sid, newFolder);
-		WSFolder[] folders = folderClient.listChildren(sid, 5);
+		List<WSFolder> folders = folderClient.listChildren(sid, 5);
 		for (WSFolder folder : folders) {
 			System.out.println("folder id: " + folder.getId());
 			System.out.println("folder name : " + folder.getName());
@@ -359,7 +330,7 @@ public class SoapWorkbench {
 		System.out.println("folder id : " + newFolder.getId());
 		System.out.println("folder desc: " + newFolder.getDescription());
 
-		WSDocument[] docs = documentClient.getDocuments(sid, new Long[] { 100L, 101L, 102L, 103L });
+		List<WSDocument> docs = documentClient.getDocuments(sid, List.of(100L, 101L, 102L, 103L));
 		for (WSDocument wsDocument : docs) {
 			System.out.println("doc: " + wsDocument.getFileName());
 		}
@@ -385,7 +356,7 @@ public class SoapWorkbench {
 		wsUserTest.setEmail("marco@acme.com");
 		wsUserTest.setUsername("marco");
 		wsUserTest.setFirstName("alle");
-		long[] ids = { 2, 3 };
+		List<Long> ids = List.of(2L, 3L);
 		wsUserTest.setGroupIds(ids);
 
 		Long userId = securityClient.storeUser(sid, wsUserTest);
@@ -398,7 +369,7 @@ public class SoapWorkbench {
 		WSUser user = securityClient.getUser(sid, 2L);
 		user.setCity("Modena");
 		user.setPostalcode("41125");
-		long[] ids2 = { 4 };
+		List<Long> ids2 = List.of(4L);
 		user.setGroupIds(ids2);
 		securityClient.storeUser(sid, user);
 
@@ -410,7 +381,7 @@ public class SoapWorkbench {
 		newUser.setFirstName("ciccio");
 		securityClient.storeUser(sid, newUser);
 
-		WSUser[] users = securityClient.listUsers(sid, null);
+		List<WSUser> users = securityClient.listUsers(sid, null);
 		WSUser editingUser = null;
 		for (WSUser wsUser : users) {
 			if (wsUser.getId() == 3) {
@@ -420,17 +391,17 @@ public class SoapWorkbench {
 		}
 
 		if (editingUser != null) {
-			editingUser.setGroupIds(new long[] { 3 });
+			editingUser.setGroupIds(List.of(3L));
 			securityClient.storeUser(sid, editingUser);
 		}
 
-		WSUser[] users2 = securityClient.listUsers(sid, null);
+		List<WSUser> users2 = securityClient.listUsers(sid, null);
 		for (WSUser wsUser : users2) {
 			System.out.println("--- " + wsUser.getId());
 			System.out.println("--- " + wsUser.getUsername());
 			System.out.println("--- " + wsUser.getEmail());
 			System.out.println("--- " + wsUser.getStreet());
-			System.out.println("--- " + wsUser.getGroupIds()[0]);
+			System.out.println("--- " + wsUser.getGroupIds().get(0));
 			System.out.println("------------------------------------");
 		}
 
@@ -438,7 +409,7 @@ public class SoapWorkbench {
 		newGroup.setName("gruppo3");
 		newGroup.setDescription("gruppo3 desc");
 		newGroup.setInheritGroupId(2L);
-		newGroup.setUserIds(new long[] { 4, 6 });
+		newGroup.setUserIds(List.of(4L, 6L));
 		Long grpId = securityClient.storeGroup(sid, newGroup);
 		System.out.println("group id: " + grpId);
 
@@ -456,7 +427,7 @@ public class SoapWorkbench {
 		group.setDescription("pippoc desc");
 		securityClient.storeGroup(sid, group);
 
-		WSGroup[] groups = securityClient.listGroups(sid);
+		List<WSGroup> groups = securityClient.listGroups(sid);
 		WSGroup editingGroup = null;
 		for (WSGroup wsGroup : groups) {
 			if (wsGroup.getId() == 2) {
@@ -465,7 +436,7 @@ public class SoapWorkbench {
 			}
 		}
 		if (editingGroup != null) {
-			editingGroup.setUserIds(new long[] { 2, 3 });
+			editingGroup.setUserIds(List.of(2L, 3L));
 			securityClient.storeGroup(sid, editingGroup);
 		}
 
@@ -480,13 +451,9 @@ public class SoapWorkbench {
 
 	private static void tagFeatures(SoapTagClient tagClient, String sid) throws Exception {
 
-		WSDocument[] documents = null;
-		List<WSDocument> docsList = new ArrayList<WSDocument>();
-
-		documents = tagClient.findDocumentsByTag(sid, "abc");
-		System.out.println("---- " + documents.length);
-		docsList = Arrays.asList(documents);
-		for (WSDocument doc : docsList) {
+		List<WSDocument> documents = tagClient.findDocumentsByTag(sid, "abc");
+		System.out.println("---- " + documents.size());
+		for (WSDocument doc : documents) {
 			System.out.println("title: " + doc.getFileName());
 			System.out.println("custom id: " + doc.getCustomId());
 			System.out.println("version: " + doc.getVersion());

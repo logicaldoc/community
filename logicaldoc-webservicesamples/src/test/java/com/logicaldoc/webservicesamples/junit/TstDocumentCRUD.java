@@ -1,6 +1,7 @@
 package com.logicaldoc.webservicesamples.junit;
 
 import java.io.File;
+import java.util.List;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -9,22 +10,26 @@ import javax.activation.FileDataSource;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.soap.client.SoapDocumentClient;
 
-public class TstDocumentCRUD extends BaseUnit {
+public class TstDocumentCRUD extends BaseTestCase {
 
 	protected static Log log = LogFactory.getLog(TstDocumentCRUD.class);
 
-	public TstDocumentCRUD(String arg0) {
-		super(arg0);
+	private SoapDocumentClient documentClient;
+	
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+
+		documentClient = new SoapDocumentClient(settings.getProperty("url") + "/services/Document");
 	}
 
+	@Test
 	public void testDocumentCRUD() throws Exception {
-
-		SoapDocumentClient docc = new SoapDocumentClient(DOC_ENDPOINT);
-
 		File file = new File("C:/tmp/Get-started-EN.pdf");
 
 		DataSource ds = new FileDataSource(file);
@@ -35,40 +40,38 @@ public class TstDocumentCRUD extends BaseUnit {
 		document.setFolderId(DEFAULT_WORKSPACE);
 		document.setFileName(file.getName());
 
-		WSDocument docRes = docc.create(sid, document, content);
+		WSDocument docRes = documentClient.create(sid, document, content);
 
 		System.err.println("documentID = " + docRes.getId());
 
 		// Retrieve the metadata of the document created
 		long docId = docRes.getId();
-		WSDocument docInfo = docc.getDocument(sid, docId);
+		WSDocument docInfo = documentClient.getDocument(sid, docId);
 
 		System.out.println(docInfo.getFileName());
 
 		// Update the metadata of the document created
 		// in particular we decided to update fields: title and tags
 		try {
-			String[] tags = new String[] { "tag", "keyword", "test" };
-
 			docInfo.setFileName("MyTitle." + FilenameUtils.getExtension(file.getName()));
-			docInfo.setTags(tags);
-			docc.update(sid, docInfo);
+			docInfo.setTags(List.of("tag", "keyword", "test"));
+			documentClient.update(sid, docInfo);
 		} catch (RuntimeException e1) {
 			e1.printStackTrace();
 		}
 
 		// VERIFY THE CHANGES to the tags
-		WSDocument docInfoUpd = docc.getDocument(sid, docId);
-		String[] tags2 = docInfoUpd.getTags();
+		WSDocument docInfoUpd = documentClient.getDocument(sid, docId);
+		List<String> tags2 = docInfoUpd.getTags();
 		assertNotNull(tags2);
-		assertEquals(3, tags2.length);
+		assertEquals(3, tags2.size());
 
 		// Delete the document just created
-		docc.delete(sid, docId);
+		documentClient.delete(sid, docId);
 
 		// verify the effective deletion of the document
 		try {
-			docInfo = docc.getDocument(sid, docId);
+			docInfo = documentClient.getDocument(sid, docId);
 			assertNull(docInfo);
 		} catch (RuntimeException e) {
 			e.printStackTrace();

@@ -1,6 +1,7 @@
 package com.logicaldoc.webservicesamples.junit;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,51 +14,59 @@ import javax.activation.FileDataSource;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSAttribute;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.soap.client.SoapDocumentClient;
 import com.logicaldoc.webservice.soap.client.SoapFolderClient;
 
-public class TstMassiveImportSack extends BaseUnit  {
+public class TstMassiveImportSack extends BaseTestCase {
 
 	private static final int TIME_ATTENTION_TRESHOLD = 30000;
 
 	private static final int MAX_DOCUMENTS_TOBE_INSERTED = 15000;
-	
+
 	protected static Log log = LogFactory.getLog(TstMassiveImportSack.class);
 
-	private static SoapDocumentClient dclient;
-	private static SoapFolderClient fclient;
-	
 	private long startTime;
+
 	public int docsInserted = 0;
+
 	public int foldersCreated = 0;
 
-	public TstMassiveImportSack(String arg0) {
-		super(arg0);		
-	}
+	private SoapFolderClient folderClient;
 
+	private SoapDocumentClient documentClient;
+
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		dclient = new SoapDocumentClient(DOC_ENDPOINT);
-		fclient = new SoapFolderClient(FOLDER_ENDPOINT);
+
+		folderClient = new SoapFolderClient(settings.getProperty("url") + "/services/Folder");
+		documentClient = new SoapDocumentClient(settings.getProperty("url") + "/services/Document");
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		
+
 		log.error("Time: " + new java.util.Date());
 		log.error("Inserted Documents: " + docsInserted);
 		log.error("Created Folders: " + foldersCreated);
 		long elapsedTime = System.currentTimeMillis() - startTime;
-		double seconds = elapsedTime / 1000;		
+		double seconds = elapsedTime / 1000;
 		log.error("Job ended in: " + Math.round(seconds) + " seconds");
 		log.error("Job started at: " + new java.util.Date(startTime));
 		log.error("Job ended at: " + new java.util.Date());
 	}
 
+	@Test
 	public void testMassiveImportSack() {
 		docsInserted = 0;
 		startTime = System.currentTimeMillis();
@@ -65,8 +74,8 @@ public class TstMassiveImportSack extends BaseUnit  {
 			// String sDir = "C:/Users/Cecio/Documents/Logical"; // 1866
 			// documents, 270 folders
 			String sDir = "C:/Users/alle/Documents/Logical"; // 9220 files,
-																	// 1096
-																	// folders
+																// 1096
+																// folders
 			importFolderSack(sDir, DEFAULT_WORKSPACE);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -74,7 +83,8 @@ public class TstMassiveImportSack extends BaseUnit  {
 		}
 	}
 
-	private void importFolderSack(String sDir, long parentId) throws Exception {
+	private void importFolderSack(String sDir, long parentId) throws AuthenticationException, PermissionException,
+			PersistenceException, WebserviceException, IOException {
 
 		File[] faFiles = new File(sDir).listFiles();
 
@@ -101,15 +111,14 @@ public class TstMassiveImportSack extends BaseUnit  {
 				System.out.println(file.getAbsolutePath());
 				// Import document
 				long templateid = 2L;
-				WSAttribute[] attributes = getAttributes(templateid);
 
-				createDocumentSack(parentId, file, templateid, attributes);
+				createDocumentSack(parentId, file, templateid, getAttributes(templateid));
 				docsInserted++;
 			}
 		}
 	}
 
-	private WSAttribute[] getAttributes(long templateid) {
+	private List<WSAttribute> getAttributes(long templateid) {
 
 		List<WSAttribute> attributes = new ArrayList<WSAttribute>();
 		Date deldate = new Date();
@@ -138,7 +147,7 @@ public class TstMassiveImportSack extends BaseUnit  {
 			WSAttribute attr4 = new WSAttribute();
 			attr4.setName("outlet");
 			attr4.setType(WSAttribute.TYPE_INT);
-			attr4.setIntValue(new Long(966838));
+			attr4.setIntValue(Long.valueOf(966838L));
 			attributes.add(attr4);
 
 			WSAttribute attr5 = new WSAttribute();
@@ -154,15 +163,15 @@ public class TstMassiveImportSack extends BaseUnit  {
 			attributes.add(attr6);
 		}
 
-		return attributes.toArray(new WSAttribute[0]);
+		return attributes;
 	}
 
-	private void createDocumentSack(long targetFolder, File file, long templateid, WSAttribute[] attributes)
-			throws Exception {
+	private void createDocumentSack(long targetFolder, File file, long templateid, List<WSAttribute> attributes)
+			throws AuthenticationException, PermissionException, PersistenceException, IOException,
+			WebserviceException {
 
 		// DataSource ds = new FileDataSource(file);
-		DataSource ds = new FileDataSource(
-				new File("C:/tmp/DEL_01X06180519_07-01-2011.pdf"));
+		DataSource ds = new FileDataSource(new File("C:/tmp/DEL_01X06180519_07-01-2011.pdf"));
 		DataHandler content = new DataHandler(ds);
 
 		WSDocument document = new WSDocument();
@@ -173,35 +182,28 @@ public class TstMassiveImportSack extends BaseUnit  {
 		document.setFolderId(targetFolder);
 		document.setLanguage("en");
 
-		if (attributes != null && attributes.length > 0) {
+		if (attributes != null && attributes.size() > 0) {
 			document.setTemplateId(templateid);
 			document.setAttributes(attributes);
 		}
 
 		long startTime = System.currentTimeMillis();
-		try {
-			WSDocument docRes = dclient.create(sid, document, content);
-			System.out.println("Created documentID = " + docRes.getId());
-			long timeElapsed = System.currentTimeMillis() - startTime;
-			if (timeElapsed > TIME_ATTENTION_TRESHOLD)
-				System.err.println("Document created in: " + timeElapsed + " ms");
-		} catch (Exception e) {
-			long timeElapsed = System.currentTimeMillis() - startTime;
-			System.err.println("Error after: " + timeElapsed + " ms");
-			throw e;
-		}
+		WSDocument docRes = documentClient.create(sid, document, content);
+		System.out.println("Created documentID = " + docRes.getId());
+		long timeElapsed = System.currentTimeMillis() - startTime;
+		if (timeElapsed > TIME_ATTENTION_TRESHOLD)
+			System.err.println("Document created in: " + timeElapsed + " ms");
+
 	}
 
-	private long createFolder(String name, long parentId) throws Exception {
+	private long createFolder(String name, long parentId)
+			throws AuthenticationException, PermissionException, PersistenceException, WebserviceException {
 
 		// Check if a subfolder of the parent folder has the same name
-		WSFolder[] dsds = fclient.listChildren(sid, parentId);
-		if (dsds != null) {
-			for (int i = 0; i < dsds.length; i++) {
-				if (dsds[i].getName().equals(name)) {
-					// System.out.println("FOLDER EXIST");
-					return dsds[i].getId();
-				}
+		List<WSFolder> children = folderClient.listChildren(sid, parentId);
+		for (WSFolder wsFolder : children) {
+			if (wsFolder.getName().equals(name)) {
+				return wsFolder.getId();
 			}
 		}
 
@@ -211,80 +213,9 @@ public class TstMassiveImportSack extends BaseUnit  {
 		folder.setName(name);
 		folder.setParentId(parentId);
 
-		long startTime = System.currentTimeMillis();
-		try {
-			WSFolder fcreated = fclient.create(sid, folder);
-			foldersCreated++;
-			System.out.println("Created folderID = " + fcreated.getId());
-			return fcreated.getId();
-		} catch (Exception e) {
-			long timeElapsed = System.currentTimeMillis() - startTime;
-			System.err.println("TimeOut after: " + timeElapsed + " ms");
-			throw e;
-		}
+		WSFolder createdFolder = folderClient.create(sid, folder);
+		foldersCreated++;
+		System.out.println("Created folderID = " + createdFolder.getId());
+		return createdFolder.getId();
 	}
-
-	private void importFolder(String sDir, long parentId) throws Exception {
-
-		File[] faFiles = new File(sDir).listFiles();
-
-		for (File file : faFiles) {
-			if (docsInserted >= MAX_DOCUMENTS_TOBE_INSERTED) {
-				System.err.println("Reached limit of " + MAX_DOCUMENTS_TOBE_INSERTED + " document imported");
-				return;
-			}
-
-			if (file.isDirectory()) {
-				// System.out.println("FOLDER: " + file.getName());
-				// Creation of the folder tree
-				long childFolder = createFolder(file.getName(), parentId);
-				importFolder(file.getAbsolutePath(), childFolder);
-			} else {
-				if (file.length() < 31615) {
-					if (docsInserted % 100 == 0)
-						System.err.println("Documents currently Created: " + docsInserted);
-
-					// ****************************************************
-					// Add file to document repository
-					// ****************************************************
-					System.out.println(file.getAbsolutePath());
-					// Import document
-					long templateid = 2L;
-					WSAttribute[] attributes = getAttributes(templateid);
-
-					createDocument(parentId, file, templateid, attributes);
-					docsInserted++;
-				}
-			}
-		}
-	}
-
-	private void createDocument(long targetFolder, File file, long templateid, WSAttribute[] attributes)
-			throws Exception {
-
-		DataSource ds = new FileDataSource(file);
-		DataHandler content = new DataHandler(ds);
-
-		WSDocument document = new WSDocument();
-		document.setFileName(file.getName());
-
-		document.setFolderId(targetFolder);
-		document.setLanguage("en");
-
-		if (attributes != null && attributes.length > 0) {
-			document.setTemplateId(templateid);
-			document.setAttributes(attributes);
-		}
-
-		long startTime = System.currentTimeMillis();
-		try {
-			WSDocument docRes = dclient.create(sid, document, content);
-			System.out.println("Created documentID = " + docRes.getId());
-		} catch (Exception e) {
-			long timeElapsed = System.currentTimeMillis() - startTime;
-			System.err.println("Error after: " + timeElapsed + " ms");
-			throw e;
-		}
-	}
-
 }
