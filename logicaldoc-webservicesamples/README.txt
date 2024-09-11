@@ -9,7 +9,7 @@
 
                     LogicalDOC Community Edition
 
-You need Java 21, Maven 3.0.x
+You need Java 21, Maven 3.9.x
 
 Launch the creation of the Eclipse project by doing:
 mvn eclipse:eclipse
