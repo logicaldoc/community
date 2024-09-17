@@ -58,6 +58,7 @@ public class AttributesDataServlet extends AbstractDataServlet {
 				printAttibute("user", I18N.message("user", locale), Attribute.TYPE_USER, writer);
 			}
 
+			printAttibute("customId", I18N.message("customid", locale), writer);
 			printAttibute("filename", I18N.message("filename", locale), writer);
 			printAttibute("lastModified", I18N.message("lastmodified", locale), writer);
 			printAttibute("user", I18N.message("user", locale), Attribute.TYPE_DATE, writer);
