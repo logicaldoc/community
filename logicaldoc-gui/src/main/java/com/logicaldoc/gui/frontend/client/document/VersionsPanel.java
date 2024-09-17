@@ -14,18 +14,20 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.GridUtil;
+import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.note.VersionNotesWindow;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.widgets.grid.ListGrid;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -51,7 +53,7 @@ public class VersionsPanel extends DocumentDetailTab {
 
 	private static final String FILE_VERSION = "fileVersion";
 
-	private ListGrid list = null;
+	private RefreshableListGrid list = null;
 
 	public VersionsPanel(final GUIDocument document) {
 		super(document, null);
@@ -78,12 +80,12 @@ public class VersionsPanel extends DocumentDetailTab {
 		ListGridField permalink = preparePermalink();
 
 		ListGridField wfStatus = prepareWorkflow();
-
-		list = new ListGrid();
+				
+		list = new RefreshableListGrid(
+				new VersionsDS(document.getId(), null, Session.get().getConfigAsInt("gui.maxversions")));
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
-		list.setDataSource(new VersionsDS(document.getId(), null, 100));
 		if (document.getFolder().isDownload())
 			list.setFields(user, event, fileName, type, fileVersion, version, date, permalink, wfStatus, comment);
 		else
@@ -104,6 +106,17 @@ public class VersionsPanel extends DocumentDetailTab {
 	private ToolStrip prepareButtons() {
 		ToolStrip buttons = new ToolStrip();
 		buttons.setWidth100();
+
+		SpinnerItem maxItem = ItemFactory.newSpinnerItem("max", "display",
+				Session.get().getConfigAsInt("gui.maxversions"), 1, (Integer) null);
+		maxItem.setWidth(70);
+		maxItem.setStep(20);
+		maxItem.setSaveOnEnter(true);
+		maxItem.setImplicitSave(true);
+		maxItem.setHint(I18N.message("elements"));
+		buttons.addFormItem(maxItem);
+		maxItem.addChangedHandler(evnt -> list
+				.refresh(new VersionsDS(document.getId(), null, Integer.parseInt(maxItem.getValueAsString()))));
 
 		ToolStripButton export = new ToolStripButton(I18N.message("export"));
 		export.addClickHandler(clkEvent -> GridUtil.exportCSV(list, true));

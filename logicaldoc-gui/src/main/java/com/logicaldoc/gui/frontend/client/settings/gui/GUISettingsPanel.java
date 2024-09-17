@@ -351,6 +351,11 @@ public class GUISettingsPanel extends AdminPanel {
 		maxHistories.setStep(10);
 		maxHistories.setWrapTitle(false);
 
+		SpinnerItem maxVersions = ItemFactory.newSpinnerItem("maxversions",
+				Integer.parseInt(Util.getParameterValue(settings, "gui.maxversions").trim()));
+		maxVersions.setStep(10);
+		maxVersions.setWrapTitle(false);
+		
 		RadioGroupItem foldPagination = ItemFactory.newBooleanSelector("foldpagination");
 		foldPagination.setWrapTitle(false);
 		foldPagination.setValue(yesNo(settings, "gui.folder.pagination"));
@@ -450,7 +455,7 @@ public class GUISettingsPanel extends AdminPanel {
 				showAvatarsInGrids, textExtensions, attrTextBoxW, attrTextAreaW, attrTextAreaH, noteMaxSize,
 				emailMaxSize, wfDashletRows, ondoubleclick, docTab, foldSorting, securityOption,
 				securitySecurityOptionDefault, foldOpentree, foldOpenSelect, foldPagination, foldPageSize,
-				showDocAttrsAsLinks, openPreviewPanel, maxHistories, autocloseFolderNodes, webstartMode, galleryEnabled,
+				showDocAttrsAsLinks, openPreviewPanel, maxHistories, maxVersions, autocloseFolderNodes, webstartMode, galleryEnabled,
 				allowNotesEditing, webcontentFolders, downloadTicketBehavior, saveLogin, sessionTimeout, rpcTimeout,
 				sessionHeartbeat, popupTimeout, charset, lockOnEditing, askVersionCommentOnSave, reactToRemoteEvents,
 				showPushErrors, saveInputs, showVersionAlertsInLogin, showLicenseAlertsInLogin, showQuotaAlertsInLogin,
@@ -528,6 +533,8 @@ public class GUISettingsPanel extends AdminPanel {
 				values.get("foldpagesize").toString()));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.maxhistories",
 				values.get("maxhistories").toString()));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".gui.maxversions",
+				values.get("maxversions").toString()));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".upload.maxsize",
 				values.get("uploadmax").toString()));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".upload.disallow",

@@ -252,7 +252,7 @@ public class EMailSender {
 	 * @throws MessagingException raised if the email cannot be sent
 	 */
 	public void send(EMail email, String templateName, Map<String, Object> dictionary) throws MessagingException {
-		if (RunLevel.current().aspectEnabled("sendingMessages")) {
+		if (!RunLevel.current().aspectEnabled("sendingMessages")) {
 			log.error("Aspect not enabled");
 			throw new MessagingException("Aspect sendingMessages not enabled");
 		}
