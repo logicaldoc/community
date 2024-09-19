@@ -187,18 +187,17 @@ public final class TrackManager {
                         .getConvertedData(downloadUri, downloadExt, curExt,
                                 ServiceConverter.generateRevisionId(downloadUri),
                                 null, false, null).get("fileUrl");  // convert file and get url to a new file
+                
                 if (newFileUri.isEmpty()) {
-
                     // get the correct file name if it already exists
-                    newFileName = OODocumentManager
-                            .getCorrectName(FileUtility
-                                    .getFileNameWithoutExtension(fileName) + "." + downloadExt, userAddress);
+                    //newFileName = OODocumentManager.getCorrectName(FileUtility.getFileNameWithoutExtension(fileName) + "." + downloadExt, userAddress);
+                	newFileName = FileUtility.getFileNameWithoutExtension(fileName) + "." + downloadExt;
                 } else {
                     downloadUri = newFileUri;
                 }
             } catch (Exception e) {
-                newFileName = OODocumentManager.getCorrectName(FileUtility
-                        .getFileNameWithoutExtension(fileName) + "." + downloadExt, userAddress);
+                //newFileName = OODocumentManager.getCorrectName(FileUtility.getFileNameWithoutExtension(fileName) + "." + downloadExt, userAddress);
+            	newFileName = FileUtility.getFileNameWithoutExtension(fileName) + "." + downloadExt;
             }
         }
 
@@ -331,6 +330,7 @@ public final class TrackManager {
                         .getConvertedData(downloadUri, downloadExt, curExt,
                                 ServiceConverter.generateRevisionId(downloadUri), null,
                                 false, null).get("fileUrl");  // convert file and get url to a new file
+                
                 if (newFileUri.isEmpty()) {
                     newFileName = true;
                 } else {
@@ -349,17 +349,18 @@ public final class TrackManager {
         	System.out.println("the form is submitted");
             // new file
             if (newFileName) {
-                fileName = OODocumentManager.getCorrectName(FileUtility.getFileNameWithoutExtension(fileName)
-                        + "-form." + downloadExt, userAddress);  // get the correct file name if it already exists
+            	// get the correct file name if it already exists
+                //fileName = OODocumentManager.getCorrectName(FileUtility.getFileNameWithoutExtension(fileName) + "-form." + downloadExt, userAddress);  
+            	fileName = FileUtility.getFileNameWithoutExtension(fileName) + "-form." + downloadExt;
             } else {
-                fileName = OODocumentManager.getCorrectName(FileUtility.getFileNameWithoutExtension(fileName)
-                        + "-form." + curExt, userAddress);
+                //fileName = OODocumentManager.getCorrectName(FileUtility.getFileNameWithoutExtension(fileName) + "-form." + curExt, userAddress);
+            	fileName = FileUtility.getFileNameWithoutExtension(fileName) + "-form." + curExt;
             }
             forcesavePath = OODocumentManager.storagePath(fileName, userAddress);
         } else {
             if (newFileName) {
-                fileName = OODocumentManager.getCorrectName(FileUtility
-                        .getFileNameWithoutExtension(fileName) + downloadExt, userAddress);
+                //fileName = OODocumentManager.getCorrectName(FileUtility.getFileNameWithoutExtension(fileName) + downloadExt, userAddress);
+            	fileName = FileUtility.getFileNameWithoutExtension(fileName) +"." + downloadExt;
             }
 
             // create forcesave path if it doesn't exist
@@ -407,7 +408,7 @@ public final class TrackManager {
         String sid = request.getParameter("sid");
         System.out.println("sid: " +sid);
         if (sid == null || sid.isEmpty()) {
-        	System.out.println("sid: IS EMPTY OR NULL, treminate execution!");
+        	System.out.println("sid: IS EMPTY OR NULL, terminate execution!");
         	return;
         }
         	
