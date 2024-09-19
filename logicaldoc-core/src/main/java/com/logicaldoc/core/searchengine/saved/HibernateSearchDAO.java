@@ -1,6 +1,5 @@
 package com.logicaldoc.core.searchengine.saved;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,6 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.util.sql.SqlUtil;
 
 /**
  * Hibernate implementation of {@link SearchDAO}
@@ -28,19 +26,13 @@ public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch
 
 	@Override
 	public List<SavedSearch> findByUserId(long userId) throws PersistenceException {
-		Map<String, Object> params = new HashMap<>();
-		params.put("userId", userId);
-		return findByWhere(ENTITY + ".userId = :userId", params, ENTITY + ".name asc", null);
+		return findByWhere(ENTITY + ".userId = :userId", Map.of("userId", userId), ENTITY + ".name asc", null);
 	}
 
 	@Override
 	public SavedSearch findByUserIdAndName(long userId, String name) throws PersistenceException {
-		Map<String, Object> params = new HashMap<>();
-		params.put("userId", userId);
-		params.put("name", name);
-
-		List<SavedSearch> searches = findByWhere(
-				ENTITY + ".userId = :userId and " + ENTITY + ".name = :name", params, null, null);
+		List<SavedSearch> searches = findByWhere(ENTITY + ".userId = :userId and " + ENTITY + ".name = :name",
+				Map.of("userId", userId, "name", name), null, null);
 		if (searches.isEmpty())
 			return null;
 		else
@@ -78,16 +70,12 @@ public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch
 		final Set<String> names = new HashSet<>();
 
 		StringBuilder query = new StringBuilder(
-				"select lower(ld_name) from ld_search where ld_deleted=0 and ld_userid=");
-		query.append(Long.toString(search.getId()));
-		query.append(" and lower(ld_name) like '");
-		query.append(SqlUtil.doubleQuotes(baseName.toLowerCase()));
-		query.append("%' and not ld_id=");
-		query.append(Long.toString(search.getId()));
+				"select lower(ld_name) from ld_search where ld_deleted=0 and ld_userid = :userId and lower(ld_name) like :baseName and not ld_id = :id");
 
 		// Execute the query to populate the sets
 		try {
-			SqlRowSet rs = queryForRowSet(query.toString(), null);
+			SqlRowSet rs = queryForRowSet(query.toString(), Map.of("userId", search.getUserId(), "baseName",
+					baseName.toLowerCase() + "%", "id", search.getId()), null);
 			if (rs != null)
 				while (rs.next()) {
 					String file = rs.getString(1);

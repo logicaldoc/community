@@ -2,7 +2,6 @@ package com.logicaldoc.core.sequence;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.util.sql.SqlUtil;
 
 /**
  * Hibernate implementation of <code>SequenceDAO</code>. <br>
@@ -87,11 +85,10 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 
 	@Override
 	public List<Sequence> findByName(String name, long tenantId) {
-		String query = " " + ENTITY + ".tenantId=" + tenantId;
-		query += AND + ENTITY + ".name like '" + SqlUtil.doubleQuotes(name) + "%' ";
+		String query = " " + ENTITY + ".tenantId = :tenantId " + AND + ENTITY + ".name like :name ";
 
 		try {
-			return findByWhere(query, null, null);
+			return findByWhere(query, Map.of("tenantId", tenantId, "name", name + "%"), null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -126,10 +123,10 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 	}
 
 	private Sequence findSequence(String sequenceName, long objectId, long tenantId, Sequence sequence) {
-		String query = "select ld_id from ld_sequence where ld_name='" + SqlUtil.doubleQuotes(sequenceName)
-				+ "' and ld_objectid=" + objectId + " and ld_tenantid=" + tenantId;
+		String query = "select ld_id from ld_sequence where ld_name = :name and ld_objectid = :objectId and ld_tenantid = :tenantId";
 		try {
-			long sequenceId = queryForLong(query);
+			long sequenceId = queryForLong(query,
+					Map.of("tenantId", tenantId, "objectId", objectId, "name", sequenceName));
 			if (sequenceId != 0L)
 				sequence = findById(sequenceId);
 		} catch (Exception t) {
@@ -141,16 +138,12 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 	private List<Sequence> findSequences(String sequenceName, long objectId, long tenantId) {
 		List<Sequence> sequences = new ArrayList<>();
 		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put("tenantId", tenantId);
-			params.put("objectId", objectId);
-			params.put("name", sequenceName);
-
 			String query = " " + ENTITY + ".tenantId = :tenantId ";
 			query += AND + ENTITY + ".objectId = :objectId ";
 			query += AND + ENTITY + ".name = :name ";
 
-			sequences = findByWhere(query, params, null, null);
+			sequences = findByWhere(query, Map.of("tenantId", tenantId, "objectId", objectId, "name", sequenceName),
+					null, null);
 		} catch (Exception t) {
 			// Nothing to do
 		}
