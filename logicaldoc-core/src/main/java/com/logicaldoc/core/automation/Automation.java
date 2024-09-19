@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -289,11 +291,31 @@ public class Automation {
 
 	}
 
+	private void forbidRuntimeUsage(String expression) throws SecurityException {
+		boolean forbidden = false;
+
+		if (expression.contains("java.lang.Runtime")) {
+			forbidden = true;
+		} else {
+			Pattern runtimePattern = Pattern.compile("\\.\\s*(getRuntime|runtime)", Pattern.DOTALL);
+			Matcher m = runtimePattern.matcher(expression);
+			while (m.find()) {
+				String snippet = expression.substring(Math.max(0, m.start() - 50),
+						Math.min(expression.length() - 1, m.end() + 50));
+				log.error("Detected possible suspicious access to java.lang.Runtime: {}", snippet);
+				forbidden = true;
+			}
+		}
+
+		if (forbidden)
+			throw new SecurityException(
+					"The script makes use of the forbidden class java.lang.Runtime and cannot be executed");
+	}
+
 	private void evaluate(String expression, Map<String, Object> clientDictionary, Writer writer) {
 		try {
-			if (expression.contains("java.lang.Runtime"))
-				throw new SecurityException(
-						"The script makes use of the forbidden class java.lang.Runtime and cannot be executed");
+			forbidRuntimeUsage(expression);
+
 			VelocityContext context = prepareContext(prepareDictionary(clientDictionary));
 			Velocity.evaluate(context, writer, StringUtils.isNotEmpty(logTag) ? logTag : "ScriptEngine", expression);
 		} catch (Exception e) {
