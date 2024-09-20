@@ -138,10 +138,10 @@ public class ContextMenu extends Menu {
 						@Override
 						public void onSuccess(GUIFolder selectedFolder) {
 							delete.setEnabled(!selectedFolder.isDefaultWorkspace());
-							move.setEnabled(false);
-							merge.setEnabled(false);
+							move.setEnabled(!selectedFolder.isDefaultWorkspace());
 							rename.setEnabled(!selectedFolder.isDefaultWorkspace());
 							createWorkspace.setEnabled(Feature.enabled(Feature.MULTI_WORKSPACE));
+							merge.setEnabled(false);
 						}
 					});
 	}
