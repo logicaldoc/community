@@ -676,7 +676,8 @@ public final class OODocumentManager {
             + File.separator;
 
         // get a file name with an index if the file with such a name already exists
-        String fileName = getCorrectName(demoName, null);
+        //String fileName = getCorrectName(demoName, null);
+        String fileName = demoName;
 
         // get the input file stream
         InputStream stream = Thread.currentThread()
