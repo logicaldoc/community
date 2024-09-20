@@ -247,6 +247,10 @@ public abstract class AbstractStorer implements Storer {
 		return getConfig().getProperty(STORE + id + ".dir");
 	}
 
+	protected String sanitizeResourceName(String resourceName) {
+		return resourceName.replace("..", "").replace("/", "").replace("\\", "");
+	}
+	
 	@Override
 	public String getResourceName(Document doc, String fileVersion, String suffix) {
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -257,7 +261,7 @@ public abstract class AbstractStorer implements Storer {
 		 * current version, but the filename is the version number without
 		 * extension, e.g. "docId/2.1"
 		 */
-		String filename;
+		String resourceName;
 		if (doc.getDocRef() != null) {
 			// The shortcut document doesn't have the 'fileversion' and the
 			// 'version'
@@ -269,20 +273,20 @@ public abstract class AbstractStorer implements Storer {
 		}
 
 		if (StringUtils.isEmpty(fileVersion))
-			filename = document.getFileVersion();
+			resourceName = document.getFileVersion();
 		else
-			filename = fileVersion;
-		if (StringUtils.isEmpty(filename))
-			filename = document.getVersion();
+			resourceName = fileVersion;
+		if (StringUtils.isEmpty(resourceName))
+			resourceName = document.getVersion();
 
 		/*
 		 * Document's related resources are stored with a suffix, e.g.
 		 * "doc/2.1-thumb.png"
 		 */
 		if (StringUtils.isNotEmpty(suffix))
-			filename += "-" + suffix;
+			resourceName += "-" + suffix;
 
-		return filename;
+		return sanitizeResourceName(resourceName);
 	}
 
 	@Override
