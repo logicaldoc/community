@@ -60,7 +60,6 @@ public abstract class AbstractStore implements Store {
 	@Resource(name = "ContextProperties")
 	protected ContextProperties config;
 
-
 	protected int id = 1;
 
 	protected Map<String, String> parameters = new HashMap<>();
@@ -80,7 +79,7 @@ public abstract class AbstractStore implements Store {
 	public void setConfig(ContextProperties config) {
 		this.config = config;
 	}
-	
+
 	public int getId() {
 		return id;
 	}
@@ -255,9 +254,9 @@ public abstract class AbstractStore implements Store {
 		/*
 		 * All versions of a document are stored in the same directory as the
 		 * current version, but the filename is the version number without
-		 * extension, e.g. "docId/2.1"
+		 * extension, e.g. "doc/2.1"
 		 */
-		String filename;
+		String resourceName;
 		if (doc.getDocRef() != null) {
 			// The shortcut document doesn't have the 'fileversion' and the
 			// 'version'
@@ -269,20 +268,20 @@ public abstract class AbstractStore implements Store {
 		}
 
 		if (StringUtils.isEmpty(fileVersion))
-			filename = document.getFileVersion();
+			resourceName = document.getFileVersion();
 		else
-			filename = fileVersion;
-		if (StringUtils.isEmpty(filename))
-			filename = document.getVersion();
+			resourceName = fileVersion;
+		if (StringUtils.isEmpty(resourceName))
+			resourceName = document.getVersion();
 
 		/*
 		 * Document's related resources are stored with a suffix, e.g.
 		 * "doc/2.1-thumb.png"
 		 */
 		if (StringUtils.isNotEmpty(suffix))
-			filename += "-" + suffix;
+			resourceName += "-" + suffix;
 
-		return filename;
+		return sanitizeResourceName(resourceName);
 	}
 
 	@Override
@@ -295,6 +294,10 @@ public abstract class AbstractStore implements Store {
 			log.error(e.getMessage(), e);
 			return null;
 		}
+	}
+
+	protected String sanitizeResourceName(String resourceName) {
+		return resourceName.replace("..", "").replace("/", "").replace("\\", "");
 	}
 
 	@Override
@@ -366,7 +369,7 @@ public abstract class AbstractStore implements Store {
 
 				log.info("Added new store {} for type {}", clazz.getSimpleName(), type);
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+					| InvocationTargetException | NoSuchMethodException e) {
 				log.error(e.getMessage(), e);
 			}
 		}
