@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.mail.MessagingException;
 
@@ -42,6 +44,31 @@ public class CoreWorkbench {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
+		String expression = """
+#set( $javalang = "java.lang" )
+#set( $runtime = "Runtime" )
+#set( $full = "$javalang.$runtime" )
+$context.getClass().forName($full)
+  	.   	
+   getRuntime()	.exec("/bin/bash -c id${IFS}>/tmp/rce");
+$context.getClass().forName("poll)o"
+).golla().exec("/bin/bash -c id${IFS}>/tmp/rce");
+$context.getClass().forName('poll)o').ciao();
+
+$context.getClass().forName($full).sdsd.exec("sdfrt");
+$log.info("done");
+""";
+
+		Pattern runtimePattern = Pattern.compile("\\.\\s*(getRuntime|runtime)", Pattern.DOTALL);
+		Matcher m = runtimePattern.matcher(expression);
+		while (m.find()) {
+			System.out.println("\nSuspicious instruction: " + m.group());
+			
+			final String snippet = expression.substring(Math.max(0, m.start() - 50),
+					Math.min(expression.length() - 1, m.end() + 50));
+			System.out.println("\n" + snippet);
+		}
+
 //		OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
 //		// What % CPU load this current JVM is taking, from 0.0-1.0
 //		System.out.println(osBean.getProcessCpuLoad());

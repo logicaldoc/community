@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.automation.Automation;
+import com.logicaldoc.core.automation.AutomationException;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.communication.Message;
@@ -325,7 +326,7 @@ public class LoginThrottle {
 					EMailSender sender = (EMailSender) Context.get().getBean(EMailSender.class);
 					sender.sendAsync(email);
 				}
-			} catch (PersistenceException e) {
+			} catch (PersistenceException | AutomationException e) {
 				log.warn(e.getMessage(), e);
 			}
 		}, "BruteForceAttack", 500);

@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.automation.Automation;
+import com.logicaldoc.core.automation.AutomationException;
 import com.logicaldoc.core.communication.oauth.Microsoft365TokenProvider;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentHistory;
@@ -250,8 +251,9 @@ public class EMailSender {
 	 * @param dictionary The dictionary to be used in the template
 	 * 
 	 * @throws MessagingException raised if the email cannot be sent
+	 * @throws AutomationException the automation has been evaluated but produced an error
 	 */
-	public void send(EMail email, String templateName, Map<String, Object> dictionary) throws MessagingException {
+	public void send(EMail email, String templateName, Map<String, Object> dictionary) throws MessagingException, AutomationException {
 		if (!RunLevel.current().aspectEnabled("sendingMessages")) {
 			log.error("Aspect not enabled");
 			throw new MessagingException("Aspect sendingMessages not enabled");

@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.automation.Automation;
+import com.logicaldoc.core.automation.AutomationException;
 import com.logicaldoc.util.LocaleUtil;
 
 /**
@@ -44,7 +45,7 @@ public class MessageTemplate extends PersistentObject {
 		setTenantId(source.getTenantId());
 	}
 
-	private String getFormattedContent(Map<String, Object> dictionary, String text) {
+	private String getFormattedContent(Map<String, Object> dictionary, String text) throws AutomationException {
 		Automation script = new Automation(getName(), LocaleUtil.toLocale(language), getTenantId());
 		String content = script.evaluate(text, dictionary);
 		if (content != null)
@@ -52,11 +53,11 @@ public class MessageTemplate extends PersistentObject {
 		return content;
 	}
 
-	public String getFormattedBody(Map<String, Object> dictionary) {
+	public String getFormattedBody(Map<String, Object> dictionary) throws AutomationException {
 		return getFormattedContent(dictionary, getBody());
 	}
 
-	public String getFormattedSubject(Map<String, Object> dictionary) {
+	public String getFormattedSubject(Map<String, Object> dictionary) throws AutomationException {
 		return getFormattedContent(dictionary, getSubject());
 	}
 

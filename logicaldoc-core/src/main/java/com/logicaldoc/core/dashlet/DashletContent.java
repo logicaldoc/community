@@ -30,6 +30,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.automation.Automation;
+import com.logicaldoc.core.automation.AutomationException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentHistory;
@@ -106,7 +107,8 @@ public class DashletContent extends HttpServlet {
 				handleNote(dashlet, dashletDictionary, automation, writer);
 			else if (Dashlet.TYPE_CONTENT.equals(dashlet.getType()))
 				handleContent(dashlet, dashletDictionary, automation, writer);
-		} catch (NumberFormatException | ServletException | PersistenceException | IOException e) {
+		} catch (NumberFormatException | ServletException | PersistenceException | IOException
+				| AutomationException e) {
 			log.error(e.getMessage(), e);
 			try {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -124,7 +126,7 @@ public class DashletContent extends HttpServlet {
 
 	private void handleDocumentEvent(boolean showSid, Locale locale, Dashlet dashlet,
 			Map<String, Object> dashletDictionary, Automation automation, PrintWriter writer)
-			throws PersistenceException {
+			throws PersistenceException, AutomationException {
 		if (StringUtils.isNotEmpty(dashlet.getContent())) {
 			String content = automation.evaluate(dashlet.getContent(), dashletDictionary);
 			if (StringUtils.isNotEmpty(content))
@@ -354,7 +356,7 @@ public class DashletContent extends HttpServlet {
 	}
 
 	private void handleDocument(Locale locale, Dashlet dashlet, Map<String, Object> dashletDictionary,
-			Automation automation, PrintWriter writer) throws PersistenceException {
+			Automation automation, PrintWriter writer) throws PersistenceException, AutomationException {
 		if (StringUtils.isNotEmpty(dashlet.getContent())) {
 			String content = automation.evaluate(dashlet.getContent(), dashletDictionary);
 			if (StringUtils.isNotEmpty(content))
@@ -507,7 +509,7 @@ public class DashletContent extends HttpServlet {
 	}
 
 	private void handleNote(Dashlet dashlet, Map<String, Object> dashletDictionary, Automation automation,
-			PrintWriter writer) {
+			PrintWriter writer) throws AutomationException {
 
 		if (StringUtils.isNotEmpty(dashlet.getContent())) {
 			String content = automation.evaluate(dashlet.getContent(), dashletDictionary);
@@ -554,7 +556,7 @@ public class DashletContent extends HttpServlet {
 	}
 
 	private void handleContent(Dashlet dashlet, Map<String, Object> dashletDictionary, Automation automation,
-			PrintWriter writer) {
+			PrintWriter writer) throws AutomationException {
 		String content = automation.evaluate(dashlet.getContent(), dashletDictionary);
 		if (StringUtils.isNotEmpty(content))
 			writer.write(content.trim());

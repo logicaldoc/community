@@ -73,7 +73,7 @@ public class DocumentListenerManager {
 					log.info("Added new document listener {} position {}", className,
 							ext.getParameter(POSITION).valueAsString());
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+					| InvocationTargetException | NoSuchMethodException e) {
 				log.error(e.getMessage());
 			}
 		}

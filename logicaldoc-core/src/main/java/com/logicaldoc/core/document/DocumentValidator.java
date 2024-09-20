@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.automation.AutomationException;
 import com.logicaldoc.core.metadata.validation.ValidationException;
 import com.logicaldoc.core.metadata.validation.Validator;
 
@@ -65,6 +66,9 @@ public class DocumentValidator extends Validator implements DocumentListener {
 				return;
 
 			validate(document, document.getTemplate(), transaction);
+		} catch (AutomationException e) {
+			log.warn(e.getMessage(), e);
+			dictionary.put(VALIDATED_FLAG, "false");
 		} finally {
 			dictionary.put(VALIDATED_FLAG, "true");
 		}

@@ -18,7 +18,7 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 public class AutomationTest extends AbstractCoreTestCase {
 
 	@Test
-	public void testAutomation() {
+	public void testAutomation() throws AutomationException {
 		Map<String, Object> dict = new HashMap<>();
 		dict.put("testval", "abc");
 

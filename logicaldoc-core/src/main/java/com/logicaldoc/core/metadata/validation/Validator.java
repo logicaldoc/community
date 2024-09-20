@@ -15,6 +15,7 @@ import com.logicaldoc.core.History;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.automation.Automation;
+import com.logicaldoc.core.automation.AutomationException;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.metadata.Template;
@@ -43,8 +44,11 @@ public class Validator {
 	 * 
 	 * @throws ValidationException in case of invalid object, this exception
 	 *         contains all the errors descriptions
+	 * @throws AutomationException the automation has been evaluated but
+	 *         produced an error
 	 */
-	public void validate(ExtensibleObject object, Template template, History transaction) throws ValidationException {
+	public void validate(ExtensibleObject object, Template template, History transaction)
+			throws ValidationException, AutomationException {
 		if (!RunLevel.current().aspectEnabled("validation"))
 			return;
 
@@ -106,7 +110,7 @@ public class Validator {
 	}
 
 	private void validateAttributes(ExtensibleObject object, Template template, History transaction,
-			Map<String, String> errors) {
+			Map<String, String> errors) throws AutomationException {
 		for (String attributeName : template.getAttributeNames()) {
 			Attribute attribute = object.getAttribute(attributeName);
 			if (attribute == null)
@@ -119,7 +123,7 @@ public class Validator {
 	}
 
 	private void executeObjectValidation(ExtensibleObject object, Template template, History transaction,
-			Map<String, String> errors) {
+			Map<String, String> errors) throws AutomationException {
 
 		Map<String, Object> automationDictionary = new HashMap<>();
 		automationDictionary.put("object", object);
@@ -141,7 +145,7 @@ public class Validator {
 	}
 
 	private void executeAttributeValidation(ExtensibleObject object, History transaction, Map<String, String> errors,
-			String attributeName, Attribute attribute, Attribute templateAttribute) {
+			String attributeName, Attribute attribute, Attribute templateAttribute) throws AutomationException {
 		Map<String, Object> fieldValidationDictionary = new HashMap<>();
 		fieldValidationDictionary.put("object", object);
 		fieldValidationDictionary.put("event", transaction);

@@ -42,6 +42,7 @@ import org.springframework.jdbc.core.RowMapper;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.automation.Automation;
+import com.logicaldoc.core.automation.AutomationException;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.EMailSender;
@@ -508,7 +509,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 				systemMessageDao.store(sys);
 			}
-		} catch (PersistenceException | MessagingException e) {
+		} catch (PersistenceException | MessagingException | AutomationException e) {
 			log.warn(e.getMessage(), e);
 		}
 	}
@@ -1172,7 +1173,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 			Validator validator = new Validator();
 			validator.validate(object, object.getTemplate(), transaction);
-		} catch (PersistenceException e) {
+		} catch (PersistenceException | AutomationException e) {
 			throwServerException(session, log, e);
 		}
 
@@ -1506,7 +1507,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			}
 
 			return sendEmail(mail, session, attachedDocs);
-		} catch (PermissionException | PersistenceException | IOException e) {
+		} catch (PermissionException | PersistenceException | IOException | AutomationException e) {
 			log.warn(e.getMessage(), e);
 			return "error";
 		}
@@ -2686,7 +2687,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				guiMail.setSubject(email.getSubject());
 				guiMail.setMessage(
 						email.isHtml() ? HTMLSanitizer.sanitize(email.getMessageText()) : email.getMessageText());
-				
+
 				guiMail.setSigned(email.isSigned());
 
 				setEmailRecipients(email, guiMail);

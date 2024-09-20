@@ -441,7 +441,7 @@ public class FormatConverterManager {
 			return new NoConversionConverter();
 
 		String inOutkey = composeKey(inFileName, outFileName);
-		
+
 		List<FormatConverter> formatConverters = getConverters().get(inOutkey);
 		if (formatConverters == null || formatConverters.isEmpty())
 			formatConverters = getConverters().get("*-pdf");
@@ -538,7 +538,7 @@ public class FormatConverterManager {
 					throw new ClassNotFoundException(String.format(
 							"The specified converter %s doesn't implement FormatConverter interface", className));
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+					| InvocationTargetException | NoSuchMethodException e) {
 				log.warn(e.getMessage(), e);
 				continue;
 			}

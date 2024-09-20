@@ -73,7 +73,7 @@ public class FolderListenerManager {
 					log.info("Added new folder listener {} position {}", className,
 							ext.getParameter(POSITION).valueAsString());
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+					| InvocationTargetException | NoSuchMethodException e) {
 				log.error(e.getMessage());
 			}
 

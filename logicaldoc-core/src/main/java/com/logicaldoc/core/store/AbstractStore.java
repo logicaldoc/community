@@ -60,7 +60,6 @@ public abstract class AbstractStore implements Store {
 	@Resource(name = "ContextProperties")
 	protected ContextProperties config;
 
-
 	protected int id = 1;
 
 	protected Map<String, String> parameters = new HashMap<>();
@@ -80,7 +79,7 @@ public abstract class AbstractStore implements Store {
 	public void setConfig(ContextProperties config) {
 		this.config = config;
 	}
-	
+
 	public int getId() {
 		return id;
 	}
@@ -366,7 +365,7 @@ public abstract class AbstractStore implements Store {
 
 				log.info("Added new store {} for type {}", clazz.getSimpleName(), type);
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+					| InvocationTargetException | NoSuchMethodException e) {
 				log.error(e.getMessage(), e);
 			}
 		}

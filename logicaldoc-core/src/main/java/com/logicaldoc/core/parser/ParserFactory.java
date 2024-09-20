@@ -161,7 +161,7 @@ public class ParserFactory {
 				parsers.put(ext, (Parser) parser);
 				log.info("Added new parser {} for extension {}", className, ext);
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+					| InvocationTargetException | NoSuchMethodException e) {
 				log.error(e.getMessage());
 			}
 

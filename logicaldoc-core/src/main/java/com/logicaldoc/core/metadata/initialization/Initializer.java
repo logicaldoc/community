@@ -13,6 +13,7 @@ import com.logicaldoc.core.History;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.automation.Automation;
+import com.logicaldoc.core.automation.AutomationException;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.metadata.Template;
@@ -92,7 +93,7 @@ public class Initializer {
 	}
 
 	private void executeInitialization(ExtensibleObject object, History transaction, String attributeName,
-			Attribute attribute, Attribute templateAttribute) {
+			Attribute attribute, Attribute templateAttribute) throws AutomationException {
 		Map<String, Object> fieldValidationDictionary = new HashMap<>();
 		fieldValidationDictionary.put("object", object);
 		fieldValidationDictionary.put("event", transaction);

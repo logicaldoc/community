@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.automation.Automation;
+import com.logicaldoc.core.automation.AutomationException;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.communication.Recipient;
@@ -115,7 +116,8 @@ public class PswRecovery extends HttpServlet {
 	}
 
 	private void sendEmail(HttpServletRequest request, HttpServletResponse response, String tenant, Ticket ticket,
-			User user) throws IOException, PersistenceException, MessagingException, NoSuchAlgorithmException {
+			User user) throws IOException, PersistenceException, MessagingException, NoSuchAlgorithmException,
+			AutomationException {
 
 		EMail email = new EMail();
 		email.setHtml(1);

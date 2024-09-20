@@ -932,8 +932,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 				throw new ServerException("Database Connection failure.");
 			}
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException | ClassNotFoundException | PluginException | ServerException
-				| SQLException e) {
+				| NoSuchMethodException | ClassNotFoundException | PluginException | ServerException | SQLException e) {
 			throwServerException(session, log, e);
 		}
 	}
@@ -1024,7 +1023,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 			if (pluginRegistry.isRestartRequired())
 				ApplicationListener.restartRequired();
-		} catch (ServerException | IOException | NoSuchMethodException | SecurityException | IllegalArgumentException
+		} catch (ServerException | IOException | NoSuchMethodException | IllegalArgumentException
 				| InvocationTargetException | PluginException e) {
 			throwServerException(session, log, e);
 		} finally {

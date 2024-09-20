@@ -27,6 +27,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.automation.Automation;
+import com.logicaldoc.core.automation.AutomationException;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.communication.Message;
@@ -267,7 +268,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			guiUser.setPasswordMinLenght(config.getInt(session.getTenantName() + PASSWORD_SIZE, 12));
 
 			return guiSession;
-		} catch (PersistenceException e) {
+		} catch (PersistenceException | AutomationException e) {
 			return (GUISession) throwServerException(session, log, e);
 		}
 	}
@@ -866,8 +867,11 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	 * @param password The decoded password
 	 * 
 	 * @throws MessagingException Cannot notify user
+	 * @throws AutomationException the script has been evaluated but produced an
+	 *         error
 	 */
-	private void notifyAccount(User user, String password) throws MessagingException {
+	private void notifyAccount(User user, String password)
+			throws MessagingException, AutomationException {
 		EMail email;
 		email = new EMail();
 		email.setHtml(1);
@@ -1394,32 +1398,26 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 		final String NAME_CONDITION = "_entity.name like '";
 		final String MORE_CONDITIONS = "%' and _entity.value >= :max and _entity.lastModified >= :oldestDate";
-		
+
 		try {
 			if (max > 0)
-				seqs.addAll(dao.findByWhere(
-						NAME_CONDITION + LoginThrottle.LOGINFAIL_USERNAME
-								+ MORE_CONDITIONS,
-						params, null, null));
+				seqs.addAll(dao.findByWhere(NAME_CONDITION + LoginThrottle.LOGINFAIL_USERNAME + MORE_CONDITIONS, params,
+						null, null));
 
 			max = config.getInt("throttle.ip.max", 0);
 			cal = Calendar.getInstance();
 			cal.add(Calendar.MINUTE, -config.getInt("throttle.ip.wait", 0));
 			if (max > 0)
-				seqs.addAll(dao.findByWhere(
-						NAME_CONDITION + LoginThrottle.LOGINFAIL_IP
-								+ MORE_CONDITIONS,
-						params, null, null));
-			
+				seqs.addAll(dao.findByWhere(NAME_CONDITION + LoginThrottle.LOGINFAIL_IP + MORE_CONDITIONS, params, null,
+						null));
+
 			max = config.getInt("throttle.apikey.max", 0);
 			cal = Calendar.getInstance();
 			cal.add(Calendar.MINUTE, -config.getInt("throttle.apikey.wait", 0));
 			if (max > 0)
-				seqs.addAll(dao.findByWhere(
-						NAME_CONDITION + LoginThrottle.LOGINFAIL_APIKEY
-								+ MORE_CONDITIONS,
-						params, null, null));
-			
+				seqs.addAll(dao.findByWhere(NAME_CONDITION + LoginThrottle.LOGINFAIL_APIKEY + MORE_CONDITIONS, params,
+						null, null));
+
 			ArrayList<GUISequence> ret = new ArrayList<>();
 			for (Sequence seq : seqs) {
 				GUISequence guiSeq = new GUISequence();
