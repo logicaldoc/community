@@ -384,6 +384,12 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 		client.replaceFile(sid, docId, fileVersion, comment, content);
 	}
 
+	public void replaceFile(String sid, long docId, String fileVersion, String comment, File content)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException,
+			UnexistingResourceException {
+		client.replaceFile(sid, docId, fileVersion, comment, new DataHandler(new FileDataSource(content)));
+	}
+
 	@Override
 	public void promoteVersion(String sid, long docId, String version) throws AuthenticationException,
 			PermissionException, WebserviceException, PersistenceException, IOException, UnexistingResourceException {

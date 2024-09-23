@@ -82,7 +82,8 @@ public class FSStore extends AbstractStore {
 
 		File dir = getContainer(docId);
 		FileUtils.forceMkdir(dir);
-		File dest = new File(new StringBuilder(dir.getPath()).append("/").append(resource).toString());
+		File dest = new File(
+				new StringBuilder(dir.getPath()).append("/").append(sanitizeResourceName(resource)).toString());
 		FileUtil.copyFile(file, dest);
 
 		checkWriteAfterStore(docId, resource, file.length());
@@ -97,7 +98,7 @@ public class FSStore extends AbstractStore {
 
 			File dir = getContainer(docId);
 			FileUtils.forceMkdir(dir);
-			file = new File(new StringBuilder(dir.getPath()).append("/").append(resource).toString());
+			file = new File(new StringBuilder(dir.getPath()).append("/").append(sanitizeResourceName(resource)).toString());
 			FileUtil.writeFile(stream, file.getPath());
 		} catch (IOException e) {
 			throw e;
@@ -111,14 +112,14 @@ public class FSStore extends AbstractStore {
 	@Override
 	public void writeToFile(long docId, String resource, File out) throws IOException {
 		File container = getContainer(docId);
-		File file = new File(container, resource);
+		File file = new File(container, sanitizeResourceName(resource));
 		FileUtil.copyFile(file, out);
 	}
 
 	@Override
 	public InputStream getStream(long docId, String resource) throws IOException {
 		File container = getContainer(docId);
-		File file = new File(container, resource);
+		File file = new File(container, sanitizeResourceName(resource));
 
 		try {
 			return new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
@@ -142,7 +143,7 @@ public class FSStore extends AbstractStore {
 	@Override
 	public byte[] getBytes(long docId, String resource, long start, long length) throws IOException {
 		File container = getContainer(docId);
-		File file = new File(container, resource);
+		File file = new File(container, sanitizeResourceName(resource));
 		return FileUtil.toByteArray(file, start, length);
 	}
 
@@ -168,14 +169,14 @@ public class FSStore extends AbstractStore {
 	@Override
 	public long size(long docId, String resource) {
 		File file = getContainer(docId);
-		file = new File(file, resource);
+		file = new File(file, sanitizeResourceName(resource));
 		return file.length();
 	}
 
 	@Override
 	public boolean exists(long docId, String resource) {
 		File file = getContainer(docId);
-		file = new File(file, resource);
+		file = new File(file, sanitizeResourceName(resource));
 		return file.exists();
 	}
 
