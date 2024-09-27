@@ -556,7 +556,6 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	}
 
 	private MenuItem getOnlyOfficeMenuItem(GUIFolder folder, final GUIDocument document) {
-
 		Menu menu = new Menu();
 		menu.setShowShadow(true);
 		menu.setShadowDepth(3);
@@ -574,7 +573,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		// This should be enabled only on PDF
 		final MenuItem fillForms = new MenuItem("Fill in PDF forms");
-		fillForms.addClickHandler(event -> {
+		fillForms.addClickHandler(click -> {
 			if (document == null)
 				return;
 
@@ -586,7 +585,6 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		menu.setItems(edit, create, fillForms);
 
-		// TODO limit the editing only on supported file types
 		edit.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
 				&& folder.isWrite());
 
@@ -596,7 +594,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		fillForms.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
 				&& folder.isWrite() && (document.getType().toLowerCase().endsWith("pdf")));
 
-		MenuItem onlyOfficeItem = new MenuItem("OnlyOffice");
+		MenuItem onlyOfficeItem = new MenuItem(I18N.message("onlyoffice"));
 		onlyOfficeItem.setSubmenu(menu);
 
 		return onlyOfficeItem;
@@ -637,8 +635,11 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.SHAREFILE))
 			menu.addItem(getShareFileMenuItem(folder));
 		if (Feature.enabled(Feature.GOOGLE_DRIVE)
-				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.GDOCS))
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.GOOGLEDRIVE))
 			menu.addItem(new DriveMenuItem(folder, document));
+		if (Feature.enabled(Feature.ONLYOFFICE)
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ONLYOFFICE))
+			menu.addItem(getOnlyOfficeMenuItem(folder, document));
 		if (Feature.enabled(Feature.ZOHO)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ZOHO))
 			menu.addItem(new ZohoMenuItem(folder, document));
@@ -658,8 +659,6 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			menu.addItem(getWebContentMenuItem(folder, document));
 		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.TEXTCONTENT))
 			menu.addItem(getTextContentMenuItem(folder, document));
-//		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ONLYOFFICE))
-//			menu.addItem(getOnlyOfficeMenuItem(folder, document));
 	}
 
 	private void addChatGPTItem(Menu menu) {

@@ -31,6 +31,7 @@ import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
+import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.tab.Tab;
 
@@ -192,6 +193,13 @@ public class SecuritySettingsPanel extends AdminPanel {
 		allowSid.setRequired(true);
 		allowSid.setDisabled(Session.get().isDemo());
 
+		final RadioGroupItem allowClientId = ItemFactory.newBooleanSelector("allowclientid",
+				I18N.message("allowclientid"));
+		allowClientId.setValue(settings.isAllowClientId() ? "yes" : "no");
+		allowClientId.setWrapTitle(false);
+		allowClientId.setRequired(true);
+		allowClientId.setDisabled(Session.get().isDemo());
+
 		final SelectItem cookiesSameSite = ItemFactory.newSelectItem("cookiessamesite");
 		cookiesSameSite.setHint(I18N.message("cookiessamesitehint"));
 		cookiesSameSite.setWidth(90);
@@ -214,14 +222,15 @@ public class SecuritySettingsPanel extends AdminPanel {
 		forceSsl.setRequired(true);
 		forceSsl.setDisabled(Session.get().isDemo());
 
-		final TextItem contentSecurityPolicy = ItemFactory.newTextItem(CONTENTSECURITYPOLICY,
+		final TextAreaItem contentSecurityPolicy = ItemFactory.newTextAreaItem(CONTENTSECURITYPOLICY,
 				settings.getContentSecurityPolicy());
 		contentSecurityPolicy.setHint(I18N.message("contentsecuritypolicyhint"));
-		contentSecurityPolicy.setWidth(400);
+		contentSecurityPolicy.setWidth(450);
+		contentSecurityPolicy.setHeight(150);
 
 		if (Session.get().isDefaultTenant())
-			securityForm.setFields(maxInactivity, savelogin, alertnewdevice, ignorelogincase, allowSid, cookiesSameSite,
-					secureCookies, forceSsl, contentSecurityPolicy);
+			securityForm.setFields(maxInactivity, savelogin, alertnewdevice, ignorelogincase, allowSid, allowClientId,
+					cookiesSameSite, secureCookies, forceSsl, contentSecurityPolicy);
 		else
 			securityForm.setFields(maxInactivity, savelogin, alertnewdevice);
 
@@ -239,7 +248,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 			Tab geolocation = prepareGeolocationTab(settings);
 			tabs.addTab(geolocation);
 		}
-		
+
 		Tab sessions = new Tab();
 		sessions.setTitle(I18N.message("sessions"));
 		sessions.setPane(new SessionsPanel());
@@ -296,6 +305,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 	private void collectDefaultTenantSettings(final Map<String, Object> values) {
 		if (Session.get().isDefaultTenant()) {
 			SecuritySettingsPanel.this.settings.setAllowSidInRequest(values.get("allowsid").equals("yes"));
+			SecuritySettingsPanel.this.settings.setAllowClientId(values.get("allowclientid").equals("yes"));
 
 			SecuritySettingsPanel.this.settings.setIgnoreLoginCase(values.get("ignorelogincase").equals("yes"));
 			SecuritySettingsPanel.this.settings.setCookiesSecure(values.get("secureCookies").equals("yes"));
@@ -403,21 +413,20 @@ public class SecuritySettingsPanel extends AdminPanel {
 		ButtonItem syncGeoDB = new ButtonItem("geoSyncDb", I18N.message("syncgeolocationdb"));
 		syncGeoDB.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
 			LD.contactingServer();
-			SecurityService.Instance.get().syncGeolocationDB(licenseKey.getValueAsString(),
-					new AsyncCallback<>() {
+			SecurityService.Instance.get().syncGeolocationDB(licenseKey.getValueAsString(), new AsyncCallback<>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-							LD.clearPrompt();
-						}
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+					LD.clearPrompt();
+				}
 
-						@Override
-						public void onSuccess(String dbVer) {
-							geoDBversion.setValue(dbVer);
-							LD.clearPrompt();
-						}
-					});
+				@Override
+				public void onSuccess(String dbVer) {
+					geoDBversion.setValue(dbVer);
+					LD.clearPrompt();
+				}
+			});
 		});
 
 		geolocationForm.setFields(enableGeolocation, useCache, licenseKey, geoDBversion, syncGeoDB);

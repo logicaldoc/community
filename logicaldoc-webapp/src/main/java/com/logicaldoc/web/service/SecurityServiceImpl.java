@@ -870,8 +870,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	 * @throws AutomationException the script has been evaluated but produced an
 	 *         error
 	 */
-	private void notifyAccount(User user, String password)
-			throws MessagingException, AutomationException {
+	private void notifyAccount(User user, String password) throws MessagingException, AutomationException {
 		EMail email;
 		email = new EMail();
 		email.setHtml(1);
@@ -1028,6 +1027,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			securitySettings.setSaveLogin("true".equals(pbean.getProperty(session.getTenantName() + GUI_SAVELOGIN)));
 		securitySettings.setIgnoreLoginCase("true".equals(pbean.getProperty("login.ignorecase")));
 		securitySettings.setAllowSidInRequest(pbean.getBoolean("security.acceptsid", false));
+		securitySettings.setAllowClientId(pbean.getBoolean("security.useclientid", true));
 		if (StringUtils.isNotEmpty(pbean.getProperty(session.getTenantName() + ANONYMOUS_ENABLED)))
 			securitySettings.setEnableAnonymousLogin(
 					"true".equals(pbean.getProperty(session.getTenantName() + ANONYMOUS_ENABLED)));
@@ -1075,6 +1075,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			conf.setProperty(SSL_REQUIRED, Boolean.toString(settings.isForceSsl()));
 			conf.setProperty(COOKIES_SECURE, Boolean.toString(settings.isCookiesSecure()));
 			conf.setProperty("security.acceptsid", Boolean.toString(settings.isAllowSidInRequest()));
+			conf.setProperty("security.useclientid", Boolean.toString(settings.isAllowClientId()));
+
 			conf.setProperty("security.geolocation.enabled", Boolean.toString(settings.isGeolocationEnabled()));
 			conf.setProperty("security.geolocation.cache", Boolean.toString(settings.isGeolocationCache()));
 			conf.setProperty(SECURITY_GEOLOCATION_APIKEY,

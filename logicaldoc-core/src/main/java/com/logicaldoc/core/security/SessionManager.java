@@ -202,8 +202,8 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	}
 
 	/**
-	 * Creates a new session for the given user and stores it in
-	 * the pool of opened sessions
+	 * Creates a new session for the given user and stores it in the pool of
+	 * opened sessions
 	 * 
 	 * @param username the username
 	 * @param key the secret key
@@ -466,7 +466,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		if (auth instanceof LDAuthenticationToken ldAuthenticationToken)
 			return ldAuthenticationToken.getSid();
 
-		if (request != null) {
+		if (request != null && Context.get().getProperties().getBoolean("security.useclientid", true)) {
 			Client client = buildClient(request);
 			Session session = getByClientId(client.getId());
 			if (session != null && isOpen(session.getSid()))
@@ -586,11 +586,11 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		String authorization = request.getHeader("Authorization");
 		String apiKey = request.getHeader(HEADER_APIKEY);
 
-		client.setId(String.format("%s-%s-%s-%s", StringUtils.defaultString(client.getUsername(), "0"),
+		client.setId(String.format("%s-%s-%s-%s-%s", StringUtils.defaultString(client.getUsername(), "0"),
 				StringUtils.isNotEmpty(authorization) ? Integer.toString(authorization.hashCode()) : "0",
-				StringUtils.isNotEmpty(apiKey) ? Integer.toString(apiKey.hashCode()) : "0", request.getRemoteAddr()));
+				StringUtils.isNotEmpty(apiKey) ? Integer.toString(apiKey.hashCode()) : "0", request.getRemoteAddr(),
+				StringUtils.defaultString(request.getHeader("user-agent"))));
 		return client;
-
 	}
 
 	private static String[] getBasicCredentials(HttpServletRequest req) {

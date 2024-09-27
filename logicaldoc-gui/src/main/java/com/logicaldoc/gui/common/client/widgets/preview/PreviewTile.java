@@ -46,8 +46,7 @@ public class PreviewTile extends HLayout {
 			HTMLFlow thumbnailImage = new HTMLFlow(html);
 			thumbnailImage.addClickHandler(event -> {
 				if (Session.get().isShowThumbnail()) {
-					ImageLightbox lightbox = new ImageLightbox(docId, title);
-					lightbox.show();
+					new ImageLightbox(docId, title).show();
 				}
 			});
 

@@ -297,7 +297,7 @@ public abstract class AbstractStore implements Store {
 	}
 
 	protected String sanitizeResourceName(String resourceName) {
-		return resourceName.replace("..", "").replace("/", "").replace("\\", "");
+		return resourceName.replace("..", "").replaceAll("[^a-zA-Z0-9\\-\\\\.]", "");
 	}
 
 	@Override

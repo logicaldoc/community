@@ -45,6 +45,8 @@ public class GUISecuritySettings implements Serializable {
 	private boolean forceSsl = false;
 
 	private boolean allowSidInRequest = false;
+	
+	private boolean allowClientId = true;
 
 	private boolean alertNewDevice = true;
 
@@ -263,5 +265,13 @@ public class GUISecuritySettings implements Serializable {
 
 	public void setCookiesSameSite(String cookiesSameSite) {
 		this.cookiesSameSite = cookiesSameSite;
+	}
+
+	public boolean isAllowClientId() {
+		return allowClientId;
+	}
+
+	public void setAllowClientId(boolean allowClientId) {
+		this.allowClientId = allowClientId;
 	}
 }

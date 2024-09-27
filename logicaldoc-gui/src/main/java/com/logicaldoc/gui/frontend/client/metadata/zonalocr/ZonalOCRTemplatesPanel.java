@@ -75,15 +75,13 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 
 		addSettingsButton(toolBar);
 
-		addDeleteButton(toolBar);
-
 		addSaveButton(toolBar);
-
-		toolBar.addSeparator();
 
 		addAddZoneButton(toolBar);
 
 		addDeleteZonesButton(toolBar);
+		
+		addDeleteButton(toolBar);
 
 		toolBar.addSeparator();
 

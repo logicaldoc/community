@@ -10,13 +10,14 @@ import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.mail.MessagingException;
 
@@ -42,12 +43,14 @@ public class CoreWorkbench {
 	 * Test sending e-mail with attachments
 	 * 
 	 * @throws IOException
+	 * @throws ParseException 
 	 */
-	public static void main(String[] args) throws IOException {
-		String expression = "1.0-conversion-pdf";
-		System.out.println(expression.replace("..", "").replace("/", "").replace("\\", "") );
-		
-		
+	public static void main(String[] args) throws IOException, ParseException {
+
+		SimpleDateFormat df = new SimpleDateFormat("MMM dd , yyyy", Locale.ENGLISH);
+
+		System.out.println(df.parse("April 3 , 2020"));
+				
 		
 //		OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
 //		// What % CPU load this current JVM is taking, from 0.0-1.0

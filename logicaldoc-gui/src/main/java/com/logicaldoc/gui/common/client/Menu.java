@@ -147,7 +147,7 @@ public class Menu {
 
 	public static final long SHAREFILE = -2075;
 
-	public static final long GDOCS = -2080;
+	public static final long GOOGLEDRIVE = -2080;
 
 	public static final long WEBCONTENT = -2100;
 
