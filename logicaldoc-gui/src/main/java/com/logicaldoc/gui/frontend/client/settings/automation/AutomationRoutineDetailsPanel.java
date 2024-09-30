@@ -143,10 +143,7 @@ public class AutomationRoutineDetailsPanel extends VLayout {
 		boolean inputValid = parametersPanel.validate();
 		if (!inputValid)
 			tabSet.selectTab(1);
-		boolean securityValid = securityPanel.validate();
-		if (!securityValid)
-			tabSet.selectTab(1);
-		return stdValid && inputValid && securityValid;
+		return stdValid && inputValid;
 	}
 
 	public void onSave() {

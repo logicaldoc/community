@@ -106,6 +106,17 @@ public class AutomationRoutineSecurity extends AutomationRoutineDetailsTab {
 				}
 				event.cancel();
 			});
+
+			list.addEditCompleteHandler(event -> {
+				for (ListGridRecord rec : list.getSelectedRecords()) {
+					GUIAccessControlEntry acl = routine.getAce(rec.getAttributeAsLong(ENTITY_ID));
+					if (acl != null) {
+						acl.setWrite(rec.getAttributeAsBoolean(WRITE, false));
+						acl.setRead(rec.getAttributeAsBoolean(READ, false));
+					}
+				}
+				changedHandler.onChanged(null);
+			});
 		}
 	}
 
@@ -171,6 +182,13 @@ public class AutomationRoutineSecurity extends AutomationRoutineDetailsTab {
 
 	private void addRecord(ListGridRecord rec) {
 		list.addData(rec);
+
+		GUIAccessControlEntry ace = new GUIAccessControlEntry();
+		ace.setEntityId(rec.getAttributeAsLong(ENTITY_ID));
+		ace.setRead(rec.getAttributeAsBoolean(READ, false));
+		ace.setWrite(rec.getAttributeAsBoolean(WRITE, false));
+		routine.addAce(ace);
+
 		changedHandler.onChanged(null);
 	}
 
@@ -250,6 +268,8 @@ public class AutomationRoutineSecurity extends AutomationRoutineDetailsTab {
 
 		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
+				for (ListGridRecord listGridRecord : selection)
+					routine.removeAce(listGridRecord.getAttributeAsLong(ENTITY_ID));
 				list.removeSelectedData();
 				changedHandler.onChanged(null);
 			}
@@ -258,14 +278,6 @@ public class AutomationRoutineSecurity extends AutomationRoutineDetailsTab {
 
 	@Override
 	public boolean validate() {
-		// the grid could not be initialized already so scroll it
-		if (list != null) {
-			try {
-				routine.setAccessControlList(this.getACL());
-			} catch (Exception e) {
-				// Nothing to do
-			}
-		}
 		return true;
 	}
 }

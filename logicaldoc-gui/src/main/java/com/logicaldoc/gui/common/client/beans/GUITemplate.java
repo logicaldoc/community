@@ -70,7 +70,7 @@ public class GUITemplate implements Serializable {
 	}
 
 	public void appendAttribute(GUIAttribute attribute) {
-		int maxPosition=attributes.stream().mapToInt(a->a.getPosition()).max().orElse(0);
+		int maxPosition = attributes.stream().mapToInt(a -> a.getPosition()).max().orElse(0);
 		attribute.setPosition(++maxPosition);
 		attributes.add(attribute);
 	}
@@ -133,6 +133,33 @@ public class GUITemplate implements Serializable {
 
 	public void setPermissions(List<String> permissions) {
 		this.permissions = permissions;
+	}
+
+	public GUIAccessControlEntry getAce(long entityId) {
+		for (GUIAccessControlEntry acl : accessControlList) {
+			if (acl.getEntityId() == entityId)
+				return acl;
+		}
+		return null;
+	}
+
+	public void removeAce(long entityId) {
+		List<GUIAccessControlEntry> newAce = new ArrayList<>();
+		for (GUIAccessControlEntry ace : accessControlList) {
+			if (ace.getEntityId() != entityId)
+				newAce.add(ace);
+		}
+		accessControlList = newAce;
+	}
+	
+	public void addAce(GUIAccessControlEntry ace) {
+		GUIAccessControlEntry existingAce = getAce(ace.getEntityId());
+		if(existingAce==null) {
+			accessControlList.add(ace);
+		} else {
+			existingAce.setRead(ace.isRead());
+			existingAce.setWrite(ace.isWrite());
+		}
 	}
 
 	public List<GUIAccessControlEntry> getAccessControlList() {

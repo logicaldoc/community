@@ -175,9 +175,6 @@ public class TemplateDetailsPanel extends VLayout {
 		stdValid = validationPanel.validate();
 		if (!stdValid)
 			tabSet.selectTab(1);
-		stdValid = securityPanel.validate();
-		if (!stdValid)
-			tabSet.selectTab(2);
 		return stdValid;
 	}
 

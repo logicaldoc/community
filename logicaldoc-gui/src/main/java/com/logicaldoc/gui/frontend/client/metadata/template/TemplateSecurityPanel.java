@@ -1,8 +1,5 @@
 package com.logicaldoc.gui.frontend.client.metadata.template;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.data.AccessControlListDS;
@@ -11,7 +8,6 @@ import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
-import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Button;
@@ -48,8 +44,6 @@ public class TemplateSecurityPanel extends VLayout {
 	protected ChangedHandler changedHandler;
 
 	private ListGrid list;
-
-	private boolean aclInitialized = false;
 
 	public TemplateSecurityPanel(GUITemplate template, ChangedHandler changedHandler) {
 		if (template == null) {
@@ -103,7 +97,16 @@ public class TemplateSecurityPanel extends VLayout {
 					setupContextMenu().showContextMenu();
 				event.cancel();
 			});
-			list.addEditCompleteHandler(event -> changedHandler.onChanged(null));
+			list.addEditCompleteHandler(event -> {
+				for (ListGridRecord rec : list.getSelectedRecords()) {
+					GUIAccessControlEntry acl = template.getAce(rec.getAttributeAsLong(ENTITY_ID));
+					if (acl != null) {
+						acl.setWrite(rec.getAttributeAsBoolean(WRITE, false));
+						acl.setRead(rec.getAttributeAsBoolean(READ, false));
+					}
+				}
+				changedHandler.onChanged(null);
+			});
 		}
 
 		addButons(template);
@@ -142,8 +145,9 @@ public class TemplateSecurityPanel extends VLayout {
 			rec.setAttribute(AVATAR, "group");
 			rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
 			rec.setAttribute(READ, true);
-			list.addData(rec);
-			changedHandler.onChanged(null);
+			
+			addRecord(rec);
+			
 			group.clearValue();
 		});
 
@@ -174,9 +178,9 @@ public class TemplateSecurityPanel extends VLayout {
 			rec.setAttribute(ENTITY,
 					selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
 			rec.setAttribute(READ, true);
-
-			list.addData(rec);
-			changedHandler.onChanged(null);
+			
+			addRecord(rec);
+			
 			user.clearValue();
 		});
 		if (template.isWrite())
@@ -193,6 +197,18 @@ public class TemplateSecurityPanel extends VLayout {
 		printButton.addClickHandler(event -> GridUtil.print(list));
 	}
 
+	private void addRecord(ListGridRecord rec) {
+		list.addData(rec);
+
+		GUIAccessControlEntry ace = new GUIAccessControlEntry();
+		ace.setEntityId(rec.getAttributeAsLong(ENTITY_ID));
+		ace.setRead(rec.getAttributeAsBoolean(READ, false));
+		ace.setWrite(rec.getAttributeAsBoolean(WRITE, false));
+		template.addAce(ace);
+
+		changedHandler.onChanged(null);
+	}
+
 	private void prepareList(GUITemplate template) {
 		list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -204,27 +220,6 @@ public class TemplateSecurityPanel extends VLayout {
 		list.setMinHeight(200);
 		list.setMinWidth(300);
 		list.setDataSource(new AccessControlListDS(template.getId(), "template"));
-		list.addDataArrivedHandler(event -> aclInitialized = true);
-	}
-
-	/**
-	 * Creates an array of all the ACL
-	 * 
-	 * @return the complete ACL
-	 */
-	private List<GUIAccessControlEntry> getACL() {
-		int totalRecords = list.getRecordList().getLength();
-		List<GUIAccessControlEntry> acl = new ArrayList<>();
-		for (int i = 0; i < totalRecords; i++) {
-			Record rec = list.getRecordList().get(i);
-			GUIAccessControlEntry ace = new GUIAccessControlEntry();
-			ace.setName(rec.getAttributeAsString(ENTITY));
-			ace.setEntityId(rec.getAttributeAsLong(ENTITY_ID));
-			ace.setWrite(rec.getAttributeAsBoolean(WRITE));
-			ace.setRead(rec.getAttributeAsBoolean(READ));
-			acl.add(ace);
-		}
-		return acl;
 	}
 
 	/**
@@ -250,21 +245,12 @@ public class TemplateSecurityPanel extends VLayout {
 
 		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
 			if (Boolean.TRUE.equals(value)) {
+				for (ListGridRecord listGridRecord : selection)
+					template.removeAce(listGridRecord.getAttributeAsLong(ENTITY_ID));
 				list.removeSelectedData();
 				changedHandler.onChanged(null);
 			}
 		});
-	}
-
-	protected boolean validate() {
-		if (aclInitialized)
-			try {
-				if (template.isWrite())
-					template.setAccessControlList(getACL());
-			} catch (Exception t) {
-				// Nothing to do
-			}
-		return true;
 	}
 
 	public GUITemplate getTemplate() {

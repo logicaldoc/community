@@ -1,8 +1,5 @@
 package com.logicaldoc.gui.frontend.client.metadata.stamp;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIStamp;
 import com.logicaldoc.gui.common.client.data.StampAclDS;
@@ -11,7 +8,6 @@ import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
-import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Button;
@@ -44,8 +40,6 @@ public class StampSecurity extends StampDetailsTab {
 	private static final String ENTITY_ID = "entityId";
 
 	private ListGrid list;
-
-	private boolean aclInitialized = false;
 
 	public StampSecurity(GUIStamp stamp, ChangedHandler changedHandler) {
 		super(stamp, changedHandler);
@@ -92,7 +86,16 @@ public class StampSecurity extends StampDetailsTab {
 					setupContextMenu().showContextMenu();
 				event.cancel();
 			});
-			list.addEditCompleteHandler(event -> changedHandler.onChanged(null));
+			list.addEditCompleteHandler(event -> {
+				for (ListGridRecord rec : list.getSelectedRecords()) {
+					GUIAccessControlEntry acl = stamp.getAce(rec.getAttributeAsLong(ENTITY_ID));
+					if (acl != null) {
+						acl.setWrite(rec.getAttributeAsBoolean(WRITE, false));
+						acl.setRead(rec.getAttributeAsBoolean(READ, false));
+					}
+				}
+				changedHandler.onChanged(null);
+			});
 		}
 
 		VLayout container = new VLayout();
@@ -134,8 +137,9 @@ public class StampSecurity extends StampDetailsTab {
 			rec.setAttribute(AVATAR, "group");
 			rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
 			rec.setAttribute(READ, true);
-			list.addData(rec);
-			changedHandler.onChanged(null);
+
+			addRecord(rec);
+
 			group.clearValue();
 		});
 
@@ -167,8 +171,8 @@ public class StampSecurity extends StampDetailsTab {
 					selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
 			rec.setAttribute(READ, true);
 
-			list.addData(rec);
-			changedHandler.onChanged(null);
+			addRecord(rec);
+
 			user.clearValue();
 		});
 		if (stamp.isWrite())
@@ -187,6 +191,18 @@ public class StampSecurity extends StampDetailsTab {
 		return buttons;
 	}
 
+	private void addRecord(ListGridRecord rec) {
+		list.addData(rec);
+
+		GUIAccessControlEntry ace = new GUIAccessControlEntry();
+		ace.setEntityId(rec.getAttributeAsLong(ENTITY_ID));
+		ace.setRead(rec.getAttributeAsBoolean(READ, false));
+		ace.setWrite(rec.getAttributeAsBoolean(WRITE, false));
+		stamp.addAce(ace);
+
+		changedHandler.onChanged(null);
+	}
+
 	private void prepareList() {
 		list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -198,29 +214,6 @@ public class StampSecurity extends StampDetailsTab {
 		list.setMinHeight(200);
 		list.setMinWidth(300);
 		list.setDataSource(new StampAclDS(stamp.getId()));
-		list.addDataArrivedHandler(event -> aclInitialized = true);
-	}
-
-	/**
-	 * Creates an array of all the right
-	 * 
-	 * @return the array of rights
-	 */
-	private List<GUIAccessControlEntry> getACL() {
-		int totalRecords = list.getRecordList().getLength();
-		List<GUIAccessControlEntry> acl = new ArrayList<>();
-
-		for (int i = 0; i < totalRecords; i++) {
-			Record rec = list.getRecordList().get(i);
-			GUIAccessControlEntry ace = new GUIAccessControlEntry();
-			ace.setName(rec.getAttributeAsString(ENTITY));
-			ace.setEntityId(rec.getAttributeAsLong(ENTITY_ID));
-			ace.setWrite(rec.getAttributeAsBoolean(WRITE));
-			ace.setRead(rec.getAttributeAsBoolean(READ));
-			acl.add(ace);
-		}
-
-		return acl;
 	}
 
 	/**
@@ -246,21 +239,12 @@ public class StampSecurity extends StampDetailsTab {
 
 		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
 			if (Boolean.TRUE.equals(value)) {
+				for (ListGridRecord listGridRecord : selection)
+					stamp.removeAce(listGridRecord.getAttributeAsLong(ENTITY_ID));
 				list.removeSelectedData();
 				changedHandler.onChanged(null);
 			}
 		});
-	}
-
-	protected boolean validate() {
-		if (aclInitialized)
-			try {
-				if (stamp.isWrite())
-					stamp.setAccessControlList(getACL());
-			} catch (Exception t) {
-				// Nothing to do
-			}
-		return true;
 	}
 
 	@Override

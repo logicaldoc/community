@@ -50,6 +50,33 @@ public class GUIAutomationRoutine extends GUIExtensibleObject implements Seriali
 		this.automation = automation;
 	}
 
+	public GUIAccessControlEntry getAce(long entityId) {
+		for (GUIAccessControlEntry ace : accessControlList) {
+			if (ace.getEntityId() == entityId)
+				return ace;
+		}
+		return null;
+	}
+
+	public void removeAce(long entityId) {
+		List<GUIAccessControlEntry> newAcls = new ArrayList<>();
+		for (GUIAccessControlEntry ace : accessControlList) {
+			if (ace.getEntityId() != entityId)
+				newAcls.add(ace);
+		}
+		accessControlList = newAcls;
+	}
+
+	public void addAce(GUIAccessControlEntry ace) {
+		GUIAccessControlEntry existingAce = getAce(ace.getEntityId());
+		if(existingAce==null) {
+			accessControlList.add(ace);
+		} else {
+			existingAce.setRead(ace.isRead());
+			existingAce.setWrite(ace.isWrite());
+		}
+	}
+	
 	public List<GUIAccessControlEntry> getAccessControlList() {
 		return accessControlList;
 	}

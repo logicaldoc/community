@@ -143,10 +143,7 @@ public class StampDetailsPanel extends VLayout {
 		boolean paramsValid = parametersPanel.validate();
 		if (!propsValid)
 			tabSet.selectTab(1);
-		boolean securityValid = securityPanel.validate();
-		if (!securityValid)
-			tabSet.selectTab(2);
-		return propsValid && paramsValid && securityValid;
+		return propsValid && paramsValid;
 	}
 
 	public void onSave() {
