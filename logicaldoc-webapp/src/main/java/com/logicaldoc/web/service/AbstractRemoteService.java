@@ -77,6 +77,14 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		return UploadServlet.getUploads(sid);
 	}
 
+	public void setThreadRequest(HttpServletRequest request) {
+		synchronized (this) {
+			if (perThreadRequest == null)
+				perThreadRequest = new ThreadLocal<HttpServletRequest>();
+			perThreadRequest.set(request);
+		}
+	}
+
 	protected Session validateSession() throws InvalidSessionServerException {
 		return validateSession(getThreadLocalRequest());
 	}
