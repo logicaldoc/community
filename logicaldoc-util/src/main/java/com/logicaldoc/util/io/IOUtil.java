@@ -12,8 +12,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -111,5 +114,54 @@ public class IOUtil {
 		try (XMLDecoder decoder = new XMLDecoder(new ByteArrayInputStream(xml.getBytes()))) {
 			return decoder.readObject();
 		}
+	}
+
+	/**
+	 * Downloads an URL into a local file
+	 * 
+	 * @param url The URL to download
+	 * @param dest The destination local file
+	 * @param timeout A connection timeout in seconds
+	 * @param bufferSize The buffer size in bytes
+	 * 
+	 * @throws IOException I/O error
+	 */
+	public static void download(final String url, File dest, int timeout, int bufferSize) throws IOException {
+		if (url == null || url.isEmpty()) {
+			throw new IOException("Url argument is not specified"); // URL
+																	// isn't
+																	// specified
+		}
+
+		URL uri = new URL(url);
+		java.net.HttpURLConnection connection = (java.net.HttpURLConnection) uri.openConnection();
+		if (timeout > 0)
+			connection.setConnectTimeout(timeout);
+		try (InputStream stream = connection.getInputStream();) {
+			int statusCode = connection.getResponseCode();
+
+			if (statusCode != HttpServletResponse.SC_OK) { // checking status
+															// code
+				connection.disconnect();
+				throw new IOException("Document editing service returned status: " + statusCode);
+			}
+
+			if (stream == null)
+				throw new IOException("Input stream is null");
+
+			FileUtil.writeFile(getAllBytes(stream, bufferSize), dest.getAbsolutePath());
+		} finally {
+			connection.disconnect();
+		}
+	}
+
+	// get byte array from stream
+	private static byte[] getAllBytes(InputStream is, int bufferSize) throws IOException {
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		byte[] buffer = new byte[bufferSize];
+		for (int len = is.read(buffer); len != -1; len = is.read(buffer)) {
+			os.write(buffer, 0, len);
+		}
+		return os.toByteArray();
 	}
 }
