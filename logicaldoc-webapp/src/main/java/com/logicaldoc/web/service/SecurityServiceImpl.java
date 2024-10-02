@@ -85,7 +85,6 @@ import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.config.ContextProperties;
-import com.logicaldoc.util.config.SecurityConfigurator;
 import com.logicaldoc.util.config.WebConfigurator;
 import com.logicaldoc.util.config.WebContextConfigurator;
 import com.logicaldoc.util.crypt.CryptUtil;
@@ -102,6 +101,8 @@ import com.logicaldoc.web.UploadServlet;
  * @since 6.0
  */
 public class SecurityServiceImpl extends AbstractRemoteService implements SecurityService {
+
+	private static final String SECURITY_CSP = "security.csp";
 
 	private static final String SECURITY_GEOLOCATION_APIKEY = "security.geolocation.apikey";
 
@@ -1055,7 +1056,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		securitySettings.setGeolocationKey(pbean.getProperty(SECURITY_GEOLOCATION_APIKEY));
 		securitySettings.setGeolocationDbVer(Geolocation.get().getDatabaseVersion());
 
-		securitySettings.setContentSecurityPolicy(new SecurityConfigurator().getContentSecurityPolicy());
+		securitySettings.setContentSecurityPolicy(pbean.getProperty(SECURITY_CSP));
 
 		log.debug("Security settings data loaded successfully.");
 
@@ -1082,23 +1083,23 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			conf.setProperty(SECURITY_GEOLOCATION_APIKEY,
 					settings.getGeolocationKey() != null ? settings.getGeolocationKey() : "");
 
+			String currentCsp = conf.getProperty(SECURITY_CSP, "");
+			restartRequired = currentCsp.equals(settings.getContentSecurityPolicy());
+			conf.setProperty(SECURITY_CSP, settings.getContentSecurityPolicy());
+
 			try {
 				// Update the WEB-INF/web.xml
 				ServletContext context = getServletContext();
 				String policy = "true".equals(conf.getProperty(SSL_REQUIRED)) ? "CONFIDENTIAL" : "NONE";
 				WebConfigurator webConfigurator = new WebConfigurator(context.getRealPath("/WEB-INF/web.xml"));
-				restartRequired = webConfigurator.setTransportGuarantee(policy);
+				restartRequired = restartRequired || webConfigurator.setTransportGuarantee(policy);
 
 				// Update the META-INF/context.xml
 				conf.setProperty(COOKIES_SAMESITE, settings.getCookiesSameSite());
 				WebContextConfigurator webContextConfigurator = new WebContextConfigurator(
 						context.getRealPath("/META-INF/context.xml"));
-				restartRequired = webContextConfigurator.setSameSiteCookies(settings.getCookiesSameSite());
-
-				// Update the context-security.xml
-				SecurityConfigurator secConfigurator = new SecurityConfigurator();
 				restartRequired = restartRequired
-						|| secConfigurator.setContentSecurityPolicy(settings.getContentSecurityPolicy());
+						|| webContextConfigurator.setSameSiteCookies(settings.getCookiesSameSite());
 			} catch (Exception e) {
 				log.warn(e.getMessage(), e);
 			}

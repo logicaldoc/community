@@ -23,6 +23,7 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocUtil;
+import com.logicaldoc.gui.common.client.util.SecurityUtil;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.DropSpotPopup;
 import com.logicaldoc.gui.frontend.client.calendar.CalendarEventDialog;
@@ -33,7 +34,7 @@ import com.logicaldoc.gui.frontend.client.document.signature.DigitalSignatureDia
 import com.logicaldoc.gui.frontend.client.document.stamp.StampDialog;
 import com.logicaldoc.gui.frontend.client.document.update.UpdateDialog;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
-import com.logicaldoc.gui.frontend.client.services.DocumentService;
+import com.logicaldoc.gui.frontend.client.onlyoffice.OnlyOfficeEditor;
 import com.logicaldoc.gui.frontend.client.subscription.SubscriptionDialog;
 import com.smartgwt.client.types.SelectionType;
 import com.smartgwt.client.util.SC;
@@ -79,6 +80,8 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 	protected ToolStripButton gallery = AwesomeFactory.newToolStripButton("images", "gallery");
 
 	protected ToolStripButton office = AwesomeFactory.newToolStripButton("windows", "editwithoffice");
+
+	protected ToolStripButton onlyoffice = AwesomeFactory.newToolStripButton("windows", "editwithonlyoffice");
 
 	protected ToolStripButton bulkUpdate = AwesomeFactory.newToolStripButton("edit", "bulkupdate");
 
@@ -132,6 +135,8 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		addConvert();
 
 		addOffice();
+
+		addOnlyOffice();
 
 		addSeparator();
 
@@ -431,7 +436,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.FORM))
 				setFeatureDisabled(addForm);
 
-			addForm.addClickHandler(event -> new AddDocumentUsingForm().show());
+			addForm.addClickHandler(click -> new AddDocumentUsingForm().show());
 		}
 	}
 
@@ -441,7 +446,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.SCAN))
 				setFeatureDisabled(scan);
 
-			scan.addClickHandler(event -> Util.openScan());
+			scan.addClickHandler(click -> Util.openScan());
 		}
 	}
 
@@ -459,7 +464,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.DROP_SPOT))
 				setFeatureDisabled(dropSpot);
 
-			dropSpot.addClickHandler(event -> DropSpotPopup.openDropSpot());
+			dropSpot.addClickHandler(click -> DropSpotPopup.openDropSpot());
 		}
 	}
 
@@ -471,9 +476,23 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.OFFICE))
 				setFeatureDisabled(office);
 
-			office.addClickHandler(event -> checkPermissionsAndRun(
+			office.addClickHandler(click -> checkPermissionsAndRun(
 					new String[] { GUIAccessControlEntry.PERMISSION_DOWNLOAD, GUIAccessControlEntry.PERMISSION_WRITE },
 					() -> Util.openEditWithOffice(document.getId())));
+		}
+	}
+
+	private void addOnlyOffice() {
+		if (Feature.visible(Feature.ONLYOFFICE) && Menu.enabled(Menu.ONLYOFFICE)) {
+			addButton(onlyoffice);
+			onlyoffice.setTooltip(I18N.message("editwithonlyoffice"));
+			onlyoffice.setTitle("<i class='fab fa-briefcase fa-lg fa-lg' aria-hidden='true'></i>");
+			if (!Feature.enabled(Feature.OFFICE))
+				setFeatureDisabled(office);
+
+			onlyoffice.addClickHandler(click -> checkPermissionsAndRun(
+					new String[] { GUIAccessControlEntry.PERMISSION_DOWNLOAD, GUIAccessControlEntry.PERMISSION_WRITE },
+					() -> new OnlyOfficeEditor(document).show()));
 		}
 	}
 
@@ -484,9 +503,9 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.PDF))
 				setFeatureDisabled(convert);
 
-			convert.addClickHandler(event -> {
+			convert.addClickHandler(click -> {
 				new ConversionDialog(document).show();
-				event.cancel();
+				click.cancel();
 			});
 		}
 	}
@@ -499,7 +518,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				setFeatureDisabled(pdf);
 
 			pdf.addClickHandler(
-					event -> checkPermissionsAndRun(new String[] { GUIAccessControlEntry.PERMISSION_DOWNLOAD }, () -> {
+					click -> checkPermissionsAndRun(new String[] { GUIAccessControlEntry.PERMISSION_DOWNLOAD }, () -> {
 						List<Long> selection = DocumentsPanel.get().getDocumentsGrid().getSelectedIds();
 						if (selection.size() == 1) {
 							DocUtil.downloadPdfConversion(document.getId(), document.getVersion());
@@ -549,28 +568,8 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 	 * @param task The task to run
 	 */
 	private void checkPermissionsAndRun(String[] requiredPermissions, Runnable task) {
-		DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-		if (grid.getSelectedCount() == 0)
-			return;
-
-		DocumentService.Instance.get().getAllowedPermissions(grid.getSelectedIds(),
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUIAccessControlEntry grantedPermissions) {
-						for (String permission : requiredPermissions) {
-							if (!grantedPermissions.isPermissionAllowed(permission.toLowerCase())) {
-								GuiLog.warn(I18N.message("somedocsdonothaveperm", permission.toUpperCase()), null);
-								return;
-							}
-						}
-						task.run();
-					}
-				});
+		SecurityUtil.checkPermissionsAndRun(DocumentsPanel.get().getDocumentsGrid().getSelectedIds(),
+				requiredPermissions, task);
 	}
 
 	private void addRefresh() {
@@ -610,6 +609,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				stamp.setDisabled(true);
 				sign.setDisabled(true);
 				office.setDisabled(true);
+				onlyoffice.setDisabled(true);
 				addForm.setDisabled(true);
 				readingRequest.setDisabled(true);
 			}
@@ -693,10 +693,14 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 
 		office.setDisabled(
 				!Feature.enabled(Feature.OFFICE) || !isOfficeFile || !document.isDownload() || !document.isWrite());
+		onlyoffice.setDisabled(!Feature.enabled(Feature.OFFICE) || !Menu.enabled(Menu.ONLYOFFICE)
+				|| !document.isDownload() || !document.isWrite());
 		if (document.getStatus() != Constants.DOC_UNLOCKED && !Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)
 				&& document.getLockUserId() != null
-				&& Session.get().getUser().getId() != document.getLockUserId().longValue())
+				&& Session.get().getUser().getId() != document.getLockUserId().longValue()) {
 			office.setDisabled(true);
+			onlyoffice.setDisabled(true);
+		}
 	}
 
 	@Override

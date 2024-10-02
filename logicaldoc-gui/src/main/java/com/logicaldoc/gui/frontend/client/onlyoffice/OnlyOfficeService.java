@@ -1,14 +1,11 @@
 package com.logicaldoc.gui.frontend.client.onlyoffice;
 
-import java.util.List;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
-import com.logicaldoc.gui.common.client.beans.GUIValue;
 
 /**
  * The client side stub for the OnlyOffice Service.
@@ -29,6 +26,15 @@ public interface OnlyOfficeService extends RemoteService {
 	public void startEditing(long docId) throws ServerException;
 
 	/**
+	 * Starts the filling of a form with Only Office
+	 * 
+	 * @param docId ID of the form to take as model
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void startFilling(long docId) throws ServerException;
+
+	/**
 	 * Starts the editing of a document with Only Office
 	 * 
 	 * @param docId ID of the document being edited
@@ -36,24 +42,6 @@ public interface OnlyOfficeService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public void endEditing(long docId) throws ServerException;
-
-	/**
-	 * Loads the settings
-	 * 
-	 * @returns the list of settings
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public List<GUIValue> loadSettings() throws ServerException;
-
-	/**
-	 * Saves the settings
-	 * 
-	 * @param settings the list of settings
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void saveSettings(List<GUIValue> settings) throws ServerException;
 
 	public static class Instance {
 		private static OnlyOfficeServiceAsync inst;

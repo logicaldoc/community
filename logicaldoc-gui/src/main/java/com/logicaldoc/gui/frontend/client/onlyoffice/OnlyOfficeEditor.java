@@ -58,8 +58,19 @@ public class OnlyOfficeEditor extends Window {
 		addItem(layout);
 
 		if ("fillForms".equals(document.getComment())) {
-			// the document is not being edited just used to produce another PDF
-			reloadBody();
+			// the document is being edited, so declare the editing
+			OnlyOfficeService.Instance.get().startFilling(document.getId(), new AsyncCallback<Void>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(Void result) {
+					reloadBody();
+				}
+			});
 		} else {
 			// the document is being edited, so declare the editing
 			OnlyOfficeService.Instance.get().startEditing(document.getId(), new AsyncCallback<Void>() {
@@ -78,24 +89,19 @@ public class OnlyOfficeEditor extends Window {
 	}
 
 	private void onClose() {
-		if ("fillForms".equals(document.getComment())) {
-			// the document is not being edited just used to produce another PDF
-			destroy();
-		} else {
-			// the document is being edited, so declare the end of editing
-			OnlyOfficeService.Instance.get().endEditing(document.getId(), new AsyncCallback<Void>() {
+		// the document is being edited, so declare the end of editing
+		OnlyOfficeService.Instance.get().endEditing(document.getId(), new AsyncCallback<Void>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-				@Override
-				public void onSuccess(Void result) {
-					destroy();
-				}
-			});
-		}
+			@Override
+			public void onSuccess(Void result) {
+				destroy();
+			}
+		});
 	}
 
 	/**

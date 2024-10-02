@@ -14,6 +14,7 @@ import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
@@ -29,6 +30,7 @@ import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.util.SecurityUtil;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.ValuesCallback;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
@@ -564,8 +566,9 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		edit.addClickHandler(event -> {
 			if (document == null)
 				return;
-
-			new OnlyOfficeEditor(document).show();
+			SecurityUtil.checkPermissionsAndRun(Arrays.asList(document.getId()),
+					new String[] { GUIAccessControlEntry.PERMISSION_DOWNLOAD, GUIAccessControlEntry.PERMISSION_WRITE },
+					() -> new OnlyOfficeEditor(document).show());
 		});
 
 		final MenuItem create = new MenuItem(I18N.message("createdoc"));
