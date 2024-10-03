@@ -116,8 +116,6 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 				hiddenApiKey, changedHandler);
 		apiKey.addChangedHandler(changedHandler);
 
-		GuiLog.info("key: " + syndication.getApiKey());
-
 		TextItem include = ItemFactory.newTextItem("include", syndication.getIncludes());
 		include.addChangedHandler(changedHandler);
 

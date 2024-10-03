@@ -444,10 +444,10 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * Gets the Session ID specification from the current request following this
 	 * lookup strategy:
 	 * <ol>
-	 * <li>Session attribute <code>PARAM_SID</code></li>
-	 * <li>Request attribute <code>PARAM_SID</code></li>
 	 * <li>Request parameter <code>PARAM_SID</code></li>
 	 * <li>Request header <code>PARAM_SID</code></li>
+	 * <li>Request attribute <code>PARAM_SID</code></li>
+	 * <li>Session attribute <code>PARAM_SID</code></li>
 	 * <li>Cookie <code>COOKIE_SID</code></li>
 	 * <li>Spring SecurityContextHolder</li>
 	 * <li>Client ID</li>
@@ -481,20 +481,20 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 			return null;
 
 		String sid = null;
-		if (request.getSession(true).getAttribute(PARAM_SID) != null
-				&& StringUtils.isNotEmpty((String) request.getSession(true).getAttribute(PARAM_SID)))
-			sid = (String) request.getSession(true).getAttribute(PARAM_SID);
-		else if (request.getAttribute(PARAM_SID) != null
-				&& StringUtils.isNotEmpty((String) request.getAttribute(PARAM_SID)))
-			sid = (String) request.getAttribute(PARAM_SID);
-		else if (StringUtils.isNotEmpty(request.getParameter(PARAM_SID))
+		if (StringUtils.isNotEmpty(request.getParameter(PARAM_SID))
 				&& Context.get().getProperties().getBoolean("security.acceptsid", false))
 			sid = request.getParameter(PARAM_SID);
 		else if (StringUtils.isNotEmpty(request.getHeader(PARAM_SID)))
 			sid = request.getHeader(PARAM_SID);
-		else {
+		else if (request.getAttribute(PARAM_SID) != null
+				&& StringUtils.isNotEmpty((String) request.getAttribute(PARAM_SID)))
+			sid = (String) request.getAttribute(PARAM_SID); 
+		else if (request.getSession(true).getAttribute(PARAM_SID) != null
+				&& StringUtils.isNotEmpty((String) request.getSession(true).getAttribute(PARAM_SID)))
+			sid = (String) request.getSession(true).getAttribute(PARAM_SID);
+		else 
 			sid = getSessionIdFromCookie(request);
-		}
+		
 		return sid;
 	}
 

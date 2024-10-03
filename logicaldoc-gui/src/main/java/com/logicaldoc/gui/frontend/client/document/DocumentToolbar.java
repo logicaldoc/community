@@ -486,7 +486,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		if (Feature.visible(Feature.ONLYOFFICE) && Menu.enabled(Menu.ONLYOFFICE)) {
 			addButton(onlyoffice);
 			onlyoffice.setTooltip(I18N.message("editwithonlyoffice"));
-			onlyoffice.setTitle("<i class='fab fa-briefcase fa-lg fa-lg' aria-hidden='true'></i>");
+			onlyoffice.setTitle("<i class='fal fa-briefcase fa-lg fa-lg' aria-hidden='true'></i>");
 			if (!Feature.enabled(Feature.OFFICE))
 				setFeatureDisabled(office);
 
