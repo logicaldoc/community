@@ -641,7 +641,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.GOOGLEDRIVE))
 			menu.addItem(new DriveMenuItem(folder, document));
 		if (Feature.enabled(Feature.ONLYOFFICE)
-				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ONLYOFFICE))
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ONLYOFFICE)
+				&& Session.get().getConfigAsBoolean("converter.OnlyOfficeConverter.enabled"))
 			menu.addItem(getOnlyOfficeMenuItem(folder, document));
 		if (Feature.enabled(Feature.ZOHO)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ZOHO))
