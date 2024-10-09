@@ -34,7 +34,22 @@ public class EMailAttachment implements Serializable {
 	private long size;
 
 	private String mimeType = "";
+	
+	/**
+	 * Should be used to fill the Content-Disposition header
+	 */
+	private String disposition;
 
+	/**
+	 * Should be used to fill the Content-Type header
+	 */
+	private String contentType;
+	
+	/**
+	 * Should be used to fill the Content-Transfer-Encoding header
+	 */
+	private String contentEncoding;
+	
 	private String fileName = "";
 
 	public String getIcon() {
@@ -128,5 +143,29 @@ public class EMailAttachment implements Serializable {
 		}
 
 		return content;
+	}
+
+	public String getDisposition() {
+		return disposition;
+	}
+
+	public void setDisposition(String disposition) {
+		this.disposition = disposition;
+	}
+
+	public String getContentType() {
+		return contentType;
+	}
+
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
+
+	public String getContentEncoding() {
+		return contentEncoding;
+	}
+
+	public void setContentEncoding(String contentEncoding) {
+		this.contentEncoding = contentEncoding;
 	}
 }

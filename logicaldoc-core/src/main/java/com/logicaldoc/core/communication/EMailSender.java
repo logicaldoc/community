@@ -251,9 +251,11 @@ public class EMailSender {
 	 * @param dictionary The dictionary to be used in the template
 	 * 
 	 * @throws MessagingException raised if the email cannot be sent
-	 * @throws AutomationException the automation has been evaluated but produced an error
+	 * @throws AutomationException the automation has been evaluated but
+	 *         produced an error
 	 */
-	public void send(EMail email, String templateName, Map<String, Object> dictionary) throws MessagingException, AutomationException {
+	public void send(EMail email, String templateName, Map<String, Object> dictionary)
+			throws MessagingException, AutomationException {
 		if (!RunLevel.current().aspectEnabled("sendingMessages")) {
 			log.error("Aspect not enabled");
 			throw new MessagingException("Aspect sendingMessages not enabled");
@@ -309,6 +311,8 @@ public class EMailSender {
 		Session session = newMailSession();
 
 		MimeMessage message = new MimeMessage(session);
+		for (Map.Entry<String, String> line : email.getHeaders().entrySet())
+			message.addHeaderLine(line.getKey() + "=" + line.getValue());
 
 		// The FROM field must to be the one configured for the SMTP connection.
 		// because of errors will be returned in the case the sender is not in
@@ -318,20 +322,23 @@ public class EMailSender {
 		Set<InternetAddress> cc = email.getAddressesCC();
 		Set<InternetAddress> bcc = email.getAddressesBCC();
 		message.setFrom(from);
-		message.setRecipients(javax.mail.Message.RecipientType.TO, to.toArray(new InternetAddress[0]));
+		if (CollectionUtils.isNotEmpty(to))
+			message.setRecipients(javax.mail.Message.RecipientType.TO, to.toArray(new InternetAddress[0]));
 		if (CollectionUtils.isNotEmpty(cc))
 			message.setRecipients(javax.mail.Message.RecipientType.CC, cc.toArray(new InternetAddress[0]));
-		if (CollectionUtils.isNotEmpty(cc))
+		if (CollectionUtils.isNotEmpty(bcc))
 			message.setRecipients(javax.mail.Message.RecipientType.BCC, bcc.toArray(new InternetAddress[0]));
 		message.setSubject(email.getSubject(), UTF_8);
-
-		MimeBodyPart body = buildBodyPart(email);
 
 		/*
 		 * If we have to images, the parts must be 'related' otherwise 'mixed'
 		 */
 		Multipart mpMessage = new MimeMultipart(email.getImages().isEmpty() ? "mixed" : "related");
-		mpMessage.addBodyPart(body);
+
+		if (StringUtils.isNotEmpty(email.getMessageText())) {
+			MimeBodyPart body = buildBodyPart(email);
+			mpMessage.addBodyPart(body);
+		}
 
 		int i = 1;
 		for (String image : email.getImages()) {
@@ -362,6 +369,19 @@ public class EMailSender {
 			} catch (UnsupportedEncodingException e) {
 				throw new MessagingException(e.getMessage(), e);
 			}
+
+			if (StringUtils.isNotEmpty(att.getDisposition()))
+				if ("remove".equals(att.getDisposition()))
+					part.removeHeader("Content-Disposition");
+				else
+					part.setDisposition(att.getDisposition());
+
+			if (StringUtils.isNotEmpty(att.getContentType()))
+				part.setHeader("Content-Type", att.getContentType());
+
+			if (StringUtils.isNotEmpty(att.getContentEncoding()))
+				part.setHeader("Content-Transfer-Encoding", att.getContentEncoding());
+
 			mpMessage.addBodyPart(part);
 		}
 
@@ -530,7 +550,7 @@ public class EMailSender {
 	}
 
 	private String detectMimeType(EMailAttachment att) {
-		String mime = "text/plain";
+		String mime = StringUtils.isEmpty(att.getMimeType()) ? att.getMimeType() : "text/plain";
 		try {
 			MagicMatch match = Magic.getMagicMatch(att.getData(), true);
 			mime = match.getMimeType();

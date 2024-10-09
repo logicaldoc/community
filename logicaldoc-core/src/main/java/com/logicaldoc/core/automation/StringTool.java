@@ -19,7 +19,7 @@ public class StringTool {
 	 * @return the passed in String, or the empty String if it was null
 	 */
 	public String defaultString(String str) {
-		return StringUtils.defaultString(str);
+		return StringUtils.defaultIfEmpty(str, "");
 	}
 
 	/**

@@ -2,7 +2,6 @@ package com.logicaldoc.webservice.model;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -307,8 +306,9 @@ public class WSUtil {
 		try {
 			return DateUtils.parseDate(date, "yyyy-MM-dd HH:mm:ss.SSS Z", "yyyy-MM-dd HH:mm:ss.SS Z",
 					"yyyy-MM-dd HH:mm:ss Z", "yyyy-MM-dd");
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			log.error("Unparseable date {}", date);
+			log.error(e.getMessage(), e);
 		}
 
 		return null;

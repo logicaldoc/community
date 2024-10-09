@@ -49,6 +49,11 @@ public class EMail extends Message {
 	 */
 	private long accountId;
 
+	/**
+	 * Optional headers to put in the email
+	 */
+	private Map<String, String> headers = new HashMap<>();
+
 	private Map<Integer, EMailAttachment> attachments = new HashMap<>();
 
 	private Recipient from;
@@ -335,5 +340,13 @@ public class EMail extends Message {
 		} else if (!emailId.equals(other.emailId))
 			return false;
 		return true;
+	}
+
+	public Map<String, String> getHeaders() {
+		return headers;
+	}
+
+	public void setHeaders(Map<String, String> headers) {
+		this.headers = headers;
 	}
 }

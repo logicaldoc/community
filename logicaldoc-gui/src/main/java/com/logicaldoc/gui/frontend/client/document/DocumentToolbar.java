@@ -302,6 +302,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 						user.setUsername(Session.get().getUser().getUsername());
 						user.setFirstName(Session.get().getUser().getFirstName());
 						user.setName(Session.get().getUser().getName());
+						user.setEmail(Session.get().getUser().getEmail());
 						calEvent.addAttendee(user);
 
 						List<GUIDocument> docs = grid.getSelectedDocuments();

@@ -41,6 +41,7 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.LinkItem;
@@ -59,6 +60,8 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  * This is the form used for editing a calendar event.
@@ -143,27 +146,27 @@ public class CalendarEventDialog extends Window {
 		tabs.setHeight100();
 		addItem(tabs);
 
-		HLayout buttonsPanel = new HLayout();
+		ToolStrip buttonsBar = new ToolStrip();
+		buttonsBar.setWidth100();
 
-		IButton save = new IButton();
-		save.setMargin(3);
-		save.setHeight(30);
-		save.setTitle(I18N.message("save"));
+		ToolStripButton save = new ToolStripButton(I18N.message("save"));
 		save.addClickHandler(event -> onSave());
+		buttonsBar.addButton(save);
 
-		IButton delete = new IButton();
-		delete.setMargin(3);
-		delete.setHeight(30);
-		delete.setTitle(I18N.message(DDELETE));
+		ToolStripButton delete = new ToolStripButton(I18N.message(DDELETE));
 		delete.addClickHandler(event -> onDelete());
-
 		if (calendarEvent.getId() != 0)
-			buttonsPanel.setMembers(save, delete);
-		else
-			buttonsPanel.setMembers(save);
+			buttonsBar.addButton(delete);
+
+		CheckboxItem iCalendar = ItemFactory.newCheckbox("icalendar", I18N.message("notifyicalendar"));
+		iCalendar.setValue(calendarEvent.isiCalendar());
+		iCalendar.addChangedHandler(changed -> calendarEvent.setiCalendar(iCalendar.getValueAsBoolean()));
+		buttonsBar.addFormItem(iCalendar);
+
+		buttonsBar.addFill();
 
 		if (!readOnly)
-			addItem(buttonsPanel);
+			addItem(buttonsBar);
 	}
 
 	private Tab prepareReminders() {
@@ -792,6 +795,7 @@ public class CalendarEventDialog extends Window {
 
 			saveAttendees();
 
+			LD.contactingServer();
 			CalendarService.Instance.get().saveEvent(calendarEvent, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
@@ -800,6 +804,7 @@ public class CalendarEventDialog extends Window {
 
 				@Override
 				public void onSuccess(Void arg) {
+					LD.clearPrompt();
 					destroy();
 					if (onChangedCallback != null)
 						onChangedCallback.onSuccess(arg);
@@ -887,6 +892,7 @@ public class CalendarEventDialog extends Window {
 			if (calendarEvent.getParentId() != null) {
 				LD.ask(I18N.message("delevent"), I18N.message("douwantdeletealloccurrences"), answer -> {
 					Long id = Boolean.TRUE.equals(answer) ? calendarEvent.getParentId() : calendarEvent.getId();
+					LD.contactingServer();
 					CalendarService.Instance.get().deleteEvent(id, new AsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
@@ -895,11 +901,13 @@ public class CalendarEventDialog extends Window {
 
 						@Override
 						public void onSuccess(Void arg) {
+							LD.clearPrompt();
 							destroy();
 						}
 					});
 				});
-			} else
+			} else {
+				LD.contactingServer();
 				CalendarService.Instance.get().deleteEvent(calendarEvent.getId(), new AsyncCallback<>() {
 
 					@Override
@@ -909,11 +917,13 @@ public class CalendarEventDialog extends Window {
 
 					@Override
 					public void onSuccess(Void arg) {
+						LD.clearPrompt();
 						destroy();
 						if (onChangedCallback != null)
 							onChangedCallback.onSuccess(arg);
 					}
 				});
+			}
 		});
 	}
 

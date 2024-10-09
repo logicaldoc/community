@@ -66,6 +66,8 @@ public class GUICalendarEvent implements Serializable {
 
 	private String automation;
 
+	private boolean iCalendar = true;
+
 	@Override
 	public String toString() {
 		return getId() + "-" + getTitle();
@@ -304,12 +306,20 @@ public class GUICalendarEvent implements Serializable {
 	public void setLocation(String location) {
 		this.location = location;
 	}
-	
+
 	public List<GUIGroup> getAttendeesGroups() {
 		return attendeesGroups;
 	}
 
 	public void setAttendeesGroups(List<GUIGroup> attendeesGroups) {
 		this.attendeesGroups = attendeesGroups;
+	}
+
+	public boolean isiCalendar() {
+		return iCalendar;
+	}
+
+	public void setiCalendar(boolean iCalendar) {
+		this.iCalendar = iCalendar;
 	}
 }
