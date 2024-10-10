@@ -68,6 +68,7 @@ public class WorkflowDesigner extends AdminPanel {
 
 	public void redraw(GUIWorkflow workflow) {
 		this.workflow = workflow;
+		this.workflowToolstrip.setCurrentWorkflow(workflow);
 		drawingPanel.redraw();
 	}
 
