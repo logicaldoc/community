@@ -881,9 +881,8 @@ public class CalendarEventDialog extends Window {
 	 */
 	private void onDelete() {
 		GUIUser currentUser = Session.get().getUser();
-		if (currentUser.getId() != calendarEvent.getOrganizerId() && !currentUser.isMemberOf(Constants.GROUP_ADMIN)) {
+		if (currentUser.getId() != calendarEvent.getOrganizerId() && !currentUser.isMemberOf(Constants.GROUP_ADMIN))
 			return;
-		}
 
 		LD.ask(I18N.message("delevent"), I18N.message("deleventconfirm"), confirmToDelete -> {
 			if (Boolean.FALSE.equals(confirmToDelete))
@@ -892,39 +891,33 @@ public class CalendarEventDialog extends Window {
 			if (calendarEvent.getParentId() != null) {
 				LD.ask(I18N.message("delevent"), I18N.message("douwantdeletealloccurrences"), answer -> {
 					Long id = Boolean.TRUE.equals(answer) ? calendarEvent.getParentId() : calendarEvent.getId();
-					LD.contactingServer();
-					CalendarService.Instance.get().deleteEvent(id, new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(Void arg) {
-							LD.clearPrompt();
-							destroy();
-						}
-					});
+					deleteEvent(id);
 				});
 			} else {
-				LD.contactingServer();
-				CalendarService.Instance.get().deleteEvent(calendarEvent.getId(), new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(Void arg) {
-						LD.clearPrompt();
-						destroy();
-						if (onChangedCallback != null)
-							onChangedCallback.onSuccess(arg);
-					}
-				});
+				deleteEvent(calendarEvent.getId());
 			}
 		});
+	}
+
+	private void deleteEvent(Long id) {
+		LD.ask(I18N.message("delevent"), I18N.message("askalertcancelation"), answer -> {
+			LD.contactingServer();
+			CalendarService.Instance.get().deleteEvent(id, Boolean.TRUE.equals(answer), new AsyncCallback<>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(Void arg) {
+					LD.clearPrompt();
+					destroy();
+					if (onChangedCallback != null)
+						onChangedCallback.onSuccess(arg);
+				}
+			});
+		});
+
 	}
 
 	private void addAttendee(final ListGrid list, String id, String name, String email) {

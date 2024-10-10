@@ -58,10 +58,11 @@ public interface CalendarService extends RemoteService {
 	 * occurrences will be deleted too
 	 * 
 	 * @param eventId identifier of the event
+	 * @param alertCancelation flat to alert attendees about the cancelation
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void deleteEvent(long eventId) throws ServerException;
+	public void deleteEvent(long eventId, boolean alertCancelation) throws ServerException;
 
 	/**
 	 * Counts the number of events that start from now until a given date

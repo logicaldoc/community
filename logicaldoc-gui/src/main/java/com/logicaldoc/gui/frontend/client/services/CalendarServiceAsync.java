@@ -12,7 +12,7 @@ public interface CalendarServiceAsync {
 
 	void getEvent(long eventId, AsyncCallback<GUICalendarEvent> callback);
 
-	void deleteEvent(long eventId, AsyncCallback<Void> callback);
+	void deleteEvent(long eventId, boolean alertCancelation, AsyncCallback<Void> callback);
 
 	void countUserEvents(String username, Date end, AsyncCallback<Integer> callback);
 

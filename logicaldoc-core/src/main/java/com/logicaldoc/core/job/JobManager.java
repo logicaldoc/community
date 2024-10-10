@@ -93,7 +93,7 @@ public class JobManager {
 		JobKey jobKey = JobKey.jobKey(job.getName(), job.getGroup());
 		JobDetail jobDetail = scheduler.getJobDetail(jobKey);
 		if (jobDetail != null) {
-			// Delete the job and all it's triggers that may altrady exist
+			// Delete the job and all it's triggers that may already exist
 			scheduler.deleteJob(jobKey);
 		}
 
@@ -118,7 +118,6 @@ public class JobManager {
 
 		if (triggerSpec instanceof Date dateSpec) {
 			// The job must be fired on a specific data
-
 			SimpleScheduleBuilder schedule = SimpleScheduleBuilder.simpleSchedule();
 			if (MISSFIRE_RUNNOW.equals(getMissfireInstruction(job.getGroup())))
 				schedule = schedule.withMisfireHandlingInstructionFireNow();
