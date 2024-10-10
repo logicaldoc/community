@@ -309,21 +309,13 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testSaveSettings() {
+	public void testSaveSettings() throws ServerException {
 		GUISecuritySettings securitySettings = new GUISecuritySettings();
 		securitySettings.setPwdExpiration(30);
 		securitySettings.setPwdSize(6);
 		securitySettings.setAnonymousKey("xxx");
-
-		String notThrownTest = null;
-		try {
-			testSubject.saveSettings(securitySettings);
-			notThrownTest = "ok";
-		} catch (Exception t) {
-			t.printStackTrace();
-			// Nothing to do
-		}
-		assertEquals("ok", notThrownTest);
+		securitySettings.setContentSecurityPolicy("xyz");
+		testSubject.saveSettings(securitySettings);
 	}
 
 	@Test

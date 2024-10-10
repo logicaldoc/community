@@ -136,6 +136,10 @@ public class WorkflowToolStrip extends ToolStrip {
 		update();
 	}
 
+	public void setCurrentWorkflow(GUIWorkflow currentWorkflow) {
+		this.currentWorkflow = currentWorkflow;
+	}
+	
 	private void addExportButton() {
 		export = new ToolStripButton(I18N.message("eexport"));
 		export.addClickHandler(event -> Util

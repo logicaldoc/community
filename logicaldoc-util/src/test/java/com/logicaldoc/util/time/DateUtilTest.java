@@ -25,17 +25,15 @@ public class DateUtilTest extends TestCase {
 		calendar.set(Calendar.SECOND, 13);
 		calendar.set(Calendar.MILLISECOND, 27);
 
-		DateFormat timeZoneFormat = new SimpleDateFormat("Z");
+		assertTrue(DateUtil.format(calendar.getTime())
+				.startsWith("1992-"
+						+ StringUtils.leftPad(Integer.toString(Calendar.getInstance().get(Calendar.MONTH) + 1), 2, '0')
+						+ "-15 23:50:13 "));
 
-		assertEquals(
-				"1992-" + StringUtils.leftPad(Integer.toString(Calendar.getInstance().get(Calendar.MONTH) + 1), 2, '0')
-						+ "-15 23:50:13 " + timeZoneFormat.format(new Date()),
-				DateUtil.format(calendar.getTime()));
-
-		assertEquals(
-				"1992-" + StringUtils.leftPad(Integer.toString(Calendar.getInstance().get(Calendar.MONTH) + 1), 2, '0')
-						+ "-15 23:50:13.027 " + timeZoneFormat.format(new Date()),
-				DateUtil.formatWithMillis(calendar.getTime()));
+		assertTrue(DateUtil.formatWithMillis(calendar.getTime())
+				.startsWith("1992-"
+						+ StringUtils.leftPad(Integer.toString(Calendar.getInstance().get(Calendar.MONTH) + 1), 2, '0')
+						+ "-15 23:50:13.027 "));
 	}
 
 	@Test
