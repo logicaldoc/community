@@ -80,7 +80,7 @@ public class VersionsPanel extends DocumentDetailTab {
 		ListGridField permalink = preparePermalink();
 
 		ListGridField wfStatus = prepareWorkflow();
-				
+
 		list = new RefreshableListGrid(
 				new VersionsDS(document.getId(), null, Session.get().getConfigAsInt("gui.maxversions")));
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -349,8 +349,7 @@ public class VersionsPanel extends DocumentDetailTab {
 
 					@Override
 					public void onSuccess(List<GUIVersion> result) {
-						MetadataDiff diffWinfow = new MetadataDiff(result.get(0), result.get(1));
-						diffWinfow.show();
+						new MetadataDiff(result.get(0), result.get(1)).show();
 					}
 				}));
 		return compareMetadata;

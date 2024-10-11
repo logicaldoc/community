@@ -117,10 +117,7 @@ public class MetadataDiff extends Window {
 
 		IButton compareContent = new IButton(I18N.message("comparecontent"));
 		compareContent.setWidth100();
-		compareContent.addClickHandler(event -> {
-			ComparisonWindow diff = new ComparisonWindow(version1, version2);
-			diff.show();
-		});
+		compareContent.addClickHandler(click -> new ComparisonWindow(version1, version2).show());
 		if (Feature.visible(Feature.COMPARISON)) {
 			addItem(compareContent);
 			compareContent.setDisabled(!Feature.enabled(Feature.COMPARISON));
@@ -135,9 +132,8 @@ public class MetadataDiff extends Window {
 
 		List<String> names = prepareAttributeNames(version1, version2);
 
-		for (String name : names) {
+		for (String name : names)
 			addDiffRecord(version1, version2, dateFormat, numberFormat, attributeRecords, name);
-		}
 
 		attributeRecords.sort(null);
 		records.addAll(attributeRecords);
@@ -175,7 +171,8 @@ public class MetadataDiff extends Window {
 
 	private String extractValue(DateTimeFormat dateFormat, NumberFormat numberFormat, GUIAttribute attribute) {
 		String val = "";
-		if ((attribute.getType() == GUIAttribute.TYPE_STRING || attribute.getType() == GUIAttribute.TYPE_USER)
+		if ((attribute.getType() == GUIAttribute.TYPE_STRING || attribute.getType() == GUIAttribute.TYPE_USER
+				|| attribute.getType() == GUIAttribute.TYPE_DOCUMENT || attribute.getType() == GUIAttribute.TYPE_FOLDER)
 				&& attribute.getStringValue() != null) {
 			val = attribute.getStringValue();
 		} else if (attribute.getType() == GUIAttribute.TYPE_INT && attribute.getValue() != null) {
