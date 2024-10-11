@@ -466,7 +466,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		if (auth instanceof LDAuthenticationToken ldAuthenticationToken)
 			return ldAuthenticationToken.getSid();
 
-		if (request != null) {
+		if (request != null && Context.get().getProperties().getBoolean("security.useclientid", false)) {
 			Client client = buildClient(request);
 			Session session = getByClientId(client.getId());
 			if (session != null && isOpen(session.getSid()))
