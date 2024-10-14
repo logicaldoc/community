@@ -1,6 +1,7 @@
 package com.logicaldoc.core.security;
 
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import com.logicaldoc.core.security.spring.LDAuthenticationToken;
 import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**
@@ -395,11 +397,31 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		if (auth instanceof LDAuthenticationToken ldAuthenticationToken)
 			return ldAuthenticationToken.getSid();
 
-		if (request != null) {
+		if (request != null && Context.get().getProperties().getBoolean("security.useclientid", false)) {
 			Client client = buildClient(request);
 			Session session = getByClientId(client.getId());
-			if (session != null && isOpen(session.getSid()))
-				return session.getSid();
+
+			/*
+			 * In case of ClienID match, we must check the session provides
+			 * Basic Authentication and refers to the same username
+			 */
+			if (session != null && isOpen(session.getSid()) && session.getUsername().equals(client.getUsername())) {
+				String[] credentials = getBasicCredentials(request);
+				if (credentials.length == 2) {
+					try {
+						/*
+						 * In case the current user has defined a password, also
+						 * check it matches with the basic authentication
+						 */
+						final String sessionUserPassword = session.getUser().getPassword();
+						if (StringUtils.isEmpty(sessionUserPassword)
+								|| CryptUtil.encryptSHA256(credentials[1]).equals(sessionUserPassword))
+							return session.getSid();
+					} catch (NoSuchAlgorithmException e) {
+						log.error("Unable to check credentials", e);
+					}
+				}
+			}
 		}
 
 		return null;
