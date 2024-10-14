@@ -490,10 +490,10 @@ public class TaskEditor extends Window {
 				// Check if the selected user is already present in the
 				// candidates list
 				if (candidatesGrid.find(new AdvancedCriteria("name", OperatorId.EQUALS,
-						"g." + selectedRecord.getAttribute("name"))) != null)
+						"#group." + selectedRecord.getAttribute("name"))) != null)
 					return;
 				else
-					addCandidates("g." + selectedRecord.getAttribute("name"), selectedRecord.getAttribute("name"));
+					addCandidates("#group." + selectedRecord.getAttribute("name"), selectedRecord.getAttribute("name"));
 				addGroup.clearValue();
 			}
 		});
@@ -577,7 +577,7 @@ public class TaskEditor extends Window {
 		ListGridRecord rec = new ListGridRecord();
 		rec.setAttribute("name", name);
 		rec.setAttribute(LABEL, label);
-		if (name.startsWith("g."))
+		if (name.startsWith("#group."))
 			rec.setAttribute(AVATAR, "group");
 		else if (name.startsWith("att."))
 			rec.setAttribute(AVATAR, "attribute");
