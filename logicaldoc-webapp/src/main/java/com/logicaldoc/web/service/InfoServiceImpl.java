@@ -123,8 +123,9 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
 	private static String loadChangelog() {
 		try (InputStream is = IOUtil.getLimitedStream(InfoServiceImpl.class.getResourceAsStream("/CHANGELOG.txt"),
-				4096)) {
-			return IOUtil.readStream(is);
+				5000)) {
+			String changelog = IOUtil.readStream(is);
+			return changelog.replace("logicaldoc", "").replace("LogicalDOC", "");
 		} catch (Exception e) {
 			return "";
 		}

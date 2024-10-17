@@ -64,7 +64,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			UserHistoryDAO userHistoryDao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
 			TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 
-			User user = userDao.findByUsername(username);
+			User user = pickUser(username);
 			if (user == null)
 				return null;
 
@@ -209,7 +209,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 			DeviceDAO deviceDao = (DeviceDAO) Context.get().getBean(DeviceDAO.class);
 			try {
-				return !deviceDao.isTrustedDevice(username, request);
+				return !deviceDao.isTrustedDevice(user.getUsername(), request);
 			} catch (PersistenceException e) {
 				log.warn(e.getMessage(), e);
 				return false;
