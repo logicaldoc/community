@@ -302,7 +302,7 @@ public class Automation {
 		} else {
 			Pattern runtimePattern = Pattern.compile("\\.\\s*(getRuntime|runtime)", Pattern.DOTALL);
 			Matcher m = runtimePattern.matcher(expression);
-			while (m.find()) {
+			if (m.find()) {
 				String snippet = expression.substring(Math.max(0, m.start() - 50),
 						Math.min(expression.length() - 1, m.end() + 50));
 				log.error("Detected possible suspicious access to java.lang.Runtime: {}", snippet);

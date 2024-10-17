@@ -322,4 +322,38 @@ public class GUICalendarEvent implements Serializable {
 	public void setiCalendar(boolean iCalendar) {
 		this.iCalendar = iCalendar;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + ((start == null) ? 0 : start.hashCode());
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GUICalendarEvent other = (GUICalendarEvent) obj;
+		if (id != other.id)
+			return false;
+		if (start == null) {
+			if (other.start != null)
+				return false;
+		} else if (!start.equals(other.start))
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		return true;
+	}
 }

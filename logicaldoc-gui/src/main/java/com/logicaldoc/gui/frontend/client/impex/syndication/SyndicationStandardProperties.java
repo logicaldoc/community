@@ -6,7 +6,6 @@ import java.util.Map;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUISyndication;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.smartgwt.client.types.DateDisplayFormat;

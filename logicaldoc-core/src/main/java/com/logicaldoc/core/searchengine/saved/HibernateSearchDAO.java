@@ -19,6 +19,8 @@ import com.logicaldoc.core.PersistenceException;
  */
 public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch> implements SearchDAO {
 
+	private static final String USERID = "userId";
+
 	private HibernateSearchDAO() {
 		super(SavedSearch.class);
 		super.log = LoggerFactory.getLogger(HibernateSearchDAO.class);
@@ -26,13 +28,13 @@ public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch
 
 	@Override
 	public List<SavedSearch> findByUserId(long userId) throws PersistenceException {
-		return findByWhere(ENTITY + ".userId = :userId", Map.of("userId", userId), ENTITY + ".name asc", null);
+		return findByWhere(ENTITY + ".userId = :userId", Map.of(USERID, userId), ENTITY + ".name asc", null);
 	}
 
 	@Override
 	public SavedSearch findByUserIdAndName(long userId, String name) throws PersistenceException {
 		List<SavedSearch> searches = findByWhere(ENTITY + ".userId = :userId and " + ENTITY + ".name = :name",
-				Map.of("userId", userId, "name", name), null, null);
+				Map.of(USERID, userId, "name", name), null, null);
 		if (searches.isEmpty())
 			return null;
 		else
@@ -74,7 +76,7 @@ public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch
 
 		// Execute the query to populate the sets
 		try {
-			SqlRowSet rs = queryForRowSet(query.toString(), Map.of("userId", search.getUserId(), "baseName",
+			SqlRowSet rs = queryForRowSet(query.toString(), Map.of(USERID, search.getUserId(), "baseName",
 					baseName.toLowerCase() + "%", "id", search.getId()), null);
 			if (rs != null)
 				while (rs.next()) {

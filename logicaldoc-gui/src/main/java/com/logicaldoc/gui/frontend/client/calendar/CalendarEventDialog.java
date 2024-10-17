@@ -71,6 +71,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class CalendarEventDialog extends Window {
 
+	private static final String DELEVENT = "delevent";
+
 	private static final String NOTIFY = "notify";
 
 	private static final String EMAIL = "email";
@@ -884,12 +886,12 @@ public class CalendarEventDialog extends Window {
 		if (currentUser.getId() != calendarEvent.getOrganizerId() && !currentUser.isMemberOf(Constants.GROUP_ADMIN))
 			return;
 
-		LD.ask(I18N.message("delevent"), I18N.message("deleventconfirm"), confirmToDelete -> {
+		LD.ask(I18N.message(DELEVENT), I18N.message("deleventconfirm"), confirmToDelete -> {
 			if (Boolean.FALSE.equals(confirmToDelete))
 				return;
 
 			if (calendarEvent.getParentId() != null) {
-				LD.ask(I18N.message("delevent"), I18N.message("douwantdeletealloccurrences"), answer -> {
+				LD.ask(I18N.message(DELEVENT), I18N.message("douwantdeletealloccurrences"), answer -> {
 					Long id = Boolean.TRUE.equals(answer) ? calendarEvent.getParentId() : calendarEvent.getId();
 					deleteEvent(id);
 				});
@@ -900,7 +902,7 @@ public class CalendarEventDialog extends Window {
 	}
 
 	private void deleteEvent(Long id) {
-		LD.ask(I18N.message("delevent"), I18N.message("askalertcancelation"), answer -> {
+		LD.ask(I18N.message(DELEVENT), I18N.message("askalertcancelation"), answer -> {
 			LD.contactingServer();
 			CalendarService.Instance.get().deleteEvent(id, Boolean.TRUE.equals(answer), new AsyncCallback<>() {
 				@Override
@@ -956,5 +958,30 @@ public class CalendarEventDialog extends Window {
 			newRecord.setAttribute("when", BEFORE);
 		}
 		remindersGrid.addData(newRecord);
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((calendarEvent == null) ? 0 : calendarEvent.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CalendarEventDialog other = (CalendarEventDialog) obj;
+		if (calendarEvent == null) {
+			if (other.calendarEvent != null)
+				return false;
+		} else if (!calendarEvent.equals(other.calendarEvent))
+			return false;
+		return true;
 	}
 }

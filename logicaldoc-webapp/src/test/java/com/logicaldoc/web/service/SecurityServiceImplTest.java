@@ -316,6 +316,9 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 		securitySettings.setAnonymousKey("xxx");
 		securitySettings.setContentSecurityPolicy("xyz");
 		testSubject.saveSettings(securitySettings);
+		
+		GUISecuritySettings settings = testSubject.loadSettings();
+		assertEquals("xxx", settings.getAnonymousKey());
 	}
 
 	@Test

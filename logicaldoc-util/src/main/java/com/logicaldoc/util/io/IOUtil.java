@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
@@ -125,15 +127,16 @@ public class IOUtil {
 	 * @param bufferSize The buffer size in bytes
 	 * 
 	 * @throws IOException I/O error
+	 * @throws URISyntaxException The URL is invalid
 	 */
-	public static void download(final String url, File dest, int timeout, int bufferSize) throws IOException {
+	public static void download(final String url, File dest, int timeout, int bufferSize) throws IOException, URISyntaxException {
 		if (url == null || url.isEmpty()) {
 			throw new IOException("Url argument is not specified"); // URL
 																	// isn't
 																	// specified
 		}
 
-		URL uri = new URL(url);
+		URL uri = new URI(url).toURL();
 		java.net.HttpURLConnection connection = (java.net.HttpURLConnection) uri.openConnection();
 		if (timeout > 0)
 			connection.setConnectTimeout(timeout);

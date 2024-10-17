@@ -30,6 +30,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class ThreadWindow extends Window {
 
+	private static final String CHATGPT = "chatgpt";
+
 	private VLayout contents;
 
 	private VLayout messagesBoard = new VLayout();
@@ -46,7 +48,7 @@ public class ThreadWindow extends Window {
 
 	private ThreadWindow() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.MINIMIZE_BUTTON, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("chatgpt"));
+		setTitle(I18N.message(CHATGPT));
 		setCanDragResize(true);
 		setIsModal(false);
 		setPosition(Positioning.ABSOLUTE);
@@ -150,7 +152,7 @@ public class ThreadWindow extends Window {
 
 	private void ask(String question) {
 		appendMessage(question, "user");
-		appendMessage("", "chatgpt");
+		appendMessage("", CHATGPT);
 		answerPolling = null;
 
 		ChatGPTService.Instance.get().ask(question, new AsyncCallback<Void>() {
@@ -169,7 +171,7 @@ public class ThreadWindow extends Window {
 
 	private void startThread(String question) {
 		appendMessage(question, "user");
-		appendMessage("", "chatgpt");
+		appendMessage("", CHATGPT);
 		answerPolling = null;
 
 		ChatGPTService.Instance.get().startThread(question, DocumentController.get().getCurrentSelection(),

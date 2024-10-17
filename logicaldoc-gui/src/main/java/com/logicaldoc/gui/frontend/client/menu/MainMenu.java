@@ -79,6 +79,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class MainMenu extends ToolStrip implements FolderObserver, DocumentObserver {
 
+	private static final String CREATEDOC = "createdoc";
+
+	private static final String EDITDOC = "editdoc";
+
 	private static final String APIKEY = "apikey";
 
 	private static final String AUTHORIZE = "authorize";
@@ -218,7 +222,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		menu.setShowShadow(true);
 		menu.setShadowDepth(3);
 
-		final MenuItem edit = new MenuItem(I18N.message("editdoc"));
+		final MenuItem edit = new MenuItem(I18N.message(EDITDOC));
 		edit.addClickHandler(event -> {
 			if (document == null)
 				return;
@@ -243,7 +247,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			}
 		});
 
-		final MenuItem create = new MenuItem(I18N.message("createdoc"));
+		final MenuItem create = new MenuItem(I18N.message(CREATEDOC));
 		create.addClickHandler(event -> new WebcontentCreate().show());
 
 		menu.setItems(edit, create);
@@ -264,7 +268,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		menu.setShowShadow(true);
 		menu.setShadowDepth(3);
 
-		final MenuItem edit = new MenuItem(I18N.message("editdoc"));
+		final MenuItem edit = new MenuItem(I18N.message(EDITDOC));
 		edit.addClickHandler(event -> {
 			if (document == null)
 				return;
@@ -289,7 +293,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			}
 		});
 
-		final MenuItem create = new MenuItem(I18N.message("createdoc"));
+		final MenuItem create = new MenuItem(I18N.message(CREATEDOC));
 		create.addClickHandler((MenuItemClickEvent event) -> new TextContentCreate().show());
 
 		menu.setItems(edit, create);
@@ -562,7 +566,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		menu.setShowShadow(true);
 		menu.setShadowDepth(3);
 
-		final MenuItem edit = new MenuItem(I18N.message("editdoc"));
+		final MenuItem edit = new MenuItem(I18N.message(EDITDOC));
 		edit.addClickHandler(event -> {
 			if (document == null)
 				return;
@@ -571,7 +575,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 					() -> new OnlyOfficeEditor(document).show());
 		});
 
-		final MenuItem create = new MenuItem(I18N.message("createdoc"));
+		final MenuItem create = new MenuItem(I18N.message(CREATEDOC));
 		create.addClickHandler(event -> new OnlyOfficeCreate().show());
 
 		// This should be enabled only on PDF

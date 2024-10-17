@@ -80,9 +80,9 @@ public class Device extends PersistentObject implements Serializable {
 	 * @param request the current request
 	 */
 	public Device(HttpServletRequest request) {
-		UserAgent agent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
-
 		setDeviceId(getDeviceId(request));
+		
+		UserAgent agent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
 		setBrowser(agent.getBrowser().getName());
 
 		if (agent.getBrowserVersion() != null)

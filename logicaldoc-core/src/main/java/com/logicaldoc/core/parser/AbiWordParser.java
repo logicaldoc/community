@@ -50,7 +50,7 @@ public class AbiWordParser extends AbstractParser {
 			String tmp = content.toString();
 			if (tmp != null && tmp.length() > 0) {
 				// Clean all the unwanted characters
-				tmp = tmp.replaceAll("[<>\"â€œâ€�`]", "");
+				tmp = tmp.replaceAll("[<>\"]", "");
 			}
 			return tmp;
 		}

@@ -392,12 +392,7 @@ public class ContextMenu extends Menu {
 	}
 
 	private void applyCompareSecurity(List<GUIDocument> selection) {
-		if ((selection != null && selection.size() == 2) && Feature.enabled(Feature.COMPARISON)) {
-			String fileName1 = selection.get(0).getFileName().toLowerCase();
-			String fileName2 = selection.get(1).getFileName().toLowerCase();
-			compare.setEnabled(Util.getExtension(fileName1).equalsIgnoreCase(Util.getExtension(fileName2)));
-		} else
-			compare.setEnabled(false);
+		compare.setEnabled(selection != null && selection.size() == 2 && Feature.enabled(Feature.COMPARISON));
 	}
 
 	private void addAutomationItem(MenuItem automation, Menu moreMenu) {

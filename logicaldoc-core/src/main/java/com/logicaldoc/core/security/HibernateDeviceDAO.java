@@ -123,11 +123,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 			return false;
 
 		List<Device> trustedDevices = findTrustedDevices(user.getId());
-		for (Device device : trustedDevices)
-			if (device.equals(requestDevice))
-				return true;
-
-		return false;
+		return trustedDevices.stream().anyMatch(d -> d.getDeviceId().equals(requestDevice.getDeviceId()));
 	}
 
 	@Override

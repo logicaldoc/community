@@ -43,6 +43,8 @@ import com.smartgwt.client.widgets.tab.Tab;
  */
 public class SecuritySettingsPanel extends AdminPanel {
 
+	private static final String ALLOWCLIENTID = "allowclientid";
+
 	private static final String ENABLEANONYMOUS = "enableanonymous";
 
 	private static final String CONTENTSECURITYPOLICY = "contentsecuritypolicy";
@@ -193,8 +195,8 @@ public class SecuritySettingsPanel extends AdminPanel {
 		allowSid.setRequired(true);
 		allowSid.setDisabled(Session.get().isDemo());
 
-		final RadioGroupItem allowClientId = ItemFactory.newBooleanSelector("allowclientid",
-				I18N.message("allowclientid"));
+		final RadioGroupItem allowClientId = ItemFactory.newBooleanSelector(ALLOWCLIENTID,
+				I18N.message(ALLOWCLIENTID));
 		allowClientId.setValue(settings.isAllowClientId() ? "yes" : "no");
 		allowClientId.setWrapTitle(false);
 		allowClientId.setRequired(true);
@@ -305,7 +307,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 	private void collectDefaultTenantSettings(final Map<String, Object> values) {
 		if (Session.get().isDefaultTenant()) {
 			SecuritySettingsPanel.this.settings.setAllowSidInRequest(values.get("allowsid").equals("yes"));
-			SecuritySettingsPanel.this.settings.setAllowClientId(values.get("allowclientid").equals("yes"));
+			SecuritySettingsPanel.this.settings.setAllowClientId(values.get(ALLOWCLIENTID).equals("yes"));
 
 			SecuritySettingsPanel.this.settings.setIgnoreLoginCase(values.get("ignorelogincase").equals("yes"));
 			SecuritySettingsPanel.this.settings.setCookiesSecure(values.get("secureCookies").equals("yes"));

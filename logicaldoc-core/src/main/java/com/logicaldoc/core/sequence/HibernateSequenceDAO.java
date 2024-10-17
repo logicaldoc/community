@@ -20,6 +20,7 @@ import com.logicaldoc.core.PersistenceException;
  */
 public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence> implements SequenceDAO {
 
+	private static final String TENANTID = "tenantId";
 	private static final String AND = " and ";
 
 	private HibernateSequenceDAO() {
@@ -88,7 +89,7 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 		String query = " " + ENTITY + ".tenantId = :tenantId " + AND + ENTITY + ".name like :name ";
 
 		try {
-			return findByWhere(query, Map.of("tenantId", tenantId, "name", name + "%"), null, null);
+			return findByWhere(query, Map.of(TENANTID, tenantId, "name", name + "%"), null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -126,7 +127,7 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 		String query = "select ld_id from ld_sequence where ld_name = :name and ld_objectid = :objectId and ld_tenantid = :tenantId";
 		try {
 			long sequenceId = queryForLong(query,
-					Map.of("tenantId", tenantId, "objectId", objectId, "name", sequenceName));
+					Map.of(TENANTID, tenantId, "objectId", objectId, "name", sequenceName));
 			if (sequenceId != 0L)
 				sequence = findById(sequenceId);
 		} catch (Exception t) {
@@ -142,7 +143,7 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 			query += AND + ENTITY + ".objectId = :objectId ";
 			query += AND + ENTITY + ".name = :name ";
 
-			sequences = findByWhere(query, Map.of("tenantId", tenantId, "objectId", objectId, "name", sequenceName),
+			sequences = findByWhere(query, Map.of(TENANTID, tenantId, "objectId", objectId, "name", sequenceName),
 					null, null);
 		} catch (Exception t) {
 			// Nothing to do

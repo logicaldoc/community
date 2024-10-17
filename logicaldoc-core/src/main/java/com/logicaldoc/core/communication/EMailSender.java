@@ -333,59 +333,18 @@ public class EMailSender {
 		/*
 		 * If we have to images, the parts must be 'related' otherwise 'mixed'
 		 */
-		Multipart mpMessage = new MimeMultipart(email.getImages().isEmpty() ? "mixed" : "related");
+		Multipart multipartMessage = new MimeMultipart(email.getImages().isEmpty() ? "mixed" : "related");
 
 		if (StringUtils.isNotEmpty(email.getMessageText())) {
 			MimeBodyPart body = buildBodyPart(email);
-			mpMessage.addBodyPart(body);
+			multipartMessage.addBodyPart(body);
 		}
 
-		int i = 1;
-		for (String image : email.getImages()) {
-			MimeBodyPart imageBodyPart = new MimeBodyPart();
+		includeImages(email, multipartMessage);
 
-			try {
-				DataSource ds = new URLDataSource(UrlUtil.toURL(image));
-				imageBodyPart.setDataHandler(new DataHandler(ds));
-			} catch (MalformedURLException | URISyntaxException e) {
-				throw new MessagingException(e.getMessage(), e);
-			}
+		includeAttachments(email, multipartMessage);
 
-			imageBodyPart.setHeader("Content-ID", "<image_" + (i++) + ">");
-			imageBodyPart.setDisposition("inline");
-			mpMessage.addBodyPart(imageBodyPart);
-		}
-
-		for (Integer partId : email.getAttachments().keySet()) {
-			EMailAttachment att = email.getAttachment(partId);
-			String mime = detectMimeType(att);
-			DataSource fdSource = new ByteArrayDataSource(att.getData(), mime);
-			DataHandler fdHandler = new DataHandler(fdSource);
-			MimeBodyPart part = new MimeBodyPart();
-			part.setDataHandler(fdHandler);
-			try {
-				String fileName = MimeUtility.encodeText(att.getFileName(), UTF_8, null);
-				part.setFileName(fileName);
-			} catch (UnsupportedEncodingException e) {
-				throw new MessagingException(e.getMessage(), e);
-			}
-
-			if (StringUtils.isNotEmpty(att.getDisposition()))
-				if ("remove".equals(att.getDisposition()))
-					part.removeHeader("Content-Disposition");
-				else
-					part.setDisposition(att.getDisposition());
-
-			if (StringUtils.isNotEmpty(att.getContentType()))
-				part.setHeader("Content-Type", att.getContentType());
-
-			if (StringUtils.isNotEmpty(att.getContentEncoding()))
-				part.setHeader("Content-Transfer-Encoding", att.getContentEncoding());
-
-			mpMessage.addBodyPart(part);
-		}
-
-		message.setContent(mpMessage);
+		message.setContent(multipartMessage);
 
 		MailDateFormat formatter = new MailDateFormat();
 		formatter.setTimeZone(TimeZone.getTimeZone("GMT")); // always use UTC
@@ -412,6 +371,57 @@ public class EMailSender {
 		 */
 		email.setSentDate(now);
 		historycizeOutgoingEmail(email, message, from);
+	}
+
+	private void includeAttachments(EMail email, Multipart multipartMessage) throws MessagingException {
+		for (Integer partId : email.getAttachments().keySet()) {
+			EMailAttachment att = email.getAttachment(partId);
+			String mime = detectMimeType(att);
+			DataSource fdSource = new ByteArrayDataSource(att.getData(), mime);
+			DataHandler fdHandler = new DataHandler(fdSource);
+			MimeBodyPart part = new MimeBodyPart();
+			part.setDataHandler(fdHandler);
+			try {
+				String fileName = MimeUtility.encodeText(att.getFileName(), UTF_8, null);
+				part.setFileName(fileName);
+			} catch (UnsupportedEncodingException e) {
+				throw new MessagingException(e.getMessage(), e);
+			}
+
+			if (StringUtils.isNotEmpty(att.getDisposition())) {
+				if ("remove".equals(att.getDisposition())) {
+					part.removeHeader("Content-Disposition");
+				} else {
+					part.setDisposition(att.getDisposition());
+				}
+			}
+
+			if (StringUtils.isNotEmpty(att.getContentType()))
+				part.setHeader("Content-Type", att.getContentType());
+
+			if (StringUtils.isNotEmpty(att.getContentEncoding()))
+				part.setHeader("Content-Transfer-Encoding", att.getContentEncoding());
+
+			multipartMessage.addBodyPart(part);
+		}
+	}
+
+	private void includeImages(EMail email, Multipart multipartMessage) throws MessagingException {
+		int i = 1;
+		for (String image : email.getImages()) {
+			MimeBodyPart imageBodyPart = new MimeBodyPart();
+
+			try {
+				DataSource ds = new URLDataSource(UrlUtil.toURL(image));
+				imageBodyPart.setDataHandler(new DataHandler(ds));
+			} catch (MalformedURLException | URISyntaxException e) {
+				throw new MessagingException(e.getMessage(), e);
+			}
+
+			imageBodyPart.setHeader("Content-ID", "<image_" + (i++) + ">");
+			imageBodyPart.setDisposition("inline");
+			multipartMessage.addBodyPart(imageBodyPart);
+		}
 	}
 
 	protected InternetAddress prepareFrom(EMail email) throws AddressException {

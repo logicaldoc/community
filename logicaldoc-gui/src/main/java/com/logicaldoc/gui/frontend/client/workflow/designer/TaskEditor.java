@@ -58,6 +58,8 @@ import com.smartgwt.client.widgets.tab.TabSet;
  */
 public class TaskEditor extends Window {
 
+	private static final String GROUP_PREFIX = "#group.";
+
 	private static final String AVATAR = "avatar";
 
 	private static final String LABEL = "label";
@@ -490,10 +492,10 @@ public class TaskEditor extends Window {
 				// Check if the selected user is already present in the
 				// candidates list
 				if (candidatesGrid.find(new AdvancedCriteria("name", OperatorId.EQUALS,
-						"g." + selectedRecord.getAttribute("name"))) != null)
+						GROUP_PREFIX + selectedRecord.getAttribute("name"))) != null)
 					return;
 				else
-					addCandidates("g." + selectedRecord.getAttribute("name"), selectedRecord.getAttribute("name"));
+					addCandidates(GROUP_PREFIX + selectedRecord.getAttribute("name"), selectedRecord.getAttribute("name"));
 				addGroup.clearValue();
 			}
 		});
@@ -577,7 +579,7 @@ public class TaskEditor extends Window {
 		ListGridRecord rec = new ListGridRecord();
 		rec.setAttribute("name", name);
 		rec.setAttribute(LABEL, label);
-		if (name.startsWith("g."))
+		if (name.startsWith(GROUP_PREFIX))
 			rec.setAttribute(AVATAR, "group");
 		else if (name.startsWith("att."))
 			rec.setAttribute(AVATAR, "attribute");

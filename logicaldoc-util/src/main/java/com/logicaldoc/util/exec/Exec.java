@@ -93,14 +93,14 @@ public class Exec {
 
 		if (log.isDebugEnabled())
 			log.debug("Executing command: {}", commandLine);
-		
+
 		ProcessBuilder pb = new ProcessBuilder();
 		pb.redirectErrorStream(true);
 		pb.command(commandLine.toArray(new String[0]));
 		pb.directory(directory);
 		if (!CollectionUtils.isEmpty(environment))
 			pb.environment().putAll(environment);
-		
+
 		Worker worker = null;
 		Process process = null;
 		try {
@@ -116,7 +116,7 @@ public class Exec {
 				worker.join(timeout * 1000L);
 			else
 				worker.join();
-			
+
 			if (worker.getExit() == null)
 				throw new TimeoutException();
 			else
@@ -194,7 +194,8 @@ public class Exec {
 				Callable<Integer> call = new CallableProcess(process);
 				Future<Integer> future = service.submit(call);
 				exit = future.get(timeout, TimeUnit.SECONDS);
-				log.debug("{} returned {}", commandLine.get(0), exit);
+				if (log.isDebugEnabled())
+					log.debug("{} returned {}", commandLine.get(0), exit);
 			} catch (InterruptedException e) {
 				process.destroy();
 				Thread.currentThread().interrupt();

@@ -1,6 +1,5 @@
 package com.logicaldoc.gui.frontend.client.onlyoffice;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 import com.google.gwt.http.client.URL;
@@ -23,11 +22,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class OnlyOfficeEditor extends Window {
 
-	private HTMLFlow html = new HTMLFlow();
-
-	private VLayout layout = null;
-
-	private GUIDocument document;
+	private static final String ONLYOFFICE_EDITOR_DOC_ID = "onlyoffice/editor?docId=";
+	private static final String FILE_NAME = "&fileName=";
 
 	public OnlyOfficeEditor(final GUIDocument document) {
 
@@ -37,8 +33,6 @@ public class OnlyOfficeEditor extends Window {
 		else
 			setTitle(I18N.message("createdoc") + ": " + document.getFileName());
 
-		this.document = document;
-
 		setWidth(com.google.gwt.user.client.Window.getClientWidth());
 		setHeight(com.google.gwt.user.client.Window.getClientHeight());
 		setCanDragResize(true);
@@ -47,15 +41,15 @@ public class OnlyOfficeEditor extends Window {
 		centerInPage();
 		setMargin(2);
 
-		addCloseClickHandler(event -> onClose());
-
-		addResizedHandler(event -> reloadBody());
-
-		layout = new VLayout();
+		VLayout layout = new VLayout();
 		layout.setMargin(1);
 		layout.setWidth100();
 		layout.setHeight100();
 		addItem(layout);
+
+		addCloseClickHandler(event -> onClose(document.getId()));
+
+		addResizedHandler(event -> reloadBody(document, layout));
 
 		if ("fillForms".equals(document.getComment())) {
 			// the document is being edited, so declare the editing
@@ -68,7 +62,7 @@ public class OnlyOfficeEditor extends Window {
 
 				@Override
 				public void onSuccess(Void result) {
-					reloadBody();
+					reloadBody(document, layout);
 				}
 			});
 		} else {
@@ -82,15 +76,15 @@ public class OnlyOfficeEditor extends Window {
 
 				@Override
 				public void onSuccess(Void result) {
-					reloadBody();
+					reloadBody(document, layout);
 				}
 			});
 		}
 	}
 
-	private void onClose() {
+	private void onClose(long docId) {
 		// the document is being edited, so declare the end of editing
-		OnlyOfficeService.Instance.get().endEditing(document.getId(), new AsyncCallback<Void>() {
+		OnlyOfficeService.Instance.get().endEditing(docId, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -104,38 +98,32 @@ public class OnlyOfficeEditor extends Window {
 		});
 	}
 
-	/**
-	 * Reloads a preview.
-	 * 
-	 * @throws UnsupportedEncodingException
-	 */
-	private void reloadBody() {
-		String iframe = "<iframe src='" + getOnlyOfficeEditorUrl() + "' style='border: 0px solid white; width:"
+	private void reloadBody(GUIDocument document, VLayout layout) {
+		String iframe = "<iframe src='" + getOnlyOfficeEditorUrl(document) + "' style='border: 0px solid white; width:"
 				+ (getWidth() - 18) + "px; height:" + (getHeight() - 68) + "px' scrolling='no'></iframe>";
 
-		html = new HTMLFlow();
+		HTMLFlow html = new HTMLFlow();
 		html.setWidth100();
 		html.setHeight100();
 		html.setShowEdges(false);
 		html.setContents(iframe);
-
 		layout.setMembers(html);
 	}
 
-	private String getOnlyOfficeEditorUrl() {
+	private String getOnlyOfficeEditorUrl(GUIDocument document) {
 		String finalUrl;
 
 		if (document.getId() > 0) {
-			finalUrl = Util.contextPath() + "onlyoffice/editor?docId=" + document.getId() + "&fileName="
+			finalUrl = Util.contextPath() + ONLYOFFICE_EDITOR_DOC_ID + document.getId() + FILE_NAME
 					+ URL.encode(document.getFileName());
 
 			// fillforms mode
 			if ((document.getComment() != null) && document.getComment().equals("fillForms")) {
-				finalUrl = Util.contextPath() + "onlyoffice/editor?docId=" + document.getId() + "&fileName="
+				finalUrl = Util.contextPath() + ONLYOFFICE_EDITOR_DOC_ID + document.getId() + FILE_NAME
 						+ URL.encode(document.getFileName()) + "&mode=fillForms";
 			}
 		} else {
-			finalUrl = Util.contextPath() + "onlyoffice/editor?docId=" + document.getId() + "&fileName="
+			finalUrl = Util.contextPath() + ONLYOFFICE_EDITOR_DOC_ID + document.getId() + FILE_NAME
 					+ URL.encode(document.getFileName()) + "&fileExt=" + document.getType() + "&folderId="
 					+ document.getFolder().getId();
 		}

@@ -45,7 +45,7 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 			return super.getObject();
 		else {
 			log.debug(ASPECT_DISABLED);
-			return null;
+			return new DummyScheduler();
 		}
 	}
 
