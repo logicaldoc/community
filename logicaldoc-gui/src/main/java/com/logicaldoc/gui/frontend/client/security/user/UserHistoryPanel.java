@@ -4,7 +4,7 @@ import com.logicaldoc.gui.common.client.data.UserHistoryDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.widgets.grid.CopyCellClickHandler;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
@@ -44,15 +44,7 @@ public class UserHistoryPanel extends VLayout {
 		list.setAutoFetchData(true);
 		list.setDataSource(new UserHistoryDS(userId));
 		list.setFields(event, date, ip, geolocation, device, sid, comment);
-		list.addCellClickHandler(click -> {
-			ListGridField field = list.getField(click.getColNum());
-			String title = field.getTitle();
-			String value = list.getDefaultFormattedFieldValue(click.getRecord(), field);
-				LD.askForValue(title, title, value, v -> {
-					// Nothing to do
-				});
-			click.cancel();
-		});
+		list.addCellClickHandler(new CopyCellClickHandler());
 
 		ToolStrip buttons = new ToolStrip();
 		buttons.setWidth100();

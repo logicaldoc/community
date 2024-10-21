@@ -44,7 +44,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.5.5
  */
-public class SearchIndexHistoryPanel extends VLayout {
+public class IndexingHistoryPanel extends VLayout {
 
 	private static final String EVENTS = "event.indexed,event.indexed.error";
 

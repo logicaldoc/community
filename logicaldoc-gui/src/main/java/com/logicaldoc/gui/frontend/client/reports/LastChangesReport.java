@@ -18,6 +18,7 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.grid.CopyCellClickHandler;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
@@ -276,18 +277,10 @@ public class LastChangesReport extends AdminPanel {
 		histories.setFilterOnKeypress(true);
 		histories.setAutoFetchData(true);
 		histories.sort("date", SortDirection.DESCENDING);
+		histories.addCellClickHandler(new CopyCellClickHandler());
 		histories.addCellContextClickHandler(evn -> {
 			showContextMenu();
 			evn.cancel();
-		});
-		histories.addCellClickHandler(click -> {
-			ListGridField field = histories.getField(click.getColNum());
-			String title = field.getTitle();
-			String value = histories.getDefaultFormattedFieldValue(click.getRecord(), field);
-			LD.askForValue(title, title, value, v -> {
-				// Nothing to do
-			});
-			click.cancel();
 		});
 
 		results.addMember(histories);

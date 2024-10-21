@@ -39,10 +39,15 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 		MenuDAO mDao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		boolean showSid = mDao.isReadEnable(Menu.SESSIONS, session.getUserId());
 
-		long userId = Long.parseLong(request.getParameter("id"));
+		Long userId = StringUtils.isNotEmpty(request.getParameter("id")) ? Long.parseLong(request.getParameter("id"))
+				: null;
+		Long tenantId = StringUtils.isNotEmpty(request.getParameter("tenantId"))
+				? Long.parseLong(request.getParameter("tenantId"))
+				: null;
+		String comment = request.getParameter("comment");
 		String event = request.getParameter("event");
 
-		List<Object> records = executeQuery(max, userId, event);
+		List<Object> records = executeQuery(max, tenantId, userId, event, comment);
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
@@ -54,7 +59,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 		 */
 		for (Object gridRecord : records)
 			printHistory(writer, (Object[]) gridRecord, locale, showSid, df);
-		
+
 		writer.write("</list>");
 	}
 
@@ -78,20 +83,33 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 		if (columns[10] != null)
 			writer.print("<geolocation><![CDATA[" + columns[10] + "]]></geolocation>");
 		if (columns[11] != null)
-			writer.print("<geolocation><![CDATA[" + columns[11] + "]]></geolocation>");			
+			writer.print("<geolocation><![CDATA[" + columns[11] + "]]></geolocation>");
 		writer.print("</history>");
 	}
 
-	private List<Object> executeQuery(Integer max, long userId, String event) throws PersistenceException {
+	private List<Object> executeQuery(Integer max, Long tenantId, Long userId, String event, String comment)
+			throws PersistenceException {
 		Map<String, Object> params = new HashMap<>();
-		params.put("userId", userId);
 
 		StringBuilder query = new StringBuilder(
-				"select A.id, A.username, A.event, A.date, A.comment, A.reason, A.sessionId, A.userId, A.ip, A.device, A.geolocation, A.keyLabel from UserHistory A where A.deleted = 0 and A.userId = :userId ");
+				"select A.id, A.username, A.event, A.date, A.comment, A.reason, A.sessionId, A.userId, A.ip, A.device, A.geolocation, A.keyLabel from UserHistory A where A.deleted = 0 ");
 		if (StringUtils.isNotEmpty(event)) {
 			query.append(" and A.event = :event ");
 			params.put("event", event);
 		}
+		if (tenantId != null) {
+			query.append(" and A.tenantId = :tenantId ");
+			params.put("tenantId", tenantId);
+		}
+		if (userId != null) {
+			query.append(" and A.userId = :userId ");
+			params.put("userId", userId);
+		}
+		if (StringUtils.isNotEmpty(comment)) {
+			query.append(" and A.comment like :comment ");
+			params.put("comment", comment + "%");
+		}
+
 		query.append(" order by A.date desc ");
 
 		UserHistoryDAO dao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);

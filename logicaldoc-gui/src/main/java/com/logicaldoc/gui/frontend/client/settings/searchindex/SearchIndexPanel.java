@@ -117,12 +117,12 @@ public class SearchIndexPanel extends AdminPanel {
 					tabs.addTab(fillFiltersTab());
 					tabs.addTab(fillLanguagesTab());
 					tabs.addTab(fillParsersTab());
-					tabs.addTab(fillHistoryTab());
-
 					if (Session.get().isDefaultTenant()) {
 						tabs.addTab(fillIndexingQueueTab(100));
 						tabs.addTab(fillEntiesTab());
 					}
+					tabs.addTab(fillIndexingHistoryTab());
+					tabs.addTab(fillSearchHistoryTab());
 				}
 			});
 	}
@@ -141,10 +141,16 @@ public class SearchIndexPanel extends AdminPanel {
 		return indexingQueueTab;
 	}
 
-	private Tab fillHistoryTab() {
-		Tab historyTab = new Tab(I18N.message("indexinghistory"));
-		historyTab.setPane(new SearchIndexHistoryPanel());
-		return historyTab;
+	private Tab fillIndexingHistoryTab() {
+		Tab indexingHistoryTab = new Tab(I18N.message("indexinghistory"));
+		indexingHistoryTab.setPane(new IndexingHistoryPanel());
+		return indexingHistoryTab;
+	}
+
+	private Tab fillSearchHistoryTab() {
+		Tab searchHistoryTab = new Tab(I18N.message("searchhistory"));
+		searchHistoryTab.setPane(new SearchHistoryPanel());
+		return searchHistoryTab;
 	}
 
 	private Tab fillParsersTab() {
@@ -499,7 +505,7 @@ public class SearchIndexPanel extends AdminPanel {
 		timeoutRetain.setHint(I18N.message("ontimeoutretaintexthint"));
 		timeoutRetain.setValue(this.searchEngine.isParsingTimeoutRetain() ? "yes" : "no");
 		timeoutRetain.setRequired(true);
-		
+
 		// The optional max text that will be put in the index
 		SpinnerItem maxText = ItemFactory.newSpinnerItem("maxtext", this.searchEngine.getMaxText());
 		maxText.setHint(I18N.message("maxtextinindex"));
