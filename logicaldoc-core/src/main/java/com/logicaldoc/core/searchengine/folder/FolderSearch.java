@@ -49,6 +49,8 @@ public class FolderSearch extends Search {
 
 	private static final String AND = " and ";
 
+	private String query;
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void internalSearch() throws SearchException {
@@ -63,7 +65,7 @@ public class FolderSearch extends Search {
 
 		Map<String, Object> params = null;
 		try {
-			params = prepareExpression();
+			params = prepareQuery();
 		} catch (PersistenceException e1) {
 			throw new SearchException(e1);
 		}
@@ -74,7 +76,7 @@ public class FolderSearch extends Search {
 		// Execute the search
 		List<Hit> folders;
 		try {
-			folders = dao.query(options.getExpression(), params, new HitMapper(), null);
+			folders = dao.query(query, params, new HitMapper(), null);
 		} catch (PersistenceException e) {
 			throw new SearchException(e);
 		}
@@ -104,39 +106,36 @@ public class FolderSearch extends Search {
 	 * 
 	 * PersistenceException error at data layer
 	 */
-	private Map<String, Object> prepareExpression() throws PersistenceException {
-		if (StringUtils.isNotEmpty(options.getExpression()))
+	private Map<String, Object> prepareQuery() throws PersistenceException {
+		if (StringUtils.isNotEmpty(query))
 			return options.getParameters();
 
 		Map<String, Object> params = new HashMap<>();
-		StringBuilder query = new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 
 		if (options.isRetrieveAliases())
-			query.append("(");
+			sb.append("(");
 
 		// Find all real folders
-		query.append(
+		sb.append(
 				"select A.ld_id, A.ld_parentid, A.ld_name, A.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref, C.ld_name, A.ld_templateid, A.ld_tgs, A.ld_color ");
-		query.append(" from ld_folder A ");
-		query.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
-		appendWhereClause(false, params, query);
+		sb.append(" from ld_folder A ");
+		sb.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
+		appendWhereClause(false, params, sb);
 
 		if (options.isRetrieveAliases()) {
 			// Append all aliases
-			query.append(
+			sb.append(
 					") UNION (select A.ld_id, A.ld_parentid, A.ld_name, A.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref, C.ld_name, REF.ld_templateid, REF.ld_tgs, A.ld_color ");
-			query.append(" from ld_folder A ");
-			query.append(" join ld_folder REF on A.ld_foldref=REF.ld_id ");
-			query.append(" left outer join ld_template C on REF.ld_templateid=C.ld_id ");
-			appendWhereClause(true, params, query);
-			query.append(")");
+			sb.append(" from ld_folder A ");
+			sb.append(" join ld_folder REF on A.ld_foldref=REF.ld_id ");
+			sb.append(" left outer join ld_template C on REF.ld_templateid=C.ld_id ");
+			appendWhereClause(true, params, sb);
+			sb.append(")");
 		}
 
-		options.setExpression(query.toString());
-
-		log.info("executing query {}", query);
-		log.info("with parameters {}", params);
-
+		log.info("executing query {} with parameters {}", sb, params);
+		query = sb.toString();
 		return params;
 	}
 

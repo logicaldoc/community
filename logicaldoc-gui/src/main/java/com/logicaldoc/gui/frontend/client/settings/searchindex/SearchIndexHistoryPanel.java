@@ -67,7 +67,7 @@ public class SearchIndexHistoryPanel extends VLayout {
 		ColoredListGridField id = new ColoredListGridField("id");
 		id.setHidden(true);
 
-		ListGridField eventLabel = new ListGridField("event", I18N.message("event"));
+		ListGridField eventLabel = new ListGridField("event", I18N.message("result"));
 		eventLabel.setAlign(Alignment.CENTER);
 		eventLabel.setAutoFitWidth(true);
 		eventLabel.setCanFilter(true);

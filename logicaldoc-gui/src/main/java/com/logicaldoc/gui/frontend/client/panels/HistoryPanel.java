@@ -81,12 +81,14 @@ public abstract class HistoryPanel extends VLayout {
 				list.setFields(user, event, date, comment, fileName, path);
 		}
 
-		list.addDoubleClickHandler(evnt -> {
-			LD.askForValue(I18N.message(COMMENT), I18N.message(COMMENT),
-					list.getSelectedRecord().getAttributeAsString(COMMENT), value -> {
-						// Nothing to do
-					});
-			evnt.cancel();
+		list.addCellClickHandler(click -> {
+			ListGridField field = list.getField(click.getColNum());
+			String title = field.getTitle();
+			String value = list.getDefaultFormattedFieldValue(click.getRecord(), field);
+				LD.askForValue(title, title, value, v -> {
+					// Nothing to do
+				});
+			click.cancel();
 		});
 
 		ToolStrip buttons = new ToolStrip();

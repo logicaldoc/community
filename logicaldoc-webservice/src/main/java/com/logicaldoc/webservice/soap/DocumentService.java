@@ -778,7 +778,7 @@ public interface DocumentService {
 	Integer max) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
-	 * Lists of last modified documents of the current session.
+	 * Lists of last modified documents by current user.
 	 * 
 	 * @param sid identifier of the session
 	 * @param maxHits Maximum number of returned records
@@ -791,7 +791,7 @@ public interface DocumentService {
 	 */
 	@WebMethod(action = "getRecentDocuments")
 	@WebResult(name = "document")
-	@WSDoc(description = "lists of last modified documents in the current session")
+	@WSDoc(description = "lists of last modified documents by current user")
 	public List<WSDocument> getRecentDocuments(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WSDoc(description = "max number of returned records", required = false)

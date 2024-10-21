@@ -280,6 +280,15 @@ public class LastChangesReport extends AdminPanel {
 			showContextMenu();
 			evn.cancel();
 		});
+		histories.addCellClickHandler(click -> {
+			ListGridField field = histories.getField(click.getColNum());
+			String title = field.getTitle();
+			String value = histories.getDefaultFormattedFieldValue(click.getRecord(), field);
+			LD.askForValue(title, title, value, v -> {
+				// Nothing to do
+			});
+			click.cancel();
+		});
 
 		results.addMember(histories);
 

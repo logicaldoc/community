@@ -27,6 +27,9 @@ import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
+import com.logicaldoc.core.security.user.UserEvent;
+import com.logicaldoc.core.security.user.UserHistory;
+import com.logicaldoc.core.security.user.UserHistoryDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.plugin.PluginRegistry;
@@ -211,6 +214,18 @@ public abstract class Search {
 		log.info("Search completed in {} ms and found {} hits (estimated {})", execTime, hits.size(),
 				estimatedHitsNumber);
 
+		UserHistoryDAO historyDao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
+		UserHistory transaction = options.getTransaction();
+		if (transaction == null)
+			transaction = new UserHistory();
+		transaction.setUser(searchUser);
+		transaction.setComment(StringUtils.left(options.toString(), 500));
+		transaction.setEvent(UserEvent.SEARCH.toString());
+		try {
+			historyDao.store(transaction);
+		} catch (PersistenceException e) {
+			log.info("Error trying to save search history", e);
+		}
 		return hits;
 	}
 

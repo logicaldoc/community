@@ -142,7 +142,7 @@ public class SearchIndexPanel extends AdminPanel {
 	}
 
 	private Tab fillHistoryTab() {
-		Tab historyTab = new Tab(I18N.message("history"));
+		Tab historyTab = new Tab(I18N.message("indexinghistory"));
 		historyTab.setPane(new SearchIndexHistoryPanel());
 		return historyTab;
 	}

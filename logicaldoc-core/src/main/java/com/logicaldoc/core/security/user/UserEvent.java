@@ -21,7 +21,8 @@ public enum UserEvent {
     UPDATED("event.user.updated"),
     DISABLED("event.user.disabled"),
     ENABLED("event.user.enabled"),
-    NEWAPIKEY("event.user.newapikey");
+    NEWAPIKEY("event.user.newapikey"),
+    SEARCH("event.user.search");
 	
     private String event;
 

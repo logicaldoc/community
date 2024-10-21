@@ -16,7 +16,7 @@ public class TagSearchTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testSearch() {
-		SearchOptions opt = new SearchOptions();
+		SearchOptions opt = new TagSearchOptions();
 		opt.setType(SearchOptions.TYPE_TAG);
 		opt.setUserId(1);
 		opt.setExpression("abc");
@@ -35,8 +35,7 @@ public class TagSearchTest extends AbstractCoreTestCase {
 		assertEquals(2, results.size());
 		assertEquals(1, results.get(0).getId());
 
-		opt = new SearchOptions();
-		opt.setType(SearchOptions.TYPE_TAG);
+		opt = new TagSearchOptions();
 		opt.setUserId(1);
 		opt.setExpression("abc");
 		opt.setMaxHits(1);

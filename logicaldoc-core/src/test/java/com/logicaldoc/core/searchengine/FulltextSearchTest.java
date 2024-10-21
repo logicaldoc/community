@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -55,6 +56,9 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 		opt.write(file);
 
 		FulltextSearchOptions opt2 = (FulltextSearchOptions) SearchOptions.read(file);
+		
+		System.out.println(opt);
+		
 
 		Assert.assertEquals("prova test", opt2.getExpression());
 		Assert.assertEquals("it", opt2.getExpressionLanguage());

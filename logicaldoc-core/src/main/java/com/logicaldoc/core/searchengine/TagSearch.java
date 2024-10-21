@@ -31,15 +31,10 @@ public class TagSearch extends Search {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void internalSearch() throws SearchException {
-		try {
-			prepareExpression();
-		} catch (PersistenceException e) {
-			throw new SearchException(e);
-		}
-
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		try {
-			hits.addAll(dao.query(options.getExpression(), new HitMapper(), options.getMaxHits()));
+			String query = prepareQuery();
+			hits.addAll(dao.query(query, new HitMapper(), options.getMaxHits()));
 		} catch (PersistenceException e) {
 			throw new SearchException(e);
 		}
@@ -56,7 +51,7 @@ public class TagSearch extends Search {
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
-	private void prepareExpression() throws PersistenceException {
+	private String prepareQuery() throws PersistenceException {
 		// Find all real documents
 		StringBuilder query = new StringBuilder(
 				"select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified, ");
@@ -93,7 +88,7 @@ public class TagSearch extends Search {
 
 		log.info("executing tag search query = {}", query);
 
-		options.setExpression(query.toString());
+		return query.toString();
 	}
 
 	/**

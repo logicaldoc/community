@@ -16,8 +16,10 @@ import com.logicaldoc.core.searchengine.Search;
 import com.logicaldoc.core.searchengine.SearchException;
 import com.logicaldoc.core.searchengine.SearchOptions;
 import com.logicaldoc.core.security.Permission;
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.WebserviceException;
@@ -45,6 +47,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 
 		SearchOptions options = opt.toSearchOptions();
 		options.setUserId(user.getId());
+		options.setTransaction(new UserHistory(SessionManager.get().get(sid)));
 
 		WSSearchResult searchResult = new WSSearchResult();
 

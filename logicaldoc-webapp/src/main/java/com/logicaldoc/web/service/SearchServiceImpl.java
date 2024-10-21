@@ -31,6 +31,7 @@ import com.logicaldoc.core.searchengine.saved.SearchDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
+import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUICriterion;
@@ -168,6 +169,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	private SearchOptions prepareSearchOptions(GUISearchOptions options, Session session) {
 		SearchOptions searchOptions = toSearchOptions(options);
 		searchOptions.setTenantId(session.getTenantId());
+		searchOptions.setTransaction(new UserHistory(session));
 
 		if (searchOptions instanceof FulltextSearchOptions fulltextOptions) {
 			Locale exprLoc = LocaleUtil.toLocale(options.getExpressionLanguage());

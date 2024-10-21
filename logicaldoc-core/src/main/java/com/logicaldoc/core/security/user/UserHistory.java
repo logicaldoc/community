@@ -1,6 +1,7 @@
 package com.logicaldoc.core.security.user;
 
 import com.logicaldoc.core.History;
+import com.logicaldoc.core.security.Session;
 
 /**
  * History entry due to an event on a user.
@@ -18,6 +19,11 @@ public class UserHistory extends History {
 		super();
 	}
 
+	public UserHistory(Session session) {
+		super();
+		setSession(session);
+	}
+	
 	public UserHistory(UserHistory source) {
 		copyAttributesFrom(source);
 		setAuthor(source.getAuthor());

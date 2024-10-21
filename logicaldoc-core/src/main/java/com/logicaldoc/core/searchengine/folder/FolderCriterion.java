@@ -1,11 +1,14 @@
 package com.logicaldoc.core.searchengine.folder;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.logicaldoc.core.metadata.Attribute;
 
@@ -270,5 +273,20 @@ public class FolderCriterion implements Serializable {
 
 	public void setExtendedAttribute(boolean extendedAttribute) {
 		this.extendedAttribute = extendedAttribute;
+	}
+	
+	@Override
+	public String toString() {
+		return new ReflectionToStringBuilder(this, ToStringStyle.NO_CLASS_NAME_STYLE) {
+			protected boolean accept(Field field) {
+				try {
+					Object value = field.get(getObject());
+					return super.accept(field) && value != null && StringUtils.isNotEmpty(value.toString())
+							&& !field.getName().equals("field");
+				} catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
+					return false;
+				}
+			}
+		}.toString();
 	}
 }
