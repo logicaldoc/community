@@ -74,6 +74,8 @@ public abstract class Util {
 
 	private static final Set<String> spreadsheetExts = new HashSet<>(Arrays.asList(".xls", ".xlsm", ".xlsx", ".ods"));
 
+	private static final Set<String> presentationExts = new HashSet<>(Arrays.asList(".ppt", ".pptx", ".pptm", ".odp"));
+
 	private static final Set<String> imageExts = new HashSet<>(
 			Arrays.asList(".gif", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".png", ".jfif", ".webp"));
 
@@ -301,8 +303,8 @@ public abstract class Util {
 				long shortcutSize = Math.round(size * 0.625D);
 				long shortcutMarginTop = Math.round(size * 0.4375D);
 				long shortcutMarginLeft = Math.round(size * 0.6D);
-				sb.append(IMG_SRC + fileIconUrl("shortcut.svg") + WIDTH + shortcutSize + PX_HEIGHT
-						+ shortcutSize + "px' style='position:absolute; z-index:1; margin-top: " + shortcutMarginTop
+				sb.append(IMG_SRC + fileIconUrl("shortcut.svg") + WIDTH + shortcutSize + PX_HEIGHT + shortcutSize
+						+ "px' style='position:absolute; z-index:1; margin-top: " + shortcutMarginTop
 						+ "px; margin-left:" + shortcutMarginLeft + "px'/>");
 			}
 
@@ -318,8 +320,8 @@ public abstract class Util {
 			iconName = baseIconName;
 		}
 
-		sb.append("<img class='filenameIcon' src='" + fileIconUrl(iconName + ".svg") + WIDTH + size
-				+ PX_HEIGHT + size + "px' />");
+		sb.append("<img class='filenameIcon' src='" + fileIconUrl(iconName + ".svg") + WIDTH + size + PX_HEIGHT + size
+				+ "px' />");
 
 		sb.append(END_DIV);
 		return sb.toString();
@@ -450,6 +452,10 @@ public abstract class Util {
 
 	public static boolean isSpreadsheetFile(String fileName) {
 		return spreadsheetExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext));
+	}
+
+	public static boolean isPresentationFile(String fileName) {
+		return presentationExts.stream().anyMatch(ext -> fileName.toLowerCase().endsWith(ext));
 	}
 
 	public static boolean isDICOMFile(String fileName) {

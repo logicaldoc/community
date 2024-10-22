@@ -114,8 +114,7 @@ public class DriveMenuItem extends MenuItem {
 				checkoutAndUploadToGDrive(document);
 			} else {
 				if (document.getStatus() == 1 && document.getExtResId() != null) {
-					DriveEditor popup = new DriveEditor(document);
-					popup.show();
+					new DriveEditor(document).show();
 				} else {
 					SC.warn(I18N.message("event.locked"));
 				}

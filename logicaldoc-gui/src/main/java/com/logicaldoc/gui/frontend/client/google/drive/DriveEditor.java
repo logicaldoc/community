@@ -97,6 +97,9 @@ public class DriveEditor extends Window {
 		if (Util.isSpreadsheetFile(document.getFileName()))
 			url = "https://docs.google.com/spreadsheets/d/" + document.getExtResId() + "/edit?hl="
 					+ Session.get().getUser().getLanguage();
+		if (Util.isPresentationFile(document.getFileName()))
+			url = "https://docs.google.com/presentation/d/" + document.getExtResId() + "/edit?hl="
+					+ Session.get().getUser().getLanguage();
 
 		String iframe = "<iframe src='" + url + "' style='border: 0px solid white; width:" + (getWidth() - 18)
 				+ "px; height:" + (getHeight() - 68) + "px' scrolling='no'></iframe>";
