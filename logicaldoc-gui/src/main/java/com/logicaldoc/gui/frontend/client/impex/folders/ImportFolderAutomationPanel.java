@@ -57,8 +57,15 @@ public class ImportFolderAutomationPanel extends ImportFolderDetailsTab {
 		automationAfter.setWidth("*");
 		automationAfter.setHeight("*");
 		automationAfter.addChangedHandler(changedHandler);
+		
+		TextAreaItem automationEnd = ItemFactory.newTextAreaItemForAutomation("automationEnd",
+				"aftercrawlingprocessed", importFolder.getAutomationEnd(), changedHandler, false);
+		automationEnd.setRequired(false);
+		automationEnd.setWidth("*");
+		automationEnd.setHeight("*");
+		automationAfter.addChangedHandler(changedHandler);
 
-		form.setItems(automationBefore, automationAfter);
+		form.setItems(automationBefore, automationAfter, automationEnd);
 
 		container.addMember(form);
 	}
@@ -70,6 +77,7 @@ public class ImportFolderAutomationPanel extends ImportFolderDetailsTab {
 		if (Boolean.FALSE.equals(form.hasErrors())) {
 			importFolder.setAutomation((String) values.get("automationBefore"));
 			importFolder.setAutomationAfter((String) values.get("automationAfter"));
+			importFolder.setAutomationEnd((String) values.get("automationEnd"));
 		}
 		return !form.hasErrors();
 	}

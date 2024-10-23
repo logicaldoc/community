@@ -89,6 +89,8 @@ public class GUIEmailAccount implements Serializable {
 
 	private String automationAfter;
 
+	private String automationEnd;
+
 	public GUIEmailAccount() {
 		super();
 		target = null;
@@ -292,5 +294,13 @@ public class GUIEmailAccount implements Serializable {
 
 	public void setClientTenant(String clientTenant) {
 		this.clientTenant = clientTenant;
+	}
+
+	public String getAutomationEnd() {
+		return automationEnd;
+	}
+
+	public void setAutomationEnd(String automationEnd) {
+		this.automationEnd = automationEnd;
 	}
 }

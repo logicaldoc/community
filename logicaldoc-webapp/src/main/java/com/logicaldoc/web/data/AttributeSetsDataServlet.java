@@ -59,7 +59,6 @@ public class AttributeSetsDataServlet extends AbstractDataServlet {
 		 * Iterate over the collection of templates
 		 */
 		for (AttributeSet set : sets) {
-
 			writer.print("<attributeset>");
 			writer.print("<id>" + set.getId() + "</id>");
 			writer.print("<name><![CDATA[" + set.getName() + "]]></name>");

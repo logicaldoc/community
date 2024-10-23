@@ -86,6 +86,8 @@ public class GUIImportFolder implements Serializable {
 	private String automation;
 
 	private String automationAfter;
+	
+	private String automationEnd;
 
 	public GUIImportFolder() {
 		super();
@@ -359,5 +361,13 @@ public class GUIImportFolder implements Serializable {
 
 	public void setAutomationAfter(String automationAfter) {
 		this.automationAfter = automationAfter;
+	}
+
+	public String getAutomationEnd() {
+		return automationEnd;
+	}
+
+	public void setAutomationEnd(String automationEnd) {
+		this.automationEnd = automationEnd;
 	}
 }
