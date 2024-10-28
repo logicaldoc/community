@@ -190,7 +190,7 @@ public class LastChangesReport extends AdminPanel {
 
 		// Event
 		SelectItem event = ItemFactory.newEventsSelector(EVENT, I18N.message(EVENT), null, true, true, true, true,
-				true);
+				true, false, false);
 		event.setColSpan(2);
 		event.setEndRow(true);
 

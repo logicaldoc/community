@@ -151,6 +151,15 @@ public interface SettingService extends RemoteService {
 	public List<GUIParameter> loadGUISettings() throws ServerException;
 
 	/**
+	 * Load the auditing settings
+	 * 
+	 * @return the User Interface settings
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public List<GUIParameter> loadAuditingSettings() throws ServerException;
+	
+	/**
 	 * Loads the parameters of a specified converter
 	 * 
 	 * @param converter name of the converter

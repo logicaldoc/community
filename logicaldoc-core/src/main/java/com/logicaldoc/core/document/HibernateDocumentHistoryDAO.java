@@ -9,11 +9,8 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.HibernatePersistentObjectDAO;
-import com.logicaldoc.core.History;
+import com.logicaldoc.core.HibernateHistoryDAO;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.RunLevel;
-import com.logicaldoc.core.communication.EventCollector;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**
@@ -22,8 +19,7 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Alessandro Gasparini - LogicalDOC
  * @since 3.0
  */
-public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<DocumentHistory>
-		implements DocumentHistoryDAO {
+public class HibernateDocumentHistoryDAO extends HibernateHistoryDAO<DocumentHistory> implements DocumentHistoryDAO {
 
 	private static final String DATE_ASC = ".date asc";
 
@@ -86,25 +82,6 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 		String statement = "update ld_history set ld_new=0 where ld_new=1 and ld_userid=" + userId + " and ld_event='"
 				+ SqlUtil.doubleQuotes(event) + "'";
 		jdbcUpdate(statement);
-	}
-
-	@Override
-	public void store(DocumentHistory history) throws PersistenceException {
-		// Write only if the history is enabled
-		if (RunLevel.current().aspectEnabled(History.ASPECT)) {
-			if (history.getDate() == null)
-				history.setDate(new Date());
-			if (history.getComment() != null) {
-				// trim to 4000 chars
-				history.setComment(StringUtils.abbreviate(history.getComment(), 4000));
-
-				// remove non printable chars, but maintains the carriage
-				// returns and the tabs
-				history.setComment(history.getComment().trim().replaceAll("[\\p{Cntrl}&&[^\\n]&&[^\\t]&&[^\\r]]", ""));
-			}
-			super.store(history);
-			EventCollector.get().newEvent(history);
-		}
 	}
 
 	@Override

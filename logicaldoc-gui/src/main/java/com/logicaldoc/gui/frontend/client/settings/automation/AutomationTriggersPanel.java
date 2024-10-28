@@ -119,7 +119,7 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 		folderSelector.addFolderChangeListener(this);
 		toolStrip.addFormItem(folderSelector);
 
-		event = ItemFactory.newEventSelector("event", "event", evnt -> refresh(), true, true, true, true, true);
+		event = ItemFactory.newEventSelector("event", "event", evnt -> refresh(), true, true, true, true, true, true, false);
 		toolStrip.addFormItem(event);
 
 		toolStrip.addSeparator();

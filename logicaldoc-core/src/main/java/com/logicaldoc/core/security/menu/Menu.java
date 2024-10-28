@@ -48,6 +48,8 @@ public class Menu extends SecurablePersistentObject implements Comparable<Menu> 
 	public static final long RATING = 1610;
 
 	public static final long PARAMETERS = 100;
+	
+	public static final long AUDITING = 106;
 
 	public static final long ADMIN_SESSIONS = 71;
 

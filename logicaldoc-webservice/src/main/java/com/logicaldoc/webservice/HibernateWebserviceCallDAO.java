@@ -2,7 +2,7 @@ package com.logicaldoc.webservice;
 
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.HibernatePersistentObjectDAO;
+import com.logicaldoc.core.HibernateHistoryDAO;
 import com.logicaldoc.core.PersistenceException;
 
 /**
@@ -11,8 +11,7 @@ import com.logicaldoc.core.PersistenceException;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.7
  */
-public class HibernateWebserviceCallDAO extends HibernatePersistentObjectDAO<WebserviceCall>
-		implements WebserviceCallDAO {
+public class HibernateWebserviceCallDAO extends HibernateHistoryDAO<WebserviceCall> implements WebserviceCallDAO {
 
 	private HibernateWebserviceCallDAO() {
 		super(WebserviceCall.class);

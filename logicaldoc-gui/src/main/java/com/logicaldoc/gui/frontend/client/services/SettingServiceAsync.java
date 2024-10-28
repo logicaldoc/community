@@ -17,6 +17,8 @@ public interface SettingServiceAsync {
 	void saveEmailSettings(GUIEmailSettings settings, AsyncCallback<Void> callback);
 
 	void loadGUISettings(AsyncCallback<List<GUIParameter>> callback);
+	
+	void loadAuditingSettings(AsyncCallback<List<GUIParameter>> callback);
 
 	void loadSettingsByNames(List<String> names, AsyncCallback<List<GUIParameter>> callback);
 

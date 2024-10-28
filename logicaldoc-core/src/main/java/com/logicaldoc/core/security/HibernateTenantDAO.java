@@ -25,31 +25,31 @@ import com.logicaldoc.util.config.ContextProperties;
 
 public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> implements TenantDAO {
 
-	@Resource(name="ContextProperties")
+	@Resource(name = "ContextProperties")
 	private ContextProperties config;
 
-	@Resource(name="FolderDAO")
+	@Resource(name = "FolderDAO")
 	private FolderDAO folderDao;
 
-	@Resource(name="GroupDAO")
+	@Resource(name = "GroupDAO")
 	private GroupDAO groupDao;
 
-	@Resource(name="UserDAO")
+	@Resource(name = "UserDAO")
 	private UserDAO userDao;
 
-	@Resource(name="GenericDAO")
+	@Resource(name = "GenericDAO")
 	private GenericDAO genericDao;
 
-	@Resource(name="TemplateDAO")
+	@Resource(name = "TemplateDAO")
 	private TemplateDAO templateDao;
 
-	@Resource(name="AttributeSetDAO")
+	@Resource(name = "AttributeSetDAO")
 	private AttributeSetDAO attributeSetDao;
 
-	@Resource(name="MessageTemplateDAO")
+	@Resource(name = "MessageTemplateDAO")
 	private MessageTemplateDAO messageTemplateDao;
 
-	@Resource(name="DashletDAO")
+	@Resource(name = "DashletDAO")
 	private DashletDAO dashletDao;
 
 	protected HibernateTenantDAO() {
@@ -103,16 +103,7 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 	}
 
 	@Override
-	public String getTenantName(long tenantId) {
-		Tenant tenant = null;
-		try {
-			tenant = findById(tenantId);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-		if (tenant != null)
-			return tenant.getName();
-		else
-			return null;
+	public String getTenantName(long tenantId) throws PersistenceException {
+		return queryForString("select ld_name from ld_tenant where ld_deleted=0 and ld_tenantid=" + tenantId);
 	}
 }

@@ -55,6 +55,8 @@ public class SettingsMenu extends VLayout {
 
 		addComparators();
 
+		addAuditing();
+		
 		addParameters();
 	}
 
@@ -62,16 +64,26 @@ public class SettingsMenu extends VLayout {
 		Button parameters = new Button(I18N.message("parameters"));
 		parameters.setWidth100();
 		parameters.setHeight(25);
-		parameters.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new ParametersPanel()));
+		parameters.addClickHandler(click -> AdminScreen.get().setContent(new ParametersPanel()));
 		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.PARAMETERS))
 			addMember(parameters);
 	}
 
+	private void addAuditing() {
+		Button auditing = new Button(I18N.message("auditing"));
+		auditing.setWidth100();
+		auditing.setHeight(25);
+		auditing.addClickHandler(click -> AdminScreen.get().setContent(new AuditingPanel()));
+		if (Menu.enabled(Menu.AUDITING)) {
+			addMember(auditing);
+		}
+	}
+	
 	private void addComparators() {
 		Button comparators = new Button(I18N.message("comparators"));
 		comparators.setWidth100();
 		comparators.setHeight(25);
-		comparators.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new ComparatorsPanel()));
+		comparators.addClickHandler(click -> AdminScreen.get().setContent(new ComparatorsPanel()));
 		if (Feature.visible(Feature.COMPARISON) && Menu.enabled(Menu.COMPARATORS)) {
 			addMember(comparators);
 			if (!Feature.enabled(Feature.COMPARISON))
@@ -88,7 +100,7 @@ public class SettingsMenu extends VLayout {
 		Button automation = new Button(I18N.message("automation"));
 		automation.setWidth100();
 		automation.setHeight(25);
-		automation.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new AutomationSettingsPanel()));
+		automation.addClickHandler(click -> AdminScreen.get().setContent(new AutomationSettingsPanel()));
 		if (Feature.visible(Feature.AUTOMATION) && Menu.enabled(Menu.AUTOMATION)) {
 			addMember(automation);
 			if (!Feature.enabled(Feature.AUTOMATION))

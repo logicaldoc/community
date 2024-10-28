@@ -120,6 +120,8 @@ public class Menu {
 	public static final long OCR = 104;
 
 	public static final long REPOSITORIES = 105;
+	
+	public static final long AUDITING = 106;
 
 	public static final long OFFICE = -1090;
 

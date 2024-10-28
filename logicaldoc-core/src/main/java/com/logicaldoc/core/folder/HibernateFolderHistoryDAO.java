@@ -9,11 +9,8 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.HibernatePersistentObjectDAO;
-import com.logicaldoc.core.History;
+import com.logicaldoc.core.HibernateHistoryDAO;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.RunLevel;
-import com.logicaldoc.core.communication.EventCollector;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**
@@ -22,7 +19,7 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
-public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<FolderHistory> implements FolderHistoryDAO {
+public class HibernateFolderHistoryDAO extends HibernateHistoryDAO<FolderHistory> implements FolderHistoryDAO {
 
 	private static final String AND = " and ";
 
@@ -65,19 +62,6 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 	}
 
 	@Override
-	public void store(FolderHistory history) throws PersistenceException {
-		// Write only if the history is enabled
-		if (RunLevel.current().aspectEnabled(History.ASPECT)) {
-			if (history.getDate() == null)
-				history.setDate(new Date());
-			if (history.getComment() != null && history.getComment().length() > 4000)
-				history.setComment(StringUtils.abbreviate(history.getComment(), 4000));
-			super.store(history);
-			EventCollector.get().newEvent(history);
-		}
-	}
-
-	@Override
 	public List<FolderHistory> findByPath(String pathExpression, Date oldestDate, Collection<String> events,
 			Integer max) throws PersistenceException {
 		StringBuilder query = new StringBuilder(
@@ -104,7 +88,8 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 	}
 
 	@Override
-	public List<FolderHistory> findByFolderIdAndEvent(long folderId, String event, Date oldestDate) throws PersistenceException {
+	public List<FolderHistory> findByFolderIdAndEvent(long folderId, String event, Date oldestDate)
+			throws PersistenceException {
 		String query = ENTITY + ".folderId = :folderId and " + ENTITY + ".event = :event ";
 
 		Map<String, Object> params = new HashMap<>();

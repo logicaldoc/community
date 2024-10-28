@@ -437,11 +437,11 @@ values     (100,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'parameters',7,'settings.p
 
 insert into ld_menu 
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
-values     (101,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'searchandindexing',7,'searchandindexing.png',1,1,1,6,10);
+values     (101,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'searchandindexing',7,'searchandindexing.png',1,1,1,6,1);
 
 insert into ld_menu 
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
-values     (102,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'guisettings',7,'guisettings.png',1,1,1,6,10);
+values     (102,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'guisettings',7,'guisettings.png',1,1,1,6,1);
 
 insert into ld_menu 
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
@@ -449,7 +449,11 @@ values     (103,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'outgoingemail',7,'outgoin
 
 insert into ld_menu 
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
-values     (105,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'repositories',7,'repositories.png',1,1,1,60,1);
+values     (105,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'repositories',7,'repositories.png',1,1,1,6,1);
+
+insert into ld_menu 
+           (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (106,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'auditing',7,'settings.png',1,1,1,6,1);
 
 insert into ld_menu
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)

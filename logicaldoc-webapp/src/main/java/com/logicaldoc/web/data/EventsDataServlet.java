@@ -45,6 +45,8 @@ public class EventsDataServlet extends AbstractDataServlet {
 		boolean user = Boolean.parseBoolean(request.getParameter("user"));
 		boolean importfolder = Boolean.parseBoolean(request.getParameter("importfolder"));
 		boolean ocr = Boolean.parseBoolean(request.getParameter("ocr"));
+		boolean all = Boolean.parseBoolean(request.getParameter("all"));
+		boolean webservice = Boolean.parseBoolean(request.getParameter("webservice"));
 
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
@@ -52,6 +54,17 @@ public class EventsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
+		if(all) {
+			writer.print(EVENT);
+			writer.print(CODE + "all" + CLOSE_CODE);
+			writer.print(LABEL_CDATA + I18N.message("allevents", locale) + CLOSE_LABEL);
+			writer.print("<type></type>");
+			writer.print(CLOSE_EVENT);
+		}
+		
+		if (folder)
+			writeFolderEvents(writer, locale);
+		
 		writeDocumentEvents(writer, locale);
 
 		if (folder)
@@ -68,6 +81,14 @@ public class EventsDataServlet extends AbstractDataServlet {
 
 		if (ocr)
 			writeOcrEvents(writer, locale);
+		
+		if(webservice) {
+			writer.print(EVENT);
+			writer.print(CODE + "event.webservice.call" + CLOSE_CODE);
+			writer.print(LABEL_CDATA + I18N.message("event.webservice.call", locale) + CLOSE_LABEL);
+			writer.print("<type>webservice</type>");
+			writer.print(CLOSE_EVENT);
+		}
 
 		writer.write("</list>");
 	}

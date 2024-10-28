@@ -204,7 +204,8 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 					|| name.startsWith("cas.") || name.startsWith("cache.") || name.startsWith("jdbc.")
 					|| name.startsWith("comparator.") || name.contains(".via.") || name.contains(".downloadticket.")
 					|| name.startsWith("zonalocr.") || name.endsWith(CHARSET) || name.startsWith("policy.")
-					|| name.startsWith("cookies.") || name.startsWith("saml."))
+					|| name.startsWith("cookies.") || name.startsWith("saml.") || name.startsWith("history.")
+					|| name.endsWith("history.events"))
 				continue;
 
 			sortedSet.add(key.toString());
@@ -547,5 +548,22 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		} catch (Exception e) {
 			return (List<GUIParameter>) throwServerException(session, log, e);
 		}
+	}
+
+	@Override
+	public List<GUIParameter> loadAuditingSettings() throws ServerException {
+		Session session = checkMenu(getThreadLocalRequest(), Menu.AUDITING);
+		String tenantName = session.getTenantName();
+
+		ContextProperties conf = Context.get().getProperties();
+
+		List<GUIParameter> params = new ArrayList<>();
+		for (Object name : conf.keySet()) {
+			if (name.toString().startsWith(tenantName + ".history") || name.toString().startsWith("history.")
+					|| name.toString().equals("webservice.call.ttl"))
+				params.add(new GUIParameter(name.toString(), conf.getProperty(name.toString())));
+		}
+
+		return params;
 	}
 }
