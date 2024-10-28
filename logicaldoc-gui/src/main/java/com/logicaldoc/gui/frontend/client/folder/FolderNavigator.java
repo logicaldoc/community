@@ -392,7 +392,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	 */
 	public void openFolder(final long folderId) {
 		getTree().closeAll();
-
+		
 		FolderService.Instance.get().getFolder(folderId, true, true, isPaginationEnabled(), new AsyncCallback<>() {
 
 			@Override
@@ -414,6 +414,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 				TreeNode node = new TreeNode(folder.getName());
 				node.setAttribute("id", parent.getAttributeAsString("id") + "-" + Long.toString(folderId));
 				node.setAttribute(FOLDER_ID, Long.toString(folderId));
+				node.setAttribute(PARENT_ID, Long.toString(folder.getParentId()));
 				node.setAttribute("type", Integer.toString(folder.getType()));
 				node.setAttribute(FOLD_REF, folderRef != null ? Long.toString(folderRef) : null);
 				if (folder.getColor() != null)
@@ -458,6 +459,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			TreeNode node = new TreeNode(fld.getName());
 			node.setAttribute("id", parentId + "-" + Long.toString(fldId));
 			node.setAttribute(FOLDER_ID, Long.toString(fldId));
+			node.setAttribute(PARENT_ID, Long.toString(fld.getParentId()));
 			node.setAttribute("type", Integer.toString(fld.getType()));
 			node.setAttribute(FOLD_REF, fldRef != null ? Long.toString(fldRef) : null);
 			if (fld.getColor() != null)

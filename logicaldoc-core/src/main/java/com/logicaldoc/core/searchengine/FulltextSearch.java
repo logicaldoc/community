@@ -266,12 +266,8 @@ public class FulltextSearch extends Search {
 
 	private Map<Long, Hit> buildHitsMap(FulltextSearchOptions opt, Hits results) {
 		Map<Long, Hit> hitsMap = new HashMap<>();
-		System.out.println("----- "+opt.getExpression());
 		while (results != null && results.hasNext()) {
 			Hit hit = results.next();
-
-			System.out.println("hit: "+hit.getId());
-			
 			// Skip a document if not in the filter set
 			if (opt.getFilterIds() != null && !opt.getFilterIds().isEmpty()
 					&& !opt.getFilterIds().contains(hit.getId()))

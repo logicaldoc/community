@@ -406,8 +406,9 @@ public class StandardSearchEngine implements SearchEngine {
 		if (rows != null)
 			query = query.setRows(rows);
 
-		for (String filter : filters)
-			query = query.addFilterQuery(filter);
+		if (CollectionUtils.isNotEmpty(filters))
+			for (String filter : filters)
+				query = query.addFilterQuery(filter);
 
 		query = query.setSort(SortClause.desc("score"));
 		query.set("exprLang", expressionLanguage);
