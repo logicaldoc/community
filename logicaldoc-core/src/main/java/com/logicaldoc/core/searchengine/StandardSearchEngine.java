@@ -38,7 +38,6 @@ import org.apache.solr.core.CoreContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Joiner;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
@@ -46,8 +45,8 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.DocumentNoteDAO;
 import com.logicaldoc.core.metadata.Attribute;
-import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.parser.ParserFactory;
+import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.searchengine.analyzer.FilteredAnalyzer;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.config.ContextProperties;
@@ -381,11 +380,13 @@ public class StandardSearchEngine implements SearchEngine {
 			// the content field
 			FilteredAnalyzer.lang.set(expressionLanguage);
 			Hits hits = null;
+
 			SolrQuery query = prepareSearchQuery(expression, filters, expressionLanguage, rows);
 
 			try {
-				log.info("Execute search: {}", expression);
+				log.info("Execute search: {}   with filters: {}", expression, filters);
 				QueryResponse rsp = server.query(query);
+				log.debug("fulltext query results: {}", rsp.getResults().getNumFound());
 				hits = new Hits(rsp);
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
@@ -404,8 +405,10 @@ public class StandardSearchEngine implements SearchEngine {
 		SolrQuery query = new SolrQuery().setQuery(expression);
 		if (rows != null)
 			query = query.setRows(rows);
-		if (CollectionUtils.isNotEmpty(filters))
-			query = query.addFilterQuery(Joiner.on(" +").join(filters));
+
+		for (String filter : filters)
+			query = query.addFilterQuery(filter);
+
 		query = query.setSort(SortClause.desc("score"));
 		query.set("exprLang", expressionLanguage);
 		return query;
