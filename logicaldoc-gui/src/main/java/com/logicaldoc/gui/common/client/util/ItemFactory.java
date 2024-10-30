@@ -1138,14 +1138,14 @@ public class ItemFactory {
 		return securityOption;
 	}
 
-	public static SelectItem newEventsSelector(String name, String title, final ChangedHandler handler, boolean folder,
-			boolean workflow, boolean user, boolean importfolder, boolean ocr, boolean webservice, boolean allOption) {
+	public static SelectItem newEventsSelector(String name, String title, final ChangedHandler handler,
+			EventSelectorOptions options) {
 		final SelectItem select = newMultipleSelector(originalItemName(name), title);
 		select.setWidth(350);
 		select.setHeight(250);
 		select.setMultipleAppearance(MultipleAppearance.GRID);
 		select.setMultiple(true);
-		select.setOptionDataSource(new EventsDS(folder, workflow, user, importfolder, ocr, webservice, allOption));
+		select.setOptionDataSource(new EventsDS(options.isFolder(), options.isWorkflow(), options.isUser(), options.isImportfolder(), options.isOcr(), options.isWebservice(), options.isAllOption()));
 		select.setValueField("code");
 		select.setDisplayField(LABEL);
 		if (handler != null)
@@ -1164,12 +1164,11 @@ public class ItemFactory {
 		return select;
 	}
 
-	public static SelectItem newEventSelector(String name, String title, final ChangedHandler handler, boolean folder,
-			boolean workflow, boolean user, boolean importfolder, boolean ocr, boolean webservice, boolean allOption) {
+	public static SelectItem newEventSelector(String name, String title, final ChangedHandler handler, EventSelectorOptions options) {
 		final SelectItem select = newSelectItem(originalItemName(name), title);
 		select.setWidth(350);
 		select.setMultiple(false);
-		select.setOptionDataSource(new EventsDS(folder, workflow, user, importfolder, ocr, webservice, allOption));
+		select.setOptionDataSource(new EventsDS(options.isFolder(), options.isWorkflow(), options.isUser(), options.isImportfolder(), options.isOcr(), options.isWebservice(), options.isAllOption()));
 		select.setValueField("code");
 		select.setDisplayField(LABEL);
 		if (handler != null)

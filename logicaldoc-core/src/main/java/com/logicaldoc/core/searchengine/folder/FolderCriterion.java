@@ -274,10 +274,11 @@ public class FolderCriterion implements Serializable {
 	public void setExtendedAttribute(boolean extendedAttribute) {
 		this.extendedAttribute = extendedAttribute;
 	}
-	
+
 	@Override
 	public String toString() {
 		return new ReflectionToStringBuilder(this, ToStringStyle.NO_CLASS_NAME_STYLE) {
+			@Override
 			protected boolean accept(Field field) {
 				try {
 					Object value = field.get(getObject());

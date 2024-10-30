@@ -27,7 +27,7 @@ public abstract class HibernateHistoryDAO<T extends History> extends HibernatePe
 	private ContextProperties config;
 
 	// A cache of tenant names to minimize the DB accesses
-	private static Map<Long, String> tenantNames = new HashMap<>();
+	private static final Map<Long, String> tenantNames = new HashMap<>();
 
 	protected HibernateHistoryDAO(Class<T> historyClass) {
 		super(historyClass);
@@ -55,7 +55,7 @@ public abstract class HibernateHistoryDAO<T extends History> extends HibernatePe
 		if ("all".equals(allowedEvents) || allowedEvents.contains(history.getEvent()))
 			super.store(history);
 
-		EventCollector.get().newEvent((History) history);
+		EventCollector.get().newEvent(history);
 	}
 
 	protected String getTenantName(T history) throws PersistenceException {

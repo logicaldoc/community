@@ -9,6 +9,7 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.EventSelectorOptions;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
@@ -71,9 +72,10 @@ public class AuditingPanel extends AdminPanel {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setWrapItemTitles(false);
 
-		final String eventsParameterName = Session.get().getTenantName() + ".history.events";
+		String eventsParameterName = Session.get().getTenantName() + ".history.events";
 		final SelectItem eventsSelector = ItemFactory.newEventsSelector(eventsParameterName,
-				I18N.message("recordedevents"), null, true, true, true, true, true, true, true);
+				I18N.message("recordedevents"), null,
+				new EventSelectorOptions(true, true, true, true, true, true, true));
 		eventsSelector.setColSpan(2);
 		eventsSelector.setEndRow(true);
 
@@ -156,36 +158,40 @@ public class AuditingPanel extends AdminPanel {
 
 		IButton save = new IButton(I18N.message("save"));
 		save.setMinWidth(80);
-		save.addClickHandler(event -> {
-			if (vm.validate()) {
-				List<GUIParameter> settings = new ArrayList<>();
-				final String eventsValue = vm.getValueAsString(eventsParameterName);
-				settings.add(new GUIParameter(eventsParameterName,
-						eventsValue != null && eventsValue.contains("all") ? "all" : eventsValue));
-				settings.add(new GUIParameter(HISTORY_DOCUMENT_TTL, vm.getValueAsString(HISTORY_DOCUMENT_TTL)));
-				settings.add(new GUIParameter(HISTORY_FOLDER_TTL, vm.getValueAsString(HISTORY_FOLDER_TTL)));
-				settings.add(new GUIParameter(HISTORY_USER_TTL, vm.getValueAsString(HISTORY_USER_TTL)));
-				settings.add(new GUIParameter(HISTORY_IMPORTFOLDER_TTL, vm.getValueAsString(HISTORY_IMPORTFOLDER_TTL)));
-				settings.add(new GUIParameter(HISTORY_WORKFLOW_TTL, vm.getValueAsString(HISTORY_WORKFLOW_TTL)));
-				settings.add(new GUIParameter(HISTORY_OCR_TTL, vm.getValueAsString(HISTORY_OCR_TTL)));
-				settings.add(new GUIParameter(WEBSERVICE_CALL_TTL, vm.getValueAsString(WEBSERVICE_CALL_TTL)));
-
-				SettingService.Instance.get().saveSettings(settings, new AsyncCallback<Void>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(Void ret) {
-						GuiLog.info(I18N.message("settingssaved"), null);
-					}
-				});
-			}
-		});
+		save.addClickHandler(event -> onSave(vm));
 
 		body.setMembers(form);
 		addMember(save);
+	}
+
+	private void onSave(ValuesManager vm) {
+		if (Boolean.TRUE.equals(vm.validate())) {
+			List<GUIParameter> settings = new ArrayList<>();
+
+			String eventsParameterName = Session.get().getTenantName() + ".history.events";
+			final String eventsValue = vm.getValueAsString(eventsParameterName);
+			settings.add(new GUIParameter(eventsParameterName,
+					eventsValue != null && eventsValue.contains("all") ? "all" : eventsValue));
+			settings.add(new GUIParameter(HISTORY_DOCUMENT_TTL, vm.getValueAsString(HISTORY_DOCUMENT_TTL)));
+			settings.add(new GUIParameter(HISTORY_FOLDER_TTL, vm.getValueAsString(HISTORY_FOLDER_TTL)));
+			settings.add(new GUIParameter(HISTORY_USER_TTL, vm.getValueAsString(HISTORY_USER_TTL)));
+			settings.add(new GUIParameter(HISTORY_IMPORTFOLDER_TTL, vm.getValueAsString(HISTORY_IMPORTFOLDER_TTL)));
+			settings.add(new GUIParameter(HISTORY_WORKFLOW_TTL, vm.getValueAsString(HISTORY_WORKFLOW_TTL)));
+			settings.add(new GUIParameter(HISTORY_OCR_TTL, vm.getValueAsString(HISTORY_OCR_TTL)));
+			settings.add(new GUIParameter(WEBSERVICE_CALL_TTL, vm.getValueAsString(WEBSERVICE_CALL_TTL)));
+
+			SettingService.Instance.get().saveSettings(settings, new AsyncCallback<Void>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(Void ret) {
+					GuiLog.info(I18N.message("settingssaved"), null);
+				}
+			});
+		}
 	}
 }

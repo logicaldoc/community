@@ -4,6 +4,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.EventSelectorOptions;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.types.Alignment;
@@ -82,8 +83,7 @@ public class TriggerDialog extends Window {
 		if (panel.getSelectedRecord() != null)
 			template.setValue(panel.getSelectedRecord().getAttributeAsLong("templateId"));
 
-		SelectItem eventsSelector = ItemFactory.newEventsSelector("events", "triggeron", null, false, false, false,
-				false, false, false, false);
+		SelectItem eventsSelector = ItemFactory.newEventsSelector("events", "triggeron", null, new EventSelectorOptions(false, false, false, false, false, false, false));
 		eventsSelector.setValue(events);
 
 		DynamicForm form = new DynamicForm();

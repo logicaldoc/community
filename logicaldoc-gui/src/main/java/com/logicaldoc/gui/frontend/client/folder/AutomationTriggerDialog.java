@@ -5,6 +5,7 @@ import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationTrigger;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.EventSelectorOptions;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.AutomationService;
 import com.smartgwt.client.types.HeaderControls;
@@ -106,8 +107,7 @@ public class AutomationTriggerDialog extends Window {
 		form1.setNumCols(1);
 		form1.setValuesManager(vm);
 
-		SelectItem events = ItemFactory.newEventsSelector(EVENTS, I18N.message("triggeron"), null, true, true, true,
-				true, true, true, false);
+		SelectItem events = ItemFactory.newEventsSelector(EVENTS, I18N.message("triggeron"), null, new EventSelectorOptions(true, true, true, true, true, true, false));
 		events.setHeight(210);
 		events.setHeight(250);
 		events.setEndRow(true);

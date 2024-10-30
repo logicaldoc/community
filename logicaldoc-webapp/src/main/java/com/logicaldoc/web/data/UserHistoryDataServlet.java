@@ -30,6 +30,8 @@ import com.logicaldoc.util.Context;
  */
 public class UserHistoryDataServlet extends AbstractDataServlet {
 
+	private static final String TENANT_ID = "tenantId";
+	
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -41,8 +43,8 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 
 		Long userId = StringUtils.isNotEmpty(request.getParameter("id")) ? Long.parseLong(request.getParameter("id"))
 				: null;
-		Long tenantId = StringUtils.isNotEmpty(request.getParameter("tenantId"))
-				? Long.parseLong(request.getParameter("tenantId"))
+		Long tenantId = StringUtils.isNotEmpty(request.getParameter(TENANT_ID))
+				? Long.parseLong(request.getParameter(TENANT_ID))
 				: null;
 		String comment = request.getParameter("comment");
 		String event = request.getParameter("event");
@@ -99,7 +101,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 		}
 		if (tenantId != null) {
 			query.append(" and A.tenantId = :tenantId ");
-			params.put("tenantId", tenantId);
+			params.put(TENANT_ID, tenantId);
 		}
 		if (userId != null) {
 			query.append(" and A.userId = :userId ");

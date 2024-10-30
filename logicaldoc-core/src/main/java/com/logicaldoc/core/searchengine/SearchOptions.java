@@ -95,7 +95,7 @@ public abstract class SearchOptions implements Serializable, Comparable<SearchOp
 	 * 
 	 * @param type the type of search
 	 */
-	public SearchOptions(int type) {
+	protected SearchOptions(int type) {
 		this.type = type;
 	}
 
@@ -281,6 +281,7 @@ public abstract class SearchOptions implements Serializable, Comparable<SearchOp
 	public String toString() {
 		return this.getClass().getSimpleName().replace("Options", "")
 				+ new ReflectionToStringBuilder(this, ToStringStyle.NO_CLASS_NAME_STYLE) {
+					@Override
 					protected boolean accept(Field field) {
 						try {
 							Object value = field.get(getObject());
@@ -289,9 +290,8 @@ public abstract class SearchOptions implements Serializable, Comparable<SearchOp
 									&& !field.getName().equals("description") && !field.getName().equals("transaction")
 									&& value != null && StringUtils.isNotEmpty(value.toString())
 									&& (!field.getType().isArray() || Array.getLength(value) > 0)
-									&& (!Collection.class.isAssignableFrom(field.getType())
-											|| Boolean.FALSE.equals(value.getClass().getDeclaredMethod("isEmpty")
-													.invoke(value, new Object[0])));
+									&& (!Collection.class.isAssignableFrom(field.getType()) || Boolean.FALSE
+											.equals(value.getClass().getDeclaredMethod("isEmpty").invoke(value)));
 						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
 								| NoSuchMethodException | SecurityException e) {
 							return false;

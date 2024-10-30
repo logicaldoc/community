@@ -32,6 +32,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class DriveEditor extends Window {
 
+	private static final String EDIT_HL = "/edit?hl=";
+
 	private HTMLFlow html = new HTMLFlow();
 
 	private VLayout layout = null;
@@ -92,13 +94,13 @@ public class DriveEditor extends Window {
 	 * Reloads a preview.
 	 */
 	private void reloadBody() {
-		String url = "https://docs.google.com/document/d/" + document.getExtResId() + "/edit?hl="
+		String url = "https://docs.google.com/document/d/" + document.getExtResId() + EDIT_HL
 				+ Session.get().getUser().getLanguage();
 		if (Util.isSpreadsheetFile(document.getFileName()))
-			url = "https://docs.google.com/spreadsheets/d/" + document.getExtResId() + "/edit?hl="
+			url = "https://docs.google.com/spreadsheets/d/" + document.getExtResId() + EDIT_HL
 					+ Session.get().getUser().getLanguage();
 		if (Util.isPresentationFile(document.getFileName()))
-			url = "https://docs.google.com/presentation/d/" + document.getExtResId() + "/edit?hl="
+			url = "https://docs.google.com/presentation/d/" + document.getExtResId() + EDIT_HL
 					+ Session.get().getUser().getLanguage();
 
 		String iframe = "<iframe src='" + url + "' style='border: 0px solid white; width:" + (getWidth() - 18)

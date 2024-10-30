@@ -29,8 +29,6 @@ public class SearchHistoryPanel extends VLayout {
 
 	private static final String USERID = "userId";
 
-	private SpinnerItem maxItem;
-
 	@Override
 	protected void onDraw() {
 		setWidth100();
@@ -77,17 +75,17 @@ public class SearchHistoryPanel extends VLayout {
 		ToolStrip buttons = new ToolStrip();
 		buttons.setWidth100();
 
-		maxItem = ItemFactory.newSpinnerItem("max", "display", Session.get().getConfigAsInt("gui.maxhistories"), 1,
-				(Integer) null);
+		SpinnerItem maxItem = ItemFactory.newSpinnerItem("max", "display",
+				Session.get().getConfigAsInt("gui.maxhistories"), 1, (Integer) null);
 		maxItem.setWidth(70);
 		maxItem.setStep(20);
 		maxItem.setSaveOnEnter(true);
 		maxItem.setImplicitSave(true);
 		maxItem.setHint(I18N.message("elements"));
-		maxItem.addChangedHandler(evnt -> refresh(list));
+		maxItem.addChangedHandler(changed -> refresh(list, maxItem.getValueAsInteger()));
 
 		ToolStripButton refresh = new ToolStripButton(I18N.message("refresh"));
-		refresh.addClickHandler(evnt -> refresh(list));
+		refresh.addClickHandler(click -> refresh(list, maxItem.getValueAsInteger()));
 
 		buttons.addButton(refresh);
 		buttons.addFormItem(maxItem);
@@ -95,11 +93,11 @@ public class SearchHistoryPanel extends VLayout {
 
 		ToolStripButton export = new ToolStripButton(I18N.message("export"));
 		buttons.addButton(export);
-		export.addClickHandler(evnt -> GridUtil.exportCSV(list, true));
+		export.addClickHandler(click -> GridUtil.exportCSV(list, true));
 
 		ToolStripButton print = new ToolStripButton(I18N.message("print"));
 		buttons.addButton(print);
-		print.addClickHandler(evnt -> GridUtil.print(list));
+		print.addClickHandler(click -> GridUtil.print(list));
 
 		buttons.addSeparator();
 
@@ -110,8 +108,7 @@ public class SearchHistoryPanel extends VLayout {
 		addMember(container);
 	}
 
-	private void refresh(RefreshableListGrid list) {
-		list.refresh(new UserHistoryDS(Session.get().getTenantId(), null, "event.user.search", "Fulltext",
-				Integer.parseInt(maxItem.getValueAsString())));
+	private void refresh(RefreshableListGrid list, int max) {
+		list.refresh(new UserHistoryDS(Session.get().getTenantId(), null, "event.user.search", "Fulltext", max));
 	}
 }

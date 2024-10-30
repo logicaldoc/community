@@ -65,8 +65,6 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 
 			User user = pickUser(username);
-			if (user == null)
-				return null;
 
 			// Get just a few informations needed by the login
 			GUIUser usr = new GUIUser();
