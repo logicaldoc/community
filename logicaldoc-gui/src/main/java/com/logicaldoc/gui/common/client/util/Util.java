@@ -518,9 +518,8 @@ public abstract class Util {
 	 * @param text the content to put into the clipboards
 	 * @return The formated file size.
 	 */
-	private static native void writeToClipboard(String text) /*-{
-  		 // navigator.clipboard.writeText(text);
-  		 copy(text);
+	public static native void writeToClipboard(String text) /*-{		
+		$wnd.copy(text);
 	}-*/;
 
 	/**
