@@ -13,20 +13,21 @@
 	<packaging>jar</packaging>
 	<properties>
 		<gwt.output.directory>./war</gwt.output.directory>
+		<jetty.version>9.4.46.v20220331</jetty.version>
 	</properties>
+
 	<dependencies>
-        <dependency>
-          <groupId>org.gwtproject</groupId>
-          <artifactId>gwt-dev</artifactId>
-        </dependency>                
 		<dependency>
 			<groupId>org.gwtproject</groupId>
-			<artifactId>gwt-servlet</artifactId>
-			<scope>provided</scope>
+			<artifactId>gwt-dev</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.gwtproject</groupId>
 			<artifactId>gwt-user</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.gwtproject</groupId>
+			<artifactId>gwt-servlet</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -88,7 +89,7 @@
 				<exclusion>
 					<groupId>com.google.gwt</groupId>
 					<artifactId>gwt-dev</artifactId>
-				</exclusion>				
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -139,80 +140,147 @@
 			<version>9.5</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.logicaldoc</groupId>
+			<artifactId>logicaldoc-util</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>websocket-api</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>websocket-server</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>websocket-servlet</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>websocket-common</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-client</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-http</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-io</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-util</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-util-ajax</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-security</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.service.serviceloader</artifactId>
+			<version>1.0.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<outputDirectory>${gwt.output.directory}/WEB-INF/classes</outputDirectory>
 		<plugins>
 			<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <release>11</release>
-                    <encoding>iso-8859-1</encoding>
-					<source>11</source>
-					<target>11</target>					
-                </configuration>
-            </plugin>
-			<!--plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>gwt-maven-plugin</artifactId>
-				<version>${gwt.version}</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<extraJvmArgs>-XX:-UseGCOverheadLimit -Xmx4000m</extraJvmArgs>
-					<webappDirectory>./war</webappDirectory>
-					<modules>
-						<module>com.logicaldoc.gui.common.Common</module>
-						<module>com.logicaldoc.gui.frontend.Frontend</module>
-						<module>com.logicaldoc.gui.login.Login</module>
-						<module>com.logicaldoc.gui.setup.Setup</module>
-					</modules>
+					<release>11</release>
+					<encoding>iso-8859-1</encoding>
+					<source>11</source>
+					<target>11</target>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>net.ltgt.gwt.maven</groupId>
+				<artifactId>gwt-maven-plugin</artifactId>
+				<extensions>true</extensions>
 				<executions>
 					<execution>
-						<phase>process-classes</phase>
+						<id>frontend</id>
+						<phase>compile</phase>
 						<goals>
 							<goal>compile</goal>
 						</goals>
+						<configuration>
+							<moduleName>com.logicaldoc.gui.frontend.Frontend</moduleName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>login</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<configuration>
+							<moduleName>com.logicaldoc.gui.login.Login</moduleName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>setup</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<configuration>
+							<moduleName>com.logicaldoc.gui.setup.Setup</moduleName>
+						</configuration>
 					</execution>
 				</executions>
-			</plugin -->
-            <plugin>
-              <groupId>net.ltgt.gwt.maven</groupId>
-              <artifactId>gwt-maven-plugin</artifactId>
-              <executions>
-                 <execution>
-                   <id>frontend</id>
-                   <phase>compile</phase>
-                   <goals>
-                     <goal>compile</goal>
-                   </goals>                   
-                   <configuration>
-                     <moduleName>com.logicaldoc.gui.frontend.Frontend</moduleName>
-                   </configuration>
-                 </execution>
-                 <execution>
-                   <id>login</id>
-                   <phase>compile</phase>
-                   <goals>
-                     <goal>compile</goal>
-                   </goals>
-                   <configuration>
-                     <moduleName>com.logicaldoc.gui.login.Login</moduleName>
-                   </configuration>
-                 </execution>
-                 <execution>
-                   <id>setup</id>
-                   <phase>compile</phase>
-                   <goals>
-                     <goal>compile</goal>
-                   </goals>                   
-                   <configuration>
-                     <moduleName>com.logicaldoc.gui.setup.Setup</moduleName>
-                   </configuration>
-                 </execution>                                  
-              </executions>
-            </plugin>            
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -411,7 +479,8 @@
 
 								<!-- Delete all the sources from the smartgwt
 								jar -->
-								<delete dir="target/plugin/WEB-INF/lib/smartgwt" failonerror="false" />
+								<delete dir="target/plugin/WEB-INF/lib/smartgwt"
+									failonerror="false" />
 								<unzip dest="target/plugin/WEB-INF/lib/smartgwt"
 									src="target/plugin/WEB-INF/lib/smartgwt-${smartgwt.version}.jar" />
 								<delete
@@ -437,7 +506,8 @@
 									todir="target/plugin/setup/sc/skins/standard/images/"
 									file="./war/skin/images/blank.gif" />
 								<delete
-									file="target/${project.artifactId}-${project.version}-plugin2.zip" failonerror="false" />
+									file="target/${project.artifactId}-${project.version}-plugin2.zip"
+									failonerror="false" />
 								<zip
 									destfile="target/${project.artifactId}-${project.version}-plugin2.zip"
 									basedir="target/plugin" />
@@ -448,7 +518,6 @@
 						</configuration>
 					</execution>
 				</executions>
-
 			</plugin>
 		</plugins>
 	</build>

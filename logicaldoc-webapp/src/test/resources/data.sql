@@ -30,6 +30,7 @@ insert into ld_extoption (ld_id, ld_lastmodified, ld_creation, ld_recordversion,
 insert into ld_template
 			(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid, ld_recordversion)
 values (-1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'default','default',0,0,1,1);
+insert into ld_template_acl(ld_templateid, ld_groupid, ld_read, ld_write) values (-1, 3, 1, 0);
 
 insert into ld_template_ext(ld_templateid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
 select -1, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly from ld_attributeset_ext where ld_setid=-1;
@@ -42,6 +43,8 @@ insert into ld_group
 values     (-2,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'_user_2',1,1);
 insert into ld_usergroup
 values (-2,2);
+insert into ld_menu_acl (ld_menuid, ld_groupid, ld_read, ld_write) values (5,-2,1,0);
+
 
 insert into ld_user
            (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_enabled,ld_username,ld_password,ld_name,ld_firstname,ld_street,ld_postalcode,ld_city,ld_country,ld_language,ld_email,ld_telephone,ld_type,ld_passwordchanged,ld_passwordexpires,ld_source,ld_quota,ld_passwordexpired,ld_tenantid,ld_recordversion,ld_enforcewrktime,ld_evalform)

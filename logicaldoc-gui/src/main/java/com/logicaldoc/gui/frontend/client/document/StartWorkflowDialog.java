@@ -84,7 +84,7 @@ public class StartWorkflowDialog extends Window {
 					}
 
 					@Override
-					public void onSuccess(Void result) {
+					public void onSuccess(String result) {
 						GuiLog.info(I18N.message("event.workflow.start"), null);
 						destroy();
 					}

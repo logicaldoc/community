@@ -66,6 +66,8 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 		when(client.getId()).thenReturn("testid");
 		when(request.getHeader("Authorization")).thenReturn("Basic YWRtaW46YWRtaW4=");
 		when(request.getSession(true)).thenReturn(httpSession);
+		
+		SecurityContextHolder.getContext().setAuthentication(null);
 	}
 
 	@After

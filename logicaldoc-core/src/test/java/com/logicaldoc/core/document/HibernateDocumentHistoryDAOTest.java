@@ -196,7 +196,7 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 	@SuppressWarnings("rawtypes")
 	@Test
 	public void testFindByUserIdAndEvent() throws PersistenceException {
-		Collection histories = dao.findByUserIdAndEvent(1, "data test 01", null);
+		Collection histories = dao.findByUserIdAndEvent(1, "event.checkedin", null);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(1, histories.size());
 

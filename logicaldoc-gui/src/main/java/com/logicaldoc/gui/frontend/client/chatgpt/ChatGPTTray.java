@@ -17,8 +17,6 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
  * @since 8.9.4
  */
 public class ChatGPTTray extends MenuTray {
-	
-	private FormItemIcon ask = new FormItemIcon();
 
 	public ChatGPTTray() {
 		TextItem question = ItemFactory.newTextItem("chatgpt", "");
@@ -28,12 +26,13 @@ public class ChatGPTTray extends MenuTray {
 				onAsk(question.getValueAsString());
 		});
 
+		FormItemIcon ask = new FormItemIcon();
 		ask.setInline(true);
 		ask.setInlineIconAlign(Alignment.RIGHT);
 		ask.setText(AwesomeFactory.getIconHtml("paper-plane"));
 		question.setIcons(ask);
 		ask.addFormItemClickHandler(click -> onAsk(question.getValueAsString()));
-		
+
 		setItems(question);
 	}
 

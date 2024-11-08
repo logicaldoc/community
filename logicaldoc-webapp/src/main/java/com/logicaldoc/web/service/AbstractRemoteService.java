@@ -254,7 +254,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		} else if (t instanceof ServerException se) {
 			throw se;
 		} else
-			throw new ServerException(message);
+				throw new ServerException(message);
 	}
 
 	/**

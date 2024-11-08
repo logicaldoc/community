@@ -289,4 +289,9 @@ public class MockServletResponse implements HttpServletResponse {
 	public int getStatus() {
 		return 0;
 	}
+	
+	public void clear() {
+		FileUtil.delete(output);
+		
+	}
 }

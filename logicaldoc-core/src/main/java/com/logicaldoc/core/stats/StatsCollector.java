@@ -80,6 +80,10 @@ public class StatsCollector extends Task {
 
 	private static String productName = "LogicalDOC Community";
 
+	private boolean uploadStatistics = true;
+
+	private List<NameValuePair> statistics = new ArrayList<>();
+
 	public StatsCollector() {
 		super(NAME);
 		log = LoggerFactory.getLogger(StatsCollector.class);
@@ -240,48 +244,48 @@ public class StatsCollector extends Task {
 			log.debug("Package collected statistics");
 
 			// Prepare the post parameters
-			List<NameValuePair> postParams = new ArrayList<>();
+			statistics.clear();
 
 			// Add all statistics as parameters
-			postParams.add(new BasicNameValuePair("id", StringUtils.defaultString(id)));
-			postParams.add(new BasicNameValuePair("userno", StringUtils.defaultString(userno)));
-			postParams.add(new BasicNameValuePair("sid", StringUtils.defaultString(sid)));
+			statistics.add(new BasicNameValuePair("id", StringUtils.defaultString(id)));
+			statistics.add(new BasicNameValuePair("userno", StringUtils.defaultString(userno)));
+			statistics.add(new BasicNameValuePair("sid", StringUtils.defaultString(sid)));
 
-			postParams.add(new BasicNameValuePair("product_release", StringUtils.defaultString(release)));
-			postParams.add(new BasicNameValuePair("email", StringUtils.defaultString(email)));
-			postParams.add(new BasicNameValuePair("product", StringUtils.defaultString(StatsCollector.product)));
-			postParams
+			statistics.add(new BasicNameValuePair("product_release", StringUtils.defaultString(release)));
+			statistics.add(new BasicNameValuePair("email", StringUtils.defaultString(email)));
+			statistics.add(new BasicNameValuePair("product", StringUtils.defaultString(StatsCollector.product)));
+			statistics
 					.add(new BasicNameValuePair("product_name", StringUtils.defaultString(StatsCollector.productName)));
 
-			postParams.add(new BasicNameValuePair("java_version", StringUtils.defaultString(javaversion)));
-			postParams.add(new BasicNameValuePair("java_vendor", StringUtils.defaultString(javavendor)));
-			postParams.add(new BasicNameValuePair("java_arch", StringUtils.defaultString(javaarch)));
-			postParams.add(new BasicNameValuePair("dbms", StringUtils.defaultString(dbms)));
+			statistics.add(new BasicNameValuePair("java_version", StringUtils.defaultString(javaversion)));
+			statistics.add(new BasicNameValuePair("java_vendor", StringUtils.defaultString(javavendor)));
+			statistics.add(new BasicNameValuePair("java_arch", StringUtils.defaultString(javaarch)));
+			statistics.add(new BasicNameValuePair("dbms", StringUtils.defaultString(dbms)));
 
-			postParams.add(new BasicNameValuePair("os_name", StringUtils.defaultString(osname)));
-			postParams.add(new BasicNameValuePair("os_version", StringUtils.defaultString(osversion)));
-			postParams.add(new BasicNameValuePair("file_encoding", StringUtils.defaultString(fileencoding)));
+			statistics.add(new BasicNameValuePair("os_name", StringUtils.defaultString(osname)));
+			statistics.add(new BasicNameValuePair("os_version", StringUtils.defaultString(osversion)));
+			statistics.add(new BasicNameValuePair("file_encoding", StringUtils.defaultString(fileencoding)));
 
-			postParams.add(new BasicNameValuePair("user_language", StringUtils.defaultString(userlanguage)));
-			postParams.add(new BasicNameValuePair("user_country", StringUtils.defaultString(usercountry)));
+			statistics.add(new BasicNameValuePair("user_language", StringUtils.defaultString(userlanguage)));
+			statistics.add(new BasicNameValuePair("user_country", StringUtils.defaultString(usercountry)));
 
 			// Sizing
-			postParams.add(new BasicNameValuePair("users", Integer.toString(users)));
-			postParams.add(new BasicNameValuePair("guests", Integer.toString(guests)));
-			postParams.add(new BasicNameValuePair("groups", Integer.toString(groups)));
-			postParams.add(new BasicNameValuePair("docs", Long.toString(totaldocs)));
-			postParams.add(new BasicNameValuePair("pages", Long.toString(totalpages)));
+			statistics.add(new BasicNameValuePair("users", Integer.toString(users)));
+			statistics.add(new BasicNameValuePair("guests", Integer.toString(guests)));
+			statistics.add(new BasicNameValuePair("groups", Integer.toString(groups)));
+			statistics.add(new BasicNameValuePair("docs", Long.toString(totaldocs)));
+			statistics.add(new BasicNameValuePair("pages", Long.toString(totalpages)));
 
-			postParams.add(new BasicNameValuePair("archived_docs", Long.toString(archiveddocs)));
-			postParams.add(new BasicNameValuePair("folders", Long.toString(withdocs + empty + deletedfolders)));
-			postParams.add(new BasicNameValuePair("tags", Long.toString(tags)));
-			postParams.add(new BasicNameValuePair("versions", Long.toString(versions)));
-			postParams.add(new BasicNameValuePair("histories", Long.toString(histories)));
-			postParams.add(new BasicNameValuePair("user_histories", Long.toString(userHistories)));
-			postParams.add(new BasicNameValuePair("votes", Long.toString(votes)));
-			postParams.add(new BasicNameValuePair("wscalls", Long.toString(wsCalls)));
+			statistics.add(new BasicNameValuePair("archived_docs", Long.toString(archiveddocs)));
+			statistics.add(new BasicNameValuePair("folders", Long.toString(withdocs + empty + deletedfolders)));
+			statistics.add(new BasicNameValuePair("tags", Long.toString(tags)));
+			statistics.add(new BasicNameValuePair("versions", Long.toString(versions)));
+			statistics.add(new BasicNameValuePair("histories", Long.toString(histories)));
+			statistics.add(new BasicNameValuePair("user_histories", Long.toString(userHistories)));
+			statistics.add(new BasicNameValuePair("votes", Long.toString(votes)));
+			statistics.add(new BasicNameValuePair("wscalls", Long.toString(wsCalls)));
 
-			collectFeatureUsageStats(postParams);
+			collectFeatureUsageStats(statistics);
 			next();
 			if (interruptRequested)
 				return;
@@ -290,29 +294,29 @@ public class StatsCollector extends Task {
 			 * General usage
 			 */
 			Date lastLogin = findLastLogin();
-			postParams.add(new BasicNameValuePair("last_login", formatDate(lastLogin)));
+			statistics.add(new BasicNameValuePair("last_login", formatDate(lastLogin)));
 
 			Date lastCreation = findLastCreation();
-			postParams.add(new BasicNameValuePair("last_creation", formatDate(lastCreation)));
+			statistics.add(new BasicNameValuePair("last_creation", formatDate(lastCreation)));
 
 			/*
 			 * Quotas
 			 */
-			postParams.add(new BasicNameValuePair("docdir", Long.toString(docdir)));
-			postParams.add(new BasicNameValuePair("trash", Long.toString(trash)));
-			postParams.add(new BasicNameValuePair("indexdir", Long.toString(indexdir)));
-			postParams.add(new BasicNameValuePair("quota",
+			statistics.add(new BasicNameValuePair("docdir", Long.toString(docdir)));
+			statistics.add(new BasicNameValuePair("trash", Long.toString(trash)));
+			statistics.add(new BasicNameValuePair("indexdir", Long.toString(indexdir)));
+			statistics.add(new BasicNameValuePair("quota",
 					Long.toString(docdir + indexdir + userdir + importdir + exportdir + plugindir + dbdir + logdir)));
 
 			/*
 			 * Registration
 			 */
-			postParams.add(new BasicNameValuePair("reg_name", regName != null ? regName : ""));
-			postParams.add(new BasicNameValuePair("reg_email", regEmail != null ? regEmail : ""));
-			postParams.add(new BasicNameValuePair("reg_organization", regOrganization != null ? regOrganization : ""));
-			postParams.add(new BasicNameValuePair("reg_website", regWebsite != null ? regWebsite : ""));
+			statistics.add(new BasicNameValuePair("reg_name", regName != null ? regName : ""));
+			statistics.add(new BasicNameValuePair("reg_email", regEmail != null ? regEmail : ""));
+			statistics.add(new BasicNameValuePair("reg_organization", regOrganization != null ? regOrganization : ""));
+			statistics.add(new BasicNameValuePair("reg_website", regWebsite != null ? regWebsite : ""));
 
-			postStatistics(postParams);
+			uploadStatistics(statistics);
 
 			next();
 		} catch (PersistenceException e) {
@@ -325,14 +329,16 @@ public class StatsCollector extends Task {
 		return lastLogin != null ? isoDf.format(lastLogin) : "";
 	}
 
-	private void postStatistics(List<NameValuePair> postParams) {
+	private void uploadStatistics(List<NameValuePair> postParams) {
 		try {
 			// Execute request
 			try (CloseableHttpClient httpClient = HttpUtil.getNotValidatingClient(60)) {
 				HttpPost post = new HttpPost("http://stat.logicaldoc.com/stats/collect");
 				UrlEncodedFormEntity entity = new UrlEncodedFormEntity(postParams, StandardCharsets.UTF_8);
 				post.setEntity(entity);
-				httpClient.execute(post, new StringHttpClientResponseHandler());
+
+				if (uploadStatistics)
+					httpClient.execute(post, new StringHttpClientResponseHandler());
 			}
 			log.info("Statistics packaged");
 		} catch (IOException e) {
@@ -850,5 +856,13 @@ public class StatsCollector extends Task {
 
 	public static void setProductName(String productName) {
 		StatsCollector.productName = productName;
+	}
+
+	void setUploadStatistics(boolean uploadStatistics) {
+		this.uploadStatistics = uploadStatistics;
+	}
+
+	List<NameValuePair> getStatistics() {
+		return statistics;
 	}
 }

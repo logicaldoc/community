@@ -15,47 +15,47 @@ import com.logicaldoc.util.plugin.PluginException;
 public class HibernateSequenceDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
-	private SequenceDAO dao;
+	private SequenceDAO testSubject;
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateSequqnceDAO
-		dao = (SequenceDAO) context.getBean("SequenceDAO");
+		testSubject = (SequenceDAO) context.getBean("SequenceDAO");
 	}
 
 	@Test
 	public void testReset() {
-		dao.reset("test", 0L, Tenant.DEFAULT_ID, 5);
+		testSubject.reset("test", 0L, Tenant.DEFAULT_ID, 5);
 		for (int i = 1; i <= 20; i++) {
-			Assert.assertEquals(i + 5, dao.next("test", 0L, Tenant.DEFAULT_ID));
+			Assert.assertEquals(i + 5, testSubject.next("test", 0L, Tenant.DEFAULT_ID));
 		}
-		dao.reset("test", 0L, Tenant.DEFAULT_ID, 100);
+		testSubject.reset("test", 0L, Tenant.DEFAULT_ID, 100);
 		for (int i = 1; i <= 20; i++) {
-			Assert.assertEquals(i + 100, dao.next("test", 0L, Tenant.DEFAULT_ID));
+			Assert.assertEquals(i + 100, testSubject.next("test", 0L, Tenant.DEFAULT_ID));
 		}
-		dao.reset("test2", 0L, Tenant.DEFAULT_ID, 30);
+		testSubject.reset("test2", 0L, Tenant.DEFAULT_ID, 30);
 		for (int i = 1; i <= 20; i++) {
-			Assert.assertEquals(i + 30, dao.next("test2", 0L, Tenant.DEFAULT_ID));
+			Assert.assertEquals(i + 30, testSubject.next("test2", 0L, Tenant.DEFAULT_ID));
 		}
 	}
 
 	@Test
 	public void testNext() {
 		for (int i = 1; i <= 20; i++) {
-			Assert.assertEquals(i, dao.next("test", 0L, Tenant.DEFAULT_ID));
+			Assert.assertEquals(i, testSubject.next("test", 0L, Tenant.DEFAULT_ID));
 		}
 		for (int i = 1; i <= 20; i++) {
-			Assert.assertEquals(i, dao.next("test2", 0L, Tenant.DEFAULT_ID));
+			Assert.assertEquals(i, testSubject.next("test2", 0L, Tenant.DEFAULT_ID));
 		}
-		Assert.assertEquals(25L, dao.next("test2", 0L, Tenant.DEFAULT_ID, 5L));
-		Assert.assertEquals(23L, dao.next("test2", 0L, Tenant.DEFAULT_ID, -2L));
+		Assert.assertEquals(25L, testSubject.next("test2", 0L, Tenant.DEFAULT_ID, 5L));
+		Assert.assertEquals(23L, testSubject.next("test2", 0L, Tenant.DEFAULT_ID, -2L));
 	}
 
 	@Test
 	public void testFindByName() {
-		Collection<Sequence> sequences = dao.findByName("customid-", Tenant.DEFAULT_ID);
+		Collection<Sequence> sequences = testSubject.findByName("customid-", Tenant.DEFAULT_ID);
 		Assert.assertNotNull(sequences);
 		Assert.assertEquals(2, sequences.size());
 	}

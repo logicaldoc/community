@@ -257,8 +257,8 @@ public class EMailSender {
 	public void send(EMail email, String templateName, Map<String, Object> dictionary)
 			throws MessagingException, AutomationException {
 		if (!RunLevel.current().aspectEnabled("sendingMessages")) {
-			log.error("Aspect not enabled");
-			throw new MessagingException("Aspect sendingMessages not enabled");
+			log.error("Aspect sendingMessages not enabled");
+			return;
 		}
 
 		MessageTemplateDAO templateDao = (MessageTemplateDAO) Context.get().getBean(MessageTemplateDAO.class);
@@ -306,6 +306,11 @@ public class EMailSender {
 	 * @throws MessagingException raised if the email cannot be sent
 	 */
 	public void send(EMail email) throws MessagingException {
+		if (!RunLevel.current().aspectEnabled("sendingMessages")) {
+			log.error("Aspect sendingMessages not enabled");
+			return;
+		}
+		
 		cleanAuthorAddress(email);
 
 		Session session = newMailSession();

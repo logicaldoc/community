@@ -457,10 +457,17 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(adminUser);
 		transaction.setNotified(0);
-		testSubject.lock(1L, 2, transaction);
+		
+		// Already locked by same user
+		try {
+			testSubject.lock(1L, 2, transaction);
+			fail("An exception should have been raised here");
+		} catch (PersistenceException e) {
+			// All ok
+		}
 
 		Document doc = docDao.findById(1);
-		assertEquals(2, doc.getStatus());
+		assertEquals(1, doc.getStatus());
 		assertEquals(1L, doc.getLockUserId().longValue());
 
 		transaction = new DocumentHistory();
@@ -468,16 +475,15 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		transaction.setNotified(0);
 
 		// Locked by a different user
-		boolean exceptionHappened = false;
 		try {
 			testSubject.unlock(doc.getId(), transaction);
+			fail("An exception should have been raised here");
 		} catch (PersistenceException e) {
-			exceptionHappened = true;
+			// All ok
 		}
-		assertTrue(exceptionHappened);
 
 		doc = docDao.findById(1);
-		assertEquals(2, doc.getStatus());
+		assertEquals(1, doc.getStatus());
 		assertEquals(1L, doc.getLockUserId().longValue());
 
 		transaction = new DocumentHistory();
@@ -870,12 +876,16 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 	public void testArchiveFolder() throws PersistenceException {
 		Document doc = docDao.findById(1L);
 		assertNotNull(doc);
-		assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
-
+		assertEquals(AbstractDocument.DOC_CHECKED_OUT, doc.getStatus());
+		
 		DocumentHistory history = new DocumentHistory();
 		history.setUserId(1L);
 		history.setUsername("admin");
 		history.setSession(SessionManager.get().newSession("admin", "admin", (Client) null));
+		testSubject.unlock(1L, history);
+		doc = docDao.findById(1L);
+		assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+
 		assertEquals(4, testSubject.archiveFolder(6L, history));
 
 		doc = docDao.findById(1L);

@@ -186,7 +186,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 		assertNotNull(doc);
 		testSubject.lock(doc.getId(), "admin");
 		doc = testSubject.findById(1);
-		assertEquals(2, doc.getStatus());
+		assertEquals(1, doc.getStatus());
 		assertEquals(1L, doc.getLockUserId().longValue());
 
 		// double lock with same user just to check that no exceptions are
@@ -200,7 +200,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 		testSubject.lock(1L, "admin");
 
 		Document doc = testSubject.findById(1L);
-		assertEquals(2, doc.getStatus());
+		assertEquals(1, doc.getStatus());
 		assertEquals(1L, doc.getLockUserId().longValue());
 
 		// Locked by a different user

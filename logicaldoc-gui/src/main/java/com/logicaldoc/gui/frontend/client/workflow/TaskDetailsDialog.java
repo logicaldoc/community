@@ -380,8 +380,7 @@ public class TaskDetailsDialog extends Window {
 
 					@Override
 					public void onSuccess(GUIWorkflow workflow) {
-						WorkflowPreview diagramWindow = new WorkflowPreview(workflow);
-						diagramWindow.show();
+						new WorkflowPreview(workflow).show();
 					}
 				}));
 		return completionDiagram;

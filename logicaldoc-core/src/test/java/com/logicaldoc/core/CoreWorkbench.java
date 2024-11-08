@@ -10,7 +10,6 @@ import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ import com.talanlabs.avatargenerator.Avatar;
 import com.talanlabs.avatargenerator.IdenticonAvatar;
 
 public class CoreWorkbench {
-
+	
 	/**
 	 * Test sending e-mail with attachments
 	 * 

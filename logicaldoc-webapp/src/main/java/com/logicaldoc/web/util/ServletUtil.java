@@ -1,3 +1,4 @@
+
 package com.logicaldoc.web.util;
 
 import java.io.BufferedInputStream;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
@@ -693,9 +695,9 @@ public class ServletUtil {
 	 * @throws PersistenceException error at data layer
 	 */
 	public static void downloadDocument(HttpServletRequest request, HttpServletResponse response, String sid,
-			String docId, String fileVersion, String fileName, User user)
+			long docId, String fileVersion, String fileName, User user)
 			throws IOException, NumberFormatException, ServletException, PersistenceException {
-		downloadDocument(request, response, sid, Integer.parseInt(docId), fileVersion, fileName, null, user);
+		downloadDocument(request, response, sid, docId, fileVersion, fileName, null, user);
 	}
 
 	/**
@@ -713,13 +715,13 @@ public class ServletUtil {
 	 *        will returned
 	 * @param docVersion id of the doc version; if null the latest version will
 	 *        returned
-	 * 
-	 * @throws Exception a generic error
+	 * @throws PersistenceException Error in the data layer
+	 * @throws IOException I/O error during the upload
 	 */
-	public static void uploadDocumentResource(HttpServletRequest request, String docId, String suffix,
-			String fileVersion, String docVersion) throws Exception {
+	public static void uploadDocumentResource(HttpServletRequest request, long docId, String suffix, String fileVersion,
+			String docVersion) throws PersistenceException, IOException {
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		Document doc = docDao.findById(Long.parseLong(docId));
+		Document doc = docDao.findById(docId);
 
 		String ver = docVersion;
 		if (StringUtils.isEmpty(ver))
@@ -730,27 +732,44 @@ public class ServletUtil {
 		Store store = (Store) Context.get().getBean(Store.class);
 
 		DiskFileItemFactory factory = new DiskFileItemFactory();
+		
 		// Configure the factory here, if desired.
 		ServletFileUpload upload = new ServletFileUpload(factory);
+		
 		// Configure the uploader here, if desired.
-		List<FileItem> fileItems = upload.parseRequest(request);
+		List<FileItem> fileItems = getUploadFileItems(request, upload);
+		
 		for (FileItem item : fileItems) {
 			if (!item.isFormField()) {
-				File savedFile = FileUtil.createTempFile("", "");
-				item.write(savedFile);
-
-				InputStream is = null;
-				try {
-					is = item.getInputStream();
-					store.store(item.getInputStream(), Long.parseLong(docId),
-							store.getResourceName(doc, ver, suffix));
+				File savedFile = writeItemToFile(item);
+				try (InputStream is = item.getInputStream();) {
+					store.store(item.getInputStream(), docId, store.getResourceName(doc, ver, suffix));
 				} finally {
-					if (is != null)
-						is.close();
 					FileUtils.forceDelete(savedFile);
 				}
 			}
 		}
+	}
+
+	private static File writeItemToFile(FileItem item) throws IOException {
+		File savedFile = FileUtil.createTempFile("upload", "");
+		try {
+			item.write(savedFile);
+		} catch (Exception e) {
+			throw new IOException(e);
+		}
+		return savedFile;
+	}
+
+	private static List<FileItem> getUploadFileItems(HttpServletRequest request, ServletFileUpload upload)
+			throws IOException {
+		List<FileItem> fileItems;
+		try {
+			fileItems = upload.parseRequest(request);
+		} catch (FileUploadException e) {
+			throw new IOException(e);
+		}
+		return fileItems;
 	}
 
 	/**

@@ -197,7 +197,11 @@ insert into ld_foldertag(ld_folderid, ld_tenantid, ld_tag) values (1201, 1, 'fta
 
 insert into ld_document
            (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_fileversion,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_digest,ld_links,ld_ocrd,ld_previewpages,ld_docattrs)
-values     (1,6,'2008-10-22 00:00:00',0,0,'a','1.0','1.0','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,0,'PDF',3,'en','pippo.pdf',1356,1,0,'',1,0,0,1,1,1,5,0,0,'xx',0,0,1,0);
+values     (1,6,'2008-10-22 00:00:00',0,0,'a','1.0','1.0','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,1,'PDF',1,'en','pippo.pdf',1356,1,0,'',1,0,0,1,1,1,5,0,0,'xx',0,0,1,0);
+
+INSERT INTO ld_document_ext (ld_docid,ld_mandatory,ld_type,ld_editor,ld_position,ld_stringvalue,ld_stringvalues,ld_intvalue,ld_doublevalue,ld_datevalue,ld_name,ld_label,ld_setid,ld_hidden,ld_readonly,ld_multiple,ld_parent,ld_dependson)
+VALUES (1,0,0,0,1,'string value',null,6,6.0,null,'attribute1','attribute1',105,0,0,0,null,null);
+
 
 insert into ld_document
            (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_docref,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd,ld_previewpages,ld_docattrs)
@@ -274,7 +278,7 @@ values     (3, 1,'zzz');
 
 insert into ld_history 
 				(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_new, ld_path,ld_tenantid,ld_recordversion)
-values     (1,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,5,1,'2006-12-20 00:00:00','author','data test 01','reason test 01','1.0',0,1,'/Default/pippo',1,1);
+values     (1,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,5,1,'2006-12-20 00:00:00','author','event.checkedin','reason test 01','1.0',0,1,'/Default/pippo',1,1);
 
 insert into ld_history 
 			    (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_new, ld_path,ld_tenantid,ld_recordversion)
@@ -474,3 +478,10 @@ values(3, '2021-02-18 00:00:00', '2021-02-18 00:00:00',1,0,1,'psw3','2021-02-18 
 
 INSERT INTO ld_uniquetag (ld_tag,ld_tenantid,ld_count) VALUES ('approved',1,2);
 INSERT INTO ld_uniquetag (ld_tag,ld_tenantid,ld_count) VALUES ('rejected',1,4);
+
+insert into ld_dashlet	(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_recordversion, ld_tenantid, ld_name, ld_title, ld_query, ld_content, ld_type, ld_max, ld_unique, ld_columns)
+values(21,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,1,1,'checkout-1','event.checkedoutdocs','from Document where lockUserId=$user.id and status=1 order by date desc',null,'document', 10, 1, 'ext_attribute1');
+insert into ld_dashlet	(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_recordversion, ld_tenantid, ld_name, ld_title, ld_query, ld_content, ld_type, ld_max, ld_unique, ld_columns)
+values(22,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,1,1,'checkin-1','event.checkedindocs','from DocumentHistory where userId=$user.id and event=''event.checkedin'' order by date desc',null,'docevent', 10, 1, 'ext_attribute1');
+insert into ld_dashlet	(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_recordversion, ld_tenantid, ld_name, ld_title, ld_query, ld_content, ld_type, ld_max, ld_unique, ld_columns)
+values(23,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,1,1,'content-1','event.checkedindocs',null,'sample content','content', 10, 1, 'ext_attribute1');

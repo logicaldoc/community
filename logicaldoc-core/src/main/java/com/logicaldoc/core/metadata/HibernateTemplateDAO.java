@@ -304,8 +304,8 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		clonedTemplate.setAttributes(originalTemplate.getAttributes().entrySet().stream()
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 		store(clonedTemplate);
-		jdbcUpdate("insert into ld_template_acl(ld_templateid, ld_groupid, ld_write) select " + clonedTemplate.getId()
-				+ ", ld_groupid, ld_write from ld_template_acl where ld_templateid=" + id);
+		jdbcUpdate("insert into ld_template_acl(ld_templateid, ld_groupid, ld_read, ld_write) select " + clonedTemplate.getId()
+				+ ", ld_groupid, ld_read, ld_write from ld_template_acl where ld_templateid=" + id);
 		initialize(clonedTemplate);
 		return clonedTemplate;
 	}

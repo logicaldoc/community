@@ -25,7 +25,7 @@ public interface WorkflowServiceAsync {
 			AsyncCallback<Void> callback);
 
 	void startWorkflow(String workflowName, String workflowDescription, String tag, String color, List<Long> docIds,
-			AsyncCallback<Void> callback);
+			AsyncCallback<String> callback);
 
 	void getWorkflowDetailsByTask(String taskId, AsyncCallback<GUIWorkflow> callback);
 

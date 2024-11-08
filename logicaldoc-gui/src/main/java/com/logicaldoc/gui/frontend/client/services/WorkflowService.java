@@ -170,9 +170,11 @@ public interface WorkflowService extends RemoteService {
 	 * @param docIds identifiers of the documents appended to the new workflow
 	 *        instance
 	 * 
+	 * @return the new instance's identifier
+	 * 
 	 * @throws ServerException an error happened in the server applications
 	 */
-	public void startWorkflow(String workflowName, String workflowDescription, String tag, String color, List<Long> docIds)
+	public String startWorkflow(String workflowName, String workflowDescription, String tag, String color, List<Long> docIds)
 			throws ServerException;
 
 	/**

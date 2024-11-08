@@ -1,7 +1,6 @@
 package com.logicaldoc.util.servlet;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -145,33 +144,13 @@ public class MockServletRequest implements HttpServletRequest {
 
 	@Override
 	public String getContentType() {
-		return null;
+		return getHeader("Content-Type");
 	}
 
 	@Override
 	public ServletInputStream getInputStream() throws IOException {
 		if (body != null) {
-			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
-			return new ServletInputStream() {
-				public int read() throws IOException {
-					return byteArrayInputStream.read();
-				}
-
-				@Override
-				public boolean isFinished() {
-					return false;
-				}
-
-				@Override
-				public boolean isReady() {
-					return false;
-				}
-
-				@Override
-				public void setReadListener(ReadListener arg0) {
-					// Do nothing
-				}
-			};
+			return new BytesServletInputStream(body.getBytes(StandardCharsets.UTF_8));
 		} else if (payload != null) {
 			return new ServletInputStream() {
 				public int read() throws IOException {
@@ -466,7 +445,7 @@ public class MockServletRequest implements HttpServletRequest {
 
 	public void setBody(String body) {
 		this.body = body;
-		setContentLength(body.getBytes().length);
+		setContentLength(body.getBytes(StandardCharsets.UTF_8).length);
 	}
 
 	public void setContextPath(String contextPath) {
@@ -483,6 +462,10 @@ public class MockServletRequest implements HttpServletRequest {
 
 	public void setHeader(String name, String value) {
 		this.headers.put(name, value);
+	}
+
+	public void removeHeader(String name) {
+		this.headers.remove(name);
 	}
 
 	public void setHeaders(Map<String, String> headers) {

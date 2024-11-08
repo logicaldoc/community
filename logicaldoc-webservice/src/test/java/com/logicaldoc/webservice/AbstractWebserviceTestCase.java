@@ -6,6 +6,10 @@ import java.util.List;
 
 import org.springframework.context.ApplicationContext;
 
+import com.logicaldoc.core.security.Client;
+import com.logicaldoc.core.security.Device;
+import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.apikey.ApiKey;
 import com.logicaldoc.core.security.apikey.ApiKeyDAO;
 import com.logicaldoc.util.Context;
@@ -24,6 +28,8 @@ public abstract class AbstractWebserviceTestCase extends AbstractTestCase {
 
 	protected ApiKey apiKey;
 
+	protected Session session;
+
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
@@ -31,6 +37,20 @@ public abstract class AbstractWebserviceTestCase extends AbstractTestCase {
 		ApiKeyDAO dao = (ApiKeyDAO) Context.get().getBean(ApiKeyDAO.class);
 		apiKey = new ApiKey(1L, "MyKey");
 		dao.store(apiKey);
+
+		Client client = new Client("xyz", "192.168.2.231", "ghost");
+		Device device = new Device();
+		device.setBrowser("Firefox");
+		device.setBrowserVersion("18");
+		device.setOperativeSystem("Windows");
+		client.setDevice(device);
+		session = SessionManager.get().newSession("admin", "admin", null, client);
+	}
+
+	@Override
+	public void tearDown() throws SQLException {
+		SessionManager.get().kill(session.getSid());
+		super.tearDown();
 	}
 
 	@Override

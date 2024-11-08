@@ -163,7 +163,7 @@ public class WorkflowHistoryDialog extends Window {
 				}
 			}
 		};
-		
+
 		instancesGrid.setCanFreezeFields(true);
 		instancesGrid.setAutoFetchData(true);
 		instancesGrid.setShowHeader(true);
@@ -174,7 +174,7 @@ public class WorkflowHistoryDialog extends Window {
 		instancesGrid.setBorder("1px solid #E1E1E1");
 		instancesGrid.sort(STARTDATE, SortDirection.DESCENDING);
 		instancesGrid.setFields(id, version, templateId, tag, startDate, endDate, documents, initiator, documentIds);
-		
+
 		instancesGrid.addCellDoubleClickHandler(event -> onInstanceSelected());
 		instancesGrid.addCellContextClickHandler(event -> {
 			showInstanceContextMenu();
@@ -244,20 +244,19 @@ public class WorkflowHistoryDialog extends Window {
 
 		MenuItem completionDiagram = new MenuItem();
 		completionDiagram.setTitle(I18N.message("completiondiagram"));
-		completionDiagram.addClickHandler(event -> WorkflowService.Instance.get().getCompletionDiagram(
-				selectedWorkflow.getName(), selectedWorkflow.getVersion(), selection.getAttributeAsString("id"),
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+		completionDiagram.addClickHandler(
+				event -> WorkflowService.Instance.get().getCompletionDiagram(selectedWorkflow.getName(),
+						selectedWorkflow.getVersion(), selection.getAttributeAsString("id"), new AsyncCallback<>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-					@Override
-					public void onSuccess(GUIWorkflow workflow) {
-						WorkflowPreview diagramWindow = new WorkflowPreview(workflow);
-						diagramWindow.show();
-					}
-				}));
+							@Override
+							public void onSuccess(GUIWorkflow workflow) {
+								new WorkflowPreview(workflow).show();
+							}
+						}));
 
 		contextMenu.setItems(completionDiagram, delete);
 		contextMenu.showContextMenu();
