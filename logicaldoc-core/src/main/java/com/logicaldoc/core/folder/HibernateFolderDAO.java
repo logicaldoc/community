@@ -2,10 +2,8 @@ package com.logicaldoc.core.folder;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -949,25 +948,17 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		permissionColumn.put("LDREADINGREQ", Permission.READINGREQ);
 		permissionColumn.put("LDPREVIEW", Permission.PREVIEW);
 		permissionColumn.put("LDCUSTOMID", Permission.CUSTOMID);
-
-		/**
-		 * IMPORTANT: the connection MUST be explicitly closed, otherwise it is
-		 * probable that the connection pool will leave open it indefinitely.
-		 */
-		try (Connection con = getConnection();
-				Statement stmt = con.createStatement();
-				ResultSet rs = stmt.executeQuery(query.toString())) {
-			while (rs.next()) {
-				for (Entry<String, Permission> entry : permissionColumn.entrySet()) {
-					String column = entry.getKey();
-					Permission permission = entry.getValue();
-					if (rs.getInt(column) == 1)
-						permissions.add(permission);
-				}
+		
+		SqlRowSet rows = queryForRowSet(query.toString(), null);
+		while (rows.next()) {
+			for (Entry<String, Permission> entry : permissionColumn.entrySet()) {
+				String column = entry.getKey();
+				Permission permission = entry.getValue();
+				if (rows.getInt(column) == 1)
+					permissions.add(permission);
 			}
-		} catch (SQLException se) {
-			throw new PersistenceException(se.getMessage(), se);
 		}
+
 		return permissions;
 	}
 

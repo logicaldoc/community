@@ -1,8 +1,5 @@
 package com.logicaldoc.core.metadata;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -269,19 +266,11 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			query.append(groups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 			query.append(")");
 
-			/**
-			 * IMPORTANT: the connection MUST be explicitly closed, otherwise it
-			 * is probable that the connection pool will leave open it
-			 * indefinitely.
-			 */
-			try (Connection con = getConnection();
-					Statement stmt = con.createStatement();
-					ResultSet rs = stmt.executeQuery(query.toString())) {
-				while (rs.next()) {
-					permissions.add(Permission.READ);
-					if (rs.getInt("LDWRITE") == 1)
-						permissions.add(Permission.WRITE);
-				}
+			SqlRowSet rows = queryForRowSet(query.toString(), null);
+			while (rows.next()) {
+				permissions.add(Permission.READ);
+				if (rows.getInt("LDWRITE") == 1)
+					permissions.add(Permission.WRITE);
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -289,7 +278,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 
 		return permissions;
 	}
-
+	
 	@Override
 	public Template clone(long id, String cloneName) throws PersistenceException {
 		Template originalTemplate = findById(id, true);

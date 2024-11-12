@@ -3,10 +3,8 @@ package com.logicaldoc.core.document;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -1445,23 +1443,14 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		permissionColumn.put("LDPREVIEW", Permission.PREVIEW);
 		permissionColumn.put("LDCUSTOMID", Permission.CUSTOMID);
 
-		/**
-		 * IMPORTANT: the connection MUST be explicitly closed, otherwise it is
-		 * probable that the connection pool will leave open it indefinitely.
-		 */
-		try (Connection con = getConnection();
-				Statement stmt = con.createStatement();
-				ResultSet rs = stmt.executeQuery(query.toString())) {
-			while (rs.next()) {
-				for (Entry<String, Permission> entry : permissionColumn.entrySet()) {
-					String column = entry.getKey();
-					Permission permission = entry.getValue();
-					if (rs.getInt(column) == 1)
-						permissions.add(permission);
-				}
+		SqlRowSet rows = queryForRowSet(query.toString(), null);
+		while (rows.next()) {
+			for (Entry<String, Permission> entry : permissionColumn.entrySet()) {
+				String column = entry.getKey();
+				Permission permission = entry.getValue();
+				if (rows.getInt(column) == 1)
+					permissions.add(permission);
 			}
-		} catch (SQLException se) {
-			throw new PersistenceException(se.getMessage(), se);
 		}
 
 		if (permissions.isEmpty()) {
