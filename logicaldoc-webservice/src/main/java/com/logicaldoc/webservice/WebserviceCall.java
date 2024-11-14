@@ -1,7 +1,5 @@
 package com.logicaldoc.webservice;
 
-import javax.persistence.Table;
-
 import com.logicaldoc.core.history.History;
 
 /**

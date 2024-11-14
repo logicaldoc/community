@@ -561,7 +561,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 			try {
 				Class<?> beanClass = Class.forName(beanClassName);
-				Table annotation = (Table) beanClass.getAnnotation(Table.class);
+				Table annotation = beanClass.getAnnotation(Table.class);
 				if (annotation != null && StringUtils.isNotEmpty(annotation.name()))
 					tables.add(annotation.name());
 			} catch (Exception e) {
