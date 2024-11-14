@@ -10,8 +10,8 @@ import javax.annotation.Resource;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.history.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.sql.SqlUtil;

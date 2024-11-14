@@ -68,7 +68,7 @@ public interface TemplateDAO extends PersistentObjectDAO<Template> {
 	 * 
 	 * @return Collection of enabled permissions
 	 */
-	public Set<Permission> getEnabledPermissions(long templateId, long userId);
+	public Set<Permission> getAllowedPermissions(long templateId, long userId);
 
 	/**
 	 * Returns if a template is writable for a user

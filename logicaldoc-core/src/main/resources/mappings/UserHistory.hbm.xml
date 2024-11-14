@@ -16,6 +16,8 @@
 		<property name="creation" type="timestamp" column="ld_creation" not-null="true" />
 		<property name="deleted" type="int" column="ld_deleted" not-null="true" />
 		<property name="tenantId" type="long" column="ld_tenantid" not-null="true" />
+		<property name="docId" type="long" column="ld_docid"/>
+		<property name="folderId" type="long" column="ld_folderid" />
 		<property name="userId" type="long" column="ld_userid" />
 		<property name="date" type="timestamp" column="ld_date" />
 		<property name="username" type="string" column="ld_username" length="255" />
@@ -33,5 +35,6 @@
 		<property name="author" type="string" column="ld_author" length="255" />
 		<property name="geolocation" type="string" column="ld_geolocation" length="255" />
         <property name="device" type="string" column="ld_device" length="255" />
+        <property name="path" type="string" column="ld_path" length="4000" />
 	</class>
 </hibernate-mapping>

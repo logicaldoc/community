@@ -13,7 +13,6 @@ import org.hibernate.LazyInitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.History;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
@@ -21,6 +20,7 @@ import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
+import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
@@ -271,7 +271,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		guiTemplate.setType(template.getType());
 
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-		Set<Permission> permissions = dao.getEnabledPermissions(templateId, session.getUserId());
+		Set<Permission> permissions = dao.getAllowedPermissions(templateId, session.getUserId());
 		List<String> permissionsList = new ArrayList<>();
 		for (Permission permission : permissions)
 			permissionsList.add(permission.toString());

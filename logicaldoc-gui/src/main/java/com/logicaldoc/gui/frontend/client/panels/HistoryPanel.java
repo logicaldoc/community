@@ -67,7 +67,7 @@ public abstract class HistoryPanel extends VLayout {
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
 		list.setDataSource(getDataSource(null));
-		list.addCellClickHandler(new CopyCellClickHandler());
+		list.addCellDoubleClickHandler(new CopyCellClickHandler());
 
 		if (Menu.enabled(Menu.SESSIONS)) {
 			if (versionFields)

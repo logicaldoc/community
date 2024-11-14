@@ -70,7 +70,7 @@ public class SearchHistoryPanel extends VLayout {
 		list.setDataSource(new UserHistoryDS(Session.get().getTenantId(), null, "event.user.search", "Fulltext",
 				Session.get().getConfigAsInt("gui.maxhistories")));
 		list.setFields(id, date, userId, userField, comment);
-		list.addCellClickHandler(new CopyCellClickHandler());
+		list.addCellDoubleClickHandler(new CopyCellClickHandler());
 
 		ToolStrip buttons = new ToolStrip();
 		buttons.setWidth100();

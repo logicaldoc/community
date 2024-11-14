@@ -305,7 +305,7 @@ public class WSUtil {
 
 		try {
 			return DateUtils.parseDate(date, "yyyy-MM-dd HH:mm:ss.SSS Z", "yyyy-MM-dd HH:mm:ss.SS Z",
-					"yyyy-MM-dd HH:mm:ss Z", "yyyy-MM-dd");
+					"yyyy-MM-dd HH:mm:ss Z", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd");
 		} catch (Exception e) {
 			log.error("Unparseable date {}", date);
 			log.error(e.getMessage(), e);

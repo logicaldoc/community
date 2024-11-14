@@ -199,7 +199,7 @@ public interface WorkflowService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server applications
 	 */
-	public GUIWorkflow claimTask(String taskId, String userId) throws ServerException;
+	public GUIWorkflow claimTask(String taskId, long userId) throws ServerException;
 
 	/**
 	 * The task is assigned to another user
@@ -211,7 +211,7 @@ public interface WorkflowService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server applications
 	 */
-	public GUIWorkflow reassignTask(String taskId, String userId) throws ServerException;
+	public GUIWorkflow reassignTask(String taskId, long userId) throws ServerException;
 
 	/**
 	 * The task is reassigned to the pooled users

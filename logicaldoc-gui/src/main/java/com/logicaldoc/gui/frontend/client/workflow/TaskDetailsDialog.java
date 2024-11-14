@@ -431,7 +431,7 @@ public class TaskDetailsDialog extends Window {
 				&& (workflow.getSelectedTask().getOwner() == null
 						|| workflow.getSelectedTask().getOwner().trim().isEmpty()));
 		takeButton.addClickHandler(event -> WorkflowService.Instance.get().claimTask(workflow.getSelectedTask().getId(),
-				Long.toString(Session.get().getUser().getId()), new AsyncCallback<>() {
+				Session.get().getUser().getId(), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
@@ -478,7 +478,7 @@ public class TaskDetailsDialog extends Window {
 				setUser(user.getSelectedRecord().getAttribute("id"));
 
 				WorkflowService.Instance.get().reassignTask(workflow.getSelectedTask().getId(),
-						user.getSelectedRecord().getAttribute("id"), new AsyncCallback<>() {
+						user.getSelectedRecord().getAttributeAsLong("id"), new AsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {

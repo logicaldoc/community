@@ -277,7 +277,7 @@ public class LastChangesReport extends AdminPanel {
 		histories.setFilterOnKeypress(true);
 		histories.setAutoFetchData(true);
 		histories.sort("date", SortDirection.DESCENDING);
-		histories.addCellClickHandler(new CopyCellClickHandler());
+		histories.addCellDoubleClickHandler(new CopyCellClickHandler());
 		histories.addCellContextClickHandler(evn -> {
 			showContextMenu();
 			evn.cancel();

@@ -14,12 +14,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.mail.MessagingException;
+import javax.persistence.Table;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
@@ -27,30 +28,31 @@ import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
 
+import com.logicaldoc.core.automation.AutomationDictionary;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.MailUtil;
+import com.logicaldoc.core.history.History;
 import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.io.FileUtil;
 import com.talanlabs.avatargenerator.Avatar;
 import com.talanlabs.avatargenerator.IdenticonAvatar;
 
 public class CoreWorkbench {
-	
+
 	/**
 	 * Test sending e-mail with attachments
 	 * 
 	 * @throws IOException
-	 * @throws ParseException 
+	 * @throws ParseException
 	 */
 	public static void main(String[] args) throws IOException, ParseException {
+		System.out.println(History.eventTables());
 
-		SimpleDateFormat df = new SimpleDateFormat("MMM dd , yyyy", Locale.ENGLISH);
-
-		System.out.println(df.parse("April 3 , 2020"));
-				
-		
 //		OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
 //		// What % CPU load this current JVM is taking, from 0.0-1.0
 //		System.out.println(osBean.getProcessCpuLoad());

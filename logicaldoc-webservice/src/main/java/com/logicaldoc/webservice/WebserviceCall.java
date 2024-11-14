@@ -1,6 +1,8 @@
 package com.logicaldoc.webservice;
 
-import com.logicaldoc.core.History;
+import javax.persistence.Table;
+
+import com.logicaldoc.core.history.History;
 
 /**
  * Represents a call to the webservice

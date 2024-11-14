@@ -9,8 +9,8 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.history.HibernatePersistentObjectDAO;
 import com.logicaldoc.util.crypt.CryptUtil;
 
 /**

@@ -13,7 +13,8 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  *
- * @param <T> Class of the implementation of a {@link PersistentObject} this DAO handles
+ * @param <T> Class of the implementation of a {@link PersistentObject} this DAO
+ *        handles
  */
 public interface PersistentObjectDAO<T extends PersistentObject> {
 
@@ -204,8 +205,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	@SuppressWarnings("rawtypes")
-	public List query(String sql, RowMapper rowMapper, Integer maxRows) throws PersistenceException;
+	public <P> List<P> query(String sql, RowMapper<P> rowMapper, Integer maxRows) throws PersistenceException;
 
 	/**
 	 * Query given SQL to create a prepared statement from SQL and a list of
@@ -223,8 +223,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	@SuppressWarnings("rawtypes")
-	public List query(String sql, Map<String, Object> parameters, RowMapper rowMapper, Integer maxRows)
+	public <P> List<P> query(String sql, Map<String, Object> parameters, RowMapper<P> rowMapper, Integer maxRows)
 			throws PersistenceException;
 
 	/**
@@ -331,7 +330,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
 	public int queryForInt(String sql) throws PersistenceException;
-	
+
 	/**
 	 * Execute a query that results in an int value, given static SQL. Uses a
 	 * JDBC Statement, not a PreparedStatement. If you want to execute a static
@@ -384,7 +383,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
 	public long queryForLong(String sql, Map<String, Object> parameters) throws PersistenceException;
-	
+
 	/**
 	 * Execute a query that results in a double value, given static SQL. Uses a
 	 * JDBC Statement, not a PreparedStatement. If you want to execute a static
@@ -400,7 +399,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
 	public double queryForDouble(String sql) throws PersistenceException;
-	
+
 	/**
 	 * Execute a query that results in a double value, given static SQL. Uses a
 	 * JDBC Statement, not a PreparedStatement. If you want to execute a static
@@ -539,6 +538,8 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public String getDbms();
 
 	public boolean isOracle();
+
+	public boolean isMySQL();
 
 	/**
 	 * Retrieves the metadata from the database

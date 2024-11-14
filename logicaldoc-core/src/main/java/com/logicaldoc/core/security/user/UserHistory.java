@@ -1,6 +1,8 @@
 package com.logicaldoc.core.security.user;
 
-import com.logicaldoc.core.History;
+import javax.persistence.Table;
+
+import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.security.Session;
 
 /**
@@ -9,6 +11,7 @@ import com.logicaldoc.core.security.Session;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.0
  */
+@Table(name = "ld_user_history")
 public class UserHistory extends History {
 
 	private static final long serialVersionUID = 1L;

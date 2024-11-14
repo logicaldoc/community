@@ -1,10 +1,25 @@
-package com.logicaldoc.core;
+package com.logicaldoc.core.history;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.Table;
+
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.classreading.MetadataReader;
+import org.springframework.core.type.classreading.MetadataReaderFactory;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.core.type.filter.AssignableTypeFilter;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.security.Client;
@@ -518,5 +533,42 @@ public abstract class History extends PersistentObject implements Comparable<His
 		} else if (!event.equals(other.event))
 			return false;
 		return true;
+	}
+
+	/**
+	 * Retrieves those histories that refer to events stored in the database and
+	 * used for reports. It looks for those histories that also declare the
+	 * {@link Table} annotation.
+	 * 
+	 * @return Collection of table names
+	 */
+	public static Collection<String> eventTables() {
+		List<String> tables = new ArrayList<>();
+
+		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
+		scanner.addIncludeFilter(new AnnotationTypeFilter(Table.class));
+		scanner.addExcludeFilter(new AssignableTypeFilter(History.class) {
+
+			@Override
+			public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory)
+					throws IOException {
+				return !super.match(metadataReader, metadataReaderFactory);
+			}
+		});
+
+		for (BeanDefinition bd : scanner.findCandidateComponents("com.logicaldoc")) {
+			String beanClassName = bd.getBeanClassName();
+
+			try {
+				Class<?> beanClass = Class.forName(beanClassName);
+				Table annotation = (Table) beanClass.getAnnotation(Table.class);
+				if (annotation != null && StringUtils.isNotEmpty(annotation.name()))
+					tables.add(annotation.name());
+			} catch (Exception e) {
+				log.error(e.getMessage(), e);
+			}
+		}
+
+		return tables;
 	}
 }

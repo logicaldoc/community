@@ -1,4 +1,4 @@
-package com.logicaldoc.core;
+package com.logicaldoc.core.history;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -29,6 +29,11 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.PersistentObject;
+import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.core.RunLevel;
+import com.logicaldoc.core.SqlRowSetWrapper;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.util.Context;
@@ -40,7 +45,8 @@ import com.logicaldoc.util.config.ContextProperties;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  * 
- * @param <T> Class of the implementation of a {@link PersistentObject} this DAO handles
+ * @param <T> Class of the implementation of a {@link PersistentObject} this DAO
+ *        handles
  */
 public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> implements PersistentObjectDAO<T> {
 
@@ -426,8 +432,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public List query(String sql, RowMapper rowMapper, Integer maxRows) throws PersistenceException {
+	public <P> List<P> query(String sql, RowMapper<P> rowMapper, Integer maxRows) throws PersistenceException {
 		try {
 			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
@@ -442,8 +447,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public List query(String sql, Map<String, Object> parameters, RowMapper rowMapper, Integer maxRows)
+	public <P> List<P> query(String sql, Map<String, Object> parameters, RowMapper<P> rowMapper, Integer maxRows)
 			throws PersistenceException {
 		if (MapUtils.isEmpty(parameters))
 			return query(sql, rowMapper, maxRows);
@@ -542,8 +546,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		try {
 			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-			Long result =jdbcTemplate.queryForObject(sql, Long.class); 
-			return result !=null ? result : 0L;
+			Long result = jdbcTemplate.queryForObject(sql, Long.class);
+			return result != null ? result : 0L;
 		} catch (NullPointerException | EmptyResultDataAccessException e) {
 			return 0L;
 		} catch (Exception e) {
@@ -560,7 +564,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
 			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 			Long result = jdbcTemplate.queryForObject(sql, parameters, Long.class);
-			return result !=null ? result : 0L;
+			return result != null ? result : 0L;
 		} catch (NullPointerException | EmptyResultDataAccessException e) {
 			return 0L;
 		} catch (Exception e) {
@@ -574,7 +578,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 			Double result = jdbcTemplate.queryForObject(sql, Double.class);
-			return result !=null ? result : 0D;
+			return result != null ? result : 0D;
 		} catch (NullPointerException | EmptyResultDataAccessException e) {
 			return 0D;
 		} catch (Exception e) {
@@ -591,7 +595,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
 			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 			Double result = jdbcTemplate.queryForObject(sql, parameters, Double.class);
-			return result !=null ? result : 0D;
+			return result != null ? result : 0D;
 		} catch (NullPointerException | EmptyResultDataAccessException e) {
 			return 0D;
 		} catch (Exception e) {
@@ -720,8 +724,9 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		return "hsqldb".equals(getDbms());
 	}
 
-	protected boolean isMySQL() {
-		return "mysql".equals(getDbms());
+	@Override
+	public boolean isMySQL() {
+		return "mysql".equals(getDbms()) || isMariaDB();
 	}
 
 	protected boolean isMariaDB() {

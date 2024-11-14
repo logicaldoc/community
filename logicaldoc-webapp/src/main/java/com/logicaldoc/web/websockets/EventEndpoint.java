@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gwt.user.client.rpc.SerializationException;
 import com.google.gwt.user.server.rpc.impl.ServerSerializationStreamWriter;
-import com.logicaldoc.core.History;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.communication.EventCollector;
 import com.logicaldoc.core.communication.EventListener;
@@ -29,6 +28,7 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.folder.FolderEvent;
+import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;

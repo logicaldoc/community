@@ -44,7 +44,7 @@ public class UserHistoryPanel extends VLayout {
 		list.setAutoFetchData(true);
 		list.setDataSource(new UserHistoryDS(userId));
 		list.setFields(event, date, ip, geolocation, device, sid, comment);
-		list.addCellClickHandler(new CopyCellClickHandler());
+		list.addCellDoubleClickHandler(new CopyCellClickHandler());
 
 		ToolStrip buttons = new ToolStrip();
 		buttons.setWidth100();

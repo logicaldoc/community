@@ -36,12 +36,12 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
-import com.logicaldoc.core.SystemInfo;
 import com.logicaldoc.core.dbinit.PluginDbInit;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
+import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.job.JobManager;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -596,74 +596,21 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			List<String> events, Long rootFolderId) throws ServerException {
 		Session session = validateSession();
 
-		// Search in the document/folder history
-		StringBuilder query = new StringBuilder(
-				"select A.ld_username, A.ld_event, A.ld_date, A.ld_filename, A.ld_folderid, A.ld_path, A.ld_sessionid, A.ld_docid, A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment, A.ld_reason, A.ld_device, A.ld_geolocation, A.ld_keylabel from ld_history A where A.ld_tenantid = "
-						+ session.getTenantId());
-		appendUserCondition("A", userId, query);
-		appendSessionCondition("A", historySid, query);
-		appendDatesCondition("A", from, till, query);
-		appendFolderCondition("A", rootFolderId, query);
-		appendEventsCondition("A", events, query);
+		int i = 0;
+		StringBuilder query = new StringBuilder();
+		for (String table : History.eventTables()) {
+			String tableAlias = "A" + (i++);
 
-		// Search in the folder history
-		query.append(
-				" union select B.ld_username, B.ld_event, B.ld_date, B.ld_filename, B.ld_folderid, B.ld_path, B.ld_sessionid, B.ld_docid, B.ld_userid, B.ld_ip as ip, B.ld_userlogin, B.ld_comment, B.ld_reason, B.ld_device, B.ld_geolocation, B.ld_keylabel from ld_folder_history B where B.ld_tenantid = "
-						+ session.getTenantId());
-		appendUserCondition("B", userId, query);
-		appendSessionCondition("B", historySid, query);
-		appendDatesCondition("B", from, till, query);
-		appendFolderCondition("B", rootFolderId, query);
-		appendEventsCondition("B", events, query);
-
-		// Search in the user history
-		if (rootFolderId == null) {
+			if (!query.isEmpty())
+				query.append(" union ");
 			query.append(
-					" union select C.ld_username, C.ld_event, C.ld_date, null, null, null, C.ld_sessionid, null, C.ld_userid, C.ld_ip as ip, C.ld_userlogin, C.ld_comment, C.ld_reason, C.ld_device, C.ld_geolocation, C.ld_keylabel from ld_user_history C where C.ld_tenantid = "
-							+ session.getTenantId());
-			appendUserCondition("C", userId, query);
-			appendSessionCondition("C", historySid, query);
-			appendDatesCondition("C", from, till, query);
-			appendEventsCondition("C", events, query);
-		}
-
-		if (SystemInfo.get().getFeatures().contains("Feature_19")) {
-
-			// Search in the workflow history
-			query.append(
-					" union select D.ld_username, D.ld_event, D.ld_date, null, null, null, D.ld_sessionid, D.ld_docid, D.ld_userid, '' as ip, D.ld_userlogin, D.ld_comment, D.ld_reason, D.ld_device, D.ld_geolocation, D.ld_keylabel from ld_workflowhistory D where D.ld_tenantid = "
-							+ session.getTenantId());
-			appendUserCondition("D", userId, query);
-			appendSessionCondition("D", historySid, query);
-			appendDatesCondition("D", from, till, query);
-			appendFolderCondition("D", rootFolderId, query);
-			appendEventsCondition("D", events, query);
-		}
-
-		if (SystemInfo.get().getFeatures().contains("Feature_1")) {
-			// Search in the workflow history
-			query.append(
-					" union select E.ld_username, E.ld_event, E.ld_date, E.ld_filename, E.ld_folderid, E.ld_path, null, E.ld_docid, E.ld_userid, null as ip, E.ld_userlogin, E.ld_comment, null, null, null, null  from ld_importfolder_history E where E.ld_tenantid = "
-							+ session.getTenantId());
-			appendUserCondition("E", userId, query);
-			if (StringUtils.isNotEmpty(historySid))
-				query.append(" and 1 = 2 ");
-			appendDatesCondition("E", from, till, query);
-			appendFolderCondition("E", rootFolderId, query);
-			appendEventsCondition("E", events, query);
-		}
-
-		if (SystemInfo.get().getFeatures().contains("Feature_3")) {
-			// Search in the OCR history
-			query.append(
-					" union select F.ld_username, F.ld_event, F.ld_date, F.ld_filename, F.ld_folderid, F.ld_path, null, F.ld_docid, F.ld_userid, null as ip, F.ld_userlogin, F.ld_comment, null, null, null, null  from ld_ocr_history F where F.ld_tenantid = "
-							+ session.getTenantId());
-			appendUserCondition("F", userId, query);
-			if (StringUtils.isNotEmpty(historySid))
-				query.append(" and 1 = 2 ");
-			appendDatesCondition("F", from, till, query);
-			appendFolderCondition("F", rootFolderId, query);
-			appendEventsCondition("F", events, query);
+					"select A.ld_username, A.ld_event, A.ld_date, A.ld_filename, A.ld_folderid, A.ld_path, A.ld_sessionid, A.ld_docid, A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment, A.ld_reason, A.ld_device, A.ld_geolocation, A.ld_keylabel from TABLE A where A.ld_tenantid = "
+					.replace("TABLE", table).replace("A", tableAlias) + session.getTenantId());
+			appendUserCondition(tableAlias, userId, query);
+			appendSessionCondition(tableAlias, historySid, query);
+			appendDatesCondition(tableAlias, from, till, query);
+			appendFolderCondition(tableAlias, rootFolderId, query);
+			appendEventsCondition(tableAlias, events, query);
 		}
 
 		query.append(" order by 3 desc ");
@@ -703,13 +650,12 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			query.append(AND + tableAlias + ".ld_userid = " + userId);
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<GUIHistory> executeQuery(String query, int maxResult, Session session) throws PersistenceException {
 		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
-		return dao.query(query, new RowMapper<>() {
+		return dao.query(query, new RowMapper<GUIHistory>() {
 
 			@Override
-			public GUIHistory mapRow(ResultSet rs, int arg1) throws SQLException {
+			public GUIHistory mapRow(ResultSet rs, int row) throws SQLException {
 				GUIHistory history = new GUIHistory();
 				history.setTenant(session.getTenantName());
 				history.setTenantId(session.getTenantId());

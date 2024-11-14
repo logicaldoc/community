@@ -3,10 +3,8 @@ package com.logicaldoc.core.document;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -34,7 +32,6 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
-import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.RunLevel;
@@ -42,6 +39,7 @@ import com.logicaldoc.core.communication.EventCollector;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.GenericDAO;
+import com.logicaldoc.core.history.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.security.AccessControlUtil;
 import com.logicaldoc.core.security.Permission;
@@ -215,7 +213,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		return findIdsByWhere(query.toString(), null, null);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<Document> findByLockUserAndStatus(Long userId, Integer status) {
 		StringBuilder sb = new StringBuilder(
@@ -1197,7 +1194,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<TagCloud> getTagCloud(long tenantId, int maxTags) throws PersistenceException {
 		GenericDAO gendao = (GenericDAO) Context.get().getBean(GenericDAO.class);
@@ -1332,7 +1328,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	@Override
 	public List<String> findDuplicatedDigests(Long tenantId, Long folderId) throws PersistenceException {
 		// First of all, find all duplicates digests.
@@ -1419,8 +1415,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 						ld_customid as LDCUSTOMID from ld_document_acl where ld_docid=
 						""");
 		query.append(Long.toString(docId));
-		query.append(" and ld_groupid in (");
-		query.append(user.getGroups().stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
+		query.append(" and ld_groupid in (select ld_groupid from ld_usergroup where ld_userid=");
+		query.append(Long.toString(userId));
 		query.append(")");
 
 		Map<String, Permission> permissionColumn = new HashMap<>();
@@ -1445,23 +1441,14 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		permissionColumn.put("LDPREVIEW", Permission.PREVIEW);
 		permissionColumn.put("LDCUSTOMID", Permission.CUSTOMID);
 
-		/**
-		 * IMPORTANT: the connection MUST be explicitly closed, otherwise it is
-		 * probable that the connection pool will leave open it indefinitely.
-		 */
-		try (Connection con = getConnection();
-				Statement stmt = con.createStatement();
-				ResultSet rs = stmt.executeQuery(query.toString())) {
-			while (rs.next()) {
-				for (Entry<String, Permission> entry : permissionColumn.entrySet()) {
-					String column = entry.getKey();
-					Permission permission = entry.getValue();
-					if (rs.getInt(column) == 1)
-						permissions.add(permission);
-				}
+		SqlRowSet rows = queryForRowSet(query.toString(), null);
+		while (rows.next()) {
+			for (Entry<String, Permission> entry : permissionColumn.entrySet()) {
+				String column = entry.getKey();
+				Permission permission = entry.getValue();
+				if (rows.getInt(column) == 1)
+					permissions.add(permission);
 			}
-		} catch (SQLException se) {
-			throw new PersistenceException(se.getMessage(), se);
 		}
 
 		if (permissions.isEmpty()) {

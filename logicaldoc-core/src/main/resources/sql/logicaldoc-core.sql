@@ -128,7 +128,7 @@ create table ld_user_history (ld_id bigint not null, ld_lastmodified timestamp n
                               ld_comment varchar(4000), ld_reason varchar(4000), ld_notified int not null, ld_sessionid varchar(255), 
                               ld_new int, ld_filename varchar(255), ld_userlogin varchar(255), ld_ip varchar(255),
                               ld_author varchar(255), ld_geolocation varchar(255), ld_device varchar(255), 
-                              ld_filesize bigint, primary key (ld_id));
+                              ld_filesize bigint, ld_folderid bigint, ld_docid bigint, ld_path varchar(4000), primary key (ld_id));
 create table ld_usergroup (ld_groupid bigint not null, ld_userid bigint not null, primary key (ld_groupid, ld_userid));
 create table ld_version (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null,
                          ld_deleted int not null, ld_tenantid bigint not null, ld_immutable int not null, ld_customid varchar(200),
