@@ -7,8 +7,8 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.history.HibernatePersistentObjectDAO;
 
 /**
  * Hibernate implementation of <code>SequenceDAO</code>. <br>

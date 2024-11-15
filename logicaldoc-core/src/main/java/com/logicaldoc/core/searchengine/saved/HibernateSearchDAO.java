@@ -8,8 +8,8 @@ import java.util.Set;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
+import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.history.HibernatePersistentObjectDAO;
 
 /**
  * Hibernate implementation of {@link SearchDAO}

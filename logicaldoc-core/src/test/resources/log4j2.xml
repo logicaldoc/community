@@ -16,6 +16,15 @@
 			</Policies>
 			<DefaultRolloverStrategy max="1" />
 		</RollingFile>
+		<RollingFile name="hikari" fileName="${root}/hikari.log" filePattern="${root}/hikari.log.%i">
+			<PatternLayout>
+				<Pattern>${pattern}</Pattern>
+			</PatternLayout>
+			<Policies>
+				<SizeBasedTriggeringPolicy size="1 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="1" />
+		</RollingFile>
 
 		<Console name="console" target="SYSTEM_OUT">
 			<PatternLayout pattern="%m%n" />
@@ -37,6 +46,9 @@
 			level="fatal" additivity="false">
 			<Appender-Ref ref="file" />
 		</Logger>
+		<Logger name="com.zaxxer.hikari" level="debug" additivity="false">
+			<AppenderRef ref="hikari" />
+		</Logger>
 		<Logger name="java.sql" level="error" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
@@ -47,6 +59,9 @@
 			<AppenderRef ref="file" />
 		</Logger>
 		<Logger name="com.logicaldoc.util.io.FileUtil" level="debug" additivity="false">
+			<AppenderRef ref="file" />
+		</Logger>
+		<Logger name="org.hsqldb" level="debug" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
 

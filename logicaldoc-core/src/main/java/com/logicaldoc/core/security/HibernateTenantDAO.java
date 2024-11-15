@@ -11,12 +11,12 @@ import javax.annotation.Resource;
 
 import org.apache.commons.collections.CollectionUtils;
 
+import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.communication.MessageTemplateDAO;
 import com.logicaldoc.core.dashlet.DashletDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.GenericDAO;
-import com.logicaldoc.core.history.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.user.GroupDAO;

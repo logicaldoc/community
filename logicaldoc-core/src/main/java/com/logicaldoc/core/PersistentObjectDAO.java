@@ -266,7 +266,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 *        :paramA, :paramB ...)
 	 * @param parameters Parameters used in the where expression (map
 	 *        name-value)
-	 * @param elementType the required type of element in the result list (for
+	 * @param requiredType the required type of element in the result list (for
 	 *        example, Integer.class)
 	 * @param maxRows maximum number of returned records
 	 * 
@@ -274,8 +274,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	@SuppressWarnings("rawtypes")
-	public List queryForList(String sql, Map<String, Object> parameters, Class elementType, Integer maxRows)
+	public <R> List<R> queryForList(String sql, Map<String, Object> parameters, Class<R> requiredType, Integer maxRows)
 			throws PersistenceException;
 
 	/**
@@ -287,7 +286,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * element type.
 	 * 
 	 * @param sql SQL query to execute
-	 * @param elementType the required type of element in the result list (for
+	 * @param requiredType the required type of element in the result list (for
 	 *        example, Integer.class)
 	 * @param maxRows maximum number of returned records
 	 * 
@@ -295,8 +294,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	@SuppressWarnings("rawtypes")
-	public List queryForList(String sql, Class elementType, Integer maxRows) throws PersistenceException;
+	public <R> List<R> queryForList(String sql, Class<R> requiredType, Integer maxRows) throws PersistenceException;
 
 	/**
 	 * Query given SQL to create a prepared statement from SQL and a list of
@@ -305,15 +303,14 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * them matching the specified element type.
 	 * 
 	 * @param sql SQL query to execute
-	 * @param elementType the required type of element in the result list (for
+	 * @param requiredType the required type of element in the result list (for
 	 *        example, Integer.class)
 	 * 
 	 * @return a List of objects that match the specified element type
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	@SuppressWarnings("rawtypes")
-	public List queryForList(String sql, Class elementType) throws PersistenceException;
+	public <R> List<R> queryForList(String sql, Class<R> requiredType) throws PersistenceException;
 
 	/**
 	 * Execute a query that results in an int value, given static SQL. Uses a
@@ -443,14 +440,31 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * column query that results in a object value.
 	 * 
 	 * @param sql SQL query to execute
-	 * @param type The type of the returned value
+	 * @param requiredType The type of the returned value
 	 * 
 	 * @return the object value
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public Object queryForObject(String sql, @SuppressWarnings("rawtypes")
-	Class type) throws PersistenceException;
+	public <R> R queryForObject(String sql, Class<R> requiredType) throws PersistenceException;
+
+	/**
+	 * Execute a query that results in a Object value, given static SQL. Uses a
+	 * JDBC Statement, not a PreparedStatement. If you want to execute a static
+	 * query with a PreparedStatement. This method is useful for running static
+	 * SQL with a known outcome. The query is expected to be a single row/single
+	 * column query that results in a object value.
+	 * 
+	 * @param sql SQL query to execute
+	 * @param parameters Optional map of parameters
+	 * @param requiredType The type of the returned value
+	 * 
+	 * @return the object value
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
+	 */
+	public <R> R queryForObject(String sql, Map<String, Object> parameters, Class<R> requiredType)
+			throws PersistenceException;
 
 	/**
 	 * This method deletes an entity. Same as delete(id, 1)
@@ -505,20 +519,20 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	/**
 	 * Executes the given SQL update statement
 	 * 
-	 * @param statement the SQL statement to execute against the database
+	 * @param sql the SQL statement to execute against the database
 	 * 
 	 * @return the value returned by the database after execution
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public int jdbcUpdate(String statement) throws PersistenceException;
+	public int jdbcUpdate(String sql) throws PersistenceException;
 
 	/**
 	 * Issue a single SQL update operation (such as an insert, update or delete
 	 * statement) via a prepared statement, binding the given arguments
 	 * 
-	 * @param statement SQL statement to execute (for parameters please use
-	 *        JPA-style: :paramA, :paramB ...)
+	 * @param sql SQL statement to execute (for parameters please use JPA-style:
+	 *        :paramA, :paramB ...)
 	 * @param parameters Parameters used in the where expression (map
 	 *        name-value)
 	 * 
@@ -526,7 +540,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public int jdbcUpdate(String statement, Map<String, Object> parameters) throws PersistenceException;
+	public int jdbcUpdate(String sql, Map<String, Object> parameters) throws PersistenceException;
 
 	/**
 	 * Get the DBMS name currently connected(possible values are: <b>mysql</b>,

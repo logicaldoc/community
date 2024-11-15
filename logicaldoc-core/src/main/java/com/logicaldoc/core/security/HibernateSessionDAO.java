@@ -7,9 +7,9 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.SystemInfo;
-import com.logicaldoc.core.history.HibernatePersistentObjectDAO;
 
 public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> implements SessionDAO {
 

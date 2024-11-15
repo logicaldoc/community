@@ -1417,7 +1417,6 @@ public class DocumentManagerImpl implements DocumentManager {
 		this.documentNoteDAO = documentNoteDAO;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public long archiveFolder(long folderId, DocumentHistory transaction) throws PersistenceException {
 		Folder root = folderDAO.findFolder(folderId);
@@ -1429,9 +1428,8 @@ public class DocumentManagerImpl implements DocumentManager {
 		for (Long fid : folderIds) {
 			String where = " where ld_deleted=0 and not ld_status=" + AbstractDocument.DOC_ARCHIVED
 					+ " and ld_folderid=" + fid;
-			archivedDocIds
-					.addAll((Set<Long>) documentDAO.queryForList("select ld_id from ld_document " + where, Long.class)
-							.stream().collect(Collectors.toSet()));
+			archivedDocIds.addAll(documentDAO.queryForList("select ld_id from ld_document " + where, Long.class)
+					.stream().collect(Collectors.toSet()));
 			if (archivedDocIds.isEmpty())
 				continue;
 			archiveDocuments(archivedDocIds, transaction);

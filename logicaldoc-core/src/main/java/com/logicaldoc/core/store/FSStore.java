@@ -18,10 +18,10 @@ import com.logicaldoc.util.io.IOUtil;
 
 /**
  * This class is an implementation of the Store interface to persist documents
- * in the filesystem. From the root of the documents store, this
- * implementation saves all document's files into a defined directory using the
- * following logic. The document's id is tokenized by three chars tokens, than
- * the doc/ dir is appended, so if the docId=12345, the document's path will
+ * in the filesystem. From the root of the documents store, this implementation
+ * saves all document's files into a defined directory using the following
+ * logic. The document's id is tokenized by three chars tokens, than the doc/
+ * dir is appended, so if the docId=12345, the document's path will
  * be:123/45/doc.
  * 
  * @author Marco Meschieri - LogicalDOC
@@ -38,6 +38,8 @@ public class FSStore extends AbstractStore {
 	@Override
 	public void delete(long docId) {
 		File docDir = getContainer(docId);
+		if (docDir == null || !docDir.exists())
+			return;
 
 		for (File file : docDir.listFiles()) {
 			log.info("Deleting stored file {}", file.getAbsolutePath());
@@ -98,7 +100,8 @@ public class FSStore extends AbstractStore {
 
 			File dir = getContainer(docId);
 			FileUtils.forceMkdir(dir);
-			file = new File(new StringBuilder(dir.getPath()).append("/").append(sanitizeResourceName(resource)).toString());
+			file = new File(
+					new StringBuilder(dir.getPath()).append("/").append(sanitizeResourceName(resource)).toString());
 			FileUtil.writeFile(stream, file.getPath());
 		} catch (IOException e) {
 			throw e;

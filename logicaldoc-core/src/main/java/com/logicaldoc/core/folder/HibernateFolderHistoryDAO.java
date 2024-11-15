@@ -9,8 +9,8 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.HibernateHistoryDAO;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.history.HibernateHistoryDAO;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**

@@ -32,6 +32,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
+import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.RunLevel;
@@ -39,7 +40,6 @@ import com.logicaldoc.core.communication.EventCollector;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.GenericDAO;
-import com.logicaldoc.core.history.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.security.AccessControlUtil;
 import com.logicaldoc.core.security.Permission;
@@ -1121,8 +1121,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			log.debug("Clean unique tags of tenant {}", tenantId);
 
 			// Collect the currently unique used tags
-			@SuppressWarnings("unchecked")
-			Set<String> currentlyUsedTags = ((Map<String, String>) queryForList(
+			Set<String> currentlyUsedTags = (queryForList(
 					"select distinct(B.ld_tag) from ld_tag B, ld_document C where B.ld_tenantid=" + tenantId
 							+ " and C.ld_id=B.ld_docid and C.ld_deleted=0 "
 							+ " UNION select distinct(D.ld_tag) from ld_foldertag D, ld_folder E where D.ld_tenantid="
@@ -1328,7 +1327,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		return null;
 	}
 
-	
 	@Override
 	public List<String> findDuplicatedDigests(Long tenantId, Long folderId) throws PersistenceException {
 		// First of all, find all duplicates digests.
