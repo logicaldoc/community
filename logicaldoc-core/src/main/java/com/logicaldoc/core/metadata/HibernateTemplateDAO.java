@@ -262,8 +262,8 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			query.append(" from ld_template_acl ");
 			query.append(" where ");
 			query.append(" ld_templateid=" + templateId);
-			query.append(" and ld_groupid in (");
-			query.append(groups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
+			query.append(" and ld_groupid in (select ld_groupid from ld_usergroup where ld_userid=");
+			query.append(Long.toString(userId));
 			query.append(")");
 
 			SqlRowSet rows = queryForRowSet(query.toString(), null);

@@ -2,7 +2,9 @@ package com.logicaldoc.core;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -23,7 +25,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -40,7 +41,8 @@ import com.logicaldoc.util.config.ContextProperties;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  * 
- * @param <T> Class of the implementation of a {@link PersistentObject} this DAO handles
+ * @param <T> Class of the implementation of a {@link PersistentObject} this DAO
+ *        handles
  */
 public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> implements PersistentObjectDAO<T> {
 
@@ -376,6 +378,109 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		return sessionFactory.getCurrentSession();
 	}
 
+	@Override
+	public <P> List<P> query(String sql, RowMapper<P> rowMapper, Integer maxRows) throws PersistenceException {
+		return query(sql, null, rowMapper, maxRows);
+	}
+
+	@Override
+	public <P> List<P> query(String sql, Map<String, Object> parameters, RowMapper<P> rowMapper, Integer maxRows)
+			throws PersistenceException {
+
+		return getCurrentSession().doReturningWork(connection -> {
+			List<P> result = new ArrayList<>();
+			try (NamedParameterStatement stmt = new NamedParameterStatement(connection, sql, parameters, maxRows);
+					ResultSet rs = stmt.executeQuery();) {
+				if (log.isDebugEnabled())
+					log.debug("Run statement {} in connection {}", sql, connection);
+
+				int i = 0;
+				while (rs.next())
+					result.add(rowMapper.mapRow(rs, i++));
+				return result;
+			} catch (Exception e) {
+				throw new PersistenceException(e.getMessage(), e);
+			}
+		});
+	}
+
+	@Override
+	public <R> List<R> queryForList(String sql, Class<R> requiredType) throws PersistenceException {
+		return queryForList(sql, requiredType, null);
+	}
+
+	@Override
+	public <R> List<R> queryForList(String sql, Class<R> requiredType, Integer maxRows) throws PersistenceException {
+		return queryForList(sql, null, requiredType, maxRows);
+	}
+
+	@Override
+	public <R> List<R> queryForList(String sql, Map<String, Object> parameters, Class<R> requiredType, Integer maxRows)
+			throws PersistenceException {
+
+		return getCurrentSession().doReturningWork(connection -> {
+			List<R> result = new ArrayList<>();
+			try (NamedParameterStatement stmt = new NamedParameterStatement(connection, sql, parameters, maxRows);
+					ResultSet rs = stmt.executeQuery();) {
+				if (log.isDebugEnabled())
+					log.debug("Run statement {} in connection {}", sql, connection);
+
+				while (rs.next()) {
+					Object obj = rs.getObject(1);
+					if (obj == null) {
+						result.add(null);
+					} else {
+						if (!rs.getObject(1).getClass().equals(requiredType)) {
+							log.debug("Retrieved object {} differs from attended {}", obj.getClass(), requiredType);
+							if (obj instanceof Timestamp ts && requiredType.equals(Date.class)) {
+								result.add(requiredType.getConstructor(Long.TYPE).newInstance(ts.getTime()));
+							} else {
+								result.add(rs.getObject(1, requiredType));
+							}
+						} else {
+							result.add(rs.getObject(1, requiredType));
+						}
+					}
+				}
+				return result;
+			} catch (Exception e) {
+				throw new PersistenceException(e.getMessage(), e);
+			}
+		});
+	}
+
+	@Override
+	public SqlRowSet queryForRowSet(String sql, Integer maxRows) throws PersistenceException {
+		try {
+			SqlRowSet rs = null;
+			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
+			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+			if (maxRows != null)
+				jdbcTemplate.setMaxRows(maxRows);
+			rs = jdbcTemplate.queryForRowSet(insertTopClause(sql, maxRows));
+			return new SqlRowSetWrapper(rs);
+		} catch (Exception e) {
+			throw new PersistenceException(e);
+		}
+	}
+
+	@Override
+	public SqlRowSet queryForRowSet(String sql, Map<String, Object> parameters, Integer maxRows)
+			throws PersistenceException {
+		if (MapUtils.isEmpty(parameters))
+			return queryForRowSet(sql, maxRows);
+
+		try {
+			SqlRowSet rs = null;
+			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
+			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+			rs = jdbcTemplate.queryForRowSet(insertTopClause(sql, maxRows), parameters);
+			return new SqlRowSetWrapper(rs);
+		} catch (Exception e) {
+			throw new PersistenceException(e);
+		}
+	}
+	
 	/**
 	 * Parses a SQL query and inserts the hits to the SQL processor to restrict
 	 * the maximum number of returned records. The syntax varies depending on
@@ -424,108 +529,29 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 		return outQuery;
 	}
-
-	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public List query(String sql, RowMapper rowMapper, Integer maxRows) throws PersistenceException {
-		try {
-			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
-			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-			if (maxRows != null)
-				jdbcTemplate.setMaxRows(maxRows);
-			logQuery(sql);
-			return jdbcTemplate.query(insertTopClause(sql, maxRows), rowMapper);
-		} catch (Exception e) {
-			throw new PersistenceException(e);
-		}
-
-	}
-
-	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public List query(String sql, Map<String, Object> parameters, RowMapper rowMapper, Integer maxRows)
-			throws PersistenceException {
-		if (MapUtils.isEmpty(parameters))
-			return query(sql, rowMapper, maxRows);
-		try {
-			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
-			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			return jdbcTemplate.query(insertTopClause(sql, maxRows), parameters, rowMapper);
-		} catch (Exception e) {
-			throw new PersistenceException(e);
-		}
-
-	}
-
-	@SuppressWarnings({ "rawtypes" })
-	@Override
-	public List queryForList(String sql, Class elementType) throws PersistenceException {
-		return queryForList(sql, elementType, null);
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override
-	public List queryForList(String sql, Class elementType, Integer maxRows) throws PersistenceException {
-		try {
-			logQuery(sql);
-			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
-			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-			if (maxRows != null)
-				jdbcTemplate.setMaxRows(maxRows);
-			return jdbcTemplate.queryForList(insertTopClause(sql, maxRows), elementType);
-		} catch (Exception e) {
-			throw new PersistenceException(e);
-		}
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override
-	public List queryForList(String sql, Map<String, Object> prameters, Class elementType, Integer maxRows)
-			throws PersistenceException {
-
-		if (MapUtils.isEmpty(prameters))
-			return queryForList(sql, elementType, maxRows);
-
-		try {
-			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
-			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			return jdbcTemplate.queryForList(insertTopClause(sql, maxRows), prameters, elementType);
-		} catch (Exception e) {
-			throw new PersistenceException(e);
-		}
-	}
-
-	@Override
-	public SqlRowSet queryForRowSet(String sql, Integer maxRows) throws PersistenceException {
-		try {
-			SqlRowSet rs = null;
-			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
-			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-			if (maxRows != null)
-				jdbcTemplate.setMaxRows(maxRows);
-			rs = jdbcTemplate.queryForRowSet(insertTopClause(sql, maxRows));
-			return new SqlRowSetWrapper(rs);
-		} catch (Exception e) {
-			throw new PersistenceException(e);
-		}
-	}
-
-	@Override
-	public SqlRowSet queryForRowSet(String sql, Map<String, Object> parameters, Integer maxRows)
-			throws PersistenceException {
-		if (MapUtils.isEmpty(parameters))
-			return queryForRowSet(sql, maxRows);
-
-		try {
-			SqlRowSet rs = null;
-			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
-			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			rs = jdbcTemplate.queryForRowSet(insertTopClause(sql, maxRows), parameters);
-			return new SqlRowSetWrapper(rs);
-		} catch (Exception e) {
-			throw new PersistenceException(e);
-		}
-	}
+	
+//	@Override
+//	public SqlRowSet queryForRowSet(String sql, Integer maxRows) throws PersistenceException {
+//		return queryForRowSet(sql, null, maxRows);
+//	}
+//
+//	@Override
+//	public SqlRowSet queryForRowSet(String sql, Map<String, Object> parameters, Integer maxRows)
+//			throws PersistenceException {
+//
+//		return getCurrentSession().doReturningWork(new ReturningWork<SqlRowSet>() {
+//
+//			@Override
+//			public SqlRowSet execute(Connection connection) throws SQLException {
+//					@SuppressWarnings("resource")
+//					NamedParameterStatement stmt = new NamedParameterStatement(connection, sql, parameters,
+//							maxRows);
+//					if (log.isDebugEnabled())
+//						log.debug("Run statement {} in connection {}", sql, connection);
+//					return new ResultSetWrappingSqlRowSet(stmt.executeQuery());
+//			}
+//		});
+//	}
 
 	@Override
 	public int queryForInt(String sql) throws PersistenceException {
@@ -539,106 +565,75 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	@Override
 	public long queryForLong(String sql) throws PersistenceException {
-		try {
-			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
-			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-			Long result =jdbcTemplate.queryForObject(sql, Long.class); 
-			return result !=null ? result : 0L;
-		} catch (NullPointerException | EmptyResultDataAccessException e) {
-			return 0L;
-		} catch (Exception e) {
-			throw new PersistenceException(e);
-		}
+		return queryForLong(sql, null);
 	}
 
 	@Override
 	public long queryForLong(String sql, Map<String, Object> parameters) throws PersistenceException {
-		if (MapUtils.isEmpty(parameters))
-			return queryForLong(sql);
-
-		try {
-			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
-			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			Long result = jdbcTemplate.queryForObject(sql, parameters, Long.class);
-			return result !=null ? result : 0L;
-		} catch (NullPointerException | EmptyResultDataAccessException e) {
-			return 0L;
-		} catch (Exception e) {
-			throw new PersistenceException(e);
-		}
+		Long ret = queryForObject(sql, parameters, Long.class);
+		return ret = ret != null ? ret.longValue() : 0L;
 	}
 
 	@Override
 	public double queryForDouble(String sql) throws PersistenceException {
-		try {
-			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
-			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-			Double result = jdbcTemplate.queryForObject(sql, Double.class);
-			return result !=null ? result : 0D;
-		} catch (NullPointerException | EmptyResultDataAccessException e) {
-			return 0D;
-		} catch (Exception e) {
-			throw new PersistenceException(e);
-		}
+		return queryForDouble(sql, null);
 	}
 
 	@Override
 	public double queryForDouble(String sql, Map<String, Object> parameters) throws PersistenceException {
-		if (MapUtils.isEmpty(parameters))
-			return queryForLong(sql);
-
-		try {
-			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
-			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			Double result = jdbcTemplate.queryForObject(sql, parameters, Double.class);
-			return result !=null ? result : 0D;
-		} catch (NullPointerException | EmptyResultDataAccessException e) {
-			return 0D;
-		} catch (Exception e) {
-			throw new PersistenceException(e);
-		}
+		Double ret = queryForObject(sql, parameters, Double.class);
+		return ret = ret != null ? ret.doubleValue() : 0D;
 	}
 
 	@Override
 	public String queryForString(String sql) throws PersistenceException {
-		try {
-			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
-			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-			return jdbcTemplate.queryForObject(sql, String.class);
-		} catch (EmptyResultDataAccessException e) {
-			return null;
-		} catch (Exception e) {
-			throw new PersistenceException(e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Object queryForObject(String sql, @SuppressWarnings("rawtypes")
-	Class type) throws PersistenceException {
-		try {
-			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
-			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-			return jdbcTemplate.queryForObject(sql, type);
-		} catch (EmptyResultDataAccessException e) {
-			return null;
-		} catch (Exception e) {
-			throw new PersistenceException(e);
-		}
+		return queryForObject(sql, String.class);
 	}
 
 	@Override
-	public int jdbcUpdate(String statement) throws PersistenceException {
+	public <R> R queryForObject(String sql, Class<R> requiredType) throws PersistenceException {
+		return queryForObject(sql, null, requiredType);
+	}
+
+	@Override
+	public <R> R queryForObject(String sql, Map<String, Object> parameters, Class<R> requiredType)
+			throws PersistenceException {
+		return getCurrentSession().doReturningWork(connection -> {
+			try (NamedParameterStatement stmt = new NamedParameterStatement(connection, sql, parameters);
+					ResultSet rs = stmt.executeQuery();) {
+				if (log.isDebugEnabled())
+					log.debug("Run statement {} in connection {}", sql, connection);
+
+				if (rs.next())
+					return rs.getObject(1, requiredType);
+				else
+					return null;
+			} catch (Exception e) {
+				throw new PersistenceException(e.getMessage(), e);
+			}
+		});
+	}
+
+	@Override
+	public int jdbcUpdate(String sql, Map<String, Object> parameters) throws PersistenceException {
 		if (!checkStoringAspect())
 			return 0;
 
-		try {
-			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
-			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-			return jdbcTemplate.update(statement);
-		} catch (Exception e) {
-			throw new PersistenceException(e);
-		}
+		return getCurrentSession().doReturningWork(connection -> {
+			try (NamedParameterStatement stmt = new NamedParameterStatement(connection, sql, parameters);) {
+				if (log.isDebugEnabled())
+					log.debug("Run statement {} in connection {}", sql, connection);
+
+				return stmt.executeUpdate();
+			} catch (Exception e) {
+				throw new PersistenceException(e.getMessage(), e);
+			}
+		});
+	}
+
+	@Override
+	public int jdbcUpdate(String sql) throws PersistenceException {
+		return jdbcUpdate(sql, null);
 	}
 
 	@Override
@@ -683,26 +678,13 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		}
 	}
 
-	@Override
-	public int jdbcUpdate(String statement, Map<String, Object> parameters) throws PersistenceException {
-		if (!checkStoringAspect())
-			return 0;
-
-		if (MapUtils.isEmpty(parameters))
-			return jdbcUpdate(statement);
-
+	protected Connection getConnection() throws PersistenceException {
 		DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
 		try {
-			NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-			return jdbcTemplate.update(statement, parameters);
+			return dataSource.getConnection();
 		} catch (Exception e) {
-			throw new PersistenceException(e);
+			throw new PersistenceException(e.getMessage(), e);
 		}
-	}
-
-	protected Connection getConnection() throws SQLException {
-		DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
-		return dataSource.getConnection();
 	}
 
 	@Override
@@ -720,8 +702,9 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		return "hsqldb".equals(getDbms());
 	}
 
-	protected boolean isMySQL() {
-		return "mysql".equals(getDbms());
+	@Override
+	public boolean isMySQL() {
+		return "mysql".equals(getDbms()) || isMariaDB();
 	}
 
 	protected boolean isMariaDB() {

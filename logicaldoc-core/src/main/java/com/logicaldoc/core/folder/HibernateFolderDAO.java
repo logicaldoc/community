@@ -919,8 +919,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		query.append(" from ld_folder_acl ");
 		query.append(WHERE);
 		query.append(" ld_folderid=" + id);
-		query.append(" and ld_groupid in (");
-		query.append(userGroups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
+		query.append(" and ld_groupid in (select ld_groupid from ld_usergroup where ld_userid=");
+		query.append(Long.toString(userId));
 		query.append(")");
 
 		Map<String, Permission> permissionColumn = new HashMap<>();

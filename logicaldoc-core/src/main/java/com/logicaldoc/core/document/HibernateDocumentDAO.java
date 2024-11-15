@@ -1122,13 +1122,12 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			log.debug("Clean unique tags of tenant {}", tenantId);
 
 			// Collect the currently unique used tags
-			@SuppressWarnings("unchecked")
-			Set<String> currentlyUsedTags = ((Map<String, String>) queryForList(
+			Set<String> currentlyUsedTags = queryForList(
 					"select distinct(B.ld_tag) from ld_tag B, ld_document C where B.ld_tenantid=" + tenantId
 							+ " and C.ld_id=B.ld_docid and C.ld_deleted=0 "
 							+ " UNION select distinct(D.ld_tag) from ld_foldertag D, ld_folder E where D.ld_tenantid="
 							+ tenantId + " and E.ld_id=D.ld_folderid and E.ld_deleted=0",
-					String.class).stream().collect(Collectors.groupingBy(Function.identity()))).keySet();
+					String.class).stream().collect(Collectors.groupingBy(Function.identity())).keySet();
 
 			// Delete all currently recorded unique tags no more used
 			if (isOracle()) {
@@ -1417,8 +1416,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 						ld_customid as LDCUSTOMID from ld_document_acl where ld_docid=
 						""");
 		query.append(Long.toString(docId));
-		query.append(" and ld_groupid in (");
-		query.append(user.getGroups().stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
+		query.append(" and ld_groupid in (select ld_groupid from ld_usergroup where ld_userid=");
+		query.append(Long.toString(userId));
 		query.append(")");
 
 		Map<String, Permission> permissionColumn = new HashMap<>();
