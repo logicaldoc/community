@@ -426,13 +426,13 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	@Override
-	public void queryForResultSet(String sql, Map<String, Object> parameters, Integer maxRows, ResultSetWorker worker)
+	public void queryForResultSet(String sql, Map<String, Object> parameters, Integer maxRows, ResultSetWalker walker)
 			throws PersistenceException {
 		getCurrentSession().doWork(connection -> {
 			try (NamedParameterStatement stmt = new NamedParameterStatement(connection, sql, parameters, maxRows);
 					ResultSet rs = stmt.executeQuery();) {
 				logStatement(sql, connection);
-				worker.work(rs);
+				walker.walk(rs);
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 				if (e instanceof PersistenceException pe)

@@ -4,19 +4,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * A worker that operates in a result set bound to the current JDBC connection
+ * A walker that operates over a {@link ResultSet} bound to the current JDBC connection
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.0.1
  */
-public interface ResultSetWorker {
+public interface ResultSetWalker {
 
 	/**
 	 * Implement in this method your iteration logic
 	 * 
-	 * @param rows The result set ready to be used
+	 * @param rows The {@link ResultSet} ready to be iterated
 	 * 
 	 * @throws SQLException Error in the database
 	 */
-	public void work(ResultSet rows) throws SQLException;
+	public void walk(ResultSet rows) throws SQLException;
 }

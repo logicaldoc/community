@@ -257,7 +257,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public void queryForResultSet(String sql, Map<String, Object> parameters, Integer maxRows, ResultSetWorker worker)
+	public void queryForResultSet(String sql, Map<String, Object> parameters, Integer maxRows, ResultSetWalker worker)
 			throws PersistenceException;
 
 	/**
