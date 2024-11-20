@@ -175,7 +175,7 @@ public class WSUtil {
 	}
 
 	public static Document toDocument(WSDocument wsDoc) throws PersistenceException {
-		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO fdao = Context.get().getBean(FolderDAO.class);
 		Folder folder = fdao.findById(wsDoc.getFolderId());
 		if (folder == null) {
 			throw new PersistenceException("error - folder not found");
@@ -236,7 +236,7 @@ public class WSUtil {
 		Template template = null;
 		Map<String, Attribute> attrs = new HashMap<>();
 		if (wsDoc.getTemplateId() != null) {
-			TemplateDAO templDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+			TemplateDAO templDao = Context.get().getBean(TemplateDAO.class);
 			template = templDao.findById(wsDoc.getTemplateId());
 			doc.setTemplate(template);
 			if (template != null) {
@@ -314,7 +314,7 @@ public class WSUtil {
 		return null;
 	}
 
-	public static WSAttributeSet toWSAttributeSet(AttributeSet attributeSet) {
+	public static WSAttributeSet toWSAttributeSet(AttributeSet attributeSet) throws PersistenceException {
 		WSAttributeSet wsAttributeSet = new WSAttributeSet();
 
 		wsAttributeSet.setId(attributeSet.getId());
@@ -322,7 +322,7 @@ public class WSUtil {
 		wsAttributeSet.setDescription(attributeSet.getDescription());
 		wsAttributeSet.setLastModified(DateUtil.format(attributeSet.getLastModified()));
 
-		AttributeSetDAO setDao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+		AttributeSetDAO setDao = Context.get().getBean(AttributeSetDAO.class);
 		setDao.initialize(attributeSet);
 
 		// Populate extended attributes
@@ -447,7 +447,7 @@ public class WSUtil {
 			wsTemplate.setValidation(template.getValidation());
 			wsTemplate.setLastModified(DateUtil.format(template.getLastModified()));
 
-			TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+			TemplateDAO templateDao = Context.get().getBean(TemplateDAO.class);
 			templateDao.initialize(template);
 			wsTemplate.setDocsCount(templateDao.countDocs(template.getId()));
 
@@ -496,7 +496,7 @@ public class WSUtil {
 			throw new PersistenceException(e.getMessage(), e);
 		}
 
-		GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
+		GroupDAO groupDao = Context.get().getBean(GroupDAO.class);
 		Group group = groupDao.findById(ace.getGroupId());
 		if (group.getName().startsWith("_user_"))
 			wsAce.setUserId(Long.parseLong(group.getName().substring(group.getName().lastIndexOf('_') + 1)));
@@ -513,7 +513,7 @@ public class WSUtil {
 		}
 
 		if (wsAce.getUserId() != 0L) {
-			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+			UserDAO userDao = Context.get().getBean(UserDAO.class);
 			User user = userDao.findById(wsAce.getUserId());
 			userDao.initialize(user);
 			ace.setGroupId(user.getUserGroup().getId());

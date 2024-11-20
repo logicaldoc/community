@@ -1,11 +1,11 @@
 package com.logicaldoc.core;
 
+import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 /**
  * Interface for DAOs that operate on persistent objects
@@ -151,7 +151,21 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public List<Object> findByQuery(String query, Map<String, Object> parameters, Integer max)
+	public List<?> findByQuery(String query, Map<String, Object> parameters, Integer max) throws PersistenceException;
+
+	/**
+	 * Find everything you want from the DB using the ORM query language
+	 * 
+	 * @param query The query to execute
+	 * @param parameters The map of the parameters
+	 * @poaram requiredType The type of the elements in the result
+	 * @param max Maximum results number (optional)
+	 * 
+	 * @return Query result
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
+	 */
+	public <R> List<R> findByQuery(String query, Map<String, Object> parameters, Class<R> requiredType, Integer max)
 			throws PersistenceException;
 
 	/**
@@ -189,8 +203,10 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * Initialises lazy loaded data such as collections
 	 * 
 	 * @param entity The entity to be initialised
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public void initialize(T entity);
+	public void initialize(T entity) throws PersistenceException;
 
 	/**
 	 * Query given SQL to create a prepared statement from SQL and a list of
@@ -228,33 +244,21 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 
 	/**
 	 * Query given SQL to create a prepared statement from SQL and a list of
-	 * arguments to bind to the query, returns a navigable RowSet
+	 * arguments to bind to the query, you can give your own worker to iterate
+	 * the {@link ResultSet}.
 	 * 
 	 * @param sql SQL query to execute (for parameters please use JPA-style:
 	 *        :paramA, :paramB ...)
 	 * @param parameters Parameters used in the where expression (map
 	 *        name-value)
 	 * @param maxRows the new max rows limit; null means there is no limit
-	 * 
-	 * @return the result row set
+	 * @param worker an implementation that receive the {@link ResultSet} to
+	 *        iterate
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public SqlRowSet queryForRowSet(String sql, Map<String, Object> parameters, Integer maxRows)
+	public void queryForResultSet(String sql, Map<String, Object> parameters, Integer maxRows, ResultSetWorker worker)
 			throws PersistenceException;
-
-	/**
-	 * Query given SQL to create a prepared statement from SQL and a list of
-	 * arguments to bind to the query, returns a navigable RowSet
-	 * 
-	 * @param sql SQL query to execute
-	 * @param maxRows the new max rows limit; null means there is no limit
-	 * 
-	 * @return the result row set
-	 * 
-	 * @throws PersistenceException raised in case of errors in the database
-	 */
-	public SqlRowSet queryForRowSet(String sql, Integer maxRows) throws PersistenceException;
 
 	/**
 	 * Query given SQL to create a prepared statement from SQL and a list of

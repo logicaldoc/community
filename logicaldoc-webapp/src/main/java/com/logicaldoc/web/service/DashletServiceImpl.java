@@ -36,7 +36,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 		Session session = validateSession();
 		checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
 		try {
-			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
+			DashletDAO dao = Context.get().getBean(DashletDAO.class);
 			Dashlet dashlet = dao.findByName(guiDashlet.getName(), session.getTenantId());
 			if (dashlet == null) {
 				dashlet = toDashlet(guiDashlet);
@@ -62,19 +62,18 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 			save(guiDashlet);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<GUIDashlet> loadDashlets() throws ServerException {
 		Session session = validateSession();
 		try {
-			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
+			DashletDAO dao = Context.get().getBean(DashletDAO.class);
 			List<Dashlet> dashlets = dao.findAll(session.getTenantId());
 			ArrayList<GUIDashlet> guiDashlets = new ArrayList<>();
 			for (Dashlet dashlet : dashlets)
 				guiDashlets.add(fromDashlet(dashlet));
 			return guiDashlets;
 		} catch (Exception e) {
-			return (List<GUIDashlet>) throwServerException(session, log, e);
+			return throwServerException(session, log, e);
 		}
 	}
 
@@ -82,13 +81,13 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 	public GUIDashlet get(long dashletId) throws ServerException {
 		Session session = validateSession();
 		try {
-			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
+			DashletDAO dao = Context.get().getBean(DashletDAO.class);
 			Dashlet dashlet = dao.findById(dashletId);
 			if (dashlet == null)
 				throw new ServerException("Unexisting dashlet " + dashletId);
 			return fromDashlet(dashlet);
 		} catch (Exception e) {
-			return (GUIDashlet) throwServerException(session, log, e);
+			return throwServerException(session, log, e);
 		}
 	}
 
@@ -96,13 +95,13 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 	public GUIDashlet get(String name) throws ServerException {
 		Session session = validateSession();
 		try {
-			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
+			DashletDAO dao = Context.get().getBean(DashletDAO.class);
 			Dashlet dashlet = dao.findByName(name, session.getTenantId());
 			if (dashlet == null)
 				throw new ServerException("Unexisting dashlet " + name);
 			return fromDashlet(dashlet);
 		} catch (Exception e) {
-			return (GUIDashlet) throwServerException(session, log, e);
+			return throwServerException(session, log, e);
 		}
 	}
 
@@ -111,7 +110,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 		Session session = validateSession();
 		checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
 		try {
-			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
+			DashletDAO dao = Context.get().getBean(DashletDAO.class);
 			dao.delete(dashletId);
 		} catch (Exception e) {
 			throwServerException(session, log, e);
@@ -121,8 +120,8 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 	@Override
 	public void saveUserDashlets(List<GUIDashlet> dashlets) throws ServerException {
 		Session session = validateSession();
-		GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
-		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		GenericDAO gDao = Context.get().getBean(GenericDAO.class);
+		UserDAO uDao = Context.get().getBean(UserDAO.class);
 
 		try {
 			/*

@@ -3,7 +3,7 @@ package com.logicaldoc.core.ticket;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -24,7 +24,6 @@ import com.logicaldoc.util.config.ContextProperties;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
-@SuppressWarnings("unchecked")
 public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> implements TicketDAO {
 
 	@Resource(name = "DocumentDAO")
@@ -99,10 +98,8 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 	@Override
 	public Ticket findByTicketId(String ticketid) {
 		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put("ticketid", ticketid);
-			Collection<Ticket> coll = findByQuery("from Ticket _ticket where _ticket.ticketId = :ticketid", params,
-					null);
+			List<Ticket> coll = findByObjectQuery("from Ticket _ticket where _ticket.ticketId = :ticketid",
+					Map.of("ticketid", ticketid), null);
 			Ticket ticket = null;
 			if (!coll.isEmpty()) {
 				ticket = coll.iterator().next();
@@ -123,9 +120,8 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 		boolean result = true;
 
 		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put("docId", docId);
-			Collection<Ticket> coll = findByQuery("from Ticket _ticket where _ticket.docId = :docId", params, null);
+			List<Ticket> coll = findByObjectQuery("from Ticket _ticket where _ticket.docId = :docId",
+					Map.of("docId", docId), null);
 			for (Ticket downloadTicket : coll) {
 				downloadTicket.setDeleted(1);
 				saveOrUpdate(downloadTicket);
@@ -148,9 +144,8 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 			return;
 
 		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put("expired", new Date());
-			Collection<Ticket> coll = findByQuery("from Ticket _ticket where _ticket.expired < :expired", params, null);
+			Collection<Ticket> coll = findByObjectQuery("from Ticket _ticket where _ticket.expired < :expired",
+					Map.of("expired", new Date()), null);
 			for (Ticket downloadTicket : coll) {
 				downloadTicket.setDeleted(1);
 				saveOrUpdate(downloadTicket);

@@ -94,15 +94,15 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testGetTagCloud() throws PersistenceException {
 		Session session = SessionManager.get().newSession("admin", "admin", (Client) null);
-//		try {
-//			dao.updateCountUniqueTags();
-//			
-//			List<TagCloud> cloud = dao.getTagCloud(session.getSid());
-//			assertNotNull(cloud);
-//			assertEquals("approved,rejected", cloud.stream().map(TagCloud::getTag).collect(Collectors.joining(",")));
-//		} finally {
-//			SessionManager.get().kill(session.getSid());
-//		}
+		try {
+			dao.updateCountUniqueTags();
+			
+			List<TagCloud> cloud = dao.getTagCloud(session.getSid());
+			assertNotNull(cloud);
+			assertEquals("approved,rejected", cloud.stream().map(TagCloud::getTag).collect(Collectors.joining(",")));
+		} finally {
+			SessionManager.get().kill(session.getSid());
+		}
 	}
 
 	@Test
@@ -760,8 +760,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		assertTrue(dao.isWriteAllowed(7L, 3L));
 		assertTrue(dao.isPrintAllowed(7L, 3L));
 
-		assertTrue(dao.getAllowedPermissions(7L, 3L).contains(Permission.SECURITY));
-		assertTrue(!dao.getAllowedPermissions(7L, 2L).contains(Permission.SECURITY));
+		assertFalse(dao.getAllowedPermissions(7L, 2L).contains(Permission.IMMUTABLE));
+		assertTrue(dao.getAllowedPermissions(7L, 2L).contains(Permission.SECURITY));
 	}
 	
 	@Test

@@ -90,7 +90,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 
 		int versionsCap = Context.get().getProperties().getInt("document.maxversions");
 		assertEquals(versionsCap, testSubject.findByDocId(doc.getId()).size());
-		Store store = (Store) Context.get().getBean(Store.class);
+		Store store = Context.get().getBean(Store.class);
 		for (Version ver : testSubject.findByDocId(doc.getId())) {
 			String res = store.getResourceName(doc.getId(), ver.getFileVersion(), null);
 			store.store(this.getClass().getResourceAsStream("/data.sql"), doc.getId(), res);

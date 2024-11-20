@@ -44,7 +44,7 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 		prepareStore();
 
 		// Prepare an API Key
-		ApiKeyDAO dao = (ApiKeyDAO) Context.get().getBean(ApiKeyDAO.class);
+		ApiKeyDAO dao = Context.get().getBean(ApiKeyDAO.class);
 		apiKey = new ApiKey(1L, "MyKey");
 		dao.store(apiKey);
 	}

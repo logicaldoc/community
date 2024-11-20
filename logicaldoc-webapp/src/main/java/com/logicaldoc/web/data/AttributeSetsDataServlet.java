@@ -48,7 +48,7 @@ public class AttributeSetsDataServlet extends AbstractDataServlet {
 			writer.print("</attributeset>");
 		}
 
-		AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+		AttributeSetDAO dao = Context.get().getBean(AttributeSetDAO.class);
 		List<AttributeSet> sets = null;
 		if (type != null)
 			sets = dao.findByType(type, session.getTenantId());

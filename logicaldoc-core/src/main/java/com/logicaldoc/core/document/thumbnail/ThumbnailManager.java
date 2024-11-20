@@ -126,7 +126,7 @@ public class ThumbnailManager {
 
 	protected void createImage(Document document, String fileVersion, int size, Integer quality, String suffix,
 			String sid) throws IOException {
-		TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		TenantDAO tDao = Context.get().getBean(TenantDAO.class);
 
 		ThumbnailBuilder builder = getBuilder(document);
 		if (builder == null) {

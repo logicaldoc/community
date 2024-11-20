@@ -269,7 +269,7 @@ public class FormatConverterManager {
 			if (transaction != null) {
 				transaction.setEvent(DocumentEvent.CONVERTED.toString());
 				transaction.setComment("format: " + FileUtil.getExtension(out.getName()));
-				DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+				DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 				try {
 					dao.initialize(document);
 					dao.store(document, transaction);
@@ -326,7 +326,7 @@ public class FormatConverterManager {
 				history.setComment(String.format("%s -> %s", history.getFilenameOld(), history.getFilename()));
 				history.setIp(session.getClient().getAddress());
 
-				UserHistoryDAO dao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
+				UserHistoryDAO dao = Context.get().getBean(UserHistoryDAO.class);
 				try {
 					dao.store(history);
 				} catch (PersistenceException e) {

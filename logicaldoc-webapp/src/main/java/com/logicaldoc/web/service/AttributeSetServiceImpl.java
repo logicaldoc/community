@@ -46,7 +46,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		Session session = validateSession();
 
 		try {
-			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+			AttributeSetDAO dao = Context.get().getBean(AttributeSetDAO.class);
 			dao.delete(setId);
 		} catch (Exception t) {
 			throwServerException(session, log, t);
@@ -58,7 +58,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		Session session = validateSession();
 
 		try {
-			AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
+			AttributeOptionDAO dao = Context.get().getBean(AttributeOptionDAO.class);
 			dao.deleteBySetIdAndAttribute(setId, attribute);
 			int i = 0;
 			for (GUIValue value : values) {
@@ -73,7 +73,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 
 	private void store(long setId, AttributeOption option) throws ServerException {
 		try {
-			AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
+			AttributeOptionDAO dao = Context.get().getBean(AttributeOptionDAO.class);
 			dao.store(option);
 		} catch (Exception e) {
 			throw new ServerException(String.format("Options have not been %s", setId != 0L ? "updated" : "stored"), e);
@@ -84,7 +84,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	public void deleteOptions(long setId, String attribute, List<String> values) throws ServerException {
 		Session session = validateSession();
 		try {
-			AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
+			AttributeOptionDAO dao = Context.get().getBean(AttributeOptionDAO.class);
 			List<AttributeOption> options = dao.findByAttribute(setId, attribute);
 			for (AttributeOption option : options)
 				for (String value : values)
@@ -99,7 +99,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 
 	private void delete(AttributeOption option) throws ServerException {
 		try {
-			AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
+			AttributeOptionDAO dao = Context.get().getBean(AttributeOptionDAO.class);
 			dao.delete(option.getId());
 		} catch (Exception e) {
 			throw new ServerException("Option has not been deleted", e);
@@ -113,7 +113,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		try {
 			AttributeSet attributeSet;
 			if (guiAttributeSet.getId() != 0) {
-				AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+				AttributeSetDAO dao = Context.get().getBean(AttributeSetDAO.class);
 				attributeSet = dao.findById(guiAttributeSet.getId());
 				dao.initialize(attributeSet);
 			} else {
@@ -133,7 +133,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 
 			guiAttributeSet.setId(attributeSet.getId());
 		} catch (Exception t) {
-			return (GUIAttributeSet) throwServerException(session, log, t);
+			return throwServerException(session, log, t);
 		}
 
 		return guiAttributeSet;
@@ -141,7 +141,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 
 	private void store(GUIAttributeSet guiAttributeSet, AttributeSet attributeSet) throws ServerException {
 		try {
-			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+			AttributeSetDAO dao = Context.get().getBean(AttributeSetDAO.class);
 			dao.store(attributeSet);
 		} catch (Exception e) {
 			throw new ServerException(
@@ -197,7 +197,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 
 	public GUIAttributeSet getAttributeSet(String name) throws ServerException {
 		Session session = validateSession();
-		AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+		AttributeSetDAO dao = Context.get().getBean(AttributeSetDAO.class);
 		try {
 			AttributeSet set = dao.findByName(name, session.getTenantId());
 			if (set != null)
@@ -205,7 +205,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			else
 				return null;
 		} catch (Exception t) {
-			return (GUIAttributeSet) throwServerException(session, log, t);
+			return throwServerException(session, log, t);
 		}
 	}
 
@@ -213,7 +213,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	public GUIAttributeSet getAttributeSet(long setId) throws ServerException {
 		validateSession();
 
-		AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+		AttributeSetDAO dao = Context.get().getBean(AttributeSetDAO.class);
 		try {
 			AttributeSet attributeSet = dao.findById(setId);
 			if (attributeSet == null)
@@ -307,19 +307,18 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		return val == 1;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<GUIAttributeSet> getAttributeSets() throws ServerException {
 		Session session = validateSession();
 		try {
-			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+			AttributeSetDAO dao = Context.get().getBean(AttributeSetDAO.class);
 			List<GUIAttributeSet> guiSets = new ArrayList<>();
 			List<Long> setIds = dao.findAllIds(session.getTenantId());
 			for (Long setId : setIds)
 				guiSets.add(getAttributeSet(setId));
 			return guiSets;
 		} catch (Exception t) {
-			return (List<GUIAttributeSet>) throwServerException(session, log, t);
+			return throwServerException(session, log, t);
 		}
 	}
 
@@ -357,7 +356,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	public void applyValidationToTemplates(long setId, String attribute) throws ServerException {
 		Session session = validateSession();
 		try {
-			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+			AttributeSetDAO dao = Context.get().getBean(AttributeSetDAO.class);
 			AttributeSet set = dao.findById(setId);
 			dao.initialize(set);
 
@@ -382,7 +381,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	public void applyInitializationToTemplates(long setId, String attribute) throws ServerException {
 		Session session = validateSession();
 		try {
-			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+			AttributeSetDAO dao = Context.get().getBean(AttributeSetDAO.class);
 			AttributeSet set = dao.findById(setId);
 			dao.initialize(set);
 			Attribute setAttribute = set.getAttribute(attribute);
@@ -406,11 +405,11 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	public void applyAllToTemplates(long setId, String attributeName) throws ServerException {
 		Session session = validateSession();
 		try {
-			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+			AttributeSetDAO dao = Context.get().getBean(AttributeSetDAO.class);
 			AttributeSet set = dao.findById(setId);
 			Attribute setAttribute = set.getAttribute(attributeName);
 
-			TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+			TemplateDAO templateDao = Context.get().getBean(TemplateDAO.class);
 
 			/*
 			 * Update the attributes referenced in the templates

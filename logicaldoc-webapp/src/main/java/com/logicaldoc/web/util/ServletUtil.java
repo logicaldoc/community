@@ -101,23 +101,30 @@ public class ServletUtil {
 	public static User getSessionUser(HttpServletRequest request) throws InvalidSessionException {
 		Session session = validateSession(request);
 		User user = (User) session.getDictionary().get(USER);
-		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		userDao.initialize(user);
+		initializeUser(user);
 		return user;
 	}
 
 	public static User getSessionUser(String sid) throws InvalidSessionException {
 		Session session = validateSession(sid);
 		User user = (User) session.getDictionary().get(USER);
-		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		userDao.initialize(user);
+		initializeUser(user);
 		return user;
+	}
+
+	private static void initializeUser(User user) {
+		UserDAO userDao = Context.get().getBean(UserDAO.class);
+		try {
+			userDao.initialize(user);
+		} catch (PersistenceException e) {
+			Log.warn(e.getMessage(), e);
+		}
 	}
 
 	public static Session checkMenu(HttpServletRequest request, long menuId)
 			throws ServletException, InvalidSessionException {
 		Session session = validateSession(request);
-		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
+		MenuDAO dao = Context.get().getBean(MenuDAO.class);
 		if (!dao.isReadEnable(menuId, session.getUserId())) {
 			String message = "User " + session.getUsername() + " cannot access the menu " + menuId;
 			throw new ServletException(message);
@@ -140,7 +147,7 @@ public class ServletUtil {
 	public static Session checkEvenOneMenu(HttpServletRequest request, long... menuIds)
 			throws ServletException, InvalidSessionException {
 		Session session = validateSession(request);
-		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
+		MenuDAO dao = Context.get().getBean(MenuDAO.class);
 		for (long menuId : menuIds) {
 			if (dao.isReadEnable(menuId, session.getUserId()))
 				return session;
@@ -228,7 +235,7 @@ public class ServletUtil {
 
 		String filename = getFilename(fileName, suffix, document);
 
-		Store store = (Store) Context.get().getBean(Store.class);
+		Store store = Context.get().getBean(Store.class);
 		String resource = store.getResourceName(document, fileVersion, null);
 		if (!store.exists(document.getId(), resource)) {
 			throw new FileNotFoundException(resource);
@@ -332,8 +339,7 @@ public class ServletUtil {
 	private static void initUser(User user) {
 		if (user != null)
 			try {
-				UserDAO udao = (UserDAO) Context.get().getBean(UserDAO.class);
-				udao.initialize(user);
+				initializeUser(user);
 			} catch (Exception e) {
 				// Nothing to do
 			}
@@ -435,7 +441,7 @@ public class ServletUtil {
 			history.setSessionId(sid);
 		}
 
-		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO fdao = Context.get().getBean(FolderDAO.class);
 		history.setPath(fdao.computePathExtended(document.getFolder().getId()));
 		if ("preview".equals(request.getParameter("control")))
 			history.setEvent(DocumentEvent.VIEWED.toString());
@@ -447,7 +453,7 @@ public class ServletUtil {
 		 * we will not save if there is another view in the same session asked
 		 * since 30 seconds.
 		 */
-		DocumentHistoryDAO hdao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
+		DocumentHistoryDAO hdao = Context.get().getBean(DocumentHistoryDAO.class);
 		List<DocumentHistory> oldHistories = hdao.findByUserIdAndEvent(user.getId(), history.getEvent(),
 				session != null ? session.getSid() : sid);
 		Calendar cal = Calendar.getInstance();
@@ -502,7 +508,7 @@ public class ServletUtil {
 	}
 
 	private static Document getDocument(long docId, User user) throws PersistenceException, FileNotFoundException {
-		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 		Document doc = dao.findById(docId);
 		if (doc == null || (user != null && !user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher")
 				&& !doc.isPublishing()))
@@ -638,7 +644,7 @@ public class ServletUtil {
 		response.setCharacterEncoding(StandardCharsets.UTF_8.displayName());
 
 		// get document
-		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO ddao = Context.get().getBean(DocumentDAO.class);
 		Document doc = ddao.findById(docId);
 
 		if (doc == null) {
@@ -657,12 +663,11 @@ public class ServletUtil {
 
 		setContentDisposition(request, response, doc.getFileName() + ".txt");
 
-		UserDAO udao = (UserDAO) Context.get().getBean(UserDAO.class);
-		udao.initialize(user);
+		initializeUser(user);
 		if (!user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher") && !doc.isPublishing())
 			throw new FileNotFoundException("Document not published");
 
-		SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);
+		SearchEngine indexer = Context.get().getBean(SearchEngine.class);
 
 		String content = indexer.getHit(docId).getContent();
 		if (content == null)
@@ -720,7 +725,7 @@ public class ServletUtil {
 	 */
 	public static void uploadDocumentResource(HttpServletRequest request, long docId, String suffix, String fileVersion,
 			String docVersion) throws PersistenceException, IOException {
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
 		Document doc = docDao.findById(docId);
 
 		String ver = docVersion;
@@ -729,7 +734,7 @@ public class ServletUtil {
 		if (StringUtils.isEmpty(ver))
 			ver = doc.getFileVersion();
 
-		Store store = (Store) Context.get().getBean(Store.class);
+		Store store = Context.get().getBean(Store.class);
 
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		

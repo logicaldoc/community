@@ -77,6 +77,8 @@ import com.logicaldoc.util.time.TimeDiff.TimeField;
 @Component("documentManager")
 public class DocumentManagerImpl implements DocumentManager {
 
+	private static final String UPDATE_LD_DOCUMENT_SET_LD_INDEXED = "update ld_document set ld_indexed=";
+
 	private static final String NO_VALUE_OBJECT_HAS_BEEN_PROVIDED = "No value object has been provided";
 
 	private static final String TRANSACTION_CANNOT_BE_NULL = "transaction cannot be null";
@@ -482,7 +484,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		if (parser != null) {
 			log.debug("Using parser {} to parse document {}", parser.getClass().getName(), doc.getId());
 
-			TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+			TenantDAO tDao = Context.get().getBean(TenantDAO.class);
 			try {
 				content = parser.parse(store.getStream(doc.getId(), resource), new ParseParameters(doc,
 						doc.getFileName(), fileVersion, null, locale, tDao.findById(doc.getTenantId()).getName()));
@@ -531,9 +533,8 @@ public class DocumentManagerImpl implements DocumentManager {
 				} else {
 					log.debug("Alias {} cannot be indexed because it references an unexisting document {}", doc,
 							doc.getDocRef());
-					documentDAO.initialize(doc);
-					doc.setIndexed(AbstractDocument.INDEX_SKIP);
-					documentDAO.store(doc);
+					documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + AbstractDocument.INDEX_SKIP
+							+ " where ld_id=" + doc.getId());
 					return 0;
 				}
 			}
@@ -546,6 +547,8 @@ public class DocumentManagerImpl implements DocumentManager {
 				parsingTime = TimeDiff.getTimeDifference(beforeParsing, new Date(), TimeField.MILLISECOND);
 			}
 
+			documentDAO.initialize(doc);
+
 			// This may take time
 			addHit(doc, cont);
 		} catch (PersistenceException | ParsingException e) {
@@ -555,15 +558,17 @@ public class DocumentManagerImpl implements DocumentManager {
 
 		// For additional safety update the DB directly
 		doc.setIndexed(AbstractDocument.INDEX_INDEXED);
+		documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + doc.getIndexed() + " where ld_id=" + doc.getId());
 
+		// Save the event
 		if (transaction != null) {
 			transaction.setEvent(DocumentEvent.INDEXED.toString());
 			transaction.setComment(HTMLSanitizer.sanitize(StringUtils.abbreviate(cont, 100)));
 			transaction.setReason(Integer.toString(currentIndexed));
 			transaction.setDocument(doc);
 		}
-
-		documentDAO.store(doc, transaction);
+		DocumentHistoryDAO hDao = Context.get().getBean(DocumentHistoryDAO.class);
+		hDao.store(transaction);
 
 		/*
 		 * Mark the aliases to be re-indexed
@@ -582,14 +587,14 @@ public class DocumentManagerImpl implements DocumentManager {
 		transaction.setComment(exception.getMessage());
 		transaction.setDocument(document);
 		transaction.setPath(folderDAO.computePathExtended(document.getFolder().getId()));
-		DocumentHistoryDAO hDao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
+		DocumentHistoryDAO hDao = Context.get().getBean(DocumentHistoryDAO.class);
 		hDao.store(transaction);
 
 		if (exception instanceof ParsingException) {
-			TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+			TenantDAO tDao = Context.get().getBean(TenantDAO.class);
 			String tenant = tDao.getTenantName(document.getTenantId());
 			if (Context.get().getProperties().getBoolean(tenant + ".index.skiponerror", false)) {
-				DocumentDAO dDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+				DocumentDAO dDao = Context.get().getBean(DocumentDAO.class);
 				dDao.initialize(document);
 				document.setIndexed(AbstractDocument.INDEX_SKIP);
 				dDao.store(document);
@@ -613,8 +618,8 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	private void markAliasesToIndex(long referencedDocId) throws PersistenceException {
-		documentDAO.jdbcUpdate("update ld_document set ld_indexed=" + AbstractDocument.INDEX_TO_INDEX
-				+ " where ld_docref=" + referencedDocId + " and not ld_id = " + referencedDocId);
+		documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + AbstractDocument.INDEX_TO_INDEX + " where ld_docref="
+				+ referencedDocId + " and not ld_id = " + referencedDocId);
 	}
 
 	@Override
@@ -799,7 +804,7 @@ public class DocumentManagerImpl implements DocumentManager {
 					indexer.deleteHit(doc.getId());
 
 					// The same thing should be done on each shortcut
-					documentDAO.jdbcUpdate("update ld_document set ld_indexed=" + AbstractDocument.INDEX_TO_INDEX
+					documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + AbstractDocument.INDEX_TO_INDEX
 							+ " where ld_docref=" + doc.getId());
 				}
 
@@ -999,7 +1004,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	public int countPages(Document doc) {
 		try {
 			Parser parser = ParserFactory.getParser(doc.getFileName());
-			Store strt = (Store) Context.get().getBean(Store.class);
+			Store strt = Context.get().getBean(Store.class);
 			return parser.countPages(strt.getStream(doc.getId(), strt.getResourceName(doc, null, null)),
 					doc.getFileName());
 		} catch (Exception e) {
@@ -1444,7 +1449,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			throw new IllegalArgumentException("transaction user cannot be null");
 
 		List<Long> idsList = new ArrayList<>();
-		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 		Collection<Long> folderIds = folderDAO.findFolderIdByUserIdAndPermission(transaction.getUserId(),
 				Permission.ARCHIVE, null, true);
 
@@ -1464,7 +1469,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		}
 
 		// Remove all corresponding hits from the index
-		SearchEngine engine = (SearchEngine) Context.get().getBean(SearchEngine.class);
+		SearchEngine engine = Context.get().getBean(SearchEngine.class);
 		engine.deleteHits(idsList);
 
 		log.info("Archived documents {}", idsList);
@@ -1690,7 +1695,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			bigPdf = MergeUtil.mergePdf(List.of(pdfs));
 
 			// Add an history entry to track the export of the document
-			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
 			if (transaction != null)
 				for (Long id : docIds) {
 					DocumentHistory trans = new DocumentHistory(transaction);
@@ -1700,10 +1705,10 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			Document docVO = new Document();
 			docVO.setFileName(fileName.toLowerCase().endsWith(".pdf") ? fileName : fileName + ".pdf");
-			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
 			docVO.setFolder(folderDao.findById(targetFolderId));
 
-			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+			DocumentManager manager = Context.get().getBean(DocumentManager.class);
 			return manager.create(bigPdf, docVO, transaction);
 		} finally {
 			FileUtil.delete(bigPdf);
@@ -1731,15 +1736,14 @@ public class DocumentManagerImpl implements DocumentManager {
 		for (long docId : docIds) {
 			try {
 				i++;
-				DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+				DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
 				Document document = docDao.findDocument(docId);
 
 				if (document != null && user != null && !user.isMemberOf(Group.GROUP_ADMIN)
 						&& !user.isMemberOf("publisher") && !document.isPublishing())
 					continue;
 
-				FormatConverterManager manager = (FormatConverterManager) Context.get()
-						.getBean(FormatConverterManager.class);
+				FormatConverterManager manager = Context.get().getBean(FormatConverterManager.class);
 				manager.convertToPdf(document, null);
 
 				File pdf = new File(tempDir, nf.format(i) + ".pdf");
@@ -1761,7 +1765,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			throws PersistenceException, PermissionException {
 		validateTransaction(transaction);
 
-		MenuDAO menuDAO = (MenuDAO) Context.get().getBean(MenuDAO.class);
+		MenuDAO menuDAO = Context.get().getBean(MenuDAO.class);
 		if (!menuDAO.isReadEnable(Menu.DESTROY_DOCUMENTS, transaction.getUserId())) {
 			String message = "User " + transaction.getUsername() + " cannot access the menu " + Menu.DESTROY_DOCUMENTS;
 			throw new PermissionException(message);
@@ -1792,7 +1796,6 @@ public class DocumentManagerImpl implements DocumentManager {
 					}
 				}, 1);
 
-		@SuppressWarnings("unchecked")
 		List<Long> versionIds = documentDAO.queryForList("select ld_id from ld_version where ld_documentid=" + docId,
 				Long.class);
 		if (!versionIds.isEmpty()) {

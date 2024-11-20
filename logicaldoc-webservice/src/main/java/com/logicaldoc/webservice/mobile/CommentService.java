@@ -48,14 +48,14 @@ public class CommentService extends AbstractService {
 	String docid) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 
-		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO ddao = Context.get().getBean(DocumentDAO.class);
 		Long docId = Long.parseLong(docid);
 		Document document = ddao.findById(docId);
 
 		checkDocumentPermission(Permission.READ, user, docId);
 		boolean writeEnabled = isWriteEnabled(user, docId);
 
-		DocumentNoteDAO dndao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
+		DocumentNoteDAO dndao = Context.get().getBean(DocumentNoteDAO.class);
 
 		List<DocumentNote> notes = dndao.findByDocId(docId, document.getFileVersion());
 
@@ -85,7 +85,7 @@ public class CommentService extends AbstractService {
 
 	private boolean isWriteEnabled(User user, long docId) {
 		try {
-			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 			if (dao.isPermissionAllowed(Permission.WRITE, docId, user.getId())) {
 				return true;
 			}
@@ -115,7 +115,7 @@ public class CommentService extends AbstractService {
 		note.setDate(new Date());
 		note.setMessage(content);
 
-		DocumentNoteDAO dndao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
+		DocumentNoteDAO dndao = Context.get().getBean(DocumentNoteDAO.class);
 		dndao.store(note);
 
 		return Response.ok(comment).build();
@@ -137,7 +137,7 @@ public class CommentService extends AbstractService {
 		note.setDate(new Date());
 		note.setMessage(comment.getContent());
 
-		DocumentNoteDAO dndao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
+		DocumentNoteDAO dndao = Context.get().getBean(DocumentNoteDAO.class);
 		dndao.store(note);
 
 		return Response.ok(comment).build();

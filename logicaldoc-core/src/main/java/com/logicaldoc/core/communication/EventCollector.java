@@ -47,7 +47,7 @@ public class EventCollector {
 	private Map<String, Queue<Long>> fifos = new HashMap<>();
 
 	public static EventCollector get() {
-		return (EventCollector) Context.get().getBean(EventCollector.class);
+		return Context.get().getBean(EventCollector.class);
 	}
 
 	public void addListener(EventListener listener) {
@@ -98,18 +98,18 @@ public class EventCollector {
 			return;
 
 		if (history.getDocId() != null && history.getDocument() == null) {
-			DocumentDAO docDao = (DocumentDAO) com.logicaldoc.util.Context.get().getBean(DocumentDAO.class);
+			DocumentDAO docDao = com.logicaldoc.util.Context.get().getBean(DocumentDAO.class);
 			try {
 				history.setDocument(docDao.findById(history.getDocId()));
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
-		} else if (history.getDocument() != null) {
+		} else if (history.getDocument() != null && history.getDocument() instanceof Document doc) {
 			/*
 			 * Do not use the original document because to avoid interactions
 			 * with Hibernate session.
 			 */
-			Document clone = new Document(history.getDocument());
+			Document clone = new Document(doc);
 			// Restore some attributes skipped by the clone method
 			clone.setCustomId(history.getDocument().getCustomId());
 			clone.setStatus(history.getDocument().getStatus());
@@ -124,7 +124,7 @@ public class EventCollector {
 			log.debug("Finished notification of history {}", history);
 		};
 
-		ThreadPools pools = (ThreadPools) Context.get().getBean(ThreadPools.class);
+		ThreadPools pools = Context.get().getBean(ThreadPools.class);
 		pools.execute(notifier, "EventCollector");
 	}
 

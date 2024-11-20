@@ -28,7 +28,7 @@ public class ConversionFormatsDataServlet extends AbstractDataServlet {
 
 		String fileName = request.getParameter("fileName");
 
-		FormatConverterManager manager = (FormatConverterManager) Context.get().getBean(FormatConverterManager.class);
+		FormatConverterManager manager = Context.get().getBean(FormatConverterManager.class);
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");

@@ -34,7 +34,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 
 	@Override
 	public void store(DocumentNote note) throws PersistenceException {
-		DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO documentDao = Context.get().getBean(DocumentDAO.class);
 		Document doc = documentDao.findById(note.getDocId());
 		if (doc == null)
 			throw new PersistenceException("Cannot save note for undexisting document " + note.getDocId());
@@ -57,7 +57,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 
 		try {
 			if (transaction != null) {
-				DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+				DocumentDAO documentDao = Context.get().getBean(DocumentDAO.class);
 				Document doc = documentDao.findById(note.getDocId());
 				transaction.setEvent(DocumentEvent.NEW_NOTE.toString());
 				documentDao.saveDocumentHistory(doc, transaction);
@@ -115,7 +115,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	}
 
 	private void markToIndex(long docId) throws PersistenceException {
-		DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO documentDao = Context.get().getBean(DocumentDAO.class);
 		Document doc = documentDao.findById(docId);
 		if (doc != null && doc.getIndexed() == AbstractDocument.INDEX_INDEXED) {
 			documentDao.initialize(doc);

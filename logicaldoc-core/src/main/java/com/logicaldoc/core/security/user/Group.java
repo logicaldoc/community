@@ -117,7 +117,7 @@ public class Group extends PersistentObject implements Serializable {
 	public User getUser() {
 		if (!isUserGroup())
 			return null;
-		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		UserDAO userDao = Context.get().getBean(UserDAO.class);
 		long userId = Long.parseLong(name.substring(name.lastIndexOf('_') + 1));
 		try {
 			return userDao.findById(userId);

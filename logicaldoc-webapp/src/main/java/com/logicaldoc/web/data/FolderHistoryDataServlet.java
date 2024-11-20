@@ -29,20 +29,20 @@ public class FolderHistoryDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		MenuDAO mDao = (MenuDAO) Context.get().getBean(MenuDAO.class);
+		MenuDAO mDao = Context.get().getBean(MenuDAO.class);
 		boolean showSid = mDao.isReadEnable(Menu.SESSIONS, session.getUserId());
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
+		DocumentHistoryDAO dao = Context.get().getBean(DocumentHistoryDAO.class);
 		StringBuilder query = new StringBuilder(
 				"select A.username, A.event, A.date, A.comment, A.filename, A.path, A.sessionId, A.id, A.reason, A.ip, A.device, A.geolocation, A.userId, A.color, A.keyLabel from FolderHistory A where A.deleted = 0 ");
 		if (request.getParameter("id") != null)
 			query.append(" and A.folderId=" + request.getParameter("id"));
 		query.append(" order by A.date desc ");
 
-		List<Object> records = dao.findByQuery(query.toString(), (Map<String, Object>) null, max != null ? max : 100);
+		List<?> records = dao.findByQuery(query.toString(), (Map<String, Object>) null, max != null ? max : 100);
 
 		/*
 		 * Iterate over records composing the response XML document

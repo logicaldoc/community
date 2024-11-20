@@ -13,7 +13,6 @@ import com.logicaldoc.core.PersistenceException;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
-@SuppressWarnings("unchecked")
 public class HibernateBookmarkDAO extends HibernatePersistentObjectDAO<Bookmark> implements BookmarkDAO {
 
 	private static final String AND = " and ";

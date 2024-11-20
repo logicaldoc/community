@@ -56,8 +56,8 @@ public class ConvertPdf extends HttpServlet {
 		try {
 			Session session = ServletUtil.validateSession(request);
 
-			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			VersionDAO versionDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
+			DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+			VersionDAO versionDao = Context.get().getBean(VersionDAO.class);
 
 			long docId = Long.parseLong(request.getParameter(DOCUMENT_ID));
 			Document document = docDao.findById(docId);

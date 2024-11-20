@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.util.plugin.PluginException;
@@ -24,12 +25,15 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 
 	protected static Logger log = LoggerFactory.getLogger(FulltextSearchTest.class);
 
-	protected SearchEngine engine;
+	protected SearchEngine testSubject;
+	
+	protected DocumentDAO documentDao;
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		engine = (SearchEngine) context.getBean("SearchEngine");
+		testSubject = (SearchEngine) context.getBean("SearchEngine");
+		documentDao = (DocumentDAO) context.getBean("DocumentDAO");
 		try {
 			addHits();
 		} catch (Exception e) {
@@ -78,7 +82,8 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 		fold.setId(Folder.DEFAULTWORKSPACEID);
 		fold.setName("test");
 		document.setFolder(fold);
-		engine.addHit(document, "Questo e un documento di prova. Per fortuna che esistono i test. document");
+		documentDao.initialize(document);
+		testSubject.addHit(document, "Questo e un documento di prova. Per fortuna che esistono i test. document");
 
 		// Adding unexisting document 111
 		document = new Document();
@@ -88,7 +93,8 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 		document.setLanguage("en");
 		document.setDate(new Date());
 		document.setFolder(fold);
-		engine.addHit(document,
+		documentDao.initialize(document);
+		testSubject.addHit(document,
 				"This is another test documents just for test insertion.Solr is an enterprise-ready, Lucene-based search server that supports faceted ... This is useful for retrieving and highlighting the documents contents for display but is not .... hl, When hl=true , highlight snippets in the query response.");
 
 		document = new Document();
@@ -97,7 +103,8 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 		document.setLanguage("en");
 		document.setDate(new Date());
 		document.setFolder(fold);
-		engine.addHit(document, "Another document");
+		documentDao.initialize(document);
+		testSubject.addHit(document, "Another document");
 
 		document = new Document();
 		document.setId(3L);
@@ -105,13 +112,14 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 		document.setLanguage("en");
 		document.setDate(new Date());
 		document.setFolder(fold);
-		engine.addHit(document,
+		documentDao.initialize(document);
+		testSubject.addHit(document,
 				"Lorem ipsum dolor sit amet, consectetur 5568299afbX0 ZKBKCHZZ80A CH8900761016116097873 adipisicing elit");
 	}
 
 	@Test
 	public void testSearch() throws Exception {
-		Assert.assertEquals(4, engine.getCount());
+		Assert.assertEquals(4, testSubject.getCount());
 
 		FulltextSearchOptions opt = new FulltextSearchOptions();
 		opt.setLanguage("en");
@@ -157,7 +165,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 			folderDao.computePath(folderId);
 		}
 
-		Assert.assertEquals(4, engine.getCount());
+		Assert.assertEquals(4, testSubject.getCount());
 
 		// Search in a tree
 		FulltextSearchOptions opt = new FulltextSearchOptions();

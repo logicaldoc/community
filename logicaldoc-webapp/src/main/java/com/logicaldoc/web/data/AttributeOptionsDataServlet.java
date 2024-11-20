@@ -43,7 +43,7 @@ public class AttributeOptionsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
+		AttributeOptionDAO dao = Context.get().getBean(AttributeOptionDAO.class);
 		List<AttributeOption> options = dao.findByAttributeAndCategory(setId, attribute, category);
 
 		if (withempty) {

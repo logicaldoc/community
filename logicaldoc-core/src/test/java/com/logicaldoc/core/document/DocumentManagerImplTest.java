@@ -826,7 +826,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 			testSubject.replaceFile(doc.getId(), "1.3", is, history);
 		}
 
-		Store str = (Store) Context.get().getBean(Store.class);
+		Store str = Context.get().getBean(Store.class);
 
 		doc = docDao.findById(3L);
 		assertNotNull(doc);

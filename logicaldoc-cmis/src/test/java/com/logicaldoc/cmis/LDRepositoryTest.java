@@ -89,15 +89,15 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 		engine = (SearchEngine) context.getBean("SearchEngine");
 
+		fdao = (FolderDAO) context.getBean("FolderDAO");
+
+		ddao = (DocumentDAO) context.getBean("DocumentDAO");
+		
 		try {
 			addHits();
 		} catch (Exception e) {
 			throw new IOException(e.getMessage(), e);
 		}
-
-		fdao = (FolderDAO) context.getBean("FolderDAO");
-
-		ddao = (DocumentDAO) context.getBean("DocumentDAO");
 
 		session = SessionManager.get().newSession("admin", "admin", (Client) null);
 
@@ -124,6 +124,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		fold.setId(5);
 		fold.setName("root");
 		document.setFolder(fold);
+		ddao.initialize(document);
 		engine.addHit(document, "Questo � un documento di prova. Per fortuna che esistono i test. document");
 
 		// Adding unexisting document 111
@@ -134,6 +135,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		document.setLanguage("en");
 		document.setDate(new Date());
 		document.setFolder(fold);
+		ddao.initialize(document);
 		engine.addHit(document,
 				"This is another test documents just for test insertion.Solr is an enterprise-ready, Lucene-based search server that supports faceted ... This is useful for retrieving and highlighting the documents contents for display but is not .... hl, When hl=true , highlight snippets in the query response.");
 
@@ -143,6 +145,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		document.setLanguage("en");
 		document.setDate(new Date());
 		document.setFolder(fold);
+		ddao.initialize(document);
 		engine.addHit(document, "Another document");
 
 		document = new Document();
@@ -151,6 +154,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		document.setLanguage("en");
 		document.setDate(new Date());
 		document.setFolder(fold);
+		ddao.initialize(document);
 		engine.addHit(document,
 				"Lorem ipsum dolor sit amet, consectetur 5568299afbX0 ZKBKCHZZ80A CH8900761016116097873 adipisicing elit");
 
@@ -166,6 +170,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		document.addTag("Google");
 		document.addTag("document");
 		document.addTag("numbered");
+		ddao.initialize(document);
 		engine.addHit(document,
 				"12, 81390264001300, FLEXSPACE NO 1 LLP, T/A FLEXSPACE, UNIT 13 EVANS BUSINESS CENTRE, VINCENT CAREY ROAD, ROTHERWAS INDUSTRIAL ESTATE, HEREFORD, HR2");
 	}

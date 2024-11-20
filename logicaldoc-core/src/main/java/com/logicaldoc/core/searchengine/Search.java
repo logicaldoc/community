@@ -143,7 +143,7 @@ public abstract class Search {
 		internalSearch();
 
 		ContextProperties config = Context.get().getProperties();
-		TenantDAO tdao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		TenantDAO tdao = Context.get().getBean(TenantDAO.class);
 		String extattrs;
 		try {
 			extattrs = config.getProperty(tdao.getTenantName(searchUser.getTenantId()) + ".search.extattr");
@@ -164,7 +164,7 @@ public abstract class Search {
 			// Search for extended attributes, key is docId-name
 			final Map<String, Attribute> extAtt = new HashMap<>();
 
-			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			DocumentDAO ddao = Context.get().getBean(DocumentDAO.class);
 			StringBuilder query = new StringBuilder();
 
 			if (hits.get(0).getType().startsWith("folder")) {
@@ -214,7 +214,7 @@ public abstract class Search {
 		log.info("Search completed in {} ms and found {} hits (estimated {})", execTime, hits.size(),
 				estimatedHitsNumber);
 
-		UserHistoryDAO historyDao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
+		UserHistoryDAO historyDao = Context.get().getBean(UserHistoryDAO.class);
 		UserHistory transaction = options.getTransaction();
 		if (transaction == null)
 			transaction = new UserHistory();
@@ -230,7 +230,7 @@ public abstract class Search {
 	}
 
 	protected Collection<Long> getAccessibleFolderIds() throws SearchException {
-		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO fdao = Context.get().getBean(FolderDAO.class);
 
 		/*
 		 * We have to see what folders the user can access. But we need to
@@ -271,7 +271,7 @@ public abstract class Search {
 		if (searchUser.isAdmin() || hits.isEmpty())
 			return denied;
 
-		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 
 		// Detect those hits outside the accessible folders
 		for (Hit hit : hits)
@@ -315,16 +315,16 @@ public abstract class Search {
 	}
 
 	private void initSearchUser() throws SearchException {
-		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		UserDAO uDao = Context.get().getBean(UserDAO.class);
 		try {
 			searchUser = uDao.findById(options.getUserId());
+			uDao.initialize(searchUser);
 		} catch (PersistenceException e1) {
 			throw new SearchException(e1);
 		}
-		if (searchUser != null) {
-			uDao.initialize(searchUser);
+
+		if (searchUser != null && log.isInfoEnabled())
 			log.info("Search User: {}", searchUser.getUsername());
-		}
 	}
 
 	/**

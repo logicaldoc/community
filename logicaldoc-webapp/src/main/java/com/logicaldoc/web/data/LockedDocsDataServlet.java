@@ -38,7 +38,7 @@ public class LockedDocsDataServlet extends AbstractDataServlet {
 
 		Long userId = request.getParameter("userId") != null ? Long.parseLong(request.getParameter("userId")) : null;
 
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
 		DateFormat df = getDateFormat();
 
 		PrintWriter writer = response.getWriter();
@@ -62,7 +62,6 @@ public class LockedDocsDataServlet extends AbstractDataServlet {
 			query.append(Long.toString(userId));
 		}
 
-		@SuppressWarnings("unchecked")
 		List<Document> records = docDao.query(query.toString(), new RowMapper<Document>() {
 			public Document mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Document doc = new Document();

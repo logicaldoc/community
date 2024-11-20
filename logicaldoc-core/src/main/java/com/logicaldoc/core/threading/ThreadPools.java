@@ -57,7 +57,7 @@ public class ThreadPools {
 	}
 
 	public static ThreadPools get() {
-		return (ThreadPools) Context.get().getBean(ThreadPools.class);
+		return Context.get().getBean(ThreadPools.class);
 	}
 
 	/**

@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -62,8 +61,10 @@ public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch
 
 	/**
 	 * Avoids name duplications for the same user
+	 * 
+	 * @throws PersistenceException Error in the data layer 
 	 */
-	private void setUniqueName(SavedSearch search) {
+	private void setUniqueName(SavedSearch search) throws PersistenceException {
 		String baseName = search.getName();
 
 		/*
@@ -71,22 +72,17 @@ public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch
 		 */
 		final Set<String> names = new HashSet<>();
 
-		StringBuilder query = new StringBuilder(
-				"select lower(ld_name) from ld_search where ld_deleted=0 and ld_userid = :userId and lower(ld_name) like :baseName and not ld_id = :id");
-
 		// Execute the query to populate the sets
-		try {
-			SqlRowSet rs = queryForRowSet(query.toString(), Map.of(USERID, search.getUserId(), "baseName",
-					baseName.toLowerCase() + "%", "id", search.getId()), null);
-			if (rs != null)
-				while (rs.next()) {
-					String file = rs.getString(1);
-					if (!names.contains(file))
-						names.add(file);
-				}
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+		queryForResultSet(
+				"select lower(ld_name) from ld_search where ld_deleted=0 and ld_userid = :userId and lower(ld_name) like :baseName and not ld_id = :id",
+				Map.of(USERID, search.getUserId(), "baseName", baseName.toLowerCase() + "%", "id", search.getId()),
+				null, rs -> {
+					while (rs.next()) {
+						String file = rs.getString(1);
+						if (!names.contains(file))
+							names.add(file);
+					}
+				});
 
 		int counter = 1;
 		while (names.contains(search.getName().toLowerCase()))

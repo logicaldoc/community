@@ -61,7 +61,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	 * @return the instance of ContextProperties in the application context
 	 */
 	public ContextProperties getProperties() {
-		return (ContextProperties) getBean(ContextProperties.class);
+		return getBean(ContextProperties.class);
 	}
 
 	@Override
@@ -108,16 +108,14 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	/**
 	 * Retrieves the list of bean of the same type
 	 * 
-	 * @param clazz class to use as filter
+	 * @param requiredType class to use as filter
 	 * 
 	 * @return the collection of bean instances
 	 */
-	public List<Object> getBeansOfType(@SuppressWarnings("rawtypes")
-	Class clazz) {
-		List<Object> beans = new ArrayList<>();
-		for (String name : applicationContext.getBeanNamesForType(clazz)) {
-			beans.add(getBean(name));
-		}
+	public <R> List<R> getBeansOfType(Class<R> requiredType) {
+		List<R> beans = new ArrayList<>();
+		for (String name : applicationContext.getBeanNamesForType(requiredType))
+			beans.add(requiredType.cast(getBean(name)));
 		return beans;
 	}
 
@@ -126,18 +124,15 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	 * first the fully qualified class name is checked, then if nothing was
 	 * found the simple class name is used as bean id.
 	 * 
-	 * @param clazz The bean identifier as class name
+	 * @param requiredType The bean identifier as class name
 	 * 
 	 * @return The bean instance
 	 */
-	public Object getBean(@SuppressWarnings("rawtypes")
-	Class clazz) {
-		String id = clazz.getName();
-
+	public <R> R getBean(Class<R> requiredType) {
+		String id = requiredType.getName();
 		if (!applicationContext.containsBean(id))
 			id = id.substring(id.lastIndexOf('.') + 1);
-
-		return getBean(id);
+		return requiredType.cast(getBean(id));
 	}
 
 	/**
@@ -165,10 +160,8 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	private static void closeCaches() {
 		CacheManager cm1 = CacheManager.getInstance();
 		cm1.shutdown();
-
-		for (Object cm : Context.get().getBeansOfType(CacheManager.class)) {
-			((CacheManager) cm).shutdown();
-		}
+		for (CacheManager cm : Context.get().getBeansOfType(CacheManager.class))
+			cm.shutdown();
 	}
 
 	/**

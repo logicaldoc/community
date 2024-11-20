@@ -55,7 +55,7 @@ public class EnvironmentDataServlet extends AbstractDataServlet {
 			writer.print(ENTRY_CLOSE);
 		}
 
-		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 		Map<String, String> meta = dao.getDatabaseMetadata();
 		for (Map.Entry<String, String> entry : meta.entrySet()) {
 			writer.print(ENTRY_SCOPE_DATABASE_SCOPE);

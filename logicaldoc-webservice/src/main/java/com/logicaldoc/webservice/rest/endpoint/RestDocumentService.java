@@ -942,7 +942,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 		String myPath = "/" + docPath;
 
 		User user = validateSession(sid);
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
 		Document doc = docDao.findByPath(myPath, user.getTenantId());
 
 		if (!type.toLowerCase().endsWith(".png"))

@@ -65,7 +65,7 @@ public class LoginThrottle {
 	 */
 	public static void clearFailures(String username, String ip) {
 		if (Context.get().getProperties().getBoolean(THROTTLE_ENABLED)) {
-			SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
+			SequenceDAO sDao = Context.get().getBean(SequenceDAO.class);
 			if (StringUtils.isNotEmpty(username))
 				try {
 					sDao.delete(LOGINFAIL_USERNAME + username, 0L, Tenant.SYSTEM_ID);
@@ -95,7 +95,7 @@ public class LoginThrottle {
 
 		// Update the failed login counters
 		if (Context.get().getProperties().getBoolean(THROTTLE_ENABLED)) {
-			SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
+			SequenceDAO sDao = Context.get().getBean(SequenceDAO.class);
 			if (StringUtils.isNotEmpty(username))
 				sDao.next(LOGINFAIL_USERNAME + username, 0L, Tenant.SYSTEM_ID);
 			if (StringUtils.isNotEmpty(client.getAddress()))
@@ -105,7 +105,7 @@ public class LoginThrottle {
 		}
 
 		// Record the failed login attempt
-		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		UserDAO uDao = Context.get().getBean(UserDAO.class);
 		try {
 			User user = uDao.findByUsername(username);
 			if (user == null) {
@@ -113,7 +113,7 @@ public class LoginThrottle {
 				user.setUsername(username);
 				user.setName(username);
 			}
-			UserHistoryDAO dao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
+			UserHistoryDAO dao = Context.get().getBean(UserHistoryDAO.class);
 			dao.createUserHistory(user, UserEvent.LOGIN_FAILED.toString(), exception.getMessage(), null, client);
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
@@ -149,7 +149,7 @@ public class LoginThrottle {
 	}
 
 	private static void checkIp(String ip) throws IPBlockedException {
-		SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
+		SequenceDAO sDao = Context.get().getBean(SequenceDAO.class);
 		Calendar cal = Calendar.getInstance();
 
 		ContextProperties config = Context.get().getProperties();
@@ -178,7 +178,7 @@ public class LoginThrottle {
 	}
 
 	private static void checkUsername(String username) throws UsernameBlockedException {
-		SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
+		SequenceDAO sDao = Context.get().getBean(SequenceDAO.class);
 		Calendar cal = Calendar.getInstance();
 
 		ContextProperties config = Context.get().getProperties();
@@ -213,7 +213,7 @@ public class LoginThrottle {
 		if (StringUtils.isEmpty(apikey))
 			return;
 
-		SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
+		SequenceDAO sDao = Context.get().getBean(SequenceDAO.class);
 		Calendar cal = Calendar.getInstance();
 
 		ContextProperties config = Context.get().getProperties();
@@ -244,7 +244,7 @@ public class LoginThrottle {
 	protected static void disableUser(String username) {
 		if (Context.get().getProperties().getBoolean("throttle.username.disableuser", false)) {
 			try {
-				UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+				UserDAO userDao = Context.get().getBean(UserDAO.class);
 				User user = userDao.findByUsername(username);
 				if (user != null && user.getEnabled() == 1) {
 					user.setEnabled(0);
@@ -276,8 +276,7 @@ public class LoginThrottle {
 					dictionary.put("date", date);
 					dictionary.put(Automation.LOCALE, user.getLocale());
 
-					MessageTemplateDAO templateDAO = (MessageTemplateDAO) Context.get()
-							.getBean(MessageTemplateDAO.class);
+					MessageTemplateDAO templateDAO = Context.get().getBean(MessageTemplateDAO.class);
 					MessageTemplate template = templateDAO.findByNameAndLanguage("bfa.alert", user.getLanguage(),
 							Tenant.DEFAULT_ID);
 					if (template == null)
@@ -304,7 +303,7 @@ public class LoginThrottle {
 					recipient.setType(Recipient.TYPE_SYSTEM);
 					message.getRecipients().add(recipient);
 
-					SystemMessageDAO messageDAO = (SystemMessageDAO) Context.get().getBean(SystemMessageDAO.class);
+					SystemMessageDAO messageDAO = Context.get().getBean(SystemMessageDAO.class);
 					messageDAO.store(message);
 
 					/*
@@ -323,7 +322,7 @@ public class LoginThrottle {
 					recipient.setMode(Recipient.MODE_EMAIL_TO);
 					email.getRecipients().add(recipient);
 
-					EMailSender sender = (EMailSender) Context.get().getBean(EMailSender.class);
+					EMailSender sender = Context.get().getBean(EMailSender.class);
 					sender.sendAsync(email);
 				}
 			} catch (PersistenceException | AutomationException e) {
@@ -336,7 +335,7 @@ public class LoginThrottle {
 		List<User> recipients = new ArrayList<>();
 		String setting = Context.get().getProperties().getProperty("throttle.alert.recipients", "");
 		if (StringUtils.isNotEmpty(setting)) {
-			UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
+			UserDAO uDao = Context.get().getBean(UserDAO.class);
 			String[] usernames = setting.split(",");
 			for (String username : usernames) {
 				User user = uDao.findByUsername(username);
@@ -351,7 +350,7 @@ public class LoginThrottle {
 
 	private static void deleteSequence(Sequence seq) {
 		try {
-			SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
+			SequenceDAO sDao = Context.get().getBean(SequenceDAO.class);
 			sDao.delete(seq.getId());
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);

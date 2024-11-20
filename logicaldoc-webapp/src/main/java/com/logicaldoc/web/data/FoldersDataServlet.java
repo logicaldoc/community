@@ -2,6 +2,8 @@ package com.logicaldoc.web.data;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -14,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
@@ -65,8 +66,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 
 		Folder parentFolder = getParentFolder(response, parent, parentFolderId);
 
-		Context context = Context.get();
-		UserDAO udao = (UserDAO) context.getBean(UserDAO.class);
+		UserDAO udao = Context.get().getBean(UserDAO.class);
 		User user = udao.findById(session.getUserId());
 		udao.initialize(user);
 
@@ -95,51 +95,47 @@ public class FoldersDataServlet extends AbstractDataServlet {
 	private void printFolders(PrintWriter writer, Session session, long tenantId, String tenantName, String parent,
 			Folder parentFolder, User user, Long startRecord, Long endRecord) throws PersistenceException {
 		StringBuilder query = prepareQuery(session, tenantName, parentFolder, user);
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		Map<String, Object> params = new HashMap<>();
-		params.put("parentId", parentFolder.getId());
-		params.put("tenantId", tenantId);
-		SqlRowSet rs = folderDao.queryForRowSet(query.toString(), params, null);
+		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+		folderDao.queryForResultSet(query.toString(), Map.of("parentId", parentFolder.getId(), "tenantId", tenantId),
+				null, rows -> {
+					long i = 0;
+					while (rows.next()) {
+						if ((startRecord != null && i < startRecord) || (endRecord != null && i > endRecord)) {
+							i++;
+							continue;
+						}
 
-		if (rs != null) {
-			long i = 0;
-			while (rs.next()) {
-				if ((startRecord != null && i < startRecord) || (endRecord != null && i > endRecord)) {
-					i++;
-					continue;
-				}
+						writer.print("<folder>");
+						writer.print("<id>" + parent + "-" + rows.getLong(1) + "</id>");
+						writer.print("<folderId>" + rows.getLong(1) + "</folderId>");
+						writer.print("<parentId>" + rows.getLong(2) + "</parentId>");
+						writer.print("<parent>" + parent + "</parent>");
+						writer.print("<name><![CDATA[" + rows.getString(3) + "]]></name>");
+						writer.print("<type>" + rows.getInt(4) + "</type>");
+						printFoldRef(writer, rows);
+						printCustomIcon(writer, rows);
+						writer.print("<status>0</status>");
+						writer.print("<publishedStatus>yes</publishedStatus>");
+						printColor(writer, rows);
+						writer.print("<position>" + rows.getInt(7) + "</position>");
+						writer.print("</folder>");
 
-				writer.print("<folder>");
-				writer.print("<id>" + parent + "-" + rs.getLong(1) + "</id>");
-				writer.print("<folderId>" + rs.getLong(1) + "</folderId>");
-				writer.print("<parentId>" + rs.getLong(2) + "</parentId>");
-				writer.print("<parent>" + parent + "</parent>");
-				writer.print("<name><![CDATA[" + rs.getString(3) + "]]></name>");
-				writer.print("<type>" + rs.getInt(4) + "</type>");
-				printFoldRef(writer, rs);
-				printCustomIcon(writer, rs);
-				writer.print("<status>0</status>");
-				writer.print("<publishedStatus>yes</publishedStatus>");
-				printColor(writer, rs);
-				writer.print("<position>" + rs.getInt(7) + "</position>");
-				writer.print("</folder>");
-
-				i++;
-			}
-		}
+						i++;
+					}
+				});
 	}
 
-	private void printColor(PrintWriter writer, SqlRowSet rs) {
+	private void printColor(PrintWriter writer, ResultSet rs) throws SQLException {
 		if (StringUtils.isNotEmpty(rs.getString(6)))
 			writer.print("<color><![CDATA[" + rs.getString(6) + "]]></color>");
 	}
 
-	private void printCustomIcon(PrintWriter writer, SqlRowSet rs) {
+	private void printCustomIcon(PrintWriter writer, ResultSet rs) throws SQLException {
 		writer.print(
 				"<customIcon>" + (rs.getInt(4) == Folder.TYPE_ALIAS ? "folder_alias" : "folder") + "</customIcon>");
 	}
 
-	private void printFoldRef(PrintWriter writer, SqlRowSet rs) {
+	private void printFoldRef(PrintWriter writer, ResultSet rs) throws SQLException {
 		if (rs.getObject(5) != null)
 			writer.print("<foldRef>" + rs.getLong(5) + "</foldRef>");
 	}
@@ -156,16 +152,17 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		query.append(" order by ld_filename");
 
 		if (parentFolder != null) {
-			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
 			Map<String, Object> params = new HashMap<>();
 			params.put("parentId", parentFolder.getId());
-			SqlRowSet rs = folderDao.queryForRowSet(query.toString(), params, null);
-			if (rs != null)
-				printFoldersWithDocs(writer, rs, parent, parentFolder.getId());
+
+			folderDao.queryForResultSet(query.toString(), params, null,
+					rows -> printFoldersWithDocs(writer, rows, parent, parentFolder.getId()));
 		}
 	}
 
-	private void printFoldersWithDocs(PrintWriter writer, SqlRowSet rs, String parent, long parentId) {
+	private void printFoldersWithDocs(PrintWriter writer, ResultSet rs, String parent, long parentId)
+			throws SQLException {
 		while (rs.next()) {
 			Date now = new Date();
 			boolean published = (rs.getInt(4) == 1) && (rs.getDate(5) == null || now.after(rs.getDate(5)))
@@ -207,7 +204,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 
 	private void addReadConditions(StringBuilder query, Session session, Folder parentFolder)
 			throws PersistenceException {
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
 		Collection<Long> accessibleIds = folderDao.findFolderIdByUserId(session.getUserId(), parentFolder.getId(),
 				false);
 		if (!accessibleIds.isEmpty()) {
@@ -275,7 +272,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 
 	private Folder getParentFolder(HttpServletResponse response, String parent, long parentFolderId)
 			throws PersistenceException {
-		FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO fDao = Context.get().getBean(FolderDAO.class);
 		Folder parentFolder = fDao.findFolder(parentFolderId);
 		if (parentFolder == null) {
 			String message = String.format("No folder found with ID=%d parent %s", parentFolderId, parent);
@@ -299,7 +296,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 	}
 
 	private String getParent(HttpServletRequest request, long tenantId) throws PersistenceException, IOException {
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
 		String parent = "" + Folder.ROOTID;
 
 		if (request.getParameter(PARENT) != null) {

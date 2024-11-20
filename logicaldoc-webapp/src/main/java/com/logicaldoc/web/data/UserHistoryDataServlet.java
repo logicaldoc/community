@@ -31,14 +31,14 @@ import com.logicaldoc.util.Context;
 public class UserHistoryDataServlet extends AbstractDataServlet {
 
 	private static final String TENANT_ID = "tenantId";
-	
+
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		MenuDAO mDao = (MenuDAO) Context.get().getBean(MenuDAO.class);
+		MenuDAO mDao = Context.get().getBean(MenuDAO.class);
 		boolean showSid = mDao.isReadEnable(Menu.SESSIONS, session.getUserId());
 
 		Long userId = StringUtils.isNotEmpty(request.getParameter("id")) ? Long.parseLong(request.getParameter("id"))
@@ -49,7 +49,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 		String comment = request.getParameter("comment");
 		String event = request.getParameter("event");
 
-		List<Object> records = executeQuery(max, tenantId, userId, event, comment);
+		List<?> records = executeQuery(max, tenantId, userId, event, comment);
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
@@ -89,7 +89,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 		writer.print("</history>");
 	}
 
-	private List<Object> executeQuery(Integer max, Long tenantId, Long userId, String event, String comment)
+	private List<?> executeQuery(Integer max, Long tenantId, Long userId, String event, String comment)
 			throws PersistenceException {
 		Map<String, Object> params = new HashMap<>();
 
@@ -114,7 +114,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 
 		query.append(" order by A.date desc ");
 
-		UserHistoryDAO dao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-		return dao.findByQuery(query.toString(), params, max != null ? max : 100);
+		return Context.get().getBean(UserHistoryDAO.class).findByQuery(query.toString(), params,
+				max != null ? max : 100);
 	}
 }

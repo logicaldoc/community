@@ -507,7 +507,7 @@ public class User extends PersistentObject implements Serializable {
 		// The special group was not found in the belonging groups, this may
 		// indicate a lost association between this user and his group
 		log.warn("User {} has lost association with his group", username);
-		GroupDAO dao = (GroupDAO) Context.get().getBean(GroupDAO.class);
+		GroupDAO dao = Context.get().getBean(GroupDAO.class);
 		Group group = dao.findByName(getUserGroupName(), getTenantId());
 		if (group == null)
 			log.warn("User {} doesn't have his user group {}", username, getUserGroupName());

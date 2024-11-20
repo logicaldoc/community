@@ -55,8 +55,8 @@ public class LongRunningOperationCompleteListener implements ThreadCompleteListe
 
 	@Override
 	public void completed(NotifyingThread thread) {
-		SystemMessageDAO smdao = (SystemMessageDAO) Context.get().getBean(SystemMessageDAO.class);
-		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		SystemMessageDAO smdao = Context.get().getBean(SystemMessageDAO.class);
+		UserDAO uDao = Context.get().getBean(UserDAO.class);
 		Date now = new Date();
 
 		for (String username : usernames) {

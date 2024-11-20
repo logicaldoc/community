@@ -11,7 +11,6 @@ import javax.annotation.Resource;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -196,15 +195,17 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 
 			// Manually initialize the collegtion of ACEs
 			template.getAccessControlList().clear();
-			SqlRowSet aclSet = queryForRowSet(
+
+			queryForResultSet(
 					"select ld_groupid,ld_write,ld_read from ld_template_acl where ld_templateid=" + template.getId(),
-					null);
-			while (aclSet.next()) {
-				AccessControlEntry ace = new AccessControlEntry(aclSet.getLong(1));
-				ace.setWrite(aclSet.getInt(2));
-				ace.setRead(aclSet.getInt(3));
-				template.addAccessControlEntry(ace);
-			}
+					null, null, rows -> {
+						while (rows.next()) {
+							AccessControlEntry ace = new AccessControlEntry(rows.getLong(1));
+							ace.setWrite(rows.getInt(2));
+							ace.setRead(rows.getInt(3));
+							template.addAccessControlEntry(ace);
+						}
+					});
 
 			log.trace("Initialized {} aces", template.getAccessControlList().size());
 		} catch (Exception e) {
@@ -266,12 +267,13 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			query.append(Long.toString(userId));
 			query.append(")");
 
-			SqlRowSet rows = queryForRowSet(query.toString(), null);
-			while (rows.next()) {
-				permissions.add(Permission.READ);
-				if (rows.getInt("LDWRITE") == 1)
-					permissions.add(Permission.WRITE);
-			}
+			queryForResultSet(query.toString(), null, null, rows -> {
+				while (rows.next()) {
+					permissions.add(Permission.READ);
+					if (rows.getInt("LDWRITE") == 1)
+						permissions.add(Permission.WRITE);
+				}
+			});
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}

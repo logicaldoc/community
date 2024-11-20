@@ -68,7 +68,7 @@ public class ZipExport {
 	 * @throws PersistenceException error at database level
 	 */
 	public ByteArrayOutputStream process(FolderHistory transaction, boolean pdfConversion) throws PersistenceException {
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
 		Folder folder = folderDao.findFolder(transaction.getFolderId());
 		this.userId = transaction.getUserId();
 		this.startFolderId = folder.getId();
@@ -130,8 +130,8 @@ public class ZipExport {
 	 */
 	public void process(Long[] docIds, OutputStream out, boolean pdfConversion, DocumentHistory transaction)
 			throws PersistenceException {
-		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		DocumentDAO ddao = Context.get().getBean(DocumentDAO.class);
+		FolderDAO fdao = Context.get().getBean(FolderDAO.class);
 
 		zos = new ZipArchiveOutputStream(out);
 		zos.setEncoding("UTF-8");
@@ -176,7 +176,7 @@ public class ZipExport {
 	}
 
 	private void saveHistory(DocumentHistory transaction, Document doc) {
-		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO ddao = Context.get().getBean(DocumentDAO.class);
 		if (transaction != null) {
 			DocumentHistory t = new DocumentHistory(transaction);
 			transaction.setEvent(DocumentEvent.DOWNLOADED.toString());
@@ -212,7 +212,7 @@ public class ZipExport {
 			throws PersistenceException {
 		if (allLevel || depth < 1) {
 			addFolderDocuments(folder, pdfConversion, sid);
-			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
 			Collection<Folder> children = folderDao.findByUserId(userId, folder.getId());
 			Iterator<Folder> iter = children.iterator();
 
@@ -231,7 +231,7 @@ public class ZipExport {
 	 * @throws PersistenceException error in the databaes
 	 */
 	protected void addFolderDocuments(Folder folder, boolean pdfConversion, String sid) throws PersistenceException {
-		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO ddao = Context.get().getBean(DocumentDAO.class);
 		Collection<Document> docs = ddao.findByFolder(folder.getId(), null);
 
 		for (Document document : docs) {
@@ -274,12 +274,11 @@ public class ZipExport {
 	 * @param pdfConversion if the PDF conversion has to be used instead
 	 */
 	private void addDocument(String path, Document document, boolean pdfConversion) {
-		Store store = (Store) Context.get().getBean(Store.class);
+		Store store = Context.get().getBean(Store.class);
 		String resource = store.getResourceName(document, null, null);
 
 		if (pdfConversion && !"pdf".equals(FileUtil.getExtension(document.getFileName().toLowerCase()))) {
-			FormatConverterManager manager = (FormatConverterManager) Context.get()
-					.getBean(FormatConverterManager.class);
+			FormatConverterManager manager = Context.get().getBean(FormatConverterManager.class);
 			try {
 				manager.convertToPdf(document, null);
 			} catch (IOException e) {
@@ -323,7 +322,7 @@ public class ZipExport {
 	 * @throws PersistenceException Error in the database
 	 */
 	private String getZipEntryPath(Folder folder) throws PersistenceException {
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
 
 		long rootId = folderDao.findRoot(folder.getTenantId()).getId();
 		if (folder.getId() == rootId)

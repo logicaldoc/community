@@ -177,7 +177,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		testSubject.destroyDocuments(List.of(1L));
 		assertEquals(0L, docDao.queryForLong("select count(ld_id) from ld_document where ld_id=1"));
 	}
-	
+
 	@Test
 	public void testApplyParentFolderSecurity() throws ServerException, PersistenceException {
 		assertEquals(0L, docDao.queryForLong("select count(*) from ld_document_acl where ld_docid=1"));
@@ -185,7 +185,6 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertEquals(4L, docDao.queryForLong("select count(*) from ld_document_acl where ld_docid=1"));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testDeleteFromTrash() throws ServerException, PersistenceException {
 		testSubject.delete(List.of(7L));
@@ -200,7 +199,6 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertEquals(1, docIds.size());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testEmptyTrash() throws ServerException, PersistenceException {
 		testSubject.delete(List.of(7L));

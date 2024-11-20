@@ -54,7 +54,7 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 		User user = new User();
 		user.setUsername(ADMIN);
 
-		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		UserDAO uDao = Context.get().getBean(UserDAO.class);
 
 		/**
 		 * The standard authentication has failed, now check the database

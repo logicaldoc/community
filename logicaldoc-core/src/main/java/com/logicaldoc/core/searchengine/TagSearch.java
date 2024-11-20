@@ -31,7 +31,7 @@ public class TagSearch extends Search {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void internalSearch() throws SearchException {
-		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 		try {
 			String query = prepareQuery();
 			hits.addAll(dao.query(query, new HitMapper(), options.getMaxHits()));
@@ -134,7 +134,7 @@ public class TagSearch extends Search {
 					" and A.ld_docref is not null and REF.ld_deleted=0 and A.ld_docref = REF.ld_id and A.ld_docref in ");
 		else
 			query.append(" and A.ld_docref is null and A.ld_id in ");
-		DocumentDAO docDAO = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO docDAO = Context.get().getBean(DocumentDAO.class);
 		List<Long> precoll = docDAO.findDocIdByUserIdAndTag(options.getUserId(), options.getExpression());
 		String buf = precoll.toString().replace("[", "(").replace("]", ")");
 		query.append(!"()".equals(buf) ? buf : "(0)");

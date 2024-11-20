@@ -92,7 +92,7 @@ public class WebserviceChartServlet extends HttpServlet {
 			 * Retrieve the sequences and order them by date
 			 */
 			DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-			SequenceDAO dao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
+			SequenceDAO dao = Context.get().getBean(SequenceDAO.class);
 
 			DateFormat dfName = new SimpleDateFormat("MMM yyyy", locale);
 			DateFormat dfNumber = new SimpleDateFormat("yyyyMM");

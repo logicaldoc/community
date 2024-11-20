@@ -18,7 +18,6 @@ import javax.annotation.Resource;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -138,7 +137,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (StringUtils.isEmpty(password))
 			return;
 
-		TenantDAO tenantDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		TenantDAO tenantDAO = Context.get().getBean(TenantDAO.class);
 		String tenant = tenantDAO.getTenantName(user.getTenantId());
 
 		Map<String, String> messages = I18N.getMessages(user.getLocale() != null ? user.getLocale() : Locale.ENGLISH);
@@ -300,7 +299,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	 * @throws PersistenceException Error in the database
 	 */
 	private void enforceUserGroupAssignment(User user) throws PersistenceException {
-		GroupDAO groupDAO = (GroupDAO) Context.get().getBean(GroupDAO.class);
+		GroupDAO groupDAO = Context.get().getBean(GroupDAO.class);
 		String userGroupName = user.getUserGroupName();
 		Group grp = groupDAO.findByName(userGroupName, user.getTenantId());
 		if (grp == null) {
@@ -346,7 +345,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	 */
 	private void enforceReadOnlyUserGroups(User user) throws PersistenceException {
 		if (user.isReadonly()) {
-			GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
+			GroupDAO gDao = Context.get().getBean(GroupDAO.class);
 			Group guestGroup = gDao.findByName("guest", user.getTenantId());
 			Group userGroup = user.getUserGroup();
 			user.removeGroupMemberships(null);
@@ -367,7 +366,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (user.isReadonly()) {
 			user = findById(user.getId());
 			initialize(user);
-			GroupDAO groupDAO = (GroupDAO) Context.get().getBean(GroupDAO.class);
+			GroupDAO groupDAO = Context.get().getBean(GroupDAO.class);
 			for (Group group : user.getGroups())
 				groupDAO.fixGuestPermissions(group);
 		}
@@ -561,7 +560,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (user.getPasswordExpired() == 1)
 			return true;
 
-		String tenantName = ((TenantDAO) Context.get().getBean(TenantDAO.class)).getTenantName(user.getTenantId());
+		String tenantName = (Context.get().getBean(TenantDAO.class)).getTenantName(user.getTenantId());
 		int passwordTtl = config.getInt(tenantName + ".password.ttl", 90);
 		if (passwordTtl <= 0)
 			return false;
@@ -611,7 +610,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (user.getEnabled() == 0)
 			return true;
 
-		String tenantName = ((TenantDAO) Context.get().getBean(TenantDAO.class)).getTenantName(user.getTenantId());
+		String tenantName = (Context.get().getBean(TenantDAO.class)).getTenantName(user.getTenantId());
 		int maxInactiveDays = config.getInt(tenantName + ".security.user.maxinactivity", -1);
 		if (user.getMaxInactivity() != null)
 			maxInactiveDays = user.getMaxInactivity();
@@ -627,7 +626,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 						+ user.getId());
 		sb.append(" UNION select max(ld_date) from ld_folder_history where ld_deleted=0 and ld_userid=" + user.getId()
 				+ " order by 1 desc");
-		@SuppressWarnings("unchecked")
+
 		List<Date> interactions = queryForList(sb.toString(), Date.class);
 		Date lastInteraction = null;
 		if (!interactions.isEmpty())
@@ -702,12 +701,12 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 		// Delete the user's group
 		if (userGroup != null) {
-			GroupDAO groupDAO = (GroupDAO) Context.get().getBean(GroupDAO.class);
+			GroupDAO groupDAO = Context.get().getBean(GroupDAO.class);
 			groupDAO.delete(userGroup.getId());
 		}
 
 		jdbcUpdate("delete from ld_usergroup where ld_userid=" + userId);
-		
+
 		jdbcUpdate("delete from ld_apikey where ld_userid=" + userId);
 
 		saveUserHistory(user, transaction);
@@ -723,7 +722,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	private int getPasswordEnforce(User user) throws PersistenceException {
-		TenantDAO tenantDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		TenantDAO tenantDAO = Context.get().getBean(TenantDAO.class);
 		String tenant = tenantDAO.getTenantName(user.getTenantId());
 		return config.getInt(tenant + ".password.enforcehistory", 10);
 	}
@@ -744,10 +743,9 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		return userListenerManager;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void initialize(User user) {
-		if (user == null)
+	public void initialize(User user) throws PersistenceException {
+		if (user == null || user.getId() == 0L)
 			return;
 
 		refresh(user);
@@ -765,7 +763,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		user.getGroups().clear();
 		user.getUserGroups().clear();
 		if (!groupIds.isEmpty()) {
-			GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
+			GroupDAO gDao = Context.get().getBean(GroupDAO.class);
 			try {
 				List<Group> groups = gDao.findByWhere(
 						ENTITY + ".id in (" + StringUtil.arrayToString(groupIds.toArray(new Long[0]), ",") + ")", null,
@@ -782,22 +780,19 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		// Manually initialize the collegtion of working times
 		user.getWorkingTimes().clear();
 
-		try {
-			SqlRowSet timeSet = queryForRowSet(
-					"select ld_dayofweek,ld_hourstart,ld_minutestart,ld_hourend,ld_minuteend,ld_label,ld_description from ld_workingtime where ld_userid="
-							+ user.getId(),
-					null);
-			while (timeSet.next()) {
-				WorkingTime wt = new WorkingTime(timeSet.getInt(1), timeSet.getInt(2), timeSet.getInt(3));
-				wt.setHourEnd(timeSet.getInt(4));
-				wt.setMinuteEnd(timeSet.getInt(5));
-				wt.setLabel(timeSet.getString(6));
-				wt.setDescription(timeSet.getString(7));
-				user.getWorkingTimes().add(wt);
-			}
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+		queryForResultSet(
+				"select ld_dayofweek,ld_hourstart,ld_minutestart,ld_hourend,ld_minuteend,ld_label,ld_description from ld_workingtime where ld_userid="
+						+ user.getId(),
+				null, null, rows -> {
+					while (rows.next()) {
+						WorkingTime wt = new WorkingTime(rows.getInt(1), rows.getInt(2), rows.getInt(3));
+						wt.setHourEnd(rows.getInt(4));
+						wt.setMinuteEnd(rows.getInt(5));
+						wt.setLabel(rows.getString(6));
+						wt.setDescription(rows.getString(7));
+						user.getWorkingTimes().add(wt);
+					}
+				});
 	}
 
 	@Override
@@ -822,7 +817,6 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			return findByUsername(ADMIN + StringUtils.capitalize(tenantName));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Set<User> findByGroup(long groupId) throws PersistenceException {
 		List<Long> docIds = new ArrayList<>();

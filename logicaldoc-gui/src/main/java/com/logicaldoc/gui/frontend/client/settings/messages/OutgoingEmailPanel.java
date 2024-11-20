@@ -214,7 +214,6 @@ public class OutgoingEmailPanel extends AdminPanel {
 
 			@SuppressWarnings("unchecked")
 			Map<String, Object> values = vm.getValues();
-
 			OutgoingEmailPanel.this.emailSettings.setProtocol((String) values.get(PROTOCOL));
 			OutgoingEmailPanel.this.emailSettings.setServer((String) values.get("server"));
 			if (values.get("port") instanceof Integer)

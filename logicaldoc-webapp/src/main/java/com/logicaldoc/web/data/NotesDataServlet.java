@@ -2,10 +2,10 @@ package com.logicaldoc.web.data;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
@@ -52,19 +51,6 @@ public class NotesDataServlet extends AbstractDataServlet {
 
 		Long page = getPage(request);
 
-		SqlRowSet set = executeQuery(userId, docId, fileVersion, page);
-
-		PrintWriter writer = response.getWriter();
-		writer.write("<list>");
-
-		while (set.next()) {
-			printPost(writer, set);
-		}
-
-		writer.write("</list>");
-	}
-
-	private SqlRowSet executeQuery(Long userId, Long docId, String fileVersion, Long page) throws PersistenceException {
 		StringBuilder query = new StringBuilder(
 				"select A.ld_id,A.ld_message,A.ld_username,A.ld_date,A.ld_docid,B.ld_filename,A.ld_userid,A.ld_page,A.ld_color,A.ld_fileversion from ld_note A, ld_document B where A.ld_deleted=0 and B.ld_deleted=0 and A.ld_docid=B.ld_id ");
 		if (userId != null)
@@ -75,26 +61,31 @@ public class NotesDataServlet extends AbstractDataServlet {
 			query.append(" and A.ld_page =" + page);
 
 		if (docId != null && fileVersion == null) {
-			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			DocumentDAO ddao = Context.get().getBean(DocumentDAO.class);
 			Document doc = ddao.findDocument(docId);
 			fileVersion = doc.getFileVersion();
 		}
 
-		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
-		SqlRowSet set = null;
+		Map<String, Object> params = null;
 		if (docId != null && StringUtils.isNotEmpty(fileVersion)) {
-			query.append(" and A.ld_fileversion = :fileVersion order by A.ld_date desc, A.ld_page asc ");
-			Map<String, Object> params = new HashMap<>();
-			params.put(FILE_VERSION, fileVersion);
-			set = dao.queryForRowSet(query.toString(), params, 200);
-		} else {
-			query.append(" order by A.ld_date desc, A.ld_page asc ");
-			set = dao.queryForRowSet(query.toString(), 200);
+			query.append(" and A.ld_fileversion = :fileVersion ");
+			params = Map.of(FILE_VERSION, fileVersion);
 		}
-		return set;
+		query.append(" order by A.ld_date desc, A.ld_page asc ");
+
+		PrintWriter writer = response.getWriter();
+		writer.write("<list>");
+
+		DocumentNoteDAO dao = Context.get().getBean(DocumentNoteDAO.class);
+		dao.queryForResultSet(query.toString(), params, 200, rows -> {
+			while (rows.next())
+				printPost(writer, rows);
+		});
+
+		writer.write("</list>");
 	}
 
-	private void printPost(PrintWriter writer, SqlRowSet set) {
+	private void printPost(PrintWriter writer, ResultSet set) throws SQLException {
 		DateFormat df = getDateFormat();
 
 		writer.print("<post>");
@@ -145,7 +136,7 @@ public class NotesDataServlet extends AbstractDataServlet {
 		Long docId = null;
 		if (request.getParameter("docId") != null) {
 			docId = Long.parseLong(request.getParameter("docId"));
-			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			DocumentDAO ddao = Context.get().getBean(DocumentDAO.class);
 			Document doc = ddao.findDocument(docId);
 			if (doc != null)
 				docId = doc.getId();

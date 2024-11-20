@@ -20,7 +20,6 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.1
  */
-@SuppressWarnings("unchecked")
 public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<AttributeOption>
 		implements AttributeOptionDAO {
 
@@ -53,7 +52,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 				Map<String, Object> params = new HashMap<>();
 				params.put(SET_ID, Long.valueOf(setId));
 
-				coll = findByQuery(
+				coll = findByObjectQuery(
 						"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = :setId order by _opt.position asc",
 						params, null);
 			} else {
@@ -61,7 +60,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 				params.put(SET_ID, Long.valueOf(setId));
 				params.put("category", category);
 
-				coll = findByQuery(
+				coll = findByObjectQuery(
 						"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = :setId and _opt.category = :category order by _opt.position asc",
 						params, null);
 			}
@@ -71,7 +70,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 				params.put(SET_ID, Long.valueOf(setId));
 				params.put("attribute", attribute);
 
-				coll = findByQuery(
+				coll = findByObjectQuery(
 						"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = :setId and _opt.attribute = :attribute order by _opt.position asc",
 						params, null);
 			} else {
@@ -80,7 +79,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 				params.put("category", category);
 				params.put("attribute", attribute);
 
-				coll = findByQuery(
+				coll = findByObjectQuery(
 						"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = :setId and _opt.attribute = :attribute and _opt.category = :category order by _opt.position asc",
 						params, null);
 			}
@@ -132,7 +131,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 
 		List<AttributeOption> options = findByQuery(
 				"from AttributeOption _opt where _opt.setId = :setId and _opt.attribute not in " + buf.toString(),
-				params, null);
+				params, AttributeOption.class, null);
 
 		for (AttributeOption option : options)
 			del(option, PersistentObject.DELETED_CODE_DEFAULT);

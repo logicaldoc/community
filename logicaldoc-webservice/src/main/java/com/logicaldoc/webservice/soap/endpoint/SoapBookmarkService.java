@@ -66,7 +66,7 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 	}
 
 	private WSBookmark storeBookmark(WSBookmark bookmark, User user) throws PersistenceException {
-		BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
+		BookmarkDAO bDao = Context.get().getBean(BookmarkDAO.class);
 
 		Bookmark bmark = null;
 		if (bookmark.getType() == Bookmark.TYPE_DOCUMENT)
@@ -97,7 +97,7 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 
 		WSDocument doc = checkDocumentAvailable(sid, docId);
 
-		BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
+		BookmarkDAO bDao = Context.get().getBean(BookmarkDAO.class);
 		Bookmark bmark = bDao.findByUserIdAndDocId(user.getId(), docId);
 		if (bmark == null) {
 			bmark = new Bookmark();
@@ -120,7 +120,7 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 
 		WSFolder folder = checkFolderAvailable(sid, folderId);
 
-		BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
+		BookmarkDAO bDao = Context.get().getBean(BookmarkDAO.class);
 		Bookmark bmark = bDao.findByUserIdAndDocId(user.getId(), folderId);
 		if (bmark == null) {
 			bmark = new Bookmark();
@@ -139,7 +139,7 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 	public List<WSBookmark> getBookmarks(String sid)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
-		BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
+		BookmarkDAO bDao = Context.get().getBean(BookmarkDAO.class);
 		List<Bookmark> list = bDao.findByUserId(user.getId());
 		List<WSBookmark> wsBookmarks = new ArrayList<>();
 		for (Bookmark bookmark : list)
@@ -151,7 +151,7 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 	public void deleteBookmark(String sid, long bookmarkId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
-		BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
+		BookmarkDAO bDao = Context.get().getBean(BookmarkDAO.class);
 		Bookmark bookmark = bDao.findById(bookmarkId);
 		if (bookmark == null || bookmark.getUserId() != user.getId())
 			throw new WebserviceException("Bookmark " + bookmarkId + " not found or not accessible");
@@ -162,7 +162,7 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 	public void unbookmarkDocument(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
-		BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
+		BookmarkDAO bDao = Context.get().getBean(BookmarkDAO.class);
 		Bookmark bookmark = bDao.findByUserIdAndDocId(user.getId(), docId);
 		if (bookmark != null)
 			deleteBookmark(sid, bookmark.getId());
@@ -172,7 +172,7 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 	public void unbookmarkFolder(String sid, long folderId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
-		BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
+		BookmarkDAO bDao = Context.get().getBean(BookmarkDAO.class);
 		Bookmark bookmark = bDao.findByUserIdAndFolderId(user.getId(), folderId);
 		if (bookmark != null)
 			deleteBookmark(sid, bookmark.getId());

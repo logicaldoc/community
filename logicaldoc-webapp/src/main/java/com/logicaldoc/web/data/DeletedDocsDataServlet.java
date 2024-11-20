@@ -46,7 +46,7 @@ public class DeletedDocsDataServlet extends AbstractDataServlet {
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
 
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
 		DateFormat df = getDateFormat();
 
 		PrintWriter writer = response.getWriter();
@@ -78,7 +78,6 @@ public class DeletedDocsDataServlet extends AbstractDataServlet {
 		if (log.isErrorEnabled())
 			log.error(query.toString());
 
-		@SuppressWarnings("unchecked")
 		List<Document> records = docDao.query(query.toString(), new RowMapper<Document>() {
 			public Document mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Document doc = new Document();

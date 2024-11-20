@@ -111,7 +111,7 @@ public class EventEndpoint implements EventListener {
 	@OnOpen
 	public void onOpen(final Session session) {
 		if (!registered) {
-			EventCollector eventCollector = (EventCollector) Context.get().getBean(EventCollector.class);
+			EventCollector eventCollector = Context.get().getBean(EventCollector.class);
 			eventCollector.addListener(this);
 			registered = true;
 		}
@@ -142,7 +142,7 @@ public class EventEndpoint implements EventListener {
 
 		try {
 			if (event.getTenant() == null) {
-				TenantDAO tenantDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
+				TenantDAO tenantDAO = Context.get().getBean(TenantDAO.class);
 				event.setTenant(tenantDAO.getTenantName(event.getTenantId()));
 			}
 		} catch (PersistenceException e) {
@@ -190,8 +190,8 @@ public class EventEndpoint implements EventListener {
 			message.setFolder(folder);
 
 		GUIDocument document = null;
-		if (event.getDocument() != null) {
-			Document clone = new Document(event.getDocument());
+		if (event.getDocument() != null && event.getDocument() instanceof Document doc) {
+			Document clone = new Document(doc);
 			// Report some attributes skipped by the clone method
 			clone.setCustomId(event.getDocument().getCustomId());
 			clone.setStatus(event.getDocument().getStatus());
@@ -202,7 +202,7 @@ public class EventEndpoint implements EventListener {
 			document = new DocumentServiceImpl().fromDocument(clone, null, null);
 			document.setId(event.getDocId());
 		} else if (event.getDocId() != null) {
-			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
 			Document d = docDao.findById(event.getDocId());
 			if (d != null) {
 				document = new DocumentServiceImpl().fromDocument(d, null, null);

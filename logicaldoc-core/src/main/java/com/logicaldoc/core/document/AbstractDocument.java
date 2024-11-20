@@ -948,7 +948,7 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 	 */
 	private void fixEncryptedPassword(String encryptedPassword) {
 		try {
-			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
 			docDao.jdbcUpdate("update ld_document set ld_password='" + encryptedPassword + "' where ld_id=" + getId());
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage());
@@ -1055,7 +1055,7 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 			log.debug("Got error when trying to copy collections from document {}", docVO, ex);
 
 			// load again the provided doc
-			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
 			try {
 				Document testDocVO = docDao.findById(docVO.getId());
 				if (testDocVO != null) {

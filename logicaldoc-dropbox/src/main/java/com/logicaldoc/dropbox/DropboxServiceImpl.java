@@ -141,8 +141,8 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			if (!targetPath.endsWith("/"))
 				targetPath += "/";
 
-			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+			DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
 
 			// Prepare a fieldsMap docId-path
 			Map<Long, String> documents = new HashMap<>();
@@ -183,8 +183,8 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 	private void uploadDocument(Long docId, String path, Dropbox dropbox, Session session)
 			throws IOException, PersistenceException {
-		Store store = (Store) Context.get().getBean(Store.class);
-		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		Store store = Context.get().getBean(Store.class);
+		DocumentDAO ddao = Context.get().getBean(DocumentDAO.class);
 
 		File temp = null;
 		try {
@@ -205,7 +205,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			history.setSession(session);
 			history.setDocument(doc);
 
-			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			FolderDAO fdao = Context.get().getBean(FolderDAO.class);
 			history.setPath(fdao.computePathExtended(doc.getFolder().getId()));
 			history.setEvent(DocumentEvent.DOWNLOADED.toString());
 
@@ -221,7 +221,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 	private void loadFoldersTree(long parentId, String parentPath, long userId, Map<Long, String> folders)
 			throws PersistenceException {
-		FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO fDao = Context.get().getBean(FolderDAO.class);
 		folders.put(parentId, parentPath);
 		for (Folder folder : fDao.findChildren(parentId, userId)) {
 			if (parentId != folder.getId())
@@ -232,7 +232,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 	@Override
 	public int importDocuments(long targetFolder, List<String> paths) throws ServerException {
 		Session session = DropboxServiceImpl.validateSession(getThreadLocalRequest());
-		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO fdao = Context.get().getBean(FolderDAO.class);
 
 		int count = 0;
 		try {
@@ -270,7 +270,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			importDocument(root, metadata, dbox, session);
 			imported.add(entry.getPathDisplay());
 		} else {
-			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			FolderDAO fdao = Context.get().getBean(FolderDAO.class);
 			String rootPath = entry.getPathDisplay();
 			if (!rootPath.endsWith("/"))
 				rootPath += "/";
@@ -296,8 +296,8 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 	private void importDocument(Folder root, FileMetadata src, Dropbox dbox, Session session)
 			throws IOException, PersistenceException {
-		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+		DocumentDAO ddao = Context.get().getBean(DocumentDAO.class);
+		DocumentManager manager = Context.get().getBean(DocumentManager.class);
 
 		File temp = null;
 		try {
@@ -316,7 +316,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 				history.setFolderId(root.getId());
 				history.setSession(session);
 
-				FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+				FolderDAO fdao = Context.get().getBean(FolderDAO.class);
 				String pathExtended = fdao.computePathExtended(root.getId());
 				history.setPath(pathExtended);
 
@@ -344,7 +344,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 				history.setComment("Imported from Dropbox");
 				history.setSession(session);
 
-				FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+				FolderDAO fdao = Context.get().getBean(FolderDAO.class);
 				history.setPath(fdao.computePathExtended(root.getId()));
 				history.setEvent(DocumentEvent.STORED.toString());
 

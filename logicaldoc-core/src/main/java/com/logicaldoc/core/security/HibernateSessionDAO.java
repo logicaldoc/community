@@ -44,9 +44,12 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 		StringBuilder query = new StringBuilder(" 1=1 ");
 		if (tenantId != null)
 			query.append(" and " + ENTITY + ".tenantId = " + tenantId);
-		if (status != null)
+		if (status != null) {
 			query.append(" and " + ENTITY + ".status = " + status);
-
+			if(status.intValue() == Session.STATUS_OPEN)
+				query.append(" and " + ENTITY + ".finished is null ");	
+		}
+		
 		try {
 			List<Session> sessions = findByWhere(query.toString(), null, null);
 			return sessions.size();

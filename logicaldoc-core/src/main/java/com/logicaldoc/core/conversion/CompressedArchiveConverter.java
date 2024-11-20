@@ -37,8 +37,7 @@ public abstract class CompressedArchiveConverter extends AbstractFormatConverter
 			if ("txt".equals(targetExtension)) {
 				FileUtil.copyFile(tempFile, dest);
 			} else if ("pdf".equals(targetExtension)) {
-				FormatConverterManager manager = (FormatConverterManager) Context.get()
-						.getBean(FormatConverterManager.class);
+				FormatConverterManager manager = Context.get().getBean(FormatConverterManager.class);
 				FormatConverter converter = manager.getConverter("txt", targetExtension);
 
 				if (converter == null)
@@ -67,8 +66,7 @@ public abstract class CompressedArchiveConverter extends AbstractFormatConverter
 		String targetExtension = FileUtil.getExtension(dest.getName()).toLowerCase();
 		try {
 			extractEntry(src, entry, uncompressedEntryFile);
-			FormatConverterManager manager = (FormatConverterManager) Context.get()
-					.getBean(FormatConverterManager.class);
+			FormatConverterManager manager = Context.get().getBean(FormatConverterManager.class);
 			FormatConverter converter = manager.getConverter(entryExtension, targetExtension);
 
 			if (converter == null)

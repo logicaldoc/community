@@ -2,14 +2,14 @@ package com.logicaldoc.web.data;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
@@ -26,7 +26,8 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.Context;
 
 /**
- * This servlet is responsible retrieving the Access Control List for documents, folders, menus and templates
+ * This servlet is responsible retrieving the Access Control List for documents,
+ * folders, menus and templates
  * 
  * @author Matteo Caruso - LogicalDOC
  * @since 6.0
@@ -93,20 +94,22 @@ public class AclDataServlet extends AbstractDataServlet {
 	 * Useful method for retrieving the label for the users
 	 */
 	private Map<Long, String> getUsers(long tenantId) throws PersistenceException {
-		UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
-		SqlRowSet set = dao.queryForRowSet(
+		Map<Long, String> users = new HashMap<>();
+		UserDAO dao = Context.get().getBean(UserDAO.class);
+		dao.queryForResultSet(
 				"select ld_id, ld_username, ld_firstname, ld_name from ld_user where ld_deleted=0 and ld_tenantid="
 						+ tenantId,
-				null);
-		Map<Long, String> users = new HashMap<>();
-		while (set.next())
-			users.put(set.getLong(1), set.getString(3) + " " + set.getString(4) + " (" + set.getString(2) + ")");
+				null, null, rows -> {
+					while (rows.next())
+						users.put(rows.getLong(1),
+								rows.getString(3) + " " + rows.getString(4) + " (" + rows.getString(2) + ")");
+
+				});
 		return users;
 	}
-	
-	private void templateACL(HttpServletResponse response, long templateId)
-			throws IOException, PersistenceException {
-		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+
+	private void templateACL(HttpServletResponse response, long templateId) throws IOException, PersistenceException {
+		TemplateDAO tDao = Context.get().getBean(TemplateDAO.class);
 		Template template = tDao.findById(templateId);
 		tDao.initialize(template);
 
@@ -123,42 +126,41 @@ public class AclDataServlet extends AbstractDataServlet {
 		query.append(AND_B_LD_TENANTID + template.getTenantId());
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id order by B.ld_name asc");
 
-		SqlRowSet set = tDao.queryForRowSet(query.toString(), null);
+		tDao.queryForResultSet(query.toString(), null, null, rows -> {
+			/*
+			 * Iterate over records composing the response XML document
+			 */
+			while (rows.next()) {
+				long groupId = rows.getLong(1);
+				String groupName = rows.getString(2);
+				int groupType = rows.getInt(3);
+				long userId = 0L;
+				if (groupType == Group.TYPE_USER && groupName != null)
+					userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
 
-		/*
-		 * Iterate over records composing the response XML document
-		 */
-		while (set.next()) {
-			long groupId = set.getLong(1);
-			String groupName = set.getString(2);
-			int groupType = set.getInt(3);
-			long userId = 0L;
-			if (groupType == Group.TYPE_USER && groupName != null)
-				userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
+				writer.print(ACE);
+				writer.print(ENTITYID + groupId + ENTITYID_CLOSED);
 
-			writer.print(ACE);
-			writer.print(ENTITYID + groupId + ENTITYID_CLOSED);
+				if (groupType == Group.TYPE_DEFAULT) {
+					writer.print(ENTITY + groupName + ENTITY_CLOSED);
+					writer.print(AVATAR_GROUP_AVATAR);
+				} else {
+					writer.print(ENTITY + users.get(userId) + ENTITY_CLOSED);
+					writer.print(AVATAR + userId + AVATAR_CLOSED);
+				}
+				writer.print("<write>" + (rows.getInt(4) == 1) + "</write>");
+				writer.print(READ + (rows.getInt(5) == 1) + READ_CLOSED);
+				writer.print(TYPE + groupType + TYPE_CLOSED);
+				writer.print(ACE_CLOSED);
 
-			if (groupType == Group.TYPE_DEFAULT) {
-				writer.print(ENTITY + groupName + ENTITY_CLOSED);
-				writer.print(AVATAR_GROUP_AVATAR);
-			} else {
-				writer.print(ENTITY + users.get(userId) + ENTITY_CLOSED);
-				writer.print(AVATAR + userId + AVATAR_CLOSED);
 			}
-			writer.print("<write>" + (set.getInt(4) == 1) + "</write>");
-			writer.print(READ + (set.getInt(5) == 1) + READ_CLOSED);
-			writer.print(TYPE + groupType + TYPE_CLOSED);
-			writer.print(ACE_CLOSED);
-
-		}
+		});
 
 		writer.write(LIST_CLOSED);
 	}
 
-	private void documentACL(HttpServletResponse response, long documentId)
-			throws IOException, PersistenceException {
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+	private void documentACL(HttpServletResponse response, long documentId) throws IOException, PersistenceException {
+		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
 		Document document = docDao.findById(documentId);
 		docDao.initialize(document);
 
@@ -169,8 +171,7 @@ public class AclDataServlet extends AbstractDataServlet {
 		writer.write(LIST);
 
 		// Prepare the query on the ACL in join with groups
-		StringBuilder query = new StringBuilder(
-				        """
+		StringBuilder query = new StringBuilder("""
 						 select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write, 0, A.ld_security, A.ld_immutable, A.ld_delete,
 						        A.ld_rename, 0, 0, A.ld_sign, A.ld_archive, A.ld_workflow, A.ld_download,
 						        A.ld_calendar, A.ld_subscription, A.ld_print, A.ld_password, A.ld_move, A.ld_email, A.ld_automation,
@@ -182,19 +183,19 @@ public class AclDataServlet extends AbstractDataServlet {
 		query.append(AND_B_LD_TENANTID + document.getTenantId());
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id order by B.ld_type asc, B.ld_name asc");
 
-		SqlRowSet set = docDao.queryForRowSet(query.toString(), null);
-
-		/*
-		 * Iterate over records composing the response XML document
-		 */
-		while (set.next())
-			printACE(writer, set, users);
+		docDao.queryForResultSet(query.toString(), null, null, rows -> {
+			/*
+			 * Iterate over records composing the response XML document
+			 */
+			while (rows.next())
+				printACE(writer, rows, users);
+		});
 
 		writer.write(LIST_CLOSED);
 	}
 
 	private void folderACL(HttpServletResponse response, long folderId) throws IOException, PersistenceException {
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
 		Folder folder = folderDao.findById(folderId);
 		folderDao.initialize(folder);
 
@@ -211,8 +212,7 @@ public class AclDataServlet extends AbstractDataServlet {
 		writer.write(LIST);
 
 		// Prepare the query on the ACL in join with groups
-		StringBuilder query = new StringBuilder(
-				       """
+		StringBuilder query = new StringBuilder("""
 						select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write, A.ld_add, A.ld_security, A.ld_immutable, A.ld_delete,
 						       A.ld_rename, A.ld_import, A.ld_export, A.ld_sign, A.ld_archive, A.ld_workflow, A.ld_download,
 						       A.ld_calendar, A.ld_subscription, A.ld_print, A.ld_password, A.ld_move, A.ld_email, A.ld_automation,
@@ -224,20 +224,20 @@ public class AclDataServlet extends AbstractDataServlet {
 		query.append(AND_B_LD_TENANTID + ref.getTenantId());
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id order by B.ld_type asc, B.ld_name asc");
 
-		SqlRowSet set = folderDao.queryForRowSet(query.toString(), null);
-
-		/*
-		 * Iterate over records composing the response XML document
-		 */
-		while (set.next())
-			printACE(writer, set, users);
+		folderDao.queryForResultSet(query.toString(), null, null, rows -> {
+			/*
+			 * Iterate over records composing the response XML document
+			 */
+			while (rows.next())
+				printACE(writer, rows, users);
+		});
 
 		writer.write(LIST_CLOSED);
 	}
 
 	private void menuAcl(HttpServletResponse response, long menuId, long tenantId)
 			throws IOException, PersistenceException {
-		MenuDAO menuDao = (MenuDAO) Context.get().getBean(MenuDAO.class);
+		MenuDAO menuDao = Context.get().getBean(MenuDAO.class);
 		Menu menu = menuDao.findById(menuId);
 		menuDao.initialize(menu);
 
@@ -254,39 +254,39 @@ public class AclDataServlet extends AbstractDataServlet {
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id and B.ld_tenantid = " + tenantId);
 		query.append(" order by B.ld_type asc, B.ld_name asc");
 
-		SqlRowSet set = menuDao.queryForRowSet(query.toString(), null);
+		menuDao.queryForResultSet(query.toString(), null, null, rows -> {
+			/*
+			 * Iterate over records composing the response XML document
+			 */
+			while (rows.next()) {
+				long groupId = rows.getLong(1);
+				String groupName = rows.getString(2);
+				int groupType = rows.getInt(3);
+				long userId = 0L;
+				if (groupType == Group.TYPE_USER && groupName != null)
+					userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
 
-		/*
-		 * Iterate over records composing the response XML document
-		 */
-		while (set.next()) {
-			long groupId = set.getLong(1);
-			String groupName = set.getString(2);
-			int groupType = set.getInt(3);
-			long userId = 0L;
-			if (groupType == Group.TYPE_USER && groupName != null)
-				userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
+				writer.print(ACE);
+				writer.print(ENTITYID + groupId + ENTITYID_CLOSED);
 
-			writer.print(ACE);
-			writer.print(ENTITYID + groupId + ENTITYID_CLOSED);
+				if (groupType == Group.TYPE_DEFAULT) {
+					writer.print(ENTITY + groupName + ENTITY_CLOSED);
+					writer.print(AVATAR_GROUP_AVATAR);
+				} else {
+					writer.print(ENTITY + users.get(userId) + ENTITY_CLOSED);
+					writer.print(AVATAR + userId + AVATAR_CLOSED);
+				}
 
-			if (groupType == Group.TYPE_DEFAULT) {
-				writer.print(ENTITY + groupName + ENTITY_CLOSED);
-				writer.print(AVATAR_GROUP_AVATAR);
-			} else {
-				writer.print(ENTITY + users.get(userId) + ENTITY_CLOSED);
-				writer.print(AVATAR + userId + AVATAR_CLOSED);
+				writer.print(READ + intToBoolean(rows.getInt(4)) + READ_CLOSED);
+				writer.print(TYPE + groupType + TYPE_CLOSED);
+				writer.print(ACE_CLOSED);
 			}
-
-			writer.print(READ + intToBoolean(set.getInt(4)) + READ_CLOSED);
-			writer.print(TYPE + groupType + TYPE_CLOSED);
-			writer.print(ACE_CLOSED);
-		}
+		});
 
 		writer.write(LIST_CLOSED);
 	}
 
-	private void printACE(PrintWriter writer, SqlRowSet set, Map<Long, String> users) {
+	private void printACE(PrintWriter writer, ResultSet set, Map<Long, String> users) throws SQLException {
 		long groupId = set.getLong(1);
 		String groupName = set.getString(2);
 		int groupType = set.getInt(3);

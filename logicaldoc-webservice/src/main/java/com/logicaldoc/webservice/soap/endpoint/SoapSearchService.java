@@ -55,7 +55,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 		lastSearch.search();
 		List<Hit> hitsList = lastSearch.getHits();
 
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
 		List<WSDocument> docs = new ArrayList<>();
 		for (Hit hit : hitsList) {
 			Document d = docDao.findById(hit.getId());
@@ -83,7 +83,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
 		List<Document> docs = docDao.findByFileNameAndParentFolderId(null, filename, null, user.getTenantId(), null);
 
 		List<WSDocument> wsDocs = new ArrayList<>();
@@ -107,7 +107,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
 		List<Folder> folders = folderDao.find(name, user.getTenantId());
 		List<WSFolder> wsFolders = new ArrayList<>();
 		for (Folder folder : folders) {

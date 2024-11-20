@@ -166,7 +166,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.finished = new Date();
 
 		// Add a user history entry
-		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
+		UserHistoryDAO userHistoryDAO = Context.get().getBean(UserHistoryDAO.class);
 		userHistoryDAO.createUserHistory(user, UserEvent.TIMEOUT.toString(), null, sid, client);
 	}
 
@@ -178,7 +178,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.finished = new Date();
 
 		// Add a user history entry
-		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
+		UserHistoryDAO userHistoryDAO = Context.get().getBean(UserHistoryDAO.class);
 		userHistoryDAO.createUserHistory(user, UserEvent.LOGOUT.toString(), null, sid, client);
 	}
 
@@ -225,7 +225,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.node = SystemInfo.get().getInstallationId();
 		this.setLastRenew(getCreation());
 
-		TenantDAO tenantDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		TenantDAO tenantDAO = Context.get().getBean(TenantDAO.class);
 		try {
 			this.tenantName = tenantDAO.getTenantName(tenantId);
 		} catch (PersistenceException e) {
@@ -237,12 +237,12 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		/*
 		 * Add / update the device in the DB
 		 */
-		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
+		UserHistoryDAO userHistoryDAO = Context.get().getBean(UserHistoryDAO.class);
 		if (client != null && client.getDevice() != null) {
 			client.getDevice().setUserId(user.getId());
 			client.getDevice().setUsername(user.getFullName());
 
-			DeviceDAO deviceDAO = (DeviceDAO) Context.get().getBean(DeviceDAO.class);
+			DeviceDAO deviceDAO = Context.get().getBean(DeviceDAO.class);
 			Device device = deviceDAO.findByDevice(client.getDevice());
 			if (device == null)
 				device = client.getDevice();
@@ -280,7 +280,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 					recipient.setMode(Recipient.MODE_EMAIL_TO);
 					email.getRecipients().add(recipient);
 
-					EMailSender sender = (EMailSender) Context.get().getBean(EMailSender.class);
+					EMailSender sender = Context.get().getBean(EMailSender.class);
 					sender.sendAsync(email, "newdevice", dictionaryMap);
 				}
 
@@ -323,7 +323,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		}
 
 		// Add a user history entry
-		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
+		UserHistoryDAO userHistoryDAO = Context.get().getBean(UserHistoryDAO.class);
 		UserHistory history = userHistoryDAO.createUserHistory(user, UserEvent.LOGIN.toString(), historyComment, sid,
 				client);
 

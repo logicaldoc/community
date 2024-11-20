@@ -96,8 +96,12 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 		// Check the type
 		if (user.getType() != User.TYPE_DEFAULT && user.getType() != User.TYPE_READONLY)
 			throw new AccountTypeNotAllowedException();
-
-		userDAO.initialize(user);
+		
+		try {
+			userDAO.initialize(user);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 
 		if (user.getEnabled() == 0)
 			throw new AccountDisabledException(this);

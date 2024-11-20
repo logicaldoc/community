@@ -279,10 +279,11 @@ public class ResourceServiceImpl implements ResourceService {
 		User user;
 		try {
 			user = userDAO.findById(userId);
+			userDAO.initialize(user);
 		} catch (PersistenceException e) {
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
 		}
-		userDAO.initialize(user);
+		
 		checkPublished(user, document);
 
 		return marshallDocument(document, session);
@@ -849,10 +850,10 @@ public class ResourceServiceImpl implements ResourceService {
 		User user = null;
 		try {
 			user = userDAO.findById(resource.getRequestedPerson());
+			userDAO.initialize(user);
 		} catch (PersistenceException e1) {
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e1);
 		}
-		userDAO.initialize(user);
 
 		try {
 			checkPublished(user, Long.parseLong(resource.getID()));
@@ -941,7 +942,7 @@ public class ResourceServiceImpl implements ResourceService {
 		try {
 			User user = userDAO.findById(resource.getRequestedPerson());
 
-			BookmarkDAO bdao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
+			BookmarkDAO bdao = Context.get().getBean(BookmarkDAO.class);
 
 			Bookmark bmark = new Bookmark();
 			if (resource.isFolder()) {
@@ -972,7 +973,7 @@ public class ResourceServiceImpl implements ResourceService {
 		try {
 			User user = userDAO.findById(resource.getRequestedPerson());
 
-			BookmarkDAO bdao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
+			BookmarkDAO bdao = Context.get().getBean(BookmarkDAO.class);
 
 			Bookmark bkm = null;
 			if (resource.isFolder()) {

@@ -60,7 +60,7 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 	protected ContextProperties config() {
 		ContextProperties config = null;
 		try {
-			config = (ContextProperties) Context.get().getBean(ContextProperties.class);
+			config = Context.get().getProperties();
 		} catch (Exception t) {
 			try {
 				config = new ContextProperties();

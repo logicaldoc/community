@@ -351,7 +351,7 @@ public class StatsCollector extends Task {
 	private Date findLastLogin() {
 		Date lastLogin = null;
 		try {
-			lastLogin = (Date) documentDAO
+			lastLogin = documentDAO
 					.queryForObject("select max(ld_date) from ld_user_history where ld_deleted=0 and ld_event='"
 							+ UserEvent.LOGIN.toString() + "'", Date.class);
 		} catch (Exception t) {
@@ -363,7 +363,7 @@ public class StatsCollector extends Task {
 	private Date findLastCreation() {
 		Date lastCreation = null;
 		try {
-			lastCreation = (Date) documentDAO
+			lastCreation = documentDAO
 					.queryForObject("select max(ld_date) from ld_history where ld_deleted=0 and ld_event='"
 							+ DocumentEvent.STORED + "'", Date.class);
 		} catch (Exception t) {

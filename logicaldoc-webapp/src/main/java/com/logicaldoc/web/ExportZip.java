@@ -53,7 +53,7 @@ public class ExportZip extends HttpServlet {
 		try {
 			Session session = ServletUtil.validateSession(request);
 
-			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
 
 			String folderId = request.getParameter("folderId");
 			if (folderId != null) {
@@ -117,7 +117,7 @@ public class ExportZip extends HttpServlet {
 	}
 
 	private String getExportName(String folderId) throws PersistenceException {
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
 		String exportName = "export";
 		if (folderId != null) {
 			Folder folder = folderDao.findById(Long.parseLong(folderId));
@@ -130,8 +130,8 @@ public class ExportZip extends HttpServlet {
 	}
 
 	private ArrayList<Long> getDocIds(HttpServletRequest request, Long userId) throws PersistenceException {
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
 
 		ArrayList<Long> docIds = new ArrayList<>();
 		if (request.getParameterValues(DOC_ID) != null && request.getParameterValues(DOC_ID).length > 0) {

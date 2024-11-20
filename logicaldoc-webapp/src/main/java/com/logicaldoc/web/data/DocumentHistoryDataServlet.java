@@ -48,7 +48,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws IOException, PersistenceException {
 
-		MenuDAO mDao = (MenuDAO) Context.get().getBean(MenuDAO.class);
+		MenuDAO mDao = Context.get().getBean(MenuDAO.class);
 		boolean showSid = mDao.isReadEnable(Menu.SESSIONS, session.getUserId());
 
 		PrintWriter writer = response.getWriter();
@@ -57,9 +57,8 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		StringBuilder query = new StringBuilder(
 				"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color, A.fileVersion, A.fileSize, A.keyLabel from DocumentHistory A where A.deleted = 0 ");
 		Map<String, Object> params = prepareQueryParams(request, query);
-
-		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
-		List<Object> records = dao.findByQuery(query.toString(), params, max != null ? max : 100);
+		List<?> records = Context.get().getBean(DocumentHistoryDAO.class).findByQuery(query.toString(), params,
+				max != null ? max : 100);
 
 		// Used only to cache the already encountered documents when the
 		// history
@@ -133,7 +132,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 
 		if (request.getParameter(DOC_ID) != null) {
 			Long docId = Long.parseLong(request.getParameter(DOC_ID));
-			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			DocumentDAO ddao = Context.get().getBean(DocumentDAO.class);
 			Document doc = ddao.findDocument(docId);
 			if (doc != null)
 				docId = doc.getId();

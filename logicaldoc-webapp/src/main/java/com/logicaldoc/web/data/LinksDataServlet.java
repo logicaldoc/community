@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
@@ -46,7 +45,7 @@ public class LinksDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 		StringBuilder query = new StringBuilder(
 				"select A.id, B.folder.id, A.type, A.document1.id, A.document1.fileName, A.document1.type, A.document2.id, A.document2.fileName, A.document2.type, ");
 		query.append(
@@ -59,7 +58,7 @@ public class LinksDataServlet extends AbstractDataServlet {
 			query.append(" and not A.document2.id = " + docId);
 		}
 
-		List<Object> records = dao.findByQuery(query.toString(), (Map<String, Object>) null, null);
+		List<?> records = dao.findByQuery(query.toString(), (Map<String, Object>) null, null);
 
 		/*
 		 * Iterate over records composing the response XML document
@@ -82,7 +81,7 @@ public class LinksDataServlet extends AbstractDataServlet {
 		if (!Context.get().getProperties().getBoolean(tenant + ".gui.showdocattrsaslinks", false))
 			return;
 
-		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 
 		StringBuilder query;
 		query = new StringBuilder(
@@ -101,34 +100,35 @@ public class LinksDataServlet extends AbstractDataServlet {
 			query.append(" and not DOC2.ld_id = " + docId);
 		}
 
-		SqlRowSet rs = dao.queryForRowSet(query.toString(), null);
-		while (rs.next()) {
-			List<Object> cols = new ArrayList<>(Collections.nCopies(13, null));
-			final long docId1 = rs.getLong(1);
-			final long docId2 = rs.getLong(6);
-			final String attributeName = rs.getString(5);
+		dao.queryForResultSet(query.toString(), null, null, rows -> {
+			while (rows.next()) {
+				List<Object> cols = new ArrayList<>(Collections.nCopies(13, null));
+				final long docId1 = rows.getLong(1);
+				final long docId2 = rows.getLong(6);
+				final String attributeName = rows.getString(5);
 
-			cols.set(0, -docId1);
-			cols.set(1, rs.getLong(2));
-			cols.set(2, StringUtils.defaultString(rs.getString(10), attributeName));
-			cols.set(3, docId1);
-			cols.set(9, rs.getLong(2));
-			cols.set(10, rs.getLong(7));
-
-			if (parentDocId.longValue() == docId1) {
-				cols.set(6, docId2);
-				cols.set(7, rs.getString(8));
-				cols.set(8, rs.getString(8));
-				cols.set(12, rs.getString(9));
-			} else {
+				cols.set(0, -docId1);
+				cols.set(1, rows.getLong(2));
+				cols.set(2, StringUtils.defaultString(rows.getString(10), attributeName));
 				cols.set(3, docId1);
-				cols.set(4, rs.getString(3));
-				cols.set(5, rs.getString(3));
-				cols.set(11, rs.getString(4));
-			}
+				cols.set(9, rows.getLong(2));
+				cols.set(10, rows.getLong(7));
 
-			printLink(writer, cols.toArray(new Object[0]), parent, parentDocId, attributeName);
-		}
+				if (parentDocId.longValue() == docId1) {
+					cols.set(6, docId2);
+					cols.set(7, rows.getString(8));
+					cols.set(8, rows.getString(8));
+					cols.set(12, rows.getString(9));
+				} else {
+					cols.set(3, docId1);
+					cols.set(4, rows.getString(3));
+					cols.set(5, rows.getString(3));
+					cols.set(11, rows.getString(4));
+				}
+
+				printLink(writer, cols.toArray(new Object[0]), parent, parentDocId, attributeName);
+			}
+		});
 	}
 
 	private void printLink(PrintWriter writer, Object[] cols, String parent, Long parentDocId, String attribute) {
@@ -180,7 +180,7 @@ public class LinksDataServlet extends AbstractDataServlet {
 		Long docId = null;
 		if (StringUtils.isNotEmpty(request.getParameter("docId"))) {
 			docId = Long.parseLong(request.getParameter("docId"));
-			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			DocumentDAO ddao = Context.get().getBean(DocumentDAO.class);
 			Document doc = ddao.findDocument(docId);
 			if (doc != null)
 				docId = doc.getId();

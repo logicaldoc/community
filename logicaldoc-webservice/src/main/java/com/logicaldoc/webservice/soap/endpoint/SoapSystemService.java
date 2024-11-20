@@ -83,7 +83,7 @@ public class SoapSystemService extends AbstractService implements SystemService 
 			/*
 			 * Users statistics
 			 */
-			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+			UserDAO userDao = Context.get().getBean(UserDAO.class);
 			WSParameter users = new WSParameter();
 			users.setName("users_regular");
 			users.setValue(Long.toString(userDao.count(tenantId != Tenant.SYSTEM_ID ? tenantId : null)));
@@ -97,7 +97,7 @@ public class SoapSystemService extends AbstractService implements SystemService 
 			/*
 			 * Last run
 			 */
-			GenericDAO genDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
+			GenericDAO genDao = Context.get().getBean(GenericDAO.class);
 			Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, "lastrun", null, Tenant.SYSTEM_ID);
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			WSParameter lastrun = new WSParameter();
@@ -116,7 +116,7 @@ public class SoapSystemService extends AbstractService implements SystemService 
 	}
 
 	private WSParameter getStat(String statSubtype, String paramName, long tenantId) throws PersistenceException {
-		GenericDAO genDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
+		GenericDAO genDao = Context.get().getBean(GenericDAO.class);
 		Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, statSubtype, null, tenantId);
 		WSParameter parameter = new WSParameter();
 		parameter.setName(paramName);

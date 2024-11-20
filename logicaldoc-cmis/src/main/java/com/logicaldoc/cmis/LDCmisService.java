@@ -88,9 +88,9 @@ public class LDCmisService extends AbstractCmisService {
 		this.sid = sid;
 
 		try {
-			historyDao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
+			historyDao = Context.get().getBean(DocumentHistoryDAO.class);
 
-			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			FolderDAO fdao = Context.get().getBean(FolderDAO.class);
 			Session session = SessionManager.get().get(sid);
 			Folder root = fdao.findRoot(session.getTenantId());
 
@@ -187,7 +187,7 @@ public class LDCmisService extends AbstractCmisService {
 		query.append(DocumentEvent.DELETED);
 		query.append("')");
 
-		Timestamp latestDate = (Timestamp) historyDao.queryForObject(query.toString(), Timestamp.class);
+		Timestamp latestDate = historyDao.queryForObject(query.toString(), Timestamp.class);
 
 		StringBuilder query2 = new StringBuilder(
 				"SELECT MAX(ld_date) FROM ld_folder_history WHERE ld_deleted=0 AND ld_tenantid=");
@@ -202,7 +202,7 @@ public class LDCmisService extends AbstractCmisService {
 		query2.append(FolderEvent.DELETED);
 		query2.append("')");
 
-		Timestamp latestFolderDate = (Timestamp) historyDao.queryForObject(query2.toString(), Timestamp.class);
+		Timestamp latestFolderDate = historyDao.queryForObject(query2.toString(), Timestamp.class);
 
 		if (latestDate == null && latestFolderDate == null) {
 			return "0";

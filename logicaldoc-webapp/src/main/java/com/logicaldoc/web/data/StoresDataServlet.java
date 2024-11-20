@@ -46,7 +46,7 @@ public class StoresDataServlet extends AbstractDataServlet {
 
 		if (types) {
 			// Just list the different stores(types of stores)
-			Store manager = (Store) Context.get().getBean(Store.class);
+			Store manager = Context.get().getBean(Store.class);
 			Set<String> set = manager.getStoreDefinitions().keySet();
 			for (String type : set.stream().sorted().toList()) {
 				if (!manager.getStoreDefinitions().get(type).isEnabled())
@@ -103,7 +103,7 @@ public class StoresDataServlet extends AbstractDataServlet {
 	private void printParameters(PrintWriter writer, HttpServletRequest request, Session session, int i, String type) {
 		ContextProperties conf = Context.get().getProperties();
 		if (isParameters(request, session)) {
-			Store manager = (Store) Context.get().getBean(Store.class);
+			Store manager = Context.get().getBean(Store.class);
 			Store st = manager.getStoreDefinitions().get(type);
 			if (st != null) {
 				for (String name : st.getParameterNames()) {
@@ -117,7 +117,7 @@ public class StoresDataServlet extends AbstractDataServlet {
 	private boolean isParameters(HttpServletRequest request, Session session) {
 		boolean parameters = "true".equals(request.getParameter("parameters"));
 		if (parameters) {
-			MenuDAO mDao = (MenuDAO) Context.get().getBean(MenuDAO.class);
+			MenuDAO mDao = Context.get().getBean(MenuDAO.class);
 			parameters = session.getTenantId() == Tenant.DEFAULT_ID && mDao.isReadEnable(105, session.getUserId());
 		}
 		return parameters;

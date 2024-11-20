@@ -39,7 +39,7 @@ public class ContextListener extends ContextLoaderListener {
 		try {
 			log.info("Cleanup past sessions of the current node {}", SystemInfo.get().getInstallationId());
 			if (Context.get() != null) {
-				SessionDAO sessionDAO = (SessionDAO) Context.get().getBean(SessionDAO.class);
+				SessionDAO sessionDAO = Context.get().getBean(SessionDAO.class);
 				sessionDAO.deleteCurrentNodeSessions();
 
 				ContextProperties config = Context.get().getProperties();

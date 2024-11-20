@@ -21,7 +21,7 @@ public class AccessControlUtil {
 
 	public static void removeForbiddenPermissionsForGuests(Securable securable) throws PersistenceException {
 		// Remove the forbidden permissions for the guests
-		GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
+		GroupDAO gDao = Context.get().getBean(GroupDAO.class);
 		Iterator<AccessControlEntry> iter = securable.getAccessControlList().iterator();
 		while (iter.hasNext()) {
 			AccessControlEntry ace = iter.next();

@@ -31,7 +31,7 @@ public class ExtensionAliasesDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max, Locale locale)
 			throws PersistenceException, IOException {
 
-		FormatConverterManager manager = (FormatConverterManager) Context.get().getBean(FormatConverterManager.class);
+		FormatConverterManager manager = Context.get().getBean(FormatConverterManager.class);
 		manager.getConverters();
 
 		ContextProperties config = Context.get().getProperties();

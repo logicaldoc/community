@@ -74,15 +74,15 @@ public class NamedParameterStatement implements AutoCloseable {
 	public NamedParameterStatement(Connection connection, String query, Map<String, Object> parameters, Integer maxRows)
 			throws SQLException {
 		indexMap = new HashMap<>();
-		
+
 		// remove those parameters not really referenced in the query
-		Map<String, Object> usedParameters=new HashMap<>();
-		if (parameters != null) 
+		Map<String, Object> usedParameters = new HashMap<>();
+		if (parameters != null)
 			for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-				if(query.contains(":"+entry.getKey()))
+				if (query.contains(":" + entry.getKey()))
 					usedParameters.put(entry.getKey(), entry.getValue());
 			}
-		
+
 		String parsedQuery = parse(query, indexMap);
 		statement = connection.prepareStatement(parsedQuery);
 		if (!usedParameters.isEmpty()) {
@@ -94,18 +94,17 @@ public class NamedParameterStatement implements AutoCloseable {
 
 	/**
 	 * Parses a query with named parameters. The parameter-index mappings are
-	 * put into the map, and the parsed query is returned. <b>DO NOT CALL FROM
-	 * CLIENT CODE.</b> This method is non-private so JUnit code can test it.
+	 * put into the map, and the parsed query is returned.
 	 * 
 	 * @param query query to parse
 	 * @param paramMap map to hold parameter-index mappings
 	 * @return the parsed query
 	 */
-	static final String parse(String query, Map<String, List<Integer>> paramMap) {
+	private static final String parse(String query, Map<String, List<Integer>> paramMap) {
 		// I was originally using regular expressions, but they didn't work well
 		// for ignoring parameter-like strings inside quotes.
 		int length = query.length();
-		StringBuffer parsedQuery = new StringBuffer(length);
+		StringBuilder parsedQuery = new StringBuilder(length);
 		boolean inSingleQuote = false;
 		boolean inDoubleQuote = false;
 		int index = 1;
@@ -127,27 +126,21 @@ public class NamedParameterStatement implements AutoCloseable {
 					inDoubleQuote = true;
 				} else if (c == ':' && i + 1 < length && Character.isJavaIdentifierStart(query.charAt(i + 1))) {
 					int j = i + 2;
-					while (j < length && Character.isJavaIdentifierPart(query.charAt(j))) {
+					while (j < length && Character.isJavaIdentifierPart(query.charAt(j)))
 						j++;
-					}
 					String name = query.substring(i + 1, j);
 					c = '?'; // replace the parameter with a question mark
 					i += name.length(); // skip past the end if the parameter
 
-					List<Integer> indexList = paramMap.get(name);
-					if (indexList == null) {
-						indexList = new LinkedList<>();
-						paramMap.put(name, indexList);
-					}
-					indexList.add(Integer.valueOf(index));
-
-					index++;
+					paramMap.putIfAbsent(name, new LinkedList<>());
+					paramMap.get(name).add(Integer.valueOf(index++));
 				}
 			}
 			parsedQuery.append(c);
 		}
 
 		return parsedQuery.toString();
+
 	}
 
 	/**

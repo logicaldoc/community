@@ -100,7 +100,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
 
-		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 
 		int page = getPage(request);
 
@@ -111,7 +111,6 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
 		String sql = "select ld_docid from ld_bookmark where ld_type=" + Bookmark.TYPE_DOCUMENT
 				+ " and ld_deleted = 0 and ld_userid = " + session.getUserId();
-		@SuppressWarnings("unchecked")
 		List<Long> bookmarks = dao.queryForList(sql, Long.class);
 
 		// The list of documents to be returned
@@ -292,7 +291,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
 	private void findDocumentsByIds(HttpServletRequest request, Session session, List<Document> documentsInCurrentPage)
 			throws PersistenceException {
-		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 
 		String[] idsArray = request.getParameter("docIds").split(",");
 		for (String id : idsArray) {
@@ -310,7 +309,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
 	private void findDocumentsByStatus(Session session, int maxRecords, int page, Integer status,
 			List<Document> documentsInCurrentPage) throws PersistenceException {
-		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 
 		List<Document> docs = dao.findByLockUserAndStatus(session.getUserId(), status);
 		int begin = (page - 1) * maxRecords;
@@ -328,8 +327,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			String extendedAttributesSpec, final Map<String, Object> extendedAttributesValues)
 			throws PersistenceException, IOException {
 
-		Context context = Context.get();
-		UserDAO udao = (UserDAO) context.getBean(UserDAO.class);
+		UserDAO udao = Context.get().getBean(UserDAO.class);
 		User sessionUser = udao.findById(session.getUserId());
 		udao.initialize(sessionUser);
 
@@ -370,7 +368,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			final Map<String, Object> extendedAttributesValues, User user, Long folderId, Long formId, String filename)
 			throws PersistenceException {
 
-		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 		StringBuilder query = new StringBuilder("""
 select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.publisher, A.creation, A.creator, A.fileSize, A.immutable, A.indexed, A.lockUserId, A.fileName, A.status,
        A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus, A.startPublishing, A.stopPublishing, A.published, A.extResId, B.name, A.docRefType, A.stamped, A.lockUser,
@@ -403,7 +401,7 @@ select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.
 			params.put("fileName", "%" + filename.toLowerCase() + "%");
 		}
 
-		List<Object> records = new ArrayList<>();
+		List<?> records = new ArrayList<>();
 		if (folderId != null || filename != null || formId != null
 				|| StringUtils.isNotEmpty(request.getParameter(INDEXED)))
 			records = dao.findByQuery(query.toString(), params, null);
@@ -425,7 +423,7 @@ select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.
 		if (user.isAdmin())
 			return new ArrayList<>();
 
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
 		String groupIdsString = user.getGroups().stream().map(g -> Long.toString(g.getId()))
 				.collect(Collectors.joining(","));
 
@@ -440,15 +438,14 @@ select ld_docid
 		forbiddenDocsQuery.append(") and ld_folderid = ");
 		forbiddenDocsQuery.append(Long.toString(folderId));
 
-		@SuppressWarnings("unchecked")
 		List<Long> forbiddenDocIds = docDao.queryForList(forbiddenDocsQuery.toString(), Long.class);
 		return forbiddenDocIds;
 	}
 
-	private List<Document> enrichRecords(List<Object> records, List<String> extendedAttributes,
+	private List<Document> enrichRecords(List<?> records, List<String> extendedAttributes,
 			final Map<String, Object> extendedAttributesValues, User user) throws PersistenceException {
 
-		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 
 		/*
 		 * Iterate over records enriching the data
@@ -577,7 +574,7 @@ select ld_docid
 	private Document retrieveHiliteDoc(List<Document> documentRecords, Long folderId, Long hiliteDocId)
 			throws PersistenceException {
 
-		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 		Document hiliteDoc = null;
 
 		// Always add the hilight doc as first element of the collection
@@ -628,7 +625,7 @@ select ld_docid
 	private void retrieveExtendedAttributesValues(Locale locale, List<String> extendedAttributes,
 			String extendedAttributesSpec, final Map<String, Object> extAttributesValues, Long folderId, Long formId)
 			throws PersistenceException {
-		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 		if (extendedAttributes.isEmpty())
 			return;
 
@@ -664,7 +661,7 @@ select ld_docid
 	}
 
 	private Long getFolder(Long folderId) throws PersistenceException {
-		FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO fDao = Context.get().getBean(FolderDAO.class);
 		Folder folder = fDao.findById(folderId);
 		if (folder.getFoldRef() != null)
 			folderId = folder.getFoldRef();
@@ -672,7 +669,7 @@ select ld_docid
 	}
 
 	private Long getFolderId(HttpServletRequest request, Session session) throws PersistenceException, IOException {
-		FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO fDao = Context.get().getBean(FolderDAO.class);
 		Long folderId = null;
 		if (StringUtils.isNotEmpty(request.getParameter("folderId")))
 			folderId = Long.parseLong(request.getParameter("folderId"));

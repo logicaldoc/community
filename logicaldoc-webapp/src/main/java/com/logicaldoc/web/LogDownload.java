@@ -26,7 +26,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentDAO;
@@ -279,16 +278,19 @@ public class LogDownload extends HttpServlet {
 	private void dumpUpdateTable(ZipOutputStream out) throws IOException, PersistenceException {
 		File buf = FileUtil.createTempFile("updates", ".csv");
 		try {
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-
-			SqlRowSet rows = dao
-					.queryForRowSet("select ld_update, ld_date, ld_version from ld_update order by ld_date desc", null);
-			try (CSVFileWriter csv = new CSVFileWriter(buf.getAbsolutePath(), ',')) {
-				while (rows.next()) {
-					csv.writeFields(List.of(df.format(rows.getDate(2)), rows.getString(3), rows.getString(1)));
-				}
-			}
+			DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
+			dao.queryForResultSet("select ld_update, ld_date, ld_version from ld_update order by ld_date desc", null,
+					null, rows -> {
+						try (CSVFileWriter csv = new CSVFileWriter(buf.getAbsolutePath(), ',')) {
+							SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+							while (rows.next()) {
+								csv.writeFields(
+										List.of(df.format(rows.getDate(2)), rows.getString(3), rows.getString(1)));
+							}
+						} catch (IOException e) {
+							throw new PersistenceException(e);
+						}
+					});
 
 			writeEntry(out, "logicaldoc/updates/updates.csv", buf);
 		} finally {
@@ -319,16 +321,19 @@ public class LogDownload extends HttpServlet {
 	private void dumpPatchTable(ZipOutputStream out) throws IOException, PersistenceException {
 		File buf = FileUtil.createTempFile("patches", ".csv");
 		try {
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-
-			SqlRowSet rows = dao
-					.queryForRowSet("select ld_patch, ld_date, ld_version from ld_patch order by ld_date desc", null);
-			try (CSVFileWriter csv = new CSVFileWriter(buf.getAbsolutePath(), ',')) {
-				while (rows.next()) {
-					csv.writeFields(List.of(df.format(rows.getDate(2)), rows.getString(3), rows.getString(1)));
-				}
-			}
+			DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
+			dao.queryForResultSet("select ld_patch, ld_date, ld_version from ld_patch order by ld_date desc", null,
+					null, rows -> {
+						try (CSVFileWriter csv = new CSVFileWriter(buf.getAbsolutePath(), ',')) {
+							SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+							while (rows.next()) {
+								csv.writeFields(
+										List.of(df.format(rows.getDate(2)), rows.getString(3), rows.getString(1)));
+							}
+						} catch (IOException e) {
+							throw new PersistenceException(e);
+						}
+					});
 
 			writeEntry(out, "logicaldoc/patches/patches.csv", buf);
 		} finally {

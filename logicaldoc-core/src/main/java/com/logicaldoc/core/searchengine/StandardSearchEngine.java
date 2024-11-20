@@ -192,7 +192,6 @@ public class StandardSearchEngine implements SearchEngine {
 	}
 
 	private Document getDocument(Document document) throws PersistenceException {
-		documentDao.initialize(document);
 		Document doc = document;
 		if (document.getDocRef() != null) {
 			// This is an alias
@@ -212,8 +211,10 @@ public class StandardSearchEngine implements SearchEngine {
 	public synchronized void addHit(Document document, InputStream content) throws IndexException {
 		try {
 			Document doc = document;
-			if (doc.getDocRef() != null)
+			if (doc.getDocRef() != null) {
 				doc = documentDao.findById(doc.getDocRef());
+				documentDao.initialize(doc);
+			}
 
 			Locale locale = doc.getLocale();
 			if (locale == null)

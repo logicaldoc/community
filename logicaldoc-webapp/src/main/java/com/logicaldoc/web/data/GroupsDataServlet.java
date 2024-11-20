@@ -27,18 +27,18 @@ public class GroupsDataServlet extends AbstractDataServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max, Locale locale)
-			throws PersistenceException, IOException {
-		
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+			Locale locale) throws PersistenceException, IOException {
+
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
 		StringBuilder query = new StringBuilder("select A.id, A.name, A.description, A.source "
-				+ "from com.logicaldoc.core.security.user.Group A where A.deleted = 0 and A.type = " + Group.TYPE_DEFAULT
-				+ " and A.tenantId=" + session.getTenantId());
+				+ "from com.logicaldoc.core.security.user.Group A where A.deleted = 0 and A.type = "
+				+ Group.TYPE_DEFAULT + " and A.tenantId=" + session.getTenantId());
 
-		GroupDAO dao = (GroupDAO) Context.get().getBean(GroupDAO.class);
-		List<Object> records = dao.findByQuery(query.toString(), (Map<String, Object>) null, null);
+		GroupDAO dao = Context.get().getBean(GroupDAO.class);
+		List<?> records = dao.findByQuery(query.toString(), (Map<String, Object>) null, null);
 
 		/*
 		 * Iterate over records composing the response XML document

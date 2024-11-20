@@ -109,8 +109,8 @@ public class Bookmark extends PersistentObject {
 	 * @return full path to the document
 	 */
 	public String getPath() {
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
 		try {
 			return folderDao.computePathExtended(docDao.findById(targetId).getFolder().getId());
 		} catch (PersistenceException e) {

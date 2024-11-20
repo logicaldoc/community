@@ -20,7 +20,8 @@ import org.springframework.core.type.filter.AssignableTypeFilter;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
-import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.AbstractDocument;
+import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Session;
@@ -105,7 +106,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 	private User user;
 
 	// Not persistent
-	private Document document;
+	private AbstractDocument document;
 
 	// Not persistent
 	private Folder folder;
@@ -228,14 +229,13 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	public User getUser() {
 		if (user == null && (userId != null && userId.longValue() != 0L)) {
-			UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
+			UserDAO uDao = Context.get().getBean(UserDAO.class);
 			try {
 				user = uDao.findById(userId);
+				uDao.initialize(user);
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
-			if (user != null)
-				uDao.initialize(user);
 		}
 		return user;
 	}
@@ -274,11 +274,15 @@ public abstract class History extends PersistentObject implements Comparable<His
 		}
 	}
 
-	public void setDocument(Document document) {
+	public void setDocument(AbstractDocument document) {
 		this.document = document;
 		if (document != null) {
 			this.setTenantId(document.getTenantId());
-			this.setDocId(document.getId());
+			if (document instanceof Version ver)
+				this.setDocId(ver.getDocId());
+			else
+				this.setDocId(document.getId());
+
 			this.setFilename(document.getFileName());
 			this.setFileSize(document.getFileSize());
 			if (document.getFolder() != null)
@@ -363,7 +367,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 		this.userLogin = login;
 	}
 
-	public Document getDocument() {
+	public AbstractDocument getDocument() {
 		return document;
 	}
 

@@ -138,7 +138,7 @@ public class EMailSender {
 	private Long folderId;
 
 	public EMailSender(long tenant) {
-		TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		TenantDAO tenantDao = Context.get().getBean(TenantDAO.class);
 		try {
 			loadSettings(tenantDao.findById(tenant).getName());
 		} catch (PersistenceException e) {
@@ -151,7 +151,7 @@ public class EMailSender {
 	}
 
 	public void setTenant(long tenant) {
-		TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		TenantDAO tenantDao = Context.get().getBean(TenantDAO.class);
 		try {
 			loadSettings(tenantDao.findById(tenant).getName());
 		} catch (PersistenceException e) {
@@ -233,7 +233,7 @@ public class EMailSender {
 	 * @param dictionary map of variable to pass to the automation
 	 */
 	public void sendAsync(EMail email, String templateName, Map<String, Object> dictionary) {
-		ThreadPools tPools = (ThreadPools) Context.get().getBean(ThreadPools.class);
+		ThreadPools tPools = Context.get().getBean(ThreadPools.class);
 		tPools.execute(() -> {
 			try {
 				send(email, templateName, dictionary);
@@ -261,7 +261,7 @@ public class EMailSender {
 			return;
 		}
 
-		MessageTemplateDAO templateDao = (MessageTemplateDAO) Context.get().getBean(MessageTemplateDAO.class);
+		MessageTemplateDAO templateDao = Context.get().getBean(MessageTemplateDAO.class);
 		MessageTemplate template = null;
 		try {
 			template = templateDao.findByNameAndLanguage(templateName, email.getLocale().toString(),
@@ -287,7 +287,7 @@ public class EMailSender {
 	 * @param email the email to send
 	 */
 	public void sendAsync(EMail email) {
-		ThreadPools tPools = (ThreadPools) Context.get().getBean(ThreadPools.class);
+		ThreadPools tPools = Context.get().getBean(ThreadPools.class);
 		tPools.execute(() -> {
 			try {
 				send(email);
@@ -448,7 +448,7 @@ public class EMailSender {
 
 	private void cleanAuthorAddress(EMail email) {
 		try {
-			TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+			TenantDAO tDao = Context.get().getBean(TenantDAO.class);
 			String tenantName = tDao.getTenantName(email.getTenantId());
 			if (!Context.get().getProperties().getBoolean(tenantName + ".smtp.userasfrom", false))
 				email.setAuthorAddress(null);
@@ -586,11 +586,11 @@ public class EMailSender {
 		if (folderId == null || !email.isHistoricyze())
 			return;
 
-		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-		TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		DocumentManager manager = Context.get().getBean(DocumentManager.class);
+		TemplateDAO templateDao = Context.get().getBean(TemplateDAO.class);
+		UserDAO userDao = Context.get().getBean(UserDAO.class);
 
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
 		Folder saveFolder = null;
 		try {
 			saveFolder = folderId != null && folderId != 0 ? folderDao.findFolder(folderId) : null;

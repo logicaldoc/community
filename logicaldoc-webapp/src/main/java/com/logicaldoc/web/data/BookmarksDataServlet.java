@@ -36,7 +36,7 @@ public class BookmarksDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		List<Object> records = new ArrayList<>();
-		BookmarkDAO dao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
+		BookmarkDAO dao = Context.get().getBean(BookmarkDAO.class);
 
 		/*
 		 * Search for documents first.

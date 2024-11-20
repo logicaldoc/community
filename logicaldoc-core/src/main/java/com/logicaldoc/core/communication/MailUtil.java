@@ -357,7 +357,7 @@ public class MailUtil {
 					return rec;
 				}).collect(Collectors.toSet()));
 			} catch (Exception t) {
-				log.warn("Unable to extract BCC addresses {}", t.getMessage());
+				log.warn("Unable to extract ReplyTo addresses {}", t.getMessage());
 			}
 		}
 	}

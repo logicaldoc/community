@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.AccessControlUtil;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.user.Group;
@@ -32,7 +31,6 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
-@SuppressWarnings("unchecked")
 public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> implements MenuDAO {
 
 	private static final String SELECT_DISTINCT_A_LD_MENUID_FROM_LD_MENUGROUP_A_LD_MENU_B = "select distinct(A.ld_menuid) from ld_menu_acl A, ld_menu B ";
@@ -103,7 +101,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				query.append(groups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 				query.append(")");
 
-				coll = findByQuery(query.toString(), (Map<String, Object>) null, null);
+				coll = findByObjectQuery(query.toString(), (Map<String, Object>) null, null);
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -150,7 +148,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			if (type != null)
 				query1.append(AND + ENTITY + ".type = " + type.toString());
 
-			coll = findByQuery(query1.toString(), params, null);
+			coll = findByObjectQuery(query1.toString(), params, null);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -205,7 +203,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			query1.append(CLOSE_BRACKET_AND + ENTITY + DOT_PARENT_ID + parentId);
 			query1.append(" and not(" + ENTITY + ".id=" + parentId + ")");
 
-			coll = findByQuery(query1.toString(), (Map<String, Object>) null, null);
+			coll = findByObjectQuery(query1.toString(), (Map<String, Object>) null, null);
 		} catch (Exception e) {
 			if (log.isErrorEnabled())
 				log.error(e.getMessage(), e);
@@ -235,7 +233,6 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 	}
 
 	private boolean isWriteOrReadEnable(long menuId, long userId, boolean write) {
-		boolean result = true;
 		try {
 			User user = userDAO.findById(userId);
 			if (user == null)
@@ -257,18 +254,13 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			query.append(groups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 			query.append(CLOSE_BRACKET_AND + ENTITY + ".id = :id");
 
-			Map<String, Object> params = new HashMap<>();
-			params.put("id", Long.valueOf(menuId));
-
-			List<AccessControlEntry> coll = findByQuery(query.toString(), params, null);
-			result = CollectionUtils.isNotEmpty(coll);
+			return CollectionUtils
+					.isNotEmpty(findByObjectQuery(query.toString(), Map.of("id", Long.valueOf(menuId)), null));
 		} catch (Exception e) {
 			if (log.isErrorEnabled())
 				log.error(e.getMessage(), e);
-			result = false;
+			return false;
 		}
-
-		return result;
 	}
 
 	@Override
@@ -342,7 +334,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 		query.append(LEFT_JOIN + ENTITY + ACL_AS_GROUP);
 		query.append(WHERE + ENTITY + ".deleted=0 and _group.read=1 and _group.groupId =" + groupId);
 
-		return findByQuery(query.toString(), (Map<String, Object>) null, null);
+		return findByObjectQuery(query.toString(), (Map<String, Object>) null, null);
 	}
 
 	public List<Long> findIdByUserId(long userId, long parentId, Integer type) {

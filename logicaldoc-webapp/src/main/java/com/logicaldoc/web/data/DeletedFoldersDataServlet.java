@@ -42,7 +42,7 @@ public class DeletedFoldersDataServlet extends AbstractDataServlet {
 				? Long.parseLong(request.getParameter("userId"))
 				: null;
 
-		FolderDAO fldDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO fldDao = Context.get().getBean(FolderDAO.class);
 		DateFormat df = getDateFormat();
 
 		PrintWriter writer = response.getWriter();
@@ -68,7 +68,6 @@ public class DeletedFoldersDataServlet extends AbstractDataServlet {
 
 		query.append(" order by ld_creation desc ");
 
-		@SuppressWarnings("unchecked")
 		List<Folder> records = fldDao.query(query.toString(), new RowMapper<Folder>() {
 			public Folder mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Folder folder = new Folder();

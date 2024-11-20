@@ -31,7 +31,7 @@ public class TasksDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		TaskManager manager = (TaskManager) Context.get().getBean(TaskManager.class);
+		TaskManager manager = Context.get().getBean(TaskManager.class);
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");

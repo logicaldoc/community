@@ -29,13 +29,12 @@ public class TagServiceImpl extends AbstractRemoteService implements TagService 
 
 	protected static Logger log = LoggerFactory.getLogger(TagServiceImpl.class);
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public List<GUITag>getTagCloud() throws ServerException {
+	public List<GUITag> getTagCloud() throws ServerException {
 		Session session = validateSession();
 		try {
 			ArrayList<GUITag> ret = new ArrayList<>();
-			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 			List<TagCloud> list = dao.getTagCloud(session.getSid());
 
 			for (TagCloud tagCloud : list) {
@@ -48,7 +47,7 @@ public class TagServiceImpl extends AbstractRemoteService implements TagService 
 
 			return ret;
 		} catch (Exception t) {
-			return (List<GUITag>) throwServerException(session, log, t);
+			return throwServerException(session, log, t);
 		}
 	}
 

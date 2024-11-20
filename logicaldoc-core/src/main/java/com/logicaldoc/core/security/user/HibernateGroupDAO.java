@@ -163,7 +163,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 		if (group.getDeleted() == 0)
 			refresh(group);
 
-		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		UserDAO uDao = Context.get().getBean(UserDAO.class);
 		try {
 			group.setUsers(uDao.findByGroup(group.getId()));
 		} catch (PersistenceException e) {
@@ -189,7 +189,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 			return;
 		boolean guest = group.isGuest();
 		if (!guest && group.isUserGroup()) {
-			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+			UserDAO userDao = Context.get().getBean(UserDAO.class);
 			User user = userDao
 					.findById(Long.parseLong(group.getName().substring(group.getName().lastIndexOf('_') + 1)));
 			guest = user.isReadonly();

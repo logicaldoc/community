@@ -184,7 +184,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	}
 
 	protected void checkPermission(Permission permission, User user, long folderId) throws AccessDeniedException {
-		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO dao = Context.get().getBean(FolderDAO.class);
 		try {
 			if (!dao.isPermissionAllowed(permission, folderId, user.getId())) {
 				String message = String.format("User %s doesn't have permission %s on folder %s", user.getUsername(),
@@ -208,24 +208,31 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	protected User getSessionUser(String sid) throws InvalidSessionServerException {
 		Session session = validateSession(sid);
 		User user = (User) session.getDictionary().get(USER);
-		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		userDao.initialize(user);
+		initUser(user);
 		return user;
+	}
+
+	private void initUser(User user) {
+		try {
+			UserDAO userDao = Context.get().getBean(UserDAO.class);
+			userDao.initialize(user);
+		} catch (PersistenceException e) {
+			log.warn(e.getMessage(), e);
+		}
 	}
 
 	protected User getSessionUser(HttpServletRequest request) throws InvalidSessionServerException {
 		Session session = validateSession(request);
 		User user = (User) session.getDictionary().get(USER);
-		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		userDao.initialize(user);
+		initUser(user);
 		return user;
 	}
 
-	protected Object throwServerException(Session session, Logger logger, Throwable t) throws ServerException {
+	protected <R> R throwServerException(Session session, Logger logger, Throwable throwable) throws ServerException {
 		if (logger != null)
-			logger.error(t.getMessage(), t);
+			logger.error(throwable.getMessage(), throwable);
 
-		String message = t.getMessage();
+		String message = throwable.getMessage();
 		if (session != null) {
 			Log lastError = session.getLastError();
 			if (lastError != null) {
@@ -237,24 +244,24 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		if (message != null)
 			message = message.replace("com.logicaldoc.", "").replace("java.lang.", "");
 
-		if (session != null
-				&& (t instanceof org.hibernate.TransactionException || t instanceof org.hibernate.HibernateException
-						|| t instanceof org.springframework.transaction.TransactionSystemException)) {
+		if (session != null && (throwable instanceof org.hibernate.TransactionException
+				|| throwable instanceof org.hibernate.HibernateException
+				|| throwable instanceof org.springframework.transaction.TransactionSystemException)) {
 			message = I18N.message("dberrorretry", session.getUser().getLocale());
 		}
 
-		if (t instanceof ValidationException ie) {
+		if (throwable instanceof ValidationException ie) {
 			// Translate a validation error
 			throw new ServerValidationException(ie.getMessage(),
 					ie.getErrors().values().stream()
 							.map(e -> new ServerValidationError(e.getAttribute(), e.getLabel(), e.getDescription()))
 							.toList().toArray(new ServerValidationError[0]));
-		} else if (t instanceof PermissionException) {
-			throw new AccessDeniedException(t.getMessage());
-		} else if (t instanceof ServerException se) {
+		} else if (throwable instanceof PermissionException) {
+			throw new AccessDeniedException(throwable.getMessage());
+		} else if (throwable instanceof ServerException se) {
 			throw se;
 		} else
-				throw new ServerException(message);
+			throw new ServerException(message);
 	}
 
 	/**
@@ -295,7 +302,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	 */
 	protected boolean executeLongRunningOperation(String name, Runnable runnable, Session session)
 			throws ServerException {
-		ThreadPools pools = (ThreadPools) Context.get().getBean(ThreadPools.class);
+		ThreadPools pools = Context.get().getBean(ThreadPools.class);
 
 		/*
 		 * Build the notifying thread and schedule for immediate execution (1ms
@@ -340,7 +347,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	 * @return The list of attributes
 	 */
 	protected List<GUIAttribute> prepareGUIAttributes(Template template, ExtensibleObject extensibleObject) {
-		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+		TemplateDAO tDao = Context.get().getBean(TemplateDAO.class);
 		tDao.initialize(template);
 
 		List<GUIAttribute> attributes = new ArrayList<>();

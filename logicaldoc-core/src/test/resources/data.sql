@@ -227,7 +227,7 @@ insert into ld_document
            (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_deleteuserid,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd,ld_previewpages,ld_docattrs)
 values     (7,6,'2010-04-01 00:00:00',0,0,'h','1.0','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,1,'XML',3,'en','context.xml',122345,1,0,'',1,0,2,0,1,1,1,5,0,0,0,0,1,0);
 insert into ld_document_acl(ld_docid, ld_groupid, ld_read, ld_write, ld_security, ld_immutable, ld_delete, ld_rename, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_readingreq, ld_preview, ld_customid)
-values (7,-3,1,1,1,0,1,1,0,0,0,0,0,1,1,0,1,1,0,0,1,1);
+values (7,-2,1,1,1,0,1,1,0,0,0,0,0,1,1,0,1,1,0,0,1,1);
 
 
 insert into ld_ticket

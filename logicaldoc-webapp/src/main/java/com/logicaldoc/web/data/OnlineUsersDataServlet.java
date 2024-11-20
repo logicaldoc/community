@@ -32,8 +32,8 @@ public class OnlineUsersDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		SessionDAO sessionDao = (SessionDAO) Context.get().getBean(SessionDAO.class);
+		UserDAO userDao = Context.get().getBean(UserDAO.class);
+		SessionDAO sessionDao = Context.get().getBean(SessionDAO.class);
 		Session currentSession = ServletUtil.validateSession(request);
 		String tenant = currentSession.getTenantName();
 

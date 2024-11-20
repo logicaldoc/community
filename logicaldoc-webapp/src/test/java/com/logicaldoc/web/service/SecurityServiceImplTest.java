@@ -391,7 +391,7 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 		String deviceId = testSubject.trustDevice("myLabel");
 		assertTrue(testSubject.isTrustedDevice(deviceId));
 
-		DeviceDAO dDao = (DeviceDAO) Context.get().getBean(DeviceDAO.class);
+		DeviceDAO dDao = Context.get().getBean(DeviceDAO.class);
 		Device device = dDao.findByDeviceId(deviceId);
 		testSubject.deleteTrustedDevices(List.of(device.getId()));
 		assertFalse(testSubject.isTrustedDevice(deviceId));
@@ -401,7 +401,7 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 	public void testDeviceLabel() throws ServerException {
 		String deviceId = testSubject.trustDevice("myLabel");
 		assertTrue(testSubject.isTrustedDevice(deviceId));
-		DeviceDAO dDao = (DeviceDAO) Context.get().getBean(DeviceDAO.class);
+		DeviceDAO dDao = Context.get().getBean(DeviceDAO.class);
 		Device device = dDao.findByDeviceId(deviceId);
 		assertNotNull(device);
 		assertEquals("myLabel", device.getLabel());
@@ -512,7 +512,7 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 		String key = testSubject.createApiKey("Test");
 		assertNotNull(key);
 
-		ApiKeyDAO dao = (ApiKeyDAO) Context.get().getBean(ApiKeyDAO.class);
+		ApiKeyDAO dao = Context.get().getBean(ApiKeyDAO.class);
 		ApiKey apiKey = dao.findByKey(key);
 
 		// try to recreate with same name

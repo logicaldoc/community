@@ -1560,7 +1560,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		// Without a template the OCR template also must be forced to null
 		assertNull(folder.getOcrTemplateId());
 
-		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+		TemplateDAO tDao = Context.get().getBean(TemplateDAO.class);
 		folder = testSubject.findById(1200);
 		testSubject.initialize(folder);
 		folder.setTemplate(tDao.findById(1));

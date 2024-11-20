@@ -58,7 +58,7 @@ public abstract class AbstractWebdavTestCase extends AbstractTestCase {
 	}
 
 	protected void prepareSession(String username, String password) throws PersistenceException {
-		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		UserDAO userDao = Context.get().getBean(UserDAO.class);
 
 		Client client = new Client("xyz", "192.168.2.231", "ghost");
 		Device device = new Device();
