@@ -69,6 +69,8 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 				return "<span class='event-ok'>" + I18N.message("iimport").toLowerCase() + CLOSE_SPAN;
 			else if (value.toString().contains("importfolder.updated"))
 				return "<span class='event-med'>" + I18N.message("update").toLowerCase() + CLOSE_SPAN;
+			else if (value.toString().contains("importfolder.warn"))
+				return "<span class='event-warning'>" + I18N.message("warning").toLowerCase() + CLOSE_SPAN;
 			else if (value.toString().contains("importfolder.error"))
 				return "<span class='event-error'>" + I18N.message("error").toLowerCase() + CLOSE_SPAN;
 			else

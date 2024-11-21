@@ -351,6 +351,10 @@
 	color: DarkRed;
 }
 
+.event-warning {
+	color: Orange;
+}
+
 .calendar-without-label table[role="presentation"] td.normal b {
    display: none;
 }
