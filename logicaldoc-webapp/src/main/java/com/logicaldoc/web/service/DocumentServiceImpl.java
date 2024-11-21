@@ -956,7 +956,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			if (docVersion != null)
 				versDao.initialize(docVersion);
 		} catch (Exception e) {
-			return super.<List<GUIVersion>>throwServerException(session, log, e);
+			return super.<List<GUIVersion>> throwServerException(session, log, e);
 		}
 
 		GUIVersion version2 = null;
@@ -1146,8 +1146,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	public void restore(List<Long> docIds, long folderId) throws ServerException {
 		Session session = validateSession();
 
-		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
-
 		for (Long docId : docIds) {
 			if (docId == null)
 				continue;
@@ -1155,7 +1153,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			transaction.setSession(session);
 
 			try {
-				docDao.restore(docId, folderId, transaction);
+				Context.get().getBean(DocumentDAO.class).restore(docId, folderId, transaction);
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
@@ -2261,9 +2259,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			return;
 
 		String idsStr = Arrays.asList(ids).toString().replace('[', '(').replace(']', ')');
-		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
 		try {
-			dao.bulkUpdate("set ld_deleted=2 where ld_id in " + idsStr, (Map<String, Object>) null);
+			Context.get().getBean(DocumentDAO.class)
+					.jdbcUpdate("update ld_document set ld_deleted=2 where ld_id in " + idsStr);
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
 		}
@@ -2275,13 +2273,12 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		Session session = validateSession();
 
 		try {
-			DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
-			dao.bulkUpdate("set ld_deleted=2 where ld_deleted=1 and  ld_deleteuserid=" + session.getUserId(),
-					(Map<String, Object>) null);
+			Context.get().getBean(DocumentDAO.class)
+					.jdbcUpdate("update ld_document set ld_deleted=2 where ld_deleted=1 and  ld_deleteuserid="
+							+ session.getUserId());
 
-			FolderDAO fdao = Context.get().getBean(FolderDAO.class);
-			fdao.bulkUpdate("set ld_deleted=2 where ld_deleted=1 and  ld_deleteuserid=" + session.getUserId(),
-					(Map<String, Object>) null);
+			Context.get().getBean(FolderDAO.class).jdbcUpdate(
+					"update ld_folder set ld_deleted=2 where ld_deleted=1 and  ld_deleteuserid=" + session.getUserId());
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
 		}

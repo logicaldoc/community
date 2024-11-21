@@ -13,6 +13,8 @@ import com.logicaldoc.core.SystemInfo;
 
 public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> implements SessionDAO {
 
+	private static final String AND = " and ";
+
 	protected HibernateSessionDAO() {
 		super(Session.class);
 	}
@@ -20,20 +22,15 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 	@Override
 	public void deleteCurrentNodeSessions() {
 		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put("node", SystemInfo.get().getInstallationId());
-
-			bulkUpdate(" set deleted=1 where node = :node and deleted=0", params);
+			jdbcUpdate("update ld_session set ld_deleted=1 where ld_node = :node and ld_deleted=0",
+					Map.of("node", SystemInfo.get().getInstallationId()));
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
 		}
 
 		try {
-			Map<String, Object> params = new HashMap<>();
-			params.put("node", SystemInfo.get().getInstallationId());
-			params.put("status", Session.STATUS_OPEN);
-
-			bulkUpdate(" set status=" + Session.STATUS_EXPIRED + " where node = :node and status = :status", params);
+			jdbcUpdate("update ld_session set ld_status=" + Session.STATUS_EXPIRED + " where ld_node = :node and ld_status = :status",
+					Map.of("node", SystemInfo.get().getInstallationId(), "status", Session.STATUS_OPEN));
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -43,13 +40,13 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 	public int countSessions(Long tenantId, Integer status) {
 		StringBuilder query = new StringBuilder(" 1=1 ");
 		if (tenantId != null)
-			query.append(" and " + ENTITY + ".tenantId = " + tenantId);
+			query.append(AND + ENTITY + ".tenantId = " + tenantId);
 		if (status != null) {
-			query.append(" and " + ENTITY + ".status = " + status);
-			if(status.intValue() == Session.STATUS_OPEN)
-				query.append(" and " + ENTITY + ".finished is null ");	
+			query.append(AND + ENTITY + ".status = " + status);
+			if (status.intValue() == Session.STATUS_OPEN)
+				query.append(AND + ENTITY + ".finished is null ");
 		}
-		
+
 		try {
 			List<Session> sessions = findByWhere(query.toString(), null, null);
 			return sessions.size();

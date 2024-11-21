@@ -438,8 +438,7 @@ select ld_docid
 		forbiddenDocsQuery.append(") and ld_folderid = ");
 		forbiddenDocsQuery.append(Long.toString(folderId));
 
-		List<Long> forbiddenDocIds = docDao.queryForList(forbiddenDocsQuery.toString(), Long.class);
-		return forbiddenDocIds;
+		return docDao.queryForList(forbiddenDocsQuery.toString(), Long.class);
 	}
 
 	private List<Document> enrichRecords(List<?> records, List<String> extendedAttributes,

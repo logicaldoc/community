@@ -102,26 +102,22 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 		if (dropIndex)
 			try {
-				SearchEngine indexer = Context.get().getBean(SearchEngine.class);
-				indexer.dropIndex();
+				Context.get().getBean(SearchEngine.class).dropIndex();
 			} catch (Exception e) {
 				throw new ServerException(e.getMessage(), e);
 			}
 
 		Runnable task = () -> {
 			try {
-				DocumentDAO documentDao = Context.get().getBean(DocumentDAO.class);
-				documentDao.bulkUpdate(
-						"set ld_indexed=0 where ld_indexed=1 "
-								+ (!dropIndex ? " and ld_tenantid=" + session.getTenantId() : ""),
-						(Map<String, Object>) null);
+				Context.get().getBean(DocumentDAO.class)
+						.jdbcUpdate("update ld_document set ld_indexed=0 where ld_indexed=1 "
+								+ (!dropIndex ? " and ld_tenantid=" + session.getTenantId() : ""));
 			} catch (Exception t) {
 				log.error(t.getMessage(), t);
 			}
 		};
 
-		Thread recreateThread = new Thread(task);
-		recreateThread.start();
+		new Thread(task).start();
 	}
 
 	@Override

@@ -847,18 +847,18 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		// The parent folder
 		Folder parent = findFolder(parentId);
 
-		int count = bulkUpdate("set ld_deleted=0, ld_parentid=" + parent.getId()
+		int count = jdbcUpdate("update ld_folder set ld_deleted=0, ld_parentid=" + parent.getId()
 				+ ", ld_lastmodified=CURRENT_TIMESTAMP where not ld_type=" + Folder.TYPE_WORKSPACE + " and ld_id="
-				+ folderId, (Map<String, Object>) null);
+				+ folderId);
 
 		if (count == 0) {
 			// The root of folders in the current tenant
 			Folder root = findRoot(parent.getTenantId());
 
 			// Workspaces must always be restored under the root
-			bulkUpdate("set ld_deleted=0, ld_parentid=" + root.getId()
+			jdbcUpdate("update ld_folder set ld_deleted=0, ld_parentid=" + root.getId()
 					+ ", ld_lastmodified=CURRENT_TIMESTAMP where ld_type=" + Folder.TYPE_WORKSPACE + " and ld_id="
-					+ folderId, (Map<String, Object>) null);
+					+ folderId);
 		}
 
 		Folder fld = findFolder(folderId);
@@ -871,8 +871,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		Set<Long> treeIds = findFolderIdInTree(folderId, true);
 		if (!treeIds.isEmpty()) {
 			String idsStr = treeIds.toString().replace('[', '(').replace(']', ')');
-			bulkUpdate("set ld_deleted=0, ld_lastmodified=CURRENT_TIMESTAMP where ld_deleted=1 and ld_id in " + idsStr,
-					(Map<String, Object>) null);
+			jdbcUpdate(
+					"update ld_folder set ld_deleted=0, ld_lastmodified=CURRENT_TIMESTAMP where ld_deleted=1 and ld_id in "
+							+ idsStr);
 			jdbcUpdate(
 					"update ld_document set ld_deleted=0, ld_lastmodified=CURRENT_TIMESTAMP where ld_deleted=1 and ld_folderid in "
 							+ idsStr);
@@ -2000,7 +2001,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		store(f, transaction);
 
 		// Now all the folders that are referencing this one must be updated
-		bulkUpdate("set securityRef=" + securityRef + " where securityRef=" + folderId, (Map<String, Object>) null);
+		bulkUpdate("set securityRef=" + securityRef + " where securityRef=" + folderId, null);
 	}
 
 	@Override

@@ -1303,12 +1303,14 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		folder = testSubject.findById(1201L);
 		assertEquals(1200L, folder.getSecurityRef().longValue());
+		assertEquals(1200L, folder.getParentId());
 		folder = testSubject.findById(1202L);
 		assertEquals(1200L, folder.getSecurityRef().longValue());
+		assertEquals(1201L, folder.getParentId());
 
 		// The root has its own policies
 		testSubject.updateSecurityRef(1200L, 5L, transaction);
-
+		
 		folder = testSubject.findById(1200L);
 		assertEquals(5L, folder.getSecurityRef().longValue());
 		folder = testSubject.findById(1201L);

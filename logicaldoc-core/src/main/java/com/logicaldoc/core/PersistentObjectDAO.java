@@ -151,7 +151,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public List<?> findByQuery(String query, Map<String, Object> parameters, Integer max) throws PersistenceException;
+	public List<Object[]> findByQuery(String query, Map<String, Object> parameters, Integer max) throws PersistenceException;
 
 	/**
 	 * Find everything you want from the DB using the ORM query language
@@ -509,7 +509,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public void deleteAll(Collection<T> entities, int code) throws PersistenceException;
 
 	/**
-	 * Executes a bulk update as specified by the given expression
+	 * Executes a bulk update as specified by the given HQL expression
 	 * 
 	 * @param expression The update expression.
 	 * @param parameters Optional map of parameters

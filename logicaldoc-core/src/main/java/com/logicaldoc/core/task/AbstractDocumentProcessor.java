@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -84,8 +83,8 @@ public abstract class AbstractDocumentProcessor extends Task {
 
 		// Mark all these documents as belonging to the current
 		// transaction
-		documentDao.bulkUpdate("set ld_transactionid='" + transactionId + "' where ld_id in " + idsStr,
-				(Map<String, Object>) null);
+		documentDao
+				.jdbcUpdate("update ld_document set ld_transactionid='" + transactionId + "' where ld_id in " + idsStr);
 
 		// Now we can release the lock
 		lockManager.release(getName(), transactionId);
@@ -130,8 +129,8 @@ public abstract class AbstractDocumentProcessor extends Task {
 
 	private void removeTransactionReference() {
 		try {
-			documentDao.bulkUpdate("set ld_transactionid=null where ld_transactionId='" + transactionId + "'",
-					(Map<String, Object>) null);
+			documentDao.jdbcUpdate(
+					"update ld_document set ld_transactionid=null where ld_transactionId='" + transactionId + "'");
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
 		}

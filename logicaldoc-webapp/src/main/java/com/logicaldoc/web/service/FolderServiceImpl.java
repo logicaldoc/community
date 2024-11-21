@@ -1074,12 +1074,9 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		if (ids.isEmpty())
 			return;
 
-		FolderDAO dao = Context.get().getBean(FolderDAO.class);
 		try {
-			dao.bulkUpdate(
-					"set ld_deleted=2 where ld_id in ("
-							+ ids.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")) + ")",
-					(Map<String, Object>) null);
+			Context.get().getBean(FolderDAO.class).jdbcUpdate("update ld_folder set ld_deleted=2 where ld_id in ("
+					+ ids.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")) + ")");
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
 		}

@@ -207,7 +207,7 @@ public class IndexerTask extends Task {
 				Map<String, Object> params = new HashMap<>();
 				params.put("transactionId", transactionId);
 
-				documentDao.bulkUpdate("set ld_transactionid = null where ld_transactionId = :transactionId", params);
+				documentDao.jdbcUpdate("update ld_document set ld_transactionid = null where ld_transactionId = :transactionId", params);
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
@@ -253,8 +253,8 @@ public class IndexerTask extends Task {
 			Map<String, Object> params = new HashMap<>();
 			params.put("transactionId", transactionId);
 
-			documentDao.bulkUpdate(
-					" set ld_transactionid = :transactionId where ld_transactionid is null and ld_id in " + idsStr,
+			documentDao.jdbcUpdate(
+					" update ld_document set ld_transactionid = :transactionId where ld_transactionid is null and ld_id in " + idsStr,
 					params);
 		}
 		log.info("Documents marked for indexing in transaction {}", transactionId);

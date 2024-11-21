@@ -449,7 +449,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 	@Override
 	public void restore(long menuId, boolean parents) throws PersistenceException {
-		bulkUpdate("set ld_deleted=0 where ld_id=" + menuId, (Map<String, Object>) null);
+		jdbcUpdate("update ld_menu set ld_deleted=0 where ld_id=" + menuId);
 
 		// Restore parents
 		if (parents) {

@@ -165,7 +165,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	@Override
-	public List<?> findByQuery(String query, Map<String, Object> parameters, Integer max) throws PersistenceException {
+	public List<Object[]> findByQuery(String query, Map<String, Object> parameters, Integer max) throws PersistenceException {
 		try {
 			logQuery(query);
 			return prepareQuery(query, parameters, max).list();
@@ -308,23 +308,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	protected <R> Query<R> prepareQuery(String expression, Map<String, Object> values, Class<R> requiredType,
 			Integer max) {
 		Query<R> queryObject = sessionFactory.getCurrentSession().createQuery(expression, requiredType);
-		applyParametersAndLimit(values, max, queryObject);
-		return queryObject;
-	}
-
-	/**
-	 * Utility method useful for preparing an Hibernate query for updates
-	 * 
-	 * @param expression The expression for the query
-	 * @param values The parameters values to be used (optional, if the query is
-	 *        parametric)
-	 * @param max Optional maximum number of wanted results
-	 * 
-	 * @return The Hibernate query (for updates/deletes this query cannot by
-	 *         typed)
-	 */
-	protected Query<?> prepareQueryForUpdate(String expression, Map<String, Object> values, Integer max) {
-		Query<?> queryObject = sessionFactory.getCurrentSession().createQuery(expression);
 		applyParametersAndLimit(values, max, queryObject);
 		return queryObject;
 	}
@@ -558,8 +541,10 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			return 0;
 
 		try {
-			return prepareQueryForUpdate(UPDATE + entityClass.getCanonicalName() + " " + expression, parameters, null)
-					.executeUpdate();
+			Query<?> queryObject = sessionFactory.getCurrentSession()
+					.createQuery(UPDATE + entityClass.getCanonicalName() + " " + expression);
+			applyParametersAndLimit(parameters, null, queryObject);
+			return queryObject.executeUpdate();
 		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
