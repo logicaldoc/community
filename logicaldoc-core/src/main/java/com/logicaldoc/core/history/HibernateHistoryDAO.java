@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.communication.EventCollector;
@@ -20,6 +21,9 @@ import com.logicaldoc.util.config.ContextProperties;
 
 /**
  * Parent of all DAOs that handle histories
+ * 
+ * @param <T> Class of the implementation of a {@link History} this DAO
+ *        handles
  * 
  * @author Alessandro Gasparini - LogicalDOC
  * @since 9.0.1

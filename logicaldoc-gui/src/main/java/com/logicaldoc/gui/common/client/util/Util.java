@@ -516,7 +516,6 @@ public abstract class Util {
 	 * Writes a text into the client's clipboard
 	 * 
 	 * @param text the content to put into the clipboards
-	 * @return The formated file size.
 	 */
 	public static native void writeToClipboard(String text) /*-{		
 		$wnd.copy(text);
@@ -525,8 +524,8 @@ public abstract class Util {
 	/**
 	 * Format file size in Bytes, KBytes, MBytes or GBytes.
 	 * 
-	 * @param size The file size in bytes.
-	 * @return The formated file size.
+	 * @param size The file size in bytes S
+	 * @return The formated file size
 	 */
 	public static native String formatSize(double size) /*-{
 		if (size / 1024 < 1) {

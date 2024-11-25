@@ -158,7 +158,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @param query The query to execute
 	 * @param parameters The map of the parameters
-	 * @poaram requiredType The type of the elements in the result
+	 * @param requiredType The type of the elements in the result
 	 * @param max Maximum results number (optional)
 	 * 
 	 * @return Query result

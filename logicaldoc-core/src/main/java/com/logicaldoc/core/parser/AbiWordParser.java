@@ -38,6 +38,9 @@ public class AbiWordParser extends AbstractParser {
 
 		private boolean appendChar;
 
+		/**
+		 * Default constructor
+		 */
 		public AbiWordContentHandler() {
 			content = new StringBuilder();
 			appendChar = false;
