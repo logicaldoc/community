@@ -28,7 +28,6 @@ public class TagSearch extends Search {
 	protected TagSearch() {
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void internalSearch() throws SearchException {
 		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);

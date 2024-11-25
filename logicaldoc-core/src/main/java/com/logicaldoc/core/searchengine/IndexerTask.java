@@ -118,6 +118,7 @@ public class IndexerTask extends Task {
 		errors = 0;
 		indexed = 0;
 		indexingTime = 0;
+		parsingTime = 0;
 		try {
 			Integer max = getMax();
 

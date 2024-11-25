@@ -41,7 +41,6 @@ public class LockManager {
 	 * 
 	 * @return the lists of transactions
 	 */
-	@SuppressWarnings("unchecked")
 	public List<String> getAllTransactions() {
 		try {
 			return genericDao.queryForList(

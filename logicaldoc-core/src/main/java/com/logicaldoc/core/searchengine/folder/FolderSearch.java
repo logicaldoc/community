@@ -51,7 +51,6 @@ public class FolderSearch extends Search {
 
 	private String query;
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void internalSearch() throws SearchException {
 		UserDAO userDAO = Context.get().getBean(UserDAO.class);

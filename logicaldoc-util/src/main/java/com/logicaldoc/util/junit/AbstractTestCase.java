@@ -1,6 +1,5 @@
 package com.logicaldoc.util.junit;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
@@ -14,8 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
@@ -34,6 +31,7 @@ import org.springframework.util.CollectionUtils;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
+import com.logicaldoc.util.time.Pause;
 
 /**
  * Abstract test case that of database and context initialization.
@@ -218,8 +216,6 @@ public abstract class AbstractTestCase {
 	}
 
 	protected void waiting() throws InterruptedException {
-		final int secondsToWait = 5;
-		CountDownLatch latch = new CountDownLatch(1);
-		assertFalse(latch.await(secondsToWait, TimeUnit.SECONDS));
+		Pause.doPause(5000L);
 	}
 }
