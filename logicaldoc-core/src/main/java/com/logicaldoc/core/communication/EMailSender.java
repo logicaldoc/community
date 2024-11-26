@@ -54,6 +54,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.TemplateDAO;
+import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.threading.ThreadPools;
@@ -266,6 +267,8 @@ public class EMailSender {
 		try {
 			template = templateDao.findByNameAndLanguage(templateName, email.getLocale().toString(),
 					email.getTenantId());
+			if (template == null)
+				templateDao.findByNameAndLanguage(templateName, email.getLocale().toString(), Tenant.DEFAULT_ID);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -310,7 +313,7 @@ public class EMailSender {
 			log.error("Aspect sendingMessages not enabled");
 			return;
 		}
-		
+
 		cleanAuthorAddress(email);
 
 		Session session = newMailSession();
