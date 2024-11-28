@@ -148,10 +148,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("sendmessage"));
 		toolStrip.addButton(add);
-		add.addClickHandler(nevent -> {
-			MessageDialog dialog = new MessageDialog();
-			dialog.show();
-		});
+		add.addClickHandler(click -> new MessageDialog().show());
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
