@@ -627,7 +627,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 						+ user.getId());
 		sb.append(" UNION select max(ld_date) from ld_folder_history where ld_deleted=0 and ld_userid=" + user.getId()
 				+ " order by 1 desc");
-		@SuppressWarnings("unchecked")
+
 		List<Date> interactions = queryForList(sb.toString(), Date.class);
 		Date lastInteraction = null;
 		if (!interactions.isEmpty())
@@ -707,7 +707,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		}
 
 		jdbcUpdate("delete from ld_usergroup where ld_userid=" + userId);
-		
+
 		jdbcUpdate("delete from ld_apikey where ld_userid=" + userId);
 
 		saveUserHistory(user, transaction);
@@ -744,7 +744,6 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		return userListenerManager;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void initialize(User user) {
 		if (user == null)
@@ -822,7 +821,6 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			return findByUsername(ADMIN + StringUtils.capitalize(tenantName));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Set<User> findByGroup(long groupId) throws PersistenceException {
 		List<Long> docIds = new ArrayList<>();

@@ -230,6 +230,7 @@ public class MessageDialog extends Window {
 						rec.setAttribute("id", user.getId());
 						rec.setAttribute(AVATAR, user.getId());
 						rec.setAttribute(LABEL, user.getFullName());
+						records.add(rec);
 					}
 
 					addRecipients(records);

@@ -192,7 +192,6 @@ public class StandardSearchEngine implements SearchEngine {
 	}
 
 	private Document getDocument(Document document) throws PersistenceException {
-		documentDao.initialize(document);
 		Document doc = document;
 		if (document.getDocRef() != null) {
 			// This is an alias

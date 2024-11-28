@@ -213,7 +213,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		return findIdsByWhere(query.toString(), null, null);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<Document> findByLockUserAndStatus(Long userId, Integer status) {
 		StringBuilder sb = new StringBuilder(
@@ -243,7 +242,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<Long> findDocIdByTag(String tag) throws PersistenceException {
 		StringBuilder query = new StringBuilder(
@@ -591,7 +589,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		return coll;
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<String> findTags(long docId) throws PersistenceException {
 		return queryForList("select ld_tag from ld_tag where ld_docid=" + docId + " order by ld_tag", String.class);
 	}
@@ -621,7 +618,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		return map;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<String> findAllTags(String firstLetter, Long tenantId) throws PersistenceException {
 		StringBuilder sb = new StringBuilder("select ld_tag from ld_uniquetag where 1=1 ");
@@ -657,7 +653,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		return coll;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<Long> findDocIdByUserIdAndTag(long userId, String tag) throws PersistenceException {
 		List<Long> ids = new ArrayList<>();
@@ -746,7 +741,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		return coll;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<Long> findDocIdByFolder(long folderId, Integer max) throws PersistenceException {
 		String sql = "select ld_id from ld_document where ld_deleted=0 and ld_folderid = " + folderId
@@ -782,7 +776,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		Map<String, Object> params = new HashMap<>();
 		params.put("docId", docId);
 
-		@SuppressWarnings("unchecked")
 		List<Long> ids = queryForList(query.toString(), params, Long.class, null);
 
 		if (ids.isEmpty())
@@ -826,7 +819,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			log.trace("Initialized {} aces", doc.getAccessControlList().size());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<Long> findDeletedDocIds() throws PersistenceException {
 		String query = "select ld_id from ld_document where ld_deleted=1 order by ld_lastmodified desc";
@@ -1067,7 +1059,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		Map<String, Object> params = new HashMap<>();
 		params.put("now", new Date());
 
-		@SuppressWarnings("unchecked")
 		Collection<Long> buf = queryForList(query.toString(), params, Long.class, null);
 		Set<Long> ids = new HashSet<>();
 		for (Long id : buf) {
@@ -1077,7 +1068,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		return ids;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void cleanExpiredTransactions() throws PersistenceException {
 		// Retrieve the actual registered locks on transactions
@@ -1167,7 +1157,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		jdbcUpdate(insertStatement.toString());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void updateCountUniqueTags() throws PersistenceException {
 		List<Long> tenantIds = tenantDAO.findAllIds();
@@ -1194,7 +1183,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<TagCloud> getTagCloud(long tenantId, int maxTags) throws PersistenceException {
 		GenericDAO gendao = (GenericDAO) Context.get().getBean(GenericDAO.class);

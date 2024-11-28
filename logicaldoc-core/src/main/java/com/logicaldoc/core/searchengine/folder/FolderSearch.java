@@ -49,7 +49,6 @@ public class FolderSearch extends Search {
 
 	private static final String AND = " and ";
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void internalSearch() throws SearchException {
 		UserDAO userDAO = (UserDAO) Context.get().getBean(UserDAO.class);

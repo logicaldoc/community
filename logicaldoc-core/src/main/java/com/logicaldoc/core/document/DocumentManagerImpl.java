@@ -531,9 +531,8 @@ public class DocumentManagerImpl implements DocumentManager {
 				} else {
 					log.debug("Alias {} cannot be indexed because it references an unexisting document {}", doc,
 							doc.getDocRef());
-					documentDAO.initialize(doc);
-					doc.setIndexed(AbstractDocument.INDEX_SKIP);
-					documentDAO.store(doc);
+					documentDAO.jdbcUpdate("update ld_document set ld_indexed=" + AbstractDocument.INDEX_SKIP
+							+ " where ld_id=" + doc.getId());
 					return 0;
 				}
 			}
@@ -546,6 +545,8 @@ public class DocumentManagerImpl implements DocumentManager {
 				parsingTime = TimeDiff.getTimeDifference(beforeParsing, new Date(), TimeField.MILLISECOND);
 			}
 
+			documentDAO.initialize(doc);
+
 			// This may take time
 			addHit(doc, cont);
 		} catch (PersistenceException | ParsingException e) {
@@ -555,15 +556,17 @@ public class DocumentManagerImpl implements DocumentManager {
 
 		// For additional safety update the DB directly
 		doc.setIndexed(AbstractDocument.INDEX_INDEXED);
+		documentDAO.jdbcUpdate("update ld_document set ld_indexed=" + doc.getIndexed() + " where ld_id=" + doc.getId());
 
+		// Save the event
 		if (transaction != null) {
 			transaction.setEvent(DocumentEvent.INDEXED.toString());
 			transaction.setComment(HTMLSanitizer.sanitize(StringUtils.abbreviate(cont, 100)));
 			transaction.setReason(Integer.toString(currentIndexed));
 			transaction.setDocument(doc);
 		}
-
-		documentDAO.store(doc, transaction);
+		DocumentHistoryDAO hDao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
+		hDao.store(transaction);
 
 		/*
 		 * Mark the aliases to be re-indexed
@@ -1417,7 +1420,6 @@ public class DocumentManagerImpl implements DocumentManager {
 		this.documentNoteDAO = documentNoteDAO;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public long archiveFolder(long folderId, DocumentHistory transaction) throws PersistenceException {
 		Folder root = folderDAO.findFolder(folderId);
@@ -1429,9 +1431,8 @@ public class DocumentManagerImpl implements DocumentManager {
 		for (Long fid : folderIds) {
 			String where = " where ld_deleted=0 and not ld_status=" + AbstractDocument.DOC_ARCHIVED
 					+ " and ld_folderid=" + fid;
-			archivedDocIds
-					.addAll((Set<Long>) documentDAO.queryForList("select ld_id from ld_document " + where, Long.class)
-							.stream().collect(Collectors.toSet()));
+			archivedDocIds.addAll(documentDAO.queryForList("select ld_id from ld_document " + where, Long.class)
+					.stream().collect(Collectors.toSet()));
 			if (archivedDocIds.isEmpty())
 				continue;
 			archiveDocuments(archivedDocIds, transaction);
@@ -1794,7 +1795,6 @@ public class DocumentManagerImpl implements DocumentManager {
 					}
 				}, 1);
 
-		@SuppressWarnings("unchecked")
 		List<Long> versionIds = documentDAO.queryForList("select ld_id from ld_version where ld_documentid=" + docId,
 				Long.class);
 		if (!versionIds.isEmpty()) {

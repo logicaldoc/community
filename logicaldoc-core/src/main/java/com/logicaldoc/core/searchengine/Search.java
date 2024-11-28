@@ -250,7 +250,6 @@ public abstract class Search {
 	 * 
 	 * @throws SearchException error in the data layer
 	 */
-	@SuppressWarnings("unchecked")
 	protected Set<Long> getDeniedDocIds(List<Hit> hits, Collection<Long> accessibleFolderIds) throws SearchException {
 		HashSet<Long> denied = new HashSet<>();
 		if (searchUser.isAdmin() || hits.isEmpty())

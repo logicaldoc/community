@@ -281,10 +281,10 @@ public class ThumbnailManager {
 				// Try to instantiate the builder
 				@SuppressWarnings("unchecked")
 				Object builder = clazz.getDeclaredConstructor().newInstance();
-				if (!(builder instanceof ThumbnailBuilder))
+				if (!(builder instanceof ThumbnailBuilder thumbBuilder))
 					throw new ClassNotFoundException(
 							"The specified builder " + className + " doesn't implement ThumbnailBuilder interface");
-				builders.put(extension, (ThumbnailBuilder) builder);
+				builders.put(extension, thumbBuilder);
 				log.info("Added new thumbnail builder {} for extension {}", className, extension);
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
