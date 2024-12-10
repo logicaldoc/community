@@ -32,7 +32,7 @@ public class PluginUploader extends Window {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("uploadplugin"));
 		setWidth(430);
-		setHeight(130);
+		setHeight(170);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
@@ -42,7 +42,7 @@ public class PluginUploader extends Window {
 		submitButton.addClickHandler(event -> onSubmit());
 
 		VLayout layout = new VLayout();
-		layout.setMembersMargin(5);
+		layout.setMembersMargin(1);
 		layout.setMargin(2);
 
 		uploader = new Upload(submitButton);

@@ -563,8 +563,10 @@ public class FileUtil {
 	 * @throws IOException if the copy resulted in an error
 	 */
 	public static void copyFile(File source, File target) throws IOException {
-		try (FileChannel in = new FileInputStream(source).getChannel();
-				FileChannel out = new FileOutputStream(target).getChannel();) {
+		try (FileInputStream fis = new FileInputStream(source);
+				FileChannel in = fis.getChannel();
+				FileOutputStream fos = new FileOutputStream(target);
+				FileChannel out = fos.getChannel();) {
 
 			ByteBuffer buffer = ByteBuffer.allocateDirect(BUFF_SIZE);
 			while (in.read(buffer) != -1) {

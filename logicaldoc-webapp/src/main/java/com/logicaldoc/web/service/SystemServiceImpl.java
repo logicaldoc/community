@@ -4,10 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -71,7 +67,6 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.LogConfigurator;
 import com.logicaldoc.util.config.PluginDescriptorConfigurator;
-import com.logicaldoc.util.exec.Exec;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ZipUtil;
 import com.logicaldoc.util.plugin.LogicalDOCPlugin;
@@ -603,7 +598,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 				query.append(" union ");
 			query.append(
 					"select A.ld_username, A.ld_event, A.ld_date, A.ld_filename, A.ld_folderid, A.ld_path, A.ld_sessionid, A.ld_docid, A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment, A.ld_reason, A.ld_device, A.ld_geolocation, A.ld_keylabel from TABLE A where A.ld_tenantid = "
-					.replace("TABLE", table).replace("A", tableAlias) + session.getTenantId());
+							.replace("TABLE", table).replace("A", tableAlias) + session.getTenantId());
 			appendUserCondition(tableAlias, userId, query);
 			appendSessionCondition(tableAlias, historySid, query);
 			appendDatesCondition(tableAlias, from, till, query);
@@ -820,18 +815,6 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 				// Nothing to do
 			}
 
-		try {
-			if (pluginJarFile.exists()) {
-				if (new Exec().isWindows())
-					Runtime.getRuntime().exec(
-							new String[] { "cmd.exe", "/c", "del /F /Q \"" + pluginJarFile.getAbsolutePath() + "\"" });
-				else
-					Runtime.getRuntime().exec(new String[] { "rm", "-rf", pluginJarFile.getAbsolutePath() });
-			}
-		} catch (IOException e) {
-			throwServerException(session, log, e);
-		}
-
 		if (pluginJarFile.exists())
 			throw new ServerException("Cannot remove plugin file " + pluginJarFile.getAbsolutePath()
 					+ ". Please stop the application and delete that file manually.");
@@ -940,21 +923,6 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 				log.info("Deleted existing plugin home {}", pluginHome.getAbsolutePath());
 			}
 
-			File libFolder = new File(new File(rootFolder, "WEB-INF"), "lib");
-			File pluginJarFile = new File(libFolder, pluginJar);
-
-			/*
-			 * Append the plugin jar in the classpath
-			 */
-			appendPluginJarInClasspath(pluginJarFile);
-
-			/*
-			 * Initialize the plugin
-			 */
-			PluginRegistry pluginRegistry = PluginRegistry.getInstance();
-			pluginRegistry.init(libFolder.getAbsolutePath());
-			initializePlugin(pluginId);
-
 			/*
 			 * Copy the plugin archive as .installed so it will be maintained
 			 * over the updates
@@ -963,27 +931,11 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			File targetFile = new File(pluginsDir, pluginId + "-" + pluginVersion + "-plugin.zip.installed");
 			log.info("Copying plugin package {} into {}", pluginPackage.getName(), targetFile.getAbsolutePath());
 			FileUtil.copyFile(pluginPackage, targetFile);
-
-			if (pluginRegistry.isRestartRequired())
-				ApplicationListener.restartRequired();
-		} catch (ServerException | IOException | NoSuchMethodException | IllegalArgumentException
-				| InvocationTargetException | PluginException e) {
+			ApplicationListener.restartRequired();
+		} catch (ServerException | IOException | IllegalArgumentException e) {
 			throwServerException(session, log, e);
 		} finally {
 			UploadServlet.cleanUploads(session.getSid());
-		}
-	}
-
-	private void appendPluginJarInClasspath(File pluginJarFile)
-			throws NoSuchMethodException, InvocationTargetException, MalformedURLException {
-		final ClassLoader sysloader = this.getClass().getClassLoader();
-		final Class<URLClassLoader> sysclass = URLClassLoader.class;
-		final Method method = sysclass.getDeclaredMethod("addURL", URL.class);
-
-		try {
-			method.invoke(sysloader, pluginJarFile.toURI().toURL());
-		} catch (IllegalAccessException iae) {
-			log.warn(iae.getMessage(), iae);
 		}
 	}
 
