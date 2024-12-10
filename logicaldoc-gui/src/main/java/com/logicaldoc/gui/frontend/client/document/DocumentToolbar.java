@@ -484,7 +484,8 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 	}
 
 	private void addOnlyOffice() {
-		if (Feature.visible(Feature.ONLYOFFICE) && Menu.enabled(Menu.ONLYOFFICE) && Session.get().getConfigAsBoolean("converter.OnlyOfficeConverter.enabled")) {
+		if (Feature.visible(Feature.ONLYOFFICE) && Menu.enabled(Menu.ONLYOFFICE)
+				&& Session.get().getConfigAsBoolean("converter.OnlyOfficeConverter.enabled")) {
 			addButton(onlyoffice);
 			onlyoffice.setTooltip(I18N.message("editwithonlyoffice"));
 			onlyoffice.setTitle("<i class='fal fa-briefcase fa-lg fa-lg' aria-hidden='true'></i>");
@@ -692,16 +693,10 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		else if (document.getType() != null)
 			isOfficeFile = Util.isOfficeFileType(document.getType());
 
-		office.setDisabled(
-				!Feature.enabled(Feature.OFFICE) || !isOfficeFile || !document.isDownload() || !document.isWrite());
+		office.setDisabled(!Feature.enabled(Feature.OFFICE) || !isOfficeFile || !document.isDownload()
+				|| !document.isWrite() || document.getStatus() != Constants.DOC_UNLOCKED);
 		onlyoffice.setDisabled(!Feature.enabled(Feature.OFFICE) || !Menu.enabled(Menu.ONLYOFFICE)
-				|| !document.isDownload() || !document.isWrite());
-		if (document.getStatus() != Constants.DOC_UNLOCKED && !Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)
-				&& document.getLockUserId() != null
-				&& Session.get().getUser().getId() != document.getLockUserId().longValue()) {
-			office.setDisabled(true);
-			onlyoffice.setDisabled(true);
-		}
+				|| !document.isDownload() || !document.isWrite() || document.getStatus() != Constants.DOC_UNLOCKED);
 	}
 
 	@Override

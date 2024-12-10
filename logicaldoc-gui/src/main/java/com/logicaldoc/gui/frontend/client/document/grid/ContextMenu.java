@@ -307,7 +307,7 @@ public class ContextMenu extends Menu {
 
 		applyDownloadSecurity(allowedPermissions, someSelection, justOneSelected);
 
-		applyOfficeSecurity(allowedPermissions, justOneSelected);
+		applyOfficeSecurity(allowedPermissions, selection, justOneSelected);
 
 		convert.setEnabled(justOneSelected && Feature.enabled(Feature.FORMAT_CONVERSION));
 		archive.setEnabled(someSelection && allowedPermissions.isArchive() && Feature.enabled(Feature.ARCHIVING));
@@ -334,9 +334,11 @@ public class ContextMenu extends Menu {
 		merge.setEnabled(moreSelected && enabledPermissions.isWrite());
 	}
 
-	private void applyOfficeSecurity(GUIAccessControlEntry enabledPermissions, boolean justOneSelected) {
+	private void applyOfficeSecurity(GUIAccessControlEntry enabledPermissions, List<GUIDocument> selection,
+			boolean justOneSelected) {
 		office.setEnabled(justOneSelected && Feature.enabled(Feature.OFFICE) && enabledPermissions.isWrite()
-				&& enabledPermissions.isDownload() && Util.isOfficeFile(grid.getSelectedDocument().getFileName()));
+				&& enabledPermissions.isDownload() && Util.isOfficeFile(grid.getSelectedDocument().getFileName())
+				&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection));
 	}
 
 	private void applyDownloadSecurity(GUIAccessControlEntry enabledPermissions, boolean someSelection,
