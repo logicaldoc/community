@@ -553,24 +553,23 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		if (grid.getSelectedCount() == 0)
 			return;
 
-		DocumentService.Instance.get().getAllowedPermissions(grid.getSelectedIds(),
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+		DocumentService.Instance.get().getAllowedPermissions(grid.getSelectedIds(), new AsyncCallback<>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(GUIAccessControlEntry grantedPermissions) {
-						for (String permission : requiredPermissions) {
-							if (!grantedPermissions.isPermissionAllowed(permission.toLowerCase())) {
-								GuiLog.warn(I18N.message("somedocsdonothaveperm", permission.toUpperCase()), null);
-								return;
-							}
-						}
-						task.run();
+			@Override
+			public void onSuccess(GUIAccessControlEntry grantedPermissions) {
+				for (String permission : requiredPermissions) {
+					if (!grantedPermissions.isPermissionAllowed(permission.toLowerCase())) {
+						GuiLog.warn(I18N.message("somedocsdonothaveperm", permission.toUpperCase()), null);
+						return;
 					}
-				});
+				}
+				task.run();
+			}
+		});
 	}
 
 	private void addRefresh() {
@@ -691,12 +690,8 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		else if (document.getType() != null)
 			isOfficeFile = Util.isOfficeFileType(document.getType());
 
-		office.setDisabled(
-				!Feature.enabled(Feature.OFFICE) || !isOfficeFile || !document.isDownload() || !document.isWrite());
-		if (document.getStatus() != Constants.DOC_UNLOCKED && !Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)
-				&& document.getLockUserId() != null
-				&& Session.get().getUser().getId() != document.getLockUserId().longValue())
-			office.setDisabled(true);
+		office.setDisabled(!Feature.enabled(Feature.OFFICE) || !isOfficeFile || !document.isDownload()
+				|| !document.isWrite() || document.getStatus() != Constants.DOC_UNLOCKED);
 	}
 
 	@Override
