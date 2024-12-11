@@ -88,7 +88,7 @@
 <!ELEMENT value (#PCDATA)>
 ]>
 
-<plugin id="logicaldoc-dropbox" version="9.0.1" class="com.logicaldoc.dropbox.DropboxPlugin">
+<plugin id="logicaldoc-dropbox" version="9.1.0" class="com.logicaldoc.dropbox.DropboxPlugin">
 	<requires>
 		<import plugin-id="logicaldoc-core" />
 	</requires>
