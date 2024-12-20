@@ -21,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.index.CheckIndex;
 import org.apache.lucene.index.CheckIndex.Status;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.NIOFSDirectory;
@@ -403,6 +404,9 @@ public class StandardSearchEngine implements SearchEngine {
 	 */
 	protected SolrQuery prepareSearchQuery(String expression, Set<String> filters, String expressionLanguage,
 			Integer rows) {
+		// Don't want any limit in the number of conditions processed by Lucene
+		BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
+
 		SolrQuery query = new SolrQuery().setQuery(expression);
 		if (rows != null)
 			query = query.setRows(rows);
@@ -487,9 +491,8 @@ public class StandardSearchEngine implements SearchEngine {
 		}
 
 		/*
-		 * Iterate over all the entries in pages of 1000 elements checking if
-		 * the entry refers to an existing document. We use the cursor mark
-		 * method.
+		 * Iterate over all the entries in pages of 1000 elements checking if the entry
+		 * refers to an existing document. We use the cursor mark method.
 		 */
 		SolrQuery query = (new SolrQuery("*:*")).setRows(1000).setSort(SortClause.asc("id"));
 		String cursorMark = CursorMarkParams.CURSOR_MARK_START;
