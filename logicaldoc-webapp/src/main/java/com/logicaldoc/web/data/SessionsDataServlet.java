@@ -60,7 +60,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
 					: null;
 
 			// Just listing the sessions
-			SessionDAO sessionDao = Context.get().getBean(SessionDAO.class);
+			SessionDAO sessionDao = Context.get(SessionDAO.class);
 			List<Session> sessions = sessionDao.findByNode(node);
 
 			boolean csvFormat = "true".equals(request.getParameter("csv"));
@@ -83,7 +83,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
 			/*
 			 * The current user must be enabled to see the sessions.
 			 */
-			MenuDAO mDao = Context.get().getBean(MenuDAO.class);
+			MenuDAO mDao = Context.get(MenuDAO.class);
 			boolean showSid = currentUser == null || mDao.isReadEnable(Menu.ADMIN_SESSIONS, currentUser.getId());
 
 			PrintWriter writer = response.getWriter();

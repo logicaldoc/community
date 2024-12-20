@@ -120,8 +120,8 @@ public class UserUtil {
 	 * @param avatarImageFile The file containing the avatar image
 	 */
 	public static void saveAvatar(User user, File avatarImageFile) {
-		UserDAO userDao = Context.get().getBean(UserDAO.class);
-		TenantDAO tenantDao = Context.get().getBean(TenantDAO.class);
+		UserDAO userDao = Context.get(UserDAO.class);
+		TenantDAO tenantDao = Context.get(TenantDAO.class);
 
 		File tmpAvatarImage = null;
 		try {
@@ -149,14 +149,14 @@ public class UserUtil {
 	 * @param user The user to elaborate
 	 */
 	public static void generateDefaultAvatar(User user) {
-		UserDAO userDao = Context.get().getBean(UserDAO.class);
+		UserDAO userDao = Context.get(UserDAO.class);
 		
 		File tmpAvatarImage = null;
 		try {
 			userDao.initialize(user);
 			tmpAvatarImage = FileUtil.createTempFile(AVATAR, ".png");
 
-			TenantDAO tenantDao = Context.get().getBean(TenantDAO.class);
+			TenantDAO tenantDao = Context.get(TenantDAO.class);
 			String tenantName = tenantDao.getTenantName(user.getTenantId());
 			int size = Context.get().getProperties().getInt(tenantName + ".gui.avatar.size", 128);
 
@@ -255,7 +255,7 @@ public class UserUtil {
 	public static String getAvatarImage(String userIdOrName) throws PersistenceException {
 		String content = TRANSPARENT_IMAGE;
 
-		UserDAO userDao = Context.get().getBean(UserDAO.class);
+		UserDAO userDao = Context.get(UserDAO.class);
 		User user = null;
 		if (userIdOrName != null)
 			try {

@@ -30,7 +30,7 @@ public class SequencesDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		SequenceDAO dao = Context.get().getBean(SequenceDAO.class);
+		SequenceDAO dao = Context.get(SequenceDAO.class);
 		List<Sequence> sequences = dao.findByName(StringUtils.defaultString(request.getParameter("prefix")),
 				session.getTenantId());
 		sequences.sort((o1, o2) -> o1.getName().compareTo(o2.getName()));

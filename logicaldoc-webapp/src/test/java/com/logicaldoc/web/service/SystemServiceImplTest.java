@@ -252,7 +252,7 @@ public class SystemServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testUnscheduleJobs() throws SchedulerException, ServerException {
-		JobManager jobManager = Context.get().getBean(JobManager.class);
+		JobManager jobManager = Context.get(JobManager.class);
 		jobManager.schedule(new AbstractJob("Dummy", "xyz") {
 
 			@Override

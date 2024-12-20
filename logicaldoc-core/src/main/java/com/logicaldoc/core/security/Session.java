@@ -166,7 +166,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.finished = new Date();
 
 		// Add a user history entry
-		UserHistoryDAO userHistoryDAO = Context.get().getBean(UserHistoryDAO.class);
+		UserHistoryDAO userHistoryDAO = Context.get(UserHistoryDAO.class);
 		userHistoryDAO.createUserHistory(user, UserEvent.TIMEOUT.toString(), null, sid, client);
 	}
 
@@ -178,7 +178,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.finished = new Date();
 
 		// Add a user history entry
-		UserHistoryDAO userHistoryDAO = Context.get().getBean(UserHistoryDAO.class);
+		UserHistoryDAO userHistoryDAO = Context.get(UserHistoryDAO.class);
 		userHistoryDAO.createUserHistory(user, UserEvent.LOGOUT.toString(), null, sid, client);
 	}
 
@@ -225,7 +225,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.node = SystemInfo.get().getInstallationId();
 		this.setLastRenew(getCreation());
 
-		TenantDAO tenantDAO = Context.get().getBean(TenantDAO.class);
+		TenantDAO tenantDAO = Context.get(TenantDAO.class);
 		try {
 			this.tenantName = tenantDAO.getTenantName(tenantId);
 		} catch (PersistenceException e) {
@@ -237,12 +237,11 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		/*
 		 * Add / update the device in the DB
 		 */
-		UserHistoryDAO userHistoryDAO = Context.get().getBean(UserHistoryDAO.class);
 		if (client != null && client.getDevice() != null) {
 			client.getDevice().setUserId(user.getId());
 			client.getDevice().setUsername(user.getFullName());
 
-			DeviceDAO deviceDAO = Context.get().getBean(DeviceDAO.class);
+			DeviceDAO deviceDAO = Context.get(DeviceDAO.class);
 			Device device = deviceDAO.findByDevice(client.getDevice());
 			if (device == null)
 				device = client.getDevice();
@@ -259,7 +258,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 				history.setDevice(client.getDevice().toString());
 				if (client.getGeolocation() != null)
 					history.setGeolocation(client.getGeolocation().toString());
-				userHistoryDAO.store(history);
+				Context.get(UserHistoryDAO.class).store(history);
 
 				// Send an email alert to the user in case of new device
 				if (newDevice && Context.get().getProperties().getBoolean(tenantName + ".alertnewdevice", true)) {
@@ -280,10 +279,8 @@ public class Session extends PersistentObject implements Comparable<Session> {
 					recipient.setMode(Recipient.MODE_EMAIL_TO);
 					email.getRecipients().add(recipient);
 
-					EMailSender sender = Context.get().getBean(EMailSender.class);
-					sender.sendAsync(email, "newdevice", dictionaryMap);
+					Context.get(EMailSender.class).sendAsync(email, "newdevice", dictionaryMap);
 				}
-
 			} catch (PersistenceException e) {
 				log.warn("Cannot record the device {}", device);
 			}
@@ -323,7 +320,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		}
 
 		// Add a user history entry
-		UserHistoryDAO userHistoryDAO = Context.get().getBean(UserHistoryDAO.class);
+		UserHistoryDAO userHistoryDAO = Context.get(UserHistoryDAO.class);
 		UserHistory history = userHistoryDAO.createUserHistory(user, UserEvent.LOGIN.toString(), historyComment, sid,
 				client);
 
@@ -504,10 +501,10 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	public void setKeyLabel(String keyLabel) {
 		this.keyLabel = keyLabel;
 	}
-	
+
 	@Override
 	public int compareTo(Session other) {
-		if(equals(other))
+		if (equals(other))
 			return 0;
 		int compare = Integer.compare(status, other.status);
 		if (compare == 0)

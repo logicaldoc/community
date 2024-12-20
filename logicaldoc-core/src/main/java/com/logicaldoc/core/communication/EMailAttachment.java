@@ -130,7 +130,7 @@ public class EMailAttachment implements Serializable {
 		// and gets some fields
 		try (InputStream contentStream = new ByteArrayInputStream(getData())) {
 			if (tenantId != null) {
-				TenantDAO tDao = Context.get().getBean(TenantDAO.class);
+				TenantDAO tDao = Context.get(TenantDAO.class);
 				content = parser.parse(contentStream, getFileName(),
 						StringUtils.isNotEmpty(encoding) ? encoding : "UTF-8", locale != null ? locale : Locale.ENGLISH,
 						tDao.findById(tenantId).getName());

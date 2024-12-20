@@ -42,7 +42,7 @@ public class DeletedFoldersDataServlet extends AbstractDataServlet {
 				? Long.parseLong(request.getParameter("userId"))
 				: null;
 
-		FolderDAO fldDao = Context.get().getBean(FolderDAO.class);
+		FolderDAO fldDao = Context.get(FolderDAO.class);
 		DateFormat df = getDateFormat();
 
 		PrintWriter writer = response.getWriter();

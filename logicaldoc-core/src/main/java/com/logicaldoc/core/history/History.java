@@ -229,7 +229,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	public User getUser() {
 		if (user == null && (userId != null && userId.longValue() != 0L)) {
-			UserDAO uDao = Context.get().getBean(UserDAO.class);
+			UserDAO uDao = Context.get(UserDAO.class);
 			try {
 				user = uDao.findById(userId);
 				uDao.initialize(user);

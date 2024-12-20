@@ -176,8 +176,8 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 		 * message
 		 */
 		if (originalId == 0L && message.getType() == Message.TYPE_SYSTEM) {
-			UserHistoryDAO hDao = Context.get().getBean(UserHistoryDAO.class);
-			UserDAO uDao = Context.get().getBean(UserDAO.class);
+			UserHistoryDAO hDao = Context.get(UserHistoryDAO.class);
+			UserDAO uDao = Context.get(UserDAO.class);
 			for (Recipient rec : message.getRecipients()) {
 				if (rec.getType() == Recipient.TYPE_EMAIL)
 					continue;

@@ -64,10 +64,10 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		try {
 			List<Hit> hits = doSearch(options, session, result);
 
-			BookmarkDAO bDao = Context.get().getBean(BookmarkDAO.class);
+			BookmarkDAO bDao = Context.get(BookmarkDAO.class);
 			List<Long> bookmarks = bDao.findBookmarkedDocs(session.getUserId());
 
-			DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+			DocumentDAO docDao = Context.get(DocumentDAO.class);
 			List<GUIDocument> guiResults = new ArrayList<>();
 			DocumentServiceImpl documentServiceImpl = new DocumentServiceImpl();
 			for (Hit hit : hits) {
@@ -200,7 +200,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			search.setDescription(options.getDescription());
 			search.saveOptions(opt);
 
-			SearchDAO dao = Context.get().getBean(SearchDAO.class);
+			SearchDAO dao = Context.get(SearchDAO.class);
 			dao.store(search);
 
 			log.debug("Saved search {}", opt.getName());
@@ -213,7 +213,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	@Override
 	public void delete(List<String> names) throws ServerException {
 		Session session = validateSession();
-		SearchDAO dao = Context.get().getBean(SearchDAO.class);
+		SearchDAO dao = Context.get(SearchDAO.class);
 
 		try {
 			for (String name : names) {
@@ -230,7 +230,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	@Override
 	public GUISearchOptions load(String name) throws ServerException {
 		Session session = validateSession();
-		SearchDAO dao = Context.get().getBean(SearchDAO.class);
+		SearchDAO dao = Context.get(SearchDAO.class);
 
 		try {
 			com.logicaldoc.core.searchengine.saved.SavedSearch search = dao.findByUserIdAndName(session.getUserId(),
@@ -252,7 +252,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	 * @throws PersistenceException A problem at db level
 	 */
 	public static List<SearchOptions> getSearches(Session session) throws PersistenceException {
-		SearchDAO dao = Context.get().getBean(SearchDAO.class);
+		SearchDAO dao = Context.get(SearchDAO.class);
 
 		Map<String, SearchOptions> map = new HashMap<>();
 		List<com.logicaldoc.core.searchengine.saved.SavedSearch> searches = dao.findByUserId(session.getUserId());
@@ -343,7 +343,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 
 	private void store(com.logicaldoc.core.searchengine.saved.SavedSearch search, Long userId) {
 		try {
-			SearchDAO dao = Context.get().getBean(SearchDAO.class);
+			SearchDAO dao = Context.get(SearchDAO.class);
 			com.logicaldoc.core.searchengine.saved.SavedSearch clone = new com.logicaldoc.core.searchengine.saved.SavedSearch(
 					search);
 			clone.setUserId(userId);
@@ -354,7 +354,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	}
 
 	private void addUsersFromGroups(Collection<Long> groupIds, Collection<Long> users) throws PersistenceException {
-		UserDAO gDao = Context.get().getBean(UserDAO.class);
+		UserDAO gDao = Context.get(UserDAO.class);
 		for (Long gId : groupIds) {
 			Set<User> usrs = gDao.findByGroup(gId);
 			for (User user : usrs) {
@@ -366,7 +366,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 
 	private com.logicaldoc.core.searchengine.saved.SavedSearch loadSavedSearch(String name, Session session)
 			throws PersistenceException {
-		SearchDAO dao = Context.get().getBean(SearchDAO.class);
+		SearchDAO dao = Context.get(SearchDAO.class);
 		return dao.findByUserIdAndName(session.getUserId(), name);
 	}
 

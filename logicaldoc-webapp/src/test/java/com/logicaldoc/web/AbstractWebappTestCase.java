@@ -82,7 +82,7 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 	}
 
 	protected void prepareSession(String username, String password) throws ServerException, PersistenceException {
-		UserDAO userDao = Context.get().getBean(UserDAO.class);
+		UserDAO userDao = Context.get(UserDAO.class);
 
 		guiSession = new GUISession();
 		Client client=new Client("xyz", "192.168.2.231", "ghost");

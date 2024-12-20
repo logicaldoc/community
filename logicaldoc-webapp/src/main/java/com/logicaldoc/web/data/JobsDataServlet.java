@@ -55,7 +55,7 @@ public class JobsDataServlet extends AbstractDataServlet {
 		 */
 		if (groupsonly) {
 			try {
-				JobManager jobManager = Context.get().getBean(JobManager.class);
+				JobManager jobManager = Context.get(JobManager.class);
 				for (String name : jobManager.getGroups()) {
 					writer.print("<job>");
 					writer.print("<group><![CDATA[" + name + "]]></group>");
@@ -78,12 +78,12 @@ public class JobsDataServlet extends AbstractDataServlet {
 			throws SchedulerException, PersistenceException {
 		DateFormat df = getDateFormat();
 
-		TenantDAO tDao = Context.get().getBean(TenantDAO.class);
+		TenantDAO tDao = Context.get(TenantDAO.class);
 		Map<Long, String> tenants = tDao.findAll().stream().collect(Collectors.toMap(t -> t.getId(), Tenant::getName));
 
 		int count = 0;
 
-		JobManager jobManager = Context.get().getBean(JobManager.class);
+		JobManager jobManager = Context.get(JobManager.class);
 		for (Trigger trigger : jobManager.getTriggers(group,
 				session.getTenantId() == Tenant.DEFAULT_ID ? null : session.getTenantId())) {
 			if (count++ >= maxRecords)

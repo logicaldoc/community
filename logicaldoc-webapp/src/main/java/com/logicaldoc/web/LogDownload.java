@@ -196,7 +196,7 @@ public class LogDownload extends HttpServlet {
 	}
 
 	private String printDatabaseEnvironment() {
-		DocumentDAO dao = (DocumentDAO) Context.get().getBean("DocumentDAO");
+		DocumentDAO dao = (DocumentDAO) Context.get("DocumentDAO");
 		Properties prop = new Properties();
 		prop.putAll(dao.getDatabaseMetadata());
 
@@ -278,7 +278,7 @@ public class LogDownload extends HttpServlet {
 	private void dumpUpdateTable(ZipOutputStream out) throws IOException, PersistenceException {
 		File buf = FileUtil.createTempFile("updates", ".csv");
 		try {
-			DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
+			DocumentDAO dao = Context.get(DocumentDAO.class);
 			dao.queryForResultSet("select ld_update, ld_date, ld_version from ld_update order by ld_date desc", null,
 					null, rows -> {
 						try (CSVFileWriter csv = new CSVFileWriter(buf.getAbsolutePath(), ',')) {
@@ -321,7 +321,7 @@ public class LogDownload extends HttpServlet {
 	private void dumpPatchTable(ZipOutputStream out) throws IOException, PersistenceException {
 		File buf = FileUtil.createTempFile("patches", ".csv");
 		try {
-			DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
+			DocumentDAO dao = Context.get(DocumentDAO.class);
 			dao.queryForResultSet("select ld_patch, ld_date, ld_version from ld_patch order by ld_date desc", null,
 					null, rows -> {
 						try (CSVFileWriter csv = new CSVFileWriter(buf.getAbsolutePath(), ',')) {

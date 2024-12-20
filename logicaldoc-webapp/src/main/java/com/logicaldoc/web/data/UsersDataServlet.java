@@ -56,7 +56,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 		/*
 		 * Iterate over records composing the response XML document
 		 */
-		UserDAO userDao = Context.get().getBean(UserDAO.class);
+		UserDAO userDao = Context.get(UserDAO.class);
 		for (User user : users) {
 			if (user.getType() == User.TYPE_SYSTEM || (skipdisabled && user.getEnabled() != 1))
 				continue;
@@ -113,8 +113,8 @@ public class UsersDataServlet extends AbstractDataServlet {
 	private List<User> findUsers(Session session, String groupIdOrName) throws PersistenceException {
 		List<User> users = new ArrayList<>();
 
-		UserDAO userDao = Context.get().getBean(UserDAO.class);
-		GroupDAO groupDao = Context.get().getBean(GroupDAO.class);
+		UserDAO userDao = Context.get(UserDAO.class);
+		GroupDAO groupDao = Context.get(GroupDAO.class);
 
 		if (groupIdOrName != null && !groupIdOrName.trim().isEmpty()) {
 			Group group = null;

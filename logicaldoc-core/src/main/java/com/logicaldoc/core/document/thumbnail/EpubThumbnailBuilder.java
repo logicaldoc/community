@@ -56,9 +56,9 @@ public class EpubThumbnailBuilder extends ImageThumbnailBuilder {
 				 * The eBook does not define a cover, so we create one using the
 				 * first page
 				 */
-				ThumbnailBuilder pdfBuilder = Context.get().getBean(ThumbnailManager.class).getBuilder("pdf");
+				ThumbnailBuilder pdfBuilder = Context.get(ThumbnailManager.class).getBuilder("pdf");
 
-				FormatConverter pdfConverter = Context.get().getBean(FormatConverterManager.class).getConverter("epub",
+				FormatConverter pdfConverter = Context.get(FormatConverterManager.class).getConverter("epub",
 						"pdf");
 
 				if (pdfBuilder != null && pdfConverter != null && !(pdfConverter instanceof NotAvailableConverter)) {
@@ -82,7 +82,7 @@ public class EpubThumbnailBuilder extends ImageThumbnailBuilder {
 
 					File pdf = FileUtil.createTempFile(EBOOKCOVER, ".pdf");
 					try {
-						pdfConverter = Context.get().getBean(FormatConverterManager.class).getConverter("txt", "pdf");
+						pdfConverter = Context.get(FormatConverterManager.class).getConverter("txt", "pdf");
 						pdfConverter.convert(tmp, pdf);
 
 						if (pdfBuilder != null)

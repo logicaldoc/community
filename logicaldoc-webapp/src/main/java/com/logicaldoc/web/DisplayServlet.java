@@ -59,10 +59,10 @@ public class DisplayServlet extends HttpServlet {
 			else if (StringUtils.isNotEmpty(folderId))
 				redirectUrl += FOLDER_ID + "=" + folderId;
 			else if (StringUtils.isNotEmpty(folderPath)) {
-				UserDAO uDao = Context.get().getBean(UserDAO.class);
+				UserDAO uDao = Context.get(UserDAO.class);
 				User user = uDao.findByUsername(username);
 
-				FolderDAO fDao = Context.get().getBean(FolderDAO.class);
+				FolderDAO fDao = Context.get(FolderDAO.class);
 				Folder folder = fDao.findByPathExtended(folderPath, user.getTenantId());
 				redirectUrl += FOLDER_ID + "=" + folder.getId();
 			}

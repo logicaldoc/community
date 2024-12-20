@@ -38,7 +38,7 @@ public class TicketsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		TicketDAO dao = Context.get().getBean(TicketDAO.class);
+		TicketDAO dao = Context.get(TicketDAO.class);
 		StringBuilder query = new StringBuilder(
 				"select A.ld_id, A.ld_ticketid, A.ld_docid, A.ld_creation, A.ld_expired, A.ld_count, A.ld_maxcount, A.ld_suffix, A.ld_enabled, B.ld_filename, B.ld_folderid, A.ld_views, A.ld_maxviews, A.ld_type from ld_ticket as A, ld_document as B where A.ld_deleted = 0 and (A.ld_type = "
 						+ Ticket.DOWNLOAD + " or A.ld_type = " + Ticket.VIEW + ") and A.ld_tenantid="

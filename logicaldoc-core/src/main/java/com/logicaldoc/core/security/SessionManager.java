@@ -81,7 +81,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	}
 
 	public static final SessionManager get() {
-		return Context.get().getBean(SessionManager.class);
+		return Context.get(SessionManager.class);
 	}
 
 	/**

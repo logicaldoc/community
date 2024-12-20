@@ -484,7 +484,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		if (parser != null) {
 			log.debug("Using parser {} to parse document {}", parser.getClass().getName(), doc.getId());
 
-			TenantDAO tDao = Context.get().getBean(TenantDAO.class);
+			TenantDAO tDao = Context.get(TenantDAO.class);
 			try {
 				content = parser.parse(store.getStream(doc.getId(), resource), new ParseParameters(doc,
 						doc.getFileName(), fileVersion, null, locale, tDao.findById(doc.getTenantId()).getName()));
@@ -567,7 +567,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			transaction.setReason(Integer.toString(currentIndexed));
 			transaction.setDocument(doc);
 		}
-		DocumentHistoryDAO hDao = Context.get().getBean(DocumentHistoryDAO.class);
+		DocumentHistoryDAO hDao = Context.get(DocumentHistoryDAO.class);
 		hDao.store(transaction);
 
 		/*
@@ -587,14 +587,14 @@ public class DocumentManagerImpl implements DocumentManager {
 		transaction.setComment(exception.getMessage());
 		transaction.setDocument(document);
 		transaction.setPath(folderDAO.computePathExtended(document.getFolder().getId()));
-		DocumentHistoryDAO hDao = Context.get().getBean(DocumentHistoryDAO.class);
+		DocumentHistoryDAO hDao = Context.get(DocumentHistoryDAO.class);
 		hDao.store(transaction);
 
 		if (exception instanceof ParsingException) {
-			TenantDAO tDao = Context.get().getBean(TenantDAO.class);
+			TenantDAO tDao = Context.get(TenantDAO.class);
 			String tenant = tDao.getTenantName(document.getTenantId());
 			if (Context.get().getProperties().getBoolean(tenant + ".index.skiponerror", false)) {
-				DocumentDAO dDao = Context.get().getBean(DocumentDAO.class);
+				DocumentDAO dDao = Context.get(DocumentDAO.class);
 				dDao.initialize(document);
 				document.setIndexed(AbstractDocument.INDEX_SKIP);
 				dDao.store(document);
@@ -1004,7 +1004,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	public int countPages(Document doc) {
 		try {
 			Parser parser = ParserFactory.getParser(doc.getFileName());
-			Store strt = Context.get().getBean(Store.class);
+			Store strt = Context.get(Store.class);
 			return parser.countPages(strt.getStream(doc.getId(), strt.getResourceName(doc, null, null)),
 					doc.getFileName());
 		} catch (Exception e) {
@@ -1449,7 +1449,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			throw new IllegalArgumentException("transaction user cannot be null");
 
 		List<Long> idsList = new ArrayList<>();
-		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get(DocumentDAO.class);
 		Collection<Long> folderIds = folderDAO.findFolderIdByUserIdAndPermission(transaction.getUserId(),
 				Permission.ARCHIVE, null, true);
 
@@ -1469,7 +1469,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		}
 
 		// Remove all corresponding hits from the index
-		SearchEngine engine = Context.get().getBean(SearchEngine.class);
+		SearchEngine engine = Context.get(SearchEngine.class);
 		engine.deleteHits(idsList);
 
 		log.info("Archived documents {}", idsList);
@@ -1695,7 +1695,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			bigPdf = MergeUtil.mergePdf(List.of(pdfs));
 
 			// Add an history entry to track the export of the document
-			DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+			DocumentDAO docDao = Context.get(DocumentDAO.class);
 			if (transaction != null)
 				for (Long id : docIds) {
 					DocumentHistory trans = new DocumentHistory(transaction);
@@ -1705,10 +1705,10 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			Document docVO = new Document();
 			docVO.setFileName(fileName.toLowerCase().endsWith(".pdf") ? fileName : fileName + ".pdf");
-			FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+			FolderDAO folderDao = Context.get(FolderDAO.class);
 			docVO.setFolder(folderDao.findById(targetFolderId));
 
-			DocumentManager manager = Context.get().getBean(DocumentManager.class);
+			DocumentManager manager = Context.get(DocumentManager.class);
 			return manager.create(bigPdf, docVO, transaction);
 		} finally {
 			FileUtil.delete(bigPdf);
@@ -1736,14 +1736,14 @@ public class DocumentManagerImpl implements DocumentManager {
 		for (long docId : docIds) {
 			try {
 				i++;
-				DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+				DocumentDAO docDao = Context.get(DocumentDAO.class);
 				Document document = docDao.findDocument(docId);
 
 				if (document != null && user != null && !user.isMemberOf(Group.GROUP_ADMIN)
 						&& !user.isMemberOf("publisher") && !document.isPublishing())
 					continue;
 
-				FormatConverterManager manager = Context.get().getBean(FormatConverterManager.class);
+				FormatConverterManager manager = Context.get(FormatConverterManager.class);
 				manager.convertToPdf(document, null);
 
 				File pdf = new File(tempDir, nf.format(i) + ".pdf");
@@ -1765,7 +1765,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			throws PersistenceException, PermissionException {
 		validateTransaction(transaction);
 
-		MenuDAO menuDAO = Context.get().getBean(MenuDAO.class);
+		MenuDAO menuDAO = Context.get(MenuDAO.class);
 		if (!menuDAO.isReadEnable(Menu.DESTROY_DOCUMENTS, transaction.getUserId())) {
 			String message = "User " + transaction.getUsername() + " cannot access the menu " + Menu.DESTROY_DOCUMENTS;
 			throw new PermissionException(message);

@@ -72,7 +72,7 @@ public class ZipImport {
 		this.zipFile = zipsource;
 		this.sessionId = sessionId;
 
-		UserDAO userDao = Context.get().getBean(UserDAO.class);
+		UserDAO userDao = Context.get(UserDAO.class);
 		this.user = userDao.findById(userId);
 
 		File dir = prepareUnzipDir(userId);
@@ -145,7 +145,7 @@ public class ZipImport {
 	 * @throws PersistenceException
 	 */
 	protected void addEntry(File file, Folder parent) throws PersistenceException {
-		FolderDAO dao = Context.get().getBean(FolderDAO.class);
+		FolderDAO dao = Context.get(FolderDAO.class);
 		String folderName = file.getName();
 		FolderHistory transaction = new FolderHistory();
 		transaction.setUser(user);
@@ -168,7 +168,7 @@ public class ZipImport {
 					addEntry(files[i], folder);
 		} else if (file.length() > 0L) {
 			// creates a document
-			DocumentManager docManager = Context.get().getBean(DocumentManager.class);
+			DocumentManager docManager = Context.get(DocumentManager.class);
 			try {
 				DocumentHistory history = new DocumentHistory();
 				history.setEvent(DocumentEvent.STORED.toString());
@@ -193,7 +193,7 @@ public class ZipImport {
 	 * Sends a system message to the user that imported the zip
 	 */
 	protected void sendNotificationMessage() {
-		SystemMessageDAO smdao = Context.get().getBean(SystemMessageDAO.class);
+		SystemMessageDAO smdao = Context.get(SystemMessageDAO.class);
 		Date now = new Date();
 		Recipient recipient = new Recipient();
 		recipient.setName(user.getUsername());

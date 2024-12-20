@@ -90,7 +90,7 @@ public class SearchTool {
 	public List<Hit> search(long tenantId, String expression, Set<String> filters, String expressionLanguage) {
 		filters.add(HitField.TENANT_ID.getName() + ":" + tenantId);
 
-		SearchEngine engine = Context.get().getBean(SearchEngine.class);
+		SearchEngine engine = Context.get(SearchEngine.class);
 		Hits result = engine.search(expression, filters, expressionLanguage, null);
 
 		Map<Long, Hit> hitsMap = new HashMap<>();
@@ -107,7 +107,7 @@ public class SearchTool {
 			if (!hitsIds.isEmpty()) {
 				hitsIdsCondition.append(" and (");
 
-				FolderDAO fdao = Context.get().getBean(FolderDAO.class);
+				FolderDAO fdao = Context.get(FolderDAO.class);
 				if (fdao.isOracle()) {
 					/*
 					 * In Oracle The limit of 1000 elements applies to sets of
@@ -145,7 +145,7 @@ public class SearchTool {
 			richQuery.append(" where A.ld_deleted=0 and A.ld_tenantid = " + tenantId);
 			richQuery.append(hitsIdsCondition.toString());
 
-			DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
+			DocumentDAO dao = Context.get(DocumentDAO.class);
 			try {
 				dao.query(richQuery.toString(), new HitMapper(hitsMap), null);
 			} catch (Exception e) {

@@ -31,10 +31,10 @@ public class CatchAllParser extends AbstractParser {
 	 */
 	private void parse2(ParseParameters parameters, StringBuilder content) {
 		try {
-			FormatConverterManager manager = Context.get().getBean(FormatConverterManager.class);
+			FormatConverterManager manager = Context.get(FormatConverterManager.class);
 			manager.convertToPdf(parameters.getDocument(), parameters.getFileVersion(), null);
 
-			Store store = Context.get().getBean(Store.class);
+			Store store = Context.get(Store.class);
 			String pdfResource = store
 					.getResourceName(parameters.getDocument(),
 							parameters.getFileVersion() != null ? parameters.getFileVersion()
@@ -57,7 +57,7 @@ public class CatchAllParser extends AbstractParser {
 	 * Parses without document specification
 	 */
 	private void parse1(InputStream input, ParseParameters parameters, StringBuilder content) {
-		FormatConverterManager manager = Context.get().getBean(FormatConverterManager.class);
+		FormatConverterManager manager = Context.get(FormatConverterManager.class);
 		File inputFile = null;
 		File outputPdf = null;
 		try {

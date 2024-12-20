@@ -151,7 +151,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 			conf.write();
 
 			// Always update the settings for the default sender
-			EMailSender sender = Context.get().getBean(EMailSender.class);
+			EMailSender sender = Context.get(EMailSender.class);
 			sender.setHost(conf.getProperty(Tenant.DEFAULT_NAME + SMTP_HOST));
 			sender.setPort(Integer.parseInt(conf.getProperty(Tenant.DEFAULT_NAME + SMTP_PORT)));
 			sender.setUsername(conf.getProperty(Tenant.DEFAULT_NAME + SMTP_USERNAME));
@@ -235,7 +235,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		Session session = checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
 
 		try {
-			GenericDAO genericDao = Context.get().getBean(GenericDAO.class);
+			GenericDAO genericDao = Context.get(GenericDAO.class);
 			int counter = 0;
 			ContextProperties conf = Context.get().getProperties();
 			for (GUIParameter setting : settings) {
@@ -283,7 +283,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 	public void saveFirewallSettings(List<GUIParameter> settings) throws ServerException {
 		saveSettings(settings);
 
-		HttpFirewall firewall = Context.get().getBean(HttpFirewall.class);
+		HttpFirewall firewall = Context.get(HttpFirewall.class);
 		ContextProperties config = Context.get().getProperties();
 
 		firewall.setAllowBackSlash(config.getBoolean("firewall.allowBackSlash", false));
@@ -296,7 +296,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 	@Override
 	public void saveStoreSettings(List<GUIParameter> settings) throws ServerException {
 		saveSettings(settings);
-		Store store = Context.get().getBean(Store.class);
+		Store store = Context.get(Store.class);
 		store.init();
 	}
 
@@ -310,7 +310,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 				throw new ServerException(
 						"You cannot delete the store " + storeId + " because it is the current default");
 
-			FolderDAO dao = Context.get().getBean(FolderDAO.class);
+			FolderDAO dao = Context.get(FolderDAO.class);
 
 			/*
 			 * Search for those folders that refer this store
@@ -395,7 +395,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		 */
 
 		try {
-			GenericDAO gDao = Context.get().getBean(GenericDAO.class);
+			GenericDAO gDao = Context.get(GenericDAO.class);
 			List<Generic> generics = gDao.findByTypeAndSubtype(GUISETTING, null, null, session.getTenantId());
 			for (Generic gen : generics)
 				params.add(new GUIParameter(tenantName + "." + gen.getSubtype(), gen.getString1()));
@@ -439,7 +439,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 	public boolean testStore(int id) throws ServerException {
 		validateSession();
 		try {
-			Store manager = Context.get().getBean(Store.class);
+			Store manager = Context.get(Store.class);
 			Store store = manager.newStore(id);
 			log.info("Testing store {}", store);
 			return store.test();
@@ -528,7 +528,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 			List<GUIParameter> params = new ArrayList<>();
 
 			// Retrieve API calls stats
-			SequenceDAO dao = Context.get().getBean(SequenceDAO.class);
+			SequenceDAO dao = Context.get(SequenceDAO.class);
 			GUIParameter p = new GUIParameter("webservice.apicalls",
 					"" + dao.getCurrentValue("wscall", 0, tenantId != null ? tenantId : Tenant.SYSTEM_ID));
 			params.add(p);

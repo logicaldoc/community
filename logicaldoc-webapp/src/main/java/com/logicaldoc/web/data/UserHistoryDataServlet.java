@@ -38,7 +38,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		MenuDAO mDao = Context.get().getBean(MenuDAO.class);
+		MenuDAO mDao = Context.get(MenuDAO.class);
 		boolean showSid = mDao.isReadEnable(Menu.SESSIONS, session.getUserId());
 
 		Long userId = StringUtils.isNotEmpty(request.getParameter("id")) ? Long.parseLong(request.getParameter("id"))
@@ -114,7 +114,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 
 		query.append(" order by A.date desc ");
 
-		return Context.get().getBean(UserHistoryDAO.class).findByQuery(query.toString(), params,
+		return Context.get(UserHistoryDAO.class).findByQuery(query.toString(), params,
 				max != null ? max : 100);
 	}
 }

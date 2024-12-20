@@ -942,7 +942,7 @@ public class ResourceServiceImpl implements ResourceService {
 		try {
 			User user = userDAO.findById(resource.getRequestedPerson());
 
-			BookmarkDAO bdao = Context.get().getBean(BookmarkDAO.class);
+			BookmarkDAO bdao = Context.get(BookmarkDAO.class);
 
 			Bookmark bmark = new Bookmark();
 			if (resource.isFolder()) {
@@ -973,7 +973,7 @@ public class ResourceServiceImpl implements ResourceService {
 		try {
 			User user = userDAO.findById(resource.getRequestedPerson());
 
-			BookmarkDAO bdao = Context.get().getBean(BookmarkDAO.class);
+			BookmarkDAO bdao = Context.get(BookmarkDAO.class);
 
 			Bookmark bkm = null;
 			if (resource.isFolder()) {

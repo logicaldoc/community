@@ -32,8 +32,8 @@ public class GarbageDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max, Locale locale)
 			throws PersistenceException, IOException {
 
-		DocumentDAO documentDAO = Context.get().getBean(DocumentDAO.class);
-		FolderDAO folderDAO = Context.get().getBean(FolderDAO.class);
+		DocumentDAO documentDAO = Context.get(DocumentDAO.class);
+		FolderDAO folderDAO = Context.get(FolderDAO.class);
 
 		DateFormat df = getDateFormat();
 

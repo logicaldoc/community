@@ -47,7 +47,7 @@ public class EventCollector {
 	private Map<String, Queue<Long>> fifos = new HashMap<>();
 
 	public static EventCollector get() {
-		return Context.get().getBean(EventCollector.class);
+		return Context.get(EventCollector.class);
 	}
 
 	public void addListener(EventListener listener) {
@@ -98,7 +98,7 @@ public class EventCollector {
 			return;
 
 		if (history.getDocId() != null && history.getDocument() == null) {
-			DocumentDAO docDao = com.logicaldoc.util.Context.get().getBean(DocumentDAO.class);
+			DocumentDAO docDao = com.logicaldoc.util.Context.get(DocumentDAO.class);
 			try {
 				history.setDocument(docDao.findById(history.getDocId()));
 			} catch (PersistenceException e) {
@@ -124,7 +124,7 @@ public class EventCollector {
 			log.debug("Finished notification of history {}", history);
 		};
 
-		ThreadPools pools = Context.get().getBean(ThreadPools.class);
+		ThreadPools pools = Context.get(ThreadPools.class);
 		pools.execute(notifier, "EventCollector");
 	}
 

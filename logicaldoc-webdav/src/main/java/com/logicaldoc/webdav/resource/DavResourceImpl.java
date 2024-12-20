@@ -108,7 +108,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		this.config = config;
 		this.session = session;
 
-		resourceService = (ResourceService) Context.get().getBean(RESOURCE_SERVICE);
+		resourceService = (ResourceService) Context.get(RESOURCE_SERVICE);
 		if (this.resource != null) {
 			this.isCollection = this.resource.isFolder();
 			this.resource.setRequestedPerson(Long.parseLong(session.getObject("id").toString()));
@@ -132,7 +132,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		this.locator = locator;
 		this.config = config;
 		this.session = session;
-		resourceService = (ResourceService) Context.get().getBean(RESOURCE_SERVICE);
+		resourceService = (ResourceService) Context.get(RESOURCE_SERVICE);
 	}
 
 	/**
@@ -150,7 +150,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 			ResourceConfig config, boolean isCollection) throws DavException {
 		this(locator, factory, session, config);
 		this.isCollection = isCollection;
-		resourceService = (ResourceService) Context.get().getBean(RESOURCE_SERVICE);
+		resourceService = (ResourceService) Context.get(RESOURCE_SERVICE);
 	}
 
 	/**

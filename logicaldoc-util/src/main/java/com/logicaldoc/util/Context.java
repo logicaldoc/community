@@ -55,6 +55,14 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 		return instance;
 	}
 
+	public static <R> R get(Class<R> requiredType) {
+		return get().getBean(requiredType);
+	}
+	
+	public static Object get(String id) {
+		return get().getBean(id);
+	}
+
 	/**
 	 * Gets the registry with all the configuration properties for this context
 	 * 

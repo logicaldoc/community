@@ -83,7 +83,7 @@ public class VersionsDataServlet extends AbstractDataServlet {
 	}
 
 	private List<?> executeQuery(HttpServletRequest request, Integer max) throws PersistenceException {
-		VersionDAO dao = Context.get().getBean(VersionDAO.class);
+		VersionDAO dao = Context.get(VersionDAO.class);
 
 		Map<String, Object> params = new HashMap<>();
 
@@ -92,7 +92,7 @@ public class VersionsDataServlet extends AbstractDataServlet {
 						+ " A.customId, A.fileSize, A.type, A.templateName, A.workflowStatus, A.workflowStatusDisplay, A.userId, A.color ");
 		if (request.getParameter(DOC_ID) != null) {
 			long docId = Long.parseLong(request.getParameter(DOC_ID));
-			DocumentDAO ddao = Context.get().getBean(DocumentDAO.class);
+			DocumentDAO ddao = Context.get(DocumentDAO.class);
 			Document doc = ddao.findDocument(docId);
 			if (doc != null)
 				docId = doc.getId();

@@ -28,7 +28,7 @@ public class ApiKeysDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		ApiKeyDAO dao = Context.get().getBean(ApiKeyDAO.class);
+		ApiKeyDAO dao = Context.get(ApiKeyDAO.class);
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");

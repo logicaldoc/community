@@ -493,7 +493,7 @@ public class WSUser {
 			user.setSecondFactor(getSecondFactor());
 
 			if (CollectionUtils.isNotEmpty(groupIds)) {
-				GroupDAO groupDao = Context.get().getBean(GroupDAO.class);
+				GroupDAO groupDao = Context.get(GroupDAO.class);
 				Set<Group> groups = new HashSet<>();
 				for (long groupId : getGroupIds()) {
 					Group group = groupDao.findById(groupId);
@@ -520,7 +520,7 @@ public class WSUser {
 	public static WSUser fromUser(User user) {
 		WSUser wsUser = new WSUser();
 		try {
-			UserDAO dao = Context.get().getBean(UserDAO.class);
+			UserDAO dao = Context.get(UserDAO.class);
 			dao.initialize(user);
 			
 			wsUser.setId(user.getId());

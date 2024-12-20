@@ -227,10 +227,10 @@ public class Dropbox {
 	}
 
 	private Generic getGeneric() throws PersistenceException {
-		UserDAO uDao = Context.get().getBean(UserDAO.class);
+		UserDAO uDao = Context.get(UserDAO.class);
 		User user = uDao.findById(userId);
 
-		GenericDAO genericDao = Context.get().getBean(GenericDAO.class);
+		GenericDAO genericDao = Context.get(GenericDAO.class);
 		Generic settings = genericDao.findByAlternateKey("usersetting", "dropbox", userId, user.getTenantId());
 		if (settings == null) {
 			settings = new Generic("usersetting", "dropbox", userId, user.getTenantId());
@@ -249,7 +249,7 @@ public class Dropbox {
 		settings.setString2(encrypter.encrypt(apiSecret));
 		if (StringUtils.isNotEmpty(accessToken))
 			settings.setString3(encrypter.encrypt(accessToken));
-		GenericDAO genericDao = Context.get().getBean(GenericDAO.class);
+		GenericDAO genericDao = Context.get(GenericDAO.class);
 		genericDao.store(settings);
 	}
 

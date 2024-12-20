@@ -34,7 +34,7 @@ public abstract class AbstractWebserviceTestCase extends AbstractTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		ApiKeyDAO dao = Context.get().getBean(ApiKeyDAO.class);
+		ApiKeyDAO dao = Context.get(ApiKeyDAO.class);
 		apiKey = new ApiKey(1L, "MyKey");
 		dao.store(apiKey);
 

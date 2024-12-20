@@ -201,7 +201,7 @@ public class WSFolder implements Serializable {
 		Template template = null;
 		if (templateId != null) {
 			folder.getAttributes().clear();
-			TemplateDAO templDao = Context.get().getBean(TemplateDAO.class);
+			TemplateDAO templDao = Context.get(TemplateDAO.class);
 			template = templDao.findById(templateId);
 			if (template != null && CollectionUtils.isNotEmpty(attributes)) {
 				for (WSAttribute wsAttribute : attributes) {

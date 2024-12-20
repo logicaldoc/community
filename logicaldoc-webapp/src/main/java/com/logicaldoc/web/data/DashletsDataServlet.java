@@ -37,7 +37,7 @@ public class DashletsDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		List<Object> records = new ArrayList<>();
-		BookmarkDAO dao = Context.get().getBean(BookmarkDAO.class);
+		BookmarkDAO dao = Context.get(BookmarkDAO.class);
 
 		/*
 		 * Search for folders first.

@@ -21,7 +21,7 @@ public class ContextTool {
 	 * @return the instance
 	 */
 	public Object getBean(String id) {
-		return Context.get().getBean(id);
+		return Context.get(id);
 	}
 
 	/**

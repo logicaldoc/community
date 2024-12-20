@@ -130,7 +130,7 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			DavSessionImpl davSession = new DavSessionImpl();
 			davSession.setTenantId(SessionManager.get().get(session.getSid()).getTenantId());
 			davSession.putObject("sid", session.getSid());
-			UserDAO dao = Context.get().getBean(UserDAO.class);
+			UserDAO dao = Context.get(UserDAO.class);
 			User user = dao.findById(session.getUserId());
 			dao.initialize(user);
 			davSession.putObject("id", session.getUserId());
@@ -905,7 +905,7 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			throws DavException, IOException {
 		log.debug("doCheckin");
 
-		ResourceService resourceService = Context.get().getBean(ResourceService.class);
+		ResourceService resourceService = Context.get(ResourceService.class);
 		WebdavSession session = (com.logicaldoc.webdav.session.WebdavSession) request.getDavSession();
 		Resource repositoryResource = resourceService.getResource(resource.getResourcePath(), session);
 

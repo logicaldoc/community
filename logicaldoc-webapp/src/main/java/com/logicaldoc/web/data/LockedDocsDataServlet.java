@@ -38,7 +38,7 @@ public class LockedDocsDataServlet extends AbstractDataServlet {
 
 		Long userId = request.getParameter("userId") != null ? Long.parseLong(request.getParameter("userId")) : null;
 
-		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+		DocumentDAO docDao = Context.get(DocumentDAO.class);
 		DateFormat df = getDateFormat();
 
 		PrintWriter writer = response.getWriter();

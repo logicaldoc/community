@@ -145,7 +145,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		Session session = validateSession();
 
 		try {
-			GenericDAO genDao = Context.get().getBean(GenericDAO.class);
+			GenericDAO genDao = Context.get(GenericDAO.class);
 
 			List<List<GUIParameter>> parameters = new ArrayList<>();
 
@@ -346,7 +346,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	}
 
 	private Task getTask(String taskName) {
-		TaskManager manager = Context.get().getBean(TaskManager.class);
+		TaskManager manager = Context.get(TaskManager.class);
 		Task tsk = null;
 		for (Task t : manager.getTasks()) {
 			if (t.getName().equals(taskName)) {
@@ -377,7 +377,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	}
 
 	private void addReportRecipients(GUITask guiTask, Task task) {
-		UserDAO dao = Context.get().getBean(UserDAO.class);
+		UserDAO dao = Context.get(UserDAO.class);
 		if (StringUtils.isNotEmpty(task.getReportRecipients())) {
 			StringTokenizer st = new StringTokenizer(task.getReportRecipients(), ",", false);
 			while (st.hasMoreTokens()) {
@@ -402,7 +402,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	public List<GUITask> loadTasks(String locale) throws ServerException {
 		validateSession();
 
-		TaskManager manager = Context.get().getBean(TaskManager.class);
+		TaskManager manager = Context.get(TaskManager.class);
 		List<GUITask> tasks = new ArrayList<>();
 
 		for (Task t : manager.getTasks()) {
@@ -448,7 +448,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	public GUITask saveTask(GUITask guiTask, String locale) throws ServerException {
 		validateSession();
 
-		TaskManager manager = Context.get().getBean(TaskManager.class);
+		TaskManager manager = Context.get(TaskManager.class);
 		Task task = null;
 		for (Task t : manager.getTasks()) {
 			if (t.getName().equals(guiTask.getName())) {
@@ -498,7 +498,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	@Override
 	public void startTask(String taskName) {
-		TaskManager manager = Context.get().getBean(TaskManager.class);
+		TaskManager manager = Context.get(TaskManager.class);
 
 		for (Task task : manager.getTasks()) {
 			if (task.getName().equals(taskName)) {
@@ -511,7 +511,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	@Override
 	public void stopTask(String taskName) {
-		TaskManager manager = Context.get().getBean(TaskManager.class);
+		TaskManager manager = Context.get(TaskManager.class);
 		for (Task task : manager.getTasks()) {
 			if (task.getName().equals(taskName)) {
 				task.interrupt();
@@ -644,7 +644,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	}
 
 	private List<GUIHistory> executeQuery(String query, int maxResult, Session session) throws PersistenceException {
-		DocumentHistoryDAO dao = Context.get().getBean(DocumentHistoryDAO.class);
+		DocumentHistoryDAO dao = Context.get(DocumentHistoryDAO.class);
 		return dao.query(query, new RowMapper<GUIHistory>() {
 
 			@Override
@@ -684,7 +684,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			return;
 
 		StringBuilder folderPredicate = new StringBuilder();
-		FolderDAO fDao = Context.get().getBean(FolderDAO.class);
+		FolderDAO fDao = Context.get(FolderDAO.class);
 		Collection<Long> tree = fDao.findFolderIdInTree(rootFolderId, false);
 		if (fDao.isOracle()) {
 			/*
@@ -710,7 +710,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		Session session = validateSession();
 
 		try {
-			TenantDAO dao = Context.get().getBean(TenantDAO.class);
+			TenantDAO dao = Context.get(TenantDAO.class);
 			Map<Long, String> tenants = dao.findAll().stream()
 					.collect(Collectors.toMap(Tenant::getId, Tenant::getName));
 			tenants.put(Tenant.SYSTEM_ID, "system");
@@ -769,7 +769,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	@Override
 	public void unscheduleJobs(List<GUIValue> jobs) throws ServerException {
 		Session session = validateSession();
-		JobManager jobManager = Context.get().getBean(JobManager.class);
+		JobManager jobManager = Context.get(JobManager.class);
 		for (GUIValue trigger : jobs)
 			try {
 				jobManager.unscheduleTrigger(trigger.getCode(), trigger.getValue());

@@ -551,7 +551,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	protected Connection getConnection() throws PersistenceException {
-		DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
+		DataSource dataSource = (DataSource) Context.get(DATA_SOURCE);
 		try {
 			return dataSource.getConnection();
 		} catch (Exception e) {
@@ -645,7 +645,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	@Override
 	public Map<String, String> getDatabaseMetadata() {
 		Map<String, String> map = new HashMap<>();
-		DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
+		DataSource dataSource = (DataSource) Context.get(DATA_SOURCE);
 		try (Connection connection = dataSource.getConnection();) {
 			DatabaseMetaData meta = connection.getMetaData();
 			map.put("db.product.name", meta.getDatabaseProductName());

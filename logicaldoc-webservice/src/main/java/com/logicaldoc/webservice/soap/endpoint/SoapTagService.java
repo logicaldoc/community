@@ -134,7 +134,7 @@ public class SoapTagService extends AbstractService implements TagService {
 	@Override
 	public List<String> getTags(String sid) throws PersistenceException, AuthenticationException, WebserviceException {
 		User user = validateSession(sid);
-		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+		DocumentDAO docDao = Context.get(DocumentDAO.class);
 		return docDao.findAllTags(null, user.getTenantId());
 	}
 
@@ -148,7 +148,7 @@ public class SoapTagService extends AbstractService implements TagService {
 		ContextProperties config = Context.get().getProperties();
 		String mode = config.getProperty(session.getTenantName() + ".tag.mode");
 		if ("preset".equals(mode)) {
-			GenericDAO gDao = Context.get().getBean(GenericDAO.class);
+			GenericDAO gDao = Context.get(GenericDAO.class);
 			List<Generic> buf = gDao.findByTypeAndSubtype("tag", null, null, session.getTenantId());
 			for (Generic generic : buf)
 				tags.add(generic.getSubtype());
@@ -162,7 +162,7 @@ public class SoapTagService extends AbstractService implements TagService {
 			throws PersistenceException, AuthenticationException, WebserviceException {
 		validateSession(sid);
 
-		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get(DocumentDAO.class);
 		List<TagCloud> list = dao.getTagCloud(sid);
 
 		List<WSTagCloud> tagClouds = new ArrayList<>();
@@ -177,7 +177,7 @@ public class SoapTagService extends AbstractService implements TagService {
 			throws PersistenceException, AuthenticationException, WebserviceException {
 		User user = validateSession(sid);
 
-		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+		DocumentDAO docDao = Context.get(DocumentDAO.class);
 		List<Document> docs = docDao.findByUserIdAndTag(user.getId(), tag, null);
 		List<WSDocument> wsDocs = new ArrayList<>();
 
@@ -200,7 +200,7 @@ public class SoapTagService extends AbstractService implements TagService {
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
-		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get(FolderDAO.class);
 		List<Folder> folders = folderDao.findByUserIdAndTag(user.getId(), tag, null);
 		List<WSFolder> wsFolders = new ArrayList<>();
 		for (Folder folder : folders) {

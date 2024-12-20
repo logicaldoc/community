@@ -163,7 +163,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 		if (call.getUri() != null)
 			call.setUri(maskCredentials(call.getUri()));
 
-		ThreadPools pools = Context.get().getBean(ThreadPools.class);
+		ThreadPools pools = Context.get(ThreadPools.class);
 		pools.schedule(new WebserviceCallStore(call), THREADPOOL_CALL_STORE, 5000);
 	}
 
@@ -233,7 +233,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 		long timeSinceLastSync = ChronoUnit.MINUTES.between(lastSync.toInstant(), now.toInstant());
 		if (timeSinceLastSync >= 10) {
-			ThreadPools pools = Context.get().getBean(ThreadPools.class);
+			ThreadPools pools = Context.get(ThreadPools.class);
 			pools.schedule(new WebserviceCallCounterSync(), THREADPOOL_CALL_COUNTER, 5000);
 		}
 	}
@@ -352,7 +352,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 		@Override
 		public void run() {
 			try {
-				WebserviceCallDAO dao = Context.get().getBean(WebserviceCallDAO.class);
+				WebserviceCallDAO dao = Context.get(WebserviceCallDAO.class);
 				Date now = new Date();
 
 				if (lastClean == null)

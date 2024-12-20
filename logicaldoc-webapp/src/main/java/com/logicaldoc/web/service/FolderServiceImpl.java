@@ -76,7 +76,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		transaction.setSession(session);
 
 		try {
-			FolderDAO fdao = Context.get().getBean(FolderDAO.class);
+			FolderDAO fdao = Context.get(FolderDAO.class);
 			fdao.updateSecurityRef(folderId, rightsFolderId, transaction);
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
@@ -89,7 +89,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	public void saveACL(GUIFolder guiFolder, boolean subtree) throws ServerException {
 		Session session = validateSession();
 
-		FolderDAO fdao = Context.get().getBean(FolderDAO.class);
+		FolderDAO fdao = Context.get(FolderDAO.class);
 		try {
 			Folder folder = fdao.findById(guiFolder.getId());
 			fdao.initialize(folder);
@@ -121,7 +121,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		Session session = validateSession();
 
 		executeLongRunningOperation("Apply Metadata to Tree", () -> {
-			FolderDAO fdao = Context.get().getBean(FolderDAO.class);
+			FolderDAO fdao = Context.get(FolderDAO.class);
 			FolderHistory transaction = new FolderHistory();
 			transaction.setSession(session);
 
@@ -145,7 +145,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	private void delete(Session session, final long folderId) throws PermissionException, PersistenceException {
-		FolderDAO dao = Context.get().getBean(FolderDAO.class);
+		FolderDAO dao = Context.get(FolderDAO.class);
 		if (!dao.isPermissionAllowed(Permission.DELETE, folderId, session.getUserId()))
 			throw new PermissionException(session.getUsername(), FOLDER + folderId, Permission.DELETE);
 
@@ -157,7 +157,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	public GUIFolder fromFolder(Folder folder, boolean computePath) throws PersistenceException {
-		FolderDAO dao = Context.get().getBean(FolderDAO.class);
+		FolderDAO dao = Context.get(FolderDAO.class);
 		dao.initialize(folder);
 
 		GUIFolder guiFolder = new GUIFolder();
@@ -186,7 +186,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			guiFolder.setPathExtended(dao.computePathExtended(folder.getId()));
 
 		if (guiFolder.isWorkspace()) {
-			SequenceDAO seqDao = Context.get().getBean(SequenceDAO.class);
+			SequenceDAO seqDao = Context.get(SequenceDAO.class);
 			guiFolder.setDocumentsTotal(seqDao.getCurrentValue("wsdocs", folder.getId(), folder.getTenantId()));
 			guiFolder.setSizeTotal(seqDao.getCurrentValue("wssize", folder.getId(), folder.getTenantId()));
 		}
@@ -233,7 +233,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	 * @throws PersistenceException Error in the database layer
 	 */
 	private static long[] countDocsInTree(long folderId) throws PersistenceException {
-		FolderDAO dao = Context.get().getBean(FolderDAO.class);
+		FolderDAO dao = Context.get(FolderDAO.class);
 		Folder root = dao.findById(folderId);
 		String pathPrefix = root.getPath();
 		long[] stats = new long[] { 0L, 0L };
@@ -251,7 +251,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	private static long countSubfoldersInTree(long folderId) throws PersistenceException {
-		FolderDAO dao = Context.get().getBean(FolderDAO.class);
+		FolderDAO dao = Context.get(FolderDAO.class);
 		Folder root = dao.findById(folderId);
 		String pathPrefix = root.getPath();
 
@@ -260,14 +260,14 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	private static int countDirectDocs(long folderId) throws PersistenceException {
-		FolderDAO dao = Context.get().getBean(FolderDAO.class);
+		FolderDAO dao = Context.get(FolderDAO.class);
 		return dao.queryForInt("select count(ld_id) from ld_document where ld_deleted=0 and ld_folderid=" + folderId
 				+ " and not ld_status=" + AbstractDocument.DOC_ARCHIVED);
 	}
 
 	private static int countDirectSubfolders(long folderId) throws PersistenceException {
 		int count = 0;
-		FolderDAO dao = Context.get().getBean(FolderDAO.class);
+		FolderDAO dao = Context.get(FolderDAO.class);
 		count = dao.queryForInt(
 				"select count(ld_id) from ld_folder where not ld_id=ld_parentid and ld_deleted=0 and ld_parentid="
 						+ folderId);
@@ -282,7 +282,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		if (session != null)
 			validateSession(session.getSid());
 
-		FolderDAO dao = Context.get().getBean(FolderDAO.class);
+		FolderDAO dao = Context.get(FolderDAO.class);
 
 		try {
 			if (session != null)
@@ -378,7 +378,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	private static void setAllowedPermissions(Session session, long folderId, GUIFolder guiFolder)
 			throws PersistenceException {
 		if (session != null) {
-			FolderDAO dao = Context.get().getBean(FolderDAO.class);
+			FolderDAO dao = Context.get(FolderDAO.class);
 			Set<Permission> permissions = dao.getAllowedPermissions(folderId, session.getUserId());
 			guiFolder.setAllowedPermissions(new GUIAccessControlEntry(
 					permissions.stream().map(p -> p.name().toLowerCase()).toList().toArray(new String[0])));
@@ -409,7 +409,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	private List<GUIFolder> computePath(long folderId, long tenantId, boolean computeSubfolders)
 			throws PersistenceException, ServerException {
-		FolderDAO dao = Context.get().getBean(FolderDAO.class);
+		FolderDAO dao = Context.get(FolderDAO.class);
 		String pathExtended = dao.computePathExtended(folderId);
 
 		StringTokenizer st = new StringTokenizer(pathExtended, "/", false);
@@ -452,7 +452,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	private void copyFolder(Session session, long folderId, long targetId, boolean foldersOnly, String securityOption,
 			GUIFolder model) throws PersistenceException, ServerException {
-		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get(FolderDAO.class);
 		Folder folderToCopy = folderDao.findById(folderId);
 
 		Folder destParentFolder = folderDao.findFolder(targetId);
@@ -507,7 +507,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	private void move(Session session, long folderId, long targetId) throws PersistenceException {
-		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get(FolderDAO.class);
 
 		Folder folderToMove = folderDao.findById(folderId);
 
@@ -554,7 +554,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	public void rename(long folderId, String name) throws ServerException {
 		Session session = validateSession();
 
-		FolderDAO dao = Context.get().getBean(FolderDAO.class);
+		FolderDAO dao = Context.get(FolderDAO.class);
 
 		try {
 			List<Folder> folders = dao.findByNameAndParentId(name, dao.findById(folderId).getParentId());
@@ -584,7 +584,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	public GUIFolder save(GUIFolder guiFolder) throws ServerException {
 		Session session = validateSession();
 
-		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get(FolderDAO.class);
 
 		try {
 			Folder folder = folderDao.findById(guiFolder.getId());
@@ -665,7 +665,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	public GUIFolder create(GUIFolder newFolder, boolean inheritSecurity) throws ServerException {
 		Session session = validateSession();
 
-		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get(FolderDAO.class);
 
 		String folderName = newFolder.getName().replace("/", "");
 
@@ -714,7 +714,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	public GUIFolder createAlias(long parentId, long foldRef) throws ServerException {
 		Session session = validateSession();
 
-		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get(FolderDAO.class);
 
 		// Prepare the transaction
 		FolderHistory transaction = new FolderHistory();
@@ -738,7 +738,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	private void saveACL(Session session, Folder folder, List<GUIAccessControlEntry> acl) throws PersistenceException {
-		FolderDAO fdao = Context.get().getBean(FolderDAO.class);
+		FolderDAO fdao = Context.get(FolderDAO.class);
 
 		log.info("Applying {} aces to folder {}", acl.size(), folder.getId());
 
@@ -790,7 +790,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			throws ServerException {
 		Session session = validateSession();
 
-		FolderDAO fdao = Context.get().getBean(FolderDAO.class);
+		FolderDAO fdao = Context.get(FolderDAO.class);
 
 		Folder folder;
 		try {
@@ -810,9 +810,9 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	private void cut(Session session, List<Long> docIds, long folderId) throws ServerException {
-		DocumentManager docManager = Context.get().getBean(DocumentManager.class);
-		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
-		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+		DocumentManager docManager = Context.get(DocumentManager.class);
+		FolderDAO folderDao = Context.get(FolderDAO.class);
+		DocumentDAO docDao = Context.get(DocumentDAO.class);
 
 		try {
 			Folder selectedFolderFolder = folderDao.findById(folderId);
@@ -866,9 +866,9 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	private void copy(Session session, List<Long> docIds, long folderId, boolean links, boolean notes, boolean security)
 			throws ServerException {
-		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
-		DocumentManager docManager = Context.get().getBean(DocumentManager.class);
-		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+		FolderDAO folderDao = Context.get(FolderDAO.class);
+		DocumentManager docManager = Context.get(DocumentManager.class);
+		DocumentDAO docDao = Context.get(DocumentDAO.class);
 
 		try {
 			Folder selectedFolderFolder = folderDao.findById(folderId);
@@ -899,9 +899,9 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	public void pasteAsAlias(List<Long> docIds, long folderId, String type) throws ServerException {
 		Session session = validateSession();
 
-		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
-		DocumentManager docManager = Context.get().getBean(DocumentManager.class);
-		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+		FolderDAO folderDao = Context.get(FolderDAO.class);
+		DocumentManager docManager = Context.get(DocumentManager.class);
+		DocumentDAO docDao = Context.get(DocumentDAO.class);
 		try {
 			Folder selectedFolderFolder = folderDao.findFolder(folderId);
 
@@ -954,7 +954,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			return;
 		}
 
-		TemplateDAO templateDao = Context.get().getBean(TemplateDAO.class);
+		TemplateDAO templateDao = Context.get(TemplateDAO.class);
 		Template template = templateDao.findById(f.getTemplateId());
 		templateDao.initialize(template);
 
@@ -1052,7 +1052,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	public void restore(List<Long> folderIds, long parentId) throws ServerException {
 		Session session = validateSession();
 
-		FolderDAO dao = Context.get().getBean(FolderDAO.class);
+		FolderDAO dao = Context.get(FolderDAO.class);
 
 		for (Long foldId : folderIds) {
 			if (foldId == null)
@@ -1075,7 +1075,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			return;
 
 		try {
-			Context.get().getBean(FolderDAO.class).jdbcUpdate("update ld_folder set ld_deleted=2 where ld_id in ("
+			Context.get(FolderDAO.class).jdbcUpdate("update ld_folder set ld_deleted=2 where ld_id in ("
 					+ ids.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")) + ")");
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
@@ -1087,7 +1087,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		Session session = validateSession();
 
 		executeLongRunningOperation("Apply Tags", () -> {
-			FolderDAO fdao = Context.get().getBean(FolderDAO.class);
+			FolderDAO fdao = Context.get(FolderDAO.class);
 			FolderHistory transaction = new FolderHistory();
 			transaction.setSession(session);
 			try {
@@ -1121,7 +1121,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		executeLongRunningOperation("Apply Grid Layout", () -> {
 			FolderHistory history = new FolderHistory();
 			history.setSession(session);
-			FolderDAO fdao = Context.get().getBean(FolderDAO.class);
+			FolderDAO fdao = Context.get(FolderDAO.class);
 			try {
 				fdao.applyGridToTree(folderId, history);
 			} catch (PersistenceException e) {
@@ -1135,7 +1135,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		Session session = validateSession();
 
 		executeLongRunningOperation("Apply OCR", () -> {
-			FolderDAO fdao = Context.get().getBean(FolderDAO.class);
+			FolderDAO fdao = Context.get(FolderDAO.class);
 			FolderHistory transaction = new FolderHistory();
 			transaction.setSession(session);
 			try {
@@ -1153,7 +1153,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		executeLongRunningOperation("Apply Store", () -> {
 			try {
 				checkPermission(Permission.STORE, session.getUser(), parentId);
-				FolderDAO fdao = Context.get().getBean(FolderDAO.class);
+				FolderDAO fdao = Context.get(FolderDAO.class);
 				FolderHistory transaction = new FolderHistory();
 				transaction.setSession(session);
 				fdao.applyStoreToTree(parentId, transaction);
@@ -1173,7 +1173,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 		executeLongRunningOperation("Merge", () -> {
 			try {
-				FolderDAO fDao = Context.get().getBean(FolderDAO.class);
+				FolderDAO fDao = Context.get(FolderDAO.class);
 				Folder target = fDao.findFolder(targetId);
 				fDao.initialize(target);
 
@@ -1222,7 +1222,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		try {
 			Set<Permission> commonPermissions = Permission.all();
 			if (!session.getUser().isAdmin()) {
-				FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+				FolderDAO folderDao = Context.get(FolderDAO.class);
 				for (long folderId : folderIds) {
 					Set<Permission> folderPermissions = folderDao.getAllowedPermissions(folderId, session.getUserId());
 					for (Permission permission : Permission.all()) {

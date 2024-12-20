@@ -184,7 +184,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	}
 
 	protected void checkPermission(Permission permission, User user, long folderId) throws AccessDeniedException {
-		FolderDAO dao = Context.get().getBean(FolderDAO.class);
+		FolderDAO dao = Context.get(FolderDAO.class);
 		try {
 			if (!dao.isPermissionAllowed(permission, folderId, user.getId())) {
 				String message = String.format("User %s doesn't have permission %s on folder %s", user.getUsername(),
@@ -214,7 +214,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 
 	private void initUser(User user) {
 		try {
-			UserDAO userDao = Context.get().getBean(UserDAO.class);
+			UserDAO userDao = Context.get(UserDAO.class);
 			userDao.initialize(user);
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
@@ -302,7 +302,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	 */
 	protected boolean executeLongRunningOperation(String name, Runnable runnable, Session session)
 			throws ServerException {
-		ThreadPools pools = Context.get().getBean(ThreadPools.class);
+		ThreadPools pools = Context.get(ThreadPools.class);
 
 		/*
 		 * Build the notifying thread and schedule for immediate execution (1ms
@@ -347,7 +347,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	 * @return The list of attributes
 	 */
 	protected List<GUIAttribute> prepareGUIAttributes(Template template, ExtensibleObject extensibleObject) {
-		TemplateDAO tDao = Context.get().getBean(TemplateDAO.class);
+		TemplateDAO tDao = Context.get(TemplateDAO.class);
 		tDao.initialize(template);
 
 		List<GUIAttribute> attributes = new ArrayList<>();

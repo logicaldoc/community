@@ -137,7 +137,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (StringUtils.isEmpty(password))
 			return;
 
-		TenantDAO tenantDAO = Context.get().getBean(TenantDAO.class);
+		TenantDAO tenantDAO = Context.get(TenantDAO.class);
 		String tenant = tenantDAO.getTenantName(user.getTenantId());
 
 		Map<String, String> messages = I18N.getMessages(user.getLocale() != null ? user.getLocale() : Locale.ENGLISH);
@@ -299,7 +299,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	 * @throws PersistenceException Error in the database
 	 */
 	private void enforceUserGroupAssignment(User user) throws PersistenceException {
-		GroupDAO groupDAO = Context.get().getBean(GroupDAO.class);
+		GroupDAO groupDAO = Context.get(GroupDAO.class);
 		String userGroupName = user.getUserGroupName();
 		Group grp = groupDAO.findByName(userGroupName, user.getTenantId());
 		if (grp == null) {
@@ -345,7 +345,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	 */
 	private void enforceReadOnlyUserGroups(User user) throws PersistenceException {
 		if (user.isReadonly()) {
-			GroupDAO gDao = Context.get().getBean(GroupDAO.class);
+			GroupDAO gDao = Context.get(GroupDAO.class);
 			Group guestGroup = gDao.findByName("guest", user.getTenantId());
 			Group userGroup = user.getUserGroup();
 			user.removeGroupMemberships(null);
@@ -366,7 +366,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (user.isReadonly()) {
 			user = findById(user.getId());
 			initialize(user);
-			GroupDAO groupDAO = Context.get().getBean(GroupDAO.class);
+			GroupDAO groupDAO = Context.get(GroupDAO.class);
 			for (Group group : user.getGroups())
 				groupDAO.fixGuestPermissions(group);
 		}
@@ -560,7 +560,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (user.getPasswordExpired() == 1)
 			return true;
 
-		String tenantName = (Context.get().getBean(TenantDAO.class)).getTenantName(user.getTenantId());
+		String tenantName = (Context.get(TenantDAO.class)).getTenantName(user.getTenantId());
 		int passwordTtl = config.getInt(tenantName + ".password.ttl", 90);
 		if (passwordTtl <= 0)
 			return false;
@@ -610,7 +610,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (user.getEnabled() == 0)
 			return true;
 
-		String tenantName = (Context.get().getBean(TenantDAO.class)).getTenantName(user.getTenantId());
+		String tenantName = (Context.get(TenantDAO.class)).getTenantName(user.getTenantId());
 		int maxInactiveDays = config.getInt(tenantName + ".security.user.maxinactivity", -1);
 		if (user.getMaxInactivity() != null)
 			maxInactiveDays = user.getMaxInactivity();
@@ -701,7 +701,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 		// Delete the user's group
 		if (userGroup != null) {
-			GroupDAO groupDAO = Context.get().getBean(GroupDAO.class);
+			GroupDAO groupDAO = Context.get(GroupDAO.class);
 			groupDAO.delete(userGroup.getId());
 		}
 
@@ -722,7 +722,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	private int getPasswordEnforce(User user) throws PersistenceException {
-		TenantDAO tenantDAO = Context.get().getBean(TenantDAO.class);
+		TenantDAO tenantDAO = Context.get(TenantDAO.class);
 		String tenant = tenantDAO.getTenantName(user.getTenantId());
 		return config.getInt(tenant + ".password.enforcehistory", 10);
 	}
@@ -763,7 +763,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		user.getGroups().clear();
 		user.getUserGroups().clear();
 		if (!groupIds.isEmpty()) {
-			GroupDAO gDao = Context.get().getBean(GroupDAO.class);
+			GroupDAO gDao = Context.get(GroupDAO.class);
 			try {
 				List<Group> groups = gDao.findByWhere(
 						ENTITY + ".id in (" + StringUtil.arrayToString(groupIds.toArray(new Long[0]), ",") + ")", null,

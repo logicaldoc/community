@@ -53,7 +53,7 @@ public class FolderSearch extends Search {
 
 	@Override
 	public void internalSearch() throws SearchException {
-		UserDAO userDAO = Context.get().getBean(UserDAO.class);
+		UserDAO userDAO = Context.get(UserDAO.class);
 		User user;
 		try {
 			user = userDAO.findById(options.getUserId());
@@ -71,7 +71,7 @@ public class FolderSearch extends Search {
 
 		options.setParameters(params);
 
-		FolderDAO dao = Context.get().getBean(FolderDAO.class);
+		FolderDAO dao = Context.get(FolderDAO.class);
 		// Execute the search
 		List<Hit> folders;
 		try {
@@ -285,7 +285,7 @@ public class FolderSearch extends Search {
 
 	private void appendMainFolderCondition(StringBuilder query, String tableAlias, FolderSearchOptions fOptions)
 			throws PersistenceException {
-		FolderDAO dao = Context.get().getBean(FolderDAO.class);
+		FolderDAO dao = Context.get(FolderDAO.class);
 		if (fOptions.getFolderId() != null) {
 			query.append(AND);
 			if (fOptions.isSearchInSubPath()) {
@@ -374,7 +374,7 @@ public class FolderSearch extends Search {
 	private void appendFolderCriterion(StringBuilder query, String tableAlias, String columnName,
 			FolderCriterion criterion) throws PersistenceException {
 		if (FolderCriterion.OPERATOR_INORSUBFOLDERS.equals(criterion.getOperator())) {
-			FolderDAO dao = Context.get().getBean(FolderDAO.class);
+			FolderDAO dao = Context.get(FolderDAO.class);
 			String path = dao.computePath(criterion.getLongValue());
 			query.append(tableAlias + ".ld_path like '" + path + "/%'");
 		} else
@@ -540,7 +540,7 @@ public class FolderSearch extends Search {
 		 * collect all accessible folders.
 		 */
 		if (ids.isEmpty() && !user.isMemberOf(Group.GROUP_ADMIN)) {
-			FolderDAO folderDAO = Context.get().getBean(FolderDAO.class);
+			FolderDAO folderDAO = Context.get(FolderDAO.class);
 			ids = folderDAO.findFolderIdByUserId(options.getUserId(), null, true);
 		}
 
@@ -548,7 +548,7 @@ public class FolderSearch extends Search {
 	}
 
 	private Collection<Long> retrieveAccessibleFolderIdsFromFolderCriterions(User user) throws PersistenceException {
-		FolderDAO folderDAO = Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDAO = Context.get(FolderDAO.class);
 		Collection<Long> ids = new HashSet<>();
 		for (FolderCriterion criterion : ((FolderSearchOptions) options).getCriteria()) {
 			if (criterion.getType() == FolderCriterion.TYPE_FOLDER && !criterion.isEmpty()) {

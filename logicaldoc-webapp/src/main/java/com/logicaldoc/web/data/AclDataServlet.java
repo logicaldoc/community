@@ -95,7 +95,7 @@ public class AclDataServlet extends AbstractDataServlet {
 	 */
 	private Map<Long, String> getUsers(long tenantId) throws PersistenceException {
 		Map<Long, String> users = new HashMap<>();
-		UserDAO dao = Context.get().getBean(UserDAO.class);
+		UserDAO dao = Context.get(UserDAO.class);
 		dao.queryForResultSet(
 				"select ld_id, ld_username, ld_firstname, ld_name from ld_user where ld_deleted=0 and ld_tenantid="
 						+ tenantId,
@@ -109,7 +109,7 @@ public class AclDataServlet extends AbstractDataServlet {
 	}
 
 	private void templateACL(HttpServletResponse response, long templateId) throws IOException, PersistenceException {
-		TemplateDAO tDao = Context.get().getBean(TemplateDAO.class);
+		TemplateDAO tDao = Context.get(TemplateDAO.class);
 		Template template = tDao.findById(templateId);
 		tDao.initialize(template);
 
@@ -160,7 +160,7 @@ public class AclDataServlet extends AbstractDataServlet {
 	}
 
 	private void documentACL(HttpServletResponse response, long documentId) throws IOException, PersistenceException {
-		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+		DocumentDAO docDao = Context.get(DocumentDAO.class);
 		Document document = docDao.findById(documentId);
 		docDao.initialize(document);
 
@@ -195,7 +195,7 @@ public class AclDataServlet extends AbstractDataServlet {
 	}
 
 	private void folderACL(HttpServletResponse response, long folderId) throws IOException, PersistenceException {
-		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get(FolderDAO.class);
 		Folder folder = folderDao.findById(folderId);
 		folderDao.initialize(folder);
 
@@ -237,7 +237,7 @@ public class AclDataServlet extends AbstractDataServlet {
 
 	private void menuAcl(HttpServletResponse response, long menuId, long tenantId)
 			throws IOException, PersistenceException {
-		MenuDAO menuDao = Context.get().getBean(MenuDAO.class);
+		MenuDAO menuDao = Context.get(MenuDAO.class);
 		Menu menu = menuDao.findById(menuId);
 		menuDao.initialize(menu);
 

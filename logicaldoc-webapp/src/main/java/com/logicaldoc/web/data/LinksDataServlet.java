@@ -45,7 +45,7 @@ public class LinksDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get(DocumentDAO.class);
 		StringBuilder query = new StringBuilder(
 				"select A.id, B.folder.id, A.type, A.document1.id, A.document1.fileName, A.document1.type, A.document2.id, A.document2.fileName, A.document2.type, ");
 		query.append(
@@ -81,7 +81,7 @@ public class LinksDataServlet extends AbstractDataServlet {
 		if (!Context.get().getProperties().getBoolean(tenant + ".gui.showdocattrsaslinks", false))
 			return;
 
-		DocumentDAO dao = Context.get().getBean(DocumentDAO.class);
+		DocumentDAO dao = Context.get(DocumentDAO.class);
 
 		StringBuilder query;
 		query = new StringBuilder(
@@ -180,7 +180,7 @@ public class LinksDataServlet extends AbstractDataServlet {
 		Long docId = null;
 		if (StringUtils.isNotEmpty(request.getParameter("docId"))) {
 			docId = Long.parseLong(request.getParameter("docId"));
-			DocumentDAO ddao = Context.get().getBean(DocumentDAO.class);
+			DocumentDAO ddao = Context.get(DocumentDAO.class);
 			Document doc = ddao.findDocument(docId);
 			if (doc != null)
 				docId = doc.getId();

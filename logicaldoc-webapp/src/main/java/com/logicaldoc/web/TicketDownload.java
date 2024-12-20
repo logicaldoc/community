@@ -68,7 +68,7 @@ public class TicketDownload extends HttpServlet {
 
 			String suffix = getSuffix(ticket, document, request);
 
-			TenantDAO tenantDao = Context.get().getBean(TenantDAO.class);
+			TenantDAO tenantDao = Context.get(TenantDAO.class);
 			String tenantName = tenantDao.getTenantName(ticket.getTenantId());
 
 			String behavior = request.getParameter("behavior");
@@ -98,7 +98,7 @@ public class TicketDownload extends HttpServlet {
 				increaseDownloadCount(request, ticket, document);
 			}
 
-			TicketDAO ticketDao = Context.get().getBean(TicketDAO.class);
+			TicketDAO ticketDao = Context.get(TicketDAO.class);
 			ticketDao.store(ticket);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -144,7 +144,7 @@ public class TicketDownload extends HttpServlet {
 		if ("pdf".equals(suffix))
 			suffix = "conversion.pdf";
 		if ("conversion.pdf".equals(suffix)) {
-			FormatConverterManager converter = Context.get().getBean(FormatConverterManager.class);
+			FormatConverterManager converter = Context.get(FormatConverterManager.class);
 			converter.convertToPdf(document, null);
 			if ("pdf".equalsIgnoreCase(FileUtil.getExtension(document.getFileName())))
 				suffix = null;
@@ -153,7 +153,7 @@ public class TicketDownload extends HttpServlet {
 	}
 
 	private Document getDocument(Ticket ticket) throws PersistenceException, IOException {
-		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+		DocumentDAO docDao = Context.get(DocumentDAO.class);
 		Document doc = docDao.findById(ticket.getDocId());
 		if (doc.getDocRef() != null)
 			doc = docDao.findById(doc.getDocRef());
@@ -163,7 +163,7 @@ public class TicketDownload extends HttpServlet {
 	}
 
 	private Ticket getTicket(String ticketId) throws IOException {
-		TicketDAO tktDao = Context.get().getBean(TicketDAO.class);
+		TicketDAO tktDao = Context.get(TicketDAO.class);
 		Ticket ticket = tktDao.findByTicketId(ticketId);
 		if (ticket == null || ticket.getDocId() == 0)
 			throw new IOException("Unexisting ticket");
@@ -223,7 +223,7 @@ public class TicketDownload extends HttpServlet {
 		 */
 		DownloadServlet.processSafeHtml(suffix, null, document);
 
-		Store store = Context.get().getBean(Store.class);
+		Store store = Context.get(Store.class);
 		String resource = store.getResourceName(document, fileVersion, suffix);
 		OutputStream os = null;
 		try (InputStream is = store.getStream(document.getId(), resource)) {
@@ -270,7 +270,7 @@ public class TicketDownload extends HttpServlet {
 		DocumentHistory history = new DocumentHistory();
 		history.setDocument(document);
 
-		FolderDAO fdao = Context.get().getBean(FolderDAO.class);
+		FolderDAO fdao = Context.get(FolderDAO.class);
 		history.setPath(fdao.computePathExtended(document.getFolder().getId()));
 		history.setEvent(isPreviewDownload(ticket, request, document) ? DocumentEvent.VIEWED.toString()
 				: DocumentEvent.DOWNLOADED.toString());
@@ -278,7 +278,7 @@ public class TicketDownload extends HttpServlet {
 		history.setFolderId(document.getFolder().getId());
 		history.setComment("Ticket " + ticket);
 
-		DocumentDAO ddao = Context.get().getBean(DocumentDAO.class);
+		DocumentDAO ddao = Context.get(DocumentDAO.class);
 		try {
 			ddao.saveDocumentHistory(document, history);
 		} catch (PersistenceException e) {

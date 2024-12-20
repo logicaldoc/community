@@ -46,7 +46,7 @@ public class DeletedDocsDataServlet extends AbstractDataServlet {
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
 
-		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+		DocumentDAO docDao = Context.get(DocumentDAO.class);
 		DateFormat df = getDateFormat();
 
 		PrintWriter writer = response.getWriter();

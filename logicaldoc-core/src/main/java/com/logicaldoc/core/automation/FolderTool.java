@@ -46,7 +46,7 @@ public class FolderTool {
 			url += "/";
 
 		try {
-			TenantDAO tenantDao = Context.get().getBean(TenantDAO.class);
+			TenantDAO tenantDao = Context.get(TenantDAO.class);
 			Tenant tenant = tenantDao.findById(tenantId);
 			url += "display?tenant=" + tenant.getName() + "&folderId=" + folderId;
 			return url;
@@ -89,7 +89,7 @@ public class FolderTool {
 	public String getPath(Long folderId) throws PersistenceException {
 		if (folderId == null)
 			return "";
-		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get(FolderDAO.class);
 		return folderDao.computePathExtended(folderId);
 	}
 
@@ -113,7 +113,7 @@ public class FolderTool {
 	 * @return the found folder
 	 */
 	public Folder findByPath(String path, Long tenantId) {
-		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get(FolderDAO.class);
 		try {
 			return folderDao.findByPathExtended(path, tenantId != null ? tenantId : Tenant.DEFAULT_ID);
 		} catch (PersistenceException e) {
@@ -130,7 +130,7 @@ public class FolderTool {
 	 * @return the found folder
 	 */
 	public Folder findById(long id) {
-		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get(FolderDAO.class);
 		try {
 			return folderDao.findById(id);
 		} catch (PersistenceException e) {
@@ -162,7 +162,7 @@ public class FolderTool {
 		transaction.setUser(user);
 
 		try {
-			FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+			FolderDAO folderDao = Context.get(FolderDAO.class);
 			folderDao.store(folder, transaction);
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
@@ -175,7 +175,7 @@ public class FolderTool {
 	 * @param folder the folder to initialize
 	 */
 	public void initialize(Folder folder) {
-		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get(FolderDAO.class);
 		folderDao.initialize(folder);
 	}
 
@@ -194,7 +194,7 @@ public class FolderTool {
 		transaction.setFolderId(folderId);
 		transaction.setUser(user);
 
-		FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+		FolderDAO folderDao = Context.get(FolderDAO.class);
 		folderDao.delete(folderId, transaction);
 	}
 
@@ -217,7 +217,7 @@ public class FolderTool {
 		transaction.setFolder(folder);
 		transaction.setUser(user);
 
-		FolderDAO fdao = Context.get().getBean(FolderDAO.class);
+		FolderDAO fdao = Context.get(FolderDAO.class);
 		fdao.move(folder, target, transaction);
 	}
 
@@ -254,7 +254,7 @@ public class FolderTool {
 		transaction.setFolder(source);
 		transaction.setUser(user);
 
-		FolderDAO fdao = Context.get().getBean(FolderDAO.class);
+		FolderDAO fdao = Context.get(FolderDAO.class);
 
 		return fdao.copy(source, target, null, foldersOnly, securityOption, transaction);
 	}
@@ -275,7 +275,7 @@ public class FolderTool {
 		transaction.setFolder(source);
 		transaction.setUser(user);
 
-		FolderDAO fdao = Context.get().getBean(FolderDAO.class);
+		FolderDAO fdao = Context.get(FolderDAO.class);
 		fdao.merge(source, target, transaction);
 	}
 
@@ -300,7 +300,7 @@ public class FolderTool {
 		transaction.setUser(user);
 		transaction.setTenantId(tenantId);
 
-		FolderDAO fdao = Context.get().getBean(FolderDAO.class);
+		FolderDAO fdao = Context.get(FolderDAO.class);
 		Folder parent = folder;
 		Folder newFolder = null;
 		try {
@@ -350,8 +350,8 @@ public class FolderTool {
 	 */
 	public void applyTemplate(long rootId, String templateName, boolean inheritSecurity, String username)
 			throws PersistenceException {
-		FolderDAO dao = Context.get().getBean(FolderDAO.class);
-		GenericDAO gdao = Context.get().getBean(GenericDAO.class);
+		FolderDAO dao = Context.get(FolderDAO.class);
+		GenericDAO gdao = Context.get(GenericDAO.class);
 		Folder root = dao.findFolder(rootId);
 
 		SecurityTool secTool = new SecurityTool();

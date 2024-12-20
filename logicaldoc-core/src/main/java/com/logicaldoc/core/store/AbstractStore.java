@@ -247,7 +247,7 @@ public abstract class AbstractStore implements Store {
 
 	@Override
 	public String getResourceName(Document doc, String fileVersion, String suffix) {
-		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+		DocumentDAO docDao = Context.get(DocumentDAO.class);
 		Document document = doc;
 
 		/*
@@ -285,7 +285,7 @@ public abstract class AbstractStore implements Store {
 
 	@Override
 	public String getResourceName(long docId, String fileVersion, String suffix) {
-		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+		DocumentDAO docDao = Context.get(DocumentDAO.class);
 		try {
 			Document doc = docDao.findById(docId);
 			return getResourceName(doc, fileVersion, suffix);
@@ -385,7 +385,7 @@ public abstract class AbstractStore implements Store {
 			deletionsLog.info("str: {}, doc: {}, res: {}\n{}", getId(), docId, path,
 					Arrays.toString(Thread.currentThread().getStackTrace()).replace(',', '\n'));
 
-		DocumentHistoryDAO documentHistoryDAO = Context.get().getBean(DocumentHistoryDAO.class);
+		DocumentHistoryDAO documentHistoryDAO = Context.get(DocumentHistoryDAO.class);
 		DocumentHistory history = new DocumentHistory();
 		history.setEvent(DocumentEvent.RESOURCE_DELETED.toString());
 		history.setDocId(docId);

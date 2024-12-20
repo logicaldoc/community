@@ -33,7 +33,7 @@ public class MessagesDataServlet extends AbstractDataServlet {
 		/*
 		 * Execute the Query
 		 */
-		SystemMessageDAO dao = Context.get().getBean(SystemMessageDAO.class);
+		SystemMessageDAO dao = Context.get(SystemMessageDAO.class);
 		dao.deleteExpiredMessages(session.getUsername());
 
 		DateFormat df = getDateFormat();

@@ -32,7 +32,7 @@ public class MenusDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		MenuDAO dao = Context.get().getBean(MenuDAO.class);
+		MenuDAO dao = Context.get(MenuDAO.class);
 		long parent = Menu.ROOT;
 
 		if (!"/".equals(request.getParameter(PARENT)) && StringUtils.isNotEmpty(request.getParameter(PARENT)))

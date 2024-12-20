@@ -39,7 +39,7 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		UserDAO dao = Context.get().getBean(UserDAO.class);
+		UserDAO dao = Context.get(UserDAO.class);
 		User user = dao.findById(session.getUserId());
 		dao.initialize(user);
 

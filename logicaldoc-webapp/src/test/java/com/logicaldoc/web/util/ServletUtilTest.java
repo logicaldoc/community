@@ -191,7 +191,7 @@ test.txt\r
 		mockRequest.setBody(body);
 
 		ServletUtil.uploadDocumentResource(mockRequest, 1L, "abc", "1.0", "1.0");
-		Store store = Context.get().getBean(Store.class);
+		Store store = Context.get(Store.class);
 		assertEquals(8L, store.size(1L, store.getResourceName(1L, "1.0", "abc")));
 	}
 

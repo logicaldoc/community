@@ -111,7 +111,7 @@ public class EventEndpoint implements EventListener {
 	@OnOpen
 	public void onOpen(final Session session) {
 		if (!registered) {
-			EventCollector eventCollector = Context.get().getBean(EventCollector.class);
+			EventCollector eventCollector = Context.get(EventCollector.class);
 			eventCollector.addListener(this);
 			registered = true;
 		}
@@ -142,7 +142,7 @@ public class EventEndpoint implements EventListener {
 
 		try {
 			if (event.getTenant() == null) {
-				TenantDAO tenantDAO = Context.get().getBean(TenantDAO.class);
+				TenantDAO tenantDAO = Context.get(TenantDAO.class);
 				event.setTenant(tenantDAO.getTenantName(event.getTenantId()));
 			}
 		} catch (PersistenceException e) {
@@ -202,7 +202,7 @@ public class EventEndpoint implements EventListener {
 			document = new DocumentServiceImpl().fromDocument(clone, null, null);
 			document.setId(event.getDocId());
 		} else if (event.getDocId() != null) {
-			DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+			DocumentDAO docDao = Context.get(DocumentDAO.class);
 			Document d = docDao.findById(event.getDocId());
 			if (d != null) {
 				document = new DocumentServiceImpl().fromDocument(d, null, null);

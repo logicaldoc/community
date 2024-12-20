@@ -69,7 +69,7 @@ public abstract class HibernateHistoryDAO<T extends History> extends HibernatePe
 		if (HibernateHistoryDAO.tenantNames.containsKey(history.getTenantId()))
 			return HibernateHistoryDAO.tenantNames.get(history.getTenantId());
 
-		TenantDAO tenantDao = Context.get().getBean(TenantDAO.class);
+		TenantDAO tenantDao = Context.get(TenantDAO.class);
 		String name = tenantDao.getTenantName(history.getTenantId());
 		HibernateHistoryDAO.tenantNames.put(history.getTenantId(), name);
 		return name;

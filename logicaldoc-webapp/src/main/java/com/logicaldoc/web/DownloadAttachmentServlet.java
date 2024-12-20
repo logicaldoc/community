@@ -52,8 +52,8 @@ public class DownloadAttachmentServlet extends HttpServlet {
 		try {
 			Session session = ServletUtil.validateSession(request);
 
-			DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
-			FolderDAO folderDao = Context.get().getBean(FolderDAO.class);
+			DocumentDAO docDao = Context.get(DocumentDAO.class);
+			FolderDAO folderDao = Context.get(FolderDAO.class);
 
 			long docId = Long.parseLong(request.getParameter("docId"));
 			String fileVersion = request.getParameter("fileVersion");
@@ -82,7 +82,7 @@ public class DownloadAttachmentServlet extends HttpServlet {
 
 	private void download(HttpServletRequest request, HttpServletResponse response, long docId, String fileVersion,
 			String filename, Document doc) throws MessagingException, IOException, CMSException {
-		Store store = Context.get().getBean(Store.class);
+		Store store = Context.get(Store.class);
 		String resource = store.getResourceName(docId, fileVersion, null);
 
 		try (InputStream is = store.getStream(docId, resource)) {

@@ -45,7 +45,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 	@Override
 	public void delete(List<Long> ids) throws ServerException {
 		validateSession();
-		SystemMessageDAO dao = Context.get().getBean(SystemMessageDAO.class);
+		SystemMessageDAO dao = Context.get(SystemMessageDAO.class);
 		for (long id : ids) {
 			try {
 				dao.delete(id);
@@ -60,7 +60,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 		Session session = validateSession();
 
 		try {
-			SystemMessageDAO dao = Context.get().getBean(SystemMessageDAO.class);
+			SystemMessageDAO dao = Context.get(SystemMessageDAO.class);
 			SystemMessage message = dao.findById(messageId);
 			dao.initialize(message);
 
@@ -205,7 +205,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 
 		try {
 
-			MessageTemplateDAO dao = Context.get().getBean(MessageTemplateDAO.class);
+			MessageTemplateDAO dao = Context.get(MessageTemplateDAO.class);
 
 			for (GUIMessageTemplate t : templates) {
 				MessageTemplate template = dao.findByNameAndLanguage(t.getName(), t.getLanguage(),
@@ -228,7 +228,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 
 	private void storeTemplate(MessageTemplate template) throws ServerException {
 		try {
-			MessageTemplateDAO dao = Context.get().getBean(MessageTemplateDAO.class);
+			MessageTemplateDAO dao = Context.get(MessageTemplateDAO.class);
 			dao.store(template);
 		} catch (Exception e) {
 			throw new ServerException(TEMPLATES_HAVE_NOT_BEEN_SAVED);
@@ -240,7 +240,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 		Session session = validateSession();
 
 		try {
-			MessageTemplateDAO dao = Context.get().getBean(MessageTemplateDAO.class);
+			MessageTemplateDAO dao = Context.get(MessageTemplateDAO.class);
 			for (Long id : ids) {
 				MessageTemplate template = dao.findById(id);
 				if (template != null && !"en".equals(template.getLanguage()))
@@ -253,7 +253,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 
 	private void delete(long id) throws ServerException {
 		try {
-			MessageTemplateDAO dao = Context.get().getBean(MessageTemplateDAO.class);
+			MessageTemplateDAO dao = Context.get(MessageTemplateDAO.class);
 			dao.delete(id);
 		} catch (Exception e) {
 			throw new ServerException(TEMPLATES_HAVE_NOT_BEEN_SAVED, e);
@@ -265,7 +265,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 		Session session = validateSession();
 
 		try {
-			MessageTemplateDAO dao = Context.get().getBean(MessageTemplateDAO.class);
+			MessageTemplateDAO dao = Context.get(MessageTemplateDAO.class);
 			List<MessageTemplate> templates = dao.findByName(name, session.getTenantId());
 			for (MessageTemplate template : templates) {
 				if (template.getType().equals(MessageTemplate.TYPE_SYSTEM))
@@ -282,7 +282,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 		Session session = validateSession();
 
 		try {
-			MessageTemplateDAO dao = Context.get().getBean(MessageTemplateDAO.class);
+			MessageTemplateDAO dao = Context.get(MessageTemplateDAO.class);
 			MessageTemplate template = dao.findById(templateId);
 			if (template == null)
 				return null;

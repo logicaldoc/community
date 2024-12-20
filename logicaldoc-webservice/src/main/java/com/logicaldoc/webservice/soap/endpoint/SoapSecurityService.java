@@ -70,7 +70,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 	private List<WSUser> collectUsers(String group, User user) throws PersistenceException {
 		List<WSUser> users = new ArrayList<>();
-		UserDAO dao = Context.get().getBean(UserDAO.class);
+		UserDAO dao = Context.get(UserDAO.class);
 		if (StringUtils.isEmpty(group)) {
 			for (User usr : dao.findAll(user.getTenantId())) {
 				dao.initialize(user);
@@ -78,7 +78,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 					users.add(WSUser.fromUser(usr));
 			}
 		} else {
-			GroupDAO gDao = Context.get().getBean(GroupDAO.class);
+			GroupDAO gDao = Context.get(GroupDAO.class);
 			Group grp = gDao.findByName(group, user.getTenantId());
 			gDao.initialize(grp);
 			for (User usr : grp.getUsers()) {
@@ -97,7 +97,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 		try {
 			List<WSGroup> groups = new ArrayList<>();
-			GroupDAO dao = Context.get().getBean(GroupDAO.class);
+			GroupDAO dao = Context.get(GroupDAO.class);
 			for (Group grp : dao.findAll(user.getTenantId())) {
 				if (grp.getType() == Group.TYPE_DEFAULT) {
 					dao.initialize(grp);
@@ -116,8 +116,8 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		User sessionUser = validateSession(sid);
 
 		try {
-			GroupDAO gDao = Context.get().getBean(GroupDAO.class);
-			UserDAO dao = Context.get().getBean(UserDAO.class);
+			GroupDAO gDao = Context.get(GroupDAO.class);
+			UserDAO dao = Context.get(UserDAO.class);
 			User usr = wsUser.toUser();
 			usr.setTenantId(sessionUser.getTenantId());
 
@@ -205,7 +205,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		checkAdministrator(sid);
 
 		try {
-			GroupDAO dao = Context.get().getBean(GroupDAO.class);
+			GroupDAO dao = Context.get(GroupDAO.class);
 			Group grp = group.toGroup();
 			if (group.getId() != 0) {
 				grp = dao.findById(group.getId());
@@ -224,7 +224,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 			if (CollectionUtils.isNotEmpty(group.getUserIds())) {
 
-				UserDAO userDao = Context.get().getBean(UserDAO.class);
+				UserDAO userDao = Context.get(UserDAO.class);
 				for (User usr : grp.getUsers()) {
 					usr.removeGroup(grp.getId());
 					userDao.store(usr);
@@ -257,7 +257,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			throw new PermissionException("You cannot delete the admin user");
 
 		try {
-			UserDAO dao = Context.get().getBean(UserDAO.class);
+			UserDAO dao = Context.get(UserDAO.class);
 			User usr = dao.findById(userId);
 			if (usr.getType() == User.TYPE_SYSTEM) {
 				throw new PermissionException(
@@ -278,7 +278,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			throw new PermissionException("You cannot delete the admin group");
 
 		try {
-			GroupDAO dao = Context.get().getBean(GroupDAO.class);
+			GroupDAO dao = Context.get(GroupDAO.class);
 			Group grp = dao.findById(groupId);
 			if (grp.getType() != Group.TYPE_DEFAULT) {
 				throw new PermissionException(
@@ -296,7 +296,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		checkAdministrator(sid);
 
 		try {
-			UserDAO userDao = Context.get().getBean(UserDAO.class);
+			UserDAO userDao = Context.get(UserDAO.class);
 			User user = userDao.findById(userId);
 			if (user == null)
 				throw new WebserviceException("User " + userId + " not found");
@@ -317,7 +317,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			history.setComment("");
 			user.setRepass("");
 
-			UserDAO dao = Context.get().getBean(UserDAO.class);
+			UserDAO dao = Context.get(UserDAO.class);
 
 			dao.store(user, history);
 
@@ -332,7 +332,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	public WSUser getUser(String sid, long userId) throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 		try {
-			UserDAO userDao = Context.get().getBean(UserDAO.class);
+			UserDAO userDao = Context.get(UserDAO.class);
 			User user = userDao.findById(userId);
 			if (user == null)
 				return null;
@@ -349,7 +349,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	public WSUser getUserByUsername(String sid, String username) throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 		try {
-			UserDAO userDao = Context.get().getBean(UserDAO.class);
+			UserDAO userDao = Context.get(UserDAO.class);
 			User user = userDao.findByUsername(username);
 
 			if (user == null)
@@ -367,7 +367,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	public WSGroup getGroup(String sid, long groupId) throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 
-		GroupDAO groupDao = Context.get().getBean(GroupDAO.class);
+		GroupDAO groupDao = Context.get(GroupDAO.class);
 		Group group = groupDao.findById(groupId);
 		if (group == null)
 			return null;

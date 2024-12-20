@@ -90,10 +90,10 @@ public class AttributesDataServlet extends AbstractDataServlet {
 		 */
 		Map<String, Attribute> attributes = new HashMap<>();
 		if (templateId == null) {
-			AttributeSetDAO dao = Context.get().getBean(AttributeSetDAO.class);
+			AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
 			attributes = dao.findAttributes(session.getTenantId(), null);
 		} else {
-			TemplateDAO dao = Context.get().getBean(TemplateDAO.class);
+			TemplateDAO dao = Context.get(TemplateDAO.class);
 			Template template = dao.findById(templateId);
 			dao.initialize(template);
 			List<String> names = template.getAttributeNames();

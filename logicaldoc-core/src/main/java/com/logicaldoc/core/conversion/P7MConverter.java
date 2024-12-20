@@ -35,7 +35,7 @@ public class P7MConverter extends AbstractFormatConverter {
 			p7m.read();
 			p7m.extractOriginalFile(tmp);
 
-			FormatConverterManager manager = Context.get().getBean(FormatConverterManager.class);
+			FormatConverterManager manager = Context.get(FormatConverterManager.class);
 			FormatConverter converter = manager.getConverter(enclosedExtension, targetExtension);
 
 			if (converter == null)

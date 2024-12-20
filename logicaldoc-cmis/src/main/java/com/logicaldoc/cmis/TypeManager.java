@@ -335,7 +335,7 @@ public class TypeManager {
 		/*
 		 * Extended properties
 		 */
-		AttributeSetDAO dao = Context.get().getBean(AttributeSetDAO.class);
+		AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
 		List<AttributeSet> sets = dao.findAll();
 		for (AttributeSet set : sets) {
 			dao.initialize(set);

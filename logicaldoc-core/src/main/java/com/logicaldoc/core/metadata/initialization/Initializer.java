@@ -81,7 +81,7 @@ public class Initializer {
 			// If an error happens here it means that the collection could not
 			// be loaded, so load the bean again and initialize it.
 			log.debug("Got error {} trying to reload the template {}", e.getMessage(), template.getId());
-			TemplateDAO tDao = Context.get().getBean(TemplateDAO.class);
+			TemplateDAO tDao = Context.get(TemplateDAO.class);
 			try {
 				template = tDao.findById(template.getId());
 				tDao.initialize(template);
@@ -110,7 +110,7 @@ public class Initializer {
 	private void setUser(History transaction) {
 		User user = transaction != null && transaction.getUser() != null ? transaction.getUser() : null;
 		if (user == null && transaction != null && transaction.getUserId() != null) {
-			UserDAO uDao = Context.get().getBean(UserDAO.class);
+			UserDAO uDao = Context.get(UserDAO.class);
 			try {
 				user = uDao.findById(transaction.getUserId());
 				transaction.setUser(user);

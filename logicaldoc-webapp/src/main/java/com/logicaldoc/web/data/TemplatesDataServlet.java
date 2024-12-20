@@ -35,7 +35,7 @@ public class TemplatesDataServlet extends AbstractDataServlet {
 				: null;
 		Integer type = request.getParameter("type") != null ? Integer.parseInt(request.getParameter("type")) : null;
 
-		TemplateDAO templateDao = Context.get().getBean(TemplateDAO.class);
+		TemplateDAO templateDao = Context.get(TemplateDAO.class);
 		Template template = templateId != null ? templateDao.findById(templateId) : null;
 
 		PrintWriter writer = response.getWriter();

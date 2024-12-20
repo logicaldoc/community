@@ -27,7 +27,7 @@ public class DocUtil {
 	public static String getFileName(Document document, String fileVersion) {
 		String fileName = document.getFileName();
 		if (StringUtils.isNotEmpty(fileVersion) && !fileVersion.equals(document.getFileVersion())) {
-			VersionDAO vDao = Context.get().getBean(VersionDAO.class);
+			VersionDAO vDao = Context.get(VersionDAO.class);
 			try {
 				Version ver = vDao.findByFileVersion(document.getId(), fileVersion);
 				if (ver != null)
@@ -43,7 +43,7 @@ public class DocUtil {
 		String tenantName = "default";
 		if (document != null)
 			try {
-				TenantDAO tenantDao = Context.get().getBean(TenantDAO.class);
+				TenantDAO tenantDao = Context.get(TenantDAO.class);
 				Tenant tenant = tenantDao.findById(document.getTenantId());
 				tenantName = tenant.getName();
 			} catch (Exception t) {

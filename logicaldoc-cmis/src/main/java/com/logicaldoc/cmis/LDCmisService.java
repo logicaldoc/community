@@ -88,9 +88,9 @@ public class LDCmisService extends AbstractCmisService {
 		this.sid = sid;
 
 		try {
-			historyDao = Context.get().getBean(DocumentHistoryDAO.class);
+			historyDao = Context.get(DocumentHistoryDAO.class);
 
-			FolderDAO fdao = Context.get().getBean(FolderDAO.class);
+			FolderDAO fdao = Context.get(FolderDAO.class);
 			Session session = SessionManager.get().get(sid);
 			Folder root = fdao.findRoot(session.getTenantId());
 

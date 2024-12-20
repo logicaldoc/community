@@ -33,7 +33,7 @@ public class RatingsDataServlet extends AbstractDataServlet {
 
 		DateFormat df = getDateFormat();
 
-		RatingDAO ratingDao = Context.get().getBean(RatingDAO.class);
+		RatingDAO ratingDao = Context.get(RatingDAO.class);
 		List<Rating> ratings = ratingDao.findByDocId(Long.parseLong(docId));
 
 		PrintWriter writer = response.getWriter();

@@ -280,7 +280,7 @@ public class ImageUtil {
 			File pdfFile = FileUtil.createTempFile("zonalocr", ".pdf");
 			try {
 				if (!"pdf".equals(ext)) {
-					FormatConverterManager manager = Context.get().getBean(FormatConverterManager.class);
+					FormatConverterManager manager = Context.get(FormatConverterManager.class);
 					manager.convertFile(originalFile, originalFileName, pdfFile, "jpg", null);
 				} else {
 					pdfFile = originalFile;

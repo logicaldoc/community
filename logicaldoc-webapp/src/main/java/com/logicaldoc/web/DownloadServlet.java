@@ -72,8 +72,8 @@ public class DownloadServlet extends HttpServlet {
 
 	private void downloadDocument(HttpServletRequest request, HttpServletResponse response, Session session)
 			throws IOException, ServletException, PersistenceException {
-		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
-		VersionDAO versDao = Context.get().getBean(VersionDAO.class);
+		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		VersionDAO versDao = Context.get(VersionDAO.class);
 
 		// Flag indicating to download only indexed text
 		String downloadText = request.getParameter("downloadText");
@@ -190,7 +190,7 @@ public class DownloadServlet extends HttpServlet {
 				&& (doc.getDocRefType() != null && doc.getDocRefType().contains("pdf"))) {
 
 			// Generate the PDF conversion
-			FormatConverterManager manager = Context.get().getBean(FormatConverterManager.class);
+			FormatConverterManager manager = Context.get(FormatConverterManager.class);
 			try {
 				manager.convertToPdf(doc, fileVersion, session.getSid());
 			} catch (Exception e) {
@@ -203,7 +203,7 @@ public class DownloadServlet extends HttpServlet {
 	}
 
 	private void checkDownloadPermission(Session session, Document doc) throws PersistenceException, IOException {
-		DocumentDAO documentDao = Context.get().getBean(DocumentDAO.class);
+		DocumentDAO documentDao = Context.get(DocumentDAO.class);
 		if (!documentDao.isDownloadAllowed(doc.getId(), session.getUserId()))
 			throw new IOException("You don't have the DOWNLOAD permission");
 	}
@@ -225,7 +225,7 @@ public class DownloadServlet extends HttpServlet {
 
 	static void processSafeHtml(String suffix, Version version, Document doc) throws IOException {
 		if ("safe.html".equals(suffix)) {
-			Store store = Context.get().getBean(Store.class);
+			Store store = Context.get(Store.class);
 			if (doc != null) {
 				String safeResource = store.getResourceName(doc,
 						version == null ? doc.getFileVersion() : version.getFileVersion(), suffix);

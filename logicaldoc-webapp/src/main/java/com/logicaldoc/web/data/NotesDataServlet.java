@@ -61,7 +61,7 @@ public class NotesDataServlet extends AbstractDataServlet {
 			query.append(" and A.ld_page =" + page);
 
 		if (docId != null && fileVersion == null) {
-			DocumentDAO ddao = Context.get().getBean(DocumentDAO.class);
+			DocumentDAO ddao = Context.get(DocumentDAO.class);
 			Document doc = ddao.findDocument(docId);
 			fileVersion = doc.getFileVersion();
 		}
@@ -76,7 +76,7 @@ public class NotesDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		DocumentNoteDAO dao = Context.get().getBean(DocumentNoteDAO.class);
+		DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
 		dao.queryForResultSet(query.toString(), params, 200, rows -> {
 			while (rows.next())
 				printPost(writer, rows);
@@ -136,7 +136,7 @@ public class NotesDataServlet extends AbstractDataServlet {
 		Long docId = null;
 		if (request.getParameter("docId") != null) {
 			docId = Long.parseLong(request.getParameter("docId"));
-			DocumentDAO ddao = Context.get().getBean(DocumentDAO.class);
+			DocumentDAO ddao = Context.get(DocumentDAO.class);
 			Document doc = ddao.findDocument(docId);
 			if (doc != null)
 				docId = doc.getId();

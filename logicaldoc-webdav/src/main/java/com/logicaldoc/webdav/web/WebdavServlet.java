@@ -105,7 +105,7 @@ public class WebdavServlet extends AbstractWebdavServlet {
 	public ResourceConfig getResourceConfig() {
 		// fallback if no config present
 		if (config == null)
-			setConfig(Context.get().getBean(ResourceConfig.class));
+			setConfig(Context.get(ResourceConfig.class));
 		return config;
 	}
 

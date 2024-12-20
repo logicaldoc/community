@@ -103,7 +103,7 @@ public class MailTool {
 			att.setFileName(document.getFileName());
 			String extension = document.getFileExtension();
 			att.setMimeType(MimeType.get(extension));
-			Store store = Context.get().getBean(Store.class);
+			Store store = Context.get(Store.class);
 			att.setData(store.getBytes(document.getId(), store.getResourceName(document, null, null)));
 			email.addAttachment(2 + email.getAttachments().size(), att);
 		}
@@ -224,7 +224,7 @@ public class MailTool {
 			throw new IllegalArgumentException("Filename must end with .msg or .eml");
 
 		EMail email = null;
-		Store store = Context.get().getBean(Store.class);
+		Store store = Context.get(Store.class);
 		try (InputStream stream = store.getStream(document.getId(), store.getResourceName(document, null, null))) {
 			if (document.getFileName().toLowerCase().endsWith(".eml"))
 				email = MailUtil.messageToMail(stream, extractAttachments);
@@ -251,7 +251,7 @@ public class MailTool {
 	 */
 	public void sendSystemMessage(String recipient, String message, String subject, int scope, int priority)
 			throws PersistenceException {
-		UserDAO uDao = Context.get().getBean(UserDAO.class);
+		UserDAO uDao = Context.get(UserDAO.class);
 		User user = uDao.findByUsername(recipient);
 
 		SystemMessage m = new SystemMessage();
@@ -274,7 +274,7 @@ public class MailTool {
 		m.setDateScope(scope);
 		m.setPrio(priority);
 
-		SystemMessageDAO dao = Context.get().getBean(SystemMessageDAO.class);
+		SystemMessageDAO dao = Context.get(SystemMessageDAO.class);
 		dao.store(m);
 	}
 
@@ -296,7 +296,7 @@ public class MailTool {
 		InputStream is = null;
 		try {
 			long docId = doc.getId();
-			Store store = Context.get().getBean(Store.class);
+			Store store = Context.get(Store.class);
 			String resource = store.getResourceName(docId, doc.getFileVersion(), null);
 			is = store.getStream(docId, resource);
 
@@ -327,7 +327,7 @@ public class MailTool {
 							DocumentHistory transaction = new DocumentHistory();
 							transaction.setUser(user);
 
-							DocumentManager manager = Context.get().getBean(DocumentManager.class);
+							DocumentManager manager = Context.get(DocumentManager.class);
 							Document attDoc = manager.create(tmpFile, docVO, transaction);
 							createdDocs.add(attDoc);
 						} finally {

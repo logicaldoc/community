@@ -76,7 +76,7 @@ public class TaskScheduling {
 	public Date getNextFireTime() {
 		Date nextFire = null;
 
-		Object trigger = Context.get().getBean(taskName + "Trigger");
+		Object trigger = Context.get(taskName + "Trigger");
 		if (trigger instanceof Trigger trgr)
 			nextFire = previousFireTime != null ? trgr.getFireTimeAfter(previousFireTime) : trgr.getNextFireTime();
 
@@ -120,9 +120,9 @@ public class TaskScheduling {
 	 * @throws ParseException raised if the scheduling expression is invalid
 	 */
 	public void save() throws IOException, ParseException {
-		Scheduler scheduler = (Scheduler) Context.get().getBean("Scheduler");
+		Scheduler scheduler = (Scheduler) Context.get("Scheduler");
 		// Use the & prefix to get the factory and not the bean it produces
-		TaskTrigger trigger = (TaskTrigger) Context.get().getBean("&" + taskName + "Trigger");
+		TaskTrigger trigger = (TaskTrigger) Context.get("&" + taskName + "Trigger");
 		String expression = getCronExpression();
 
 		ContextProperties config = Context.get().getProperties();

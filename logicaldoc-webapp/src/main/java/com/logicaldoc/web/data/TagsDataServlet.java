@@ -76,7 +76,7 @@ public class TagsDataServlet extends AbstractDataServlet {
 	}
 
 	private void enrichMapWithFolderTags(Long folderId, HashMap<String, Long> tagsMap, List<String> words) {
-		FolderDAO fDao = Context.get().getBean(FolderDAO.class);
+		FolderDAO fDao = Context.get(FolderDAO.class);
 		if (folderId != null) {
 			List<String> tags = fDao.findTags(folderId);
 
@@ -95,7 +95,7 @@ public class TagsDataServlet extends AbstractDataServlet {
 	private void enrichMapWithDocumentTags(Long docId, HashMap<String, Long> tagsMap, List<String> words)
 			throws PersistenceException {
 		if (docId != null) {
-			DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+			DocumentDAO docDao = Context.get(DocumentDAO.class);
 			List<String> tags = docDao.findTags(docId);
 
 			/*
@@ -113,13 +113,13 @@ public class TagsDataServlet extends AbstractDataServlet {
 	private HashMap<String, Long> buildTagsMap(Session session, String mode, String firstLetter, String editing)
 			throws PersistenceException {
 
-		DocumentDAO docDao = Context.get().getBean(DocumentDAO.class);
+		DocumentDAO docDao = Context.get(DocumentDAO.class);
 		HashMap<String, Long> tagsMap = new HashMap<>();
 
 		if (("preset".equals(firstLetter) || "preset".equals(mode)) && "true".equals(editing)) {
 			// We have to return the preset only, because the user is
 			// editing a document
-			GenericDAO gDao = Context.get().getBean(GenericDAO.class);
+			GenericDAO gDao = Context.get(GenericDAO.class);
 			List<Generic> buf = gDao.findByTypeAndSubtype("tag", null, null, session.getTenantId());
 			for (Generic generic : buf)
 				tagsMap.put(generic.getSubtype(), 0L);

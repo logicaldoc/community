@@ -52,7 +52,7 @@ public class AnonymousLoginFilter extends GenericFilterBean {
 			if (config.getBoolean(tenant + ".anonymous.enabled")) {
 				LDAuthenticationToken authToken = new LDAuthenticationToken(
 						config.getProperty(tenant + ".anonymous.user"));
-				AuthenticationManager authenticationManager = Context.get().getBean(AuthenticationManager.class);
+				AuthenticationManager authenticationManager = Context.get(AuthenticationManager.class);
 				try {
 					Authentication anonAuthentication = authenticationManager.authenticate(authToken);
 					if (anonAuthentication.isAuthenticated()) {

@@ -102,7 +102,7 @@ public class DashletContentTest extends AbstractCoreTestCase {
 	}
 
 	protected void prepareSession(String username, String password) throws PersistenceException {
-		UserDAO userDao = Context.get().getBean(UserDAO.class);
+		UserDAO userDao = Context.get(UserDAO.class);
 
 		Client client = new Client("xyz", "192.168.2.231", "ghost");
 		Device device = new Device();
