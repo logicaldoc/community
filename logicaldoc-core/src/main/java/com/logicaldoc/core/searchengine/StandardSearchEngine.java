@@ -21,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.index.CheckIndex;
 import org.apache.lucene.index.CheckIndex.Status;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.NIOFSDirectory;
@@ -401,6 +402,9 @@ public class StandardSearchEngine implements SearchEngine {
 	 */
 	protected SolrQuery prepareSearchQuery(String expression, Set<String> filters, String expressionLanguage,
 			Integer rows) {
+		// Don't want any limit in the number of conditions processed by Lucene
+		BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
+
 		SolrQuery query = new SolrQuery().setQuery(expression);
 		if (rows != null)
 			query = query.setRows(rows);
