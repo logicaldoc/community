@@ -61,7 +61,7 @@ public class TicketsReport extends ReportPanel {
 
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
-		display.addClickHandler(event -> {
+		display.addClickHandler(click -> {
 			if (Boolean.TRUE.equals(max.validate()))
 				refresh();
 		});
@@ -127,7 +127,7 @@ public class TicketsReport extends ReportPanel {
 		maxViews.setCanFilter(false);
 		maxViews.setCanGroupBy(false);
 
-		list.addDoubleClickHandler(event -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
+		list.addDoubleClickHandler(click -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
 
 		list.setFields(enabled, id, ticketId, type, count, maxCount, views, maxViews, creation, expired, fileName);
 	}
@@ -158,7 +158,7 @@ public class TicketsReport extends ReportPanel {
 		Menu contextMenu = new Menu();
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
-		preview.addClickHandler((MenuItemClickEvent event) -> {
+		preview.addClickHandler(click -> {
 			long id = Long.parseLong(rec.getAttribute(DOC_ID));
 			DocumentService.Instance.get().getById(id, new AsyncCallback<>() {
 
@@ -169,8 +169,7 @@ public class TicketsReport extends ReportPanel {
 
 				@Override
 				public void onSuccess(GUIDocument doc) {
-					PreviewPopup iv = new PreviewPopup(doc);
-					iv.show();
+					new PreviewPopup(doc).show();
 				}
 			});
 		});
@@ -179,10 +178,8 @@ public class TicketsReport extends ReportPanel {
 
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
-		download.addClickHandler((MenuItemClickEvent event) -> {
-			String id = rec.getAttribute(DOC_ID);
-			WindowUtils.openUrl(GWT.getHostPageBaseURL() + "download?docId=" + id);
-		});
+		download.addClickHandler(
+				click -> WindowUtils.openUrl(GWT.getHostPageBaseURL() + "download?docId=" + rec.getAttribute(DOC_ID)));
 
 		MenuItem ticketURL = new MenuItem();
 		ticketURL.setTitle(I18N.message("ticketurl"));

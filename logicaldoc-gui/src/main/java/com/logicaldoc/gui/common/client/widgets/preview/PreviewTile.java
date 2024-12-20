@@ -3,7 +3,6 @@ package com.logicaldoc.gui.common.client.widgets.preview;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.ImageLightbox;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Canvas;
@@ -46,7 +45,7 @@ public class PreviewTile extends HLayout {
 			HTMLFlow thumbnailImage = new HTMLFlow(html);
 			thumbnailImage.addClickHandler(event -> {
 				if (Session.get().isShowThumbnail()) {
-					new ImageLightbox(docId, title).show();
+					new TileImageLightbox(docId, title).show();
 				}
 			});
 

@@ -1,29 +1,32 @@
 package com.logicaldoc.gui.common.client.widgets;
 
-import com.logicaldoc.gui.common.client.Session;
-import com.logicaldoc.gui.common.client.util.Util;
+import com.google.gwt.widgetideas.graphics.client.ImageLoader;
+import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.types.HeaderControls;
+import com.smartgwt.client.types.ImageStyle;
+import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Window;
 
 public class ImageLightbox extends Window {
-	public ImageLightbox(long docId, String title) {
-		int size = 800;
-		if (Session.get().getConfig("gui.tile.size") != null)
-			size = Integer.parseInt(Session.get().getConfig("gui.tile.size"));
-		int windowHeight = size + 10;
-		if (windowHeight > com.google.gwt.user.client.Window.getClientHeight())
-			windowHeight = com.google.gwt.user.client.Window.getClientHeight();
-
+	public ImageLightbox(String imageUrl, String title, int size) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(title);
-		setWidth("50%");
-		setHeight(windowHeight);
+		setTitle(I18N.message(title));
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
+		setAutoSize(true);
 		centerInPage();
 
-		HTMLPanel html = new HTMLPanel(Util.tileImageHTML(docId, null, null, size));
-		addItem(html);
+		ImageLoader.loadImages(new String[] { imageUrl },
+				imageElements -> {
+					Img img = new Img(imageUrl);  
+			        img.setImageWidth(size);  
+			        img.setImageHeight(size);  
+			        img.setImageType(ImageStyle.NORMAL);   
+			        addItem(img);  	
+				});
+		
+		
+
 	}
 }

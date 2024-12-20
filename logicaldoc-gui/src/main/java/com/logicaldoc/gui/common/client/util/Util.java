@@ -175,6 +175,18 @@ public abstract class Util {
 		download(downloadTicketURL(ticketId));
 	}
 
+	public static String qrURL(String content, int size) {
+		return Util.contextPath() + "barcode?label=false&format=QR_CODE&width=" + size + "&height=" + size + "&code="
+				+ content;
+	}
+
+	public static String qrImg(String content, int size) {
+		if (Feature.isCommercial())
+			return "<img src='" + qrURL(content, size) + "' width='" + size + "' />";
+		else
+			return "";
+	}
+
 	public static String displayURL(Long docId, Long folderId) {
 		String url = contextPath() + "display?";
 		if (docId != null)
@@ -1159,7 +1171,7 @@ public abstract class Util {
 	}
 
 	/**
-	 * Converts some HTML specific cahrd into it's entity
+	 * Converts some HTML specific chars into it's entity
 	 * 
 	 * @param originalText the original string to filter
 	 * 

@@ -61,6 +61,7 @@ import com.logicaldoc.gui.common.client.widgets.CronExpressionComposer;
 import com.logicaldoc.gui.common.client.widgets.DocumentSelector;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.PasswordGenerator;
+import com.logicaldoc.gui.common.client.widgets.QRFormItemIcon;
 import com.logicaldoc.gui.common.client.widgets.UserSelector;
 import com.logicaldoc.gui.common.client.widgets.automation.AutomationItemEditor;
 import com.logicaldoc.gui.common.client.widgets.automation.HtmlItemEditor;
@@ -885,7 +886,7 @@ public class ItemFactory {
 			boolean skipDisabled) {
 		return newUserSelector(name, title, groupIdOrName, !required, skipDisabled, true);
 	}
-	
+
 	public static SelectItem newUserSelector(String name, String title, String groupIdOrName, boolean required,
 			boolean skipDisabled, boolean withClear) {
 		return new UserSelector(name, title, groupIdOrName, !required, skipDisabled, withClear, null);
@@ -1145,7 +1146,8 @@ public class ItemFactory {
 		select.setHeight(250);
 		select.setMultipleAppearance(MultipleAppearance.GRID);
 		select.setMultiple(true);
-		select.setOptionDataSource(new EventsDS(options.isFolder(), options.isWorkflow(), options.isUser(), options.isImportfolder(), options.isOcr(), options.isWebservice(), options.isAllOption()));
+		select.setOptionDataSource(new EventsDS(options.isFolder(), options.isWorkflow(), options.isUser(),
+				options.isImportfolder(), options.isOcr(), options.isWebservice(), options.isAllOption()));
 		select.setValueField("code");
 		select.setDisplayField(LABEL);
 		if (handler != null)
@@ -1164,11 +1166,13 @@ public class ItemFactory {
 		return select;
 	}
 
-	public static SelectItem newEventSelector(String name, String title, final ChangedHandler handler, EventSelectorOptions options) {
+	public static SelectItem newEventSelector(String name, String title, final ChangedHandler handler,
+			EventSelectorOptions options) {
 		final SelectItem select = newSelectItem(originalItemName(name), title);
 		select.setWidth(350);
 		select.setMultiple(false);
-		select.setOptionDataSource(new EventsDS(options.isFolder(), options.isWorkflow(), options.isUser(), options.isImportfolder(), options.isOcr(), options.isWebservice(), options.isAllOption()));
+		select.setOptionDataSource(new EventsDS(options.isFolder(), options.isWorkflow(), options.isUser(),
+				options.isImportfolder(), options.isOcr(), options.isWebservice(), options.isAllOption()));
 		select.setValueField("code");
 		select.setDisplayField(LABEL);
 		if (handler != null)
@@ -1883,8 +1887,16 @@ public class ItemFactory {
 		if (url != null)
 			linkItem.setValue(url);
 
-		linkItem.setIcons(new CopyTextFormItemIcon(textToCopy != null ? textToCopy : url,
-				textToCopy != null ? "copytext" : "copylink"));
+		QRFormItemIcon qrFormItemIcon = new QRFormItemIcon();
+
+		final CopyTextFormItemIcon copyTextFormItemIcon = new CopyTextFormItemIcon(
+				textToCopy != null ? textToCopy : url, textToCopy != null ? "copytext" : "copylink");
+
+		if (Feature.isCommercial())
+			linkItem.setIcons(copyTextFormItemIcon, qrFormItemIcon);
+		else
+			linkItem.setIcons(copyTextFormItemIcon);
+		
 		return linkItem;
 	}
 

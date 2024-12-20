@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
@@ -16,10 +15,10 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.QRFormItemIcon;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.types.PickerIconName;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -29,7 +28,6 @@ import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.LinkItem;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
-import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
@@ -75,9 +73,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 		prepareForm1();
 
-		StaticTextItem idItem = ItemFactory.newStaticTextItem("id", Long.toString(folder.getId()));
-		if (folder.getFoldRef() != null)
-			idItem.setTooltip(I18N.message("thisisalias") + ": " + folder.getFoldRef());
+		StaticTextItem idItem = prepareIdItem();
 
 		TextItem name = prepareNameItem();
 
@@ -113,12 +109,6 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 		LinkItem pathItem = preparePathItem();
 
-		LinkItem barcode = ItemFactory.newLinkItem("barcode", I18N.message("generatebarcode"),
-				I18N.message("generatebarcode"),
-				GWT.getHostPageBaseURL() + "barcode?code=" + folder.getId() + "&width=400&height=150");
-		barcode.setTarget("_blank");
-		barcode.setTitle(I18N.message("barcode"));
-
 		final StaticTextItem documents = ItemFactory.newStaticTextItem("documents",
 				folder.getDocumentCount() > 0 ? Util.formatLong(folder.getDocumentCount()) : "-");
 		documents.setIconHSpace(2);
@@ -144,10 +134,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 		List<FormItem> items = new ArrayList<>();
 		items.addAll(Arrays.asList(idItem, pathItem, name, description, store, maxVersions, creation, documents,
-				subfolders, size, barcode));
-
-		if (!Feature.enabled(Feature.BARCODES))
-			items.remove(barcode);
+				subfolders, size));
 		if (!Feature.enabled(Feature.MULTI_STORE))
 			items.remove(store);
 		if (folder.isDefaultWorkspace())
@@ -163,6 +150,25 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		prepareRightForm();
 
 		columns.addMember(new FolderTile(folder, changedHandler));
+	}
+
+	private StaticTextItem prepareIdItem() {
+		StaticTextItem id = ItemFactory.newStaticTextItem("id", Long.toString(folder.getId()));
+
+		StringBuilder sb = new StringBuilder("id: ");
+		sb.append(folder.getId());
+		sb.append("_CR_name: ");
+		sb.append(folder.getName());
+		sb.append("_CR_path: ");
+		sb.append(folder.getPathExtended());
+
+		if (Feature.isCommercial())
+			id.setIcons(new QRFormItemIcon(sb.toString()));
+
+		if (folder.getFoldRef() != null)
+			id.setTooltip(I18N.message("thisisalias") + ": " + folder.getFoldRef());
+
+		return id;
 	}
 
 	private SpinnerItem prepareMaxVersionsItem() {
@@ -188,13 +194,19 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	}
 
 	private void addComputeStatsIcons(StaticTextItem documents, StaticTextItem subfolders, StaticTextItem size) {
-		PickerIcon computeStats = new PickerIcon(PickerIconName.REFRESH, computeStatsClick -> {
-			computeStatsClick.getItem().setValue(I18N.message("computing") + "...");
+		FormItemIcon computeStats = new FormItemIcon();
+		computeStats.setPrompt(I18N.message("calculatestats"));
+		computeStats.setSrc("[SKIN]/arrows-rotate.svg");
+		computeStats.setWidth(16);
+		computeStats.setHeight(16);
+		computeStats.addFormItemClickHandler(click -> {
+			click.getItem().setValue(I18N.message("computing") + "...");
 			FolderService.Instance.get().computeStats(folder.getId(), new AsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
+
 				}
 
 				@Override
@@ -208,7 +220,6 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 				}
 			});
 		});
-		computeStats.setPrompt(I18N.message("calculatestats"));
 
 		documents.setIcons(computeStats);
 		subfolders.setIcons(computeStats);
@@ -220,6 +231,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 				: FolderNavigator.get().getPath(folder.getId());
 		LinkItem pathItem = ItemFactory.newLinkItem("path", "path", Util.padLeft(path, 40),
 				Util.displayURL(null, folder.getId()), path);
+
 		pathItem.setTooltip(path);
 		pathItem.setWrap(false);
 		return pathItem;
@@ -228,10 +240,10 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	private FormItemIcon prepareEnforceStore() {
 		FormItemIcon enforceStore = new FormItemIcon();
 		enforceStore.setPrompt(I18N.message("enforcefilesintofolderstorage"));
-		enforceStore.setSrc("[SKIN]/data_into.png");
+		enforceStore.setSrc("[SKIN]/boxes-stacked.svg");
 		enforceStore.setWidth(16);
 		enforceStore.setHeight(16);
-		
+
 		enforceStore.addFormItemClickHandler(event -> {
 			LD.ask(I18N.message("enforcementofstorage"),
 					I18N.message("enforcefilesintofolderstorage") + ".\n" + I18N.message("doyouwanttoproceed"), yes -> {
@@ -262,7 +274,8 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	private FormItemIcon prepareApplyStoreToSubfoldersItem() {
 		FormItemIcon applyStoreToSubfolders = new FormItemIcon();
 		applyStoreToSubfolders.setPrompt(I18N.message("applytosubfolders"));
-		applyStoreToSubfolders.setSrc("[SKIN]/page_save.png");
+		applyStoreToSubfolders.setSrc("[SKIN]/clone.svg");
+
 		applyStoreToSubfolders.setWidth(16);
 		applyStoreToSubfolders.setHeight(16);
 		applyStoreToSubfolders.addFormItemClickHandler(applyStoreToSubfoldersClick -> {

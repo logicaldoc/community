@@ -71,7 +71,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 	protected Layout securityTabPanel;
 
-	protected StandardPropertiesPanel propertiesPanel;
+	protected DocumentStandardPropertiesPanel propertiesPanel;
 
 	protected DocumentExtendedPropertiesPanel extendedPropertiesPanel;
 
@@ -570,7 +570,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		}
 
 		try {
-			propertiesPanel = new StandardPropertiesPanel(document, changeHandler);
+			propertiesPanel = new DocumentStandardPropertiesPanel(document, changeHandler);
 			propertiesTabPanel.addMember(propertiesPanel);
 		} catch (Exception t) {
 			// Nothing to do
