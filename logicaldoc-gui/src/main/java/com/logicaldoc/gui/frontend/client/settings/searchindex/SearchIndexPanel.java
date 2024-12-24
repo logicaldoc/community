@@ -36,7 +36,6 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.SearchEngineService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.types.PickerIconName;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
@@ -45,7 +44,7 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
-import com.smartgwt.client.widgets.form.fields.PickerIcon;
+import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
@@ -399,8 +398,11 @@ public class SearchIndexPanel extends AdminPanel {
 		searchEngineForm.setColWidths(1, "*");
 		searchEngineForm.setValuesManager(vm);
 
-		PickerIcon computeStat = new PickerIcon(PickerIconName.REFRESH, iconClick -> {
-			iconClick.getItem().setValue(I18N.message("computing") + "...");
+		FormItemIcon computeStats = new FormItemIcon();
+		computeStats.setPrompt(I18N.message("calculatestats"));
+		computeStats.setSrc("[SKIN]/arrows-rotate.svg");
+		computeStats.addFormItemClickHandler(click -> {
+			click.getItem().setValue(I18N.message("computing") + "...");
 			SearchEngineService.Instance.get().countEntries(new AsyncCallback<Long>() {
 
 				@Override
@@ -410,20 +412,15 @@ public class SearchIndexPanel extends AdminPanel {
 
 				@Override
 				public void onSuccess(Long count) {
-					iconClick.getItem().setValue(Util.formatLong(count));
+					click.getItem().setValue(Util.formatLong(count));
 				}
 			});
 		});
 
-		computeStat.setPrompt(I18N.message("calculatestats"));
-		computeStat.setWidth(16);
-
 		// Entries count
 		StaticTextItem entries = ItemFactory.newStaticTextItem("entries", "entriescount", "-");
 		entries.setIconHSpace(2);
-		entries.setIconWidth(16);
-		entries.setIconHeight(16);
-		entries.setIcons(computeStat);
+		entries.setIcons(computeStats);
 		entries.setWidth("1%");
 
 		// Locked

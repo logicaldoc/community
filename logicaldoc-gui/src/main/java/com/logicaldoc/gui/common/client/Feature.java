@@ -264,8 +264,4 @@ public class Feature {
 	public static boolean showLicensee() {
 		return enabled(SHOW_DISABLED);
 	}
-
-	public static boolean isCommercial() {
-		return enabled(ADDITIONAL_FORMATS);
-	}
 }

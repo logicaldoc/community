@@ -22,40 +22,43 @@ import com.smartgwt.client.widgets.form.fields.StaticTextItem;
  *
  */
 public class QRLightbox extends Window {
-	public QRLightbox(String content, String title, int size) {
+	private static final int QR_SIZE = 150;
+
+	public QRLightbox(String content) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message(title));
+		setTitle(I18N.message("qrcode"));
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
 		setAutoSize(true);
 		centerInPage();
-		
-		String qrUrl1 = Util.qrURL(content, size);
+
+		String qrUrl1 = Util.qrURL(content, QR_SIZE);
 		if ((content.startsWith("http") || content.startsWith("https")) && content.startsWith(Util.contextPath())
 				&& !content.startsWith(Session.get().getConfig("server.url"))) {
-			
-			// We are not accessing from the declared server.url so display the additional QR with server.url
+
+			// We are not accessing from the declared server.url so display the
+			// additional QR with server.url
 			final StringBuilder content2 = new StringBuilder(Session.get().getConfig("server.url"));
 			if (!content2.toString().endsWith("/"))
 				content2.append("/");
 			content2.append(content.substring(Util.contextPath().length()));
-			
-			String qrUrl2 = Util.qrURL(content2.toString(), size);
-			
+
+			String qrUrl2 = Util.qrURL(content2.toString(), QR_SIZE);
+
 			ImageLoader.loadImages(new String[] { qrUrl1, qrUrl2 }, imageElements -> {
-				StaticTextItem qr1Item = ItemFactory.newStaticTextItem("qr1", title,
-						"<table border='0'><tr><td><img src='" +imageElements[0].getSrc()+"' />"  
-								+ "</td><td><a href='" + content + "' target='_blank'>"
-								+ content + "</a></td></tr></table>");
+				StaticTextItem qr1Item = ItemFactory.newStaticTextItem("qr1", "qrcode",
+						"<table border='0'><tr><td><img src='" + imageElements[0].getSrc() + "' />"
+								+ "</td><td><a href='" + content + "' target='_blank'>" + content
+								+ "</a></td></tr></table>");
 				qr1Item.setWrap(false);
 				qr1Item.setWrapTitle(false);
 				qr1Item.setShowTitle(false);
 
-				StaticTextItem qr2Item = ItemFactory.newStaticTextItem("qr2", title,
-						"<table border='0'><tr><td><img src='" +imageElements[1].getSrc()+"' />"
-								+ "</td><td><a href='" + content2 + "' target='_blank'>"
-								+ content2 + "</a></td></tr></table>");
+				StaticTextItem qr2Item = ItemFactory.newStaticTextItem("qr2", "qrcode",
+						"<table border='0'><tr><td><img src='" + imageElements[1].getSrc() + "' />"
+								+ "</td><td><a href='" + content2 + "' target='_blank'>" + content2
+								+ "</a></td></tr></table>");
 				qr2Item.setWrap(false);
 				qr2Item.setWrapTitle(false);
 				qr2Item.setShowTitle(false);
@@ -68,11 +71,12 @@ public class QRLightbox extends Window {
 				addItem(form);
 			});
 		} else {
-			// We are accessing from the declared server.url so just display the QR
+			// We are accessing from the declared server.url so just display the
+			// QR
 			ImageLoader.loadImages(new String[] { qrUrl1 }, imageElements -> {
 				Img img = new Img(qrUrl1);
-				img.setImageWidth(size);
-				img.setImageHeight(size);
+				img.setImageWidth(QR_SIZE);
+				img.setImageHeight(QR_SIZE);
 				img.setImageType(ImageStyle.NORMAL);
 				addItem(img);
 			});

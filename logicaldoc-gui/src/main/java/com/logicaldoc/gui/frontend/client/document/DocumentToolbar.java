@@ -473,7 +473,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		if (Feature.visible(Feature.OFFICE)) {
 			addButton(office);
 			office.setTooltip(I18N.message("editwithoffice"));
-			office.setTitle("<i class='fab fa-windows fa-lg fa-lg' aria-hidden='true'></i>");
+			office.setTitle("<i class='fab fa-windows fa-thin' aria-hidden='true'></i>");
 			if (!Feature.enabled(Feature.OFFICE))
 				setFeatureDisabled(office);
 
@@ -488,7 +488,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				&& Session.get().getConfigAsBoolean("converter.OnlyOfficeConverter.enabled")) {
 			addButton(onlyoffice);
 			onlyoffice.setTooltip(I18N.message("editwithonlyoffice"));
-			onlyoffice.setTitle("<i class='fal fa-briefcase fa-lg fa-lg' aria-hidden='true'></i>");
+			onlyoffice.setTitle("<i class='fal fa-briefcase fa-thin' aria-hidden='true'></i>");
 			if (!Feature.enabled(Feature.OFFICE))
 				setFeatureDisabled(onlyoffice);
 

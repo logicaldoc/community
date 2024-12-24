@@ -181,10 +181,10 @@ public abstract class Util {
 	}
 
 	public static String qrImg(String content, int size) {
-		if (Feature.isCommercial())
-			return "<img src='" + qrURL(content, size) + "' width='" + size + "' />";
-		else
+		if (isCommunity())
 			return "";
+		else
+			return "<img src='" + qrURL(content, size) + "' width='" + size + "' />";
 	}
 
 	public static String displayURL(Long docId, Long folderId) {
@@ -454,6 +454,10 @@ public abstract class Util {
 		return !Feature.enabled(Feature.ADDITIONAL_FORMATS);
 	}
 
+	public static boolean isCommercial() {
+		return Feature.enabled(Feature.ADDITIONAL_FORMATS);
+	}
+	
 	public static boolean isOfficeFileType(String type) {
 		return officeExts.stream().anyMatch(type::equalsIgnoreCase);
 	}

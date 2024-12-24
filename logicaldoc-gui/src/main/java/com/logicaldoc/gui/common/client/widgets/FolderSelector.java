@@ -9,7 +9,6 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.FoldersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
-import com.logicaldoc.gui.frontend.client.folder.FolderSearchDialog;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -54,32 +53,33 @@ public class FolderSelector extends TextItem {
 			setFolder(Long.parseLong(item.getAttributeAsString("folderId")), item.getAttributeAsString("name"));
 		});
 
-		PickerIcon search = new PickerIcon(PickerIcon.SEARCH,
-				event -> new FolderSearchDialog(FolderSelector.this).show());
+		FormItemIcon search = new FormItemIcon();
 		search.setPrompt(I18N.message("search"));
+		search.setSrc("[SKIN]/magnifying-glass.svg");
 		search.setWidth(12);
 		search.setHeight(12);
 
 		PickerIcon pick = new PickerIcon(PickerIcon.COMBO_BOX, event -> menu.showContextMenu());
 
 		FormItemIcon open = new FormItemIcon();
-		open.setName("open");
+		open.setPrompt(I18N.message("openfolder"));
+		open.setSrc("[SKIN]/folder.svg");
 		open.setWidth(12);
 		open.setHeight(12);
-		open.setSrc("[SKIN]/folder.png");
-		open.setPrompt(I18N.message("openfolder"));
 		open.addFormItemClickHandler(click -> {
 			if (getFolderId() != null)
 				DocumentsPanel.get().openInFolder(getFolderId(), null);
 		});
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, event -> {
+		FormItemIcon clear = new FormItemIcon();
+		clear.setPrompt(I18N.message("clear"));
+		clear.setSrc("[SKIN]/trash.svg");
+		clear.setWidth(12);
+		clear.setHeight(12);
+		clear.addFormItemClickHandler(click -> {
 			clearValue();
 			setFolder(null, null);
 		});
-		clear.setPrompt(I18N.message("clear"));
-		clear.setWidth(12);
-		clear.setHeight(12);
 
 		List<FormItemIcon> icons = new ArrayList<>();
 		icons.add(pick);
