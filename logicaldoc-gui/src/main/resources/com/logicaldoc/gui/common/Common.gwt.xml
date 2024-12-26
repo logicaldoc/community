@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.8.2//EN" "http://www.gwtproject.org/doctype/2.8.2/gwt-module.dtd">
 <module rename-to="common">
-   <!-- inherits name="com.smartclient.theme.enterprise.EnterpriseResources" / -->
-   <inherits name="com.smartclient.theme.simplicity.SimplicityResources" />
    <inherits name="com.google.gwt.core.Core" />
    <inherits name='com.google.gwt.user.User' />
    <inherits name="com.google.gwt.user.History" />
    <inherits name="com.google.gwt.i18n.I18N" />
+   
    <inherits name="com.smartgwt.SmartGwtNoScript" />
+   <inherits name="com.smartclient.theme.simplicity.SimplicityResources" />
+   <inherits name="com.smartclient.theme.tahoe.TahoeResources" />
    <inherits name="com.smartgwt.tools.SmartGwtTools" />
 
    <inherits name='org.wisepersist.gwt.uploader.Uploader'/>
    
    <!-- Compile for firefox only more fastly for developement and hosted mode -->
-
    <set-property name="user.agent" value="gecko1_8,safari" />
    <entry-point class="com.logicaldoc.gui.common.client.Common" />
 </module>

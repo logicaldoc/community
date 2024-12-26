@@ -220,6 +220,8 @@ public class Feature {
 	public static final int CHATGPT = 104;
 
 	public static final int GOOGLE_CALENDAR = 105;
+	
+	public static final int SCANNER = 106;
 
 	public static final int ONLYOFFICE = 107;
 
