@@ -77,6 +77,15 @@ public class FormatConverterManager {
 	// All the available converters
 	private Map<String, FormatConverter> availableConverters = new HashMap<>();
 
+	public FormatConverterManager(Store store, TenantDAO tenantDao, DocumentManager documentManager,
+			ContextProperties config) {
+		super();
+		this.store = store;
+		this.tenantDao = tenantDao;
+		this.documentManager = documentManager;
+		this.config = config;
+	}
+
 	/**
 	 * Retrieves the content of the Pdf conversion. If the Pdf conversion is not
 	 * available in the store, it is created.
@@ -574,21 +583,5 @@ public class FormatConverterManager {
 		if (converters.isEmpty())
 			init();
 		return converters;
-	}
-
-	public void setStore(Store store) {
-		this.store = store;
-	}
-
-	public void setTenantDao(TenantDAO tenantDao) {
-		this.tenantDao = tenantDao;
-	}
-
-	public void setDocumentManager(DocumentManager documentManager) {
-		this.documentManager = documentManager;
-	}
-
-	public void setConfig(ContextProperties config) {
-		this.config = config;
 	}
 }

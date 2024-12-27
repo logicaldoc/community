@@ -55,6 +55,12 @@ public class JobManager {
 	@Resource(name = "ContextProperties")
 	private ContextProperties config;
 
+	public JobManager(Scheduler scheduler, ContextProperties config) {
+		super();
+		this.scheduler = scheduler;
+		this.config = config;
+	}
+
 	/**
 	 * Schedules a new Job
 	 * 

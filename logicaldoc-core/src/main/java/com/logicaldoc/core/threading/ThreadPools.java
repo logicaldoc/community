@@ -51,8 +51,9 @@ public class ThreadPools {
 
 	@Resource(name = "ContextProperties")
 	private ContextProperties config;
-
-	public void setConfig(ContextProperties config) {
+	
+	public ThreadPools(ContextProperties config) {
+		super();
 		this.config = config;
 	}
 

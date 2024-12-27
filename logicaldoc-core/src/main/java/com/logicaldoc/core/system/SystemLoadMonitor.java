@@ -41,6 +41,11 @@ public class SystemLoadMonitor {
 	private List<SystemLoadListener> listeners = new ArrayList<>();
 
 	private boolean lastCheckOverloaded = false;
+	
+	public SystemLoadMonitor(ContextProperties config) {
+		super();
+		this.config = config;
+	}
 
 	public void addListener(SystemLoadListener listener) {
 		if (!listeners.contains(listener))
@@ -49,10 +54,6 @@ public class SystemLoadMonitor {
 
 	public void removeListener(SystemLoadListener listener) {
 		listeners.remove(listener);
-	}
-
-	public void setConfig(ContextProperties config) {
-		this.config = config;
 	}
 
 	private void initSamples() {

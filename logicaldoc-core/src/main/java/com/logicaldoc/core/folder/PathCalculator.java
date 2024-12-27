@@ -26,6 +26,11 @@ public class PathCalculator extends Task {
 	@Resource(name = "FolderDAO")
 	private FolderDAO folderDao;
 
+	public PathCalculator(String name, FolderDAO folderDao) {
+		this();
+		this.folderDao = folderDao;
+	}
+
 	private long processed = 0;
 
 	private long errors = 0;
@@ -94,7 +99,4 @@ public class PathCalculator extends Task {
 		return folderDao;
 	}
 
-	public void setFolderDao(FolderDAO folderDao) {
-		this.folderDao = folderDao;
-	}
 }

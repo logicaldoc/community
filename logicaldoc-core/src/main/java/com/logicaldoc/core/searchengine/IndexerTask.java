@@ -82,13 +82,14 @@ public class IndexerTask extends Task {
 		super(NAME);
 		log = LoggerFactory.getLogger(IndexerTask.class);
 	}
-
-	public void setDocumentManager(DocumentManager documentManager) {
+	
+	public IndexerTask(String name, DocumentManager documentManager, DocumentDAO documentDao, TenantDAO tenantDao,
+			SearchEngine indexer) {
+		this();
 		this.documentManager = documentManager;
-	}
-
-	public void setDocumentDao(DocumentDAO documentDao) {
 		this.documentDao = documentDao;
+		this.tenantDao = tenantDao;
+		this.indexer = indexer;
 	}
 
 	@Override
@@ -310,10 +311,6 @@ public class IndexerTask extends Task {
 		return new String[] { where, sorting };
 	}
 
-	public void setIndexer(SearchEngine indexer) {
-		this.indexer = indexer;
-	}
-
 	@Override
 	protected String prepareReport(Locale locale) {
 		StringBuilder sb = new StringBuilder();
@@ -326,10 +323,6 @@ public class IndexerTask extends Task {
 		sb.append(I18N.message("errors", locale) + ": ");
 		sb.append(errors);
 		return sb.toString();
-	}
-
-	public void setTenantDao(TenantDAO tenantDao) {
-		this.tenantDao = tenantDao;
 	}
 
 	private static void startIndexerThreads(int threadsTotal) {

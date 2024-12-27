@@ -13,7 +13,7 @@ import com.logicaldoc.core.task.Task;
 import com.logicaldoc.core.task.TaskException;
 
 /**
- * This task optimises all indexes
+ * This task optimizes all indexes
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 3.5.0
@@ -33,12 +33,14 @@ public class IndexOptimizer extends Task {
 		log = LoggerFactory.getLogger(IndexOptimizer.class);
 	}
 
-	public SearchEngine getIndexer() {
-		return indexer;
+	public IndexOptimizer(String name, SearchEngine indexer, DocumentDAO documentDao) {
+		this();
+		this.indexer = indexer;
+		this.documentDao = documentDao;
 	}
 
-	public void setIndexer(SearchEngine indexer) {
-		this.indexer = indexer;
+	public SearchEngine getIndexer() {
+		return indexer;
 	}
 
 	@Override
@@ -78,9 +80,5 @@ public class IndexOptimizer extends Task {
 	@Override
 	public boolean isConcurrent() {
 		return true;
-	}
-
-	public void setDocumentDao(DocumentDAO documentDao) {
-		this.documentDao = documentDao;
 	}
 }

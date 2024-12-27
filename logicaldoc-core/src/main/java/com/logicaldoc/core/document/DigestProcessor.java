@@ -35,8 +35,9 @@ public class DigestProcessor extends Task {
 		super(NAME);
 		log = LoggerFactory.getLogger(DigestProcessor.class);
 	}
-
-	public void setDocumentDao(DocumentDAO documentDao) {
+	
+	public DigestProcessor(String name, DocumentDAO documentDao) {
+		this();
 		this.documentDao = documentDao;
 	}
 

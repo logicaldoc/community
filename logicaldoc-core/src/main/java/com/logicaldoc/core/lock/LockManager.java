@@ -35,6 +35,12 @@ public class LockManager {
 
 	@Resource(name = "ContextProperties")
 	private ContextProperties config;
+	
+	public LockManager(GenericDAO genericDao, ContextProperties config) {
+		super();
+		this.genericDao = genericDao;
+		this.config = config;
+	}
 
 	/**
 	 * Gets all the transaction ids associated to the locks
@@ -151,11 +157,4 @@ public class LockManager {
 		}
 	}
 
-	public void setGenericDao(GenericDAO genericDao) {
-		this.genericDao = genericDao;
-	}
-
-	public void setConfig(ContextProperties config) {
-		this.config = config;
-	}
 }

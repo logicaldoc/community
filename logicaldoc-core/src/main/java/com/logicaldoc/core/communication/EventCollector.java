@@ -41,6 +41,11 @@ public class EventCollector {
 
 	@Resource(name = "ContextProperties")
 	private ContextProperties config;
+	
+	public EventCollector(ContextProperties config) {
+		super();
+		this.config = config;
+	}
 
 	// Maintain a fifos for the history IDs. Key is the class name, value is a
 	// FIFO queue
@@ -130,10 +135,6 @@ public class EventCollector {
 
 	public ContextProperties getConfig() {
 		return config;
-	}
-
-	public void setConfig(ContextProperties config) {
-		this.config = config;
 	}
 
 	public static boolean isEnabled() {

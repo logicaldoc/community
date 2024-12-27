@@ -28,6 +28,11 @@ public class TagsProcessor extends Task {
 		super(NAME);
 		log = LoggerFactory.getLogger(TagsProcessor.class);
 	}
+	
+	public TagsProcessor(String name, DocumentDAO documentDao) {
+		this();
+		this.documentDao = documentDao;
+	}
 
 	@Override
 	public boolean isIndeterminate() {
@@ -73,7 +78,4 @@ public class TagsProcessor extends Task {
 		log.info("End of tags processing");
 	}
 
-	public void setDocumentDao(DocumentDAO documentDao) {
-		this.documentDao = documentDao;
-	}
 }

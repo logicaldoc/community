@@ -126,32 +126,23 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Resource(name = "ContextProperties")
 	private ContextProperties config;
-
-	public void setListenerManager(DocumentListenerManager listenerManager) {
-		this.listenerManager = listenerManager;
-	}
-
-	public void setDocumentDAO(DocumentDAO documentDAO) {
+	
+	public DocumentManagerImpl(DocumentDAO documentDAO, DocumentLinkDAO documentLinkDAO,
+			DocumentNoteDAO documentNoteDAO, FolderDAO folderDAO, TemplateDAO templateDAO,
+			DocumentListenerManager listenerManager, VersionDAO versionDAO, UserDAO userDAO, TicketDAO ticketDAO,
+			SearchEngine indexer, Store store, ContextProperties config) {
+		super();
 		this.documentDAO = documentDAO;
-	}
-
-	public void setTemplateDAO(TemplateDAO templateDAO) {
+		this.documentLinkDAO = documentLinkDAO;
+		this.documentNoteDAO = documentNoteDAO;
+		this.folderDAO = folderDAO;
 		this.templateDAO = templateDAO;
-	}
-
-	public void setIndexer(SearchEngine indexer) {
-		this.indexer = indexer;
-	}
-
-	public void setVersionDAO(VersionDAO versionDAO) {
+		this.listenerManager = listenerManager;
 		this.versionDAO = versionDAO;
-	}
-
-	public void setStore(Store store) {
+		this.userDAO = userDAO;
+		this.ticketDAO = ticketDAO;
+		this.indexer = indexer;
 		this.store = store;
-	}
-
-	public void setConfig(ContextProperties config) {
 		this.config = config;
 	}
 
@@ -1302,14 +1293,6 @@ public class DocumentManagerImpl implements DocumentManager {
 		}
 	}
 
-	public void setUserDAO(UserDAO userDAO) {
-		this.userDAO = userDAO;
-	}
-
-	public void setFolderDAO(FolderDAO folderDAO) {
-		this.folderDAO = folderDAO;
-	}
-
 	@Override
 	public Version deleteVersion(long versionId, DocumentHistory transaction) throws PersistenceException {
 		Version versionToDelete = enforceExistingVersion(versionId);
@@ -1418,10 +1401,6 @@ public class DocumentManagerImpl implements DocumentManager {
 		}
 	}
 
-	public void setDocumentNoteDAO(DocumentNoteDAO documentNoteDAO) {
-		this.documentNoteDAO = documentNoteDAO;
-	}
-
 	@Override
 	public long archiveFolder(long folderId, DocumentHistory transaction) throws PersistenceException {
 		Folder root = folderDAO.findFolder(folderId);
@@ -1528,10 +1507,6 @@ public class DocumentManagerImpl implements DocumentManager {
 			return urlPrefix + "view/" + ticket.getTicketId();
 		else
 			return urlPrefix + "download-ticket?ticketId=" + ticket.getTicketId();
-	}
-
-	public void setTicketDAO(TicketDAO ticketDAO) {
-		this.ticketDAO = ticketDAO;
 	}
 
 	@Override
@@ -1754,10 +1729,6 @@ public class DocumentManagerImpl implements DocumentManager {
 			}
 		}
 		return tempDir;
-	}
-
-	public void setDocumentLinkDAO(DocumentLinkDAO documentLinkDAO) {
-		this.documentLinkDAO = documentLinkDAO;
 	}
 
 	@Override

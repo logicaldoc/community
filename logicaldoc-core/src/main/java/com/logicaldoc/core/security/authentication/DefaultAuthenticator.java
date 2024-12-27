@@ -29,8 +29,9 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 
 	@Resource(name = "UserDAO")
 	protected UserDAO userDAO;
-
-	public void setUserDAO(UserDAO userDAO) {
+	
+	public DefaultAuthenticator(UserDAO userDAO) {
+		super();
 		this.userDAO = userDAO;
 	}
 
