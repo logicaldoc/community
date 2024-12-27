@@ -4,7 +4,7 @@ In viewer.mjs:
 Replace ../build/ with ./
 Replace ../web/ with ./
 Replace sidebarViewOnLoad: -1, with sidebarViewOnLoad: false, 
-
+   
 
 Comment
 defaultUrl: {
