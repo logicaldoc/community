@@ -10,7 +10,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 
 /**
@@ -44,22 +43,23 @@ public class PermaLinkDisplay extends Window {
 
 		ImageLoader.loadImages(new String[] { Util.qrURL(downloadUrl, QR_SIZE), Util.qrURL(downloadUrl2, QR_SIZE),
 				Util.qrURL(displayUrl, QR_SIZE), Util.qrURL(displayUrl2, QR_SIZE) }, imageElements -> {
-					DynamicForm form = new DynamicForm();
-					form.setMargin(4);
-					form.setTitleOrientation(TitleOrientation.LEFT);
-
 					StaticTextItem downloadUrlItem = prepareBarcodeAndLink("download1", "download", downloadUrl);
+					downloadUrlItem.setShowTitle(true);
 					StaticTextItem downloadUrlItem2 = prepareBarcodeAndLink("download2", "download", downloadUrl2);
+					downloadUrlItem2.setShowTitle(false);
 					downloadUrlItem2.setVisible(!downloadUrl.equals(downloadUrl2));
 
-					StaticTextItem displayUrlItem = prepareBarcodeAndLink("displayUrl", "details", displayUrl);
+					StaticTextItem displayUrlItem = prepareBarcodeAndLink("displayUrl1", "details", displayUrl);
+					displayUrlItem.setShowTitle(true);
 					StaticTextItem displayUrlItem2 = prepareBarcodeAndLink("displayUrl2", "details", displayUrl2);
-					displayUrlItem2.setVisible(!downloadUrl.equals(downloadUrl2));
+					displayUrlItem2.setShowTitle(false);
+					displayUrlItem2.setVisible(!displayUrl.equals(displayUrl2));
 
-					ButtonItem close = new ButtonItem("close", I18N.message("close"));
-					close.addClickHandler(event -> PermaLinkDisplay.this.destroy());
-
-					form.setItems(downloadUrlItem, downloadUrlItem2, displayUrlItem, displayUrlItem2, close);
+					DynamicForm form = new DynamicForm();
+					form.setNumCols(1);
+					form.setMargin(2);
+					form.setTitleOrientation(TitleOrientation.TOP);
+					form.setItems(downloadUrlItem, downloadUrlItem2, displayUrlItem, displayUrlItem2);
 
 					addItem(form);
 				});

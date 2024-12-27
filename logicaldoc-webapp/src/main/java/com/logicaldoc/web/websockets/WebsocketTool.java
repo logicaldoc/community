@@ -35,6 +35,7 @@ public class WebsocketTool {
 	public void showMessage(Session session, String message, String level) {
 		WebsocketMessage command = new WebsocketMessage(session.getSid(), "command");
 		command.setCommand("message");
+		command.setTenantId(session.getTenantId());
 		command.setUserId(session.getUserId());
 		command.setUsername(session.getUsername());
 		command.setPayload(message);
@@ -56,6 +57,7 @@ public class WebsocketTool {
 	public void openUrl(Session session, String url, String target) {
 		WebsocketMessage command = new WebsocketMessage(session.getSid(), "command");
 		command.setCommand("openurl");
+		command.setTenantId(session.getTenantId());
 		command.setUserId(session.getUserId());
 		command.setUsername(session.getUsername());
 		command.setPayload(url);

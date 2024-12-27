@@ -23,7 +23,7 @@
 </script>
 
 <!--include the SC Core API-->
-<script src="<%=MODULE%>/sc/modules/ISC_Core.js?isc_version=7.1.js"></script>
+<script src="<%=MODULE%>/sc/modules/ISC_Core.js"></script>
 
 <!--include SmartClient -->
 <script type="text/javascript">
@@ -43,7 +43,7 @@
 <!--load skin-->
 <script type="text/javascript">document.getElementById('loadingMsg').innerHTML = 'Loading skin...';</script>
 <script type="text/javascript">
-    document.write("<"+"script src=<%=MODULE%>/sc/skins/<%=SKIN%>/load_skin.js?isc_version=7.1.js&tenant=<%=TENANT%>"+"><"+"/script>");
+    document.write("<"+"script src=<%=MODULE%>/sc/skins/<%=SKIN%>/load_skin.js?tenant=<%=TENANT%>"+"><"+"/script>");
 </script>
 
 <!--load localizations-->

@@ -21,7 +21,6 @@ import com.logicaldoc.gui.common.client.widgets.QRFormItemIcon;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewTile;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.types.PickerIconName;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -31,12 +30,10 @@ import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.LinkItem;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
-import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -152,8 +149,10 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 
 		StaticTextItem permaLink = ItemFactory.newStaticTextItem("permalink", perma);
 
-		if (Feature.isCommercial()) {
-			FormItemIcon qrCode = new QRFormItemIcon();
+		if (Util.isCommercial()) {
+			FormItemIcon qrCode = new FormItemIcon();
+			qrCode.setPrompt(I18N.message("qrcode"));
+			qrCode.setSrc("[SKIN]/qrcode.svg");
 			qrCode.addFormItemClickHandler(click -> new PermaLinkDisplay(document.getId()).show());
 			permaLink.setIcons(qrCode);
 		}
@@ -168,7 +167,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 			id.setValue(Util.padLeft(Long.toString(document.getId()) + " (" + document.getCustomId() + ")", 35));
 		}
 
-		if (Feature.isCommercial()) {
+		if (Util.isCommercial()) {
 			StringBuilder sb = new StringBuilder("id: ");
 			sb.append(document.getId());
 			sb.append("_CR_filename: ");
@@ -243,11 +242,13 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 	private StaticTextItem preparePagesItem() {
 		StaticTextItem pages = ItemFactory.newStaticTextItem("pages", Util.formatInt(document.getPages()));
 		pages.setIconHSpace(2);
-		pages.setIconWidth(16);
-		pages.setIconHeight(16);
 		pages.setWidth("1%");
-		PickerIcon countPages = new PickerIcon(PickerIconName.REFRESH, (final FormItemIconClickEvent event) -> {
-			event.getItem().setValue(I18N.message("computing") + "...");
+
+		FormItemIcon countPages = new FormItemIcon();
+		countPages.setSrc("[SKIN]/arrows-rotate.svg");
+		countPages.setPrompt(I18N.message("countpages"));
+		countPages.addFormItemClickHandler(click -> {
+			click.getItem().setValue(I18N.message("computing") + "...");
 			DocumentService.Instance.get().updatePages(document.getId(), new AsyncCallback<>() {
 
 				@Override
@@ -264,7 +265,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 				}
 			});
 		});
-		countPages.setPrompt(I18N.message("countpages"));
+
 		if (document.getId() != 0)
 			pages.setIcons(countPages);
 		return pages;
@@ -315,9 +316,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 
 		FormItemIcon editTags = new FormItemIcon();
 		editTags.setPrompt(I18N.message("edittags"));
-		editTags.setSrc("[SKIN]/actions/edit.png");
-		editTags.setWidth(16);
-		editTags.setHeight(16);
+		editTags.setSrc("[SKIN]/pen-to-square.svg");
 		editTags.addFormItemClickHandler(event -> {
 			tagsString.setVisible(false);
 			tagItem.setVisible(true);

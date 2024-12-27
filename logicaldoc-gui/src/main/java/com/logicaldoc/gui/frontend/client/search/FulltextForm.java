@@ -23,10 +23,10 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.MiniDateRangeItem;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
-import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -82,17 +82,22 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		form1.setTitleOrientation(TitleOrientation.TOP);
 		form1.setNumCols(3);
 
-		PickerIcon searchPicker = new PickerIcon(PickerIcon.SEARCH, event -> search());
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, event -> {
-			vm.clearValues();
-			prepareFields(null);
-		});
-
+		FormItemIcon search = new FormItemIcon();
+		search.setPrompt(I18N.message("search"));
+		search.setSrc("[SKIN]/magnifying-glass.svg");;
+		search.addFormItemClickHandler(click -> search());
+		
+		FormItemIcon clear = new FormItemIcon();
+		clear.setPrompt(I18N.message("clear"));
+		clear.setSrc("[SKIN]/trash.svg");
+		clear.addFormItemClickHandler(click -> {vm.clearValues();
+		prepareFields(null);});
+		
 		expression = ItemFactory.newTextItem(EXPRESSION_STR, I18N.message("search") + "...");
 		expression.setWidth("*");
 		expression.setColSpan(3);
 		expression.setRequired(true);
-		expression.setIcons(searchPicker, clear);
+		expression.setIcons(search, clear);
 		expression.addKeyPressHandler(event -> {
 			if (event.getKeyName() == null)
 				return;
@@ -115,9 +120,9 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		SelectItem template = ItemFactory.newTemplateSelector(true, null);
 		template.setMultiple(false);
 		template.setColSpan(3);
-		template.addChangedHandler(event -> {
-			if (event.getValue() != null && !"".equals(event.getValue()))
-				prepareFields(Long.parseLong((String) event.getValue()));
+		template.addChangedHandler(changed -> {
+			if (changed.getValue() != null && !"".equals(changed.getValue()))
+				prepareFields(Long.parseLong((String) changed.getValue()));
 			else
 				prepareFields(null);
 		});

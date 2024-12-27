@@ -19,7 +19,7 @@ import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
-import com.smartgwt.client.widgets.form.fields.PickerIcon;
+import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -91,7 +91,10 @@ public class TagsForm extends VLayout {
 		otherCharForm = new DynamicForm();
 		otherCharForm.setWidth(1);
 
-		PickerIcon searchPicker = new PickerIcon(PickerIcon.SEARCH, event -> {
+		FormItemIcon search = new FormItemIcon();
+		search.setPrompt(I18N.message("clear"));
+		search.setSrc("[SKIN]/magnifying-glass.svg");
+		search.addFormItemClickHandler(click -> {
 			if (!otherCharForm.validate())
 				return;
 			onLetterSelect(otherCharForm.getValueAsString("otherchar"));
@@ -100,7 +103,7 @@ public class TagsForm extends VLayout {
 		TextItem otherChar = ItemFactory.newTextItem("otherchar", null);
 		otherChar.setRequired(true);
 		otherChar.setWrapTitle(false);
-		otherChar.setIcons(searchPicker);
+		otherChar.setIcons(search);
 		otherChar.setLength(1);
 		otherChar.setWidth(50);
 
@@ -165,21 +168,20 @@ public class TagsForm extends VLayout {
 							return;
 
 						ListGridRecord selection = tags.getSelectedRecord();
-						TagService.Instance.get().rename(selection.getAttribute("word"), value,
-								new AsyncCallback<>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
+						TagService.Instance.get().rename(selection.getAttribute("word"), value, new AsyncCallback<>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-									@Override
-									public void onSuccess(Void arg) {
-										GuiLog.info(I18N.message("procinexecution"), I18N.message("taginexecution"));
-										ListGridRecord selection = tags.getSelectedRecord();
-										selection.setAttribute("word", value);
-										onLetterSelect(value.substring(0, 1));
-									}
-								});
+							@Override
+							public void onSuccess(Void arg) {
+								GuiLog.info(I18N.message("procinexecution"), I18N.message("taginexecution"));
+								ListGridRecord selection = tags.getSelectedRecord();
+								selection.setAttribute("word", value);
+								onLetterSelect(value.substring(0, 1));
+							}
+						});
 					}));
 			contextMenu.addItem(rename);
 

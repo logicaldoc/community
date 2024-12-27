@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.common.client.widgets;
 
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 
 /**
@@ -20,23 +20,18 @@ public class QRFormItemIcon extends FormItemIcon {
 	 */
 	public QRFormItemIcon(String code, String tooltip) {
 		setName("qrcode");
-		if (Feature.isCommercial()) {
+		if (Util.isCommercial()) {
 			setPrompt(I18N.message(tooltip));
 			setSrc("[SKIN]/qrcode.svg");
-			setWidth(16);
-			setHeight(16);
-
 			addFormItemClickHandler(event -> {
 				String content = code;
 				if (content == null)
 					content = event.getItem().getValue().toString();
-				new QRLightbox(content, "qrcode", 150).show();
+				new QRLightbox(content).show();
 			});
 		} else {
 			setSrc("[SKIN]/blank.png");
 			setText("");
-			setWidth(16);
-			setHeight(16);
 			setDisabled(true);
 		}
 	}

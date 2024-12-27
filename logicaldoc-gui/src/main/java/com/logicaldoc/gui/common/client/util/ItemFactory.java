@@ -97,7 +97,6 @@ import com.smartgwt.client.widgets.form.fields.LinkItem;
 import com.smartgwt.client.widgets.form.fields.MiniDateRangeItem;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
-import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.RichTextItem;
 import com.smartgwt.client.widgets.form.fields.RowSpacerItem;
@@ -112,7 +111,6 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.EditorEnterEvent;
 import com.smartgwt.client.widgets.form.fields.events.EditorExitEvent;
-import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.form.validator.CustomValidator;
 import com.smartgwt.client.widgets.form.validator.IntegerRangeValidator;
 import com.smartgwt.client.widgets.form.validator.IsFloatValidator;
@@ -127,6 +125,8 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  * @since 6.0
  */
 public class ItemFactory {
+
+	public static final int ITEM_ICON_SIZE = 14;
 
 	private static final String PROTOCOL = "protocol";
 
@@ -211,6 +211,9 @@ public class ItemFactory {
 		dateRangeItem.setHintStyle("hint");
 		dateRangeItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		dateRangeItem.setBrowserSpellCheck(false);
+		dateRangeItem.setIconHeight(ITEM_ICON_SIZE);
+		dateRangeItem.setIconWidth(ITEM_ICON_SIZE);
+		dateRangeItem.setIconVAlign(VerticalAlignment.CENTER);
 		DateRangeItem.setDefaultProperties(dateRangeItem);
 
 		MiniDateRangeItem miniDateRangeItem = new MiniDateRangeItem();
@@ -225,6 +228,9 @@ public class ItemFactory {
 		miniDateRangeItem.setPickerIconPrompt(I18N.message(SHOWDATECHOOSER));
 		miniDateRangeItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		miniDateRangeItem.setBrowserSpellCheck(false);
+		miniDateRangeItem.setIconHeight(ITEM_ICON_SIZE);
+		miniDateRangeItem.setIconWidth(ITEM_ICON_SIZE);
+		miniDateRangeItem.setIconVAlign(VerticalAlignment.CENTER);
 		MiniDateRangeItem.setDefaultProperties(miniDateRangeItem);
 
 		DateItem dateItem = new DateItem();
@@ -239,10 +245,13 @@ public class ItemFactory {
 		dateItem.setEndDate(new Date(new Date().getTime() + 2208992400000L));
 		dateItem.setStartDate(new Date(-2208992400000L));
 		dateItem.setBrowserSpellCheck(false);
+		dateItem.setIconHeight(ITEM_ICON_SIZE);
+		dateItem.setIconWidth(ITEM_ICON_SIZE);
+		dateItem.setIconVAlign(VerticalAlignment.CENTER);
 		DateItem.setDefaultProperties(dateItem);
 
 		DateChooser dateChooser = new DateChooser();
-		dateChooser.setEndYear(2040);
+		dateChooser.setEndYear(2050);
 		dateChooser.setStartYear(1990);
 		DateChooser.setDefaultProperties(dateChooser);
 
@@ -251,6 +260,9 @@ public class ItemFactory {
 		selectItem.setHintStyle("hint");
 		selectItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		selectItem.setBrowserSpellCheck(false);
+		selectItem.setIconHeight(ITEM_ICON_SIZE);
+		selectItem.setIconWidth(ITEM_ICON_SIZE);
+		selectItem.setIconVAlign(VerticalAlignment.CENTER);
 		SelectItem.setDefaultProperties(selectItem);
 
 		TextItem textItem = new TextItem();
@@ -258,24 +270,36 @@ public class ItemFactory {
 		textItem.setWidth(150);
 		textItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		textItem.setBrowserSpellCheck(false);
+		textItem.setIconHeight(ITEM_ICON_SIZE);
+		textItem.setIconWidth(ITEM_ICON_SIZE);
+		textItem.setIconVAlign(VerticalAlignment.CENTER);
 		TextItem.setDefaultProperties(textItem);
 
 		RadioGroupItem radioGroupItem = new RadioGroupItem();
 		radioGroupItem.setHintStyle("hint");
 		radioGroupItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		radioGroupItem.setBrowserSpellCheck(false);
+		radioGroupItem.setIconHeight(ITEM_ICON_SIZE);
+		radioGroupItem.setIconWidth(ITEM_ICON_SIZE);
+		radioGroupItem.setIconVAlign(VerticalAlignment.CENTER);
 		RadioGroupItem.setDefaultProperties(radioGroupItem);
 
 		CheckboxItem checkboxItem = new CheckboxItem();
 		checkboxItem.setHintStyle("hint");
 		checkboxItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		checkboxItem.setBrowserSpellCheck(false);
+		checkboxItem.setIconHeight(ITEM_ICON_SIZE);
+		checkboxItem.setIconWidth(ITEM_ICON_SIZE);
+		checkboxItem.setIconVAlign(VerticalAlignment.CENTER);
 		CheckboxItem.setDefaultProperties(checkboxItem);
 
 		MultiComboBoxItem multiComboBoxItem = new MultiComboBoxItem();
 		multiComboBoxItem.setHintStyle("hint");
 		multiComboBoxItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		multiComboBoxItem.setBrowserSpellCheck(false);
+		multiComboBoxItem.setIconHeight(ITEM_ICON_SIZE);
+		multiComboBoxItem.setIconWidth(ITEM_ICON_SIZE);
+		multiComboBoxItem.setIconVAlign(VerticalAlignment.CENTER);
 		MultiComboBoxItem.setDefaultProperties(multiComboBoxItem);
 
 		SpinnerItem spinnerItem = new SpinnerItem();
@@ -283,11 +307,17 @@ public class ItemFactory {
 		spinnerItem.setWidth(60);
 		spinnerItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		spinnerItem.setBrowserSpellCheck(false);
+		spinnerItem.setIconHeight(ITEM_ICON_SIZE);
+		spinnerItem.setIconWidth(ITEM_ICON_SIZE);
+		spinnerItem.setIconVAlign(VerticalAlignment.CENTER);
 		SpinnerItem.setDefaultProperties(spinnerItem);
 
 		PasswordItem passwordItem = new PasswordItem();
 		passwordItem.setHintStyle("hint");
 		passwordItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
+		passwordItem.setIconHeight(ITEM_ICON_SIZE);
+		passwordItem.setIconWidth(ITEM_ICON_SIZE);
+		passwordItem.setIconVAlign(VerticalAlignment.CENTER);
 		TextItem.setDefaultProperties(passwordItem);
 
 		StaticTextItem staticTextItem = new StaticTextItem();
@@ -295,12 +325,18 @@ public class ItemFactory {
 		staticTextItem.setHintStyle("hint");
 		staticTextItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		staticTextItem.setBrowserSpellCheck(false);
+		staticTextItem.setIconHeight(ITEM_ICON_SIZE);
+		staticTextItem.setIconWidth(ITEM_ICON_SIZE);
+		staticTextItem.setIconVAlign(VerticalAlignment.CENTER);
 		StaticTextItem.setDefaultProperties(staticTextItem);
 
 		IntegerItem integerItem = new IntegerItem();
 		integerItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		integerItem.setHintStyle("hint");
 		integerItem.setBrowserSpellCheck(false);
+		integerItem.setIconHeight(ITEM_ICON_SIZE);
+		integerItem.setIconWidth(ITEM_ICON_SIZE);
+		integerItem.setIconVAlign(VerticalAlignment.CENTER);
 		IntegerItem.setDefaultProperties(integerItem);
 
 		ColorPickerItem colorPickerItem = new ColorPickerItem();
@@ -308,12 +344,18 @@ public class ItemFactory {
 		colorPickerItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		colorPickerItem.setHintStyle("hint");
 		colorPickerItem.setBrowserSpellCheck(false);
+		colorPickerItem.setIconHeight(ITEM_ICON_SIZE);
+		colorPickerItem.setIconWidth(ITEM_ICON_SIZE);
+		colorPickerItem.setIconVAlign(VerticalAlignment.CENTER);
 		ColorPickerItem.setDefaultProperties(colorPickerItem);
 
 		LinkItem linkItem = new LinkItem();
 		linkItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		linkItem.setHintStyle("hint");
 		linkItem.setBrowserSpellCheck(false);
+		linkItem.setIconHeight(ITEM_ICON_SIZE);
+		linkItem.setIconWidth(ITEM_ICON_SIZE);
+		linkItem.setIconVAlign(VerticalAlignment.CENTER);
 		LinkItem.setDefaultProperties(linkItem);
 
 		TextAreaItem textAreaItem = new TextAreaItem();
@@ -321,27 +363,42 @@ public class ItemFactory {
 		textAreaItem.setHintStyle("hint");
 		textAreaItem.setBrowserSpellCheck(false);
 		textAreaItem.setIconVAlign(VerticalAlignment.CENTER);
+		textAreaItem.setIconHeight(ITEM_ICON_SIZE);
+		textAreaItem.setIconWidth(ITEM_ICON_SIZE);
+		textAreaItem.setIconVAlign(VerticalAlignment.CENTER);
 		TextAreaItem.setDefaultProperties(textAreaItem);
 
 		TimeItem timeItem = new TimeItem();
 		timeItem.setHintStyle("hint");
 		timeItem.setWidth(60);
 		timeItem.setBrowserSpellCheck(false);
+		timeItem.setIconHeight(ITEM_ICON_SIZE);
+		timeItem.setIconWidth(ITEM_ICON_SIZE);
+		timeItem.setIconVAlign(VerticalAlignment.CENTER);
 		TimeItem.setDefaultProperties(timeItem);
 
 		FloatItem floatItem = new FloatItem();
 		floatItem.setHintStyle("hint");
 		floatItem.setBrowserSpellCheck(false);
+		floatItem.setIconHeight(ITEM_ICON_SIZE);
+		floatItem.setIconWidth(ITEM_ICON_SIZE);
+		floatItem.setIconVAlign(VerticalAlignment.CENTER);
 		FloatItem.setDefaultProperties(floatItem);
 
 		ColorPickerItem colorItemPicker = new ColorPickerItem();
 		colorItemPicker.setHintStyle("hint");
 		colorItemPicker.setWidth(115);
 		colorItemPicker.setBrowserSpellCheck(false);
+		colorItemPicker.setIconHeight(ITEM_ICON_SIZE);
+		colorItemPicker.setIconWidth(ITEM_ICON_SIZE);
+		colorItemPicker.setIconVAlign(VerticalAlignment.CENTER);
 		ColorPickerItem.setDefaultProperties(colorItemPicker);
 
 		RichTextItem richTextItem = new RichTextItem();
 		richTextItem.setBrowserSpellCheck(false);
+		richTextItem.setIconHeight(ITEM_ICON_SIZE);
+		richTextItem.setIconWidth(ITEM_ICON_SIZE);
+		richTextItem.setIconVAlign(VerticalAlignment.CENTER);
 		RichTextItem.setDefaultProperties(richTextItem);
 	}
 
@@ -361,11 +418,15 @@ public class ItemFactory {
 			item.setValue(value);
 
 		if (clearOption) {
-			PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent event) -> {
+			FormItemIcon clear = new FormItemIcon();
+			clear.setPrompt(I18N.message("clear"));
+			clear.setSrc("[SKIN]/trash.svg");
+			clear.addFormItemClickHandler(click -> {
 				item.setValue((String) null);
 				if (changedHandler != null)
 					changedHandler.onChanged(null);
 			});
+
 			item.setIcons(clear);
 			item.setIconVAlign(VerticalAlignment.CENTER);
 		}
@@ -1153,14 +1214,15 @@ public class ItemFactory {
 		if (handler != null)
 			select.addChangedHandler(handler);
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, click -> {
+		FormItemIcon clear = new FormItemIcon();
+		clear.setPrompt(I18N.message("clear"));
+		clear.setSrc("[SKIN]/trash.svg");
+		clear.addFormItemClickHandler(click -> {
 			select.clearValue();
 			select.setValue((String) null);
 			if (handler != null)
 				handler.onChanged(null);
 		});
-		clear.setWidth(12);
-		clear.setHeight(12);
 		select.setIcons(clear);
 
 		return select;
@@ -1178,14 +1240,15 @@ public class ItemFactory {
 		if (handler != null)
 			select.addChangedHandler(handler);
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent event) -> {
+		FormItemIcon clear = new FormItemIcon();
+		clear.setPrompt(I18N.message("clear"));
+		clear.setSrc("[SKIN]/trash.svg");
+		clear.addFormItemClickHandler(click -> {
 			select.clearValue();
 			select.setValue((String) null);
 			if (handler != null)
 				handler.onChanged(null);
 		});
-		clear.setWidth(12);
-		clear.setHeight(12);
 		select.setIcons(clear);
 
 		return select;
@@ -1311,9 +1374,7 @@ public class ItemFactory {
 
 		FormItemIcon composer = new FormItemIcon();
 		composer.setPrompt(I18N.message("opencronexpressioncomposer"));
-		composer.setSrc("[SKIN]/DynamicForm/date_control.png");
-		composer.setWidth(16);
-		composer.setHeight(16);
+		composer.setSrc("[SKIN]/calendar-lines-pen.svg");
 		composer.addFormItemClickHandler(click -> {
 			new CronExpressionComposer(cron, handler).show();
 			click.cancel();
@@ -1321,9 +1382,7 @@ public class ItemFactory {
 
 		FormItemIcon validate = new FormItemIcon();
 		validate.setPrompt(I18N.message("validate"));
-		validate.setSrc("[SKIN]/actions/approve.png");
-		validate.setWidth(16);
-		validate.setHeight(16);
+		validate.setSrc("[SKIN]/check.svg");
 		validate.addFormItemClickHandler(click -> InfoService.Instance.get().getCronDescription(cron.getValueAsString(),
 				I18N.getLocale(), new AsyncCallback<String>() {
 
@@ -1341,14 +1400,15 @@ public class ItemFactory {
 					}
 				}));
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, click -> {
+		FormItemIcon clear = new FormItemIcon();
+		clear.setPrompt(I18N.message("clear"));
+		clear.setSrc("[SKIN]/trash.svg");
+		clear.addFormItemClickHandler(click -> {
 			cron.setValue((String) null);
 			cron.clearErrors();
 			if (handler != null)
 				handler.onChanged(null);
 		});
-		clear.setWidth(16);
-		clear.setHeight(16);
 		cron.setIcons(composer, validate, clear);
 
 		return cron;
@@ -1516,8 +1576,7 @@ public class ItemFactory {
 		password.setName(originalItemName(name));
 		if (value != null)
 			password.setValue(value);
-		password.setIconVAlign(VerticalAlignment.CENTER);
-
+		
 		FormItemIcon showPassword = newShowPasswordIcon();
 
 		password.setIcons(showPassword);
@@ -1528,9 +1587,7 @@ public class ItemFactory {
 	private static FormItemIcon newShowPasswordIcon() {
 		FormItemIcon showPassword = new FormItemIcon();
 		showPassword.setName("showpassword");
-		showPassword.setWidth(16);
-		showPassword.setHeight(16);
-		showPassword.setSrc("[SKIN]/eye.png");
+		showPassword.setSrc("[SKIN]/eye.svg");
 		showPassword.setPrompt(I18N.message("showpassword"));
 		showPassword.addFormItemClickHandler(event -> {
 			NodeList<Element> inputElements = Document.get().getElementsByTagName("input");
@@ -1561,9 +1618,7 @@ public class ItemFactory {
 		if (withGeneratorTool) {
 			FormItemIcon generator = new FormItemIcon();
 			generator.setName("generator");
-			generator.setWidth(16);
-			generator.setHeight(16);
-			generator.setSrc("[SKIN]/key.png");
+			generator.setSrc("[SKIN]/key.svg");
 			generator.setPrompt(I18N.message("passwordgenerator"));
 			generator.addFormItemClickHandler(event -> new PasswordGenerator().show());
 			password.setIcons(newShowPasswordIcon(), generator);
@@ -1590,19 +1645,19 @@ public class ItemFactory {
 			FormItem hiddenPasswordItem, ChangedHandler changedHandler) {
 		StaticTextItem item = newStaticTextItem(name, title, value == null || value.isEmpty() ? "" : "*****");
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, pick -> {
+		FormItemIcon clear = new FormItemIcon();
+		clear.setPrompt(I18N.message("clear"));
+		clear.setSrc("[SKIN]/trash.svg");
+		clear.addFormItemClickHandler(click -> {
 			item.setValue((String) null);
 			hiddenPasswordItem.setValue((String) null);
 			if (changedHandler != null)
 				changedHandler.onChanged(null);
 		});
-		clear.setPrompt(I18N.message("clear"));
 
 		FormItemIcon edit = new FormItemIcon();
 		edit.setName("edit");
-		edit.setWidth(16);
-		edit.setHeight(16);
-		edit.setSrc("[SKIN]/edit.png");
+		edit.setSrc("[SKIN]/pen-to-square.svg");
 		edit.setPrompt(I18N.message("edit"));
 		edit.addFormItemClickHandler(event -> {
 			PasswordItem password = newPasswordItem("psw", title,
@@ -1892,11 +1947,11 @@ public class ItemFactory {
 		final CopyTextFormItemIcon copyTextFormItemIcon = new CopyTextFormItemIcon(
 				textToCopy != null ? textToCopy : url, textToCopy != null ? "copytext" : "copylink");
 
-		if (Feature.isCommercial())
-			linkItem.setIcons(copyTextFormItemIcon, qrFormItemIcon);
-		else
+		if (Util.isCommunity())
 			linkItem.setIcons(copyTextFormItemIcon);
-		
+		else
+			linkItem.setIcons(copyTextFormItemIcon, qrFormItemIcon);
+
 		return linkItem;
 	}
 
@@ -1950,8 +2005,6 @@ public class ItemFactory {
 	private static void appendAutomationEditorIcon(FormItem item, ChangedHandler handler, boolean withHtmlEditor) {
 		FormItemIcon editAutomation = new FormItemIcon();
 		editAutomation.setName("editautomation");
-		editAutomation.setWidth(16);
-		editAutomation.setHeight(16);
 		editAutomation.setSrc("[SKIN]/java.png");
 		editAutomation.setPrompt(I18N.message("openautomationeditor"));
 		editAutomation.addFormItemClickHandler(click -> new AutomationItemEditor(item, handler).show());
@@ -1966,9 +2019,7 @@ public class ItemFactory {
 	private static FormItemIcon prepareEditHtmlIcon(FormItem item, ChangedHandler handler) {
 		FormItemIcon editHtml = new FormItemIcon();
 		editHtml.setName(EDITHTML);
-		editHtml.setWidth(16);
-		editHtml.setHeight(16);
-		editHtml.setSrc("[SKIN]/html.png");
+		editHtml.setSrc("[SKIN]/code.svg");
 		editHtml.setPrompt(I18N.message("openhtmleditor"));
 		editHtml.addFormItemClickHandler(click -> new HtmlItemEditor(item, handler).show());
 		return editHtml;
@@ -2664,13 +2715,14 @@ public class ItemFactory {
 		selector.setValueMap(opts);
 		selector.setRequired(false);
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, (FormItemIconClickEvent event) -> {
+		FormItemIcon clear = new FormItemIcon();
+		clear.setPrompt(I18N.message("clear"));
+		clear.setSrc("[SKIN]/trash.svg");
+		clear.addFormItemClickHandler(click -> {
 			selector.clearValue();
 			selector.setValue((String) null);
 			selector.fireEvent(new ChangedEvent(selector.getJsObj()));
 		});
-		clear.setWidth(12);
-		clear.setHeight(12);
 		selector.setIcons(clear);
 
 		return selector;
@@ -2694,9 +2746,7 @@ public class ItemFactory {
 		if (withSimplifiedHtmlEditor) {
 			FormItemIcon editHtml = new FormItemIcon();
 			editHtml.setName(EDITHTML);
-			editHtml.setWidth(16);
-			editHtml.setHeight(16);
-			editHtml.setSrc("[SKIN]/html.png");
+			editHtml.setSrc("[SKIN]/code.svg");
 			editHtml.setPrompt(I18N.message("openhtmleditor"));
 			editHtml.addFormItemClickHandler(click -> {
 				RichTextItem htmlItem = newRichTextItemForNote("html", "html", item.getValueAsString());

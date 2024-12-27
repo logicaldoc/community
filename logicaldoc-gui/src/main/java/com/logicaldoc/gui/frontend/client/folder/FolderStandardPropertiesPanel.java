@@ -112,22 +112,16 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		final StaticTextItem documents = ItemFactory.newStaticTextItem("documents",
 				folder.getDocumentCount() > 0 ? Util.formatLong(folder.getDocumentCount()) : "-");
 		documents.setIconHSpace(2);
-		documents.setIconWidth(16);
-		documents.setIconHeight(16);
 		documents.setWidth("1%");
 
 		final StaticTextItem subfolders = ItemFactory.newStaticTextItem("folders",
 				folder.getSubfolderCount() > 0 ? Util.formatLong(folder.getSubfolderCount()) : "-");
 		subfolders.setIconHSpace(2);
-		subfolders.setIconWidth(16);
-		subfolders.setIconHeight(16);
 		subfolders.setWidth("1%");
 
 		final StaticTextItem size = ItemFactory.newStaticTextItem("size",
 				folder.getSize() > 0 ? Util.formatSize(folder.getSize()) : "-");
 		size.setIconHSpace(2);
-		size.setIconWidth(16);
-		size.setIconHeight(16);
 		size.setWidth("1%");
 
 		addComputeStatsIcons(documents, subfolders, size);
@@ -162,7 +156,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		sb.append("_CR_path: ");
 		sb.append(folder.getPathExtended());
 
-		if (Feature.isCommercial())
+		if (Util.isCommercial())
 			id.setIcons(new QRFormItemIcon(sb.toString()));
 
 		if (folder.getFoldRef() != null)
@@ -197,8 +191,6 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		FormItemIcon computeStats = new FormItemIcon();
 		computeStats.setPrompt(I18N.message("calculatestats"));
 		computeStats.setSrc("[SKIN]/arrows-rotate.svg");
-		computeStats.setWidth(16);
-		computeStats.setHeight(16);
 		computeStats.addFormItemClickHandler(click -> {
 			click.getItem().setValue(I18N.message("computing") + "...");
 			FolderService.Instance.get().computeStats(folder.getId(), new AsyncCallback<>() {
@@ -241,9 +233,6 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		FormItemIcon enforceStore = new FormItemIcon();
 		enforceStore.setPrompt(I18N.message("enforcefilesintofolderstorage"));
 		enforceStore.setSrc("[SKIN]/boxes-stacked.svg");
-		enforceStore.setWidth(16);
-		enforceStore.setHeight(16);
-
 		enforceStore.addFormItemClickHandler(event -> {
 			LD.ask(I18N.message("enforcementofstorage"),
 					I18N.message("enforcefilesintofolderstorage") + ".\n" + I18N.message("doyouwanttoproceed"), yes -> {
@@ -275,9 +264,6 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		FormItemIcon applyStoreToSubfolders = new FormItemIcon();
 		applyStoreToSubfolders.setPrompt(I18N.message("applytosubfolders"));
 		applyStoreToSubfolders.setSrc("[SKIN]/clone.svg");
-
-		applyStoreToSubfolders.setWidth(16);
-		applyStoreToSubfolders.setHeight(16);
 		applyStoreToSubfolders.addFormItemClickHandler(applyStoreToSubfoldersClick -> {
 			LD.contactingServer();
 			FolderService.Instance.get().applyStore(folder.getId(), new AsyncCallback<>() {
@@ -343,13 +329,11 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		final TextItem newTagItem = prepareNewTagItem(ds);
 
 		final StaticTextItem tagsString = ItemFactory.newStaticTextItem("tags", "tag",
-				Util.getTagsHTML(folder.getTags()));
+				Util.getTagsHTML(folder.getTags())); 
 		tagsString.setEndRow(true);
 		FormItemIcon editTags = new FormItemIcon();
 		editTags.setPrompt(I18N.message("edittags"));
-		editTags.setSrc("[SKIN]/actions/edit.png");
-		editTags.setWidth(16);
-		editTags.setHeight(16);
+		editTags.setSrc("[SKIN]/pen-to-square.svg");
 		editTags.addFormItemClickHandler(editTagClick -> {
 			tagsString.setVisible(false);
 			tagItem.setVisible(true);
