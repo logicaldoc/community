@@ -16,7 +16,6 @@ import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.apikey.ApiKey;
 import com.logicaldoc.core.security.apikey.ApiKeyDAO;
 import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.core.security.user.UserDAO;
 
 /**
  * This authenticator uses the API Key
@@ -31,12 +30,11 @@ public class ApiKeyAuthenticator extends DefaultAuthenticator {
 
 	@Resource(name = "ApiKeyDAO")
 	protected ApiKeyDAO apiKeyDAO;
-	
-	public ApiKeyAuthenticator(UserDAO userDAO, ApiKeyDAO apiKeyDAO) {
-		super(userDAO);
+
+	public void setApiKeyDAO(ApiKeyDAO apiKeyDAO) {
 		this.apiKeyDAO = apiKeyDAO;
 	}
-	
+
 	@Override
 	public User authenticate(String username, String password) throws AuthenticationException {
 		// Cannot authenticate without an API Key
