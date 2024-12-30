@@ -596,7 +596,7 @@ public class TaskEditor extends Window {
 	}
 
 	private void onSave() {
-		boolean humanInteraction = Boolean.valueOf(vm.getValueAsString("humanInteraction"));
+		boolean humanInteraction = Boolean.parseBoolean(vm.getValueAsString("humanInteraction"));
 
 		if (Boolean.FALSE.equals(vm.validate()) && humanInteraction)
 			return;

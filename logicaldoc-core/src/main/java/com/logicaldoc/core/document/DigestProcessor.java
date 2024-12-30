@@ -35,11 +35,6 @@ public class DigestProcessor extends Task {
 		super(NAME);
 		log = LoggerFactory.getLogger(DigestProcessor.class);
 	}
-	
-	public DigestProcessor(String name, DocumentDAO documentDao) {
-		this();
-		this.documentDao = documentDao;
-	}
 
 	@Override
 	public boolean isIndeterminate() {

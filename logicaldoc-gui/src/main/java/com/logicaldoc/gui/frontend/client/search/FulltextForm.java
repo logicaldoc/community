@@ -38,6 +38,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class FulltextForm extends VLayout implements SearchObserver {
+	private static final String SEARCH = "search";
+
 	private static final String TEMPLATE = "template";
 
 	private static final String LANGUAGE = "language";
@@ -83,7 +85,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		form1.setNumCols(3);
 
 		FormItemIcon search = new FormItemIcon();
-		search.setPrompt(I18N.message("search"));
+		search.setPrompt(I18N.message(SEARCH));
 		search.setSrc("[SKIN]/magnifying-glass.svg");;
 		search.addFormItemClickHandler(click -> search());
 		
@@ -93,7 +95,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		clear.addFormItemClickHandler(click -> {vm.clearValues();
 		prepareFields(null);});
 		
-		expression = ItemFactory.newTextItem(EXPRESSION_STR, I18N.message("search") + "...");
+		expression = ItemFactory.newTextItem(EXPRESSION_STR, I18N.message(SEARCH) + "...");
 		expression.setWidth("*");
 		expression.setColSpan(3);
 		expression.setRequired(true);
@@ -105,7 +107,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 				search();
 		});
 		expression.addClickHandler(event -> {
-			if ((I18N.message("search") + "...").equals(event.getItem().getValue())) {
+			if ((I18N.message(SEARCH) + "...").equals(event.getItem().getValue())) {
 				event.getItem().setValue("");
 			}
 		});

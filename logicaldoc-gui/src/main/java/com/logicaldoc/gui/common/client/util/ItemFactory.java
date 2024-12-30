@@ -127,6 +127,10 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class ItemFactory {
 
+	private static final String SKIN_TRASH = "[SKIN]/trash.svg";
+
+	private static final String CLEAR = "clear";
+
 	public static final int ITEM_ICON_SIZE = 14;
 
 	private static final String PROTOCOL = "protocol";
@@ -198,7 +202,7 @@ public class ItemFactory {
 	static {
 		DateRangeDialog dialog = new DateRangeDialog();
 		dialog.setCancelButtonTitle(I18N.message("cancel"));
-		dialog.setClearButtonTitle(I18N.message("clear"));
+		dialog.setClearButtonTitle(I18N.message(CLEAR));
 		dialog.setOkButtonTitle(I18N.message("ok"));
 		dialog.setHeaderTitle(I18N.message("selectdaterange"));
 		dialog.setTitle(I18N.message("selectdaterange"));
@@ -420,8 +424,8 @@ public class ItemFactory {
 
 		if (clearOption) {
 			FormItemIcon clear = new FormItemIcon();
-			clear.setPrompt(I18N.message("clear"));
-			clear.setSrc("[SKIN]/trash.svg");
+			clear.setPrompt(I18N.message(CLEAR));
+			clear.setSrc(SKIN_TRASH);
 			clear.addFormItemClickHandler(click -> {
 				item.setValue((String) null);
 				if (changedHandler != null)
@@ -1232,8 +1236,8 @@ public class ItemFactory {
 			select.addChangedHandler(handler);
 
 		FormItemIcon clear = new FormItemIcon();
-		clear.setPrompt(I18N.message("clear"));
-		clear.setSrc("[SKIN]/trash.svg");
+		clear.setPrompt(I18N.message(CLEAR));
+		clear.setSrc(SKIN_TRASH);
 		clear.addFormItemClickHandler(click -> {
 			select.clearValue();
 			select.setValue((String) null);
@@ -1258,8 +1262,8 @@ public class ItemFactory {
 			select.addChangedHandler(handler);
 
 		FormItemIcon clear = new FormItemIcon();
-		clear.setPrompt(I18N.message("clear"));
-		clear.setSrc("[SKIN]/trash.svg");
+		clear.setPrompt(I18N.message(CLEAR));
+		clear.setSrc(SKIN_TRASH);
 		clear.addFormItemClickHandler(click -> {
 			select.clearValue();
 			select.setValue((String) null);
@@ -1418,8 +1422,8 @@ public class ItemFactory {
 				}));
 
 		FormItemIcon clear = new FormItemIcon();
-		clear.setPrompt(I18N.message("clear"));
-		clear.setSrc("[SKIN]/trash.svg");
+		clear.setPrompt(I18N.message(CLEAR));
+		clear.setSrc(SKIN_TRASH);
 		clear.addFormItemClickHandler(click -> {
 			cron.setValue((String) null);
 			cron.clearErrors();
@@ -1663,8 +1667,8 @@ public class ItemFactory {
 		StaticTextItem item = newStaticTextItem(name, title, value == null || value.isEmpty() ? "" : "*****");
 
 		FormItemIcon clear = new FormItemIcon();
-		clear.setPrompt(I18N.message("clear"));
-		clear.setSrc("[SKIN]/trash.svg");
+		clear.setPrompt(I18N.message(CLEAR));
+		clear.setSrc(SKIN_TRASH);
 		clear.addFormItemClickHandler(click -> {
 			item.setValue((String) null);
 			hiddenPasswordItem.setValue((String) null);
@@ -2733,8 +2737,8 @@ public class ItemFactory {
 		selector.setRequired(false);
 
 		FormItemIcon clear = new FormItemIcon();
-		clear.setPrompt(I18N.message("clear"));
-		clear.setSrc("[SKIN]/trash.svg");
+		clear.setPrompt(I18N.message(CLEAR));
+		clear.setSrc(SKIN_TRASH);
 		clear.addFormItemClickHandler(click -> {
 			selector.clearValue();
 			selector.setValue((String) null);

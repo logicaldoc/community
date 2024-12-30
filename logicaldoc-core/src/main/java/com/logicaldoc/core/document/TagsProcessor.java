@@ -1,8 +1,7 @@
 package com.logicaldoc.core.document;
 
-import javax.annotation.Resource;
-
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
@@ -21,16 +20,12 @@ public class TagsProcessor extends Task {
 
 	public static final String NAME = "TagsProcessor";
 
-	@Resource(name = "DocumentDAO")
-	private DocumentDAO documentDao;
+	private final DocumentDAO documentDao;
 
-	public TagsProcessor() {
+	@Autowired
+	public TagsProcessor(DocumentDAO documentDao) {
 		super(NAME);
 		log = LoggerFactory.getLogger(TagsProcessor.class);
-	}
-	
-	public TagsProcessor(String name, DocumentDAO documentDao) {
-		this();
 		this.documentDao = documentDao;
 	}
 

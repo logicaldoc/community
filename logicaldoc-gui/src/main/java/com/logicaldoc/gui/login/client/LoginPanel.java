@@ -401,7 +401,7 @@ public class LoginPanel extends VLayout {
 	}
 
 	protected void initGUI() {
-		boolean saveLoginEnabled = Boolean.valueOf(info.getConfig("gui.savelogin"));
+		boolean saveLoginEnabled = Boolean.parseBoolean(info.getConfig("gui.savelogin"));
 		initGUI(saveLoginEnabled);
 	}
 
@@ -659,7 +659,7 @@ public class LoginPanel extends VLayout {
 
 	protected void onAuthenticationSuccess(GUISession session) {
 		SC.clearPrompt();
-		boolean saveLoginEnabled = Boolean.valueOf(info.getConfig("gui.savelogin"));
+		boolean saveLoginEnabled = Boolean.parseBoolean(info.getConfig("gui.savelogin"));
 		CookiesManager.saveLogin(saveLoginEnabled, rememberMe.getValueAsBoolean(), username.getValueAsString(),
 				password.getValueAsString());
 

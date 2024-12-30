@@ -22,11 +22,12 @@ import com.smartgwt.client.widgets.form.fields.StaticTextItem;
  *
  */
 public class QRLightbox extends Window {
+	private static final String QRCODE = "qrcode";
 	private static final int QR_SIZE = 150;
 
 	public QRLightbox(String content) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("qrcode"));
+		setTitle(I18N.message(QRCODE));
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
@@ -47,7 +48,7 @@ public class QRLightbox extends Window {
 			String qrUrl2 = Util.qrURL(content2.toString(), QR_SIZE);
 
 			ImageLoader.loadImages(new String[] { qrUrl1, qrUrl2 }, imageElements -> {
-				StaticTextItem qr1Item = ItemFactory.newStaticTextItem("qr1", "qrcode",
+				StaticTextItem qr1Item = ItemFactory.newStaticTextItem("qr1", QRCODE,
 						"<table border='0'><tr><td><img src='" + imageElements[0].getSrc() + "' />"
 								+ "</td><td><a href='" + content + "' target='_blank'>" + content
 								+ "</a></td></tr></table>");
@@ -55,7 +56,7 @@ public class QRLightbox extends Window {
 				qr1Item.setWrapTitle(false);
 				qr1Item.setShowTitle(false);
 
-				StaticTextItem qr2Item = ItemFactory.newStaticTextItem("qr2", "qrcode",
+				StaticTextItem qr2Item = ItemFactory.newStaticTextItem("qr2", QRCODE,
 						"<table border='0'><tr><td><img src='" + imageElements[1].getSrc() + "' />"
 								+ "</td><td><a href='" + content2 + "' target='_blank'>" + content2
 								+ "</a></td></tr></table>");

@@ -45,6 +45,8 @@ import com.smartgwt.client.widgets.layout.Layout;
  */
 public abstract class Util {
 
+	private static final String HEIGHT = "&height=";
+
 	private static final String WIDTH = "' width='";
 
 	private static final String PX_HEIGHT = "px' height='";
@@ -176,7 +178,7 @@ public abstract class Util {
 	}
 
 	public static String qrURL(String content, int size) {
-		return Util.contextPath() + "barcode?label=false&format=QR_CODE&width=" + size + "&height=" + size + "&code="
+		return Util.contextPath() + "barcode?label=false&format=QR_CODE&width=" + size + HEIGHT + size + "&code="
 				+ content;
 	}
 
@@ -184,7 +186,7 @@ public abstract class Util {
 		if (isCommunity())
 			return "";
 		else
-			return "<img src='" + qrURL(content, size) + "' width='" + size + "' />";
+			return IMG_SRC + qrURL(content, size) + WIDTH + size + "' />";
 	}
 
 	public static String displayURL(Long docId, Long folderId) {
@@ -198,11 +200,11 @@ public abstract class Util {
 
 	public static String webEditorUrl(long docId, String fileName, int height) {
 		return contextPath() + "ckeditor/index.jsp?docId=" + docId + "&lang=" + I18N.getLocale() + "&fileName="
-				+ fileName + "&height=" + height + AND_SID_EQUAL + Session.get().getSid();
+				+ fileName + HEIGHT + height + AND_SID_EQUAL + Session.get().getSid();
 	}
 
 	public static String webEditorUrl(int height) {
-		return contextPath() + "ckeditor/index.jsp?docId=nodoc&lang=" + I18N.getLocale() + "&height=" + height
+		return contextPath() + "ckeditor/index.jsp?docId=nodoc&lang=" + I18N.getLocale() + HEIGHT + height
 				+ AND_SID_EQUAL + Session.get().getSid();
 	}
 

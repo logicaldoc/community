@@ -816,14 +816,12 @@ public class StatsCollector extends Task {
 		} else
 			genericDAO.initialize(gen);
 
-		if (val instanceof Date date)
-			gen.setDate1(date);
-		else if (val instanceof String string)
-			gen.setString1(string);
-		else if (val instanceof Long longVal)
-			gen.setInteger1(longVal);
-		else
-			gen.setInteger1(((Integer) val).longValue());
+		switch (val) {
+		case Date dateVal -> gen.setDate1(dateVal);
+		case String stringVal -> gen.setString1(stringVal);
+		case Integer intVal -> gen.setInteger1(intVal.longValue());
+		default -> gen.setInteger1(null);
+		}
 
 		try {
 			genericDAO.store(gen);

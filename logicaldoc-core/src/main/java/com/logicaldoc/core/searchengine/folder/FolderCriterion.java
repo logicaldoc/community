@@ -184,12 +184,12 @@ public class FolderCriterion implements Serializable {
 				setLongValue((Long) value);
 			break;
 		case Attribute.TYPE_DOUBLE:
-			if (value instanceof Double doubleVal)
-				setDoubleValue(doubleVal);
-			else if (value instanceof Long longVal)
-				setDoubleValue(longVal.doubleValue());
-			else
-				setDoubleValue(((Float) value).doubleValue());
+			switch (value) {
+			case Double doubleVal -> setDoubleValue(doubleVal);
+			case Long longVal -> setDoubleValue(longVal.doubleValue());
+			case Float floatVal -> setDoubleValue(floatVal.doubleValue());
+			default -> setDoubleValue(null);
+			}
 			break;
 		case Attribute.TYPE_DATE:
 			setDateValue((Date) value);

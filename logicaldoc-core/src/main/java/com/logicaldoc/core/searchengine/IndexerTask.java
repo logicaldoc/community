@@ -13,11 +13,10 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
@@ -58,16 +57,12 @@ public class IndexerTask extends Task {
 
 	public static final String NAME = "IndexerTask";
 
-	@Resource(name = "documentManager")
 	private DocumentManager documentManager;
 
-	@Resource(name = "DocumentDAO")
 	private DocumentDAO documentDao;
 
-	@Resource(name = "TenantDAO")
 	private TenantDAO tenantDao;
 
-	@Resource(name = "SearchEngine")
 	private SearchEngine indexer;
 
 	private long indexed = 0;
@@ -78,14 +73,11 @@ public class IndexerTask extends Task {
 
 	private long parsingTime = 0;
 
-	public IndexerTask() {
+	@Autowired
+	public IndexerTask(DocumentManager documentManager, DocumentDAO documentDao, TenantDAO tenantDao,
+			SearchEngine indexer) {
 		super(NAME);
 		log = LoggerFactory.getLogger(IndexerTask.class);
-	}
-	
-	public IndexerTask(String name, DocumentManager documentManager, DocumentDAO documentDao, TenantDAO tenantDao,
-			SearchEngine indexer) {
-		this();
 		this.documentManager = documentManager;
 		this.documentDao = documentDao;
 		this.tenantDao = tenantDao;
@@ -209,7 +201,9 @@ public class IndexerTask extends Task {
 				Map<String, Object> params = new HashMap<>();
 				params.put("transactionId", transactionId);
 
-				documentDao.jdbcUpdate("update ld_document set ld_transactionid = null where ld_transactionId = :transactionId", params);
+				documentDao.jdbcUpdate(
+						"update ld_document set ld_transactionid = null where ld_transactionId = :transactionId",
+						params);
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
@@ -256,7 +250,8 @@ public class IndexerTask extends Task {
 			params.put("transactionId", transactionId);
 
 			documentDao.jdbcUpdate(
-					" update ld_document set ld_transactionid = :transactionId where ld_transactionid is null and ld_id in " + idsStr,
+					" update ld_document set ld_transactionid = :transactionId where ld_transactionid is null and ld_id in "
+							+ idsStr,
 					params);
 		}
 		log.info("Documents marked for indexing in transaction {}", transactionId);

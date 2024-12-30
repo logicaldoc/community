@@ -320,16 +320,13 @@ public class DashletContent extends HttpServlet {
 			Object val = extValues.get(key);
 			if (val != null) {
 				writer.print("<ext_" + name + ">");
-				if (val instanceof Date date)
-					writer.print(df.format(date));
-				else if (val instanceof Integer integer)
-					writer.print(Integer.toString(integer));
-				else if (val instanceof Long longVal)
-					writer.print(Long.toString(longVal));
-				else if (val instanceof Double doubleVal)
-					writer.print(Double.toString(doubleVal));
-				else
-					writer.print("<![CDATA[" + val + "]]>");
+				switch (val) {
+					case Date date -> writer.print(df.format(date));
+					case Integer integer -> writer.print(Integer.toString(integer));
+					case Long longVal -> writer.print(Long.toString(longVal));
+					case Double doubleVal -> writer.print(Double.toString(doubleVal));
+					default -> throw new IllegalArgumentException("Unexpected value: " + val);
+				}
 				writer.print("</ext_" + name + ">");
 			}
 		}
