@@ -35,11 +35,14 @@ import com.logicaldoc.util.io.FileUtil;
  * used as default when we refer to a Document, but all previous versions are
  * accessible from the history even if the are not indexed.
  * </p>
+ * 
+ * <p>
  * Each Version carries out two main informations, the version code itself that
  * is called simply 'version', and the file version, called 'fileVersion'. The
  * first identified the Version itself while the second refers to the file
  * content. In general not all updates to a document involves the upload of a
  * new file.
+ * </p>
  * 
  * A Document is written in a single language, this language defines the
  * full-text index in which the document's content will be stored.
