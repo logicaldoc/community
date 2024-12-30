@@ -34,7 +34,7 @@ import com.logicaldoc.util.io.FileUtil;
  * Each document has one or more Versions. The most recent version is the one
  * used as default when we refer to a Document, but all previous versions are
  * accessible from the history even if the are not indexed.
- * <p>
+ * </p>
  * Each Version carries out two main informations, the version code itself that
  * is called simply 'version', and the file version, called 'fileVersion'. The
  * first identified the Version itself while the second refers to the file
