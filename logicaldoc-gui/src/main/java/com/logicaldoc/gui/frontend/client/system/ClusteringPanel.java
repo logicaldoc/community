@@ -3,7 +3,6 @@ package com.logicaldoc.gui.frontend.client.system;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
@@ -17,10 +16,10 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.tab.Tab;
 
 /**
@@ -41,24 +40,23 @@ public class ClusteringPanel extends AdminPanel {
 
 	@Override
 	protected void onDraw() {
-		SettingService.Instance.get().loadSettingsByNames(
-				Arrays.asList("cluster.enabled", "cluster.name", "cluster.port", "cluster.multicastip",
-						"cluster.cache.resources", "cluster.chunk.size", "id"),
-				new AsyncCallback<>() {
+		SettingService.Instance.get()
+				.loadSettingsByNames(Arrays.asList("cluster.enabled", "cluster.name", "cluster.port",
+						"cluster.multicastip", "cluster.cache.resources", "cluster.chunk.size", "id"),
+						new AsyncCallback<>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
 
-					@Override
-					public void onSuccess(List<GUIParameter> parameters) {
-						init(parameters);
-					}
-				});
+							@Override
+							public void onSuccess(List<GUIParameter> parameters) {
+								init(parameters);
+							}
+						});
 	}
 
-	@SuppressWarnings("unchecked")
 	private void init(List<GUIParameter> parameters) {
 		DynamicForm clusterForm = new DynamicForm();
 		clusterForm.setWidth(300);
@@ -66,8 +64,7 @@ public class ClusteringPanel extends AdminPanel {
 		clusterForm.setValuesManager(vm);
 		clusterForm.setTitleOrientation(TitleOrientation.LEFT);
 
-		RadioGroupItem enabled = ItemFactory.newBooleanSelector("eenabled", "enabled");
-		enabled.setValue("true".equals(parameters.get(0).getValue()) ? "yes" : "no");
+		ToggleItem enabled = ItemFactory.newToggleItem("eenabled", "enabled", parameters.get(0).getValueAsBoolean());
 
 		TextItem name = ItemFactory.newTextItem("name", parameters.get(1).getValue());
 		name.setRequired(true);
@@ -78,9 +75,9 @@ public class ClusteringPanel extends AdminPanel {
 
 		TextItem multicastip = ItemFactory.newTextItem("multicastip", parameters.get(3).getValue());
 
-		RadioGroupItem cacheResources = ItemFactory.newBooleanSelector("cacheResources", "cache");
+		ToggleItem cacheResources = ItemFactory.newToggleItem("cacheResources", "cache",
+				parameters.get(4).getValueAsBoolean());
 		cacheResources.setHint(I18N.message("cachesresources"));
-		cacheResources.setValue("true".equals(parameters.get(4).getValue()) ? "yes" : "no");
 
 		SpinnerItem chunkSize = ItemFactory.newSpinnerItem("chunksize", Integer.valueOf(parameters.get(5).getValue()));
 		chunkSize.setHint("MB");
@@ -96,17 +93,13 @@ public class ClusteringPanel extends AdminPanel {
 		ButtonItem save = new ButtonItem();
 		save.setTitle(I18N.message("save"));
 		save.addClickHandler(click -> {
-			final Map<String, Object> values = vm.getValues();
-
 			if (Boolean.TRUE.equals(vm.validate())) {
 				List<GUIParameter> settings = new ArrayList<>();
-				settings.add(
-						new GUIParameter("cluster.enabled", values.get("eenabled").equals("yes") ? "true" : "false"));
+				settings.add(new GUIParameter("cluster.enabled", vm.getValueAsString("eenabled")));
 				settings.add(new GUIParameter("cluster.name", vm.getValueAsString("name")));
 				settings.add(new GUIParameter("cluster.port", vm.getValueAsString(BASEPORT)));
 				settings.add(new GUIParameter("cluster.multicastip", vm.getValueAsString("multicastip")));
-				settings.add(new GUIParameter("cluster.cache.resources",
-						values.get("cacheResources").equals("yes") ? "true" : "false"));
+				settings.add(new GUIParameter("cluster.cache.resources", vm.getValueAsString("cacheResources")));
 				settings.add(new GUIParameter("cluster.chunk.size", vm.getValueAsString("chunksize")));
 
 				SettingService.Instance.get().saveSettings(settings, new AsyncCallback<>() {

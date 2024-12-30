@@ -88,7 +88,7 @@ public class UpdateDialog extends StickyWindow {
 	protected void onDraw() {
 		super.onDraw();
 
-		if (ids==null || ids.isEmpty()) {
+		if (ids == null || ids.isEmpty()) {
 			FolderService.Instance.get().getFolder(metadata.getFolder().getId(), false, false, false,
 					new AsyncCallback<GUIFolder>() {
 						@Override
@@ -180,7 +180,7 @@ public class UpdateDialog extends StickyWindow {
 				bulkPanel.getDocument().setComment(saveForm.getValueAsString(VERSIONCOMMENT));
 				LD.contactingServer();
 				DocumentService.Instance.get().bulkUpdate(ids, bulkPanel.getDocument(),
-						"true".equals(saveForm.getValueAsString(IGNOREEMPTYFIELDS)), new AsyncCallback<>() {
+						Boolean.valueOf(saveForm.getValueAsString(IGNOREEMPTYFIELDS)), new AsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable error) {
 								LD.clearPrompt();
@@ -246,9 +246,9 @@ public class UpdateDialog extends StickyWindow {
 			metadata.setStatus(0);
 		}
 
-		if(metadata!=null)
+		if (metadata != null)
 			metadata.setAllowedPermissions(permissions);
-		
+
 		bulkPanel = new UpdatePanel(metadata, CONTEXT_UPLOAD.equals(context) || CHECKIN.equals(context),
 				permissions.isSecurity());
 		bulkPanel.setWidth100();

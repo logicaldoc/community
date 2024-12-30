@@ -45,11 +45,11 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -498,9 +498,9 @@ public class SearchIndexPanel extends AdminPanel {
 		timeout.setStep(10);
 
 		// Retain extracted text on timeout
-		RadioGroupItem timeoutRetain = ItemFactory.newBooleanSelector("timeoutRetain", "ontimeoutretaintext");
+		ToggleItem timeoutRetain = ItemFactory.newToggleItem("timeoutRetain", "ontimeoutretaintext",
+				this.searchEngine.isParsingTimeoutRetain());
 		timeoutRetain.setHint(I18N.message("ontimeoutretaintexthint"));
-		timeoutRetain.setValue(this.searchEngine.isParsingTimeoutRetain() ? "yes" : "no");
 		timeoutRetain.setRequired(true);
 
 		// The optional max text that will be put in the index
@@ -526,9 +526,9 @@ public class SearchIndexPanel extends AdminPanel {
 		repository.setVisible(Session.get().isDefaultTenant());
 
 		// Mark unindexable on error
-		RadioGroupItem skipOnError = ItemFactory.newBooleanSelector("skipOnError", "onerrormarkunindexable");
+		ToggleItem skipOnError = ItemFactory.newToggleItem("skipOnError", "onerrormarkunindexable",
+				this.searchEngine.isSkipOnError());
 		skipOnError.setHint(I18N.message("onerrormarkunindexablehint"));
-		skipOnError.setValue(this.searchEngine.isSkipOnError() ? "yes" : "no");
 		skipOnError.setRequired(true);
 
 		HLayout buttons = prepareButtons();
@@ -719,18 +719,15 @@ public class SearchIndexPanel extends AdminPanel {
 	}
 
 	private void collectValues() {
-		@SuppressWarnings("unchecked")
-		final Map<String, Object> values = vm.getValues();
-
-		SearchIndexPanel.this.searchEngine.setIncludePatterns((String) values.get("includepatterns"));
-		SearchIndexPanel.this.searchEngine.setExcludePatterns((String) values.get("excludepatterns"));
-		SearchIndexPanel.this.searchEngine.setIncludePatternsMetadata((String) values.get("includepatternsmetadata"));
-		SearchIndexPanel.this.searchEngine.setExcludePatternsMetadata((String) values.get("excludepatternsmetadata"));
-		SearchIndexPanel.this.searchEngine.setDir((String) values.get("repository"));
-		SearchIndexPanel.this.searchEngine.setSorting((String) values.get("sorting"));
-		SearchIndexPanel.this.searchEngine.setCustomSorting((String) values.get("customsorting"));
-		SearchIndexPanel.this.searchEngine.setSkipOnError("yes".equals(values.get("skipOnError")));
-		SearchIndexPanel.this.searchEngine.setParsingTimeoutRetain("yes".equals(values.get("timeoutRetain")));
+		SearchIndexPanel.this.searchEngine.setIncludePatterns(vm.getValueAsString("includepatterns"));
+		SearchIndexPanel.this.searchEngine.setExcludePatterns(vm.getValueAsString("excludepatterns"));
+		SearchIndexPanel.this.searchEngine.setIncludePatternsMetadata(vm.getValueAsString("includepatternsmetadata"));
+		SearchIndexPanel.this.searchEngine.setExcludePatternsMetadata(vm.getValueAsString("excludepatternsmetadata"));
+		SearchIndexPanel.this.searchEngine.setDir(vm.getValueAsString("repository"));
+		SearchIndexPanel.this.searchEngine.setSorting(vm.getValueAsString("sorting"));
+		SearchIndexPanel.this.searchEngine.setCustomSorting(vm.getValueAsString("customsorting"));
+		SearchIndexPanel.this.searchEngine.setSkipOnError(Boolean.valueOf(vm.getValueAsString("skipOnError")));
+		SearchIndexPanel.this.searchEngine.setParsingTimeoutRetain(Boolean.valueOf(vm.getValueAsString("timeoutRetain")));
 
 		String btch = vm.getValueAsString("batch");
 		if (btch == null || "".equals(btch.trim()))

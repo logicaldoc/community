@@ -107,6 +107,7 @@ import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.TimeItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.EditorEnterEvent;
@@ -1006,6 +1007,10 @@ public class ItemFactory {
 		return select;
 	}
 
+	public static RadioGroupItem newRadioGroup(String name) {
+		return newRadioGroup(name, name);
+	}
+
 	public static RadioGroupItem newRadioGroup(String name, String title) {
 		RadioGroupItem radioGroupItem = new RadioGroupItem();
 		radioGroupItem.setName(originalItemName(name));
@@ -1015,17 +1020,29 @@ public class ItemFactory {
 		return radioGroupItem;
 	}
 
-	public static RadioGroupItem newBooleanSelector(String name, String title) {
-		RadioGroupItem radioGroupItem = newRadioGroup(name, title);
-		LinkedHashMap<String, String> map = new LinkedHashMap<>();
-		map.put("yes", I18N.message("yes"));
-		map.put("no", I18N.message("no"));
-		radioGroupItem.setValueMap(map);
-		return radioGroupItem;
+//	public static RadioGroupItem newBooleanSelector(String name) {
+//		return newBooleanSelector(name, name);
+//	}
+//	
+//	public static RadioGroupItem newBooleanSelector(String name, String title) {
+//		RadioGroupItem radioGroupItem = newRadioGroup(name, title);
+//		LinkedHashMap<String, String> map = new LinkedHashMap<>();
+//		map.put("yes", I18N.message("yes"));
+//		map.put("no", I18N.message("no"));
+//		radioGroupItem.setValueMap(map);
+//		return radioGroupItem;
+//	}
+
+	public static ToggleItem newToggleItem(String name, boolean value) {
+		return newToggleItem(name, name, value);
 	}
 
-	public static RadioGroupItem newBooleanSelector(String name) {
-		return newBooleanSelector(name, name);
+	public static ToggleItem newToggleItem(String name, String title, boolean value) {
+		ToggleItem toggleItem = new ToggleItem();
+		toggleItem.setName(name);
+		toggleItem.setTitle(I18N.message(title));
+		toggleItem.setValue(value);
+		return toggleItem;
 	}
 
 	public static CheckboxItem newCheckbox(String name, String title) {
@@ -1576,7 +1593,7 @@ public class ItemFactory {
 		password.setName(originalItemName(name));
 		if (value != null)
 			password.setValue(value);
-		
+
 		FormItemIcon showPassword = newShowPasswordIcon();
 
 		password.setIcons(showPassword);

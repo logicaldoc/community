@@ -1,7 +1,5 @@
 package com.logicaldoc.gui.frontend.client.impex.email;
 
-import java.util.Map;
-
 import com.logicaldoc.gui.common.client.beans.GUIEmailAccount;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -12,9 +10,9 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
@@ -90,8 +88,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		port.setEndRow(true);
 		port.addChangedHandler(changedHandler);
 
-		RadioGroupItem ssl = ItemFactory.newBooleanSelector("ssl", "ssl");
-		ssl.setValue(account.isSsl() ? "yes" : "no");
+		ToggleItem ssl = ItemFactory.newToggleItem("ssl", account.isSsl());
 		ssl.addChangedHandler(changedHandler);
 
 		SelectItem protocol = ItemFactory.newEmailProtocolSelector();
@@ -150,28 +147,22 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		formsContainer.addMember(form);
 	}
 
-	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values = form.getValues();
 		form.validate();
 		if (Boolean.FALSE.equals(form.hasErrors())) {
-			account.setMailAddress((String) values.get("mailaddress"));
-			account.setHost((String) values.get("server"));
-			account.setUsername((String) values.get(USERNAME));
+			account.setMailAddress(form.getValueAsString("mailaddress"));
+			account.setHost(form.getValueAsString("server"));
+			account.setUsername(form.getValueAsString(USERNAME));
 			account.setTarget(targetSelector.getFolder());
-			account.setLanguage((String) values.get("language"));
-			account.setProvider((String) values.get(PROTOCOL));
-			if (values.get("port") instanceof Integer)
-				account.setPort((Integer) values.get("port"));
-			else
-				account.setPort(Integer.parseInt((String) values.get("port")));
-			account.setSsl("yes".equals(values.get("ssl")));
-			account.setFoldering(Integer.parseInt((String) values.get("foldering")));
-
-			account.setPassword((String) values.get("password_hidden"));
-			account.setClientId((String) values.get("clientid"));
-			account.setClientSecret((String) values.get("clientsecret_hidden"));
-			account.setClientTenant((String) values.get("clienttenant"));
+			account.setLanguage(form.getValueAsString("language"));
+			account.setProvider(form.getValueAsString(PROTOCOL));
+			account.setPort(Integer.parseInt(form.getValueAsString("port")));
+			account.setSsl(Boolean.valueOf(form.getValueAsString("ssl")));
+			account.setFoldering(Integer.parseInt(form.getValueAsString("foldering")));
+			account.setPassword(form.getValueAsString("password_hidden"));
+			account.setClientId(form.getValueAsString("clientid"));
+			account.setClientSecret(form.getValueAsString("clientsecret_hidden"));
+			account.setClientTenant(form.getValueAsString("clienttenant"));
 		}
 		return !form.hasErrors();
 	}

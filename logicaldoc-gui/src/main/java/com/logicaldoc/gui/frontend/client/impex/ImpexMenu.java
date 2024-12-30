@@ -46,8 +46,7 @@ public class ImpexMenu extends VLayout {
 		Button syndication = new Button(I18N.message("syndication"));
 		syndication.setWidth100();
 		syndication.setHeight(25);
-		syndication.addClickHandler(
-				(ClickEvent syndicationClick) -> AdminScreen.get().setContent(new SyndicationsPanel()));
+		syndication.addClickHandler(click -> AdminScreen.get().setContent(new SyndicationsPanel()));
 		if (Feature.visible(Feature.SYNDICATION) && Menu.enabled(Menu.SYNDICATION)) {
 			addMember(syndication);
 			if (!Feature.enabled(Feature.SYNDICATION))
@@ -59,8 +58,7 @@ public class ImpexMenu extends VLayout {
 		Button converters = new Button(I18N.message("formatconverters"));
 		converters.setWidth100();
 		converters.setHeight(25);
-		converters.addClickHandler(
-				(ClickEvent convertersClick) -> AdminScreen.get().setContent(new FormatConvertersPanel()));
+		converters.addClickHandler(click -> AdminScreen.get().setContent(new FormatConvertersPanel()));
 
 		if (Session.get().isDefaultTenant() && Feature.visible(Feature.FORMAT_CONVERSION)
 				&& Menu.enabled(Menu.FORMAT_CONVERTERS)) {

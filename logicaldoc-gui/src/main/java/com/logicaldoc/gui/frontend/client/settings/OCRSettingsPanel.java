@@ -24,6 +24,7 @@ import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.validator.FloatRangeValidator;
 import com.smartgwt.client.widgets.tab.Tab;
@@ -39,8 +40,6 @@ public class OCRSettingsPanel extends AdminPanel {
 	private static final String OCR_EVENTS_RECORD = "ocr_events_record";
 
 	private static final String OCR_EVENTS_MAXTEXT = "ocr_events_maxtext";
-
-	private static final String NO = "no";
 
 	private static final String OCR_TIMEOUT_BATCH = "ocr_timeout_batch";
 
@@ -65,12 +64,6 @@ public class OCRSettingsPanel extends AdminPanel {
 	private static final String OCR_MAXSIZE = "ocr_maxsize";
 
 	private static final String OCR_BATCH = "ocr_batch";
-
-	private static final String FALSE = "false";
-
-	private static final String TRUE = "true";
-
-	private static final String YES = "yes";
 
 	// Stores the engine's parameters
 	private DynamicForm engineForm = null;
@@ -103,7 +96,7 @@ public class OCRSettingsPanel extends AdminPanel {
 		form.setWidth(1);
 
 		// OCR Enabled
-		RadioGroupItem enabled = prepareEnabledSwitch(params);
+		ToggleItem enabled = prepareEnabledSwitch(params);
 
 		SpinnerItem resolutionThreshold = prepareResolutionThresholdSpinner(params);
 
@@ -163,25 +156,18 @@ public class OCRSettingsPanel extends AdminPanel {
 		threadsWait.setMin(1);
 		threadsWait.setStep(10);
 
-		RadioGroupItem cropImage = prepareCropImageSwitch(params);
+		ToggleItem cropImage = prepareCropImageSwitch(params);
 
-		RadioGroupItem errorOnEmpty = ItemFactory.newBooleanSelector("ocr_erroronempty",
-				I18N.message("erroronemptyextraction"));
+		ToggleItem errorOnEmpty = ItemFactory.newToggleItem("ocr_erroronempty", I18N.message("erroronemptyextraction"),
+				com.logicaldoc.gui.common.client.util.Util.getParameterValueAsBoolean(params, "ocr.erroronempty"));
 		errorOnEmpty.setWrapTitle(false);
 		errorOnEmpty.setRequired(true);
 		errorOnEmpty.setEndRow(true);
-		errorOnEmpty.setValue(
-				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.erroronempty").equals(TRUE)
-						? YES
-						: NO);
 
-		RadioGroupItem recordEvents = ItemFactory.newBooleanSelector(OCR_EVENTS_RECORD, I18N.message("recordevents"));
+		ToggleItem recordEvents = ItemFactory.newToggleItem(OCR_EVENTS_RECORD, I18N.message("recordevents"),
+				com.logicaldoc.gui.common.client.util.Util.getParameterValueAsBoolean(params, "ocr.events.record"));
 		recordEvents.setWrapTitle(false);
 		recordEvents.setRequired(true);
-		recordEvents.setValue(
-				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.events.record").equals(TRUE)
-						? YES
-						: NO);
 
 		SpinnerItem eventMaxText = ItemFactory.newSpinnerItem(OCR_EVENTS_MAXTEXT, I18N.message("nomorethan"),
 				Integer.parseInt(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params,
@@ -205,7 +191,7 @@ public class OCRSettingsPanel extends AdminPanel {
 
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler(event -> onSave());
+		save.addClickHandler(click -> save());
 
 		body.setMembers(form);
 		if (Session.get().isDefaultTenant())
@@ -218,16 +204,13 @@ public class OCRSettingsPanel extends AdminPanel {
 		tabs.addTab(history);
 	}
 
-	private RadioGroupItem prepareCropImageSwitch(List<GUIParameter> params) {
-		RadioGroupItem cropImage = ItemFactory.newBooleanSelector("ocr_cropimage",
-				I18N.message("cropvisiblepartofimage"));
+	private ToggleItem prepareCropImageSwitch(List<GUIParameter> params) {
+		ToggleItem cropImage = ItemFactory.newToggleItem("ocr_cropimage", I18N.message("cropvisiblepartofimage"),
+				com.logicaldoc.gui.common.client.util.Util.getParameterValueAsBoolean(params, "ocr.cropImage"));
 		cropImage.setWrapTitle(false);
 		cropImage.setRequired(true);
 		cropImage.setEndRow(true);
 		cropImage.setDisabled(!Session.get().isDefaultTenant());
-		cropImage.setValue(
-				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.cropImage").equals(TRUE) ? YES
-						: NO);
 		return cropImage;
 	}
 
@@ -250,13 +233,12 @@ public class OCRSettingsPanel extends AdminPanel {
 			if (param.getName().startsWith("ocr.engine."))
 				engines.put(param.getValue(), param.getValue());
 
-		final RadioGroupItem engine = ItemFactory.newBooleanSelector("ocr_engine", "engine");
+		final RadioGroupItem engine = ItemFactory.newRadioGroup("ocr_engine", "engine");
 		engine.setRequired(true);
 		engine.setEndRow(true);
 		engine.setValueMap(engines);
 		engine.addChangedHandler((ChangedEvent event) -> initEngineForm(event.getValue().toString(), params));
 		engine.setValue(com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.engine"));
-
 		return engine;
 	}
 
@@ -299,7 +281,6 @@ public class OCRSettingsPanel extends AdminPanel {
 		rangeValidator.setMax(100);
 		rangeValidator.setErrorMessage(I18N.message("percentageerror"));
 		textThreshold.setValidators(rangeValidator);
-
 		return textThreshold;
 	}
 
@@ -316,14 +297,12 @@ public class OCRSettingsPanel extends AdminPanel {
 		return resolutionThreshold;
 	}
 
-	private RadioGroupItem prepareEnabledSwitch(List<GUIParameter> params) {
-		RadioGroupItem enabled = ItemFactory.newBooleanSelector("ocr_enabled", "enabled");
+	private ToggleItem prepareEnabledSwitch(List<GUIParameter> params) {
+		ToggleItem enabled = ItemFactory.newToggleItem("ocr_enabled", "enabled",
+				com.logicaldoc.gui.common.client.util.Util.getParameterValueAsBoolean(params, "ocr.enabled"));
 		enabled.setRequired(true);
 		enabled.setEndRow(true);
 		enabled.setDisabled(!Session.get().isDefaultTenant());
-		enabled.setValue(
-				com.logicaldoc.gui.common.client.util.Util.getParameterValue(params, "ocr.enabled").equals(TRUE) ? YES
-						: NO);
 		return enabled;
 	}
 
@@ -353,104 +332,49 @@ public class OCRSettingsPanel extends AdminPanel {
 		body.addMember(engineForm, 1);
 	}
 
-	private void onSave() {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> values = vm.getValues();
+	private void save() {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
 		List<GUIParameter> params = new ArrayList<>();
 
 		params.add(
-				new GUIParameter(Session.get().getTenantName() + ".ocr.includes", (String) values.get("ocr_includes")));
+				new GUIParameter(Session.get().getTenantName() + ".ocr.includes", vm.getValueAsString("ocr_includes")));
 		params.add(
-				new GUIParameter(Session.get().getTenantName() + ".ocr.excludes", (String) values.get("ocr_excludes")));
-
+				new GUIParameter(Session.get().getTenantName() + ".ocr.excludes", vm.getValueAsString("ocr_excludes")));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.text.threshold",
-				values.get(OCR_TEXT_THRESHOLD).toString()));
-
-		if (values.get(OCR_RESOLUTION_THRESHOLD) instanceof Integer)
-			params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.resolution.threshold",
-					((Integer) values.get(OCR_RESOLUTION_THRESHOLD)).toString()));
-		else
-			params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.resolution.threshold",
-					(String) values.get(OCR_RESOLUTION_THRESHOLD)));
-
+				vm.getValueAsString(OCR_TEXT_THRESHOLD)));
+		params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.resolution.threshold",
+				vm.getValueAsString(OCR_RESOLUTION_THRESHOLD)));
 		params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.erroronempty",
-				values.get("ocr_erroronempty").equals(YES) ? TRUE : FALSE));
+				vm.getValueAsString("ocr_erroronempty")));
 
 		if (Session.get().isDefaultTenant())
-			collectValuesForWholeSystem(values, params);
+			collectValuesForWholeSystem(params);
 
 		doSaveSettings(params);
 	}
 
-	private void collectValuesForWholeSystem(Map<String, Object> values, List<GUIParameter> params) {
-		params.add(new GUIParameter("ocr.enabled", values.get("ocr_enabled").equals(YES) ? TRUE : FALSE));
+	private void collectValuesForWholeSystem(List<GUIParameter> params) {
+		params.add(new GUIParameter("ocr.enabled", vm.getValueAsString("ocr_enabled")));
+		params.add(new GUIParameter("ocr.cropImage", vm.getValueAsString("ocr_cropimage")));
+		params.add(new GUIParameter(OCR_DOT_TIMEOUT, vm.getValueAsString(OCR_TIMEOUT)));
+		params.add(new GUIParameter(OCR_TIMEOUT_BATCH.replace('_', '.'), vm.getValueAsString(OCR_TIMEOUT_BATCH)));
+		params.add(new GUIParameter(OCR_MAXSIZE.replace('_', '.'), vm.getValueAsString(OCR_MAXSIZE)));
+		params.add(new GUIParameter("ocr.rendres", vm.getValueAsString(OCR_RENDRES)));
+		params.add(new GUIParameter(OCR_BATCH.replace('_', '.'), vm.getValueAsString(OCR_BATCH)));
+		params.add(new GUIParameter(OCR_EVENTS_MAXTEXT.replace('_', '.'), vm.getValueAsString(OCR_EVENTS_MAXTEXT)));
+		params.add(new GUIParameter(OCR_EVENTS_RECORD.replace('_', '.'), vm.getValueAsString(OCR_EVENTS_RECORD)));
+		params.add(new GUIParameter(OCR_DOT_THREADS, vm.getValueAsString(OCR_THREADS)));
+		params.add(new GUIParameter(OCR_THREADS_WAIT.replace('_', '.'), vm.getValueAsString(OCR_THREADS_WAIT)));
 
-		params.add(new GUIParameter("ocr.cropImage", values.get("ocr_cropimage").equals(YES) ? TRUE : FALSE));
-
-		if (values.get(OCR_TIMEOUT) instanceof Integer)
-			params.add(new GUIParameter(OCR_DOT_TIMEOUT, ((Integer) values.get(OCR_TIMEOUT)).toString()));
-		else
-			params.add(new GUIParameter(OCR_DOT_TIMEOUT, (String) values.get(OCR_TIMEOUT)));
-
-		if (values.get(OCR_TIMEOUT_BATCH) instanceof Integer)
-			params.add(new GUIParameter(OCR_TIMEOUT_BATCH.replace('_', '.'),
-					((Integer) values.get(OCR_TIMEOUT_BATCH)).toString()));
-		else
-			params.add(new GUIParameter(OCR_TIMEOUT_BATCH.replace('_', '.'), (String) values.get(OCR_TIMEOUT_BATCH)));
-
-		if (values.get(OCR_MAXSIZE) instanceof Integer)
-			params.add(new GUIParameter(OCR_MAXSIZE.replace('_', '.'), ((Integer) values.get(OCR_MAXSIZE)).toString()));
-		else
-			params.add(new GUIParameter(OCR_MAXSIZE.replace('_', '.'), (String) values.get(OCR_MAXSIZE)));
-
-		if (values.get(OCR_RENDRES) instanceof Integer)
-			params.add(new GUIParameter("ocr.rendres", ((Integer) values.get(OCR_RENDRES)).toString()));
-		else
-			params.add(new GUIParameter("ocr.rendres", (String) values.get(OCR_RENDRES)));
-
-		if (values.get(OCR_BATCH) instanceof Integer)
-			params.add(new GUIParameter(OCR_BATCH.replace('_', '.'), ((Integer) values.get(OCR_BATCH)).toString()));
-		else
-			params.add(new GUIParameter(OCR_BATCH.replace('_', '.'), (String) values.get(OCR_BATCH)));
-
-		if (values.get(OCR_EVENTS_MAXTEXT) instanceof Integer)
-			params.add(new GUIParameter(OCR_EVENTS_MAXTEXT.replace('_', '.'),
-					((Integer) values.get(OCR_EVENTS_MAXTEXT)).toString()));
-		else
-			params.add(new GUIParameter(OCR_EVENTS_MAXTEXT.replace('_', '.'), (String) values.get(OCR_EVENTS_MAXTEXT)));
-
-		params.add(new GUIParameter(OCR_EVENTS_RECORD.replace('_', '.'),
-				values.get(OCR_EVENTS_RECORD).equals(YES) ? TRUE : FALSE));
-
-		collectThreadValues(values, params);
-
-		collectEngineSettings(values, params);
-	}
-
-	private void collectThreadValues(Map<String, Object> values, List<GUIParameter> params) {
-		if (values.get(OCR_THREADS) instanceof Integer)
-			params.add(new GUIParameter(OCR_DOT_THREADS, ((Integer) values.get(OCR_THREADS)).toString()));
-		else
-			params.add(new GUIParameter(OCR_DOT_THREADS, (String) values.get(OCR_THREADS)));
-
-		if (values.get(OCR_THREADS_WAIT) instanceof Integer)
-			params.add(new GUIParameter(OCR_THREADS_WAIT.replace('_', '.'),
-					((Integer) values.get(OCR_THREADS_WAIT)).toString()));
-		else
-			params.add(new GUIParameter(OCR_THREADS_WAIT.replace('_', '.'), (String) values.get(OCR_THREADS_WAIT)));
-	}
-
-	private void collectEngineSettings(Map<String, Object> values, List<GUIParameter> params) {
-		String engine = (String) values.get("ocr_engine");
+		String engine = vm.getValueAsString("ocr_engine");
 		params.add(new GUIParameter("ocr.engine", engine));
 
-		for (Map.Entry<String, Object> entry : values.entrySet()) {
-			String name = entry.getKey();
+		for (Object key : vm.getValues().keySet()) {
+			String name = key.toString();
 			if (name.startsWith("ocr_" + engine + "_"))
-				params.add(new GUIParameter(name.replace('_', '.'), entry.getValue().toString()));
+				params.add(new GUIParameter(name.replace('_', '.'), vm.getValueAsString(name)));
 		}
 	}
 

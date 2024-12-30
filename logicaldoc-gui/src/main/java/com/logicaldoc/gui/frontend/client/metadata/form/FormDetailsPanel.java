@@ -24,11 +24,11 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
@@ -235,18 +235,17 @@ public class FormDetailsPanel extends VLayout {
 			webTabPanel.setHeight100();
 			tab.setPane(webTabPanel);
 
-			RadioGroupItem webEnabled = ItemFactory.newBooleanSelector(WEB_ENABLED, "enabled");
-			webEnabled.setValue(form.isWebEnabled() ? "yes" : "no");
+			ToggleItem webEnabled = ItemFactory.newToggleItem(WEB_ENABLED, "enabled", form.isWebEnabled());
 			webEnabled.setRequired(true);
 			webEnabled.addChangedHandler(changedHandler);
 
-			RadioGroupItem collectEmails = ItemFactory.newBooleanSelector("collectEmails", "collectemails");
-			collectEmails.setValue(form.isCollectEmails() ? "yes" : "no");
+			ToggleItem collectEmails = ItemFactory.newToggleItem("collectEmails", "collectemails",
+					form.isCollectEmails());
 			collectEmails.setRequired(true);
 			collectEmails.addChangedHandler(changedHandler);
 
-			RadioGroupItem editAfterSubmit = ItemFactory.newBooleanSelector("editAfterSubmit", "alloweditaftersubmit");
-			editAfterSubmit.setValue(form.isEditAfterSubmit() ? "yes" : "no");
+			ToggleItem editAfterSubmit = ItemFactory.newToggleItem("editAfterSubmit", "alloweditaftersubmit",
+					form.isEditAfterSubmit());
 			editAfterSubmit.setRequired(true);
 			editAfterSubmit.addChangedHandler(changedHandler);
 
@@ -385,14 +384,14 @@ public class FormDetailsPanel extends VLayout {
 			form.setDescription(vm.getValueAsString(DESCRIPTION));
 			form.setFooter(vm.getValueAsString(FOOTER));
 			form.setConfirmation(vm.getValueAsString("confirmation"));
-			form.setWebEnabled("yes".equals(vm.getValueAsString(WEB_ENABLED)));
-			form.setCollectEmails("yes".equals(vm.getValueAsString("collectEmails")));
-			form.setEditAfterSubmit("yes".equals(vm.getValueAsString("editAfterSubmit")));
+			form.setWebEnabled(Boolean.valueOf(vm.getValueAsString(WEB_ENABLED)));
+			form.setCollectEmails(Boolean.valueOf(vm.getValueAsString("collectEmails")));
+			form.setEditAfterSubmit(Boolean.valueOf(vm.getValueAsString("editAfterSubmit")));
 			form.setBackgroundColor(vm.getValueAsString("backgroundColor"));
 			form.setWidth(Integer.parseInt(vm.getValueAsString("width")));
 			form.setColumns(Integer.parseInt(vm.getValueAsString("columns")));
 			form.setTargetFolder(targetFolder.getFolder());
-			form.setNotifyResponses("true".equals(vm.getValueAsString("notifyResponses")));
+			form.setNotifyResponses(Boolean.valueOf(vm.getValueAsString("notifyResponses")));
 
 			String[] ids = recipients.getValues();
 			List<GUIUser> formReceipients = new ArrayList<>();

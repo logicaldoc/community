@@ -26,8 +26,8 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -114,8 +114,8 @@ public class BruteForcePanel extends AdminPanel {
 		form.setValuesManager(vm);
 		form.setTitleOrientation(TitleOrientation.LEFT);
 
-		RadioGroupItem enabled = ItemFactory.newBooleanSelector("eenabled", "bruteforcepreventionenabled");
-		enabled.setValue("true".equals(params.get(THROTTLE_ENABLED)) ? "yes" : "no");
+		ToggleItem enabled = ItemFactory.newToggleItem("eenabled", "bruteforcepreventionenabled",
+				Boolean.valueOf(params.get(THROTTLE_ENABLED)));
 		enabled.setWrapTitle(false);
 		enabled.setTitleOrientation(TitleOrientation.LEFT);
 
@@ -130,11 +130,10 @@ public class BruteForcePanel extends AdminPanel {
 		usernameWait.setHint(I18N.message(MINUTES));
 		usernameWait.setWrapTitle(false);
 
-		usernameWait.setDisabled("true".equals(params.get(THROTTLE_USERNAME_DISABLEUSER)));
+		usernameWait.setDisabled(Boolean.valueOf(params.get(THROTTLE_USERNAME_DISABLEUSER)));
 
-		RadioGroupItem usernameDisableUser = ItemFactory.newBooleanSelector("usernamedisableuser",
-				"disableuserafterfailedusername");
-		usernameDisableUser.setValue("true".equals(params.get(THROTTLE_USERNAME_DISABLEUSER)) ? "yes" : "no");
+		ToggleItem usernameDisableUser = ItemFactory.newToggleItem("usernamedisableuser",
+				"disableuserafterfailedusername", Boolean.valueOf(params.get(THROTTLE_USERNAME_DISABLEUSER)));
 		usernameDisableUser.setWrapTitle(false);
 		usernameDisableUser.setTitleOrientation(TitleOrientation.LEFT);
 		usernameDisableUser.addChangedHandler(event -> usernameWait.setDisabled("yes".equals(event.getValue())));
@@ -149,12 +148,11 @@ public class BruteForcePanel extends AdminPanel {
 		ipWait.setWrapTitle(false);
 		ipWait.setHint(I18N.message(MINUTES));
 
-		
 		SpinnerItem apikeyMax = ItemFactory.newSpinnerItem("apikeymax", "maxsameapikeyfailedattempts",
 				intValue(params.get(THROTTLE_APIKEY_MAX)));
 		apikeyMax.setMin(0);
 		apikeyMax.setWrapTitle(false);
-		
+
 		SpinnerItem apikeyWait = ItemFactory.newSpinnerItem("apikeywait", "sameapikeywait",
 				intValue(params.get(THROTTLE_APIKEY_WAIT)));
 		apikeyWait.setMin(0);
@@ -266,23 +264,19 @@ public class BruteForcePanel extends AdminPanel {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
-		@SuppressWarnings("unchecked")
-		Map<String, Object> values = vm.getValues();
 		List<GUIParameter> params = new ArrayList<>();
-		params.add(
-				new GUIParameter(THROTTLE_ENABLED, "yes".equals(values.get("eenabled").toString()) ? "true" : "false"));
-		params.add(new GUIParameter(THROTTLE_USERNAME_MAX, values.get("usernamemax").toString()));
-		params.add(new GUIParameter(THROTTLE_USERNAME_WAIT, values.get("usernamewait").toString()));
-		params.add(new GUIParameter(THROTTLE_IP_MAX, values.get("ipmax").toString()));
-		params.add(new GUIParameter(THROTTLE_IP_WAIT, values.get("ipwait").toString()));
-		params.add(new GUIParameter(THROTTLE_APIKEY_MAX, values.get("apikeymax").toString()));
-		params.add(new GUIParameter(THROTTLE_APIKEY_WAIT, values.get("apikeywait").toString()));
-		params.add(new GUIParameter(THROTTLE_USERNAME_DISABLEUSER,
-				"yes".equals(values.get("usernamedisableuser").toString()) ? "true" : "false"));
+		params.add(new GUIParameter(THROTTLE_ENABLED, vm.getValueAsString("eenabled")));
+		params.add(new GUIParameter(THROTTLE_USERNAME_MAX, vm.getValueAsString("usernamemax")));
+		params.add(new GUIParameter(THROTTLE_USERNAME_WAIT, vm.getValueAsString("usernamewait")));
+		params.add(new GUIParameter(THROTTLE_IP_MAX, vm.getValueAsString("ipmax")));
+		params.add(new GUIParameter(THROTTLE_IP_WAIT, vm.getValueAsString("ipwait")));
+		params.add(new GUIParameter(THROTTLE_APIKEY_MAX, vm.getValueAsString("apikeymax")));
+		params.add(new GUIParameter(THROTTLE_APIKEY_WAIT, vm.getValueAsString("apikeywait")));
+		params.add(new GUIParameter(THROTTLE_USERNAME_DISABLEUSER, vm.getValueAsString("usernamedisableuser")));
 
-		if (values.get(RECIPIENTS) != null) {
+		if (vm.getValueAsString(RECIPIENTS) != null) {
 			@SuppressWarnings("unchecked")
-			ArrayList<String> usernames = (ArrayList<String>) values.get(RECIPIENTS);
+			ArrayList<String> usernames = (ArrayList<String>) vm.getValue(RECIPIENTS);
 			params.add(
 					new GUIParameter(THROTTLE_ALERT_RECIPIENTS, usernames.stream().collect(Collectors.joining(","))));
 		} else {

@@ -20,10 +20,10 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -87,13 +87,13 @@ public class WebservicesPanel extends VLayout {
 		restUrl.setColSpan(4);
 
 		// Web Service Enabled
-		RadioGroupItem wsEnabled = prepareEnabledItem();
+		ToggleItem wsEnabled = prepareEnabledItem();
 
 		// Web Service Basic Authentication Enabled
-		RadioGroupItem wsBasicAuthEnabled = prepareBasicAuthEnabledItem();
+		ToggleItem wsBasicAuthEnabled = prepareBasicAuthEnabledItem();
 
 		// Flag to rec webservice calls payload
-		RadioGroupItem recordCallsPayload = prepareRecordCallsPayloadItem();
+		ToggleItem recordCallsPayload = prepareRecordCallsPayloadItem();
 
 		SpinnerItem ttl = ItemFactory.newSpinnerItem(WS_TTL, "timetolive",
 				Integer.parseInt(Util.getParameterValue(settings, WEBSERVICE_CALL_TTL)));
@@ -102,10 +102,10 @@ public class WebservicesPanel extends VLayout {
 		ttl.setStep(1);
 		ttl.setDisabled(FALSE.equals(Util.getParameterValue(settings, WEBSERVICE_CALL_TTL)));
 
-		// Flag to rec webservice calls
-		RadioGroupItem recordCalls = ItemFactory.newBooleanSelector("wsRecordCalls", "recordcalls");
+		// Flag to record webservice calls
+		ToggleItem recordCalls = ItemFactory.newToggleItem("wsRecordCalls", "recordcalls",
+				Util.getParameterValueAsBoolean(settings, WEBSERVICE_CALL_RECORD));
 		recordCalls.setRequired(true);
-		recordCalls.setValue(Util.getParameterValue(settings, WEBSERVICE_CALL_RECORD).equals("true") ? "yes" : "no");
 		recordCalls.addChangedHandler(event -> {
 			ttl.setDisabled("no".equals(event.getValue().toString()));
 			recordCallsPayload.setDisabled("no".equals(event.getValue().toString()));
@@ -129,13 +129,11 @@ public class WebservicesPanel extends VLayout {
 			refreshStats(Session.get().getTenantId());
 	}
 
-	private RadioGroupItem prepareRecordCallsPayloadItem() {
-		RadioGroupItem recordCallsPayload = ItemFactory.newBooleanSelector("wsRecordCallsPayload",
-				"recordcallspayload");
+	private ToggleItem prepareRecordCallsPayloadItem() {
+		ToggleItem recordCallsPayload = ItemFactory.newToggleItem("wsRecordCallsPayload", "recordcallspayload",
+				Util.getParameterValueAsBoolean(settings, WEBSERVICE_CALL_RECORD_PAYLOAD));
 		recordCallsPayload.setWrapTitle(false);
 		recordCallsPayload.setRequired(true);
-		recordCallsPayload.setValue(
-				Util.getParameterValue(settings, WEBSERVICE_CALL_RECORD_PAYLOAD).equals("true") ? "yes" : "no");
 		return recordCallsPayload;
 	}
 
@@ -151,26 +149,22 @@ public class WebservicesPanel extends VLayout {
 		return tenantStat;
 	}
 
-	private RadioGroupItem prepareEnabledItem() {
-		RadioGroupItem wsEnabled = ItemFactory.newBooleanSelector("wsEnabled", "enabled");
+	private ToggleItem prepareEnabledItem() {
+		ToggleItem wsEnabled = ItemFactory.newToggleItem("wsEnabled", "enabled",
+				Util.getParameterValueAsBoolean(settings, WEBSERVICE_ENABLED));
 		wsEnabled.setRequired(true);
-		wsEnabled.setValue(Util.getParameterValue(settings, WEBSERVICE_ENABLED).equals("true") ? "yes" : "no");
 		wsEnabled.setColSpan(4);
 		wsEnabled.setDisabled(!Session.get().isDefaultTenant());
 		return wsEnabled;
 	}
 
-	private RadioGroupItem prepareBasicAuthEnabledItem() {
-		RadioGroupItem wsBasicAuthEnabled = ItemFactory.newBooleanSelector("wsBasicAuthEnabled", "enablebasicauth");
-		wsBasicAuthEnabled.setRequired(true);
-
-		wsBasicAuthEnabled
-				.setValue(Util.getParameterValue(settings, WEBSERVICE_BASICAUTH_ENABLED).equals("true") ? "yes" : "no");
-		wsBasicAuthEnabled.setColSpan(4);
-		wsBasicAuthEnabled.setWrapTitle(false);
-		wsBasicAuthEnabled.setDisabled(!Session.get().isDefaultTenant());
-
-		return wsBasicAuthEnabled;
+	private ToggleItem prepareBasicAuthEnabledItem() {
+		ToggleItem toggleItem = ItemFactory.newToggleItem("wsBasicAuthEnabled", "enablebasicauth",
+				Util.getParameterValueAsBoolean(settings, WEBSERVICE_BASICAUTH_ENABLED));
+		toggleItem.setColSpan(4);
+		toggleItem.setWrapTitle(false);
+		toggleItem.setDisabled(!Session.get().isDefaultTenant());
+		return toggleItem;
 	}
 
 	private void refreshStats(Long tenantId) {
@@ -219,14 +213,12 @@ public class WebservicesPanel extends VLayout {
 	}
 
 	public void save() {
-		Util.getParameter(settings, WEBSERVICE_ENABLED)
-				.setValue(webServiceForm.getValueAsString("wsEnabled").equals("yes") ? "true" : FALSE);
+		Util.getParameter(settings, WEBSERVICE_ENABLED).setValue(webServiceForm.getValueAsString("wsEnabled"));
 		Util.getParameter(settings, WEBSERVICE_BASICAUTH_ENABLED)
-				.setValue(webServiceForm.getValueAsString("wsBasicAuthEnabled").equals("yes") ? "true" : FALSE);
-		Util.getParameter(settings, WEBSERVICE_CALL_RECORD)
-				.setValue(webServiceForm.getValueAsString("wsRecordCalls").equals("yes") ? "true" : FALSE);
+				.setValue(webServiceForm.getValueAsString("wsBasicAuthEnabled"));
+		Util.getParameter(settings, WEBSERVICE_CALL_RECORD).setValue(webServiceForm.getValueAsString("wsRecordCalls"));
 		Util.getParameter(settings, WEBSERVICE_CALL_RECORD_PAYLOAD)
-				.setValue(webServiceForm.getValueAsString("wsRecordCallsPayload").equals("yes") ? "true" : FALSE);
+				.setValue(webServiceForm.getValueAsString("wsRecordCallsPayload"));
 		Util.getParameter(settings, WEBSERVICE_CALL_TTL).setValue(
 				webServiceForm.getValueAsString(WS_TTL) != null ? webServiceForm.getValueAsString(WS_TTL) : "90");
 	}

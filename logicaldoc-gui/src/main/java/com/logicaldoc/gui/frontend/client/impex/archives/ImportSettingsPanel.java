@@ -5,9 +5,9 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -18,7 +18,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class ImportSettingsPanel extends VLayout {
-	
+
 	private static final String IMPORTTEMPLATES = "importtemplates";
 
 	private GUIArchive archive;
@@ -37,8 +37,7 @@ public class ImportSettingsPanel extends VLayout {
 		description.addChangedHandler(changedHandler);
 		description.setDisabled(archive.getStatus() != GUIArchive.STATUS_OPENED);
 
-		RadioGroupItem importTemplates = ItemFactory.newBooleanSelector(IMPORTTEMPLATES, IMPORTTEMPLATES);
-		importTemplates.setValue(archive.getImportTemplate() == 1 ? "yes" : "no");
+		ToggleItem importTemplates = ItemFactory.newToggleItem(IMPORTTEMPLATES, archive.getImportTemplate() == 1);
 		importTemplates.addChangedHandler(changedHandler);
 		importTemplates.setDisabled(archive.getStatus() != GUIArchive.STATUS_OPENED);
 
@@ -59,7 +58,7 @@ public class ImportSettingsPanel extends VLayout {
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			archive.setDescription(vm.getValueAsString("description"));
 			archive.setImportCustomId(Integer.parseInt(vm.getValueAsString("importcids")));
-			archive.setImportTemplate("yes".equals(vm.getValueAsString(IMPORTTEMPLATES)) ? 1 : 0);
+			archive.setImportTemplate(Boolean.valueOf(vm.getValueAsString(IMPORTTEMPLATES)) ? 1 : 0);
 			return true;
 		} else
 			return false;

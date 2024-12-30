@@ -2,7 +2,6 @@ package com.logicaldoc.gui.frontend.client.account.contacts;
 
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
@@ -15,10 +14,10 @@ import com.logicaldoc.gui.frontend.client.services.ContactService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 
 /**
  * This popup window is used to upload a new contacts file to the server.
@@ -60,8 +59,7 @@ public class ContactsImportSettings extends Window {
 		delimiter.setValueMap(map2);
 		delimiter.setValue("\"");
 
-		RadioGroupItem skip = ItemFactory.newBooleanSelector("skipfirstrow");
-		skip.setValue("yes");
+		ToggleItem skip = ItemFactory.newToggleItem("skipfirstrow", true);
 
 		SpinnerItem firstName = ItemFactory.newSpinnerItem("firstname", 1);
 		firstName.setRequired(true);
@@ -117,63 +115,43 @@ public class ContactsImportSettings extends Window {
 	}
 
 	public String getSeparator() {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> values = form.getValues();
-		return values.get("separatedby").toString();
+		return form.getValues().get("separatedby").toString();
 	}
 
 	public String getTextDelimiter() {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> values = form.getValues();
-		return values.get("textdelimiter").toString();
+		return form.getValues().get("textdelimiter").toString();
 	}
 
 	public boolean isSkipFirstRow() {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> values = form.getValues();
-		return "yes".equals(values.get("skipfirstrow").toString());
+		return Boolean.valueOf(form.getValueAsString("skipfirstrow"));
 	}
 
 	public int getFirstNameIndex() {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> values = form.getValues();
-		return Integer.parseInt(values.get("firstname").toString());
+		return Integer.parseInt(form.getValues().get("firstname").toString());
 	}
 
 	public int getLastNameIndex() {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> values = form.getValues();
-		return Integer.parseInt(values.get("lastname").toString());
+		return Integer.parseInt(form.getValues().get("lastname").toString());
 	}
 
 	public int getEmailIndex() {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> values = form.getValues();
-		return Integer.parseInt(values.get("email").toString());
+		return Integer.parseInt(form.getValues().get("email").toString());
 	}
 
 	public int getCompanyIndex() {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> values = form.getValues();
-		return Integer.parseInt(values.get("company").toString());
+		return Integer.parseInt(form.getValues().get("company").toString());
 	}
 
 	public int getPhoneIndex() {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> values = form.getValues();
-		return Integer.parseInt(values.get("phone").toString());
+		return Integer.parseInt(form.getValues().get("phone").toString());
 	}
 
 	public int getMobileIndex() {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> values = form.getValues();
-		return Integer.parseInt(values.get("mobile").toString());
+		return Integer.parseInt(form.getValues().get("mobile").toString());
 	}
 
 	public int getAddressIndex() {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> values = form.getValues();
-		return Integer.parseInt(values.get("address").toString());
+		return Integer.parseInt(form.getValues().get("address").toString());
 	}
 
 	public GUIParseContactsParameters getParseContactsParameters() {
@@ -195,20 +173,20 @@ public class ContactsImportSettings extends Window {
 			try {
 				ContactService.Instance.get().parseContacts(true, getParseContactsParameters(), new AsyncCallback<>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-								LD.clearPrompt();
-							}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+						LD.clearPrompt();
+					}
 
-							@Override
-							public void onSuccess(List<GUIContact> contacts) {
-								LD.clearPrompt();
-								ContactsImportPreview preview = new ContactsImportPreview(ContactsImportSettings.this);
-								preview.show();
-								preview.setContacts(contacts);
-							}
-						});
+					@Override
+					public void onSuccess(List<GUIContact> contacts) {
+						LD.clearPrompt();
+						ContactsImportPreview preview = new ContactsImportPreview(ContactsImportSettings.this);
+						preview.show();
+						preview.setContacts(contacts);
+					}
+				});
 			} catch (Exception t) {
 				LD.clearPrompt();
 			}

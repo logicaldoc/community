@@ -116,7 +116,7 @@ public class DocumentCheckin extends Window {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
-		if ("true".equals(vm.getValueAsString(CHECKFILENAME)) && !uploader.getUploadedFile().equals(fileName)) {
+		if (Boolean.valueOf(vm.getValueAsString(CHECKFILENAME)) && !uploader.getUploadedFile().equals(fileName)) {
 			submitButton.setDisabled(true);
 			SC.warn(I18N.message("nosamefilename"));
 			return;
@@ -124,7 +124,7 @@ public class DocumentCheckin extends Window {
 
 		document.setComment(vm.getValueAsString("comment"));
 		UpdateDialog bulk = new UpdateDialog(Arrays.asList(document.getId()), document, UpdateDialog.CHECKIN,
-				"true".equals(vm.getValueAsString(MAJORVERSION)));
+				Boolean.valueOf(vm.getValueAsString(MAJORVERSION)));
 		bulk.show();
 		destroy();
 	}
@@ -134,6 +134,6 @@ public class DocumentCheckin extends Window {
 	}
 
 	public boolean getImportZip() {
-		return "true".equals(vm.getValueAsString("zip"));
+		return Boolean.valueOf(vm.getValueAsString("zip"));
 	}
 }

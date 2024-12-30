@@ -52,8 +52,7 @@ public class FolderCopyDialog extends Dialog {
 
 		List<Long> selectedSourceIds = FolderNavigator.get().getSelectedIds();
 
-		final boolean securityOptionEnabled = "true"
-				.equals(Session.get().getInfo().getConfig("gui.security.inheritoption"));
+		final boolean securityOptionEnabled = Session.get().getConfigAsBoolean("gui.security.inheritoption");
 
 		final DynamicForm form = new DynamicForm();
 		form.setWidth100();
@@ -113,7 +112,7 @@ public class FolderCopyDialog extends Dialog {
 				I18N.message("copyask", Arrays.asList(label, folders.getSelectedRecord().getAttributeAsString("name"))),
 				yes -> {
 					if (Boolean.TRUE.equals(yes)) {
-						copy(tagetFolderId, "true".equals(form.getValueAsString(FOLDERS_ONLY)),
+						copy(tagetFolderId, Boolean.valueOf(form.getValueAsString(FOLDERS_ONLY)),
 								!securityOptionEnabled ? "inheritparentsec" : form.getValueAsString(SECURITY));
 						hide();
 						destroy();
@@ -136,7 +135,7 @@ public class FolderCopyDialog extends Dialog {
 						GUIAccessControlEntry.PERMISSION_WRITE));
 
 				new FolderCopyDetailsDialog(sourceFolder, tagetFolderId, form.getValueAsString(SECURITY),
-						"true".equals(form.getValueAsString(FOLDERS_ONLY))).show();
+						Boolean.valueOf(form.getValueAsString(FOLDERS_ONLY))).show();
 				hide();
 				destroy();
 			}

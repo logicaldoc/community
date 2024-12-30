@@ -54,11 +54,11 @@ public class TaskNotificationPanel extends VLayout {
 		sendReport.setRedrawOnChange(true);
 		sendReport.setWidth(50);
 		sendReport.setValue(task.isSendActivityReport());
-		sendReport.addChangedHandler(event -> {
-			task.setSendActivityReport("true".equals(notificationsForm.getValue("sendReport").toString()));
+		sendReport.addChangedHandler(changed -> {
+			task.setSendActivityReport(Boolean.valueOf(notificationsForm.getValueAsString("sendReport")));
 
 			// Notify the external handler
-			changedHandler.onChanged(event);
+			changedHandler.onChanged(changed);
 		});
 
 		items.add(sendReport);

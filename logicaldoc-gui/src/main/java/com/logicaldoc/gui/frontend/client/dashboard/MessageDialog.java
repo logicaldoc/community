@@ -117,7 +117,7 @@ public class MessageDialog extends Window {
 				GUIMessage msg = new GUIMessage();
 				msg.setSubject(form.getValueAsString("subject"));
 				msg.setMessage(form.getValueAsString("message"));
-				msg.setConfirmation("true".equals(form.getValueAsString(CONFIRMATION)));
+				msg.setConfirmation(Boolean.valueOf(form.getValueAsString(CONFIRMATION)));
 				if (form.getValueAsString(VALIDITY) != null)
 					msg.setValidity(Integer.parseInt(form.getValueAsString(VALIDITY)));
 				msg.setPriority(Integer.parseInt(form.getValue(PRIORITY).toString()));

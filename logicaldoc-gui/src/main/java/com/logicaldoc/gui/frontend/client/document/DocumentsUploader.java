@@ -179,10 +179,10 @@ public class DocumentsUploader extends Window {
 	}
 
 	public boolean getImportZip() {
-		return "true".equals(vm.getValueAsString("zip"));
+		return Boolean.valueOf(vm.getValueAsString("zip"));
 	}
 
 	public boolean getImmediateIndexing() {
-		return "true".equals(vm.getValueAsString("immediateIndexing"));
+		return Boolean.valueOf(vm.getValueAsString("immediateIndexing"));
 	}
 }

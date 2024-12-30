@@ -98,6 +98,6 @@ public class ReplaceVersionFile extends Window {
 	}
 
 	public boolean getImportZip() {
-		return "true".equals(vm.getValueAsString("zip"));
+		return Boolean.valueOf(vm.getValueAsString("zip"));
 	}
 }

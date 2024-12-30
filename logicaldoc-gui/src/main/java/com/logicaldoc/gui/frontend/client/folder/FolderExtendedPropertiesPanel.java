@@ -12,7 +12,7 @@ import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 
 /**
@@ -33,8 +33,7 @@ public class FolderExtendedPropertiesPanel extends FolderDetailTab {
 		setHeight100();
 		setMembersMargin(1);
 
-		RadioGroupItem locked = ItemFactory.newBooleanSelector("locked", "templatelocked");
-		locked.setValue(folder.getTemplateLocked() == 1 ? "yes" : "no");
+		ToggleItem locked = ItemFactory.newToggleItem("locked", "templatelocked", folder.getTemplateLocked() == 1);
 		locked.addChangedHandler(changedHandler);
 		locked.setEndRow(true);
 
@@ -74,7 +73,7 @@ public class FolderExtendedPropertiesPanel extends FolderDetailTab {
 	@Override
 	public boolean validate() {
 		if (propertiesPanel.validate() && form1.validate()) {
-			folder.setTemplateLocked("yes".equals(form1.getValueAsString("locked")) ? 1 : 0);
+			folder.setTemplateLocked(Boolean.valueOf(form1.getValueAsString("locked")) ? 1 : 0);
 			return true;
 		}
 		return false;

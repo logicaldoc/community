@@ -272,9 +272,7 @@ public class ParameterConditionRow extends HLayout {
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DOUBLE)) {
 			return ItemFactory.newFloatItem(VALUE_STR, "double", null);
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_BOOLEAN)) {
-			FormItem item = ItemFactory.newBooleanSelector(VALUE_STR, "boolean");
-			item.setValue("yes");
-			return item;
+			return ItemFactory.newToggleItem(VALUE_STR, "boolean", true);
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_STRING_PRESET)) {
 			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
 			FormItem item = ItemFactory.newStringItemForAttribute(template.getAttribute(attributeName));

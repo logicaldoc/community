@@ -127,7 +127,7 @@ public class AttributeSetsPanel extends VLayout {
 
 		list.addCellContextClickHandler(event -> {
 			ListGridRecord rec = list.getSelectedRecord();
-			if (!"true".equals(rec.getAttributeAsString("readonly"))) {
+			if (!Boolean.valueOf(rec.getAttributeAsString("readonly"))) {
 				showContextMenu();
 			}
 			event.cancel();

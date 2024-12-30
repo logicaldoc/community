@@ -8,10 +8,10 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
@@ -71,9 +71,8 @@ public class CustomActionEditor extends Window {
 
 		addItem(toolStrip);
 
-		RadioGroupItem enabled = ItemFactory.newBooleanSelector("enabled");
+		ToggleItem enabled = ItemFactory.newToggleItem("enabled", action.isEnabled());
 		enabled.setRequired(true);
-		enabled.setValue(action.isEnabled() ? "yes" : "no");
 
 		TextItem name = ItemFactory.newTextItem("name", action.getName());
 		name.setRequired(true);
@@ -122,7 +121,7 @@ public class CustomActionEditor extends Window {
 			action.setName(form.getValueAsString("name").replace("/", ""));
 			action.setDescription(form.getValueAsString("description"));
 			action.setAutomation(form.getValueAsString("automation"));
-			action.setEnabled("yes".equals(form.getValueAsString("enabled")));
+			action.setEnabled(Boolean.valueOf(form.getValueAsString("enabled")));
 			action.setType(2);
 
 			Long routineId = null;

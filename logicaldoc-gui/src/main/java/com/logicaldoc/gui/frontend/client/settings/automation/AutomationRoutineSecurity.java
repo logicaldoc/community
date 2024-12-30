@@ -238,8 +238,8 @@ public class AutomationRoutineSecurity extends AutomationRoutineDetailsTab {
 			GUIAccessControlEntry ace = new GUIAccessControlEntry();
 			ace.setName(rec.getAttributeAsString(ENTITY));
 			ace.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
-			ace.setWrite("true".equals(rec.getAttributeAsString(WRITE)));
-			ace.setRead("true".equals(rec.getAttributeAsString(READ)));
+			ace.setWrite(rec.getAttributeAsBoolean(WRITE));
+			ace.setRead(rec.getAttributeAsBoolean(READ));
 			acl.add(ace);
 		}
 

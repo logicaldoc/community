@@ -15,7 +15,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
  * @since 8.0
  */
 public class AwesomeFactory {
-	
+
 	private static final String ONCLICK_DOWNLOAD_DOCUMENT_RESOURCE = " onclick=\"downloadDocumentResource('";
 
 	private static final String STYLE_COLOR = " style='color: ";
@@ -29,6 +29,8 @@ public class AwesomeFactory {
 	private static final String I_CLASS = "<i class='";
 
 	private static final String TITLE = "title='";
+
+	private static final String STYLE = "light";
 
 	private AwesomeFactory() {
 	}
@@ -149,10 +151,11 @@ public class AwesomeFactory {
 
 	public static String getSpinnerIconHtml(String icon, String text) {
 		if (text == null || text.isEmpty())
-			return I_CLASS + getCssClassPrefix() + " fa-" + icon + " fa-thin fa-spinner' aria-hidden='true'></i>";
+			return I_CLASS + getCssClassPrefix() + " fa-" + icon + " fa-" + STYLE
+					+ " fa-spinner' aria-hidden='true'></i>";
 		else
-			return DIV_I_CLASS + getCssClassPrefix() + " fa-" + icon
-					+ " fa-thin fa-fw fa-spinner' aria-hidden='true'></i>&nbsp;" + I18N.message(text) + CLOSE_DIV;
+			return DIV_I_CLASS + getCssClassPrefix() + " fa-" + icon + " fa-" + STYLE
+					+ " fa-fw fa-spinner' aria-hidden='true'></i>&nbsp;" + I18N.message(text) + CLOSE_DIV;
 	}
 
 	public static String getIconButtonHTML(String icon, String text, String tooltip, String color, String url) {
@@ -217,15 +220,10 @@ public class AwesomeFactory {
 			return "";
 		String html = AwesomeFactory.getIconHtml("database");
 		if (indexed == Constants.INDEX_SKIP) {
-//			html = "<span class='fa-stack'><i class='" + getCssClassPrefix()
-//					+ " fa-database fa-stack-1x fa-thin' aria-hidden='true' data-fa-transform='grow-6'></i>";
-//			html += I_CLASS + AwesomeFactory.getCssClassPrefix()
-//					+ " fa-times fa-stack-1x' style='color: red' data-fa-transform='grow-2'></i></span>";
-			
-			html = "<span class='fa-stack'><i class='" + getCssClassPrefix()
-			+ " fa-database fa-stack-1x fa-thin' aria-hidden='true' ></i>";
+			html = "<span class='fa-stack'><i class='" + getCssClassPrefix() + " fa-database fa-stack-1x fa-" + STYLE
+					+ "' aria-hidden='true' ></i>";
 			html += I_CLASS + AwesomeFactory.getCssClassPrefix()
-			+ " fa-times fa-stack-1x' style='color: red' ></i></span>";
+					+ " fa-times fa-stack-1x' style='color: red' ></i></span>";
 		}
 		return html;
 	}
@@ -240,19 +238,19 @@ public class AwesomeFactory {
 
 	public static String getIconHtml(String icon, String rotation, String text) {
 		if (text == null || text.isEmpty())
-			return I_CLASS + getCssClassPrefix() + " fa-" + icon + (rotation != null ? " " + rotation : "")
-					+ " fa-thin' aria-hidden='true'></i>";
+			return I_CLASS + getCssClassPrefix() + " fa-" + icon + (rotation != null ? " " + rotation : "") + " fa-"
+					+ STYLE + "' aria-hidden='true'></i>";
 		else
-			return DIV_I_CLASS + getCssClassPrefix() + " fa-" + icon + (rotation != null ? " " + rotation : "")
-					+ " fa-thin fa-fw' aria-hidden='true'></i> " + I18N.message(text) + CLOSE_DIV;
+			return DIV_I_CLASS + getCssClassPrefix() + " fa-" + icon + (rotation != null ? " " + rotation : "") + " fa-"
+					+ STYLE + " fa-fw' aria-hidden='true'></i> " + I18N.message(text) + CLOSE_DIV;
 	}
 
 	public static String getColoredIconHtmlWithoutI18N(String icon, String text, String color) {
 		if (text == null || text.isEmpty())
-			return I_CLASS + getCssClassPrefix() + " fa-" + icon + " fa-thin' aria-hidden='true'  "
+			return I_CLASS + getCssClassPrefix() + " fa-" + icon + " fa-" + STYLE + "' aria-hidden='true'  "
 					+ (color != null && !color.isEmpty() ? "style='color: " + color + "'" : "") + "></i>";
 		else
-			return DIV_I_CLASS + getCssClassPrefix() + " fa-" + icon + " fa-thin fa-fw' aria-hidden='true'"
+			return DIV_I_CLASS + getCssClassPrefix() + " fa-" + icon + " fa-" + STYLE + " fa-fw' aria-hidden='true'"
 					+ (color != null && !color.isEmpty() ? "style='color: " + color + "'" : "") + "></i> " + text
 					+ CLOSE_DIV;
 	}

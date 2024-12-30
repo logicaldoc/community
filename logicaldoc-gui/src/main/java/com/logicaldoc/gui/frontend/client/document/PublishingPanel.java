@@ -9,7 +9,7 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.DateItem;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 
 /**
@@ -47,10 +47,10 @@ public class PublishingPanel extends DocumentDetailTab {
 		form1.setTitleOrientation(TitleOrientation.TOP);
 		form1.setWrapItemTitles(false);
 
-		RadioGroupItem published = ItemFactory.newBooleanSelector(PUBLISHED, PUBLISHED);
+		ToggleItem published = ItemFactory.newToggleItem(PUBLISHED, true);
 		if (document.getPublished() != -1) {
 			published.setRequired(true);
-			published.setValue(document.getPublished() == 1 ? "yes" : "no");
+			published.setValue(document.getPublished() == 1);
 		}
 		published.setEndRow(true);
 		published.addChangedHandler(changedHandler);
@@ -103,8 +103,7 @@ public class PublishingPanel extends DocumentDetailTab {
 		Map<String, Object> values = vm.getValues();
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
-			if (!"".equals(values.get(PUBLISHED)) && values.get(PUBLISHED) != null)
-				document.setPublished("yes".equals(values.get(PUBLISHED)) ? 1 : 0);
+			document.setPublished(Boolean.valueOf(vm.getValueAsString(PUBLISHED)) ? 1 : 0);
 			document.setStartPublishing((Date) values.get("startpublishing"));
 			document.setStopPublishing((Date) values.get("stoppublishing"));
 		}

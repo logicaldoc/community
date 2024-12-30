@@ -39,7 +39,7 @@ public class CreateDialog extends Dialog {
 		setPadding(3);
 
 		final boolean inheritOptionEnabled = folder.getType() == 0
-				&& "true".equals(Session.get().getInfo().getConfig("gui.security.inheritoption"));
+				&& Session.get().getConfigAsBoolean("gui.security.inheritoption");
 
 		form = new DynamicForm();
 		form.setHeight100();
@@ -81,7 +81,7 @@ public class CreateDialog extends Dialog {
 		if (form.validate()) {
 			folder.setName(form.getValueAsString("name").trim());
 			FolderService.Instance.get().create(folder,
-					folder.getType() == 0 && "true".equals(form.getValueAsString("inheritSecurity")),
+					folder.getType() == 0 && Boolean.valueOf(form.getValueAsString("inheritSecurity")),
 					new AsyncCallback<>() {
 
 						@Override

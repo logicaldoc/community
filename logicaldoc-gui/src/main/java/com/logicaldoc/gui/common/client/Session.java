@@ -279,7 +279,7 @@ public class Session implements DocumentObserver {
 	}
 
 	public boolean isServerPushEnabled() {
-		return "true".equals(Session.get().getConfig("gui.serverpush"));
+		return Session.get().getConfigAsBoolean("gui.serverpush");
 	}
 
 	public boolean isShowThumbnail() {

@@ -19,12 +19,12 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -139,9 +139,8 @@ public class BarcodeTemplateSettings extends Window {
 		type.addChangedHandler(
 				(ChangedEvent event) -> sampleUploader.setVisible(ZONAL.equals(event.getValue().toString())));
 
-		RadioGroupItem saveChangeEvent = ItemFactory.newBooleanSelector("savechangeevent");
+		ToggleItem saveChangeEvent = ItemFactory.newToggleItem("savechangeevent", template.isSaveChangeEvent());
 		saveChangeEvent.setWrapTitle(false);
-		saveChangeEvent.setValue(template.isSaveChangeEvent() ? "yes" : "no");
 
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", template.getDescription());
 		description.setHeight(150);
@@ -194,7 +193,7 @@ public class BarcodeTemplateSettings extends Window {
 		else
 			template.setZonal(false);
 
-		template.setSaveChangeEvent("yes".equals(vm.getValue("savechangeevent")));
+		template.setSaveChangeEvent(Boolean.valueOf(vm.getValueAsString("savechangeevent")));
 
 		if (Session.get().isDefaultTenant() && template.getId() != 0L) {
 			template.setBatch(Integer.parseInt(vm.getValueAsString("batch")));

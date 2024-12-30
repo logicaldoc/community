@@ -6,7 +6,7 @@ import com.logicaldoc.gui.common.client.widgets.ExtendedPropertiesPanel;
 import com.logicaldoc.gui.frontend.client.folder.FolderDetailTab;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 
 /**
  * Shows folder's optional template metadata
@@ -25,8 +25,7 @@ public class FolderCopyExtendedPropertiesPanel extends FolderDetailTab {
 		setHeight100();
 		setMembersMargin(1);
 
-		RadioGroupItem locked = ItemFactory.newBooleanSelector("locked", "templatelocked");
-		locked.setValue(folder.getTemplateLocked() == 1 ? "yes" : "no");
+		ToggleItem locked = ItemFactory.newToggleItem("locked", "templatelocked", folder.getTemplateLocked() == 1);
 		locked.setEndRow(true);
 
 		form1 = new DynamicForm();
@@ -39,10 +38,10 @@ public class FolderCopyExtendedPropertiesPanel extends FolderDetailTab {
 		setMembers(form1, propertiesPanel);
 	}
 
-    @Override
+	@Override
 	public boolean validate() {
 		if (propertiesPanel.validate() && form1.validate()) {
-			folder.setTemplateLocked("yes".equals(form1.getValueAsString("locked")) ? 1 : 0);
+			folder.setTemplateLocked(Boolean.valueOf(form1.getValueAsString("locked")) ? 1 : 0);
 			return true;
 		}
 		return false;

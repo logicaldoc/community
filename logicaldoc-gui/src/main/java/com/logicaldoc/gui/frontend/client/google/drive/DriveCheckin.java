@@ -69,7 +69,7 @@ public class DriveCheckin extends Window {
 			return;
 		LD.contactingServer();
 		GoogleService.Instance.get().checkin(document.getId(), vm.getValueAsString("comment"),
-				"true".equals(vm.getValueAsString(MAJORVERSION)), new AsyncCallback<>() {
+				Boolean.valueOf(vm.getValueAsString(MAJORVERSION)), new AsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GoogleUtil.handleGoogleServiceError(caught);

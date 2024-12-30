@@ -72,7 +72,7 @@ public class DocumentsPreviewPanel extends VLayout {
 	}
 
 	protected void setInitialSize() {
-		if (!"true".equals(Session.get().getConfig("gui.preview.openpanel"))) {
+		if (!Session.get().getConfigAsBoolean("gui.preview.openpanel")) {
 			setWidth(0);
 		} else {
 			try {

@@ -51,7 +51,7 @@ public class ApplyTemplateDialog extends Dialog {
 		inheritSecurity.setName("inheritSecurity");
 		inheritSecurity.setTitle(I18N.message("inheritparentsec"));
 		inheritSecurity.setValue("inherit".equals(Session.get().getConfig("gui.security.inheritoption.default")));
-		inheritSecurity.setHidden(!"true".equals(Session.get().getInfo().getConfig("gui.security.inheritoption")));
+		inheritSecurity.setHidden(!Session.get().getConfigAsBoolean("gui.security.inheritoption"));
 
 		SelectItem templateSelector = ItemFactory.newFolderTemplateSelector();
 
@@ -69,9 +69,9 @@ public class ApplyTemplateDialog extends Dialog {
 			long templateId = Long.parseLong(form.getValueAsString("foldertemplate"));
 
 			LD.contactingServer();
-			
+
 			FolderService.Instance.get().applyTemplate(folderId, templateId,
-					"true".equals(form.getValueAsString("inheritSecurity")), new AsyncCallback<>() {
+					Boolean.valueOf(form.getValueAsString("inheritSecurity")), new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

@@ -21,6 +21,7 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -101,7 +102,7 @@ public class StampProperties extends StampDetailsTab {
 
 		final ColorItem color = ItemFactory.newColorPickerItem(stamp.getColor(), true, changedHandler);
 
-		final RadioGroupItem barcodeLabel = prepareBarcodeLabelSelector();
+		final ToggleItem barcodeLabel = prepareBarcodeLabelSelector();
 
 		final SelectItem barcodeFormat = prepareBarcodeItemSelector();
 
@@ -271,9 +272,8 @@ public class StampProperties extends StampDetailsTab {
 		}
 	}
 
-	private RadioGroupItem prepareBarcodeLabelSelector() {
-		final RadioGroupItem barcodeLabel = ItemFactory.newBooleanSelector(BARCODE_LABEL, "label");
-		barcodeLabel.setValue(stamp.getBarcodeLabel() == 1 ? "yes" : "no");
+	private ToggleItem prepareBarcodeLabelSelector() {
+		ToggleItem barcodeLabel = ItemFactory.newToggleItem(BARCODE_LABEL, "label", stamp.getBarcodeLabel() == 1);
 		if (changedHandler != null)
 			barcodeLabel.addChangedHandler(changedHandler);
 		return barcodeLabel;
@@ -435,7 +435,7 @@ public class StampProperties extends StampDetailsTab {
 			stamp.setImageHeight(Integer.parseInt(vm.getValueAsString(IMAGE_HEIGHT)));
 
 		if (vm.getValueAsString(BARCODE_LABEL) != null)
-			stamp.setBarcodeLabel("yes".equals(vm.getValueAsString(BARCODE_LABEL)) ? 1 : 0);
+			stamp.setBarcodeLabel(Boolean.valueOf(vm.getValueAsString(BARCODE_LABEL)) ? 1 : 0);
 		if (vm.getValueAsString(BARCODE_FORMAT) != null)
 			stamp.setBarcodeFormat(vm.getValueAsString(BARCODE_FORMAT));
 

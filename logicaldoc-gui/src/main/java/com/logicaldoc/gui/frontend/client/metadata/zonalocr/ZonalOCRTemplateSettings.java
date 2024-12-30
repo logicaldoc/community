@@ -16,11 +16,11 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -117,9 +117,9 @@ public class ZonalOCRTemplateSettings extends Window {
 		StaticTextItem id = ItemFactory.newStaticTextItem("id", "" + ocrPanel.getSelectedOcrTemplate().getId());
 		id.setVisible(ocrPanel.getSelectedOcrTemplate().getId() != 0L);
 
-		RadioGroupItem saveChangeEvent = ItemFactory.newBooleanSelector("savechangeevent");
+		ToggleItem saveChangeEvent = ItemFactory.newToggleItem("savechangeevent",
+				ocrPanel.getSelectedOcrTemplate().isSaveChangeEvent());
 		saveChangeEvent.setWrapTitle(false);
-		saveChangeEvent.setValue(ocrPanel.getSelectedOcrTemplate().isSaveChangeEvent() ? "yes" : "no");
 
 		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", Session.get().getConfigAsInt("zonalocr.batch"));
 		batch.setStep(50);
@@ -145,7 +145,7 @@ public class ZonalOCRTemplateSettings extends Window {
 
 		ocrPanel.getSelectedOcrTemplate().setName(vm.getValueAsString("name"));
 		ocrPanel.getSelectedOcrTemplate().setDescription(vm.getValueAsString("description"));
-		ocrPanel.getSelectedOcrTemplate().setSaveChangeEvent("yes".equals(vm.getValue("savechangeevent")));
+		ocrPanel.getSelectedOcrTemplate().setSaveChangeEvent(Boolean.valueOf(vm.getValueAsString("savechangeevent")));
 
 		if (Session.get().isDefaultTenant()) {
 			int batch = Integer.parseInt(vm.getValueAsString("batch"));

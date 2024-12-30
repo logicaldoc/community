@@ -79,7 +79,7 @@ public class TaskSchedulingPanel extends VLayout {
 		simple.setTitle(I18N.message("policy"));
 		simple.setDefaultValue(Boolean.toString(task.getScheduling().isSimple()));
 		simple.addChangedHandler(event -> {
-			simplePolicy = "true".equals(simple.getValueAsString());
+			simplePolicy = Boolean.valueOf(simple.getValueAsString());
 			changedHandler.onChanged(event);
 			reloadForm();
 		});
@@ -145,36 +145,34 @@ public class TaskSchedulingPanel extends VLayout {
 		return form;
 	}
 
-	@SuppressWarnings("unchecked")
 	boolean validate() {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return false;
 
-		Map<String, Object> values = vm.getValues();
-		task.getScheduling().setSimple(((String) values.get(SIMPLE)).equals("true"));
+		task.getScheduling().setSimple( Boolean.valueOf(vm.getValueAsString(SIMPLE)));
 
-		long max = Long.parseLong(values.get("maxduration").toString());
+		long max = Long.parseLong(vm.getValueAsString("maxduration"));
 		if (max <= 0)
 			max = -1L;
 		else
 			max = max * 60L;
 		task.getScheduling().setMaxLength(max);
 
-		if (task.getScheduling().isSimple() || ((String) values.get(SIMPLE)).equals("true")) {
+		if (task.getScheduling().isSimple() || Boolean.valueOf(vm.getValueAsString(SIMPLE))) {
 			long longValue = 0;
-			if (values.get(INITIALDELAY_STR) instanceof String)
-				longValue = Long.parseLong((String) values.get(INITIALDELAY_STR));
+			if (vm.getValue(INITIALDELAY_STR) instanceof String str)
+				longValue = Long.parseLong(str);
 			else
-				longValue = ((Integer) values.get(INITIALDELAY_STR)).longValue();
+				longValue = ((Integer) vm.getValue(INITIALDELAY_STR)).longValue();
 			task.getScheduling().setDelay(longValue);
 
-			if (values.get(REPEAT_INTERVAL) instanceof String)
-				longValue = Long.parseLong((String) values.get(REPEAT_INTERVAL));
+			if (vm.getValue(REPEAT_INTERVAL) instanceof String str)
+				longValue = Long.parseLong(str);
 			else
-				longValue = ((Integer) values.get(REPEAT_INTERVAL)).longValue();
+				longValue = ((Integer) vm.getValue(REPEAT_INTERVAL)).longValue();
 			task.getScheduling().setInterval(longValue);
 		} else {
-			task.getScheduling().setCronExpression((String) values.get("cron"));
+			task.getScheduling().setCronExpression(vm.getValueAsString("cron"));
 		}
 
 		return !vm.hasErrors();

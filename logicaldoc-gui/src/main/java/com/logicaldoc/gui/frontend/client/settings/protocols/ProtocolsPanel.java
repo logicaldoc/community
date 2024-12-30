@@ -22,10 +22,10 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.tab.Tab;
 
 /**
@@ -35,8 +35,6 @@ import com.smartgwt.client.widgets.tab.Tab;
  * @since 6.0
  */
 public class ProtocolsPanel extends AdminPanel {
-
-	private static final String FALSE = "false";
 
 	private static final String ENABLED = "enabled";
 
@@ -98,7 +96,7 @@ public class ProtocolsPanel extends AdminPanel {
 		apiCalls.setTitle(I18N.message("apicalls"));
 		apiCalls.setPane(new ApiCallsPanel());
 		tabs.addTab(apiCalls);
-		
+
 		Tab cmis = new Tab();
 		cmis.setTitle("CMIS");
 
@@ -114,17 +112,17 @@ public class ProtocolsPanel extends AdminPanel {
 				GWT.getHostPageBaseURL() + "service/cmis");
 
 		// CMIS Service Enabled
-		RadioGroupItem cmisEnabledItem = ItemFactory.newBooleanSelector("cmisEnabled", ENABLED);
+		ToggleItem cmisEnabledItem = ItemFactory.newToggleItem("cmisEnabled", ENABLED,
+				Boolean.valueOf(cmisEnabled.getValue()));
 		cmisEnabledItem.setRequired(true);
 		cmisEnabledItem.setWrapTitle(false);
-		cmisEnabledItem.setValue(yesNo(cmisEnabled.getValue()));
 		cmisEnabledItem.setDisabled(!Session.get().isDefaultTenant());
 
 		// CMIS Changelog
-		RadioGroupItem cmisChangelogItem = ItemFactory.newBooleanSelector("cmisChangelog", "changelog");
+		ToggleItem cmisChangelogItem = ItemFactory.newToggleItem("cmisChangelog", "changelog",
+				Boolean.valueOf(cmisChangelog.getValue()));
 		cmisChangelogItem.setRequired(true);
 		cmisChangelogItem.setWrapTitle(false);
-		cmisChangelogItem.setValue(yesNo(cmisChangelog.getValue()));
 
 		// CMIS Max Items
 		SpinnerItem cmisMaxItemsItem = ItemFactory.newSpinnerItem("cmisMaxItems", "maxitems",
@@ -159,9 +157,9 @@ public class ProtocolsPanel extends AdminPanel {
 		wdbUrl.setHint("&nbsp;&nbsp;&nbsp;(" + I18N.message("webdavbtooltip") + ")");
 
 		// Status
-		RadioGroupItem wdEnabledItem = ItemFactory.newBooleanSelector("wdEnabled", ENABLED);
+		ToggleItem wdEnabledItem = ItemFactory.newToggleItem("wdEnabled", ENABLED,
+				Boolean.valueOf(wdEnabled.getValue()));
 		wdEnabledItem.setRequired(true);
-		wdEnabledItem.setValue(yesNo(wdEnabled.getValue()));
 		wdEnabledItem.setDisabled(!Session.get().isDefaultTenant());
 
 		// Default depth
@@ -178,10 +176,10 @@ public class ProtocolsPanel extends AdminPanel {
 		webDav.setPane(webDavForm);
 
 		// FTP Service status
-		RadioGroupItem ftpEnabledItem = ItemFactory.newBooleanSelector("ftpEnabled", ENABLED);
+		ToggleItem ftpEnabledItem = ItemFactory.newToggleItem("ftpEnabled", ENABLED,
+				Boolean.valueOf(ftpEnabled.getValue()));
 		ftpEnabledItem.setRequired(true);
 		ftpEnabledItem.setWrapTitle(false);
-		ftpEnabledItem.setValue(yesNo(ftpEnabled.getValue()));
 		ftpEnabledItem.setDisabled(!Session.get().isDefaultTenant());
 
 		// FTP port
@@ -193,10 +191,10 @@ public class ProtocolsPanel extends AdminPanel {
 		ftpPortItem.setDisabled(!Session.get().isDefaultTenant());
 
 		// FTP security
-		RadioGroupItem ftpSslItem = ItemFactory.newBooleanSelector("ftpSsl", "encryptionftps");
+		ToggleItem ftpSslItem = ItemFactory.newToggleItem("ftpSsl", "encryptionftps",
+				Boolean.valueOf(ftpSsl.getValue()));
 		ftpSslItem.setRequired(true);
 		ftpSslItem.setWrapTitle(false);
-		ftpSslItem.setValue(yesNo(ftpSsl.getValue()));
 		ftpSslItem.setDisabled(!Session.get().isDefaultTenant());
 
 		TextItem ftpKeystoreFileItem = ItemFactory.newTextItem("ftpKeystoreFile", "keystore",
@@ -251,10 +249,6 @@ public class ProtocolsPanel extends AdminPanel {
 		addSaveButton();
 	}
 
-	private String yesNo(String trueFalse) {
-		return trueFalse.equals("true") ? "yes" : "no";
-	}
-
 	private void addSaveButton() {
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
@@ -278,19 +272,19 @@ public class ProtocolsPanel extends AdminPanel {
 		if (Session.get().isDefaultTenant()) {
 			webservicesPanel.save();
 
-			ProtocolsPanel.this.cmisEnabled.setValue(values.get("cmisEnabled").equals("yes") ? "true" : FALSE);
+			ProtocolsPanel.this.cmisEnabled.setValue(values.get("cmisEnabled").toString());
 
-			ProtocolsPanel.this.cmisChangelog.setValue(values.get("cmisChangelog").equals("yes") ? "true" : FALSE);
+			ProtocolsPanel.this.cmisChangelog.setValue(values.get("cmisChangelog").toString());
 
 			ProtocolsPanel.this.cmisMaxItems.setValue(values.get("cmisMaxItems").toString());
 
-			ProtocolsPanel.this.wdEnabled.setValue(values.get("wdEnabled").equals("yes") ? "true" : FALSE);
+			ProtocolsPanel.this.wdEnabled.setValue(values.get("wdEnabled").toString());
 
 			ProtocolsPanel.this.wdDepth.setValue(values.get("wdDepth").toString());
 
-			ProtocolsPanel.this.ftpEnabled.setValue(values.get("ftpEnabled").equals("yes") ? "true" : FALSE);
+			ProtocolsPanel.this.ftpEnabled.setValue(values.get("ftpEnabled").toString());
 			ProtocolsPanel.this.ftpPort.setValue(values.get("ftpPort").toString());
-			ProtocolsPanel.this.ftpSsl.setValue(values.get("ftpSsl").equals("yes") ? "true" : FALSE);
+			ProtocolsPanel.this.ftpSsl.setValue(values.get("ftpSsl").toString());
 			ProtocolsPanel.this.ftpKeystoreFile.setValue(values.get("ftpKeystoreFile").toString());
 			ProtocolsPanel.this.ftpKeystoreAlias.setValue(values.get("ftpKeystoreAlias").toString());
 			ProtocolsPanel.this.ftpKeystoreAliasPassword.setValue(values.get("ftpKeystoreAliasPassword").toString());

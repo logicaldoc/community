@@ -1253,6 +1253,15 @@ public abstract class Util {
 		}
 	}
 
+	public static Boolean getParameterValueAsBoolean(List<GUIParameter> params, String name) {
+		try {
+			GUIParameter param = getParameter(params, name);
+			return param != null ? param.getValueAsBoolean() : null;
+		} catch (RuntimeException re) {
+			return null;
+		}
+	}
+	
 	public static void removeChildren(Layout container) {
 		Canvas[] members = container.getMembers();
 		if (members != null)

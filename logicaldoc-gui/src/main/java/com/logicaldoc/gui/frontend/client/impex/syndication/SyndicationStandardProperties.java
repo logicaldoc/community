@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.impex.syndication;
 
 import java.util.Date;
-import java.util.Map;
 
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUISyndication;
@@ -13,9 +12,9 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
@@ -160,9 +159,9 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 			}
 		});
 
-		RadioGroupItem replicateCustomId = ItemFactory.newBooleanSelector(REPLICATECUSTOMID, REPLICATECUSTOMID);
+		ToggleItem replicateCustomId = ItemFactory.newToggleItem(REPLICATECUSTOMID,
+				syndication.getReplicateCustomId() == 1);
 		replicateCustomId.setRequired(true);
-		replicateCustomId.setValue(syndication.getReplicateCustomId() == 1 ? "yes" : "no");
 		replicateCustomId.addChangedHandler(changedHandler);
 
 		form.setItems(name, sourceSelector, remoteUrl, targetPath, fakeUsername, hiddenPassword, username, password,
@@ -172,38 +171,36 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values = form.getValues();
 		form.validate();
 		if (Boolean.FALSE.equals(form.hasErrors())) {
-			syndication.setName((String) values.get("name"));
-			syndication.setUsername((String) values.get(USERNAME));
-			syndication.setTargetPath((String) values.get("targetpath"));
-			syndication.setUrl((String) values.get("url"));
+			syndication.setName(form.getValueAsString("name"));
+			syndication.setUsername(form.getValueAsString(USERNAME));
+			syndication.setTargetPath(form.getValueAsString("targetpath"));
+			syndication.setUrl(form.getValueAsString("url"));
 			syndication.setSourceFolder(sourceSelector.getFolder());
-			syndication.setIncludes((String) values.get("include"));
-			syndication.setExcludes((String) values.get("exclude"));
-			syndication.setPassword((String) values.get("password_hidden"));
-			syndication.setApiKey((String) values.get("apikey_hidden"));
+			syndication.setIncludes(form.getValueAsString("include"));
+			syndication.setExcludes(form.getValueAsString("exclude"));
+			syndication.setPassword(form.getValueAsString("password_hidden"));
+			syndication.setApiKey(form.getValueAsString("apikey_hidden"));
 
-			if (values.get(MAX_PACKET_SIZE) instanceof Long)
-				syndication.setMaxPacketSize((Long) values.get(MAX_PACKET_SIZE));
+			if (form.getValue(MAX_PACKET_SIZE) instanceof Long longVal)
+				syndication.setMaxPacketSize(longVal);
 			else
-				syndication.setMaxPacketSize(Long.parseLong(values.get(MAX_PACKET_SIZE).toString()));
+				syndication.setMaxPacketSize(Long.parseLong(form.getValueAsString(MAX_PACKET_SIZE)));
 
-			if (values.get(BATCH) instanceof Long)
-				syndication.setBatch((Long) values.get(BATCH));
+			if (form.getValue(BATCH) instanceof Long longVal)
+				syndication.setBatch(longVal);
 			else
-				syndication.setBatch(Long.parseLong(values.get(BATCH).toString()));
+				syndication.setBatch(Long.parseLong(form.getValueAsString(BATCH)));
 
-			if (values.get(TIMEOUT) instanceof Integer)
-				syndication.setTimeout((Integer) values.get(TIMEOUT));
+			if (form.getValue(TIMEOUT) instanceof Integer intVal)
+				syndication.setTimeout(intVal);
 			else
-				syndication.setTimeout(Integer.parseInt(values.get(TIMEOUT).toString()));
+				syndication.setTimeout(Integer.parseInt(form.getValueAsString(TIMEOUT)));
 
-			syndication.setStartDate((Date) values.get("startdate"));
-			syndication.setReplicateCustomId("yes".equals(values.get(REPLICATECUSTOMID)) ? 1 : 0);
+			syndication.setStartDate((Date) form.getValue("startdate"));
+			syndication.setReplicateCustomId(Boolean.valueOf(form.getValueAsString(REPLICATECUSTOMID)) ? 1 : 0);
 		}
 		return !form.hasErrors();
 	}

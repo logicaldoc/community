@@ -9,10 +9,10 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -63,9 +63,9 @@ public class TransitionEditor extends Window {
 		final TextItem name = ItemFactory.newTextItem("name", transition.getText());
 		name.setRequired(true);
 
-		RadioGroupItem requiresNote = ItemFactory.newBooleanSelector("requiresNote", "requiresnote");
+		ToggleItem requiresNote = ItemFactory.newToggleItem("requiresNote", "requiresnote",
+				transition.isRequiresNote());
 		requiresNote.setWrapTitle(false);
-		requiresNote.setDefaultValue(transition.isRequiresNote() ? "yes" : "no");
 
 		SpinnerItem minNoteSize = ItemFactory.newSpinnerItem("minnotesize",
 				transition.getMinNoteSize() != null && transition.getMinNoteSize() > 0 ? transition.getMinNoteSize()
@@ -95,7 +95,7 @@ public class TransitionEditor extends Window {
 				transition.setText(transitionName);
 				TransitionEditor.this.widget.setContents(transitionName);
 				transition.setOnChosen(form.getValueAsString("automation"));
-				transition.setRequiresNote("yes".equals(form.getValueAsString("requiresNote")));
+				transition.setRequiresNote(Boolean.valueOf(form.getValueAsString("requiresNote")));
 				transition.setMinNoteSize((Integer) form.getValue("minnotesize"));
 
 				destroy();

@@ -16,8 +16,8 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
+import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
@@ -30,8 +30,6 @@ import com.smartgwt.client.widgets.tab.TabSet;
  * @since 6.5
  */
 public class FirewallPanel extends VLayout {
-
-	private static final String FALSE = "false";
 
 	private static final String WHITELIST = "whitelist";
 
@@ -101,21 +99,21 @@ public class FirewallPanel extends VLayout {
 	private void initGUI() {
 		prepareForm();
 
-		RadioGroupItem enabled = prepareEnabledSwitch();
+		ToggleItem enabled = prepareEnabledSwitch();
 
 		final TextAreaItem whitelist = prepareWhiteListItem();
 
 		final TextAreaItem blacklist = prepareBlackListItem();
 
-		RadioGroupItem allowSemicolon = prepareAllowSemicolonSwitch();
+		ToggleItem allowSemicolon = prepareAllowSemicolonSwitch();
 
-		RadioGroupItem allowBackSlash = prepareAllowBackSlashSwitch();
+		ToggleItem allowBackSlash = prepareAllowBackSlashSwitch();
 
-		RadioGroupItem allowUrlEncodedPercent = prepareAllowUrlEncodedPercentSwitch();
+		ToggleItem allowUrlEncodedPercent = prepareAllowUrlEncodedPercentSwitch();
 
-		RadioGroupItem allowUrlEncodedSlash = prepareAllowUrlEncodedSlashSwitch();
+		ToggleItem allowUrlEncodedSlash = prepareAllowUrlEncodedSlashSwitch();
 
-		RadioGroupItem allowUrlEncodedPeriod = prepareAllowUrlEncodedPeriodSwitch();
+		ToggleItem allowUrlEncodedPeriod = prepareAllowUrlEncodedPeriodSwitch();
 
 		if (user == null) {
 			/*
@@ -133,9 +131,9 @@ public class FirewallPanel extends VLayout {
 		}
 	}
 
-	private void initSettings(RadioGroupItem enabled, final TextAreaItem whitelist, final TextAreaItem blacklist,
-			RadioGroupItem allowSemicolon, RadioGroupItem allowBackSlash, RadioGroupItem allowUrlEncodedPercent,
-			RadioGroupItem allowUrlEncodedSlash, RadioGroupItem allowUrlEncodedPeriod) {
+	private void initSettings(ToggleItem enabled, final TextAreaItem whitelist, final TextAreaItem blacklist,
+			ToggleItem allowSemicolon, ToggleItem allowBackSlash, ToggleItem allowUrlEncodedPercent,
+			ToggleItem allowUrlEncodedSlash, ToggleItem allowUrlEncodedPeriod) {
 		form.setItems(enabled, whitelist, blacklist, allowSemicolon, allowBackSlash, allowUrlEncodedPercent,
 				allowUrlEncodedSlash, allowUrlEncodedPeriod);
 		SettingService.Instance.get()
@@ -151,22 +149,21 @@ public class FirewallPanel extends VLayout {
 
 							@Override
 							public void onSuccess(List<GUIParameter> params) {
-								enabled.setValue("true".equals(params.get(0).getValue()) ? "yes" : "no");
+								enabled.setValue(params.get(0).getValueAsBoolean());
 								whitelist.setValue(params.get(1).getValue().replace(',', '\n'));
 								blacklist.setValue(params.get(2).getValue().replace(',', '\n'));
-								allowSemicolon.setValue("true".equals(params.get(3).getValue()) ? "yes" : "no");
-								allowBackSlash.setValue("true".equals(params.get(4).getValue()) ? "yes" : "no");
-								allowUrlEncodedPercent.setValue("true".equals(params.get(5).getValue()) ? "yes" : "no");
-								allowUrlEncodedSlash.setValue("true".equals(params.get(6).getValue()) ? "yes" : "no");
-								allowUrlEncodedPeriod.setValue("true".equals(params.get(7).getValue()) ? "yes" : "no");
+								allowSemicolon.setValue(params.get(3).getValueAsBoolean());
+								allowBackSlash.setValue(params.get(4).getValueAsBoolean());
+								allowUrlEncodedPercent.setValue(params.get(5).getValueAsBoolean());
+								allowUrlEncodedSlash.setValue(params.get(6).getValueAsBoolean());
+								allowUrlEncodedPeriod.setValue(params.get(7).getValueAsBoolean());
 							}
 						});
 	}
 
-	private RadioGroupItem prepareAllowUrlEncodedPeriodSwitch() {
-		RadioGroupItem allowUrlEncodedPeriod = ItemFactory.newBooleanSelector("allowUrlEncodedPeriod",
-				"allowurlencodedperiod");
-		allowUrlEncodedPeriod.setValue(Session.get().getConfigAsBoolean(FIREWALL_ALLOW_URL_ENCODED_PERIOD));
+	private ToggleItem prepareAllowUrlEncodedPeriodSwitch() {
+		ToggleItem allowUrlEncodedPeriod = ItemFactory.newToggleItem("allowUrlEncodedPeriod", "allowurlencodedperiod",
+				Session.get().getConfigAsBoolean(FIREWALL_ALLOW_URL_ENCODED_PERIOD));
 		allowUrlEncodedPeriod.setWrapTitle(false);
 		allowUrlEncodedPeriod.setRequired(true);
 		allowUrlEncodedPeriod.setDisabled(Session.get().isDemo());
@@ -175,10 +172,9 @@ public class FirewallPanel extends VLayout {
 		return allowUrlEncodedPeriod;
 	}
 
-	private RadioGroupItem prepareAllowUrlEncodedSlashSwitch() {
-		RadioGroupItem allowUrlEncodedSlash = ItemFactory.newBooleanSelector("allowUrlEncodedSlash",
-				"allowurlencodedslash");
-		allowUrlEncodedSlash.setValue(Session.get().getConfigAsBoolean(FIREWALL_ALLOW_URL_ENCODED_SLASH));
+	private ToggleItem prepareAllowUrlEncodedSlashSwitch() {
+		ToggleItem allowUrlEncodedSlash = ItemFactory.newToggleItem("allowUrlEncodedSlash", "allowurlencodedslash",
+				Session.get().getConfigAsBoolean(FIREWALL_ALLOW_URL_ENCODED_SLASH));
 		allowUrlEncodedSlash.setWrapTitle(false);
 		allowUrlEncodedSlash.setRequired(true);
 		allowUrlEncodedSlash.setDisabled(Session.get().isDemo());
@@ -187,10 +183,9 @@ public class FirewallPanel extends VLayout {
 		return allowUrlEncodedSlash;
 	}
 
-	private RadioGroupItem prepareAllowUrlEncodedPercentSwitch() {
-		RadioGroupItem allowUrlEncodedPercent = ItemFactory.newBooleanSelector("allowUrlEncodedPercent",
-				"allowurlencodedpercent");
-		allowUrlEncodedPercent.setValue(Session.get().getConfigAsBoolean(FIREWALL_ALLOW_URL_ENCODED_PERCENT));
+	private ToggleItem prepareAllowUrlEncodedPercentSwitch() {
+		ToggleItem allowUrlEncodedPercent = ItemFactory.newToggleItem("allowUrlEncodedPercent",
+				"allowurlencodedpercent", Session.get().getConfigAsBoolean(FIREWALL_ALLOW_URL_ENCODED_PERCENT));
 		allowUrlEncodedPercent.setWrapTitle(false);
 		allowUrlEncodedPercent.setRequired(true);
 		allowUrlEncodedPercent.setDisabled(Session.get().isDemo());
@@ -199,9 +194,9 @@ public class FirewallPanel extends VLayout {
 		return allowUrlEncodedPercent;
 	}
 
-	private RadioGroupItem prepareAllowBackSlashSwitch() {
-		RadioGroupItem allowBackSlash = ItemFactory.newBooleanSelector("allowBackSlash", "allowbackslash");
-		allowBackSlash.setValue(Session.get().getConfigAsBoolean(FIREWALL_ALLOW_BACK_SLASH));
+	private ToggleItem prepareAllowBackSlashSwitch() {
+		ToggleItem allowBackSlash = ItemFactory.newToggleItem("allowBackSlash", "allowbackslash",
+				Session.get().getConfigAsBoolean(FIREWALL_ALLOW_BACK_SLASH));
 		allowBackSlash.setWrapTitle(false);
 		allowBackSlash.setRequired(true);
 		allowBackSlash.setDisabled(Session.get().isDemo());
@@ -210,9 +205,9 @@ public class FirewallPanel extends VLayout {
 		return allowBackSlash;
 	}
 
-	private RadioGroupItem prepareAllowSemicolonSwitch() {
-		RadioGroupItem allowSemicolon = ItemFactory.newBooleanSelector("allowSemicolon", "allowsemicolon");
-		allowSemicolon.setValue(Session.get().getConfigAsBoolean(FIREWALL_ALLOW_SEMICOLON));
+	private ToggleItem prepareAllowSemicolonSwitch() {
+		ToggleItem allowSemicolon = ItemFactory.newToggleItem("allowSemicolon", "allowsemicolon",
+				Session.get().getConfigAsBoolean(FIREWALL_ALLOW_SEMICOLON));
 		allowSemicolon.setWrapTitle(false);
 		allowSemicolon.setRequired(true);
 		allowSemicolon.setDisabled(Session.get().isDemo());
@@ -243,9 +238,9 @@ public class FirewallPanel extends VLayout {
 		return whitelist;
 	}
 
-	private RadioGroupItem prepareEnabledSwitch() {
-		RadioGroupItem enabled = ItemFactory.newBooleanSelector("eenabled", "enabled");
-		enabled.setValue(Session.get().getConfigAsBoolean(FIREWALL_ENABLED));
+	private ToggleItem prepareEnabledSwitch() {
+		ToggleItem enabled = ItemFactory.newToggleItem("eenabled", "enabled",
+				Session.get().getConfigAsBoolean(FIREWALL_ENABLED));
 		enabled.setWrapTitle(false);
 		enabled.setRequired(true);
 		enabled.setDisabled(Session.get().isDemo());
@@ -266,7 +261,7 @@ public class FirewallPanel extends VLayout {
 	}
 
 	public void onSave() {
-		String enabled = "yes".equals(vm.getValueAsString("eenabled")) ? "true" : FALSE;
+		String enabled = vm.getValueAsString("eenabled");
 		String whitelist = vm.getValueAsString(WHITELIST);
 		String blacklist = vm.getValueAsString(BLACKLIST);
 
@@ -277,16 +272,11 @@ public class FirewallPanel extends VLayout {
 				whitelist != null ? whitelist.replace('\n', ',').replace(" ", "") : null));
 		params.add(new GUIParameter(FIREWALL_BLACKLIST,
 				blacklist != null ? blacklist.replace('\n', ',').replace(" ", "") : null));
-		params.add(new GUIParameter(FIREWALL_ALLOW_SEMICOLON,
-				"yes".equals(vm.getValueAsString("allowSemicolon")) ? "true" : FALSE));
-		params.add(new GUIParameter(FIREWALL_ALLOW_BACK_SLASH,
-				"yes".equals(vm.getValueAsString("allowBackSlash")) ? "true" : FALSE));
-		params.add(new GUIParameter(FIREWALL_ALLOW_URL_ENCODED_PERCENT,
-				"yes".equals(vm.getValueAsString("allowUrlEncodedPercent")) ? "true" : FALSE));
-		params.add(new GUIParameter(FIREWALL_ALLOW_URL_ENCODED_SLASH,
-				"yes".equals(vm.getValueAsString("allowUrlEncodedSlash")) ? "true" : FALSE));
-		params.add(new GUIParameter(FIREWALL_ALLOW_URL_ENCODED_PERIOD,
-				"yes".equals(vm.getValueAsString("allowUrlEncodedPeriod")) ? "true" : FALSE));
+		params.add(new GUIParameter(FIREWALL_ALLOW_SEMICOLON, vm.getValueAsString("allowSemicolon")));
+		params.add(new GUIParameter(FIREWALL_ALLOW_BACK_SLASH, vm.getValueAsString("allowBackSlash")));
+		params.add(new GUIParameter(FIREWALL_ALLOW_URL_ENCODED_PERCENT, vm.getValueAsString("allowUrlEncodedPercent")));
+		params.add(new GUIParameter(FIREWALL_ALLOW_URL_ENCODED_SLASH, vm.getValueAsString("allowUrlEncodedSlash")));
+		params.add(new GUIParameter(FIREWALL_ALLOW_URL_ENCODED_PERIOD, vm.getValueAsString("allowUrlEncodedPeriod")));
 
 		for (GUIParameter guiParameter : params)
 			Session.get().setConfig(guiParameter.getName(), guiParameter.getValue());
