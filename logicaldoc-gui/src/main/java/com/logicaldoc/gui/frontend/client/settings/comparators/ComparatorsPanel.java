@@ -223,7 +223,7 @@ public class ComparatorsPanel extends AdminPanel {
 		enabled.setCellFormatter((value, rec, rowNum, colNum) -> {
 			if (value == null)
 				return "";
-			else if (Boolean.valueOf(value.toString()))
+			else if (Boolean.parseBoolean(value.toString()))
 				return Util.imageHTML("bullet_green.png");
 			else
 				return Util.imageHTML("bullet_red.png");

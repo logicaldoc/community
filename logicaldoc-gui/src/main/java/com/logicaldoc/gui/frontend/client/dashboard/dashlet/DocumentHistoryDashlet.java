@@ -135,7 +135,7 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 
 			@Override
 			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
-				if (rec.getAttributeAsBoolean("new") && event != null) {
+				if (Boolean.TRUE.equals(rec.getAttributeAsBoolean("new")) && event != null) {
 					return "font-weight: bold;";
 				} else {
 					return super.getCellCSSText(rec, rowNum, colNum);
@@ -182,7 +182,7 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 			Record[] records = grid.getRecordList().toArray();
 			int unread = 0;
 			for (Record rec : records) {
-				if (rec.getAttributeAsBoolean("new"))
+				if (Boolean.TRUE.equals(rec.getAttributeAsBoolean("new")))
 					unread++;
 			}
 

@@ -103,7 +103,7 @@ public class PublishingPanel extends DocumentDetailTab {
 		Map<String, Object> values = vm.getValues();
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
-			document.setPublished(Boolean.valueOf(vm.getValueAsString(PUBLISHED)) ? 1 : 0);
+			document.setPublished(Boolean.parseBoolean(vm.getValueAsString(PUBLISHED)) ? 1 : 0);
 			document.setStartPublishing((Date) values.get("startpublishing"));
 			document.setStopPublishing((Date) values.get("stoppublishing"));
 		}

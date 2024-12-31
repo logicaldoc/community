@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.system.task;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 import com.logicaldoc.gui.common.client.beans.GUITask;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -149,7 +148,7 @@ public class TaskSchedulingPanel extends VLayout {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return false;
 
-		task.getScheduling().setSimple( Boolean.valueOf(vm.getValueAsString(SIMPLE)));
+		task.getScheduling().setSimple(Boolean.valueOf(vm.getValueAsString(SIMPLE)));
 
 		long max = Long.parseLong(vm.getValueAsString("maxduration"));
 		if (max <= 0)
@@ -158,7 +157,7 @@ public class TaskSchedulingPanel extends VLayout {
 			max = max * 60L;
 		task.getScheduling().setMaxLength(max);
 
-		if (task.getScheduling().isSimple() || Boolean.valueOf(vm.getValueAsString(SIMPLE))) {
+		if (task.getScheduling().isSimple() || Boolean.parseBoolean(vm.getValueAsString(SIMPLE))) {
 			long longValue = 0;
 			if (vm.getValue(INITIALDELAY_STR) instanceof String str)
 				longValue = Long.parseLong(str);

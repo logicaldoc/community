@@ -76,8 +76,8 @@ public class UserQuotaPanel extends HLayout {
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
 			long quota;
-			if (values.get(QUOTA) instanceof String)
-				quota = Integer.parseInt((String) values.get(QUOTA));
+			if (values.get(QUOTA) instanceof String str)
+				quota = Integer.parseInt(str);
 			else
 				quota = (Integer) values.get(QUOTA);
 			if (quota > 0)

@@ -19,8 +19,6 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	public static final int DOC_UNLOCKED = 0;
 
-	private long tenantId;
-
 	private Long docRef;
 
 	private String docRefType;
@@ -110,7 +108,7 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	private Long formId = null;
 
 	// Users to be notified of the upload
-	private List<Long> notifyUsers=new ArrayList<>();
+	private List<Long> notifyUsers = new ArrayList<>();
 
 	// Optional message to send to users
 	private String notifyMessage;
@@ -603,14 +601,6 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 		this.bulkUpdate = bulkUpdate;
 	}
 
-	public long getTenantId() {
-		return tenantId;
-	}
-
-	public void setTenantId(long tenantId) {
-		this.tenantId = tenantId;
-	}
-
 	public int getDocAttrs() {
 		if (docAttrs == 0 && getAttributes().isEmpty())
 			for (GUIAttribute att : getAttributes())
@@ -634,11 +624,11 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	public boolean isCustomid() {
 		return allowedPermissions.isCustomid();
 	}
-	
+
 	public boolean isRead() {
 		return allowedPermissions.isRead();
 	}
-	
+
 	public boolean isWrite() {
 		return allowedPermissions.isWrite();
 	}
@@ -646,7 +636,7 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	public boolean isPreview() {
 		return allowedPermissions.isPreview();
 	}
-	
+
 	public boolean isDownload() {
 		return allowedPermissions.isDownload();
 	}
@@ -673,5 +663,48 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	public void setAccessControlList(List<GUIAccessControlEntry> accessControlList) {
 		this.accessControlList = accessControlList;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
+		result = prime * result + ((fileVersion == null) ? 0 : fileVersion.hashCode());
+		result = prime * result + ((folder == null) ? 0 : folder.hashCode());
+		result = prime * result + ((version == null) ? 0 : version.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GUIDocument other = (GUIDocument) obj;
+		if (fileName == null) {
+			if (other.fileName != null)
+				return false;
+		} else if (!fileName.equals(other.fileName))
+			return false;
+		if (fileVersion == null) {
+			if (other.fileVersion != null)
+				return false;
+		} else if (!fileVersion.equals(other.fileVersion))
+			return false;
+		if (folder == null) {
+			if (other.folder != null)
+				return false;
+		} else if (!folder.equals(other.folder))
+			return false;
+		if (version == null) {
+			if (other.version != null)
+				return false;
+		} else if (!version.equals(other.version))
+			return false;
+		return true;
 	}
 }

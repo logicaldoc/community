@@ -292,8 +292,8 @@ public class ApiCallsPanel extends VLayout {
 	private int getDisplayMaxValue(final Map<String, Object> values) {
 		int displayMaxValue = 0;
 		if (values.get(DISPLAY_MAX) != null) {
-			if (values.get(DISPLAY_MAX) instanceof Integer)
-				displayMaxValue = (Integer) values.get(DISPLAY_MAX);
+			if (values.get(DISPLAY_MAX) instanceof Integer intVal)
+				displayMaxValue = intVal;
 			else
 				displayMaxValue = Integer.parseInt((String) values.get(DISPLAY_MAX));
 		}
@@ -303,8 +303,8 @@ public class ApiCallsPanel extends VLayout {
 	private Long getUserId(final Map<String, Object> values) {
 		Long userId = null;
 		if (values.get("user") != null) {
-			if (values.get("user") instanceof Long)
-				userId = (Long) values.get("user");
+			if (values.get("user") instanceof Long longVal)
+				userId = longVal;
 			else
 				userId = Long.parseLong(values.get("user").toString());
 		}

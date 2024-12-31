@@ -459,7 +459,7 @@ public abstract class Util {
 	public static boolean isCommercial() {
 		return Feature.enabled(Feature.ADDITIONAL_FORMATS);
 	}
-	
+
 	public static boolean isOfficeFileType(String type) {
 		return officeExts.stream().anyMatch(type::equalsIgnoreCase);
 	}
@@ -612,14 +612,14 @@ public abstract class Util {
 	public static String formatSizeKB(Object value) {
 		if (value == null)
 			return null;
-		if (value instanceof Double)
-			return Util.formatSizeKB(((Double) value).doubleValue());
-		if (value instanceof Long)
-			return Util.formatSizeKB(((Long) value).doubleValue());
-		else if (value instanceof Integer)
-			return Util.formatSizeKB(((Integer) value).doubleValue());
-		if (value instanceof String)
-			return Util.formatSizeKB(Long.parseLong(value.toString()));
+		if (value instanceof Double doubleVal)
+			return Util.formatSizeKB(doubleVal.doubleValue());
+		if (value instanceof Long longVal)
+			return Util.formatSizeKB(longVal.doubleValue());
+		else if (value instanceof Integer intVal)
+			return Util.formatSizeKB(intVal.doubleValue());
+		if (value instanceof String str)
+			return Util.formatSizeKB(Long.parseLong(str));
 		else
 			return Util.formatSizeKB(0L);
 	}
@@ -656,16 +656,14 @@ public abstract class Util {
 	public static String formatSizeW7(Object value) {
 		if (value == null)
 			return null;
-		if (value instanceof Float)
-			return Util.formatSizeKB(((Float) value).doubleValue());
-		if (value instanceof Long)
-			return Util.formatSizeW7(((Long) value).doubleValue());
-		else if (value instanceof Integer)
-			return Util.formatSizeW7(((Integer) value).doubleValue());
-		else if (value instanceof Float)
-			return Util.formatSizeW7(((Float) value).doubleValue());
-		if (value instanceof String)
-			return Util.formatSizeW7(Long.parseLong(value.toString()));
+		if (value instanceof Float floatVal)
+			return Util.formatSizeKB(floatVal.doubleValue());
+		if (value instanceof Long longVal)
+			return Util.formatSizeW7(longVal.doubleValue());
+		else if (value instanceof Integer intVal)
+			return Util.formatSizeW7(intVal.doubleValue());
+		if (value instanceof String str)
+			return Util.formatSizeW7(Long.parseLong(str));
 		else
 			return Util.formatSizeW7(0L);
 	}
@@ -1260,10 +1258,10 @@ public abstract class Util {
 			GUIParameter param = getParameter(params, name);
 			return param != null ? param.getValueAsBoolean() : null;
 		} catch (RuntimeException re) {
-			return null;
+			return Boolean.FALSE;
 		}
 	}
-	
+
 	public static void removeChildren(Layout container) {
 		Canvas[] members = container.getMembers();
 		if (members != null)

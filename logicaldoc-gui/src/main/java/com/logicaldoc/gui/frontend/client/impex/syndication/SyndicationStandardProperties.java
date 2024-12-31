@@ -200,7 +200,7 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 				syndication.setTimeout(Integer.parseInt(form.getValueAsString(TIMEOUT)));
 
 			syndication.setStartDate((Date) form.getValue("startdate"));
-			syndication.setReplicateCustomId(Boolean.valueOf(form.getValueAsString(REPLICATECUSTOMID)) ? 1 : 0);
+			syndication.setReplicateCustomId(Boolean.parseBoolean(form.getValueAsString(REPLICATECUSTOMID)) ? 1 : 0);
 		}
 		return !form.hasErrors();
 	}

@@ -35,8 +35,6 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 
 	private static final String TWOFA_STAR = ".2fa.*";
 
-	private static final String FALSE = "false";
-
 	private static final String ENABLED = ".enabled";
 
 	private static final String ALLOWTRUSTED = "allowtrusted";

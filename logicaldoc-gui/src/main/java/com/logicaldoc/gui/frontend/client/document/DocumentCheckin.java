@@ -116,7 +116,7 @@ public class DocumentCheckin extends Window {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
-		if (Boolean.valueOf(vm.getValueAsString(CHECKFILENAME)) && !uploader.getUploadedFile().equals(fileName)) {
+		if (Boolean.parseBoolean(vm.getValueAsString(CHECKFILENAME)) && !uploader.getUploadedFile().equals(fileName)) {
 			submitButton.setDisabled(true);
 			SC.warn(I18N.message("nosamefilename"));
 			return;

@@ -1,8 +1,5 @@
 package com.logicaldoc.core.automation;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +20,7 @@ public class LogTool {
 	 * @param message the message to print
 	 */
 	public void print(String message) {
-		SimpleDateFormat df = new SimpleDateFormat("[yyyy-MM-dd HH:mm:ss]");
-		System.out.println(df.format(new Date()) + " " + message);
+		LoggerFactory.getLogger("console").info(message);
 	}
 
 	/**

@@ -98,7 +98,8 @@
 			<artifactId>commons-el</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<!-- dependency> <groupId>commons-discovery</groupId> <artifactId>commons-discovery</artifactId> 
+		<!-- dependency> <groupId>commons-discovery</groupId>
+		<artifactId>commons-discovery</artifactId> 
 			<scope>provided</scope> </dependency -->
 		<dependency>
 			<groupId>commons-lang</groupId>
@@ -144,7 +145,8 @@
 			<artifactId>sqltool</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<!-- dependency> <groupId>xerces</groupId> <artifactId>xercesImpl</artifactId> 
+		<!-- dependency> <groupId>xerces</groupId>
+		<artifactId>xercesImpl</artifactId> 
 			<scope>provided</scope> <exclusions> <exclusion> <groupId>xml-apis</groupId> 
 			<artifactId>xml-apis</artifactId> </exclusion> </exclusions> </dependency -->
 		<dependency>
@@ -280,10 +282,12 @@
 			<groupId>org.apache.pdfbox</groupId>
 			<artifactId>pdfbox-tools</artifactId>
 		</dependency>
-		<!-- Extracting text in languages whose text goes from right to left (such 
+		<!-- Extracting text in languages whose text goes from right to left
+		(such 
 			as Arabic and Hebrew) in PDF files can result in text that is backwards. 
 			PDFBox can normalize and reverse the text if the ICU4J jar file has been 
-			placed on the classpath (it is an optional dependency). http://pdfbox.apache.org/userguide/text_extraction.html -->
+			placed on the classpath (it is an optional dependency).
+		http://pdfbox.apache.org/userguide/text_extraction.html -->
 		<dependency>
 			<groupId>com.ibm.icu</groupId>
 			<artifactId>icu4j</artifactId>
@@ -566,7 +570,12 @@
 		<dependency>
 			<groupId>org.commonmark</groupId>
 			<artifactId>commonmark</artifactId>
-		</dependency>						
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+			<version>3.0.2</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -654,8 +663,8 @@
 									<exclude name="commons-math*" />
 									<exclude name="xz-*" />
 									<exclude name="*smime*" />
-									<exclude name="java-libpst*" />	
-									<exclude name="*commonmark*" />		
+									<exclude name="java-libpst*" />
+									<exclude name="*commonmark*" />
 								</delete>
 								<delete dir="target/plugin/WEB-INF/lib">
 									<include name="opencv-*-android-*" />
@@ -708,7 +717,8 @@
 					<reportSet>
 						<reports>
 							<report>dependencies</report>
-							<!-- <report>project-team</report> <report>mailing-list</report> <report>cim</report> 
+							<!-- <report>project-team</report>
+							<report>mailing-list</report> <report>cim</report> 
 								<report>issue-tracking</report> <report>license</report> <report>scm</report> -->
 						</reports>
 					</reportSet>

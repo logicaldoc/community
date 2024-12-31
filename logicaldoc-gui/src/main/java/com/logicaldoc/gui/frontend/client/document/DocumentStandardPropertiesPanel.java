@@ -45,6 +45,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
+
 	private static final String FOLDER = "folder";
 
 	private static final String COLOR = "color";
@@ -439,5 +440,30 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 			document.setTags(Arrays.asList(tagItem.getValues()));
 		}
 		return !vm.hasErrors();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((tagItem == null) ? 0 : tagItem.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DocumentStandardPropertiesPanel other = (DocumentStandardPropertiesPanel) obj;
+		if (tagItem == null) {
+			if (other.tagItem != null)
+				return false;
+		} else if (!tagItem.equals(other.tagItem))
+			return false;
+		return true;
 	}
 }

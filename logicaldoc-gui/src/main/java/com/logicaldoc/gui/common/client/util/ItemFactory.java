@@ -1024,18 +1024,18 @@ public class ItemFactory {
 		return radioGroupItem;
 	}
 
-//	public static RadioGroupItem newBooleanSelector(String name) {
-//		return newBooleanSelector(name, name);
-//	}
-//	
-//	public static RadioGroupItem newBooleanSelector(String name, String title) {
-//		RadioGroupItem radioGroupItem = newRadioGroup(name, title);
-//		LinkedHashMap<String, String> map = new LinkedHashMap<>();
-//		map.put("yes", I18N.message("yes"));
-//		map.put("no", I18N.message("no"));
-//		radioGroupItem.setValueMap(map);
-//		return radioGroupItem;
-//	}
+	public static RadioGroupItem newBooleanSelector(String name) {
+		return newBooleanSelector(name, name);
+	}
+	
+	public static RadioGroupItem newBooleanSelector(String name, String title) {
+		RadioGroupItem radioGroupItem = newRadioGroup(name, title);
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
+		map.put("yes", I18N.message("yes"));
+		map.put("no", I18N.message("no"));
+		radioGroupItem.setValueMap(map);
+		return radioGroupItem;
+	}
 
 	public static ToggleItem newToggleItem(String name, boolean value) {
 		return newToggleItem(name, name, value);

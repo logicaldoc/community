@@ -287,20 +287,20 @@ public abstract class FolderSearchForm extends VLayout {
 	}
 
 	private void setCriterionValue(GUICriterion criterion, Object fieldValue) {
-		if (fieldValue instanceof Date)
-			criterion.setDateValue((Date) fieldValue);
-		else if (fieldValue instanceof Integer)
-			criterion.setLongValue(((Integer) fieldValue).longValue());
-		else if (fieldValue instanceof Long)
-			criterion.setLongValue((Long) fieldValue);
-		else if (fieldValue instanceof Float)
-			criterion.setDoubleValue(((Float) fieldValue).doubleValue());
-		else if (fieldValue instanceof Double)
-			criterion.setDoubleValue((Double) fieldValue);
-		else if (fieldValue instanceof String)
-			criterion.setStringValue((String) fieldValue);
-		else if (fieldValue instanceof JavaScriptObject) {
-			JSOHelper.convertToMap((JavaScriptObject) fieldValue);
+		if (fieldValue instanceof Date dateVal)
+			criterion.setDateValue(dateVal);
+		else if (fieldValue instanceof Integer intVal)
+			criterion.setLongValue(intVal.longValue());
+		else if (fieldValue instanceof Long longVal)
+			criterion.setLongValue(longVal);
+		else if (fieldValue instanceof Float floatVal)
+			criterion.setDoubleValue(floatVal.doubleValue());
+		else if (fieldValue instanceof Double doubleVal)
+			criterion.setDoubleValue(doubleVal);
+		else if (fieldValue instanceof String str)
+			criterion.setStringValue(str);
+		else if (fieldValue instanceof JavaScriptObject js) {
+			JSOHelper.convertToMap(js);
 		}
 	}
 
@@ -308,12 +308,12 @@ public abstract class FolderSearchForm extends VLayout {
 		Object fieldValue = condition.getValueFieldItem().getValue();
 
 		// This lines are necessary to avoid error for GWT values type.
-		if (condition.getValueFieldItem() instanceof IntegerItem)
-			fieldValue = Long.parseLong(fieldValue.toString());
-		if (condition.getValueFieldItem() instanceof UserSelector)
-			fieldValue = ((UserSelector) condition.getValueFieldItem()).getUser().getId();
-		if (condition.getValueFieldItem() instanceof FolderSelector)
-			fieldValue = ((FolderSelector) condition.getValueFieldItem()).getFolder().getId();
+		if (condition.getValueFieldItem() instanceof IntegerItem integerItem)
+			fieldValue = Long.parseLong(integerItem.toString());
+		if (condition.getValueFieldItem() instanceof UserSelector selector)
+			fieldValue = selector.getUser().getId();
+		if (condition.getValueFieldItem() instanceof FolderSelector selector)
+			fieldValue = selector.getFolder().getId();
 		return fieldValue;
 	}
 

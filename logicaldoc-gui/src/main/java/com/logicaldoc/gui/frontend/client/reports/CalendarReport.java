@@ -318,8 +318,8 @@ public class CalendarReport extends AdminPanel {
 	private int getMaxRecords(final Map<String, Object> values) {
 		int maxRecords = 0;
 		if (values.get(DISPLAYMAX) != null) {
-			if (values.get(DISPLAYMAX) instanceof Integer)
-				maxRecords = (Integer) values.get(DISPLAYMAX);
+			if (values.get(DISPLAYMAX) instanceof Integer intValue)
+				maxRecords = intValue;
 			else
 				maxRecords = Integer.parseInt((String) values.get(DISPLAYMAX));
 		}

@@ -86,7 +86,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 
 		FormItemIcon search = new FormItemIcon();
 		search.setPrompt(I18N.message(SEARCH));
-		search.setSrc("[SKIN]/magnifying-glass.svg");;
+		search.setSrc("[SKIN]/magnifying-glass.svg");
 		search.addFormItemClickHandler(click -> search());
 		
 		FormItemIcon clear = new FormItemIcon();

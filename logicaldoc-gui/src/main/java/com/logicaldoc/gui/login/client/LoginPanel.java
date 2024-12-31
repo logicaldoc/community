@@ -217,7 +217,7 @@ public class LoginPanel extends VLayout {
 		formItems.add(password);
 		formItems.add(spacerItem12);
 
-		if (Boolean.valueOf(info.getConfig("gui.login.lang"))) {
+		if (Boolean.parseBoolean(info.getConfig("gui.login.lang"))) {
 			formItems.add(language);
 			formItems.add(spacerItem12);
 		}
@@ -312,7 +312,7 @@ public class LoginPanel extends VLayout {
 			username.setValue(credentials[0]);
 			password.setValue(credentials[1]);
 		}
-		
+
 		CookiesManager.removeSid();
 	}
 
@@ -496,7 +496,7 @@ public class LoginPanel extends VLayout {
 			return;
 		}
 
-		if (Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION) && Boolean.valueOf(info.getConfig("2fa.enabled"))
+		if (Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION) && Boolean.parseBoolean(info.getConfig("2fa.enabled"))
 				&& credentialsPanel.isVisible()) {
 			String login = username.getValueAsString();
 			LoginService.Instance.get().isSecretKeyRequired(login, CookiesManager.getSavedDevice(),
@@ -663,8 +663,8 @@ public class LoginPanel extends VLayout {
 		CookiesManager.saveLogin(saveLoginEnabled, rememberMe.getValueAsBoolean(), username.getValueAsString(),
 				password.getValueAsString());
 
-		if (!Boolean.valueOf(session.getInfo().getConfig("2fa.enabled"))
-				|| !Boolean.valueOf(session.getInfo().getConfig("2fa.allowtrusted"))) {
+		if (!Boolean.parseBoolean(session.getInfo().getConfig("2fa.enabled"))
+				|| !Boolean.parseBoolean(session.getInfo().getConfig("2fa.allowtrusted"))) {
 			Util.redirectToSuccessUrl(language.getValueAsString());
 		} else {
 			SecurityService.Instance.get().isTrustedDevice(CookiesManager.getSavedDevice(),

@@ -435,7 +435,7 @@ public class StampProperties extends StampDetailsTab {
 			stamp.setImageHeight(Integer.parseInt(vm.getValueAsString(IMAGE_HEIGHT)));
 
 		if (vm.getValueAsString(BARCODE_LABEL) != null)
-			stamp.setBarcodeLabel(Boolean.valueOf(vm.getValueAsString(BARCODE_LABEL)) ? 1 : 0);
+			stamp.setBarcodeLabel(Boolean.parseBoolean(vm.getValueAsString(BARCODE_LABEL)) ? 1 : 0);
 		if (vm.getValueAsString(BARCODE_FORMAT) != null)
 			stamp.setBarcodeFormat(vm.getValueAsString(BARCODE_FORMAT));
 

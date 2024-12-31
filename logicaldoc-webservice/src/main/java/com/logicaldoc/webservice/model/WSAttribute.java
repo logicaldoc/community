@@ -230,51 +230,62 @@ public class WSAttribute implements Serializable {
 	}
 
 	private static void setNonUserValue(WSAttribute attribute, Object value) {
-		if (value instanceof String string) {
+		switch (value) {
+		case String string -> {
 			attribute.type = TYPE_STRING;
 			attribute.setStringValue(string);
-		} else if (value instanceof Long longValue) {
+		}
+		case Long longValue -> {
 			attribute.type = TYPE_INT;
 			attribute.setIntValue(longValue);
-		} else if (value instanceof Integer integer) {
+		}
+		case Integer integer -> {
 			attribute.type = TYPE_INT;
 			attribute.setIntValue(integer.longValue());
-		} else if (value instanceof Boolean bool) {
+		}
+		case Boolean bool -> {
 			attribute.setIntValue(bool.booleanValue() ? 1L : 0L);
 			attribute.type = TYPE_BOOLEAN;
-		} else if (value instanceof Double doubleVal) {
+		}
+		case Double doubleVal -> {
 			attribute.type = TYPE_DOUBLE;
 			attribute.setDoubleValue(doubleVal);
-		} else if (value instanceof Date date) {
+		}
+		case Date date -> {
 			attribute.type = TYPE_DATE;
 			attribute.setDateValue(DateUtil.format(date));
-		} else if (value instanceof WSUser user) {
+		}
+		case WSUser user -> {
 			attribute.stringValue = user.getFullName();
 			attribute.intValue = user.getId();
 			attribute.type = TYPE_USER;
-		} else if (value instanceof WSFolder folder) {
+		}
+		case WSFolder folder -> {
 			attribute.stringValue = folder.getName();
 			attribute.intValue = folder.getId();
 			attribute.type = TYPE_FOLDER;
-		} else if (value instanceof WSDocument document) {
+		}
+		case WSDocument document -> {
 			attribute.stringValue = document.getFileName();
 			attribute.intValue = document.getId();
 			attribute.type = TYPE_DOCUMENT;
-		} else {
-			setDateValue(attribute, value);
+		}
+		default -> setDateValue(attribute, value);
 		}
 	}
 
 	private static void setDateValue(WSAttribute attribute, Object value) {
 		attribute.type = TYPE_DATE;
-		if (value instanceof XMLGregorianCalendar theXGCal) {
+
+		switch (value) {
+		case XMLGregorianCalendar theXGCal -> {
 			GregorianCalendar theGCal = theXGCal.toGregorianCalendar();
 			Date theDate = theGCal.getTime();
 			attribute.setDateValue(DateUtil.format(theDate));
-		} else if (value instanceof Date date) {
-			attribute.setDateValue(DateUtil.format(date));
-		} else
-			attribute.setDateValue(null);
+		}
+		case Date date -> attribute.setDateValue(DateUtil.format(date));
+		default -> attribute.setDateValue(null);
+		}
 	}
 
 	public int getEditor() {

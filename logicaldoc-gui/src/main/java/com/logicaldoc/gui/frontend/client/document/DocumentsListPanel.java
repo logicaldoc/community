@@ -107,7 +107,8 @@ public class DocumentsListPanel extends VLayout {
 
 				@Override
 				public void onSuccess(GUIAccessControlEntry enabledPermissions) {
-					new ContextMenu(FolderController.get().getCurrentFolder(), documentsGrid, enabledPermissions).showContextMenu();
+					new ContextMenu(FolderController.get().getCurrentFolder(), documentsGrid, enabledPermissions)
+							.showContextMenu();
 				}
 			});
 			if (click != null)
@@ -156,9 +157,7 @@ public class DocumentsListPanel extends VLayout {
 
 		DocumentsDSParameters params = new DocumentsDSParameters(folder.getId(), null,
 				documentsGrid.getGridCursor().getPageSize(), documentsGrid.getGridCursor().getCurrentPage(),
-				documentsGrid instanceof DocumentsListGrid
-						? DocumentGridUtil.getSortSpec((DocumentsListGrid) documentsGrid)
-						: null);
+				documentsGrid instanceof DocumentsListGrid listGrid ? DocumentGridUtil.getSortSpec(listGrid) : null);
 		DocumentsDS dataSource = new DocumentsDS(params);
 		documentsGrid.fetchNewData(dataSource);
 		documentsGrid.setCanDrag(folder.isMove());

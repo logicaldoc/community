@@ -929,17 +929,18 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 		ReportInfo info = request.getReportInfo();
 		Report report;
-		if (resource instanceof DeltaVResource deltaResource) {
-			report = deltaResource.getReport(info);
-		} else if (resource instanceof AclResource aclResource) {
-			report = aclResource.getReport(info);
-		} else {
+
+		switch (resource) {
+		case DeltaVResource deltaResource -> report = deltaResource.getReport(info);
+		case AclResource aclResource -> report = aclResource.getReport(info);
+		default -> {
 			try {
 				response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			} catch (Exception t) {
 				// Nothing to do
 			}
 			return;
+		}
 		}
 
 		int statusCode = (report.isMultiStatusReport()) ? DavServletResponse.SC_MULTI_STATUS

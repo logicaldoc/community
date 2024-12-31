@@ -41,7 +41,7 @@ public class FolderCopyExtendedPropertiesPanel extends FolderDetailTab {
 	@Override
 	public boolean validate() {
 		if (propertiesPanel.validate() && form1.validate()) {
-			folder.setTemplateLocked(Boolean.valueOf(form1.getValueAsString("locked")) ? 1 : 0);
+			folder.setTemplateLocked(Boolean.parseBoolean(form1.getValueAsString("locked")) ? 1 : 0);
 			return true;
 		}
 		return false;

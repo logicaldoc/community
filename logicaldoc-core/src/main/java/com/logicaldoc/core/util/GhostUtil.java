@@ -136,7 +136,6 @@ public class GhostUtil {
 	 * http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html
 	 */
 	protected static class StreamGobbler extends Thread {
-
 		InputStream is;
 
 		StreamGobbler(InputStream is) {
@@ -150,7 +149,7 @@ public class GhostUtil {
 				BufferedReader br = new BufferedReader(isr);
 				String line = null;
 				while ((line = br.readLine()) != null) {
-					System.out.println(line);
+					LoggerFactory.getLogger("console").info(line);
 				}
 			} catch (IOException ioe) {
 				log.error(ioe.getMessage());

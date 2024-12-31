@@ -3,6 +3,8 @@ package com.logicaldoc.core.metadata;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.annotation.Nullable;
+
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.security.user.User;
@@ -157,7 +159,8 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 	public void setDateValue(Date dateValue) {
 		this.dateValue = dateValue;
 	}
-
+	
+	@Nullable
 	public Boolean getBooleanValue() {
 		if (intValue != null)
 			return intValue.intValue() == 1;

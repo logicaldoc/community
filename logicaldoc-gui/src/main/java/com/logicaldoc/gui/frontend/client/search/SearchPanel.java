@@ -104,8 +104,8 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 
 		previewPanel = new SearchPreviewPanel();
 		previewPanel.addVisibilityChangedHandler(event -> {
-			if (detailPanel instanceof DocumentDetailsPanel)
-				previewPanel.setDocument(((DocumentDetailsPanel) detailPanel).getDocument());
+			if (detailPanel instanceof DocumentDetailsPanel docDetails)
+				previewPanel.setDocument(docDetails.getDocument());
 		});
 
 		// The listing plus the preview
@@ -147,8 +147,8 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 
 				@Override
 				public void onSuccess(GUIFolder fld) {
-					if (detailPanel instanceof FolderDetailsPanel) {
-						((FolderDetailsPanel) detailPanel).setFolder(fld);
+					if (detailPanel instanceof FolderDetailsPanel folderDetails) {
+						folderDetails.setFolder(fld);
 					} else {
 						details.removeMember(detailPanel);
 						detailPanel = new FolderDetailsPanel(fld);
@@ -213,8 +213,8 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 			}
 		}
 
-		if (detailPanel instanceof DocumentDetailsPanel) {
-			((DocumentDetailsPanel) detailPanel).setDocument(document);
+		if (detailPanel instanceof DocumentDetailsPanel docDetails) {
+			docDetails.setDocument(document);
 
 		} else {
 			detailPanel = new DocumentDetailsPanel();

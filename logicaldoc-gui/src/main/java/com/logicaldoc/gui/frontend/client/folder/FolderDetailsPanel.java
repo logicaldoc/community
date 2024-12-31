@@ -491,8 +491,8 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 			FolderService.Instance.get().save(folder, new AsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					if (caught instanceof ServerValidationException) {
-						handleValidationException((ServerValidationException) caught);
+					if (caught instanceof ServerValidationException validationException) {
+						handleValidationException(validationException);
 					} else {
 						GuiLog.serverError(caught);
 					}

@@ -24,8 +24,6 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private long id;
-
 	private long parentId;
 
 	private String description;
@@ -118,17 +116,7 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 	}
 
 	public GUIFolder(long id) {
-		this.id = id;
-	}
-
-	@Override
-	public long getId() {
-		return id;
-	}
-
-	@Override
-	public void setId(long id) {
-		this.id = id;
+		setId(id);
 	}
 
 	public GUIAccessControlEntry getAllowedPermissions() {
@@ -142,7 +130,7 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 	public boolean isCustomid() {
 		return allowedPermissions.isCustomid();
 	}
-	
+
 	public boolean isWrite() {
 		return allowedPermissions.isWrite();
 	}
@@ -488,5 +476,31 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 
 	public void setSize(long size) {
 		this.size = size;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + (int) (parentId ^ (parentId >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GUIFolder other = (GUIFolder) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return parentId == other.parentId;
 	}
 }

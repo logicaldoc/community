@@ -13,8 +13,6 @@ import java.util.List;
 public class GUIStamp extends GUIExtensibleObject implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private long id = 0L;
-
 	public static final int TYPE_TEXT = 0;
 
 	public static final int TYPE_IMAGE = 1;
@@ -83,17 +81,7 @@ public class GUIStamp extends GUIExtensibleObject implements Serializable {
 
 	public GUIStamp(long id) {
 		super();
-		this.id = id;
-	}
-
-	@Override
-	public long getId() {
-		return id;
-	}
-
-	@Override
-	public void setId(long id) {
-		this.id = id;
+		setId(id);
 	}
 
 	public int getType() {
@@ -312,5 +300,30 @@ public class GUIStamp extends GUIExtensibleObject implements Serializable {
 
 	public void setWrite(boolean write) {
 		this.write = write;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GUIStamp other = (GUIStamp) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
 	}
 }

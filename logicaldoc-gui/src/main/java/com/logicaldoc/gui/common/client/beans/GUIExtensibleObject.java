@@ -18,6 +18,8 @@ public class GUIExtensibleObject implements Serializable {
 
 	private long id = 0L;
 
+	private long tenantId = 1L;
+	
 	private String template;
 
 	private Long templateId;
@@ -249,6 +251,14 @@ public class GUIExtensibleObject implements Serializable {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public long getTenantId() {
+		return tenantId;
+	}
+
+	public void setTenantId(long tenantId) {
+		this.tenantId = tenantId;
 	}
 
 	@Override

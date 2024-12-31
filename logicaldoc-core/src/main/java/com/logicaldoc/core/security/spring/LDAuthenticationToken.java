@@ -21,7 +21,7 @@ public class LDAuthenticationToken extends UsernamePasswordAuthenticationToken {
 
 	private String sid;
 
-	private boolean anonymous=false;
+	private boolean anonymous = false;
 
 	/**
 	 * Constructor for the anonymous login
@@ -60,6 +60,31 @@ public class LDAuthenticationToken extends UsernamePasswordAuthenticationToken {
 			return sid;
 		else
 			return super.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((sid == null) ? 0 : sid.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		LDAuthenticationToken other = (LDAuthenticationToken) obj;
+		if (sid == null) {
+			if (other.sid != null)
+				return false;
+		} else if (!sid.equals(other.sid))
+			return false;
+		return true;
 	}
 
 }
