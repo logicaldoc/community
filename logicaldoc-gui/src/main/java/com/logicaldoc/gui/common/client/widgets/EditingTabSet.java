@@ -39,9 +39,11 @@ public class EditingTabSet extends TabSet {
 			cancelButton.addClickHandler(cancelHandler);
 
 		savePanel = new HLayout();
-		savePanel.setHeight(18);
-		savePanel.setMembersMargin(4);
+		savePanel.setHeight100();
+		savePanel.setPadding(2);
+		savePanel.setAlign(VerticalAlignment.CENTER);
 		savePanel.setStyleName("warn");
+		
 		savePanel.setMembers(saveButton, cancelButton);
 
 		savePanel.hide();

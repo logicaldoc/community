@@ -19,4 +19,8 @@
 </script>
 
 <%@ include file="body.jsp" %>
+
+<!-- Make sure custom stype is last loaded -->
+<link REL="STYLESHEET" HREF="<%=MODULE%>/sc/skins/<%=SKIN%>/style.css" TYPE="text/css" />
+
 <%@ include file="footer.jsp" %>

@@ -1,0 +1,972 @@
+.treeCellOver,
+.treeCellOverDark {
+  background: #b6e3ff;
+  color: black;
+}
+
+.gwt-HorizontalSplitPanel {
+	
+}
+
+.gwt-HorizontalSplitPanel .hsplitter {
+	cursor: move;
+	border: 0px;
+	background: #91c0ef url(./images/vborder.png) repeat-y;
+}
+
+
+/*calendar styles*/
+.calendarevent2 {
+   font-size:9px;
+   background-color: #7BDE7B;
+   border: 1px solid 	#008A00;
+   font-family: Arial, Verdana, sans-serif;
+}
+
+.calendarevent2Header {
+    font-size:9px; color: white;
+    background-color:	#005C00;
+}
+
+.calendarevent2Body {
+    font-size: 9px;
+    background-color: #7BDE7B;
+    padding: 3px;
+    font-family: Arial, Verdana, sans-serif;
+    color: black;
+}
+
+.calendarevent2Resizer{
+    border-top:1px solid white;
+    border-bottom: 1px solid white;
+}
+
+.calendarevent3 {
+   font-size:9px;
+   background-color:#FA8072;
+   border: 1px solid #004D99;
+   font-family: Arial, Verdana, sans-serif;
+}
+
+.calendarevent3Header {
+    font-size:9px; color: white;
+    background-color:#B22222;
+}
+
+.calendarevent3Body {
+    font-size: 9px;
+    background-color: #FA8072;
+    padding: 3px;
+    font-family: Arial, Verdana, sans-serif;
+    color: black;
+}
+
+.calendarevent3Resizer{
+    border-top:1px solid white;
+    border-bottom: 1px solid white;
+}
+
+
+/* Generic styles */
+
+.bigtext {
+  font-size: 24pt;
+}
+
+.normal, .normalFocused, .normalDisabled {
+    color: rgb(40, 40, 40);
+    font-family: RobotoLight;
+    font-size: 12px;
+}
+
+.contactingserver, .contactingserver  td[class|=normal] {
+  font-family: Arial, Bitstream Vera Sans, sans-serif; 
+  font-size: 16pt;
+  font-weight: bold;
+  white-space: nowrap;
+  background-color: white;
+}
+
+.sessiontimeout {
+  font-family: Arial, Bitstream Vera Sans, sans-serif; 
+  font-size: 16pt;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.updateavailable {
+  font-family: Arial, Bitstream Vera Sans, sans-serif; 
+  font-size: 14pt;
+  font-weight: bold;
+  white-space: nowrap;
+  color: green;
+}
+
+.updateunavailable {
+  font-family: Arial, Bitstream Vera Sans, sans-serif; 
+  font-size: 14pt;
+  font-weight: bold;
+  white-space: nowrap;
+  color: red;
+}
+
+.updatetemporarilyunavailable {
+  font-family: Arial, Bitstream Vera Sans, sans-serif; 
+  font-size: 14pt;
+  font-weight: bold;
+  white-space: nowrap;
+  color: orange;
+}
+
+.row {
+  border-top: 1px solid #cccccc;
+  margin-top: 4px;
+}
+
+.setupHeader {
+	font-family: Arial, Bitstream Vera Sans, sans-serif;
+	font-size: 16px;
+	font-weight: bold;
+	color: #AAAAAA;
+	vertical-align: center;
+}
+
+.logo_head, .logo_headOver, .logo_headDown {
+	margin-left: 5px;
+	margin-top: 5px;
+	border: 0px solid;
+	float: left;
+	width: 205px;
+}
+
+.logo_head_oem, .logo_head_oemOver, .logo_head_oemDown {
+	margin-right: 5px;
+	margin-top: 5px;
+	border: 0px solid;
+	float: right;
+	width: 205px;
+}
+
+.footer {
+	height: 20px;
+	background-color: #DDDDDD;
+}
+
+.searchOptions {
+	padding-left: 5px;
+	color: white;
+	cursor: pointer;
+}
+
+.warn {
+	background-color: rgb(255, 255, 161);
+}
+
+.diff {
+	color: #FF8723;
+}
+
+.footerInfo {
+	color: #577ED0;
+}
+
+.footerError {
+	color: #EF4A4A;
+}
+
+.footerWarn {
+	color: #CC9900;
+}
+
+.immutable {
+	color: #888888;
+	font-style: italic;
+}
+
+.upload {
+	margin-left: 5px;
+	margin-top: 10px;
+}
+
+.infoPanel {
+	background-color: #DDDDDD;
+}
+
+.cursor {
+	background-color: #DDDDDD;
+}
+
+.officelogout {
+	color: #536CDF;
+}
+
+
+.s {
+	border-bottom: 1px solid #dddddd;
+}
+
+.deletedItem {
+	color: grey;
+	text-decoration: line-through;
+}
+
+.hint {
+	white-space: nowrap;
+	padding-left: 3px;
+	color: grey;
+}
+
+.savepanel {
+	background-color: #eeeeee;
+}
+
+.notifyMessage a,
+.notifyMessage a:link, 
+.notifyMessage a:hover, 
+.notifyMessage a:visited {
+    color: rgb(10, 200, 200);
+}
+
+.avatarIcon {
+	vertical-align:middle;
+	margin-top:0px;
+	margin-bottom:0px;
+	margin-left:2px;
+	margin-right:2px;
+	display:block;
+    -webkit-touch-callout:none
+}
+
+.box {
+   display: flex;
+   align-items:center;
+}
+
+.nodisplay {
+   display: none;
+}
+
+/*
+ * Print panel
+ */
+.printPanel {
+	width: 100%;
+	padding: 10px;
+	margin: 10px auto;
+	
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	
+	-webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+	-moz-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+	
+	overflow: hidden;
+}
+
+.printPanel ul {
+	list-style: none;
+	margin: 0 auto;
+	overflow: hidden;
+    padding: 0px;
+}
+
+.printPanel ul li {
+	float: left;
+	margin: 0 5px;
+}
+
+.printPanel ul a {
+	display: inline-block;
+	text-decoration: none;
+	line-height: 18px;
+	padding: 4px 8px;
+	font-size: 12px;
+	color: #fff;
+	font-weight: bold;
+	outline: none;
+	
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	
+	background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+	background: -moz-linear-gradient(top, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+	background: -ms-linear-gradient(top, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+	background: -o-linear-gradient(top, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+	background: linear-gradient(top, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+	
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+	
+	-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+	-moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.printPanel ul a:hover {
+	background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+	background: -moz-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+	background: -ms-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+	background: -o-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+	background: linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+}
+
+.printPanel ul a:active {
+	-webkit-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.1);
+	box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.1);
+	
+	background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+	background: -moz-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+	background: -ms-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+	background: -o-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+	background: linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+}
+
+.printPanel.default {
+	background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.1));
+	background: -moz-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.1));
+	background: -ms-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.1));
+	background: -o-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.1));
+	background: linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.1));
+	background-color: #44A8D9;
+	
+	border: 1px solid #256CB4;
+}
+.printPanel.default ul a {
+	background-color: #44A8D9;
+	border: 1px solid #2589b4;
+}
+
+.event-ok {
+	color: DarkGreen;
+}
+
+.event-med {
+	color: DarkCyan;
+}
+
+.event-error {
+	color: DarkRed;
+}
+
+.event-warning {
+	color: Orange;
+}
+
+.calendar-without-label table[role="presentation"] td.normal b {
+   display: none;
+}
+
+.statusIcon {
+  border:none; 
+  background:none;
+  margin-right: 2px;
+  margin-left: 2px;
+}
+
+
+.gwt-Label  {
+  background: rgb(71,167,224);
+  background: -moz-linear-gradient(180deg, rgba(71,167,224,1) 0%, rgba(189,206,208,1) 76%);
+  background: -webkit-linear-gradient(180deg, rgba(71,167,224,1) 0%, rgba(189,206,208,1) 76%);
+  background: linear-gradient(180deg, rgba(71,167,224,1) 0%, rgba(189,206,208,1) 76%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#47a7e0",endColorstr="#bdced0",GradientType=1); 
+  text-align: center;
+  color: white;
+  padding-top: 4px;
+  padding-right: 20px;
+}
+
+.gwt-ProgressBar-shell {
+  border: 2px solid #848280;
+  background-color: #454545;
+  height: 16px;
+  width: 50%;
+  margin-left: 10px;
+}
+
+.gwt-ProgressBar-shell .gwt-ProgressBar-bar {
+  background-color: #BB4B44;
+}
+
+.gwt-ProgressBar-shell .gwt-ProgressBar-text {
+  padding: 0;
+  margin: 0;
+  color: white;
+}
+
+.progressLabel {
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  padding-left: 5px;
+  white-space: nowrap;
+}
+
+.dropFilesLabel {
+  margin-top: 6px;
+  padding-top: 28px;
+  padding-bottom: 28px;
+  padding-left: 5px;
+  padding-right: 5px;  
+  font-family: verdana, arial, sans-serif;
+  font-size: 12px;
+  color: #2d4b6d;
+  font-weight: bold;
+  text-align: center;
+  display: block;
+  border: 2px dashed #888888;
+  border-radius: 7px;
+}
+
+.dropFilesLabelHover {
+  border: 2px solid #444444;
+  color: #7c9647;
+}
+
+.cancelButton {
+  margin: 3px 0 -1px 2px;
+  cursor: pointer;
+}
+
+.folder-cursor {
+  background-color: #f0f0f0;
+  border: 1px solid #d0d0d0;
+}
+
+.systemusage-low {
+  color: red;
+}
+
+.systemusage-progress-low, .systemusage-progress-lowOver, .systemusage-progress-lowDown, .systemusage-progressProgress-lowDown, .systemusage-progressProgress-lowSelected {
+  background-color: red;
+  border-radius: 0px;
+  outline: none;
+}
+
+.update-changelog, .update-notes{
+  font-family: Arial, Bitstream Vera Sans, sans-serif; 
+  font-size: 14pt;
+  font-weight: bold;
+  white-space: nowrap;
+  color: red;
+}
+
+
+.filenameIcon {
+	vertical-align:middle;
+	margin-top:0px;
+	margin-bottom:0px;
+	margin-left:2px;
+	margin-right:2px;
+	display:block;
+    -webkit-touch-callout:none
+}
+
+
+.container{
+  position: relative;
+}
+.container > img {
+  position: absolute;
+  top:0;
+  left:0;
+}
+
+
+.icon-container{
+  position: relative;
+}
+.icon-container > img{
+  top:0;
+  left:0;
+}
+
+/* 
+ * Shiva overrides 
+ */
+
+.button, .button:hover, .buttonOver, .buttonFocused, .buttonFocusedOver, .buttonDown, .buttonFocusedDown, .buttonSelected, .buttonSelectedFocused, .buttonSelectedDown, .buttonSelectedFocusedDown, .buttonSelectedOver, .buttonSelectedFocusedOver, .buttonDisabled, .buttonSelectedDisabled, .buttonDeselectedDisabled {
+	background-color: transparent;
+	border: medium;
+	border-radius: 2px;
+	padding: 0px 5px;
+	vertical-align: middle;
+	outline: 0px;
+	color: rgb(255, 255, 255);
+	font-size: 11px;
+	font-family: Roboto-Light-Vivid, Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	opacity: 1;
+	background-size: 100%;
+	background-image: linear-gradient(#3d7bb2 0%, #2d5e8a 100%);
+	transition: opacity 0.2s;
+}
+
+.tabButtonTopSelected {
+	font-family: Roboto-Light-Vivid, Arial, Helvetica, sans-serif;
+	color: rgb(0, 173, 213);
+	background-color: transparent;
+	border-width: 0px 3px;
+	border-style: solid;
+	border-color: rgb(167, 236, 252) rgb(61, 123, 178) #4788b800;
+	opacity: 1;
+	border-image: 1 100%;
+}
+
+.tabButtonTopOver {
+  color: #9ac9ed;
+  background-color: transparent;
+  border: 3px solid #a7cae1;
+  border-bottom: 0px solid transparent;
+  border-top: 0px solid #a7cae1;
+  opacity: 0.9;
+  transition: color 0.2s, background-color, opacity;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.tabButtonTopSelected {
+	font-family: Roboto-Light-Vivid, Arial, Helvetica, sans-serif;
+	color: #1b91c0;
+	background-color: transparent;
+	border: 3px solid #2e9bc6;
+	border-bottom: 0px solid transparent;
+	border-top: 0px solid #2e9bc6;
+	opacity: 1;
+	border-image: none 1 100%;
+}
+
+.tabButtonTopSelectedOver {
+  font-family: Roboto-Light-Vivid, Arial, Helvetica, sans-serif;
+  color: #9ac9ed;
+  background-color: transparent;
+  border: 3px solid #a7c4e1;
+  border-bottom: 0px solid transparent;
+  border-top: 0px solid #a7e1c1;
+  border-image: none 1 100%;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.treeConnectorSvg, .treeConnectorSvgOver, .treeConnectorSvgDown, .treeConnectorSvgSelected, .treeConnectorSvgDisabled {
+	color: rgb(59, 111, 178);
+	fill: rgb(224, 224, 224);
+}
+
+.tabButtonTopSelectedFocused {
+  font-family: Roboto-Light-Vivid, Arial, Helvetica, sans-serif;
+  color: #9ac9ed;
+  background-color: transparent;
+  border: 3px solid #3d7bb2;
+  border-bottom: 0px solid transparent;
+  border-top: 0px solid #a7e1c1;
+}
+
+.tabButtonTopFocused {
+  color: #9ac9ed;
+  background-color: transparent;
+  border: 3px solid #3d7bb2;
+  border-bottom: 0px solid transparent;
+  border-top: 0px solid #a7e1c1;
+}
+
+.tabButtonTopFocusedOver {
+  color: #9ac9ed;
+  background-color: transparent;
+  border: 3px solid #3d7bb2;
+  border-bottom: 0px solid transparent;
+  border-top: 0px solid #a7e1c1;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.tabButtonTopSelectedFocusedOver {
+  font-family: Roboto-Light-Vivid, Arial, Helvetica, sans-serif;
+  color: #9ac9ed;
+  background-color: transparent;
+  border: 3px solid #3d7bb2;
+  border-bottom: 0px solid transparent;
+  border-top: 0px solid #a7e1c1;
+  border-image: none 1 100%;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.tabButtonTopDown {
+  font-family: Roboto-Light-Vivid, Arial, Helvetica, sans-serif;
+  color: #9ac9ed;
+  background-color: transparent;
+  border: 3px solid #3d7bb2;
+  border-bottom: 0px solid transparent;
+  border-top: 0px solid #a7e1c1;
+}
+
+.tabButtonTopSelectedDown {
+  font-family: Roboto-Light-Vivid, Arial, Helvetica, sans-serif;
+  color: #9ac9ed;
+  background-color: transparent;
+  border: 3px solid #3d7bb2;
+  border-bottom: 0px solid transparent;
+  border-top: 0px solid #a7e1c1;
+}
+
+.tabButtonTopFocusedDown {
+  font-family: Roboto-Light-Vivid, Arial, Helvetica, sans-serif;
+  color: #9ac9ed;
+  background-color: transparent;
+  border: 3px solid #3d7bb2;
+  border-bottom: 0px solid transparent;
+  border-top: 0px solid #a7e1c1;
+}
+
+.tabButtonTopSelectedFocusedDown {
+  font-family: Roboto-Light-Vivid, Arial, Helvetica, sans-serif;
+  color: #9ac9ed;
+  background-color: transparent;
+  border: 3px solid #3d7bb2;
+  border-bottom: 0px solid transparent;
+  border-top: 0px solid #a7e1c1;
+}
+
+.headerBar {
+	background-color: transparent;
+	background-size: 100%;
+	background-image: linear-gradient(rgb(255, 255, 255) 0%, rgb(246, 248, 250) 100%);
+	border-top: 2px solid rgb(61, 123, 178);
+	border-bottom: 2px solid rgb(56, 118, 163);
+	border-radius: 0px;
+}
+
+.svgCheckbox {
+  color: #3d7bb2;
+  transition: color, background-color 0.1s ease-in-out;
+}
+
+.svgRadio {
+  color: #3d7bb2;
+  transition: color, background-color 0.1s ease-in-out;
+}
+
+.toggleSwitchOn {
+  border: 1px solid #cdd5db;
+  background-color: #3d7bb2;
+}
+
+.dialogHeader,
+.dialogHeaderHilite {
+  padding: 0px;
+  background-color: #3d7bb2;
+  background-image: linear-gradient(to bottom, #3d7bb2 0%, #2d5e8a 100%);
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  /* this is necessary to float the ::after separator outside the header and ignore it's radius */
+  position: relative;
+}
+
+.windowHeader, 
+.windowHeaderHilite {
+	padding: 0px;
+	background-color: #3d7bb2;
+	background-image: linear-gradient(to bottom, #3d7bb2 0%, #2d5e8a 100%);
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	position: relative;
+	color: #ffffff;
+}
+
+.buttonItem, .buttonItemOver, .buttonItemFocused, .buttonItemFocusedOver, .buttonItemDown, .buttonItemFocusedDown, .buttonItemSelected, .buttonItemSelectedFocused, .buttonItemSelectedDown, .buttonItemSelectedFocusedDown, .buttonItemSelectedOver, .buttonItemSelectedFocusedOver, .buttonItemDisabled, .buttonItemOpened, .buttonItemOverOpened, .buttonItemSelectedDisabled, .buttonItemDeselectedDisabled {
+	background-color: transparent;
+	border: none;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	padding: 0px 5px;
+	vertical-align: middle;
+	outline: 0px;
+	color: #ffffff;
+	font-size: 12.58px;
+	font-family: Roboto-Light-Vivid, Arial, Helvetica, sans-serif;
+	opacity: 1;
+	background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzNkYjI3MSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzM4YTM3ZSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
+	background-size: 100%;
+	background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #3d7bb2), color-stop(100%, #2d5e8a));
+	background-image: -moz-linear-gradient(top, #3d7bb2 0%, #2d5e8a 100%);
+	background-image: -webkit-linear-gradient(top, #3d7bb2 0%, #2d5e8a 100%);
+	background-image: linear-gradient(to bottom, #3d7bb2 0%, #2d5e8a 100%);
+	transition: opacity 0.2s;
+}
+
+.calendarHeaderBar {
+	background-color: transparent;
+	border-right: medium;
+	border-top: 2px solid #3d7bb2;
+	border-bottom: 2px solid #2d5e8a;
+}
+
+.dateChooserButton,
+.dateChooserButtonOver,
+.dateChooserButtonDown,
+.dateChooserButtonDisabled,
+.dateChooserButtonSelected,
+.dateChooserButtonSelectedOver,
+.dateChooserButtonSelectedDown,
+.dateChooserButtonSelectedDisabled {
+  background-color: #f0f0f0;
+  color: #3d7bb2;
+  font-family: Roboto-Light-Vivid, Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.dateChooserButtonOver,
+.dateChooserButtonDown {
+  color: #3d7bb2;
+  cursor: pointer;
+}
+
+.dateChooserBottomButton,
+.dateChooserBottomButtonOver,
+.dateChooserBottomButtonDown,
+.dateChooserBottomButtonDisabled,
+.dateChooserBottomButtonSelected,
+.dateChooserBottomButtonSelectedOver,
+.dateChooserBottomButtonSelectedDown,
+.dateChooserBottomButtonSelectedDisabled {
+  background-color: #f0f0f0;
+  color: #3d7bb2;
+  border: 0px solid #ffffff;
+  font-family: Roboto-Light-Vivid, Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  transition: background-color 0.2s;
+}
+
+.dateChooserFiscalYearCellSelected {
+  color: #ffffff;
+  background-color: #3d7bb2;
+}
+
+.dateChooserWeekCellOver,
+.dateChooserWeekCellDown,
+.dateChooserWeekCellSelectedOver,
+.dateChooserWeekCellSelectedDown {
+  color: #ffffff;
+  background-color: #3d7bb2;
+}
+
+.dateChooserWeekCellSelected {
+  color: #ffffff;
+  background-color: #3d7bb2;
+}
+
+.dateChooserWeekdayOver {
+  background-color: #3d7bb2;
+  color: #ffffff;
+}
+
+/* selected/over date-cell styling */
+.dateChooserWeekdaySelectedOver {
+  background-color: #3d7bb2;
+  color: #ffffff;
+  border: 0px solid #3d7bb2;
+}
+
+.dateChooserWeekdaySelected,
+.dateChooserWeekdayDown,
+.dateChooserWeekdaySelectedDown {
+  background-color: #3d7bb2;
+  color: #ffffff;
+}
+
+.dateChooserWeekdaySelected {
+  background-color: #3d7bb2;
+  color: #ffffff;
+  border: 0px solid #3d7bb2;
+}
+
+.dateChooserWeekendOver {
+  background-color: #3d7bb2;
+  color: #ffffff;
+}
+
+/* selected/over date-cell styling */
+.dateChooserWeekendSelectedOver {
+  background-color: #3d7bb2;
+  color: #ffffff;
+  border: 0px solid #3d7bb2;
+}
+
+.dateChooserWeekendSelected,
+.dateChooserWeekendDown,
+.dateChooserWeekendSelectedDown {
+  background-color: #3d7bb2;
+  color: #ffffff;
+}
+
+.dateChooserWeekendSelected {
+  background-color: #3d7bb2;
+  color: #ffffff;
+  border: 0px solid #3d7bb2;
+}
+
+.dateChooserNavButtonOver,
+.dateChooserNavButtonDown,
+.dateChooserNavButtonFocused,
+.dateChooserNavButtonFocusedOver,
+.dateChooserNavButtonFocusedDown {
+  color: #3d7bb2;
+  background: #f0f0f0;
+}
+
+.dateChooserNavButtonSelected,
+.dateChooserNavButtonSelectedOver {
+  color: #3d7bb2;
+  background: #f0f0f0;
+}
+
+.dateChooserNavButtonSelectedFocused,
+.dateChooserNavButtonSelectedFocusedOver,
+.dateChooserNavButtonSelectedFocusedDown {
+  color: #3d7bb2;
+  background: #f0f0f0;
+}
+
+.colorPickerHeader,
+.colorPickerHilite {
+  padding: 0px;
+  background-color: #3d7bb2;
+  border-radius: 0px;
+}
+
+.calendarHeaderBar {
+  background-color: transparent;
+  border-right: none;
+  border-top: 2px solid #3d7bb2;
+  border-bottom: 2px solid #2d5e8ae;
+}
+
+.calMonthDayHeaderSelected,
+.calMonthDayHeaderSelectedDark,
+.calMonthDayHeaderSelectedOver,
+.calMonthDayHeaderSelectedOverDark,
+.calMonthDayHeaderSelectedDisabled {
+  background-color: #7fc1fa;
+  color: #454545;
+}
+
+.calMonthDayBodySelected,
+.calMonthDayBodySelectedDark,
+.calMonthDayBodySelectedOver,
+.calMonthDayBodySelectedOverDark,
+.calMonthDayBodySelectedDisabled {
+  background-color: #84c3fa;
+}
+
+.textItemLiteErrorFocused,
+.textItemLiteErrorFocusedRTL,
+.textItemLiteErrorFocusedOver,
+.textItemLiteErrorFocusedOverRTL,
+.textItemLiteFocused,
+.textItemLiteFocusedRTL,
+.textItemLiteFocusedOver,
+.textItemLiteFocusedOverRTL,
+.textItemLitePendingFocused,
+.textItemLitePendingFocusedRTL,
+.textItemLitePendingFocusedOver,
+.textItemLitePendingFocusedOverRTL,
+.selectItemLiteControlErrorFocused,
+.selectItemLiteControlErrorFocusedRTL,
+.selectItemLiteControlErrorFocusedOver,
+.selectItemLiteControlErrorFocusedOverRTL,
+.selectItemLiteControlFocused,
+.selectItemLiteControlFocusedRTL,
+.selectItemLiteControlFocusedOver,
+.selectItemLiteControlFocusedOverRTL,
+.selectItemLiteControlPendingFocused,
+.selectItemLiteControlPendingFocusedRTL,
+.selectItemLiteControlPendingFocusedOver,
+.selectItemLiteControlPendingFocusedOverRTL,
+.textAreaItemLiteErrorFocused,
+.textAreaItemLiteErrorFocusedRTL,
+.textAreaItemLiteErrorFocusedOver,
+.textAreaItemLiteErrorFocusedOverRTL,
+.textAreaItemLiteFocused,
+.textAreaItemLiteFocusedRTL,
+.textAreaItemLiteFocusedOver,
+.textAreaItemLiteFocusedOverRTL,
+.textAreaItemLitePendingFocused,
+.textAreaItemLitePendingFocusedRTL,
+.textAreaItemLitePendingFocusedOver,
+.textAreaItemLitePendingFocusedOverRTL {
+  outline: none;
+  color: #5b5b5b;
+  border-color: #3d7bb2;
+  background-color: #ffffff;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.selectItemLiteControlFocused,
+.selectItemLiteControlFocusedRTL {
+  outline: none;
+  border-color: #3d7bb2;
+}
+
+.textItemLiteErrorFocusedOver,
+.textItemLiteErrorFocusedOverRTL,
+.textItemLiteFocusedOver,
+.textItemLiteFocusedOverRTL,
+.textItemLitePendingFocusedOver,
+.textItemLitePendingFocusedOverRTL,
+.textAreaItemLiteFocusedOver,
+.textAreaItemLiteFocusedOverRTL,
+.textAreaItemLiteErrorFocusedOver,
+.textAreaItemLiteErrorFocusedOverRTL,
+.textAreaItemLitePendingFocusedOver,
+.textAreaItemLitePendingFocusedOverRTL,
+.selectItemLiteControlFocusedOver,
+.selectItemLiteControlFocusedOverRTL,
+.selectItemLiteControlPendingFocusedOver,
+.selectItemLiteControlPendingFocusedOverRTL,
+.nativeSelectItemErrorFocusedOver,
+.nativeSelectItemErrorFocusedOverRTL {
+  outline: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  border: 1px solid #3d7bb2;
+}
+
+.tabControlIconOver,
+.tabControlIconOvertop,
+.tabControlIconOverleft,
+.tabControlIconOverbottom,
+.tabControlIconOverright {
+  background-color: #f5f8fa;
+  color: #3d7bb2;
+}
+
+*:focus {
+  outline-color: #3d7bb2;
+  outline-radius: 0px;
+}
+
+div.windowHeader div.normal span  {
+	color: rgb(222,222,222);
+	font-family: RobotoLight;
+	font-size: 12px;
+}
+
+/* 
+ * End of Shiva overrides 
+ */

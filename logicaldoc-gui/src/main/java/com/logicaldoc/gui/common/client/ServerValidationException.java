@@ -15,7 +15,7 @@ public class ServerValidationException extends ServerException {
 	/**
 	 * Array of errors
 	 */
-	private final ServerValidationError[] errors;
+	private ServerValidationError[] errors;
 
 	public ServerValidationException() {
 		super();

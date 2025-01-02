@@ -312,7 +312,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	}
 
 	private void setLongValue(Generic generic, GUIParameter parameter) {
-		if (generic != null)
+		if (generic != null && generic.getInteger1() != null)
 			parameter.setValue(Long.toString(generic.getInteger1()));
 		else
 			parameter.setValue("0");
