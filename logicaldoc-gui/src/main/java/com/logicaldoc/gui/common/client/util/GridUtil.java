@@ -43,7 +43,7 @@ public class GridUtil {
 			/*
 			 * With a timer we scroll the grid in order to fetch all the data
 			 */
-			final Timer timer = new Timer() {
+			new Timer() {
 				public void run() {
 					Integer[] visibleRows = listGrid.getVisibleRows();
 					if (visibleRows[1] >= listGrid.getTotalRows() - 1) {
@@ -59,8 +59,7 @@ public class GridUtil {
 						schedule(100);
 					}
 				}
-			};
-			timer.schedule(100);
+			}.schedule(100);
 		}
 	}
 

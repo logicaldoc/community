@@ -25,7 +25,7 @@
 				<unzip src="@{webroot}/WEB-INF/lib/${pom.artifactId}-${pom.version}-plugin.jar.skip" dest="@{webroot}/WEB-INF/lib/tmp" />
 				<delete>
 				  <fileset dir="@{webroot}/WEB-INF/lib/tmp">
-				  	<include name="com/logicaldoc/core/security/dao/HibernateTenant*" />
+				  	<include name="com/logicaldoc/core/security/HibernateTenant*" />
 				  	<include name="com/logicaldoc/core/security/authentication/AuthenticationChain*" />
 				  </fileset>
 				</delete>

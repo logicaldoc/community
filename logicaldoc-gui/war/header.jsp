@@ -145,20 +145,19 @@ body {
        
         let windowContent = '<!DOCTYPE html> ';
         windowContent += '<html> ';
-        windowContent += '<head><title>' + title + '</title> ';
+    
+		    windowContent += '<head><title>' + title + '</title> ';
         windowContent += '\u003Cstyle> ';
         windowContent += '.cell, .cellDarkAltCol, .cellDark{white-space: nowrap;} ';
         windowContent += '.printHeader{white-space: nowrap; font-weight: bold; border:0px solid white;} ';
         windowContent += '\u003C/style> ';
-        
-        windowContent += "<link REL='STYLESHEET' HREF='<%=MODULE%>/sc/skins/<%=SKIN%>/style.css' TYPE='text/css' /> ";
 
         windowContent += "\u003Cscript type='text/javascript'> ";
         windowContent += "  function printPage(){document.getElementById('printPanel').style.display='none'; window.print(); window.close();} ";
         windowContent += "\u003C/script> ";
         
         windowContent += '</head> ';
-        
+    
         windowContent += '<body> ';
         
         windowContent += "<div id='printPanel' class='printPanel default'><ul><li><a href='javascript:printPage();' id='printButton'> ";

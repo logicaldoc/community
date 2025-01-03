@@ -9,7 +9,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ImageStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Img;
-import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 
@@ -19,10 +18,10 @@ import com.smartgwt.client.widgets.form.fields.StaticTextItem;
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.1.1
- *
  */
-public class QRLightbox extends Window {
+public class QRLightbox extends DelayedRedrawWindow {
 	private static final String QRCODE = "qrcode";
+
 	private static final int QR_SIZE = 150;
 
 	public QRLightbox(String content) {
@@ -70,6 +69,8 @@ public class QRLightbox extends Window {
 				form.setTitleOrientation(TitleOrientation.LEFT);
 				form.setItems(qr1Item, qr2Item);
 				addItem(form);
+
+				delayedRedraw();
 			});
 		} else {
 			// We are accessing from the declared server.url so just display the

@@ -6,9 +6,14 @@ import java.util.Map;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.HeaderControl;
-import com.smartgwt.client.widgets.Window;
 
-public abstract class StickyWindow extends Window {
+/**
+ * A Window that remembers its dimensions
+ * 
+ * @author Marco Meschieri - LogicalDOC
+ * @since 8.8
+ */
+public abstract class StickyWindow extends DelayedRedrawWindow {
 
 	/**
 	 * The key is a class name while the value is it's descriptor
@@ -70,7 +75,7 @@ public abstract class StickyWindow extends Window {
 	}
 
 	protected void restoreCurrentStatus() {
-		if(mustCenter())
+		if (mustCenter())
 			centerInPage();
 		WindowStatus status = getWindowStatus();
 		if (status != null) {
