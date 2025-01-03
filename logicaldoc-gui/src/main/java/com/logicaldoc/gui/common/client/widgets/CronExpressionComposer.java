@@ -633,4 +633,29 @@ public class CronExpressionComposer extends Window {
 			vm.getItem(EXPRESSION).setValue("0 " + m + " " + h + DEFAULT_CRON_END_EXPRESSION);
 		}
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((sourceItem == null) ? 0 : sourceItem.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CronExpressionComposer other = (CronExpressionComposer) obj;
+		if (sourceItem == null) {
+			if (other.sourceItem != null)
+				return false;
+		} else if (!sourceItem.equals(other.sourceItem))
+			return false;
+		return true;
+	}
 }

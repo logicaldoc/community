@@ -56,7 +56,7 @@ public class GUIExtensibleObject implements Serializable {
 	}
 
 	public List<String> getAttributeNames() {
-		return attributes.stream().map(att -> att.getName()).collect(Collectors.toList());
+		return attributes.stream().map(att -> att.getName()).collect(Collectors.toUnmodifiableList());
 	}
 
 	public void setAttributes(List<GUIAttribute> attributes) {

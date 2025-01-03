@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
@@ -306,43 +305,38 @@ public class LastChangesReport extends AdminPanel {
 	 * @return an array of select items
 	 */
 	public SelectItem[] getEventTypes() {
-		List<SelectItem> items = new ArrayList<>();
-		return items.toArray(new SelectItem[0]);
+		return new ArrayList<>().toArray(new SelectItem[0]);
 	}
 
-	@SuppressWarnings("unchecked")
 	private void onSearch() {
 		histories.setData();
-
-		final Map<String, Object> values = vm.getValues();
-
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
-		List<String> eventValues = getEvents(values);
+		List<String> eventValues = getEvents();
 
-		Long userId = getUserId(values);
+		Long userId = getUserId();
 
 		Date fromValue = null;
-		if (values.get(FROM_DATE) != null)
-			fromValue = (Date) values.get(FROM_DATE);
+		if (vm.getValue(FROM_DATE) != null)
+			fromValue = (Date) vm.getValue(FROM_DATE);
 		Date tillValue = null;
-		if (values.get(TILL_DATE) != null)
-			tillValue = (Date) values.get(TILL_DATE);
+		if (vm.getValue(TILL_DATE) != null)
+			tillValue = (Date) vm.getValue(TILL_DATE);
 
 		String sid = null;
-		if (values.get("sid") != null)
-			sid = (String) values.get("sid");
+		if (vm.getValue("sid") != null)
+			sid = vm.getValueAsString("sid");
 
-		int displayMaxValue = getDisplayMax(values);
+		int displayMaxValue = getDisplayMax();
 
 		doSearch(eventValues, userId, fromValue, tillValue, sid, displayMaxValue);
 	}
 
-	private List<String> getEvents(final Map<String, Object> values) {
+	private List<String> getEvents() {
 		String[] eventValues = new String[0];
-		if (values.get(EVENT) != null) {
-			String buf = values.get(EVENT).toString().trim().toLowerCase();
+		if (vm.getValue(EVENT) != null) {
+			String buf = vm.getValueAsString(EVENT).trim().toLowerCase();
 			buf = buf.replace('[', ' ');
 			buf = buf.replace(']', ' ');
 			buf = buf.replace(" ", "");
@@ -351,24 +345,24 @@ public class LastChangesReport extends AdminPanel {
 		return Arrays.asList(eventValues);
 	}
 
-	private Long getUserId(final Map<String, Object> values) {
+	private Long getUserId() {
 		Long userId = null;
-		if (values.get("user") != null) {
-			if (values.get("user") instanceof Long longVal)
+		if (vm.getValue("user") != null) {
+			if (vm.getValue("user") instanceof Long longVal)
 				userId = longVal;
 			else
-				userId = Long.parseLong(values.get("user").toString());
+				userId = Long.parseLong(vm.getValueAsString("user"));
 		}
 		return userId;
 	}
 
-	private int getDisplayMax(final Map<String, Object> values) {
+	private int getDisplayMax() {
 		int displayMaxValue = 0;
-		if (values.get(DISPLAYMAX) != null) {
-			if (values.get(DISPLAYMAX) instanceof Integer intVal)
+		if (vm.getValue(DISPLAYMAX) != null) {
+			if (vm.getValue(DISPLAYMAX) instanceof Integer intVal)
 				displayMaxValue = intVal;
 			else
-				displayMaxValue = Integer.parseInt((String) values.get(DISPLAYMAX));
+				displayMaxValue = Integer.parseInt(vm.getValueAsString(DISPLAYMAX));
 		}
 		return displayMaxValue;
 	}

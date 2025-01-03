@@ -186,4 +186,26 @@ public class Avatar extends HLayout {
 			});
 		}
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + (int) (userId ^ (userId >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Avatar other = (Avatar) obj;
+		if (userId != other.userId)
+			return false;
+		return true;
+	}
 }

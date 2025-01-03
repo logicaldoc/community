@@ -2026,7 +2026,7 @@ public class ItemFactory {
 	private static void appendAutomationEditorIcon(FormItem item, ChangedHandler handler, boolean withHtmlEditor) {
 		FormItemIcon editAutomation = new FormItemIcon();
 		editAutomation.setName("editautomation");
-		editAutomation.setSrc("[SKIN]/java.png");
+		editAutomation.setSrc("[SKIN]/java.svg");
 		editAutomation.setPrompt(I18N.message("openautomationeditor"));
 		editAutomation.addFormItemClickHandler(click -> new AutomationItemEditor(item, handler).show());
 

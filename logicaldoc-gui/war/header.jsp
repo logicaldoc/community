@@ -127,7 +127,6 @@ body {
 
 <link href="./fontawesome/css/all.min.css" rel="stylesheet">
 
-<link REL="STYLESHEET" HREF="<%=MODULE%>/sc/skins/<%=SKIN%>/style.css" TYPE="text/css" />
 <link id="favicon" rel="shortcut icon" type="image/png" href='' />
 <script type="text/javascript">		
 	// Determine what skin file to load

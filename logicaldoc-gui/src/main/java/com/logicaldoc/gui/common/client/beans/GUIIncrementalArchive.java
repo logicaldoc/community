@@ -84,7 +84,7 @@ public class GUIIncrementalArchive implements Serializable {
 	}
 
 	public List<Long> getTemplateIds() {
-		return templates.stream().map(t -> t.getId()).collect(Collectors.toList());
+		return templates.stream().map(t -> t.getId()).collect(Collectors.toUnmodifiableList());
 	}
 
 	public Long getAosManagerId() {
