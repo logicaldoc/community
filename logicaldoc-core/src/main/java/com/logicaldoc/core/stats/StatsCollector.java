@@ -820,6 +820,7 @@ public class StatsCollector extends Task {
 		case Date dateVal -> gen.setDate1(dateVal);
 		case String stringVal -> gen.setString1(stringVal);
 		case Integer intVal -> gen.setInteger1(intVal.longValue());
+		case Long longVal -> gen.setInteger1(longVal);
 		default -> gen.setInteger1(null);
 		}
 
