@@ -112,6 +112,11 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 	public static final int NATURE_DOC = 0;
 
 	private String comment;
+	
+	/**
+	 * The text of the last note put on the document
+	 */
+	private String lastNote;
 
 	private long fileSize = 0;
 
@@ -1080,6 +1085,14 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 
 	public void setDocAttrs(int docAttrs) {
 		this.docAttrs = docAttrs;
+	}
+
+	public String getLastNote() {
+		return lastNote;
+	}
+
+	public void setLastNote(String lastNote) {
+		this.lastNote = lastNote;
 	}
 
 	@Override

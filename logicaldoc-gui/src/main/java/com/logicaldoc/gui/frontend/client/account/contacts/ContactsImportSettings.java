@@ -3,11 +3,10 @@ package com.logicaldoc.gui.frontend.client.account.contacts;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.beans.GUIParseContactsParameters;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.ContactService;
@@ -171,11 +170,11 @@ public class ContactsImportSettings extends Window {
 		if (form.validate()) {
 			LD.contactingServer();
 			try {
-				ContactService.Instance.get().parseContacts(true, getParseContactsParameters(), new AsyncCallback<>() {
+				ContactService.Instance.get().parseContacts(true, getParseContactsParameters(), new GUIAsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
+						super.onFailure(caught);
 						LD.clearPrompt();
 					}
 

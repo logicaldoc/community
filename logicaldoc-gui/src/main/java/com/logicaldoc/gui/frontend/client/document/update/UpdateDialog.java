@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.ServerValidationException;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
@@ -90,24 +91,14 @@ public class UpdateDialog extends StickyWindow {
 
 		if (ids == null || ids.isEmpty()) {
 			FolderService.Instance.get().getFolder(metadata.getFolder().getId(), false, false, false,
-					new AsyncCallback<GUIFolder>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					new GUIAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIFolder folder) {
 							onDraw(folder.getAllowedPermissions());
 						}
 					});
 		} else {
-			DocumentService.Instance.get().getAllowedPermissions(ids, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			DocumentService.Instance.get().getAllowedPermissions(ids, new GUIAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIAccessControlEntry permissions) {
 					onDraw(permissions);
@@ -123,14 +114,14 @@ public class UpdateDialog extends StickyWindow {
 			if (!bulkPanel.validate())
 				return;
 
-			DocumentService.Instance.get().validate(metadata, new AsyncCallback<>() {
+			DocumentService.Instance.get().validate(metadata, new GUIAsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
 					if (caught instanceof ServerValidationException validationException)
 						bulkPanel.extendedPropertiesPanel.handleErrors(validationException);
 					else
-						GuiLog.serverError(caught);
+						super.onFailure(caught);
 				}
 
 				@Override

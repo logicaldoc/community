@@ -1,11 +1,10 @@
 package com.logicaldoc.gui.frontend.client.dashboard.dashlet;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.BookmarksDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
@@ -66,12 +65,7 @@ public class BookmarkDashlet extends Dashlet {
 			event.cancel();
 			Record rec = event.getRecord();
 			DocumentService.Instance.get().getById(Long.parseLong(rec.getAttributeAsString(docIdAttribute)),
-					new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					new GUIAsyncCallback<>() {
 
 						@Override
 						public void onSuccess(GUIDocument document) {

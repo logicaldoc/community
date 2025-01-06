@@ -1438,15 +1438,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		while (st.hasMoreTokens()) {
 			String name = st.nextToken();
-
-			Map<String, Object> params = new HashMap<>();
-			params.put("folderId", folder.getId());
-			params.put("name", name);
-			params.put("tenantId", folder.getTenantId());
-
-			long child = findIdsByWhere(
-					"_entity.parentId = :folderId and _entity.name = :name and _entity.tenantId = :tenantId", params,
-					null, null).stream().findFirst().orElse(0L);
+			long child = queryForLong(
+					"select ld_id from ld_folder where ld_deleted=0 and ld_parentid = :folderId and ld_name = :name and ld_tenantid = :tenantId",
+					Map.of("folderId", folder.getId(), "name", name, "tenantId", folder.getTenantId()));
 
 			if (child == 0L) {
 				Folder folderVO = new Folder();

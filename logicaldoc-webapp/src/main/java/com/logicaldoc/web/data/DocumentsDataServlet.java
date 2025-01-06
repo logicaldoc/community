@@ -195,13 +195,18 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
 		writer.print("<rating>" + (document.getRating() != null ? document.getRating() : "0") + "</rating>");
 		writer.print("<fileVersion><![CDATA[" + document.getFileVersion() + "]]></fileVersion>");
-		writer.print(
-				"<comment><![CDATA[" + (document.getComment() != null ? document.getComment() : "") + "]]></comment>");
-		writer.print("<workflowStatus><![CDATA["
-				+ (document.getWorkflowStatus() != null ? document.getWorkflowStatus() : "") + "]]></workflowStatus>");
-		writer.print("<workflowStatusDisplay><![CDATA["
-				+ (document.getWorkflowStatusDisplay() != null ? document.getWorkflowStatusDisplay() : "")
-				+ "]]></workflowStatusDisplay>");
+		
+		if (StringUtils.isNotEmpty(document.getComment()))
+			writer.print("<comment><![CDATA[" + document.getComment() + "]]></comment>");
+		
+		if (StringUtils.isNotEmpty(document.getLastNote()))
+			writer.print("<lastNote><![CDATA[" + document.getLastNote() + "]]></lastNote>");
+		
+		if (StringUtils.isNotEmpty(document.getWorkflowStatus()))
+			writer.print("<workflowStatus><![CDATA[" + document.getWorkflowStatus() + "]]></workflowStatus>");
+		if (StringUtils.isNotEmpty(document.getWorkflowStatusDisplay()))
+			writer.print("<workflowStatusDisplay><![CDATA[" + document.getWorkflowStatusDisplay()
+					+ "]]></workflowStatusDisplay>");
 
 		if (StringUtils.isNotEmpty(document.getColor()))
 			writer.print("<color><![CDATA[" + document.getColor() + "]]></color>");
@@ -371,7 +376,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		StringBuilder query = new StringBuilder("""
 select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.publisher, A.creation, A.creator, A.fileSize, A.immutable, A.indexed, A.lockUserId, A.fileName, A.status,
        A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus, A.startPublishing, A.stopPublishing, A.published, A.extResId, B.name, A.docRefType, A.stamped, A.lockUser,
-       A.password, A.pages, A.workflowStatusDisplay, A.language, A.links+A.docAttrs, A.tgs, A.creatorId, A.publisherId, A.color, A.folder.id, A.tenantId
+       A.password, A.pages, A.workflowStatusDisplay, A.language, A.links+A.docAttrs, A.tgs, A.creatorId, A.publisherId, A.color, A.folder.id, A.tenantId, A.lastNote
   from Document as A
   left outer join A.template as B
  where A.deleted = 0
@@ -461,6 +466,7 @@ select ld_docid
 			doc.setColor((String) cols[38]);
 			doc.setTenantId((Long) cols[40]);
 			doc.setIndexed((Integer) cols[12]);
+			
 
 			Folder f = new Folder();
 			f.setId((Long) cols[39]);
@@ -522,6 +528,7 @@ select ld_docid
 			doc.setRating((Integer) cols[18]);
 			doc.setFileVersion((String) cols[19]);
 			doc.setComment((String) cols[20]);
+			doc.setLastNote((String) cols[41]);
 			doc.setWorkflowStatus((String) cols[21]);
 			doc.setExtResId((String) cols[25]);
 			doc.setTemplateName((String) cols[26]);

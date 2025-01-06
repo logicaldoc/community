@@ -5,13 +5,13 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIReminder;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.google.GoogleApiAuthorization;
@@ -72,13 +72,13 @@ public class UserCalendarPanel extends VLayout {
 
 		if (Feature.enabled(Feature.GOOGLE_CALENDAR) && Menu.enabled(Menu.GOOGLE_CALENDAR)) {
 			toolStrip.addSeparator();
-			
+
 			ToolStripButton authorize = new ToolStripButton();
 			authorize.setTitle(I18N.message("authorize"));
 			authorize.setTooltip(I18N.message("authorizegooglecal"));
 			authorize.addClickHandler(click -> GoogleApiAuthorization.get().show());
 			toolStrip.addButton(authorize);
-			
+
 			ToolStripButton synchronize = new ToolStripButton();
 			synchronize.setTitle(I18N.message("synchronize"));
 			synchronize.setTooltip(I18N.message("synchronizegooglecal"));
@@ -89,28 +89,19 @@ public class UserCalendarPanel extends VLayout {
 			enableSynchronization.setTooltip(I18N.message("calendarenabledtip"));
 			toolStrip.addFormItem(enableSynchronization);
 
-			GoogleService.Instance.get().loadSettings(new AsyncCallback<List<String>>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+			GoogleService.Instance.get().loadSettings(new GUIAsyncCallback<List<String>>() {
 
 				@Override
 				public void onSuccess(List<String> settings) {
 					enableSynchronization.setValue("1".equals(settings.get(2)));
-					enableSynchronization.addChangedHandler(changed -> GoogleService.Instance.get().enableCalendar(enableSynchronization.getValueAsBoolean(), new AsyncCallback<Void>() {
+					enableSynchronization.addChangedHandler(changed -> GoogleService.Instance.get()
+							.enableCalendar(enableSynchronization.getValueAsBoolean(), new GUIAsyncCallback<Void>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(Void arg0) {
-							// Ignore
-						}
-					}));
+								@Override
+								public void onSuccess(Void arg0) {
+									// Ignore
+								}
+							}));
 				}
 			});
 		}

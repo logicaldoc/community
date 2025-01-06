@@ -409,7 +409,7 @@ public abstract class Task implements Runnable {
 	 * @return the report's body
 	 */
 	protected String prepareReport(Locale locale) {
-		return null;
+		return "";
 	}
 
 	/**

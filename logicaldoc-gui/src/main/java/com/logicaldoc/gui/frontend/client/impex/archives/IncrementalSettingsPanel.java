@@ -69,7 +69,7 @@ public class IncrementalSettingsPanel extends VLayout {
 		templates = ItemFactory.newTemplateSelector(false, null);
 		templates.addChangedHandler(changedHandler);
 		templates.setValues(incremental.getTemplateIds().stream().map(id -> Long.toString(id))
-				.collect(Collectors.toUnmodifiableList()).toArray(new String[0]));
+				.collect(Collectors.toList()).toArray(new String[0]));
 
 		form.setFields(prefix, frequency, folderSelector, templates);
 

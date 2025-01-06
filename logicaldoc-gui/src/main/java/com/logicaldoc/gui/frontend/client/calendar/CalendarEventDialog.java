@@ -9,6 +9,7 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -492,13 +493,7 @@ public class CalendarEventDialog extends Window {
 
 			long id = Long.parseLong(selection.getAttribute("id"));
 
-			DocumentService.Instance.get().getById(id, new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught.getMessage(), caught);
-				}
-
+			DocumentService.Instance.get().getById(id, new GUIAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIDocument doc) {
 					new PreviewPopup(doc).show();
@@ -904,12 +899,7 @@ public class CalendarEventDialog extends Window {
 	private void deleteEvent(Long id) {
 		LD.ask(I18N.message(DELEVENT), I18N.message("askalertcancelation"), answer -> {
 			LD.contactingServer();
-			CalendarService.Instance.get().deleteEvent(id, Boolean.TRUE.equals(answer), new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			CalendarService.Instance.get().deleteEvent(id, Boolean.TRUE.equals(answer), new GUIAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void arg) {
 					LD.clearPrompt();
@@ -959,7 +949,7 @@ public class CalendarEventDialog extends Window {
 		}
 		remindersGrid.addData(newRecord);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -13,7 +13,9 @@ import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
+import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.html.HTMLSanitizer;
 
 /**
  * Hibernate implementation of <code>DocumentNoteDAO</code>
@@ -44,11 +46,31 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 
 		super.store(note);
 
-		if (doc.getIndexed() == AbstractDocument.INDEX_INDEXED) {
-			documentDao.initialize(doc);
-			doc.setIndexed(AbstractDocument.INDEX_TO_INDEX);
-			documentDao.store(doc);
-		}
+		updateLastNote(doc, note);
+	}
+
+	private void updateLastNote(Document doccument, DocumentNote note) {
+		// In case of note on the whole document, update the document's lastNote field
+		if (note.getPage() == 0)
+			ThreadPools.get().execute(() -> {
+				try {
+					DocumentDAO dao = Context.get(DocumentDAO.class);
+					Document document = dao.findById(note.getDocId());
+					dao.initialize(document);
+
+					String lastNoteMessage = dao.queryForList(
+							"select ld_message from ld_note where ld_page=0 and ld_id=:id order by ld_date desc",
+							Map.of("id", note.getDocId()), String.class, null).stream().findFirst()
+							.orElse(note.getMessage());
+
+					document.setLastNote(HTMLSanitizer.sanitizeSimpleText(lastNoteMessage));
+					if (doccument.getIndexed() == AbstractDocument.INDEX_INDEXED)
+						doccument.setIndexed(AbstractDocument.INDEX_TO_INDEX);
+					dao.store(document);
+				} catch (PersistenceException e) {
+					log.error(e.getMessage(), e);
+				}
+			}, "Note");
 	}
 
 	@Override
@@ -77,7 +99,8 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	}
 
 	@Override
-	public List<DocumentNote> findByDocIdAndType(long docId, String fileVersion, String type) throws PersistenceException {
+	public List<DocumentNote> findByDocIdAndType(long docId, String fileVersion, String type)
+			throws PersistenceException {
 		return findByDocIdAndTypes(docId, fileVersion, StringUtils.isEmpty(type) ? null : Arrays.asList(type));
 	}
 
@@ -114,22 +137,22 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 		return findByWhere(ENTITY + ".userId =" + userId, "order by " + ENTITY + ".date desc", null);
 	}
 
-	private void markToIndex(long docId) throws PersistenceException {
-		DocumentDAO documentDao = Context.get(DocumentDAO.class);
-		Document doc = documentDao.findById(docId);
-		if (doc != null && doc.getIndexed() == AbstractDocument.INDEX_INDEXED) {
-			documentDao.initialize(doc);
-			doc.setIndexed(AbstractDocument.INDEX_TO_INDEX);
-			documentDao.store(doc);
-		}
-	}
 
 	@Override
 	public void delete(long id, int code) throws PersistenceException {
 		DocumentNote note = findById(id);
-		if (note != null)
-			markToIndex(note.getDocId());
-		super.delete(id, code);
+		if (note != null) {
+			super.delete(id, code);
+			DocumentDAO documentDao = Context.get(DocumentDAO.class);
+			Document document = documentDao.findById(note.getDocId());
+			if (document != null && document.getIndexed() == AbstractDocument.INDEX_INDEXED) {
+				// Mark to index
+				documentDao.initialize(document);
+				document.setIndexed(AbstractDocument.INDEX_TO_INDEX);
+				documentDao.store(document);
+				updateLastNote(document, note);
+			}
+		}
 	}
 
 	@Override

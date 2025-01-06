@@ -1,11 +1,10 @@
 package com.logicaldoc.gui.frontend.client.chatgpt;
 
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
@@ -155,12 +154,7 @@ public class ThreadWindow extends Window {
 		appendMessage("", CHATGPT);
 		answerPolling = null;
 
-		ChatGPTService.Instance.get().ask(question, new AsyncCallback<Void>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
+		ChatGPTService.Instance.get().ask(question, new GUIAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(Void result) {
@@ -175,12 +169,7 @@ public class ThreadWindow extends Window {
 		answerPolling = null;
 
 		ChatGPTService.Instance.get().startThread(question, DocumentController.get().getCurrentSelection(),
-				new AsyncCallback<Void>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				new GUIAsyncCallback<>() {
 
 					@Override
 					public void onSuccess(Void arg0) {
@@ -192,13 +181,7 @@ public class ThreadWindow extends Window {
 	private void collectAnswer() {
 		answerPolling = new Timer() {
 			public void run() {
-				ChatGPTService.Instance.get().getAnswer(new AsyncCallback<GUIValue>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				ChatGPTService.Instance.get().getAnswer(new GUIAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIValue answer) {
 						if (answer.getValue() != null) {

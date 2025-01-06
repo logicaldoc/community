@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.CookiesManager;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -14,7 +14,6 @@ import com.logicaldoc.gui.common.client.controllers.DocumentObserver;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.controllers.FolderObserver;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
@@ -147,14 +146,14 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	}
 
 	public void openInFolder(long docId) {
-		DocumentService.Instance.get().getById(docId, new AsyncCallback<>() {
+		DocumentService.Instance.get().getById(docId, new GUIAsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				/*
 				 * Sometimes we can have spurious errors using Firefox.
 				 */
 				if (Session.get().isDevel())
-					GuiLog.serverError(caught);
+					super.onFailure(caught);
 			}
 
 			@Override
@@ -177,14 +176,14 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	 *        list
 	 */
 	public void selectDocument(long docId, final boolean clearSelection) {
-		DocumentService.Instance.get().getById(docId, new AsyncCallback<>() {
+		DocumentService.Instance.get().getById(docId, new GUIAsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				/*
 				 * Sometimes we can have spurious errors using Firefox.
 				 */
 				if (Session.get().isDevel())
-					GuiLog.serverError(caught);
+					super.onFailure(caught);
 			}
 
 			@Override

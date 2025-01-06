@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIMessageTemplate;
@@ -67,13 +68,7 @@ public class EmailDialog extends AbstractEmailDialog {
 		messageTemplate.addChangedHandler(event -> {
 			if (messageTemplate.getValueAsString() != null && !"".equals(messageTemplate.getValueAsString())) {
 				MessageService.Instance.get().getTemplate(Long.parseLong(messageTemplate.getValueAsString()),
-						new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						new GUIAsyncCallback<>() {
 							@Override
 							public void onSuccess(GUIMessageTemplate t) {
 								subject.setValue(t.getSubject());
@@ -159,28 +154,27 @@ public class EmailDialog extends AbstractEmailDialog {
 	@Override
 	protected void onSubmit(GUIEmail mail) {
 		LD.contactingServer();
-		DocumentService.Instance.get().sendAsEmail(mail, Session.get().getUser().getLanguage(),
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
-						sendButton.enable();
-						destroy();
-					}
+		DocumentService.Instance.get().sendAsEmail(mail, Session.get().getUser().getLanguage(), new AsyncCallback<>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				LD.clearPrompt();
+				GuiLog.serverError(caught);
+				sendButton.enable();
+				destroy();
+			}
 
-					@Override
-					public void onSuccess(String result) {
-						LD.clearPrompt();
-						sendButton.enable();
-						if ("ok".equals(result)) {
-							GuiLog.info(I18N.message("messagesent") + ". " + I18N.message("documentcopysent"));
-						} else {
-							GuiLog.error(I18N.message("messagenotsent"), null, null);
-						}
-						destroy();
-					}
-				});
+			@Override
+			public void onSuccess(String result) {
+				LD.clearPrompt();
+				sendButton.enable();
+				if ("ok".equals(result)) {
+					GuiLog.info(I18N.message("messagesent") + ". " + I18N.message("documentcopysent"));
+				} else {
+					GuiLog.error(I18N.message("messagenotsent"), null, null);
+				}
+				destroy();
+			}
+		});
 	}
 
 	private String getMessageWithoutSignature() {

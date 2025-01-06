@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
@@ -56,12 +57,7 @@ public class EventsCalendar extends Calendar {
 
 		addEventClickHandler(event -> {
 			CalendarService.Instance.get().getEvent(event.getEvent().getAttributeAsLong("eventId"),
-					new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					new GUIAsyncCallback<>() {
 						@Override
 						public void onSuccess(final GUICalendarEvent ev) {
 							long organizerId = Long.parseLong(event.getEvent().getAttribute("organizerId"));

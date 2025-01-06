@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.account.certificate;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.controllers.UserController;
@@ -63,12 +64,7 @@ public class OwnCertificateDialog extends Window {
 		layout.addMember(submitButton);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new GUIAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(Void result) {
@@ -139,12 +135,7 @@ public class OwnCertificateDialog extends Window {
 					public void onSuccess(Void arg0) {
 						LD.clearPrompt();
 						cleanUploadFolder();
-						SecurityService.Instance.get().getUser(Session.get().getUser().getId(), new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						SecurityService.Instance.get().getUser(Session.get().getUser().getId(), new GUIAsyncCallback<>() {
 
 							@Override
 							public void onSuccess(GUIUser user) {

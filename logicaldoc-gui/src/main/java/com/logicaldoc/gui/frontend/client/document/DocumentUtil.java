@@ -2,10 +2,9 @@ package com.logicaldoc.gui.frontend.client.document;
 
 import java.util.Arrays;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.util.SC;
@@ -23,12 +22,7 @@ public interface DocumentUtil {
 	 */
 	public static void downloadDocumentResource(String docId, String url) {
 		DocumentService.Instance.get().getAllowedPermissions(Arrays.asList(Long.parseLong(docId)),
-				new AsyncCallback<GUIAccessControlEntry>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new GUIAsyncCallback<GUIAccessControlEntry>() {
 					@Override
 					public void onSuccess(GUIAccessControlEntry acl) {
 						if (acl.isDownload()) {

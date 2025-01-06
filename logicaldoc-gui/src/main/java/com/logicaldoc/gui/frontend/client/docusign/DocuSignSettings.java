@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.docusign;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocuSignSettings;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.frontend.client.services.DocuSignService;
@@ -37,12 +36,7 @@ public class DocuSignSettings extends Window {
 		setPadding(2);
 		setAutoSize(true);
 
-		DocuSignService.Instance.get().loadSettings(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
+		DocuSignService.Instance.get().loadSettings(new GUIAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(GUIDocuSignSettings settings) {
@@ -102,12 +96,7 @@ public class DocuSignSettings extends Window {
 		settings.setIntegrationKey(form.getValueAsString("integrationkey"));
 		settings.setSecretKey(form.getValueAsString("secretkey"));
 
-		DocuSignService.Instance.get().authorize(settings, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		DocuSignService.Instance.get().authorize(settings, new GUIAsyncCallback<>() {
 			@Override
 			public void onSuccess(String authorizationUrl) {
 				WindowUtils.openUrl(authorizationUrl, "_blank", null);

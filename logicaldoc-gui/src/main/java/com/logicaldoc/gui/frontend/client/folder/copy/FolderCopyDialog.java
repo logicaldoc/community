@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.folder.copy;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -121,13 +121,7 @@ public class FolderCopyDialog extends Dialog {
 	}
 
 	private void copySingleFolder(long selectedSourceId, final DynamicForm form, long tagetFolderId) {
-		FolderService.Instance.get().getFolder(selectedSourceId, false, false, false, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		FolderService.Instance.get().getFolder(selectedSourceId, false, false, false, new GUIAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIFolder sourceFolder) {
 				sourceFolder.setName(form.getValueAsString("name"));
@@ -155,14 +149,7 @@ public class FolderCopyDialog extends Dialog {
 
 		LD.contactingServer();
 		FolderService.Instance.get().copyFolders(FolderNavigator.get().getSelectedIds(), targetFolderId, foldersOnly,
-				securityOption, null, new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
-					}
-
+				securityOption, null, new GUIAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void ret) {
 						LD.clearPrompt();

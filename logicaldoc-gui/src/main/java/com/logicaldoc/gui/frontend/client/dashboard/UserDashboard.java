@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.dashboard;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -124,13 +124,7 @@ public class UserDashboard extends VLayout {
 				}
 
 		Session.get().getUser().setDashlets(dashlets);
-		DashletService.Instance.get().saveUserDashlets(dashlets, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		DashletService.Instance.get().saveUserDashlets(dashlets, new GUIAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void ret) {
 				GuiLog.info(I18N.message("settingssaved"), null);

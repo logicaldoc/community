@@ -1,11 +1,10 @@
 package com.logicaldoc.gui.frontend.client.document;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIBookmark;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.BookmarksDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -79,16 +78,10 @@ public class BookmarksPanel extends VLayout {
 		list.addCellContextClickHandler(event -> {
 			final ListGridRecord rec = list.getSelectedRecord();
 			FolderService.Instance.get().getFolder(Long.parseLong(rec.getAttributeAsString("folderId")), false, false,
-					false, new AsyncCallback<>() {
-
+					false, new GUIAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIFolder folder) {
 							showContextMenu(folder, rec.getAttributeAsString("type").equals("0"));
-						}
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
 						}
 					});
 			event.cancel();
@@ -129,17 +122,13 @@ public class BookmarksPanel extends VLayout {
 
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 				if (Boolean.TRUE.equals(answer)) {
-					DocumentService.Instance.get().deleteBookmarks(GridUtil.getIds(selection), new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(Void result) {
-							list.removeSelectedData();
-						}
-					});
+					DocumentService.Instance.get().deleteBookmarks(GridUtil.getIds(selection),
+							new GUIAsyncCallback<>() {
+								@Override
+								public void onSuccess(Void result) {
+									list.removeSelectedData();
+								}
+							});
 				}
 			});
 		});

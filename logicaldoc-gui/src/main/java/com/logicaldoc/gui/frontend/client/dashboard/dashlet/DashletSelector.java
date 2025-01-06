@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.dashboard.dashlet;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.DashletService;
 import com.smartgwt.client.types.HeaderControls;
@@ -60,11 +59,7 @@ public class DashletSelector extends Window {
 				for (int row = 0; row < portlets[column].length; row++)
 					size[column] += portlets[column][row].length;
 
-			DashletService.Instance.get().get(form.getValueAsString("dashlet"), new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+			DashletService.Instance.get().get(form.getValueAsString("dashlet"), new GUIAsyncCallback<>() {
 
 				@Override
 				public void onSuccess(GUIDashlet guiDashlet) {

@@ -2,7 +2,7 @@ package com.logicaldoc.gui.common.client.util;
 
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -33,11 +33,7 @@ public class SecurityUtil {
 		if (docIds == null || docIds.isEmpty())
 			return;
 
-		DocumentService.Instance.get().getAllowedPermissions(docIds, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
+		DocumentService.Instance.get().getAllowedPermissions(docIds, new GUIAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(GUIAccessControlEntry grantedPermissions) {

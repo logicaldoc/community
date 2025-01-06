@@ -251,8 +251,13 @@ public class EventEndpoint implements EventListener {
 		try {
 			peer.getBasicRemote().sendText(serializedMessage);
 		} catch (Exception e) {
-			log.error("Error sending websocket message {} to peer {}", event, peer.getRequestURI());
-			log.error(e.getMessage(), e);
+			if (e.getMessage().contains("WebSocket session has been closed")) {
+				log.debug("Cannot send websocket message {} to peer {} because WebSocket session has been closed",
+						event, peer.getRequestURI());
+			} else {
+				log.error("Error sending websocket message {} to peer {}", event, peer.getRequestURI());
+				log.error(e.getMessage(), e);
+			}
 		}
 	}
 

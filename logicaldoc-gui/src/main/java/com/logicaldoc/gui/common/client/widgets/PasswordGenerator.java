@@ -1,8 +1,7 @@
 package com.logicaldoc.gui.common.client.widgets;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Window;
@@ -64,10 +63,10 @@ public class PasswordGenerator extends Window {
 	protected void onSubmit() {
 		submit.setDisabled(true);
 		if (pwdSize == null)
-			SecurityService.Instance.get().generatePassword(new AsyncCallback<>() {
+			SecurityService.Instance.get().generatePassword(new GUIAsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
+					super.onFailure(caught);
 					submit.setDisabled(false);
 				}
 
@@ -79,10 +78,10 @@ public class PasswordGenerator extends Window {
 			});
 		else
 			SecurityService.Instance.get().generatePassword2(pwdSize, pwdUpperCase, pwdLowerCase, pwdDigit, pwdSpecial,
-					pwdSequence, pwdOccurrence, new AsyncCallback<>() {
+					pwdSequence, pwdOccurrence, new GUIAsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
+							super.onFailure(caught);
 							submit.setDisabled(false);
 						}
 

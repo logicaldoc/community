@@ -73,7 +73,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		docDao = (DocumentDAO) context.getBean("DocumentDAO");
+		docDao = Context.get(DocumentDAO.class);
 		verDao = (VersionDAO) context.getBean("VersionDAO");
 		userDao = (UserDAO) context.getBean("UserDAO");
 		folderDao = (FolderDAO) context.getBean("FolderDAO");

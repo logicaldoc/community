@@ -17,7 +17,8 @@
 		<property name="tenantId" type="long" column="ld_tenantid" not-null="true" />
 		<property name="docId" type="long" column="ld_documentid" not-null="true" />
 		<property name="immutable" type="int" column="ld_immutable" not-null="true" />
-		<property name="customId" type="string" column="ld_customid" length="700" />
+		<property name="customId" type="string" column="ld_customid"  />
+		<property name="lastNote" type="string" column="ld_lastnote" />
 		<property name="version" type="string" column="ld_version" length="10" />
 		<property name="fileVersion" type="string" column="ld_fileversion" length="10" />
 		<property name="date" type="timestamp" column="ld_date" />
@@ -48,7 +49,7 @@
 		<property name="username" type="string" column="ld_username" length="255" />
 		<property name="userId" type="long" column="ld_userid" />
 		<property name="versionDate" type="timestamp" column="ld_versiondate" />
-		<property name="comment" type="string" column="ld_comment" length="1000" />
+		<property name="comment" type="string" column="ld_comment"  />
 		<property name="event" type="string" column="ld_event" length="255" />
 		<property name="exportStatus" type="int" column="ld_exportstatus" not-null="true" />
 		<property name="exportId" type="long" column="ld_exportid" />

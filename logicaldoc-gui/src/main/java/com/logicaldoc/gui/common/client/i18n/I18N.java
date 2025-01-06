@@ -44,15 +44,14 @@ public class I18N {
 	public static String messageWithDefault(String key, String def) {
 		if (bundle.containsKey(key))
 			return bundle.get(key);
+		else if (key != null && bundle.containsKey(key.toLowerCase()))
+			return bundle.get(key.toLowerCase());
 		else
 			return def;
 	}
 
 	public static String message(String key) {
-		if (bundle.containsKey(key))
-			return bundle.get(key);
-		else
-			return key;
+		return messageWithDefault(key, key);
 	}
 
 	public static String message(String key, String val) {

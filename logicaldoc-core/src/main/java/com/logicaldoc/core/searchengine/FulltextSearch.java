@@ -110,6 +110,7 @@ public class FulltextSearch extends Search {
 			hit.setLanguage(rs.getString(36));
 			hit.setPages(rs.getInt(37));
 			hit.setColor(rs.getString(38));
+			hit.setLastNote(rs.getString(39));
 
 			return hit;
 		}
@@ -197,7 +198,7 @@ public class FulltextSearch extends Search {
 		richQuery.append(
 				" FOLD.ld_name, A.ld_folderid, A.ld_tgs tags, A.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
 		richQuery.append(
-				" A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp, A.ld_language, A.ld_pages, A.ld_color ");
+				" A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp, A.ld_language, A.ld_pages, A.ld_color, A.ld_lastnote ");
 		richQuery.append(" from ld_document A ");
 		richQuery.append(" join ld_folder FOLD on A.ld_folderid=FOLD.ld_id ");
 		richQuery.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
@@ -227,7 +228,7 @@ public class FulltextSearch extends Search {
 			richQuery.append(
 					" FOLD.ld_name, A.ld_folderid, A.ld_tgs tags, REF.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
 			richQuery.append(
-					" REF.ld_stamped, REF.ld_password, REF.ld_workflowstatusdisp, REF.ld_language, REF.ld_pages, A.ld_color ");
+					" REF.ld_stamped, REF.ld_password, REF.ld_workflowstatusdisp, REF.ld_language, REF.ld_pages, A.ld_color, A.ld_lastnote ");
 			richQuery.append(" from ld_document A  ");
 			richQuery.append(" join ld_folder FOLD on A.ld_folderid=FOLD.ld_id ");
 			richQuery.append(" join ld_document REF on A.ld_docref=REF.ld_id ");

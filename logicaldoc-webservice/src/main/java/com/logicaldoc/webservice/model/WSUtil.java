@@ -53,6 +53,7 @@ public class WSUtil {
 			wsDoc.setCustomId(document.getCustomId());
 			wsDoc.setLanguage(document.getLanguage());
 			wsDoc.setComment(document.getComment());
+			wsDoc.setLastNote(document.getLastNote());
 			wsDoc.setWorkflowStatus(document.getWorkflowStatus());
 			wsDoc.setWorkflowStatusDisplay(document.getWorkflowStatusDisplay());
 			wsDoc.setColor(document.getColor());

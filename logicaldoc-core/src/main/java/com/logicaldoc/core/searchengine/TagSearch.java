@@ -59,7 +59,7 @@ public class TagSearch extends Search {
 		query.append(" A.ld_rating, A.ld_fileversion, A.ld_comment, A.ld_workflowstatus, A.ld_startpublishing, ");
 		query.append(" A.ld_stoppublishing, A.ld_published, ");
 		query.append(" B.ld_name, A.ld_folderid, A.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
-		query.append(" A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp, A.ld_language, A.ld_pages, A.ld_color ");
+		query.append(" A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp, A.ld_language, A.ld_pages, A.ld_color, A.ld_lastnote ");
 		query.append(" from ld_document A ");
 		query.append(" join ld_folder B on A.ld_folderid=B.ld_id ");
 		query.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
@@ -77,7 +77,7 @@ public class TagSearch extends Search {
 		query.append(" A.ld_stoppublishing, A.ld_published, ");
 		query.append(" B.ld_name, A.ld_folderid, REF.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
 		query.append(
-				" REF.ld_stamped, REF.ld_password, REF.ld_workflowstatusdisp, REF.ld_language, REF.ld_pages, A.ld_color ");
+				" REF.ld_stamped, REF.ld_password, REF.ld_workflowstatusdisp, REF.ld_language, REF.ld_pages, A.ld_color, A.ld_lastnote ");
 		query.append(" from ld_document A ");
 		query.append(" join ld_folder B on A.ld_folderid=B.ld_id ");
 		query.append(" join ld_document REF on A.ld_docref=REF.ld_id ");
@@ -207,6 +207,7 @@ public class TagSearch extends Search {
 			hit.setLanguage(rs.getString(35));
 			hit.setPages(rs.getInt(36));
 			hit.setColor(rs.getString(37));
+			hit.setLastNote(rs.getString(38));
 
 			return hit;
 		}

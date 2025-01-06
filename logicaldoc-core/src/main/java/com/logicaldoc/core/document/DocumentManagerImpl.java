@@ -1059,6 +1059,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	private void copyNotes(Document sourceDocument, Document createdDocument) throws PersistenceException {
 		List<DocumentNote> docNotes = documentNoteDAO.findByDocId(sourceDocument.getId(),
 				sourceDocument.getFileVersion());
+		docNotes.sort((o1, o2) -> o1.getDate().compareTo(o2.getDate()));
 		for (DocumentNote docNote : docNotes) {
 			DocumentNote newNote = new DocumentNote(docNote);
 			newNote.setDocId(createdDocument.getId());

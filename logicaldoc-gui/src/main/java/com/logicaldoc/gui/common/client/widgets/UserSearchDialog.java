@@ -3,10 +3,9 @@ package com.logicaldoc.gui.common.client.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -92,11 +91,11 @@ public class UserSearchDialog extends Window {
 	}
 
 	protected void search(String username, String groupId) {
-		SecurityService.Instance.get().searchUsers(username, groupId, new AsyncCallback<>() {
+		SecurityService.Instance.get().searchUsers(username, groupId, new GUIAsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				LD.clearPrompt();
-				GuiLog.serverError(caught);
+				super.onFailure(caught);
 			}
 
 			@Override

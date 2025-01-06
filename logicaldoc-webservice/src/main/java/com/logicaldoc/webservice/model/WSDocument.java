@@ -163,6 +163,9 @@ public class WSDocument implements Serializable {
 
 	@WSDoc(required = false)
 	private String comment;
+	
+	@WSDoc(required = false)
+	private String lastNote;
 
 	@WSDoc(required = false)
 	private String lastModified;
@@ -662,5 +665,13 @@ public class WSDocument implements Serializable {
 
 	public void setColor(String color) {
 		this.color = color;
+	}
+
+	public String getLastNote() {
+		return lastNote;
+	}
+
+	public void setLastNote(String lastNote) {
+		this.lastNote = lastNote;
 	}
 }

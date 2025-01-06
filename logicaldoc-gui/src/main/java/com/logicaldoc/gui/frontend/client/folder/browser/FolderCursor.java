@@ -3,12 +3,11 @@ package com.logicaldoc.gui.frontend.client.folder.browser;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.controllers.FolderObserver;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
 import com.logicaldoc.gui.frontend.client.folder.FolderPagination;
@@ -180,13 +179,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 		if (currentPagination.getTotalPages() < 2
 				&& currentPagination.getPageSize() == Session.get().getConfigAsInt(GUI_FOLDER_MAXCHILDREN))
 			FolderService.Instance.get().setFolderPagination(currentPagination.getFolderId(), null, null,
-					new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					new GUIAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void arg) {
 							// Nothing to do
@@ -194,13 +187,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 					});
 		else
 			FolderService.Instance.get().setFolderPagination(currentPagination.getFolderId(),
-					currentPagination.getStartRow(), currentPagination.getPageSize(), new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					currentPagination.getStartRow(), currentPagination.getPageSize(), new GUIAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void arg) {
 							// Nothing to do

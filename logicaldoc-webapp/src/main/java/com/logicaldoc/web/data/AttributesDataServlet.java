@@ -72,6 +72,7 @@ public class AttributesDataServlet extends AbstractDataServlet {
 			printAttibute("creator", I18N.message("creator", locale), writer);
 			printAttibute("publisher", I18N.message("publisher", locale), writer);
 			printAttibute("comment", I18N.message("comment", locale), writer);
+			printAttibute("lastNote", I18N.message("lastnote", locale), writer);
 			printAttibute("template", I18N.message("template", locale), writer);
 			printAttibute("tags", I18N.message("tags", locale), writer);
 			printAttibute("workflowStatus", I18N.message("workflowstatus", locale), writer);

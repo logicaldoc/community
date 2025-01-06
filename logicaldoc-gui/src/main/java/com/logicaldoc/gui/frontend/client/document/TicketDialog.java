@@ -4,11 +4,10 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.AdvancedCriteria;
@@ -141,7 +140,7 @@ public class TicketDialog extends Window {
 		Integer expireHours = null;
 		if (form.getValue(DUEDATENUMBER) != null)
 			expireHours = Integer.parseInt(form.getValueAsString(DUEDATENUMBER));
-		if (expireHours!=null && "day".equals(form.getValueAsString("duedatetime")))
+		if (expireHours != null && "day".equals(form.getValueAsString("duedatetime")))
 			expireHours = expireHours * 24;
 
 		if (date == null && (expireHours == null || expireHours.intValue() < 1))
@@ -159,11 +158,11 @@ public class TicketDialog extends Window {
 
 		DocumentService.Instance.get().createDownloadTicket(document.getId(),
 				Integer.parseInt(form.getValueAsString(ACTION)), suffix, expireHours, date, maxDownloads, maxViews,
-				new AsyncCallback<>() {
+				new GUIAsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
+						super.onFailure(caught);
 						destroy();
 					}
 

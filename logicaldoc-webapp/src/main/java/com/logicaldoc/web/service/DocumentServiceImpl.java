@@ -830,6 +830,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		guiDocument.setLockUserId(realDoc.getLockUserId());
 		guiDocument.setLockUser(realDoc.getLockUser());
 		guiDocument.setComment(realDoc.getComment());
+		guiDocument.setLastNote(realDoc.getLastNote());
 		guiDocument.setStatus(realDoc.getStatus());
 		guiDocument.setWorkflowStatus(realDoc.getWorkflowStatus());
 		guiDocument.setWorkflowStatusDisplay(realDoc.getWorkflowStatusDisplay());

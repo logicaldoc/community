@@ -5,11 +5,10 @@ import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.FoldersDS;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.grid.FolderListGridField;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
@@ -98,12 +97,7 @@ public class FolderTree extends TreeGrid {
 
 			addCellClickHandler(event ->
 
-			FolderService.Instance.get().getFolder(getSelectedFolderId(), false, false, true, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			FolderService.Instance.get().getFolder(getSelectedFolderId(), false, false, true, new GUIAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIFolder folder) {
 					cursor.onFolderSelected(folder);
@@ -270,13 +264,7 @@ public class FolderTree extends TreeGrid {
 	 */
 	public void selectFolder(final long folderId) {
 		FolderService.Instance.get().getFolder(folderId, false, false, Session.get().isFolderPagination(),
-				new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new GUIAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIFolder result) {
 						if (result != null) {

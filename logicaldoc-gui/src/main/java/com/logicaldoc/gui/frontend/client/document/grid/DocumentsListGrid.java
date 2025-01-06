@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -16,7 +16,6 @@ import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.controllers.DocumentObserver;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
@@ -50,7 +49,6 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
-import com.smartgwt.client.widgets.events.KeyPressEvent;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellClickEvent;
@@ -68,6 +66,8 @@ import com.smartgwt.client.widgets.grid.events.SelectionEvent;
  * @since 6.5
  */
 public class DocumentsListGrid extends RefreshableListGrid implements DocumentsGrid, DocumentObserver {
+
+	private static final String LAST_NOTE = "lastNote";
 
 	private static final String GROUP_FIELD_NAME = "group:[{fieldName:";
 
@@ -156,9 +156,9 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		addCellClickHandler(this::onCellClick);
 
 		addDataArrivedHandler(this::onDataArrived);
-		
+
 		addSelectionChangedHandler(selection -> DocumentController.get().setCurrentSelection(getSelectedDocuments()));
-		
+
 		DocumentController.get().addObserver(this);
 	}
 
@@ -189,12 +189,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			long id = Long.parseLong(getSelectedRecord().getAttribute("id"));
 			String ratingImageName = getSelectedRecord().getAttribute(RATING);
 			final int docRating = Integer.parseInt(ratingImageName.replace(RATING, ""));
-			DocumentService.Instance.get().getRating(id, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			DocumentService.Instance.get().getRating(id, new GUIAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIRating rating) {
 					if (rating != null) {
@@ -324,6 +319,12 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		comment.setCanSort(true);
 		fieldsMap.put(comment.getName(), comment);
 
+		ListGridField lastNote = new ColoredListGridField(LAST_NOTE, 300);
+		lastNote.setHidden(true);
+		lastNote.setCanFilter(true);
+		lastNote.setCanSort(true);
+		fieldsMap.put(lastNote.getName(), lastNote);
+
 		ListGridField tags = new ColoredListGridField("tags", 200);
 		tags.setHidden(true);
 		tags.setCanFilter(true);
@@ -362,7 +363,6 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		 * when filters are activated and the user selects a record so we do not
 		 * put the thumbnail image cell
 		 */
-
 		ListGridField folderId = new ColoredListGridField("folderId", 80);
 		folderId.setHidden(true);
 		folderId.setCanSort(false);
@@ -383,7 +383,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		ListGridField score = new ColoredListGridField("score", 120);
 		score.setCanFilter(false);
 		score.setHidden(true);
-		score.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
+		score.setCellFormatter((value, rec, rowNum, colNum) -> {
 			try {
 				int scoreValue = rec.getAttributeAsInt("score");
 				int red = 100 - scoreValue > 0 ? 100 - scoreValue : 0;
@@ -398,7 +398,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 		addExtendedAttributesFields();
 
-		addKeyPressHandler((KeyPressEvent keyPress) -> {
+		addKeyPressHandler(keyPress -> {
 			if (keyPress.isCtrlKeyDown()) {
 				List<GUIDocument> selection = getSelectedDocuments();
 				if ("C".equalsIgnoreCase(keyPress.getKeyName())) {
@@ -502,6 +502,10 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		if (!fields.contains(fieldsMap.get(COMMENT))) {
 			fieldsMap.get(COMMENT).setHidden(true);
 			fields.add(fieldsMap.get(COMMENT));
+		}
+		if (!fields.contains(fieldsMap.get(LAST_NOTE))) {
+			fieldsMap.get(LAST_NOTE).setHidden(true);
+			fields.add(fieldsMap.get(LAST_NOTE));
 		}
 		if (!fields.contains(fieldsMap.get(WORKFLOW_STATUS))) {
 			fieldsMap.get(WORKFLOW_STATUS).setHidden(true);

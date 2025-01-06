@@ -3,8 +3,8 @@ package com.logicaldoc.gui.frontend.client.document;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -72,7 +72,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 	private static final String SECURITY = "security";
 
 	private static final String WRITE = "write";
-	
+
 	private static final String CUSTOMID = "customid";
 
 	private static final String DOWNLOAD = "download";
@@ -122,7 +122,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		ListGridField read = new ListGridField("read", prepareHeaderLabel("read"));
 		read.setType(ListGridFieldType.BOOLEAN);
 		read.setCanEdit(true);
-		
+
 		ListGridField preview = new ListGridField(PREVIEW, prepareHeaderLabel(PREVIEW));
 		preview.setType(ListGridFieldType.BOOLEAN);
 		preview.setCanEdit(true);
@@ -138,7 +138,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		ListGridField write = new ListGridField(WRITE, prepareHeaderLabel(WRITE));
 		write.setType(ListGridFieldType.BOOLEAN);
 		write.setCanEdit(true);
-		
+
 		ListGridField customid = new ListGridField(CUSTOMID, prepareHeaderLabel(CUSTOMID));
 		customid.setType(ListGridFieldType.BOOLEAN);
 		customid.setCanEdit(true);
@@ -413,7 +413,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 			GUIAccessControlEntry ace = new GUIAccessControlEntry();
 			ace.setName(rec.getAttributeAsString(ENTITY));
 			ace.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
-			
+
 			ace.setRead(rec.getAttributeAsBoolean("read"));
 			ace.setPreview(rec.getAttributeAsBoolean(PREVIEW));
 			ace.setPrint(rec.getAttributeAsBoolean(PRINT));
@@ -483,13 +483,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 	public void onSave() {
 		validate();
 
-		DocumentService.Instance.get().saveACL(document, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		DocumentService.Instance.get().saveACL(document, new GUIAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void result) {
 				GuiLog.info(I18N.message("appliedrightsondoc"), null);
@@ -500,12 +494,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 
 	public void onCopyParentFolderSecurity() {
 		FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new GUIAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIFolder folder) {
 						document.setAccessControlList(folder.getAccessControlList());
@@ -521,7 +510,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		else
 			return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

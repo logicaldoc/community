@@ -325,6 +325,7 @@ public class DashletContent extends HttpServlet {
 					case Integer integer -> writer.print(Integer.toString(integer));
 					case Long longVal -> writer.print(Long.toString(longVal));
 					case Double doubleVal -> writer.print(Double.toString(doubleVal));
+					case String str -> writer.print(str);
 					default -> throw new IllegalArgumentException("Unexpected value: " + val);
 				}
 				writer.print("</ext_" + name + ">");

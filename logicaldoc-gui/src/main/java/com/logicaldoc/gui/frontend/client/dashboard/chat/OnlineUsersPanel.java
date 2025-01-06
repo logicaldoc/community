@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.controllers.UserController;
@@ -50,7 +50,7 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 				Session.get().getConfigAsBoolean("gui.avatar.showingrids"));
 		user.setShowTitle(false);
 		user.setWidth("100%");
-		
+
 		ListGridField username = new ListGridField(USERNAME, I18N.message(USERNAME));
 		username.setShowTitle(false);
 		username.setWidth(80);
@@ -180,12 +180,7 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 					for (int i = 0; i < selection.length; i++)
 						users.add(selection[i].getAttributeAsString(USERNAME));
 
-					ChatService.Instance.get().invite(users, answer, new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					ChatService.Instance.get().invite(users, answer, new GUIAsyncCallback<>() {
 
 						@Override
 						public void onSuccess(Void arg) {

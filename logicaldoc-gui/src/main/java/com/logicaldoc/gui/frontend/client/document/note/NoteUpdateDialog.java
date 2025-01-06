@@ -1,8 +1,9 @@
 package com.logicaldoc.gui.frontend.client.document.note;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.NoteChangeListener;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -26,9 +27,9 @@ public class NoteUpdateDialog extends Window {
 
 	private long noteId;
 
-	private String fileVersion;
+	private String noteMessage;
 
-	private RichTextItem message;
+	private String fileVersion;
 
 	private long docId;
 
@@ -36,31 +37,37 @@ public class NoteUpdateDialog extends Window {
 
 	private NoteChangeListener saveHandler;
 
+	private RichTextItem message;
+
 	public NoteUpdateDialog(final long docId, final long noteId, String fileVersion, String noteMessage,
 			final NoteChangeListener saveHandler) {
 		super();
 		this.saveHandler = saveHandler;
 		this.noteId = noteId;
+		this.noteMessage = noteMessage;
 		this.docId = docId;
 		this.fileVersion = fileVersion;
 
-		HeaderControl maximize = new HeaderControl(HeaderControl.MAXIMIZE, event -> maximize());
-
-		HeaderControl minimize = new HeaderControl(HeaderControl.MINIMIZE, event -> resetDimensions());
-
 		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, event -> NoteUpdateDialog.this.destroy());
 
-		setHeaderControls(HeaderControls.HEADER_LABEL, maximize, minimize, closeIcon);
+		setHeaderControls(HeaderControls.HEADER_LABEL, closeIcon);
 		setTitle(I18N.message("note"));
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
-		resetDimensions();
+		setAutoSize(true);
+		centerInPage();
 
-		initGUI(noteMessage);
+		addResizedHandler(resized -> {
+			if (getWidth() > 600)
+				message.setWidth(getWidth() - 10);
+			else
+				message.setWidth(590);
+		});
 	}
 
-	private void initGUI(String noteMessage) {
+	@Override
+	protected void onDraw() {
 		if (noteForm != null)
 			removeItem(noteForm);
 
@@ -96,12 +103,12 @@ public class NoteUpdateDialog extends Window {
 		if (!noteForm.validate())
 			return;
 
-		DocumentService.Instance.get().updateNote(docId, noteId, fileVersion, message.getValue().toString(),
-				new AsyncCallback<>() {
+		DocumentService.Instance.get().updateNote(docId, noteId, fileVersion, noteForm.getValueAsString("message"),
+				new GUIAsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
+						super.onFailure(caught);
 						destroy();
 					}
 
@@ -110,12 +117,14 @@ public class NoteUpdateDialog extends Window {
 						if (saveHandler != null)
 							saveHandler.onChanged();
 						destroy();
+						DocumentService.Instance.get().getById(docId, new GUIAsyncCallback<GUIDocument>() {
+
+							@Override
+							public void onSuccess(GUIDocument result) {
+								DocumentController.get().modified(result);
+							}
+						});
 					}
 				});
-	}
-
-	private void resetDimensions() {
-		setAutoSize(true);
-		centerInPage();
 	}
 }

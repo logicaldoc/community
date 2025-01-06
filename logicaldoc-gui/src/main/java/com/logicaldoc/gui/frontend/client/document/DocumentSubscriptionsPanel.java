@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.SubscriptionsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -104,13 +105,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 				return;
 			long groupId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
 			AuditService.Instance.get().subscribeDocuments(Arrays.asList(document.getId()),
-					Constants.getAuditDefaultEvents(), null, groupId, new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					Constants.getAuditDefaultEvents(), null, groupId, new GUIAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void arg0) {
 							refreshList();

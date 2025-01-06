@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.data.DevicesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -58,12 +59,7 @@ public class TrustedDevices extends com.smartgwt.client.widgets.Window {
 		label.setCanEdit(true);
 		label.addCellSavedHandler(
 				event -> SecurityService.Instance.get().updateDeviceLabel(event.getRecord().getAttributeAsLong("id"),
-						event.getNewValue() != null ? event.getNewValue().toString() : null, new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						event.getNewValue() != null ? event.getNewValue().toString() : null, new GUIAsyncCallback<>() {
 
 							@Override
 							public void onSuccess(Void arg) {

@@ -3,11 +3,10 @@ package com.logicaldoc.gui.frontend.client.dashboard.tag;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUITag;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.search.TagsForm;
@@ -81,11 +80,7 @@ public class MostUsedTagsPortlet extends Portlet {
 	}
 
 	private void refresh() {
-		TagService.Instance.get().getTagCloud(new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
+		TagService.Instance.get().getTagCloud(new GUIAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(List<GUITag> cloud) {

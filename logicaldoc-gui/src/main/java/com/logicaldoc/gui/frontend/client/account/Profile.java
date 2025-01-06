@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.account;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
@@ -236,7 +236,7 @@ public class Profile extends Window {
 		CheckboxItem evalForm = ItemFactory.newCheckbox("evalformenabled");
 		evalForm.setValue(user.isEvalFormEnabled());
 		evalForm.setVisible(Menu.enabled(Menu.PRODUCT_EVALUATION));
-		
+
 		final DynamicForm guiForm = new DynamicForm();
 		guiForm.setHeight100();
 		guiForm.setValuesManager(vm);
@@ -356,11 +356,7 @@ public class Profile extends Window {
 			searches.add(rec.getAttributeAsString("search"));
 		u.setSearchPref(searches.toString().replace("[", "").replace("]", "").replace(" ", ""));
 
-		SecurityService.Instance.get().saveProfile(u, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
+		SecurityService.Instance.get().saveProfile(u, new GUIAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(GUIUser ret) {

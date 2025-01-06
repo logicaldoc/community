@@ -2813,8 +2813,8 @@ public class ItemFactory {
 		item.setRequiredMessage(I18N.message(FIELDREQUIRED));
 		item.setShowTitle(false);
 		item.setRequired(true);
-		item.setWidth("*");
 		item.setHeight(300);
+		item.setWidth(590);
 
 		addNoteValidator(item);
 		return item;

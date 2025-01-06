@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -91,12 +92,7 @@ public class DocumentDashlet extends Dashlet {
 			event.cancel();
 			Record rec = event.getRecord();
 			DocumentService.Instance.get().getById(Long.parseLong(rec.getAttributeAsString(docIdAttribute)),
-					new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
+					new GUIAsyncCallback<>() {
 
 						@Override
 						public void onSuccess(GUIDocument document) {
@@ -173,12 +169,7 @@ public class DocumentDashlet extends Dashlet {
 			MenuItem unlock = new MenuItem();
 			unlock.setTitle(I18N.message("unlock"));
 			unlock.addClickHandler(event -> DocumentService.Instance.get().unlock(Arrays.asList(document.getId()),
-					new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					new GUIAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void result) {
 							Session.get().getUser().setLockedDocs(Session.get().getUser().getLockedDocs() - 1);

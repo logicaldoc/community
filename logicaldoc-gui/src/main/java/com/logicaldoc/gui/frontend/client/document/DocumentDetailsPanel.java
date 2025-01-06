@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.ServerValidationException;
 import com.logicaldoc.gui.common.client.Session;
@@ -244,13 +245,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		// This 'if condition' is necessary to know if the close image
 		// has been selected into the Documents list panel or into the
 		// Search list panel.
-		DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		DocumentService.Instance.get().getById(document.getId(), new GUIAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIDocument doc) {
 				DocumentController.get().selected(doc);

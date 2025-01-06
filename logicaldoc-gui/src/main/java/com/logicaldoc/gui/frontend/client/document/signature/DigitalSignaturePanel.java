@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.document.signature;
 import java.util.Arrays;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -110,11 +111,11 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 			} else {
 				LD.contactingServer();
 				SignService.Instance.get().signDocuments(Arrays.asList(document.getId()), form.getValueAsString(REASON),
-						1, null, null, null, new AsyncCallback<>() {
+						1, null, null, null, new GUIAsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								LD.clearPrompt();
-								GuiLog.serverError(caught);
+								super.onFailure(caught);
 							}
 
 							@Override
@@ -135,13 +136,7 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 		container.addMember(list);
 		container.addMember(form);
 
-		SignService.Instance.get().isVisualSignatureEnabled(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SignService.Instance.get().isVisualSignatureEnabled(new GUIAsyncCallback<>() {
 			@Override
 			public void onSuccess(Boolean enabled) {
 				visualPositioning.setDisabled(!enabled);

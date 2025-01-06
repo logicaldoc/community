@@ -2,12 +2,11 @@ package com.logicaldoc.gui.frontend.client.document;
 
 import java.util.LinkedHashMap;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -64,13 +63,7 @@ public class ConversionDialog extends Window {
 		convert.addClickHandler(event -> onConvert());
 
 		FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
-				new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new GUIAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIFolder folder) {
 						convert.setDisabled(!folder.isDownload() && !folder.isWrite());
@@ -98,12 +91,12 @@ public class ConversionDialog extends Window {
 		LD.contactingServer();
 		if ("save".equals(form.getValueAsString(ACTION))) {
 			DocumentService.Instance.get().convert(document.getId(), document.getFileVersion(), format,
-					new AsyncCallback<>() {
+					new GUIAsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
 							LD.clearPrompt();
-							GuiLog.serverError(caught);
+							super.onFailure(caught);
 						}
 
 						@Override

@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.document;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -9,7 +9,6 @@ import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
 import com.logicaldoc.gui.common.client.data.DocumentsDSParameters;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.grid.ContextMenu;
@@ -89,8 +88,7 @@ public class DocumentsListPanel extends VLayout {
 					doc.setDocRef(doc.getId());
 					doc.setId(aliasId);
 				}
-				PreviewPopup iv = new PreviewPopup(doc);
-				iv.show();
+				new PreviewPopup(doc).show();
 			}
 			event.cancel();
 		});
@@ -98,19 +96,14 @@ public class DocumentsListPanel extends VLayout {
 		registerSelectionHandler();
 
 		documentsGrid.registerCellContextClickHandler(click -> {
-			DocumentService.Instance.get().getAllowedPermissions(documentsGrid.getSelectedIds(), new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
-				@Override
-				public void onSuccess(GUIAccessControlEntry enabledPermissions) {
-					new ContextMenu(FolderController.get().getCurrentFolder(), documentsGrid, enabledPermissions)
-							.showContextMenu();
-				}
-			});
+			DocumentService.Instance.get().getAllowedPermissions(documentsGrid.getSelectedIds(),
+					new GUIAsyncCallback<>() {
+						@Override
+						public void onSuccess(GUIAccessControlEntry enabledPermissions) {
+							new ContextMenu(FolderController.get().getCurrentFolder(), documentsGrid,
+									enabledPermissions).showContextMenu();
+						}
+					});
 			if (click != null)
 				click.cancel();
 		});
@@ -122,12 +115,7 @@ public class DocumentsListPanel extends VLayout {
 			if (documentsGrid.getSelectedCount() != 1)
 				return;
 			GUIDocument selectedDocument = documentsGrid.getSelectedDocument();
-			DocumentService.Instance.get().getById(selectedDocument.getId(), new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			DocumentService.Instance.get().getById(selectedDocument.getId(), new GUIAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIDocument doc) {
 					DocumentController.get().setCurrentDocument(doc);

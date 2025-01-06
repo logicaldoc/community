@@ -3,8 +3,8 @@ package com.logicaldoc.gui.common.client.widgets.preview;
 import java.util.List;
 
 import com.google.gwt.http.client.URL;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -91,7 +91,7 @@ public class PreviewPanel extends VLayout {
 				&& ReadingRequestController.get().isReadingConfirmRequired(document.getId())) {
 			showConfirmReadingPanel();
 		}
-		
+
 		addResizedHandler(event -> doResize());
 	}
 
@@ -100,11 +100,7 @@ public class PreviewPanel extends VLayout {
 
 		ReadingRequestService.Instance.get().confirmReadings(
 				ReadingRequestController.get().getUnconfirmedReadingIds(document.getId()), document.getVersion(),
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				new GUIAsyncCallback<>() {
 
 					@Override
 					public void onSuccess(Void v) {
@@ -124,12 +120,7 @@ public class PreviewPanel extends VLayout {
 		} else if (Util.isEmailFile(document.getFileName().toLowerCase())) {
 			reloadMail();
 		} else if (Util.isDICOMFile(document.getFileName().toLowerCase())) {
-			DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+			DocumentService.Instance.get().getById(document.getId(), new GUIAsyncCallback<>() {
 
 				@Override
 				public void onSuccess(GUIDocument doc) {
@@ -209,11 +200,7 @@ public class PreviewPanel extends VLayout {
 	 * Reloads a mail preview
 	 */
 	protected void reloadMail() {
-		DocumentService.Instance.get().extractEmail(docId, document.getFileVersion(), new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
+		DocumentService.Instance.get().extractEmail(docId, document.getFileVersion(), new GUIAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(final GUIEmail email) {

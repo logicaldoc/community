@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
@@ -267,12 +268,7 @@ public class VersionsPanel extends DocumentDetailTab {
 				I18N.message("delversionwarn") + ".\n " + I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
 						DocumentService.Instance.get().deleteVersions(GridUtil.getIds(selection),
-								new AsyncCallback<>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
-
+								new GUIAsyncCallback<>() {
 									@Override
 									public void onSuccess(GUIDocument result) {
 										if (result != null) {
@@ -297,14 +293,7 @@ public class VersionsPanel extends DocumentDetailTab {
 					if (Boolean.TRUE.equals(yes)) {
 						LD.contactingServer();
 						DocumentService.Instance.get().promoteVersion(document.getId(),
-								selection[0].getAttributeAsString(VERSION), new AsyncCallback<>() {
-
-									@Override
-									public void onFailure(Throwable caught) {
-										LD.clearPrompt();
-										GuiLog.serverError(caught);
-									}
-
+								selection[0].getAttributeAsString(VERSION), new GUIAsyncCallback<>() {
 									@Override
 									public void onSuccess(GUIDocument document) {
 										LD.clearPrompt();
@@ -322,12 +311,7 @@ public class VersionsPanel extends DocumentDetailTab {
 		compareContent.setTitle(I18N.message("comparecontent"));
 		compareContent.addClickHandler(compareContentEvent -> DocumentService.Instance.get().getVersionsById(
 				Long.parseLong(selection[0].getAttribute("id")), Long.parseLong(selection[1].getAttribute("id")),
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new GUIAsyncCallback<>() {
 					@Override
 					public void onSuccess(List<GUIVersion> versions) {
 						new ComparisonWindow(versions.get(0), versions.get(1)).show();
@@ -341,12 +325,7 @@ public class VersionsPanel extends DocumentDetailTab {
 		compareMetadata.setTitle(I18N.message("comparemetadata"));
 		compareMetadata.addClickHandler(compareMetadataEvent -> DocumentService.Instance.get().getVersionsById(
 				Long.parseLong(selection[0].getAttribute("id")), Long.parseLong(selection[1].getAttribute("id")),
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new GUIAsyncCallback<>() {
 					@Override
 					public void onSuccess(List<GUIVersion> result) {
 						new MetadataDiff(result.get(0), result.get(1)).show();

@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.InputValues;
 import com.logicaldoc.gui.common.client.ServerValidationError;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
@@ -17,7 +17,6 @@ import com.logicaldoc.gui.common.client.beans.GUIExtensibleObject;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.data.Criteria;
@@ -233,11 +232,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 			return;
 		}
 
-		TemplateService.Instance.get().getAttributes(templateId, extensibleObject, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
+		TemplateService.Instance.get().getAttributes(templateId, extensibleObject, new GUIAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(List<GUIAttribute> templateAttributes) {

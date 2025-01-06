@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.dropbox;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -64,13 +65,7 @@ public class DropboxAuthorization extends Window {
 
 	@Override
 	protected void onDraw() {
-		DropboxService.Instance.get().loadSettings(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		DropboxService.Instance.get().loadSettings(new GUIAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<String> settings) {
 				apiKey.setValue(settings.get(0));
@@ -81,22 +76,11 @@ public class DropboxAuthorization extends Window {
 
 	public void onAuthenticate() {
 		DropboxService.Instance.get().saveSettings(form.getValueAsString(CONSTANT_B), form.getValueAsString(CONSTANT_A),
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new GUIAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void consentUrl) {
 						hide();
-						DropboxService.Instance.get().startAuthorization(new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						DropboxService.Instance.get().startAuthorization(new GUIAsyncCallback<>() {
 							@Override
 							public void onSuccess(String authorizationUrl) {
 								new DropboxAccessTokenWizard(authorizationUrl).show();
@@ -109,7 +93,7 @@ public class DropboxAuthorization extends Window {
 	public static DropboxAuthorization get() {
 		return instance;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof DropboxAuthorization)

@@ -16,8 +16,9 @@
 		<property name="deleted" type="int" column="ld_deleted" not-null="true" />
         <property name="tenantId" type="long" column="ld_tenantid" not-null="true" />
 		<property name="immutable" type="int" column="ld_immutable" not-null="true" />
-		<property name="customId" type="string" column="ld_customid" length="700" />
-		<property name="comment" type="string" column="ld_comment" length="1000" />
+		<property name="customId" type="string" column="ld_customid" />
+		<property name="comment" type="string" column="ld_comment"  />
+		<property name="lastNote" type="string" column="ld_lastnote" />
 		<property name="version" type="string" column="ld_version" length="10" />
 		<property name="fileVersion" type="string" column="ld_fileversion" length="10" />
 		<property name="date" type="timestamp" column="ld_date" />

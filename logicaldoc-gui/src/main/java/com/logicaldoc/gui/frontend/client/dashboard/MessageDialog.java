@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -213,11 +214,7 @@ public class MessageDialog extends Window {
 		groupSelector.setMultiple(false);
 		groupSelector.addChangedHandler(event -> {
 			String groupId = groupSelector.getSelectedRecord().getAttributeAsString("id");
-			SecurityService.Instance.get().searchUsers(null, groupId, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
+			SecurityService.Instance.get().searchUsers(null, groupId, new GUIAsyncCallback<>() {
 
 				@Override
 				public void onSuccess(List<GUIUser> users) {

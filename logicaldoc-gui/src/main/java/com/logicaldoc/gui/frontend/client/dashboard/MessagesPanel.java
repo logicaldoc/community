@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.dashboard;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
@@ -8,7 +8,6 @@ import com.logicaldoc.gui.common.client.controllers.UserController;
 import com.logicaldoc.gui.common.client.controllers.UserObserver;
 import com.logicaldoc.gui.common.client.data.MessagesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -120,12 +119,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 			final Record rec = grid.getSelectedRecord();
 			if (rec != null)
 				MessageService.Instance.get().getMessage(Long.parseLong(rec.getAttributeAsString("id")), true,
-						new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						new GUIAsyncCallback<>() {
 
 							@Override
 							public void onSuccess(GUIMessage message) {
@@ -181,12 +175,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				MessageService.Instance.get().delete(GridUtil.getIds(selection), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				MessageService.Instance.get().delete(GridUtil.getIds(selection), new GUIAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						grid.removeSelectedData();

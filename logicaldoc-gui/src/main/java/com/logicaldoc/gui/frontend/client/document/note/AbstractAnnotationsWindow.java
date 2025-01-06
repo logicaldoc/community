@@ -7,11 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ImageDrawingPane;
@@ -100,13 +99,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 		setShowModalMask(true);
 		centerInPage();
 
-		DocumentService.Instance.get().getNotes(document.getId(), fileVersion, types, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		DocumentService.Instance.get().getNotes(document.getId(), fileVersion, types, new GUIAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUIDocumentNote> nts) {
 				notes.addAll(nts);
@@ -183,12 +176,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 	 */
 	protected void onSave() {
 		captureNotesPosition();
-		DocumentService.Instance.get().saveNotes(document.getId(), fileVersion, notes, types, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		DocumentService.Instance.get().saveNotes(document.getId(), fileVersion, notes, types, new GUIAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg) {
 				onNotesSaved();
@@ -275,13 +263,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 		pageDrawingPane = new ImageDrawingPane(getPageUrl(page), imageElements -> {
 			// Reload the document to update the pages count
 			if (document.getPreviewPages() <= 1)
-				DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				DocumentService.Instance.get().getById(document.getId(), new GUIAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIDocument dc) {
 						document.setPages(dc.getPreviewPages());

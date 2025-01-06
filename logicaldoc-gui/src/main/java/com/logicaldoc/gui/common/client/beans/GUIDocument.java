@@ -81,6 +81,8 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	private String comment;
 
+	private String lastNote;
+
 	private String workflowStatus;
 
 	private String workflowStatusDisplay;
@@ -651,6 +653,14 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	public boolean isRename() {
 		return allowedPermissions.isRename();
+	}
+
+	public String getLastNote() {
+		return lastNote;
+	}
+
+	public void setLastNote(String lastNote) {
+		this.lastNote = lastNote;
 	}
 
 	public boolean hasPermission(String permission) {

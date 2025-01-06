@@ -257,6 +257,7 @@ public class DocumentGridUtil {
 			rec.setAttribute("fileVersion", doc.getFileVersion());
 			rec.setAttribute("version", doc.getVersion());
 			rec.setAttribute(COMMENT, doc.getComment());
+			rec.setAttribute("lastNote", doc.getLastNote());
 			rec.setAttribute(WORKFLOW_STATUS, doc.getWorkflowStatus());
 			rec.setAttribute(WORKFLOW_STATUS_DISPLAY, doc.getWorkflowStatusDisplay());
 			rec.setAttribute("color", doc.getColor());

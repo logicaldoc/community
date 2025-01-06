@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.InfoService;
@@ -536,12 +537,7 @@ public class CronExpressionComposer extends Window {
 		}
 
 		InfoService.Instance.get().getCronDescription("" + vm.getItem(EXPRESSION).getValue(), I18N.getLocale(),
-				new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				new GUIAsyncCallback<>() {
 
 					@Override
 					public void onSuccess(String description) {

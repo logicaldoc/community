@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIReadingRequest;
@@ -123,12 +123,7 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 		readingsGrid.setSelectionType(SelectionStyle.SINGLE);
 		readingsGrid.setFields(id, date, icon, fileName, confirmed, fileVersion, recipient, requestor, message);
 		readingsGrid.addSelectionChangedHandler(event -> DocumentService.Instance.get()
-				.getById(event.getSelectedRecord().getAttributeAsLong(DOC_ID), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.getById(event.getSelectedRecord().getAttributeAsLong(DOC_ID), new GUIAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIDocument document) {
 						previewPanel.setDocument(document);
@@ -180,27 +175,20 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
-		preview.addClickHandler(event -> DocumentService.Instance.get().getById(selectedDocId, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
+		preview.addClickHandler(
+				event -> DocumentService.Instance.get().getById(selectedDocId, new GUIAsyncCallback<>() {
 
-			@Override
-			public void onSuccess(GUIDocument document) {
-				new PreviewPopup(document).show();
-			}
-		}));
+					@Override
+					public void onSuccess(GUIDocument document) {
+						new PreviewPopup(document).show();
+					}
+				}));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
 			if (Boolean.TRUE.equals(value)) {
-				ReadingRequestService.Instance.get().delete(selectedReadingId, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				ReadingRequestService.Instance.get().delete(selectedReadingId, new GUIAsyncCallback<>() {
 
 					@Override
 					public void onSuccess(Void result) {
@@ -213,11 +201,7 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 		MenuItem invite = new MenuItem();
 		invite.setTitle(I18N.message("inviteandremind"));
 		invite.addClickHandler(event -> ReadingRequestService.Instance.get().notityReadingRequest(selectedReadingId,
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				new GUIAsyncCallback<>() {
 
 					@Override
 					public void onSuccess(Void arg) {

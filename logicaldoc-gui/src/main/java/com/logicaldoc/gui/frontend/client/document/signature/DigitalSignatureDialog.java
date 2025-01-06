@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.document.signature;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -87,13 +88,7 @@ public class DigitalSignatureDialog extends Window {
 
 		addItem(layout);
 
-		SignService.Instance.get().isVisualSignatureEnabled(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SignService.Instance.get().isVisualSignatureEnabled(new GUIAsyncCallback<>() {
 			@Override
 			public void onSuccess(Boolean enabled) {
 				visualPositioning.setDisabled(!enabled);

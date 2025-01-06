@@ -2,7 +2,7 @@ package com.logicaldoc.gui.common.client.widgets;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -56,12 +56,7 @@ public class DropSpotPopup extends Window {
 
 	public static void openDropSpot() {
 		// Just to clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				// Nothing to do
-			}
+		DocumentService.Instance.get().cleanUploadedFileFolder(new GUIAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(Void result) {
@@ -78,7 +73,7 @@ public class DropSpotPopup extends Window {
 	public void close() {
 		try {
 			FolderNavigator.get().reload();
-		}catch(Exception e) {
+		} catch (Exception e) {
 			// Do nothing
 		}
 		destroy();

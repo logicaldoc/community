@@ -80,7 +80,7 @@ public class ReadingRequestController {
 	public List<Long> getUnconfirmedReadingIds(long docId) {
 		List<Long> readingIds = new ArrayList<>();
 		if (isReadingConfirmRequired(docId)) {
-			readingIds = unconfirmedReadings.get(docId).stream().map(r -> r.getId()).collect(Collectors.toUnmodifiableList());
+			readingIds = unconfirmedReadings.get(docId).stream().map(r -> r.getId()).collect(Collectors.toList());
 		}
 		return readingIds;
 	}

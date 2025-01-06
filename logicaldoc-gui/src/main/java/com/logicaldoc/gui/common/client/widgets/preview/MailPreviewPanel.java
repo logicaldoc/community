@@ -3,12 +3,11 @@ package com.logicaldoc.gui.common.client.widgets.preview;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
@@ -45,7 +44,7 @@ public class MailPreviewPanel extends VLayout {
 
 		this.mail = mail;
 		this.document = document;
-		
+
 		/**
 		 * Prepare the form that contains the email data
 		 */
@@ -254,12 +253,7 @@ public class MailPreviewPanel extends VLayout {
 		MenuItem copy = new MenuItem();
 		copy.setTitle(I18N.message("copy"));
 		copy.addClickHandler(event -> DocumentService.Instance.get().saveEmailAttachment(doc.getId(),
-				doc.getFileVersion(), attachment.getFileName(), new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				doc.getFileVersion(), attachment.getFileName(), new GUIAsyncCallback<>() {
 
 					@Override
 					public void onSuccess(GUIDocument doc) {

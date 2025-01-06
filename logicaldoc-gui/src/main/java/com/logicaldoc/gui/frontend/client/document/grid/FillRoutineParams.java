@@ -2,10 +2,9 @@ package com.logicaldoc.gui.frontend.client.document.grid;
 
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.ExtendedPropertiesPanel;
 import com.logicaldoc.gui.frontend.client.services.AutomationService;
 import com.smartgwt.client.types.HeaderControls;
@@ -58,13 +57,7 @@ public class FillRoutineParams extends Window {
 		if (!propertiesPanel.validate())
 			return;
 
-		AutomationService.Instance.get().execute(routine, docIds, folderIds, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		AutomationService.Instance.get().execute(routine, docIds, folderIds, new GUIAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg0) {
 				destroy();

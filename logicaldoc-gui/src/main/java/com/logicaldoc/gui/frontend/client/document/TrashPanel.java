@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.data.GarbageDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -97,13 +98,7 @@ public class TrashPanel extends VLayout {
 
 	private void restoreDocument(final long id) {
 		DocumentService.Instance.get().restore(Arrays.asList(id), FolderController.get().getCurrentFolder().getId(),
-				new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new GUIAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void ret) {
 						list.removeSelectedData();
@@ -118,13 +113,7 @@ public class TrashPanel extends VLayout {
 
 	private void restoreFolder(final long id) {
 		FolderService.Instance.get().restore(Arrays.asList(id), FolderController.get().getCurrentFolder().getId(),
-				new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new GUIAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void ret) {
 						list.removeSelectedData();
@@ -167,13 +156,7 @@ public class TrashPanel extends VLayout {
 		emptyTrash.addClickHandler(
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmemptytrash"), (Boolean response) -> {
 					if (Boolean.TRUE.equals(response)) {
-						DocumentService.Instance.get().emptyTrash(new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						DocumentService.Instance.get().emptyTrash(new GUIAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void arg) {
 								refresh();
@@ -204,26 +187,14 @@ public class TrashPanel extends VLayout {
 		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean response) -> {
 			if (Boolean.TRUE.equals(response)) {
 				if (!docIds.isEmpty())
-					DocumentService.Instance.get().deleteFromTrash(docIds, new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					DocumentService.Instance.get().deleteFromTrash(docIds, new GUIAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void arg) {
 							refresh();
 						}
 					});
 				if (!folderIds.isEmpty())
-					FolderService.Instance.get().deleteFromTrash(folderIds, new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					FolderService.Instance.get().deleteFromTrash(folderIds, new GUIAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void arg) {
 							refresh();

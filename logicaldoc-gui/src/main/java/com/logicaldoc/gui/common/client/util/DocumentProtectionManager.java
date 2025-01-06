@@ -3,12 +3,11 @@ package com.logicaldoc.gui.common.client.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.util.SC;
 
@@ -38,11 +37,7 @@ public class DocumentProtectionManager {
 	 *        gets unlocked
 	 */
 	public static void askForPassword(final Long docId, final DocumentProtectionHandler handler) {
-		DocumentService.Instance.get().getById(docId, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
+		DocumentService.Instance.get().getById(docId, new GUIAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(final GUIDocument result) {
@@ -75,13 +70,7 @@ public class DocumentProtectionManager {
 
 	private static void unsetPassword(final Long docId, final DocumentProtectionHandler handler,
 			final GUIDocument result, final String password) {
-		DocumentService.Instance.get().unsetPassword(result.getId(), password, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		DocumentService.Instance.get().unsetPassword(result.getId(), password, new GUIAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void res) {
 				saveProtectionPasswordAndNotify(docId, handler, result, password);
@@ -91,13 +80,7 @@ public class DocumentProtectionManager {
 
 	private static void unprotect(final Long docId, final DocumentProtectionHandler handler, final GUIDocument result,
 			final String password) {
-		DocumentService.Instance.get().unprotect(result.getId(), password, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		DocumentService.Instance.get().unprotect(result.getId(), password, new GUIAsyncCallback<>() {
 			@Override
 			public void onSuccess(Boolean granted) {
 				if (Boolean.TRUE.equals(granted)) {
