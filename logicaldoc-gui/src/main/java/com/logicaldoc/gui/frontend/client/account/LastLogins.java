@@ -106,4 +106,9 @@ public class LastLogins extends com.smartgwt.client.widgets.Window {
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

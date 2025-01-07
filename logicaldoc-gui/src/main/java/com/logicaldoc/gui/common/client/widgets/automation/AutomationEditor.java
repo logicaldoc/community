@@ -93,4 +93,9 @@ public class AutomationEditor extends VStack {
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

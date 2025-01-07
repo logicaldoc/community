@@ -123,4 +123,9 @@ public class PasswordGenerator extends Window {
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

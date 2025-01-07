@@ -98,6 +98,11 @@ public class HtmlItemEditor extends Window {
 		return super.equals(other);
 	}
 
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+	
 	/**
 	 * Saves the actual item content in a global Javascript variable that can be
 	 * accessed by the HTML editor

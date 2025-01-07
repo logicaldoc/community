@@ -67,4 +67,14 @@ public class ColoredListGridField extends ListGridField {
 	public void setColorFieldName(String colorFieldName) {
 		this.colorFieldName = colorFieldName;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

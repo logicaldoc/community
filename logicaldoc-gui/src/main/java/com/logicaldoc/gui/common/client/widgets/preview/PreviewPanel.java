@@ -3,8 +3,8 @@ package com.logicaldoc.gui.common.client.widgets.preview;
 import java.util.List;
 
 import com.google.gwt.http.client.URL;
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -417,7 +417,12 @@ public class PreviewPanel extends VLayout {
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+
 	/**
 	 * Declares the javascript function used to notify when the document has
 	 * been completely read
