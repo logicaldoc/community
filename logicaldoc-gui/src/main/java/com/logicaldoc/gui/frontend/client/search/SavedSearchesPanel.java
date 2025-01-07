@@ -5,11 +5,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.data.SavedSearchesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.ValuesCallback;
 import com.logicaldoc.gui.common.client.widgets.GroupSelectorCombo;
@@ -63,13 +62,7 @@ public class SavedSearchesPanel extends VLayout {
 
 		list.addCellDoubleClickHandler(event -> {
 			ListGridRecord rec = event.getRecord();
-			SearchService.Instance.get().load(rec.getAttributeAsString("name"), new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			SearchService.Instance.get().load(rec.getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUISearchOptions options) {
 					Search.get().setOptions(options);
@@ -91,20 +84,13 @@ public class SavedSearchesPanel extends VLayout {
 		execute.setTitle(I18N.message("execute"));
 		execute.addClickHandler(event -> {
 			ListGridRecord selection = list.getSelectedRecord();
-			SearchService.Instance.get().load(selection.getAttributeAsString("name"),
-					new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(GUISearchOptions options) {
-							Search.get().setOptions(options);
-							Search.get().search();
-						}
-					});
+			SearchService.Instance.get().load(selection.getAttributeAsString("name"), new DefaultAsyncCallback<>() {
+				@Override
+				public void onSuccess(GUISearchOptions options) {
+					Search.get().setOptions(options);
+					Search.get().search();
+				}
+			});
 		});
 
 		MenuItem share = new MenuItem();
@@ -127,15 +113,7 @@ public class SavedSearchesPanel extends VLayout {
 						public void execute(Map<String, Object> values) {
 							LD.contactingServer();
 							SearchService.Instance.get().shareSearch(selection.getAttributeAsString("name"),
-									usersSelector.getUserIds(), groupsSelector.getGroupIds(),
-									new AsyncCallback<>() {
-
-										@Override
-										public void onFailure(Throwable caught) {
-											LD.clearPrompt();
-											GuiLog.serverError(caught);
-										}
-
+									usersSelector.getUserIds(), groupsSelector.getGroupIds(), new DefaultAsyncCallback<>() {
 										@Override
 										public void onSuccess(Void arg0) {
 											LD.clearPrompt();
@@ -158,12 +136,7 @@ public class SavedSearchesPanel extends VLayout {
 
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
 				if (Boolean.TRUE.equals(value)) {
-					SearchService.Instance.get().delete(names, new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					SearchService.Instance.get().delete(names, new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void result) {
 							list.removeSelectedData();

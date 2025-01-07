@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.metadata.zonalocr;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
 import com.logicaldoc.gui.common.client.data.DocumentsDSParameters;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -84,13 +84,7 @@ public class ZonalOCRQueuePanel extends VLayout {
 		reschedule.addClickHandler(event -> LD.ask(I18N.message("rescheduleallprocessing"),
 				I18N.message("rescheduleallprocessingask"), confirm -> {
 					if (Boolean.TRUE.equals(confirm))
-						ZonalOCRService.Instance.get().rescheduleAll(new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						ZonalOCRService.Instance.get().rescheduleAll(new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void ret) {
 								GuiLog.info(I18N.message("docsrescheduledprocessing"), null);
@@ -218,12 +212,7 @@ public class ZonalOCRQueuePanel extends VLayout {
 		markUnprocessable.addClickHandler(event -> {
 			if (selection == null || selection.length < 1)
 				return;
-			ZonalOCRService.Instance.get().markUnprocessable(GridUtil.getIds(selection), new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			ZonalOCRService.Instance.get().markUnprocessable(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void result) {
 					for (ListGridRecord rec : selection) {

@@ -1,11 +1,10 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.SubscriptionsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -152,12 +151,7 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				AuditService.Instance.get().deleteSubscriptions(GridUtil.getIds(selection), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				AuditService.Instance.get().deleteSubscriptions(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						list.removeSelectedData();
@@ -180,13 +174,7 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 			if ("folder".equals(type))
 				DocumentsPanel.get().openInFolder(Long.parseLong(id), null);
 			else {
-				DocumentService.Instance.get().getById(Long.parseLong(id), new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				DocumentService.Instance.get().getById(Long.parseLong(id), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIDocument result) {
 						DocumentsPanel.get().openInFolder(result.getFolder().getId(), result.getId());

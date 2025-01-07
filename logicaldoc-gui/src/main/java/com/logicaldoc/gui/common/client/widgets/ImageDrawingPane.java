@@ -119,4 +119,9 @@ public class ImageDrawingPane extends DrawPane {
 		setWidth((int) (imageWidth * zoomLevel));
 		setHeight((int) (imageHeight * zoomLevel));
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
 }

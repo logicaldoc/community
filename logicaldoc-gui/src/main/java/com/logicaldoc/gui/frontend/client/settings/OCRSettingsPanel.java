@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -73,13 +73,7 @@ public class OCRSettingsPanel extends AdminPanel {
 	public OCRSettingsPanel() {
 		super("ocr");
 
-		OCRService.Instance.get().loadSettings(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		OCRService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUIParameter> params) {
 				initGUI(params);
@@ -379,13 +373,7 @@ public class OCRSettingsPanel extends AdminPanel {
 	}
 
 	private void doSaveSettings(List<GUIParameter> params) {
-		SettingService.Instance.get().saveSettings(params, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SettingService.Instance.get().saveSettings(params, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void ret) {
 				GuiLog.info(I18N.message("settingssaved"), null);

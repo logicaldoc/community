@@ -1,12 +1,11 @@
 package com.logicaldoc.gui.frontend.client.settings;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.OCRHistoryDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -134,13 +133,7 @@ public class OCRHistoryPanel extends VLayout {
 			MenuItem downloadIndexed = new MenuItem();
 			downloadIndexed.setTitle(I18N.message("downloadindexedtext"));
 			downloadIndexed.addClickHandler(evnt -> FolderService.Instance.get().getFolder(
-					selectedRecord.getAttributeAsLong("folderId"), false, false, false, new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					selectedRecord.getAttributeAsLong("folderId"), false, false, false, new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIFolder folder) {
 							if (folder.isDownload())

@@ -1,25 +1,21 @@
 package com.logicaldoc.gui.frontend.client.google;
 
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.OAuthException;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 
 /**
- * Some utility methods for Gootle
+ * Useful to handle communication with Google service
  * 
  * @author Marco Meschieri - LogicalDOC
- * @since 8.9.4
- *
+ * @since 9.1.1
  */
-public class GoogleUtil {
-
-	private GoogleUtil() {
-		// empty
-	}
-
-	public static void handleGoogleServiceError(Throwable caught) {
+public class GoogleAsyncCallback<T> extends DefaultAsyncCallback<T> {
+	@Override
+	public void onFailure(Throwable caught) {
 		LD.clearPrompt();
-		if(caught instanceof OAuthException)
+		if (caught instanceof OAuthException)
 			GoogleApiAuthorization.get().show();
 		else
 			GuiLog.serverError(caught);

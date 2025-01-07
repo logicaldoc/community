@@ -2,10 +2,9 @@ package com.logicaldoc.gui.frontend.client.google;
 
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.smartgwt.client.data.AdvancedCriteria;
@@ -77,13 +76,7 @@ public class GoogleApiAuthorization extends Window {
 
 	@Override
 	protected void onDraw() {
-		GoogleService.Instance.get().loadSettings(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		GoogleService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<String> settings) {
 				clientId.setValue(settings.get(0));
@@ -93,13 +86,8 @@ public class GoogleApiAuthorization extends Window {
 	}
 
 	public void onAuthenticate() {
-		GoogleService.Instance.get().saveSettings(form.getValueAsString(CONSTSNT_B),
-				form.getValueAsString(CONSTANT_A), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+		GoogleService.Instance.get().saveSettings(form.getValueAsString(CONSTSNT_B), form.getValueAsString(CONSTANT_A),
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(String consentUrl) {
 						WindowUtils.openUrl(consentUrl, "_blank", null);
@@ -111,7 +99,7 @@ public class GoogleApiAuthorization extends Window {
 	public static GoogleApiAuthorization get() {
 		return instance;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof GoogleApiAuthorization)

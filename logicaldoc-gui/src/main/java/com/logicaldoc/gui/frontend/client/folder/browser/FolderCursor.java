@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.folder.browser;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -179,7 +179,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 		if (currentPagination.getTotalPages() < 2
 				&& currentPagination.getPageSize() == Session.get().getConfigAsInt(GUI_FOLDER_MAXCHILDREN))
 			FolderService.Instance.get().setFolderPagination(currentPagination.getFolderId(), null, null,
-					new GUIAsyncCallback<>() {
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void arg) {
 							// Nothing to do
@@ -187,7 +187,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 					});
 		else
 			FolderService.Instance.get().setFolderPagination(currentPagination.getFolderId(),
-					currentPagination.getStartRow(), currentPagination.getPageSize(), new GUIAsyncCallback<>() {
+					currentPagination.getStartRow(), currentPagination.getPageSize(), new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void arg) {
 							// Nothing to do

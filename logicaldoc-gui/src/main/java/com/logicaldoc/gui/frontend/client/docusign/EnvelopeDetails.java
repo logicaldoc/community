@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocuSignSettings;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -119,7 +119,7 @@ public class EnvelopeDetails extends Window {
 			docIds.add(document.getId());
 
 		LD.contactingServer();
-		DocuSignService.Instance.get().validateEnvelope(docIds, new GUIAsyncCallback<>() {
+		DocuSignService.Instance.get().validateEnvelope(docIds, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Collection<GUIDocument> docs) {
 				LD.clearPrompt();
@@ -140,7 +140,7 @@ public class EnvelopeDetails extends Window {
 					settings.setSubject(form.getValueAsString("subject"));
 
 					LD.contactingServer();
-					DocuSignService.Instance.get().sendEnvelope(settings, new GUIAsyncCallback<>() {
+					DocuSignService.Instance.get().sendEnvelope(settings, new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(String envelopeId) {
 							LD.clearPrompt();

@@ -3,10 +3,9 @@ package com.logicaldoc.gui.frontend.client.account.contacts;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.ContactService;
 import com.smartgwt.client.types.HeaderControls;
@@ -60,7 +59,7 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 			LD.contactingServer();
 			try {
 				ContactService.Instance.get().parseContacts(false, settings.getParseContactsParameters(),
-						new GUIAsyncCallback<>() {
+						new DefaultAsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {

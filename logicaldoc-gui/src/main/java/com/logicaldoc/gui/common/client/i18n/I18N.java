@@ -51,7 +51,7 @@ public class I18N {
 	}
 
 	public static String message(String key) {
-		return messageWithDefault(key, key);
+		return messageWithDefault(key, key != null ? key : "");
 	}
 
 	public static String message(String key, String val) {

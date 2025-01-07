@@ -8,12 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
@@ -88,13 +87,15 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		search.setPrompt(I18N.message(SEARCH));
 		search.setSrc("[SKIN]/magnifying-glass.svg");
 		search.addFormItemClickHandler(click -> search());
-		
+
 		FormItemIcon clear = new FormItemIcon();
 		clear.setPrompt(I18N.message("clear"));
 		clear.setSrc("[SKIN]/trash.svg");
-		clear.addFormItemClickHandler(click -> {vm.clearValues();
-		prepareFields(null);});
-		
+		clear.addFormItemClickHandler(click -> {
+			vm.clearValues();
+			prepareFields(null);
+		});
+
 		expression = ItemFactory.newTextItem(EXPRESSION_STR, I18N.message(SEARCH) + "...");
 		expression.setWidth("*");
 		expression.setColSpan(3);
@@ -311,12 +312,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		if (templateId == null)
 			return;
 
-		TemplateService.Instance.get().getAttributes(templateId, null, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		TemplateService.Instance.get().getAttributes(templateId, null, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUIAttribute> result) {
 				for (GUIAttribute att : result.stream()

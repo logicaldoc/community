@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.metadata;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -62,12 +62,7 @@ public class FolderTemplatesPanel extends AdminPanel {
 
 		body.setMembers(hint, toolStrip);
 
-		FolderService.Instance.get().loadTemplates(new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		FolderService.Instance.get().loadTemplates(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUIValue> p) {
 				reloadTemplates(p);
@@ -104,12 +99,7 @@ public class FolderTemplatesPanel extends AdminPanel {
 				templates.add(val);
 			}
 
-		FolderService.Instance.get().saveTemplates(templates, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		FolderService.Instance.get().saveTemplates(templates, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg) {
 				GuiLog.info(I18N.message("settingssaved"), null);

@@ -1,12 +1,11 @@
 package com.logicaldoc.gui.frontend.client.security.ldap;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUILDAPServer;
 import com.logicaldoc.gui.common.client.data.LDAPServersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -137,13 +136,7 @@ public class LDAPServersPanel extends AdminPanel {
 		list.addSelectionChangedHandler(event -> {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
-				LDAPService.Instance.get().get(rec.getAttributeAsLong("id"), new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				LDAPService.Instance.get().get(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUILDAPServer server) {
 						showServerDetails(server);
@@ -156,13 +149,7 @@ public class LDAPServersPanel extends AdminPanel {
 
 		list.addDropCompleteHandler(event -> {
 			if (list.getRecords() != null && list.getRecords().length > 0) {
-				LDAPService.Instance.get().reorder(GridUtil.getIds(list.getRecords()), new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				LDAPService.Instance.get().reorder(GridUtil.getIds(list.getRecords()), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void arg) {
 						// Nothing to do
@@ -190,12 +177,7 @@ public class LDAPServersPanel extends AdminPanel {
 		delete.addClickHandler(
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
-						LDAPService.Instance.get().delete(id, new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						LDAPService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void result) {
 								refresh();

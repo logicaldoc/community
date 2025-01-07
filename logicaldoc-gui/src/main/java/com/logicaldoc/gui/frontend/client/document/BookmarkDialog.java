@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.document;
 
 import java.util.Map;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIBookmark;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -69,7 +69,8 @@ public class BookmarkDialog extends Window {
 						bookmark.setDescription((String) values.get(DESCRIPTION));
 					}
 
-					DocumentService.Instance.get().updateBookmark(bookmark, new GUIAsyncCallback<>() {
+					DocumentService.Instance.get().updateBookmark(bookmark, new DefaultAsyncCallback<>() {
+						@Override
 						public void onSuccess(Void ret) {
 							destroy();
 							BookmarksPanel.get().refresh();

@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.metadata.form;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -51,14 +51,8 @@ public class WebFormPrefilledEmail extends StickyWindow {
 		hintForm.setItems(hint);
 
 		addItem(hintForm);
-		
-		FormService.Instance.get().getById(formId, new AsyncCallback<>() {
 
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		FormService.Instance.get().getById(formId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIForm frm) {
 				extPanel = new ExtendedPropertiesPanel(frm, null, true, false, false, true);
@@ -86,12 +80,11 @@ public class WebFormPrefilledEmail extends StickyWindow {
 
 		LD.contactingServer();
 		FormService.Instance.get().invite((GUIForm) extPanel.getObject(), mail, I18N.getLocale(),
-				new AsyncCallback<>() {
+				new DefaultAsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
+						super.onFailure(caught);
 						destroy();
 					}
 

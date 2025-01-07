@@ -92,6 +92,11 @@ public class HtmlItemEditor extends Window {
 		setSavedHtmlContent("");
 		destroy();
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
 
 	/**
 	 * Saves the actual item content in a global Javascript variable that can be

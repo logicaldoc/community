@@ -2,14 +2,13 @@ package com.logicaldoc.gui.frontend.client.metadata;
 
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUIScheme;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.metadata.barcode.BarcodesPanel;
 import com.logicaldoc.gui.frontend.client.metadata.form.FormsPanel;
@@ -111,8 +110,7 @@ public class MetadataMenu extends VLayout {
 		Button retentionPolicies = new Button(I18N.message("retentionpolicies"));
 		retentionPolicies.setWidth100();
 		retentionPolicies.setHeight(25);
-		retentionPolicies
-				.addClickHandler(click -> AdminScreen.get().setContent(new RetentionPoliciesPanel()));
+		retentionPolicies.addClickHandler(click -> AdminScreen.get().setContent(new RetentionPoliciesPanel()));
 		if (Feature.visible(Feature.RETENTION_POLICIES) && Menu.enabled(Menu.RETENTION_POLICIES)) {
 			addMember(retentionPolicies);
 			if (!Feature.enabled(Feature.RETENTION_POLICIES))
@@ -124,8 +122,7 @@ public class MetadataMenu extends VLayout {
 		Button folderTemplates = new Button(I18N.message("foldertemplates"));
 		folderTemplates.setWidth100();
 		folderTemplates.setHeight(25);
-		folderTemplates
-				.addClickHandler(click -> AdminScreen.get().setContent(new FolderTemplatesPanel()));
+		folderTemplates.addClickHandler(click -> AdminScreen.get().setContent(new FolderTemplatesPanel()));
 		if (Feature.visible(Feature.FOLDER_TEMPLATE)) {
 			addMember(folderTemplates);
 			if (!Feature.enabled(Feature.FOLDER_TEMPLATE))
@@ -151,13 +148,7 @@ public class MetadataMenu extends VLayout {
 		customidAndAutonaming.setWidth100();
 		customidAndAutonaming.setHeight(25);
 		customidAndAutonaming.addClickHandler(
-				customidAndAutonamingClick -> SchemeService.Instance.get().load(new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				customidAndAutonamingClick -> SchemeService.Instance.get().load(new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(List<GUIScheme> schemas) {
 						AdminScreen.get().setContent(new CustomIdPanel(schemas));
@@ -193,13 +184,7 @@ public class MetadataMenu extends VLayout {
 			if (!Feature.enabled(Feature.TAGS_ADMIN))
 				setFeatureDisabled(tags);
 		}
-		tags.addClickHandler(tagsClick -> TagService.Instance.get().getSettings(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		tags.addClickHandler(tagsClick -> TagService.Instance.get().getSettings(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUIParameter> parameters) {
 				AdminScreen.get().setContent(new TagsPanel(parameters));

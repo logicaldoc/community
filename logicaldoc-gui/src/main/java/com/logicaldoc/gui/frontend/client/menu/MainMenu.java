@@ -9,10 +9,10 @@ import java.util.stream.Collectors;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -25,7 +25,6 @@ import com.logicaldoc.gui.common.client.controllers.DocumentObserver;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.controllers.FolderObserver;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -144,17 +143,12 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			tenantItem.addChangedHandler(event -> {
 				long tenantId = Long.parseLong(event.getValue().toString());
 				if (tenantId != Session.get().getInfo().getTenant().getId())
-					TenantService.Instance.get().changeSessionTenant(tenantId, new AsyncCallback<>() {
+					TenantService.Instance.get().changeSessionTenant(tenantId, new DefaultAsyncCallback<>() {
 
 						@Override
 						public void onSuccess(GUITenant tenant) {
 							Session.get().getInfo().setTenant(tenant);
 							Util.redirectToRoot();
-						}
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
 						}
 					});
 			});
@@ -229,12 +223,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 			if (document.getStatus() == 0) {
 				// Need to checkout first
-				DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						DocUtil.markCheckedOut(document);
@@ -275,12 +264,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 			if (document.getStatus() == 0) {
 				// Need to checkout first
-				DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						DocUtil.markCheckedOut(document);
@@ -310,13 +294,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 	private MenuItem getDropboxMenuItem(GUIFolder folder) {
 		final MenuItem exportTo = new MenuItem(I18N.message("exporttodropbox"));
-		exportTo.addClickHandler(event -> DropboxService.Instance.get().isConnected(new AsyncCallback<Boolean>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		exportTo.addClickHandler(event -> DropboxService.Instance.get().isConnected(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Boolean connected) {
 				if (Boolean.FALSE.equals(connected))
@@ -327,13 +305,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		}));
 
 		final MenuItem importFrom = new MenuItem(I18N.message("importfromdropbox"));
-		importFrom.addClickHandler(event -> DropboxService.Instance.get().isConnected(new AsyncCallback<Boolean>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		importFrom.addClickHandler(event -> DropboxService.Instance.get().isConnected(new DefaultAsyncCallback<Boolean>() {
 			@Override
 			public void onSuccess(Boolean connected) {
 				if (Boolean.FALSE.equals(connected))
@@ -363,50 +335,36 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 	private MenuItem getChatGPTMenuItem() {
 		final MenuItem settings = new MenuItem(I18N.message("settings"));
-		settings.addClickHandler(
-				click -> ChatGPTService.Instance.get().loadSettings(new AsyncCallback<List<GUIValue>>() {
+		settings.addClickHandler(click -> ChatGPTService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
+			@Override
+			public void onSuccess(List<GUIValue> settings) {
+				TextItem apiKey = ItemFactory.newPasswordItem(APIKEY, APIKEY, GUIValue.getValue(APIKEY, settings));
+				apiKey.setWidth(360);
 
+				TextItem model = ItemFactory.newTextItem("model", GUIValue.getValue("model", settings));
+
+				LD.askForValues(I18N.message("chatgpt"), null, Arrays.asList(apiKey, model), 400, new ValuesCallback() {
 					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
+					public void execute(Map<String, Object> values) {
+						List<GUIValue> settings = new ArrayList<>();
+						for (Map.Entry<String, Object> val : values.entrySet())
+							settings.add(new GUIValue(val.getKey(), "" + val.getValue()));
+
+						ChatGPTService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<>() {
+							@Override
+							public void onSuccess(Void arg0) {
+								// Nothing to do
+							}
+						});
 					}
 
 					@Override
-					public void onSuccess(List<GUIValue> settings) {
-						TextItem apiKey = ItemFactory.newPasswordItem(APIKEY, APIKEY,
-								GUIValue.getValue(APIKEY, settings));
-						apiKey.setWidth(360);
-
-						TextItem model = ItemFactory.newTextItem("model", GUIValue.getValue("model", settings));
-
-						LD.askForValues(I18N.message("chatgpt"), null, Arrays.asList(apiKey, model), 400,
-								new ValuesCallback() {
-									@Override
-									public void execute(Map<String, Object> values) {
-										List<GUIValue> settings = new ArrayList<>();
-										for (Map.Entry<String, Object> val : values.entrySet())
-											settings.add(new GUIValue(val.getKey(), "" + val.getValue()));
-
-										ChatGPTService.Instance.get().saveSettings(settings, new AsyncCallback<Void>() {
-											@Override
-											public void onFailure(Throwable caught) {
-												GuiLog.serverError(caught);
-											}
-
-											@Override
-											public void onSuccess(Void arg0) {
-												// Nothing to do
-											}
-										});
-									}
-
-									@Override
-									public void execute(String value) {
-										// Ignore
-									}
-								});
+					public void execute(String value) {
+						// Ignore
 					}
-				})
+				});
+			}
+		})
 
 		);
 
@@ -426,14 +384,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		exportTo.addClickHandler((MenuItemClickEvent event) -> new ShareFileDialog(true).show());
 
 		final MenuItem importFrom = new MenuItem(I18N.message("importfromsharefile"));
-		importFrom.addClickHandler(event -> ShareFileService.Instance.get().isAuthorized(new AsyncCallback<Boolean>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-				LD.clearPrompt();
-			}
-
+		importFrom.addClickHandler(event -> ShareFileService.Instance.get().isAuthorized(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Boolean authorized) {
 				LD.clearPrompt();
@@ -473,14 +424,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		final MenuItem sendEnvelope = new MenuItem(I18N.message("sendenvelope"));
 		sendEnvelope.addClickHandler(event -> {
 			LD.contactingServer();
-			DocuSignService.Instance.get().isAuthorized(new AsyncCallback<Boolean>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-					LD.clearPrompt();
-				}
-
+			DocuSignService.Instance.get().isAuthorized(new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Boolean authorized) {
 					LD.clearPrompt();
@@ -499,14 +443,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		final MenuItem envelopes = new MenuItem(I18N.message("envelopes"));
 		envelopes.addClickHandler(event -> {
 			LD.contactingServer();
-			DocuSignService.Instance.get().isAuthorized(new AsyncCallback<Boolean>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-					LD.clearPrompt();
-				}
-
+			DocuSignService.Instance.get().isAuthorized(new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Boolean authorized) {
 					LD.clearPrompt();
@@ -679,13 +616,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
 			MenuItem registration = new MenuItem(I18N.message("registration"));
 			registration.addClickHandler(registrationClick -> SettingService.Instance.get().loadSettingsByNames(
-					Arrays.asList("reg.name", "reg.email", "reg.organization", "reg.website"), new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					Arrays.asList("reg.name", "reg.email", "reg.organization", "reg.website"),
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(List<GUIParameter> reg) {
 							new Registration(reg.stream().map(r -> r.getValue()).collect(Collectors.toList())).show();

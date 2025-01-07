@@ -2,12 +2,11 @@ package com.logicaldoc.gui.frontend.client.metadata.template;
 
 import java.util.Arrays;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.data.TemplatesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
@@ -142,13 +141,7 @@ public class TemplatesPanel extends VLayout {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				TemplateService.Instance.get().getTemplate(Long.parseLong(rec.getAttributeAsString("id")),
-						new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(GUITemplate template) {
 								showTemplateDetails(template);
@@ -185,12 +178,7 @@ public class TemplatesPanel extends VLayout {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				TemplateService.Instance.get().delete(selectedTemplateId, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				TemplateService.Instance.get().delete(selectedTemplateId, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						list.removeSelectedData();
@@ -204,13 +192,7 @@ public class TemplatesPanel extends VLayout {
 		MenuItem clone = new MenuItem();
 		clone.setTitle(I18N.message("clone"));
 		clone.addClickHandler(event -> TemplateService.Instance.get().clone(selectedTemplateId,
-				selectedRecord.getAttribute("name") + "-Clone", new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				selectedRecord.getAttribute("name") + "-Clone", new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUITemplate templateClone) {
 						list.deselectAllRecords();

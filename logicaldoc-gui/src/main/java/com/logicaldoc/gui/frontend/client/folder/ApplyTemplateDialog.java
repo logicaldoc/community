@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.folder;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -71,7 +71,7 @@ public class ApplyTemplateDialog extends Dialog {
 			LD.contactingServer();
 
 			FolderService.Instance.get().applyTemplate(folderId, templateId,
-					Boolean.valueOf(form.getValueAsString("inheritSecurity")), new GUIAsyncCallback<>() {
+					Boolean.valueOf(form.getValueAsString("inheritSecurity")), new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void arg0) {
 							LD.clearPrompt();

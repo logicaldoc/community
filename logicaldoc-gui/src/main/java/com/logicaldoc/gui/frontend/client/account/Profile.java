@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.account;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
@@ -356,7 +356,7 @@ public class Profile extends Window {
 			searches.add(rec.getAttributeAsString("search"));
 		u.setSearchPref(searches.toString().replace("[", "").replace("]", "").replace(" ", ""));
 
-		SecurityService.Instance.get().saveProfile(u, new GUIAsyncCallback<>() {
+		SecurityService.Instance.get().saveProfile(u, new DefaultAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(GUIUser ret) {
@@ -415,5 +415,10 @@ public class Profile extends Window {
 			tabs.selectTab(3);
 
 		return !vm.hasErrors();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
 	}
 }

@@ -1,10 +1,9 @@
 package com.logicaldoc.gui.frontend.client.impex.archives;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIIncrementalArchive;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
@@ -73,18 +72,12 @@ public class IncrementalDetailsPanel extends VLayout implements FolderChangeList
 		closeImage.setHeight("16px");
 		closeImage.addClickHandler((ClickEvent event) -> {
 			if (getIncremental().getId() != 0) {
-				ImpexService.Instance.get().loadIncremental(getIncremental().getId(),
-						new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUIIncrementalArchive incremental) {
-								setIncremental(incremental);
-							}
-						});
+				ImpexService.Instance.get().loadIncremental(getIncremental().getId(), new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(GUIIncrementalArchive incremental) {
+						setIncremental(incremental);
+					}
+				});
 			} else {
 				GUIIncrementalArchive archive = new GUIIncrementalArchive();
 				archive.setType(IncrementalDetailsPanel.this.incremental.getType());
@@ -153,12 +146,7 @@ public class IncrementalDetailsPanel extends VLayout implements FolderChangeList
 
 	public void onSave() {
 		if (settingsPanel.validate()) {
-			ImpexService.Instance.get().saveIncremental(incremental, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			ImpexService.Instance.get().saveIncremental(incremental, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIIncrementalArchive incremental) {
 					savePanel.setVisible(false);

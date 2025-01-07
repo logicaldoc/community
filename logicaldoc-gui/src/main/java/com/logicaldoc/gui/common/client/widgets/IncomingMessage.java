@@ -76,4 +76,9 @@ public class IncomingMessage extends HLayout {
 	public void setClickHandler(ClickHandler clickHandler) {
 		this.clickHandler = clickHandler;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
 }

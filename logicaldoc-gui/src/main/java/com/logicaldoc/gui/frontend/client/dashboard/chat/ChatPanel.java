@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.dashboard.chat;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.ChatService;
@@ -71,7 +71,7 @@ public class ChatPanel extends VLayout {
 	protected void onPost(String message) {
 		if (message == null || message.trim().isEmpty())
 			return;
-		ChatService.Instance.get().post(message, new GUIAsyncCallback<>() {
+		ChatService.Instance.get().post(message, new DefaultAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(Void arg) {

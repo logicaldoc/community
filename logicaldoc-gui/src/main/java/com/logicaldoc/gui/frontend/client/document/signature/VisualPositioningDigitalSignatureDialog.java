@@ -8,8 +8,7 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -73,7 +72,7 @@ public class VisualPositioningDigitalSignatureDialog extends Window {
 				}
 
 				public void onResponseReceived(Request request, Response response) {
-					DocumentService.Instance.get().getById(docIds.get(0), new GUIAsyncCallback<>() {
+					DocumentService.Instance.get().getById(docIds.get(0), new DefaultAsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -167,14 +166,7 @@ public class VisualPositioningDigitalSignatureDialog extends Window {
 
 		LD.contactingServer();
 
-		SignService.Instance.get().signDocuments(docIds, reason, page, exprX, exprY, exprW, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				LD.clearPrompt();
-				GuiLog.serverError(caught);
-			}
-
+		SignService.Instance.get().signDocuments(docIds, reason, page, exprX, exprY, exprW, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg0) {
 				LD.clearPrompt();

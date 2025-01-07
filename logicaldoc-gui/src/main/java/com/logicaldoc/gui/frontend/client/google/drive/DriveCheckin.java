@@ -1,13 +1,12 @@
 package com.logicaldoc.gui.frontend.client.google.drive;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.frontend.client.google.GoogleAsyncCallback;
 import com.logicaldoc.gui.frontend.client.google.GoogleService;
-import com.logicaldoc.gui.frontend.client.google.GoogleUtil;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Window;
@@ -69,12 +68,7 @@ public class DriveCheckin extends Window {
 			return;
 		LD.contactingServer();
 		GoogleService.Instance.get().checkin(document.getId(), vm.getValueAsString("comment"),
-				Boolean.valueOf(vm.getValueAsString(MAJORVERSION)), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GoogleUtil.handleGoogleServiceError(caught);
-					}
-
+				Boolean.valueOf(vm.getValueAsString(MAJORVERSION)), new GoogleAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIDocument result) {
 						LD.clearPrompt();

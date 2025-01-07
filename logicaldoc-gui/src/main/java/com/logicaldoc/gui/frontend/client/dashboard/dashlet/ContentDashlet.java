@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.dashboard.dashlet;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.services.DashletService;
@@ -37,7 +37,7 @@ public class ContentDashlet extends Dashlet {
 
 	@Override
 	protected void refresh() {
-		DashletService.Instance.get().get(guiDashlet.getId(), new GUIAsyncCallback<>() {
+		DashletService.Instance.get().get(guiDashlet.getId(), new DefaultAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(GUIDashlet dashlet) {

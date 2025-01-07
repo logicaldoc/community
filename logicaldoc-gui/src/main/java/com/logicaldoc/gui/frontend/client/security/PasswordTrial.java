@@ -3,9 +3,8 @@ package com.logicaldoc.gui.frontend.client.security;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.PasswordGenerator;
@@ -63,10 +62,10 @@ public class PasswordTrial extends PasswordGenerator {
 		
 		submit.setDisabled(true);
 		SecurityService.Instance.get().validatePassword(form.getValueAsString(PASSWORD_CONSTANT), pwdSize, pwdUpperCase,
-				pwdLowerCase, pwdDigit, pwdSpecial, pwdSequence, pwdOccurrence, new AsyncCallback<>() {
+				pwdLowerCase, pwdDigit, pwdSpecial, pwdSequence, pwdOccurrence, new DefaultAsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
+						super.onFailure(caught);
 						submit.setDisabled(false);
 					}
 

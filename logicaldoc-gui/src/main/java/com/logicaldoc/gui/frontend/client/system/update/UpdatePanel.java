@@ -9,8 +9,8 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -97,11 +97,10 @@ public class UpdatePanel extends VLayout {
 
 		LD.contactingServer();
 
-		UpdateService.Instance.get().checkUpdate(new AsyncCallback<>() {
+		UpdateService.Instance.get().checkUpdate(new DefaultAsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				LD.clearPrompt();
-				GuiLog.serverError(caught);
+				super.onFailure(caught);
 				onUpdateUnavailable();
 			}
 
@@ -212,11 +211,11 @@ public class UpdatePanel extends VLayout {
 			bar.setPercentDone(0);
 			download.setDisabled(true);
 			UpdateService.Instance.get().downloadUpdate(Util.getValue("id", parameters), updateFileName,
-					Long.parseLong(Util.getValue("size", parameters)), new AsyncCallback<>() {
+					Long.parseLong(Util.getValue("size", parameters)), new DefaultAsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
+							super.onFailure(caught);
 							download.setDisabled(false);
 						}
 
@@ -226,13 +225,7 @@ public class UpdatePanel extends VLayout {
 
 							new Timer() {
 								public void run() {
-									UpdateService.Instance.get().checkDownloadStatus(new AsyncCallback<>() {
-
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
-
+									UpdateService.Instance.get().checkDownloadStatus(new DefaultAsyncCallback<>() {
 										@Override
 										public void onSuccess(List<Integer> status) {
 											bar.setPercentDone(status.get(1));
@@ -279,13 +272,7 @@ public class UpdatePanel extends VLayout {
 	}
 
 	private void displayNotes(String fileName) {
-		UpdateService.Instance.get().getUpdateNotes(fileName, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		UpdateService.Instance.get().getUpdateNotes(fileName, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<String> infos) {
 				VLayout panel = new VLayout();
@@ -417,13 +404,7 @@ public class UpdatePanel extends VLayout {
 			if (Boolean.TRUE.equals(choice)) {
 				confirmUpdate.setVisible(false);
 				download.setVisible(false);
-				UpdateService.Instance.get().confirmUpdate(updateFileName, new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				UpdateService.Instance.get().confirmUpdate(updateFileName, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(String path) {
 						Session.get().setUpdating(true);
@@ -438,13 +419,7 @@ public class UpdatePanel extends VLayout {
 	private void onDelete() {
 		SC.ask(I18N.message("delete"), I18N.message("deleteupdatepackagequestion"), choice -> {
 			if (Boolean.TRUE.equals(choice)) {
-				UpdateService.Instance.get().deleteUpdate(updateFileName, new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				UpdateService.Instance.get().deleteUpdate(updateFileName, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void v) {
 						refresh();

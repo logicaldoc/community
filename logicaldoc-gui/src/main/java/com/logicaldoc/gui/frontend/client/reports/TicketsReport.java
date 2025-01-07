@@ -1,12 +1,11 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.TicketsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -160,13 +159,7 @@ public class TicketsReport extends ReportPanel {
 		preview.setTitle(I18N.message("preview"));
 		preview.addClickHandler(click -> {
 			long id = Long.parseLong(rec.getAttribute(DOC_ID));
-			DocumentService.Instance.get().getById(id, new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			DocumentService.Instance.get().getById(id, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIDocument doc) {
 					new PreviewPopup(doc).show();
@@ -200,13 +193,7 @@ public class TicketsReport extends ReportPanel {
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(event -> DocumentService.Instance.get().enableTicket(rec.getAttributeAsLong("id"),
-				new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						rec.setAttribute(EENABLED, "0");
@@ -218,13 +205,7 @@ public class TicketsReport extends ReportPanel {
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(event -> DocumentService.Instance.get().disableTicket(rec.getAttributeAsLong("id"),
-				new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						rec.setAttribute(EENABLED, "2");
@@ -237,12 +218,7 @@ public class TicketsReport extends ReportPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer))
-				DocumentService.Instance.get().deleteTicket(rec.getAttributeAsLong("id"), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				DocumentService.Instance.get().deleteTicket(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						list.removeSelectedData();

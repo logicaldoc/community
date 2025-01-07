@@ -2,8 +2,7 @@ package com.logicaldoc.gui.frontend.client.folder;
 
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -79,12 +78,7 @@ public class AutomationDialog extends Window {
 				routine = new GUIAutomationRoutine();
 			} else {
 				AutomationService.Instance.get().getRoutine(Long.parseLong(changed.getValue().toString()),
-						new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						new DefaultAsyncCallback<>() {
 
 							@Override
 							public void onSuccess(GUIAutomationRoutine rt) {
@@ -150,7 +144,7 @@ public class AutomationDialog extends Window {
 		LD.contactingServer();
 		AutomationDialog.this.destroy();
 		GuiLog.info(I18N.message("automationlaunched"));
-		AutomationService.Instance.get().execute(routine, docIds, folderIds, new GUIAsyncCallback<>() {
+		AutomationService.Instance.get().execute(routine, docIds, folderIds, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg0) {
 				LD.clearPrompt();

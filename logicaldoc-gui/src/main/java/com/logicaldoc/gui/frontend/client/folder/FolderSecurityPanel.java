@@ -3,8 +3,8 @@ package com.logicaldoc.gui.frontend.client.folder;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.AccessControlListDS;
@@ -250,13 +250,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 	private void displayInheritingPanel(GUIFolder folder) {
 		FolderService.Instance.get().getFolder(folder.getSecurityRef().getId(), true, false, false,
-				new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(final GUIFolder refFolder) {
 						inheritInfoPanel = new HLayout();
@@ -391,13 +385,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		inheritFromParent.setAutoFit(true);
 		buttons.addMember(inheritFromParent);
 		inheritFromParent.addClickHandler((ClickEvent event) -> FolderService.Instance.get()
-				.getFolder(folder.getParentId(), false, false, false, new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.getFolder(folder.getParentId(), false, false, false, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIFolder parent) {
 						LD.ask(I18N.message("inheritrights"),
@@ -405,13 +393,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 								(Boolean interitConfirmed) -> {
 									if (Boolean.TRUE.equals(interitConfirmed)) {
 										FolderService.Instance.get().inheritACL(folder.getId(), folder.getParentId(),
-												new AsyncCallback<>() {
-
-													@Override
-													public void onFailure(Throwable caught) {
-														GuiLog.serverError(caught);
-													}
-
+												new DefaultAsyncCallback<>() {
 													@Override
 													public void onSuccess(GUIFolder arg) {
 														FolderSecurityPanel.this.refresh(arg);
@@ -611,13 +593,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		// Apply all rights
 		folder.setAccessControlList(this.getACL());
 
-		FolderService.Instance.get().saveACL(folder, recursive, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		FolderService.Instance.get().saveACL(folder, recursive, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void result) {
 				if (!recursive)

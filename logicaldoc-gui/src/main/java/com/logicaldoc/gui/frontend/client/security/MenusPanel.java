@@ -1,12 +1,11 @@
 package com.logicaldoc.gui.frontend.client.security;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIMenu;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.MenusDS;
 import com.logicaldoc.gui.common.client.formatters.I18NCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
@@ -81,13 +80,7 @@ public class MenusPanel extends VLayout {
 			Record rec = menus.getSelectedRecord();
 			if (rec != null)
 				SecurityService.Instance.get().getMenu(Long.parseLong(rec.getAttributeAsString("id")), I18N.getLocale(),
-						new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(GUIMenu menu) {
 								showRights(menu);

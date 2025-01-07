@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.document.split;
 
 import java.util.Map;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -90,7 +90,7 @@ public class SplitDialog extends Window {
 				SplitService.Instance.get().split(document.getId(),
 						Integer.parseInt((String) values.get("splittingpolicy")),
 						Integer.parseInt((String) values.get("separatorhandling")), (String) values.get("expression"),
-						new GUIAsyncCallback<>() {
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								LD.clearPrompt();

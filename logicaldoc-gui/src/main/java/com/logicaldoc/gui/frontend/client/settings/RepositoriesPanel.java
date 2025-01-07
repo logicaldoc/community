@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -50,13 +50,7 @@ public class RepositoriesPanel extends AdminPanel {
 
 		SettingService.Instance.get().loadSettingsByNames(Arrays.asList("conf.dbdir", "conf.exportdir",
 				"conf.importdir", "conf.logdir", "conf.plugindir", "conf.userdir"),
-				new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(List<GUIParameter> folderParameters) {
 						List<FormItem> items = new ArrayList<>();
@@ -91,13 +85,7 @@ public class RepositoriesPanel extends AdminPanel {
 				settings.add(new GUIParameter(ItemFactory.originalItemName(name), entry.getValue().toString().trim()));
 		}
 
-		SettingService.Instance.get().saveSettings(settings, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SettingService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg) {
 				GuiLog.info(I18N.message("settingssaved"), null);

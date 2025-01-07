@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.Timer;
 import com.logicaldoc.gui.common.client.CookiesManager;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -146,7 +146,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	}
 
 	public void openInFolder(long docId) {
-		DocumentService.Instance.get().getById(docId, new GUIAsyncCallback<>() {
+		DocumentService.Instance.get().getById(docId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				/*
@@ -176,7 +176,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	 *        list
 	 */
 	public void selectDocument(long docId, final boolean clearSelection) {
-		DocumentService.Instance.get().getById(docId, new GUIAsyncCallback<>() {
+		DocumentService.Instance.get().getById(docId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				/*

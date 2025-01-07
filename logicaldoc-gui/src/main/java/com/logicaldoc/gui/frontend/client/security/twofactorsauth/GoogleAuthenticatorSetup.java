@@ -2,11 +2,10 @@ package com.logicaldoc.gui.frontend.client.security.twofactorsauth;
 
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.frontend.client.services.TwoFactorsAuthenticationService;
@@ -92,12 +91,7 @@ public class GoogleAuthenticatorSetup extends TwoFactorsAuthenticationSetup {
 		account = user.getUsername() + "@" + WindowUtils.getRequestInfo().getHostName();
 
 		TwoFactorsAuthenticationService.Instance.get().generateGoogleAuthorizationCredentials(account,
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(List<String> arg) {
 						user.setKey(arg.get(0));

@@ -9,6 +9,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUISession;
@@ -121,12 +122,7 @@ public class Frontend implements EntryPoint {
 							: Util.getLocaleInRequest();
 					InfoService.Instance.get().getInfo(loc,
 							tenant != null ? tenant : session.getUser().getTenant().getName(), false,
-							new AsyncCallback<GUIInfo>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
+							new DefaultAsyncCallback<>() {
 								@Override
 								public void onSuccess(GUIInfo info) {
 									session.setInfo(info);
@@ -143,7 +139,7 @@ public class Frontend implements EntryPoint {
 			}
 		});
 	}
-	
+
 	public static void showMain() {
 		// Remove the loading frame
 		RootPanel.getBodyElement().removeChild(RootPanel.get("loadingwrapper-frontend").getElement());

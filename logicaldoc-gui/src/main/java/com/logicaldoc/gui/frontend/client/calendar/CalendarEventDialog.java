@@ -9,7 +9,7 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -17,7 +17,6 @@ import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUIReminder;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -493,7 +492,7 @@ public class CalendarEventDialog extends Window {
 
 			long id = Long.parseLong(selection.getAttribute("id"));
 
-			DocumentService.Instance.get().getById(id, new GUIAsyncCallback<>() {
+			DocumentService.Instance.get().getById(id, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIDocument doc) {
 					new PreviewPopup(doc).show();
@@ -793,12 +792,7 @@ public class CalendarEventDialog extends Window {
 			saveAttendees();
 
 			LD.contactingServer();
-			CalendarService.Instance.get().saveEvent(calendarEvent, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			CalendarService.Instance.get().saveEvent(calendarEvent, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void arg) {
 					LD.clearPrompt();
@@ -899,7 +893,7 @@ public class CalendarEventDialog extends Window {
 	private void deleteEvent(Long id) {
 		LD.ask(I18N.message(DELEVENT), I18N.message("askalertcancelation"), answer -> {
 			LD.contactingServer();
-			CalendarService.Instance.get().deleteEvent(id, Boolean.TRUE.equals(answer), new GUIAsyncCallback<>() {
+			CalendarService.Instance.get().deleteEvent(id, Boolean.TRUE.equals(answer), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void arg) {
 					LD.clearPrompt();

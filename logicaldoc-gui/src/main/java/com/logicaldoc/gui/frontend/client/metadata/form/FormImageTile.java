@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.metadata.form;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.Upload;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FormService;
@@ -114,13 +113,7 @@ public class FormImageTile extends HLayout {
 			layout.addMember(saveButton);
 
 			addCloseClickHandler(
-					event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void result) {
 							destroy();
@@ -136,25 +129,12 @@ public class FormImageTile extends HLayout {
 				return;
 			}
 
-			FormService.Instance.get().processImage(new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-					close();
-				}
-
+			FormService.Instance.get().processImage(new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(String imageSrc) {
 					form.setHeaderImage(imageSrc);
 					FormImageTile.this.initGUI();
-					DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void result) {
 							destroy();

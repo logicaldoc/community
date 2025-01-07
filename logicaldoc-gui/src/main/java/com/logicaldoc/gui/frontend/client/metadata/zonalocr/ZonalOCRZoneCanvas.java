@@ -1,8 +1,7 @@
 package com.logicaldoc.gui.frontend.client.metadata.zonalocr;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIZone;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.panels.zone.ZoneCanvas;
 import com.logicaldoc.gui.frontend.client.services.ZonalOCRService;
@@ -29,13 +28,7 @@ public class ZonalOCRZoneCanvas extends ZoneCanvas {
 	public void onEdit() {
 		if (zone.getSample() == null || zone.getSampleText() == null) {
 			LD.contactingServer();
-			ZonalOCRService.Instance.get().updateZone(zone, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-					LD.clearPrompt();
-				}
-
+			ZonalOCRService.Instance.get().updateZone(zone, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIZone newZone) {
 					LD.clearPrompt();

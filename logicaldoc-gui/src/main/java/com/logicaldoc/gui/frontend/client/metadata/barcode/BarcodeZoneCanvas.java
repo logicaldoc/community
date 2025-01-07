@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.metadata.barcode;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIBarcodeZone;
 import com.logicaldoc.gui.common.client.beans.GUIZone;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.panels.zone.ZoneCanvas;
 import com.logicaldoc.gui.frontend.client.services.BarcodeService;
@@ -30,13 +29,7 @@ public class BarcodeZoneCanvas extends ZoneCanvas {
 	protected void onEdit() {
 		if (zone.getSample() == null || zone.getSampleText() == null) {
 			LD.contactingServer();
-			BarcodeService.Instance.get().updateZone((GUIBarcodeZone) zone, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-					LD.clearPrompt();
-				}
-
+			BarcodeService.Instance.get().updateZone((GUIBarcodeZone) zone, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIBarcodeZone newZone) {
 					LD.clearPrompt();

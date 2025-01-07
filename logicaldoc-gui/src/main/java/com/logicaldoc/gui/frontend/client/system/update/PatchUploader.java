@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.system.update;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.IgnoreAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.widgets.Upload;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -25,7 +26,7 @@ public class PatchUploader extends Window {
 	private PatchPanel panel;
 
 	public PatchUploader(PatchPanel panel) {
-		this.panel=panel;
+		this.panel = panel;
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("uploadpatch"));
 		setWidth(430);
@@ -52,18 +53,7 @@ public class PatchUploader extends Window {
 	}
 
 	private void cleanUploads() {
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				// Nothing to do
-			}
-
-			@Override
-			public void onSuccess(Void result) {
-				// Nothing to do
-			}
-		});
+		DocumentService.Instance.get().cleanUploadedFileFolder(new IgnoreAsyncCallback<>());
 	}
 
 	public void onSubmit() {
@@ -83,13 +73,13 @@ public class PatchUploader extends Window {
 			@Override
 			public void onSuccess(String result) {
 				try {
-				if (result == null || "".equals(result)) {
-					panel.showList();
-					destroy();
-				} else {
-					SC.warn(I18N.message(result));
-				}
-				}finally {
+					if (result == null || "".equals(result)) {
+						panel.showList();
+						destroy();
+					} else {
+						SC.warn(I18N.message(result));
+					}
+				} finally {
 					cleanUploads();
 				}
 			}

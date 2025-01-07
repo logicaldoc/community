@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.system.plugin;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.IgnoreAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.Upload;
@@ -56,18 +57,8 @@ public class PluginUploader extends Window {
 	}
 
 	private void cleanUploads() {
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
+		DocumentService.Instance.get().cleanUploadedFileFolder(new IgnoreAsyncCallback<>());
 
-			@Override
-			public void onFailure(Throwable caught) {
-				// Nothing to do
-			}
-
-			@Override
-			public void onSuccess(Void result) {
-				// Nothing to do
-			}
-		});
 	}
 
 	public void onSubmit() {
@@ -76,11 +67,11 @@ public class PluginUploader extends Window {
 			return;
 		}
 
-		SystemService.Instance.get().installPlugin(new AsyncCallback<>() {
+		SystemService.Instance.get().installPlugin(new DefaultAsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
+				super.onFailure(caught);
 				cleanUploads();
 				destroy();
 			}

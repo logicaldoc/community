@@ -4,11 +4,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.beans.GUIWorkingTime;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.ValuesCallback;
@@ -86,14 +85,7 @@ public class WorkingTimePanel extends VLayout {
 						public void execute(Map<String, Object> values) {
 							LD.contactingServer();
 							SecurityService.Instance.get().cloneWorkTimes(user.getId(), usersSelector.getUserIds(),
-									groupsSelector.getGroupIds(), new AsyncCallback<>() {
-
-										@Override
-										public void onFailure(Throwable caught) {
-											LD.clearPrompt();
-											GuiLog.serverError(caught);
-										}
-
+									groupsSelector.getGroupIds(), new DefaultAsyncCallback<>() {
 										@Override
 										public void onSuccess(Void arg0) {
 											LD.clearPrompt();

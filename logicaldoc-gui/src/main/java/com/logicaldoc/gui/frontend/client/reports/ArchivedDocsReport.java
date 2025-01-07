@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.ArchivedDocsDS;
@@ -143,13 +143,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		preview.addClickHandler(event -> {
 			long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
 
-			DocumentService.Instance.get().getById(id, new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			DocumentService.Instance.get().getById(id, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIDocument doc) {
 					PreviewPopup iv = new PreviewPopup(doc);
@@ -175,12 +169,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		MenuItem restore = new MenuItem();
 		restore.setTitle(I18N.message("restore"));
 		restore.addClickHandler(event -> DocumentService.Instance.get().unarchiveDocuments(GridUtil.getIds(selection),
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void arg0) {
 						list.removeSelectedData();
@@ -192,12 +181,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				DocumentService.Instance.get().delete(GridUtil.getIds(selection), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				DocumentService.Instance.get().delete(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						list.removeSelectedData();

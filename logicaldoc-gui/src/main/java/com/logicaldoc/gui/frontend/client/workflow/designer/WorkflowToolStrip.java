@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.workflow.designer;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUITransition;
@@ -139,7 +139,7 @@ public class WorkflowToolStrip extends ToolStrip {
 	public void setCurrentWorkflow(GUIWorkflow currentWorkflow) {
 		this.currentWorkflow = currentWorkflow;
 	}
-	
+
 	private void addExportButton() {
 		export = new ToolStripButton(I18N.message("eexport"));
 		export.addClickHandler(event -> Util
@@ -180,12 +180,7 @@ public class WorkflowToolStrip extends ToolStrip {
 		delete = new ToolStripButton(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				WorkflowService.Instance.get().delete(currentWorkflow.getName(), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				WorkflowService.Instance.get().delete(currentWorkflow.getName(), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						currentWorkflow = new GUIWorkflow();
@@ -208,12 +203,7 @@ public class WorkflowToolStrip extends ToolStrip {
 
 			LD.ask(I18N.message("undeploy"), I18N.message("undeploywarn"), (Boolean yes) -> {
 				if (Boolean.TRUE.equals(yes))
-					WorkflowService.Instance.get().undeploy(currentWorkflow.getName(), new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					WorkflowService.Instance.get().undeploy(currentWorkflow.getName(), new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void result) {
 							GuiLog.info(I18N.message("workflowundeployed", currentWorkflow.getName()));
@@ -253,13 +243,7 @@ public class WorkflowToolStrip extends ToolStrip {
 			GuiLog.error(I18N.message("atleastoneinitialtask"));
 		else {
 			LD.contactingServer();
-			WorkflowService.Instance.get().deploy(currentWorkflow, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					GuiLog.serverError(caught);
-				}
-
+			WorkflowService.Instance.get().deploy(currentWorkflow, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIWorkflow result) {
 					LD.clearPrompt();
@@ -367,12 +351,7 @@ public class WorkflowToolStrip extends ToolStrip {
 		versionSelector.addChangedHandler(event ->
 
 		WorkflowService.Instance.get().get(currentWorkflow.getName(), (Integer) event.getValue(),
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIWorkflow result) {
 						if (result != null) {
@@ -390,12 +369,7 @@ public class WorkflowToolStrip extends ToolStrip {
 		workflowSelector.addChangedHandler(event -> {
 			if (event.getValue() != null && !"".equals(event.getValue())) {
 				WorkflowService.Instance.get().get(workflowSelector.getSelectedRecord().getAttributeAsString("name"),
-						null, new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						null, new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(GUIWorkflow result) {
 								if (result != null) {
@@ -457,13 +431,7 @@ public class WorkflowToolStrip extends ToolStrip {
 		}
 
 		LD.contactingServer();
-		WorkflowService.Instance.get().save(currentWorkflow, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				LD.clearPrompt();
-				GuiLog.serverError(caught);
-			}
-
+		WorkflowService.Instance.get().save(currentWorkflow, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIWorkflow result) {
 				LD.clearPrompt();
@@ -492,12 +460,7 @@ public class WorkflowToolStrip extends ToolStrip {
 	}
 
 	protected void reload(String workflowName) {
-		WorkflowService.Instance.get().get(workflowName, null, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		WorkflowService.Instance.get().get(workflowName, null, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIWorkflow result) {
 				if (result != null) {

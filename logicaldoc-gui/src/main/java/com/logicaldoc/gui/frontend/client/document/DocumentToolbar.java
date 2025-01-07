@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.CookiesManager;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
@@ -736,13 +736,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 
 	private void saveGridState() {
 		Session.get().getUser().setDocsGrid(DocumentsPanel.get().getDocsGridViewState());
-		SecurityService.Instance.get().saveInterfaceSettings(Session.get().getUser(), new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable e) {
-				GuiLog.serverError(e);
-			}
-
+		SecurityService.Instance.get().saveInterfaceSettings(Session.get().getUser(), new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIUser usr) {
 				GuiLog.info(I18N.message("settingssaved"));

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -189,7 +189,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			long id = Long.parseLong(getSelectedRecord().getAttribute("id"));
 			String ratingImageName = getSelectedRecord().getAttribute(RATING);
 			final int docRating = Integer.parseInt(ratingImageName.replace(RATING, ""));
-			DocumentService.Instance.get().getRating(id, new GUIAsyncCallback<>() {
+			DocumentService.Instance.get().getRating(id, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIRating rating) {
 					if (rating != null) {

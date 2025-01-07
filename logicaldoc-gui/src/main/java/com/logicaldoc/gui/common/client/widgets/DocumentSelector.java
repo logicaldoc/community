@@ -118,4 +118,29 @@ public class DocumentSelector extends StaticTextItem {
 	public void addDocumentChangeListener(DocumentChangeListener listener) {
 		listeners.add(listener);
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((documentId == null) ? 0 : documentId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DocumentSelector other = (DocumentSelector) obj;
+		if (documentId == null) {
+			if (other.documentId != null)
+				return false;
+		} else if (!documentId.equals(other.documentId))
+			return false;
+		return true;
+	}
 }

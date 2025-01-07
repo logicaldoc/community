@@ -26,8 +26,6 @@ public class FolderSelector extends TextItem {
 
 	private Long folderId;
 
-	private Menu menu = new Menu();
-
 	private Collection<FolderChangeListener> listeners = new ArrayList<>();
 
 	public FolderSelector(String name, List<FormItemIcon> additionalIcons) {
@@ -44,6 +42,7 @@ public class FolderSelector extends TextItem {
 			setWidth(180);
 
 		Date date = new Date();
+		Menu menu = new Menu();
 		menu.setDataSource(new FoldersDS("folderselector" + date.getTime(), true, 100L));
 		menu.setWidth(130);
 		menu.setCanSelectParentItems(true);
@@ -146,5 +145,10 @@ public class FolderSelector extends TextItem {
 
 	public void addFolderChangeListener(FolderChangeListener listener) {
 		listeners.add(listener);
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
 	}
 }

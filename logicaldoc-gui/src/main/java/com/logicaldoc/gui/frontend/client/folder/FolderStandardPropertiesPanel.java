@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.TagsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -193,14 +192,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		computeStats.setSrc("[SKIN]/arrows-rotate.svg");
 		computeStats.addFormItemClickHandler(click -> {
 			click.getItem().setValue(I18N.message("computing") + "...");
-			FolderService.Instance.get().computeStats(folder.getId(), new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-
-				}
-
+			FolderService.Instance.get().computeStats(folder.getId(), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(List<Long> stats) {
 					folder.setDocumentCount(stats.get(0));
@@ -239,14 +231,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 						if (Boolean.TRUE.equals(yes)) {
 							LD.contactingServer();
 							DocumentService.Instance.get().enforceFilesIntoFolderStore(folder.getId(),
-									new AsyncCallback<>() {
-
-										@Override
-										public void onFailure(Throwable caught) {
-											LD.clearPrompt();
-											GuiLog.serverError(caught);
-										}
-
+									new DefaultAsyncCallback<>() {
 										@Override
 										public void onSuccess(Void v) {
 											LD.clearPrompt();
@@ -266,14 +251,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		applyStoreToSubfolders.setSrc("[SKIN]/clone.svg");
 		applyStoreToSubfolders.addFormItemClickHandler(applyStoreToSubfoldersClick -> {
 			LD.contactingServer();
-			FolderService.Instance.get().applyStore(folder.getId(), new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					GuiLog.serverError(caught);
-				}
-
+			FolderService.Instance.get().applyStore(folder.getId(), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void v) {
 					LD.clearPrompt();
@@ -329,7 +307,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		final TextItem newTagItem = prepareNewTagItem(ds);
 
 		final StaticTextItem tagsString = ItemFactory.newStaticTextItem("tags", "tag",
-				Util.getTagsHTML(folder.getTags())); 
+				Util.getTagsHTML(folder.getTags()));
 		tagsString.setEndRow(true);
 		FormItemIcon editTags = new FormItemIcon();
 		editTags.setPrompt(I18N.message("edittags"));
@@ -431,14 +409,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		applyTags.setDisabled(!folder.isWrite());
 		applyTags.addClickHandler(event -> {
 			LD.contactingServer();
-			FolderService.Instance.get().applyTags(folder.getId(), new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					GuiLog.serverError(caught);
-				}
-
+			FolderService.Instance.get().applyTags(folder.getId(), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void v) {
 					LD.clearPrompt();

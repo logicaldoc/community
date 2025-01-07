@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.document;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -97,7 +97,7 @@ public class DocumentsListPanel extends VLayout {
 
 		documentsGrid.registerCellContextClickHandler(click -> {
 			DocumentService.Instance.get().getAllowedPermissions(documentsGrid.getSelectedIds(),
-					new GUIAsyncCallback<>() {
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIAccessControlEntry enabledPermissions) {
 							new ContextMenu(FolderController.get().getCurrentFolder(), documentsGrid,
@@ -115,7 +115,7 @@ public class DocumentsListPanel extends VLayout {
 			if (documentsGrid.getSelectedCount() != 1)
 				return;
 			GUIDocument selectedDocument = documentsGrid.getSelectedDocument();
-			DocumentService.Instance.get().getById(selectedDocument.getId(), new GUIAsyncCallback<>() {
+			DocumentService.Instance.get().getById(selectedDocument.getId(), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIDocument doc) {
 					DocumentController.get().setCurrentDocument(doc);

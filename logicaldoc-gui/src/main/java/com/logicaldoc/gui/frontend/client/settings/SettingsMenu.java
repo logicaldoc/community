@@ -1,12 +1,11 @@
 package com.logicaldoc.gui.frontend.client.settings;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIEmailSettings;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.logicaldoc.gui.frontend.client.settings.automation.AutomationSettingsPanel;
@@ -56,7 +55,7 @@ public class SettingsMenu extends VLayout {
 		addComparators();
 
 		addAuditing();
-		
+
 		addParameters();
 	}
 
@@ -78,7 +77,7 @@ public class SettingsMenu extends VLayout {
 			addMember(auditing);
 		}
 	}
-	
+
 	private void addComparators() {
 		Button comparators = new Button(I18N.message("comparators"));
 		comparators.setWidth100();
@@ -143,20 +142,13 @@ public class SettingsMenu extends VLayout {
 		Button smtp = new Button(I18N.message("outgoingemail"));
 		smtp.setWidth100();
 		smtp.setHeight(25);
-		smtp.addClickHandler(
-				event -> SettingService.Instance.get().loadEmailSettings(new AsyncCallback<>() {
+		smtp.addClickHandler(event -> SettingService.Instance.get().loadEmailSettings(new DefaultAsyncCallback<>() {
+			@Override
+			public void onSuccess(GUIEmailSettings settings) {
+				AdminScreen.get().setContent(new OutgoingEmailPanel(settings));
+			}
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUIEmailSettings settings) {
-						AdminScreen.get().setContent(new OutgoingEmailPanel(settings));
-					}
-
-				}));
+		}));
 
 		if (Session.get().isDemo())
 			setFeatureDisabled(smtp);

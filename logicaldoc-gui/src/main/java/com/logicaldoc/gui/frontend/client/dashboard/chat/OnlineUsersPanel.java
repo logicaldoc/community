@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.Timer;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.controllers.UserController;
@@ -180,7 +180,7 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 					for (int i = 0; i < selection.length; i++)
 						users.add(selection[i].getAttributeAsString(USERNAME));
 
-					ChatService.Instance.get().invite(users, answer, new GUIAsyncCallback<>() {
+					ChatService.Instance.get().invite(users, answer, new DefaultAsyncCallback<>() {
 
 						@Override
 						public void onSuccess(Void arg) {

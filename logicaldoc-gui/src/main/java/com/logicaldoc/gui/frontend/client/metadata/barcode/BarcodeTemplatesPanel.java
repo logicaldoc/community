@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.metadata.barcode;
 import java.util.ArrayList;
 import java.util.Date;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIBarcodeTemplate;
 import com.logicaldoc.gui.common.client.beans.GUIBarcodeZone;
 import com.logicaldoc.gui.common.client.beans.GUIOCRTemplate;
@@ -98,12 +98,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 			selectedOcrTemplate.setZones(patterns);
 		}
 
-		BarcodeService.Instance.get().save((GUIBarcodeTemplate) selectedOcrTemplate, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		BarcodeService.Instance.get().save((GUIBarcodeTemplate) selectedOcrTemplate, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIBarcodeTemplate template) {
 				GuiLog.info(I18N.message("settingssaved"), null);
@@ -234,13 +229,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		delete.addClickHandler(deleteClick -> LD.ask(I18N.message("question"),
 				I18N.message("confirmdeletebarcodetemplate"), (Boolean yes) -> {
 					if (Boolean.TRUE.equals(yes))
-						BarcodeService.Instance.get().delete(selectedOcrTemplate.getId(), new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						BarcodeService.Instance.get().delete(selectedOcrTemplate.getId(), new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void arg0) {
 								selectedOcrTemplate = null;
@@ -311,13 +300,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		barcodeTemplateSelector.setEndRow(false);
 		barcodeTemplateSelector.addChangedHandler(changed -> {
 			ListGridRecord rec = barcodeTemplateSelector.getSelectedRecord();
-			BarcodeService.Instance.get().getTemplate(rec.getAttributeAsLong("id"), new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			BarcodeService.Instance.get().getTemplate(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIBarcodeTemplate tmpl) {
 					setSelectedOcrTemplate(tmpl);

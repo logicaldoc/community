@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.common.client.widgets;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.smartgwt.client.types.HeaderControls;
@@ -63,7 +63,7 @@ public class PasswordGenerator extends Window {
 	protected void onSubmit() {
 		submit.setDisabled(true);
 		if (pwdSize == null)
-			SecurityService.Instance.get().generatePassword(new GUIAsyncCallback<>() {
+			SecurityService.Instance.get().generatePassword(new DefaultAsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					super.onFailure(caught);
@@ -78,7 +78,7 @@ public class PasswordGenerator extends Window {
 			});
 		else
 			SecurityService.Instance.get().generatePassword2(pwdSize, pwdUpperCase, pwdLowerCase, pwdDigit, pwdSpecial,
-					pwdSequence, pwdOccurrence, new GUIAsyncCallback<>() {
+					pwdSequence, pwdOccurrence, new DefaultAsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							super.onFailure(caught);
@@ -117,5 +117,10 @@ public class PasswordGenerator extends Window {
 		pswd.setWrap(false);
 		pswd.setIcons(new CopyTextFormItemIcon());
 		return pswd;
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
 	}
 }

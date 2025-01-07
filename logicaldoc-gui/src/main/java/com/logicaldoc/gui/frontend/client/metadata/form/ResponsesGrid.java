@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
@@ -132,7 +131,7 @@ public class ResponsesGrid extends RefreshableListGrid {
 							Session.get().getInfo().getAttributeLabel(name));
 					ext.setTitle(Session.get().getInfo().getAttributeLabel(name));
 				}
-				
+
 				if (!attDef.isSection()) {
 					ext.setCanFilter(true);
 					ext.setCanSort(true);
@@ -195,13 +194,7 @@ public class ResponsesGrid extends RefreshableListGrid {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler((MenuItemClickEvent event) -> DocumentService.Instance.get()
-				.delete(DocumentGridUtil.getIds(selection), new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.delete(DocumentGridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void arg0) {
 						refresh(getDataSource());

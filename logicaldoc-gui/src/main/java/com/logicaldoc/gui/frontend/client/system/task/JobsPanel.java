@@ -3,11 +3,10 @@ package com.logicaldoc.gui.frontend.client.system.task;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.data.JobsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
@@ -123,13 +122,7 @@ public class JobsPanel extends VLayout {
 							selectedJobs.add(
 									new GUIValue(rec.getAttributeAsString(TRIGGER), rec.getAttributeAsString("group")));
 
-						SystemService.Instance.get().unscheduleJobs(selectedJobs, new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								LD.clearPrompt();
-								GuiLog.serverError(caught);
-							}
-
+						SystemService.Instance.get().unscheduleJobs(selectedJobs, new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void result) {
 								LD.clearPrompt();

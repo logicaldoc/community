@@ -2,10 +2,9 @@ package com.logicaldoc.gui.frontend.client.textcontent;
 
 import java.util.Arrays;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -61,13 +60,7 @@ public class TextContentEditor extends Window {
 			prepareBody(content);
 		} else {
 			DocumentService.Instance.get().getContentAsString(TextContentEditor.this.document.getId(),
-					new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(String content) {
 							prepareBody(content);
@@ -111,10 +104,10 @@ public class TextContentEditor extends Window {
 	private void unlockAndClose() {
 		if (document.getId() != 0)
 			DocumentService.Instance.get().unlock(Arrays.asList(TextContentEditor.this.document.getId()),
-					new AsyncCallback<>() {
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
+							super.onFailure(caught);
 							destroy();
 						}
 
@@ -133,14 +126,7 @@ public class TextContentEditor extends Window {
 		if (document.getId() != 0L) {
 			// We are editing an existing file
 			DocumentService.Instance.get().checkinContent(document.getId(), form.getValueAsString(CONTENT),
-					new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							LD.clearPrompt();
-							GuiLog.serverError(caught);
-						}
-
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIDocument doc) {
 							LD.clearPrompt();
@@ -152,13 +138,7 @@ public class TextContentEditor extends Window {
 		} else {
 			// We are creating a new file
 			DocumentService.Instance.get().createDocument(document, form.getValueAsString(CONTENT),
-					new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							LD.clearPrompt();
-							GuiLog.serverError(caught);
-						}
-
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIDocument doc) {
 							LD.clearPrompt();

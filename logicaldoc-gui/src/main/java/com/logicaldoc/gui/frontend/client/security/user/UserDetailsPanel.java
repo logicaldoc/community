@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.frontend.client.security.user;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.controllers.UserController;
@@ -91,12 +91,7 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), canceEvent -> {
 			if (user.getId() != 0) {
-				SecurityService.Instance.get().getUser(user.getId(), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				SecurityService.Instance.get().getUser(user.getId(), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIUser user) {
 						setUser(user);
@@ -366,13 +361,7 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 			final boolean notifyCredentials = user.isNotifyCredentials();
 
 			LD.contactingServer();
-			SecurityService.Instance.get().saveUser(user, Session.get().getInfo(), new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					GuiLog.serverError(caught);
-				}
-
+			SecurityService.Instance.get().saveUser(user, Session.get().getInfo(), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIUser user) {
 					LD.clearPrompt();

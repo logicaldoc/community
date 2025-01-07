@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
@@ -164,13 +164,7 @@ public class UserPropertiesPanel extends HLayout {
 
 	private void addAvatar() {
 		if (user.getId() != 0L) {
-			Avatar avatar = new Avatar(user.getId(), new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			Avatar avatar = new Avatar(user.getId(), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void result) {
 					if (usersPanel != null)

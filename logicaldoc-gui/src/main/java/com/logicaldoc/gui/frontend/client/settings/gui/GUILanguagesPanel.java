@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.frontend.client.settings.gui;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.data.LanguagesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -77,13 +77,7 @@ public class GUILanguagesPanel extends VLayout {
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(event -> SystemService.Instance.get()
-				.setGUILanguageStatus(rec.getAttributeAsString("code"), true, new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.setGUILanguageStatus(rec.getAttributeAsString("code"), true, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						rec.setAttribute(EENABLED, "0");
@@ -95,13 +89,7 @@ public class GUILanguagesPanel extends VLayout {
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(event -> SystemService.Instance.get()
-				.setGUILanguageStatus(rec.getAttributeAsString("code"), false, new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.setGUILanguageStatus(rec.getAttributeAsString("code"), false, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						rec.setAttribute(EENABLED, "2");

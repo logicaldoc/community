@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.dropbox;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.smartgwt.client.types.Alignment;
@@ -83,12 +82,7 @@ public class DropboxAccessTokenWizard extends Window {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
-		DropboxService.Instance.get().finishAuthorization(vm.getValueAsString("code").trim(), new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		DropboxService.Instance.get().finishAuthorization(vm.getValueAsString("code").trim(), new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(String account) {
 				if (account != null) {

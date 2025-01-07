@@ -137,4 +137,9 @@ public class PreviewPopup extends Window {
 
 		previewSlot.setMembers(previewPanel);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
 }

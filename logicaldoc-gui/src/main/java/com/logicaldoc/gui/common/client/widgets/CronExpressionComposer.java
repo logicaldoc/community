@@ -3,10 +3,8 @@ package com.logicaldoc.gui.common.client.widgets;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.InfoService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.HeaderControls;
@@ -537,7 +535,7 @@ public class CronExpressionComposer extends Window {
 		}
 
 		InfoService.Instance.get().getCronDescription("" + vm.getItem(EXPRESSION).getValue(), I18N.getLocale(),
-				new GUIAsyncCallback<>() {
+				new DefaultAsyncCallback<>() {
 
 					@Override
 					public void onSuccess(String description) {

@@ -101,4 +101,9 @@ public class LastLogins extends com.smartgwt.client.widgets.Window {
 		list.setDataSource(new UserHistoryDS(Session.get().getUser().getId(), "event.user.login", 300));
 		list.fetchData();
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
 }

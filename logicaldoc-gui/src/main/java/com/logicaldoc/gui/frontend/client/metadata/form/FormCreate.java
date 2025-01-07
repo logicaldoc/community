@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.metadata.form;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.FormService;
 import com.smartgwt.client.types.HeaderControls;
@@ -74,13 +73,7 @@ public class FormCreate extends Window {
 		else
 			vo.setTemplateId(Long.parseLong(vm.getValueAsString(TEMPLATE)));
 
-		FormService.Instance.get().save(vo, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-				destroy();
-			}
-
+		FormService.Instance.get().save(vo, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIForm form) {
 				grid.refresh();

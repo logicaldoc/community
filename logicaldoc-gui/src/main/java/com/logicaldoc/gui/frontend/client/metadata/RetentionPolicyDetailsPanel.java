@@ -1,10 +1,9 @@
 package com.logicaldoc.gui.frontend.client.metadata;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIRetentionPolicy;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
@@ -63,18 +62,12 @@ public class RetentionPolicyDetailsPanel extends VLayout implements FolderChange
 
 		tabSet = new EditingTabSet((ClickEvent event) -> onSave(), (ClickEvent event) -> {
 			if (policy.getId() != 0) {
-				RetentionPoliciesService.Instance.get().getPolicy(policy.getId(),
-						new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUIRetentionPolicy policy) {
-								setPolicy(policy);
-							}
-						});
+				RetentionPoliciesService.Instance.get().getPolicy(policy.getId(), new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(GUIRetentionPolicy policy) {
+						setPolicy(policy);
+					}
+				});
 			} else {
 				GUIRetentionPolicy newsPolicy = new GUIRetentionPolicy();
 				setPolicy(newsPolicy);
@@ -154,12 +147,7 @@ public class RetentionPolicyDetailsPanel extends VLayout implements FolderChange
 			else
 				policy.setFolderId(folder.getFolderId());
 
-			RetentionPoliciesService.Instance.get().save(policy, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			RetentionPoliciesService.Instance.get().save(policy, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIRetentionPolicy newPolicy) {
 					tabSet.hideSave();

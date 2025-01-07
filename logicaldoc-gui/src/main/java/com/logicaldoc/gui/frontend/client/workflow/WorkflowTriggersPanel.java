@@ -1,10 +1,9 @@
 package com.logicaldoc.gui.frontend.client.workflow;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.WorkflowTriggersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.EventsListGridField;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
@@ -45,19 +44,7 @@ public class WorkflowTriggersPanel extends VLayout {
 		applyTriggersToSubfolders.setAutoFit(true);
 		applyTriggersToSubfolders.addClickHandler(event -> {
 			LD.contactingServer();
-			WorkflowService.Instance.get().applyTriggersToTree(folder.getId(), new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					GuiLog.serverError(caught);
-				}
-
-				@Override
-				public void onSuccess(Void v) {
-					LD.clearPrompt();
-				}
-			});
+			WorkflowService.Instance.get().applyTriggersToTree(folder.getId(), new DefaultAsyncCallback<>());
 		});
 
 		HLayout buttons = new HLayout();
@@ -68,8 +55,7 @@ public class WorkflowTriggersPanel extends VLayout {
 
 		addTrigger.addClickHandler(event -> {
 			list.deselectAllRecords();
-			TriggerDialog dialog = new TriggerDialog(WorkflowTriggersPanel.this);
-			dialog.show();
+			new TriggerDialog(WorkflowTriggersPanel.this).show();
 		});
 
 		setMembersMargin(4);
@@ -118,12 +104,7 @@ public class WorkflowTriggersPanel extends VLayout {
 					if (Boolean.TRUE.equals(value)) {
 						ListGridRecord rec = list.getSelectedRecord();
 						WorkflowService.Instance.get().deleteTrigger(Long.parseLong(rec.getAttributeAsString("id")),
-								new AsyncCallback<>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
-
+								new DefaultAsyncCallback<>() {
 									@Override
 									public void onSuccess(Void result) {
 										removeMember(list);

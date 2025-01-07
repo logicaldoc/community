@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.metadata.barcode;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
 import com.logicaldoc.gui.common.client.data.DocumentsDSParameters;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -84,12 +84,7 @@ public class BarcodeQueuePanel extends VLayout {
 		reschedule.addClickHandler(event -> LD.ask(I18N.message("rescheduleallprocessing"),
 				I18N.message("rescheduleallprocessingask"), answer -> {
 					if (Boolean.TRUE.equals(answer))
-						BarcodeService.Instance.get().rescheduleAll(new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+						BarcodeService.Instance.get().rescheduleAll(new DefaultAsyncCallback<>() {
 
 							@Override
 							public void onSuccess(Void ret) {
@@ -228,12 +223,7 @@ public class BarcodeQueuePanel extends VLayout {
 			if (selection == null || selection.length < 1)
 				return;
 
-			BarcodeService.Instance.get().markUnprocessable(GridUtil.getIds(selection), new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			BarcodeService.Instance.get().markUnprocessable(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void result) {
 					for (ListGridRecord rec : selection) {

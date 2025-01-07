@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUILDAPServer;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
@@ -157,13 +157,12 @@ public class LDAPBrowser extends VLayout {
 			searchButton.setDisabled(true);
 
 			LD.contactingServer();
-			LDAPService.Instance.get().listUsers(username, server.getId(), new AsyncCallback<>() {
+			LDAPService.Instance.get().listUsers(username, server.getId(), new DefaultAsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
 					searchButton.setDisabled(false);
-					LD.clearPrompt();
-					GuiLog.serverError(caught);
+					super.onFailure(caught);
 				}
 
 				@Override
@@ -201,13 +200,7 @@ public class LDAPBrowser extends VLayout {
 		importItem.addClickHandler(click -> {
 			LD.contactingServer();
 			users.deselectAllRecords();
-			LDAPService.Instance.get().importUsers(usernames, server.getId(), new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-					LD.clearPrompt();
-				}
-
+			LDAPService.Instance.get().importUsers(usernames, server.getId(), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(List<GUIValue> report) {
 					LD.clearPrompt();

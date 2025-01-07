@@ -3,7 +3,6 @@ package com.logicaldoc.gui.frontend.client.google.drive;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -14,13 +13,12 @@ import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.IconGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
+import com.logicaldoc.gui.frontend.client.google.GoogleAsyncCallback;
 import com.logicaldoc.gui.frontend.client.google.GoogleService;
-import com.logicaldoc.gui.frontend.client.google.GoogleUtil;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -109,12 +107,7 @@ public class DriveImport extends Window {
 			@Override
 			protected void onSearch() {
 				LD.contactingServer();
-				GoogleService.Instance.get().search(this.getValueAsString(), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GoogleUtil.handleGoogleServiceError(caught);
-					}
-
+				GoogleService.Instance.get().search(this.getValueAsString(), new GoogleAsyncCallback<>() {
 					@Override
 					public void onSuccess(List<GUIDocument> hits) {
 						LD.clearPrompt();
@@ -140,7 +133,7 @@ public class DriveImport extends Window {
 		ToolStripButton importSelection = new ToolStripButton();
 		importSelection.setTitle(I18N.message("iimport"));
 		toolStrip.addButton(importSelection);
-		importSelection.addClickHandler((ClickEvent event) -> {
+		importSelection.addClickHandler(click -> {
 			ListGridRecord[] selection = grid.getSelectedRecords();
 			if (selection == null || selection.length == 0)
 				return;
@@ -151,12 +144,7 @@ public class DriveImport extends Window {
 
 			LD.contactingServer();
 			GoogleService.Instance.get().importDocuments(resIds, FolderController.get().getCurrentFolder().getId(),
-					null, new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GoogleUtil.handleGoogleServiceError(caught);
-						}
-
+					null, new GoogleAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void ret) {
 							LD.clearPrompt();

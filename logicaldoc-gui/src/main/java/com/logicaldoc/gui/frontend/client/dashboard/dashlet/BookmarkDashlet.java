@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.dashboard.dashlet;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.BookmarksDS;
@@ -65,7 +65,7 @@ public class BookmarkDashlet extends Dashlet {
 			event.cancel();
 			Record rec = event.getRecord();
 			DocumentService.Instance.get().getById(Long.parseLong(rec.getAttributeAsString(docIdAttribute)),
-					new GUIAsyncCallback<>() {
+					new DefaultAsyncCallback<>() {
 
 						@Override
 						public void onSuccess(GUIDocument document) {

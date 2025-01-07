@@ -5,12 +5,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIHistory;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.EventSelectorOptions;
 import com.logicaldoc.gui.common.client.util.GridUtil;
@@ -371,14 +370,7 @@ public class LastChangesReport extends AdminPanel {
 			int displayMaxValue) {
 		LD.contactingServer();
 		SystemService.Instance.get().search(userId, fromValue, tillValue, displayMaxValue, sid, eventValues,
-				folder.getFolderId(), new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
-					}
-
+				folder.getFolderId(), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(List<GUIHistory> result) {
 						LD.clearPrompt();
@@ -455,17 +447,10 @@ public class LastChangesReport extends AdminPanel {
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
 		if (docId != null)
-			preview.addClickHandler(event -> DocumentService.Instance.get().getById(docId, new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			preview.addClickHandler(event -> DocumentService.Instance.get().getById(docId, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIDocument doc) {
-					PreviewPopup iv = new PreviewPopup(doc);
-					iv.show();
+					new PreviewPopup(doc).show();
 				}
 			}));
 		return preview;

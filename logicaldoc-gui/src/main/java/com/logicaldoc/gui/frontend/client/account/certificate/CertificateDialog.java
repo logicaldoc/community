@@ -1,12 +1,11 @@
 package com.logicaldoc.gui.frontend.client.account.certificate;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.controllers.UserController;
 import com.logicaldoc.gui.common.client.controllers.UserObserver;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -79,23 +78,11 @@ public class CertificateDialog extends Window implements UserObserver {
 		createNew.setAutoFit(true);
 		createNew.addClickHandler(event -> {
 			LD.contactingServer();
-			SignService.Instance.get().generateNewCertificate(new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					GuiLog.serverError(caught);
-				}
-
+			SignService.Instance.get().generateNewCertificate(new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void arg) {
 					LD.clearPrompt();
-					SecurityService.Instance.get().getUser(Session.get().getUser().getId(), new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					SecurityService.Instance.get().getUser(Session.get().getUser().getId(), new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIUser user) {
 							Session.get().setUser(user);
@@ -114,13 +101,7 @@ public class CertificateDialog extends Window implements UserObserver {
 		delete.setAutoFit(true);
 		delete.addClickHandler(event -> SC.ask(I18N.message("deletecertwarn"), (Boolean value) -> {
 			LD.contactingServer();
-			SignService.Instance.get().deleteCertificate(new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					GuiLog.serverError(caught);
-				}
-
+			SignService.Instance.get().deleteCertificate(new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void arg) {
 					LD.clearPrompt();

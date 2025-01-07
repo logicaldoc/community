@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.document;
 
 import java.util.Arrays;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.IgnoreAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -93,18 +93,7 @@ public class DocumentCheckin extends Window {
 		addItem(layout);
 
 		// Just to clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				// Nothing to do
-			}
-
-			@Override
-			public void onSuccess(Void result) {
-				// Nothing to do
-			}
-		});
+		DocumentService.Instance.get().cleanUploadedFileFolder(new IgnoreAsyncCallback<>());
 	}
 
 	public void onSubmit() {

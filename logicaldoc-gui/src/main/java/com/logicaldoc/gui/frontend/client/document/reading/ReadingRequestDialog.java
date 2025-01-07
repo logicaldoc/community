@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.document.reading;
 
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -72,7 +72,7 @@ public class ReadingRequestDialog extends StickyWindow {
 				ReadingRequestService.Instance.get().askReadingConfirmation(docIds, usersItem.getUserIds(),
 						groupsItem.getGroupIds(),
 						Boolean.parseBoolean(form.getValueAsString("notifyreadingconfirmation")),
-						form.getValueAsString("message"), new GUIAsyncCallback<>() {
+						form.getValueAsString("message"), new DefaultAsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {

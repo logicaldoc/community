@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.document.note;
 
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.NotesDS;
@@ -168,7 +168,7 @@ public class NotesPanel extends DocumentDetailTab {
 
 		LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				DocumentService.Instance.get().deleteNotes(GridUtil.getIds(selection), new GUIAsyncCallback<>() {
+				DocumentService.Instance.get().deleteNotes(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 
 					@Override
 					public void onSuccess(Void result) {

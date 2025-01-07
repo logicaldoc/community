@@ -3,10 +3,9 @@ package com.logicaldoc.gui.frontend.client.sharefile;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
@@ -94,13 +93,7 @@ public class ShareFileDialog extends Dialog {
 
 						LD.contactingServer();
 						ShareFileService.Instance.get().exportDocuments(targetId, folderIds, docIds,
-								new AsyncCallback<Boolean>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										LD.clearPrompt();
-										GuiLog.serverError(caught);
-									}
-
+								new DefaultAsyncCallback<>() {
 									@Override
 									public void onSuccess(Boolean result) {
 										LD.clearPrompt();
@@ -129,13 +122,7 @@ public class ShareFileDialog extends Dialog {
 				ShareFileDialog.this.destroy();
 				LD.contactingServer();
 				ShareFileService.Instance.get().importDocuments(FolderController.get().getCurrentFolder().getId(), ids,
-						new AsyncCallback<Integer>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								LD.clearPrompt();
-								GuiLog.serverError(caught);
-							}
-
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Integer count) {
 								LD.clearPrompt();

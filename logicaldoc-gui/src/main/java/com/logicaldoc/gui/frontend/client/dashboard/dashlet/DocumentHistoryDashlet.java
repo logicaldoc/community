@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.logicaldoc.gui.common.client.Constants;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -42,7 +42,7 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 
 		HeaderControl markAsRead = new HeaderControl(HeaderControl.TRASH, e -> {
 			LD.contactingServer();
-			DocumentService.Instance.get().markHistoryAsRead(event, new GUIAsyncCallback<>() {
+			DocumentService.Instance.get().markHistoryAsRead(event, new DefaultAsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

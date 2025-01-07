@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.settings.messages;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIMessageTemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -201,12 +201,7 @@ public class MessageTemplatesPanel extends VLayout {
 			templates.add(template);
 		}
 
-		MessageService.Instance.get().saveTemplates(templates, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		MessageService.Instance.get().saveTemplates(templates, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg0) {
 				GuiLog.info(I18N.message("settingssaved"), null);
@@ -228,12 +223,7 @@ public class MessageTemplatesPanel extends VLayout {
 					ids.add(records[i].getAttributeAsLong("id"));
 			}
 
-			MessageService.Instance.get().deleteTemplates(ids, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			MessageService.Instance.get().deleteTemplates(ids, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void arg0) {
 					reload();
@@ -244,12 +234,7 @@ public class MessageTemplatesPanel extends VLayout {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> MessageService.Instance.get()
-				.deleteTemplates(list.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.deleteTemplates(list.getSelectedRecord().getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void arg) {
 						reload();
@@ -266,12 +251,7 @@ public class MessageTemplatesPanel extends VLayout {
 	private void reload() {
 		String lang = langSelector.getValueAsString();
 
-		MessageService.Instance.get().loadTemplates(lang, null, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		MessageService.Instance.get().loadTemplates(lang, null, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUIMessageTemplate> templates) {
 				List<ListGridRecord> records = new ArrayList<>();

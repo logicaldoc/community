@@ -35,7 +35,7 @@ public class EchoServlet extends HttpServlet {
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		if (Context.get().getProperties().getBoolean("echo.enabled", false)) {
+		if (Context.get().getProperties().getBoolean("echo.enabled", false) && log.isInfoEnabled()) {
 			log.info(getUrl(request));
 			log.info(getContent(request));
 		}

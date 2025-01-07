@@ -2,10 +2,9 @@ package com.logicaldoc.gui.frontend.client.metadata.template;
 
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.Upload;
 import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
@@ -73,13 +72,12 @@ public class OptionsUploader extends Window {
 
 		LD.contactingServer();
 		AttributeSetService.Instance.get().parseOptions(options.getSetId(), options.getAttribute(),
-				new AsyncCallback<>() {
+				new DefaultAsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
+						super.onFailure(caught);
 						options.refresh();
-						LD.clearPrompt();
 					}
 
 					@Override

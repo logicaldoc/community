@@ -15,7 +15,6 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.controllers.DocumentObserver;
 import com.logicaldoc.gui.common.client.controllers.UserController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.InfoService;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -295,12 +294,7 @@ public class Session implements DocumentObserver {
 			Session.get().close();
 			Util.redirect(GWT.getHostPageBaseURL() + "saml/logout");
 		} else {
-			SecurityService.Instance.get().logout(new AsyncCallback<>() {
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-					SC.warn(caught.getMessage());
-				}
-
+			SecurityService.Instance.get().logout(new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void result) {
 					CookiesManager.removeSid();

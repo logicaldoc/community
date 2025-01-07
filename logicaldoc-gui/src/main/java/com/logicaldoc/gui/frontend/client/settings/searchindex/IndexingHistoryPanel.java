@@ -3,14 +3,13 @@ package com.logicaldoc.gui.frontend.client.settings.searchindex;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DocumentHistoryDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -197,13 +196,7 @@ public class IndexingHistoryPanel extends VLayout {
 		downloadIndexed.addClickHandler(evnt -> {
 			Record rec = list.getSelectedRecord();
 			FolderService.Instance.get().getFolder(rec.getAttributeAsLong("folderId"), false, false, false,
-					new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIFolder folder) {
 							if (folder.isDownload())
@@ -217,13 +210,7 @@ public class IndexingHistoryPanel extends VLayout {
 		index.setTitle(I18N.message("index"));
 		index.addClickHandler(event -> {
 			LD.contactingServer();
-			DocumentService.Instance.get().indexDocuments(getSelectedDocIds(list), new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					GuiLog.serverError(caught);
-				}
-
+			DocumentService.Instance.get().indexDocuments(getSelectedDocIds(list), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void result) {
 					LD.clearPrompt();
@@ -235,12 +222,7 @@ public class IndexingHistoryPanel extends VLayout {
 		MenuItem markIndexMetadataOnly = new MenuItem();
 		markIndexMetadataOnly.setTitle(I18N.message("markindexablemetadataonly"));
 		markIndexMetadataOnly.addClickHandler(event -> DocumentService.Instance.get()
-				.markIndexable(getSelectedDocIds(list), Constants.INDEX_TO_INDEX_METADATA, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.markIndexable(getSelectedDocIds(list), Constants.INDEX_TO_INDEX_METADATA, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						refresh(list);
@@ -249,13 +231,8 @@ public class IndexingHistoryPanel extends VLayout {
 
 		MenuItem markUnindexable = new MenuItem();
 		markUnindexable.setTitle(I18N.message("markunindexable"));
-		markUnindexable.addClickHandler(
-				event -> DocumentService.Instance.get().markUnindexable(getSelectedDocIds(list), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+		markUnindexable.addClickHandler(event -> DocumentService.Instance.get().markUnindexable(getSelectedDocIds(list),
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						refresh(list);
@@ -265,12 +242,7 @@ public class IndexingHistoryPanel extends VLayout {
 		MenuItem markIndexable = new MenuItem();
 		markIndexable.setTitle(I18N.message("markindexable"));
 		markIndexable.addClickHandler(event -> DocumentService.Instance.get().markIndexable(getSelectedDocIds(list),
-				Constants.INDEX_TO_INDEX, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				Constants.INDEX_TO_INDEX, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						refresh(list);

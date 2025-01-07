@@ -10,7 +10,7 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIStamp;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
@@ -87,7 +87,7 @@ public class VisualPositioningStampDialog extends Window {
 				public void onResponseReceived(Request request, Response response) {
 					firstSelectedDoc = documents.get(0);
 
-					DocumentService.Instance.get().getById(firstSelectedDoc.getId(), new GUIAsyncCallback<>() {
+					DocumentService.Instance.get().getById(firstSelectedDoc.getId(), new DefaultAsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -144,7 +144,7 @@ public class VisualPositioningStampDialog extends Window {
 		LD.contactingServer();
 
 		StampService.Instance.get().applyStamp(documents.stream().map(d -> d.getId()).collect(Collectors.toList()),
-				stamp, new GUIAsyncCallback<>() {
+				stamp, new DefaultAsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -157,7 +157,7 @@ public class VisualPositioningStampDialog extends Window {
 						LD.clearPrompt();
 						GuiLog.info(I18N.message("event.stamped"), null);
 						for (GUIDocument doc : documents) {
-							DocumentService.Instance.get().getById(doc.getId(), new GUIAsyncCallback<>() {
+							DocumentService.Instance.get().getById(doc.getId(), new DefaultAsyncCallback<>() {
 								@Override
 								public void onSuccess(GUIDocument document) {
 									DocumentController.get().modified(document);
@@ -181,7 +181,7 @@ public class VisualPositioningStampDialog extends Window {
 		stampSelector.setRequired(true);
 		stampSelector.setValue(stamp.getId());
 		stampSelector.addChangedHandler(changed -> StampService.Instance.get()
-				.getStamp(Long.parseLong(stampSelector.getValueAsString()), new GUIAsyncCallback<>() {
+				.getStamp(Long.parseLong(stampSelector.getValueAsString()), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIStamp stmp) {
 						VisualPositioningStampDialog.this.stamp = stmp;

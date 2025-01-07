@@ -1,11 +1,10 @@
 package com.logicaldoc.gui.frontend.client.workflow;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.data.WorkflowHistoriesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -86,12 +85,7 @@ public class WorkflowHistoryDialog extends Window {
 				return;
 
 			WorkflowService.Instance.get().get(selectedRecord.getAttributeAsString("name"), null,
-					new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIWorkflow result) {
 							selectedWorkflow = result;
@@ -225,12 +219,7 @@ public class WorkflowHistoryDialog extends Window {
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), value -> {
 			if (Boolean.TRUE.equals(value)) {
 				WorkflowService.Instance.get().deleteInstance(selection.getAttributeAsString("id"),
-						new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void result) {
 								instancesGrid.removeSelectedData();
@@ -246,12 +235,7 @@ public class WorkflowHistoryDialog extends Window {
 		completionDiagram.setTitle(I18N.message("completiondiagram"));
 		completionDiagram.addClickHandler(
 				event -> WorkflowService.Instance.get().getCompletionDiagram(selectedWorkflow.getName(),
-						selectedWorkflow.getVersion(), selection.getAttributeAsString("id"), new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						selectedWorkflow.getVersion(), selection.getAttributeAsString("id"), new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(GUIWorkflow workflow) {
 								new WorkflowPreview(workflow).show();

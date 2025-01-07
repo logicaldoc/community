@@ -2,19 +2,18 @@ package com.logicaldoc.gui.frontend.client.google.drive;
 
 import java.util.Arrays;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
+import com.logicaldoc.gui.frontend.client.google.GoogleAsyncCallback;
 import com.logicaldoc.gui.frontend.client.google.GoogleService;
-import com.logicaldoc.gui.frontend.client.google.GoogleUtil;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
@@ -64,18 +63,14 @@ public class DriveEditor extends Window {
 				// Creating a new document document, so delete the temporary
 				// doc in Google Drive
 				LD.contactingServer();
-				GoogleService.Instance.get().delete(DriveEditor.this.document.getExtResId(), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GoogleUtil.handleGoogleServiceError(caught);
-					}
-
-					@Override
-					public void onSuccess(Void result) {
-						LD.clearPrompt();
-						destroy();
-					}
-				});
+				GoogleService.Instance.get().delete(DriveEditor.this.document.getExtResId(),
+						new GoogleAsyncCallback<>() {
+							@Override
+							public void onSuccess(Void result) {
+								LD.clearPrompt();
+								destroy();
+							}
+						});
 			}
 		});
 
@@ -130,24 +125,17 @@ public class DriveEditor extends Window {
 		toolStrip.addButton(cancel);
 		toolStrip.addSeparator();
 		cancel.addClickHandler(event -> DocumentService.Instance.get()
-				.unlock(Arrays.asList(DriveEditor.this.document.getId()), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-						destroy();
-					}
-
+				.unlock(Arrays.asList(DriveEditor.this.document.getId()), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						DocUtil.markUnlocked(document);
 						DocumentController.get().setCurrentDocument(document);
 						LD.contactingServer();
 						GoogleService.Instance.get().delete(DriveEditor.this.document.getExtResId(),
-								new AsyncCallback<>() {
+								new DefaultAsyncCallback<>() {
 									@Override
 									public void onFailure(Throwable caught) {
-										LD.clearPrompt();
-										GuiLog.serverError(caught);
+										super.onFailure(caught);
 										destroy();
 									}
 
@@ -169,32 +157,28 @@ public class DriveEditor extends Window {
 			} else {
 				LD.contactingServer();
 				GoogleService.Instance.get().importDocuments(Arrays.asList(document.getExtResId()),
-						FolderController.get().getCurrentFolder().getId(), document.getType(), new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GoogleUtil.handleGoogleServiceError(caught);
-							}
-
+						FolderController.get().getCurrentFolder().getId(), document.getType(),
+						new GoogleAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void result) {
 								DocumentsPanel.get().refresh();
 
 								// Delete the temporary resource in GDrive
-								GoogleService.Instance.get().delete(document.getExtResId(), new AsyncCallback<>() {
+								GoogleService.Instance.get().delete(document.getExtResId(),
+										new DefaultAsyncCallback<>() {
 
-									@Override
-									public void onFailure(Throwable caught) {
-										LD.clearPrompt();
-										GuiLog.serverError(caught);
-										destroy();
-									}
+											@Override
+											public void onFailure(Throwable caught) {
+												super.onFailure(caught);
+												destroy();
+											}
 
-									@Override
-									public void onSuccess(Void ret) {
-										LD.clearPrompt();
-										destroy();
-									}
-								});
+											@Override
+											public void onSuccess(Void ret) {
+												LD.clearPrompt();
+												destroy();
+											}
+										});
 							}
 						});
 			}

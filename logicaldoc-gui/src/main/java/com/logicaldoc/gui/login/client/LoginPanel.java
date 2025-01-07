@@ -500,7 +500,7 @@ public class LoginPanel extends VLayout {
 				&& credentialsPanel.isVisible()) {
 			String login = username.getValueAsString();
 			LoginService.Instance.get().isSecretKeyRequired(login, CookiesManager.getSavedDevice(),
-					new AsyncCallback<Boolean>() {
+					new AsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

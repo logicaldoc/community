@@ -1,9 +1,10 @@
 package com.logicaldoc.gui.frontend.client.tenant;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.IgnoreAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIBranding;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.Upload;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.TenantService;
@@ -53,34 +54,18 @@ public class BrandingPackageUploader extends Window {
 		layout.addMember(uploadButton);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				// Nothing to do
-			}
-
-			@Override
-			public void onSuccess(Void result) {
-				destroy();
-			}
-		}));
+		addCloseClickHandler(
+				event -> DocumentService.Instance.get().cleanUploadedFileFolder(new IgnoreAsyncCallback<>() {
+					@Override
+					public void onSuccess(Void result) {
+						destroy();
+					}
+				}));
 
 		addItem(layout);
 
 		// Just to clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				// Nothing to do
-			}
-
-			@Override
-			public void onSuccess(Void result) {
-				// Nothing to do
-			}
-		});
+		DocumentService.Instance.get().cleanUploadedFileFolder(new IgnoreAsyncCallback<>());
 	}
 
 	public void onUpload() {
@@ -89,13 +74,7 @@ public class BrandingPackageUploader extends Window {
 			return;
 		}
 
-		TenantService.Instance.get().importBrandingPackage(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		TenantService.Instance.get().importBrandingPackage(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIBranding branding) {
 				panel.update(branding);

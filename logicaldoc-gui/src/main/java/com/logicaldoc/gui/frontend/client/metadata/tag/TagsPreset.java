@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.metadata.tag;
 import java.util.Arrays;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.data.TagsDS;
@@ -65,12 +66,7 @@ public class TagsPreset extends VLayout {
 		addTag.setRequired(true);
 		addTag.addClickHandler(event -> LD.askForValue(I18N.message("addtag"), I18N.message("tag"), "", value -> {
 			if (value != null && !"".equals(value))
-				TagService.Instance.get().addTag(value, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				TagService.Instance.get().addTag(value, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void arg0) {
 						GuiLog.info(I18N.message("settingssaved"), null);

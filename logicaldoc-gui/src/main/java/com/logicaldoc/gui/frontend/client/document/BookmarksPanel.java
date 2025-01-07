@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.document;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIBookmark;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.BookmarksDS;
@@ -78,7 +78,7 @@ public class BookmarksPanel extends VLayout {
 		list.addCellContextClickHandler(event -> {
 			final ListGridRecord rec = list.getSelectedRecord();
 			FolderService.Instance.get().getFolder(Long.parseLong(rec.getAttributeAsString("folderId")), false, false,
-					false, new GUIAsyncCallback<>() {
+					false, new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIFolder folder) {
 							showContextMenu(folder, rec.getAttributeAsString("type").equals("0"));
@@ -123,7 +123,7 @@ public class BookmarksPanel extends VLayout {
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 				if (Boolean.TRUE.equals(answer)) {
 					DocumentService.Instance.get().deleteBookmarks(GridUtil.getIds(selection),
-							new GUIAsyncCallback<>() {
+							new DefaultAsyncCallback<>() {
 								@Override
 								public void onSuccess(Void result) {
 									list.removeSelectedData();

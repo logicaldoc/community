@@ -1,11 +1,10 @@
 package com.logicaldoc.gui.frontend.client.folder;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.SubscriptionsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -110,13 +109,7 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 				return;
 			long groupId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
 			AuditService.Instance.get().subscribeFolder(folder.getId(), false, Constants.getAuditDefaultEvents(), null,
-					groupId, new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					groupId, new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void arg0) {
 							refreshList();
@@ -134,13 +127,7 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 				return;
 			long userId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
 			AuditService.Instance.get().subscribeFolder(folder.getId(), false, Constants.getAuditDefaultEvents(),
-					userId, null, new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					userId, null, new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void arg0) {
 							refreshList();
@@ -162,12 +149,7 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				AuditService.Instance.get().deleteSubscriptions(GridUtil.getIds(selection), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				AuditService.Instance.get().deleteSubscriptions(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						list.removeSelectedData();

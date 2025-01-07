@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
@@ -13,7 +13,6 @@ import com.logicaldoc.gui.common.client.data.UsersDS;
 import com.logicaldoc.gui.common.client.formatters.UserCellFormatter;
 import com.logicaldoc.gui.common.client.formatters.UserDateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -282,13 +281,7 @@ public class UsersPanel extends AdminPanel {
 	}
 
 	private void onSelectUser(long userId) {
-		SecurityService.Instance.get().getUser(userId, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SecurityService.Instance.get().getUser(userId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIUser user) {
 				showUserDetails(user);
@@ -408,12 +401,7 @@ public class UsersPanel extends AdminPanel {
 		MenuItem disableUser = new MenuItem();
 		disableUser.setTitle(I18N.message("disable"));
 		disableUser.addClickHandler(event -> SecurityService.Instance.get()
-				.changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), false, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), false, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						list.getSelectedRecord().setAttribute(ENABLED_ICON, "2");
@@ -429,12 +417,7 @@ public class UsersPanel extends AdminPanel {
 		MenuItem enableUser = new MenuItem();
 		enableUser.setTitle(I18N.message("enable"));
 		enableUser.addClickHandler(event -> SecurityService.Instance.get()
-				.changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), true, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), true, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						list.getSelectedRecord().setAttribute(ENABLED_ICON, "0");
@@ -450,13 +433,7 @@ public class UsersPanel extends AdminPanel {
 		MenuItem twoTactorsAuth = new MenuItem();
 		twoTactorsAuth.setTitle(I18N.message("twofactorsauth"));
 		twoTactorsAuth.addClickHandler(event -> SecurityService.Instance.get()
-				.getUser(selectedUsers[0].getAttributeAsLong("id"), new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.getUser(selectedUsers[0].getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIUser user) {
 						TwoFactorsAuthenticationDialog dialog = new TwoFactorsAuthenticationDialog(user, true);
@@ -492,12 +469,7 @@ public class UsersPanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), yes -> {
 			if (Boolean.TRUE.equals(yes)) {
-				SecurityService.Instance.get().deleteUser(selectedUserId, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				SecurityService.Instance.get().deleteUser(selectedUserId, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						list.removeSelectedData();

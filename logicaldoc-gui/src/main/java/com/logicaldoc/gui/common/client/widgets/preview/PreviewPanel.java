@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.gwt.http.client.URL;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -100,7 +100,7 @@ public class PreviewPanel extends VLayout {
 
 		ReadingRequestService.Instance.get().confirmReadings(
 				ReadingRequestController.get().getUnconfirmedReadingIds(document.getId()), document.getVersion(),
-				new GUIAsyncCallback<>() {
+				new DefaultAsyncCallback<>() {
 
 					@Override
 					public void onSuccess(Void v) {
@@ -120,7 +120,7 @@ public class PreviewPanel extends VLayout {
 		} else if (Util.isEmailFile(document.getFileName().toLowerCase())) {
 			reloadMail();
 		} else if (Util.isDICOMFile(document.getFileName().toLowerCase())) {
-			DocumentService.Instance.get().getById(document.getId(), new GUIAsyncCallback<>() {
+			DocumentService.Instance.get().getById(document.getId(), new DefaultAsyncCallback<>() {
 
 				@Override
 				public void onSuccess(GUIDocument doc) {
@@ -200,7 +200,7 @@ public class PreviewPanel extends VLayout {
 	 * Reloads a mail preview
 	 */
 	protected void reloadMail() {
-		DocumentService.Instance.get().extractEmail(docId, document.getFileVersion(), new GUIAsyncCallback<>() {
+		DocumentService.Instance.get().extractEmail(docId, document.getFileVersion(), new DefaultAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(final GUIEmail email) {
@@ -413,6 +413,11 @@ public class PreviewPanel extends VLayout {
 		redrawing = false;
 	}
 
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
 	/**
 	 * Declares the javascript function used to notify when the document has
 	 * been completely read

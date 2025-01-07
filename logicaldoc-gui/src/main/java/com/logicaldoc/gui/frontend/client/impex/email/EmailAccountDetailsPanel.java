@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.impex.email;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIEmailAccount;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.EmailAccountService;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -52,12 +51,7 @@ public class EmailAccountDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (account.getId() != 0) {
-				EmailAccountService.Instance.get().get(account.getId(), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				EmailAccountService.Instance.get().get(account.getId(), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIEmailAccount account) {
 						setAccount(account);
@@ -200,12 +194,7 @@ public class EmailAccountDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (validate()) {
-			EmailAccountService.Instance.get().save(account, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			EmailAccountService.Instance.get().save(account, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIEmailAccount account) {
 					tabSet.hideSave();

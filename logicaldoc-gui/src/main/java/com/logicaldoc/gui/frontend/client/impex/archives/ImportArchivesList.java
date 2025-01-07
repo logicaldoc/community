@@ -1,11 +1,10 @@
 package com.logicaldoc.gui.frontend.client.impex.archives;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIArchive;
 import com.logicaldoc.gui.common.client.data.ArchivesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
@@ -156,12 +155,7 @@ public class ImportArchivesList extends VLayout {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				ImpexService.Instance.get().delete(id, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				ImpexService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						list.removeSelectedData();
@@ -185,13 +179,7 @@ public class ImportArchivesList extends VLayout {
 			return;
 		}
 
-		ImpexService.Instance.get().load(archiveId, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		ImpexService.Instance.get().load(archiveId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIArchive result) {
 				details = new ImportDetailsPanel(result, ImportArchivesList.this);

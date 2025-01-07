@@ -1,10 +1,9 @@
 package com.logicaldoc.gui.frontend.client.system;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.data.SessionsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -153,12 +152,7 @@ public class SessionsPanel extends VLayout {
 		killSession.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmkill"), yes -> {
 			if (Boolean.TRUE.equals(yes)) {
 				ListGridRecord rec = sessionsGrid.getSelectedRecord();
-				SecurityService.Instance.get().kill(rec.getAttributeAsString("sid"), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				SecurityService.Instance.get().kill(rec.getAttributeAsString("sid"), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						sessionsGrid.getSelectedRecord().setAttribute(STATUS_LABEL, "Closed");

@@ -1,11 +1,10 @@
 package com.logicaldoc.gui.frontend.client.folder;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationTrigger;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.AutomationTriggersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.EventsListGridField;
@@ -113,12 +112,12 @@ public class FolderAutomationPanel extends FolderDetailTab {
 
 		applyToSubfolders.addClickHandler(event -> {
 			LD.contactingServer();
-			AutomationService.Instance.get().applyTriggersToTree(folder.getId(), new AsyncCallback<>() {
+			AutomationService.Instance.get().applyTriggersToTree(folder.getId(), new DefaultAsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
 					LD.clearPrompt();
-					GuiLog.serverError(caught);
+					super.onFailure(caught);
 				}
 
 				@Override
@@ -143,18 +142,14 @@ public class FolderAutomationPanel extends FolderDetailTab {
 		delete.addClickHandler(
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirmation -> {
 					if (Boolean.TRUE.equals(confirmation)) {
-						AutomationService.Instance.get().deleteTriggers(GridUtil.getIds(selection), new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void result) {
-								list.removeSelectedData();
-								list.deselectAllRecords();
-							}
-						});
+						AutomationService.Instance.get().deleteTriggers(GridUtil.getIds(selection),
+								new DefaultAsyncCallback<>() {
+									@Override
+									public void onSuccess(Void result) {
+										list.removeSelectedData();
+										list.deselectAllRecords();
+									}
+								});
 					}
 				}));
 
@@ -197,20 +192,12 @@ public class FolderAutomationPanel extends FolderDetailTab {
 
 	private void onEdit() {
 		ListGridRecord selection = list.getSelectedRecord();
-		AutomationService.Instance.get().getTrigger(selection.getAttributeAsLong("id"),
-				new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUIAutomationTrigger trigger) {
-						AutomationTriggerDialog dialog = new AutomationTriggerDialog(trigger,
-								FolderAutomationPanel.this);
-						dialog.show();
-					}
-				});
+		AutomationService.Instance.get().getTrigger(selection.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
+			@Override
+			public void onSuccess(GUIAutomationTrigger trigger) {
+				AutomationTriggerDialog dialog = new AutomationTriggerDialog(trigger, FolderAutomationPanel.this);
+				dialog.show();
+			}
+		});
 	}
 }

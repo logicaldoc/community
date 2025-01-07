@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -158,7 +158,7 @@ public class TicketDialog extends Window {
 
 		DocumentService.Instance.get().createDownloadTicket(document.getId(),
 				Integer.parseInt(form.getValueAsString(ACTION)), suffix, expireHours, date, maxDownloads, maxViews,
-				new GUIAsyncCallback<>() {
+				new DefaultAsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

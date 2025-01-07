@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -85,7 +85,8 @@ public class SubscriptionDialog extends Window {
 		notifyon.setValue((events == null || events.length == 0) ? "all" : SELECTION);
 
 		final SelectItem event;
-		event = ItemFactory.newEventsSelector(EVENT, I18N.message(EVENT), null, new EventSelectorOptions(true, false, false, false, false, false, false));
+		event = ItemFactory.newEventsSelector(EVENT, I18N.message(EVENT), null,
+				new EventSelectorOptions(true, false, false, false, false, false, false));
 		event.setEndRow(true);
 		event.setDisabled(events == null || events.length == 0);
 		if (events != null)
@@ -151,24 +152,18 @@ public class SubscriptionDialog extends Window {
 
 	private void doUpdateSubscriptions(ListGrid grid, List<Long> selectedIds, List<String> events,
 			final String eventsStr, final String folderOption) {
-		AuditService.Instance.get().update(selectedIds, CURRENT.equals(folderOption), events,
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(Void ret) {
-						GuiLog.info(I18N.message("settingssaved"), null);
-						for (ListGridRecord rec : grid.getSelectedRecords()) {
-							rec.setAttribute("events", eventsStr);
-							if (folderOption != null && !folderOption.isEmpty())
-								rec.setAttribute("folderOption", folderOption.equals(CURRENT) ? "0" : "1");
-							grid.refreshRow(grid.getRecordIndex(rec));
-						}
-					}
-				});
+		AuditService.Instance.get().update(selectedIds, CURRENT.equals(folderOption), events, new DefaultAsyncCallback<>() {
+			@Override
+			public void onSuccess(Void ret) {
+				GuiLog.info(I18N.message("settingssaved"), null);
+				for (ListGridRecord rec : grid.getSelectedRecords()) {
+					rec.setAttribute("events", eventsStr);
+					if (folderOption != null && !folderOption.isEmpty())
+						rec.setAttribute("folderOption", folderOption.equals(CURRENT) ? "0" : "1");
+					grid.refreshRow(grid.getRecordIndex(rec));
+				}
+			}
+		});
 	}
 
 	/**
@@ -249,12 +244,7 @@ public class SubscriptionDialog extends Window {
 
 			if (folderId != null)
 				AuditService.Instance.get().subscribeFolder(folderId, form.getValueAsString(OPTION).equals(CURRENT),
-						events, null, null, new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						events, null, null, new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void ret) {
 								GuiLog.info(I18N.message("foldersubscribed"), null);
@@ -263,12 +253,7 @@ public class SubscriptionDialog extends Window {
 							}
 						});
 			else
-				AuditService.Instance.get().subscribeDocuments(docIds, events, null, null, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				AuditService.Instance.get().subscribeDocuments(docIds, events, null, null, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void ret) {
 						GuiLog.info(I18N.message("documentsubscribed"), null);
@@ -283,9 +268,11 @@ public class SubscriptionDialog extends Window {
 	private SelectItem prepareEventSelector(final Long folderId) {
 		final SelectItem event;
 		if (folderId != null)
-			event = ItemFactory.newEventsSelector(EVENT, EVENT, null, new EventSelectorOptions(true, false, false, false, false, false, false));
+			event = ItemFactory.newEventsSelector(EVENT, EVENT, null,
+					new EventSelectorOptions(true, false, false, false, false, false, false));
 		else
-			event = ItemFactory.newEventsSelector(EVENT, EVENT, null, new EventSelectorOptions(false, false, false, false, false, false, false));
+			event = ItemFactory.newEventsSelector(EVENT, EVENT, null,
+					new EventSelectorOptions(false, false, false, false, false, false, false));
 		event.setEndRow(true);
 		event.setDisabled(true);
 		return event;

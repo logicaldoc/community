@@ -6,12 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIAttributeSet;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -395,14 +394,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		ListGridRecord[] selection = attributesList.getSelectedRecords();
 
 		LD.contactingServer();
-		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				LD.clearPrompt();
-				GuiLog.serverError(caught);
-			}
-
+		AttributeSetService.Instance.get().getAttributeSets(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUIAttributeSet> sets) {
 				LD.clearPrompt();
@@ -445,14 +437,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		ListGridRecord[] selection = attributesList.getSelectedRecords();
 
 		LD.contactingServer();
-		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				LD.clearPrompt();
-				GuiLog.serverError(caught);
-			}
-
+		AttributeSetService.Instance.get().getAttributeSets(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUIAttributeSet> sets) {
 				LD.clearPrompt();
@@ -787,13 +772,7 @@ public class TemplatePropertiesPanel extends HLayout {
 
 		PickerIcon computeStat = new PickerIcon(PickerIconName.REFRESH, event -> {
 			event.getItem().setValue(I18N.message("computing") + "...");
-			TemplateService.Instance.get().countDocuments(template.getId(), new AsyncCallback<Long>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			TemplateService.Instance.get().countDocuments(template.getId(), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Long count) {
 					event.getItem().setValue(Util.formatLong(count));
@@ -865,14 +844,7 @@ public class TemplatePropertiesPanel extends HLayout {
 	private void resetValidation() {
 		ListGridRecord[] selection = attributesList.getSelectedRecords();
 		LD.contactingServer();
-		AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				LD.clearPrompt();
-				GuiLog.serverError(caught);
-			}
-
+		AttributeSetService.Instance.get().getAttributeSets(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUIAttributeSet> sets) {
 				LD.clearPrompt();

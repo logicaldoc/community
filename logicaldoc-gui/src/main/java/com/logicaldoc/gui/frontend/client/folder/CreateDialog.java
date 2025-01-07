@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.folder;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -81,7 +81,7 @@ public class CreateDialog extends Dialog {
 			folder.setName(form.getValueAsString("name").trim());
 			FolderService.Instance.get().create(folder,
 					folder.getType() == 0 && Boolean.valueOf(form.getValueAsString("inheritSecurity")),
-					new GUIAsyncCallback<>() {
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIFolder newFolder) {
 							FolderController.get().created(newFolder);

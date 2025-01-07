@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.dashboard;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
@@ -119,7 +119,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 			final Record rec = grid.getSelectedRecord();
 			if (rec != null)
 				MessageService.Instance.get().getMessage(Long.parseLong(rec.getAttributeAsString("id")), true,
-						new GUIAsyncCallback<>() {
+						new DefaultAsyncCallback<>() {
 
 							@Override
 							public void onSuccess(GUIMessage message) {
@@ -175,7 +175,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				MessageService.Instance.get().delete(GridUtil.getIds(selection), new GUIAsyncCallback<>() {
+				MessageService.Instance.get().delete(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						grid.removeSelectedData();

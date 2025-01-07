@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.document;
 import java.util.Map;
 
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -67,7 +67,7 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		processOcr.setColSpan(1);
 		processOcr.addClickHandler(event -> {
 			LD.contactingServer();
-			ZonalOCRService.Instance.get().process(document.getId(), new GUIAsyncCallback<>() {
+			ZonalOCRService.Instance.get().process(document.getId(), new DefaultAsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -97,7 +97,7 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		processBarcode.setColSpan(1);
 		processBarcode.addClickHandler(event -> {
 			LD.contactingServer();
-			BarcodeService.Instance.get().process(document.getId(), new GUIAsyncCallback<>() {
+			BarcodeService.Instance.get().process(document.getId(), new DefaultAsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					LD.clearPrompt();

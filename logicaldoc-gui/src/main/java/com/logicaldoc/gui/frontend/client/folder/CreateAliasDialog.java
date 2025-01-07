@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.folder;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.FolderTree;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.HeaderControls;
@@ -67,14 +66,9 @@ public class CreateAliasDialog extends Dialog {
 	 */
 	public void createAlias(long referencedFolderId) {
 		final TreeNode parent = FolderNavigator.get().getSelectedRecord();
-		FolderService.Instance.get().createAlias(parent.getAttributeAsLong(com.logicaldoc.gui.frontend.client.folder.browser.FolderTree.FOLDER_ID), referencedFolderId,
-				new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+		FolderService.Instance.get().createAlias(
+				parent.getAttributeAsLong(com.logicaldoc.gui.frontend.client.folder.browser.FolderTree.FOLDER_ID),
+				referencedFolderId, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIFolder ret) {
 						if (parent != null)

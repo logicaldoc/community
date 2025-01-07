@@ -3,12 +3,11 @@ package com.logicaldoc.gui.frontend.client.metadata;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIScheme;
 import com.logicaldoc.gui.common.client.data.SequencesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
@@ -152,13 +151,7 @@ public class CustomIdPanel extends AdminPanel {
 			cid.setScheme(rec.getAttributeAsString(SCHEME));
 			cid.setType(rec.getAttributeAsString("type"));
 
-			SchemeService.Instance.get().save(cid, new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			SchemeService.Instance.get().save(cid, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void ret) {
 					// Nothing to do
@@ -222,12 +215,7 @@ public class CustomIdPanel extends AdminPanel {
 		sequences.addEditCompleteHandler(event -> {
 			ListGridRecord rec = sequences.getRecord(event.getRowNum());
 			SchemeService.Instance.get().resetSequence(rec.getAttributeAsLong("id"), rec.getAttributeAsInt(VALUE),
-					new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void ret) {
 							// Nothing to do
@@ -257,13 +245,7 @@ public class CustomIdPanel extends AdminPanel {
 					if (Boolean.TRUE.equals(confirm)) {
 						final ListGridRecord rec = schemes.getSelectedRecord();
 						SchemeService.Instance.get().delete(Long.parseLong(rec.getAttributeAsString(TEMPLATE_ID)),
-								rec.getAttributeAsString("type"), new AsyncCallback<>() {
-
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
-
+								rec.getAttributeAsString("type"), new DefaultAsyncCallback<>() {
 									@Override
 									public void onSuccess(Void ret) {
 										schemes.getSelectedRecord().setAttribute(SCHEME, (String) null);
@@ -290,12 +272,7 @@ public class CustomIdPanel extends AdminPanel {
 		delete.addClickHandler(
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean confirm) -> {
 					if (Boolean.TRUE.equals(confirm)) {
-						SchemeService.Instance.get().deleteSequence(id, new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						SchemeService.Instance.get().deleteSequence(id, new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void result) {
 								sequences.removeSelectedData();

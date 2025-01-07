@@ -1,10 +1,9 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DeletedDocsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -147,27 +146,28 @@ public class DeletedDocsReport extends ReportPanel implements FolderChangeListen
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("permanentlydelete"));
-		delete.addClickHandler(click -> LD.ask(I18N.message("permanentlydelete"), I18N.message("permanentlydeletehint"), choice -> {
-			if (Boolean.TRUE.equals(choice)) {
-				LD.contactingServer();
-				DocumentService.Instance.get().destroyDocuments(GridUtil.getIds(selection), new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
-						refresh();
-					}
+		delete.addClickHandler(
+				click -> LD.ask(I18N.message("permanentlydelete"), I18N.message("permanentlydeletehint"), choice -> {
+					if (Boolean.TRUE.equals(choice)) {
+						LD.contactingServer();
+						DocumentService.Instance.get().destroyDocuments(GridUtil.getIds(selection),
+								new DefaultAsyncCallback<Void>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										super.onFailure(caught);
+										refresh();
+									}
 
-					@Override
-					public void onSuccess(Void arg0) {
-						LD.clearPrompt();
-						refresh();
+									@Override
+									public void onSuccess(Void arg0) {
+										LD.clearPrompt();
+										refresh();
+									}
+								});
 					}
-				});
-			}
-		}));
-		delete.setEnabled(com.logicaldoc.gui.common.client.Menu
-				.enabled(com.logicaldoc.gui.common.client.Menu.DESTROY_DOCUMENTS));
+				}));
+		delete.setEnabled(
+				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DESTROY_DOCUMENTS));
 
 		contextMenu.setItems(restore, delete);
 		contextMenu.showContextMenu();

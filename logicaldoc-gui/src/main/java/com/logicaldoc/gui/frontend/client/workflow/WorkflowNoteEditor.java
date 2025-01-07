@@ -1,8 +1,7 @@
 package com.logicaldoc.gui.frontend.client.workflow;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.types.HeaderControls;
@@ -56,12 +55,7 @@ public class WorkflowNoteEditor extends Window {
 		if (!noteForm.validate())
 			return;
 		WorkflowService.Instance.get().addNote(parentDialog.getWorkflow().getSelectedTask().getId(), null,
-				message.getValue().toString(), new AsyncCallback<Long>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				message.getValue().toString(), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Long noteId) {
 						parentDialog.onNewNote();

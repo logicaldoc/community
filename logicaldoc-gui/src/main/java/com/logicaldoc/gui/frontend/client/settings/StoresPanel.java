@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.data.StoresDS;
@@ -263,13 +263,7 @@ public class StoresPanel extends VLayout {
 	}
 
 	private void doRemoveStore(int selectedStoreId) {
-		SettingService.Instance.get().removeStore(selectedStoreId, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SettingService.Instance.get().removeStore(selectedStoreId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<String> paths) {
 				if (!paths.isEmpty()) {
@@ -289,13 +283,7 @@ public class StoresPanel extends VLayout {
 		MenuItem test = new MenuItem();
 		test.setTitle(I18N.message("testconnection"));
 		test.addClickHandler(event -> SettingService.Instance.get().testStore(selectedRecord.getAttributeAsInt("id"),
-				new AsyncCallback<Boolean>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Boolean result) {
 						if (result.booleanValue())
@@ -328,13 +316,7 @@ public class StoresPanel extends VLayout {
 	private void onSave(boolean alertInclusion) {
 		List<GUIParameter> settings = collectSettings();
 
-		SettingService.Instance.get().saveStoreSettings(settings, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SettingService.Instance.get().saveStoreSettings(settings, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg) {
 				GuiLog.info(I18N.message("settingssaved"), null);

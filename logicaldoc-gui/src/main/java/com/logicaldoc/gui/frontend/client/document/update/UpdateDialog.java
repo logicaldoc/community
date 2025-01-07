@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.ServerValidationException;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
@@ -91,14 +91,14 @@ public class UpdateDialog extends StickyWindow {
 
 		if (ids == null || ids.isEmpty()) {
 			FolderService.Instance.get().getFolder(metadata.getFolder().getId(), false, false, false,
-					new GUIAsyncCallback<>() {
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIFolder folder) {
 							onDraw(folder.getAllowedPermissions());
 						}
 					});
 		} else {
-			DocumentService.Instance.get().getAllowedPermissions(ids, new GUIAsyncCallback<>() {
+			DocumentService.Instance.get().getAllowedPermissions(ids, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIAccessControlEntry permissions) {
 					onDraw(permissions);
@@ -114,7 +114,7 @@ public class UpdateDialog extends StickyWindow {
 			if (!bulkPanel.validate())
 				return;
 
-			DocumentService.Instance.get().validate(metadata, new GUIAsyncCallback<>() {
+			DocumentService.Instance.get().validate(metadata, new DefaultAsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {

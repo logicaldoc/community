@@ -2,13 +2,12 @@ package com.logicaldoc.gui.frontend.client.google.drive;
 
 import java.util.LinkedHashMap;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.frontend.client.google.GoogleAsyncCallback;
 import com.logicaldoc.gui.frontend.client.google.GoogleService;
-import com.logicaldoc.gui.frontend.client.google.GoogleUtil;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
@@ -83,12 +82,7 @@ public class DriveCreate extends Window {
 			filename = filename + "." + type;
 		final String fn = filename;
 
-		GoogleService.Instance.get().create(filename, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GoogleUtil.handleGoogleServiceError(caught);
-			}
-
+		GoogleService.Instance.get().create(filename, new GoogleAsyncCallback<>() {
 			@Override
 			public void onSuccess(String resId) {
 				LD.clearPrompt();

@@ -4,13 +4,12 @@ import java.util.Date;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.CalendarEventsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.CalendarService;
 import com.smartgwt.client.types.TimeDisplayFormat;
@@ -57,7 +56,7 @@ public class EventsCalendar extends Calendar {
 
 		addEventClickHandler(event -> {
 			CalendarService.Instance.get().getEvent(event.getEvent().getAttributeAsLong("eventId"),
-					new GUIAsyncCallback<>() {
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(final GUICalendarEvent ev) {
 							long organizerId = Long.parseLong(event.getEvent().getAttribute("organizerId"));
@@ -74,11 +73,7 @@ public class EventsCalendar extends Calendar {
 											} else {
 												CalendarService.Instance.get().getEvent(
 														Long.parseLong(event.getEvent().getAttribute("parentId")),
-														new AsyncCallback<>() {
-															public void onFailure(Throwable caught) {
-																GuiLog.serverError(caught);
-															}
-
+														new DefaultAsyncCallback<>() {
 															@Override
 															public void onSuccess(GUICalendarEvent calEv) {
 																new CalendarEventDialog(calEv, onChangeCallback).show();

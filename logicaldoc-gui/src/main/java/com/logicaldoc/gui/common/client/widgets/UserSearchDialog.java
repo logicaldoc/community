@@ -3,7 +3,7 @@ package com.logicaldoc.gui.common.client.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.services.SecurityService;
@@ -91,7 +91,7 @@ public class UserSearchDialog extends Window {
 	}
 
 	protected void search(String username, String groupId) {
-		SecurityService.Instance.get().searchUsers(username, groupId, new GUIAsyncCallback<>() {
+		SecurityService.Instance.get().searchUsers(username, groupId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				LD.clearPrompt();
@@ -127,5 +127,10 @@ public class UserSearchDialog extends Window {
 		selector.setValue(Long.toString(id));
 		selector.fireUserChanged();
 		destroy();
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
 	}
 }

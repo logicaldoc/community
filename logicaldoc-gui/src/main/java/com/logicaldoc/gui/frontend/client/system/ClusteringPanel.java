@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -43,13 +43,7 @@ public class ClusteringPanel extends AdminPanel {
 		SettingService.Instance.get()
 				.loadSettingsByNames(Arrays.asList("cluster.enabled", "cluster.name", "cluster.port",
 						"cluster.multicastip", "cluster.cache.resources", "cluster.chunk.size", "id"),
-						new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(List<GUIParameter> parameters) {
 								init(parameters);
@@ -102,12 +96,7 @@ public class ClusteringPanel extends AdminPanel {
 				settings.add(new GUIParameter("cluster.cache.resources", vm.getValueAsString("cacheResources")));
 				settings.add(new GUIParameter("cluster.chunk.size", vm.getValueAsString("chunksize")));
 
-				SettingService.Instance.get().saveSettings(settings, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				SettingService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						GuiLog.info(I18N.message("settingssaved") + " " + I18N.message("needrestart"), null);

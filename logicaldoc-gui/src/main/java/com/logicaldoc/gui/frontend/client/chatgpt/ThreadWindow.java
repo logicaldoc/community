@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.frontend.client.chatgpt;
 
 import com.google.gwt.user.client.Timer;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -154,7 +154,7 @@ public class ThreadWindow extends Window {
 		appendMessage("", CHATGPT);
 		answerPolling = null;
 
-		ChatGPTService.Instance.get().ask(question, new GUIAsyncCallback<>() {
+		ChatGPTService.Instance.get().ask(question, new DefaultAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(Void result) {
@@ -169,7 +169,7 @@ public class ThreadWindow extends Window {
 		answerPolling = null;
 
 		ChatGPTService.Instance.get().startThread(question, DocumentController.get().getCurrentSelection(),
-				new GUIAsyncCallback<>() {
+				new DefaultAsyncCallback<>() {
 
 					@Override
 					public void onSuccess(Void arg0) {
@@ -181,7 +181,7 @@ public class ThreadWindow extends Window {
 	private void collectAnswer() {
 		answerPolling = new Timer() {
 			public void run() {
-				ChatGPTService.Instance.get().getAnswer(new GUIAsyncCallback<>() {
+				ChatGPTService.Instance.get().getAnswer(new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIValue answer) {
 						if (answer.getValue() != null) {

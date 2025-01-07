@@ -1,11 +1,10 @@
 package com.logicaldoc.gui.frontend.client.tenant;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIKeystore;
 import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -59,13 +58,7 @@ public class TenantKeystorePanel extends VLayout {
 			setHeight100();
 			setMembersMargin(20);
 
-			SignService.Instance.get().loadKeystore(tenantId, new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			SignService.Instance.get().loadKeystore(tenantId, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIKeystore keystore) {
 					TenantKeystorePanel.this.keystore = keystore;
@@ -304,12 +297,7 @@ public class TenantKeystorePanel extends VLayout {
 		delete.setAutoFit(true);
 		delete.addClickHandler(event -> SC.ask(I18N.message("deletekeystorewarn"), answer -> {
 			if (Boolean.TRUE.equals(answer))
-				SignService.Instance.get().deleteKeystore(tenantId, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				SignService.Instance.get().deleteKeystore(tenantId, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void arg) {
 						initGUI();
@@ -334,13 +322,7 @@ public class TenantKeystorePanel extends VLayout {
 				return;
 
 			LD.contactingServer();
-			SignService.Instance.get().saveKeystore(keystore, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					GuiLog.serverError(caught);
-				}
-
+			SignService.Instance.get().saveKeystore(keystore, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void arg) {
 					LD.clearPrompt();
@@ -357,13 +339,7 @@ public class TenantKeystorePanel extends VLayout {
 			if (!validate())
 				return;
 			LD.contactingServer();
-			SignService.Instance.get().generateNewKeystore(keystore, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					GuiLog.serverError(caught);
-				}
-
+			SignService.Instance.get().generateNewKeystore(keystore, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void arg) {
 					LD.clearPrompt();

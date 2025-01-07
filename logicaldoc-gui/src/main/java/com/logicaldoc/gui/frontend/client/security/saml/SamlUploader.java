@@ -1,8 +1,8 @@
 package com.logicaldoc.gui.frontend.client.security.saml;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.IgnoreAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.Upload;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.HeaderControls;
@@ -52,44 +52,22 @@ public class SamlUploader extends Window {
 		layout.addMember(submit);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
-			@Override
-			public void onSuccess(Void result) {
-				destroy();
-			}
-		}));
+		addCloseClickHandler(
+				event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(Void result) {
+						destroy();
+					}
+				}));
 
 		addItem(layout);
 
 		// Just to clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				// Nothing to do
-			}
-
-			@Override
-			public void onSuccess(Void result) {
-				// Nothing to do
-			}
-		});
+		DocumentService.Instance.get().cleanUploadedFileFolder(new IgnoreAsyncCallback<>());
 	}
 
 	public void onSubmit() {
-		SamlService.Instance.get().importResource(srcItem.getName(), new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SamlService.Instance.get().importResource(srcItem.getName(), new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(String content) {
 				srcItem.setValue(content);

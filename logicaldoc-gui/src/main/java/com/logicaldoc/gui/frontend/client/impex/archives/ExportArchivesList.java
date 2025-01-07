@@ -1,11 +1,10 @@
 package com.logicaldoc.gui.frontend.client.impex.archives;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIArchive;
 import com.logicaldoc.gui.common.client.data.ArchivesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
@@ -189,12 +188,7 @@ public class ExportArchivesList extends VLayout {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				ImpexService.Instance.get().delete(id, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				ImpexService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						list.removeSelectedData();
@@ -211,11 +205,12 @@ public class ExportArchivesList extends VLayout {
 
 		MenuItem close = new MenuItem();
 		close.setTitle(I18N.message("close"));
-		close.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmarchiveclose"), confirm -> {
-			if (Boolean.TRUE.equals(confirm)) {
-				onClosingArchive(rec);
-			}
-		}));
+		close.addClickHandler(
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmarchiveclose"), confirm -> {
+					if (Boolean.TRUE.equals(confirm)) {
+						onClosingArchive(rec);
+					}
+				}));
 
 		if (GUIArchive.STATUS_OPENED != Integer.parseInt(rec.getAttributeAsString(STATUS)))
 			close.setEnabled(false);
@@ -244,12 +239,7 @@ public class ExportArchivesList extends VLayout {
 
 	protected void closeArchive(final ListGridRecord rec) {
 		ImpexService.Instance.get().setStatus(Long.parseLong(rec.getAttributeAsString("id")), GUIArchive.STATUS_CLOSED,
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						rec.setAttribute(STATUS, "1");
@@ -282,12 +272,7 @@ public class ExportArchivesList extends VLayout {
 
 	protected void openArchive(final ListGridRecord rec) {
 		ImpexService.Instance.get().setStatus(Long.parseLong(rec.getAttributeAsString("id")), GUIArchive.STATUS_OPENED,
-				new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						rec.setAttribute(STATUS, "0");

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUISequence;
 import com.logicaldoc.gui.common.client.data.UsersDS;
@@ -80,25 +80,19 @@ public class BruteForcePanel extends AdminPanel {
 
 		addMember(save);
 
-		SettingService.Instance.get()
-				.loadSettingsByNames(
-						Arrays.asList(THROTTLE_ENABLED, THROTTLE_USERNAME_MAX, THROTTLE_USERNAME_WAIT,
-								THROTTLE_USERNAME_DISABLEUSER, THROTTLE_USERNAME_WAIT, THROTTLE_IP_MAX,
-								THROTTLE_IP_WAIT, THROTTLE_APIKEY_MAX, THROTTLE_APIKEY_WAIT, THROTTLE_ALERT_RECIPIENTS),
-						new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(List<GUIParameter> params) {
-								Map<String, String> p = new HashMap<>();
-								for (GUIParameter par : params)
-									p.put(par.getName(), par.getValue());
-								initForm(p);
-							}
-						});
+		SettingService.Instance.get().loadSettingsByNames(
+				Arrays.asList(THROTTLE_ENABLED, THROTTLE_USERNAME_MAX, THROTTLE_USERNAME_WAIT,
+						THROTTLE_USERNAME_DISABLEUSER, THROTTLE_USERNAME_WAIT, THROTTLE_IP_MAX, THROTTLE_IP_WAIT,
+						THROTTLE_APIKEY_MAX, THROTTLE_APIKEY_WAIT, THROTTLE_ALERT_RECIPIENTS),
+				new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(List<GUIParameter> params) {
+						Map<String, String> p = new HashMap<>();
+						for (GUIParameter par : params)
+							p.put(par.getName(), par.getValue());
+						initForm(p);
+					}
+				});
 	}
 
 	private int intValue(String str) {
@@ -172,13 +166,7 @@ public class BruteForcePanel extends AdminPanel {
 
 		body.addMember(form);
 
-		SecurityService.Instance.get().loadBlockedEntities(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SecurityService.Instance.get().loadBlockedEntities(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUISequence> seqs) {
 				prepareBlockedEntriesGrid(seqs);
@@ -242,12 +230,7 @@ public class BruteForcePanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				SecurityService.Instance.get().removeBlockedEntities(ids, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				SecurityService.Instance.get().removeBlockedEntities(ids, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						blockedEntities.removeSelectedData();
@@ -283,13 +266,7 @@ public class BruteForcePanel extends AdminPanel {
 			params.add(new GUIParameter(THROTTLE_ALERT_RECIPIENTS, ""));
 		}
 
-		SettingService.Instance.get().saveSettings(params, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SettingService.Instance.get().saveSettings(params, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg) {
 				GuiLog.info(I18N.message("settingssaved"), null);

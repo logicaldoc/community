@@ -1,12 +1,11 @@
 package com.logicaldoc.gui.frontend.client.security;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUISecuritySettings;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.security.group.GroupsPanel;
@@ -56,13 +55,7 @@ public class SecurityMenu extends VLayout {
 		security.setWidth100();
 		security.setHeight(25);
 		security.addClickHandler(
-				event -> SecurityService.Instance.get().loadSettings(new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				event -> SecurityService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUISecuritySettings settings) {
 						AdminScreen.get().setContent(new SecuritySettingsPanel(settings));

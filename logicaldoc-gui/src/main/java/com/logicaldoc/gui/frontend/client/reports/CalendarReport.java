@@ -6,12 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEventSearchCriteria;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
@@ -327,13 +326,7 @@ public class CalendarReport extends AdminPanel {
 	}
 
 	private void doSearch(GUICalendarEventSearchCriteria criteria) {
-		CalendarService.Instance.get().find(criteria, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		CalendarService.Instance.get().find(criteria, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUICalendarEvent> result) {
 				List<ListGridRecord> records = new ArrayList<>();

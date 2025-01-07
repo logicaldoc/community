@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIMessageTemplate;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.beans.GUIWFState;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
@@ -163,13 +162,7 @@ public class TaskEditor extends Window {
 
 		messagesPanel.addMember(messagesForm);
 
-		MessageService.Instance.get().loadTemplates(I18N.getLocale(), "user", new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		MessageService.Instance.get().loadTemplates(I18N.getLocale(), "user", new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUIMessageTemplate> templates) {
 				LinkedHashMap<String, String> map = new LinkedHashMap<>();

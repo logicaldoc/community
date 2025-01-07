@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.data.ComparatorsDS;
@@ -307,13 +307,7 @@ public class ComparatorsPanel extends AdminPanel {
 	private void onSave() {
 		List<GUIParameter> settings = collectSettings();
 
-		SettingService.Instance.get().saveSettings(settings, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SettingService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg) {
 				GuiLog.info(I18N.message("settingssaved"), null);
@@ -394,13 +388,7 @@ public class ComparatorsPanel extends AdminPanel {
 		disable.addClickHandler(event -> SettingService.Instance.get()
 				.saveSettings(Arrays.asList(new GUIParameter(
 						settingsPrefix + settingsGrid.getSelectedRecord().getAttribute(LABEL) + ".enabled", "false")),
-						new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void arg0) {
 								settingsGrid.getSelectedRecord().setAttribute(EENABLED, false);
@@ -432,13 +420,7 @@ public class ComparatorsPanel extends AdminPanel {
 		enable.addClickHandler(event -> SettingService.Instance.get()
 				.saveSettings(Arrays.asList(new GUIParameter(
 						settingsPrefix + settingsGrid.getSelectedRecord().getAttribute(LABEL) + ".enabled", "true")),
-						new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void arg0) {
 								settingsGrid.getSelectedRecord().setAttribute(EENABLED, true);

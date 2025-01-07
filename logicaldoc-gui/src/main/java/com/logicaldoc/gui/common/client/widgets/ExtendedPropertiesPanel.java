@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.InputValues;
 import com.logicaldoc.gui.common.client.ServerValidationError;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
@@ -232,7 +232,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 			return;
 		}
 
-		TemplateService.Instance.get().getAttributes(templateId, extensibleObject, new GUIAsyncCallback<>() {
+		TemplateService.Instance.get().getAttributes(templateId, extensibleObject, new DefaultAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(List<GUIAttribute> templateAttributes) {
@@ -847,5 +847,10 @@ public class ExtendedPropertiesPanel extends HLayout {
 				}
 			}
 		}
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
 	}
 }

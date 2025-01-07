@@ -1405,7 +1405,7 @@ public class ItemFactory {
 		validate.setPrompt(I18N.message("validate"));
 		validate.setSrc("[SKIN]/check.svg");
 		validate.addFormItemClickHandler(click -> InfoService.Instance.get().getCronDescription(cron.getValueAsString(),
-				I18N.getLocale(), new AsyncCallback<String>() {
+				I18N.getLocale(), new AsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

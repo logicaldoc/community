@@ -150,4 +150,9 @@ public class ImageCropper extends Canvas {
 	public int getSelectionHeight() {
 		return (int) ((double) selection.getHeight() * (double) imageHeight / (double) img.getHeight());
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
 }

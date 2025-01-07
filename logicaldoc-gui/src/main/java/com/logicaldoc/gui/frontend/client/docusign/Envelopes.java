@@ -3,10 +3,9 @@ package com.logicaldoc.gui.frontend.client.docusign;
 import java.util.Collection;
 
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.data.DocuSignEnvelopesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
@@ -123,14 +122,8 @@ public class Envelopes extends com.smartgwt.client.widgets.Window {
 
 			MenuItem inviteToChat = new MenuItem();
 			inviteToChat.setTitle(I18N.message("signers"));
-			inviteToChat.addClickHandler(evnt -> DocuSignService.Instance.get().getSigners(
-					list.getSelectedRecord().getAttributeAsString("id"), new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+			inviteToChat.addClickHandler(evnt -> DocuSignService.Instance.get()
+					.getSigners(list.getSelectedRecord().getAttributeAsString("id"), new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Collection<String> signers) {
 							StringBuilder message = new StringBuilder();

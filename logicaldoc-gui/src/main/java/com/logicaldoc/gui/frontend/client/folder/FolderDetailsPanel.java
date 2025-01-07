@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.frontend.client.folder;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.ServerValidationException;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
@@ -225,12 +225,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 
 	private void prepareTabSet() {
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> FolderService.Instance.get()
-				.getFolder(getFolder().getId(), false, false, false, new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+				.getFolder(getFolder().getId(), false, false, false, new DefaultAsyncCallback<>() {
 
 					@Override
 					public void onSuccess(GUIFolder folder) {
@@ -488,13 +483,13 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 	public void onSave() {
 		if (validate()) {
 			folder.setName(folder.getName().trim());
-			FolderService.Instance.get().save(folder, new AsyncCallback<>() {
+			FolderService.Instance.get().save(folder, new DefaultAsyncCallback<>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					if (caught instanceof ServerValidationException validationException) {
 						handleValidationException(validationException);
 					} else {
-						GuiLog.serverError(caught);
+						super.onFailure(caught);
 					}
 				}
 

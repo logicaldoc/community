@@ -2,14 +2,13 @@ package com.logicaldoc.gui.frontend.client.workflow;
 
 import java.util.ArrayList;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.controllers.UserController;
 import com.logicaldoc.gui.common.client.data.WorkflowTasksDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -166,13 +165,7 @@ public class WorkflowDashlet extends Portlet {
 		list.addCellDoubleClickHandler(event -> {
 			Record rec = event.getRecord();
 			WorkflowService.Instance.get().getWorkflowDetailsByTask(rec.getAttributeAsString("id"),
-					new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIWorkflow result) {
 							if (result != null) {
@@ -217,13 +210,7 @@ public class WorkflowDashlet extends Portlet {
 			// recalculate the total assigned tasks
 			if (total != Session.get().getUser().getTasks()) {
 				WorkflowService.Instance.get().countAssignedTasks(Session.get().getUser().getUsername(),
-						new AsyncCallback<Integer>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Integer total) {
 								Session.get().getUser().setTasks(total != null ? total.intValue() : 0);

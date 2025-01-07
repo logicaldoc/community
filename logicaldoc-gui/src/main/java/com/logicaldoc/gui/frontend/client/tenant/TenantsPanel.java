@@ -1,12 +1,11 @@
 package com.logicaldoc.gui.frontend.client.tenant;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.data.TenantsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
@@ -155,13 +154,7 @@ public class TenantsPanel extends AdminPanel {
 	}
 
 	public void loadTenant(long tenantId) {
-		TenantService.Instance.get().load(tenantId, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		TenantService.Instance.get().load(tenantId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUITenant tenant) {
 				showTenantDetails(tenant);
@@ -223,25 +216,19 @@ public class TenantsPanel extends AdminPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> 
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
-				if (Boolean.TRUE.equals(answer)) {
-					TenantService.Instance.get().delete(id, new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(Void result) {
-							list.removeSelectedData();
-							list.deselectAllRecords();
-							details = SELECT_TENANT;
-							detailsContainer.setMembers(details);
-						}
-					});
-				}
-			}));
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
+			if (Boolean.TRUE.equals(answer)) {
+				TenantService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(Void result) {
+						list.removeSelectedData();
+						list.deselectAllRecords();
+						details = SELECT_TENANT;
+						detailsContainer.setMembers(details);
+					}
+				});
+			}
+		}));
 
 		MenuItem password = new MenuItem();
 		password.setTitle(I18N.message("changepassword"));

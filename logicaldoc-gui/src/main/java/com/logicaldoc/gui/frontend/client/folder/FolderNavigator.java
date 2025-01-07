@@ -4,8 +4,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -185,10 +185,10 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		LD.ask(I18N.message("move"), I18N.message("moveask", sourceName, targetName), yes -> {
 			if (Boolean.TRUE.equals(yes)) {
 				FolderService.Instance.get().paste(selection.stream().map(d -> d.getId()).collect(Collectors.toList()),
-						folderId, "cut", false, false, false, new AsyncCallback<>() {
+						folderId, "cut", false, false, false, new DefaultAsyncCallback<>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
+								super.onFailure(caught);
 								GuiLog.warn(I18N.message(OPERATIONNOTALLOWED), null);
 							}
 
@@ -220,10 +220,10 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 					getTree().remove(node);
 				}
 
-				FolderService.Instance.get().move(source, target, new AsyncCallback<>() {
+				FolderService.Instance.get().move(source, target, new DefaultAsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
+						super.onFailure(caught);
 						GuiLog.warn(I18N.message(OPERATIONNOTALLOWED), null);
 					}
 
@@ -246,13 +246,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	@Override
 	public void selectFolder(final long folderId) {
 		FolderService.Instance.get().getFolder(folderId, false, true, Session.get().isFolderPagination(),
-				new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIFolder result) {
 						if (result != null) {
@@ -269,18 +263,12 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	 * @return the prepared context menu
 	 */
 	private void showContextMenu() {
-		FolderService.Instance.get().getAllowedPermissions(getSelectedIds(),
-				new AsyncCallback<GUIAccessControlEntry>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUIAccessControlEntry acl) {
-						new ContextMenu(FolderNavigator.this, acl).showContextMenu();
-					}
-				});
+		FolderService.Instance.get().getAllowedPermissions(getSelectedIds(), new DefaultAsyncCallback<>() {
+			@Override
+			public void onSuccess(GUIAccessControlEntry acl) {
+				new ContextMenu(FolderNavigator.this, acl).showContextMenu();
+			}
+		});
 	}
 
 	public static FolderNavigator get() {
@@ -347,13 +335,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			selectRecord(nodeToOpen);
 
 			FolderService.Instance.get().getFolder(folderId, true, true, Session.get().isFolderPagination(),
-					new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIFolder folder) {
 							selectFolder(folder.getId());
@@ -391,14 +373,8 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	 */
 	public void openFolder(final long folderId) {
 		getTree().closeAll();
-		
-		FolderService.Instance.get().getFolder(folderId, true, true, isPaginationEnabled(), new AsyncCallback<>() {
 
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		FolderService.Instance.get().getFolder(folderId, true, true, isPaginationEnabled(), new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIFolder folder) {
 				long folderId = folder.getId();
@@ -513,12 +489,11 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		}
 
 		LD.contactingServer();
-		FolderService.Instance.get().move(ids, targetFolderId, new AsyncCallback<>() {
+		FolderService.Instance.get().move(ids, targetFolderId, new DefaultAsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				LD.clearPrompt();
-				GuiLog.serverError(caught);
+				super.onFailure(caught);
 				GuiLog.warn(I18N.message(OPERATIONNOTALLOWED), null);
 			}
 
@@ -640,12 +615,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			if (value.isEmpty())
 				SC.warn(I18N.message("commentrequired"));
 			else
-				DocumentService.Instance.get().archiveFolder(folderId, value, new AsyncCallback<Long>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				DocumentService.Instance.get().archiveFolder(folderId, value, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Long result) {
 						GuiLog.info(I18N.message("documentswerearchived", "" + result), null);
@@ -727,13 +697,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 
 				FolderService.Instance.get().setFolderPagination(cursor.getCurrentPagination().getFolderId(),
 						cursor.getCurrentPagination().getStartRow(), cursor.getCurrentPagination().getPageSize(),
-						new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void arg) {
 								TreeNode parentNode = getTree().find(FOLDER_ID, "" + cursor.getFolderId());
@@ -758,13 +722,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			scrollToCell(getRowNum(node), 0);
 
 			FolderService.Instance.get().getFolder(fld.getId(), true, true, Session.get().isFolderPagination(),
-					new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIFolder folder) {
 							getTree().openFolder(node);

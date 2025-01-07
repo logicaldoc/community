@@ -5,12 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIResult;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
@@ -72,14 +71,7 @@ public class Search {
 	public void search() {
 		LD.contactingServer();
 
-		SearchService.Instance.get().search(options, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				LD.clearPrompt();
-				GuiLog.serverError(caught);
-			}
-
+		SearchService.Instance.get().search(options, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIResult result) {
 				try {

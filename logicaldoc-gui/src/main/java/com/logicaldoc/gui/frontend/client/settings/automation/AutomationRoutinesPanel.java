@@ -2,11 +2,10 @@ package com.logicaldoc.gui.frontend.client.settings.automation;
 
 import java.util.Arrays;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.data.AutomationRoutinesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
@@ -120,19 +119,12 @@ public class AutomationRoutinesPanel extends VLayout {
 		list.addSelectionChangedHandler((SelectionEvent event) -> {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
-				AutomationService.Instance.get().getRoutine(rec.getAttributeAsLong("id"),
-						new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUIAutomationRoutine routine) {
-								showRoutineDetails(routine);
-							}
-						});
+				AutomationService.Instance.get().getRoutine(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(GUIAutomationRoutine routine) {
+						showRoutineDetails(routine);
+					}
+				});
 		});
 
 		list.addDataArrivedHandler(
@@ -161,12 +153,7 @@ public class AutomationRoutinesPanel extends VLayout {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				AutomationService.Instance.get().deleteRoutines(Arrays.asList(id), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				AutomationService.Instance.get().deleteRoutines(Arrays.asList(id), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						list.removeSelectedData();

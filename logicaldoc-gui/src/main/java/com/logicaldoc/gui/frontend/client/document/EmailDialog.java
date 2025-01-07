@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIMessageTemplate;
@@ -68,7 +67,7 @@ public class EmailDialog extends AbstractEmailDialog {
 		messageTemplate.addChangedHandler(event -> {
 			if (messageTemplate.getValueAsString() != null && !"".equals(messageTemplate.getValueAsString())) {
 				MessageService.Instance.get().getTemplate(Long.parseLong(messageTemplate.getValueAsString()),
-						new GUIAsyncCallback<>() {
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(GUIMessageTemplate t) {
 								subject.setValue(t.getSubject());
@@ -132,13 +131,7 @@ public class EmailDialog extends AbstractEmailDialog {
 
 		updateSignature();
 
-		MessageService.Instance.get().loadTemplates(I18N.getLocale(), "user", new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		MessageService.Instance.get().loadTemplates(I18N.getLocale(), "user", new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUIMessageTemplate> templates) {
 				LinkedHashMap<String, String> map = new LinkedHashMap<>();
@@ -154,11 +147,10 @@ public class EmailDialog extends AbstractEmailDialog {
 	@Override
 	protected void onSubmit(GUIEmail mail) {
 		LD.contactingServer();
-		DocumentService.Instance.get().sendAsEmail(mail, Session.get().getUser().getLanguage(), new AsyncCallback<>() {
+		DocumentService.Instance.get().sendAsEmail(mail, Session.get().getUser().getLanguage(), new DefaultAsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				LD.clearPrompt();
-				GuiLog.serverError(caught);
+				super.onFailure(caught);
 				sendButton.enable();
 				destroy();
 			}

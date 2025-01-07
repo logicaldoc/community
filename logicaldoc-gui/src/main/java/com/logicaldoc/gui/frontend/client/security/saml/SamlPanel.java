@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.security.saml;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -77,12 +77,7 @@ public class SamlPanel extends VLayout {
 
 	@Override
 	protected void onDraw() {
-		SamlService.Instance.get().loadSettings(new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SamlService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUISamlSettings settings) {
 				initGUI(settings);
@@ -289,13 +284,7 @@ public class SamlPanel extends VLayout {
 			settings.setPrivateKey(form.getValueAsString(SP_PRIVATEKEY));
 			settings.setIdpMetadata(form.getValueAsString(IDP_METADATA));
 
-			SamlService.Instance.get().saveSettings(settings, new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			SamlService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void ret) {
 					GuiLog.info(I18N.message("settingssaved"), null);

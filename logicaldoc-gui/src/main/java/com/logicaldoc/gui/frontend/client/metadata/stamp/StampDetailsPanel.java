@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.metadata.stamp;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIStamp;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.StampService;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -48,12 +47,7 @@ public class StampDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (stamp.getId() != 0) {
-				StampService.Instance.get().getStamp(stamp.getId(), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				StampService.Instance.get().getStamp(stamp.getId(), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIStamp stamp) {
 						setStamp(stamp);
@@ -148,12 +142,7 @@ public class StampDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (validate()) {
-			StampService.Instance.get().save(stamp, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			StampService.Instance.get().save(stamp, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIStamp stamp) {
 					tabSet.hideSave();

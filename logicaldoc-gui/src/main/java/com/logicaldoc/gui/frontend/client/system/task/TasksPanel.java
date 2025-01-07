@@ -6,12 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUITask;
 import com.logicaldoc.gui.common.client.data.TasksDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
@@ -77,22 +76,12 @@ public class TasksPanel extends AdminPanel {
 		MenuItem taskExecution = new MenuItem();
 		taskExecution.setTitle(I18N.message("execute"));
 		taskExecution.addClickHandler(event -> SystemService.Instance.get().getTaskByName(
-				tasksGrid.getSelectedRecord().getAttributeAsString("name"), I18N.getLocale(), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				tasksGrid.getSelectedRecord().getAttributeAsString("name"), I18N.getLocale(), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUITask task) {
 						final GUITask currentTask = task;
-						SystemService.Instance.get().startTask(currentTask.getName(), new AsyncCallback<Void>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
+						SystemService.Instance.get().startTask(currentTask.getName(), new DefaultAsyncCallback<Void>() {
+												@Override
 							public void onSuccess(Void result) {
 								final ListGridRecord rec = tasksGrid.getSelectedRecord();
 								rec.setAttribute(STATUS, GUITask.STATUS_RUNNING);
@@ -114,12 +103,7 @@ public class TasksPanel extends AdminPanel {
 		MenuItem taskStop = new MenuItem();
 		taskStop.setTitle(I18N.message("stop"));
 		taskStop.addClickHandler(event -> SystemService.Instance.get()
-				.stopTask(tasksGrid.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.stopTask(tasksGrid.getSelectedRecord().getAttributeAsString("name"), new DefaultAsyncCallback<Void>() {
 					@Override
 					public void onSuccess(Void result) {
 						tasksGrid.getSelectedRecord().setAttribute(STATUS, GUITask.STATUS_STOPPING);
@@ -134,12 +118,7 @@ public class TasksPanel extends AdminPanel {
 		MenuItem enableTask = new MenuItem();
 		enableTask.setTitle(I18N.message("enable"));
 		enableTask.addClickHandler(event -> SystemService.Instance.get()
-				.enableTask(tasksGrid.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<Boolean>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.enableTask(tasksGrid.getSelectedRecord().getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Boolean result) {
 						tasksGrid.getSelectedRecord().setAttribute(ENABLED_ICON, "bullet_green");
@@ -155,12 +134,7 @@ public class TasksPanel extends AdminPanel {
 		MenuItem disableTask = new MenuItem();
 		disableTask.setTitle(I18N.message("disable"));
 		disableTask.addClickHandler(event -> SystemService.Instance.get()
-				.disableTask(tasksGrid.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<Boolean>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.disableTask(tasksGrid.getSelectedRecord().getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Boolean result) {
 						tasksGrid.getSelectedRecord().setAttribute(ENABLED_ICON, "bullet_red");
@@ -270,12 +244,7 @@ public class TasksPanel extends AdminPanel {
 			ListGridRecord rec = tasksGrid.getSelectedRecord();
 			if (rec != null)
 				SystemService.Instance.get().getTaskByName(rec.getAttribute("name"), I18N.getLocale(),
-						new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(GUITask task) {
 								onSelectedTask(task);
@@ -293,12 +262,7 @@ public class TasksPanel extends AdminPanel {
 			final ListGridRecord rec = tasksGrid.getSelectedRecord();
 			if (rec != null)
 				SystemService.Instance.get().getTaskByName(rec.getAttribute("name"), I18N.getLocale(),
-						new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(GUITask task) {
 								rec.setAttribute(STATUS, task.getStatus());
@@ -381,12 +345,7 @@ public class TasksPanel extends AdminPanel {
 	}
 
 	private void loadTasks() {
-		SystemService.Instance.get().loadTasks(I18N.getLocale(), new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SystemService.Instance.get().loadTasks(I18N.getLocale(), new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUITask> tasks) {
 				for (GUITask guiTask : tasks) {

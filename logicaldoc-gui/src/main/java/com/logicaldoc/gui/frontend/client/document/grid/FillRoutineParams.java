@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.document.grid;
 
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.widgets.ExtendedPropertiesPanel;
@@ -57,7 +57,7 @@ public class FillRoutineParams extends Window {
 		if (!propertiesPanel.validate())
 			return;
 
-		AutomationService.Instance.get().execute(routine, docIds, folderIds, new GUIAsyncCallback<>() {
+		AutomationService.Instance.get().execute(routine, docIds, folderIds, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg0) {
 				destroy();

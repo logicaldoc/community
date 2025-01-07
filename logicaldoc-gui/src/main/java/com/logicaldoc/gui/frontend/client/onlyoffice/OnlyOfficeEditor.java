@@ -3,11 +3,10 @@ package com.logicaldoc.gui.frontend.client.onlyoffice;
 import java.util.Date;
 
 import com.google.gwt.http.client.URL;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.HTMLFlow;
@@ -23,6 +22,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 public class OnlyOfficeEditor extends Window {
 
 	private static final String ONLYOFFICE_EDITOR_DOC_ID = "onlyoffice/editor?docId=";
+
 	private static final String FILE_NAME = "&fileName=";
 
 	public OnlyOfficeEditor(final GUIDocument document) {
@@ -53,13 +53,7 @@ public class OnlyOfficeEditor extends Window {
 
 		if ("fillForms".equals(document.getComment())) {
 			// the document is being edited, so declare the editing
-			OnlyOfficeService.Instance.get().startFilling(document.getId(), new AsyncCallback<Void>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			OnlyOfficeService.Instance.get().startFilling(document.getId(), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void result) {
 					reloadBody(document, layout);
@@ -67,13 +61,7 @@ public class OnlyOfficeEditor extends Window {
 			});
 		} else {
 			// the document is being edited, so declare the editing
-			OnlyOfficeService.Instance.get().startEditing(document.getId(), new AsyncCallback<Void>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			OnlyOfficeService.Instance.get().startEditing(document.getId(), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void result) {
 					reloadBody(document, layout);
@@ -84,13 +72,7 @@ public class OnlyOfficeEditor extends Window {
 
 	private void onClose(long docId) {
 		// the document is being edited, so declare the end of editing
-		OnlyOfficeService.Instance.get().endEditing(docId, new AsyncCallback<Void>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		OnlyOfficeService.Instance.get().endEditing(docId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void result) {
 				destroy();

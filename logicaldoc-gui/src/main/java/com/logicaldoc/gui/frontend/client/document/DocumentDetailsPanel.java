@@ -2,10 +2,9 @@ package com.logicaldoc.gui.frontend.client.document;
 
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.ServerValidationException;
 import com.logicaldoc.gui.common.client.Session;
@@ -14,7 +13,6 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.controllers.DocumentObserver;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
@@ -245,7 +243,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		// This 'if condition' is necessary to know if the close image
 		// has been selected into the Documents list panel or into the
 		// Search list panel.
-		DocumentService.Instance.get().getById(document.getId(), new GUIAsyncCallback<>() {
+		DocumentService.Instance.get().getById(document.getId(), new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIDocument doc) {
 				DocumentController.get().selected(doc);
@@ -673,13 +671,13 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	}
 
 	private void save() {
-		DocumentService.Instance.get().save(document, new AsyncCallback<>() {
+		DocumentService.Instance.get().save(document, new DefaultAsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof ServerValidationException validationException) {
 					handleValidationException(validationException);
 				} else {
-					GuiLog.serverError(caught);
+					super.onFailure(caught);
 				}
 			}
 

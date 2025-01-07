@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUILDAPServer;
 import com.logicaldoc.gui.common.client.data.GroupsDS;
@@ -318,13 +318,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 			}
 			LDAPServerDetailsPanel.this.server.setDefaultGroups(groups);
 
-			LDAPService.Instance.get().save(LDAPServerDetailsPanel.this.server, new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			LDAPService.Instance.get().save(LDAPServerDetailsPanel.this.server, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUILDAPServer server) {
 					LDAPServerDetailsPanel.this.server = server;
@@ -401,13 +395,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 
 			listing.updateRecord(LDAPServerDetailsPanel.this.server);
 
-			LDAPService.Instance.get().testConnection(LDAPServerDetailsPanel.this.server, new AsyncCallback<Boolean>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			LDAPService.Instance.get().testConnection(LDAPServerDetailsPanel.this.server, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Boolean ret) {
 					if (Boolean.TRUE.equals(ret))

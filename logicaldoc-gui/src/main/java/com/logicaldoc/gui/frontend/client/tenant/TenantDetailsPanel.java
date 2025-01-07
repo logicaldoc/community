@@ -1,11 +1,10 @@
 package com.logicaldoc.gui.frontend.client.tenant;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.TenantService;
 import com.smartgwt.client.util.SC;
@@ -55,12 +54,7 @@ public class TenantDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (tenant.getId() != 0) {
-				TenantService.Instance.get().load(tenant.getId(), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				TenantService.Instance.get().load(tenant.getId(), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUITenant tenant) {
 						setTenant(tenant);
@@ -209,12 +203,7 @@ public class TenantDetailsPanel extends VLayout {
 		if (validate()) {
 			final boolean newTenant = TenantDetailsPanel.this.tenant.getId() == 0L;
 
-			TenantService.Instance.get().save(tenant, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			TenantService.Instance.get().save(tenant, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUITenant tenant) {
 					tabSet.hideSave();

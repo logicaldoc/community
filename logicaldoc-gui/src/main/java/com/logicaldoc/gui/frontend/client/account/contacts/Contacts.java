@@ -3,13 +3,11 @@ package com.logicaldoc.gui.frontend.client.account.contacts;
 import java.util.Arrays;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.data.ContactsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.ValuesCallback;
@@ -86,7 +84,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 		importCsv.setTitle(I18N.message("iimport"));
 		importCsv.setTooltip(I18N.message("importfromcsv"));
 		importCsv.addClickHandler(
-				click -> DocumentService.Instance.get().cleanUploadedFileFolder(new GUIAsyncCallback<>() {
+				click -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 
 					@Override
 					public void onSuccess(Void arg0) {
@@ -193,12 +191,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm))
-				ContactService.Instance.get().delete(GridUtil.getIds(selection), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				ContactService.Instance.get().delete(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						list.removeSelectedData();
@@ -234,7 +227,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 			public void execute(Map<String, Object> values) {
 				LD.contactingServer();
 				ContactService.Instance.get().shareContacts(GridUtil.getIds(list.getSelectedRecords()),
-						usersSelector.getUserIds(), groupsSelector.getGroupIds(), new GUIAsyncCallback<>() {
+						usersSelector.getUserIds(), groupsSelector.getGroupIds(), new DefaultAsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -253,7 +246,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 
 	private void onEdit() {
 		final ListGridRecord[] selection = list.getSelectedRecords();
-		ContactService.Instance.get().load(Long.parseLong(selection[0].getAttribute("id")), new GUIAsyncCallback<>() {
+		ContactService.Instance.get().load(Long.parseLong(selection[0].getAttribute("id")), new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIContact result) {
 				if (result != null) {

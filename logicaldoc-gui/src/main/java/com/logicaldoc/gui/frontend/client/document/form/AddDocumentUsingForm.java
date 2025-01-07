@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.document.form;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -70,7 +70,7 @@ public class AddDocumentUsingForm extends Window {
 		frm.setLanguage(I18N.getDefaultLocaleForDoc());
 		frm.setTemplateId(templateId);
 
-		TemplateService.Instance.get().getTemplate(frm.getTemplateId(), new GUIAsyncCallback<>() {
+		TemplateService.Instance.get().getTemplate(frm.getTemplateId(), new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUITemplate guiTemplate) {
 				frm.setTemplate(guiTemplate.getName());

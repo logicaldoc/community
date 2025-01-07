@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.folder.copy;
 import java.util.Arrays;
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -121,7 +121,7 @@ public class FolderCopyDialog extends Dialog {
 	}
 
 	private void copySingleFolder(long selectedSourceId, final DynamicForm form, long tagetFolderId) {
-		FolderService.Instance.get().getFolder(selectedSourceId, false, false, false, new GUIAsyncCallback<>() {
+		FolderService.Instance.get().getFolder(selectedSourceId, false, false, false, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIFolder sourceFolder) {
 				sourceFolder.setName(form.getValueAsString("name"));
@@ -149,7 +149,7 @@ public class FolderCopyDialog extends Dialog {
 
 		LD.contactingServer();
 		FolderService.Instance.get().copyFolders(FolderNavigator.get().getSelectedIds(), targetFolderId, foldersOnly,
-				securityOption, null, new GUIAsyncCallback<>() {
+				securityOption, null, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void ret) {
 						LD.clearPrompt();

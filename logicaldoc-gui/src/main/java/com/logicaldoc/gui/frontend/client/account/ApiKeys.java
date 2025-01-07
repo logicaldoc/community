@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.account;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.data.ApiKeysDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.services.SecurityService;
@@ -49,7 +49,7 @@ public class ApiKeys extends com.smartgwt.client.widgets.Window {
 		ToolStripButton newKey = new ToolStripButton(I18N.message("createnewapikey"));
 
 		newKey.addClickHandler(click -> LD.askForString("createnewapikey", "createnewapikeymessage", "My Key",
-				keyName -> SecurityService.Instance.get().createApiKey(keyName, new GUIAsyncCallback<>() {
+				keyName -> SecurityService.Instance.get().createApiKey(keyName, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(String apikey) {
 						StaticTextItem item = ItemFactory.newStaticTextItem("apikey", "apikey", apikey);
@@ -75,7 +75,7 @@ public class ApiKeys extends com.smartgwt.client.widgets.Window {
 		name.setCanEdit(true);
 		name.addCellSavedHandler(
 				saved -> SecurityService.Instance.get().updateApiKey(saved.getRecord().getAttributeAsLong("id"),
-						saved.getNewValue() != null ? saved.getNewValue().toString() : null, new GUIAsyncCallback<>() {
+						saved.getNewValue() != null ? saved.getNewValue().toString() : null, new DefaultAsyncCallback<>() {
 
 							@Override
 							public void onSuccess(Void arg) {
@@ -122,7 +122,7 @@ public class ApiKeys extends com.smartgwt.client.widgets.Window {
 		delete.addClickHandler(click -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
 				SecurityService.Instance.get().deleteApiKey(list.getSelectedRecord().getAttributeAsLong("id"),
-						new GUIAsyncCallback<>() {
+						new DefaultAsyncCallback<>() {
 
 							@Override
 							public void onSuccess(Void result) {

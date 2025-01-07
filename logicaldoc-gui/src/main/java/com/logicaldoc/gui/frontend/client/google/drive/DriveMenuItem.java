@@ -3,8 +3,8 @@ package com.logicaldoc.gui.frontend.client.google.drive;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -16,8 +16,8 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.google.GoogleApiAuthorization;
+import com.logicaldoc.gui.frontend.client.google.GoogleAsyncCallback;
 import com.logicaldoc.gui.frontend.client.google.GoogleService;
-import com.logicaldoc.gui.frontend.client.google.GoogleUtil;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.util.SC;
@@ -76,12 +76,7 @@ public class DriveMenuItem extends MenuItem {
 			List<Long> ids = grid.getSelectedIds();
 
 			LD.contactingServer();
-			GoogleService.Instance.get().exportDocuments(ids, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GoogleUtil.handleGoogleServiceError(caught);
-				}
-
+			GoogleService.Instance.get().exportDocuments(ids, new GoogleAsyncCallback<>() {
 				@Override
 				public void onSuccess(List<String> settings) {
 					LD.clearPrompt();
@@ -127,12 +122,7 @@ public class DriveMenuItem extends MenuItem {
 
 	private void checkoutAndUploadToGDrive(final GUIDocument document) {
 		// Need to checkout first
-		DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void result) {
 				document.setStatus(Constants.DOC_CHECKED_OUT);
@@ -144,12 +134,7 @@ public class DriveMenuItem extends MenuItem {
 				GuiLog.info(I18N.message("documentcheckedout"), null);
 
 				LD.contactingServer();
-				GoogleService.Instance.get().upload(document.getId(), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GoogleUtil.handleGoogleServiceError(caught);
-					}
-
+				GoogleService.Instance.get().upload(document.getId(), new GoogleAsyncCallback<>() {
 					@Override
 					public void onSuccess(String resourceId) {
 						LD.clearPrompt();

@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.impex.syndication;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUISyndication;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.SyndicationService;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -38,18 +37,12 @@ public class SyndicationDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (syndication.getId() != 0) {
-				SyndicationService.Instance.get().getSyndication(syndication.getId(),
-						new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUISyndication share) {
-								setSyndication(share);
-							}
-						});
+				SyndicationService.Instance.get().getSyndication(syndication.getId(), new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(GUISyndication share) {
+						setSyndication(share);
+					}
+				});
 			} else {
 				GUISyndication newSyndication = new GUISyndication();
 				setSyndication(newSyndication);
@@ -106,12 +99,7 @@ public class SyndicationDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (validate()) {
-			SyndicationService.Instance.get().save(syndication, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			SyndicationService.Instance.get().save(syndication, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUISyndication syndication) {
 					tabSet.hideSave();

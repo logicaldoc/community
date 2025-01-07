@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.reports.custom;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIReport;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.ReportService;
 import com.smartgwt.client.widgets.Label;
@@ -44,12 +43,7 @@ public class ReportDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (report.getId() != 0) {
-				ReportService.Instance.get().getReport(report.getId(), true, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				ReportService.Instance.get().getReport(report.getId(), true, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIReport report) {
 						setReport(report);
@@ -129,12 +123,7 @@ public class ReportDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (validate()) {
-			ReportService.Instance.get().save(report, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			ReportService.Instance.get().save(report, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIReport report) {
 					tabSet.hideSave();

@@ -10,8 +10,8 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIPatch;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -296,13 +296,7 @@ public class PatchPanel extends VLayout {
 	public void showList() {
 		LD.contactingServer();
 
-		UpdateService.Instance.get().checkPatch(new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				LD.clearPrompt();
-				GuiLog.serverError(caught);
-			}
-
+		UpdateService.Instance.get().checkPatch(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUIPatch> patches) {
 				LD.clearPrompt();
@@ -347,11 +341,11 @@ public class PatchPanel extends VLayout {
 			bar.setPercentDone(0);
 			download.setDisabled(true);
 
-			UpdateService.Instance.get().downloadPatch(patch.getId(), fileName, patch.getSize(), new AsyncCallback<>() {
+			UpdateService.Instance.get().downloadPatch(patch.getId(), fileName, patch.getSize(), new DefaultAsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
+					super.onFailure(caught);
 					download.setDisabled(false);
 				}
 
@@ -361,13 +355,7 @@ public class PatchPanel extends VLayout {
 
 					new Timer() {
 						public void run() {
-							UpdateService.Instance.get().checkDownloadStatus(new AsyncCallback<>() {
-
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
+							UpdateService.Instance.get().checkDownloadStatus(new DefaultAsyncCallback<>() {
 								@Override
 								public void onSuccess(List<Integer> status) {
 									bar.setPercentDone(status.get(1));
@@ -402,12 +390,7 @@ public class PatchPanel extends VLayout {
 	private void onDelete(String fileName) {
 		SC.ask(I18N.message("delete"), I18N.message("deletepatchquestion"), choice -> {
 			if (Boolean.TRUE.equals(choice)) {
-				UpdateService.Instance.get().deletePatch(fileName, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				UpdateService.Instance.get().deletePatch(fileName, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void ret) {
 						showList();
@@ -418,13 +401,7 @@ public class PatchPanel extends VLayout {
 	}
 
 	private void displayNotes(String fileName) {
-		UpdateService.Instance.get().getPatchNotes(fileName, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		UpdateService.Instance.get().getPatchNotes(fileName, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<String> infos) {
 				VLayout panel = new VLayout();
@@ -507,13 +484,7 @@ public class PatchPanel extends VLayout {
 			if (Boolean.TRUE.equals(choice)) {
 				confirmPatch.setVisible(false);
 				download.setVisible(false);
-				UpdateService.Instance.get().confirmPatch(patch.getFile(), new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				UpdateService.Instance.get().confirmPatch(patch.getFile(), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(String path) {
 						Session.get().setUpdating(true);
@@ -560,7 +531,7 @@ public class PatchPanel extends VLayout {
 								&& !command.isEmpty()) {
 							LD.clearPrompt();
 							ApplicationRestarting.get(I18N.message("patchnotstarted", command)).show();
-						} 
+						}
 
 						scheduleGetStatus(patch);
 					}

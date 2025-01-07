@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.security;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIMenu;
 import com.logicaldoc.gui.common.client.data.AccessControlListDS;
@@ -228,13 +228,7 @@ public class MenuSecurityPanel extends VLayout {
 		// Apply the ACL
 		menu.setAccessControlList(getACL());
 
-		SecurityService.Instance.get().saveACL(menu, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SecurityService.Instance.get().saveACL(menu, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void result) {
 				GuiLog.info(I18N.message("appliedrightsmenu"), null);

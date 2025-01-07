@@ -3,8 +3,8 @@ package com.logicaldoc.gui.frontend.client.security;
 import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUISecuritySettings;
@@ -314,13 +314,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 	}
 
 	private void doSaveSettings() {
-		SecurityService.Instance.get().saveSettings(SecuritySettingsPanel.this.settings, new AsyncCallback<Boolean>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SecurityService.Instance.get().saveSettings(SecuritySettingsPanel.this.settings, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Boolean restartRequired) {
 				GuiLog.info(I18N.message("settingssaved"), null);
@@ -402,11 +396,11 @@ public class SecuritySettingsPanel extends AdminPanel {
 		ButtonItem syncGeoDB = new ButtonItem("geoSyncDb", I18N.message("syncgeolocationdb"));
 		syncGeoDB.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
 			LD.contactingServer();
-			SecurityService.Instance.get().syncGeolocationDB(licenseKey.getValueAsString(), new AsyncCallback<>() {
+			SecurityService.Instance.get().syncGeolocationDB(licenseKey.getValueAsString(), new DefaultAsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
+					super.onFailure(caught);
 					LD.clearPrompt();
 				}
 

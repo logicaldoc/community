@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -483,7 +483,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 	public void onSave() {
 		validate();
 
-		DocumentService.Instance.get().saveACL(document, new GUIAsyncCallback<>() {
+		DocumentService.Instance.get().saveACL(document, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void result) {
 				GuiLog.info(I18N.message("appliedrightsondoc"), null);
@@ -494,7 +494,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 
 	public void onCopyParentFolderSecurity() {
 		FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
-				new GUIAsyncCallback<>() {
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIFolder folder) {
 						document.setAccessControlList(folder.getAccessControlList());

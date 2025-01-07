@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.system;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.data.AspectsDS;
@@ -102,12 +102,7 @@ public class RunLevelPanel extends VLayout {
 					rec.getAttributeAsString("demo")));
 		}
 
-		SettingService.Instance.get().saveSettings(settings, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SettingService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg) {
 				GuiLog.info(I18N.message("settingssaved"));

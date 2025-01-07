@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.system;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -21,12 +21,7 @@ public class BrandingPanel extends AdminPanel {
 
 	public BrandingPanel(long tenantId) {
 		super("branding");
-		TenantService.Instance.get().load(tenantId, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		TenantService.Instance.get().load(tenantId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUITenant ten) {
 				tenant = ten;
@@ -52,13 +47,7 @@ public class BrandingPanel extends AdminPanel {
 	}
 
 	private void onSave() {
-		TenantService.Instance.get().save(tenant, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		TenantService.Instance.get().save(tenant, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUITenant ten) {
 				BrandingPanel.this.tenant = ten;

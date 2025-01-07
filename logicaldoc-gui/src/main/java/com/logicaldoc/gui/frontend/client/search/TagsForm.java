@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.data.TagsDS;
@@ -168,20 +168,16 @@ public class TagsForm extends VLayout {
 							return;
 
 						ListGridRecord selection = tags.getSelectedRecord();
-						TagService.Instance.get().rename(selection.getAttribute("word"), value, new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(Void arg) {
-								GuiLog.info(I18N.message("procinexecution"), I18N.message("taginexecution"));
-								ListGridRecord selection = tags.getSelectedRecord();
-								selection.setAttribute("word", value);
-								onLetterSelect(value.substring(0, 1));
-							}
-						});
+						TagService.Instance.get().rename(selection.getAttribute("word"), value,
+								new DefaultAsyncCallback<>() {
+									@Override
+									public void onSuccess(Void arg) {
+										GuiLog.info(I18N.message("procinexecution"), I18N.message("taginexecution"));
+										ListGridRecord selection = tags.getSelectedRecord();
+										selection.setAttribute("word", value);
+										onLetterSelect(value.substring(0, 1));
+									}
+								});
 					}));
 			contextMenu.addItem(rename);
 
@@ -190,12 +186,7 @@ public class TagsForm extends VLayout {
 			delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 				if (Boolean.TRUE.equals(confirm)) {
 					ListGridRecord selection = tags.getSelectedRecord();
-					TagService.Instance.get().delete(selection.getAttribute("word"), new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					TagService.Instance.get().delete(selection.getAttribute("word"), new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void arg) {
 							GuiLog.info(I18N.message("procinexecution"), I18N.message("taginexecution"));

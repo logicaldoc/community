@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.webcontent;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -84,12 +84,10 @@ public class WebcontentCreate extends Window {
 
 		LD.contactingServer();
 		DocumentService.Instance.get().createWithContent(vo, "<html><body></body></html>", true,
-				new AsyncCallback<>() {
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-
-						GuiLog.serverError(caught);
+						super.onFailure(caught);
 						destroy();
 					}
 

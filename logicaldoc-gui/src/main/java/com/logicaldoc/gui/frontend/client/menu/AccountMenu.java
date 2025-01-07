@@ -3,8 +3,8 @@ package com.logicaldoc.gui.frontend.client.menu;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.CookiesManager;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
@@ -39,14 +39,8 @@ public class AccountMenu extends Menu {
 		setShadowDepth(3);
 
 		MenuItem profile = new MenuItem(I18N.message("profile"));
-		profile.addClickHandler(
-				event -> SecurityService.Instance.get().getUser(Session.get().getUser().getId(), new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+		profile.addClickHandler(event -> SecurityService.Instance.get().getUser(Session.get().getUser().getId(),
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIUser user) {
 						Profile profile = new Profile(user);
@@ -63,12 +57,7 @@ public class AccountMenu extends Menu {
 			Session.get().getUser().setHitsGrid(null);
 
 			Session.get().getUser().setDocsGrid(null);
-			SecurityService.Instance.get().saveInterfaceSettings(Session.get().getUser(), new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable e) {
-					GuiLog.serverError(e);
-				}
-
+			SecurityService.Instance.get().saveInterfaceSettings(Session.get().getUser(), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIUser usr) {
 					CookiesManager.removeAllCookies();

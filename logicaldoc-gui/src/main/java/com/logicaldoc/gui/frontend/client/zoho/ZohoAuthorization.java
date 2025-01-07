@@ -2,9 +2,8 @@ package com.logicaldoc.gui.frontend.client.zoho;
 
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.frontend.client.services.ZohoService;
@@ -55,13 +54,7 @@ public class ZohoAuthorization extends Window {
 
 		addItem(form);
 
-		ZohoService.Instance.get().loadSettings(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		ZohoService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<String> settings) {
 				clientId.setValue(settings.get(0));
@@ -72,12 +65,7 @@ public class ZohoAuthorization extends Window {
 
 	public void onAuthenticate() {
 		ZohoService.Instance.get().saveSettings(form.getValueAsString("clientid"),
-				form.getValueAsString("clientsecret"), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				form.getValueAsString("clientsecret"), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(String consentUrl) {
 						WindowUtils.openUrl(consentUrl, "_blank", null);

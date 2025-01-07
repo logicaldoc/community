@@ -6,11 +6,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIAttributeSet;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
@@ -662,13 +661,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 				if (Boolean.TRUE.equals(yes)) {
 					LD.contactingServer();
 					AttributeSetService.Instance.get().applyAllToTemplates(attributeSet.getId(),
-							selection.getAttributeAsString("name"), new AsyncCallback<>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-									LD.clearPrompt();
-								}
-
+							selection.getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 								@Override
 								public void onSuccess(Void arg0) {
 									LD.clearPrompt();
@@ -692,13 +685,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 						if (Boolean.TRUE.equals(yes)) {
 							LD.contactingServer();
 							AttributeSetService.Instance.get().applyInitializationToTemplates(attributeSet.getId(),
-									selection.getAttributeAsString("name"), new AsyncCallback<>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-											LD.clearPrompt();
-										}
-
+									selection.getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 										@Override
 										public void onSuccess(Void arg0) {
 											LD.clearPrompt();
@@ -722,13 +709,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 						if (Boolean.TRUE.equals(confirm)) {
 							LD.contactingServer();
 							AttributeSetService.Instance.get().applyValidationToTemplates(attributeSet.getId(),
-									selection.getAttributeAsString("name"), new AsyncCallback<>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-											LD.clearPrompt();
-										}
-
+									selection.getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 										@Override
 										public void onSuccess(Void arg0) {
 											LD.clearPrompt();

@@ -1,11 +1,10 @@
 package com.logicaldoc.gui.frontend.client.system;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.data.LoggersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
@@ -101,12 +100,7 @@ public class LogPanel extends VLayout {
 		SC.ask(I18N.message("confirmdeletelogger"), choice -> {
 			if (Boolean.TRUE.equals(choice) && loggerSelector.getValueAsString() != null
 					&& !loggerSelector.getValueAsString().isEmpty()) {
-				SystemService.Instance.get().removeLogger(loggerSelector.getValueAsString(), new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				SystemService.Instance.get().removeLogger(loggerSelector.getValueAsString(), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void arg0) {
 						loggerSelector.setValue("root");
@@ -125,12 +119,7 @@ public class LogPanel extends VLayout {
 							&& name.equals(loggerSelector.getSelectedRecord().getAttributeAsString("name"))
 							&& loggerSelector.getSelectedRecord().getAttributeAsBoolean("additivity"));
 			SystemService.Instance.get().saveLogger(name, levelSelector.getValueAsString(), additivity,
-					new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void arg0) {
 							loggerSelector.setOptionDataSource(new LoggersDS());

@@ -7,10 +7,9 @@ import java.util.stream.Collectors;
 
 import com.google.gwt.http.client.RequestTimeoutException;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
@@ -130,7 +129,7 @@ public class ContextMenu extends Menu {
 
 		if (selectedFolders.size() == 1)
 			FolderService.Instance.get().getFolder(firstSelectedFolder.getId(), false, false, false,
-					new GUIAsyncCallback<>() {
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIFolder selectedFolder) {
 							delete.setEnabled(!selectedFolder.isDefaultWorkspace());
@@ -169,7 +168,7 @@ public class ContextMenu extends Menu {
 		/**
 		 * Check on the server if the action has been modified
 		 */
-		SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(), new GUIAsyncCallback<>() {
+		SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(), new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIMenu action) {
 				Session.get().getUser().updateCustomAction(action);
@@ -184,7 +183,7 @@ public class ContextMenu extends Menu {
 					routine.setAutomation(action.getAutomation());
 					executeRoutine(tree.getSelectedIds(), null, routine);
 				} else if (action.getRoutineId() != null && action.getRoutineId().longValue() != 0L) {
-					AutomationService.Instance.get().getRoutine(action.getRoutineId(), new GUIAsyncCallback<>() {
+					AutomationService.Instance.get().getRoutine(action.getRoutineId(), new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIAutomationRoutine routine) {
 							if (routine.getTemplateId() != null && routine.getTemplateId().longValue() != 0L) {
@@ -208,7 +207,7 @@ public class ContextMenu extends Menu {
 	}
 
 	private void executeRoutine(List<Long> folderIds, List<Long> docIds, GUIAutomationRoutine routine) {
-		AutomationService.Instance.get().execute(routine, docIds, folderIds, new GUIAsyncCallback<>() {
+		AutomationService.Instance.get().execute(routine, docIds, folderIds, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg0) {
 				// Nothing to do
@@ -355,7 +354,7 @@ public class ContextMenu extends Menu {
 	private void onDelete() {
 		final List<Long> selectedIds = tree.getSelectedIds();
 		LD.contactingServer();
-		DocumentService.Instance.get().countDocuments(selectedIds, Constants.DOC_ARCHIVED, new GUIAsyncCallback<>() {
+		DocumentService.Instance.get().countDocuments(selectedIds, Constants.DOC_ARCHIVED, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Long count) {
 				LD.clearPrompt();
@@ -378,7 +377,7 @@ public class ContextMenu extends Menu {
 		TreeNode parentNode = tree.getTree().getParent(tree.getSelectedRecord());
 		TreeNode firstNode = tree.getTree().getChildren(parentNode)[0];
 
-		FolderService.Instance.get().delete(selectedIds, new AsyncCallback<>() {
+		FolderService.Instance.get().delete(selectedIds, new DefaultAsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				LD.clearPrompt();
@@ -386,7 +385,7 @@ public class ContextMenu extends Menu {
 				if (caught instanceof RequestTimeoutException)
 					SC.say("timeout");
 
-				GuiLog.serverError(caught);
+				super.onFailure(caught);
 			}
 
 			@Override
@@ -426,7 +425,7 @@ public class ContextMenu extends Menu {
 					final String val = value.trim().replace("/", "").replace("\\\\", "");
 					final long folderId = Long.parseLong(selectedNode.getAttributeAsString(
 							com.logicaldoc.gui.frontend.client.folder.browser.FolderTree.FOLDER_ID));
-					FolderService.Instance.get().rename(folderId, val, new GUIAsyncCallback<>() {
+					FolderService.Instance.get().rename(folderId, val, new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void v) {
 							selectedNode.setAttribute("name", val);
@@ -471,7 +470,7 @@ public class ContextMenu extends Menu {
 						Clipboard.getInstance().stream().map(doc -> doc.getId()).collect(Collectors.toList()), folderId,
 						Clipboard.getInstance().getLastAction(), Boolean.TRUE.equals(values.get("copylinks")),
 						Boolean.TRUE.equals(values.get("copynotes")), Boolean.TRUE.equals(values.get("copysecurity")),
-						new GUIAsyncCallback<>() {
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void result) {
 								DocumentsPanel.get().onFolderSelected(FolderController.get().getCurrentFolder());
@@ -499,7 +498,7 @@ public class ContextMenu extends Menu {
 	}
 
 	private void pasteAsAlias(final long folderId, final List<Long> docIds, String type) {
-		FolderService.Instance.get().pasteAsAlias(docIds, folderId, type, new GUIAsyncCallback<>() {
+		FolderService.Instance.get().pasteAsAlias(docIds, folderId, type, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void result) {
 				DocumentsPanel.get().onFolderSelected(FolderController.get().getCurrentFolder());
@@ -513,7 +512,7 @@ public class ContextMenu extends Menu {
 	 * Adds a bookmark to the currently selected folders
 	 */
 	private void onAddBookmark(List<Long> selection) {
-		DocumentService.Instance.get().addBookmarks(selection, 1, new GUIAsyncCallback<>() {
+		DocumentService.Instance.get().addBookmarks(selection, 1, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void v) {
 				// Nothing to do
@@ -529,7 +528,7 @@ public class ContextMenu extends Menu {
 			if (value.isEmpty())
 				SC.warn(I18N.message("commentrequired"));
 			else
-				DocumentService.Instance.get().archiveFolder(folderId, value, new GUIAsyncCallback<Long>() {
+				DocumentService.Instance.get().archiveFolder(folderId, value, new DefaultAsyncCallback<Long>() {
 					@Override
 					public void onSuccess(Long result) {
 						GuiLog.info(I18N.message("documentswerearchived", "" + result), null);

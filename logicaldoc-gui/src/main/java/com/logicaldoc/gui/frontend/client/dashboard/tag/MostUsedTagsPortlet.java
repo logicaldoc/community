@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUITag;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
@@ -80,7 +80,7 @@ public class MostUsedTagsPortlet extends Portlet {
 	}
 
 	private void refresh() {
-		TagService.Instance.get().getTagCloud(new GUIAsyncCallback<>() {
+		TagService.Instance.get().getTagCloud(new DefaultAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(List<GUITag> cloud) {

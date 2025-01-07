@@ -68,4 +68,9 @@ public class PreviewTile extends HLayout {
 			setMembers(showThumbnail);
 		}
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
 }

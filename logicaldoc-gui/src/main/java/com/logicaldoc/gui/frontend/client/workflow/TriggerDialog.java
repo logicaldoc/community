@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.workflow;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.EventSelectorOptions;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
@@ -101,12 +100,7 @@ public class TriggerDialog extends Window {
 					templateSelectedId = template.getValueAsString();
 
 				WorkflowService.Instance.get().saveTrigger(Long.toString(panel.getFolder().getId()), workflowSelectedId,
-						templateSelectedId, eventsSelector.getValueAsString(), new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						templateSelectedId, eventsSelector.getValueAsString(), new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void result) {
 								panel.refresh();

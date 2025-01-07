@@ -1,9 +1,10 @@
 package com.logicaldoc.gui.frontend.client.tenant;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.IgnoreAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIKeystore;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.Upload;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -65,18 +66,7 @@ public class KeystoreUploader extends Window {
 		addItem(layout);
 
 		// Cleanup the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				// Nothing to do
-			}
-
-			@Override
-			public void onSuccess(Void result) {
-				// Nothing to do
-			}
-		});
+		DocumentService.Instance.get().cleanUploadedFileFolder(new IgnoreAsyncCallback<>());
 	}
 
 	private void prepareForm() {
@@ -118,13 +108,7 @@ public class KeystoreUploader extends Window {
 		keystore.setPassword(vm.getValueAsString("password"));
 		keystore.setTenantId(keystorePanel.getTenantId());
 
-		SignService.Instance.get().imporKeystore(keystore, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SignService.Instance.get().imporKeystore(keystore, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg) {
 				keystorePanel.initGUI();

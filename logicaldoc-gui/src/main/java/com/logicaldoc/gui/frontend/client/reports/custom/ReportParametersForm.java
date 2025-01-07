@@ -5,8 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIReport;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -57,13 +57,7 @@ public class ReportParametersForm extends Window {
 		setShowModalMask(true);
 		centerInPage();
 
-		ReportService.Instance.get().getReportParameters(form.getId(), new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		ReportService.Instance.get().getReportParameters(form.getId(), new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUIAttribute> parameters) {
 				ReportParametersForm.this.parameters = parameters;
@@ -203,13 +197,7 @@ public class ReportParametersForm extends Window {
 	}
 
 	private void doExecute(ArrayList<GUIAttribute> parameters) {
-		ReportService.Instance.get().execute(report.getId(), parameters, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		ReportService.Instance.get().execute(report.getId(), parameters, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg) {
 				destroy();

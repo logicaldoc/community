@@ -1,10 +1,9 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.LockedDocsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.GridUtil;
@@ -163,12 +162,7 @@ public class LockedDocsReport extends ReportPanel {
 			if (selection == null || selection.length == 0)
 				return;
 
-			DocumentService.Instance.get().unlock(GridUtil.getIds(selection), new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			DocumentService.Instance.get().unlock(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void result) {
 					refresh();
@@ -182,17 +176,10 @@ public class LockedDocsReport extends ReportPanel {
 				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 		preview.addClickHandler((MenuItemClickEvent event) -> {
 			long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
-			DocumentService.Instance.get().getById(id, new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			DocumentService.Instance.get().getById(id, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIDocument doc) {
-					PreviewPopup iv = new PreviewPopup(doc);
-					iv.show();
+					new PreviewPopup(doc).show();
 				}
 			});
 		});

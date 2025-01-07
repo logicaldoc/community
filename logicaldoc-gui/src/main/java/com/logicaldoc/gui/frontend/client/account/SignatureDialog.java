@@ -1,10 +1,8 @@
 package com.logicaldoc.gui.frontend.client.account;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIStamp;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.frontend.client.metadata.stamp.StampUploader;
 import com.logicaldoc.gui.frontend.client.services.StampService;
 import com.smartgwt.client.types.HeaderControls;
@@ -33,7 +31,7 @@ public class SignatureDialog extends Window {
 
 		centerInPage();
 
-		StampService.Instance.get().getSignature(new GUIAsyncCallback<>() {
+		StampService.Instance.get().getSignature(new DefaultAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(GUIStamp stamp) {
@@ -42,13 +40,7 @@ public class SignatureDialog extends Window {
 				ToolStripButton save = new ToolStripButton(I18N.message("save"));
 				save.addClickHandler(click -> {
 					if (signaturePanel.validate())
-						StampService.Instance.get().save(signaturePanel.getStamp(), new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						StampService.Instance.get().save(signaturePanel.getStamp(), new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(GUIStamp arg) {
 								destroy();

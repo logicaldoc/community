@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.frontend.client.system.task;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUITask;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -55,12 +55,7 @@ public class TaskDetailPanel extends VLayout {
 	@Override
 	public void onDraw() {
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> SystemService.Instance.get()
-				.getTaskByName(task.getName(), I18N.getLocale(), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.getTaskByName(task.getName(), I18N.getLocale(), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUITask task) {
 						setTask(task);
@@ -155,12 +150,7 @@ public class TaskDetailPanel extends VLayout {
 
 	public void onSave() {
 		if (schedulingPanel.validate() && notificationPanel.validate()) {
-			SystemService.Instance.get().saveTask(task, I18N.getLocale(), new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			SystemService.Instance.get().saveTask(task, I18N.getLocale(), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUITask task) {
 					if (task != null) {

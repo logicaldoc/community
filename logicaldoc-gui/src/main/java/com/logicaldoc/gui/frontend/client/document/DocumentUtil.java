@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.document;
 
 import java.util.Arrays;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -22,7 +22,7 @@ public interface DocumentUtil {
 	 */
 	public static void downloadDocumentResource(String docId, String url) {
 		DocumentService.Instance.get().getAllowedPermissions(Arrays.asList(Long.parseLong(docId)),
-				new GUIAsyncCallback<GUIAccessControlEntry>() {
+				new DefaultAsyncCallback<GUIAccessControlEntry>() {
 					@Override
 					public void onSuccess(GUIAccessControlEntry acl) {
 						if (acl.isDownload()) {

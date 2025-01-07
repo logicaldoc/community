@@ -1,8 +1,7 @@
 package com.logicaldoc.gui.login.client;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.CopyTextFormItemIcon;
 import com.logicaldoc.gui.login.client.services.LoginService;
 import com.smartgwt.client.types.HeaderControls;
@@ -40,10 +39,10 @@ public class PasswordGenerator extends Window {
 
 	private void generatePassword() {
 		generate.setDisabled(true);
-		LoginService.Instance.get().generatePassword(username, new AsyncCallback<>() {
+		LoginService.Instance.get().generatePassword(username, new DefaultAsyncCallback<>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
+				super.onFailure(caught);
 				generate.setDisabled(false);
 			}
 

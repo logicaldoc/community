@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.settings;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIEmailAccount;
 import com.logicaldoc.gui.common.client.beans.GUIVIASettings;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -60,13 +60,7 @@ public class VIASettingsPanel extends AdminPanel {
 		setHeight100();
 		setMembersMargin(20);
 
-		VIAService.Instance.get().get(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		VIAService.Instance.get().get(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIVIASettings settings) {
 				VIASettingsPanel.this.settings = settings;
@@ -200,12 +194,7 @@ public class VIASettingsPanel extends AdminPanel {
 				.addClickHandler(click01 -> LD.ask(I18N.message("question"), I18N.message("confirmresetcache"), yes -> {
 					if (Boolean.TRUE.equals(yes)) {
 						EmailAccountService.Instance.get().resetCache(settings.getEmailAccount().getId(),
-								new AsyncCallback<>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
-
+								new DefaultAsyncCallback<>() {
 									@Override
 									public void onSuccess(Void result) {
 										GuiLog.info(I18N.message("cachedeleted"), null);
@@ -220,23 +209,13 @@ public class VIASettingsPanel extends AdminPanel {
 		ButtonItem testEmail = new ButtonItem("testconnection", I18N.message("testconnection"));
 		testEmail.addClickHandler(event -> {
 			if (validate()) {
-				VIAService.Instance.get().save(settings, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				VIAService.Instance.get().save(settings, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIVIASettings settings) {
 						GuiLog.info(I18N.message("settingssaved"), null);
 						VIASettingsPanel.this.settings = settings;
 						EmailAccountService.Instance.get().test(settings.getEmailAccount().getId(),
-								new AsyncCallback<Boolean>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
-
+								new DefaultAsyncCallback<>() {
 									@Override
 									public void onSuccess(Boolean result) {
 										if (result.booleanValue())
@@ -254,12 +233,7 @@ public class VIASettingsPanel extends AdminPanel {
 
 	private void onSave() {
 		if (validate()) {
-			VIAService.Instance.get().save(settings, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			VIAService.Instance.get().save(settings, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIVIASettings settings) {
 					GuiLog.info(I18N.message("settingssaved"), null);

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
@@ -141,12 +141,7 @@ public class FirewallPanel extends VLayout {
 						Arrays.asList(FIREWALL_ENABLED, FIREWALL_WHITELIST, FIREWALL_BLACKLIST,
 								FIREWALL_ALLOW_SEMICOLON, FIREWALL_ALLOW_BACK_SLASH, FIREWALL_ALLOW_URL_ENCODED_PERCENT,
 								FIREWALL_ALLOW_URL_ENCODED_SLASH, FIREWALL_ALLOW_URL_ENCODED_PERIOD),
-						new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(List<GUIParameter> params) {
 								enabled.setValue(params.get(0).getValueAsBoolean());
@@ -281,12 +276,7 @@ public class FirewallPanel extends VLayout {
 		for (GUIParameter guiParameter : params)
 			Session.get().setConfig(guiParameter.getName(), guiParameter.getValue());
 
-		SettingService.Instance.get().saveFirewallSettings(params, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SettingService.Instance.get().saveFirewallSettings(params, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg) {
 				if (user == null)

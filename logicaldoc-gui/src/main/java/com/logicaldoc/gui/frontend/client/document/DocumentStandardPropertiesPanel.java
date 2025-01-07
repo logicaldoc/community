@@ -5,16 +5,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
 import com.logicaldoc.gui.common.client.data.TagsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -251,7 +249,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 		countPages.setPrompt(I18N.message("countpages"));
 		countPages.addFormItemClickHandler(click -> {
 			click.getItem().setValue(I18N.message("computing") + "...");
-			DocumentService.Instance.get().updatePages(document.getId(), new GUIAsyncCallback<>() {
+			DocumentService.Instance.get().updatePages(document.getId(), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Integer docPages) {
 					if (docPages != null) {
@@ -405,12 +403,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 		rating.setEndRow(true);
 		if (updateEnabled)
 			rating.addClickHandler(
-					event -> DocumentService.Instance.get().getRating(document.getId(), new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					event -> DocumentService.Instance.get().getRating(document.getId(), new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIRating rating) {
 							if (rating != null) {

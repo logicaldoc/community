@@ -3,8 +3,8 @@ package com.logicaldoc.gui.frontend.client.settings;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -48,12 +48,7 @@ public class AuditingPanel extends AdminPanel {
 	public AuditingPanel() {
 		super("auditing");
 
-		SettingService.Instance.get().loadAuditingSettings(new AsyncCallback<List<GUIParameter>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SettingService.Instance.get().loadAuditingSettings(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUIParameter> result) {
 				initGUI(result);
@@ -180,13 +175,7 @@ public class AuditingPanel extends AdminPanel {
 			settings.add(new GUIParameter(HISTORY_OCR_TTL, vm.getValueAsString(HISTORY_OCR_TTL)));
 			settings.add(new GUIParameter(WEBSERVICE_CALL_TTL, vm.getValueAsString(WEBSERVICE_CALL_TTL)));
 
-			SettingService.Instance.get().saveSettings(settings, new AsyncCallback<Void>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			SettingService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void ret) {
 					GuiLog.info(I18N.message("settingssaved"), null);

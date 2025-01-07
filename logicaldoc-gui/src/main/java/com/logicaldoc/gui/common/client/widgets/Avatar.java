@@ -1,10 +1,9 @@
 package com.logicaldoc.gui.common.client.widgets;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -69,7 +68,7 @@ public class Avatar extends HLayout {
 	private Menu prepareContextMenu() {
 		MenuItem reset = new MenuItem();
 		reset.setTitle(I18N.message("reset"));
-		reset.addClickHandler(event -> SecurityService.Instance.get().resetAvatar(userId, new GUIAsyncCallback<>() {
+		reset.addClickHandler(event -> SecurityService.Instance.get().resetAvatar(userId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg) {
 				Avatar.this.initGUI();
@@ -129,13 +128,14 @@ public class Avatar extends HLayout {
 			layout.addMember(upload);
 			layout.addMember(saveButton);
 
-			addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new GUIAsyncCallback<>() {
+			addCloseClickHandler(
+					event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 
-				@Override
-				public void onSuccess(Void result) {
-					destroy();
-				}
-			}));
+						@Override
+						public void onSuccess(Void result) {
+							destroy();
+						}
+					}));
 
 			addItem(layout);
 		}
@@ -146,7 +146,7 @@ public class Avatar extends HLayout {
 				return;
 			}
 
-			SecurityService.Instance.get().saveAvatar(userId, new GUIAsyncCallback<>() {
+			SecurityService.Instance.get().saveAvatar(userId, new DefaultAsyncCallback<>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -157,7 +157,7 @@ public class Avatar extends HLayout {
 				@Override
 				public void onSuccess(Void arg) {
 					Avatar.this.initGUI();
-					DocumentService.Instance.get().cleanUploadedFileFolder(new GUIAsyncCallback<>() {
+					DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 
 						@Override
 						public void onSuccess(Void result) {
@@ -170,25 +170,15 @@ public class Avatar extends HLayout {
 				}
 			});
 		}
+
+		@Override
+		public boolean equals(Object other) {
+			return super.equals(other);
+		}
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + (int) (userId ^ (userId >>> 32));
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Avatar other = (Avatar) obj;
-		return userId == other.userId;
+	public boolean equals(Object other) {
+		return super.equals(other);
 	}
 }

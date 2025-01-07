@@ -3,7 +3,7 @@ package com.logicaldoc.gui.common.client.widgets.preview;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -253,7 +253,7 @@ public class MailPreviewPanel extends VLayout {
 		MenuItem copy = new MenuItem();
 		copy.setTitle(I18N.message("copy"));
 		copy.addClickHandler(event -> DocumentService.Instance.get().saveEmailAttachment(doc.getId(),
-				doc.getFileVersion(), attachment.getFileName(), new GUIAsyncCallback<>() {
+				doc.getFileVersion(), attachment.getFileName(), new DefaultAsyncCallback<>() {
 
 					@Override
 					public void onSuccess(GUIDocument doc) {

@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -45,13 +45,7 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 		super("twofactorsauth");
 
 		SettingService.Instance.get().loadSettingsByNames(Arrays.asList(Session.get().getTenantName() + TWOFA_STAR),
-				new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(List<GUIParameter> params) {
 						init(params);
@@ -200,13 +194,7 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 	}
 
 	private void doSaveSettings(final List<GUIParameter> params) {
-		SettingService.Instance.get().saveSettings(params, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SettingService.Instance.get().saveSettings(params, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg) {
 				Session.get().updateConfig(params);

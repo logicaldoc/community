@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.document;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -79,7 +79,7 @@ public class ReplaceVersionFile extends Window {
 		}
 
 		DocumentService.Instance.get().replaceFile(document.getId(), fileVersion, vm.getValueAsString("comment"),
-				new GUIAsyncCallback<>() {
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void arg0) {
 						destroy();

@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.metadata.form;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.ExtendedPropertiesPanel;
 import com.logicaldoc.gui.common.client.widgets.StickyWindow;
@@ -55,13 +54,7 @@ public class WebFormPrefilledLink extends StickyWindow {
 
 		addItem(responderForm);
 
-		FormService.Instance.get().getById(formId, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		FormService.Instance.get().getById(formId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIForm frm) {
 				extPanel = new ExtendedPropertiesPanel(frm, null, true, false, false, true);
@@ -94,13 +87,7 @@ public class WebFormPrefilledLink extends StickyWindow {
 			return;
 
 		FormService.Instance.get().getPreFilledLink((GUIForm) extPanel.getObject(), vm.getValueAsString(RESPONDEREMAIL),
-				new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(String link) {
 						prefilledLink.setValue("<a href='" + link + "' target=='_blank'>" + link + "</a>");

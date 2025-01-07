@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.settings.automation;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.AutomationService;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
@@ -48,12 +47,7 @@ public class AutomationRoutineDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (routine.getId() != 0) {
-				AutomationService.Instance.get().getRoutine(routine.getId(), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				AutomationService.Instance.get().getRoutine(routine.getId(), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIAutomationRoutine routine) {
 						setRoutine(routine);
@@ -148,12 +142,7 @@ public class AutomationRoutineDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (validate()) {
-			AutomationService.Instance.get().saveRoutine(routine, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			AutomationService.Instance.get().saveRoutine(routine, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIAutomationRoutine routine) {
 					tabSet.hideSave();

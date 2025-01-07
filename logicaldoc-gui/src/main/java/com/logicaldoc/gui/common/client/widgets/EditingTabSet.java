@@ -43,7 +43,7 @@ public class EditingTabSet extends TabSet {
 		savePanel.setPadding(2);
 		savePanel.setAlign(VerticalAlignment.CENTER);
 		savePanel.setStyleName("warn");
-		
+
 		savePanel.setMembers(saveButton, cancelButton);
 
 		savePanel.hide();
@@ -70,5 +70,30 @@ public class EditingTabSet extends TabSet {
 			saveButton.setDisabled(true);
 		if (cancelButton != null)
 			cancelButton.setDisabled(false);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((savePanel == null) ? 0 : savePanel.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		EditingTabSet other = (EditingTabSet) obj;
+		if (savePanel == null) {
+			if (other.savePanel != null)
+				return false;
+		} else if (!savePanel.equals(other.savePanel))
+			return false;
+		return true;
 	}
 }

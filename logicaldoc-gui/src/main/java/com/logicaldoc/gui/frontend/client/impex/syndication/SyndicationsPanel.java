@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.impex.syndication;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUISyndication;
 import com.logicaldoc.gui.common.client.data.SyndicationsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -129,13 +129,7 @@ public class SyndicationsPanel extends AdminPanel {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				SyndicationService.Instance.get().getSyndication(Long.parseLong(rec.getAttributeAsString("id")),
-						new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(GUISyndication syndication) {
 								showSyndicationDetails(syndication);
@@ -169,12 +163,7 @@ public class SyndicationsPanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				SyndicationService.Instance.get().delete(id, new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				SyndicationService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						list.removeSelectedData();
@@ -190,13 +179,7 @@ public class SyndicationsPanel extends AdminPanel {
 		test.addClickHandler(click -> {
 			LD.contactingServer();
 			SyndicationService.Instance.get().test(Long.parseLong(rec.getAttributeAsString("id")),
-					new AsyncCallback<Boolean>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							LD.clearPrompt();
-							GuiLog.serverError(caught);
-						}
-
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Boolean result) {
 							LD.clearPrompt();
@@ -211,13 +194,7 @@ public class SyndicationsPanel extends AdminPanel {
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(click -> SyndicationService.Instance.get()
-				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						rec.setAttribute(EENABLED, "0");
@@ -228,13 +205,7 @@ public class SyndicationsPanel extends AdminPanel {
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(event -> SyndicationService.Instance.get()
-				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						rec.setAttribute(EENABLED, "2");
@@ -247,12 +218,7 @@ public class SyndicationsPanel extends AdminPanel {
 		resetCache.addClickHandler(
 				event -> LD.ask(I18N.message("question"), I18N.message("confirmresetcache"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
-						SyndicationService.Instance.get().resetCache(id, new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						SyndicationService.Instance.get().resetCache(id, new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void result) {
 								GuiLog.info(I18N.message("cachedeleted"), null);

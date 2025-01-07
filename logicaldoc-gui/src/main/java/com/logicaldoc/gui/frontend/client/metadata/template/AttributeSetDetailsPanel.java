@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.metadata.template;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAttributeSet;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
 import com.smartgwt.client.types.Side;
@@ -41,18 +40,12 @@ public class AttributeSetDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (attributeSet.getId() != 0) {
-				AttributeSetService.Instance.get().getAttributeSet(attributeSet.getId(),
-						new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUIAttributeSet set) {
-								setAttributeSet(set);
-							}
-						});
+				AttributeSetService.Instance.get().getAttributeSet(attributeSet.getId(), new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(GUIAttributeSet set) {
+						setAttributeSet(set);
+					}
+				});
 			} else {
 				setAttributeSet(new GUIAttributeSet());
 			}
@@ -120,12 +113,7 @@ public class AttributeSetDetailsPanel extends VLayout {
 
 	protected void onSave() {
 		if (validate()) {
-			AttributeSetService.Instance.get().save(attributeSet, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			AttributeSetService.Instance.get().save(attributeSet, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIAttributeSet result) {
 					setsPanel.updateRecord(result);

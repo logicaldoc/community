@@ -3,12 +3,11 @@ package com.logicaldoc.gui.frontend.client.workflow.designer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.data.WorkflowAclDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -285,12 +284,7 @@ public class WorkflowSecurity extends Window {
 
 	public void onSave() {
 		workflow.setAccessControlList(getACL());
-		WorkflowService.Instance.get().saveACL(workflow, new AsyncCallback<Void>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		WorkflowService.Instance.get().saveACL(workflow, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg0) {
 				destroy();

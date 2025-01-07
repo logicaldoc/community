@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.reports.custom;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIReport;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.Upload;
@@ -70,13 +69,7 @@ public class ReportUploader extends Window {
 		layout.addMember(uploader);
 		layout.addMember(save);
 
-		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void result) {
 				destroy();
@@ -86,13 +79,7 @@ public class ReportUploader extends Window {
 		addItem(layout);
 
 		// Clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void result) {
 				// Nothing to do
@@ -123,13 +110,7 @@ public class ReportUploader extends Window {
 		}
 
 		if (report != null) {
-			ReportService.Instance.get().storeUploadedDesign(report.getId(), new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			ReportService.Instance.get().storeUploadedDesign(report.getId(), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void arg) {
 					destroy();
@@ -144,13 +125,7 @@ public class ReportUploader extends Window {
 			report.setName(vm.getValueAsString("name"));
 			report.setOutputFolder(outputFolderSelector.getFolder());
 
-			ReportService.Instance.get().create(report, new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			ReportService.Instance.get().create(report, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIReport rep) {
 					I18N.message("reportsaved");

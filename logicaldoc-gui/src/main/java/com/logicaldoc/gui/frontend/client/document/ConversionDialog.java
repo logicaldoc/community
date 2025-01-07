@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.document;
 
 import java.util.LinkedHashMap;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -63,7 +63,7 @@ public class ConversionDialog extends Window {
 		convert.addClickHandler(event -> onConvert());
 
 		FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
-				new GUIAsyncCallback<>() {
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIFolder folder) {
 						convert.setDisabled(!folder.isDownload() && !folder.isWrite());
@@ -91,7 +91,7 @@ public class ConversionDialog extends Window {
 		LD.contactingServer();
 		if ("save".equals(form.getValueAsString(ACTION))) {
 			DocumentService.Instance.get().convert(document.getId(), document.getFileVersion(), format,
-					new GUIAsyncCallback<>() {
+					new DefaultAsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {

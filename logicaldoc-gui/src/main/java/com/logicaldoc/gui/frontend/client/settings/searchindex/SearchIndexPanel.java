@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUISearchEngine;
@@ -100,13 +100,7 @@ public class SearchIndexPanel extends AdminPanel {
 	@Override
 	public void onDraw() {
 		if (searchEngine == null)
-			SearchEngineService.Instance.get().getInfo(new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			SearchEngineService.Instance.get().getInfo(new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUISearchEngine searchEngine) {
 					SearchIndexPanel.this.searchEngine = searchEngine;
@@ -195,12 +189,7 @@ public class SearchIndexPanel extends AdminPanel {
 			ListGridRecord rec = parsersList.getRecord(event.getRowNum());
 
 			SearchEngineService.Instance.get().setAliases(rec.getAttributeAsString(EXTENSION),
-					(String) event.getNewValues().get(ALIASES), new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					(String) event.getNewValues().get(ALIASES), new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void ret) {
 							parsersList.invalidateCache();
@@ -305,13 +294,7 @@ public class SearchIndexPanel extends AdminPanel {
 			for (ListGridRecord rec : records)
 				filters.add(rec.getAttributeAsString("name"));
 
-			SearchEngineService.Instance.get().reorderTokenFilters(filters, new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			SearchEngineService.Instance.get().reorderTokenFilters(filters, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void arg) {
 					// Nothing to do
@@ -361,13 +344,7 @@ public class SearchIndexPanel extends AdminPanel {
 				params.add(new GUIParameter(recd.getAttributeAsString("name"), recd.getAttributeAsString(VALUE)));
 			}
 
-			SearchEngineService.Instance.get().saveTokenFilterSettings(filter, params, new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			SearchEngineService.Instance.get().saveTokenFilterSettings(filter, params, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void arg) {
 					// Nothing to do
@@ -402,13 +379,7 @@ public class SearchIndexPanel extends AdminPanel {
 		computeStats.setSrc("[SKIN]/arrows-rotate.svg");
 		computeStats.addFormItemClickHandler(click -> {
 			click.getItem().setValue(I18N.message("computing") + "...");
-			SearchEngineService.Instance.get().countEntries(new AsyncCallback<Long>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			SearchEngineService.Instance.get().countEntries(new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Long count) {
 					click.getItem().setValue(Util.formatLong(count));
@@ -573,13 +544,7 @@ public class SearchIndexPanel extends AdminPanel {
 		purge.addClickHandler(purgeClick -> SC.ask(I18N.message("purgeconfirmation"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
 				LD.contactingServer();
-				SearchEngineService.Instance.get().purge(new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						LD.clearPrompt();
-						GuiLog.serverError(caught);
-					}
-
+				SearchEngineService.Instance.get().purge(new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void ret) {
 						LD.clearPrompt();
@@ -595,13 +560,7 @@ public class SearchIndexPanel extends AdminPanel {
 		check.setAutoFit(true);
 		check.addClickHandler(checkClick -> {
 			LD.contactingServer();
-			SearchEngineService.Instance.get().check(new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-					LD.clearPrompt();
-				}
-
+			SearchEngineService.Instance.get().check(new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(String ret) {
 					LD.clearPrompt();
@@ -621,13 +580,12 @@ public class SearchIndexPanel extends AdminPanel {
 					if (Boolean.TRUE.equals(yes)) {
 						LD.contactingServer();
 						rescheduleAll.setDisabled(true);
-						SearchEngineService.Instance.get().rescheduleAll(true, new AsyncCallback<>() {
+						SearchEngineService.Instance.get().rescheduleAll(true, new DefaultAsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								LD.clearPrompt();
+								super.onFailure(caught);
 								dropIndex.setDisabled(false);
-								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -651,13 +609,12 @@ public class SearchIndexPanel extends AdminPanel {
 					if (Boolean.TRUE.equals(value)) {
 						LD.contactingServer();
 						rescheduleAll.setDisabled(true);
-						SearchEngineService.Instance.get().rescheduleAll(false, new AsyncCallback<>() {
+						SearchEngineService.Instance.get().rescheduleAll(false, new DefaultAsyncCallback<>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								LD.clearPrompt();
+								super.onFailure(caught);
 								rescheduleAll.setDisabled(false);
-								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -676,13 +633,7 @@ public class SearchIndexPanel extends AdminPanel {
 	private IButton prepareUnlockButton() {
 		IButton unlock = new IButton(I18N.message("unlock"));
 		unlock.setAutoFit(true);
-		unlock.addClickHandler(unlockClick -> SearchEngineService.Instance.get().unlock(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		unlock.addClickHandler(unlockClick -> SearchEngineService.Instance.get().unlock(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void ret) {
 				GuiLog.info(I18N.message("indexunlocked"), null);
@@ -701,13 +652,7 @@ public class SearchIndexPanel extends AdminPanel {
 
 			collectValues();
 
-			SearchEngineService.Instance.get().save(SearchIndexPanel.this.searchEngine, new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			SearchEngineService.Instance.get().save(SearchIndexPanel.this.searchEngine, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void ret) {
 					AdminScreen.get().setContent(new SearchIndexPanel());
@@ -726,7 +671,8 @@ public class SearchIndexPanel extends AdminPanel {
 		SearchIndexPanel.this.searchEngine.setSorting(vm.getValueAsString("sorting"));
 		SearchIndexPanel.this.searchEngine.setCustomSorting(vm.getValueAsString("customsorting"));
 		SearchIndexPanel.this.searchEngine.setSkipOnError(Boolean.valueOf(vm.getValueAsString("skipOnError")));
-		SearchIndexPanel.this.searchEngine.setParsingTimeoutRetain(Boolean.valueOf(vm.getValueAsString("timeoutRetain")));
+		SearchIndexPanel.this.searchEngine
+				.setParsingTimeoutRetain(Boolean.valueOf(vm.getValueAsString("timeoutRetain")));
 
 		String btch = vm.getValueAsString("batch");
 		if (btch == null || "".equals(btch.trim()))
@@ -879,12 +825,7 @@ public class SearchIndexPanel extends AdminPanel {
 			for (int j = 0; j < selection.length; j++)
 				ids.add(selection[j].getAttributeAsLong("id"));
 
-			DocumentService.Instance.get().markUnindexable(ids, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			DocumentService.Instance.get().markUnindexable(ids, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void result) {
 					for (ListGridRecord rec : selection) {
@@ -905,13 +846,7 @@ public class SearchIndexPanel extends AdminPanel {
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(event -> SearchEngineService.Instance.get()
-				.setLanguageStatus(rec.getAttributeAsString("code"), true, new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.setLanguageStatus(rec.getAttributeAsString("code"), true, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						rec.setAttribute(EENABLED, "0");
@@ -923,13 +858,7 @@ public class SearchIndexPanel extends AdminPanel {
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(event -> SearchEngineService.Instance.get()
-				.setLanguageStatus(rec.getAttributeAsString("code"), false, new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.setLanguageStatus(rec.getAttributeAsString("code"), false, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						rec.setAttribute(EENABLED, "2");
@@ -952,13 +881,7 @@ public class SearchIndexPanel extends AdminPanel {
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(event -> SearchEngineService.Instance.get()
-				.setTokenFilterStatus(rec.getAttributeAsString("name"), true, new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.setTokenFilterStatus(rec.getAttributeAsString("name"), true, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						rec.setAttribute(EENABLED, "0");
@@ -969,13 +892,7 @@ public class SearchIndexPanel extends AdminPanel {
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
 		disable.addClickHandler(event -> SearchEngineService.Instance.get()
-				.setTokenFilterStatus(rec.getAttributeAsString("name"), false, new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.setTokenFilterStatus(rec.getAttributeAsString("name"), false, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						rec.setAttribute(EENABLED, "2");

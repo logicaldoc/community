@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.EventPanel;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -129,11 +127,11 @@ public class MessageDialog extends Window {
 					return;
 				}
 
-				MessageService.Instance.get().save(msg, GridUtil.getIds(records), new AsyncCallback<>() {
+				MessageService.Instance.get().save(msg, GridUtil.getIds(records), new DefaultAsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
+						super.onFailure(caught);
 						destroy();
 					}
 
@@ -214,7 +212,7 @@ public class MessageDialog extends Window {
 		groupSelector.setMultiple(false);
 		groupSelector.addChangedHandler(event -> {
 			String groupId = groupSelector.getSelectedRecord().getAttributeAsString("id");
-			SecurityService.Instance.get().searchUsers(null, groupId, new GUIAsyncCallback<>() {
+			SecurityService.Instance.get().searchUsers(null, groupId, new DefaultAsyncCallback<>() {
 
 				@Override
 				public void onSuccess(List<GUIUser> users) {

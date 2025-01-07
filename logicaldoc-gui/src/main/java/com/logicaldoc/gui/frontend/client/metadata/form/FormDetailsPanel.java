@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.UsersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
@@ -96,12 +95,7 @@ public class FormDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (form.getId() != 0) {
-				FormService.Instance.get().getById(form.getId(), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				FormService.Instance.get().getById(form.getId(), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIForm form) {
 						setForm(form);
@@ -408,12 +402,7 @@ public class FormDetailsPanel extends VLayout {
 	}
 
 	private void saveForm() {
-		FormService.Instance.get().save(form, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		FormService.Instance.get().save(form, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIForm newForm) {
 				tabSet.hideSave();

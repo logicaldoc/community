@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.system.plugin;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -86,12 +86,7 @@ public class PluginsPanel extends VLayout {
 	}
 
 	void refresh() {
-		SystemService.Instance.get().getPlugins(new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		SystemService.Instance.get().getPlugins(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUIValue> plugins) {
 				List<ListGridRecord> records = new ArrayList<>();
@@ -115,13 +110,7 @@ public class PluginsPanel extends VLayout {
 					if (Boolean.TRUE.equals(value)) {
 						LD.contactingServer();
 						SystemService.Instance.get().initializePlugin(
-								list.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										LD.clearPrompt();
-										GuiLog.serverError(caught);
-									}
-
+								list.getSelectedRecord().getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 									@Override
 									public void onSuccess(Void result) {
 										LD.clearPrompt();
@@ -138,13 +127,7 @@ public class PluginsPanel extends VLayout {
 					if (Boolean.TRUE.equals(value)) {
 						LD.contactingServer();
 						SystemService.Instance.get().uninstallPlugin(
-								list.getSelectedRecord().getAttributeAsString("name"), new AsyncCallback<>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										LD.clearPrompt();
-										GuiLog.serverError(caught);
-									}
-
+								list.getSelectedRecord().getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 									@Override
 									public void onSuccess(Void result) {
 										LD.clearPrompt();

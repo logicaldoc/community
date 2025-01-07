@@ -2,10 +2,8 @@ package com.logicaldoc.gui.frontend.client.dropbox;
 
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
@@ -65,7 +63,7 @@ public class DropboxAuthorization extends Window {
 
 	@Override
 	protected void onDraw() {
-		DropboxService.Instance.get().loadSettings(new GUIAsyncCallback<>() {
+		DropboxService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<String> settings) {
 				apiKey.setValue(settings.get(0));
@@ -76,11 +74,11 @@ public class DropboxAuthorization extends Window {
 
 	public void onAuthenticate() {
 		DropboxService.Instance.get().saveSettings(form.getValueAsString(CONSTANT_B), form.getValueAsString(CONSTANT_A),
-				new GUIAsyncCallback<>() {
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void consentUrl) {
 						hide();
-						DropboxService.Instance.get().startAuthorization(new GUIAsyncCallback<>() {
+						DropboxService.Instance.get().startAuthorization(new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(String authorizationUrl) {
 								new DropboxAccessTokenWizard(authorizationUrl).show();

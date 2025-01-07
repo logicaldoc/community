@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.document;
 
 import java.util.Date;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.frontend.client.calendar.EventsCalendar;
 import com.smartgwt.client.types.ViewName;
@@ -33,7 +33,7 @@ public class DocumentCalendarPanel extends DocumentDetailTab {
 		if (document.getDocRef() != null)
 			docId = document.getDocRef();
 
-		calendar = new EventsCalendar(docId, null, new GUIAsyncCallback<>() {
+		calendar = new EventsCalendar(docId, null, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg0) {
 				refresh();

@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.settings;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -22,12 +22,7 @@ public class QuotaPanel extends AdminPanel {
 	public QuotaPanel(long tenantId) {
 		super("quota");
 
-		TenantService.Instance.get().load(tenantId, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		TenantService.Instance.get().load(tenantId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUITenant ten) {
 				tenant = ten;
@@ -45,13 +40,7 @@ public class QuotaPanel extends AdminPanel {
 		save.setMinWidth(80);
 		save.addClickHandler(event -> {
 			if (tenantQuota.validate())
-				TenantService.Instance.get().save(tenant, new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				TenantService.Instance.get().save(tenant, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUITenant ten) {
 						QuotaPanel.this.tenant = ten;

@@ -2,10 +2,9 @@ package com.logicaldoc.gui.frontend.client.workflow;
 
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.widgets.layout.PortalLayout;
@@ -108,13 +107,7 @@ public class WorkflowDashboard extends VLayout {
 	 */
 	public void killWorkflows(List<String> instanceIds) {
 		LD.contactingServer();
-		WorkflowService.Instance.get().deleteInstances(instanceIds, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-				LD.clearPrompt();
-			}
-
+		WorkflowService.Instance.get().deleteInstances(instanceIds, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void result) {
 				refreshGridsAfterWorkflowsKilled(instanceIds);

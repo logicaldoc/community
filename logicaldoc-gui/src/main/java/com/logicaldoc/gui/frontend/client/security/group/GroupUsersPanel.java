@@ -3,11 +3,10 @@ package com.logicaldoc.gui.frontend.client.security.group;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.data.UsersDS;
 import com.logicaldoc.gui.common.client.formatters.UserCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -137,13 +136,7 @@ public class GroupUsersPanel extends VLayout {
 			}
 
 			SecurityService.Instance.get().addUserToGroup(groupId, Long.parseLong(selectedRecord.getAttribute("id")),
-					new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void ret) {
 							// Update the users table
@@ -193,12 +186,7 @@ public class GroupUsersPanel extends VLayout {
 
 			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 				if (Boolean.TRUE.equals(confirm)) {
-					SecurityService.Instance.get().removeFromGroup(groupId, ids, new AsyncCallback<>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					SecurityService.Instance.get().removeFromGroup(groupId, ids, new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void result) {
 							list.removeSelectedData();

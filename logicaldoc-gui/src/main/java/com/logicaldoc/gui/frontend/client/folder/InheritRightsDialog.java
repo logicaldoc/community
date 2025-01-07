@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.folder;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.FolderTree;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
@@ -59,11 +58,11 @@ public class InheritRightsDialog extends Dialog {
 					if (Boolean.TRUE.equals(confirm)) {
 						FolderService.Instance.get().inheritACL(panel.getFolder().getId(),
 								Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
-								new AsyncCallback<>() {
+								new DefaultAsyncCallback<>() {
 
 									@Override
 									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
+										super.onFailure(caught);
 										destroy();
 									}
 

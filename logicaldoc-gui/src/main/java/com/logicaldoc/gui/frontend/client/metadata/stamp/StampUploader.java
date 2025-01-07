@@ -1,8 +1,7 @@
 package com.logicaldoc.gui.frontend.client.metadata.stamp;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.Upload;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.StampService;
@@ -59,13 +58,7 @@ public class StampUploader extends Window {
 		layout.addMember(uploader);
 		layout.addMember(submit);
 
-		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void result) {
 				destroy();
@@ -81,14 +74,7 @@ public class StampUploader extends Window {
 			return;
 		}
 
-		StampService.Instance.get().saveImage(stampId, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-				close();
-			}
-
+		StampService.Instance.get().saveImage(stampId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg) {
 				panel.refreshStampImage();

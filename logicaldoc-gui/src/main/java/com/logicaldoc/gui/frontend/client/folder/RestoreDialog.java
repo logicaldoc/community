@@ -2,9 +2,8 @@ package com.logicaldoc.gui.frontend.client.folder;
 
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.FolderTree;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
@@ -59,13 +58,7 @@ public class RestoreDialog extends Dialog {
 			if (docIds != null)
 				DocumentService.Instance.get().restore(docIds,
 						Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
-						new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void arg0) {
 								if (RestoreDialog.this.handler != null)
@@ -77,13 +70,7 @@ public class RestoreDialog extends Dialog {
 			if (folderIds != null)
 				FolderService.Instance.get().restore(folderIds,
 						Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
-						new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void arg0) {
 								if (RestoreDialog.this.handler != null)

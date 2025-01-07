@@ -3,8 +3,7 @@ package com.logicaldoc.gui.frontend.client.document.stamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIStamp;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
@@ -79,7 +78,7 @@ public class StampDialog extends StickyWindow {
 		long stampId = selection.getAttributeAsLong("id");
 
 		LD.contactingServer();
-		StampService.Instance.get().getStamp(stampId, new GUIAsyncCallback<>() {
+		StampService.Instance.get().getStamp(stampId, new DefaultAsyncCallback<>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -112,7 +111,7 @@ public class StampDialog extends StickyWindow {
 			LD.contactingServer();
 
 			StampService.Instance.get().applyStamp(documents.stream().map(d -> d.getId()).collect(Collectors.toList()),
-					stamp, new GUIAsyncCallback<>() {
+					stamp, new DefaultAsyncCallback<>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -125,7 +124,7 @@ public class StampDialog extends StickyWindow {
 							LD.clearPrompt();
 							GuiLog.info(I18N.message("event.stamped"), null);
 							for (GUIDocument doc : documents) {
-								DocumentService.Instance.get().getById(doc.getId(), new GUIAsyncCallback<>() {
+								DocumentService.Instance.get().getById(doc.getId(), new DefaultAsyncCallback<>() {
 									@Override
 									public void onSuccess(GUIDocument document) {
 										DocumentController.get().modified(document);

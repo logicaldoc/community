@@ -2,9 +2,8 @@ package com.logicaldoc.gui.frontend.client.sharefile;
 
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.frontend.client.services.ShareFileService;
@@ -33,18 +32,11 @@ public class ShareFileSettings extends Window {
 		setPadding(2);
 		setAutoSize(true);
 
-		ShareFileService.Instance.get().loadSettings(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		ShareFileService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<String> settings) {
 				initGUI(settings);
 			}
-
 		});
 	}
 
@@ -83,12 +75,7 @@ public class ShareFileSettings extends Window {
 			return;
 
 		ShareFileService.Instance.get().authorize(form.getValueAsString("clientid"),
-				form.getValueAsString("clientsecret"), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				form.getValueAsString("clientsecret"), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(String authorizationUrl) {
 						WindowUtils.openUrl(authorizationUrl, "_blank", null);

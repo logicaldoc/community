@@ -3,9 +3,8 @@ package com.logicaldoc.gui.frontend.client.calendar;
 import java.util.Date;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
@@ -15,8 +14,8 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.google.GoogleApiAuthorization;
+import com.logicaldoc.gui.frontend.client.google.GoogleAsyncCallback;
 import com.logicaldoc.gui.frontend.client.google.GoogleService;
-import com.logicaldoc.gui.frontend.client.google.GoogleUtil;
 import com.smartgwt.client.types.ViewName;
 import com.smartgwt.client.widgets.calendar.Calendar;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
@@ -89,13 +88,13 @@ public class UserCalendarPanel extends VLayout {
 			enableSynchronization.setTooltip(I18N.message("calendarenabledtip"));
 			toolStrip.addFormItem(enableSynchronization);
 
-			GoogleService.Instance.get().loadSettings(new GUIAsyncCallback<List<String>>() {
+			GoogleService.Instance.get().loadSettings(new DefaultAsyncCallback<List<String>>() {
 
 				@Override
 				public void onSuccess(List<String> settings) {
 					enableSynchronization.setValue("1".equals(settings.get(2)));
-					enableSynchronization.addChangedHandler(changed -> GoogleService.Instance.get()
-							.enableCalendar(enableSynchronization.getValueAsBoolean(), new GUIAsyncCallback<Void>() {
+					enableSynchronization.addChangedHandler(changed -> GoogleService.Instance.get().enableCalendar(
+							enableSynchronization.getValueAsBoolean(), new DefaultAsyncCallback<Void>() {
 
 								@Override
 								public void onSuccess(Void arg0) {
@@ -150,12 +149,7 @@ public class UserCalendarPanel extends VLayout {
 		initCalendar();
 	}
 
-	private final class RefreshCallback implements AsyncCallback<Void> {
-		@Override
-		public void onFailure(Throwable caught) {
-			GoogleUtil.handleGoogleServiceError(caught);
-		}
-
+	private final class RefreshCallback extends GoogleAsyncCallback<Void> {
 		@Override
 		public void onSuccess(Void arg0) {
 			LD.clearPrompt();

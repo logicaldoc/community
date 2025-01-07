@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.settings.messages;
 
 import java.util.LinkedHashMap;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIEmailSettings;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -182,13 +182,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 			LD.askForValue(I18N.message("email"), I18N.message("email"), vm.getValueAsString(SENDEREMAIL),
 					(String value) -> {
 						LD.contactingServer();
-						SettingService.Instance.get().testEmail(value, new AsyncCallback<Boolean>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-								LD.clearPrompt();
-							}
-
+						SettingService.Instance.get().testEmail(value, new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Boolean yes) {
 								LD.clearPrompt();
@@ -231,13 +225,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 			OutgoingEmailPanel.this.emailSettings.setClientTenant(vm.getValueAsString("clienttenant"));
 
 			SettingService.Instance.get().saveEmailSettings(OutgoingEmailPanel.this.emailSettings,
-					new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Void ret) {
 							Session.get().getInfo().setConfig(Session.get().getTenantName() + ".smtp.userasfrom",

@@ -61,4 +61,29 @@ public class ApplicationRestarting extends Window {
 
 		addItem(container);
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((messageFlow == null) ? 0 : messageFlow.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ApplicationRestarting other = (ApplicationRestarting) obj;
+		if (messageFlow == null) {
+			if (other.messageFlow != null)
+				return false;
+		} else if (!messageFlow.equals(other.messageFlow))
+			return false;
+		return true;
+	}
 }

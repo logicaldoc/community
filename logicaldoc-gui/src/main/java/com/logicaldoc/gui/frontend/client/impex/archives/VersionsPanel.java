@@ -1,10 +1,9 @@
 package com.logicaldoc.gui.frontend.client.impex.archives;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIArchive;
 import com.logicaldoc.gui.common.client.data.VersionsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -137,13 +136,7 @@ public class VersionsPanel extends VLayout {
 					listGrid.deselectAllRecords();
 
 					ImpexService.Instance.get().deleteVersions(archiveId, GridUtil.getIds(selection),
-							new AsyncCallback<>() {
-
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
+							new DefaultAsyncCallback<>() {
 								@Override
 								public void onSuccess(GUIArchive archive) {
 									ListGridRecord selectedRecord = archivesList.getList().getSelectedRecord();

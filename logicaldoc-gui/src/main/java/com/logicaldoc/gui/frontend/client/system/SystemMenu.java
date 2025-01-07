@@ -1,13 +1,12 @@
 package com.logicaldoc.gui.frontend.client.system;
 
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
@@ -68,13 +67,7 @@ public class SystemMenu extends VLayout {
 		restart.setHeight(25);
 		restart.addClickHandler(event -> SC.ask(I18N.message("restartalert"), answer -> {
 			if (Boolean.TRUE.equals(answer)) {
-				SystemService.Instance.get().restart(new AsyncCallback<>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				SystemService.Instance.get().restart(new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void arg) {
 						ApplicationRestarting.get().show();
@@ -119,13 +112,7 @@ public class SystemMenu extends VLayout {
 				"<span style='color:red;'><b>" + I18N.message("confirmupdate") + "</b></span>");
 		confirmUpdate.setWidth100();
 		confirmUpdate.setHeight(25);
-		confirmUpdate.addClickHandler(event -> SystemService.Instance.get().confirmUpdate(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		confirmUpdate.addClickHandler(event -> SystemService.Instance.get().confirmUpdate(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg) {
 				Session.get().getInfo().setConfig("runlevel", "default");

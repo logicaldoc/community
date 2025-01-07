@@ -107,4 +107,9 @@ public class AutomationItemEditor extends Window {
 		removeItem(automationPanel);
 		super.destroy();
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
 }

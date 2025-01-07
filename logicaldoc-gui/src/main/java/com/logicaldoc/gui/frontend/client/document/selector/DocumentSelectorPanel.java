@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.document.selector;
 
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.GUIAsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -45,7 +45,7 @@ public class DocumentSelectorPanel extends HLayout {
 		folders.setWidth(250);
 		folders.setShowResizeBar(true);
 		folders.addCellClickHandler(event -> FolderService.Instance.get().getFolder(folders.getSelectedFolderId(),
-				false, false, Session.get().isFolderPagination(), new GUIAsyncCallback<>() {
+				false, false, Session.get().isFolderPagination(), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIFolder folder) {
 						removeMember(documents);

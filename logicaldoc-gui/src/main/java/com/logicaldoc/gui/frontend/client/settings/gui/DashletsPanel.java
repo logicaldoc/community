@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.settings.gui;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -176,12 +176,7 @@ public class DashletsPanel extends VLayout {
 	 * Sends the dashlets
 	 */
 	private void saveDashlets() {
-		DashletService.Instance.get().saveDashlets(dashlets, new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		DashletService.Instance.get().saveDashlets(dashlets, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg0) {
 				GuiLog.info(I18N.message("settingssaved"), null);
@@ -217,12 +212,7 @@ public class DashletsPanel extends VLayout {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> DashletService.Instance.get()
-				.delete(grid.getSelectedRecord().getAttributeAsLong("id"), new AsyncCallback<>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
+				.delete(grid.getSelectedRecord().getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void arg) {
 						reload();
@@ -236,12 +226,7 @@ public class DashletsPanel extends VLayout {
 	}
 
 	private void reload() {
-		DashletService.Instance.get().loadDashlets(new AsyncCallback<>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		DashletService.Instance.get().loadDashlets(new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<GUIDashlet> dashlts) {
 				dashlets.addAll(dashlts);

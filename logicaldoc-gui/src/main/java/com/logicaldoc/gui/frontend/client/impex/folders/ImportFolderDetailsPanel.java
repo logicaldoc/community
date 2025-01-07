@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.frontend.client.impex.folders;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIImportFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.ImportFolderService;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
@@ -26,7 +25,7 @@ public class ImportFolderDetailsPanel extends VLayout {
 	private Layout advancedTabPanel;
 
 	private Layout automationTabPanel;
-	
+
 	private Layout historyTabPanel;
 
 	private ImportFolderStandardProperties standardPanel;
@@ -51,18 +50,12 @@ public class ImportFolderDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (importFolder.getId() != 0) {
-				ImportFolderService.Instance.get().getImportFolder(importFolder.getId(),
-						new AsyncCallback<>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUIImportFolder share) {
-								setShare(share);
-							}
-						});
+				ImportFolderService.Instance.get().getImportFolder(importFolder.getId(), new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(GUIImportFolder share) {
+						setShare(share);
+					}
+				});
 			} else {
 				GUIImportFolder newshare = new GUIImportFolder();
 				newshare.setProvider(importFolder.getProvider());
@@ -84,7 +77,7 @@ public class ImportFolderDetailsPanel extends VLayout {
 		advancedTabPanel.setHeight100();
 		extendedPropertiesTab.setPane(advancedTabPanel);
 		tabSet.addTab(extendedPropertiesTab);
-		
+
 		Tab automationTab = new Tab(I18N.message("automation"));
 		automationTabPanel = new HLayout();
 		automationTabPanel.setWidth100();
@@ -182,7 +175,7 @@ public class ImportFolderDetailsPanel extends VLayout {
 		} catch (Exception t) {
 			// Nothing to do
 		}
-		
+
 		boolean automationValid = true;
 		try {
 			automationValid = automationPanel.validate();
@@ -209,12 +202,7 @@ public class ImportFolderDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (validate()) {
-			ImportFolderService.Instance.get().save(importFolder, new AsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			ImportFolderService.Instance.get().save(importFolder, new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIImportFolder share) {
 					tabSet.hideSave();

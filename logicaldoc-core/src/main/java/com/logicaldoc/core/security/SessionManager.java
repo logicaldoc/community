@@ -728,4 +728,29 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	public void setUserDao(UserDAO userDao) {
 		this.userDao = userDao;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((listeners == null) ? 0 : listeners.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SessionManager other = (SessionManager) obj;
+		if (listeners == null) {
+			if (other.listeners != null)
+				return false;
+		} else if (!listeners.equals(other.listeners))
+			return false;
+		return true;
+	}
 }

@@ -2,12 +2,12 @@ package com.logicaldoc.gui.frontend.client.metadata.barcode;
 
 import java.util.LinkedHashMap;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.IgnoreAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIBarcodeTemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.Upload;
 import com.logicaldoc.gui.frontend.client.services.BarcodeService;
@@ -82,32 +82,16 @@ public class BarcodeTemplateSettings extends Window {
 		addItem(layout);
 
 		// Clean the upload folder if the window is closed
-		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
-			@Override
-			public void onSuccess(Void result) {
-				destroy();
-			}
-		}));
+		addCloseClickHandler(
+				event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(Void result) {
+						destroy();
+					}
+				}));
 
 		// Just to clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				// Nothing to do
-			}
-
-			@Override
-			public void onSuccess(Void result) {
-				// Nothing to do
-			}
-		});
+		DocumentService.Instance.get().cleanUploadedFileFolder(new IgnoreAsyncCallback<>());
 	}
 
 	private void prepareForm() {
@@ -201,13 +185,7 @@ public class BarcodeTemplateSettings extends Window {
 			template.setRendRes(Integer.parseInt(vm.getValueAsString("rendres")));
 		}
 
-		BarcodeService.Instance.get().save(template, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
-
+		BarcodeService.Instance.get().save(template, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIBarcodeTemplate tmpl) {
 				panel.setSelectedOcrTemplate(tmpl);

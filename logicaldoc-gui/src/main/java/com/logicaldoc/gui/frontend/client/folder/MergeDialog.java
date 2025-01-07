@@ -2,9 +2,8 @@ package com.logicaldoc.gui.frontend.client.folder;
 
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.folder.browser.FolderBrowser;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
@@ -79,14 +78,7 @@ public class MergeDialog extends Dialog {
 		}
 
 		LD.contactingServer();
-		FolderService.Instance.get().merge(ids, targetFolderId, new AsyncCallback<>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				LD.clearPrompt();
-				GuiLog.serverError(caught);
-			}
-
+		FolderService.Instance.get().merge(ids, targetFolderId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void ret) {
 				LD.clearPrompt();

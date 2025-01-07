@@ -3,8 +3,8 @@ package com.logicaldoc.gui.frontend.client.search;
 import java.util.List;
 
 import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.CookiesManager;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -91,21 +91,14 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 				final GUIDocument doc = grid.getSelectedDocument();
 
 				FolderService.Instance.get().getFolder(doc.getFolder().getId(), false, false, false,
-						new AsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
-
+						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(GUIFolder folder) {
 								if (folder.isDownload()
 										&& "download".equals(Session.get().getInfo().getConfig("gui.doubleclick")))
 									DocUtil.download(doc.getId(), null);
 								else {
-									PreviewPopup iv = new PreviewPopup(doc);
-									iv.show();
+									new PreviewPopup(doc).show();
 								}
 							}
 						});
@@ -132,13 +125,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 					/*
 					 * We need to retrieve the folder from the server
 					 */
-					FolderService.Instance.get().getFolder(id, false, false, false, new AsyncCallback<>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							GuiLog.serverError(caught);
-						}
-
+					FolderService.Instance.get().getFolder(id, false, false, false, new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIFolder folder) {
 							showContextMenu(folder, !type.contains(FOLDER));
@@ -215,13 +202,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 
 	private void showContextMenu(GUIFolder folder, final boolean document) {
 		if (document) {
-			DocumentService.Instance.get().getAllowedPermissions(grid.getSelectedIds(), new AsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GuiLog.serverError(caught);
-				}
-
+			DocumentService.Instance.get().getAllowedPermissions(grid.getSelectedIds(), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(GUIAccessControlEntry enabledPermissions) {
 					new ContextMenu(folder, grid, enabledPermissions).showContextMenu();
