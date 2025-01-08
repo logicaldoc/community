@@ -59,7 +59,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 					dao.initialize(document);
 
 					String lastNoteMessage = dao.queryForList(
-							"select ld_message from ld_note where ld_page=0 and ld_id=:id order by ld_date desc",
+							"select ld_message from ld_note where ld_page=0 and ld_deleted=0 and ld_id=:id order by ld_date desc",
 							Map.of("id", note.getDocId()), String.class, null).stream().findFirst()
 							.orElse(note.getMessage());
 
