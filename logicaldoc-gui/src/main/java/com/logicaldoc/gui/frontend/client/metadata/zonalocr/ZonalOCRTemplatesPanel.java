@@ -322,4 +322,14 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 	protected ZoneCanvas newZoneCanvas(GUIZone zone) {
 		return new ZonalOCRZoneCanvas(zone, this);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

@@ -64,4 +64,14 @@ public class TwoFactorsAuthenticationDialog extends Window {
 		body.setMembers(panel, save);
 		addItem(body);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

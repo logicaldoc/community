@@ -303,4 +303,14 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		details = SELECT_POLICY;
 		detailsContainer.setMembers(details);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

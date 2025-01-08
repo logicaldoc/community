@@ -227,4 +227,14 @@ public class DashboardPanel extends VLayout {
 	public void setDefaultOpenTab(String defaultOpenTab) {
 		this.defaultOpenTab = defaultOpenTab;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

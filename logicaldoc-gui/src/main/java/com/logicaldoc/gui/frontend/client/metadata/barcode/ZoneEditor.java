@@ -11,7 +11,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -25,8 +24,6 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 8.4.2
  */
 public class ZoneEditor extends Window {
-
-	private ValuesManager vm;
 
 	private DynamicForm form;
 
@@ -69,8 +66,6 @@ public class ZoneEditor extends Window {
 		form.setWidth100();
 		form.setAlign(Alignment.LEFT);
 		form.setColWidths("1px, 100%");
-		vm = new ValuesManager();
-		form.setValuesManager(vm);
 
 		StaticTextItem sample = ItemFactory.newStaticTextItem("sample", zone.getSampleText());
 		sample.setVisible(zone.getSampleText() != null && !zone.getSampleText().isEmpty());
@@ -91,14 +86,24 @@ public class ZoneEditor extends Window {
 	}
 
 	public void onSave() {
-		if (Boolean.FALSE.equals(vm.validate()))
+		if (!form.validate())
 			return;
 
-		zone.setPatterns(vm.getValueAsString("patterns"));
-		zone.setInclude(vm.getValueAsString("include"));
-		zone.setExclude(vm.getValueAsString("exclude"));
-		zone.setFormats(vm.getValueAsString("formats"));
+		zone.setPatterns(form.getValueAsString("patterns"));
+		zone.setInclude(form.getValueAsString("include"));
+		zone.setExclude(form.getValueAsString("exclude"));
+		zone.setFormats(form.getValueAsString("formats"));
 
 		destroy();
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

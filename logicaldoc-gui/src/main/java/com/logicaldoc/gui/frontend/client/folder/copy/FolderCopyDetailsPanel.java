@@ -152,4 +152,14 @@ public class FolderCopyDetailsPanel extends VLayout {
 			tabSet.selectTab(interfaceTab);
 		return stdValid && extValid && interfaceValid;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

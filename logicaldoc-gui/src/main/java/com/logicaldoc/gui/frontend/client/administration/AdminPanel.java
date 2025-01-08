@@ -36,4 +36,14 @@ public abstract class AdminPanel extends VLayout {
 
 		setMembers(tabs);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

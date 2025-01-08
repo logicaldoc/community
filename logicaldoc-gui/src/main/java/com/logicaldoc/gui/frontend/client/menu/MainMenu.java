@@ -874,4 +874,14 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		addToolsButton(folder, document);
 		addMember(tools, 2);
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

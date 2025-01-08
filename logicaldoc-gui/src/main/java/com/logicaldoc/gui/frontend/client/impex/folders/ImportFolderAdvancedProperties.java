@@ -2,7 +2,6 @@ package com.logicaldoc.gui.frontend.client.impex.folders;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIImportFolder;
@@ -78,13 +77,13 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 			template.setValue(importFolder.getTemplateId().toString());
 
 		ChangedHandler changeTemplateHandler = event -> {
-				if (form.getValue(TEMPLATE) == null || "".equals(form.getValueAsString(TEMPLATE)))
-					importFolder.setTemplateId(null);
-				else
-					importFolder.setTemplateId(Long.parseLong(form.getValueAsString(TEMPLATE)));
-				importFolder.setOcrTemplateId(null);
-				importFolder.setBarcodeTemplateId(null);
-				refresh();
+			if (form.getValue(TEMPLATE) == null || "".equals(form.getValueAsString(TEMPLATE)))
+				importFolder.setTemplateId(null);
+			else
+				importFolder.setTemplateId(Long.parseLong(form.getValueAsString(TEMPLATE)));
+			importFolder.setOcrTemplateId(null);
+			importFolder.setBarcodeTemplateId(null);
+			refresh();
 		};
 		template.addChangedHandler(changeTemplateHandler);
 
@@ -166,61 +165,69 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values = form.getValues();
 		if (!form.validate())
 			return false;
 
-		collectSizeMax(values);
+		collectSizeMax();
 
-		importFolder.setDepth(Integer.parseInt(values.get("depth").toString()));
-		importFolder.setUpdatePolicy(Integer.parseInt(values.get("updatePolicy").toString()));
+		importFolder.setDepth(Integer.parseInt(form.getValueAsString("depth")));
+		importFolder.setUpdatePolicy(Integer.parseInt(form.getValueAsString("updatePolicy")));
 
-		collectTemplates(values);
+		collectTemplates();
 
-		importFolder.setDelImport((Boolean) values.get("delImport"));
-		importFolder.setInheritRights((Boolean) values.get("inheritRights"));
-		importFolder.setImportEmpty((Boolean) values.get("importEmpty"));
-		importFolder.setPreventDuplications((Boolean) values.get(PREVENTDUPLICATIONS));
+		importFolder.setDelImport((Boolean) form.getValue("delImport"));
+		importFolder.setInheritRights((Boolean) form.getValue("inheritRights"));
+		importFolder.setImportEmpty((Boolean) form.getValue("importEmpty"));
+		importFolder.setPreventDuplications((Boolean) form.getValue(PREVENTDUPLICATIONS));
 
-		collectTags(values);
+		collectTags();
 
-		importFolder.setStartDate((Date) values.get("startdate"));
+		importFolder.setStartDate((Date) form.getValue("startdate"));
 
 		return !form.hasErrors();
 	}
 
-	private void collectTags(Map<String, Object> values) {
-		if (values.get("tags") != null || !"".equals(values.get("tags")))
-			importFolder.setTags((String) values.get("tags"));
+	private void collectTags() {
+		if (form.getValue("tags") != null || !"".equals(form.getValueAsString("tags")))
+			importFolder.setTags(form.getValueAsString("tags"));
 		else
 			importFolder.setTags(null);
 	}
 
-	private void collectTemplates(Map<String, Object> values) {
-		if (values.get(TEMPLATE) == null || "".equals(values.get(TEMPLATE)))
+	private void collectTemplates() {
+		if (form.getValue(TEMPLATE) == null || "".equals(form.getValueAsString(TEMPLATE)))
 			importFolder.setTemplateId(null);
 		else
-			importFolder.setTemplateId(Long.parseLong((String) values.get(TEMPLATE)));
+			importFolder.setTemplateId(Long.parseLong(form.getValueAsString(TEMPLATE)));
 
-		if (values.get(OCRTEMPLATE) == null || "".equals(values.get(OCRTEMPLATE)))
+		if (form.getValue(OCRTEMPLATE) == null || "".equals(form.getValueAsString(OCRTEMPLATE)))
 			importFolder.setOcrTemplateId(null);
 		else
-			importFolder.setOcrTemplateId(Long.parseLong((String) values.get(OCRTEMPLATE)));
+			importFolder.setOcrTemplateId(Long.parseLong(form.getValueAsString(OCRTEMPLATE)));
 
-		if (values.get(BARCODETEMPLATE) == null || "".equals(values.get(BARCODETEMPLATE)))
+		if (form.getValue(BARCODETEMPLATE) == null || "".equals(form.getValueAsString(BARCODETEMPLATE)))
 			importFolder.setBarcodeTemplateId(null);
 		else
-			importFolder.setBarcodeTemplateId(Long.parseLong((String) values.get(BARCODETEMPLATE)));
+			importFolder.setBarcodeTemplateId(Long.parseLong(form.getValueAsString(BARCODETEMPLATE)));
 	}
 
-	private void collectSizeMax(Map<String, Object> values) {
-		if (values.get(SIZEMAX) == null)
+	private void collectSizeMax() {
+		if (form.getValue(SIZEMAX) == null)
 			importFolder.setMaxSize(null);
-		else if (values.get(SIZEMAX) instanceof Integer)
-			importFolder.setMaxSize((Integer) form.getValue(SIZEMAX));
+		else if (form.getValue(SIZEMAX) instanceof Integer integer)
+			importFolder.setMaxSize(integer);
 		else
-			importFolder.setMaxSize(Integer.parseInt((String) values.get(SIZEMAX)));
+			importFolder.setMaxSize(Integer.parseInt(form.getValueAsString(SIZEMAX)));
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

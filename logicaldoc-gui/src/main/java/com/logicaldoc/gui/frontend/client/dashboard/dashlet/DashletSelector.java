@@ -85,4 +85,14 @@ public class DashletSelector extends Window {
 		form.setItems(dashlet, select);
 		addItem(form);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

@@ -389,4 +389,14 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 	public Cursor getSearchCursor() {
 		return searchCursor;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

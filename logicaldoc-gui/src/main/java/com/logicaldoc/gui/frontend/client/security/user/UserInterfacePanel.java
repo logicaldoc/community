@@ -226,4 +226,14 @@ public class UserInterfacePanel extends HLayout {
 		else
 			user.setDateFormatLong(vm.getValueAsString(DATEFORMATLONG));
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

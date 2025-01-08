@@ -236,4 +236,14 @@ public class AnnotationContextMenu extends Menu {
 	public void addDeleteClickHandler(ClickHandler handler) {
 		delete.addClickHandler(handler);
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

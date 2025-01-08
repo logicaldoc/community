@@ -143,4 +143,14 @@ public class AntivirusPanel extends VLayout {
 		else
 			form.setFields(enabled, includes, excludes, timeout);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

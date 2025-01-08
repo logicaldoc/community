@@ -148,8 +148,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 	}
 
 	boolean validate() {
-		form.validate();
-		if (Boolean.FALSE.equals(form.hasErrors())) {
+		if (form.validate()) {
 			account.setMailAddress(form.getValueAsString("mailaddress"));
 			account.setHost(form.getValueAsString("server"));
 			account.setUsername(form.getValueAsString(USERNAME));
@@ -165,5 +164,15 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 			account.setClientTenant(form.getValueAsString("clienttenant"));
 		}
 		return !form.hasErrors();
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

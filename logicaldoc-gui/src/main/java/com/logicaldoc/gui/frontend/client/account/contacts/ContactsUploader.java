@@ -60,8 +60,17 @@ public class ContactsUploader extends Window {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
-		ContactsImportSettings popup = new ContactsImportSettings();
-		popup.show();
+		new ContactsImportSettings().show();
 		destroy();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

@@ -9,6 +9,7 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.FoldersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
+import com.logicaldoc.gui.frontend.client.folder.FolderSearchDialog;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -57,6 +58,7 @@ public class FolderSelector extends TextItem {
 		search.setSrc("[SKIN]/magnifying-glass.svg");
 		search.setWidth(12);
 		search.setHeight(12);
+		search.addFormItemClickHandler(click -> new FolderSearchDialog(FolderSelector.this).show());
 
 		PickerIcon pick = new PickerIcon(PickerIcon.COMBO_BOX, event -> menu.showContextMenu());
 
@@ -151,7 +153,7 @@ public class FolderSelector extends TextItem {
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

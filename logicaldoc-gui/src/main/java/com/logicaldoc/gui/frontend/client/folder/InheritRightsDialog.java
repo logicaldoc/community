@@ -81,4 +81,14 @@ public class InheritRightsDialog extends Dialog {
 		content.setMembers(folders, buttons);
 		addItem(content);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

@@ -61,4 +61,14 @@ public class AdminScreen extends HLayout {
 	public VLayout getRightPanel() {
 		return rightPanel;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

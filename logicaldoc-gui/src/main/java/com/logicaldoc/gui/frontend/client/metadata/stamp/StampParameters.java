@@ -26,4 +26,14 @@ public class StampParameters extends StampDetailsTab {
 	public boolean validate() {
 		return propertiesPanel.validate();
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

@@ -111,8 +111,7 @@ public class MessageDialog extends Window {
 		send.setAutoFit(true);
 		send.setMargin(3);
 		send.addClickHandler(event -> {
-			form.validate();
-			if (Boolean.FALSE.equals(form.hasErrors())) {
+			if (form.validate()) {
 				GUIMessage msg = new GUIMessage();
 				msg.setSubject(form.getValueAsString("subject"));
 				msg.setMessage(form.getValueAsString("message"));
@@ -272,5 +271,15 @@ public class MessageDialog extends Window {
 			if (!duplicate)
 				recipientsGrid.addData(newRec);
 		}
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

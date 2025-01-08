@@ -69,7 +69,7 @@ public abstract class Dashlet extends Portlet {
 		else if (GUIDashlet.TYPE_NOTE.equals(guiDashlet.getType()))
 			dashlet = new NotesDashlet(guiDashlet);
 		else if (GUIDashlet.TYPE_BOOKMARK.equals(guiDashlet.getType()))
-			dashlet = new BookmarkDashlet(guiDashlet);		
+			dashlet = new BookmarkDashlet(guiDashlet);
 		else if (GUIDashlet.TYPE_CONTENT.equals(guiDashlet.getType())) {
 			if (guiDashlet.getName().equals("tagcloud"))
 				dashlet = new TagCloudDashlet(guiDashlet);
@@ -124,5 +124,15 @@ public abstract class Dashlet extends Portlet {
 
 	protected void refresh() {
 		// Nothing to do
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

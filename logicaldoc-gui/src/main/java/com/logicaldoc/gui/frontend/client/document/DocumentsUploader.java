@@ -169,4 +169,14 @@ public class DocumentsUploader extends Window {
 	public boolean getImmediateIndexing() {
 		return Boolean.valueOf(vm.getValueAsString("immediateIndexing"));
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

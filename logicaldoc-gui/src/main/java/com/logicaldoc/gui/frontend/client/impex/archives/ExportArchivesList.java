@@ -299,4 +299,14 @@ public class ExportArchivesList extends VLayout {
 		details = SELECT_ELEMENT;
 		detailsContainer.setMembers(details);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

@@ -31,4 +31,14 @@ public abstract class AutomationRoutineDetailsTab extends HLayout {
 	public ChangedHandler getChangedHandler() {
 		return changedHandler;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

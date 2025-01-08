@@ -169,4 +169,14 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 	public void onNewReadingRequests(List<GUIReadingRequest> readings) {
 		onConfirmReading(0L);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

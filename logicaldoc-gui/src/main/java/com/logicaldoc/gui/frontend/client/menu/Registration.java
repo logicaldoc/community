@@ -11,7 +11,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 
@@ -22,8 +21,6 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
  * @since 6.0
  */
 public class Registration extends Window {
-
-	protected ValuesManager vm = new ValuesManager();
 
 	public Registration(List<String> reg) {
 		super();
@@ -38,7 +35,6 @@ public class Registration extends Window {
 		setAutoSize(true);
 
 		final DynamicForm form = new DynamicForm();
-		form.setValuesManager(vm);
 		form.setMargin(5);
 		form.setNumCols(2);
 		form.setTitleOrientation(TitleOrientation.TOP);
@@ -64,8 +60,7 @@ public class Registration extends Window {
 		apply.setTitle(I18N.message("apply"));
 		apply.setAutoFit(true);
 		apply.addClickHandler(event -> {
-			vm.validate();
-			if (Boolean.FALSE.equals(vm.hasErrors())) {
+			if (form.validate()) {
 				SettingService.Instance.get().saveRegistration(form.getValueAsString("reg_name"),
 						form.getValueAsString("reg_email"), form.getValueAsString("reg_organization"),
 						form.getValueAsString("reg_website"), new AsyncCallback<>() {

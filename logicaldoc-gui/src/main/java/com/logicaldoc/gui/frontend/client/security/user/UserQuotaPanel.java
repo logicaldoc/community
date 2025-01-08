@@ -1,13 +1,10 @@
 package com.logicaldoc.gui.frontend.client.security.user;
 
-import java.util.Map;
-
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
@@ -22,9 +19,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 public class UserQuotaPanel extends HLayout {
 	private static final String QUOTA = "quota";
 
-	private DynamicForm form1 = new DynamicForm();
-
-	private ValuesManager vm = new ValuesManager();
+	private DynamicForm form = new DynamicForm();
 
 	private GUIUser user;
 
@@ -42,17 +37,16 @@ public class UserQuotaPanel extends HLayout {
 
 	private void refresh() {
 		boolean readonly = (changedHandler == null);
-		vm.clearValues();
-		vm.clearErrors(false);
+		form.clearValues();
+		form.clearErrors(false);
 
-		if (form1 != null)
-			form1.destroy();
+		if (form != null)
+			form.destroy();
 
-		if (Boolean.TRUE.equals(contains(form1)))
-			removeChild(form1);
-		form1 = new DynamicForm();
-		form1.setValuesManager(vm);
-		form1.setTitleOrientation(TitleOrientation.TOP);
+		if (Boolean.TRUE.equals(contains(form)))
+			removeChild(form);
+		form = new DynamicForm();
+		form.setTitleOrientation(TitleOrientation.TOP);
 
 		IntegerItem quota = ItemFactory.newIntegerItem(QUOTA, QUOTA, null);
 		quota.setRequired(true);
@@ -66,25 +60,32 @@ public class UserQuotaPanel extends HLayout {
 				Util.formatSizeW7(user.getQuotaCount()));
 		quotaCount.setWrap(false);
 
-		form1.setItems(quota, quotaCount);
-		addMember(form1);
+		form.setItems(quota, quotaCount);
+		addMember(form);
 	}
 
-	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values =  vm.getValues();
-		vm.validate();
-		if (Boolean.FALSE.equals(vm.hasErrors())) {
+		if (form.validate()) {
 			long quota;
-			if (values.get(QUOTA) instanceof String str)
+			if (form.getValue(QUOTA) instanceof String str)
 				quota = Integer.parseInt(str);
 			else
-				quota = (Integer) values.get(QUOTA);
+				quota = (Integer) form.getValue(QUOTA);
 			if (quota > 0)
 				user.setQuota(quota * (1024 * 1024));
 			else
 				user.setQuota(-1);
 		}
-		return !vm.hasErrors();
+		return !form.hasErrors();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

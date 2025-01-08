@@ -231,4 +231,14 @@ public class TagsForm extends VLayout {
 		Search.get().setOptions(options);
 		Search.get().search();
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

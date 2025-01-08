@@ -253,4 +253,14 @@ public class TicketsReport extends ReportPanel {
 			urlBase += "download-ticket?ticketId=" + ticketId;
 		return urlBase;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

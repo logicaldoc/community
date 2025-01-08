@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.List;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.MarshalBase64;
@@ -77,10 +77,13 @@ public class WebserviceClient {
 		transport.call("", envelope);
 
 		AbstractList<SoapObject> response = new ArrayList<>();
-		if (envelope.getResponse() instanceof Vector) {
+		
+		System.out.println("response: "+response.getClass());
+		
+		if (envelope.getResponse() instanceof List) {
 			// We have more elements
 			@SuppressWarnings("unchecked")
-			AbstractList<SoapObject> vector = (Vector<SoapObject>) envelope.getResponse();
+			List<SoapObject> vector = (List<SoapObject>) envelope.getResponse();
 			for (SoapObject soapObject : vector) {
 				response.add(soapObject);
 			}

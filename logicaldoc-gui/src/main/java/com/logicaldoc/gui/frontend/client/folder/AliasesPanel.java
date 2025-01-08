@@ -58,4 +58,13 @@ public class AliasesPanel extends FolderDetailTab {
 		if (dataSource != null)
 			dataSource.destroy();
 	}
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

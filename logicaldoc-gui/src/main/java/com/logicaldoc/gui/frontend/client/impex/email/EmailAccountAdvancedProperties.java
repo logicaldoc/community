@@ -2,7 +2,6 @@ package com.logicaldoc.gui.frontend.client.impex.email;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 import com.logicaldoc.gui.common.client.beans.GUIEmailAccount;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -96,18 +95,25 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 		formsContainer.addMember(form);
 	}
 
-	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values = form.getValues();
-		form.validate();
-		if (Boolean.FALSE.equals(form.hasErrors())) {
-			account.setIncludes((String) values.get("include"));
-			account.setExcludes((String) values.get("exclude"));
-			account.setDeleteFromMailbox(Boolean.parseBoolean(values.get(DELETE).toString()));
-			account.setMailFolder((String) values.get("mailfolder"));
-			account.setFormat(Integer.parseInt((String) values.get("format")));
-			account.setStartDate((Date) values.get("startdate"));
+		if (form.validate()) {
+			account.setIncludes(form.getValueAsString("include"));
+			account.setExcludes(form.getValueAsString("exclude"));
+			account.setDeleteFromMailbox(Boolean.parseBoolean(form.getValueAsString(DELETE)));
+			account.setMailFolder(form.getValueAsString("mailfolder"));
+			account.setFormat(Integer.parseInt(form.getValueAsString("format")));
+			account.setStartDate((Date) form.getValue("startdate"));
 		}
 		return !form.hasErrors();
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

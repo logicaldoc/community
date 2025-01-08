@@ -192,4 +192,14 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 		contextMenu.setItems(inviteToChat);
 		return contextMenu;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

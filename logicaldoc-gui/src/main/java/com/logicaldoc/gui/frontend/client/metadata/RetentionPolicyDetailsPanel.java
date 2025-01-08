@@ -166,4 +166,14 @@ public class RetentionPolicyDetailsPanel extends VLayout implements FolderChange
 	public void onChanged(GUIFolder folder) {
 		onModified();
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

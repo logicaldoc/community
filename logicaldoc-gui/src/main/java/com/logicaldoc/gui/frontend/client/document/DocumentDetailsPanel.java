@@ -3,8 +3,8 @@ package com.logicaldoc.gui.frontend.client.document;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.Constants;
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.ServerValidationException;
 import com.logicaldoc.gui.common.client.Session;
@@ -785,5 +785,15 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	protected void onDestroy() {
 		destroy();
 		super.onDestroy();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

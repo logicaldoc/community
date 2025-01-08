@@ -122,4 +122,14 @@ public class DeletedFoldersReport extends ReportPanel implements FolderChangeLis
 	public void onChanged(GUIFolder folder) {
 		refresh();
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

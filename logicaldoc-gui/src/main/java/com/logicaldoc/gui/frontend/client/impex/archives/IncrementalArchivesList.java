@@ -222,4 +222,14 @@ public class IncrementalArchivesList extends VLayout {
 		archive.setType(IncrementalArchivesList.this.archivesType);
 		showDetails(archive);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

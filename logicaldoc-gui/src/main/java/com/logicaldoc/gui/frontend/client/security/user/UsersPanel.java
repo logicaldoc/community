@@ -486,4 +486,14 @@ public class UsersPanel extends AdminPanel {
 	void refresh() {
 		list.refresh(new UsersDS(null, true, false));
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

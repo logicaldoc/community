@@ -605,7 +605,7 @@ public class TaskEditor extends Window {
 		TaskEditor.this.state.setCreationMessageTemplate(vm.getValueAsString("creationMessageTemplate"));
 
 		if (state.getType() == GUIWFState.TYPE_TASK) {
-			TaskEditor.this.state.setRequiresNote("yes".equals(vm.getValueAsString("requiresNote")));
+			TaskEditor.this.state.setRequiresNote(Boolean.valueOf(vm.getValueAsString("requiresNote")));
 			TaskEditor.this.state.setMinNoteSize((Integer) vm.getValue("minnotesize"));
 			TaskEditor.this.state.setDueDateNumber((Integer) vm.getValue("duedateNumber"));
 			TaskEditor.this.state.setDueDateUnit(vm.getValueAsString("duedateTime"));

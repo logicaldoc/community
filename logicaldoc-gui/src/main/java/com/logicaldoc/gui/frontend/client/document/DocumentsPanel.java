@@ -508,4 +508,14 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 		} else
 			return null;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

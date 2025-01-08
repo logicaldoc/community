@@ -241,4 +241,15 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 	public void onNewReadingRequests(List<GUIReadingRequest> requests) {
 		refresh();
 	}
+	
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

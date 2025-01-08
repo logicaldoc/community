@@ -126,4 +126,14 @@ public class MenusPanel extends VLayout {
 		rights = new MenuSecurityPanel(menu, true);
 		rightsContainer.addMember(rights);
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

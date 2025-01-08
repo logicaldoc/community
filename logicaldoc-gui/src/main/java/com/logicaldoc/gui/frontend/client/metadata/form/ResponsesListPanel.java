@@ -5,6 +5,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.frontend.client.menu.QuickSearchTray;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -68,5 +69,18 @@ public class ResponsesListPanel extends VLayout {
 				.setMessage(I18N.message("shownresponses", Integer.toString(grid.getTotalRows()))));
 
 		setMembers(toolStrip, infoPanel, grid);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof QuickSearchTray)
+			return super.equals(obj);
+		else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

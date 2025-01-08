@@ -270,4 +270,14 @@ public class SearchToolbar extends ToolStrip {
 			}
 		});
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

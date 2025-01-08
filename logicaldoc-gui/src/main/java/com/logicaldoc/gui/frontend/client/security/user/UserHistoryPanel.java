@@ -73,4 +73,14 @@ public class UserHistoryPanel extends VLayout {
 		addMember(list);
 		addMember(buttons);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

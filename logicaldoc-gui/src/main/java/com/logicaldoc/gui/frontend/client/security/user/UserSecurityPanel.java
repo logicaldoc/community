@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.security.user;
 
 import java.util.Date;
-import java.util.Map;
 
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
@@ -10,7 +9,6 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -32,8 +30,6 @@ public class UserSecurityPanel extends VLayout {
 
 	private DynamicForm form = new DynamicForm();
 
-	private ValuesManager vm = new ValuesManager();
-
 	private GUIUser user;
 
 	private ChangedHandler changedHandler;
@@ -47,7 +43,6 @@ public class UserSecurityPanel extends VLayout {
 			setWidth100();
 			setHeight100();
 			setMembersMargin(20);
-
 			prepareGUI();
 		}
 	}
@@ -56,8 +51,8 @@ public class UserSecurityPanel extends VLayout {
 		setAlign(Alignment.LEFT);
 
 		boolean readonly = (changedHandler == null);
-		vm.clearValues();
-		vm.clearErrors(false);
+		form.clearValues();
+		form.clearErrors(false);
 
 		if (form != null)
 			form.destroy();
@@ -67,7 +62,6 @@ public class UserSecurityPanel extends VLayout {
 
 		form = new DynamicForm();
 		form.setWidth(1);
-		form.setValuesManager(vm);
 		form.setWrapItemTitles(false);
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(2);
@@ -173,18 +167,25 @@ public class UserSecurityPanel extends VLayout {
 		return passwordExpires;
 	}
 
-	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values = vm.getValues();
-		vm.validate();
-		if (Boolean.FALSE.equals(vm.hasErrors())) {
-			user.setPasswordExpires(Boolean.parseBoolean(values.get("passwordExpires").toString()));
-			user.setEnabled(Boolean.parseBoolean(values.get("eenabled").toString()));
-			user.setEnforceWorkingTime(Boolean.parseBoolean(values.get(ENFORCEWORKINGTIME).toString()));
-			user.setMaxInactivity((Integer) values.get("maxinactivity"));
-			user.setExpire((Date) values.get("expireson"));
-			user.setSecondFactor(values.get("2fa").toString());
+		if (form.validate()) {
+			user.setPasswordExpires(Boolean.parseBoolean(form.getValueAsString("passwordExpires")));
+			user.setEnabled(Boolean.parseBoolean(form.getValueAsString("eenabled").toString()));
+			user.setEnforceWorkingTime(Boolean.parseBoolean(form.getValueAsString(ENFORCEWORKINGTIME).toString()));
+			user.setMaxInactivity((Integer) form.getValue("maxinactivity"));
+			user.setExpire((Date) form.getValue("expireson"));
+			user.setSecondFactor(form.getValueAsString("2fa"));
 		}
-		return !vm.hasErrors();
+		return !form.hasErrors();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

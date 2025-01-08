@@ -152,4 +152,14 @@ public class CertificateDialog extends Window implements UserObserver {
 	protected void onUnload() {
 		UserController.get().removeObserver(this);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

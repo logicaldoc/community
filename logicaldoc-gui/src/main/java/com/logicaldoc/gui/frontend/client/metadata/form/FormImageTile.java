@@ -4,6 +4,7 @@ import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.widgets.Upload;
+import com.logicaldoc.gui.frontend.client.menu.QuickSearchTray;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FormService;
 import com.smartgwt.client.types.Alignment;
@@ -146,5 +147,18 @@ public class FormImageTile extends HLayout {
 				}
 			});
 		}
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof QuickSearchTray)
+			return super.equals(obj);
+		else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

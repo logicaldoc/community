@@ -58,4 +58,14 @@ public class DocumentSelectorPanel extends HLayout {
 	public List<GUIDocument> getSelection() {
 		return ((DocumentsListPanel) documents).getGrid().getSelectedDocuments();
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

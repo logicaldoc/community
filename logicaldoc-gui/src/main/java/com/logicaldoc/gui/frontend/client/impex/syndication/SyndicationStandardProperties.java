@@ -172,8 +172,7 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 	}
 
 	boolean validate() {
-		form.validate();
-		if (Boolean.FALSE.equals(form.hasErrors())) {
+		if (form.validate()) {
 			syndication.setName(form.getValueAsString("name"));
 			syndication.setUsername(form.getValueAsString(USERNAME));
 			syndication.setTargetPath(form.getValueAsString("targetpath"));
@@ -203,5 +202,15 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 			syndication.setReplicateCustomId(Boolean.parseBoolean(form.getValueAsString(REPLICATECUSTOMID)) ? 1 : 0);
 		}
 		return !form.hasErrors();
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

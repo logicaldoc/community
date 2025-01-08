@@ -157,4 +157,14 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 		}
 		list.setRecords(records.toArray(new ListGridRecord[0]));
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

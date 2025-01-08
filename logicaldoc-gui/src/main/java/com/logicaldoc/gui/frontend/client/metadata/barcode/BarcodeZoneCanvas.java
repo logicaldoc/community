@@ -41,8 +41,7 @@ public class BarcodeZoneCanvas extends ZoneCanvas {
 				}
 			});
 		} else {
-			ZoneEditor editor = new ZoneEditor((GUIBarcodeZone) zone);
-			editor.show();
+			new ZoneEditor((GUIBarcodeZone) zone).show();
 		}
 	}
 }

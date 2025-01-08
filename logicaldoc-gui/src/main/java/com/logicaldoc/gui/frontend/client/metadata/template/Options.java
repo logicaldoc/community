@@ -236,4 +236,14 @@ public class Options extends com.smartgwt.client.widgets.Window {
 	public long getSetId() {
 		return setId;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

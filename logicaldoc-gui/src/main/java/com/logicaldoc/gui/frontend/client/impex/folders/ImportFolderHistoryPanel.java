@@ -182,4 +182,14 @@ public class ImportFolderHistoryPanel extends ImportFolderDetailsTab {
 		importFolder.setRecordHistory(Boolean.TRUE.equals(recordHistory.getValueAsBoolean()));
 		return true;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

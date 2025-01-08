@@ -163,4 +163,14 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 		contextMenu.setItems(edit, delete);
 		contextMenu.showContextMenu();
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

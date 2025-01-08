@@ -108,7 +108,7 @@ public class OwnCertificateDialog extends Window {
 	}
 
 	public void onSubmit() {
-		if (Boolean.FALSE.equals(form.validate()))
+		if (!form.validate())
 			return;
 
 		LD.contactingServer();
@@ -130,5 +130,15 @@ public class OwnCertificateDialog extends Window {
 								});
 					}
 				});
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

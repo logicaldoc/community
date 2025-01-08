@@ -169,4 +169,14 @@ public class BookmarksPanel extends VLayout {
 		else
 			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong(TARGET_ID), null);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

@@ -3,7 +3,6 @@ package com.logicaldoc.gui.frontend.client.document.update;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
@@ -198,16 +197,24 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 			SC.warn(I18N.message("sometagaddedbecauseinvalid"));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean validate() {
-		Map<String, Object> values = vm.getValues();
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
-			document.setLanguage((String) values.get(LANGUAGE));
-			document.setColor((String) values.get("color"));
+			document.setLanguage(vm.getValueAsString(LANGUAGE));
+			document.setColor(vm.getValueAsString("color"));
 			document.setTags(Arrays.asList(tagItem.getValues()));
 		}
 		return !vm.hasErrors();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

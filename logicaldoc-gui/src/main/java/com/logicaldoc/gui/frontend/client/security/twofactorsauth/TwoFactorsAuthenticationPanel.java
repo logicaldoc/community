@@ -110,4 +110,14 @@ public class TwoFactorsAuthenticationPanel extends VLayout {
 
 		return vm.validate();
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

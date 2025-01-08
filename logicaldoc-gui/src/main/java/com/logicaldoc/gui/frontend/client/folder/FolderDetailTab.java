@@ -29,4 +29,14 @@ public abstract class FolderDetailTab extends DetailTab {
 	public GUIFolder getFolder() {
 		return folder;
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

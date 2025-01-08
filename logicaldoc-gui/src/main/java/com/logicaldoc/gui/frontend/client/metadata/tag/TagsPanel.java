@@ -44,4 +44,14 @@ public class TagsPanel extends AdminPanel {
 		tabs.addTab(used);
 		tabs.addTab(preset);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

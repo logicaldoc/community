@@ -1,7 +1,5 @@
 package com.logicaldoc.gui.frontend.client.impex.folders;
 
-import java.util.Map;
-
 import com.logicaldoc.gui.common.client.beans.GUIImportFolder;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.TitleOrientation;
@@ -57,9 +55,9 @@ public class ImportFolderAutomationPanel extends ImportFolderDetailsTab {
 		automationAfter.setWidth("*");
 		automationAfter.setHeight("*");
 		automationAfter.addChangedHandler(changedHandler);
-		
-		TextAreaItem automationEnd = ItemFactory.newTextAreaItemForAutomation("automationEnd",
-				"aftercrawlingprocessed", importFolder.getAutomationEnd(), changedHandler, false);
+
+		TextAreaItem automationEnd = ItemFactory.newTextAreaItemForAutomation("automationEnd", "aftercrawlingprocessed",
+				importFolder.getAutomationEnd(), changedHandler, false);
 		automationEnd.setRequired(false);
 		automationEnd.setWidth("*");
 		automationEnd.setHeight("*");
@@ -70,15 +68,22 @@ public class ImportFolderAutomationPanel extends ImportFolderDetailsTab {
 		container.addMember(form);
 	}
 
-	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values = form.getValues();
-		form.validate();
-		if (Boolean.FALSE.equals(form.hasErrors())) {
-			importFolder.setAutomation((String) values.get("automationBefore"));
-			importFolder.setAutomationAfter((String) values.get("automationAfter"));
-			importFolder.setAutomationEnd((String) values.get("automationEnd"));
+		if (form.validate()) {
+			importFolder.setAutomation(form.getValueAsString("automationBefore"));
+			importFolder.setAutomationAfter(form.getValueAsString("automationAfter"));
+			importFolder.setAutomationEnd(form.getValueAsString("automationEnd"));
 		}
 		return !form.hasErrors();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

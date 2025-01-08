@@ -207,4 +207,14 @@ public class MessagesPanel extends VLayout implements UserObserver {
 	public void destroy() {
 		UserController.get().removeObserver(this);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

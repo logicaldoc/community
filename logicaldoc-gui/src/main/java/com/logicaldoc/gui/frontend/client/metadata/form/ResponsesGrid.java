@@ -18,6 +18,7 @@ import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
+import com.logicaldoc.gui.frontend.client.menu.QuickSearchTray;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DateDisplayFormat;
@@ -213,5 +214,18 @@ public class ResponsesGrid extends RefreshableListGrid {
 	@Override
 	public DateDisplayFormat getDatetimeFormatter() {
 		return I18N.getDateDisplayFormat(true);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof QuickSearchTray)
+			return super.equals(obj);
+		else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

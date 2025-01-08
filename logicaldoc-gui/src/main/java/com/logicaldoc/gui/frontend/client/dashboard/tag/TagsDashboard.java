@@ -60,4 +60,15 @@ public class TagsDashboard extends PortalLayout {
 
 		cloud.refresh();
 	}
+	
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

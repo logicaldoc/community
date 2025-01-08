@@ -1,7 +1,5 @@
 package com.logicaldoc.gui.frontend.client.impex.email;
 
-import java.util.Map;
-
 import com.logicaldoc.gui.common.client.beans.GUIEmailAccount;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.TitleOrientation;
@@ -70,15 +68,22 @@ public class EmailAccountAutomationPanel extends EmailAccountDetailsTab {
 		container.addMember(form);
 	}
 
-	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values = form.getValues();
-		form.validate();
-		if (Boolean.FALSE.equals(form.hasErrors())) {
-			account.setAutomation((String) values.get("automationBefore"));
-			account.setAutomationAfter((String) values.get("automationAfter"));
-			account.setAutomationEnd((String) values.get("automationEnd"));
+		if (form.validate()) {
+			account.setAutomation(form.getValueAsString("automationBefore"));
+			account.setAutomationAfter(form.getValueAsString("automationAfter"));
+			account.setAutomationEnd(form.getValueAsString("automationEnd"));
 		}
 		return !form.hasErrors();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

@@ -12,6 +12,7 @@ import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
+import com.logicaldoc.gui.frontend.client.menu.QuickSearchTray;
 import com.logicaldoc.gui.frontend.client.services.FormService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
@@ -278,5 +279,18 @@ public class FormsPanel extends AdminPanel {
 
 	public static String webformURL(String formId) {
 		return Util.contextPath() + "webform/" + formId;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof QuickSearchTray)
+			return super.equals(obj);
+		else
+			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

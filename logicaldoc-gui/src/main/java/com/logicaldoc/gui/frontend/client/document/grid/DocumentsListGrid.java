@@ -976,4 +976,14 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	public Map<String, ListGridField> getFieldsMap() {
 		return fieldsMap;
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

@@ -147,4 +147,14 @@ public class Envelopes extends com.smartgwt.client.widgets.Window {
 	public void refresh() {
 		initGrid();
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

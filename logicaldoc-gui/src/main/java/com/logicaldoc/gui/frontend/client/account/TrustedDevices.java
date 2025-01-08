@@ -134,4 +134,14 @@ public class TrustedDevices extends com.smartgwt.client.widgets.Window {
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

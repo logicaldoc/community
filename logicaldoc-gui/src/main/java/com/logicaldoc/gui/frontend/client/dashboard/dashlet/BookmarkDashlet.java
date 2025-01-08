@@ -138,4 +138,14 @@ public class BookmarkDashlet extends Dashlet {
 	protected DataSource getDataSource() {
 		return new BookmarksDS();
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

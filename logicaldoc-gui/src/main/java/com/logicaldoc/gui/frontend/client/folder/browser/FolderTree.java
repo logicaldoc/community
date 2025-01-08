@@ -311,4 +311,14 @@ public class FolderTree extends TreeGrid {
 		path.append(leafNode.getName().equals("/") ? "" : leafNode.getName());
 		return path.toString();
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

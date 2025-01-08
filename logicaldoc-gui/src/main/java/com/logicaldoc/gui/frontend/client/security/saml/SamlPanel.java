@@ -261,7 +261,7 @@ public class SamlPanel extends VLayout {
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
 		save.addClickHandler(event -> {
-			if (!Boolean.TRUE.equals(form.validate()))
+			if (Boolean.FALSE.equals(form.validate()))
 				return;
 
 			GUISamlSettings settings = new GUISamlSettings();

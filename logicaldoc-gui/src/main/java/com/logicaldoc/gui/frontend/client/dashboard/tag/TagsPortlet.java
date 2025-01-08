@@ -52,4 +52,13 @@ public class TagsPortlet extends Portlet {
 		container.addMember(new TagsForm(false, false));
 	}
 
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

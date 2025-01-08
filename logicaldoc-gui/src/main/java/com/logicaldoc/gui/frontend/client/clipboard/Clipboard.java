@@ -25,7 +25,7 @@ public class Clipboard extends HashSet<GUIDocument> {
 	private transient Set<ClipboardObserver> observers = new HashSet<>();
 
 	private String lastAction = COPY;
-	
+
 	public String getLastAction() {
 		return lastAction;
 	}
@@ -76,7 +76,7 @@ public class Clipboard extends HashSet<GUIDocument> {
 		return false;
 	}
 
-	 public ListGridRecord[] getRecords() {
+	public ListGridRecord[] getRecords() {
 		ListGridRecord[] array = new ListGridRecord[size()];
 		int i = 0;
 		for (GUIDocument document : this) {
@@ -87,5 +87,15 @@ public class Clipboard extends HashSet<GUIDocument> {
 			i++;
 		}
 		return array;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

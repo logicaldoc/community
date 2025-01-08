@@ -364,4 +364,14 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 			enableAll();
 		}
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

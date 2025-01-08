@@ -249,4 +249,14 @@ public class TemplatesPanel extends VLayout {
 				Arrays.asList(GUIAccessControlEntry.PERMISSION_READ, GUIAccessControlEntry.PERMISSION_WRITE));
 		showTemplateDetails(newTemplate);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

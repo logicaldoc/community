@@ -132,28 +132,14 @@ public class UserDashboard extends VLayout {
 		});
 	}
 
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((portal == null) ? 0 : portal.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		UserDashboard other = (UserDashboard) obj;
-		if (portal == null) {
-			if (other.portal != null)
-				return false;
-		} else if (!portal.equals(other.portal))
-			return false;
-		return true;
+		return super.hashCode();
 	}
 }

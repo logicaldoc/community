@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.reports.custom;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 import com.logicaldoc.gui.common.client.beans.GUIReport;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -117,15 +116,12 @@ public class ReportStandardProperties extends ReportDetailsTab {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values = form.getValues();
-		form.validate();
-		if (Boolean.FALSE.equals(form.hasErrors())) {
-			report.setName((String) values.get("name"));
-			report.setDescription((String) values.get("description"));
-			report.setOutputFormat((String) values.get("outputFormat"));
-			report.setUpdatePolicy(Integer.parseInt(values.get("updatePolicy").toString()));
+		if (form.validate()) {
+			report.setName(form.getValueAsString("name"));
+			report.setDescription(form.getValueAsString("description"));
+			report.setOutputFormat(form.getValueAsString("outputFormat"));
+			report.setUpdatePolicy(Integer.parseInt(form.getValueAsString("updatePolicy")));
 			report.setOutputFolder(outputFolderSelector.getFolder());
 		}
 		return !form.hasErrors();

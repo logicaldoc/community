@@ -1,7 +1,5 @@
 package com.logicaldoc.gui.frontend.client.impex.folders;
 
-import java.util.Map;
-
 import com.logicaldoc.gui.common.client.beans.GUIImportFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -129,27 +127,24 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 		onProviderChanged(importFolder.getProvider());
 	}
 
-	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values = form.getValues();
-		form.validate();
-		if (Boolean.FALSE.equals(form.hasErrors())) {
-			importFolder.setProvider((String) values.get("provider"));
-			importFolder.setPath((String) values.get("path"));
-			importFolder.setUsername((String) values.get(USERNAME));
-			importFolder.setDomain((String) values.get(DOMAIN));
+		if (form.validate()) {
+			importFolder.setProvider(form.getValueAsString("provider"));
+			importFolder.setPath(form.getValueAsString("path"));
+			importFolder.setUsername(form.getValueAsString(USERNAME));
+			importFolder.setDomain(form.getValueAsString(DOMAIN));
 			importFolder.setTarget(targetSelector.getFolder());
-			importFolder.setLanguage((String) values.get("language"));
-			importFolder.setIncludes((String) values.get("include"));
-			importFolder.setExcludes((String) values.get("exclude"));
-			importFolder.setHost((String) values.get(SERVER));
-			importFolder.setPort((Integer) values.get("port"));
-			if (values.get(BATCH) instanceof Long longVal)
+			importFolder.setLanguage(form.getValueAsString("language"));
+			importFolder.setIncludes(form.getValueAsString("include"));
+			importFolder.setExcludes(form.getValueAsString("exclude"));
+			importFolder.setHost(form.getValueAsString(SERVER));
+			importFolder.setPort((Integer) form.getValue("port"));
+			if (form.getValue(BATCH) instanceof Long longVal)
 				importFolder.setBatch(longVal);
 			else
-				importFolder.setBatch(Long.valueOf(values.get(BATCH).toString()));
+				importFolder.setBatch(Long.parseLong(form.getValueAsString(BATCH)));
 
-			importFolder.setPassword((String) values.get("password_hidden"));
+			importFolder.setPassword(form.getValueAsString("password_hidden"));
 		}
 		return !form.hasErrors();
 	}
@@ -182,5 +177,15 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 			String type = event.getValue().toString();
 			onProviderChanged(type);
 		}
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

@@ -760,4 +760,14 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			}
 		});
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

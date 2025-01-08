@@ -214,4 +214,14 @@ public class LockedDocsReport extends ReportPanel {
 			userId = Long.parseLong(userSelector.getValueAsString());
 		list.refresh(new LockedDocsDS(userId, max.getValueAsInteger()));
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

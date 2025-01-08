@@ -36,4 +36,14 @@ public class DocumentExtendedPropertiesPanel extends DocumentDetailTab {
 	public void handleErrors(ServerValidationError[] errors) {
 		extPropertiesPanel.onErrors(errors);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

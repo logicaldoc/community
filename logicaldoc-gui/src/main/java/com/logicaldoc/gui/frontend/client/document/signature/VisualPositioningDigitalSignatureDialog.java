@@ -175,4 +175,15 @@ public class VisualPositioningDigitalSignatureDialog extends Window {
 			}
 		});
 	}
+	
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

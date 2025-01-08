@@ -431,27 +431,12 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((tagItem == null) ? 0 : tagItem.hashCode());
-		return result;
+	public boolean equals(Object other) {
+		return super.equals(other);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		DocumentStandardPropertiesPanel other = (DocumentStandardPropertiesPanel) obj;
-		if (tagItem == null) {
-			if (other.tagItem != null)
-				return false;
-		} else if (!tagItem.equals(other.tagItem))
-			return false;
-		return true;
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

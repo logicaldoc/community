@@ -325,4 +325,14 @@ public class GUIGridsPanel extends VLayout {
 		Session.get().setConfig(param.getName(), param.getValue());
 		return parameters;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

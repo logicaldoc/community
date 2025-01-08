@@ -82,4 +82,15 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 		 */
 		FolderNavigator.get().selectFolder(folder.getId());
 	}
+	
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

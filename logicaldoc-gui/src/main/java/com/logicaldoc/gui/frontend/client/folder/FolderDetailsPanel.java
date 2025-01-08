@@ -584,4 +584,14 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 		FolderController.get().beginEditing(folder);
 		tabSet.displaySave();
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

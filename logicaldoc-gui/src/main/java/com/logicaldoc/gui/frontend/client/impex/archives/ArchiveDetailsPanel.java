@@ -67,6 +67,15 @@ public class ArchiveDetailsPanel extends VLayout {
 		}
 		versionsPanel = new VersionsPanel(archivesList, archiveId, readonly);
 		versionsTabPanel.addMember(versionsPanel);
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
 
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

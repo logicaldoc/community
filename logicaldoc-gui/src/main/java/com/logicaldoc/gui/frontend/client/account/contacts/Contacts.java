@@ -260,4 +260,14 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 	protected void onDraw() {
 		GridUtil.scrollGrid(list, null);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

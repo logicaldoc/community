@@ -22,11 +22,8 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
  */
 public class RestoreDialog extends Dialog {
 
-	protected ClickHandler handler;
-
 	public RestoreDialog(final List<Long> docIds, final List<Long> folderIds, ClickHandler handler) {
 		super();
-		this.handler = handler;
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("restore"));
 		setWidth(250);
@@ -61,8 +58,8 @@ public class RestoreDialog extends Dialog {
 						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void arg0) {
-								if (RestoreDialog.this.handler != null)
-									RestoreDialog.this.handler.onClick(event);
+								if (handler != null)
+									handler.onClick(event);
 								close();
 							}
 						});
@@ -73,8 +70,8 @@ public class RestoreDialog extends Dialog {
 						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void arg0) {
-								if (RestoreDialog.this.handler != null)
-									RestoreDialog.this.handler.onClick(event);
+								if (handler != null)
+									handler.onClick(event);
 								close();
 							}
 						});

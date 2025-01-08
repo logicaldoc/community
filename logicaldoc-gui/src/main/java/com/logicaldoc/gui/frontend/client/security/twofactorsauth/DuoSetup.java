@@ -19,7 +19,9 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 public class DuoSetup extends TwoFactorsAuthenticationSetup {
 
 	private static final String FACTOR = "factor";
+
 	private static final String PASSCODE = "passcode";
+
 	private DynamicForm form;
 
 	public DuoSetup(GUIUser user) {
@@ -85,5 +87,15 @@ public class DuoSetup extends TwoFactorsAuthenticationSetup {
 		}
 
 		return valid;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

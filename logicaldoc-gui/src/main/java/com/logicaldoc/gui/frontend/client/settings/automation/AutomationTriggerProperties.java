@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.settings.automation;
 
 import java.util.Date;
-import java.util.Map;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
@@ -250,15 +249,13 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 		return dateItem;
 	}
 
-	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values = vm.getValues();
 		if (Boolean.FALSE.equals(vm.validate()))
 			return false;
 
-		if (values.get(ROUTINE) != null) {
+		if (vm.getValue(ROUTINE) != null) {
 			SelectItem item = (SelectItem) vm.getItem(ROUTINE);
-			GUIAutomationRoutine routine = new GUIAutomationRoutine(Long.parseLong(values.get(ROUTINE).toString()));
+			GUIAutomationRoutine routine = new GUIAutomationRoutine(Long.parseLong(vm.getValueAsString(ROUTINE)));
 			routine.setName(item.getSelectedRecord().getAttributeAsString("name"));
 			trigger.setRoutine(routine);
 		} else
@@ -269,7 +266,7 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 		else
 			trigger.setFolder(null);
 
-		trigger.setAutomation((String) values.get("automation"));
+		trigger.setAutomation(vm.getValueAsString("automation"));
 
 		String eventsStr = null;
 		if (vm.getValueAsString(EVENTS) != null && !vm.getValueAsString(EVENTS).isEmpty()) {
@@ -290,7 +287,7 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 			String str = dfDate.format((Date) vm.getValue("date"));
 			if (vm.getValue("time") != null)
 				try {
-					trigger.setDate(df.parse(str + " " + vm.getValue("time").toString()));
+					trigger.setDate(df.parse(str + " " + vm.getValueAsString("time")));
 				} catch (Exception t) {
 					trigger.setDate(df.parse(str + " " + dfTime.format((Date) vm.getValue("time"))));
 				}
@@ -310,5 +307,15 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 	public void invalidCronExpression(String errorMessage) {
 		vm.getItem("cron").setErrors(errorMessage);
 		vm.showErrors();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

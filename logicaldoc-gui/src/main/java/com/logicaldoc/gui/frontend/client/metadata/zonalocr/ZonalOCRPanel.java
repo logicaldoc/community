@@ -32,4 +32,14 @@ public class ZonalOCRPanel extends AdminPanel {
 		processingQueueTab.setPane(new ZonalOCRQueuePanel(100));
 		tabs.addTab(processingQueueTab);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

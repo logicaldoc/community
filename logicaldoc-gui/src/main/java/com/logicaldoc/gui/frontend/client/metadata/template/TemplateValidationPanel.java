@@ -1,12 +1,9 @@
 package com.logicaldoc.gui.frontend.client.metadata.template;
 
-import java.util.Map;
-
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -20,8 +17,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 public class TemplateValidationPanel extends HLayout {
 
 	protected DynamicForm form = new DynamicForm();
-
-	protected ValuesManager vm = new ValuesManager();
 
 	protected GUITemplate template;
 
@@ -45,11 +40,8 @@ public class TemplateValidationPanel extends HLayout {
 	}
 
 	private void refresh() {
-		vm.clearValues();
-		vm.clearErrors(false);
-
-		if (form != null)
-			form.destroy();
+		form.clearValues();
+		form.clearErrors(true);
 
 		if (Boolean.TRUE.equals(contains(container)))
 			removeMember(container);
@@ -65,34 +57,37 @@ public class TemplateValidationPanel extends HLayout {
 	private void prepareForm() {
 		form = new DynamicForm();
 		form.setNumCols(1);
-		form.setValuesManager(vm);
 		form.setWidth100();
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation("validation", 
-				template.getValidation(), (!template.isReadonly() && template.isWrite()) ? changedHandler : null,
-				false);
+		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation("validation", template.getValidation(),
+				(!template.isReadonly() && template.isWrite()) ? changedHandler : null, false);
 		validation.setDisabled(template.isReadonly() || !template.isWrite());
 		validation.setWidth("*");
-		
+
 		form.setItems(validation);
 
 		container.addMember(form);
 	}
 
-	@SuppressWarnings("unchecked")
 	protected boolean validate() {
-		Map<String, Object> values =  vm.getValues();
-
-		vm.validate();
-		if (Boolean.FALSE.equals(vm.hasErrors())) {
-			template.setValidation((String) values.get("validation"));
+		if (form.validate()) {
+			template.setValidation(form.getValueAsString("validation"));
 		}
-
-		return !vm.hasErrors();
+		return !form.hasErrors();
 	}
 
 	public GUITemplate getTemplate() {
 		return template;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

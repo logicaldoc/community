@@ -283,4 +283,14 @@ public class EmailAccountsPanel extends AdminPanel {
 		rec.setAttribute(EENABLED, account.getEnabled() == 1 ? "0" : "2");
 		list.refreshRow(list.getRecordIndex(rec));
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

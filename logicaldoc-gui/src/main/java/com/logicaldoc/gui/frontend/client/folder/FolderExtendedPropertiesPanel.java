@@ -82,4 +82,14 @@ public class FolderExtendedPropertiesPanel extends FolderDetailTab {
 	public void handleErrors(ServerValidationError[] errors) {
 		propertiesPanel.onErrors(errors);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

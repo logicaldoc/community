@@ -122,4 +122,14 @@ public class Features extends Window {
 	public static Features get() {
 		return instance;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }
