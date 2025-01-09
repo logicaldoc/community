@@ -49,7 +49,7 @@ public abstract class AbstractTestCase {
 
 	protected File tempDir = new File("target/tmp");
 
-	private String userHome = System.getProperty(USER_HOME);
+	protected String originalUserHome = System.getProperty(USER_HOME);
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
@@ -179,7 +179,7 @@ public abstract class AbstractTestCase {
 	 */
 	private void loadDevelSettings() throws IOException {
 		Properties devSettings = new Properties();
-		try (FileReader reader = new FileReader(new File(userHome + "/logicaldoc-dev.properties"))) {
+		try (FileReader reader = new FileReader(new File(originalUserHome + "/logicaldoc-dev.properties"))) {
 			devSettings.load(reader);
 			for (Map.Entry<Object, Object> entry : devSettings.entrySet())
 				System.setProperty(entry.getKey().toString(), entry.getValue().toString());
@@ -193,7 +193,7 @@ public abstract class AbstractTestCase {
 
 	private void restoreUserHome() {
 		// Restore user home system property
-		System.setProperty(USER_HOME, userHome);
+		System.setProperty(USER_HOME, originalUserHome);
 	}
 
 	/**
