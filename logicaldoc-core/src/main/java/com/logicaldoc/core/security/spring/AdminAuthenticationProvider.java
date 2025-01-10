@@ -1,6 +1,5 @@
 package com.logicaldoc.core.security.spring;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -18,7 +17,6 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
-import com.logicaldoc.util.crypt.CryptUtil;
 
 /**
  * This Authentication provider extends the standard
@@ -46,7 +44,6 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) authentication;
 		String username = String.valueOf(auth.getPrincipal());
-		String password = String.valueOf(auth.getCredentials());
 
 		if (!ADMIN.equals(username))
 			throw new BadCredentialsException(BADCREDENTIALS);
@@ -92,16 +89,7 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 		if (adminPasswd == null || adminPasswd.isEmpty())
 			throw new BadCredentialsException(BADCREDENTIALS);
 
-		// Check the password match with one of the current or legacy algorithm
-		String testLegacy = "";
-		try {
-			testLegacy = CryptUtil.encryptSHA(password);
-			user.setDecodedPassword(password);
-		} catch (NoSuchAlgorithmException e) {
-			log.error("Cannot cript the password", e);
-		}
-
-		if (!user.getPassword().equals(adminPasswd) && !testLegacy.equals(adminPasswd))
+		if (!user.getPassword().equals(adminPasswd))
 			throw new BadCredentialsException(BADCREDENTIALS);
 
 		Collection<GrantedAuthority> authorities = new ArrayList<>();

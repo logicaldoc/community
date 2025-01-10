@@ -1,18 +1,13 @@
 package com.logicaldoc.gui.frontend.client.workflow.designer;
 
-import java.util.Map;
-
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
 /**
  * This is the form used for the workflow joins and forks.
@@ -22,15 +17,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
  */
 public class ForkEditor extends Window {
 
-	private ValuesManager vm = new ValuesManager();
-
-	private DynamicForm form;
-
-	private StateWidget widget;
-
 	public ForkEditor(StateWidget widget) {
-		this.widget = widget;
-
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("editworkflowstate", I18N.message("task")) + " - " + widget.getTransition().getText());
 		setCanDragResize(true);
@@ -41,27 +28,21 @@ public class ForkEditor extends Window {
 		setWidth(400);
 		centerInPage();
 
-		form = new DynamicForm();
+		DynamicForm form = new DynamicForm();
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(1);
-		form.setValuesManager(vm);
 
 		TextItem name = ItemFactory.newTextItem("name", widget.getTransition().getText());
 		name.setRequired(true);
 
 		ButtonItem save = new ButtonItem("save", I18N.message("save"));
 		save.setAutoFit(true);
-		save.addClickHandler(new ClickHandler() {
-			@SuppressWarnings("unchecked")
-			public void onClick(ClickEvent event) {
-				Map<String, Object> values = vm.getValues();
-
-				if (Boolean.TRUE.equals(vm.validate())) {
-					ForkEditor.this.widget.getWFState().setName((String) values.get("name"));
-					ForkEditor.this.widget.setContents("<b>" + (String) values.get("name") + "</b>");
-					ForkEditor.this.widget.getDrawingPanel().getDiagramController().update();
-					destroy();
-				}
+		save.addClickHandler(click -> {
+			if (form.validate()) {
+				widget.getWFState().setName(form.getValueAsString("name"));
+				widget.setContents("<b>" + form.getValueAsString("name") + "</b>");
+				widget.getDrawingPanel().getDiagramController().update();
+				destroy();
 			}
 		});
 

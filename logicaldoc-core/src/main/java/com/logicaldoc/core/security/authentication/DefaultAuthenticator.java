@@ -2,11 +2,9 @@ package com.logicaldoc.core.security.authentication;
 
 import java.security.NoSuchAlgorithmException;
 
-import javax.annotation.Resource;
-
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
@@ -27,10 +25,11 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 
 	protected static Logger log = LoggerFactory.getLogger(DefaultAuthenticator.class);
 
-	@Resource(name = "UserDAO")
 	protected UserDAO userDAO;
 
-	public void setUserDAO(UserDAO userDAO) {
+	@Autowired
+	public DefaultAuthenticator(UserDAO userDAO) {
+		super();
 		this.userDAO = userDAO;
 	}
 
@@ -53,24 +52,14 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 
 		// Check the password match with one of the current or legacy algorithm
 		String test = null;
-		String testLegacy = null;
 		try {
 			test = CryptUtil.encryptSHA256(password);
-			testLegacy = CryptUtil.encryptSHA(password);
 		} catch (NoSuchAlgorithmException e) {
 			log.error(e.getMessage(), e);
 		}
 
-		if (user.getPassword() == null || (!user.getPassword().equals(test) && !user.getPassword().equals(testLegacy)))
+		if (user.getPassword() == null || !user.getPassword().equals(test))
 			throw new WrongPasswordException(this);
-
-		try {
-			// Make sure the password in the DB follows the current scheme
-			if (StringUtils.isNotEmpty(test) && user.getPassword().equals(testLegacy))
-				userDAO.jdbcUpdate("update ld_user set ld_password='" + test + "' where ld_id = " + user.getId());
-		} catch (PersistenceException e) {
-			log.warn(e.getMessage());
-		}
 
 		return user;
 	}
@@ -89,14 +78,13 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 	 * @throws AuthenticationException I something did not pass
 	 */
 	public void validateUser(User user) throws AuthenticationException {
-		if (user == null) {
+		if (user == null)
 			throw new AccountNotFoundException(this);
-		}
 
 		// Check the type
 		if (user.getType() != User.TYPE_DEFAULT && user.getType() != User.TYPE_READONLY)
 			throw new AccountTypeNotAllowedException();
-		
+
 		try {
 			userDAO.initialize(user);
 		} catch (PersistenceException e) {

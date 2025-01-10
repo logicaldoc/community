@@ -39,9 +39,7 @@ public class UserQuotaPanel extends HLayout {
 		boolean readonly = (changedHandler == null);
 		form.clearValues();
 		form.clearErrors(false);
-
-		if (form != null)
-			form.destroy();
+		form.destroy();
 
 		if (Boolean.TRUE.equals(contains(form)))
 			removeChild(form);

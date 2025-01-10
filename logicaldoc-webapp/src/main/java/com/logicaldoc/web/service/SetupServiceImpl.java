@@ -200,15 +200,16 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 
 		// Refresh the current logging location
 		String log4jPath = URLDecoder.decode(this.getClass().getResource("/log.xml").getPath(), "UTF-8");
+		Logger console = LoggerFactory.getLogger("console");
 		try {
 			// Init the logs
-			System.out.println("Taking log configuration from " + log4jPath);
+			console.info("Taking log configuration from {}", log4jPath);
 			try (InputStream inputStream = new FileInputStream(log4jPath)) {
 				ConfigurationSource source = new ConfigurationSource(inputStream);
 				Configurator.initialize(null, source);
 			}
 		} catch (FileNotFoundException e) {
-			System.err.println("Cannot access log file " + log4jPath);
+			console.error("Cannot access log file {}", log4jPath);
 		}
 
 		reloadContext();

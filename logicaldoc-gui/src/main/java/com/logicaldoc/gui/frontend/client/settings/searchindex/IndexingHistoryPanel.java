@@ -261,4 +261,14 @@ public class IndexingHistoryPanel extends VLayout {
 			docIds.add(selection[i].getAttributeAsLong(DOC_ID));
 		return docIds;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

@@ -129,4 +129,14 @@ public class WorkflowTriggersPanel extends VLayout {
 	public ListGridRecord getSelectedRecord() {
 		return list.getSelectedRecord();
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

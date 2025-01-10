@@ -409,4 +409,14 @@ public class ContextProperties extends OrderedProperties {
 				setProperty(tenantProp, getProperty("default." + prop));
 		}
 	}
+
+	@Override
+	public synchronized boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public synchronized int hashCode() {
+		return super.hashCode();
+	}
 }

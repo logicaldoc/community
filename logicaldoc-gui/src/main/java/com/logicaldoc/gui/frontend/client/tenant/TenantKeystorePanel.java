@@ -383,4 +383,14 @@ public class TenantKeystorePanel extends VLayout {
 	public long getTenantId() {
 		return tenantId;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

@@ -117,4 +117,14 @@ public abstract class HistoryPanel extends VLayout {
 	 * @return the data source to use
 	 */
 	protected abstract DataSource getDataSource(Integer maxItems);
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

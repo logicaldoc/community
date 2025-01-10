@@ -298,4 +298,14 @@ public class SystemMenu extends VLayout {
 			addMember(form2);
 		}
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

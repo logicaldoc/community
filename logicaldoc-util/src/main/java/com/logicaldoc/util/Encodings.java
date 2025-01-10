@@ -1,9 +1,5 @@
 package com.logicaldoc.util;
 
-/**
- * Encodings.java
- * Copyright (c) 2012 by Dr. Herong Yang, herongyang.com
- */
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,12 +13,12 @@ import java.util.SortedMap;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.2.1
  */
-public class Encodings {
-
-	public static void main(String[] arg) {
-		System.out.println(enlistSupportedEncodings().toString());
+public abstract class Encodings {
+	
+	private Encodings() {
+		// Do nothing
 	}
-
+	
 	public static List<String> enlistSupportedEncodings() {
 		List<String> encodings = new ArrayList<>();
 

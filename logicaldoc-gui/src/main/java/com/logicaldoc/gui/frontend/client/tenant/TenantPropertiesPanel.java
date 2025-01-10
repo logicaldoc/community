@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.tenant;
 
 import java.util.Date;
-import java.util.Map;
 
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.beans.GUITenant;
@@ -11,7 +10,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -29,8 +27,6 @@ public class TenantPropertiesPanel extends HLayout {
 	private static final String EMAIL = "email";
 
 	private DynamicForm form = new DynamicForm();
-
-	private ValuesManager vm = new ValuesManager();
 
 	private GUITenant tenant;
 
@@ -140,17 +136,14 @@ public class TenantPropertiesPanel extends HLayout {
 
 	private boolean prepareForm() {
 		boolean readonly = (changedHandler == null);
-		vm.clearValues();
-		vm.clearErrors(false);
-
-		if (form != null)
-			form.destroy();
+		form.clearValues();
+		form.clearErrors(false);
+		form.destroy();
 
 		if (Boolean.TRUE.equals(contains(form)))
 			removeChild(form);
 
 		form = new DynamicForm();
-		form.setValuesManager(vm);
 		form.setWrapItemTitles(false);
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(3);
@@ -159,26 +152,33 @@ public class TenantPropertiesPanel extends HLayout {
 		return readonly;
 	}
 
-	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values =  vm.getValues();
-		vm.validate();
-		if (Boolean.FALSE.equals(vm.hasErrors())) {
-			if (values.get("name") != null)
-				tenant.setName((String) values.get("name"));
+		if (form.validate()) {
+			if (form.getValue("name") != null)
+				tenant.setName(form.getValueAsString("name"));
 
-			tenant.setDisplayName((String) values.get("displayname"));
-			tenant.setStreet((String) values.get("address"));
-			tenant.setCity((String) values.get("city"));
-			tenant.setCountry((String) values.get("country"));
-			tenant.setState((String) values.get("state"));
-			tenant.setPostalCode((String) values.get("postalcode"));
-			tenant.setTelephone((String) values.get("phone"));
-			tenant.setEmail((String) values.get(EMAIL));
-			tenant.setEnabled(Boolean.valueOf(values.get("eenabled").toString()));
-			tenant.setExpire((Date) values.get("expire"));
+			tenant.setDisplayName(form.getValueAsString("displayname"));
+			tenant.setStreet(form.getValueAsString("address"));
+			tenant.setCity(form.getValueAsString("city"));
+			tenant.setCountry(form.getValueAsString("country"));
+			tenant.setState(form.getValueAsString("state"));
+			tenant.setPostalCode(form.getValueAsString("postalcode"));
+			tenant.setTelephone(form.getValueAsString("phone"));
+			tenant.setEmail(form.getValueAsString(EMAIL));
+			tenant.setEnabled(Boolean.valueOf(form.getValueAsString("eenabled")));
+			tenant.setExpire((Date) form.getValue("expire"));
 		}
 
-		return !vm.hasErrors();
+		return !form.hasErrors();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

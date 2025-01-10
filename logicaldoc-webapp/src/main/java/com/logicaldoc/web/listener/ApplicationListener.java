@@ -197,7 +197,9 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			if (PluginRegistry.getInstance().isRestartRequired()) {
 				restartRequired();
 				log.warn("The application has to be restarted");
-				System.out.println("The application has to be restarted");
+
+				Logger console = LoggerFactory.getLogger("console");
+				console.warn("The application has to be restarted");
 			}
 		} finally {
 			writePidFile();
@@ -310,7 +312,9 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			pidCreated = true;
 		} catch (IOException e) {
 			log.warn(e.getMessage());
-			System.err.println("Cannot create pid file " + pidFile.getAbsolutePath());
+
+			Logger console = LoggerFactory.getLogger("console");
+			console.warn("Cannot create pid file {}", pidFile.getAbsolutePath());
 		}
 	}
 

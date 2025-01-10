@@ -243,4 +243,14 @@ public class TenantsPanel extends AdminPanel {
 		contextMenu.setItems(password, delete);
 		contextMenu.showContextMenu();
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

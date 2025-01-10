@@ -1,7 +1,5 @@
 package com.logicaldoc.gui.frontend.client.security.group;
 
-import java.util.Map;
-
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.TitleOrientation;
@@ -84,18 +82,26 @@ public class GroupPropertiesPanel extends HLayout {
 		addMember(form1);
 	}
 
-	@SuppressWarnings("unchecked")
 	boolean validate() {
-		Map<String, Object> values =  vm.getValues();
 		vm.validate();
 		if (Boolean.FALSE.equals(vm.hasErrors())) {
-			group.setDescription((String) values.get("description"));
-			group.setName((String) values.get("name"));
-			if (values.get(INHERIT) != null)
-				group.setInheritGroupId(Long.parseLong((String) values.get(INHERIT)));
+			group.setDescription(vm.getValueAsString("description"));
+			group.setName(vm.getValueAsString("name"));
+			if (vm.getValue(INHERIT) != null)
+				group.setInheritGroupId(Long.parseLong(vm.getValueAsString(INHERIT)));
 			else
 				group.setInheritGroupId(null);
 		}
 		return !vm.hasErrors();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

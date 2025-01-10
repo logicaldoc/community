@@ -78,8 +78,6 @@ public class WebserviceClient {
 
 		AbstractList<SoapObject> response = new ArrayList<>();
 		
-		System.out.println("response: "+response.getClass());
-		
 		if (envelope.getResponse() instanceof List) {
 			// We have more elements
 			@SuppressWarnings("unchecked")

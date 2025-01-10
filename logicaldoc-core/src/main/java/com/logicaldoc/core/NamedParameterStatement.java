@@ -109,26 +109,20 @@ public class NamedParameterStatement implements AutoCloseable {
 		boolean inDoubleQuote = false;
 		int index = 1;
 
-		for (int i = 0; i < length; i++) {
+		int i = 0;
+		while (i < length) {
 			char c = query.charAt(i);
-			if (inSingleQuote) {
-				if (c == '\'') {
-					inSingleQuote = false;
-				}
-			} else if (inDoubleQuote) {
-				if (c == '"') {
-					inDoubleQuote = false;
-				}
+			if (inSingleQuote && c == '\'') {
+				inSingleQuote = false;
+			} else if (inDoubleQuote && c == '"') {
+				inDoubleQuote = false;
 			} else {
 				if (c == '\'') {
 					inSingleQuote = true;
 				} else if (c == '"') {
 					inDoubleQuote = true;
 				} else if (c == ':' && i + 1 < length && Character.isJavaIdentifierStart(query.charAt(i + 1))) {
-					int j = i + 2;
-					while (j < length && Character.isJavaIdentifierPart(query.charAt(j)))
-						j++;
-					String name = query.substring(i + 1, j);
+					String name = getParameterName(query, i);
 					c = '?'; // replace the parameter with a question mark
 					i += name.length(); // skip past the end if the parameter
 
@@ -137,10 +131,18 @@ public class NamedParameterStatement implements AutoCloseable {
 				}
 			}
 			parsedQuery.append(c);
+			i++;
 		}
 
 		return parsedQuery.toString();
 
+	}
+
+	private static String getParameterName(String query, int currentPosition) {
+		int j = currentPosition + 2;
+		while (j < query.length() && Character.isJavaIdentifierPart(query.charAt(j)))
+			j++;
+		return query.substring(currentPosition + 1, j);
 	}
 
 	/**

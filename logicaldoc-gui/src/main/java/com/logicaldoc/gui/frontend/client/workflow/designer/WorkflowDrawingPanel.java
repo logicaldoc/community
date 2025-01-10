@@ -130,4 +130,14 @@ public class WorkflowDrawingPanel extends VStack {
 	public StateWidget getWidget(String id) {
 		return widgets.get(id);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

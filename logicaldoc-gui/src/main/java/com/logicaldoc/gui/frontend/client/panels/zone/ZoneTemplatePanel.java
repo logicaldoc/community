@@ -50,4 +50,14 @@ public abstract class ZoneTemplatePanel extends VLayout {
 	 * @return the ZoneCanvas instance
 	 */
 	protected abstract ZoneCanvas newZoneCanvas(GUIZone zone);
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

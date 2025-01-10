@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.webservice.doc.model.WebMethodStubSet;
 import com.logicaldoc.webservice.doc.model.WebServiceStubSet;
@@ -13,6 +16,8 @@ import com.logicaldoc.webservice.doc.view.freemarker.FreemarkerWebServiceDisplay
 import com.logicaldoc.webservice.doc.view.simple.SimpleJavaNameDisplayStrategy;
 
 public class WebserviceDocGen {
+
+	private static Logger console = LoggerFactory.getLogger("console");
 
 	public static void main(String[] args) throws ClassNotFoundException {
 		String release = args[0];
@@ -26,7 +31,7 @@ public class WebserviceDocGen {
 					name = "com.logicaldoc." + args[i];
 				services.add(WebserviceDocGen.class.forName(name));
 			} catch (Exception t) {
-				System.err.println(t.getMessage());
+				console.error(t.getMessage());
 			}
 		}
 
@@ -62,7 +67,7 @@ public class WebserviceDocGen {
 		File outputFile = new File(outputDir, fileName);
 		FileUtil.writeFile(html, outputFile.getAbsolutePath());
 
-		System.out.println("Please find the HTML files at " + outputFile.getAbsolutePath());
+		console.info("Please find the HTML files at {}", outputFile.getAbsolutePath());
 	}
 
 	public void singleReport(File outputDir, Class<?> webServiceClass) {
@@ -80,6 +85,6 @@ public class WebserviceDocGen {
 		File outputFile = new File(outputDir, fileName);
 		FileUtil.writeFile(html, outputFile.getAbsolutePath());
 
-		System.out.println("Please find the HTML files at " + outputFile.getAbsolutePath());
+		console.info("Please find the HTML files at {}", outputFile.getAbsolutePath());
 	}
 }

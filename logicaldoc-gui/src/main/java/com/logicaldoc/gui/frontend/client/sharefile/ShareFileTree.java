@@ -54,4 +54,14 @@ public class ShareFileTree extends TreeGrid {
 		}
 		return super.getIcon(rec, defaultState);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

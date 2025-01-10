@@ -906,4 +906,14 @@ public class SearchIndexPanel extends AdminPanel {
 			contextMenu.setItems(enable);
 		contextMenu.showContextMenu();
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

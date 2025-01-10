@@ -112,7 +112,7 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 	public static final int NATURE_DOC = 0;
 
 	private String comment;
-	
+
 	/**
 	 * The text of the last note put on the document
 	 */
@@ -929,37 +929,9 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 
 		try {
 			String test = CryptUtil.encryptSHA256(myPassword);
-			if (test.equals(getPassword()))
-				return true;
-
-			// The test with current algorithm failed so we try with the legacy
-			// one
-			String testLegacy = CryptUtil.encryptSHA(myPassword);
-			if (testLegacy.equals(getPassword())) {
-				// There is match with the old scheme, so update the database
-				// with the new one
-				setPassword(test);
-				fixEncryptedPassword(test);
-				return true;
-			}
-
-			return false;
+			return test.equals(getPassword());
 		} catch (Exception t) {
 			return false;
-		}
-	}
-
-	/**
-	 * Saves the password encrypted with current algorithm into the database
-	 * 
-	 * @param encryptedPassword The encrypted password to write
-	 */
-	private void fixEncryptedPassword(String encryptedPassword) {
-		try {
-			DocumentDAO docDao = Context.get(DocumentDAO.class);
-			docDao.jdbcUpdate("update ld_document set ld_password='" + encryptedPassword + "' where ld_id=" + getId());
-		} catch (PersistenceException e) {
-			log.warn(e.getMessage());
 		}
 	}
 

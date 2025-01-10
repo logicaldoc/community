@@ -41,24 +41,28 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	private static Map<SystemEventStatus, LinkedList<SystemEventListener>> systemEvents = new EnumMap<>(
 			SystemEventStatus.class);
 
-	// Singleton instance
-	private static Context instance;
-
 	// The Spring's application context
 	private ApplicationContext applicationContext;
 
+	private static Context instance;
+
 	private Context() {
-		instance = this;
+		// Do nothing
 	}
 
 	public static Context get() {
+		if (instance == null) {
+			synchronized (Context.class) {
+				instance = new Context();
+			}
+		}
 		return instance;
 	}
 
 	public static <R> R get(Class<R> requiredType) {
 		return get().getBean(requiredType);
 	}
-	
+
 	public static Object get(String id) {
 		return get().getBean(id);
 	}
@@ -137,10 +141,10 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	 * @return The bean instance
 	 */
 	public <R> R getBean(Class<R> requiredType) {
-		String id = requiredType.getName();
-		if (!applicationContext.containsBean(id))
-			id = id.substring(id.lastIndexOf('.') + 1);
-		return requiredType.cast(getBean(id));
+		if (containsBean(requiredType.getSimpleName()))
+			return requiredType.cast(getBean(requiredType.getSimpleName()));
+		else
+			return applicationContext.getBean(requiredType);
 	}
 
 	/**
@@ -267,7 +271,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	 * Closes this context
 	 */
 	public void close() {
-		if ((applicationContext instanceof org.springframework.context.ConfigurableApplicationContext configurableContext))
+		if (applicationContext instanceof org.springframework.context.ConfigurableApplicationContext configurableContext)
 			configurableContext.close();
 	}
 }

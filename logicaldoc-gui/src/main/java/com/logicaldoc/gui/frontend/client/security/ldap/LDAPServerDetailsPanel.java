@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUILDAPServer;
 import com.logicaldoc.gui.common.client.data.GroupsDS;
@@ -363,7 +363,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 		test.setAutoFit(true);
 		test.setTitle(I18N.message("testconnection"));
 		test.setDisabled(server.getId() == 0L);
-		test.addClickHandler((ClickEvent event) -> {
+		test.addClickHandler(event -> {
 			if (Boolean.FALSE.equals(vm.validate()))
 				return;
 
@@ -406,5 +406,15 @@ public class LDAPServerDetailsPanel extends VLayout {
 			});
 		});
 		return test;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

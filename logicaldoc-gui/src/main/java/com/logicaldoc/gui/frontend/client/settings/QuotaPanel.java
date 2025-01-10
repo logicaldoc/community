@@ -52,4 +52,14 @@ public class QuotaPanel extends AdminPanel {
 		body.setMembers(tenantQuota);
 		addMember(save);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }
