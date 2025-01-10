@@ -142,8 +142,7 @@ public class NamedParameterStatement implements AutoCloseable {
 		int j = currentPosition + 2;
 		while (j < query.length() && Character.isJavaIdentifierPart(query.charAt(j)))
 			j++;
-		String name = query.substring(currentPosition + 1, j);
-		return name;
+		return query.substring(currentPosition + 1, j);
 	}
 
 	/**

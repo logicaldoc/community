@@ -25,6 +25,8 @@ import com.logicaldoc.util.html.HTMLSanitizer;
  */
 public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<DocumentNote> implements DocumentNoteDAO {
 
+	private static final String DELETED_0 = ".deleted=0";
+
 	private static final String DOC_ID_DOC_ID_AND = ".docId = :docId and ";
 
 	private static final String DOC_ID = "docId";
@@ -117,7 +119,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 				params.put("types", types);
 
 				return findByWhere(
-						ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".type in (:types) and " + ENTITY + ".deleted=0", params,
+						ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".type in (:types) and " + ENTITY + DELETED_0, params,
 						null, null);
 			}
 		} else if (types == null || types.isEmpty()) {
@@ -125,7 +127,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 			params.put(DOC_ID, docId);
 			params.put("fileVersion", fileVersion);
 			return findByWhere(
-					ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion and " + ENTITY + ".deleted=0",
+					ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion and " + ENTITY + DELETED_0,
 					params, null, null);
 		} else {
 			Map<String, Object> params = new HashMap<>();
@@ -133,7 +135,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 			params.put("fileVersion", fileVersion);
 			params.put("types", types);
 			return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion and " + ENTITY
-					+ ".type in (:types) and " + ENTITY + ".deleted=0", params, null, null);
+					+ ".type in (:types) and " + ENTITY + DELETED_0, params, null, null);
 		}
 	}
 
