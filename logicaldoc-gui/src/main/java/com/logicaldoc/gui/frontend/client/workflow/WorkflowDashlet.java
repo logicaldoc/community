@@ -267,4 +267,14 @@ public class WorkflowDashlet extends Portlet {
 	public WorkflowDashboard getWorkflowDashboard() {
 		return workflowDashboard;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

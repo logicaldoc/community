@@ -32,7 +32,7 @@ select -1, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_
 
 insert into ld_user
            (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_enabled,ld_username,ld_password,ld_name,ld_firstname,ld_street,ld_postalcode,ld_city,ld_country,ld_language,ld_email,ld_telephone,ld_type,ld_passwordchanged,ld_passwordexpires,ld_source,ld_quota,ld_passwordexpired,ld_tenantid,ld_recordversion,ld_enforcewrktime,ld_evalform)
-values     (2,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'boss','d033e22ae348aeb566fc214aec3585c4da997','Meschieri','Marco','','','','','it','m.meschieri@logicalobjects.it','',0,null,0,0,-1,0,1,1,0,0);
+values     (2,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'boss','8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918','Meschieri','Marco','','','','','it','m.meschieri@logicalobjects.it','',0,null,0,0,-1,0,1,1,0,0);
 insert into ld_group
            (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_tenantid,ld_name,ld_type,ld_recordversion)
 values     (-2,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'_user_2',1,1);
@@ -41,7 +41,7 @@ values (-2,2);
 
 insert into ld_user
            (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_enabled,ld_username,ld_password,ld_name,ld_firstname,ld_street,ld_postalcode,ld_city,ld_country,ld_language,ld_email,ld_telephone,ld_type,ld_passwordchanged,ld_passwordexpires,ld_source,ld_quota,ld_passwordexpired,ld_tenantid,ld_recordversion,ld_enforcewrktime,ld_evalform)
-values     (3,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'sebastian','d033e22ae348aeb566fc214aec3585c4da997','Sebastian','Stein','','','','','de','seb_stein@gmx.de','',0,null,0,0,-1,0,1,1,0,0);
+values     (3,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'sebastian','8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918','Sebastian','Stein','','','','','de','seb_stein@gmx.de','',0,null,0,0,-1,0,1,1,0,0);
 insert into ld_group
            (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_tenantid,ld_name,ld_type,ld_recordversion)
 values     (-3,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'_user_3',1,1);
@@ -50,7 +50,7 @@ values (-3,3);
 
 insert into ld_user
            (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_enabled,ld_username,ld_password,ld_name,ld_firstname,ld_street,ld_postalcode,ld_city,ld_country,ld_language,ld_email,ld_telephone,ld_type,ld_passwordchanged,ld_passwordexpires,ld_source,ld_quota,ld_passwordexpired,ld_tenantid,ld_recordversion,ld_enforcewrktime,ld_evalform)
-values     (4,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'author','d033e22ae348aeb566fc214aec3585c4da997','Author','Author','','','','','de','author@acme.com','',0,null,0,0,-1,0,1,1,0,0);
+values     (4,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'author','8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918','Author','Author','','','','','de','author@acme.com','',0,null,0,0,-1,0,1,1,0,0);
 insert into ld_group
            (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_tenantid,ld_name,ld_type,ld_recordversion)
 values     (-4,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'_user_4',1,1);
@@ -59,7 +59,7 @@ values (-4,4);
 
 insert into ld_user
            (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_enabled,ld_username,ld_password,ld_name,ld_firstname,ld_street,ld_postalcode,ld_city,ld_country,ld_language,ld_email,ld_telephone,ld_type,ld_passwordchanged,ld_passwordexpires,ld_source,ld_quota,ld_passwordexpired,ld_tenantid,ld_recordversion,ld_enforcewrktime,ld_evalform)
-values     (5,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,0,'test','d033e22ae348aeb566fc214aec3585c4da997','test','Test','','','','','de','test@acme.com','',0,null,0,0,-1,0,1,1,0,0);
+values     (5,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,0,'test','8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918','test','Test','','','','','de','test@acme.com','',0,null,0,0,-1,0,1,1,0,0);
 insert into ld_group
            (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_tenantid,ld_name,ld_type,ld_recordversion)
 values     (-5,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'_user_5',1,1);
@@ -69,7 +69,7 @@ values (-5,5);
 -- add user guest
 insert into ld_user
            (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_enabled,ld_username,ld_password,ld_name,ld_firstname,ld_street,ld_postalcode,ld_city,ld_country,ld_language,ld_email,ld_telephone,ld_type,ld_passwordchanged,ld_passwordexpires,ld_source,ld_quota,ld_passwordexpired,ld_tenantid,ld_recordversion,ld_enforcewrktime,ld_evalform)
-values     (6,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'guest','d033e22ae348aeb566fc214aec3585c4da997','test','Test','','','','','de','test@acme.com','',0,null,0,0,-1,0,1,1,0,0);
+values     (6,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'guest','8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918','test','Test','','','','','de','test@acme.com','',0,null,0,0,-1,0,1,1,0,0);
 --insert into ld_group
 --           (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_tenantid,ld_name,ld_type,ld_recordversion)
 --values     (-6,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'_user_6',1,1);

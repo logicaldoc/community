@@ -73,4 +73,14 @@ public class PrimitivesToolstrip extends ToolStrip {
 		newFork.setDisabled(wf == null || wf.getName().isEmpty());
 		newJoin.setDisabled(wf == null || wf.getName().isEmpty());
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

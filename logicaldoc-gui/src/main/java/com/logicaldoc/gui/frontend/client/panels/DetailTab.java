@@ -44,4 +44,14 @@ public abstract class DetailTab extends HLayout {
 	public void handleErrors(ServerValidationError[] errors) {
 		// Nothing to do
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

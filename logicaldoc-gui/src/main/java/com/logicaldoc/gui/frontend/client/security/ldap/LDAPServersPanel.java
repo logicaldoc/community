@@ -221,4 +221,14 @@ public class LDAPServersPanel extends AdminPanel {
 
 		list.refreshRow(list.getRecordIndex(rec));
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

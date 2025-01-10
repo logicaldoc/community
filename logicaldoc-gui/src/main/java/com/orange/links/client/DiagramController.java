@@ -576,16 +576,14 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 
 		// Search for selectable area
 		if (!inDragBuildArrow) {
-			for (FunctionShape s : shapes) {
-				if (s.isMouseNearSelectableArea(mousePoint)) {
-					s.highlightSelectableArea(mousePoint);
+			for (FunctionShape shape : shapes) {
+				if (shape.isMouseNearSelectableArea(mousePoint)) {
+					shape.highlightSelectableArea(mousePoint);
 					inEditionSelectableShapeToDrawConnection = true;
-					startFunctionWidget = s.asWidget();
+					startFunctionWidget = shape.asWidget();
 					RootPanel.getBodyElement().getStyle().setCursor(Cursor.POINTER);
 
-					Widget w = s.getWidget();
-					if (w instanceof StateWidget state)
-						state.update();
+					updateStateWidget(shape);
 					return;
 				}
 				inEditionSelectableShapeToDrawConnection = false;
@@ -593,22 +591,14 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 		} else {
 			// Don't go deeper if in edition mode
 			// If mouse over a widget, highlight it
-			FunctionShape s = getShapeUnderMouse();
-			if (s != null) {
-				s.drawHighlight();
-				highlightFunctionShape = s;
-			} else if (highlightFunctionShape != null) {
-				highlightFunctionShape.draw();
-				highlightFunctionShape = null;
-			}
-			clearAnimationsOnCanvas();
+			highlightWidgetUnderMouse();
 		}
 
 		// Test if in Drag Movable Point
 		if (!inDragMovablePoint && !inDragBuildArrow) {
-			for (Connection c : connections) {
-				if (c.isMouseNearConnection(mousePoint)) {
-					highlightPoint = c.highlightMovablePoint(mousePoint);
+			for (Connection connection : connections) {
+				if (connection.isMouseNearConnection(mousePoint)) {
+					highlightPoint = connection.highlightMovablePoint(mousePoint);
 					highlightConnection = getConnectionNearMouse();
 					inEditionDragMovablePoint = true;
 					RootPanel.getBodyElement().getStyle().setCursor(Cursor.POINTER);
@@ -618,6 +608,24 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 			}
 		}
 
+		clearAnimationsOnCanvas();
+	}
+
+	private void updateStateWidget(FunctionShape shape) {
+		Widget w = shape.getWidget();
+		if (w instanceof StateWidget state)
+			state.update();
+	}
+
+	private void highlightWidgetUnderMouse() {
+		FunctionShape s = getShapeUnderMouse();
+		if (s != null) {
+			s.drawHighlight();
+			highlightFunctionShape = s;
+		} else if (highlightFunctionShape != null) {
+			highlightFunctionShape.draw();
+			highlightFunctionShape = null;
+		}
 		clearAnimationsOnCanvas();
 	}
 

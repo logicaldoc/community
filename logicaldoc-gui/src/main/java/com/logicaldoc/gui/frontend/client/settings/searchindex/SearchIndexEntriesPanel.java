@@ -169,4 +169,14 @@ public class SearchIndexEntriesPanel extends VLayout {
 		contextMenu.setItems(openInFolder, deleteEntry);
 		contextMenu.showContextMenu();
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

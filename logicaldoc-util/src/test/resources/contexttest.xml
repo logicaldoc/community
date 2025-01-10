@@ -34,7 +34,7 @@
 
     <bean id="ContextProperties" class="com.logicaldoc.util.config.ContextProperties" />
 
-    <bean id="Context" class="com.logicaldoc.util.Context" />
+	<bean id="Context" class="com.logicaldoc.util.Context" factory-method="get" lazy-init="false" />
 
     <!-- DataSource -->
     <bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">

@@ -21,7 +21,16 @@ public class AutoDeleteZipInputStream extends ZipInputStream {
 	@Override
 	public void close() throws IOException {
 		wrapped.close();
-		if (zipFile != null)
-			FileUtil.delete(zipFile);
+		FileUtil.delete(zipFile);
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

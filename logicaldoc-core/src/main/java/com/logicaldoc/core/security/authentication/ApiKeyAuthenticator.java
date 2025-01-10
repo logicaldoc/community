@@ -4,11 +4,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
@@ -16,6 +15,7 @@ import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.apikey.ApiKey;
 import com.logicaldoc.core.security.apikey.ApiKeyDAO;
 import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
 
 /**
  * This authenticator uses the API Key
@@ -28,10 +28,11 @@ public class ApiKeyAuthenticator extends DefaultAuthenticator {
 
 	protected static Logger log = LoggerFactory.getLogger(ApiKeyAuthenticator.class);
 
-	@Resource(name = "ApiKeyDAO")
 	protected ApiKeyDAO apiKeyDAO;
 
-	public void setApiKeyDAO(ApiKeyDAO apiKeyDAO) {
+	@Autowired
+	public ApiKeyAuthenticator(UserDAO userDAO, ApiKeyDAO apiKeyDAO) {
+		super(userDAO);
 		this.apiKeyDAO = apiKeyDAO;
 	}
 

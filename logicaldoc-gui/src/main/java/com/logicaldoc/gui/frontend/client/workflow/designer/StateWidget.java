@@ -268,4 +268,14 @@ public class StateWidget extends Label {
 	public GUITransition getTransition() {
 		return transition;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

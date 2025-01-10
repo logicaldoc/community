@@ -12,6 +12,8 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.jdom2.CDATA;
 import org.jdom2.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for manipulating log4j.xml file
@@ -234,6 +236,7 @@ public class LogConfigurator {
 	}
 
 	public void initializeLogging() {
+		Logger log = LoggerFactory.getLogger("console");
 		String log4jPath = null;
 		try {
 			log4jPath = getLogConfigFilePath();
@@ -245,12 +248,12 @@ public class LogConfigurator {
 			lconf.write();
 
 			// Init the logs
-			System.out.println(String.format("Initializing the logging taking configuration from %s", log4jPath));
+			log.info("Initializing the logging taking configuration from {}", log4jPath);
 			LoggerContext lContext = Configurator.initialize(null, log4jPath);
 			if (lContext == null)
 				throw new IOException("Null logger context");
 		} catch (Exception e) {
-			System.err.println(String.format("Cannot initialize the log: %s", e.getMessage()));
+			log.error("Cannot initialize the log: {}", e.getMessage());
 		}
 	}
 

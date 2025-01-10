@@ -65,8 +65,6 @@ public class SimpleJavaNameDisplayStrategy implements JavaNameDisplayStrategy {
 		String className = clazz.getSimpleName();
 		if (className.endsWith("Service"))
 			className = className.substring(0, className.length() - "Service".length());
-		System.out.println(className);
-
 		return SimpleClassNameDisplayUtils.display(className);
 	}
 

@@ -14,7 +14,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -28,9 +27,7 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 public class WebcontentCreate extends Window {
 	private static final String TEMPLATE = "template";
 
-	private SubmitItem create;
-
-	private ValuesManager vm;
+	DynamicForm form = new DynamicForm();
 
 	public WebcontentCreate() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
@@ -41,9 +38,6 @@ public class WebcontentCreate extends Window {
 		setAutoSize(true);
 		centerInPage();
 
-		DynamicForm form = new DynamicForm();
-		vm = new ValuesManager();
-		form.setValuesManager(vm);
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(1);
 
@@ -53,7 +47,7 @@ public class WebcontentCreate extends Window {
 
 		SelectItem template = ItemFactory.newTemplateSelector(true, null);
 
-		create = new SubmitItem();
+		SubmitItem create = new SubmitItem();
 		create.setTitle(I18N.message("create"));
 		create.addClickHandler(event -> onCreate());
 
@@ -63,17 +57,17 @@ public class WebcontentCreate extends Window {
 	}
 
 	public void onCreate() {
-		if (Boolean.FALSE.equals(vm.validate()))
+		if (!form.validate())
 			return;
 		GUIDocument vo = new GUIDocument();
-		String title = vm.getValueAsString("title").trim();
+		String title = form.getValueAsString("title").trim();
 		if (title.lastIndexOf('.') != -1)
 			title = title.substring(0, title.lastIndexOf('.'));
 
-		if (vm.getValueAsString(TEMPLATE) == null || "".equals(vm.getValueAsString(TEMPLATE)))
+		if (form.getValueAsString(TEMPLATE) == null || "".equals(form.getValueAsString(TEMPLATE)))
 			vo.setTemplateId(null);
 		else {
-			vo.setTemplateId(Long.parseLong(vm.getValueAsString(TEMPLATE)));
+			vo.setTemplateId(Long.parseLong(form.getValueAsString(TEMPLATE)));
 		}
 
 		vo.setType("html");
@@ -108,5 +102,15 @@ public class WebcontentCreate extends Window {
 				});
 
 		destroy();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

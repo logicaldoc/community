@@ -535,6 +535,15 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
+    <RollingFile name="console_file" fileName="${root}/console.log" filePattern="${root}/console.log.%i">
+      <PatternLayout>
+        <Pattern>${pattern}</Pattern>
+      </PatternLayout>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>     
     <Console name="console" target="SYSTEM_OUT">
       <PatternLayout pattern="%m%n"/>
     </Console>          
@@ -684,9 +693,6 @@
       <Appender-Ref ref="ZonalOCRProcessor" />
       <Appender-Ref ref="ZonalOCRProcessor_WEB" />
     </Logger>
-    <Logger name="console" level="debug" additivity="false">
-       <Appender-Ref ref="console" />
-    </Logger>
     
     <Logger name="com.logicaldoc.core" level="info" additivity="true" />
     <Logger name="com.logicaldoc.web" level="info" additivity="true" />
@@ -698,6 +704,11 @@
     <Logger name="org.apache.solr" level="error" additivity="true" />
     <Logger name="org.jgroups.protocols" level="error" additivity="true" />
     <Logger name="org.hibernate.cache" level="warn" additivity="true" />    
+    
+    <Logger name="console" level="debug" additivity="false">
+       <Appender-Ref ref="console" />
+       <Appender-Ref ref="console_file" />
+    </Logger>
     
     <Root level="info">
       <AppenderRef ref="DMS" />

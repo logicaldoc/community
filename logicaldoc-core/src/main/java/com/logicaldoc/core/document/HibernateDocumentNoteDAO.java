@@ -50,7 +50,8 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	}
 
 	private void updateLastNote(Document doccument, DocumentNote note) {
-		// In case of note on the whole document, update the document's lastNote field
+		// In case of note on the whole document, update the document's lastNote
+		// field
 		if (note.getPage() == 0)
 			ThreadPools.get().execute(() -> {
 				try {
@@ -115,20 +116,24 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 				params.put(DOC_ID, docId);
 				params.put("types", types);
 
-				return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".type in (:types)", params, null, null);
+				return findByWhere(
+						ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".type in (:types) and " + ENTITY + ".deleted=0", params,
+						null, null);
 			}
 		} else if (types == null || types.isEmpty()) {
 			Map<String, Object> params = new HashMap<>();
 			params.put(DOC_ID, docId);
 			params.put("fileVersion", fileVersion);
-			return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion", params, null, null);
+			return findByWhere(
+					ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion and " + ENTITY + ".deleted=0",
+					params, null, null);
 		} else {
 			Map<String, Object> params = new HashMap<>();
 			params.put(DOC_ID, docId);
 			params.put("fileVersion", fileVersion);
 			params.put("types", types);
 			return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion and " + ENTITY
-					+ ".type in (:types)", params, null, null);
+					+ ".type in (:types) and " + ENTITY + ".deleted=0", params, null, null);
 		}
 	}
 
@@ -136,7 +141,6 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	public List<DocumentNote> findByUserId(long userId) throws PersistenceException {
 		return findByWhere(ENTITY + ".userId =" + userId, "order by " + ENTITY + ".date desc", null);
 	}
-
 
 	@Override
 	public void delete(long id, int code) throws PersistenceException {

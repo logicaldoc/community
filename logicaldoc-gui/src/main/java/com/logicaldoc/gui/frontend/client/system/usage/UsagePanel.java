@@ -45,4 +45,14 @@ public class UsagePanel extends VLayout {
 		grid = new SystemUsageGrid(true, tenantId);
 		addMember(grid);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

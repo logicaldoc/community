@@ -41,8 +41,7 @@
 		<constructor-arg value="contexttest.properties" />
 	</bean>
 
-	<bean id="Context" class="com.logicaldoc.util.Context"
-		abstract="false" lazy-init="default" autowire="default" />
+    <bean id="Context" class="com.logicaldoc.util.Context" factory-method="get" lazy-init="false" />
 
 	<!-- DataSource -->
 	<bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">

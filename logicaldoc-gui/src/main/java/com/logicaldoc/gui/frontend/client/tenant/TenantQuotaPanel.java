@@ -206,4 +206,14 @@ public class TenantQuotaPanel extends HLayout {
 			for (int i = 0; i < usernames.length; i++)
 				tenant.addQuotaAlertRecipient(usernames[i]);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

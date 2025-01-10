@@ -51,7 +51,6 @@ public class CryptUtilTest {
 		assertNotSame("pippo", encryptedString);
 		assertEquals("pippo", testSubject.decrypt(encryptedString));
 
-		assertEquals("d012f68144edf121d3cc330a17eec528c2e7d59", CryptUtil.encryptSHA("pippo"));
 		assertEquals("A2242EAD55C94C3DEB7CF2340BFEF9D5BCACA22DFE66E646745EE4371C633FC8",
 				CryptUtil.encryptSHA256("pippo"));
 	}

@@ -11,7 +11,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.BooleanItem;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -29,7 +28,7 @@ public class ZohoCheckin extends Window {
 
 	private SubmitItem checkin;
 
-	private ValuesManager vm;
+	private DynamicForm form = new DynamicForm();
 
 	public ZohoCheckin(final GUIDocument document, final ZohoEditor parentDialog) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
@@ -41,10 +40,6 @@ public class ZohoCheckin extends Window {
 		setShowModalMask(true);
 		centerInPage();
 		setPadding(2);
-
-		DynamicForm form = new DynamicForm();
-		vm = new ValuesManager();
-		form.setValuesManager(vm);
 
 		BooleanItem versionItem = new BooleanItem();
 		versionItem.setName(MAJORVERSION);
@@ -65,11 +60,11 @@ public class ZohoCheckin extends Window {
 	}
 
 	public void onCheckin(final GUIDocument document, final ZohoEditor parentDialog) {
-		if (Boolean.FALSE.equals(vm.validate()))
+		if (!form.validate())
 			return;
 		LD.contactingServer();
-		ZohoService.Instance.get().checkin(document.getId(), vm.getValueAsString("comment"),
-				Boolean.valueOf(vm.getValueAsString(MAJORVERSION)), new DefaultAsyncCallback<>() {
+		ZohoService.Instance.get().checkin(document.getId(), form.getValueAsString("comment"),
+				Boolean.valueOf(form.getValueAsString(MAJORVERSION)), new DefaultAsyncCallback<>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						super.onFailure(caught);
@@ -85,5 +80,15 @@ public class ZohoCheckin extends Window {
 						DocumentController.get().setCurrentDocument(result);
 					}
 				});
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
 	}
 }

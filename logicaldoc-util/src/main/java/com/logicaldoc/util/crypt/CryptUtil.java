@@ -149,29 +149,6 @@ public class CryptUtil {
 	}
 
 	/**
-	 * This method encodes a given string using the SHA algorithm. This method
-	 * will be dismissed in the future.
-	 * 
-	 * @param original String to encode
-	 * 
-	 * @return Encoded string
-	 * 
-	 * @throws NoSuchAlgorithmException Cripting exception
-	 */
-	public static String encryptSHA(String original) throws NoSuchAlgorithmException {
-		StringBuilder copy = new StringBuilder();
-
-		MessageDigest md = MessageDigest.getInstance("SHA");
-		byte[] digest = md.digest(original.getBytes(StandardCharsets.UTF_8));
-
-		for (int i = 0; i < digest.length; i++) {
-			copy.append(Integer.toHexString(digest[i] & 0xFF));
-		}
-
-		return copy.toString();
-	}
-
-	/**
 	 * This method encodes a given string using the SHA-256 algorithm
 	 * 
 	 * @param original String to encode

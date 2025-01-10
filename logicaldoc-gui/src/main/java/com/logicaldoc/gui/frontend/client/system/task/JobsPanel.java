@@ -140,4 +140,14 @@ public class JobsPanel extends VLayout {
 		if (group.getValue() != null)
 			list.refresh(new JobsDS(max.getValueAsInteger(), group.getValueAsString()));
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }

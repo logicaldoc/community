@@ -6,6 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A password generator utility
  * 
@@ -36,14 +39,15 @@ public class PasswordGenerator {
 	}
 
 	public static void main(String[] args) {
+		Logger console = LoggerFactory.getLogger("console");
 
-		System.out.format("String for password \t\t\t: %s%n", PASSWORD_ALLOW_BASE);
-		System.out.format("String for password (shuffle) \t: %s%n%n", PASSWORD_ALLOW);
+		console.info("String for password \t\t\t: {}", PASSWORD_ALLOW_BASE);
+		console.info("String for password (shuffle) \t: {}", PASSWORD_ALLOW);
 
 		// generate 5 random password
 		for (int i = 0; i < 5; i++) {
-			System.out.println("password: " + generate(16, 2, 2, 1, 1, 4, 2));
-			System.out.println("\n");
+			if (console.isInfoEnabled())
+				console.info("password: {} \n", generate(16, 2, 2, 1, 1, 4, 2));
 		}
 
 	}
@@ -88,11 +92,11 @@ public class PasswordGenerator {
 			throw new IllegalArgumentException(
 					String.format("Cannot generate password with less than %d chars", minLength));
 
-		PasswordCriteria criteria=new PasswordCriteria(minLength, uppercaseChars, lowercaseChars, digits,
+		PasswordCriteria criteria = new PasswordCriteria(minLength, uppercaseChars, lowercaseChars, digits,
 				specialChars);
 		criteria.setMaxSequenceSize(maxSequenceSize);
 		criteria.setMaxOccurrences(maxOccurrences);
-		
+
 		PasswordValidator validator = new PasswordValidator(criteria, null);
 
 		String pswd = "";

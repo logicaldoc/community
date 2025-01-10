@@ -53,9 +53,7 @@ public class UserSecurityPanel extends VLayout {
 		boolean readonly = (changedHandler == null);
 		form.clearValues();
 		form.clearErrors(false);
-
-		if (form != null)
-			form.destroy();
+		form.destroy();
 
 		if (Boolean.TRUE.equals(contains(form)))
 			removeChild(form);
@@ -170,8 +168,8 @@ public class UserSecurityPanel extends VLayout {
 	boolean validate() {
 		if (form.validate()) {
 			user.setPasswordExpires(Boolean.parseBoolean(form.getValueAsString("passwordExpires")));
-			user.setEnabled(Boolean.parseBoolean(form.getValueAsString("eenabled").toString()));
-			user.setEnforceWorkingTime(Boolean.parseBoolean(form.getValueAsString(ENFORCEWORKINGTIME).toString()));
+			user.setEnabled(Boolean.parseBoolean(form.getValueAsString("eenabled")));
+			user.setEnforceWorkingTime(Boolean.parseBoolean(form.getValueAsString(ENFORCEWORKINGTIME)));
 			user.setMaxInactivity((Integer) form.getValue("maxinactivity"));
 			user.setExpire((Date) form.getValue("expireson"));
 			user.setSecondFactor(form.getValueAsString("2fa"));

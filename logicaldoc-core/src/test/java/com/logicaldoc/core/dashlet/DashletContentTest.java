@@ -96,7 +96,6 @@ public class DashletContentTest extends AbstractCoreTestCase {
 		response = new MockServletResponse(responseFile);
 		testSubject.service(mockRequest, response);
 		response.flushBuffer();
-		System.out.println(FileUtil.readFile(responseFile));
 		assertEquals("", FileUtil.readFile(responseFile));
 
 	}

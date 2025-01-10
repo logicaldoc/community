@@ -104,4 +104,14 @@ public abstract class ZoneCanvas extends Label {
 	 * Abstract method invoked when the user wants to edit a zone
 	 */
 	protected abstract void onEdit();
+
+	@Override
+	public boolean equals(Object other) {
+		return super.equals(other);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }
