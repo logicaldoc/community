@@ -67,7 +67,7 @@ public class LockManager {
 	 */
 	public boolean get(String lockName, String transactionId) {
 		GregorianCalendar cal = new GregorianCalendar();
-		cal.add(Calendar.SECOND, config.getInt("lock.wait"));
+		cal.add(Calendar.SECOND, config.getInt("lock.wait", 10));
 		Date ldDate = cal.getTime();
 		while (new Date().before(ldDate)) {
 			try {
