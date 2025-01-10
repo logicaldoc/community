@@ -221,7 +221,7 @@ public abstract class Task implements Runnable {
 			transactionId = UUID.randomUUID().toString();
 			if (isConcurrent() || (lockManager != null && lockManager.get(getName(), transactionId)))
 				runTask();
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 			log.error("The task is stopped");
 			lastRunError = e;
