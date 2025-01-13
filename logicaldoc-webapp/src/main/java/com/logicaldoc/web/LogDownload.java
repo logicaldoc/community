@@ -9,9 +9,12 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -23,7 +26,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,26 +133,34 @@ public class LogDownload extends HttpServlet {
 		File tmp = FileUtil.createTempFile("logs", ".zip");
 
 		try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(tmp));) {
-
-			LogConfigurator conf = new LogConfigurator();
-			Collection<String> appenders = conf.getAppenders();
-
 			/*
 			 * Store the log files in the zip file
 			 */
-			for (String appender : appenders) {
-				if (appender.endsWith("_WEB"))
-					continue;
+			LogConfigurator conf = new LogConfigurator();
+			File logsDir = new File(conf.getLogsRoot());
+			File[] files = logsDir.listFiles();
 
-				File logFile = new File(conf.getFile(appender, true));
-				writeEntry(out, "logicaldoc/logs/" + logFile.getName(), logFile);
+			// Sort by descending modified date
+			Arrays.sort(files, Comparator.comparingLong(File::lastModified).reversed());
+
+			// Take max 10 files of each type
+			Map<String, Integer> counter = new HashMap<>();
+			for (File file : files) {
+				String baseName = StringUtils.substringBefore(FilenameUtils.getBaseName(file.getName()), ".");
+				counter.computeIfAbsent(baseName, k -> Integer.valueOf(0));
+
+				// store just the latest logs
+				if (file.length() > 0 && counter.get(baseName) < 10
+						&& !file.getName().toLowerCase().contains(".html")) {
+					writeEntry(out, "logicaldoc/logs/" + file.getName(), file);
+					counter.computeIfPresent(baseName, (k, v) -> v + 1);
+				}
 			}
 
 			/*
 			 * Now create a copy of the configuration and store it in the zip
 			 * file
 			 */
-			File buf;
 			OrderedProperties prop = writeContextPropertiesDump(out);
 
 			/*
@@ -160,7 +173,7 @@ public class LogDownload extends HttpServlet {
 			 */
 			String env = SystemUtil.printEnvironment();
 			env += "\n\n" + printDatabaseEnvironment();
-			buf = FileUtil.createTempFile("environment", ".txt");
+			File buf = FileUtil.createTempFile("environment", ".txt");
 			FileUtil.writeFile(env, buf.getPath());
 
 			writeEntry(out, "logicaldoc/conf/environment.txt", buf);
@@ -211,20 +224,23 @@ public class LogDownload extends HttpServlet {
 	}
 
 	private void writeTomcatLogs(ZipOutputStream out, File webappDir) throws IOException {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		String today = df.format(new Date());
 		File logsDir = new File(webappDir.getPath() + "/logs");
 		File[] files = logsDir.listFiles();
-		for (File file : files) {
-			if (file.isDirectory()
-					|| (!file.getName().toLowerCase().endsWith(".log") && !file.getName().toLowerCase().endsWith(".out")
-							&& !file.getName().toLowerCase().endsWith(".txt")))
-				continue;
 
-			// store just the logs of today
-			if (file.getName().toLowerCase().endsWith(".out") || file.getName().toLowerCase().endsWith(today + ".log")
-					|| file.getName().toLowerCase().endsWith(today + ".txt"))
+		// Sort by descending modified date
+		Arrays.sort(files, Comparator.comparingLong(File::lastModified).reversed());
+
+		// Take max 10 files of each type
+		Map<String, Integer> counter = new HashMap<>();
+		for (File file : files) {
+			String baseName = StringUtils.substringBefore(FilenameUtils.getBaseName(file.getName()), ".");
+			counter.computeIfAbsent(baseName, k -> Integer.valueOf(0));
+
+			// store just the latest logs
+			if (file.length() > 0 && counter.get(baseName) < 10) {
 				writeEntry(out, "tomcat/logs/" + file.getName(), file);
+				counter.computeIfPresent(file.getName(), (k, v) -> v + 1);
+			}
 		}
 	}
 
