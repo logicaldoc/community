@@ -4,31 +4,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.UsersDS;
-import com.logicaldoc.gui.common.client.formatters.UserCellFormatter;
-import com.logicaldoc.gui.common.client.formatters.UserDateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.EnabledListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.formatters.UserCellFormatter;
+import com.logicaldoc.gui.common.client.widgets.grid.formatters.UserDateCellFormatter;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.security.twofactorsauth.TwoFactorsAuthenticationDialog;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.AutoFitWidthApproach;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
@@ -63,9 +62,7 @@ public class UsersPanel extends AdminPanel {
 
 	private static final String GUEST = "guest";
 
-	private static final String EENABLED = "eenabled";
-
-	private static final String ENABLED_ICON = "enabledIcon";
+	private static final String ENABLED = "eenabled";
 
 	private static final String EMAIL = "email";
 
@@ -210,18 +207,7 @@ public class UsersPanel extends AdminPanel {
 		creation.setCellFormatter(new UserDateCellFormatter(false));
 		creation.setHidden(true);
 
-		ListGridField enabledIcon = new ListGridField(ENABLED_ICON, " ", 30);
-		enabledIcon.setType(ListGridFieldType.IMAGE);
-		enabledIcon.setCanSort(false);
-		enabledIcon.setAlign(Alignment.CENTER);
-		enabledIcon.setShowDefaultContextMenu(false);
-		enabledIcon.setImageURLPrefix(Util.imagePrefix());
-		enabledIcon.setImageURLSuffix(".gif");
-		enabledIcon.setCanFilter(false);
-
-		ListGridField enabled = new ListGridField(EENABLED, I18N.message("enabled"), 55);
-		enabled.setCanFilter(true);
-		enabled.setHidden(true);
+		ListGridField enabled = new EnabledListGridField();
 
 		ListGridField guest = new ListGridField(GUEST, I18N.message(GUEST), 55);
 		guest.setCanFilter(true);
@@ -253,8 +239,8 @@ public class UsersPanel extends AdminPanel {
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
 		list.setDataSource(new UsersDS(null, true, false));
-		list.setFields(id, enabledIcon, avatar, username, firstName, name, email, creation, lastLogin, expire, company,
-				department, building, organizationalUnit, city, phone, cell, groups, enabled, guest, timeZone, source);
+		list.setFields(id, enabled, avatar, username, firstName, name, email, creation, lastLogin, expire, company,
+				department, building, organizationalUnit, city, phone, cell, groups, guest, timeZone, source);
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -312,8 +298,7 @@ public class UsersPanel extends AdminPanel {
 		rec.setAttribute("cell", user.getCell());
 		rec.setAttribute(PHONE, user.getPhone());
 		rec.setAttribute("expire", user.getExpire());
-		rec.setAttribute(EENABLED, user.isEnabled());
-		rec.setAttribute(ENABLED_ICON, user.isEnabled() ? "0" : "2");
+		rec.setAttribute(ENABLED, user.isEnabled());
 		rec.setAttribute(GUEST, user.isReadOnly());
 		rec.setAttribute(SOURCE, user.getSource());
 		rec.setAttribute("city", user.getCity());
@@ -357,7 +342,7 @@ public class UsersPanel extends AdminPanel {
 
 		List<MenuItem> items = new ArrayList<>();
 		if (!Session.get().isAdmin()) {
-			if (Boolean.TRUE.equals(list.getSelectedRecord().getAttributeAsBoolean(EENABLED)))
+			if (Boolean.TRUE.equals(list.getSelectedRecord().getAttributeAsBoolean(ENABLED)))
 				items.add(disableUser);
 			else
 				items.add(enableUser);
@@ -365,7 +350,7 @@ public class UsersPanel extends AdminPanel {
 		items.add(password);
 
 		if (!ADMIN.equals(list.getSelectedRecord().getAttributeAsString(USERNAME))) {
-			if (Boolean.TRUE.equals(list.getSelectedRecord().getAttributeAsBoolean(EENABLED)))
+			if (Boolean.TRUE.equals(list.getSelectedRecord().getAttributeAsBoolean(ENABLED)))
 				items.add(disableUser);
 			else
 				items.add(enableUser);
@@ -404,8 +389,7 @@ public class UsersPanel extends AdminPanel {
 				.changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), false, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						list.getSelectedRecord().setAttribute(ENABLED_ICON, "2");
-						list.getSelectedRecord().setAttribute(EENABLED, false);
+						list.getSelectedRecord().setAttribute(ENABLED, false);
 						list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
 						onSelectUser(list.getSelectedRecord().getAttributeAsLong("id"));
 					}
@@ -420,8 +404,7 @@ public class UsersPanel extends AdminPanel {
 				.changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), true, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						list.getSelectedRecord().setAttribute(ENABLED_ICON, "0");
-						list.getSelectedRecord().setAttribute(EENABLED, true);
+						list.getSelectedRecord().setAttribute(ENABLED, true);
 						list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
 						onSelectUser(list.getSelectedRecord().getAttributeAsLong("id"));
 					}
@@ -486,7 +469,7 @@ public class UsersPanel extends AdminPanel {
 	void refresh() {
 		list.refresh(new UsersDS(null, true, false));
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

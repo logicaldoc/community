@@ -21,7 +21,7 @@ import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileVersionListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.IconGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.TypeIconGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
@@ -106,7 +106,7 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 		ListGridField message = new ListGridField("message", I18N.message("message"));
 		FileNameListGridField fileName = new FileNameListGridField();
 		ListGridField fileVersion = new FileVersionListGridField();
-		ListGridField icon = new IconGridField();
+		ListGridField icon = new TypeIconGridField();
 
 		readingsGrid = new RefreshableListGrid(new ReadingRequestsDS(true, null)) {
 			@Override

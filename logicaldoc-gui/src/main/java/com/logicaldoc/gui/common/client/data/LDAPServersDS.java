@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.common.client.data;
 
 import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.fields.DataSourceImageField;
+import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -18,7 +18,7 @@ public class LDAPServersDS extends DataSource {
 		DataSourceTextField id = new DataSourceTextField("id");
 		id.setPrimaryKey(true);
 		DataSourceTextField src = new DataSourceTextField("url");
-		DataSourceImageField enabled = new DataSourceImageField("eenabled");
+		DataSourceBooleanField enabled = new DataSourceBooleanField("eenabled");
 
 		setFields(id, src, enabled);
 		setDataURL("data/ldapservers.xml");

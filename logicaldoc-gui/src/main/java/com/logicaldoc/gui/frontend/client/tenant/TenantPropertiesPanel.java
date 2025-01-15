@@ -10,7 +10,6 @@ import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
@@ -58,9 +57,6 @@ public class TenantPropertiesPanel extends HLayout {
 
 	public void refresh() {
 		boolean readonly = prepareForm();
-
-		CheckboxItem enabled = new CheckboxItem("eenabled", I18N.message("enabled"));
-		enabled.setValue(tenant.isEnabled());
 
 		TextItem name = prepareNameItem(readonly);
 
@@ -113,14 +109,12 @@ public class TenantPropertiesPanel extends HLayout {
 			email.addChangedHandler(changedHandler);
 
 		if (readonly || tenant.isDefault()) {
-			enabled.setDisabled(true);
 			expire.setDisabled(true);
 		} else {
-			enabled.addChangedHandler(changedHandler);
 			expire.addChangedHandler(changedHandler);
 		}
 
-		form.setItems(name, enabled, expire, displayName, email, address, postalcode, city, country, state, phone);
+		form.setItems(name, displayName, expire, email, address, postalcode, city, country, state, phone);
 		addMember(layout);
 	}
 

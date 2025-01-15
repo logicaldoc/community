@@ -13,7 +13,7 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.IconGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.TypeIconGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.AuditService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -91,7 +91,7 @@ public class PersonalSubscriptions extends com.smartgwt.client.widgets.Window {
 		id.setWidth(50);
 		id.setHidden(true);
 
-		ListGridField icon = new IconGridField();
+		ListGridField icon = new TypeIconGridField();
 
 		FileNameListGridField name = new FileNameListGridField("name", "icon", "name", 210);
 		name.setWidth("*");

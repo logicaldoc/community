@@ -1,23 +1,23 @@
 package com.logicaldoc.gui.frontend.client.security.ldap;
 
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUILDAPServer;
 import com.logicaldoc.gui.common.client.data.LDAPServersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.grid.EnabledListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.formatters.EnabledCellFormatter;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.LDAPService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
@@ -61,19 +61,14 @@ public class LDAPServersPanel extends AdminPanel {
 
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);
-
+		id.setCellFormatter(new EnabledCellFormatter());
+		
 		ListGridField url = new ListGridField("url", I18N.message("server"), 300);
 		url.setCanFilter(true);
 		url.setWidth("*");
+		url.setCellFormatter(new EnabledCellFormatter());
 
-		ListGridField enabled = new ListGridField("eenabled", " ", 30);
-		enabled.setType(ListGridFieldType.IMAGE);
-		enabled.setCanSort(false);
-		enabled.setAlign(Alignment.CENTER);
-		enabled.setShowDefaultContextMenu(false);
-		enabled.setImageURLPrefix(Util.imagePrefix());
-		enabled.setImageURLSuffix(".gif");
-		enabled.setCanFilter(false);
+		ListGridField enabled = new EnabledListGridField();
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -133,16 +128,7 @@ public class LDAPServersPanel extends AdminPanel {
 			event.cancel();
 		});
 
-		list.addSelectionChangedHandler(event -> {
-			Record rec = list.getSelectedRecord();
-			if (rec != null)
-				LDAPService.Instance.get().get(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
-					@Override
-					public void onSuccess(GUILDAPServer server) {
-						showServerDetails(server);
-					}
-				});
-		});
+		list.addSelectionChangedHandler(event -> onSelectionChanged());
 
 		list.addDataArrivedHandler(
 				event -> infoPanel.setMessage(I18N.message("showservers", Integer.toString(list.getTotalRows()))));
@@ -157,6 +143,17 @@ public class LDAPServersPanel extends AdminPanel {
 				});
 			}
 		});
+	}
+
+	private void onSelectionChanged() {
+		Record rec = list.getSelectedRecord();
+		if (rec != null)
+			LDAPService.Instance.get().get(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
+				@Override
+				public void onSuccess(GUILDAPServer server) {
+					showServerDetails(server);
+				}
+			});
 	}
 
 	public void refresh() {
@@ -186,7 +183,45 @@ public class LDAPServersPanel extends AdminPanel {
 					}
 				}));
 
-		contextMenu.setItems(delete);
+		MenuItem enable = new MenuItem();
+		enable.setTitle(I18N.message("enable"));
+		enable.setEnabled(!rec.getAttributeAsBoolean("eenabled"));
+		enable.addClickHandler(event -> LDAPService.Instance.get().get(id, new DefaultAsyncCallback<>() {
+			@Override
+			public void onSuccess(GUILDAPServer server) {
+				server.setEnabled(true);
+				LDAPService.Instance.get().save(server, new DefaultAsyncCallback<>() {
+
+					@Override
+					public void onSuccess(GUILDAPServer v) {
+						super.onSuccess(v);
+						updateRecord(v);
+						onSelectionChanged();
+					}
+				});
+			}
+		}));
+
+		MenuItem disable = new MenuItem();
+		disable.setTitle(I18N.message("disable"));
+		disable.setEnabled(rec.getAttributeAsBoolean("eenabled"));
+		disable.addClickHandler(event -> LDAPService.Instance.get().get(id, new DefaultAsyncCallback<>() {
+			@Override
+			public void onSuccess(GUILDAPServer server) {
+				server.setEnabled(false);
+				LDAPService.Instance.get().save(server, new DefaultAsyncCallback<>() {
+
+					@Override
+					public void onSuccess(GUILDAPServer v) {
+						super.onSuccess(v);
+						updateRecord(v);
+						onSelectionChanged();
+					}
+				});
+			}
+		}));
+
+		contextMenu.setItems(enable, disable, delete);
 		contextMenu.showContextMenu();
 	}
 
@@ -217,11 +252,11 @@ public class LDAPServersPanel extends AdminPanel {
 
 		rec.setAttribute("url", server.getUrl());
 
-		rec.setAttribute("eenabled", server.isEnabled() ? "0" : "2");
+		rec.setAttribute("eenabled", server.isEnabled());
 
 		list.refreshRow(list.getRecordIndex(rec));
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

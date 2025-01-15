@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.common.client.formatters;
+package com.logicaldoc.gui.common.client.widgets.grid.formatters;
 
 import java.util.Date;
 
@@ -7,7 +7,7 @@ import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
- * Formats a cell depending on the guest flag
+ * Formats a cell showing a date for the user
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.1.2

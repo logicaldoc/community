@@ -26,7 +26,6 @@ public class UsersDS extends DataSource {
 		DataSourceTextField label = new DataSourceTextField("label");
 		DataSourceBooleanField guest = new DataSourceBooleanField("guest");
 		guest.setHidden(true);
-		DataSourceImageField eenabled = new DataSourceImageField("enabledIcon");
 		DataSourceBooleanField enabled = new DataSourceBooleanField("eenabled");
 		DataSourceTextField name = new DataSourceTextField("name");
 		DataSourceTextField firstName = new DataSourceTextField("firstName");
@@ -47,9 +46,9 @@ public class UsersDS extends DataSource {
 		DataSourceDateField creation = new DataSourceDateField("creation");
 		DataSourceIntegerField source = new DataSourceIntegerField("source");
 
-		setFields(id, username, label, eenabled, enabled, name, firstName, email, phone, cell, city, company,
-				department, organizationalUnit, building, groups, usergroup, guest, lastlogin, expire, creation, avatar,
-				timeZone, source);
+		setFields(id, username, label, enabled, name, firstName, email, phone, cell, city, company, department,
+				organizationalUnit, building, groups, usergroup, guest, lastlogin, expire, creation, avatar, timeZone,
+				source);
 		setDataURL("data/users.xml?1=1" + (groupIdOrName != null ? "&groupId=" + groupIdOrName : "") + "&required="
 				+ required + "&skipdisabled=" + skipDisabled);
 		setClientOnly(true);

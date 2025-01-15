@@ -24,7 +24,7 @@ import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.IconGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.TypeIconGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.IndexedListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
@@ -156,7 +156,7 @@ public class SearchIndexPanel extends AdminPanel {
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
 
-		ListGridField icon = new IconGridField();
+		ListGridField icon = new TypeIconGridField();
 		icon.setHidden(false);
 
 		ListGridField extension = new ListGridField(EXTENSION, I18N.message(EXTENSION), 80);

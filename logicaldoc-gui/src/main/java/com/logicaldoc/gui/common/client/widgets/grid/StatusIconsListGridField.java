@@ -34,11 +34,11 @@ public class StatusIconsListGridField extends ColoredListGridField {
 		setWidth(110);
 		setCanFilter(false);
 		setCanSort(false);
-		setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> formatStatusIconCell(rec));
+		setCellFormatter((value, rec, rowNum, colNum) -> formatStatusIconCell(rec));
 	}
 
 	private String formatStatusIconCell(ListGridRecord rec) {
-		String color = rec.getAttributeAsString("color");
+		String color = rec.getAttributeAsString(colorFieldName);
 
 		String content = "<div style='display: flex; text-align: center; justify-content: center;'>";
 

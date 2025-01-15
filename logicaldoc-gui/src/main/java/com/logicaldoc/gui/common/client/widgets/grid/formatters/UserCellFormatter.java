@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.common.client.formatters;
+package com.logicaldoc.gui.common.client.widgets.grid.formatters;
 
 import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGridRecord;

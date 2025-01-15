@@ -159,11 +159,16 @@ public class AwesomeFactory {
 	}
 
 	public static String getIconButtonHTML(String icon, String text, String tooltip, String color, String url) {
+		return getIconButtonHTML(icon, text, tooltip, color, null, url);
+	}
+
+	public static String getIconButtonHTML(String icon, String text, String tooltip, String color, String animation,
+			String url) {
 		String button = DIV_CLASS_STATUS_ICON
 				+ (tooltip != null && !tooltip.isEmpty() ? TITLE + I18N.message(tooltip) + "'" : "")
 				+ (color != null && !color.isEmpty() ? STYLE_COLOR + color + "'" : "")
 				+ (url != null && !url.isEmpty() ? " onclick=\"download('" + url + "')\"" : "") + " >";
-		button += getColoredIconHtml(icon, text, color);
+		button += getColoredIconHtml(icon, text, color, animation);
 		button += CLOSE_DIV;
 
 		return button;
@@ -233,24 +238,40 @@ public class AwesomeFactory {
 	}
 
 	public static String getColoredIconHtml(String icon, String text, String color) {
-		return getColoredIconHtmlWithoutI18N(icon, I18N.message(text), color);
+		return getColoredIconHtml(icon, I18N.message(text), color, null);
+	}
+
+	public static String getColoredIconHtml(String icon, String text, String color, String animation) {
+		return getColoredIconHtmlWithoutI18N(icon, I18N.message(text), color, animation);
 	}
 
 	public static String getIconHtml(String icon, String rotation, String text) {
+		return getIconHtml(icon, rotation, text, null);
+	}
+
+	public static String getIconHtml(String icon, String rotation, String text, String animation) {
 		if (text == null || text.isEmpty())
 			return I_CLASS + getCssClassPrefix() + " fa-" + icon + (rotation != null ? " " + rotation : "") + " fa-"
-					+ STYLE + "' aria-hidden='true'></i>";
+					+ STYLE + (animation != null && !animation.isEmpty() ? " fa-" + animation : "")
+					+ "' aria-hidden='true'></i>";
 		else
 			return DIV_I_CLASS + getCssClassPrefix() + " fa-" + icon + (rotation != null ? " " + rotation : "") + " fa-"
 					+ STYLE + " fa-fw' aria-hidden='true'></i> " + I18N.message(text) + CLOSE_DIV;
 	}
 
 	public static String getColoredIconHtmlWithoutI18N(String icon, String text, String color) {
+		return getColoredIconHtmlWithoutI18N(icon, text, color, null);
+	}
+
+	public static String getColoredIconHtmlWithoutI18N(String icon, String text, String color, String animation) {
 		if (text == null || text.isEmpty())
-			return I_CLASS + getCssClassPrefix() + " fa-" + icon + " fa-" + STYLE + "' aria-hidden='true'  "
+			return I_CLASS + getCssClassPrefix() + " fa-" + icon + " fa-" + STYLE
+					+ (animation != null && !animation.isEmpty() ? " fa-" + animation : "") + "' aria-hidden='true'  "
 					+ (color != null && !color.isEmpty() ? "style='color: " + color + "'" : "") + "></i>";
 		else
-			return DIV_I_CLASS + getCssClassPrefix() + " fa-" + icon + " fa-" + STYLE + " fa-fw' aria-hidden='true'"
+			return DIV_I_CLASS + getCssClassPrefix() + " fa-" + icon + " fa-" + STYLE
+					+ (animation != null && !animation.isEmpty() ? " fa-" + animation : "")
+					+ " fa-fw' aria-hidden='true'"
 					+ (color != null && !color.isEmpty() ? "style='color: " + color + "'" : "") + "></i> " + text
 					+ CLOSE_DIV;
 	}

@@ -649,6 +649,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			add.setDisabled(true);
 			addForm.setDisabled(true);
 			office.setDisabled(true);
+			onlyoffice.setDisabled(true);
 			scan.setDisabled(true);
 			bulkUpdate.setDisabled(true);
 			bulkCheckout.setDisabled(true);
@@ -695,7 +696,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 
 		office.setDisabled(!Feature.enabled(Feature.OFFICE) || !isOfficeFile || !document.isDownload()
 				|| !document.isWrite() || document.getStatus() != Constants.DOC_UNLOCKED);
-		onlyoffice.setDisabled(!Feature.enabled(Feature.OFFICE) || !Menu.enabled(Menu.ONLYOFFICE)
+		onlyoffice.setDisabled(!Feature.enabled(Feature.ONLYOFFICE) || !Menu.enabled(Menu.ONLYOFFICE)
 				|| !document.isDownload() || !document.isWrite() || document.getStatus() != Constants.DOC_UNLOCKED);
 	}
 

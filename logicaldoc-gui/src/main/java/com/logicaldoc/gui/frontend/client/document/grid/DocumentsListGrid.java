@@ -23,7 +23,7 @@ import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.IconGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.TypeIconGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.IntegerListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RatingListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
@@ -229,7 +229,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		pages.setHidden(true);
 		fieldsMap.put(pages.getName(), pages);
 
-		ListGridField icon = new IconGridField();
+		ListGridField icon = new TypeIconGridField();
 		fieldsMap.put(icon.getName(), icon);
 
 		ListGridField version = new VersionListGridField();

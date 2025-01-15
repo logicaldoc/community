@@ -15,9 +15,9 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.6
  */
-public class IconGridField extends ListGridField {
+public class TypeIconGridField extends ListGridField {
 
-	public IconGridField() {
+	public TypeIconGridField() {
 		super("icon", " ", 30);
 		setType(ListGridFieldType.TEXT);
 		setCanSort(false);

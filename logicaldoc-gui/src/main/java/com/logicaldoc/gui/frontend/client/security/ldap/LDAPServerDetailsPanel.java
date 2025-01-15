@@ -76,8 +76,6 @@ public class LDAPServerDetailsPanel extends VLayout {
 
 	private static final String USERNAME = "username";
 
-	private static final String EENABLED = "eenabled";
-
 	private ValuesManager vm = new ValuesManager();
 
 	private MultiComboBoxItem defaultGroupsItem;
@@ -109,11 +107,6 @@ public class LDAPServerDetailsPanel extends VLayout {
 		ldapForm.setTitleOrientation(TitleOrientation.TOP);
 		ldapForm.setColWidths(100, 100);
 
-		// Enabled
-		ToggleItem enabled = ItemFactory.newToggleItem(EENABLED, "enabled", this.server.isEnabled());
-		enabled.setCellStyle("warn");
-		enabled.setRequired(true);
-
 		// Anonymous Login
 		ToggleItem anon = ItemFactory.newToggleItem("anon", "anonymous", this.server.isAnonymous());
 		anon.setRequired(true);
@@ -121,12 +114,10 @@ public class LDAPServerDetailsPanel extends VLayout {
 		// Url
 		TextItem url = ItemFactory.newTextItem("url", "ldaphurl", this.server.getUrl());
 		url.setRequired(true);
-		url.setCellStyle("warn");
 		url.setWidth(300);
 
 		// Username
 		TextItem username = ItemFactory.newTextItemPreventAutocomplete(USERNAME, "user", this.server.getUsername());
-		username.setCellStyle("warn");
 		username.setWidth(300);
 
 		// User type
@@ -231,7 +222,6 @@ public class LDAPServerDetailsPanel extends VLayout {
 		// Password
 		FormItem password = ItemFactory.newSafePasswordItem("password", I18N.message("password"),
 				this.server.getPassword(), hiddenPassword, null);
-		password.setCellStyle("warn");
 		password.setWidth(300);
 
 		// Default groups
@@ -241,7 +231,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 		defaultGroupsItem.setValueField("id");
 		defaultGroupsItem.setDisplayField("name");
 
-		ldapForm.setItems(enabled, url, fakeUsername, hiddenPassword, username, password, anon, pageSize, timeout,
+		ldapForm.setItems(url, anon, fakeUsername, hiddenPassword, username, password, pageSize, timeout,
 				language, userType, defaultGroupsItem, syncTtl, keepMembership, userIdentifierAttr, grpIdentifierAttr,
 				userClass, groupClass, usersBaseNode, groupsBaseNode, userInclude, groupInclude, userExclude,
 				groupExclude, logonAttr, realm, validation);
@@ -280,8 +270,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 
 			if (Boolean.FALSE.equals(vm.validate()))
 				return;
-
-			LDAPServerDetailsPanel.this.server.setEnabled(Boolean.valueOf(vm.getValueAsString(EENABLED)));
+			
 			LDAPServerDetailsPanel.this.server.setAnonymous(Boolean.valueOf(vm.getValueAsString("anon")));
 			LDAPServerDetailsPanel.this.server
 					.setKeepLocalMemberships(Boolean.valueOf(vm.getValueAsString(KEEPMEMBERSHIP)));
@@ -366,7 +355,6 @@ public class LDAPServerDetailsPanel extends VLayout {
 			if (Boolean.FALSE.equals(vm.validate()))
 				return;
 
-			LDAPServerDetailsPanel.this.server.setEnabled(Boolean.valueOf(vm.getValueAsString(EENABLED)));
 			LDAPServerDetailsPanel.this.server.setAnonymous(Boolean.valueOf(vm.getValueAsString("anon")));
 			LDAPServerDetailsPanel.this.server
 					.setKeepLocalMemberships(Boolean.valueOf(vm.getValueAsString(KEEPMEMBERSHIP)));

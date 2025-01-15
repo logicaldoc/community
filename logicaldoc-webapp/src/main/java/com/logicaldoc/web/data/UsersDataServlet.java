@@ -75,8 +75,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 		writer.print("<user>");
 		writer.print("<id>" + user.getId() + "</id>");
 		writer.print("<username><![CDATA[" + user.getUsername() + "]]></username>");
-		writer.print("<enabledIcon>" + (user.getEnabled() == 1 ? "0" : "2") + "</enabledIcon>");
-		writer.print("<eenabled>" + (user.getEnabled() == 1 ? "true" : "false") + "</eenabled>");
+		writer.print("<eenabled>" + Boolean.toString(user.getEnabled() == 1) + "</eenabled>");
 		writer.print("<guest>" + user.isReadonly() + "</guest>");
 		writer.print("<name><![CDATA[" + StringUtils.defaultString(user.getName()) + "]]></name>");
 		writer.print("<firstName><![CDATA[" + StringUtils.defaultString(user.getFirstName()) + "]]></firstName>");

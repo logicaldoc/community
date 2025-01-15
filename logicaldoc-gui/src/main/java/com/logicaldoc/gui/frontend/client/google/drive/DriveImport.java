@@ -10,7 +10,7 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.IconGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.TypeIconGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.google.GoogleAsyncCallback;
@@ -74,7 +74,7 @@ public class DriveImport extends Window {
 		size.setCanFilter(false);
 		size.setHidden(true);
 
-		ListGridField icon = new IconGridField();
+		ListGridField icon = new TypeIconGridField();
 		icon.setHidden(true);
 
 		ListGridField version = new VersionListGridField();
