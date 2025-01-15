@@ -217,6 +217,16 @@ public class SamlPanel extends VLayout {
 		login.setWrapTitle(false);
 		login.setWrap(false);
 
+		SelectItem userType = ItemFactory.newUserTypeSelector("usertype", settings.getUserType());
+		userType.setEndRow(true);
+
+		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation("validation", settings.getValidation(), null,
+				false);
+		validation.setHeight(150);
+		validation.setWidth(400);
+		validation.setWrapTitle(false);
+		validation.setColSpan(2);
+
 		DynamicForm generalForm = new DynamicForm();
 		generalForm.setValuesManager(vm);
 		generalForm.setTitleOrientation(TitleOrientation.TOP);
@@ -238,7 +248,8 @@ public class SamlPanel extends VLayout {
 		attributeMappingsForm.setAlign(Alignment.LEFT);
 		attributeMappingsForm.setHeight(1);
 		attributeMappingsForm.setWidth(1);
-		attributeMappingsForm.setFields(username, firstName, lastName, email, groups, keepMembership);
+		attributeMappingsForm.setFields(username, firstName, lastName, email, groups, keepMembership, userType,
+				validation);
 
 		HLayout forms = new HLayout();
 		forms.setMembersMargin(10);
@@ -283,6 +294,8 @@ public class SamlPanel extends VLayout {
 			settings.setCertificate(form.getValueAsString(SP_CERTIFICATE));
 			settings.setPrivateKey(form.getValueAsString(SP_PRIVATEKEY));
 			settings.setIdpMetadata(form.getValueAsString(IDP_METADATA));
+			settings.setUserType(Integer.parseInt(form.getValueAsString("usertype")));
+			settings.setValidation(form.getValueAsString("validation"));
 
 			SamlService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<>() {
 				@Override

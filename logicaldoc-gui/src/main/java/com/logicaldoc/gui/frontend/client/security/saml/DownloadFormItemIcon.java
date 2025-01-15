@@ -19,7 +19,7 @@ public class DownloadFormItemIcon extends FormItemIcon {
 	 */
 	public DownloadFormItemIcon(String url) {
 		setPrompt(I18N.message("download"));
-		setSrc("[SKIN]/page_white_put.png");
+		setSrc("[SKIN]/download.svg");
 		setWidth(16);
 		setHeight(16);
 		addFormItemClickHandler(event -> Util.download(url));

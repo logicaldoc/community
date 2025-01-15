@@ -235,7 +235,6 @@ public class LDAPServerDetailsPanel extends VLayout {
 		password.setWidth(300);
 
 		// Default groups
-
 		defaultGroupsItem = ItemFactory.newMultiComboBoxItem("defaultGroups", "defaultassignedgroups", new GroupsDS(),
 				server.getDefaultGroups().stream().map(g -> g.getId()).collect(Collectors.toList())
 						.toArray(new Long[0]));

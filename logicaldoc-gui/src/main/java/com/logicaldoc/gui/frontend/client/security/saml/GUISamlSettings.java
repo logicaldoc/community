@@ -2,6 +2,8 @@ package com.logicaldoc.gui.frontend.client.security.saml;
 
 import java.io.Serializable;
 
+import com.logicaldoc.gui.common.client.beans.GUIUser;
+
 /**
  * A bean to store the SAML settings
  * 
@@ -43,10 +45,14 @@ public class GUISamlSettings implements Serializable {
 	private boolean keepLocalMemberships = true;
 
 	private boolean singleLogOut = false;
-	
+
 	private boolean logoutRequestSigned = false;
 
 	private boolean logoutResponseSigned = false;
+
+	private int userType = GUIUser.TYPE_DEFAULT;
+
+	private String validation;
 
 	public boolean isSingleLogOut() {
 		return singleLogOut;
@@ -190,5 +196,21 @@ public class GUISamlSettings implements Serializable {
 
 	public void setLogoutResponseSigned(boolean logoutResponseSigned) {
 		this.logoutResponseSigned = logoutResponseSigned;
+	}
+
+	public int getUserType() {
+		return userType;
+	}
+
+	public void setUserType(int userType) {
+		this.userType = userType;
+	}
+
+	public String getValidation() {
+		return validation;
+	}
+
+	public void setValidation(String validation) {
+		this.validation = validation;
 	}
 }

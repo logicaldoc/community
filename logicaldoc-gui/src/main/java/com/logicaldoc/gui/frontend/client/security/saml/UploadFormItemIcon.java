@@ -18,7 +18,7 @@ public class UploadFormItemIcon extends FormItemIcon {
 	 */
 	public UploadFormItemIcon(String title) {
 		setPrompt(I18N.message("upload"));
-		setSrc("[SKIN]/page_white_get.png");
+		setSrc("[SKIN]/upload.svg");
 		setWidth(16);
 		setHeight(16);
 		addFormItemClickHandler(event -> new SamlUploader(title, event.getItem()).show());
