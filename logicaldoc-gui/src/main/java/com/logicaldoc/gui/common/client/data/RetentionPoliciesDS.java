@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.common.client.data;
 
 import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.fields.DataSourceImageField;
+import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -22,7 +22,7 @@ public class RetentionPoliciesDS extends DataSource {
 		DataSourceTextField dateOption = new DataSourceTextField("dateOption");
 		DataSourceTextField template = new DataSourceTextField("template");
 		DataSourceTextField action = new DataSourceTextField("action");
-		DataSourceImageField enabled = new DataSourceImageField("eenabled");
+		DataSourceBooleanField enabled = new DataSourceBooleanField("eenabled");
 
 		setFields(id, name, days, dateOption, template, action, enabled);
 		setDataURL("data/retentionpolicies.xml");

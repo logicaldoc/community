@@ -62,7 +62,7 @@ public class LDAPServersPanel extends AdminPanel {
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);
 		id.setCellFormatter(new EnabledCellFormatter());
-		
+
 		ListGridField url = new ListGridField("url", I18N.message("server"), 300);
 		url.setCanFilter(true);
 		url.setWidth("*");
