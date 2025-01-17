@@ -17,8 +17,10 @@ import com.logicaldoc.gui.common.client.controllers.DocumentObserver;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
 import com.logicaldoc.gui.common.client.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.IntegerListGridField;
 import com.logicaldoc.gui.common.client.grid.RatingListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
@@ -26,7 +28,6 @@ import com.logicaldoc.gui.common.client.grid.StatusIconsListGridField;
 import com.logicaldoc.gui.common.client.grid.TypeIconGridField;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.grid.VersionListGridField;
-import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -218,8 +219,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	 * Prepares the map that contains all the possible fields we can use
 	 */
 	protected void prepareFieldsMap() {
-		ListGridField id = new ListGridField("id", I18N.getAttributeLabel("id"), 60);
-		id.setHidden(true);
+		ListGridField id =new IdListGridField();
 		fieldsMap.put(id.getName(), id);
 
 		ListGridField size = new FileSizeListGridField("size", I18N.getAttributeLabel("size"));

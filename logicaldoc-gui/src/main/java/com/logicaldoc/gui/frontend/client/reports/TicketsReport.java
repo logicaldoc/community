@@ -9,6 +9,7 @@ import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.preview.PreviewPopup;
@@ -70,10 +71,7 @@ public class TicketsReport extends ReportPanel {
 
 	@Override
 	protected void prepareListGrid() {
-		ListGridField id = new ListGridField("id");
-		id.setWidth(90);
-		id.setHidden(true);
-		id.setCanGroupBy(false);
+		ListGridField id = new IdListGridField();
 
 		ListGridField enabled = new EnabledListGridField();
 

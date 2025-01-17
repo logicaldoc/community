@@ -53,6 +53,7 @@ import com.logicaldoc.gui.common.client.data.TimeZonesDS;
 import com.logicaldoc.gui.common.client.data.UsersDS;
 import com.logicaldoc.gui.common.client.data.WorkflowsDS;
 import com.logicaldoc.gui.common.client.grid.ColoredListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.InfoService;
@@ -966,8 +967,7 @@ public class ItemFactory {
 		SelectItem tenant = new SelectItem("tenant");
 		tenant.setTitle(I18N.message("tenant"));
 		tenant.setWrapTitle(false);
-		ListGridField id = new ListGridField("id", I18N.message("id"));
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 		ListGridField nname = new ListGridField("name", I18N.message("name"));
 		nname.setAutoFitWidth(true);
 		ListGridField displayName = new ListGridField("displayName", I18N.message("displayname"));
@@ -989,8 +989,7 @@ public class ItemFactory {
 		select.setDisplayField("name");
 		select.setEmptyDisplayValue(I18N.message("customcode"));
 
-		ListGridField id = new ListGridField("id", I18N.message("id"));
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 		ListGridField nname = new ListGridField("name", I18N.message("name"));
 		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
 		select.setPickListFields(id, nname, description);

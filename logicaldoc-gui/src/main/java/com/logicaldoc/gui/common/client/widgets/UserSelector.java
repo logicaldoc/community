@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.UsersDS;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
@@ -39,8 +40,7 @@ public class UserSelector extends SelectItem {
 		setTitle(I18N.message(title));
 		setWrapTitle(false);
 
-		ListGridField id = new ListGridField("id", I18N.message("id"));
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 		ListGridField username = new ListGridField(USERNAME, I18N.message(USERNAME));
 		ListGridField label = new ListGridField("label", I18N.message("name"));
 		UserListGridField avatar = new UserListGridField();

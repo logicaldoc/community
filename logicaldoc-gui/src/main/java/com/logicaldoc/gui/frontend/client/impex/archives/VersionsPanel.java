@@ -6,6 +6,7 @@ import com.logicaldoc.gui.common.client.data.VersionsDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.VersionListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.DocUtil;
@@ -78,8 +79,7 @@ public class VersionsPanel extends VLayout {
 		if (listGrid != null)
 			removeMember(listGrid);
 
-		ListGridField id = new ListGridField("id", 80);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField docid = new ListGridField("docid", I18N.message("id"), 80);
 
@@ -164,7 +164,7 @@ public class VersionsPanel extends VLayout {
 		if (dataSource != null)
 			dataSource.destroy();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

@@ -18,6 +18,7 @@ import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.IndexedListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.grid.TypeIconGridField;
@@ -154,8 +155,7 @@ public class SearchIndexPanel extends AdminPanel {
 
 		setMembersMargin(3);
 
-		ListGridField id = new ListGridField("id");
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField icon = new TypeIconGridField();
 		icon.setHidden(false);

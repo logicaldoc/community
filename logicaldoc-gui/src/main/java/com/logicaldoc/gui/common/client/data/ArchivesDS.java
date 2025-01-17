@@ -4,7 +4,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceDateTimeField;
 import com.smartgwt.client.data.fields.DataSourceFloatField;
-import com.smartgwt.client.data.fields.DataSourceImageField;
+import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -26,8 +26,8 @@ public class ArchivesDS extends DataSource {
 		DataSourceTextField name = new DataSourceTextField("name");
 		DataSourceTextField description = new DataSourceTextField("description");
 
-		DataSourceTextField stat = new DataSourceTextField("status");
-		DataSourceImageField statusicon = new DataSourceImageField("statusicon");
+		DataSourceIntegerField stat = new DataSourceIntegerField("status");
+		DataSourceIntegerField mod = new DataSourceIntegerField("mode");
 		DataSourceTextField ttype = new DataSourceTextField("type");
 		DataSourceTextField typelabel = new DataSourceTextField("typelabel");
 		DataSourceFloatField size = new DataSourceFloatField("size");
@@ -36,8 +36,7 @@ public class ArchivesDS extends DataSource {
 		DataSourceDateTimeField created = new DataSourceDateTimeField("created");
 		DataSourceTextField pathonserver = new DataSourceTextField("pathonserver");
 
-		setFields(id, name, description, size, closer, creator, ttype, typelabel, stat, statusicon, created,
-				pathonserver);
+		setFields(id, name, description, size, closer, creator, ttype, typelabel, stat, mod, created, pathonserver);
 		setClientOnly(true);
 		setDataURL("data/archives.xml?mode=" + mode + "&locale=" + I18N.getLocale()
 				+ (status != null ? "&status=" + status : "") + (type != null ? "&type=" + type : "")

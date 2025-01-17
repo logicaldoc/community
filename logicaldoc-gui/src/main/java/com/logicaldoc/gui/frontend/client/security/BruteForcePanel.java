@@ -12,6 +12,7 @@ import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUISequence;
 import com.logicaldoc.gui.common.client.data.UsersDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
@@ -172,9 +173,7 @@ public class BruteForcePanel extends AdminPanel {
 	}
 
 	private void prepareBlockedEntriesGrid(List<GUISequence> data) {
-		ListGridField id = new ListGridField("id", I18N.message("id"));
-		id.setWidth(60);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField entity = new ListGridField("entity", I18N.message("blockedusernameip"));
 		entity.setWidth(200);

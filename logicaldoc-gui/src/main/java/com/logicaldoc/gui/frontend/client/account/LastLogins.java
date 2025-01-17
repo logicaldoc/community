@@ -4,6 +4,7 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.data.UserHistoryDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.smartgwt.client.types.HeaderControls;
@@ -69,8 +70,7 @@ public class LastLogins extends com.smartgwt.client.widgets.Window {
 	}
 
 	private void prepareGrid() {
-		ListGridField id = new ListGridField("id", 50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField date = new DateListGridField("date", "date");
 

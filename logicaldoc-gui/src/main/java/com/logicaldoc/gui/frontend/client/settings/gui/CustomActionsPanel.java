@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIMenu;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
@@ -111,11 +112,7 @@ public class CustomActionsPanel extends VLayout {
 		enabled.setImageURLSuffix(".gif");
 		enabled.setCanFilter(false);
 
-		ListGridField id = new ListGridField("id", I18N.message("id"));
-		id.setWidth(80);
-		id.setRequired(true);
-		id.setCanEdit(false);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField name = new ListGridField("name", I18N.message("name"));
 		name.setWidth(100);
@@ -284,7 +281,7 @@ public class CustomActionsPanel extends VLayout {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

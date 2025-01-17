@@ -7,6 +7,7 @@ import java.util.List;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.EventPanel;
@@ -171,9 +172,7 @@ public class MessageDialog extends Window {
 		ListGridField name = new ListGridField(LABEL, I18N.message("name"));
 		name.setCanFilter(true);
 
-		ListGridField id = new ListGridField("id", I18N.message(" "));
-		id.setWidth(50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		recipientsGrid = new ListGrid();
 		recipientsGrid.setShowRecordComponents(true);
@@ -272,12 +271,12 @@ public class MessageDialog extends Window {
 				recipientsGrid.addData(newRec);
 		}
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

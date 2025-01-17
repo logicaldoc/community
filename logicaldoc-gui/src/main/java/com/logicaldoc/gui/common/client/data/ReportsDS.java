@@ -30,8 +30,7 @@ public class ReportsDS extends DataSource {
 		DataSourceDateTimeField lastRun = new DataSourceDateTimeField("lastRun");
 		DataSourceDateTimeField lastModified = new DataSourceDateTimeField("lastModified");
 
-		setFields(id, name, enabled, running, status, lastRun, outputFolderId, outputDocId,
-				lastModified);
+		setFields(id, name, enabled, running, status, lastRun, outputFolderId, outputDocId, lastModified);
 		setDataURL("data/reports.xml");
 		setClientOnly(true);
 	}

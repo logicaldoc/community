@@ -4,6 +4,7 @@ import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIEmailAccount;
 import com.logicaldoc.gui.common.client.data.EmailAccountsDS;
 import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.IntegerListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -71,8 +72,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		listing.setHeight("60%");
 		listing.setShowResizeBar(true);
 
-		ListGridField id = new ListGridField("id", 50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField email = new ListGridField(EMAIL, I18N.message(EMAIL), 300);
 		email.setCanFilter(true);

@@ -7,6 +7,7 @@ import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.data.TenantsDS;
 import com.logicaldoc.gui.common.client.grid.EnabledDateListGridField;
 import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.formatters.EnabledCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -66,8 +67,7 @@ public class TenantsPanel extends AdminPanel {
 		listing.setHeight("50%");
 		listing.setShowResizeBar(true);
 
-		ListGridField id = new ListGridField("id", 50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 		id.setCellFormatter(new EnabledCellFormatter());
 
 		ListGridField name = new ListGridField("name", I18N.message("name"), 100);

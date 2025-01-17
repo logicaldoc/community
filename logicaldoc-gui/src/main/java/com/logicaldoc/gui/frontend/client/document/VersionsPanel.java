@@ -13,6 +13,7 @@ import com.logicaldoc.gui.common.client.data.VersionsDS;
 import com.logicaldoc.gui.common.client.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -60,9 +61,7 @@ public class VersionsPanel extends DocumentDetailTab {
 
 	@Override
 	protected void onDraw() {
-		ListGridField id = new ListGridField("id");
-		id.setHidden(true);
-
+		ListGridField id = new IdListGridField();
 		ListGridField user = new UserListGridField("user", "userId", "user");
 		ListGridField event = new ColoredListGridField("event", 200);
 		ListGridField version = new ColoredListGridField(VERSION, 70);
@@ -86,9 +85,9 @@ public class VersionsPanel extends DocumentDetailTab {
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
 		if (document.getFolder().isDownload())
-			list.setFields(user, event, fileName, type, fileVersion, version, date, permalink, wfStatus, comment);
+			list.setFields(id, user, event, fileName, type, fileVersion, version, date, permalink, wfStatus, comment);
 		else
-			list.setFields(user, event, fileName, type, fileVersion, version, date, comment);
+			list.setFields(id, user, event, fileName, type, fileVersion, version, date, comment);
 
 		addListHandlers();
 

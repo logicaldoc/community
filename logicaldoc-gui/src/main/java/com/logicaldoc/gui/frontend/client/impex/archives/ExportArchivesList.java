@@ -6,15 +6,14 @@ import com.logicaldoc.gui.common.client.beans.GUIArchive;
 import com.logicaldoc.gui.common.client.data.ArchivesDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -70,8 +69,7 @@ public class ExportArchivesList extends VLayout {
 		listing.setHeight("60%");
 		listing.setShowResizeBar(true);
 
-		ListGridField id = new ListGridField("id", 50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField name = new ListGridField("name", I18N.message("name"), 250);
 		name.setCanFilter(true);
@@ -81,14 +79,7 @@ public class ExportArchivesList extends VLayout {
 		ListGridField typeLabel = new ListGridField("typelabel", I18N.message("type"), 130);
 		typeLabel.setCanFilter(false);
 
-		ListGridField status = new ListGridField(STATUSICON, I18N.message(STATUS), 50);
-		status.setType(ListGridFieldType.IMAGE);
-		status.setCanSort(false);
-		status.setAlign(Alignment.CENTER);
-		status.setShowDefaultContextMenu(false);
-		status.setImageURLPrefix(Util.imagePrefix());
-		status.setImageURLSuffix(".png");
-		status.setCanFilter(false);
+		ListGridField status = new ArchiveStatusListGridField();
 
 		ListGridField created = new DateListGridField("created", "createdon");
 
@@ -160,7 +151,7 @@ public class ExportArchivesList extends VLayout {
 			ListGridRecord rec = list.getSelectedRecord();
 			try {
 				showDetails(Long.parseLong(rec.getAttribute("id")),
-						!Integer.toString(GUIArchive.STATUS_OPENED).equals(rec.getAttribute(STATUS)));
+						!Integer.toString(GUIArchive.STATUS_OPEN).equals(rec.getAttribute(STATUS)));
 			} catch (Exception t) {
 				// Nothing to do
 			}
@@ -212,7 +203,7 @@ public class ExportArchivesList extends VLayout {
 					}
 				}));
 
-		if (GUIArchive.STATUS_OPENED != Integer.parseInt(rec.getAttributeAsString(STATUS)))
+		if (GUIArchive.STATUS_OPEN != Integer.parseInt(rec.getAttributeAsString(STATUS)))
 			close.setEnabled(false);
 
 		if (GUIArchive.STATUS_ERROR != Integer.parseInt(rec.getAttributeAsString(STATUS)))
@@ -271,7 +262,7 @@ public class ExportArchivesList extends VLayout {
 	}
 
 	protected void openArchive(final ListGridRecord rec) {
-		ImpexService.Instance.get().setStatus(Long.parseLong(rec.getAttributeAsString("id")), GUIArchive.STATUS_OPENED,
+		ImpexService.Instance.get().setStatus(Long.parseLong(rec.getAttributeAsString("id")), GUIArchive.STATUS_OPEN,
 				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
@@ -299,7 +290,7 @@ public class ExportArchivesList extends VLayout {
 		details = SELECT_ELEMENT;
 		detailsContainer.setMembers(details);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

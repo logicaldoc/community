@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.clipboard;
 
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.Alignment;
@@ -58,8 +59,7 @@ public class ClipboardWindow extends Window {
 		grid.setCanFreezeFields(false);
 		grid.setCanGroupBy(false);
 
-		ListGridField id = new ListGridField("id");
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField fileName = new ListGridField("filename", " ", 200);
 

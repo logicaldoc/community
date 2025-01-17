@@ -211,8 +211,8 @@ public class MenuSecurityPanel extends VLayout {
 			if (selection == null || selection.length == 0)
 				return;
 
-			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-				if (Boolean.TRUE.equals(value)) {
+			LD.ask(I18N.message("question"), I18N.message("confirmdelete"), choice -> {
+				if (Boolean.TRUE.equals(choice)) {
 					aclGrid.removeSelectedData();
 					if (!withSaveButton)
 						onSave();

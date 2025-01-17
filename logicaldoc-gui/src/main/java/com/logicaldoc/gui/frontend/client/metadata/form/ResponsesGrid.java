@@ -12,6 +12,7 @@ import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -69,8 +70,7 @@ public class ResponsesGrid extends RefreshableListGrid {
 		filename.setHidden(true);
 		filename.setCanFilter(true);
 
-		ListGridField id = new ListGridField("id", I18N.getAttributeLabel("id"), 60);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField(I18N.getAttributeLabel("id"));
 
 		ListGridField size = new FileSizeListGridField("size", I18N.getAttributeLabel("size"));
 		size.setHidden(true);
@@ -215,7 +215,7 @@ public class ResponsesGrid extends RefreshableListGrid {
 	public DateDisplayFormat getDatetimeFormatter() {
 		return I18N.getDateDisplayFormat(true);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof QuickSearchTray)

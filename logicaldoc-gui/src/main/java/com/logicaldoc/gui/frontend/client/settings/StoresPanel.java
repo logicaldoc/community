@@ -9,6 +9,7 @@ import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.data.StoresDS;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -129,7 +130,8 @@ public class StoresPanel extends VLayout {
 		storesGrid.setSelectionType(SelectionStyle.SINGLE);
 		storesGrid.setCanExpandRecords(true);
 
-		ListGridField id = new ListGridField("id", " ", 20);
+		ListGridField id = new IdListGridField();
+		id.setHidden(false);
 		ListGridField name = new ListGridField("name", I18N.message("store"), 150);
 		ListGridField path = new ListGridField("path", I18N.message("path"));
 		path.setWidth("100%");

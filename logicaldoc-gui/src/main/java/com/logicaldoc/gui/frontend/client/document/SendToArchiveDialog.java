@@ -43,7 +43,7 @@ public class SendToArchiveDialog extends Window {
 		setShowModalMask(true);
 		centerInPage();
 
-		SelectItem archive = ItemFactory.newArchiveSelector(GUIArchive.MODE_EXPORT, GUIArchive.STATUS_OPENED);
+		SelectItem archive = ItemFactory.newArchiveSelector(GUIArchive.MODE_EXPORT, GUIArchive.STATUS_OPEN);
 		archive.setTitle(I18N.message("selectopenarchive"));
 		archive.setWrapTitle(false);
 		archive.setRequired(true);

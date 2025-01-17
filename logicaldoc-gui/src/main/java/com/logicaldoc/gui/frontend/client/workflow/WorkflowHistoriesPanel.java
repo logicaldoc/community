@@ -5,11 +5,12 @@ import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.WorkflowHistoriesDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.grid.VersionListGridField;
-import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.preview.PreviewPopup;
 import com.logicaldoc.gui.common.client.util.DocUtil;
@@ -72,8 +73,7 @@ public class WorkflowHistoriesPanel extends VLayout {
 
 	@Override
 	public void onDraw() {
-		ListGridField historyId = new ListGridField("id", I18N.message("id"), 60);
-		historyId.setHidden(true);
+		ListGridField historyId = new IdListGridField();
 
 		ListGridField historyEvent = new ListGridField("event", I18N.message("event"), 200);
 		ListGridField historyName = new WorkflowTaskNameListGridField("name", "display", I18N.message("task"));

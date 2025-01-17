@@ -4,6 +4,7 @@ import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIArchive;
 import com.logicaldoc.gui.common.client.beans.GUIIncrementalArchive;
 import com.logicaldoc.gui.common.client.data.IncrementalArchivesDS;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.grid.formatters.DaysCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -64,8 +65,7 @@ public class IncrementalArchivesList extends VLayout {
 		listing.setHeight("65%");
 		listing.setShowResizeBar(true);
 
-		ListGridField id = new ListGridField("id", 50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField prefix = new ListGridField(PREFIX, I18N.message(PREFIX), 250);
 

@@ -6,6 +6,7 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.BookmarksDS;
 import com.logicaldoc.gui.common.client.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.DocUtil;
@@ -48,8 +49,7 @@ public class BookmarksPanel extends VLayout {
 
 	@Override
 	public void onDraw() {
-		ListGridField id = new ListGridField("id");
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		LengthRangeValidator validator = new MinLengthValidator(1);
 
@@ -169,12 +169,12 @@ public class BookmarksPanel extends VLayout {
 		else
 			DocumentsPanel.get().openInFolder(rec.getAttributeAsLong(TARGET_ID), null);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

@@ -35,17 +35,17 @@ public class ImportSettingsPanel extends VLayout {
 
 		TextItem description = ItemFactory.newTextItem("description", archive.getDescription());
 		description.addChangedHandler(changedHandler);
-		description.setDisabled(archive.getStatus() != GUIArchive.STATUS_OPENED);
+		description.setDisabled(archive.getStatus() != GUIArchive.STATUS_OPEN);
 
 		ToggleItem importTemplates = ItemFactory.newToggleItem(IMPORTTEMPLATES, archive.getImportTemplate() == 1);
 		importTemplates.addChangedHandler(changedHandler);
-		importTemplates.setDisabled(archive.getStatus() != GUIArchive.STATUS_OPENED);
+		importTemplates.setDisabled(archive.getStatus() != GUIArchive.STATUS_OPEN);
 
 		SelectItem options = ItemFactory.newImportCustomIds();
 		options.setWidth(200);
 		options.setValue(Integer.toString(archive.getImportCustomId()));
 		options.addChangedHandler(changedHandler);
-		options.setDisabled(archive.getStatus() != GUIArchive.STATUS_OPENED);
+		options.setDisabled(archive.getStatus() != GUIArchive.STATUS_OPEN);
 
 		form.setFields(description, importTemplates, options);
 

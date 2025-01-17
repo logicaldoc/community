@@ -10,13 +10,14 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Timer;
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIPatch;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
-import com.logicaldoc.gui.common.client.grid.FileSizeListGridField;
 import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
+import com.logicaldoc.gui.common.client.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -112,8 +113,7 @@ public class PatchPanel extends VLayout {
 		Util.removeChildren(this);
 		Util.removeChildren(notesPanel);
 
-		ListGridField id = new ListGridField("id", I18N.message("id"), 100);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField file = new ListGridField("file", I18N.message("file"), 150);
 		file.setHidden(true);

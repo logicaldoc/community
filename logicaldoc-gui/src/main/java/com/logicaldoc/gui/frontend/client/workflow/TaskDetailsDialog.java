@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.logicaldoc.gui.common.client.Constants;
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -20,6 +20,7 @@ import com.logicaldoc.gui.common.client.data.DocumentsDS;
 import com.logicaldoc.gui.common.client.data.WorkflowHistoriesDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.StatusIconsListGridField;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -543,8 +544,7 @@ public class TaskDetailsDialog extends Window {
 	}
 
 	private void prepareNotesPanel() {
-		ListGridField id = new ListGridField("id", I18N.message("id"), 50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField userId = new ListGridField(USER_ID, "userid", 50);
 		userId.setHidden(true);

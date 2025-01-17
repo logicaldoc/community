@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.data.UsersDS;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.grid.formatters.UserCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -59,8 +60,7 @@ public class GroupUsersPanel extends VLayout {
 
 		UserListGridField avatar = new UserListGridField(true);
 
-		ListGridField id = new ListGridField("id", 50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField username = new ListGridField(USERNAME, I18N.message(USERNAME), 100);
 		username.setCanFilter(true);
@@ -203,7 +203,7 @@ public class GroupUsersPanel extends VLayout {
 		contextMenu.setItems(remove);
 		contextMenu.showContextMenu();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

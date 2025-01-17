@@ -6,6 +6,7 @@ import com.google.gwt.user.client.Window;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.data.DocuSignEnvelopesDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -79,8 +80,7 @@ public class Envelopes extends com.smartgwt.client.widgets.Window {
 		if (list != null)
 			removeItem(list);
 
-		ListGridField id = new ListGridField("id", 50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField subject = new ListGridField("subject", I18N.message("subject"));
 		subject.setCanFilter(true);

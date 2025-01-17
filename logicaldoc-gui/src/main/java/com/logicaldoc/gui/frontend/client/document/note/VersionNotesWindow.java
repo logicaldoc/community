@@ -6,6 +6,7 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.NotesDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -84,8 +85,7 @@ public class VersionNotesWindow extends Window {
 		toolStrip.addSeparator();
 		toolStrip.addButton(close);
 
-		ListGridField id = new ListGridField("id", I18N.message("id"), 50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField fileVersionField = new ListGridField("fileVersion", I18N.message("fileversion"), 50);
 		fileVersionField.setHidden(true);

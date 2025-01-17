@@ -4,6 +4,7 @@ import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUISyndication;
 import com.logicaldoc.gui.common.client.data.SyndicationsDS;
 import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -61,8 +62,7 @@ public class SyndicationsPanel extends AdminPanel {
 		listing.setHeight("60%");
 		listing.setShowResizeBar(true);
 
-		ListGridField id = new ListGridField("id", 50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField name = new ListGridField("name", I18N.message("name"), 100);
 		name.setCanFilter(true);

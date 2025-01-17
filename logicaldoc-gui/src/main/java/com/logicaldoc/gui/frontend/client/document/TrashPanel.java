@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.data.GarbageDS;
 import com.logicaldoc.gui.common.client.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -50,8 +51,7 @@ public class TrashPanel extends VLayout {
 
 	@Override
 	public void onDraw() {
-		ListGridField id = new ListGridField("id");
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		FileNameListGridField fileName = new FileNameListGridField();
 		fileName.setTitle(I18N.message("name"));
@@ -202,12 +202,12 @@ public class TrashPanel extends VLayout {
 			}
 		});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

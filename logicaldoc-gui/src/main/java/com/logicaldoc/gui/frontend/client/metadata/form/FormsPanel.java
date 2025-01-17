@@ -1,9 +1,10 @@
 package com.logicaldoc.gui.frontend.client.metadata.form;
 
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.data.FormsDS;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -66,8 +67,7 @@ public class FormsPanel extends AdminPanel {
 
 		final InfoPanel infoPanel = new InfoPanel("");
 
-		ListGridField id = new ListGridField("id", 70);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField name = new ListGridField("name", I18N.message("name"), 150);
 
@@ -280,7 +280,7 @@ public class FormsPanel extends AdminPanel {
 	public static String webformURL(String formId) {
 		return Util.contextPath() + "webform/" + formId;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof QuickSearchTray)

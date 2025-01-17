@@ -7,6 +7,7 @@ import com.logicaldoc.gui.common.client.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.grid.VersionListGridField;
 import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
@@ -49,9 +50,7 @@ public class DeletedDocsReport extends ReportPanel implements FolderChangeListen
 
 	@Override
 	protected void prepareListGrid() {
-		ListGridField id = new ListGridField("id", 100);
-		id.setHidden(true);
-		id.setCanGroupBy(false);
+		ListGridField id = new IdListGridField();
 
 		ListGridField size = new FileSizeListGridField("size", I18N.message("size"), 70);
 		size.setCanFilter(false);

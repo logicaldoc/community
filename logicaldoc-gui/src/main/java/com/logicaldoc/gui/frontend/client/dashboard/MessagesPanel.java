@@ -8,6 +8,7 @@ import com.logicaldoc.gui.common.client.controllers.UserController;
 import com.logicaldoc.gui.common.client.controllers.UserObserver;
 import com.logicaldoc.gui.common.client.data.MessagesDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -57,8 +58,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 		listing.setHeight("75%");
 		listing.setShowResizeBar(true);
 
-		ListGridField id = new ListGridField("id", 50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField priority = new ListGridField("priority", I18N.message("priority"), 50);
 		priority.setType(ListGridFieldType.IMAGE);
@@ -207,12 +207,12 @@ public class MessagesPanel extends VLayout implements UserObserver {
 	public void destroy() {
 		UserController.get().removeObserver(this);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

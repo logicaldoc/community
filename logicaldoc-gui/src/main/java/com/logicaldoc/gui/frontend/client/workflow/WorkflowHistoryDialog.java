@@ -5,10 +5,11 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.data.WorkflowHistoriesDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.grid.VersionListGridField;
-import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -131,7 +132,8 @@ public class WorkflowHistoryDialog extends Window {
 		body.setMembers(toolStrip, instancesContainer, historiesContainer);
 		addItem(body);
 
-		ListGridField id = new ListGridField("id", I18N.message("instance"), 70);
+		ListGridField id = new IdListGridField("instance");
+		id.setHidden(false);
 		ListGridField startDate = new DateListGridField(STARTDATE, STARTDATE, DateCellFormatter.FORMAT_LONG);
 
 		ListGridField endDate = new DateListGridField("enddate", "enddate", DateCellFormatter.FORMAT_LONG);
@@ -233,14 +235,14 @@ public class WorkflowHistoryDialog extends Window {
 
 		MenuItem completionDiagram = new MenuItem();
 		completionDiagram.setTitle(I18N.message("completiondiagram"));
-		completionDiagram.addClickHandler(
-				event -> WorkflowService.Instance.get().getCompletionDiagram(selectedWorkflow.getName(),
-						selectedWorkflow.getVersion(), selection.getAttributeAsString("id"), new DefaultAsyncCallback<>() {
-							@Override
-							public void onSuccess(GUIWorkflow workflow) {
-								new WorkflowPreview(workflow).show();
-							}
-						}));
+		completionDiagram.addClickHandler(event -> WorkflowService.Instance.get().getCompletionDiagram(
+				selectedWorkflow.getName(), selectedWorkflow.getVersion(), selection.getAttributeAsString("id"),
+				new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(GUIWorkflow workflow) {
+						new WorkflowPreview(workflow).show();
+					}
+				}));
 
 		contextMenu.setItems(completionDiagram, delete);
 		contextMenu.showContextMenu();

@@ -1,12 +1,13 @@
 package com.logicaldoc.gui.frontend.client.document.note;
 
 import com.logicaldoc.gui.common.client.Constants;
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.NotesDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.GridUtil;
@@ -61,8 +62,7 @@ public class NotesPanel extends DocumentDetailTab {
 		if (toolStrip != null)
 			container.removeMember(toolStrip);
 
-		ListGridField id = new ListGridField("id", I18N.message("id"), 50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		UserListGridField user = new UserListGridField("user", USER_ID, "author");
 		ListGridField date = new DateListGridField("date", "date");

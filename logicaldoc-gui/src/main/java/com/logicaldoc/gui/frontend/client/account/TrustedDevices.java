@@ -6,6 +6,7 @@ import java.util.List;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.data.DevicesDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -49,21 +50,19 @@ public class TrustedDevices extends com.smartgwt.client.widgets.Window {
 	}
 
 	private void prepareGrid() {
-		ListGridField id = new ListGridField("id", I18N.message("device"), 80);
-		id.setHidden(true);
-		id.setCanEdit(false);
+		ListGridField id = new IdListGridField();
 
 		ListGridField label = new ListGridField("label", I18N.message("label"), 150);
 		label.setCanEdit(true);
-		label.addCellSavedHandler(
-				event -> SecurityService.Instance.get().updateDeviceLabel(event.getRecord().getAttributeAsLong("id"),
-						event.getNewValue() != null ? event.getNewValue().toString() : null, new DefaultAsyncCallback<>() {
+		label.addCellSavedHandler(event -> SecurityService.Instance.get().updateDeviceLabel(
+				event.getRecord().getAttributeAsLong("id"),
+				event.getNewValue() != null ? event.getNewValue().toString() : null, new DefaultAsyncCallback<>() {
 
-							@Override
-							public void onSuccess(Void arg) {
-								// Nothing to do
-							}
-						}));
+					@Override
+					public void onSuccess(Void arg) {
+						// Nothing to do
+					}
+				}));
 
 		ListGridField deviceId = new ListGridField("deviceId", I18N.message("deviceid"), 150);
 		deviceId.setHidden(true);
@@ -134,12 +133,12 @@ public class TrustedDevices extends com.smartgwt.client.widgets.Window {
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

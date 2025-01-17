@@ -5,6 +5,7 @@ import com.logicaldoc.gui.common.client.beans.GUIAutomationTrigger;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.AutomationTriggersDS;
 import com.logicaldoc.gui.common.client.grid.EventsListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -53,9 +54,7 @@ public class FolderAutomationPanel extends FolderDetailTab {
 		if (list != null)
 			container.removeMember(list);
 
-		ListGridField id = new ListGridField("id", "id", 50);
-		id.setCanEdit(false);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField automation = new ListGridField(AUTOMATION, I18N.message(AUTOMATION));
 		automation.setWidth("*");
@@ -200,7 +199,7 @@ public class FolderAutomationPanel extends FolderDetailTab {
 			}
 		});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

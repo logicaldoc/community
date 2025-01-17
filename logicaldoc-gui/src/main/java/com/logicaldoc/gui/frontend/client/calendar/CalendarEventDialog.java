@@ -8,8 +8,8 @@ import java.util.List;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -18,6 +18,7 @@ import com.logicaldoc.gui.common.client.beans.GUIReminder;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.preview.PreviewPopup;
@@ -315,10 +316,7 @@ public class CalendarEventDialog extends Window {
 	}
 
 	private Tab prepareAttendees() {
-		ListGridField id = new ListGridField("id", I18N.message("id"));
-		id.setWidth(90);
-		id.setHidden(true);
-		id.setCanEdit(false);
+		ListGridField id = new IdListGridField();
 
 		ListGridField name = prepareNameField();
 

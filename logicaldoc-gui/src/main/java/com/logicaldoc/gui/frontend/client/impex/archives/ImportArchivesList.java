@@ -8,7 +8,6 @@ import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
@@ -68,14 +67,7 @@ public class ImportArchivesList extends VLayout {
 		ListGridField desdcription = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION), 250);
 		desdcription.setCanFilter(false);
 
-		ListGridField status = new ListGridField("statusicon", I18N.message("status"), 50);
-		status.setType(ListGridFieldType.IMAGE);
-		status.setCanSort(false);
-		status.setAlign(Alignment.CENTER);
-		status.setShowDefaultContextMenu(false);
-		status.setImageURLPrefix(Util.imagePrefix());
-		status.setImageURLSuffix(".png");
-		status.setCanFilter(false);
+		ListGridField status = new ArchiveStatusListGridField();
 
 		ListGridField created = new DateListGridField("created", "createdon");
 
@@ -197,7 +189,7 @@ public class ImportArchivesList extends VLayout {
 		rec.setAttribute(DESCRIPTION, result.getDescription());
 		list.refreshRow(list.getRecordIndex(rec));
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

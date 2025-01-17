@@ -5,6 +5,7 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIImportFolder;
 import com.logicaldoc.gui.common.client.data.ImportFoldersDS;
 import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.IntegerListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -69,8 +70,7 @@ public class ImportFoldersPanel extends AdminPanel {
 		listing.setHeight("60%");
 		listing.setShowResizeBar(true);
 
-		ListGridField id = new ListGridField("id", 50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField targetFolderId = new ListGridField("targetFolderId", I18N.message("targetid"), 50);
 		targetFolderId.setHidden(true);

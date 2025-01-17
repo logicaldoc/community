@@ -13,12 +13,13 @@ import com.logicaldoc.gui.common.client.controllers.ReadingRequestController;
 import com.logicaldoc.gui.common.client.controllers.ReadingRequestObserver;
 import com.logicaldoc.gui.common.client.data.ReadingRequestsDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.grid.FileVersionListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.grid.TypeIconGridField;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
-import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.preview.PreviewPopup;
@@ -97,8 +98,7 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 		toolStrip.addFill();
 		addMember(toolStrip);
 
-		ListGridField id = new ListGridField("id", I18N.getAttributeLabel("id"), 60);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 		ListGridField recipient = new UserListGridField("user", "userId", "recipient");
 		ListGridField requestor = new UserListGridField("requestor", "requestorId", "requestor");
 		ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_LONG);
@@ -241,13 +241,12 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 	public void onNewReadingRequests(List<GUIReadingRequest> requests) {
 		refresh();
 	}
-	
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

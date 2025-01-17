@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.folder;
 
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.FolderAliasesDS;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.Alignment;
@@ -25,8 +26,7 @@ public class AliasesPanel extends FolderDetailTab {
 
 	@Override
 	protected void onDraw() {
-		ListGridField id = new ListGridField("id", I18N.message("id"), 50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 		ListGridField name = new ListGridField("name", I18N.message("name"), 200);
 		ListGridField path = new ListGridField("path", I18N.message("path"));
 
@@ -58,6 +58,7 @@ public class AliasesPanel extends FolderDetailTab {
 		if (dataSource != null)
 			dataSource.destroy();
 	}
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

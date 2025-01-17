@@ -6,6 +6,7 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUILDAPServer;
 import com.logicaldoc.gui.common.client.data.LDAPServersDS;
 import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.grid.formatters.EnabledCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -59,8 +60,7 @@ public class LDAPServersPanel extends AdminPanel {
 		// Initialize the listing panel
 		Layout listing = new VLayout();
 
-		ListGridField id = new ListGridField("id", 50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 		id.setCellFormatter(new EnabledCellFormatter());
 
 		ListGridField url = new ListGridField("url", I18N.message("server"), 300);

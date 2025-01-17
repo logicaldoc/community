@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -92,11 +93,7 @@ public class DashletsPanel extends VLayout {
 		toolStrip.addFill();
 		toolStrip.setWidth100();
 
-		ListGridField id = new ListGridField("id", I18N.message("id"));
-		id.setAutoFitWidth(true);
-		id.setRequired(true);
-		id.setCanEdit(false);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField name = new ListGridField("name", I18N.message("name"));
 		name.setWidth(100);
@@ -234,7 +231,7 @@ public class DashletsPanel extends VLayout {
 			}
 		});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

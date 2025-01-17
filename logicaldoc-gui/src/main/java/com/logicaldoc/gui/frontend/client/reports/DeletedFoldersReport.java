@@ -2,11 +2,11 @@ package com.logicaldoc.gui.frontend.client.reports;
 
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DeletedFoldersDS;
-import com.logicaldoc.gui.common.client.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
-import com.logicaldoc.gui.common.client.grid.FolderListGridField;
-import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
+import com.logicaldoc.gui.common.client.grid.FolderListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
+import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -42,9 +42,7 @@ public class DeletedFoldersReport extends ReportPanel implements FolderChangeLis
 
 	@Override
 	protected void prepareListGrid() {
-		ListGridField id = new ColoredListGridField("id");
-		id.setHidden(true);
-		id.setCanGroupBy(false);
+		ListGridField id = new IdListGridField();
 
 		ListGridField name = new FolderListGridField("name", I18N.message("name"));
 		name.setWidth(200);
@@ -122,7 +120,7 @@ public class DeletedFoldersReport extends ReportPanel implements FolderChangeLis
 	public void onChanged(GUIFolder folder) {
 		refresh();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

@@ -3,10 +3,11 @@ package com.logicaldoc.gui.frontend.client.account.contacts;
 import java.util.Arrays;
 import java.util.Map;
 
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.data.ContactsDS;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -117,8 +118,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 	}
 
 	private void prepareGrid() {
-		ListGridField id = new ListGridField("id", 50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField email = new ListGridField(EMAIL, I18N.message(EMAIL));
 		email.setWidth("*");

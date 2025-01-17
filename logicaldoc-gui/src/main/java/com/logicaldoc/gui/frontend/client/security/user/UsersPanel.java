@@ -12,6 +12,7 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.UsersDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.grid.formatters.UserCellFormatter;
@@ -136,8 +137,7 @@ public class UsersPanel extends AdminPanel {
 		listing.setHeight("55%");
 		listing.setShowResizeBar(true);
 
-		ListGridField id = new ListGridField("id", 50);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 		id.setCellFormatter(new UserCellFormatter());
 
 		ListGridField username = new ListGridField(USERNAME, I18N.message(USERNAME), 100);

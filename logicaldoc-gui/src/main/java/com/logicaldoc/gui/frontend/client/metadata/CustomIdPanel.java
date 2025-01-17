@@ -7,6 +7,7 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIScheme;
 import com.logicaldoc.gui.common.client.data.SequencesDS;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -178,10 +179,7 @@ public class CustomIdPanel extends AdminPanel {
 		refresh.addClickHandler(event -> sequences.refresh(new SequencesDS(CUSTOMID)));
 		toolStrip.addButton(refresh);
 
-		ListGridField id = new ListGridField("id", I18N.message("id"));
-		id.setWidth(60);
-		id.setCanEdit(false);
-		id.setHidden(true);
+		ListGridField id = new IdListGridField();
 
 		ListGridField name = new ListGridField("name", I18N.message("name"));
 		name.setWidth(200);

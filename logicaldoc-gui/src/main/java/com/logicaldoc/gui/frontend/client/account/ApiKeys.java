@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.account;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.data.ApiKeysDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.services.SecurityService;
@@ -67,9 +68,7 @@ public class ApiKeys extends com.smartgwt.client.widgets.Window {
 		buttons.addFill();
 		buttons.setWidth100();
 
-		ListGridField id = new ListGridField("id", I18N.message("id"), 80);
-		id.setHidden(true);
-		id.setCanEdit(false);
+		ListGridField id = new IdListGridField();
 
 		ListGridField name = new ListGridField("name", I18N.message("name"), 150);
 		name.setCanEdit(true);

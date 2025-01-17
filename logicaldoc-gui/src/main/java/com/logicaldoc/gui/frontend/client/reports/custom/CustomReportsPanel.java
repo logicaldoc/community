@@ -186,7 +186,7 @@ public class CustomReportsPanel extends AdminPanel {
 		long oldVersion = rcd.getAttributeAsLong("recordVersion");
 
 		rcd.setAttribute("running",
-				rcd.getAttribute("name").equals(report.getName()) && report.getStatus() != GUIReport.STATUS_IDLE);
+				rcd.getAttribute("name").equals(report.getName()) && report.getStatus() == GUIReport.STATUS_RUNNING);
 		rcd.setAttribute("status", report.getStatus());
 		rcd.setAttribute("lastRun", report.getLastRun());
 		rcd.setAttribute("lastModified", report.getLastModified());
