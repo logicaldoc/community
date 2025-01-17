@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.dashboard;
+package com.logicaldoc.gui.frontend.client.dashboard.messages;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
@@ -14,12 +14,9 @@ import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.services.MessageService;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ContentsType;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.HTMLPane;
@@ -60,14 +57,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 
 		ListGridField id = new IdListGridField();
 
-		ListGridField priority = new ListGridField("priority", I18N.message("priority"), 50);
-		priority.setType(ListGridFieldType.IMAGE);
-		priority.setCanSort(false);
-		priority.setAlign(Alignment.CENTER);
-		priority.setShowDefaultContextMenu(false);
-		priority.setImageURLPrefix(Util.imagePrefix());
-		priority.setImageURLSuffix(".gif");
-		priority.setCanFilter(false);
+		ListGridField priority = new MessagePriorityListGridField();
 
 		ListGridField subject = new ListGridField(SUBJECT, I18N.message(SUBJECT));
 		subject.setCanFilter(true);

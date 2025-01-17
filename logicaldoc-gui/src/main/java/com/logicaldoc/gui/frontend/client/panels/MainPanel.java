@@ -15,7 +15,7 @@ import com.logicaldoc.gui.common.client.util.RequestInfo;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.IncomingMessage;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
-import com.logicaldoc.gui.frontend.client.dashboard.DashboardPanel;
+import com.logicaldoc.gui.frontend.client.dashboard.messages.DashboardPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.menu.MainMenu;
 import com.logicaldoc.gui.frontend.client.search.Search;

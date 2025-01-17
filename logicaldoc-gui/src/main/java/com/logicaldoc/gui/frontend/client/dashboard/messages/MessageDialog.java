@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.dashboard;
+package com.logicaldoc.gui.frontend.client.dashboard.messages;
 
 import java.util.ArrayList;
 import java.util.Arrays;

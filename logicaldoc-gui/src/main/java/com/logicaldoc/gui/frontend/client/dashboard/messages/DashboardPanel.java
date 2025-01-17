@@ -1,10 +1,11 @@
-package com.logicaldoc.gui.frontend.client.dashboard;
+package com.logicaldoc.gui.frontend.client.dashboard.messages;
 
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.calendar.UserCalendarPanel;
+import com.logicaldoc.gui.frontend.client.dashboard.UserDashboard;
 import com.logicaldoc.gui.frontend.client.dashboard.chat.ChatPanel;
 import com.logicaldoc.gui.frontend.client.dashboard.reading.ReadingRequestsPanel;
 import com.logicaldoc.gui.frontend.client.dashboard.tag.TagsDashboard;

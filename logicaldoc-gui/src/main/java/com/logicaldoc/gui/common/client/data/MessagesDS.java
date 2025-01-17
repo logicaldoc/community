@@ -3,7 +3,7 @@ package com.logicaldoc.gui.common.client.data;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceDateTimeField;
-import com.smartgwt.client.data.fields.DataSourceImageField;
+import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -23,7 +23,7 @@ public class MessagesDS extends DataSource {
 
 		DataSourceTextField subject = new DataSourceTextField("subject");
 		DataSourceTextField text = new DataSourceTextField("text");
-		DataSourceImageField priority = new DataSourceImageField("priority");
+		DataSourceIntegerField priority = new DataSourceIntegerField("priority");
 		DataSourceTextField from = new DataSourceTextField("from");
 		DataSourceDateTimeField sent = new DataSourceDateTimeField("sent");
 		DataSourceTextField read = new DataSourceTextField("read");
