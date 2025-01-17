@@ -6,13 +6,13 @@ import java.util.List;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.data.NotesDS;
+import com.logicaldoc.gui.common.client.grid.ColoredListGridField;
+import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
-import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.widgets.grid.ListGridField;
 

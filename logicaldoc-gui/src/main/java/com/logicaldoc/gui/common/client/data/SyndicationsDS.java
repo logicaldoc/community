@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.common.client.data;
 
 import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.fields.DataSourceImageField;
+import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -20,7 +20,7 @@ public class SyndicationsDS extends DataSource {
 		DataSourceTextField name = new DataSourceTextField("name");
 		DataSourceTextField url = new DataSourceTextField("url");
 		DataSourceTextField targetPath = new DataSourceTextField("targetPath");
-		DataSourceImageField enabled = new DataSourceImageField("eenabled");
+		DataSourceBooleanField enabled = new DataSourceBooleanField("eenabled");
 
 		setFields(id, name, url, targetPath, enabled);
 		setDataURL("data/syndications.xml");

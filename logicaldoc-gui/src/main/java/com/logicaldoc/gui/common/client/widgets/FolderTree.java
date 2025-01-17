@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.common.client.widgets;
 
 import com.logicaldoc.gui.common.client.data.FoldersDS;
-import com.logicaldoc.gui.common.client.widgets.grid.FolderListGridField;
+import com.logicaldoc.gui.common.client.grid.FolderListGridField;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.tree.TreeGrid;

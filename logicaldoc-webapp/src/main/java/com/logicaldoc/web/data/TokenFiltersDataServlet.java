@@ -56,10 +56,8 @@ public class TokenFiltersDataServlet extends AbstractDataServlet {
 			for (String filterName : filters) {
 				writer.print("<filter>");
 				writer.print("<name><![CDATA[" + filterName + "]]></name>");
-				if ("enabled".equals(config.getProperty("index.tokenfilter." + filterName)))
-					writer.print("<eenabled>0</eenabled>");
-				else
-					writer.print("<eenabled>2</eenabled>");
+				writer.print("<eenabled>" + "enabled".equals(config.getProperty("index.tokenfilter." + filterName))
+						+ "</eenabled>");
 				writer.print("</filter>");
 			}
 		}

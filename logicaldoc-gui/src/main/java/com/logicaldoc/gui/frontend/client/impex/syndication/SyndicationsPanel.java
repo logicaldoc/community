@@ -3,19 +3,18 @@ package com.logicaldoc.gui.frontend.client.impex.syndication;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUISyndication;
 import com.logicaldoc.gui.common.client.data.SyndicationsDS;
+import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
+import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SyndicationService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.SC;
@@ -38,7 +37,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class SyndicationsPanel extends AdminPanel {
 
-	private static final String EENABLED = "eenabled";
+	private static final String ENABLED = "eenabled";
 
 	private Layout detailsContainer = new VLayout();
 
@@ -74,14 +73,7 @@ public class SyndicationsPanel extends AdminPanel {
 		ListGridField targetPath = new ListGridField("targetPath", I18N.message("targetpath"), 300);
 		targetPath.setCanFilter(true);
 
-		ListGridField enabled = new ListGridField(EENABLED, " ", 30);
-		enabled.setType(ListGridFieldType.IMAGE);
-		enabled.setCanSort(false);
-		enabled.setAlign(Alignment.CENTER);
-		enabled.setShowDefaultContextMenu(false);
-		enabled.setImageURLPrefix(Util.imagePrefix());
-		enabled.setImageURLSuffix(".gif");
-		enabled.setCanFilter(false);
+		ListGridField enabled = new EnabledListGridField();
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -107,11 +99,11 @@ public class SyndicationsPanel extends AdminPanel {
 
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
-		refresh.addClickHandler(event -> refresh());
+		refresh.addClickHandler(click -> refresh());
 
 		ToolStripButton addSyndication = new ToolStripButton();
 		addSyndication.setTitle(I18N.message("addsyndication"));
-		addSyndication.addClickHandler(event -> {
+		addSyndication.addClickHandler(click -> {
 			list.deselectAllRecords();
 			GUISyndication syndication = new GUISyndication();
 			showSyndicationDetails(syndication);
@@ -120,9 +112,9 @@ public class SyndicationsPanel extends AdminPanel {
 		toolStrip.addButton(refresh);
 		toolStrip.addButton(addSyndication);
 
-		list.addCellContextClickHandler(event -> {
+		list.addCellContextClickHandler(click -> {
 			showContextMenu();
-			event.cancel();
+			click.cancel();
 		});
 
 		list.addSelectionChangedHandler(event -> {
@@ -138,7 +130,7 @@ public class SyndicationsPanel extends AdminPanel {
 		});
 
 		list.addDataArrivedHandler(
-				event -> infoPanel.setMessage(I18N.message("showsyndications", Integer.toString(list.getTotalRows()))));
+				click -> infoPanel.setMessage(I18N.message("showsyndications", Integer.toString(list.getTotalRows()))));
 
 		detailsContainer.setAlign(Alignment.CENTER);
 		detailsContainer.addMember(details);
@@ -193,22 +185,24 @@ public class SyndicationsPanel extends AdminPanel {
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
+		enable.setEnabled(!rec.getAttributeAsBoolean(ENABLED));
 		enable.addClickHandler(click -> SyndicationService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute(EENABLED, "0");
+						rec.setAttribute(ENABLED, true);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
 				}));
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
+		disable.setEnabled(rec.getAttributeAsBoolean(ENABLED));
 		disable.addClickHandler(event -> SyndicationService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute(EENABLED, "2");
+						rec.setAttribute(ENABLED, false);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
 				}));
@@ -227,10 +221,7 @@ public class SyndicationsPanel extends AdminPanel {
 					}
 				}));
 
-		if ("0".equals(rec.getAttributeAsString(EENABLED)))
-			contextMenu.setItems(test, disable, delete, resetCache);
-		else
-			contextMenu.setItems(test, enable, delete, resetCache);
+		contextMenu.setItems(test, enable, disable, delete, resetCache);
 		contextMenu.showContextMenu();
 	}
 
@@ -264,11 +255,11 @@ public class SyndicationsPanel extends AdminPanel {
 
 		rec.setAttribute("name", syndication.getName());
 		rec.setAttribute("url", syndication.getUrl());
-		rec.setAttribute(EENABLED, syndication.getEnabled() == 1 ? "0" : "2");
+		rec.setAttribute(ENABLED, syndication.getEnabled() == 1);
 		rec.setAttribute("targetPath", syndication.getTargetPath());
 		list.refreshRow(list.getRecordIndex(rec));
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

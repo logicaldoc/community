@@ -5,22 +5,22 @@ import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.TicketsDS;
+import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
+import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
+import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.preview.PreviewPopup;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
-import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
-import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.TicketDisplay;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -42,7 +42,7 @@ public class TicketsReport extends ReportPanel {
 
 	private static final String VALID = "valid";
 
-	private static final String EENABLED = "eenabled";
+	private static final String ENABLED = "eenabled";
 
 	private SpinnerItem max;
 
@@ -71,17 +71,11 @@ public class TicketsReport extends ReportPanel {
 	@Override
 	protected void prepareListGrid() {
 		ListGridField id = new ListGridField("id");
+		id.setWidth(90);
 		id.setHidden(true);
 		id.setCanGroupBy(false);
 
-		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
-		enabled.setType(ListGridFieldType.IMAGE);
-		enabled.setCanSort(false);
-		enabled.setAlign(Alignment.CENTER);
-		enabled.setShowDefaultContextMenu(false);
-		enabled.setImageURLPrefix(Util.imagePrefix());
-		enabled.setImageURLSuffix(".gif");
-		enabled.setCanFilter(false);
+		ListGridField enabled = new EnabledListGridField();
 
 		ListGridField ticketId = new ListGridField("ticketId", I18N.message("ticket"), 210);
 		ticketId.setAlign(Alignment.CENTER);
@@ -128,7 +122,7 @@ public class TicketsReport extends ReportPanel {
 
 		list.addDoubleClickHandler(click -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
 
-		list.setFields(enabled, id, ticketId, type, count, maxCount, views, maxViews, creation, expired, fileName);
+		list.setFields(id, enabled, ticketId, type, count, maxCount, views, maxViews, creation, expired, fileName);
 	}
 
 	@Override
@@ -136,10 +130,13 @@ public class TicketsReport extends ReportPanel {
 		return new RefreshableListGrid() {
 			@Override
 			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
-				if (Boolean.FALSE.equals(rec.getAttributeAsBoolean(VALID)))
-					return "color: #888888; font-style: italic;";
-				else
+				if (Boolean.FALSE.equals(rec.getAttributeAsBoolean(VALID))
+						|| Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED))) {
+					return Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED) ? "color: #888888;" : "color: red;")
+							+ " font-style: italic;";
+				} else {
 					return super.getCellCSSText(rec, rowNum, colNum);
+				}
 			}
 		};
 	}
@@ -192,11 +189,12 @@ public class TicketsReport extends ReportPanel {
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
+		enable.setEnabled(Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED)));
 		enable.addClickHandler(event -> DocumentService.Instance.get().enableTicket(rec.getAttributeAsLong("id"),
 				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute(EENABLED, "0");
+						rec.setAttribute(ENABLED, true);
 						rec.setAttribute(VALID, true);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
@@ -204,11 +202,12 @@ public class TicketsReport extends ReportPanel {
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
+		disable.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED)));
 		disable.addClickHandler(event -> DocumentService.Instance.get().disableTicket(rec.getAttributeAsLong("id"),
 				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute(EENABLED, "2");
+						rec.setAttribute(ENABLED, false);
 						rec.setAttribute(VALID, false);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
@@ -216,8 +215,8 @@ public class TicketsReport extends ReportPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), answer -> {
-			if (Boolean.TRUE.equals(answer))
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), choice -> {
+			if (Boolean.TRUE.equals(choice))
 				DocumentService.Instance.get().deleteTicket(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
@@ -237,10 +236,7 @@ public class TicketsReport extends ReportPanel {
 			delete.setEnabled(false);
 		}
 
-		if ("0".equals(rec.getAttributeAsString(EENABLED)))
-			contextMenu.setItems(disable, ticketURL, download, preview, openInFolder, delete);
-		else
-			contextMenu.setItems(enable, ticketURL, download, preview, openInFolder, delete);
+		contextMenu.setItems(enable, disable, ticketURL, download, preview, openInFolder, delete);
 		contextMenu.showContextMenu();
 	}
 
@@ -253,7 +249,7 @@ public class TicketsReport extends ReportPanel {
 			urlBase += "download-ticket?ticketId=" + ticketId;
 		return urlBase;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

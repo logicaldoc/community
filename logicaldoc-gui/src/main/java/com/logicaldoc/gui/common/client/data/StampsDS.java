@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.common.client.data;
 
 import com.smartgwt.client.data.DataSource;
+import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceImageField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
@@ -18,7 +19,7 @@ public class StampsDS extends DataSource {
 		DataSourceTextField id = new DataSourceTextField("id");
 		id.setPrimaryKey(true);
 		DataSourceTextField name = new DataSourceTextField("name");
-		DataSourceImageField enabled = new DataSourceImageField("eenabled");
+		DataSourceBooleanField enabled = new DataSourceBooleanField("eenabled");
 		DataSourceTextField description = new DataSourceTextField("description");
 		DataSourceTextField text = new DataSourceTextField("text");
 		DataSourceImageField image = new DataSourceImageField("image");

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUISearchEngine;
@@ -13,6 +13,15 @@ import com.logicaldoc.gui.common.client.data.IndexingQueueDS;
 import com.logicaldoc.gui.common.client.data.LanguagesDS;
 import com.logicaldoc.gui.common.client.data.ParsersDS;
 import com.logicaldoc.gui.common.client.data.TokenFiltersDS;
+import com.logicaldoc.gui.common.client.grid.ColoredListGridField;
+import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
+import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.grid.IndexedListGridField;
+import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.grid.TypeIconGridField;
+import com.logicaldoc.gui.common.client.grid.VersionListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -20,14 +29,6 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.validators.MinLengthValidator;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.TypeIconGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.IndexedListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
-import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -73,7 +74,7 @@ public class SearchIndexPanel extends AdminPanel {
 
 	private static final String VALUE = "value";
 
-	private static final String EENABLED = "eenabled";
+	private static final String ENABLED = "eenabled";
 
 	private static final String ALIASES = "aliases";
 
@@ -210,14 +211,7 @@ public class SearchIndexPanel extends AdminPanel {
 		languagesTabPanel.setWidth100();
 		languagesTabPanel.setHeight100();
 
-		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
-		enabled.setType(ListGridFieldType.IMAGE);
-		enabled.setCanSort(false);
-		enabled.setAlign(Alignment.CENTER);
-		enabled.setShowDefaultContextMenu(false);
-		enabled.setImageURLPrefix(Util.imagePrefix());
-		enabled.setImageURLSuffix(".gif");
-		enabled.setCanFilter(false);
+		ListGridField enabled = new EnabledListGridField();
 
 		ListGridField code = new ListGridField("code", I18N.message("code"), 80);
 		code.setCanEdit(false);
@@ -249,14 +243,7 @@ public class SearchIndexPanel extends AdminPanel {
 	}
 
 	private Tab fillFiltersTab() {
-		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
-		enabled.setType(ListGridFieldType.IMAGE);
-		enabled.setCanSort(false);
-		enabled.setAlign(Alignment.CENTER);
-		enabled.setShowDefaultContextMenu(false);
-		enabled.setImageURLPrefix(Util.imagePrefix());
-		enabled.setImageURLSuffix(".gif");
-		enabled.setCanFilter(false);
+		ListGridField enabled = new EnabledListGridField();
 
 		ListGridField name = new ListGridField("name", I18N.message("filter"));
 		name.setWidth("*");
@@ -302,9 +289,9 @@ public class SearchIndexPanel extends AdminPanel {
 			});
 		});
 
-		filtersGrid.addCellContextClickHandler(event -> {
+		filtersGrid.addCellContextClickHandler(click -> {
 			showFilterMenu(filtersGrid);
-			event.cancel();
+			click.cancel();
 		});
 		return filtersTab;
 	}
@@ -844,12 +831,13 @@ public class SearchIndexPanel extends AdminPanel {
 
 		Menu contextMenu = new Menu();
 		MenuItem enable = new MenuItem();
+		enable.setEnabled(Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED)));
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(event -> SearchEngineService.Instance.get()
 				.setLanguageStatus(rec.getAttributeAsString("code"), true, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute(EENABLED, "0");
+						rec.setAttribute(ENABLED, true);
 						langsList.refreshRow(langsList.getRecordIndex(rec));
 						GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
 					}
@@ -857,20 +845,18 @@ public class SearchIndexPanel extends AdminPanel {
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
+		disable.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED)));
 		disable.addClickHandler(event -> SearchEngineService.Instance.get()
 				.setLanguageStatus(rec.getAttributeAsString("code"), false, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute(EENABLED, "2");
+						rec.setAttribute(ENABLED, false);
 						langsList.refreshRow(langsList.getRecordIndex(rec));
 						GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
 					}
 				}));
 
-		if ("0".equals(rec.getAttributeAsString(EENABLED)))
-			contextMenu.setItems(disable);
-		else
-			contextMenu.setItems(enable);
+		contextMenu.setItems(enable, disable);
 		contextMenu.showContextMenu();
 	}
 
@@ -880,30 +866,29 @@ public class SearchIndexPanel extends AdminPanel {
 		Menu contextMenu = new Menu();
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
+		enable.setEnabled(Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED)));
 		enable.addClickHandler(event -> SearchEngineService.Instance.get()
 				.setTokenFilterStatus(rec.getAttributeAsString("name"), true, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute(EENABLED, "0");
+						rec.setAttribute(ENABLED, true);
 						grid.refreshRow(grid.getRecordIndex(rec));
 					}
 				}));
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
+		disable.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED)));
 		disable.addClickHandler(event -> SearchEngineService.Instance.get()
 				.setTokenFilterStatus(rec.getAttributeAsString("name"), false, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute(EENABLED, "2");
+						rec.setAttribute(ENABLED, false);
 						grid.refreshRow(grid.getRecordIndex(rec));
 					}
 				}));
 
-		if ("0".equals(rec.getAttributeAsString(EENABLED)))
-			contextMenu.setItems(disable);
-		else
-			contextMenu.setItems(enable);
+		contextMenu.setItems(enable, disable);
 		contextMenu.showContextMenu();
 	}
 

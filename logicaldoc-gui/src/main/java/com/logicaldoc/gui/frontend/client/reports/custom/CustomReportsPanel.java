@@ -9,14 +9,16 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIReport;
 import com.logicaldoc.gui.common.client.data.ReportsDS;
+import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
+import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.grid.RunningListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.preview.PreviewPopup;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
-import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentUtil;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -25,7 +27,6 @@ import com.logicaldoc.gui.frontend.client.services.ReportService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
@@ -47,11 +48,9 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class CustomReportsPanel extends AdminPanel {
 
-	private static final String EENABLED = "eenabled";
+	private static final String ENABLED = "eenabled";
 
 	private static final String OUTPUT_DOC_ID = "outputDocId";
-
-	private static final String ENABLED_ICON = "enabledIcon";
 
 	private Layout detailsContainer = new VLayout();
 
@@ -85,22 +84,9 @@ public class CustomReportsPanel extends AdminPanel {
 		ListGridField outputFormat = new ListGridField("outputFormat", I18N.message("format"), 70);
 		outputFormat.setCanFilter(true);
 
-		ListGridField enabledIcon = new ListGridField(ENABLED_ICON, " ", 24);
-		enabledIcon.setType(ListGridFieldType.IMAGE);
-		enabledIcon.setCanSort(false);
-		enabledIcon.setAlign(Alignment.CENTER);
-		enabledIcon.setShowDefaultContextMenu(false);
-		enabledIcon.setImageURLPrefix(Util.imagePrefix());
-		enabledIcon.setImageURLSuffix(".png");
-		enabledIcon.setCanFilter(false);
+		ListGridField enabled = new EnabledListGridField();
 
-		ListGridField runningIcon = new ListGridField("runningIcon", " ", 24);
-		runningIcon.setType(ListGridFieldType.IMAGE);
-		runningIcon.setCanSort(false);
-		runningIcon.setAlign(Alignment.CENTER);
-		runningIcon.setImageURLPrefix(Util.imagePrefix());
-		runningIcon.setImageURLSuffix(".gif");
-		runningIcon.setCanFilter(false);
+		ListGridField running = new RunningListGridField();
 
 		ListGridField lastRun = new DateListGridField("lastRun", "lastrun");
 
@@ -110,7 +96,7 @@ public class CustomReportsPanel extends AdminPanel {
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(enabledIcon, runningIcon, id, name, outputFormat, lastRun);
+		list.setFields(id, enabled, running, name, outputFormat, lastRun);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
@@ -147,15 +133,15 @@ public class CustomReportsPanel extends AdminPanel {
 
 		body.setMembers(toolStrip, listing, detailsContainer);
 
-		list.addCellContextClickHandler(event -> {
+		list.addCellContextClickHandler(click -> {
 			showContextMenu();
-			event.cancel();
+			click.cancel();
 		});
 
-		list.addSelectionChangedHandler(event -> onSelectedReport());
+		list.addSelectionChangedHandler(click -> onSelectedReport());
 
 		list.addDataArrivedHandler(
-				event -> infoPanel.setMessage(I18N.message("showreports", Integer.toString(list.getTotalRows()))));
+				click -> infoPanel.setMessage(I18N.message("showreports", Integer.toString(list.getTotalRows()))));
 
 		refresh();
 
@@ -199,10 +185,8 @@ public class CustomReportsPanel extends AdminPanel {
 	private void updateRecord(ListGridRecord rcd, GUIReport report) {
 		long oldVersion = rcd.getAttributeAsLong("recordVersion");
 
-		rcd.setAttribute("runningIcon",
-				rcd.getAttribute("name").equals(report.getName()) && report.getStatus() != GUIReport.STATUS_IDLE
-						? "running_task"
-						: "idle_task");
+		rcd.setAttribute("running",
+				rcd.getAttribute("name").equals(report.getName()) && report.getStatus() != GUIReport.STATUS_IDLE);
 		rcd.setAttribute("status", report.getStatus());
 		rcd.setAttribute("lastRun", report.getLastRun());
 		rcd.setAttribute("lastModified", report.getLastModified());
@@ -216,8 +200,7 @@ public class CustomReportsPanel extends AdminPanel {
 
 		boolean selected = list.getSelectedRecord() != null && rcd.equals(list.getSelectedRecord());
 
-		// Decide if we have to refresh the properties
-		// panel
+		// Decide if we have to refresh the properties panel
 		if (selected && report.getRecordVersion() != oldVersion) {
 			onSelectedReport();
 		}
@@ -249,7 +232,7 @@ public class CustomReportsPanel extends AdminPanel {
 				}));
 
 		if (GUIReport.STATUS_IDLE != list.getSelectedRecord().getAttributeAsInt("status")
-				|| Boolean.FALSE.equals(list.getSelectedRecord().getAttributeAsBoolean(EENABLED)))
+				|| Boolean.FALSE.equals(list.getSelectedRecord().getAttributeAsBoolean(ENABLED)))
 			execute.setEnabled(false);
 
 		MenuItem upload = new MenuItem();
@@ -264,18 +247,17 @@ public class CustomReportsPanel extends AdminPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(
-				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value))
-						ReportService.Instance.get().delete(selectedId, new DefaultAsyncCallback<>() {
-							@Override
-							public void onSuccess(Void result) {
-								list.removeSelectedData();
-								list.deselectAllRecords();
-								showReportDetails(null);
-							}
-						});
-				}));
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), chioice -> {
+			if (Boolean.TRUE.equals(chioice))
+				ReportService.Instance.get().delete(selectedId, new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(Void result) {
+						list.removeSelectedData();
+						list.deselectAllRecords();
+						showReportDetails(null);
+					}
+				});
+		}));
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
@@ -283,12 +265,11 @@ public class CustomReportsPanel extends AdminPanel {
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute(EENABLED, true);
-						rec.setAttribute(ENABLED_ICON, "bullet_green");
+						rec.setAttribute(ENABLED, true);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
 				}));
-		enable.setEnabled(!list.getSelectedRecord().getAttributeAsBoolean(EENABLED));
+		enable.setEnabled(!list.getSelectedRecord().getAttributeAsBoolean(ENABLED));
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
@@ -296,12 +277,11 @@ public class CustomReportsPanel extends AdminPanel {
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute(EENABLED, false);
-						rec.setAttribute(ENABLED_ICON, "bullet_red");
+						rec.setAttribute(ENABLED, false);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
 				}));
-		disable.setEnabled(list.getSelectedRecord().getAttributeAsBoolean(EENABLED));
+		disable.setEnabled(list.getSelectedRecord().getAttributeAsBoolean(ENABLED));
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
@@ -313,23 +293,21 @@ public class CustomReportsPanel extends AdminPanel {
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
-		preview.addClickHandler(event -> DocumentService.Instance.get().getById(outputDocId, new DefaultAsyncCallback<>() {
-			@Override
-			public void onSuccess(GUIDocument doc) {
-				PreviewPopup iv = new PreviewPopup(doc);
-				iv.show();
-			}
-		}));
+		preview.setEnabled(outputDocId != null);
+		preview.addClickHandler(
+				event -> DocumentService.Instance.get().getById(outputDocId, new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(GUIDocument doc) {
+						new PreviewPopup(doc).show();
+					}
+				}));
 
 		MenuItem export = new MenuItem();
 		export.setTitle(I18N.message("export"));
 		export.addClickHandler(event -> Util.download(
 				Util.contextPath() + "report/controller?command=export&reportId=" + rec.getAttributeAsString("id")));
 
-		if (outputDocId != null)
-			contextMenu.setItems(execute, upload, export, enable, disable, delete, openInFolder, download, preview);
-		else
-			contextMenu.setItems(execute, upload, export, enable, disable, delete, openInFolder);
+		contextMenu.setItems(enable, disable, execute, preview, upload, export, openInFolder, download, delete);
 		contextMenu.showContextMenu();
 	}
 
@@ -362,7 +340,8 @@ public class CustomReportsPanel extends AdminPanel {
 		}
 
 		rec.setAttribute("name", report.getName());
-		rec.setAttribute(EENABLED, report.getEnabled() == 1 ? "0" : "2");
+		rec.setAttribute(ENABLED, report.getEnabled() == 1);
+		rec.setAttribute("running", report.getStatus() != GUIReport.STATUS_IDLE);
 		rec.setAttribute("outputFormat", report.getOutputFormat());
 		if (report.getOutputFolder() != null) {
 			rec.setAttribute("outputFolder", report.getOutputFolder().getName());
@@ -383,7 +362,7 @@ public class CustomReportsPanel extends AdminPanel {
 						}
 					});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

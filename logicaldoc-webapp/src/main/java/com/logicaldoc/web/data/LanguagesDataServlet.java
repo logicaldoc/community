@@ -48,10 +48,9 @@ public class LanguagesDataServlet extends AbstractDataServlet {
 				writer.print("<lang>");
 				writer.print("<code><![CDATA[" + loc + "]]></code>");
 				writer.print("<name><![CDATA[" + StringUtils.capitalize(lc.getDisplayName(locale)) + "]]></name>");
-				if ("enabled".equals(pbean.getProperty(session.getTenantName() + ".lang." + loc + ".gui")))
-					writer.print("<eenabled>0</eenabled>");
-				else
-					writer.print("<eenabled>2</eenabled>");
+				writer.print("<eenabled>"
+						+ "enabled".equals(pbean.getProperty(session.getTenantName() + ".lang." + loc + ".gui"))
+						+ "</eenabled>");
 				writer.print("</lang>");
 			}
 		} else {
@@ -64,10 +63,7 @@ public class LanguagesDataServlet extends AbstractDataServlet {
 				writer.print("<code><![CDATA[" + language.toString() + "]]></code>");
 				writer.print("<name><![CDATA[" + StringUtils.capitalize(language.getLocale().getDisplayName(locale))
 						+ "]]></name>");
-				if (activeLanguages.contains(language))
-					writer.print("<eenabled>0</eenabled>");
-				else
-					writer.print("<eenabled>2</eenabled>");
+				writer.print("<eenabled>" + activeLanguages.contains(language) + "</eenabled>");
 				writer.print("</lang>");
 			}
 		}

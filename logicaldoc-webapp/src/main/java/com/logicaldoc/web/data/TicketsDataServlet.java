@@ -88,7 +88,7 @@ public class TicketsDataServlet extends AbstractDataServlet {
 			writer.print("<maxViews>" + maxViews + "</maxViews>");
 		if (StringUtils.isNotEmpty(suffix))
 			writer.print("<suffix><![CDATA[" + suffix + "]]></suffix>");
-		writer.print("<eenabled>" + (enabled ? "0" : "2") + "</eenabled>");
+		writer.print("<eenabled>" + enabled + "</eenabled>");
 		writer.print("<valid>" + isValidTicket(count, maxCount, expired, enabled) + "</valid>");
 		writer.print("<filename><![CDATA[" + fileName + "]]></filename>");
 		writer.print(

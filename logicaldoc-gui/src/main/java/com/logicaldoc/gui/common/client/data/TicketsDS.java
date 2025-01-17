@@ -38,9 +38,9 @@ public class TicketsDS extends DataSource {
 		DataSourceIntegerField type = new DataSourceIntegerField("type");
 		DataSourceImageField icon = new DataSourceImageField("icon");
 		icon.setHidden(true);
-		DataSourceImageField enabled = new DataSourceImageField("eenabled");
+		DataSourceBooleanField enabled = new DataSourceBooleanField("eenabled");
 
-		setFields(id, ticketId, type, docId, creation, expired, count, maxCount, views, maxViews, suffix, enabled,
+		setFields(id, enabled, ticketId, type, docId, creation, expired, count, maxCount, views, maxViews, suffix,
 				valid, icon, fileName, folderId);
 		setClientOnly(true);
 

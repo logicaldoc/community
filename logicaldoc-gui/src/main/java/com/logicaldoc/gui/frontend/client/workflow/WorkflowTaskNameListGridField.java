@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.frontend.client.workflow;
 
+import com.logicaldoc.gui.common.client.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 
 /**
  * A field to display the name of a workflow task with corresponding color

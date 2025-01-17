@@ -9,7 +9,7 @@ import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.FoldersDS;
-import com.logicaldoc.gui.common.client.widgets.grid.FolderListGridField;
+import com.logicaldoc.gui.common.client.grid.FolderListGridField;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.data.AdvancedCriteria;

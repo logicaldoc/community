@@ -3,7 +3,6 @@ package com.logicaldoc.gui.common.client.data;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceDateTimeField;
-import com.smartgwt.client.data.fields.DataSourceImageField;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
@@ -24,16 +23,14 @@ public class ReportsDS extends DataSource {
 		DataSourceTextField outputFolderId = new DataSourceTextField("outputFolderId");
 		DataSourceTextField outputDocId = new DataSourceTextField("outputDocId");
 
-		DataSourceImageField runningIcon = new DataSourceImageField("runningIcon");
+		DataSourceBooleanField running = new DataSourceBooleanField("running");
 		DataSourceIntegerField status = new DataSourceIntegerField("status");
-
-		DataSourceImageField enabledIcon = new DataSourceImageField("enabledIcon");
 		DataSourceBooleanField enabled = new DataSourceBooleanField("eenabled");
 
 		DataSourceDateTimeField lastRun = new DataSourceDateTimeField("lastRun");
 		DataSourceDateTimeField lastModified = new DataSourceDateTimeField("lastModified");
 
-		setFields(id, name, enabled, enabledIcon, runningIcon, status, lastRun, outputFolderId, outputDocId,
+		setFields(id, name, enabled, running, status, lastRun, outputFolderId, outputDocId,
 				lastModified);
 		setDataURL("data/reports.xml");
 		setClientOnly(true);

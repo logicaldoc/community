@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.common.client.data;
 
 import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.fields.DataSourceImageField;
+import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -17,7 +17,7 @@ public class EmailAccountsDS extends DataSource {
 		DataSourceTextField id = new DataSourceTextField("id");
 		id.setPrimaryKey(true);
 		DataSourceTextField email = new DataSourceTextField("email");
-		DataSourceImageField enabled = new DataSourceImageField("eenabled");
+		DataSourceBooleanField enabled = new DataSourceBooleanField("eenabled");
 
 		setFields(id, email, enabled);
 		setDataURL("data/emailaccounts.xml" + (type != null ? "?type=" + type : ""));

@@ -10,10 +10,10 @@ import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUITask;
 import com.logicaldoc.gui.common.client.data.TasksDS;
+import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
+import com.logicaldoc.gui.common.client.grid.RunningListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.EnabledListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.RunningListGridField;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.smartgwt.client.types.Alignment;
@@ -230,8 +230,8 @@ public class TasksPanel extends AdminPanel {
 	}
 
 	private void addGridContextHandler() {
-		tasksGrid.addCellContextClickHandler(event -> {
-			event.cancel();
+		tasksGrid.addCellContextClickHandler(click -> {
+			click.cancel();
 			if (!Session.get().isDefaultTenant())
 				return;
 
@@ -243,11 +243,7 @@ public class TasksPanel extends AdminPanel {
 							public void onSuccess(GUITask task) {
 								rec.setAttribute(STATUS, task.getStatus());
 								rec.setAttribute(ENABLED, task.getScheduling().isEnabled());
-								if (task.getStatus() != GUITask.STATUS_IDLE) {
-									rec.setAttribute(RUNNING, true);
-								} else {
-									rec.setAttribute(RUNNING, false);
-								}
+								rec.setAttribute(RUNNING,task.getStatus() != GUITask.STATUS_IDLE);
 								tasksGrid.refreshRow(tasksGrid.getRecordIndex(rec));
 								showContextMenu();
 							}

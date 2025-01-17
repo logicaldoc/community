@@ -17,6 +17,6 @@ public class DetailsPreviewPanel extends DocumentDetailTab {
 
 	@Override
 	protected void onDraw() {
-		setMembers(new com.logicaldoc.gui.common.client.widgets.preview.PreviewPanel(document));
+		setMembers(new com.logicaldoc.gui.common.client.preview.PreviewPanel(document));
 	}
 }

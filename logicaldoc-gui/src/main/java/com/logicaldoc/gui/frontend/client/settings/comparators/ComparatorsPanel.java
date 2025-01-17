@@ -10,10 +10,10 @@ import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.data.ComparatorsDS;
+import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.data.AdvancedCriteria;
@@ -24,7 +24,6 @@ import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.ImgButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -50,7 +49,7 @@ public class ComparatorsPanel extends AdminPanel {
 
 	private static final String VALUE = "value";
 
-	private static final String EENABLED = "eenabled";
+	private static final String ENABLED = "eenabled";
 
 	protected String gridAttributeName = "comparator";
 
@@ -94,10 +93,7 @@ public class ComparatorsPanel extends AdminPanel {
 		configButton.setShowFocused(false);
 		configButton.setShowRollOver(false);
 		configButton.setShowDown(false);
-		configButton.addClickHandler((ClickEvent event) -> {
-			ComparatorAssociationsDialog dialog = getAssociationsDialog();
-			dialog.show();
-		});
+		configButton.addClickHandler(click -> getAssociationsDialog().show());
 		if (!Session.get().isDemo())
 			associationsSection.setControls(configButton);
 
@@ -153,7 +149,7 @@ public class ComparatorsPanel extends AdminPanel {
 		comparator.setCanEdit(!Session.get().isDemo());
 		comparator.setCellFormatter((value, rec, rowNum, colNum) -> {
 			String label = getComparatorShortName(value != null ? value.toString() : null);
-			boolean enabled = rec.getAttributeAsBoolean(EENABLED);
+			boolean enabled = rec.getAttributeAsBoolean(ENABLED);
 			if (!enabled)
 				label = "<span style='color:red;'>" + label + "</span>";
 
@@ -180,8 +176,8 @@ public class ComparatorsPanel extends AdminPanel {
 			Record converterRecord = settingsGrid.find(new AdvancedCriteria("id", OperatorId.EQUALS,
 					associationsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
 			if (converterRecord != null)
-				associationsGrid.getSelectedRecord().setAttribute(EENABLED,
-						converterRecord.getAttributeAsBoolean(EENABLED));
+				associationsGrid.getSelectedRecord().setAttribute(ENABLED,
+						converterRecord.getAttributeAsBoolean(ENABLED));
 		});
 	}
 
@@ -217,17 +213,7 @@ public class ComparatorsPanel extends AdminPanel {
 		settingsGrid.setCanEdit(false);
 		settingsGrid.setDataSource(getSettingsDataSource());
 
-		ListGridField enabled = new ListGridField(EENABLED, " ", 30);
-		enabled.setCanSort(false);
-		enabled.setCanFilter(false);
-		enabled.setCellFormatter((value, rec, rowNum, colNum) -> {
-			if (value == null)
-				return "";
-			else if (Boolean.parseBoolean(value.toString()))
-				return Util.imageHTML("bullet_green.png");
-			else
-				return Util.imageHTML("bullet_red.png");
-		});
+		ListGridField enabled = new EnabledListGridField();
 
 		ListGridField comparator = new ListGridField(gridAttributeName, listGridAttributeLabel);
 		comparator.setWidth("*");
@@ -301,7 +287,7 @@ public class ComparatorsPanel extends AdminPanel {
 
 	protected boolean isParameterAttribute(String name) {
 		return !("id".equals(name) || gridAttributeName.equals(name) || "out".equals(name) || "in".equals(name)
-				|| LABEL.equals(name) || EENABLED.equals(name) || name.startsWith("_"));
+				|| LABEL.equals(name) || ENABLED.equals(name) || name.startsWith("_"));
 	}
 
 	private void onSave() {
@@ -369,14 +355,10 @@ public class ComparatorsPanel extends AdminPanel {
 		Menu contextMenu = new Menu();
 
 		MenuItem enable = prepareEnableMenuItem();
-
-		if (Boolean.TRUE.equals(settingsGrid.getSelectedRecord().getAttributeAsBoolean(EENABLED)))
-			enable.setEnabled(false);
+		enable.setEnabled(!settingsGrid.getSelectedRecord().getAttributeAsBoolean(ENABLED));
 
 		MenuItem disable = prepareDisableMenuItem();
-
-		if (Boolean.FALSE.equals(settingsGrid.getSelectedRecord().getAttributeAsBoolean(EENABLED)))
-			disable.setEnabled(false);
+		disable.setEnabled(settingsGrid.getSelectedRecord().getAttributeAsBoolean(ENABLED));
 
 		contextMenu.setItems(enable, disable);
 		contextMenu.showContextMenu();
@@ -391,7 +373,7 @@ public class ComparatorsPanel extends AdminPanel {
 						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void arg0) {
-								settingsGrid.getSelectedRecord().setAttribute(EENABLED, false);
+								settingsGrid.getSelectedRecord().setAttribute(ENABLED, false);
 								settingsGrid.refreshRow(settingsGrid.getRecordIndex(settingsGrid.getSelectedRecord()));
 
 								// Update the associations table
@@ -400,7 +382,7 @@ public class ComparatorsPanel extends AdminPanel {
 										settingsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
 								if (associations != null)
 									for (Record rec : associations)
-										rec.setAttribute(EENABLED, false);
+										rec.setAttribute(ENABLED, false);
 
 								// Refresh the visualization
 								associationsGrid.invalidateRecordComponents();
@@ -423,7 +405,7 @@ public class ComparatorsPanel extends AdminPanel {
 						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void arg0) {
-								settingsGrid.getSelectedRecord().setAttribute(EENABLED, true);
+								settingsGrid.getSelectedRecord().setAttribute(ENABLED, true);
 								settingsGrid.refreshRow(settingsGrid.getRecordIndex(settingsGrid.getSelectedRecord()));
 
 								// Update the associations table
@@ -432,7 +414,7 @@ public class ComparatorsPanel extends AdminPanel {
 										settingsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
 								if (associations != null)
 									for (Record rec : associations)
-										rec.setAttribute(EENABLED, true);
+										rec.setAttribute(ENABLED, true);
 
 								// Refresh the visualization
 								associationsGrid.invalidateRecordComponents();

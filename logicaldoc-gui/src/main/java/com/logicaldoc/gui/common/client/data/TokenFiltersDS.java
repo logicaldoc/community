@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.common.client.data;
 
 import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.fields.DataSourceImageField;
+import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -18,7 +18,7 @@ public class TokenFiltersDS extends DataSource {
 		DataSourceTextField name = new DataSourceTextField("name");
 		name.setPrimaryKey(true);
 
-		DataSourceImageField enabled = new DataSourceImageField("eenabled");
+		DataSourceBooleanField enabled = new DataSourceBooleanField("eenabled");
 
 		DataSourceTextField value = new DataSourceTextField("value");
 
