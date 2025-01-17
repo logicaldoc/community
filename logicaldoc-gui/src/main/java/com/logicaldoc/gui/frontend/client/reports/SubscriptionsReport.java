@@ -134,7 +134,7 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 		icon.setAlign(Alignment.CENTER);
 		icon.setShowDefaultContextMenu(false);
 		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setImageURLSuffix(".png");
+		icon.setImageURLSuffix(".svg");
 		icon.setCanFilter(false);
 
 		list.setFields(id, userId, userName, created, option, icon, path, events);
