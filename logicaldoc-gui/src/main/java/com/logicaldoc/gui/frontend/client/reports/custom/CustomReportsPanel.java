@@ -269,7 +269,7 @@ public class CustomReportsPanel extends AdminPanel {
 						list.refreshRow(list.getRecordIndex(rec));
 					}
 				}));
-		enable.setEnabled(!list.getSelectedRecord().getAttributeAsBoolean(ENABLED));
+		enable.setEnabled(Boolean.FALSE.equals(list.getSelectedRecord().getAttributeAsBoolean(ENABLED)));
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
@@ -281,7 +281,7 @@ public class CustomReportsPanel extends AdminPanel {
 						list.refreshRow(list.getRecordIndex(rec));
 					}
 				}));
-		disable.setEnabled(list.getSelectedRecord().getAttributeAsBoolean(ENABLED));
+		disable.setEnabled(Boolean.TRUE.equals(list.getSelectedRecord().getAttributeAsBoolean(ENABLED)));
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));

@@ -23,12 +23,8 @@ public class RunningListGridField extends ColoredListGridField {
 
 	private String formatStatusIconCell(ListGridRecord rec) {
 		String color = rec.getAttributeAsString(colorFieldName);
-		Boolean running = rec.getAttributeAsBoolean(RUNNING);
-		if (running == null)
-			return "";
-
 		String content = "<div style='display: flex; text-align: center; justify-content: center;'>";
-		if (Boolean.TRUE.equals(running)) {
+		if (Boolean.TRUE.equals(rec.getAttributeAsBoolean(RUNNING))) {
 			content += AwesomeFactory.getIconButtonHTML("cog", null, RUNNING, color, "spin", null);
 		} else {
 			content += AwesomeFactory.getIconButtonHTML("cog", null, "idle", color, null);

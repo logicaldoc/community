@@ -235,7 +235,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.setEnabled(rec.getAttributeAsBoolean("eenabled"));
+		disable.setEnabled(rec.getAttributeAsBoolean(ENABLED));
 		disable.addClickHandler(event -> RetentionPoliciesService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new DefaultAsyncCallback<>() {
 					@Override

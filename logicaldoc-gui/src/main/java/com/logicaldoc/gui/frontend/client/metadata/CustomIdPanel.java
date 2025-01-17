@@ -3,8 +3,8 @@ package com.logicaldoc.gui.frontend.client.metadata;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIScheme;
 import com.logicaldoc.gui.common.client.data.SequencesDS;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
@@ -147,8 +147,8 @@ public class CustomIdPanel extends AdminPanel {
 			GUIScheme cid = new GUIScheme();
 			ListGridRecord rec = customIds.getRecord(event.getRowNum());
 			cid.setTemplateId(Long.parseLong(rec.getAttribute(TEMPLATE_ID)));
-			cid.setEvaluateAtCheckin(rec.getAttributeAsBoolean(EVALUATE_AT_CHECKIN));
-			cid.setEvaluateAtUpdate(rec.getAttributeAsBoolean(EVALUATE_AT_UPDATE));
+			cid.setEvaluateAtCheckin(Boolean.TRUE.equals(rec.getAttributeAsBoolean(EVALUATE_AT_CHECKIN)));
+			cid.setEvaluateAtUpdate(Boolean.TRUE.equals(rec.getAttributeAsBoolean(EVALUATE_AT_UPDATE)));
 			cid.setScheme(rec.getAttributeAsString(SCHEME));
 			cid.setType(rec.getAttributeAsString("type"));
 
@@ -283,7 +283,7 @@ public class CustomIdPanel extends AdminPanel {
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

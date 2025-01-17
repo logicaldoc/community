@@ -797,7 +797,7 @@ public class ItemFactory {
 			if (label == null || "".equals(label))
 				return null;
 
-			if (r.getAttribute(EENABLED) != null && !r.getAttributeAsBoolean(EENABLED))
+			if (Boolean.FALSE.equals(r.getAttributeAsBoolean(EENABLED)))
 				label = SPAN_STYLE_COLOR_RED + label + CLOSE_SPAN;
 			return label;
 		});
@@ -808,7 +808,7 @@ public class ItemFactory {
 			if (label == null || "".equals(label))
 				return null;
 
-			if (rec.getAttribute(EENABLED) != null && !rec.getAttributeAsBoolean(EENABLED))
+			if (Boolean.FALSE.equals(rec.getAttributeAsBoolean(EENABLED)))
 				label = SPAN_STYLE_COLOR_RED + label + CLOSE_SPAN;
 			return label;
 		});
@@ -836,7 +836,7 @@ public class ItemFactory {
 			if (label == null || "".equals(label))
 				return null;
 
-			if (r.getAttribute(EENABLED) != null && !r.getAttributeAsBoolean(EENABLED))
+			if (Boolean.FALSE.equals(r.getAttributeAsBoolean(EENABLED)))
 				label = SPAN_STYLE_COLOR_RED + label + CLOSE_SPAN;
 			return label;
 		});
@@ -847,7 +847,7 @@ public class ItemFactory {
 			if (label == null || "".equals(label))
 				return null;
 
-			if (rec.getAttribute(EENABLED) != null && !rec.getAttributeAsBoolean(EENABLED))
+			if (Boolean.FALSE.equals(rec.getAttributeAsBoolean(EENABLED)))
 				label = SPAN_STYLE_COLOR_RED + label + CLOSE_SPAN;
 			return label;
 		});

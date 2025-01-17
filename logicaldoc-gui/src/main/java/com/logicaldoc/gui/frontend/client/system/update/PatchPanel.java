@@ -341,38 +341,39 @@ public class PatchPanel extends VLayout {
 			bar.setPercentDone(0);
 			download.setDisabled(true);
 
-			UpdateService.Instance.get().downloadPatch(patch.getId(), fileName, patch.getSize(), new DefaultAsyncCallback<>() {
+			UpdateService.Instance.get().downloadPatch(patch.getId(), fileName, patch.getSize(),
+					new DefaultAsyncCallback<>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					super.onFailure(caught);
-					download.setDisabled(false);
-				}
-
-				@Override
-				public void onSuccess(Void arg) {
-					confirmPatch.setVisible(false);
-
-					new Timer() {
-						public void run() {
-							UpdateService.Instance.get().checkDownloadStatus(new DefaultAsyncCallback<>() {
-								@Override
-								public void onSuccess(List<Integer> status) {
-									bar.setPercentDone(status.get(1));
-
-									if (status.get(1) == 100) {
-										download.setDisabled(false);
-										confirmPatch.setVisible(true);
-										deleteButton.setVisible(true);
-										displayNotes(fileName);
-									} else
-										schedule(50);
-								}
-							});
+						@Override
+						public void onFailure(Throwable caught) {
+							super.onFailure(caught);
+							download.setDisabled(false);
 						}
-					}.schedule(50);
-				}
-			});
+
+						@Override
+						public void onSuccess(Void arg) {
+							confirmPatch.setVisible(false);
+
+							new Timer() {
+								public void run() {
+									UpdateService.Instance.get().checkDownloadStatus(new DefaultAsyncCallback<>() {
+										@Override
+										public void onSuccess(List<Integer> status) {
+											bar.setPercentDone(status.get(1));
+
+											if (status.get(1) == 100) {
+												download.setDisabled(false);
+												confirmPatch.setVisible(true);
+												deleteButton.setVisible(true);
+												displayNotes(fileName);
+											} else
+												schedule(50);
+										}
+									});
+								}
+							}.schedule(50);
+						}
+					});
 		});
 
 		HLayout buttonCanvas = new HLayout();
@@ -460,8 +461,8 @@ public class PatchPanel extends VLayout {
 		patch.setDescription(rec.getAttribute(DESCRIPTION));
 		patch.setSize(rec.getAttributeAsLong("size"));
 		patch.setDate(rec.getAttributeAsDate("date"));
-		patch.setInstalled(rec.getAttributeAsBoolean(INSTALLED));
-		patch.setLocal(rec.getAttributeAsBoolean(LOCAL));
+		patch.setInstalled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(INSTALLED)));
+		patch.setLocal(Boolean.TRUE.equals(rec.getAttributeAsBoolean(LOCAL)));
 
 		Menu contextMenu = new Menu();
 
@@ -549,7 +550,7 @@ public class PatchPanel extends VLayout {
 			}
 		}.schedule(500);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

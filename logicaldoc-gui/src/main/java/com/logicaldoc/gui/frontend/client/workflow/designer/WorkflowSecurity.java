@@ -240,8 +240,8 @@ public class WorkflowSecurity extends Window {
 				GUIAccessControlEntry right = new GUIAccessControlEntry();
 				right.setName(rec.getAttributeAsString(ENTITY));
 				right.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
-				right.setWrite(rec.getAttributeAsBoolean(WRITE));
-				right.setRead(rec.getAttributeAsBoolean("read"));
+				right.setWrite(Boolean.TRUE.equals(rec.getAttributeAsBoolean(WRITE)));
+				right.setRead(Boolean.TRUE.equals(rec.getAttributeAsBoolean("read")));
 				acl.add(right);
 			}
 

@@ -857,7 +857,7 @@ public class CalendarEventDialog extends Window {
 					attendee.setId(rec.getAttributeAsLong("id"));
 					attendee.setEmail(rec.getAttributeAsString(EMAIL));
 					attendee.setName(rec.getAttributeAsString("name"));
-					attendee.setEnabled(rec.getAttributeAsBoolean(NOTIFY));
+					attendee.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(NOTIFY)));
 					userAttendees.add(attendee);
 				}
 			}

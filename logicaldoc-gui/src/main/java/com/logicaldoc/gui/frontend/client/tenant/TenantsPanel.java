@@ -227,7 +227,7 @@ public class TenantsPanel extends AdminPanel {
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.setEnabled(!rec.getAttributeAsBoolean(ENABLED));
+		enable.setEnabled(Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED)));
 		enable.addClickHandler(event -> TenantService.Instance.get().load(id, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUITenant tenant) {
@@ -246,7 +246,7 @@ public class TenantsPanel extends AdminPanel {
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.setEnabled(rec.getAttributeAsBoolean(ENABLED));
+		disable.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED)));
 		disable.addClickHandler(event -> TenantService.Instance.get().load(id, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUITenant tenant) {

@@ -183,7 +183,7 @@ public class FormsPanel extends AdminPanel {
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message(PREVIEW));
 		preview.addClickHandler(event -> WindowUtils.openUrlInNewTab(webformURL(formId)));
-		preview.setEnabled(rec.getAttributeAsBoolean(WEB_ENABLED));
+		preview.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(WEB_ENABLED)));
 
 		MenuItem invite = new MenuItem();
 		invite.setTitle(I18N.message("invite"));
@@ -193,7 +193,7 @@ public class FormsPanel extends AdminPanel {
 				new WebFormInvitationDialog(selectedForm.getId()).show();
 			}
 		});
-		invite.setEnabled(rec.getAttributeAsBoolean(WEB_ENABLED));
+		invite.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(WEB_ENABLED)));
 
 		MenuItem getPrefilledLink = new MenuItem();
 		getPrefilledLink.setTitle(I18N.message("getprefilledlink"));
@@ -203,7 +203,7 @@ public class FormsPanel extends AdminPanel {
 				new WebFormPrefilledLink(selectedForm.getId()).show();
 			}
 		});
-		getPrefilledLink.setEnabled(rec.getAttributeAsBoolean(WEB_ENABLED));
+		getPrefilledLink.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(WEB_ENABLED)));
 
 		if (Feature.enabled(Feature.WEB_FORM))
 			contextMenu.setItems(edit, preview, invite, getPrefilledLink, delete);

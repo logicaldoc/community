@@ -115,10 +115,10 @@ public class TemplatePropertiesPanel extends HLayout {
 			att.setLabel(rec.getAttributeAsString(LABEL));
 			att.setType(rec.getAttributeAsInt("type"));
 			att.setSet(rec.getAttributeAsString("set"));
-			att.setMandatory(rec.getAttributeAsBoolean(MANDATORY));
-			att.setHidden(rec.getAttributeAsBoolean(HIDDEN));
-			att.setReadonly(rec.getAttributeAsBoolean(READONLY));
-			att.setMultiple(rec.getAttributeAsBoolean(MULTIPLE));
+			att.setMandatory(Boolean.TRUE.equals(rec.getAttributeAsBoolean(MANDATORY)));
+			att.setHidden(Boolean.TRUE.equals(rec.getAttributeAsBoolean(HIDDEN)));
+			att.setReadonly(Boolean.TRUE.equals(rec.getAttributeAsBoolean(READONLY)));
+			att.setMultiple(Boolean.TRUE.equals(rec.getAttributeAsBoolean(MULTIPLE)));
 			att.setSetId(rec.getAttributeAsLong(SET_ID));
 			att.setEditor(rec.getAttributeAsInt(EDITOR));
 			att.setValidation(rec.getAttributeAsString(VALIDATION));
@@ -823,10 +823,10 @@ public class TemplatePropertiesPanel extends HLayout {
 					att.setSetId(Long.parseLong(rec.getAttributeAsString(SET_ID)));
 					att.setEditor(Integer.parseInt(rec.getAttributeAsString(EDITOR)));
 					att.setDependsOn(rec.getAttributeAsString(DEPENDSON));
-					att.setMandatory(rec.getAttributeAsBoolean(MANDATORY));
-					att.setHidden(rec.getAttributeAsBoolean(HIDDEN));
-					att.setReadonly(rec.getAttributeAsBoolean(READONLY));
-					att.setMultiple(rec.getAttributeAsBoolean(MULTIPLE));
+					att.setMandatory(Boolean.TRUE.equals(rec.getAttributeAsBoolean(MANDATORY)));
+					att.setHidden(Boolean.TRUE.equals(rec.getAttributeAsBoolean(HIDDEN)));
+					att.setReadonly(Boolean.TRUE.equals(rec.getAttributeAsBoolean(READONLY)));
+					att.setMultiple(Boolean.TRUE.equals(rec.getAttributeAsBoolean(MULTIPLE)));
 					att.setValidation(rec.getAttributeAsString(VALIDATION));
 					att.setInitialization(rec.getAttributeAsString(INITIALIZATION));
 					template.appendAttribute(att);
@@ -873,7 +873,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			}
 		});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

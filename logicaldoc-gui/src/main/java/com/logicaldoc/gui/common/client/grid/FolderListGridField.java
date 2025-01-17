@@ -38,7 +38,7 @@ public class FolderListGridField extends ColoredListGridField {
 			String val = value + "";
 			String color = rec.getAttributeAsString(colorFieldName);
 			val = DocUtil.getFolderIcon(
-					rec.getAttributeAsBoolean("opened") != null && rec.getAttributeAsBoolean("opened"),
+					Boolean.TRUE.equals(rec.getAttributeAsBoolean("opened")),
 					rec.getAttributeAsInt("type"), val, color);
 
 			return val;

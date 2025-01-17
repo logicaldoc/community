@@ -187,7 +187,7 @@ public class LDAPServersPanel extends AdminPanel {
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.setEnabled(!rec.getAttributeAsBoolean(ENABLED));
+		enable.setEnabled(Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED)));
 		enable.addClickHandler(event -> LDAPService.Instance.get().get(id, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUILDAPServer server) {
@@ -206,7 +206,7 @@ public class LDAPServersPanel extends AdminPanel {
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.setEnabled(rec.getAttributeAsBoolean(ENABLED));
+		disable.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED)));
 		disable.addClickHandler(event -> LDAPService.Instance.get().get(id, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUILDAPServer server) {

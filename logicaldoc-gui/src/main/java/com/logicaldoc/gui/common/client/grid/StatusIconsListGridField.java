@@ -59,11 +59,8 @@ public class StatusIconsListGridField extends ColoredListGridField {
 		content = putImmutableStatusIcon(rec, color, content);
 
 		// Put the password protection icon
-		if (rec.getAttribute("password") != null) {
-			Boolean password = rec.getAttributeAsBoolean("password");
-			if (password != null && password.booleanValue())
-				content += AwesomeFactory.getIconButtonHTML("key", null, "passwordprotected", color, null);
-		}
+		if (Boolean.TRUE.equals(rec.getAttributeAsBoolean("password")))
+			content += AwesomeFactory.getIconButtonHTML("key", null, "passwordprotected", color, null);
 
 		// Put the signed icon
 		content = putSignedStatusIcon(rec, color, content);
@@ -97,11 +94,8 @@ public class StatusIconsListGridField extends ColoredListGridField {
 	}
 
 	private String putBookmarkStatusIcon(ListGridRecord rec, String color, String content) {
-		if (rec.getAttribute(BOOKMARKED) != null) {
-			Boolean bookmarked = rec.getAttributeAsBoolean(BOOKMARKED);
-			if (bookmarked != null && bookmarked)
-				content += AwesomeFactory.getIconButtonHTML("bookmark", null, BOOKMARKED, color, null);
-		}
+		if (Boolean.TRUE.equals(rec.getAttributeAsBoolean(BOOKMARKED)))
+			content += AwesomeFactory.getIconButtonHTML("bookmark", null, BOOKMARKED, color, null);
 		return content;
 	}
 

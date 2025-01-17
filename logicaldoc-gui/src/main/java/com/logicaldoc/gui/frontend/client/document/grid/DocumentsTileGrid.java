@@ -95,7 +95,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 
 				// The status row
 				if (Boolean.TRUE.equals(rec.getAttributeAsBoolean("bookmarked")))
-					html += "<td>" + DocUtil.getBookmarkedIcon(rec.getAttributeAsBoolean("bookmarked")) + CLOSE_TD;
+					html += "<td>" + DocUtil.getBookmarkedIcon(Boolean.TRUE.equals(rec.getAttributeAsBoolean("bookmarked"))) + CLOSE_TD;
 				html += "<td>" + AwesomeFactory.getIndexedIcon(rec.getAttributeAsInt("indexed")) + CLOSE_TD;
 
 				// The locked icon
@@ -109,7 +109,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 					}
 				}
 
-				html += "<td>" + DocUtil.getPasswordProtectedIcon(rec.getAttributeAsBoolean("password")) + CLOSE_TD;
+				html += "<td>" + DocUtil.getPasswordProtectedIcon(Boolean.TRUE.equals(rec.getAttributeAsBoolean("password"))) + CLOSE_TD;
 				html += "<td>" + DocUtil.getImmutableIcon(rec.getAttributeAsInt("immutable")) + CLOSE_TD;
 				html += "<td>" + DocUtil.getSignedIcon(rec.getAttributeAsInt("signed")) + CLOSE_TD;
 				html += "<td>" + DocUtil.getStampedIcon(rec.getAttributeAsInt("stamped")) + CLOSE_TD;

@@ -101,8 +101,8 @@ public class TemplateSecurityPanel extends VLayout {
 				for (ListGridRecord rec : list.getSelectedRecords()) {
 					GUIAccessControlEntry acl = template.getAce(rec.getAttributeAsLong(ENTITY_ID));
 					if (acl != null) {
-						acl.setWrite(rec.getAttributeAsBoolean(WRITE, false));
-						acl.setRead(rec.getAttributeAsBoolean(READ, false));
+						acl.setWrite(Boolean.TRUE.equals(rec.getAttributeAsBoolean(WRITE, false)));
+						acl.setRead(Boolean.TRUE.equals(rec.getAttributeAsBoolean(READ, false)));
 					}
 				}
 				changedHandler.onChanged(null);
@@ -202,8 +202,8 @@ public class TemplateSecurityPanel extends VLayout {
 
 		GUIAccessControlEntry ace = new GUIAccessControlEntry();
 		ace.setEntityId(rec.getAttributeAsLong(ENTITY_ID));
-		ace.setRead(rec.getAttributeAsBoolean(READ, false));
-		ace.setWrite(rec.getAttributeAsBoolean(WRITE, false));
+		ace.setRead(Boolean.TRUE.equals(rec.getAttributeAsBoolean(READ, false)));
+		ace.setWrite(Boolean.TRUE.equals(rec.getAttributeAsBoolean(WRITE, false)));
 		template.addAce(ace);
 
 		changedHandler.onChanged(null);

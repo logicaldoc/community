@@ -61,8 +61,7 @@ public class FormatConvertersPanel extends ComparatorsPanel {
 		converter.setCanEdit(!Session.get().isDemo());
 		converter.setCellFormatter((value, rec, rowNum, colNum) -> {
 			String label = getConverterShortName(value != null ? value.toString() : null);
-			boolean enabled = rec.getAttributeAsBoolean(EENABLED);
-			if (!enabled)
+			if (Boolean.FALSE.equals(rec.getAttributeAsBoolean(EENABLED)))
 				label = "<span style='color:red;'>" + label + "</span>";
 
 			return label;
@@ -90,7 +89,7 @@ public class FormatConvertersPanel extends ComparatorsPanel {
 					associationsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
 			if (converterRecord != null)
 				associationsGrid.getSelectedRecord().setAttribute(EENABLED,
-						converterRecord.getAttributeAsBoolean(EENABLED));
+						Boolean.TRUE.equals(converterRecord.getAttributeAsBoolean(EENABLED)));
 		});
 	}
 

@@ -190,7 +190,7 @@ public class MenuSecurityPanel extends VLayout {
 			GUIAccessControlEntry ace = new GUIAccessControlEntry();
 			ace.setName(rec.getAttributeAsString(ENTITY));
 			ace.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
-			ace.setRead(rec.getAttributeAsBoolean(READ));
+			ace.setRead(Boolean.TRUE.equals(rec.getAttributeAsBoolean(READ)));
 			acl.add(ace);
 		}
 		return acl;

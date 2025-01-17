@@ -186,7 +186,7 @@ public class EmailAccountsPanel extends AdminPanel {
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.setEnabled(!rec.getAttributeAsBoolean(ENABLED));
+		enable.setEnabled(Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED)));
 		enable.addClickHandler(click -> EmailAccountService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new DefaultAsyncCallback<>() {
 					@Override
@@ -198,7 +198,7 @@ public class EmailAccountsPanel extends AdminPanel {
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.setEnabled(rec.getAttributeAsBoolean(ENABLED));
+		disable.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED)));
 		disable.addClickHandler(click -> EmailAccountService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new DefaultAsyncCallback<>() {
 					@Override
