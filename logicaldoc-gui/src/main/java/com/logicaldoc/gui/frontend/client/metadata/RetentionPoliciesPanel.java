@@ -40,7 +40,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 
 	private static final String ACTION = "action";
 
-	private static final String EENABLED = "eenabled";
+	private static final String ENABLED = "eenabled";
 
 	private static final String TEMPLATE = "template";
 
@@ -223,12 +223,12 @@ public class RetentionPoliciesPanel extends AdminPanel {
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.setEnabled(!rec.getAttributeAsBoolean("eenabled"));
+		enable.setEnabled(!rec.getAttributeAsBoolean(ENABLED));
 		enable.addClickHandler(event -> RetentionPoliciesService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute(EENABLED, true);
+						rec.setAttribute(ENABLED, true);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
 				}));
@@ -240,7 +240,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute(EENABLED, false);
+						rec.setAttribute(ENABLED, false);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
 				}));

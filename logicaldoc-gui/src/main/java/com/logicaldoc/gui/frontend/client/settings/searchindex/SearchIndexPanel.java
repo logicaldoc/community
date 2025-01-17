@@ -180,7 +180,7 @@ public class SearchIndexPanel extends AdminPanel {
 		parsersList.setWidth100();
 		parsersList.setHeight100();
 		parsersList.setAutoFetchData(true);
-		parsersList.setFields(icon, extension, name, aliases);
+		parsersList.setFields(id, icon, extension, name, aliases);
 		parsersList.setDataSource(ParsersDS.get());
 		parsersList.setShowFilterEditor(true);
 		parsersList.setFilterOnKeypress(true);

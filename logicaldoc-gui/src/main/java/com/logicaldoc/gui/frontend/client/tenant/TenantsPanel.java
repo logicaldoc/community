@@ -39,6 +39,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class TenantsPanel extends AdminPanel {
 
+	private static final String ENABLED = "eenabled";
+
 	private static final String ADDRESS = "address";
 
 	private static final String EMAIL = "email";
@@ -186,7 +188,7 @@ public class TenantsPanel extends AdminPanel {
 		rec.setAttribute("postalCode", tenant.getPostalCode());
 		rec.setAttribute("state", tenant.getState());
 		rec.setAttribute("expire", tenant.getExpire());
-		rec.setAttribute("eenabled", tenant.isEnabled());
+		rec.setAttribute(ENABLED, tenant.isEnabled());
 
 		list.refreshRow(list.getRecordIndex(rec));
 	}
@@ -225,7 +227,7 @@ public class TenantsPanel extends AdminPanel {
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.setEnabled(!rec.getAttributeAsBoolean("eenabled"));
+		enable.setEnabled(!rec.getAttributeAsBoolean(ENABLED));
 		enable.addClickHandler(event -> TenantService.Instance.get().load(id, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUITenant tenant) {
@@ -244,7 +246,7 @@ public class TenantsPanel extends AdminPanel {
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.setEnabled(rec.getAttributeAsBoolean("eenabled"));
+		disable.setEnabled(rec.getAttributeAsBoolean(ENABLED));
 		disable.addClickHandler(event -> TenantService.Instance.get().load(id, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUITenant tenant) {

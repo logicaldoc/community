@@ -130,8 +130,8 @@ public class TicketsReport extends ReportPanel {
 			protected String getCellCSSText(ListGridRecord rec, int rowNum, int colNum) {
 				if (Boolean.FALSE.equals(rec.getAttributeAsBoolean(VALID))
 						|| Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED))) {
-					return Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED) ? "color: #888888;" : "color: red;")
-							+ " font-style: italic;";
+					return Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED)) ? "color: #888888;"
+							: "color: red;" + " font-style: italic;";
 				} else {
 					return super.getCellCSSText(rec, rowNum, colNum);
 				}

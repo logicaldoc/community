@@ -76,7 +76,7 @@ public class TrashPanel extends VLayout {
 		list.setWidth100();
 		list.setHeight100();
 		list.setAutoFetchData(true);
-		list.setFields(fileName, idField, customId, lastModified);
+		list.setFields(id, fileName, idField, customId, lastModified);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setDataSource(new GarbageDS());
 		list.setShowFilterEditor(true);

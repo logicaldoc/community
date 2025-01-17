@@ -12,8 +12,10 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class RunningListGridField extends ColoredListGridField {
 
+	private static final String RUNNING = "running";
+
 	public RunningListGridField() {
-		super("running", " ", 30);
+		super(RUNNING, " ", 30);
 		setCanFilter(true);
 		setCanSort(true);
 		setCellFormatter((value, rec, rowNum, colNum) -> formatStatusIconCell(rec));
@@ -21,13 +23,13 @@ public class RunningListGridField extends ColoredListGridField {
 
 	private String formatStatusIconCell(ListGridRecord rec) {
 		String color = rec.getAttributeAsString(colorFieldName);
-		Boolean running = rec.getAttributeAsBoolean("running");
+		Boolean running = rec.getAttributeAsBoolean(RUNNING);
 		if (running == null)
 			return "";
 
 		String content = "<div style='display: flex; text-align: center; justify-content: center;'>";
 		if (Boolean.TRUE.equals(running)) {
-			content += AwesomeFactory.getIconButtonHTML("cog", null, "running", color, "spin", null);
+			content += AwesomeFactory.getIconButtonHTML("cog", null, RUNNING, color, "spin", null);
 		} else {
 			content += AwesomeFactory.getIconButtonHTML("cog", null, "idle", color, null);
 		}

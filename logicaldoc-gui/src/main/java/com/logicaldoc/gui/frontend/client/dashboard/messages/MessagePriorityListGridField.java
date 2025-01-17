@@ -16,8 +16,10 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class MessagePriorityListGridField extends ListGridField {
 
+	private static final String PRIORITY = "priority";
+
 	public MessagePriorityListGridField() {
-		super("priority", I18N.message("priority"));
+		super(PRIORITY, I18N.message(PRIORITY));
 		setCanFilter(true);
 		setCanSort(true);
 		setAlign(Alignment.CENTER);
@@ -28,7 +30,7 @@ public class MessagePriorityListGridField extends ListGridField {
 
 	private String formatPriorityIconCell(ListGridRecord rec) {
 		String content = "<div style='display: flex; text-align: center; justify-content: center;'>";
-		int priority = rec.getAttributeAsInt("priority");
+		int priority = rec.getAttributeAsInt(PRIORITY);
 
 		switch (priority) {
 		case GUIMessage.PRIO_INFO:

@@ -41,6 +41,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class LDAPServersPanel extends AdminPanel {
 
+	private static final String ENABLED = "eenabled";
+
 	private Layout detailsContainer = new VLayout();
 
 	private RefreshableListGrid list;
@@ -185,7 +187,7 @@ public class LDAPServersPanel extends AdminPanel {
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.setEnabled(!rec.getAttributeAsBoolean("eenabled"));
+		enable.setEnabled(!rec.getAttributeAsBoolean(ENABLED));
 		enable.addClickHandler(event -> LDAPService.Instance.get().get(id, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUILDAPServer server) {
@@ -204,7 +206,7 @@ public class LDAPServersPanel extends AdminPanel {
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.setEnabled(rec.getAttributeAsBoolean("eenabled"));
+		disable.setEnabled(rec.getAttributeAsBoolean(ENABLED));
 		disable.addClickHandler(event -> LDAPService.Instance.get().get(id, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUILDAPServer server) {
@@ -252,7 +254,7 @@ public class LDAPServersPanel extends AdminPanel {
 
 		rec.setAttribute("url", server.getUrl());
 
-		rec.setAttribute("eenabled", server.isEnabled());
+		rec.setAttribute(ENABLED, server.isEnabled());
 
 		list.refreshRow(list.getRecordIndex(rec));
 	}

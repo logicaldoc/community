@@ -68,7 +68,7 @@ public class BookmarksPanel extends VLayout {
 		list.setWidth100();
 		list.setHeight100();
 		list.setAutoFetchData(true);
-		list.setFields(name, description);
+		list.setFields(id, name, description);
 		list.setDataSource(new BookmarksDS());
 		list.setShowFilterEditor(true);
 		list.setFilterOnKeypress(true);

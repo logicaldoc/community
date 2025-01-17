@@ -17,8 +17,10 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class ArchiveStatusListGridField extends ListGridField {
 
+	private static final String STATUS = "status";
+
 	public ArchiveStatusListGridField() {
-		super("status", I18N.message("status"));
+		super(STATUS, I18N.message(STATUS));
 		setAutoFitWidth(true);
 		setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 		setAlign(Alignment.CENTER);
@@ -29,7 +31,7 @@ public class ArchiveStatusListGridField extends ListGridField {
 
 	private String formatStatusIconCell(ListGridRecord rec) {
 		String content = "<div style='display: flex; text-align: center; justify-content: center;'>";
-		Integer status = rec.getAttributeAsInt("status");
+		Integer status = rec.getAttributeAsInt(STATUS);
 		Integer mode = rec.getAttributeAsInt("mode");
 		switch (status) {
 		case GUIArchive.STATUS_OPEN:
