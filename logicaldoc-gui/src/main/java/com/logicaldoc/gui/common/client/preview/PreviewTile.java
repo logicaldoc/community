@@ -49,7 +49,7 @@ public class PreviewTile extends HLayout {
 				}
 			});
 
-			Img closeThumbnailImage = new Img("[SKIN]/headerIcons/close.gif", 16, 16);
+			Img closeThumbnailImage = new Img("[SKIN]/rectangle-xmark.svg", 16, 16);
 			closeThumbnailImage.setShowRollOver(true);
 			closeThumbnailImage.addClickHandler(event -> {
 				Session.get().setShowThumbnail(false);

@@ -363,8 +363,8 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 
 		String[] tokens = input.split("\\,");
 
-		int min = Integer.parseInt(Session.get().getConfig("tag.minsize"));
-		int max = Integer.parseInt(Session.get().getConfig("tag.maxsize"));
+		int min = Session.get().getConfigAsInt("tag.minsize");
+		int max = Session.get().getConfigAsInt("tag.maxsize");
 		boolean containsInvalid = false;
 		List<String> tags = new ArrayList<>();
 		for (String token : tokens) {
