@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
+import com.logicaldoc.gui.common.client.beans.GUIAttendee;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -297,7 +298,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 						GUICalendarEvent calEvent = new GUICalendarEvent();
 						calEvent.setOrganizer(Session.get().getUser().getFullName());
 						calEvent.setOrganizerId(Session.get().getUser().getId());
-						GUIUser user = new GUIUser();
+						GUIAttendee user = new GUIAttendee();
 						user.setId(Session.get().getUser().getId());
 						user.setUsername(Session.get().getUser().getUsername());
 						user.setFirstName(Session.get().getUser().getFirstName());

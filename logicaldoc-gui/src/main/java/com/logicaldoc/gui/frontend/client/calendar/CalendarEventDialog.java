@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAttendee;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
@@ -31,6 +32,7 @@ import com.logicaldoc.gui.frontend.client.document.selector.DocumentSelectorDial
 import com.logicaldoc.gui.frontend.client.services.CalendarService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
@@ -71,6 +73,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.7
  */
 public class CalendarEventDialog extends Window {
+
+	private static final String REQUIRED = "required";
 
 	private static final String DELEVENT = "delevent";
 
@@ -324,8 +328,14 @@ public class CalendarEventDialog extends Window {
 
 		ListGridField notify = new ListGridField(NOTIFY, I18N.message(NOTIFY));
 		notify.setType(ListGridFieldType.BOOLEAN);
-		notify.setWidth(70);
+		notify.setAutoFitWidth(true);
+		notify.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 
+		ListGridField required = new ListGridField(REQUIRED, I18N.message(REQUIRED));
+		required.setType(ListGridFieldType.BOOLEAN);
+		required.setAutoFitWidth(true);
+		required.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
+		
 		UserListGridField avatar = new UserListGridField();
 
 		attendeesGrid = new ListGrid();
@@ -334,7 +344,7 @@ public class CalendarEventDialog extends Window {
 		attendeesGrid.setWidth100();
 		attendeesGrid.setCanEdit(true);
 		attendeesGrid.setEditByCell(true);
-		attendeesGrid.setFields(id, avatar, name, email, notify);
+		attendeesGrid.setFields(id, avatar, name, email, required, notify);
 
 		fillAttandeesGrid(attendeesGrid);
 
@@ -451,13 +461,14 @@ public class CalendarEventDialog extends Window {
 
 	private void fillAttandeesGrid(final ListGrid attendeesGrid) {
 		List<ListGridRecord> records = new ArrayList<>();
-		for (GUIUser attender : calendarEvent.getAttendees()) {
+		for (GUIAttendee attendee : calendarEvent.getAttendees()) {
 			ListGridRecord rec = new ListGridRecord();
-			rec.setAttribute("id", attender.getId());
-			rec.setAttribute("avatar", attender.getId());
-			rec.setAttribute("name", attender.getFullName());
-			rec.setAttribute(EMAIL, attender.getEmail());
-			rec.setAttribute(NOTIFY, attender.isEnabled());
+			rec.setAttribute("id", attendee.getId());
+			rec.setAttribute("avatar", attendee.getId());
+			rec.setAttribute("name", attendee.getFullName());
+			rec.setAttribute(EMAIL, attendee.getEmail());
+			rec.setAttribute(NOTIFY, attendee.isNotify());
+			rec.setAttribute(REQUIRED, attendee.isRequired());
 			records.add(rec);
 		}
 		attendeesGrid.setData(records.toArray(new ListGridRecord[0]));
@@ -553,9 +564,7 @@ public class CalendarEventDialog extends Window {
 				return;
 			}
 
-			for (
-
-			GUIDocument doc : clipboard) {
+			for (GUIDocument doc : clipboard) {
 				calendarEvent.addDocument(doc);
 			}
 			clipboard.clear();
@@ -842,7 +851,7 @@ public class CalendarEventDialog extends Window {
 	}
 
 	private void saveAttendees() {
-		List<GUIUser> userAttendees = new ArrayList<>();
+		List<GUIAttendee> userAttendees = new ArrayList<>();
 		List<GUIGroup> groupAttendees = new ArrayList<>();
 		ListGridRecord[] records = attendeesGrid.getRecords();
 		if (records != null)
@@ -853,11 +862,12 @@ public class CalendarEventDialog extends Window {
 					attendee.setName(rec.getAttributeAsString("name"));
 					groupAttendees.add(attendee);
 				} else {
-					GUIUser attendee = new GUIUser();
+					GUIAttendee attendee = new GUIAttendee();
 					attendee.setId(rec.getAttributeAsLong("id"));
 					attendee.setEmail(rec.getAttributeAsString(EMAIL));
 					attendee.setName(rec.getAttributeAsString("name"));
-					attendee.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(NOTIFY)));
+					attendee.setNotify(Boolean.TRUE.equals(rec.getAttributeAsBoolean(NOTIFY)));
+					attendee.setRequired(Boolean.TRUE.equals(rec.getAttributeAsBoolean(REQUIRED)));
 					userAttendees.add(attendee);
 				}
 			}
@@ -921,6 +931,7 @@ public class CalendarEventDialog extends Window {
 		rec.setAttribute("name", name);
 		rec.setAttribute(EMAIL, email);
 		rec.setAttribute(NOTIFY, true);
+		rec.setAttribute(REQUIRED, true);
 		list.addData(rec);
 	}
 

@@ -7,9 +7,9 @@ import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAttendee;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIReminder;
-import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -116,7 +116,7 @@ public class UserCalendarPanel extends VLayout {
 		calEvent.setOrganizer(Session.get().getUser().getFullName());
 		calEvent.setOrganizerId(Session.get().getUser().getId());
 
-		GUIUser user = new GUIUser();
+		GUIAttendee user = new GUIAttendee();
 		user.setId(Session.get().getUser().getId());
 		user.setUsername(Session.get().getUser().getUsername());
 		user.setFirstName(Session.get().getUser().getFirstName());
@@ -156,12 +156,12 @@ public class UserCalendarPanel extends VLayout {
 			refresh();
 		}
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

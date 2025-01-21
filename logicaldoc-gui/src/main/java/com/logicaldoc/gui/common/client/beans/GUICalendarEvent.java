@@ -46,7 +46,7 @@ public class GUICalendarEvent implements Serializable {
 
 	private Date end = null;
 
-	private List<GUIUser> attendees = new ArrayList<>();
+	private List<GUIAttendee> attendees = new ArrayList<>();
 
 	private List<GUIGroup> attendeesGroups = new ArrayList<>();
 
@@ -153,7 +153,7 @@ public class GUICalendarEvent implements Serializable {
 		return null;
 	}
 
-	public void addAttendee(GUIUser newPart) {
+	public void addAttendee(GUIAttendee newPart) {
 		if (getAttendee(newPart.getId()) != null)
 			return;
 		attendees.add(newPart);
@@ -166,8 +166,8 @@ public class GUICalendarEvent implements Serializable {
 	}
 
 	public void removeAttendee(long id) {
-		List<GUIUser> newParts = new ArrayList<>();
-		for (GUIUser guiUser : attendees) {
+		List<GUIAttendee> newParts = new ArrayList<>();
+		for (GUIAttendee guiUser : attendees) {
 			if (id != guiUser.getId())
 				newParts.add(guiUser);
 		}
@@ -227,11 +227,11 @@ public class GUICalendarEvent implements Serializable {
 		this.organizer = creator;
 	}
 
-	public List<GUIUser> getAttendees() {
+	public List<GUIAttendee> getAttendees() {
 		return attendees;
 	}
 
-	public void setAttendees(List<GUIUser> attendees) {
+	public void setAttendees(List<GUIAttendee> attendees) {
 		this.attendees = attendees;
 	}
 
