@@ -25,7 +25,6 @@ public class ExtensionAliasesDialog extends Window {
 	private static final String EXTENSION = "extension";
 
 	public ExtensionAliasesDialog() {
-
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("extensionaliases"));
 		setWidth(320);

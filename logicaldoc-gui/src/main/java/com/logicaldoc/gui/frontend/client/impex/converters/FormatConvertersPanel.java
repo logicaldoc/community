@@ -1,19 +1,17 @@
 package com.logicaldoc.gui.frontend.client.impex.converters;
 
+import java.util.List;
+
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.data.FormatConvertersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.frontend.client.settings.comparators.ComparatorAssociationsDialog;
 import com.logicaldoc.gui.frontend.client.settings.comparators.ComparatorsPanel;
-import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.Record;
-import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
@@ -24,31 +22,23 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class FormatConvertersPanel extends ComparatorsPanel {
 
-	private static final String EENABLED = "eenabled";
-
 	public FormatConvertersPanel() {
 		super("formatconverters");
-		gridAttributeName = "converter";
-		listGridAttributeLabel = I18N.message(gridAttributeName);
-		settingsPrefix = gridAttributeName + ".";
+		recordAttributeForName = "converter";
+		listGridAttributeLabel = I18N.message(recordAttributeForName);
+		settingsPrefix = recordAttributeForName + ".";
 		settingsGridTitle = I18N.message("converters");
 	}
 
 	@Override
-	protected ToolStrip prepareToolStrip() {
-		ToolStrip toolStrip = super.prepareToolStrip();
+	protected List<ToolStripButton> prepareConfigButtons() {
+		List<ToolStripButton> buttons = super.prepareConfigButtons();
 
-		ToolStripButton aliases = new ToolStripButton();
-		aliases.setTitle(I18N.message("extensionaliases"));
-		aliases.setDisabled(Session.get().isDemo());
-		aliases.addClickHandler(event -> new ExtensionAliasesDialog().show());
-		aliases.setDisabled(Session.get().isDemo());
+		ToolStripButton configButton = AwesomeFactory.newToolStripButton("gears", "associations");
+		configButton.addClickHandler(click -> new ExtensionAliasesDialog().show());
 
-		toolStrip.addSeparator();
-		toolStrip.addButton(aliases);
-		toolStrip.addFill();
-
-		return toolStrip;
+		buttons.add(configButton);
+		return buttons;
 	}
 
 	@Override
@@ -56,12 +46,12 @@ public class FormatConvertersPanel extends ComparatorsPanel {
 		buildAssociationsGrid();
 
 		ListGridField in = new ListGridField("in", I18N.message("in"), 60);
-		ListGridField converter = new ListGridField(gridAttributeName, listGridAttributeLabel);
+		ListGridField converter = new ListGridField(recordAttributeForName, listGridAttributeLabel);
 		converter.setWidth("*");
 		converter.setCanEdit(!Session.get().isDemo());
 		converter.setCellFormatter((value, rec, rowNum, colNum) -> {
 			String label = getConverterShortName(value != null ? value.toString() : null);
-			if (Boolean.FALSE.equals(rec.getAttributeAsBoolean(EENABLED)))
+			if (Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED)))
 				label = "<span style='color:red;'>" + label + "</span>";
 
 			return label;
@@ -74,7 +64,7 @@ public class FormatConvertersPanel extends ComparatorsPanel {
 		associationsGrid.setEditorCustomizer(context -> {
 			ListGridField field = context.getEditField();
 
-			if (field.getName().equals(gridAttributeName)) {
+			if (field.getName().equals(recordAttributeForName)) {
 				final ListGridRecord selectedRecord = associationsGrid.getSelectedRecord();
 				final SelectItem editorItem = ItemFactory.newFormatConverterSelector(
 						selectedRecord.getAttributeAsString("in"), selectedRecord.getAttributeAsString("out"));
@@ -83,19 +73,6 @@ public class FormatConvertersPanel extends ComparatorsPanel {
 			} else
 				return context.getDefaultProperties();
 		});
-
-		associationsGrid.addEditCompleteHandler(event -> {
-			Record converterRecord = settingsGrid.find(new AdvancedCriteria("id", OperatorId.EQUALS,
-					associationsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
-			if (converterRecord != null)
-				associationsGrid.getSelectedRecord().setAttribute(EENABLED,
-						Boolean.TRUE.equals(converterRecord.getAttributeAsBoolean(EENABLED)));
-		});
-	}
-
-	@Override
-	protected ComparatorAssociationsDialog getAssociationsDialog() {
-		return new ConverterAssociationsDialog(associationsGrid);
 	}
 
 	@Override
