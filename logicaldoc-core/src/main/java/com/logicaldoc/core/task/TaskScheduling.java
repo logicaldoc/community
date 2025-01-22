@@ -100,8 +100,7 @@ public class TaskScheduling {
 	 */
 	public void load() throws IOException, ParseException {
 		ContextProperties config = Context.get().getProperties();
-		String enbl = config.getProperty("schedule.enabled." + taskName);
-		this.enabled = "true".equals(enbl);
+		this.enabled = config.getBoolean("schedule.enabled." + taskName, false);
 		setCronExpression(config.getProperty("schedule.cron." + taskName));
 		setMode(config.getProperty("schedule.mode." + taskName));
 		try {
