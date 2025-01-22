@@ -431,8 +431,8 @@ public abstract class Task implements Runnable {
 
 	/**
 	 * Concrete implementations must override this method declaring if the task
-	 * supports multiple instances running concurrently.
-	 * tHIbernat
+	 * supports multiple instances running concurrently. tHIbernat
+	 * 
 	 * @return true if the task is concurrent
 	 */
 	public abstract boolean isConcurrent();
@@ -477,7 +477,7 @@ public abstract class Task implements Runnable {
 
 	@PostConstruct
 	protected void init() {
-		sendActivityReport = "true".equals(config.getProperty("task.sendreport." + name));
+		sendActivityReport = config.getBoolean("task.sendreport." + name);
 		reportRecipients = config.getProperty("task.recipients." + name);
 	}
 }
