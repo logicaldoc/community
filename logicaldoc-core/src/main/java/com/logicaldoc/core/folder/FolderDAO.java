@@ -53,7 +53,8 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
-	public List<Folder> findByName(Folder parent, String name, Long tenantId, boolean caseSensitive) throws PersistenceException;
+	public List<Folder> findByName(Folder parent, String name, Long tenantId, boolean caseSensitive)
+			throws PersistenceException;
 
 	/**
 	 * Retrieves the root folder of the given tenant
@@ -207,7 +208,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return List of found folders
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 */
 	public List<Folder> findChildren(long parentId, Integer max) throws PersistenceException;
 
@@ -243,12 +244,12 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return if the user has write permission
 	 * 
-	 * @throws PersistenceException error at data layer 
+	 * @throws PersistenceException error at data layer
 	 */
 	public boolean hasWriteAccess(Folder folder, long userId) throws PersistenceException;
-	
+
 	public boolean isReadAllowed(long folderId, long userId) throws PersistenceException;
-	
+
 	public boolean isPreviewAllowed(long folderId, long userId) throws PersistenceException;
 
 	public boolean isPrintAllowed(long folderId, long userId) throws PersistenceException;
@@ -293,7 +294,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return List of selected folder ID's.
 	 * 
-	 * @throws PersistenceException error at data layer  
+	 * @throws PersistenceException error at data layer
 	 */
 	public List<Long> findIdByUserId(long userId, long parentId) throws PersistenceException;
 
@@ -304,7 +305,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return The List of folders
 	 * 
-	 * @throws PersistenceException error at data layer 
+	 * @throws PersistenceException error at data layer
 	 */
 	public List<Folder> findByGroupId(long groupId) throws PersistenceException;
 
@@ -647,7 +648,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return True if the folder with the given parentId is parent of the
 	 *         folder with the given childId
-	 *         
+	 * 
 	 * @throws PersistenceException error at data layer
 	 */
 	public boolean isInPath(long parentId, long childId) throws PersistenceException;
@@ -773,6 +774,15 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @return the number of documents contained in the tree
 	 */
 	public long countDocsInTree(long rootId);
+
+	/**
+	 * Counts the number of documents inside a given folder
+	 * 
+	 * @param folderId identifier of the folder
+	 * 
+	 * @return the number of documents contained in the folder
+	 */
+	public long countDocs(long folderId);
 
 	/**
 	 * Counts the number of documents inside a given folder's tree (direct and

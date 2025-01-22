@@ -185,6 +185,12 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
+	public void testCountDocs() throws PersistenceException {
+		long count = testSubject.countDocs(6L);
+		assertEquals(4, count);
+	}
+	
+	@Test
 	public void testComputeTreeSize() throws PersistenceException {
 		/*
 		 * Make sure to compute all the paths

@@ -2015,7 +2015,18 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			return 0;
 		}
 	}
-
+	
+	@Override
+	public long countDocs(long folderId) {
+		try {
+			Folder folder= findFolder(folderId);
+			return queryForLong("SELECT COUNT(*) from ld_document WHERE ld_deleted=0 and ld_folderid="+folder.getId());
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return 0;
+		}
+	}
+	
 	@Override
 	public long computeTreeSize(long rootId) {
 		try {

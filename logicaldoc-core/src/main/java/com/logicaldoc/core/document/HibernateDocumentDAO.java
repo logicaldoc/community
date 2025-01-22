@@ -304,6 +304,16 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				log.debug("Aspect customId is disabled so force the the Custom ID to a random UUID");
 			}
 
+			/*
+			 * Check maximum number of documents per folder
+			 */
+			long maxDocsPerFolder = config.getLong("maxdocsperfolder", -1L);
+			if (doc.getId() == 0L && maxDocsPerFolder > 0) {
+				long count = folderDAO.countDocs(doc.getFolder().getId());
+				if (count >= maxDocsPerFolder)
+					throw new TooManyDocumentsException(doc.getFolder(), maxDocsPerFolder);
+			}
+
 			log.debug("Invoke listeners before store");
 			Map<String, Object> dictionary = new HashMap<>();
 			for (DocumentListener listener : listenerManager.getListeners())
