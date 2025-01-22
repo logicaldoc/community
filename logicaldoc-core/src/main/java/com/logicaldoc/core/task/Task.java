@@ -391,7 +391,7 @@ public abstract class Task implements Runnable {
 			dictionary.put("error", (lastRunError != null ? lastRunError.getMessage() : null));
 			dictionary.put("report", prepareReport(recipient.getLocale()).replace("\\n", "<br />"));
 
-			// Send the email...
+			// Send the email
 			try {
 				sender.send(email, "task.report", dictionary);
 				log.info("Report sent to: {}", recipient.getEmail());
