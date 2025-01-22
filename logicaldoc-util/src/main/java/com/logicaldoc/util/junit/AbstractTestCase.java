@@ -28,6 +28,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.CollectionUtils;
 
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
@@ -72,6 +73,10 @@ public abstract class AbstractTestCase {
 		try {
 			destroyDatabase();
 
+			File pluginsDir = new File(
+					Context.get().getProperties().getProperty("conf.plugindir", "target/tests-plugins"));
+			FileUtil.delete(pluginsDir);
+
 			if (context != null)
 				((AbstractApplicationContext) context).close();
 		} finally {
@@ -115,7 +120,8 @@ public abstract class AbstractTestCase {
 		if (CollectionUtils.isEmpty(pluginArchives))
 			return;
 
-		File pluginsDir = new File(new ContextProperties().getProperty("conf.plugindir","target/tests-plugins"));
+		File pluginsDir = new File(new ContextProperties().getProperty("conf.plugindir", "target/tests-plugins"));
+		FileUtil.delete(pluginsDir);
 		pluginsDir.mkdir();
 
 		for (String pluginArchive : pluginArchives) {
