@@ -230,38 +230,45 @@ public abstract class LogicalDOCPlugin extends Plugin {
 			pbean.write();
 		} catch (IOException e) {
 			logger.warn("Cannot add task {} to the configuration", taskName);
+			logger.warn(e.getMessage(), e);
 		}
 	}
 
 	/**
 	 * Utility method to add a new appender into the log configuration
 	 * 
-	 * @param logger name of the logger
+	 * @param name name of the logger
 	 * @param additivity the additivity flag
 	 * @param level the log level
 	 * @param appender name of the appender
 	 */
-	protected void addLogger(String logger, boolean additivity, String level, String appender) {
-		// Add notifier log issues
-		LogConfigurator logging = new LogConfigurator();
-		logging.addTextAppender(appender);
-		logging.write();
+	protected void addLogger(String name, boolean additivity, String level, String appender) {
+		try {
+			// Add notifier log issues
+			LogConfigurator logging = new LogConfigurator();
+			logging.addTextAppender(appender);
+			logging.write();
 
-		String appenderWeb = appender + "_WEB";
-		logging.addHtmlAppender(appenderWeb);
-		logging.write();
+			String appenderWeb = appender + "_WEB";
+			logging.addHtmlAppender(appenderWeb);
+			logging.write();
 
-		logging.setLogger(logger, additivity, level, List.of(appender, appenderWeb));
-		logging.write();
+			logging.setLogger(name, additivity, level, List.of(appender, appenderWeb));
+			logging.write();
+		} catch (Exception e) {
+			logger.warn("Cannot add logger {}", name);
+			logger.warn(e.getMessage(), e);
+		}
 	}
 
 	/**
 	 * Utility method to add a new appender into the log configuration
 	 * 
-	 * @param logger name of the logger
+	 * @param name name of the logger
 	 * @param appender name of the appender
 	 */
-	protected void addLogger(String logger, String appender) {
+	protected void addLogger(String name, String appender) {
+		try {
 		// Add notifier log issues
 		LogConfigurator logging = new LogConfigurator();
 		logging.addTextAppender(appender);
@@ -271,8 +278,12 @@ public abstract class LogicalDOCPlugin extends Plugin {
 		logging.addHtmlAppender(appenderWeb);
 		logging.write();
 
-		logging.addLogger(logger, List.of(appender, appenderWeb));
+		logging.addLogger(name, List.of(appender, appenderWeb));
 		logging.write();
+	} catch (Exception e) {
+		logger.warn("Cannot add logger {}", name);
+		logger.warn(e.getMessage(), e);
+	}
 	}
 
 	/**
@@ -295,6 +306,7 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	 * @param optional index when loading the servlet on startup
 	 */
 	protected void addServlet(String name, String servletClass, String mapping, Integer loadOnStartup) {
+		try {
 		File dest = new File(getPluginPath());
 		dest = dest.getParentFile().getParentFile();
 		WebConfigurator config = new WebConfigurator(dest.getPath() + "/web.xml");
@@ -307,6 +319,10 @@ public abstract class LogicalDOCPlugin extends Plugin {
 		if (mapping != null) {
 			config.addServletMapping(name, mapping);
 			config.writeXMLDoc();
+		}
+		} catch (Exception e) {
+			logger.warn("Cannot add servlet {}", name);
+			logger.warn(e.getMessage(), e);
 		}
 	}
 }

@@ -28,6 +28,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.CollectionUtils;
 
+import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
@@ -114,7 +115,7 @@ public abstract class AbstractTestCase {
 		if (CollectionUtils.isEmpty(pluginArchives))
 			return;
 
-		File pluginsDir = new File("target/tests-plugins");
+		File pluginsDir = new File(new ContextProperties().getProperty("conf.plugindir","target/tests-plugins"));
 		pluginsDir.mkdir();
 
 		for (String pluginArchive : pluginArchives) {

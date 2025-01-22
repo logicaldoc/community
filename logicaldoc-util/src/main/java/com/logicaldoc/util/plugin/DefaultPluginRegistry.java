@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.java.plugin.Plugin;
-import org.java.plugin.PluginLifecycleException;
 import org.java.plugin.registry.Identity;
 import org.java.plugin.registry.PluginDescriptor;
 import org.slf4j.Logger;
@@ -22,7 +21,7 @@ public class DefaultPluginRegistry extends PluginRegistry {
 
 	protected void initPlugins(Map<String, Identity> plugins) {
 		Logger console = LoggerFactory.getLogger("console");
-		console.info("Intialising plugins");
+		console.info("Intializing plugins");
 		Set<String> keys = plugins.keySet();
 		Iterator<String> iterator = keys.iterator();
 		while (iterator.hasNext()) {
@@ -33,21 +32,15 @@ public class DefaultPluginRegistry extends PluginRegistry {
 			console.info("plugin located: {} @ {}", pluginDescriptor.getId(), pluginDescriptor.getLocation());
 
 			try {
+				console.info("Intializing plugin: {} located in {}", pluginDescriptor.getId(),
+						pluginDescriptor.getLocation());
+
+				manager.activatePlugin(pluginDescriptor.getId());
+
 				Plugin plugin = manager.getPlugin(pluginDescriptor.getId());
-
-				console.info("Intialising plugin: {}", plugin.getDescriptor());
-				console.info("plugin located: {}", plugin.getDescriptor().getLocation());
-
-				manager.activatePlugin(plugin.getDescriptor().getId());
 				console.info("Activated plugin {}", plugin.getDescriptor().getId());
-			} catch (SecurityException e) {
-				console.error("PluginRegistry -> SecurityException: {}", e.getMessage());
-			} catch (IllegalArgumentException e) {
-				console.error("PluginRegistry -> IllegalArgumentException: {}", e.getMessage());
-			} catch (PluginLifecycleException e) {
-				console.error("PluginRegistry -> PluginLifecycleException: {}", e.getMessage());
 			} catch (Exception e) {
-				console.error("PluginRegistry -> Error: {}", e.getMessage());
+				console.error(e.getMessage(), e);
 			}
 		}
 	}
