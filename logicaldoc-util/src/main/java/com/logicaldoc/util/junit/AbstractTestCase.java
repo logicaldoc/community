@@ -51,7 +51,7 @@ public abstract class AbstractTestCase {
 
 	protected File tempDir = new File("target/tmp");
 
-	protected String originalUserHome = System.getProperty(USER_HOME);
+	protected final String originalUserHome = System.getProperty(USER_HOME);
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
