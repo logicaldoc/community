@@ -135,7 +135,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCount() {
+	public void testCount() throws PersistenceException {
 		int docCount = testSubject.count(false);
 		int docCountDelete = testSubject.count(true);
 		assertEquals(4, docCount);
@@ -189,7 +189,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		long count = testSubject.countDocs(6L);
 		assertEquals(4, count);
 	}
-	
+
 	@Test
 	public void testComputeTreeSize() throws PersistenceException {
 		/*
@@ -774,7 +774,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindDeleted() {
+	public void testFindDeleted() throws PersistenceException {
 		// Try with a folder id
 		List<Folder> folders = testSubject.findDeleted(3, 100);
 		assertEquals(2, folders.size());
@@ -1080,7 +1080,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindTags() {
+	public void testFindTags() throws PersistenceException {
 		List<String> tags = testSubject.findTags(1200);
 		assertEquals(2, tags.size());
 		assertTrue(tags.contains("ftag1"));
@@ -1316,7 +1316,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		// The root has its own policies
 		testSubject.updateSecurityRef(1200L, 5L, transaction);
-		
+
 		folder = testSubject.findById(1200L);
 		assertEquals(5L, folder.getSecurityRef().longValue());
 		folder = testSubject.findById(1201L);

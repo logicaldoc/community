@@ -120,7 +120,6 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
 		Assert.assertEquals(3, histories.size());
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testStore() throws PersistenceException {
 		FolderHistory history = new FolderHistory();

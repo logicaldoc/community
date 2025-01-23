@@ -54,8 +54,6 @@ public class GUIAttendee extends GUIUser {
 		GUIAttendee other = (GUIAttendee) obj;
 		if (notify != other.notify)
 			return false;
-		if (required != other.required)
-			return false;
-		return true;
+		return required == other.required;
 	}
 }

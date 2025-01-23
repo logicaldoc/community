@@ -307,12 +307,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			/*
 			 * Check maximum number of documents per folder
 			 */
-			long maxDocsPerFolder = config.getLong("maxdocsperfolder", -1L);
-			if (doc.getId() == 0L && maxDocsPerFolder > 0) {
-				long count = folderDAO.countDocs(doc.getFolder().getId());
-				if (count >= maxDocsPerFolder)
-					throw new TooManyDocumentsException(doc.getFolder(), maxDocsPerFolder);
-			}
+			checkMaxDocsPerFolder(doc);
 
 			log.debug("Invoke listeners before store");
 			Map<String, Object> dictionary = new HashMap<>();
@@ -354,6 +349,15 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			updateAliases(doc);
 		} catch (Exception e) {
 			handleStoreError(transaction, e);
+		}
+	}
+
+	private void checkMaxDocsPerFolder(Document document) throws PersistenceException {
+		long maxDocsPerFolder = config.getLong("maxdocsperfolder", -1L);
+		if (document.getId() == 0L && maxDocsPerFolder > 0) {
+			long count = folderDAO.countDocs(document.getFolder().getId());
+			if (count >= maxDocsPerFolder)
+				throw new TooManyDocumentsException(document.getFolder(), maxDocsPerFolder);
 		}
 	}
 

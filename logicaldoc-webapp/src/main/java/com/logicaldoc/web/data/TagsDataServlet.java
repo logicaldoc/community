@@ -75,7 +75,7 @@ public class TagsDataServlet extends AbstractDataServlet {
 		writer.write("</list>");
 	}
 
-	private void enrichMapWithFolderTags(Long folderId, HashMap<String, Long> tagsMap, List<String> words) {
+	private void enrichMapWithFolderTags(Long folderId, HashMap<String, Long> tagsMap, List<String> words) throws PersistenceException {
 		FolderDAO fDao = Context.get(FolderDAO.class);
 		if (folderId != null) {
 			List<String> tags = fDao.findTags(folderId);

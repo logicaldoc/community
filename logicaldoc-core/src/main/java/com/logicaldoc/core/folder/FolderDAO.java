@@ -448,8 +448,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param tenantId The tenant
 	 * 
 	 * @return Collection of aliases
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<Folder> findAliases(Long foldRef, long tenantId);
+	public List<Folder> findAliases(Long foldRef, long tenantId) throws PersistenceException;
 
 	/**
 	 * Creates the folder for the specified path. All unexisting nodes specified
@@ -636,8 +638,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param maxHits Optional defines the max number of returned hits
 	 * 
 	 * @return The folders list
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<Folder> findDeleted(long userId, Integer maxHits);
+	public List<Folder> findDeleted(long userId, Integer maxHits) throws PersistenceException;
 
 	/**
 	 * Checks if a folder with the given folderId is parent of the folder with
@@ -732,8 +736,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param computeDeleted if the deleted folders have to be taken int account
 	 * 
 	 * @return the number of folders
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public int count(boolean computeDeleted);
+	public int count(boolean computeDeleted) throws PersistenceException;
 
 	/**
 	 * Retrieves all the workspaces in the system, that are the first-level
@@ -772,8 +778,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param rootId identifier of the root folder
 	 * 
 	 * @return the number of documents contained in the tree
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public long countDocsInTree(long rootId);
+	public long countDocsInTree(long rootId) throws PersistenceException;
 
 	/**
 	 * Counts the number of documents inside a given folder
@@ -781,8 +789,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param folderId identifier of the folder
 	 * 
 	 * @return the number of documents contained in the folder
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public long countDocs(long folderId);
+	public long countDocs(long folderId) throws PersistenceException;
 
 	/**
 	 * Counts the number of documents inside a given folder's tree (direct and
@@ -792,8 +802,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return sum of the sizes of the documents contained in the tree expressed
 	 *         in bytes
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public long computeTreeSize(long rootId);
+	public long computeTreeSize(long rootId) throws PersistenceException;
 
 	/**
 	 * Retrieves the alphabetically ordered list of all the folder's tags
@@ -801,8 +813,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param folderId identifier of the folder
 	 * 
 	 * @return list of tags
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<String> findTags(long folderId);
+	public List<String> findTags(long folderId) throws PersistenceException;
 
 	/**
 	 * Merges the contents of two folders
