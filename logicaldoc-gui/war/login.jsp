@@ -7,7 +7,6 @@
 <%! static String LOGIN_PAGE="login.jsp"; %>
 <%@ include file="header.jsp" %>
 <%@ include file="detectmobile.jsp" %>
-<link REL="STYLESHEET" HREF="<%=MODULE%>/sc/skins/<%=SKIN%>/style-login.css" TYPE="text/css" />
 
 <script type="text/javascript">
 	var j_loginurl='${pageContext.request.contextPath}/<%=LOGIN_PAGE%>';
@@ -49,6 +48,6 @@
 
 <%@ include file="body.jsp" %>
 
-<link REL="STYLESHEET" HREF="<%=MODULE%>/sc/skins/<%=SKIN%>/style-login.css" TYPE="text/css" />
-
 <%@ include file="footer.jsp" %>
+
+<link REL="STYLESHEET" HREF="<%=MODULE%>/sc/skins/<%=SKIN%>/style-login.css" TYPE="text/css" />

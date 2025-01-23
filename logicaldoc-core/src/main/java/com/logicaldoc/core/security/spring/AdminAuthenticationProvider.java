@@ -1,5 +1,6 @@
 package com.logicaldoc.core.security.spring;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -50,6 +51,11 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 
 		User user = new User();
 		user.setUsername(ADMIN);
+		try {
+			user.setDecodedPassword(String.valueOf(auth.getCredentials()));
+		} catch (NoSuchAlgorithmException e) {
+			log.error(e.getMessage(), e);
+		}
 
 		UserDAO uDao = Context.get(UserDAO.class);
 
@@ -62,7 +68,7 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 			long userId = uDao.queryForLong("select ld_id from ld_user where ld_username='admin' and ld_deleted=0");
 			dbAvailable = userId == 1L;
 		} catch (Exception t) {
-			// Noting to do
+			log.error(t.getMessage(), t);
 		}
 
 		String adminPasswd = null;
@@ -73,7 +79,7 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 				adminPasswd = uDao
 						.queryForString("select ld_password from ld_user where ld_username='admin' and ld_deleted=0");
 			} catch (Exception t) {
-				// Noting to do
+				log.error(t.getMessage(), t);
 			}
 		} else {
 			// If the database is not available, get the password from the
@@ -82,7 +88,7 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 				ContextProperties config = Context.get().getProperties();
 				adminPasswd = config.getProperty("adminpasswd");
 			} catch (Exception t) {
-				// Noting to do
+				log.error(t.getMessage(), t);
 			}
 		}
 

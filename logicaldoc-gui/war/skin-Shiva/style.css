@@ -159,7 +159,7 @@
 }
 
 .warn {
-	background-color: rgb(255, 255, 161);
+	background-color: #FFFFA1;
 }
 
 .diff {
@@ -482,6 +482,7 @@
   top:0;
   left:0;
 }
+
 
 /* 
  * Shiva overrides 
