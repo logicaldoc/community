@@ -668,7 +668,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCheckin() throws PersistenceException, IOException {
+	public void testCheckin() throws PersistenceException, IOException, InterruptedException {
 		User user = userDao.findByUsername("admin");
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setFolderId(103L);
@@ -706,7 +706,10 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
 
 		testSubject.checkout(1L, transaction);
-		doc = docDao.findById(1);
+		
+		waiting();
+		
+		doc = docDao.findById(1L);
 		docDao.initialize(doc);
 		assertEquals(Document.DOC_CHECKED_OUT, doc.getStatus());
 

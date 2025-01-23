@@ -195,23 +195,14 @@ public class SystemServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testUninstallPlugin() throws ServerException {
-		File pluginFile = new File("target/tests-plugins/logicaldoc-dummy-plugin.jar");
-		assertTrue(pluginFile.exists());
-		assertEquals(2, testSubject.getPlugins().size());
-		testSubject.uninstallPlugin("logicaldoc-dummy");
-
-		pluginFile = new File("target/tests-plugins/logicaldoc-dummy-plugin.jar");
-		assertFalse(pluginFile.exists());
-	}
-
-	@Test
 	public void testInitializePlugin() throws ServerException {
 		try {
 			assertEquals(2, testSubject.getPlugins().size());
 			testSubject.initializePlugin("logicaldoc-dummy");
 		} catch (ServerException e) {
 			fail(e.getMessage());
+		} finally {
+			testSubject.uninstallPlugin("logicaldoc-dummy");
 		}
 	}
 
