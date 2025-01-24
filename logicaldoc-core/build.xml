@@ -48,7 +48,7 @@
 					<fileset dir="target/classes">
 						<include name="com/logicaldoc/core/**" />
 						<exclude name="com/logicaldoc/core/CorePlugin*" />
-						<exclude name="com/logicaldoc/core/security/dao/HibernateTenant*" />
+						<exclude name="com/logicaldoc/core/security/HibernateTenant*" />
 						<exclude name="com/logicaldoc/core/security/authentication/AuthenticationChain*" />
 					</fileset>
 				</copy>
