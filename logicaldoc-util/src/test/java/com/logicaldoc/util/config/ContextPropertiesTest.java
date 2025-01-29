@@ -10,12 +10,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Properties;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.io.IOUtil;
 
 import junit.framework.Assert;
 
@@ -26,24 +23,6 @@ import junit.framework.Assert;
  * @since 4.5
  */
 public class ContextPropertiesTest {
-
-	private ContextProperties contextProperties;
-
-	private File propsFile = new File("target/testtest.properties");
-
-	@Before
-	public void setUp() throws IOException {
-		IOUtil.write(this.getClass().getResourceAsStream("/context.properties"), propsFile);
-		contextProperties = new ContextProperties(propsFile);
-	}
-
-	@After
-	public void trearDown() throws IOException {
-		FileUtil.delete(propsFile);
-		for (File backupFile : contextProperties.getBackups()) {
-			FileUtil.delete(backupFile);
-		}
-	}
 
 	@Test
 	public void testWrite() throws IOException {
@@ -61,8 +40,9 @@ public class ContextPropertiesTest {
 	public void testSetAndGetProperty() throws FileNotFoundException, IOException {
 		File abcFile = new File("target/abc.properties");
 		ContextProperties contextProperties = new ContextProperties(abcFile);
-		
-		// testing implicit encoding and decoding in setProperty and getPoperty (ContextProperties class)
+
+		// testing implicit encoding and decoding in setProperty and getPoperty
+		// (ContextProperties class)
 		contextProperties.setProperty("propA", "pippo");
 		contextProperties.setProperty("propB", """
 									pippo
@@ -116,13 +96,13 @@ public class ContextPropertiesTest {
 		assertEquals("pippo\npluto\npaperino", decodedValue1);
 
 		assertEquals("", contextProperties.getProperty("emptyKey"));
-		
+
 		// no encoding in properties.setProperty
 		String multiLineValue = """
                 pippo
                 pluto
                 paperino""";
-        properties.setProperty("propB", multiLineValue);
-        assertEquals(multiLineValue, properties.getProperty("propB"));
+		properties.setProperty("propB", multiLineValue);
+		assertEquals(multiLineValue, properties.getProperty("propB"));
 	}
 }
