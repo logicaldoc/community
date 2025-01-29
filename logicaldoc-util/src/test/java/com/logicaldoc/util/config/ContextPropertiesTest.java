@@ -55,12 +55,11 @@ public class ContextPropertiesTest {
 
 		contextProperties.write();
 
-		assertEquals("pippo", contextProperties.getProperty("propA"));
-		assertEquals("pippo\npluto\npaperino", contextProperties.getProperty("propB"));
+		assertEquals("pippo", contextProperties.getString("propA"));
+		assertEquals("pippo\npluto\npaperino", contextProperties.getString("propB"));
 		assertEquals(" Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-				contextProperties.getProperty("propC"));
-
-		assertEquals("", contextProperties.getProperty("emptyKey"));
+				contextProperties.getString("propC"));
+		assertEquals("", contextProperties.getString("emptyKey"));
 
 		Properties properties = new Properties();
 		try (FileReader reader = new FileReader(abcFile)) {

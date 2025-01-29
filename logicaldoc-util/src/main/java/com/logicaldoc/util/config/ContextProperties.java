@@ -262,11 +262,16 @@ public class ContextProperties extends OrderedProperties {
 	}
 
 	public String getString(String property) {
-		return getProperty(property);
+		return getString(property, null);
 	}
 
 	public String getString(String property, String defaultValue) {
-		return getProperty(property, defaultValue);
+		String value = getProperty(property, defaultValue);
+		if (StringUtil.isBase64(value)) {
+			byte[] decodedBytes = Base64.getDecoder().decode(value);
+			value = new String(decodedBytes);
+		}
+		return StrSubstitutor.replaceSystemProperties(value);
 	}
 
 	public int getInt(String property) {
@@ -343,7 +348,7 @@ public class ContextProperties extends OrderedProperties {
 	@Override
 	public String getProperty(String property) {
 		String value = super.getProperty(property);
-		return getPropertyWithDecoding(value);
+		return StrSubstitutor.replaceSystemProperties(value);
 	}
 
 	/**
@@ -357,14 +362,6 @@ public class ContextProperties extends OrderedProperties {
 	@Override
 	public String getProperty(String property, String defaultValue) {		
 		String value = super.getProperty(property, defaultValue);
-		return getPropertyWithDecoding(value);
-	}
-
-	private String getPropertyWithDecoding(String value) {
-		if (StringUtil.isBase64(value)) {
-			byte[] decodedBytes = Base64.getDecoder().decode(value);
-			value = new String(decodedBytes);
-		}
 		return StrSubstitutor.replaceSystemProperties(value);
 	}
 	
