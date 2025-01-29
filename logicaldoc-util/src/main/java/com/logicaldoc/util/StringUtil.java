@@ -14,6 +14,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Locale;
 
@@ -246,5 +247,22 @@ public class StringUtil {
 	 */
 	public static String defaultString(String input, String def) {
 		return StringUtils.defaultString(input, def);
+	}
+	
+	
+	/**
+	 * Checks if a give n string is base64 coded
+	 * 
+	 * @param value The tring to evaluate
+	 * 
+	 * @return true only if value is base64 coded
+	 */
+	public static boolean isBase64(String value) {
+	    try {
+	        Base64.getDecoder().decode(value);
+	        return true;
+	    } catch (IllegalArgumentException e) {
+	        return false;
+	    }
 	}
 }

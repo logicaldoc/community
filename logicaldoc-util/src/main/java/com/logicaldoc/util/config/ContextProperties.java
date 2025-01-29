@@ -7,10 +7,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +23,7 @@ import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.io.FileUtil;
 
 /**
@@ -131,11 +134,10 @@ public class ContextProperties extends OrderedProperties {
 
 	public ContextProperties(File file) throws IOException {
 		try {
-			if (file.exists()) {
-				this.file = file;
-				try (FileInputStream fis = new FileInputStream(file)) {
+			this.file = file;
+			FileUtils.touch(file);
+			try (FileInputStream fis = new FileInputStream(file)) {
 					load(fis);
-				}
 			}
 		} catch (IOException e) {
 			throw new IOException("Unable to read from " + file.getPath(), e);
@@ -324,6 +326,13 @@ public class ContextProperties extends OrderedProperties {
 			return Float.parseFloat(v.trim());
 	}
 
+	@Override
+	public synchronized Object setProperty(String key, String value) {
+		if (value.contains("\n"))
+			value = Base64.getEncoder().encodeToString(value.getBytes(Charset.forName("UTF-8")));
+		return super.setProperty(key, value);
+	}
+
 	/**
 	 * Gets the property value replacing all variable references
 	 * 
@@ -333,14 +342,32 @@ public class ContextProperties extends OrderedProperties {
 	 */
 	@Override
 	public String getProperty(String property) {
-		return StrSubstitutor.replaceSystemProperties(super.getProperty(property));
+		String value = super.getProperty(property);
+		return getPropertyWithDecoding(value);
 	}
 
+	/**
+	 * Gets the property value replacing all variable references
+	 * 
+	 * @param property name of the setting to process
+	 * @param defaultValue default value returned in case of absence of property
+	 * 
+	 * @return the porperty's value with expanded variables
+	 */
 	@Override
-	public String getProperty(String property, String defaultValue) {
-		return StrSubstitutor.replaceSystemProperties(super.getProperty(property, defaultValue));
+	public String getProperty(String property, String defaultValue) {		
+		String value = super.getProperty(property, defaultValue);
+		return getPropertyWithDecoding(value);
 	}
 
+	private String getPropertyWithDecoding(String value) {
+		if (StringUtil.isBase64(value)) {
+			byte[] decodedBytes = Base64.getDecoder().decode(value);
+			value = new String(decodedBytes);
+		}
+		return StrSubstitutor.replaceSystemProperties(value);
+	}
+	
 	public int getMaxBackups() {
 		return maxBackups;
 	}
