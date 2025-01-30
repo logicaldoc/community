@@ -8,9 +8,11 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.history.HibernateHistoryDAO;
+import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**
@@ -27,8 +29,9 @@ public class HibernateFolderHistoryDAO extends HibernateHistoryDAO<FolderHistory
 
 	private static final String ORDER_BY = "order by ";
 
-	private HibernateFolderHistoryDAO() {
-		super(FolderHistory.class);
+	@Autowired
+	private HibernateFolderHistoryDAO(ContextProperties config) {
+		super(FolderHistory.class, config);
 		super.log = LoggerFactory.getLogger(HibernateFolderHistoryDAO.class);
 	}
 

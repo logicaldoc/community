@@ -1,9 +1,11 @@
 package com.logicaldoc.webservice;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.history.HibernateHistoryDAO;
+import com.logicaldoc.util.config.ContextProperties;
 
 /**
  * Hibernate implementation of {@link WebserviceCallDAO}
@@ -13,8 +15,9 @@ import com.logicaldoc.core.history.HibernateHistoryDAO;
  */
 public class HibernateWebserviceCallDAO extends HibernateHistoryDAO<WebserviceCall> implements WebserviceCallDAO {
 
-	private HibernateWebserviceCallDAO() {
-		super(WebserviceCall.class);
+	@Autowired
+	private HibernateWebserviceCallDAO(ContextProperties config) {
+		super(WebserviceCall.class, config);
 		super.log = LoggerFactory.getLogger(HibernateWebserviceCallDAO.class);
 	}
 

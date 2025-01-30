@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +18,6 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.util.config.ContextProperties;
 
 /**
  * A collector of events that can distribute them to a set of listeners
@@ -39,12 +36,8 @@ public class EventCollector {
 
 	private Set<EventListener> listeners = new HashSet<>();
 
-	@Resource(name = "ContextProperties")
-	private ContextProperties config;
-	
-	public EventCollector(ContextProperties config) {
+	public EventCollector() {
 		super();
-		this.config = config;
 	}
 
 	// Maintain a fifos for the history IDs. Key is the class name, value is a
@@ -131,10 +124,6 @@ public class EventCollector {
 
 		ThreadPools pools = Context.get(ThreadPools.class);
 		pools.execute(notifier, "EventCollector");
-	}
-
-	public ContextProperties getConfig() {
-		return config;
 	}
 
 	public static boolean isEnabled() {

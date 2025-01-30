@@ -10,12 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang.StringUtils;
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
@@ -58,16 +57,12 @@ public class FormatConverterManager {
 
 	protected static Logger log = LoggerFactory.getLogger(FormatConverterManager.class);
 
-	@Resource(name = "Store")
 	private Store store;
 
-	@Resource(name = "TenantDAO")
 	private TenantDAO tenantDao;
 
-	@Resource(name = "documentManager")
 	private DocumentManager documentManager;
 
-	@Resource(name = "ContextProperties")
 	private ContextProperties config;
 
 	// Key is the src_extension-dst_extension, value is a collection of
@@ -77,6 +72,7 @@ public class FormatConverterManager {
 	// All the available converters
 	private Map<String, FormatConverter> availableConverters = new HashMap<>();
 
+	@Autowired
 	public FormatConverterManager(Store store, TenantDAO tenantDao, DocumentManager documentManager,
 			ContextProperties config) {
 		super();

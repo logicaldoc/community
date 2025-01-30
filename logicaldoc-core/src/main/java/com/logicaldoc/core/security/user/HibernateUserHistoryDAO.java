@@ -7,17 +7,20 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.history.HibernateHistoryDAO;
 import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
+import com.logicaldoc.util.config.ContextProperties;
 
 public class HibernateUserHistoryDAO extends HibernateHistoryDAO<UserHistory> implements UserHistoryDAO {
 
-	private HibernateUserHistoryDAO() {
-		super(UserHistory.class);
+	@Autowired
+	private HibernateUserHistoryDAO(ContextProperties config) {
+		super(UserHistory.class, config);
 		super.log = LoggerFactory.getLogger(HibernateUserHistoryDAO.class);
 	}
 

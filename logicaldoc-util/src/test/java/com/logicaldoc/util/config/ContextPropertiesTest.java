@@ -49,7 +49,7 @@ public class ContextPropertiesTest {
 									pluto
 									paperino""");
 		contextProperties.setProperty("propC",
-				"IExvcmVtIGlwc3VtIGRvbG9yIHNpdCBhbWV0LCBjb25zZWN0ZXR1ciBhZGlwaXNjaW5nIGVsaXQu");
+				"_b64_IExvcmVtIGlwc3VtIGRvbG9yIHNpdCBhbWV0LCBjb25zZWN0ZXR1ciBhZGlwaXNjaW5nIGVsaXQu");
 
 		contextProperties.setProperty("emptyKey", "");
 
@@ -70,11 +70,11 @@ public class ContextPropertiesTest {
 
 		// testing explicit encoding and decoding (Properties class)
 		assertEquals("pippo", properties.getProperty("propA"));
-		assertEquals(Base64.getEncoder().encodeToString("""
+		assertEquals("_b64_"+Base64.getEncoder().encodeToString("""
 									pippo
 									pluto
 									paperino""".getBytes()), properties.getProperty("propB"));
-		assertEquals("IExvcmVtIGlwc3VtIGRvbG9yIHNpdCBhbWV0LCBjb25zZWN0ZXR1ciBhZGlwaXNjaW5nIGVsaXQu",
+		assertEquals("_b64_IExvcmVtIGlwc3VtIGRvbG9yIHNpdCBhbWV0LCBjb25zZWN0ZXR1ciBhZGlwaXNjaW5nIGVsaXQu",
 				properties.getProperty("propC"));
 
 		String decodedValue = new String(
@@ -83,16 +83,7 @@ public class ContextPropertiesTest {
 				StandardCharsets.UTF_8);
 		assertEquals(" Lorem ipsum dolor sit amet, consectetur adipiscing elit.", decodedValue);
 
-		assertEquals("cGlwcG8KcGx1dG8KcGFwZXJpbm8=", properties.getProperty("propB"));
-
-		String encodedValue = Base64.getEncoder().encodeToString("""
-				pippo
-				pluto
-				paperino""".getBytes());
-		assertEquals(encodedValue, properties.getProperty("propB"));
-
-		String decodedValue1 = new String(Base64.getDecoder().decode(encodedValue));
-		assertEquals("pippo\npluto\npaperino", decodedValue1);
+		assertEquals("_b64_cGlwcG8KcGx1dG8KcGFwZXJpbm8=", properties.getProperty("propB"));
 
 		assertEquals("", contextProperties.getProperty("emptyKey"));
 

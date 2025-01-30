@@ -23,7 +23,6 @@ import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.io.FileUtil;
 
 /**
@@ -33,6 +32,8 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 3.0
  */
 public class ContextProperties extends OrderedProperties {
+
+	private static final String BASE64_PREFIX = "_b64_";
 
 	private static final String UNABLE_TO_READ_FROM = "Unable to read from %s";
 
@@ -137,7 +138,7 @@ public class ContextProperties extends OrderedProperties {
 			this.file = file;
 			FileUtils.touch(file);
 			try (FileInputStream fis = new FileInputStream(file)) {
-					load(fis);
+				load(fis);
 			}
 		} catch (IOException e) {
 			throw new IOException("Unable to read from " + file.getPath(), e);
@@ -267,10 +268,9 @@ public class ContextProperties extends OrderedProperties {
 
 	public String getString(String property, String defaultValue) {
 		String value = getProperty(property, defaultValue);
-		if (StringUtil.isBase64(value)) {
-			byte[] decodedBytes = Base64.getDecoder().decode(value);
-			value = new String(decodedBytes);
-		}
+		if (value.startsWith(BASE64_PREFIX))
+			value = new String(Base64.getDecoder().decode(value.substring(BASE64_PREFIX.length())),
+					Charset.forName("UTF-8"));
 		return StrSubstitutor.replaceSystemProperties(value);
 	}
 
@@ -334,7 +334,7 @@ public class ContextProperties extends OrderedProperties {
 	@Override
 	public synchronized Object setProperty(String key, String value) {
 		if (value.contains("\n"))
-			value = Base64.getEncoder().encodeToString(value.getBytes(Charset.forName("UTF-8")));
+			value = BASE64_PREFIX + Base64.getEncoder().encodeToString(value.getBytes(Charset.forName("UTF-8")));
 		return super.setProperty(key, value);
 	}
 
@@ -360,11 +360,11 @@ public class ContextProperties extends OrderedProperties {
 	 * @return the porperty's value with expanded variables
 	 */
 	@Override
-	public String getProperty(String property, String defaultValue) {		
+	public String getProperty(String property, String defaultValue) {
 		String value = super.getProperty(property, defaultValue);
 		return StrSubstitutor.replaceSystemProperties(value);
 	}
-	
+
 	public int getMaxBackups() {
 		return maxBackups;
 	}

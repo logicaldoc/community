@@ -6,10 +6,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
@@ -30,12 +29,11 @@ public class LockManager {
 
 	protected Logger log = LoggerFactory.getLogger(LockManager.class);
 
-	@Resource(name = "GenericDAO")
 	private GenericDAO genericDao;
 
-	@Resource(name = "ContextProperties")
 	private ContextProperties config;
-	
+
+	@Autowired
 	public LockManager(GenericDAO genericDao, ContextProperties config) {
 		super();
 		this.genericDao = genericDao;
@@ -83,7 +81,7 @@ public class LockManager {
 				log.warn(e.getMessage(), e);
 			} catch (InterruptedException ie) {
 				log.warn("Interrupted", ie);
-				
+
 				// Restore interrupted state
 				Thread.currentThread().interrupt();
 			}
