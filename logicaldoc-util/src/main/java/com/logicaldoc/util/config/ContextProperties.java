@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,6 +32,8 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 3.0
  */
 public class ContextProperties extends OrderedProperties {
+
+	private static final String UTF_8 = "UTF-8";
 
 	private static final String BASE64_PREFIX = "_b64_";
 
@@ -112,7 +114,7 @@ public class ContextProperties extends OrderedProperties {
 	 */
 	private void load(URL fileUrl) throws IOException {
 		try {
-			file = new File(URLDecoder.decode(fileUrl.getPath(), "UTF-8"));
+			file = new File(URLDecoder.decode(fileUrl.getPath(), UTF_8));
 		} catch (Exception e) {
 			throw new IOException(String.format(UNABLE_TO_READ_FROM, file.getPath()), e);
 		}
@@ -270,7 +272,7 @@ public class ContextProperties extends OrderedProperties {
 		String value = getProperty(property, defaultValue);
 		if (value.startsWith(BASE64_PREFIX))
 			value = new String(Base64.getDecoder().decode(value.substring(BASE64_PREFIX.length())),
-					Charset.forName("UTF-8"));
+					StandardCharsets.UTF_8);
 		return StrSubstitutor.replaceSystemProperties(value);
 	}
 
@@ -334,7 +336,7 @@ public class ContextProperties extends OrderedProperties {
 	@Override
 	public synchronized Object setProperty(String key, String value) {
 		if (value.contains("\n"))
-			value = BASE64_PREFIX + Base64.getEncoder().encodeToString(value.getBytes(Charset.forName("UTF-8")));
+			value = BASE64_PREFIX + Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
 		return super.setProperty(key, value);
 	}
 

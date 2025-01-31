@@ -3,7 +3,6 @@ package com.logicaldoc.util.config;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -37,7 +36,7 @@ public class ContextPropertiesTest {
 	}
 
 	@Test
-	public void testSetAndGetProperty() throws FileNotFoundException, IOException {
+	public void testSetAndGetProperty() throws IOException {
 		File abcFile = new File("target/abc.properties");
 		ContextProperties contextProperties = new ContextProperties(abcFile);
 
@@ -57,8 +56,7 @@ public class ContextPropertiesTest {
 
 		assertEquals("pippo", contextProperties.getString("propA"));
 		assertEquals("pippo\npluto\npaperino", contextProperties.getString("propB"));
-		assertEquals(" Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-				contextProperties.getString("propC"));
+		assertEquals(" Lorem ipsum dolor sit amet, consectetur adipiscing elit.", contextProperties.getString("propC"));
 		assertEquals("", contextProperties.getString("emptyKey"));
 
 		Properties properties = new Properties();
@@ -70,7 +68,7 @@ public class ContextPropertiesTest {
 
 		// testing explicit encoding and decoding (Properties class)
 		assertEquals("pippo", properties.getProperty("propA"));
-		assertEquals("_b64_"+Base64.getEncoder().encodeToString("""
+		assertEquals("_b64_" + Base64.getEncoder().encodeToString("""
 									pippo
 									pluto
 									paperino""".getBytes()), properties.getProperty("propB"));
