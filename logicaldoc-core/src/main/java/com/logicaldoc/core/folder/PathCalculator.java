@@ -2,8 +2,9 @@ package com.logicaldoc.core.folder;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
@@ -21,18 +22,17 @@ import com.logicaldoc.core.task.TaskException;
 public class PathCalculator extends Task {
 
 	public static final String NAME = "PathCalculator";
-
-	private FolderDAO folderDao;
+	
+	@Resource(name = "FolderDAO")
+	protected FolderDAO folderDao;
 
 	private long processed = 0;
 
 	private long errors = 0;
 
-	@Autowired
-	public PathCalculator(FolderDAO folderDao) {
+	public PathCalculator() {
 		super(NAME);
 		log = LoggerFactory.getLogger(PathCalculator.class);
-		this.folderDao = folderDao;
 	}
 
 	@Override

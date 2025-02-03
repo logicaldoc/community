@@ -2,9 +2,10 @@ package com.logicaldoc.core.security.authentication;
 
 import java.security.NoSuchAlgorithmException;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
@@ -25,13 +26,8 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 
 	protected static Logger log = LoggerFactory.getLogger(DefaultAuthenticator.class);
 
+	@Resource(name = "UserDAO")
 	protected UserDAO userDAO;
-
-	@Autowired
-	public DefaultAuthenticator(UserDAO userDAO) {
-		super();
-		this.userDAO = userDAO;
-	}
 
 	@Override
 	public User authenticate(String username, String password) throws AuthenticationException {

@@ -3,8 +3,9 @@ package com.logicaldoc.core.document;
 import java.util.List;
 import java.util.Locale;
 
+import javax.annotation.Resource;
+
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
@@ -23,18 +24,18 @@ import com.logicaldoc.i18n.I18N;
 public class DigestProcessor extends Task {
 	public static final String NAME = "DigestProcessor";
 
-	private DocumentDAO documentDao;
+	@Resource(name = "DocumentDAO")
+	protected DocumentDAO documentDao;
 
 	private long processed = 0;
 
 	private long errors = 0;
 
-	@Autowired
-	public DigestProcessor(DocumentDAO documentDao) {
+	public DigestProcessor() {
 		super(NAME);
 		log = LoggerFactory.getLogger(DigestProcessor.class);
-		this.documentDao = documentDao;
 	}
+
 
 	@Override
 	public boolean isIndeterminate() {

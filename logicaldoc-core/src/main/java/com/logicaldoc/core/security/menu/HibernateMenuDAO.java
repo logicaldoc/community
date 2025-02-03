@@ -11,6 +11,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,13 +58,12 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 	private static final String AND = " and ";
 
-	private UserDAO userDAO;
+	@Resource(name = "UserDAO")
+	protected UserDAO userDAO;
 
-	@Autowired
-	protected HibernateMenuDAO(UserDAO userDao) {
+	public HibernateMenuDAO() {
 		super(Menu.class);
 		super.log = LoggerFactory.getLogger(HibernateMenuDAO.class);
-		this.userDAO = userDao;
 	}
 
 	@Override

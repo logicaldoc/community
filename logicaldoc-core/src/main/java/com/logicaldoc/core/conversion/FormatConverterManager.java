@@ -10,11 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringUtils;
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
@@ -57,30 +58,23 @@ public class FormatConverterManager {
 
 	protected static Logger log = LoggerFactory.getLogger(FormatConverterManager.class);
 
-	private Store store;
+	@Resource(name = "Store")
+	protected Store store;
 
-	private TenantDAO tenantDao;
+	@Resource(name = "TenantDAO")
+	protected TenantDAO tenantDao;
 
-	private DocumentManager documentManager;
+	@Resource(name = "documentManager")
+	protected DocumentManager documentManager;
 
-	private ContextProperties config;
-
+	@Resource(name = "ContextProperties")
+	protected ContextProperties config;
 	// Key is the src_extension-dst_extension, value is a collection of
 	// converters
 	private Map<String, List<FormatConverter>> converters = new HashMap<>();
 
 	// All the available converters
 	private Map<String, FormatConverter> availableConverters = new HashMap<>();
-
-	@Autowired
-	public FormatConverterManager(Store store, TenantDAO tenantDao, DocumentManager documentManager,
-			ContextProperties config) {
-		super();
-		this.store = store;
-		this.tenantDao = tenantDao;
-		this.documentManager = documentManager;
-		this.config = config;
-	}
 
 	/**
 	 * Retrieves the content of the Pdf conversion. If the Pdf conversion is not

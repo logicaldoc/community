@@ -6,9 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -26,16 +27,15 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 
 	private static final String ORDER_BY = "order by ";
 
-	private AttributeOptionDAO optionsDao;
+	@Resource(name = "AttributeOptionDAO")
+	protected AttributeOptionDAO optionsDao;
 
-	private TemplateDAO templateDao;
+	@Resource(name = "TemplateDAO")
+	protected TemplateDAO templateDao;
 
-	@Autowired
-	public HibernateAttributeSetDAO(AttributeOptionDAO optionsDao, TemplateDAO templateDao) {
+	public HibernateAttributeSetDAO() {
 		super(AttributeSet.class);
 		super.log = LoggerFactory.getLogger(HibernateAttributeSetDAO.class);
-		this.optionsDao = optionsDao;
-		this.templateDao = templateDao;
 	}
 
 	@Override

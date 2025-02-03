@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,13 +50,8 @@ public class ThreadPools {
 
 	private Map<String, ExecutorService> pools = new HashMap<>();
 
-	private ContextProperties config;
-
-	@Autowired
-	public ThreadPools(ContextProperties config) {
-		super();
-		this.config = config;
-	}
+	@Resource(name = "ContextProperties")
+	protected ContextProperties config;
 
 	public static ThreadPools get() {
 		return Context.get(ThreadPools.class);

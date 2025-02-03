@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,17 +21,18 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.apikey.ApiKeyDAO;
 import com.logicaldoc.core.security.authentication.AuthenticationChain;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.spring.LDAuthenticationToken;
 import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
 import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.sql.SqlUtil;
@@ -57,20 +59,25 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	// The maximum number of closed session maintained in memory
 	private static final int MAX_CLOSED_SESSIONS = 50;
 
-	private transient AuthenticationChain authenticationChain;
+	@Resource(name = "authenticationChain")
+	protected transient AuthenticationChain authenticationChain;
 
-	private transient SessionDAO sessionDao;
+	@Resource(name = "SessionDAO")
+	protected transient SessionDAO sessionDao;
+
+	@Resource(name = "ApiKeyDAO")
+	protected transient ApiKeyDAO apiKeyDao;
+
+	@Resource(name = "UserDAO")
+	protected transient UserDAO userDao;
 
 	private transient SessionTimeoutWatchDog timeoutWatchDog = new SessionTimeoutWatchDog();
 
 	private transient List<SessionListener> listeners = new ArrayList<>();
 
-	@Autowired
-	private SessionManager(AuthenticationChain authenticationChain, SessionDAO sessionDao) {
+	public SessionManager() {
 		timeoutWatchDog.start();
 		log.info("Starting the session timeout watchdog");
-		this.authenticationChain = authenticationChain;
-		this.sessionDao = sessionDao;
 	}
 
 	public static final SessionManager get() {

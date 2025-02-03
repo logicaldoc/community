@@ -22,11 +22,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
@@ -90,49 +91,41 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	protected static Logger log = LoggerFactory.getLogger(DocumentManagerImpl.class);
 
-	private DocumentDAO documentDAO;
+	@Resource(name = "DocumentDAO")
+	protected DocumentDAO documentDAO;
 
-	private DocumentLinkDAO documentLinkDAO;
+	@Resource(name = "DocumentLinkDAO")
+	protected DocumentLinkDAO documentLinkDAO;
 
-	private DocumentNoteDAO documentNoteDAO;
+	@Resource(name = "DocumentNoteDAO")
+	protected DocumentNoteDAO documentNoteDAO;
 
-	private FolderDAO folderDAO;
+	@Resource(name = "FolderDAO")
+	protected FolderDAO folderDAO;
 
-	private TemplateDAO templateDAO;
+	@Resource(name = "TemplateDAO")
+	protected TemplateDAO templateDAO;
 
-	private DocumentListenerManager listenerManager;
+	@Resource(name = "documentListenerManager")
+	protected DocumentListenerManager listenerManager;
 
-	private VersionDAO versionDAO;
+	@Resource(name = "VersionDAO")
+	protected VersionDAO versionDAO;
 
-	private UserDAO userDAO;
+	@Resource(name = "UserDAO")
+	protected UserDAO userDAO;
 
-	private TicketDAO ticketDAO;
+	@Resource(name = "TicketDAO")
+	protected TicketDAO ticketDAO;
 
-	private SearchEngine indexer;
+	@Resource(name = "SearchEngine")
+	protected SearchEngine indexer;
 
-	private Store store;
+	@Resource(name = "Store")
+	protected Store store;
 
-	private ContextProperties config;
-
-	@Autowired
-	public DocumentManagerImpl(DocumentDAO documentDAO, DocumentLinkDAO documentLinkDAO,
-			DocumentNoteDAO documentNoteDAO, FolderDAO folderDAO, TemplateDAO templateDAO,
-			DocumentListenerManager listenerManager, VersionDAO versionDAO, UserDAO userDAO, TicketDAO ticketDAO,
-			SearchEngine indexer, Store store, ContextProperties config) {
-		super();
-		this.documentDAO = documentDAO;
-		this.documentLinkDAO = documentLinkDAO;
-		this.documentNoteDAO = documentNoteDAO;
-		this.folderDAO = folderDAO;
-		this.templateDAO = templateDAO;
-		this.listenerManager = listenerManager;
-		this.versionDAO = versionDAO;
-		this.userDAO = userDAO;
-		this.ticketDAO = ticketDAO;
-		this.indexer = indexer;
-		this.store = store;
-		this.config = config;
-	}
+	@Resource(name = "ContextProperties")
+	protected ContextProperties config;
 
 	@Override
 	public void replaceFile(long docId, String fileVersion, InputStream content, DocumentHistory transaction)

@@ -8,11 +8,9 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.history.HibernateHistoryDAO;
-import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**
@@ -29,9 +27,8 @@ public class HibernateDocumentHistoryDAO extends HibernateHistoryDAO<DocumentHis
 
 	private static final String AND = " and ";
 
-	@Autowired
-	private HibernateDocumentHistoryDAO(ContextProperties config) {
-		super(DocumentHistory.class, config);
+	private HibernateDocumentHistoryDAO() {
+		super(DocumentHistory.class);
 		super.log = LoggerFactory.getLogger(HibernateDocumentHistoryDAO.class);
 	}
 

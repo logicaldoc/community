@@ -7,12 +7,12 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
 import javax.management.MBeanServerConnection;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.util.config.ContextProperties;
@@ -29,7 +29,8 @@ public class SystemLoadMonitor {
 
 	protected static Logger log = LoggerFactory.getLogger(SystemLoadMonitor.class);
 
-	private ContextProperties config;
+	@Resource(name = "ContextProperties")
+	protected ContextProperties config;
 
 	private CircularFifoQueue<Integer> samples = null;
 
@@ -40,12 +41,6 @@ public class SystemLoadMonitor {
 	private List<SystemLoadListener> listeners = new ArrayList<>();
 
 	private boolean lastCheckOverloaded = false;
-
-	@Autowired
-	public SystemLoadMonitor(ContextProperties config) {
-		super();
-		this.config = config;
-	}
 
 	public void addListener(SystemLoadListener listener) {
 		if (!listeners.contains(listener))

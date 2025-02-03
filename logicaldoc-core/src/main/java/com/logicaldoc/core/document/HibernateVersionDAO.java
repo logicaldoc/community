@@ -8,9 +8,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -31,16 +32,15 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 
 	private static final String DOC_ID = ".docId=";
 
-	private Store store;
+	@Resource(name = "Store")
+	protected Store store;
 
-	private FolderDAO folderDAO;
+	@Resource(name = "FolderDAO")
+	protected FolderDAO folderDAO;
 
-	@Autowired
-	private HibernateVersionDAO(Store store, FolderDAO folderDAO) {
+	public HibernateVersionDAO() {
 		super(Version.class);
 		super.log = LoggerFactory.getLogger(HibernateVersionDAO.class);
-		this.store = store;
-		this.folderDAO = folderDAO;
 	}
 
 	@Override
