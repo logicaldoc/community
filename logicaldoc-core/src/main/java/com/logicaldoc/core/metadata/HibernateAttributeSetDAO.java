@@ -6,10 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -27,15 +26,16 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 
 	private static final String ORDER_BY = "order by ";
 
-	@Resource(name = "AttributeOptionDAO")
 	private AttributeOptionDAO optionsDao;
 
-	@Resource(name = "TemplateDAO")
 	private TemplateDAO templateDao;
 
-	public HibernateAttributeSetDAO() {
+	@Autowired
+	public HibernateAttributeSetDAO(AttributeOptionDAO optionsDao, TemplateDAO templateDao) {
 		super(AttributeSet.class);
 		super.log = LoggerFactory.getLogger(HibernateAttributeSetDAO.class);
+		this.optionsDao = optionsDao;
+		this.templateDao = templateDao;
 	}
 
 	@Override
@@ -87,10 +87,6 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 				ORDER_BY + ENTITY + ".name asc", null);
 	}
 
-	public void setOptionsDao(AttributeOptionDAO optionsDao) {
-		this.optionsDao = optionsDao;
-	}
-
 	@Override
 	public void store(AttributeSet set) throws PersistenceException {
 		if (!checkStoringAspect())
@@ -111,10 +107,6 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 		optionsDao.deleteOrphaned(set.getId(), set.getAttributeNames());
 	}
 
-	public void setTemplateDao(TemplateDAO templateDao) {
-		this.templateDao = templateDao;
-	}
-
 	@Override
 	public Map<Long, AttributeSet> load(long tenantId) throws PersistenceException {
 		Map<Long, AttributeSet> map = new HashMap<>();
@@ -128,7 +120,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	public Map<String, Attribute> findAttributes(long tenantId, Long setId) throws PersistenceException {
 		List<AttributeSet> sets = new ArrayList<>();
 		if (setId != null)
-				sets.add(findById(setId));
+			sets.add(findById(setId));
 		else
 			sets.addAll(findAll(tenantId));
 

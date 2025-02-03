@@ -6,8 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -26,15 +24,15 @@ import com.logicaldoc.util.config.ContextProperties;
  */
 public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> implements TicketDAO {
 
-	@Resource(name = "DocumentDAO")
 	private DocumentDAO documentDAO;
 
-	@Resource(name = "ContextProperties")
 	private ContextProperties config;
 
-	public HibernateTicketDAO() {
+	public HibernateTicketDAO(DocumentDAO documentDAO, ContextProperties config) {
 		super(Ticket.class);
 		super.log = LoggerFactory.getLogger(HibernateTicketDAO.class);
+		this.documentDAO = documentDAO;
+		this.config = config;
 	}
 
 	@Override

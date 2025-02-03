@@ -7,10 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -35,15 +34,12 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 
 	private static final String ORDER_BY = "order by ";
 
-	@Resource(name = "UserDAO")
 	private UserDAO userDAO;
 
-	public HibernateTemplateDAO() {
+	@Autowired
+	public HibernateTemplateDAO(UserDAO userDAO) {
 		super(Template.class);
 		super.log = LoggerFactory.getLogger(HibernateTemplateDAO.class);
-	}
-
-	public void setUserDAO(UserDAO userDAO) {
 		this.userDAO = userDAO;
 	}
 

@@ -22,12 +22,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
@@ -91,42 +90,31 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	protected static Logger log = LoggerFactory.getLogger(DocumentManagerImpl.class);
 
-	@Resource(name = "DocumentDAO")
 	private DocumentDAO documentDAO;
 
-	@Resource(name = "DocumentLinkDAO")
 	private DocumentLinkDAO documentLinkDAO;
 
-	@Resource(name = "DocumentNoteDAO")
 	private DocumentNoteDAO documentNoteDAO;
 
-	@Resource(name = "FolderDAO")
 	private FolderDAO folderDAO;
 
-	@Resource(name = "TemplateDAO")
 	private TemplateDAO templateDAO;
 
-	@Resource(name = "documentListenerManager")
 	private DocumentListenerManager listenerManager;
 
-	@Resource(name = "VersionDAO")
 	private VersionDAO versionDAO;
 
-	@Resource(name = "UserDAO")
 	private UserDAO userDAO;
 
-	@Resource(name = "TicketDAO")
 	private TicketDAO ticketDAO;
 
-	@Resource(name = "SearchEngine")
 	private SearchEngine indexer;
 
-	@Resource(name = "Store")
 	private Store store;
 
-	@Resource(name = "ContextProperties")
 	private ContextProperties config;
-	
+
+	@Autowired
 	public DocumentManagerImpl(DocumentDAO documentDAO, DocumentLinkDAO documentLinkDAO,
 			DocumentNoteDAO documentNoteDAO, FolderDAO folderDAO, TemplateDAO templateDAO,
 			DocumentListenerManager listenerManager, VersionDAO versionDAO, UserDAO userDAO, TicketDAO ticketDAO,

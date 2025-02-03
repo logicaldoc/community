@@ -11,17 +11,18 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 public class StatsCollectorTest extends AbstractCoreTestCase {
 
 	// Instance under test
-	private StatsCollector testSubject = new StatsCollector();
+	private StatsCollector testSubject;
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		testSubject = (StatsCollector) context.getBean("StatsCollector");
+		testSubject = Context.get(StatsCollector.class);
 		testSubject.setUploadStatistics(false);
 	}
 
