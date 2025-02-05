@@ -708,6 +708,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		testSubject.checkout(1L, transaction);
 		
 		waiting();
+		waiting();
 		
 		doc = docDao.findById(1L);
 		docDao.initialize(doc);
