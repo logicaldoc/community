@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -185,9 +184,10 @@ public class ResourceServiceImpl implements ResourceService {
 
 	private void getDocumentChildren(Resource parentResource, List<Resource> resourceList, User user)
 			throws PersistenceException {
-		Collection<Document> documents = documentDAO.findByFolder(Long.parseLong(parentResource.getID()), null);
-		for (Iterator<Document> iterator = documents.iterator(); iterator.hasNext();) {
-			Document document = iterator.next();
+
+		Collection<Document> documents = documentDAO.findByFileNameAndParentFolderId(
+				Long.parseLong(parentResource.getID()), "", null, user.getTenantId(), null);
+		for (Document document : documents) {
 			try {
 				checkPublished(user, document);
 			} catch (Exception t) {

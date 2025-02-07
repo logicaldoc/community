@@ -68,7 +68,7 @@
 						<include name="**/Rest*.class" />
 						<include name="**/context-webservice.xml" />
 						-->
-						<include name="**/*.class" />
+						<include name="**/ResourceServiceImpl*.class" />
 					</fileset>
 				</copy>
 			</sequential>
