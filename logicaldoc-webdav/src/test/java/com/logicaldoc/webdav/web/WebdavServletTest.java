@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.jackrabbit.webdav.DavConstants;
+import org.eclipse.jetty.util.StringUtil;
 import org.junit.Test;
 
 import com.logicaldoc.core.PersistenceException;
@@ -25,7 +26,24 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 
 	private static final String PREFIX = "/store/Default";
 
-	private static final String PROPFIND_SPEC = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><propfind xmlns=\"DAV:\"  xmlns:srtns=\"http://www.southrivertech.com/\"><prop><creationdate/><getlastmodified/><getcontentlength/><href/><resourcetype/><locktoken/><lockdiscovery/><collection/><getetag/><activelock/><isreadonly/><ishidden/><Win32FileAttributes/><srtns:srt_modifiedtime/><srtns:srt_creationtime/><srtns:srt_lastaccesstime/><srtns:srt_proptimestamp/><BSI_isreadonly/><SRT_fileattributes/></prop></propfind>";
+	private static final String PROPFIND_SPEC = """
+<?xml version='1.0' encoding='UTF-8' ?>
+<propfind xmlns="DAV:" xmlns:CAL="urn:ietf:params:xml:ns:caldav" xmlns:CARD="urn:ietf:params:xml:ns:carddav" xmlns:SABRE="http://sabredav.org/ns" xmlns:OC="http://logicaldoc.com/ns">
+	<prop>
+		<displayname/>
+		<getcontenttype/>
+		<resourcetype/>
+		<getcontentlength/>
+		<getlastmodified/>
+		<creationdate/>
+		<getetag/>
+		<OC:permissions/>
+		<OC:id/>
+		<OC:size/>
+		<OC:privatelink/>
+		<OC:share-types/>
+	</prop>
+</propfind>""";
 
 	// Instance under test
 	private WebdavServlet testSubject = new WebdavServlet();
@@ -251,9 +269,13 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
 			MockServletResponse response = new MockServletResponse(tempFile);
-
+			
 			MockServletRequest request = prepareRequest("PROPFIND", "");
+			//request.setHeader("Depth", "1");
+			request.setHeader("Accept-Encoding", "identity");
+			request.setHeader("Content-Type", "application/xml; charset=utf-8");
 			request.setBody(PROPFIND_SPEC);
+
 			testSubject.service(request, response);
 
 			return response.getOutputString();
@@ -278,6 +300,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 			testSubject.service(request, response);
 
 			String responseBody = callPROPFIND();
+			System.out.println(responseBody);
 			assertTrue(responseBody.contains(PREFIX + "/folder6/newfile1.pdf"));
 			assertTrue(responseBody.contains(PREFIX + "/folder6/newfile2.pdf"));
 		} finally {
@@ -289,6 +312,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
 			String responseBody = callPROPFIND();
+			assertFalse(StringUtil.isEmpty(responseBody));
 			assertTrue(responseBody.contains(PREFIX + "/one.pdf"));
 			assertTrue(responseBody.contains(PREFIX + "/folder6"));
 		} finally {
@@ -340,4 +364,5 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		request.setRequestURI(PREFIX + path);
 		return request;
 	}
+  
 }

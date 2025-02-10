@@ -214,9 +214,8 @@ public class MockServletRequest implements HttpServletRequest {
 		return parameters;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public Enumeration getParameterNames() {
+	public Enumeration<String> getParameterNames() {
 		return Collections.enumeration(parameters.keySet());
 	}
 
@@ -331,16 +330,19 @@ public class MockServletRequest implements HttpServletRequest {
 		return headers.get(header);
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public Enumeration getHeaderNames() {
-		return null;
+	public Enumeration<String> getHeaderNames() {
+		return Collections.enumeration(headers.keySet());
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public Enumeration getHeaders(String arg0) {
-		return null;
+	public Enumeration<String> getHeaders(String arg0) {
+		ArrayList<String> result = new ArrayList<String>();
+		String myhead = headers.get(arg0);
+		if (myhead != null)
+			result.add(myhead);
+		
+		return Collections.enumeration(result);
 	}
 
 	@Override
