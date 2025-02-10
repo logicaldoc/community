@@ -89,7 +89,6 @@ public class EncodingWebdavRequest extends WebdavRequestImpl {
 			} else {
 				// absolute path has to start with context path
 				throw new DavException(HttpServletResponse.SC_FORBIDDEN);
-
 			}
 		}
 
@@ -108,4 +107,5 @@ public class EncodingWebdavRequest extends WebdavRequestImpl {
 			return factory.createResourceLocator(hrefPrefix, ref);
 		}
 	}
+	
 }

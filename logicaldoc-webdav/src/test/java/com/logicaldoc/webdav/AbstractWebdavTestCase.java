@@ -60,7 +60,7 @@ public abstract class AbstractWebdavTestCase extends AbstractTestCase {
 	protected void prepareSession(String username, String password) throws PersistenceException {
 		UserDAO userDao = Context.get(UserDAO.class);
 
-		Client client = new Client("xyz", "192.168.2.231", "ghost");
+		Client client = new Client("xyz", "192.168.2.13", "ghost");
 		Device device = new Device();
 		device.setBrowser("Firefox");
 		device.setBrowserVersion("18");
@@ -68,6 +68,7 @@ public abstract class AbstractWebdavTestCase extends AbstractTestCase {
 		client.setDevice(device);
 		session = SessionManager.get().newSession(username, password, null, client);
 		if (session != null) {
+			System.out.println("session enstablished");
 			User user = userDao.findByUsernameIgnoreCase(username);
 			userDao.initialize(user);
 			LDAuthenticationToken token = new LDAuthenticationToken(username);
@@ -79,7 +80,8 @@ public abstract class AbstractWebdavTestCase extends AbstractTestCase {
 			davSession = new DavSessionImpl();
 			davSession.putObject("id", session.getUserId());
 			davSession.putObject("sid", session.getSid());
-		}
+		} else
+			System.out.println("session NOT enstablished");
 	}
 
 	private void prepareRepository() throws IOException {

@@ -449,7 +449,11 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
-
+		
+		log.debug("Depth: {}", request.getHeader("Depth"));
+		log.debug("Accept-Encoding: {}", request.getHeader("Accept-Encoding"));
+		log.debug("Content-Type: {}", request.getHeader("Content-Type"));
+		
 		DavPropertyNameSet requestProperties = request.getPropFindProperties();
 
 		if (log.isDebugEnabled()) {
@@ -1016,4 +1020,5 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 	public static ServletContext getContext() {
 		return context;
 	}
+
 }
