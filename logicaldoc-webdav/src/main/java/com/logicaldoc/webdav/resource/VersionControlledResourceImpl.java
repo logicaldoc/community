@@ -143,6 +143,11 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	public void checkout() throws DavException {
 		resourceService.checkout(getResource(), getResource().getSession());
 	}
+	
+	@Override
+	public org.apache.jackrabbit.webdav.DavSession getSession() {
+		return this.getSession();
+	}	
 
 	/**
 	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV

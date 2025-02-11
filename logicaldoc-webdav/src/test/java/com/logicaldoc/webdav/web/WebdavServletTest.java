@@ -8,7 +8,10 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.jackrabbit.webdav.DavConstants;
+import org.apache.jackrabbit.webdav.DavMethods;
 import org.eclipse.jetty.util.StringUtil;
 import org.junit.Test;
 
@@ -91,13 +94,15 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		testVERSIONCONTROL();
 
 		testDELETE();
+		
+		testUNCHECKOUT();
 	}
 
 	public void testVERSIONCONTROL() throws IOException {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
 			MockServletResponse response = new MockServletResponse(tempFile);
-			MockServletRequest request = prepareRequest("VERSION-CONTROL", "/five.pdf");
+			MockServletRequest request = prepareRequest(DavMethods.METHOD_VERSION_CONTROL, "/five.pdf");
 			testSubject.service(request, response);
 
 		} finally {
@@ -110,7 +115,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
 			MockServletResponse response = new MockServletResponse(tempFile);
-			MockServletRequest request = prepareRequest("REPORT", "/five.pdf");
+			MockServletRequest request = prepareRequest(DavMethods.METHOD_REPORT, "/five.pdf");
 			request.setBody("""
 <?xml version="1.0" encoding="utf-8" ?>
 <ld:filter-files xmlns:a="DAV:" xmlns:ld="http://logicaldoc.com/ns" >
@@ -135,7 +140,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 			assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
 
 			MockServletResponse response = new MockServletResponse(tempFile);
-			MockServletRequest request = prepareRequest("CHECKOUT", "/five.pdf");
+			MockServletRequest request = prepareRequest(DavMethods.METHOD_CHECKOUT, "/five.pdf");
 			testSubject.service(request, response);
 
 			doc = docDao.findById(5L);
@@ -160,7 +165,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 			assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
 
 			MockServletResponse response = new MockServletResponse(tempFile);
-			MockServletRequest request = prepareRequest("LOCK", "/five.pdf");
+			MockServletRequest request = prepareRequest(DavMethods.METHOD_LOCK, "/five.pdf");
 			testSubject.service(request, response);
 
 			doc = docDao.findById(5L);
@@ -180,7 +185,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
 			MockServletResponse response = new MockServletResponse(tempFile);
-			MockServletRequest request = prepareRequest("OPTIONS", "/five.pdf");
+			MockServletRequest request = prepareRequest(DavMethods.METHOD_OPTIONS, "/five.pdf");
 			testSubject.service(request, response);
 
 			assertTrue(response.getHeader("Allow").contains("POST"));
@@ -196,7 +201,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 			assertFalse(callPROPFIND().contains(PREFIX + "/folder6/newfolder"));
 
 			MockServletResponse response = new MockServletResponse(tempFile);
-			MockServletRequest request = prepareRequest("MKCOL", "/folder6/newfolder");
+			MockServletRequest request = prepareRequest(DavMethods.METHOD_MKCOL, "/folder6/newfolder");
 			testSubject.service(request, response);
 
 			assertTrue(callPROPFIND().contains(PREFIX + "/folder6/newfolder"));
@@ -212,7 +217,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 			assertFalse(callPROPFIND().contains(PREFIX + "/folder6/moved.pdf"));
 
 			MockServletResponse response = new MockServletResponse(tempFile);
-			MockServletRequest request = prepareRequest("MOVE", "/five.pdf");
+			MockServletRequest request = prepareRequest(DavMethods.METHOD_MOVE, "/five.pdf");
 			request.setHeader(DavConstants.HEADER_DESTINATION, PREFIX + "/folder6/moved.pdf");
 			testSubject.service(request, response);
 
@@ -230,7 +235,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 			assertFalse(callPROPFIND().contains(PREFIX + "/folder6/copied.pdf"));
 
 			MockServletResponse response = new MockServletResponse(tempFile);
-			MockServletRequest request = prepareRequest("COPY", "/one.pdf");
+			MockServletRequest request = prepareRequest(DavMethods.METHOD_COPY, "/one.pdf");
 			request.setHeader(DavConstants.HEADER_DESTINATION, PREFIX + "/folder6/copied.pdf");
 			testSubject.service(request, response);
 
@@ -239,7 +244,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 
 			// Copy over existing file
 			response = new MockServletResponse(tempFile);
-			request = prepareRequest("COPY", "/one.pdf");
+			request = prepareRequest(DavMethods.METHOD_COPY, "/one.pdf");
 			request.setHeader(DavConstants.HEADER_DESTINATION, PREFIX + "/folder6/copied.pdf");
 			testSubject.service(request, response);
 
@@ -256,7 +261,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 			assertTrue(callPROPFIND().contains(PREFIX + "/one.pdf"));
 
 			MockServletResponse response = new MockServletResponse(tempFile);
-			MockServletRequest request = prepareRequest("DELETE", "/one.pdf");
+			MockServletRequest request = prepareRequest(DavMethods.METHOD_DELETE, "/one.pdf");
 			testSubject.service(request, response);
 
 			assertFalse(callPROPFIND().contains(PREFIX + "/one.pdf"));
@@ -270,7 +275,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		try {
 			MockServletResponse response = new MockServletResponse(tempFile);
 			
-			MockServletRequest request = prepareRequest("PROPFIND", "");
+			MockServletRequest request = prepareRequest(DavMethods.METHOD_PROPFIND, "");
 			//request.setHeader("Depth", "1");
 			request.setHeader("Accept-Encoding", "identity");
 			request.setHeader("Content-Type", "application/xml; charset=utf-8");
@@ -290,7 +295,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 			assertFalse(callPROPFIND().contains(PREFIX + "/folder6/newfile.pdf"));
 
 			MockServletResponse response = new MockServletResponse(tempFile);
-			MockServletRequest request = prepareRequest("PUT", "/folder6/newfile1.pdf");
+			MockServletRequest request = prepareRequest(DavMethods.METHOD_PUT, "/folder6/newfile1.pdf");
 			request.setPayload(this.getClass().getResourceAsStream("/pdf1.pdf"));
 			testSubject.service(request, response);
 
@@ -324,7 +329,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		File tempFile = FileUtil.createTempFile("webdav", ".pdf");
 		try {
 			MockServletResponse response = new MockServletResponse(tempFile);
-			MockServletRequest request = prepareRequest("GET", "/one.pdf");
+			MockServletRequest request = prepareRequest(DavMethods.METHOD_GET, "/one.pdf");
 			testSubject.service(request, response);
 
 			assertEquals(127810L, tempFile.length());
@@ -337,7 +342,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
 			MockServletResponse response = new MockServletResponse(tempFile);
-			MockServletRequest request = prepareRequest("HEAD", "/one.pdf");
+			MockServletRequest request = prepareRequest(DavMethods.METHOD_HEAD, "/one.pdf");
 			testSubject.service(request, response);
 
 			assertEquals("d-1_1.0", response.getHeaders().get("ETag"));
@@ -350,12 +355,42 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
 			MockServletResponse response = new MockServletResponse(tempFile);
-			MockServletRequest request = prepareRequest("PROPPATCH", "/one.pdf");
+			MockServletRequest request = prepareRequest(DavMethods.METHOD_PROPPATCH, "/one.pdf");
 			testSubject.service(request, response);
 		} finally {
 			FileUtil.delete(tempFile);
 		}
 	}
+	
+	public void testUNCHECKOUT() throws IOException, PersistenceException {
+		File tempFile = FileUtil.createTempFile("webdav", ".xml");
+		try {
+			Document doc = docDao.findById(7L);
+			assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+			
+			// SET THE STATUS TO CHECKOUT
+			MockServletResponse response = new MockServletResponse(tempFile);
+			MockServletRequest request = prepareRequest(DavMethods.METHOD_CHECKOUT, "/New error indexing documents.eml");
+			testSubject.service(request, response);
+
+			doc = docDao.findById(7L);
+			assertEquals(AbstractDocument.DOC_CHECKED_OUT, doc.getStatus());
+
+			// Perform the uncheckout
+			response = new MockServletResponse(tempFile);
+			request = prepareRequest(DavMethods.METHOD_UNCHECKOUT, "/New error indexing documents.eml");
+			testSubject.service(request, response);
+
+			// Check the response
+			assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+			
+			// Check the value
+			doc = docDao.findById(7L);
+			assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+		} finally {
+			FileUtil.delete(tempFile);
+		}
+	}	
 
 	protected MockServletRequest prepareRequest(String method, String path) {
 		MockServletRequest request = new MockServletRequest(servletSession);
