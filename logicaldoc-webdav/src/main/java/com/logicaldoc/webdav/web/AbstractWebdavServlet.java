@@ -286,7 +286,7 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 */
 	protected void doHead(WebdavRequest request, WebdavResponse response, DavResource resource)
 			throws IOException, DavException {
-		log.debug("head");
+		log.debug("doHead");
 		spoolResource(request, response, resource, false);
 	}
 
@@ -302,7 +302,7 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 	protected void doGet(WebdavRequest request, WebdavResponse response, DavResource resource)
 			throws IOException, DavException {
 
-		log.debug("get");
+		log.debug("doGet");
 
 		try {
 			spoolResource(request, response, resource, true);
@@ -966,13 +966,16 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			throws DavException, IOException {
 		log.debug("doUncheckout({})", resource.getDisplayName());
 		if (!(resource instanceof VersionControlledResource)) {
+			log.debug("resource IS NOT VersionControlledResource!");
 			try {
 				response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			} catch (IOException e) {
 				// Nothing to do
+				log.debug(e.getMessage(), e);
 			}
 			return;
 		}
+		
 		((VersionControlledResource) resource).uncheckout();
 		response.setStatus(HttpServletResponse.SC_OK);
 	}
