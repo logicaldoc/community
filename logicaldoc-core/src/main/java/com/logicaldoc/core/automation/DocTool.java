@@ -31,6 +31,8 @@ import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.parser.ParsingException;
+import com.logicaldoc.core.searchengine.Hit;
+import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -588,7 +590,7 @@ public class DocTool {
 	}
 
 	/**
-	 * Gets the content of a resource and stores it as a string
+	 * Gets the content of a resource and reads it as a string
 	 * 
 	 * @param docId The document's identifier
 	 * @param fileVersion The file version
@@ -985,5 +987,28 @@ public class DocTool {
 			log.error(e.getMessage(), e);
 			return null;
 		}
+	}
+
+	/**
+	 * Same as {@link #DocTool.parse()} but first it tries to get the text from
+	 * the already built fulltext index
+	 * 
+	 * @param document The document to elaborate
+	 * 
+	 * @return the extracted texts
+	 */
+	public String getText(Document document) {
+		String text = null;
+
+		if (document.getIndexed() == AbstractDocument.INDEX_INDEXED) {
+			SearchEngine indexer = Context.get(SearchEngine.class);
+			Hit hit = indexer.getHit(document.getId());
+			if (hit != null)
+				text = hit.getContent();
+		}
+
+		if (StringUtils.isEmpty(text))
+			text = parse(document, null);
+		return text;
 	}
 }
