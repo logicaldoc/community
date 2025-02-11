@@ -588,7 +588,7 @@ public class DocTool {
 	}
 
 	/**
-	 * Gets the content of a resource and stores it as a string
+	 * Gets the content of a resource and reads it as a string
 	 * 
 	 * @param docId The document's identifier
 	 * @param fileVersion The file version
