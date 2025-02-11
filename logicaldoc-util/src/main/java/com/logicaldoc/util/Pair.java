@@ -9,7 +9,7 @@ package com.logicaldoc.util;
  * @param <K> the type of key
  * @param <V> the type of value
  */
-public class Pair<K extends Object, V extends Object> {
+public class Pair<K, V> {
 
 	/**
 	 * Key of this <code>Pair</code>.
@@ -119,7 +119,7 @@ public class Pair<K extends Object, V extends Object> {
 			return true;
 		if (o instanceof Pair) {
 			@SuppressWarnings("unchecked")
-			Pair<K,V> pair = (Pair<K,V>) o;
+			Pair<K, V> pair = (Pair<K, V>) o;
 			if (key != null ? !key.equals(pair.key) : pair.key != null)
 				return false;
 			return !(value != null ? !value.equals(pair.value) : pair.value != null);
