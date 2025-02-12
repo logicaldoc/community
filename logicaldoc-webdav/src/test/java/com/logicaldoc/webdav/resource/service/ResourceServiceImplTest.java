@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.jackrabbit.webdav.DavException;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.logicaldoc.core.PersistenceException;
@@ -217,10 +218,31 @@ public class ResourceServiceImplTest extends AbstractWebdavTestCase {
 
 		source = testSubject.getResource("/Default/folder6", davSession);
 		assertNull(source);
+		
+		// rename a folder
+		Resource source02 = testSubject.getResource("/Default/folder7", davSession);
+		Resource destination02 = testSubject.getResource("/Default", davSession);
+		
+		// Bad example, the rename must be done in a different way
+		Resource badBlood = testSubject.move(source02, destination02, "reputation", davSession);
+		assertNotNull(badBlood);
+		assertFalse("reputation".equals(badBlood.getName()));
+		assertEquals("folder7", badBlood.getName());
+		assertTrue(badBlood.isFolder());
+		
+		// good example (folder rename)
+		source02.setName("delicate");
+		Resource delicate = testSubject.move(source02, destination02, null, davSession);
+		assertNotNull(delicate);
+		assertEquals("delicate", delicate.getName());
+		assertTrue(delicate.isFolder());
+		
 	}
 
 	@Test
 	public void testDeleteResource() throws DavException {
+		
+		// delete document
 		Resource resource = testSubject.getResource("/Default/one.pdf", davSession);
 		assertNotNull(resource);
 		assertEquals("one.pdf", resource.getName());
@@ -229,6 +251,7 @@ public class ResourceServiceImplTest extends AbstractWebdavTestCase {
 		testSubject.deleteResource(resource, davSession);
 		assertNull(testSubject.getResource("/Default/one.pdf", davSession));
 
+		// delete folder
 		resource = testSubject.getResource("/Default/folder6", davSession);
 		assertNotNull(resource);
 		assertEquals("folder6", resource.getName());
@@ -257,6 +280,14 @@ public class ResourceServiceImplTest extends AbstractWebdavTestCase {
 
 		source = testSubject.getResource("/Default/one.pdf", davSession);
 		assertNotNull(source);
+		
+		// Test copy Folder (it should produce an exception, as right now copy of folder is not supported)
+		Resource dest02 = testSubject.getResource("/Default/folder7", davSession);
+		try {
+			testSubject.copy(destinationFolder, dest02, null, davSession);
+			Assert.fail();
+		} catch (DavException e) {			
+		}
 	}
 
 	@Test
@@ -290,6 +321,7 @@ public class ResourceServiceImplTest extends AbstractWebdavTestCase {
 		doc = docDao.findById(1L);
 		assertEquals(AbstractDocument.DOC_CHECKED_OUT, doc.getStatus());
 
+		// Test uncheckout
 		resource = testSubject.getResource("/Default/one.pdf", davSession);
 		testSubject.uncheckout(resource, davSession);
 

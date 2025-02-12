@@ -42,6 +42,8 @@ public class MockServletResponse implements HttpServletResponse {
 	private String characterEncoding;
 
 	private Map<String, String> headers = new HashMap<>();
+	
+	private int status = HttpServletResponse.SC_OK;
 
 	public MockServletResponse(File output) {
 		super();
@@ -246,13 +248,13 @@ public class MockServletResponse implements HttpServletResponse {
 	}
 
 	@Override
-	public void setStatus(int arg0) {
-		// Nothing to do
+	public void setStatus(int status) {
+		this.status = status;
 	}
 
 	@Override
-	public void setStatus(int arg0, String arg1) {
-		// Nothing to do
+	public void setStatus(int status, String statusMessage) {
+		this.status = status;
 	}
 
 	public int getContentLength() {
@@ -287,7 +289,7 @@ public class MockServletResponse implements HttpServletResponse {
 
 	@Override
 	public int getStatus() {
-		return 0;
+		return this.status;
 	}
 	
 	public void clear() {
