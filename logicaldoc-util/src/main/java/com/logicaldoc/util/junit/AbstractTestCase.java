@@ -73,6 +73,9 @@ public abstract class AbstractTestCase {
 		try {
 			destroyDatabase();
 
+			PluginRegistry registry = PluginRegistry.getInstance();
+			registry.getManager().shutdown();
+			
 			File pluginsDir = new File(
 					Context.get().getProperties().getProperty("conf.plugindir", "target/tests-plugins"));
 			FileUtil.delete(pluginsDir);
