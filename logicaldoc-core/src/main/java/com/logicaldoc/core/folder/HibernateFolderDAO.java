@@ -70,7 +70,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private static final String PARENTID_EQUAL = ".parentId=";
 
-	private static final String FOLDER_ACL_AS_GROUP = ".accessControlList as _group ";
+	private static final String FOLDER_ACL_AS_ACL = ".accessControlList as _acl ";
 
 	private static final String SECURITY_REF_IN = ".securityRef in (";
 
@@ -94,7 +94,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private static final String SELECT_DISTINCT = "select distinct(";
 
-	private static final String WHERE_GROUP_GROUPID_IN = " where _group.groupId in (";
+	private static final String WHERE_GROUP_GROUPID_IN = " where _acl.groupId in (";
 
 	@Resource(name = "UserDAO")
 	protected UserDAO userDAO;
@@ -223,7 +223,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private void setCreator(Folder folder, FolderHistory transaction) {
 		if (transaction != null) {
-			if (folder.getId() == 0 && transaction.getEvent() == null)
+			if (folder.getId() == 0 && StringUtils.isEmpty(transaction.getEvent()))
 				transaction.setEvent(FolderEvent.CREATED.toString());
 
 			// In case of creation event we set the creator
@@ -281,11 +281,12 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			return findAll();
 
 		Set<Group> userGroups = user.getGroups();
+
 		if (!userGroups.isEmpty()) {
 			// First of all collect all folders that define it's own
 			// policies
 			StringBuilder query = new StringBuilder("select distinct(_folder) from Folder _folder  ");
-			query.append(" left join _folder" + FOLDER_ACL_AS_GROUP);
+			query.append(" left join _folder" + FOLDER_ACL_AS_ACL);
 			query.append(WHERE_GROUP_GROUPID_IN);
 			query.append(userGroups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
 			query.append(")");
@@ -299,7 +300,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				query = new StringBuilder("select _folder from Folder _folder  where _folder.securityRef in (");
 				query.append(folders.stream().map(f -> Long.toString(f.getId())).collect(Collectors.joining(",")));
 				query.append(")");
-				List<Folder> tmp = find(query.toString(), user.getTenantId());
+
+				List<Folder> tmp = findByObjectQuery(query.toString(), null, null);
 
 				for (Folder folder : tmp) {
 					if (!folders.contains(folder))
@@ -320,7 +322,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	@Override
 	public List<Folder> findByUserId(long userId, long parentId) throws PersistenceException {
-		List<Folder> coll = new ArrayList<>();
+		List<Folder> accessibleFolders = new ArrayList<>();
 
 		User user = getExistingtUser(userId);
 
@@ -331,17 +333,20 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 * Search for all those folders that defines its own security policies
 		 */
 		StringBuilder query1 = new StringBuilder();
-		Set<Group> precoll = user.getGroups();
-		if (precoll.isEmpty())
-			return coll;
+		Set<Group> allUserGroups = user.getGroups();
+		if (allUserGroups.isEmpty())
+			return accessibleFolders;
+
+		String allUserGroupIds = allUserGroups.stream().map(ug -> Long.toString(ug.getId()))
+				.collect(Collectors.joining(","));
 
 		query1.append(SELECT_DISTINCT + ENTITY + ") " + FROM_FOLDER + ENTITY + " ");
-		query1.append(LEFT_JOIN + ENTITY + FOLDER_ACL_AS_GROUP);
+		query1.append(LEFT_JOIN + ENTITY + FOLDER_ACL_AS_ACL);
 		query1.append(WHERE_GROUP_GROUPID_IN);
-		query1.append(precoll.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
+		query1.append(allUserGroupIds);
 		query1.append(") " + AND + ENTITY + ".parentId = :parentId and " + ENTITY + ".id != " + ENTITY + ".parentId");
 
-		coll = findByObjectQuery(query1.toString(), Map.of(PARENT_ID, parentId), null);
+		accessibleFolders = findByObjectQuery(query1.toString(), Map.of(PARENT_ID, parentId), null);
 
 		/*
 		 * Now search for all other folders that references accessible folders
@@ -350,19 +355,19 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				+ ".deleted=0 and " + ENTITY + ".parentId = :parentId ");
 		query2.append(AND + ENTITY + SECURITY_REF_IN);
 		query2.append("    select distinct(B.id) from Folder B ");
-		query2.append(" left join B.accessControlList as _group");
+		query2.append(" left join B.accessControlList as _acl");
 		query2.append(WHERE_GROUP_GROUPID_IN);
-		query2.append(precoll.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
+		query2.append(allUserGroups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
 		query2.append("))");
 
 		List<Folder> coll2 = findByObjectQuery(query2.toString(), Map.of(PARENT_ID, parentId), null);
 		for (Folder folder : coll2) {
-			if (!coll.contains(folder))
-				coll.add(folder);
+			if (!accessibleFolders.contains(folder))
+				accessibleFolders.add(folder);
 		}
 
-		Collections.sort(coll, (o1, o2) -> (-1 * o1.getName().compareTo(o2.getName())));
-		return coll;
+		Collections.sort(accessibleFolders, (o1, o2) -> (-1 * o1.getName().compareTo(o2.getName())));
+		return accessibleFolders;
 	}
 
 	@Override
@@ -392,7 +397,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 * Search for the folders that define its own policies
 		 */
 		StringBuilder query1 = new StringBuilder(SELECT_DISTINCT + ENTITY + ") " + FROM_FOLDER + ENTITY + "  ");
-		query1.append(LEFT_JOIN + ENTITY + FOLDER_ACL_AS_GROUP);
+		query1.append(LEFT_JOIN + ENTITY + FOLDER_ACL_AS_ACL);
 		query1.append(WHERE_GROUP_GROUPID_IN);
 		query1.append(groups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
 		query1.append(") " + AND + ENTITY + PARENTID_EQUAL + parent.getId());
@@ -407,7 +412,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				+ ".deleted=0 and " + ENTITY + ".parentId = :parentId ");
 		query2.append(AND + ENTITY + SECURITY_REF_IN);
 		query2.append("    select distinct(B.id) from Folder B ");
-		query2.append(" left join B.accessControlList as _group");
+		query2.append(" left join B.accessControlList as _acl");
 		query2.append(WHERE_GROUP_GROUPID_IN);
 		query2.append(groups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
 		query2.append("))");
@@ -489,6 +494,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		long id = folderId;
 		Folder folder = findById(folderId);
+
 		if (folder == null)
 			return false;
 		if (folder.getSecurityRef() != null)
@@ -536,8 +542,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 * Search for folders that define its own security policies
 		 */
 		StringBuilder query = new StringBuilder(SELECT_DISTINCT + ENTITY + ") " + FROM_FOLDER + ENTITY + "  ");
-		query.append(LEFT_JOIN + ENTITY + FOLDER_ACL_AS_GROUP);
-		query.append(WHERE + ENTITY + ".deleted=0 and _group.groupId =" + groupId);
+		query.append(LEFT_JOIN + ENTITY + FOLDER_ACL_AS_ACL);
+		query.append(WHERE + ENTITY + ".deleted=0 and _acl.groupId =" + groupId);
 
 		List<Folder> coll = findByObjectQuery(query.toString(), (Map<String, Object>) null, null);
 
@@ -897,6 +903,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		// the policies
 		long id = folderId;
 		Folder folder = findById(folderId);
+
 		if (folder.getSecurityRef() != null) {
 			id = folder.getSecurityRef().longValue();
 			log.debug("Use the security reference {}", id);

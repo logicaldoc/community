@@ -11,7 +11,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
@@ -50,30 +49,30 @@ public class AbstractService {
 
 	private boolean validateSession = true;
 
+	protected Message currentMessage;
+
 	public void setValidateSession(boolean validateSession) {
 		this.validateSession = validateSession;
 	}
 
-	@Autowired
-	protected Message currentMessage;
-
-	
 	/**
-	 * Interprets the given parameter as session ID or an API Key and gives the real session id
+	 * Interprets the given parameter as session ID or an API Key and gives the
+	 * real session id
 	 * 
 	 * @param sidOrApikey The SID or an API Key
 	 * 
 	 * @return the SID of the session
 	 */
 	protected String sessionId(String sidOrApikey) {
-		if(!sidOrApikey.startsWith("ld-")) {
+		if (!sidOrApikey.startsWith("ld-")) {
 			return sidOrApikey;
 		} else {
-			// It is an API Key so go with Client ID (that also contains the API Key)
+			// It is an API Key so go with Client ID (that also contains the API
+			// Key)
 			return SessionManager.get().getSessionId(getCurrentRequest());
 		}
 	}
-	
+
 	/**
 	 * 
 	 * Utility method that validates the session and retrieve the associated

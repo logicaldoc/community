@@ -180,6 +180,22 @@ insert into ld_folder (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_p
 values (1210,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'Elard',4,0,0,1,1,8,0);
 insert into ld_folder_store (ld_folderid, ld_nodeid, ld_storeid) values (1210, 'saert536yy', 3);
 insert into ld_folder_store (ld_folderid, ld_nodeid, ld_storeid) values (1210, 'unexisting', 1);
+insert into ld_folder (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_parentid, ld_type, ld_templocked, ld_deleteuserid, ld_tenantid, ld_recordversion, ld_position, ld_hidden, ld_path) 
+values (1300, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 'workspace_deleted', 1201, 1, 0, 3, 1, 1, 7, 0, '/1200/1201/1300');
+insert into ld_folder (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_parentid, ld_type, ld_templocked, ld_deleteuserid, ld_tenantid, ld_recordversion, ld_position, ld_hidden, ld_path, ld_foldref, ld_securityref) 
+values (1301, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 'folder_with_reference', 3000, 1, 0, 3, 1, 1, 7, 0, '/1200/1201/1301', 777, 1202);
+INSERT INTO ld_folder (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_parentid, ld_type, ld_templocked, ld_deleteuserid, ld_tenantid, ld_recordversion, ld_position, ld_hidden, ld_path, ld_foldref) 
+VALUES (777, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 'Referenced Folder', 3000, 1, 0, 3, 1, 1, 7, 0, '/1200/1201/999', NULL);
+INSERT INTO ld_folder (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_parentid, ld_type, ld_templocked, ld_deleteuserid, ld_tenantid, ld_recordversion, ld_position, ld_hidden, ld_path, ld_foldref, ld_securityref) 
+VALUES (1302, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 'folder_with_securityref2', 1200, 0, 0, 3, 1, 1, 8, 0, '/1200/1302', NULL, 1201);
+
+INSERT INTO ld_folder (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_parentid, ld_type, ld_templocked, ld_deleteuserid, ld_tenantid, ld_recordversion, ld_position, ld_hidden, ld_path) 
+VALUES (1500, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 'MainFolderToDelete', 4, 0, 0, 1, 1, 1, 0, 0, '/4/1500');
+INSERT INTO ld_folder (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_parentid, ld_type, ld_templocked, ld_deleteuserid, ld_tenantid, ld_recordversion, ld_position, ld_hidden, ld_path, ld_foldref) 
+VALUES (1501, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 'Alias1', 4, 0, 0, 1, 1, 1, 0, 0, '/4/1501', 1500),
+       (1502, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 'Alias2', 4, 0, 0, 1, 1, 1, 0, 0, '/4/1502', 1500);
+
+
 
 insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_store, ld_readingreq, ld_preview, ld_customid)
 values (6,2,1,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0,1,1);
@@ -188,7 +204,19 @@ values (6,3,1,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0,1,1);
 insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_store, ld_readingreq, ld_preview, ld_customid)
 values (6,-3,1,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0,1,1);
 insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_store, ld_readingreq, ld_preview, ld_customid)
-values (1201,4,1,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0,1,1);
+values (1201,4,1,1,1,1,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0,1,1);
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_store, ld_readingreq, ld_preview, ld_customid)
+values (7,2,1,1,1,0,1,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0,1,1);
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_store, ld_readingreq, ld_preview, ld_customid)
+values (7,3,1,1,1,0,1,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0,1,1);
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_store, ld_readingreq, ld_preview, ld_customid)
+values (1301,2,1,1,1,0,1,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0,1,1);
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_store, ld_readingreq, ld_preview, ld_customid)
+values (1301,3,1,1,1,0,1,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0,1,1);
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_store, ld_readingreq, ld_preview, ld_customid)
+values (1302,2,1,1,1,0,1,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0,1,1);
+insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_store, ld_readingreq, ld_preview, ld_customid)
+values (1202,4,1,1,1,1,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0,1,1);
 
 
 insert into ld_foldertag(ld_folderid, ld_tenantid, ld_tag) values (1200, 1, 'ftag1');

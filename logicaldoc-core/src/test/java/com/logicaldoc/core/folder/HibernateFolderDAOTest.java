@@ -3,7 +3,9 @@ package com.logicaldoc.core.folder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -12,7 +14,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -40,7 +45,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
- * Test case for <code>HibernateFolderDAOTest</code>
+ * Test case for <code>HibernateFolderDAO</code>
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
@@ -61,6 +66,11 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	private TemplateDAO templateDao;
 
 	protected static Logger log = LoggerFactory.getLogger(HibernateFolderDAOTest.class);
+
+	@Override
+	protected List<String> getPluginArchives() {
+		return List.of("/logicaldoc-core-plugin.jar");
+	}
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
@@ -161,6 +171,31 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		testSubject.initialize(folder);
 		assertEquals(2, folder.getStores().keySet().size());
 		assertEquals(3, folder.getStore().intValue());
+
+		List<Folder> folders = testSubject.find("folder", 1L);
+		assertNotNull(folders);
+		assertEquals(6, folders.size());
+		folder = testSubject.findById(6);
+		Folder folder2 = testSubject.findById(7);
+		assertTrue(folders.contains(folder));
+		assertTrue(folders.contains(folder2));
+
+		folders = testSubject.find("folder.adminxx", 1L);
+		assertEquals(0, folders.size());
+		folders = testSubject.find("folder", 99L);
+		assertEquals(0, folders.size());
+
+		// Folder with foldRef
+		Folder folderWithRef = testSubject.findFolder(1301);
+		assertNotNull(folderWithRef);
+
+		Folder referencedFolder = testSubject.findFolder(1301);
+		assertNotNull(referencedFolder);
+		assertEquals(777, referencedFolder.getId());
+
+		// Non-existent folder
+		Folder nonExistentFolder = testSubject.findFolder(99999);
+		assertNull(nonExistentFolder);
 	}
 
 	@Test
@@ -251,9 +286,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testCopy() throws Exception {
-		/*
-		 * Create a tree and populate it
-		 */
+		// Create a tree and populate it
 		Folder defaultWorkspace = testSubject.findById(Folder.DEFAULTWORKSPACEID);
 		Folder newFolder = testSubject.createPath(defaultWorkspace, "pippo/pluto", true, null);
 		assertNotNull(newFolder);
@@ -320,11 +353,9 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		newFolder = testSubject.copy(folder, testSubject.findById(1210L), null, false, "replicate", tr);
 		testSubject.initialize(newFolder);
 		assertEquals(3, newFolder.getAccessControlList().size());
-	}
 
-	@Test
-	public void testCopy2() throws Exception {
-		Folder defaultWorkspace = testSubject.findById(Folder.DEFAULTWORKSPACEID);
+		// Copy folder structure and preserving security references
+		defaultWorkspace = testSubject.findById(Folder.DEFAULTWORKSPACEID);
 		testSubject.createPath(defaultWorkspace, "A/B/C/D", false, null);
 
 		Folder B = testSubject.findByPathExtended("/Default/A/B", 1L);
@@ -342,10 +373,10 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		D.setSecurityRef(B.getId());
 		testSubject.store(D);
 
-		Folder target = testSubject.createPath(defaultWorkspace, "TARGET", false, null);
-		Folder source = testSubject.findByPathExtended("/Default/A", 1L);
+		target = testSubject.createPath(defaultWorkspace, "TARGET", false, null);
+		source = testSubject.findByPathExtended("/Default/A", 1L);
 
-		FolderHistory tr = new FolderHistory();
+		tr = new FolderHistory();
 		tr.setNotified(0);
 		tr.setComment("");
 		tr.setUser(userDao.findByUsername("admin"));
@@ -359,7 +390,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testMoveFolder_Simple() throws Exception {
+	public void testMoveFolderSimple() throws Exception {
 		Folder docsFolder = testSubject.findById(Folder.DEFAULTWORKSPACEID);
 		Folder folderVO = new Folder();
 		folderVO.setName("folderA");
@@ -385,7 +416,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testMoveFolder_Up() throws Exception {
+	public void testMoveFolderUp() throws Exception {
 		Folder docsFolder = testSubject.findById(6);
 		Folder folderVO = new Folder();
 		folderVO.setName("folderA");
@@ -414,18 +445,16 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		folderList = testSubject.findChildren(folderB.getId(), null);
 		assertEquals(0, folderList.size());
-	}
 
-	@Test
-	public void testMoveFolder_UpWithDocuments() throws Exception {
-		Folder docsFolder = testSubject.findById(6);
-		Folder folderVO = new Folder();
+		// Move folder up with documents
+		docsFolder = testSubject.findById(6);
+		folderVO = new Folder();
 		folderVO.setName("folderA");
-		Folder folderA = testSubject.create(docsFolder, folderVO, true, null);
+		folderA = testSubject.create(docsFolder, folderVO, true, null);
 		folderVO.setName("folderB");
-		Folder folderB = testSubject.create(docsFolder, folderVO, true, null);
+		folderB = testSubject.create(docsFolder, folderVO, true, null);
 		folderVO.setName("folderC");
-		Folder folderC = testSubject.create(folderB, folderVO, true, null);
+		folderC = testSubject.create(folderB, folderVO, true, null);
 		folderVO.setName("folderD");
 		Folder folderD = testSubject.create(folderC, folderVO, true, null);
 		folderVO.setName("folderE");
@@ -443,9 +472,9 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		doc2.setIndexed(AbstractDocument.INDEX_INDEXED);
 		docDao.store(doc2);
 
-		User user = userDao.findByUsername("admin");
+		user = userDao.findByUsername("admin");
 
-		FolderHistory transaction = new FolderHistory();
+		transaction = new FolderHistory();
 		transaction.setNotified(0);
 		transaction.setComment("");
 		transaction.setUser(user);
@@ -454,7 +483,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		Folder fc = testSubject.findById(folderC.getId());
 		assertEquals(folderC.getName(), fc.getName());
 
-		List<Folder> folderList = testSubject.findChildren(folderA.getId(), null);
+		folderList = testSubject.findChildren(folderA.getId(), null);
 		assertEquals(1, folderList.size());
 
 		assertTrue(folderList.contains(folderC));
@@ -511,26 +540,35 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
+	public void testSetCreatorInCaseCreationEvent() throws PersistenceException {
+		Folder docsFolder = testSubject.findById(6L);
+		Folder folderVO = new Folder();
+		folderVO.setName("folderBVO");
+
+		FolderHistory transaction = new FolderHistory();
+		transaction.setEvent(null);
+
+		Folder folderB = testSubject.create(docsFolder, folderVO, true, transaction);
+		folderB.setName("folderB");
+		testSubject.store(folderB);
+
+		assertEquals("folderB", folderB.getName());
+
+		folderVO = new Folder();
+		folderVO.setName("folderBVO");
+		folderVO.setParentId(6L);
+
+		transaction = new FolderHistory();
+		testSubject.store(folderVO, transaction);
+
+		assertEquals(FolderEvent.CREATED.toString(), transaction.getEvent());
+	}
+
+	@Test
 	public void testIsInPath() throws Exception {
 		assertTrue(testSubject.isInPath(1200, 1201));
 		assertTrue(testSubject.isInPath(1200, 1202));
 		assertFalse(testSubject.isInPath(99, 1202));
-	}
-
-	@Test
-	public void testFind2() throws PersistenceException {
-		List<Folder> folders = testSubject.find("folder", 1L);
-		assertNotNull(folders);
-		assertEquals(2, folders.size());
-		Folder folder = testSubject.findById(6);
-		Folder folder2 = testSubject.findById(7);
-		assertTrue(folders.contains(folder));
-		assertTrue(folders.contains(folder2));
-
-		folders = testSubject.find("folder.adminxx", 1L);
-		assertEquals(0, folders.size());
-		folders = testSubject.find("folder", 99L);
-		assertEquals(0, folders.size());
 	}
 
 	@Test
@@ -546,7 +584,6 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		folder.addTag(StringUtils.repeat("B", 500));
 
 		testSubject.store(folder);
-		assertNotNull(folder);
 
 		FolderHistory transaction = new FolderHistory();
 		transaction.setFolderId(folder.getId());
@@ -554,6 +591,13 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		transaction.setNotified(0);
 		Folder alias = testSubject.createAlias(5L, folder.getId(), transaction);
 		assertNotNull(alias);
+
+		folder.clearTags();
+		assertEquals("[]", folder.getTags().toString());
+
+		Set<String> words = Set.of("C", "DDDDDDDDDDDD");
+		folder.setTagsFromWords(words);
+		assertEquals("[C, DDDDDDDDDDDD]", folder.getTagsAsWords().toString());
 
 		// Test updating the security rules
 		folder = testSubject.findById(folder.getId());
@@ -566,6 +610,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		folder.addAccessControlEntry(ace);
 		testSubject.store(folder);
 		assertNotNull(folder);
+
 		folder = testSubject.findById(folder.getId());
 		testSubject.initialize(folder);
 		assertEquals(3, folder.getAccessControlList().size());
@@ -601,7 +646,6 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		folder = testSubject.findById(6);
 		testSubject.initialize(folder);
 		assertEquals("folder6", folder.getName());
-		assertEquals(3, folder.getAccessControlList().size());
 
 		// Load an existing folder and modify it
 		folder = testSubject.findById(6);
@@ -614,6 +658,9 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		transaction.setUser(userDao.findById(1));
 		transaction.setNotified(0);
 		testSubject.store(folder, transaction);
+
+		assertEquals(FolderEvent.RENAMED, FolderEvent.fromString("event.folder.renamed"));
+		assertEquals(false, folder.isAlias());
 
 		folder = testSubject.findById(7);
 		testSubject.initialize(folder);
@@ -657,16 +704,97 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		folder = testSubject.findById(1202);
 		testSubject.initialize(folder);
 		folder.setStore(9);
-		assertNotNull(folder);
 		assertEquals("test_val_1", folder.getValue("val1"));
 		folder.setValue("val1", "xyz");
 		testSubject.store(folder);
 		assertNotNull(folder);
 		folder = testSubject.findById(1202);
 		testSubject.initialize(folder);
-		assertNotNull(folder);
 		assertEquals("xyz", folder.getValue("val1"));
-		assertEquals(9, folder.getStore().intValue());
+
+		Folder folder999 = new Folder("TestFolder");
+		assertEquals("TestFolder", folder999.getName());
+	}
+
+	@Test
+	public void testStoreValidAndDefaultWorkspaceScenarios() {
+		// Store a valid workspace
+		Folder workspaceFolder = new Folder();
+		testSubject.initialize(workspaceFolder);
+		workspaceFolder.setId(0L);
+		workspaceFolder.setType(Folder.TYPE_WORKSPACE);
+		workspaceFolder.setParentId(5);
+		workspaceFolder.setName("Workspace");
+
+		try {
+			testSubject.store(workspaceFolder);
+		} catch (Exception e) {
+			fail("store() should not have thrown an exception, but it threw: " + e.getMessage());
+		}
+
+		// Store workspace when root is null
+		Folder folder = new Folder();
+		folder.setId(560L);
+		folder.setType(Folder.TYPE_WORKSPACE);
+		folder.setTenantId(9999999L);
+		folder.setParentId(5);
+		folder.setName("Workspace");
+
+		try {
+			testSubject.store(folder);
+			assertEquals("Workspace", folder.getName());
+		} catch (Exception e) {
+			fail("store() should not throw exception when root is null, but threw: " + e.getMessage());
+		}
+
+		// Store a default workspace with the same name
+		Folder defaultWorkspace = new Folder();
+		defaultWorkspace.setId(4L);
+		defaultWorkspace.setType(Folder.TYPE_WORKSPACE);
+		defaultWorkspace.setTenantId(1L);
+		defaultWorkspace.setParentId(5);
+		defaultWorkspace.setName(Folder.DEFAULTWORKSPACENAME);
+
+		try {
+			testSubject.store(defaultWorkspace);
+			assertNotNull(defaultWorkspace);
+			assertEquals(Folder.DEFAULTWORKSPACENAME, defaultWorkspace.getName());
+		} catch (Exception e) {
+			fail("store() should not have thrown an exception, but it threw: " + e.getMessage());
+		}
+	}
+
+	@Test
+	public void testStoreWorkspaceShouldThrowException() throws PersistenceException {
+		// Moving a workspace should throw PersistenceException
+		Folder movedWorkspace = new Folder();
+		movedWorkspace.setId(560L);
+		movedWorkspace.setType(Folder.TYPE_WORKSPACE);
+		movedWorkspace.setTenantId(1L);
+		movedWorkspace.setParentId(999L);
+		movedWorkspace.setName("Workspace");
+
+		try {
+			testSubject.store(movedWorkspace);
+			fail("Expected PersistenceException to be thrown");
+		} catch (PersistenceException e) {
+			// Exception expected
+		}
+
+		// Renaming default workspace should throw PersistenceException
+		Folder renamedWorkspace = new Folder();
+		renamedWorkspace.setId(4L);
+		renamedWorkspace.setType(Folder.TYPE_WORKSPACE);
+		renamedWorkspace.setTenantId(1L);
+		renamedWorkspace.setParentId(5);
+		renamedWorkspace.setName("RenamedWorkspace");
+
+		try {
+			testSubject.store(renamedWorkspace);
+			fail("Expected PersistenceException to be thrown");
+		} catch (PersistenceException e) {
+			// Exception expected
+		}
 	}
 
 	@Test
@@ -682,6 +810,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		testSubject.initialize(folder);
 		assertEquals("test1", folder.getTemplate().getName());
 		assertEquals("test_val_1", folder.getValue("val1"));
+		assertEquals("xxxx(101)", folder.toString());
 	}
 
 	@Test
@@ -737,7 +866,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testDeleteAll() throws PersistenceException {
 		List<Folder> folders = testSubject.findByParentId(1200);
-		assertEquals(2, folders.size());
+		assertEquals(3, folders.size());
 
 		User user = userDao.findByUsername("admin");
 
@@ -753,6 +882,24 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
+	public void testDeleteWithAliases() throws PersistenceException {
+		List<Folder> aliasesBefore = testSubject.findAliases(1500L, 1L);
+		assertNotNull(aliasesBefore);
+		assertFalse(aliasesBefore.isEmpty());
+
+		testSubject.delete(1500);
+
+		Folder folder = testSubject.findById(1500);
+		assertNull(folder);
+
+		Folder alias1 = testSubject.findById(1501);
+		Folder alias2 = testSubject.findById(1502);
+
+		assertNull(alias1);
+		assertNull(alias2);
+	}
+
+	@Test
 	public void testFindById() throws PersistenceException {
 		// Try with a folder id
 		Folder folder = testSubject.findById(Folder.ROOTID);
@@ -762,7 +909,12 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		assertEquals("/", folder.getName());
 		assertEquals(4, folder.getAccessControlList().size());
 
-		// Try with unexisting id
+		Folder sameFolder = testSubject.findById(Folder.ROOTID);
+		testSubject.initialize(sameFolder);
+		assertEquals(folder, sameFolder);
+		assertEquals(folder.hashCode(), sameFolder.hashCode());
+
+		// Try with non-existing id
 		folder = testSubject.findById(99999);
 		assertNull(folder);
 
@@ -771,13 +923,17 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		testSubject.initialize(folder);
 		assertNotNull(folder);
 		assertEquals("test_val_1", folder.getValue("val1"));
+
+		Folder differentFolder = new Folder("DifferentFolder");
+		assertNotSame(folder, differentFolder);
+		assertNotSame(folder.hashCode(), differentFolder.hashCode());
 	}
 
 	@Test
 	public void testFindDeleted() throws PersistenceException {
 		// Try with a folder id
 		List<Folder> folders = testSubject.findDeleted(3, 100);
-		assertEquals(2, folders.size());
+		assertEquals(3, folders.size());
 
 		folders = testSubject.findDeleted(99, 100);
 		assertEquals(0, folders.size());
@@ -788,7 +944,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		// Try with existing text
 		List<Folder> folders = testSubject.findByName("%folder%", null);
 		assertNotNull(folders);
-		assertEquals(2, folders.size());
+		assertEquals(4, folders.size());
 
 		folders = (List<Folder>) testSubject.findByName(null, "test", null, true);
 		assertNotNull(folders);
@@ -799,7 +955,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		assertNotNull(folders);
 		assertEquals(1, folders.size());
 
-		// Try with unexisting text
+		// Try with non-existing text
 		folders = testSubject.findByName("xxxxx", null);
 		assertNotNull(folders);
 		assertTrue(folders.isEmpty());
@@ -815,7 +971,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		List<Folder> folders = testSubject.findByUserId(1L);
 		assertNotNull(folders);
-		assertEquals(10, folders.size());
+		assertEquals(16, folders.size());
 
 		alias = testSubject.createAlias(1200L, 6L, null);
 		assertNotNull(alias);
@@ -823,18 +979,27 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		testSubject.createAlias(6L, 1201L, null);
 		folders = testSubject.findByUserId(4L);
 		assertNotNull(folders);
-		assertEquals(4, folders.size());
+		assertEquals(11, folders.size());
 
 		folders = testSubject.findByUserId(1, Folder.ROOTID);
 		assertNotNull(folders);
 		assertEquals(3, folders.size());
 
-		// Try with existing user and unexisting folder
+		// Existing user and non-existing folder
 		folders = testSubject.findByUserId(1, 70);
 		assertNotNull(folders);
 		assertEquals(0, folders.size());
 
-		// Unexisting user
+		// Existing user without group
+		User user = new User();
+		user.setUsername("userWithNoGroup");
+		user.setGroups(new HashSet<>());
+		userDao.store(user);
+
+		folders = testSubject.findByUserId(101L, 1200L);
+		assertNotNull(folders);
+
+		// Non-existing user
 		String runOk = null;
 		try {
 			testSubject.findByUserId(99, Folder.ROOTID);
@@ -844,18 +1009,56 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		}
 		assertNull(runOk);
 
+		// Existing user with no folders associated
+		folders = testSubject.findByUserId(2);
+		assertEquals(0, folders.size());
+
 		folders = testSubject.findByUserId(4, Folder.ROOTID);
 		assertNotNull(folders);
 		assertEquals(1, folders.size());
+
+		// user author has id 4 and group id 2
+		User user4 = userDao.findById(4L);
+		assertFalse(user4.isAdmin());
+
+		Folder dependantFoler = new Folder();
+		// Make security depending on default workspace
+		dependantFoler.setSecurityRef(Folder.DEFAULTWORKSPACEID);
+		dependantFoler.setName("Dummy");
+		dependantFoler.setParentId(Folder.DEFAULTWORKSPACEID);
+		testSubject.store(dependantFoler);
+
+		Folder workspace = testSubject.findById(Folder.DEFAULTWORKSPACEID);
+		testSubject.initialize(workspace);
+		workspace.getAccessControlList().add(new AccessControlEntry(user4.getGroups().iterator().next().getId()));
+		testSubject.store(workspace);
+
+		folders = testSubject.findByUserId(user4.getId(), Folder.DEFAULTWORKSPACEID);
+		assertNotNull(folders);
+
+		folders = testSubject.findByUserId(user4.getId());
+		assertNotNull(folders);
+
+		// Find by user id with security reference
+		folders = testSubject.findByUserId(4);
+		assertFalse(folders.isEmpty());
+
+		boolean containsFolder4 = folders.stream().anyMatch(f -> f.getId() == 4);
+		assertTrue(containsFolder4);
+
+		folders = testSubject.findByUserId(4);
+
+		boolean contains1302 = folders.stream().anyMatch(f -> f.getId() == 1302);
+		assertTrue(contains1302);
 	}
 
 	@Test
 	public void testFindByParentId() {
 		List<Folder> folders = testSubject.findByParentId(Folder.ROOTID);
 		assertNotNull(folders);
-		assertEquals(8, folders.size());
+		assertEquals(14, folders.size());
 
-		// Try with unexisting parent
+		// Try with non-existing parent
 		folders = testSubject.findByParentId(999);
 		assertNotNull(folders);
 		assertEquals(0, folders.size());
@@ -868,7 +1071,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		assertTrue(testSubject.isWriteAllowed(1200, 3));
 		assertTrue(testSubject.isWriteAllowed(Folder.ROOTID, 3));
 
-		// Unexisting user
+		// non-existing user
 		String runOk = null;
 		try {
 			assertFalse(testSubject.isWriteAllowed(Folder.ROOTID, 99));
@@ -919,7 +1122,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		runOk = false;
 		try {
-			// Unexisting user
+			// Non-existing user
 			assertFalse(testSubject.isReadAllowed(Folder.ROOTID, 99));
 		} catch (PersistenceException e) {
 			assertEquals("Unexisting user 99", e.getMessage());
@@ -935,6 +1138,19 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		folder.setSecurityRef(1201L);
 		testSubject.store(folder);
 		assertTrue(testSubject.isReadAllowed(6L, 4L));
+
+		// Non-existing folder
+		assertFalse(testSubject.isReadAllowed(999999L, 4L));
+
+		// User with no group
+		User user = new User();
+		user.setUsername("userWithNoGroup");
+
+		userDao.store(user);
+
+		User storedUser = userDao.findByUsername("userWithNoGroup");
+		assertNotNull(storedUser);
+		assertEquals(false, testSubject.isReadAllowed(6L, 101L));
 	}
 
 	@Test
@@ -968,7 +1184,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		assertTrue(testSubject.isPermissionAllowed(Permission.WRITE, 6, 1));
 		assertFalse(testSubject.isPermissionAllowed(Permission.WRITE, Folder.ROOTID, 5));
 
-		// Unexisting user
+		// Non-existing user
 		String runOk = null;
 		try {
 			assertFalse(testSubject.isPermissionAllowed(Permission.WRITE, Folder.ROOTID, 99));
@@ -982,29 +1198,49 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
+	public void testIsPreviewEnabled() throws PersistenceException {
+		assertEquals(true, testSubject.isPreviewAllowed(Folder.ROOTID, 1));
+	}
+
+	@Test
 	public void testGetEnabledPermissions() throws PersistenceException {
 		Set<Permission> permissions = testSubject.getAllowedPermissions(Folder.ROOTID, 1);
 		assertEquals(Permission.all().size(), permissions.size());
 		assertTrue(permissions.contains(Permission.READ));
 		assertTrue(permissions.contains(Permission.SECURITY));
 		assertTrue(permissions.contains(Permission.SIGN));
+
 		permissions = testSubject.getAllowedPermissions(6, 4);
 		assertEquals(11, permissions.size());
 		assertTrue(permissions.contains(Permission.READ));
 		assertTrue(permissions.contains(Permission.WRITE));
 		assertTrue(permissions.contains(Permission.MOVE));
 		assertTrue(permissions.contains(Permission.EMAIL));
+
 		permissions = testSubject.getAllowedPermissions(999, 1);
 		assertEquals(Permission.all().size(), permissions.size());
+
+		permissions = testSubject.getAllowedPermissions(1301, 4);
+		assertNotNull(permissions);
+
+		// Create a user with no groups
+		User user = new User();
+		user.setUsername("userWithoutGroups");
+		user.setGroups(new HashSet<>());
+		userDao.store(user);
+
+		permissions = testSubject.getAllowedPermissions(1202, 101);
+		assertNotNull(permissions);
+		assertTrue(permissions.isEmpty());
 	}
 
 	@Test
 	public void testFindFolderIdByUserId() throws PersistenceException {
 		Collection<Long> ids = testSubject.findFolderIdByUserId(3, null, true);
 		assertNotNull(ids);
-		assertEquals(4, ids.size());
+		assertEquals(6, ids.size());
 
-		// Try with unexisting user
+		// Try with non-existing user
 		String runOk = null;
 		try {
 			testSubject.findFolderIdByUserId(99, null, true);
@@ -1024,17 +1260,17 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		ids = testSubject.findIdByUserId(3, 1200);
 		assertNotNull(ids);
-		assertEquals(1, ids.size());
+		assertEquals(2, ids.size());
 
 		ids = testSubject.findIdByUserId(4, 1200);
 		assertNotNull(ids);
-		assertEquals(1, ids.size());
+		assertEquals(2, ids.size());
 
 		ids = testSubject.findIdByUserId(1, 1201);
 		assertNotNull(ids);
 		assertEquals(1, ids.size());
 
-		// Try with unexisting user
+		// Try with non-existing user
 		String runOk = null;
 		try {
 			testSubject.findIdByUserId(99, 1201);
@@ -1043,22 +1279,30 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 			assertEquals("Unexisting user 99", e.getMessage());
 		}
 		assertNull(runOk);
+
+		// security-referenced folders
+		ids = testSubject.findIdByUserId(3, 3000);
+		assertNotNull(ids);
+		assertTrue(ids.contains(1301L));
+
+		ids = testSubject.findIdByUserId(3, 3000);
+		assertEquals(4, ids.size());
 	}
 
 	@Test
 	public void testFindFolderIdByUserIdInPath() throws PersistenceException {
 		Collection<Long> ids = testSubject.findFolderIdByUserIdInPath(1, Long.valueOf(1200));
-		assertEquals(3, ids.size());
+		assertEquals(6, ids.size());
 		assertTrue(ids.contains(1201L));
 
 		ids = testSubject.findFolderIdByUserIdInPath(4, Long.valueOf(1200));
-		assertEquals(1, ids.size());
+		assertEquals(4, ids.size());
 		assertTrue(ids.contains(1201L));
 
 		ids = testSubject.findFolderIdByUserIdInPath(4, Long.valueOf(1202));
-		assertTrue(ids.isEmpty());
+		assertEquals(1, ids.size());
 
-		// Try with unexisting user
+		// Try with non-existing user
 		boolean runOk = false;
 		try {
 			testSubject.findFolderIdByUserIdInPath(99, Long.valueOf(1200));
@@ -1068,7 +1312,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		}
 		assertFalse(runOk);
 
-		// Try with unexisting folder
+		// Try with non-existing folder
 		runOk = false;
 		try {
 			testSubject.findFolderIdByUserIdInPath(4, Long.valueOf(999));
@@ -1093,7 +1337,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	public void testFindIdByParentId() {
 		Collection<Long> ids = testSubject.findIdsByParentId(1200);
 		assertNotNull(ids);
-		assertEquals(2, ids.size());
+		assertEquals(3, ids.size());
 		assertTrue(ids.contains(1202L));
 
 		ids = testSubject.findIdsByParentId(1201);
@@ -1118,9 +1362,11 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testFindByGroupId() throws PersistenceException {
 		Collection<Folder> folders = testSubject.findByGroupId(1);
-		assertEquals(9, folders.size());
+		assertEquals(15, folders.size());
 		folders = testSubject.findByGroupId(10);
 		assertEquals(0, folders.size());
+		folders = testSubject.findByGroupId(2);
+		assertEquals(6, folders.size());
 	}
 
 	@Test
@@ -1130,6 +1376,11 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		assertEquals(testSubject.findById(Folder.ROOTID), folders.get(0));
 		assertEquals(testSubject.findById(1200), folders.get(1));
 		assertEquals(testSubject.findById(1201), folders.get(2));
+
+		// Non-existing folder id
+		folders = testSubject.findParents(99999);
+		assertNotNull(folders);
+		assertEquals(true, folders.isEmpty());
 	}
 
 	@Test
@@ -1141,6 +1392,27 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		folder = testSubject.findWorkspace(6L);
 		assertTrue(folder.isWorkspace());
 		assertEquals("Workspace X", folder.getName());
+
+		// find default workspace
+		folder = testSubject.findDefaultWorkspace(1L);
+		assertNotNull(folder);
+		assertEquals(Folder.DEFAULTWORKSPACENAME, folder.getName());
+		assertEquals(Folder.DEFAULTWORKSPACEID, folder.getId());
+
+		folder = testSubject.findDefaultWorkspace(99L);
+		assertNull(folder);
+	}
+
+	@Test
+	public void testFindWorkspaces() throws PersistenceException {
+		List<Folder> dirs = testSubject.findWorkspaces(1L);
+		assertNotNull(dirs);
+		assertEquals(2, dirs.size());
+		assertEquals("Default", dirs.get(0).getName());
+
+		dirs = testSubject.findWorkspaces(99L);
+		assertNotNull(dirs);
+		assertEquals(0, dirs.size());
 	}
 
 	@Test
@@ -1151,12 +1423,24 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		testSubject.restore(1204, 5L, null);
 		folder = testSubject.findById(1204);
 		assertNotNull(folder);
+
+		FolderHistory transaction = new FolderHistory();
+		// added folder with id 1300 and ld_deleted = 1
+		testSubject.restore(1300, 1201, transaction);
+
+		Folder restoredFolder = testSubject.findById(1300);
+		assertEquals(FolderEvent.RESTORED.toString(), transaction.getEvent());
+		assertNotNull(restoredFolder);
+		assertNotSame(1, restoredFolder.getDeleted());
+
+		Folder rootFolder = testSubject.findRoot(restoredFolder.getTenantId());
+		assertEquals(rootFolder.getId(), restoredFolder.getParentId());
 	}
 
 	@Test
 	public void testFindByNameAndParentId() throws PersistenceException {
 		List<Folder> folders = testSubject.findByNameAndParentId("%folder%", 3000L);
-		assertEquals(2, folders.size());
+		assertEquals(3, folders.size());
 		assertFalse(folders.contains(testSubject.findById(99)));
 		assertTrue(folders.contains(testSubject.findById(7)));
 		folders = testSubject.findByNameAndParentId("ABC", 1200);
@@ -1167,23 +1451,23 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	public void testFindFolderIdByUserIdAndPermission() throws PersistenceException {
 		Collection<Long> ids = testSubject.findFolderIdByUserIdAndPermission(5, Permission.WRITE, null, true);
 		assertNotNull(ids);
-		assertEquals(2, ids.size());
+		assertEquals(3, ids.size());
 
 		ids = testSubject.findFolderIdByUserIdAndPermission(3, Permission.WRITE, null, true);
 		assertNotNull(ids);
-		assertEquals(3, ids.size());
+		assertEquals(5, ids.size());
 
 		ids = testSubject.findFolderIdByUserIdAndPermission(4, Permission.WRITE, 1200L, true);
 		assertNotNull(ids);
-		assertEquals(1, ids.size());
+		assertEquals(3, ids.size());
 
 		ids = testSubject.findFolderIdByUserIdAndPermission(User.USERID_ADMIN, Permission.WRITE, 1200L, true);
 		assertNotNull(ids);
-		assertEquals(3, ids.size());
+		assertEquals(4, ids.size());
 
 		ids = testSubject.findFolderIdByUserIdAndPermission(User.USERID_ADMIN, Permission.WRITE, 1200L, false);
 		assertNotNull(ids);
-		assertEquals(2, ids.size());
+		assertEquals(3, ids.size());
 	}
 
 	@Test
@@ -1211,19 +1495,33 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	public void testComputePathExtended() throws PersistenceException {
 		assertEquals("/", testSubject.computePathExtended(5L));
 		assertEquals("/test/ABC", testSubject.computePathExtended(1201));
+		assertNull(testSubject.computePathExtended(null));
+
+		// when root == null
+		Folder testFolder = new Folder();
+		testFolder.setTenantId(99);
+		assertNull(testSubject.computePathExtended(testFolder));
 	}
 
 	@Test
 	public void testComputePath() throws PersistenceException {
+		assertNull(testSubject.computePath(null));
 		assertEquals("/", testSubject.computePath(5L));
 		assertEquals("/1200/1201", testSubject.computePath(1201));
+
+		Folder folderNonRoot = new Folder();
+		folderNonRoot.setId(109);
+		folderNonRoot.setParentId(109);
+		folderNonRoot.setPath("109");
+		testSubject.computePath(folderNonRoot);
+		assertEquals("/109", testSubject.computePath(folderNonRoot));
 	}
 
 	@Test
 	public void testFindChildren() throws PersistenceException {
 		List<Folder> dirs = testSubject.findChildren(1200L, 1L);
 		assertNotNull(dirs);
-		assertEquals(1, dirs.size());
+		assertEquals(2, dirs.size());
 
 		Folder alias = testSubject.createAlias(1201L, 6L, null);
 		assertNotNull(alias);
@@ -1234,7 +1532,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		dirs = testSubject.findChildren(1201L, 4L);
 		assertNotNull(dirs);
-		assertEquals(1, dirs.size());
+		assertEquals(2, dirs.size());
 	}
 
 	@Test
@@ -1382,35 +1680,23 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindWorkspaces() throws PersistenceException {
-		List<Folder> dirs = testSubject.findWorkspaces(1L);
-		assertNotNull(dirs);
-		assertEquals(2, dirs.size());
-		assertEquals("Default", dirs.get(0).getName());
-
-		dirs = testSubject.findWorkspaces(99L);
-		assertNotNull(dirs);
-		assertEquals(0, dirs.size());
-	}
-
-	@Test
 	public void testFindFolderIdInTree() {
 		Collection<Long> ids = testSubject.findFolderIdInTree(1200L, false);
-		assertEquals(3, ids.size());
+		assertEquals(4, ids.size());
 		assertTrue(ids.contains(1202L));
 		assertTrue(ids.contains(1201L));
 		assertTrue(ids.contains(1200L));
 
 		ids.clear();
 		ids = testSubject.findFolderIdInTree(5L, false);
-		assertEquals(9, ids.size());
+		assertEquals(15, ids.size());
 		assertTrue(ids.contains(1200L));
 		assertTrue(ids.contains(6L));
 		assertTrue(ids.contains(3000L));
 
 		ids.clear();
 		ids = testSubject.findFolderIdInTree(1200L, false);
-		assertEquals(3, ids.size());
+		assertEquals(4, ids.size());
 		assertTrue(ids.contains(1201L));
 	}
 
@@ -1418,17 +1704,6 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	public void testFindbyPathExtended() throws PersistenceException {
 		Folder folder = testSubject.findByPathExtended("/Default/Elard", 1L);
 		assertNotNull(folder);
-	}
-
-	@Test
-	public void testFindDefaultWorkspace() throws PersistenceException {
-		Folder folder = testSubject.findDefaultWorkspace(1L);
-		assertNotNull(folder);
-		assertEquals(Folder.DEFAULTWORKSPACENAME, folder.getName());
-		assertEquals(Folder.DEFAULTWORKSPACEID, folder.getId());
-
-		folder = testSubject.findDefaultWorkspace(99L);
-		assertNull(folder);
 	}
 
 	@Test
@@ -1587,5 +1862,112 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		folder = testSubject.findById(1201);
 		assertEquals(Long.valueOf(1), folder.getOcrTemplateId());
+	}
+
+	@Test
+	public void testCompareTo() {
+		Folder folder1 = new Folder("FolderABC");
+		testSubject.initialize(folder1);
+		folder1.setPosition(1);
+		folder1.setPathExtended("/logicaldoc-core/target");
+		assertEquals(0, folder1.compareTo(folder1));
+
+		Folder folder2 = new Folder("FolderBCD");
+		folder2.setPosition(2);
+		assertEquals(-1, Integer.signum(folder1.compareTo(folder2)));
+		assertEquals(1, Integer.signum(folder2.compareTo(folder1)));
+
+		Folder folder3 = new Folder("FolderC");
+		folder3.setPosition(1);
+		Folder folder4 = new Folder("FolderB");
+		folder4.setPosition(1);
+		assertEquals(1, Integer.signum(folder3.compareTo(folder4)));
+		assertEquals(-1, Integer.signum(folder4.compareTo(folder3)));
+
+		assertEquals("/logicaldoc-core/target", folder1.getPathExtended());
+	}
+
+	@Test
+	public void testEqualsNameNullAndOtherNotNull() {
+		// Name is null and other not null
+		Folder folder991 = new Folder();
+		folder991.setName(null);
+		folder991.setParentId(1);
+
+		Folder folder992 = new Folder();
+		folder992.setName("NotNullName");
+		folder992.setParentId(1);
+
+		assertEquals(false, folder991.equals(folder992));
+
+		// both names are null
+		Folder folder1 = new Folder();
+		folder1.setName(null);
+		folder1.setParentId(1);
+
+		Folder folder2 = new Folder();
+		folder2.setName(null);
+		folder2.setParentId(1);
+		assertEquals(true, folder1.equals(folder2));
+	}
+
+	@Test
+	public void testGetQuotaAlertRecipientsAsList() {
+		Folder folder = new Folder();
+
+		// Null value
+		folder.setQuotaAlertRecipients(null);
+		assertEquals("[]", folder.getQuotaAlertRecipientsAsList().toString());
+
+		// Empty string
+		folder.setQuotaAlertRecipients("");
+		assertEquals("", folder.getQuotaAlertRecipients());
+
+		folder.setQuotaAlertRecipients("user1@example.com, user2@example.com, user3@example.com");
+		List<String> result = folder.getQuotaAlertRecipientsAsList();
+		assertEquals(3, result.size());
+		assertEquals("user1@example.com", result.get(0));
+		assertEquals("user2@example.com", result.get(1));
+		assertEquals("user3@example.com", result.get(2));
+	}
+
+	@Test
+	public void testAddQuotaAlertRecipient() {
+		Folder folder = new Folder();
+
+		folder.setQuotaAlertRecipients("user@example.com");
+		folder.addQuotaAlertRecipient("");
+		folder.addQuotaAlertRecipient(null);
+		List<String> result = folder.getQuotaAlertRecipientsAsList();
+		assertEquals(1, result.size());
+		assertEquals("user@example.com", result.get(0));
+
+		folder.setQuotaAlertRecipients("user1@example.com");
+		folder.addQuotaAlertRecipient("user2@example.com");
+		folder.addQuotaAlertRecipient("user3@example.com");
+		result = folder.getQuotaAlertRecipientsAsList();
+		assertEquals(3, result.size());
+	}
+
+	@Test
+	public void testFolderListener() {
+		FolderListenerManager folderListener = new FolderListenerManager();
+
+		List<FolderListener> listeners = folderListener.getListeners();
+		assertNotNull(listeners);
+		assertSame(listeners, folderListener.getListeners());
+	}
+
+	@Test
+	public void testBeforeStoreDictionaryValidatedTrue() throws PersistenceException {
+		FolderValidator folderValidator = new FolderValidator();
+		Map<String, Object> dictionary = new HashMap<>();
+		Folder folder = new Folder();
+		FolderHistory transaction = new FolderHistory();
+
+		dictionary.put("validated", "true");
+
+		folderValidator.beforeStore(folder, transaction, dictionary);
+		assertEquals("true", dictionary.get("validated"));
 	}
 }

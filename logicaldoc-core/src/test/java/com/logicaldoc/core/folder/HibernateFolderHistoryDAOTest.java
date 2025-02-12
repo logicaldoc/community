@@ -60,7 +60,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(2, histories.size());
 
-		// Try with unexisting user
+		// Try with non-existing user
 		histories = dao.findByUserId(99);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(0, histories.size());
@@ -73,7 +73,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(2, histories.size());
 
-		// Try with unexisting folderId
+		// Try with non-existing folderId
 		histories = dao.findByFolderId(99);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(0, histories.size());
@@ -117,7 +117,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
 
 		Collection histories = dao.findByFolderId(5);
 		Assert.assertNotNull(histories);
-		Assert.assertEquals(3, histories.size());
+		Assert.assertEquals(2, histories.size());
 	}
 
 	@Test

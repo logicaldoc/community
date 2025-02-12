@@ -32,7 +32,7 @@ public class StatsCollectorTest extends AbstractCoreTestCase {
 
 		List<NameValuePair> stats = testSubject.getStatistics();
 		assertEquals("7", stats.stream().filter(p -> "docs".equals(p.getName())).findFirst().orElse(null).getValue());
-		assertEquals("11",
+		assertEquals("18",
 				stats.stream().filter(p -> "folders".equals(p.getName())).findFirst().orElse(null).getValue());
 	}
 }

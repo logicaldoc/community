@@ -88,6 +88,7 @@ public abstract class FolderComparator implements Comparator<Folder> {
 			public int compare(Folder f1, Folder f2) {
 				Comparable val1 = (Comparable) f1.getValue(attribute);
 				Comparable val2 = (Comparable) f2.getValue(attribute);
+
 				if (val1 == null && val2 == null)
 					return 0;
 				else if (val1 == null)
@@ -129,7 +130,7 @@ public abstract class FolderComparator implements Comparator<Folder> {
 
 	public static Comparator<Folder> getComparator(String sort) {
 		StringTokenizer st = new StringTokenizer(sort, ",", false);
-		List<FolderComparator> comparators = new ArrayList<>();
+		List<Comparator<Folder>> comparators = new ArrayList<>();
 
 		while (st.hasMoreTokens()) {
 			String token = st.nextToken().trim();
@@ -158,21 +159,9 @@ public abstract class FolderComparator implements Comparator<Folder> {
 		return getComparator(comparators);
 	}
 
-	public static Comparator<Folder> getComparator(List<FolderComparator> multipleOptions) {
+	private static Comparator<Folder> getComparator(List<Comparator<Folder>> multipleOptions) {
 		return (f1, f2) -> {
-			for (FolderComparator option : multipleOptions) {
-				int result = option.compare(f1, f2);
-				if (result != 0) {
-					return result;
-				}
-			}
-			return 0;
-		};
-	}
-
-	public static Comparator<Folder> getComparator(final FolderComparator... multipleOptions) {
-		return (f1, f2) -> {
-			for (FolderComparator option : multipleOptions) {
+			for (Comparator<Folder> option : multipleOptions) {
 				int result = option.compare(f1, f2);
 				if (result != 0) {
 					return result;

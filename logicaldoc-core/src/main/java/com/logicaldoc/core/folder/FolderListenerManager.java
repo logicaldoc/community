@@ -46,6 +46,7 @@ public class FolderListenerManager {
 		for (Extension extension : exts) {
 			sortedExts.add(extension);
 		}
+
 		Collections.sort(sortedExts, (Extension e1, Extension e2) -> {
 			int position1 = Integer.parseInt(e1.getParameter(POSITION).valueAsString());
 			int position2 = Integer.parseInt(e2.getParameter(POSITION).valueAsString());
