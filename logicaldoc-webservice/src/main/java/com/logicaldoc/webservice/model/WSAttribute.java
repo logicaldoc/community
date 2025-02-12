@@ -230,6 +230,9 @@ public class WSAttribute implements Serializable {
 	}
 
 	private static void setNonUserValue(WSAttribute attribute, Object value) {
+		if (value == null)
+			return;
+
 		switch (value) {
 		case String string -> {
 			attribute.type = TYPE_STRING;
