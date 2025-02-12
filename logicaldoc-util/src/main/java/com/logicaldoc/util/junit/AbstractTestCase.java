@@ -72,7 +72,6 @@ public abstract class AbstractTestCase {
 	public void tearDown() throws SQLException {
 		try {
 			destroyDatabase();
-
 			File pluginsDir = new File(
 					Context.get().getProperties().getProperty("conf.plugindir", "target/tests-plugins"));
 			FileUtil.delete(pluginsDir);
