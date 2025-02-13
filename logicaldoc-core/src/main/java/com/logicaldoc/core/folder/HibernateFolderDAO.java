@@ -190,9 +190,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	private void workspaceChecks(Folder folder) throws PersistenceException {
 		if (folder.getId() != 0L && folder.getType() == Folder.TYPE_WORKSPACE) {
 			Folder root = findRoot(folder.getTenantId());
-			if(root==null)
+			if (root == null)
 				return;
-			
+
 			if (folder.getParentId() != root.getId())
 				throw new PersistenceException("You cannot move a workspace");
 
@@ -572,7 +572,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return coll;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<Long> findIdByUserId(long userId, long parentId) throws PersistenceException {
 		List<Long> ids = new ArrayList<>();
@@ -643,7 +642,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		if (tenantId != null)
 			query.append(AND + "ld_tenantid = " + tenantId);
 
-		@SuppressWarnings("unchecked")
 		List<Long> ids = queryForList(query.toString(), Long.class);
 		List<Folder> folders = new ArrayList<>();
 		for (Long id : ids)
@@ -948,7 +946,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		permissionColumn.put("LDREADINGREQ", Permission.READINGREQ);
 		permissionColumn.put("LDPREVIEW", Permission.PREVIEW);
 		permissionColumn.put("LDCUSTOMID", Permission.CUSTOMID);
-		
+
 		SqlRowSet rows = queryForRowSet(query.toString(), null);
 		while (rows.next()) {
 			for (Entry<String, Permission> entry : permissionColumn.entrySet()) {
@@ -962,7 +960,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return permissions;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<Long> findFolderIdByUserIdInPath(long userId, long parentId) throws PersistenceException {
 		/*
@@ -1050,7 +1047,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return ids;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<Long> findFolderIdByUserIdAndPermission(long userId, Permission permission, Long parentId,
 			boolean tree) throws PersistenceException {
@@ -1497,7 +1493,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return folder;
 	}
 
-	@SuppressWarnings("unchecked")
 	private void setUniqueName(Folder folder) throws PersistenceException {
 		String folderName = folder.getName();
 		List<String> collisions = queryForList("select ld_name from ld_folder where ld_deleted=0 and ld_parentid="
@@ -1756,7 +1751,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 * Check if in the folders to be deleted there is at least one immutable
 		 * document
 		 */
-		@SuppressWarnings("unchecked")
 		List<Long> ids = queryForList(
 				"select ld_folderid from ld_document where ld_deleted=0 and ld_immutable=1 and ld_folderid in "
 						+ treeIdsString,
@@ -1807,7 +1801,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return notDeletableFolders;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Set<Long> findFolderIdInTree(long rootId, boolean includeDeleted) {
 		log.debug("findFolderIdInTree, rootID: {}, includeDeleted: {}", rootId, includeDeleted);
@@ -1857,7 +1850,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return ids;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Set<Long> findFolderIdInPath(long rootId, boolean includeDeleted) throws PersistenceException {
 		Set<Long> ids = new HashSet<>();
@@ -1919,7 +1911,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		// We do this way because if using the HQL we will have all the
 		// collections initialized
-		@SuppressWarnings("unchecked")
 		List<Long> wsIds = queryForList("select ld_id from ld_folder where (not ld_id=" + rootId
 				+ ") and ld_deleted=0 and ld_parentid=" + rootId + " and ld_type=" + Folder.TYPE_WORKSPACE
 				+ " and ld_tenantid=" + tenantId + " order by lower(ld_name)", Long.class);
@@ -2243,7 +2234,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Long> findFolderIdByTag(String tag) {
 		StringBuilder query = new StringBuilder(
 				"select distinct(A.ld_folderid) from ld_foldertag A, ld_folder B where A.ld_folderid=B.ld_id and B.ld_deleted= 0");
@@ -2294,7 +2284,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			query.append(" AND D.ld_tag = '" + SqlUtil.doubleQuotes(tag) + "' ");
 
-			@SuppressWarnings("unchecked")
 			List<Long> folderIds = queryForList(query.toString(), Long.class);
 			ids.addAll(folderIds);
 		}
@@ -2323,7 +2312,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return coll;
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<String> findTags(long folderId) {
 		try {
 			return queryForList("select ld_tag from ld_foldertag where ld_folderid=" + folderId + " order by ld_tag",
