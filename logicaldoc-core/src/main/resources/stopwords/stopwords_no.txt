@@ -1,186 +1,221 @@
-
- | A Norwegian stop word list. Comments begin with vertical bar. Each stop
- | word is at the start of a line.
-
- | This stop word list is for the dominant bokmÂl dialect. Words unique
- | to nynorsk are marked *.
-
- | Revised by Jan Bruusgaard <Jan.Bruusgaard@ssb.no>, Jan 2005
-
-og             | and
-i              | in
-jeg            | I
-det            | it/this/that
-at             | to (w. inf.)
-en             | a/an
-et             | a/an
-den            | it/this/that
-til            | to
-er             | is/am/are
-som            | who/that
-pÂ             | on
-de             | they / you(formal)
-med            | with
-han            | he
-av             | of
-ikke           | not
-ikkje          | not *
-der            | there
-sÂ             | so
-var            | was/were
-meg            | me
-seg            | you
-men            | but
-ett            | one
-har            | have
-om             | about
-vi             | we
-min            | my
-mitt           | my
-ha             | have
-hadde          | had
-hun            | she
-nÂ             | now
-over           | over
-da             | when/as
-ved            | by/know
-fra            | from
-du             | you
-ut             | out
-sin            | your
-dem            | them
-oss            | us
-opp            | up
-man            | you/one
-kan            | can
-hans           | his
-hvor           | where
-eller          | or
-hva            | what
-skal           | shall/must
-selv           | self (reflective)
-sj¯l           | self (reflective)
-her            | here
-alle           | all
-vil            | will
-bli            | become
-ble            | became
-blei           | became *
-blitt          | have become
-kunne          | could
-inn            | in
-nÂr            | when
-vÊre           | be
-kom            | come
-noen           | some
-noe            | some
-ville          | would
-dere           | you
-som            | who/which/that
-deres          | their/theirs
-kun            | only/just
-ja             | yes
-etter          | after
-ned            | down
-skulle         | should
-denne          | this
-for            | for/because
-deg            | you
-si             | hers/his
-sine           | hers/his
-sitt           | hers/his
-mot            | against
-Â              | to
-meget          | much
-hvorfor        | why
-dette          | this
-disse          | these/those
-uten           | without
-hvordan        | how
-ingen          | none
-din            | your
-ditt           | your
-blir           | become
-samme          | same
-hvilken        | which
-hvilke         | which (plural)
-sÂnn           | such a
-inni           | inside/within
-mellom         | between
-vÂr            | our
-hver           | each
-hvem           | who
-vors           | us/ours
-hvis           | whose
-bÂde           | both
-bare           | only/just
-enn            | than
-fordi          | as/because
-f¯r            | before
-mange          | many
-ogsÂ           | also
-slik           | just
-vÊrt           | been
-vÊre           | to be
-bÂe            | both *
-begge          | both
-siden          | since
-dykk           | your *
-dykkar         | yours *
-dei            | they *
-deira          | them *
-deires         | theirs *
-deim           | them *
-di             | your (fem.) *
-dÂ             | as/when *
-eg             | I *
-ein            | a/an *
-eit            | a/an *
-eitt           | a/an *
-elles          | or *
-honom          | he *
-hjÂ            | at *
-ho             | she *
-hoe            | she *
-henne          | her
-hennar         | her/hers
-hennes         | hers
-hoss           | how *
-hossen         | how *
-ikkje          | not *
-ingi           | noone *
-inkje          | noone *
-korleis        | how *
-korso          | how *
-kva            | what/which *
-kvar           | where *
-kvarhelst      | where *
-kven           | who/whom *
-kvi            | why *
-kvifor         | why *
-me             | we *
-medan          | while *
-mi             | my *
-mine           | my *
-mykje          | much *
-no             | now *
-nokon          | some (masc./neut.) *
-noka           | some (fem.) *
-nokor          | some *
-noko           | some *
-nokre          | some *
-si             | his/hers *
-sia            | since *
-sidan          | since *
-so             | so *
-somt           | some *
-somme          | some *
-um             | about*
-upp            | up *
-vere           | be *
-vore           | was *
-verte          | become *
-vort           | become *
-varte          | became *
-vart           | became *
-
+alle
+andre
+arbeid
+at
+av
+bare
+begge
+ble
+blei
+bli
+blir
+blitt
+bort
+bra
+bruke
+b√•de
+b√•e
+da
+de
+deg
+dei
+deim
+deira
+deires
+dem
+den
+denne
+der
+dere
+deres
+det
+dette
+di
+din
+disse
+ditt
+du
+dykk
+dykkar
+d√•
+eg
+ein
+eit
+eitt
+eller
+elles
+en
+ene
+eneste
+enhver
+enn
+er
+et
+ett
+etter
+folk
+for
+fordi
+fors√ªke
+fra
+f√•
+f√∏r
+f√ªr
+f√ªrst
+gjorde
+gj√ªre
+god
+g√•
+ha
+hadde
+han
+hans
+har
+hennar
+henne
+hennes
+her
+hj√•
+ho
+hoe
+honom
+hoss
+hossen
+hun
+hva
+hvem
+hver
+hvilke
+hvilken
+hvis
+hvor
+hvordan
+hvorfor
+i
+ikke
+ikkje
+ingen
+ingi
+inkje
+inn
+innen
+inni
+ja
+jeg
+kan
+kom
+korleis
+korso
+kun
+kunne
+kva
+kvar
+kvarhelst
+kven
+kvi
+kvifor
+lage
+lang
+lik
+like
+makt
+man
+mange
+me
+med
+medan
+meg
+meget
+mellom
+men
+mens
+mer
+mest
+mi
+min
+mine
+mitt
+mot
+mye
+mykje
+m√•
+m√•te
+navn
+ned
+nei
+no
+noe
+noen
+noka
+noko
+nokon
+nokor
+nokre
+ny
+n√•
+n√•r
+og
+ogs√•
+om
+opp
+oss
+over
+part
+punkt
+p√•
+rett
+riktig
+samme
+sant
+seg
+selv
+si
+sia
+sidan
+siden
+sin
+sine
+sist
+sitt
+sj√∏l
+skal
+skulle
+slik
+slutt
+so
+som
+somme
+somt
+start
+stille
+s√•
+s√•nn
+tid
+til
+tilbake
+tilstand
+um
+under
+upp
+ut
+uten
+var
+vart
+varte
+ved
+verdi
+vere
+verte
+vi
+vil
+ville
+vite
+vore
+vors
+vort
+v√•r
+v√¶re
+v√¶rt
+v√∂re
+v√∂rt
+√•

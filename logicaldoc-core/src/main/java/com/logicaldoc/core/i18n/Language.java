@@ -1,10 +1,6 @@
 package com.logicaldoc.core.i18n;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
-import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -40,7 +36,6 @@ public class Language implements Comparable<Language> {
 
 	public Language(Locale locale) {
 		this.locale = locale;
-		loadStopwords();
 	}
 
 	public Locale getLocale() {
@@ -59,44 +54,12 @@ public class Language implements Comparable<Language> {
 		return locale.getDisplayLanguage(Locale.ENGLISH);
 	}
 
-	/**
-	 * Populates the field stopWords reading the resource
-	 * /stopwords/stopwords_<b>locale</b>.txt
-	 */
-	void loadStopwords() {
-		try {
-			Set<String> swSet = new HashSet<>();
-			String stopwordsResource = "/stopwords/stopwords_" + getLocale().toString() + ".txt";
-			log.debug("Loading stopwords from: {}", stopwordsResource);
-			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(stopwordsResource);
-			if (is == null)
-				is = getClass().getResourceAsStream(stopwordsResource);
-
-			if (is == null) {
-				log.warn("No stopwords found for locale {}", getLocale());
-			} else {
-				InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
-				BufferedReader br = new BufferedReader(isr);
-				String line = null;
-				while ((line = br.readLine()) != null) {
-					line = line.trim();
-					if (line.indexOf("|") != -1) {
-						line = line.substring(0, line.indexOf("|"));
-						line = line.trim();
-					}
-					if (line != null && line.length() > 0 && !swSet.contains(line)) {
-						swSet.add(line);
-					}
-				}
-			}
-			stopWords = swSet;
-		} catch (Exception e) {
-			log.warn(e.getMessage(), e);
-		}
+	public Set<String> getStopWords() {
+		return StopWords.getStopWords(locale);
 	}
 
-	public Set<String> getStopWords() {
-		return stopWords;
+	public void setStopWords(Set<String> stopWords) {
+		this.stopWords = stopWords;
 	}
 
 	public String getAnalyzerClass() {

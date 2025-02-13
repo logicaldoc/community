@@ -1,245 +1,560 @@
-
- | A Portuguese stop word list. Comments begin with vertical bar. Each stop
- | word is at the start of a line.
-
-
- | The following is a ranked list (commonest to rarest) of stopwords
- | deriving from a large sample of text.
-
- | Extra words have been added at the end.
-
-de             |  of, from
-a              |  the; to, at; her
-o              |  the; him
-que            |  who, that
-e              |  and
-do             |  de + o
-da             |  de + a
-em             |  in
-um             |  a
-para           |  for
-  | �          from SER
-com            |  with
-n�o            |  not, no
-uma            |  a
-os             |  the; them
-no             |  em + o
-se             |  himself etc
-na             |  em + a
-por            |  for
-mais           |  more
-as             |  the; them
-dos            |  de + os
-como           |  as, like
-mas            |  but
-  | foi        from SER
-ao             |  a + o
-ele            |  he
-das            |  de + as
-  | tem        from TER
-�              |  a + a
-seu            |  his
-sua            |  her
-ou             |  or
-  | ser        from SER
-quando         |  when
-muito          |  much
-  | h�         from HAV
-nos            |  em + os; us
-j�             |  already, now
-  | est�       from EST
-eu             |  I
-tamb�m         |  also
-s�             |  only, just
-pelo           |  per + o
-pela           |  per + a
-at�            |  up to
-isso           |  that
-ela            |  he
-entre          |  between
-  | era        from SER
-depois         |  after
-sem            |  without
-mesmo          |  same
-aos            |  a + os
-  | ter        from TER
-seus           |  his
-quem           |  whom
-nas            |  em + as
-me             |  me
-esse           |  that
-eles           |  they
-  | est�o      from EST
-voc�           |  you
-  | tinha      from TER
-  | foram      from SER
-essa           |  that
-num            |  em + um
-nem            |  nor
-suas           |  her
-meu            |  my
-�s             |  a + as
-minha          |  my
-  | t�m        from TER
-numa           |  em + uma
-pelos          |  per + os
-elas           |  they
-  | havia      from HAV
-  | seja       from SER
-qual           |  which
-  | ser�       from SER
-n�s            |  we
-  | tenho      from TER
-lhe            |  to him, her
-deles          |  of them
-essas          |  those
-esses          |  those
-pelas          |  per + as
-este           |  this
-  | fosse      from SER
-dele           |  of him
-
- | other words. There are many contractions such as naquele = em+aquele,
- | mo = me+o, but they are rare.
- | Indefinite article plural forms are also rare.
-
-tu             |  thou
-te             |  thee
-voc�s          |  you (plural)
-vos            |  you
-lhes           |  to them
-meus           |  my
-minhas
-teu            |  thy
-tua
-teus
-tuas
-nosso          | our
-nossa
-nossos
-nossas
-
-dela           |  of her
-delas          |  of them
-
-esta           |  this
-estes          |  these
-estas          |  these
-aquele         |  that
-aquela         |  that
-aqueles        |  those
-aquelas        |  those
-isto           |  this
-aquilo         |  that
-
-               | forms of estar, to be (not including the infinitive):
-estou
-est�
-estamos
-est�o
-estive
-esteve
-estivemos
-estiveram
-estava
-est�vamos
-estavam
-estivera
-estiv�ramos
-esteja
-estejamos
-estejam
-estivesse
-estiv�ssemos
-estivessem
-estiver
-estivermos
-estiverem
-
-               | forms of haver, to have (not including the infinitive):
-hei
-h�
-havemos
-h�o
-houve
-houvemos
-houveram
-houvera
-houv�ramos
-haja
-hajamos
-hajam
-houvesse
-houv�ssemos
-houvessem
-houver
-houvermos
-houverem
-houverei
-houver�
-houveremos
-houver�o
-houveria
-houver�amos
-houveriam
-
-               | forms of ser, to be (not including the infinitive):
-sou
-somos
-s�o
+a
+acerca
+adeus
+agora
+ainda
+alem
+algmas
+algo
+algumas
+alguns
+ali
+além
+ambas
+ambos
+ano
+anos
+antes
+ao
+aonde
+aos
+apenas
+apoio
+apontar
+apos
+após
+aquela
+aquelas
+aquele
+aqueles
+aqui
+aquilo
+as
+assim
+através
+atrás
+até
+aí
+baixo
+bastante
+bem
+boa
+boas
+bom
+bons
+breve
+cada
+caminho
+catorze
+cedo
+cento
+certamente
+certeza
+cima
+cinco
+coisa
+com
+como
+comprido
+conhecido
+conselho
+contra
+contudo
+corrente
+cuja
+cujas
+cujo
+cujos
+custa
+cá
+da
+daquela
+daquelas
+daquele
+daqueles
+dar
+das
+de
+debaixo
+dela
+delas
+dele
+deles
+demais
+dentro
+depois
+desde
+desligado
+dessa
+dessas
+desse
+desses
+desta
+destas
+deste
+destes
+deve
+devem
+deverá
+dez
+dezanove
+dezasseis
+dezassete
+dezoito
+dia
+diante
+direita
+dispoe
+dispoem
+diversa
+diversas
+diversos
+diz
+dizem
+dizer
+do
+dois
+dos
+doze
+duas
+durante
+dá
+dão
+dúvida
+e
+ela
+elas
+ele
+eles
+em
+embora
+enquanto
+entao
+entre
+então
 era
-�ramos
 eram
-fui
+essa
+essas
+esse
+esses
+esta
+estado
+estamos
+estar
+estará
+estas
+estava
+estavam
+este
+esteja
+estejam
+estejamos
+estes
+esteve
+estive
+estivemos
+estiver
+estivera
+estiveram
+estiverem
+estivermos
+estivesse
+estivessem
+estiveste
+estivestes
+estivéramos
+estivéssemos
+estou
+está
+estás
+estávamos
+estão
+eu
+exemplo
+falta
+fará
+favor
+faz
+fazeis
+fazem
+fazemos
+fazer
+fazes
+fazia
+faço
+fez
+fim
+final
 foi
 fomos
-foram
-fora
-f�ramos
-seja
-sejamos
-sejam
-fosse
-f�ssemos
-fossem
 for
-formos
+fora
+foram
 forem
+forma
+formos
+fosse
+fossem
+foste
+fostes
+fui
+fôramos
+fôssemos
+geral
+grande
+grandes
+grupo
+ha
+haja
+hajam
+hajamos
+havemos
+havia
+hei
+hoje
+hora
+horas
+houve
+houvemos
+houver
+houvera
+houveram
+houverei
+houverem
+houveremos
+houveria
+houveriam
+houvermos
+houverá
+houverão
+houveríamos
+houvesse
+houvessem
+houvéramos
+houvéssemos
+há
+hão
+iniciar
+inicio
+ir
+irá
+isso
+ista
+iste
+isto
+já
+lado
+lhe
+lhes
+ligado
+local
+logo
+longe
+lugar
+lá
+maior
+maioria
+maiorias
+mais
+mal
+mas
+me
+mediante
+meio
+menor
+menos
+meses
+mesma
+mesmas
+mesmo
+mesmos
+meu
+meus
+mil
+minha
+minhas
+momento
+muito
+muitos
+máximo
+mês
+na
+nada
+nao
+naquela
+naquelas
+naquele
+naqueles
+nas
+nem
+nenhuma
+nessa
+nessas
+nesse
+nesses
+nesta
+nestas
+neste
+nestes
+no
+noite
+nome
+nos
+nossa
+nossas
+nosso
+nossos
+nova
+novas
+nove
+novo
+novos
+num
+numa
+numas
+nunca
+nuns
+não
+nível
+nós
+número
+o
+obra
+obrigada
+obrigado
+oitava
+oitavo
+oito
+onde
+ontem
+onze
+os
+ou
+outra
+outras
+outro
+outros
+para
+parece
+parte
+partir
+paucas
+pegar
+pela
+pelas
+pelo
+pelos
+perante
+perto
+pessoas
+pode
+podem
+poder
+poderá
+podia
+pois
+ponto
+pontos
+por
+porque
+porquê
+portanto
+posição
+possivelmente
+posso
+possível
+pouca
+pouco
+poucos
+povo
+primeira
+primeiras
+primeiro
+primeiros
+promeiro
+propios
+proprio
+própria
+próprias
+próprio
+próprios
+próxima
+próximas
+próximo
+próximos
+puderam
+pôde
+põe
+põem
+quais
+qual
+qualquer
+quando
+quanto
+quarta
+quarto
+quatro
+que
+quem
+quer
+quereis
+querem
+queremas
+queres
+quero
+questão
+quieto
+quinta
+quinto
+quinze
+quáis
+quê
+relação
+sabe
+sabem
+saber
+se
+segunda
+segundo
+sei
+seis
+seja
+sejam
+sejamos
+sem
+sempre
+sendo
+ser
 serei
-ser�
 seremos
-ser�o
 seria
-ser�amos
 seriam
-
-               | forms of ter, to have (not including the infinitive):
-tenho
+será
+serão
+seríamos
+sete
+seu
+seus
+sexta
+sexto
+sim
+sistema
+sob
+sobre
+sois
+somente
+somos
+sou
+sua
+suas
+são
+sétima
+sétimo
+só
+tal
+talvez
+tambem
+também
+tanta
+tantas
+tanto
+tarde
+te
 tem
 temos
-t�m
-tinha
-t�nhamos
-tinham
-tive
-teve
-tivemos
-tiveram
-tivera
-tiv�ramos
+tempo
+tendes
 tenha
-tenhamos
 tenham
-tivesse
-tiv�ssemos
-tivessem
-tiver
-tivermos
-tiverem
+tenhamos
+tenho
+tens
+tentar
+tentaram
+tente
+tentei
+ter
+terceira
+terceiro
 terei
-ter�
 teremos
-ter�o
 teria
-ter�amos
 teriam
+terá
+terão
+teríamos
+teu
+teus
+teve
+tinha
+tinham
+tipo
+tive
+tivemos
+tiver
+tivera
+tiveram
+tiverem
+tivermos
+tivesse
+tivessem
+tiveste
+tivestes
+tivéramos
+tivéssemos
+toda
+todas
+todo
+todos
+trabalhar
+trabalho
+treze
+três
+tu
+tua
+tuas
+tudo
+tão
+tém
+têm
+tínhamos
+um
+uma
+umas
+uns
+usa
+usar
+vai
+vais
+valor
+veja
+vem
+vens
+ver
+verdade
+verdadeiro
+vez
+vezes
+viagem
+vindo
+vinte
+você
+vocês
+vos
+vossa
+vossas
+vosso
+vossos
+vários
+vão
+vêm
+vós
+zero
+à
+às
+área
+é
+éramos
+és
+último
