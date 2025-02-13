@@ -99,10 +99,6 @@ public class Language implements Comparable<Language> {
 		return stopWords;
 	}
 
-	public void setStopWords(Set<String> stopWords) {
-		this.stopWords = stopWords;
-	}
-
 	public String getAnalyzerClass() {
 		return analyzerClass;
 	}
