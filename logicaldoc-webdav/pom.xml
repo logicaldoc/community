@@ -25,18 +25,11 @@
 			<version>2.5</version>
 			<scope>provided</scope>
 		</dependency>
-
-		<!--		<dependency>
+		<dependency>
 			<groupId>org.apache.jackrabbit</groupId>
 			<artifactId>jackrabbit-jcr-commons</artifactId>
 			<version>${jackrabbit.version}</version>
-		</dependency>-->
-		<dependency>
-			<groupId>org.apache.jackrabbit</groupId>
-			<artifactId>jackrabbit-webdav</artifactId>
-			<version>${jackrabbit.version}</version>
 		</dependency>
-		<!--				
 		<dependency>
 			<groupId>org.apache.jackrabbit</groupId>
 			<artifactId>jackrabbit-jcr-server</artifactId>
@@ -47,45 +40,12 @@
 					<artifactId>tika-core</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
--->
-		<dependency>
-			<groupId>org.apache.jackrabbit</groupId>
-			<artifactId>jackrabbit-webapp</artifactId>
-			<version>${jackrabbit.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.tika</groupId>
-					<artifactId>tika-parsers</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.tika</groupId>
-					<artifactId>tika-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>ch.qos.logback</groupId>
-					<artifactId>logback-classic</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<!-- Evaluate -->
-		<!--		<dependency>
-			<groupId>org.apache.jackrabbit</groupId>
-			<artifactId>jackrabbit-core</artifactId>
-			<version>${jackrabbit.version}</version>
 		</dependency>		
 		<dependency>
 			<groupId>org.apache.jackrabbit</groupId>
-			<artifactId>jackrabbit-data</artifactId>
+			<artifactId>jackrabbit-webdav</artifactId>
 			<version>${jackrabbit.version}</version>
-		</dependency>	
-		<dependency>
-			<groupId>org.apache.jackrabbit</groupId>
-			<artifactId>jackrabbit-jcr-servlet</artifactId>
-			<version>${jackrabbit.version}</version>
-		</dependency>			
-	-->
+		</dependency>				
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -200,22 +160,20 @@
 	<repositories>
 		<repository>
 			<id>central</id>
-			<name>Central Repository</name>
+            <name>Central Repository</name>
 			<url>https://repo1.maven.org/maven2/</url>
 		</repository>
 		<repository>
 			<id>mulesoft-public</id>
 			<name>Mulesoft Repository</name>
-			<url>
-				https://repository.mulesoft.org/nexus/content/repositories/public/</url>
-		</repository>
+			<url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
+		</repository>		
 		<repository>
 			<id>logicaldoc</id>
 			<name>LogicalDOC Repository</name>
 			<url>http://logicaldoc.sourceforge.net/maven</url>
-		</repository>
-
-	</repositories>
+		</repository>    
+	</repositories>	
 
 	<build>
 		<plugins>

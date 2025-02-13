@@ -10,9 +10,9 @@ import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavMethods;
-import org.eclipse.jetty.util.StringUtil;
 import org.junit.Test;
 
 import com.logicaldoc.core.PersistenceException;
@@ -317,7 +317,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
 			String responseBody = callPROPFIND();
-			assertFalse(StringUtil.isEmpty(responseBody));
+			assertFalse(StringUtils.isEmpty(responseBody));
 			assertTrue(responseBody.contains(PREFIX + "/one.pdf"));
 			assertTrue(responseBody.contains(PREFIX + "/folder6"));
 		} finally {

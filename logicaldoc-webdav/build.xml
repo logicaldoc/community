@@ -69,6 +69,8 @@
 						<include name="**/context-webservice.xml" />
 						-->
 						<include name="**/ResourceServiceImpl*.class" />
+						<include name="**/DavResourceImpl*.class" />
+						<include name="**/AbstractWebdavServlet*.class" />
 					</fileset>
 				</copy>
 			</sequential>
