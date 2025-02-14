@@ -296,6 +296,21 @@ public class Automation {
 		evaluate(expression, clientDictionary, writer);
 	}
 
+	private void evaluate(String expression, Map<String, Object> clientDictionary, Writer writer)
+			throws AutomationException {
+		forbidRuntimeUsage(expression);
+
+		try {
+			// Better to use a mutable shallow copy because we may receive an
+			// unmodifiable client dictionary
+			Map<String, Object> shallowCopy = new HashMap<String, Object>(clientDictionary);
+			VelocityContext context = prepareContext(prepareDictionary(shallowCopy));
+			Velocity.evaluate(context, writer, StringUtils.isNotEmpty(logTag) ? logTag : "ScriptEngine", expression);
+		} catch (Exception e) {
+			throw new AutomationException(expression, e);
+		}
+	}
+
 	private void forbidRuntimeUsage(String expression) throws ForbiddenCodeException {
 		if (expression.contains("java.lang.Runtime")) {
 			throw new ForbiddenCodeException(expression);
@@ -308,18 +323,6 @@ public class Automation {
 				log.error("Detected possible suspicious access to java.lang.Runtime: {}", snippet);
 				throw new ForbiddenCodeException(snippet, expression);
 			}
-		}
-	}
-
-	private void evaluate(String expression, Map<String, Object> clientDictionary, Writer writer)
-			throws AutomationException {
-		forbidRuntimeUsage(expression);
-
-		try {
-			VelocityContext context = prepareContext(prepareDictionary(clientDictionary));
-			Velocity.evaluate(context, writer, StringUtils.isNotEmpty(logTag) ? logTag : "ScriptEngine", expression);
-		} catch (Exception e) {
-			throw new AutomationException(expression, e);
 		}
 	}
 }
