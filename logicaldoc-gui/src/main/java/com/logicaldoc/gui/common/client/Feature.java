@@ -105,7 +105,7 @@ public class Feature {
 
 	public static final int CLOUD_STORE = 46;
 
-	public static final int VIA = 47;
+	public static final int ARTIFICIAL_INTELLIGENCE = 47;
 
 	public static final int AUTOMATION = 48;
 

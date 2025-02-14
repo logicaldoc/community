@@ -112,9 +112,9 @@ public class SettingsMenu extends VLayout {
 		via.setWidth100();
 		via.setHeight(25);
 		via.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new VIASettingsPanel()));
-		if (Feature.visible(Feature.VIA) && Menu.enabled(Menu.VIA)) {
+		if (Feature.visible(Feature.ARTIFICIAL_INTELLIGENCE) && Menu.enabled(Menu.VIA)) {
 			addMember(via);
-			if (!Feature.enabled(Feature.VIA))
+			if (!Feature.enabled(Feature.ARTIFICIAL_INTELLIGENCE))
 				setFeatureDisabled(via);
 		}
 	}

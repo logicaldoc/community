@@ -98,9 +98,6 @@
 			<artifactId>commons-el</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<!-- dependency> <groupId>commons-discovery</groupId>
-		<artifactId>commons-discovery</artifactId> 
-			<scope>provided</scope> </dependency -->
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
@@ -145,10 +142,6 @@
 			<artifactId>sqltool</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<!-- dependency> <groupId>xerces</groupId>
-		<artifactId>xercesImpl</artifactId> 
-			<scope>provided</scope> <exclusions> <exclusion> <groupId>xml-apis</groupId> 
-			<artifactId>xml-apis</artifactId> </exclusion> </exclusions> </dependency -->
 		<dependency>
 			<groupId>org.jdom</groupId>
 			<artifactId>jdom2</artifactId>
@@ -196,7 +189,7 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
 			<scope>provided</scope>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
@@ -224,7 +217,6 @@
 		<dependency>
 			<groupId>net.sf.ehcache.internal</groupId>
 			<artifactId>ehcache-core</artifactId>
-			<version>${ehcache.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
