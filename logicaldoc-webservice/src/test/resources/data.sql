@@ -93,7 +93,7 @@ insert into ld_folder
 values     (102,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,'menu.admin',101,5,0,1,1,3,0);
 insert into ld_folder
            (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_description,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
-values     (103,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,'menu.admin',101,3,'description',0,1,1,5,0);
+values     (103,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,'menu.admin103',101,3,'description',0,1,1,5,0);
 
 insert into ld_folder
            (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)

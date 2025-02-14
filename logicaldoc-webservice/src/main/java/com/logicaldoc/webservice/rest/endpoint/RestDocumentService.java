@@ -1,6 +1,11 @@
 package com.logicaldoc.webservice.rest.endpoint;
 
 import java.io.IOException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.activation.DataHandler;
@@ -18,6 +23,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
@@ -932,7 +938,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Produces("image/png")
 	@ApiResponses(value = {
 			@ApiResponse(description = "default response", content = @Content(mediaType = "image/png", schema = @Schema(type = "string", format = "binary"))) })
-	public DataHandler getThumbnail(@PathParam("type")
+	public Response getThumbnail(@PathParam("type")
 	String type, @PathParam("docpath")
 	String docPath, @PathParam("docpath")
 	List<PathSegment> docPathList) throws AuthenticationException, WebserviceException, PersistenceException,
@@ -948,12 +954,27 @@ public class RestDocumentService extends SoapDocumentService implements Document
 		if (!type.toLowerCase().endsWith(".png"))
 			type += ".png";
 
+		DataHandler dh = null;
 		try {
-			return super.getResource(sid, doc.getId(), doc.getFileVersion(), type);
+			dh = super.getResource(sid, doc.getId(), doc.getFileVersion(), type);			
 		} catch (Exception e) {
 			super.createThumbnail(sid, doc.getId(), doc.getFileVersion(), type);
-			return super.getResource(sid, doc.getId(), doc.getFileVersion(), type);
+			dh = super.getResource(sid, doc.getId(), doc.getFileVersion(), type);
 		}
+		
+		Response resp = Response.ok(dh.getInputStream()).build();        
+        resp.getHeaders().add("Cache-Control", "max-age=86400, must-revalidate");
+        resp.getHeaders().add("Pragma", "no-cache");   
+        resp.getHeaders().add("Content-Type", dh.getContentType());
+        
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.HOUR, 24);
+        Date expdate = cal.getTime();
+        ZonedDateTime date = ZonedDateTime.ofInstant(expdate.toInstant(), ZoneId.systemDefault());
+            
+        resp.getHeaders().add("Expires", date.format(DateTimeFormatter.RFC_1123_DATE_TIME));
+        
+		return resp;
 	}
 
 	@Override
