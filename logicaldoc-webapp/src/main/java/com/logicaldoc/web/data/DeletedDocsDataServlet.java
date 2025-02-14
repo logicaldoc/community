@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
@@ -31,6 +33,8 @@ import com.logicaldoc.util.Context;
 public class DeletedDocsDataServlet extends AbstractDataServlet {
 
 	private static final long serialVersionUID = 1L;
+	
+	private static final Logger log = LoggerFactory.getLogger(DeletedDocsDataServlet.class);
 
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,

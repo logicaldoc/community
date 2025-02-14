@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
@@ -36,13 +38,15 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class FoldersDataServlet extends AbstractDataServlet {
 
+	private static final long serialVersionUID = 1L;
+	
 	private static final String PARENT = "parent";
 
 	public static final String FOLDER_PAGE_SIZE = "ld-folder-page-size";
 
 	public static final String FOLDER_START_RECORD = "ld-folder-start-gridRecord";
 
-	private static final long serialVersionUID = 1L;
+	private static final Logger log = LoggerFactory.getLogger(FoldersDataServlet.class);
 
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,

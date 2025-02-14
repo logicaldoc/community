@@ -20,6 +20,8 @@ import org.apache.jackrabbit.webdav.property.HrefProperty;
 import org.apache.jackrabbit.webdav.property.ResourceType;
 import org.apache.jackrabbit.webdav.version.VersionHistoryResource;
 import org.apache.jackrabbit.webdav.version.VersionResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.webdav.resource.DavResourceFactory;
 import com.logicaldoc.webdav.resource.DeltaVResourceImpl;
@@ -34,6 +36,8 @@ import com.logicaldoc.webdav.session.WebdavSession;
  * @author Sebastian Wenzky
  */
 public class VersionHistoryResourceImpl extends DeltaVResourceImpl implements VersionHistoryResource {
+
+	private static final Logger log = LoggerFactory.getLogger(VersionHistoryResourceImpl.class);
 
 	private static final long serialVersionUID = 1L;
 

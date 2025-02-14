@@ -1,7 +1,5 @@
 package com.logicaldoc.core.searchengine;
 
-import static com.logicaldoc.core.searchengine.Search.log;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -61,7 +59,8 @@ public class TagSearch extends Search {
 		query.append(" A.ld_rating, A.ld_fileversion, A.ld_comment, A.ld_workflowstatus, A.ld_startpublishing, ");
 		query.append(" A.ld_stoppublishing, A.ld_published, ");
 		query.append(" B.ld_name, A.ld_folderid, A.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
-		query.append(" A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp, A.ld_language, A.ld_pages, A.ld_color, A.ld_lastnote ");
+		query.append(
+				" A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp, A.ld_language, A.ld_pages, A.ld_color, A.ld_lastnote ");
 		query.append(" from ld_document A ");
 		query.append(" join ld_folder B on A.ld_folderid=B.ld_id ");
 		query.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
