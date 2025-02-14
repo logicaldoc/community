@@ -28,7 +28,7 @@ import com.logicaldoc.util.io.ZipUtil;
  */
 public class KOfficeParser extends AbstractParser {
 
-	protected static Logger log = LoggerFactory.getLogger(KOfficeParser.class);
+	private static final Logger log = LoggerFactory.getLogger(KOfficeParser.class);
 
 	// --------------------------------------------< KOfficeContentHandler >
 

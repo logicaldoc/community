@@ -17,7 +17,7 @@ import com.logicaldoc.webservice.soap.AuthService;
  * @since 5.2
  */
 public class SoapAuthService extends AbstractService implements AuthService {
-	protected static Logger log = LoggerFactory.getLogger(SoapAuthService.class);
+	private static final Logger log = LoggerFactory.getLogger(SoapAuthService.class);
 
 	@Override
 	public String login(String username, String password) throws AuthenticationException {

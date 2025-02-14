@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.io.FileUtil;
@@ -20,7 +18,6 @@ import com.mpatric.mp3agic.Mp3File;
  * @since 8.2
  */
 public class Mp3ThumbnailBuilder extends AbstractThumbnailBuilder {
-	protected static Logger log = LoggerFactory.getLogger(Mp3ThumbnailBuilder.class);
 
 	@Override
 	public synchronized void buildThumbnail(String sid, Document document, String fileVersion, File src, File dest,

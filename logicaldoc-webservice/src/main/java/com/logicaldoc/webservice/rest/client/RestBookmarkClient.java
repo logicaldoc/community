@@ -22,7 +22,7 @@ import com.logicaldoc.webservice.rest.BookmarkService;
 
 public class RestBookmarkClient extends AbstractRestClient<BookmarkService> {
 
-	protected static Logger log = LoggerFactory.getLogger(RestBookmarkClient.class);
+	private static final Logger log = LoggerFactory.getLogger(RestBookmarkClient.class);
 
 	public RestBookmarkClient(String endpoint, String apiKey) {
 		this(endpoint, apiKey, -1);

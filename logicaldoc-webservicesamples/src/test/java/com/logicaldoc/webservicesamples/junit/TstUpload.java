@@ -7,9 +7,9 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
@@ -20,7 +20,7 @@ import com.logicaldoc.webservice.soap.client.SoapDocumentClient;
 
 public class TstUpload extends BaseTestCase {
 
-	protected static Log log = LogFactory.getLog(TstUpload.class);
+	private static final Logger log = LoggerFactory.getLogger(TstUpload.class);
 
 	private SoapDocumentClient documentClient;
 

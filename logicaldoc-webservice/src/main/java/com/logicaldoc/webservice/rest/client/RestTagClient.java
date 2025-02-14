@@ -19,7 +19,7 @@ import com.logicaldoc.webservice.rest.TagService;
 
 public class RestTagClient extends AbstractRestClient<TagService> {
 
-	protected static Logger log = LoggerFactory.getLogger(RestTagClient.class);
+	private static final Logger log = LoggerFactory.getLogger(RestTagClient.class);
 
 	public RestTagClient(String endpoint, String apiKey) {
 		this(endpoint, apiKey, -1);

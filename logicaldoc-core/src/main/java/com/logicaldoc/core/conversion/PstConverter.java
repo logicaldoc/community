@@ -4,9 +4,6 @@ package com.logicaldoc.core.conversion;
 import java.io.File;
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.communication.PSTWorker;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.Context;
@@ -19,8 +16,6 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 8.5.5
  */
 public class PstConverter extends AbstractFormatConverter {
-
-	protected static Logger log = LoggerFactory.getLogger(PstConverter.class);
 
 	@Override
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {

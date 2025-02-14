@@ -23,7 +23,7 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class EpubParser extends AbstractParser {
 
-	protected static Logger log = LoggerFactory.getLogger(EpubParser.class);
+	private static final Logger log = LoggerFactory.getLogger(EpubParser.class);
 
 	@Override
 	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {

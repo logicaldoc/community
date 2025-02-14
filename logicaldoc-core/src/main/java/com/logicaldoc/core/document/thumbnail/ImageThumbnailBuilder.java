@@ -22,7 +22,7 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 4.5
  */
 public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
-	protected static Logger log = LoggerFactory.getLogger(ImageThumbnailBuilder.class);
+	private static final Logger log = LoggerFactory.getLogger(ImageThumbnailBuilder.class);
 
 	@Override
 	public synchronized void buildThumbnail(String sid, Document document, String fileVersion, File src, File dest,

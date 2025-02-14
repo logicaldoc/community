@@ -1,9 +1,9 @@
 package com.logicaldoc.webservicesamples.junit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.webservice.soap.client.SoapAuthClient;
@@ -12,7 +12,7 @@ import junit.framework.TestCase;
 
 public abstract class BaseTestCase extends TestCase {
 
-	protected static Log log = LogFactory.getLog(BaseTestCase.class);
+	private static final Logger log = LoggerFactory.getLogger(BaseTestCase.class);
 
 	protected String sid;
 
@@ -28,7 +28,7 @@ public abstract class BaseTestCase extends TestCase {
 		super.setUp();
 
 		settings = new ContextProperties();
-		
+
 		authClient = new SoapAuthClient(settings.getProperty("url") + "/services/Auth");
 
 		// Get session token

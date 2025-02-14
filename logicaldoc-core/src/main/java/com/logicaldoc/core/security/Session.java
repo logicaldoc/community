@@ -40,7 +40,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(Session.class);
+	private static final Logger log = LoggerFactory.getLogger(Session.class);
 
 	public static final int STATUS_OPEN = 0;
 

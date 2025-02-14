@@ -41,7 +41,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(History.class);
+	private static final Logger log = LoggerFactory.getLogger(History.class);
 
 	protected Long docId;
 

@@ -12,8 +12,6 @@ import org.bytedeco.javacv.FrameGrabber;
 import org.bytedeco.javacv.FrameGrabber.Exception;
 import org.bytedeco.javacv.Java2DFrameUtils;
 import org.bytedeco.javacv.OpenCVFrameGrabber;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.io.FileUtil;
@@ -25,8 +23,6 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 8.2
  */
 public class VideoThumbnailBuilder extends AbstractThumbnailBuilder {
-
-	protected static Logger log = LoggerFactory.getLogger(VideoThumbnailBuilder.class);
 
 	@Override
 	public synchronized void buildThumbnail(String sid, Document document, String fileVersion, File src, File dest,

@@ -29,7 +29,7 @@ import com.logicaldoc.util.io.IOUtil;
  */
 public class TXTParser extends AbstractParser {
 
-	protected static Logger log = LoggerFactory.getLogger(TXTParser.class);
+	private static final Logger log = LoggerFactory.getLogger(TXTParser.class);
 
 	@Override
 	public String parse(File file, String filename, String encoding, Locale locale, String tenant, Document document,

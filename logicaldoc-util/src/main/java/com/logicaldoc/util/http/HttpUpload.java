@@ -27,7 +27,7 @@ import com.logicaldoc.util.MimeType;
  */
 public class HttpUpload {
 
-	protected static Logger log = LoggerFactory.getLogger(HttpUpload.class);
+	private static final Logger log = LoggerFactory.getLogger(HttpUpload.class);
 
 	private static final String UTF_8 = "UTF-8";
 

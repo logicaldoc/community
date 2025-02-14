@@ -32,7 +32,7 @@ import com.logicaldoc.util.io.ZipUtil;
  */
 public class InMemoryZipImport extends ZipImport {
 
-	protected static Logger logger = LoggerFactory.getLogger(InMemoryZipImport.class);
+	private static final Logger logger = LoggerFactory.getLogger(InMemoryZipImport.class);
 
 	public InMemoryZipImport(Document docVo, String charset) {
 		super(docVo, charset);

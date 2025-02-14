@@ -23,7 +23,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  */
 public class PluginDbInit extends DBInit {
 
-	protected static Logger log = LoggerFactory.getLogger(PluginDbInit.class);
+	private static final Logger log = LoggerFactory.getLogger(PluginDbInit.class);
 
 	/**
 	 * Intitializes the database using 'DbInit' extension point.

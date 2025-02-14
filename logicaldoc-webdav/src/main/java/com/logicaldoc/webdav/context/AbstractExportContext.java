@@ -15,7 +15,7 @@ import com.logicaldoc.webdav.resource.model.Resource;
  */
 public abstract class AbstractExportContext implements ExportContext {
 
-	protected static Logger log = LoggerFactory.getLogger(AbstractExportContext.class);
+	private static final Logger log = LoggerFactory.getLogger(AbstractExportContext.class);
 
 	private final Resource resource;
 

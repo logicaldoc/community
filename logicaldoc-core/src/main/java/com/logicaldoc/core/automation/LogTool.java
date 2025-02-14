@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 @AutomationDictionary(key = "log")
 public class LogTool {
-	private static Logger log = LoggerFactory.getLogger(LogTool.class);
+	private static final Logger log = LoggerFactory.getLogger(LogTool.class);
 
 	/**
 	 * Prints in the system output

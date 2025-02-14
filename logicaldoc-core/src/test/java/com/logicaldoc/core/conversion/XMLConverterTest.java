@@ -22,7 +22,7 @@ public class XMLConverterTest extends AbstractCoreTestCase {
 
 	private DocumentDAO ddao;
 
-	protected static Logger log = LoggerFactory.getLogger(XMLConverterTest.class);
+	private static final Logger log = LoggerFactory.getLogger(XMLConverterTest.class);
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {

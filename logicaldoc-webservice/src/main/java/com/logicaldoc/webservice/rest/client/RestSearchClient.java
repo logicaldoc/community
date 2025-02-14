@@ -16,7 +16,7 @@ import com.logicaldoc.webservice.rest.SearchService;
 
 public class RestSearchClient extends AbstractRestClient<SearchService> {
 
-	protected static Logger log = LoggerFactory.getLogger(RestSearchClient.class);
+	private static final Logger log = LoggerFactory.getLogger(RestSearchClient.class);
 
 	public RestSearchClient(String endpoint, String apiKey) {
 		this(endpoint, apiKey, -1);

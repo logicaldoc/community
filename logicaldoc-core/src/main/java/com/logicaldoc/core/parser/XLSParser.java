@@ -21,7 +21,7 @@ import com.logicaldoc.util.StringUtil;
  */
 public class XLSParser extends AbstractParser {
 
-	protected static Logger log = LoggerFactory.getLogger(XLSParser.class);
+	private static final Logger log = LoggerFactory.getLogger(XLSParser.class);
 
 	@Override
 	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {

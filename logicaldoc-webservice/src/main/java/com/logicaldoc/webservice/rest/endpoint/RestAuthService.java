@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestAuthService extends SoapAuthService implements AuthService {
 
-	private static Logger log = LoggerFactory.getLogger(RestAuthService.class);
+	private static final Logger log = LoggerFactory.getLogger(RestAuthService.class);
 
 	@GET
 	@Path("/login")

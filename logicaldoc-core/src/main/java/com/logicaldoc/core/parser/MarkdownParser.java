@@ -6,9 +6,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.conversion.MarkdownConverter;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -19,11 +16,6 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 8.9.4
  */
 public class MarkdownParser extends HTMLParser {
-
-	/**
-	 * Logger instance.
-	 */
-	protected static Logger log = LoggerFactory.getLogger(MarkdownParser.class);
 
 	@Override
 	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content)

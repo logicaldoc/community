@@ -21,7 +21,7 @@ public class DocumentValidator extends Validator implements DocumentListener {
 
 	private static final String VALIDATED_FLAG = "validated";
 
-	protected static Logger log = LoggerFactory.getLogger(DocumentValidator.class);
+	private static final Logger log = LoggerFactory.getLogger(DocumentValidator.class);
 
 	@Override
 	public void beforeStore(Document document, DocumentHistory transaction, Map<String, Object> dictionary)

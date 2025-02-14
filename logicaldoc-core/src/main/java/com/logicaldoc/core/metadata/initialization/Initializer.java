@@ -30,7 +30,7 @@ import com.logicaldoc.util.Context;
  */
 public class Initializer {
 
-	protected static Logger log = LoggerFactory.getLogger(Initializer.class);
+	private static final Logger log = LoggerFactory.getLogger(Initializer.class);
 
 	/**
 	 * Initializes an object instance taking the initialization logic from a

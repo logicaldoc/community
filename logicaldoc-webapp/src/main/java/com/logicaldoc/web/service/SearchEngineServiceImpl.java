@@ -49,7 +49,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(SearchEngineServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(SearchEngineServiceImpl.class);
 
 	@Override
 	public GUISearchEngine getInfo() throws ServerException {

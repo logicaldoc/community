@@ -89,7 +89,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 	private static final String THE_DOCUMENT = "The document ";
 
-	protected static Logger log = LoggerFactory.getLogger(SoapDocumentService.class);
+	private static final Logger log = LoggerFactory.getLogger(SoapDocumentService.class);
 
 	@Override
 	public WSDocument create(String sid, WSDocument document, DataHandler content) throws IOException,

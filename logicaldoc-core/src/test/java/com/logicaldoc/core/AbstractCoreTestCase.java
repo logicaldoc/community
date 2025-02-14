@@ -6,8 +6,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.junit.Before;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.security.apikey.ApiKey;
 import com.logicaldoc.core.security.apikey.ApiKeyDAO;
@@ -28,8 +26,6 @@ import com.logicaldoc.util.plugin.PluginException;
  * @since 3.0
  */
 public abstract class AbstractCoreTestCase extends AbstractTestCase {
-
-	protected static Logger log = LoggerFactory.getLogger(AbstractCoreTestCase.class);
 
 	protected File rootStoreOne;
 

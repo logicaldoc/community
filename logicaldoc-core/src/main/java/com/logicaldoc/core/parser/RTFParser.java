@@ -34,7 +34,7 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class RTFParser extends AbstractParser {
 
-	protected static Logger log = LoggerFactory.getLogger(RTFParser.class);
+	private static final Logger log = LoggerFactory.getLogger(RTFParser.class);
 
 	@Override
 	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {

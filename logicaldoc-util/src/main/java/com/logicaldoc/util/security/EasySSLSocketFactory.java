@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * @since 8.1
  */
 public class EasySSLSocketFactory extends SSLSocketFactory {
-	private static Logger log = LoggerFactory.getLogger(EasySSLSocketFactory.class);
+	private static final Logger log = LoggerFactory.getLogger(EasySSLSocketFactory.class);
 
 	private SSLSocketFactory factory;
 

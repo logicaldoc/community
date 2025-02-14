@@ -19,7 +19,7 @@ import com.logicaldoc.core.document.Document;
  */
 public class ZABWParser extends AbstractParser {
 
-	protected static Logger log = LoggerFactory.getLogger(ZABWParser.class);
+	private static final Logger log = LoggerFactory.getLogger(ZABWParser.class);
 
 	@Override
 	public String parse(File file, String filename, String encoding, Locale locale, String tenant, Document document,

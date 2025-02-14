@@ -29,7 +29,7 @@ import com.logicaldoc.util.time.TimeDiff;
  */
 public class LongRunningOperationCompleteListener implements ThreadCompleteListener {
 
-	private static Logger log = LoggerFactory.getLogger(LongRunningOperationCompleteListener.class);
+	private static final Logger log = LoggerFactory.getLogger(LongRunningOperationCompleteListener.class);
 
 	private Set<String> usernames = new HashSet<>();
 

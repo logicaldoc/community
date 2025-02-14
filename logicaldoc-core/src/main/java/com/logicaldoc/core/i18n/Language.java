@@ -22,7 +22,7 @@ import com.logicaldoc.core.searchengine.StandardSearchEngine;
  */
 public class Language implements Comparable<Language> {
 
-	protected static Logger log = LoggerFactory.getLogger(Language.class);
+	private static final Logger log = LoggerFactory.getLogger(Language.class);
 
 	private Locale locale;
 

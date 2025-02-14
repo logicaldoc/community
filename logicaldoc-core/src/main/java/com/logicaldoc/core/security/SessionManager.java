@@ -52,7 +52,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 	public static final String HEADER_APIKEY = "X-API-KEY";
 
-	private static Logger log = LoggerFactory.getLogger(SessionManager.class);
+	private static final Logger log = LoggerFactory.getLogger(SessionManager.class);
 
 	private static final long serialVersionUID = 1L;
 

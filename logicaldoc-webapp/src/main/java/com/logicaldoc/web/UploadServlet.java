@@ -44,7 +44,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(UploadServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(UploadServlet.class);
 
 	/**
 	 * Sets the size threshold (in bytes) beyond which files are written

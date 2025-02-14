@@ -32,7 +32,7 @@ public class EventCollector {
 
 	private static final String ASPECT = "eventsGathering";
 
-	private static Logger log = LoggerFactory.getLogger(EventCollector.class);
+	private static final Logger log = LoggerFactory.getLogger(EventCollector.class);
 
 	private Set<EventListener> listeners = new HashSet<>();
 

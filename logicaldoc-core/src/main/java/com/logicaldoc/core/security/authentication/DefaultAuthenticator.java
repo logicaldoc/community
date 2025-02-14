@@ -24,7 +24,7 @@ import com.logicaldoc.util.crypt.CryptUtil;
 @Component("defaultAuthenticator")
 public class DefaultAuthenticator extends AbstractAuthenticator {
 
-	protected static Logger log = LoggerFactory.getLogger(DefaultAuthenticator.class);
+	private static final Logger log = LoggerFactory.getLogger(DefaultAuthenticator.class);
 
 	@Resource(name = "UserDAO")
 	protected UserDAO userDAO;

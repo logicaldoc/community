@@ -46,7 +46,7 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class ImageUtil {
 
-	protected static Logger log = LoggerFactory.getLogger(ImageUtil.class);
+	private static final Logger log = LoggerFactory.getLogger(ImageUtil.class);
 
 	private ImageUtil() {
 	}

@@ -37,7 +37,7 @@ import com.logicaldoc.webservice.soap.SecurityService;
  * @since 6.1
  */
 public class SoapSecurityService extends AbstractService implements SecurityService {
-	protected static Logger log = LoggerFactory.getLogger(SoapSecurityService.class);
+	private static final Logger log = LoggerFactory.getLogger(SoapSecurityService.class);
 
 	@Override
 	public List<WSUser> listUsers(String sid, String group)

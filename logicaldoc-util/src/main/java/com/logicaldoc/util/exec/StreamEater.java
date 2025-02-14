@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 public class StreamEater implements Runnable {
 
-	protected static Logger log = LoggerFactory.getLogger(StreamEater.class);
+	private static final Logger log = LoggerFactory.getLogger(StreamEater.class);
 
 	private InputStream inputStream;
 

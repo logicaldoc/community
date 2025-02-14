@@ -95,7 +95,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(SystemServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(SystemServiceImpl.class);
 
 	protected static File defaultWebappRootFolder = null;
 

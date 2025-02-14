@@ -32,7 +32,7 @@ import com.logicaldoc.util.Context;
 @AutomationDictionary
 public class SearchTool {
 
-	protected static Logger log = LoggerFactory.getLogger(SearchTool.class);
+	private static final Logger log = LoggerFactory.getLogger(SearchTool.class);
 
 	/**
 	 * Factory method for searches.

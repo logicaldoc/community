@@ -33,7 +33,7 @@ import com.logicaldoc.core.security.user.Group;
  */
 public class SessionFilter extends GenericFilterBean {
 
-	private static Logger log = LoggerFactory.getLogger(SessionFilter.class);
+	private static final Logger log = LoggerFactory.getLogger(SessionFilter.class);
 
 	static final String FILTER_APPLIED = "__com_logicaldoc_core_security_spring_SessionFilter_applied";
 

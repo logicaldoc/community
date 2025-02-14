@@ -34,7 +34,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestTagService extends SoapTagService implements TagService {
-	protected static Logger log = LoggerFactory.getLogger(RestTagService.class);
+	private static final Logger log = LoggerFactory.getLogger(RestTagService.class);
 
 	@Override
 	@POST

@@ -87,7 +87,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(SettingServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(SettingServiceImpl.class);
 
 	@Override
 	public GUIEmailSettings loadEmailSettings() throws ServerException {

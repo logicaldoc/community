@@ -43,7 +43,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 
 	private static final String JDBC_URL = "jdbc.url";
 
-	private static Logger log = LoggerFactory.getLogger(ApplicationListener.class);
+	private static final Logger log = LoggerFactory.getLogger(ApplicationListener.class);
 
 	private boolean pidCreated = false;
 

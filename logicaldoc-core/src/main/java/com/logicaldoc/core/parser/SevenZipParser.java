@@ -20,7 +20,7 @@ import com.logicaldoc.util.io.SevenZipUtil;
  */
 public class SevenZipParser extends AbstractParser {
 
-	protected static Logger log = LoggerFactory.getLogger(SevenZipParser.class);
+	private static final Logger log = LoggerFactory.getLogger(SevenZipParser.class);
 
 	@Override
 	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content)

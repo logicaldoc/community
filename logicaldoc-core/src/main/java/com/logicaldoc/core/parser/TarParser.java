@@ -20,7 +20,7 @@ import com.logicaldoc.util.io.TarUtil;
  */
 public class TarParser extends AbstractParser {
 
-	protected static Logger log = LoggerFactory.getLogger(TarParser.class);
+	private static final Logger log = LoggerFactory.getLogger(TarParser.class);
 
 	@Override
 	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content)

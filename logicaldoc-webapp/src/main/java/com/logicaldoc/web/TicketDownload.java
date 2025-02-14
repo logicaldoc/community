@@ -36,7 +36,7 @@ public class TicketDownload extends HttpServlet {
 
 	private static final long serialVersionUID = 9088160958327454062L;
 
-	protected static Logger log = LoggerFactory.getLogger(TicketDownload.class);
+	private static final Logger log = LoggerFactory.getLogger(TicketDownload.class);
 
 	/**
 	 * Constructor of the object.

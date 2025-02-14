@@ -29,7 +29,7 @@ import com.logicaldoc.util.config.ContextProperties;
 @AutomationDictionary
 public class FolderTool {
 
-	protected static Logger log = LoggerFactory.getLogger(FolderTool.class);
+	private static final Logger log = LoggerFactory.getLogger(FolderTool.class);
 
 	/**
 	 * Prints the URL to display the folder inside the User Interface

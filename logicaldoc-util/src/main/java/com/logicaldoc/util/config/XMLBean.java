@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class XMLBean {
 
-	protected static Logger log = LoggerFactory.getLogger(XMLBean.class);
+	private static final Logger log = LoggerFactory.getLogger(XMLBean.class);
 
 	private Document doc;
 

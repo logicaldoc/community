@@ -42,7 +42,7 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 
 	private static final String INDEX_TOKENFILTER = "index.tokenfilter.";
 
-	protected static Logger log = LoggerFactory.getLogger(FilteredAnalyzer.class);
+	private static final Logger log = LoggerFactory.getLogger(FilteredAnalyzer.class);
 
 	public static final ThreadLocal<String> lang = ThreadLocal.withInitial(() -> "en");
 

@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.jsoup.Jsoup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.io.FileUtil;
 
@@ -18,11 +16,6 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 3.5
  */
 public class HTMLParser extends AbstractParser {
-
-	/**
-	 * Logger instance.
-	 */
-	protected static Logger log = LoggerFactory.getLogger(HTMLParser.class);
 
 	@Override
 	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content)

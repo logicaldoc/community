@@ -20,7 +20,7 @@ import com.logicaldoc.util.io.RarUtil;
  */
 public class RarParser extends AbstractParser {
 
-	protected static Logger log = LoggerFactory.getLogger(RarParser.class);
+	private static final Logger log = LoggerFactory.getLogger(RarParser.class);
 
 	@Override
 	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content)

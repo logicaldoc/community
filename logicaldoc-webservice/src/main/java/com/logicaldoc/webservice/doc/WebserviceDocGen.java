@@ -17,7 +17,7 @@ import com.logicaldoc.webservice.doc.view.simple.SimpleJavaNameDisplayStrategy;
 
 public class WebserviceDocGen {
 
-	private static Logger console = LoggerFactory.getLogger("console");
+	private static final Logger console = LoggerFactory.getLogger("console");
 
 	public static void main(String[] args) throws ClassNotFoundException {
 		String release = args[0];

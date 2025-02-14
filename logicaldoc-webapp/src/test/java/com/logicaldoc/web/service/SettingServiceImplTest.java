@@ -16,7 +16,7 @@ import com.logicaldoc.web.AbstractWebappTestCase;
 
 public class SettingServiceImplTest extends AbstractWebappTestCase {
 
-	private static Logger log = LoggerFactory.getLogger(SettingServiceImplTest.class);
+	private static final Logger log = LoggerFactory.getLogger(SettingServiceImplTest.class);
 
 	// Instance under test
 	private SettingServiceImpl testSubject = new SettingServiceImpl();

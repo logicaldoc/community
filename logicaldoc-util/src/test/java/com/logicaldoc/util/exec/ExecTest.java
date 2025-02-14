@@ -20,7 +20,7 @@ import com.logicaldoc.util.SystemUtil;
 
 public class ExecTest {
 
-	protected static Logger log = LoggerFactory.getLogger(ExecTest.class);
+	private static final Logger log = LoggerFactory.getLogger(ExecTest.class);
 
 	@Test
 	public void testExecStringStringArrayFileInt() {

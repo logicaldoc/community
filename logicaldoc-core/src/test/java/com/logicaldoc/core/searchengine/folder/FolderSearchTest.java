@@ -15,7 +15,7 @@ import junit.framework.Assert;
 
 public class FolderSearchTest extends AbstractCoreTestCase {
 
-	protected static Logger log = LoggerFactory.getLogger(FolderSearchTest.class);
+	private static final Logger log = LoggerFactory.getLogger(FolderSearchTest.class);
 
 	@Test
 	public void testSearch() {

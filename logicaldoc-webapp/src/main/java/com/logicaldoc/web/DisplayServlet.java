@@ -36,7 +36,7 @@ public class DisplayServlet extends HttpServlet {
 
 	public static final String FOLDER_PATH = "folderPath";
 
-	protected static Logger log = LoggerFactory.getLogger(DisplayServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(DisplayServlet.class);
 
 	public DisplayServlet() {
 		super();

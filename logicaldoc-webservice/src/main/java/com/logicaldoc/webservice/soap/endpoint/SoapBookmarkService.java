@@ -28,7 +28,7 @@ import com.logicaldoc.webservice.soap.BookmarkService;
  * @since 7.6.3
  */
 public class SoapBookmarkService extends AbstractService implements BookmarkService {
-	protected static Logger log = LoggerFactory.getLogger(SoapBookmarkService.class);
+	private static final Logger log = LoggerFactory.getLogger(SoapBookmarkService.class);
 
 	@Override
 	public WSBookmark saveBookmark(String sid, WSBookmark bookmark) throws AuthenticationException, WebserviceException,

@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestBookmarkService extends SoapBookmarkService implements BookmarkService {
-	protected static Logger log = LoggerFactory.getLogger(RestBookmarkService.class);
+	private static final Logger log = LoggerFactory.getLogger(RestBookmarkService.class);
 
 	@POST
 	@Path("/saveBookmark")

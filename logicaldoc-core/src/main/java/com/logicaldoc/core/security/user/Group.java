@@ -28,7 +28,7 @@ public class Group extends PersistentObject implements Serializable {
 
 	private static final long serialVersionUID = 2L;
 
-	protected static Logger log = LoggerFactory.getLogger(Group.class);
+	private static final Logger log = LoggerFactory.getLogger(Group.class);
 
 	public static final String GROUP_ADMIN = "admin";
 

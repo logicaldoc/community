@@ -33,7 +33,7 @@ public class ParserFactory {
 
 	private static final String PARSER_ALIAS = "parser.alias.";
 
-	protected static Logger log = LoggerFactory.getLogger(ParserFactory.class);
+	private static final Logger log = LoggerFactory.getLogger(ParserFactory.class);
 
 	/**
 	 * This is the map of registered parsers: key is the file extension, value

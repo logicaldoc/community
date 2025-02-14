@@ -6,9 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
@@ -20,8 +17,6 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 8.8.3
  */
 public abstract class CompressedArchiveConverter extends AbstractFormatConverter {
-
-	protected static Logger log = LoggerFactory.getLogger(CompressedArchiveConverter.class);
 
 	protected void convertMultipleEntries(String sid, Document document, File dest, List<String> entries)
 			throws IOException {

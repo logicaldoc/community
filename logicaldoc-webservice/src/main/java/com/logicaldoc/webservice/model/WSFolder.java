@@ -35,7 +35,7 @@ public class WSFolder implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@WSDoc(documented = false)
-	protected static Logger log = LoggerFactory.getLogger(WSFolder.class);
+	private static final Logger log = LoggerFactory.getLogger(WSFolder.class);
 
 	@WSDoc(description = "unique identifier of the folder")
 	private long id = 0;

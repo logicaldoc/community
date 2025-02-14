@@ -62,7 +62,7 @@ public class DashletContent extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(DashletContent.class);
+	private static final Logger log = LoggerFactory.getLogger(DashletContent.class);
 
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response) {

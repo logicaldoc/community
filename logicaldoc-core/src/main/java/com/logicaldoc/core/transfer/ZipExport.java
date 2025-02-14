@@ -40,7 +40,7 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class ZipExport {
 
-	protected static Logger log = LoggerFactory.getLogger(ZipExport.class);
+	private static final Logger log = LoggerFactory.getLogger(ZipExport.class);
 
 	private ZipArchiveOutputStream zos;
 

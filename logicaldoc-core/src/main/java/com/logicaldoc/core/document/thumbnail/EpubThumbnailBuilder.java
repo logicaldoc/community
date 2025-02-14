@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.mertakdut.NavPoint;
 import com.github.mertakdut.Reader;
@@ -27,8 +25,6 @@ import com.logicaldoc.util.io.FileUtil;
 public class EpubThumbnailBuilder extends ImageThumbnailBuilder {
 
 	private static final String EBOOKCOVER = "ebookcover";
-
-	protected static Logger log = LoggerFactory.getLogger(EpubThumbnailBuilder.class);
 
 	@Override
 	public synchronized void buildThumbnail(String sid, Document document, String fileVersion, File src, File dest,

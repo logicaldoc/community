@@ -21,7 +21,7 @@ import com.logicaldoc.util.Context;
 @AutomationDictionary
 public class UserTool {
 
-	protected static Logger log = LoggerFactory.getLogger(UserTool.class);
+	private static final Logger log = LoggerFactory.getLogger(UserTool.class);
 
 	/**
 	 * Retrieves a user object

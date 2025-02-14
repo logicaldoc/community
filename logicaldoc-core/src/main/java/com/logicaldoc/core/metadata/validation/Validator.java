@@ -32,7 +32,7 @@ import com.logicaldoc.util.Context;
  */
 public class Validator {
 
-	protected static Logger log = LoggerFactory.getLogger(Validator.class);
+	private static final Logger log = LoggerFactory.getLogger(Validator.class);
 
 	/**
 	 * Validates an object instance taking the validation logic from a given

@@ -40,8 +40,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.LocaleUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.types.selectors.SelectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +60,7 @@ public class FileUtil {
 
 	static final byte[] buffer = new byte[BUFF_SIZE];
 
-	protected static Logger log = LoggerFactory.getLogger(FileUtil.class);
+	private static final Logger log = LoggerFactory.getLogger(FileUtil.class);
 
 	private FileUtil() {
 		throw new IllegalStateException("Utility class");
@@ -133,8 +131,8 @@ public class FileUtil {
 	}
 
 	private static void logError(String message) {
-		Log logger = LogFactory.getLog(FileUtil.class);
-		logger.error(message);
+		Logger log = LoggerFactory.getLogger(FileUtil.class);
+		log.error(message);
 	}
 
 	public static String computeDigest(InputStream is) {

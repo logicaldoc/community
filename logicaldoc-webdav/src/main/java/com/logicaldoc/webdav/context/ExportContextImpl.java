@@ -28,7 +28,7 @@ import com.logicaldoc.webdav.resource.model.Resource;
  */
 public class ExportContextImpl extends AbstractExportContext {
 
-	protected static Logger log = LoggerFactory.getLogger(ExportContextImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(ExportContextImpl.class);
 
 	@SuppressWarnings("rawtypes")
 	private final Map properties = new HashMap();

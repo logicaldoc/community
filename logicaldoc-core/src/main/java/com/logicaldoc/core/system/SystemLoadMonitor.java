@@ -27,7 +27,7 @@ import com.sun.management.OperatingSystemMXBean;
 @Component("systemLoadMonitor")
 public class SystemLoadMonitor {
 
-	protected static Logger log = LoggerFactory.getLogger(SystemLoadMonitor.class);
+	private static final Logger log = LoggerFactory.getLogger(SystemLoadMonitor.class);
 
 	@Resource(name = "ContextProperties")
 	protected ContextProperties config;

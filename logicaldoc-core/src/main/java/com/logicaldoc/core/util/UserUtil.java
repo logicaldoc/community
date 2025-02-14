@@ -45,7 +45,7 @@ public class UserUtil {
 	 */
 	private static final String TRANSPARENT_IMAGE = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
-	protected static Logger log = LoggerFactory.getLogger(UserUtil.class);
+	private static final Logger log = LoggerFactory.getLogger(UserUtil.class);
 
 	private UserUtil() {
 	}

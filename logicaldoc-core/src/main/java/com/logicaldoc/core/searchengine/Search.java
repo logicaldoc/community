@@ -40,7 +40,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @author Michael Scholz
  */
 public abstract class Search {
-	protected static Logger log = LoggerFactory.getLogger(Search.class);
+	protected static final Logger log = LoggerFactory.getLogger(Search.class);
 
 	protected boolean moreHitsPresent = false;
 

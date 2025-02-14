@@ -24,7 +24,7 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class DBInit {
 
-	protected static Logger log = LoggerFactory.getLogger(DBInit.class);
+	private static final Logger log = LoggerFactory.getLogger(DBInit.class);
 
 	private String dbms = "";
 

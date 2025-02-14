@@ -54,7 +54,7 @@ public class DocTool {
 
 	private static final String SERVER_URL = "server.url";
 
-	protected static Logger log = LoggerFactory.getLogger(DocTool.class);
+	private static final Logger log = LoggerFactory.getLogger(DocTool.class);
 
 	/**
 	 * Builds the download url of a document(download permalink)

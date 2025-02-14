@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 @AutomationDictionary
 public class ClassTool {
 
-	protected static Logger log = LoggerFactory.getLogger(ClassTool.class);
+	private static final Logger log = LoggerFactory.getLogger(ClassTool.class);
 
 	/**
 	 * Creates a new instance of a class whose constructor does not have

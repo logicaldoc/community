@@ -7,9 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ResourceUtil;
@@ -21,8 +18,6 @@ import com.logicaldoc.util.io.ResourceUtil;
  * @since 7.6.4
  */
 public class NotAvailableConverter implements FormatConverter {
-
-	protected static Logger log = LoggerFactory.getLogger(NotAvailableConverter.class);
 
 	@Override
 	public void convert(File src, File dest) throws IOException {

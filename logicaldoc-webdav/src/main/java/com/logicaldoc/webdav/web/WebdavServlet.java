@@ -26,7 +26,7 @@ import com.logicaldoc.webdav.resource.ResourceConfig;
 @SuppressWarnings("serial")
 public class WebdavServlet extends AbstractWebdavServlet {
 
-	protected static Logger log = LoggerFactory.getLogger(WebdavServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(WebdavServlet.class);
 
 	public static final String INIT_PARAM_RESOURCE_PATH_PREFIX = "resource-path-prefix";
 

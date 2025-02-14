@@ -24,7 +24,7 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public abstract class AbstractFormatConverter implements FormatConverter {
 
-	private static Logger log = LoggerFactory.getLogger(AbstractFormatConverter.class);
+	private static final Logger log = LoggerFactory.getLogger(AbstractFormatConverter.class);
 
 	protected Map<String, String> parameters = new HashMap<>();
 

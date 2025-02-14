@@ -71,7 +71,7 @@ public abstract class PluginRegistry {
 		return instance;
 	}
 
-	private static Logger console() {
+	private static final Logger console() {
 		return LoggerFactory.getLogger("console");
 	}
 

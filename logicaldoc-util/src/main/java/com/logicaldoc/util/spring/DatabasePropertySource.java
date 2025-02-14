@@ -25,7 +25,7 @@ public class DatabasePropertySource extends PropertySource<String> {
 		super("database");
 	}
 
-	private static Logger log = LoggerFactory.getLogger(DatabasePropertySource.class);
+	private static final Logger log = LoggerFactory.getLogger(DatabasePropertySource.class);
 
 	/**
 	 * Tries to retrieve a property by using a direct JDBC query against the DB

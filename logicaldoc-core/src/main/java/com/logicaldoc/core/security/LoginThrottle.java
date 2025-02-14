@@ -52,7 +52,7 @@ public class LoginThrottle {
 
 	public static final String LOGINFAIL_USERNAME = "loginfail-username-";
 
-	protected static Logger log = LoggerFactory.getLogger(LoginThrottle.class);
+	private static final Logger log = LoggerFactory.getLogger(LoginThrottle.class);
 
 	private LoginThrottle() {
 	}

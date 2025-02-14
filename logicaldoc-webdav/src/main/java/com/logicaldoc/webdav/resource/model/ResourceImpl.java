@@ -24,7 +24,7 @@ import com.logicaldoc.webdav.session.WebdavSession;
  */
 public class ResourceImpl implements Resource {
 
-	protected static Logger log = LoggerFactory.getLogger(ResourceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(ResourceImpl.class);
 
 	private String id;
 

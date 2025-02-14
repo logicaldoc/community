@@ -56,7 +56,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 	public static final String WSCALL_HYPHEN = WSCALL + "-";
 
-	protected static Logger log = LoggerFactory.getLogger(WebserviceInterceptor.class);
+	private static final Logger log = LoggerFactory.getLogger(WebserviceInterceptor.class);
 
 	@Resource(name = "SequenceDAO")
 	private SequenceDAO sequenceDAO;

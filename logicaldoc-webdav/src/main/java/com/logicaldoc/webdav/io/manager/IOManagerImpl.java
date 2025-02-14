@@ -24,7 +24,7 @@ public class IOManagerImpl implements IOManager {
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(IOManagerImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(IOManagerImpl.class);
 
 	private final List<IOHandler> ioHandlers = new ArrayList<>();
 

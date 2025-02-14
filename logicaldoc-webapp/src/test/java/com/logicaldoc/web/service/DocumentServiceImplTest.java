@@ -78,7 +78,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	private static final String UTF_8 = "UTF-8";
 
-	private static Logger log = LoggerFactory.getLogger(DocumentServiceImplTest.class);
+	private static final Logger log = LoggerFactory.getLogger(DocumentServiceImplTest.class);
 
 	@Mock
 	private EMailSender emailSender;

@@ -40,7 +40,7 @@ import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.time.DateUtil;
 
 public class WSUtil {
-	protected static Logger log = LoggerFactory.getLogger(WSUtil.class);
+	private static final Logger log = LoggerFactory.getLogger(WSUtil.class);
 
 	private WSUtil() {
 	}

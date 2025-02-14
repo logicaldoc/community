@@ -47,7 +47,7 @@ public class JobManager {
 
 	public static final String MISSFIRE_IGNORE = "ignore";
 
-	protected static Logger log = LoggerFactory.getLogger(JobManager.class);
+	private static final Logger log = LoggerFactory.getLogger(JobManager.class);
 
 	@Resource(name = "Scheduler")
 	protected Scheduler scheduler;

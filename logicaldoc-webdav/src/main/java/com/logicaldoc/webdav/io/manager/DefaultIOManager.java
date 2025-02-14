@@ -14,7 +14,7 @@ public class DefaultIOManager extends IOManagerImpl {
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(DefaultIOManager.class);
+	private static final Logger log = LoggerFactory.getLogger(DefaultIOManager.class);
 
 	public DefaultIOManager() {
 		init();

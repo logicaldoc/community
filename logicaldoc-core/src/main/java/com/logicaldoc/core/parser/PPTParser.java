@@ -24,7 +24,7 @@ import com.logicaldoc.util.StringUtil;
  */
 public class PPTParser extends AbstractParser {
 
-	protected static Logger log = LoggerFactory.getLogger(PPTParser.class);
+	private static final Logger log = LoggerFactory.getLogger(PPTParser.class);
 
 	@Override
 	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {

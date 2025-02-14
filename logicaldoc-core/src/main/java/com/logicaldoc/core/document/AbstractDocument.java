@@ -52,7 +52,7 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public abstract class AbstractDocument extends SecurableExtensibleObject implements TransactionalObject {
 
-	protected static Logger log = LoggerFactory.getLogger(AbstractDocument.class);
+	private static final Logger log = LoggerFactory.getLogger(AbstractDocument.class);
 
 	private static final long serialVersionUID = 1L;
 

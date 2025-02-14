@@ -41,7 +41,7 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(SetupServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(SetupServiceImpl.class);
 
 	@Override
 	public void setup(SetupInfo data) throws ServerException {

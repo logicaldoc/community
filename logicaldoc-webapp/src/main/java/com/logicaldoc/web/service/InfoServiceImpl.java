@@ -60,7 +60,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
 	private static final String LANG = ".lang.";
 
-	private static Logger log = LoggerFactory.getLogger(InfoServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(InfoServiceImpl.class);
 
 	private static final long serialVersionUID = 1L;
 

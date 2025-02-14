@@ -65,7 +65,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 	private TemplateDAO templateDao;
 
-	protected static Logger log = LoggerFactory.getLogger(HibernateFolderDAOTest.class);
+	private static final Logger log = LoggerFactory.getLogger(HibernateFolderDAOTest.class);
 
 	@Override
 	protected List<String> getPluginArchives() {

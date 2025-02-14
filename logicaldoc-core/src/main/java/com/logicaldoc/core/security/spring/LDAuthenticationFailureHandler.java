@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
  */
 public class LDAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
-	private static Logger log = LoggerFactory.getLogger(LDAuthenticationFailureHandler.class);
+	private static final Logger log = LoggerFactory.getLogger(LDAuthenticationFailureHandler.class);
 
 	private static final String PARAM_FAILUREURL = "j_failureurl";
 

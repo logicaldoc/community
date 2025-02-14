@@ -24,7 +24,7 @@ import com.logicaldoc.util.Context;
  */
 public class JarUtil {
 
-	protected static Logger log = LoggerFactory.getLogger(JarUtil.class);
+	private static final Logger log = LoggerFactory.getLogger(JarUtil.class);
 
 	/**
 	 * Maximum number of entries in the compressed archive, config parameter

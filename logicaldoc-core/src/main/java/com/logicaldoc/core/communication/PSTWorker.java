@@ -25,7 +25,7 @@ import com.pff.PSTMessage;
  */
 public class PSTWorker {
 
-	protected static Logger log = LoggerFactory.getLogger(PSTWorker.class);
+	private static final Logger log = LoggerFactory.getLogger(PSTWorker.class);
 
 	private PSTFile pstFile;
 

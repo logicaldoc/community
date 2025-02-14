@@ -3,9 +3,6 @@ package com.logicaldoc.core.document.thumbnail;
 import java.io.File;
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.util.GhostUtil;
 import com.logicaldoc.util.io.FileUtil;
@@ -17,7 +14,6 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 4.5
  */
 public class PdfThumbnailBuilder extends ImageThumbnailBuilder {
-	protected static Logger log = LoggerFactory.getLogger(PdfThumbnailBuilder.class);
 
 	@Override
 	public synchronized void buildThumbnail(String sid, Document document, String fileVersion, File src, File dest,

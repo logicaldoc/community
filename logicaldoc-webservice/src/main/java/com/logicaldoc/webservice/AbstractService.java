@@ -45,7 +45,7 @@ public class AbstractService {
 
 	private static final String FOLDER = "folder ";
 
-	private static Logger log = LoggerFactory.getLogger(AbstractService.class);
+	private static final Logger log = LoggerFactory.getLogger(AbstractService.class);
 
 	private boolean validateSession = true;
 

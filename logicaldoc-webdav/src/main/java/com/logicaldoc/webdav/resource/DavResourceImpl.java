@@ -75,7 +75,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(DavResourceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(DavResourceImpl.class);
 
 	protected transient DavResourceFactory factory;
 

@@ -22,7 +22,7 @@ public class ResourceConfig implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(ResourceConfig.class);
+	private static final Logger log = LoggerFactory.getLogger(ResourceConfig.class);
 
 	private transient ItemFilter itemFilter;
 

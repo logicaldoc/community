@@ -60,7 +60,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(AbstractRemoteService.class);
+	private static final Logger log = LoggerFactory.getLogger(AbstractRemoteService.class);
 
 	protected static final String LOCALE = "locale";
 

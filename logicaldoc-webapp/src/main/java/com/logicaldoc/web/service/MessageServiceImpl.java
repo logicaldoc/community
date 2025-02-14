@@ -38,7 +38,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 
 	private static final String TEMPLATES_HAVE_NOT_BEEN_SAVED = "Templates have not been saved";
 
-	private static Logger log = LoggerFactory.getLogger(MessageServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(MessageServiceImpl.class);
 
 	private static final long serialVersionUID = 1L;
 

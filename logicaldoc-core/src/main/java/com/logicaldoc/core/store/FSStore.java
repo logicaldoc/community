@@ -29,7 +29,7 @@ import com.logicaldoc.util.io.IOUtil;
  */
 public class FSStore extends AbstractStore {
 
-	protected static Logger log = LoggerFactory.getLogger(FSStore.class);
+	private static final Logger log = LoggerFactory.getLogger(FSStore.class);
 
 	public FSStore() {
 		super();

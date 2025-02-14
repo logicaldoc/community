@@ -34,7 +34,7 @@ import com.logicaldoc.webservice.doc.WSDoc;
 @XmlType(name = "WSUser")
 public class WSUser {
 	@WSDoc(documented = false)
-	protected static Logger log = LoggerFactory.getLogger(WSUser.class);
+	private static final Logger log = LoggerFactory.getLogger(WSUser.class);
 
 	@WSDoc(documented = false)
 	public static final int TYPE_DEFAULT = 0;

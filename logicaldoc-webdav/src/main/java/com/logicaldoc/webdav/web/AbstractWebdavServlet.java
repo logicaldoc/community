@@ -69,7 +69,7 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 	protected static ServletContext context;
 
-	protected static Logger log = LoggerFactory.getLogger(AbstractWebdavServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(AbstractWebdavServlet.class);
 
 	private static final long serialVersionUID = -8726695805361483901L;
 

@@ -20,7 +20,7 @@ import com.logicaldoc.gui.common.client.websockets.WebsocketMessage;
 @AutomationDictionary
 public class WebsocketTool {
 
-	protected static Logger log = LoggerFactory.getLogger(WebsocketTool.class);
+	private static final Logger log = LoggerFactory.getLogger(WebsocketTool.class);
 
 	protected static final Random random = new Random();
 

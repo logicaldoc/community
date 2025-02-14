@@ -31,7 +31,7 @@ import com.logicaldoc.util.config.ContextProperties;
  */
 public class AdminAuthenticationProvider implements AuthenticationProvider {
 
-	protected static Logger log = LoggerFactory.getLogger(AdminAuthenticationProvider.class);
+	private static final Logger log = LoggerFactory.getLogger(AdminAuthenticationProvider.class);
 
 	private static final String BADCREDENTIALS = "badcredentials";
 

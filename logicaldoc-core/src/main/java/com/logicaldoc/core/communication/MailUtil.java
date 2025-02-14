@@ -58,7 +58,7 @@ public class MailUtil {
 
 	private static final String IPM_NOTE_SMIME = "IPM.Note.SMIME";
 
-	protected static Logger log = LoggerFactory.getLogger(MailUtil.class);
+	private static final Logger log = LoggerFactory.getLogger(MailUtil.class);
 
 	public static final String NO_SUBJECT = "(Message without subject)";
 

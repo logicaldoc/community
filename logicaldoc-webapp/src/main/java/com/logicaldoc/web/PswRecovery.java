@@ -46,7 +46,7 @@ public class PswRecovery extends HttpServlet {
 
 	private static final long serialVersionUID = 9088160958327454062L;
 
-	protected static Logger log = LoggerFactory.getLogger(PswRecovery.class);
+	private static final Logger log = LoggerFactory.getLogger(PswRecovery.class);
 
 	/**
 	 * Constructor of the object.

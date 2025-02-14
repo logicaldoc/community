@@ -40,7 +40,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestFolderService extends SoapFolderService implements FolderService {
 
-	private static Logger log = LoggerFactory.getLogger(RestFolderService.class);
+	private static final Logger log = LoggerFactory.getLogger(RestFolderService.class);
 
 	@Override
 	@POST

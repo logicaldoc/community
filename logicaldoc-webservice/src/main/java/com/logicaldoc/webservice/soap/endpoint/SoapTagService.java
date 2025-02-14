@@ -38,7 +38,7 @@ import com.logicaldoc.webservice.soap.TagService;
  * @since 7.6.3
  */
 public class SoapTagService extends AbstractService implements TagService {
-	protected static Logger log = LoggerFactory.getLogger(SoapTagService.class);
+	private static final Logger log = LoggerFactory.getLogger(SoapTagService.class);
 
 	private SoapDocumentService getDocumentService() {
 		SoapDocumentService docService = new SoapDocumentService();

@@ -67,7 +67,7 @@ public class StandardSearchEngine implements SearchEngine {
 
 	public static final Version VERSION = Version.LUCENE_8_11_2;
 
-	protected static Logger log = LoggerFactory.getLogger(StandardSearchEngine.class);
+	private static final Logger log = LoggerFactory.getLogger(StandardSearchEngine.class);
 
 	@Resource(name = "ContextProperties")
 	private ContextProperties config;

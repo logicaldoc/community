@@ -9,16 +9,16 @@ import java.util.List;
 import javax.activation.DataHandler;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.soap.client.SoapDocumentClient;
 
 public class TstDownload extends BaseTestCase {
 
-	protected static Log log = LogFactory.getLog(TstDownload.class);
+	private static final Logger log = LoggerFactory.getLogger(TstDownload.class);
 
 	private SoapDocumentClient documentClient;
 

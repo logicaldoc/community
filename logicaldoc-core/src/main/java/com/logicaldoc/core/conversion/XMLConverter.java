@@ -49,7 +49,7 @@ public class XMLConverter extends AbstractFormatConverter {
 
 	private static final String STYLE_SHEETS = "styleSheets";
 
-	protected static Logger log = LoggerFactory.getLogger(XMLConverter.class);
+	private static final Logger log = LoggerFactory.getLogger(XMLConverter.class);
 
 	@Override
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {

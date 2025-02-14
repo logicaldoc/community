@@ -27,7 +27,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  */
 public class LanguageManager {
 
-	protected static Logger log = LoggerFactory.getLogger(LanguageManager.class);
+	private static final Logger log = LoggerFactory.getLogger(LanguageManager.class);
 
 	private static LanguageManager languageManager;
 

@@ -19,7 +19,7 @@ import com.logicaldoc.util.Context;
  * @since 7.6.4
  */
 public class DocUtil {
-	protected static Logger log = LoggerFactory.getLogger(DocUtil.class);
+	private static final Logger log = LoggerFactory.getLogger(DocUtil.class);
 
 	private DocUtil() {
 	}

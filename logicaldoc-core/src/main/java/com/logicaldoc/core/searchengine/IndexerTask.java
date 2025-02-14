@@ -49,7 +49,7 @@ import com.logicaldoc.util.time.TimeDiff.TimeField;
 @Component("indexerTask")
 public class IndexerTask extends Task {
 
-	private static Logger lg = LoggerFactory.getLogger(IndexerTask.class);
+	private static final Logger lg = LoggerFactory.getLogger(IndexerTask.class);
 
 	/**
 	 * This executor will be used to index files

@@ -56,7 +56,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(ResourceServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(ResourceServiceImpl.class);
 
 	@javax.annotation.Resource(name = "DocumentDAO")
 	private transient DocumentDAO documentDAO;

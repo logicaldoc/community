@@ -39,7 +39,7 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(DeltaVResourceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(DeltaVResourceImpl.class);
 
 	protected transient SupportedReportSetProperty supportedReports = new SupportedReportSetProperty();
 

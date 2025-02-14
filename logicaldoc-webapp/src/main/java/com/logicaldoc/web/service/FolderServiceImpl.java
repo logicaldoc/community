@@ -63,7 +63,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(FolderServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(FolderServiceImpl.class);
 
 	@Override
 	public GUIFolder inheritACL(long folderId, long rightsFolderId) throws ServerException {

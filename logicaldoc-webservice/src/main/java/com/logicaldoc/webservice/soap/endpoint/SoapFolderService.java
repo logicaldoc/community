@@ -49,7 +49,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 	private static final String CANNOT_MOVE_FOLDERS_IN_THE_ROOT = "Cannot move folders in the root";
 
-	protected static Logger log = LoggerFactory.getLogger(SoapFolderService.class);
+	private static final Logger log = LoggerFactory.getLogger(SoapFolderService.class);
 
 	@Override
 	public WSFolder create(String sid, WSFolder wsFolder)

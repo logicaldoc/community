@@ -29,7 +29,7 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class MockServletResponse implements HttpServletResponse {
 
-	protected static Logger log = LoggerFactory.getLogger(MockServletResponse.class);
+	private static final Logger log = LoggerFactory.getLogger(MockServletResponse.class);
 
 	private File output;
 

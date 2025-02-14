@@ -28,7 +28,7 @@ import com.zaxxer.hikari.HikariDataSource;
  */
 public class ConnectionPool implements DataSource, Closeable {
 
-	protected static Logger log = LoggerFactory.getLogger(ConnectionPool.class);
+	private static final Logger log = LoggerFactory.getLogger(ConnectionPool.class);
 
 	private DataSource wrappedDataSource;
 

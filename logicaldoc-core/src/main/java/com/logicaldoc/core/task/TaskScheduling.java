@@ -22,7 +22,7 @@ import com.logicaldoc.util.config.ContextProperties;
  */
 public class TaskScheduling {
 
-	protected static Logger log = LoggerFactory.getLogger(TaskScheduling.class);
+	private static final Logger log = LoggerFactory.getLogger(TaskScheduling.class);
 
 	private String taskName;
 

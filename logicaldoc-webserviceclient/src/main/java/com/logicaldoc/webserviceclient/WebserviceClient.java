@@ -35,7 +35,7 @@ public class WebserviceClient {
 
 	private static final String INVOKING = "Invoking {}";
 
-	private static Logger log = LoggerFactory.getLogger(WebserviceClient.class);
+	private static final Logger log = LoggerFactory.getLogger(WebserviceClient.class);
 
 	private static final String WS_NAMESPACE = "http://ws.logicaldoc.com";
 

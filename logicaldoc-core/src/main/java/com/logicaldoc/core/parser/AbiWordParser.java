@@ -24,7 +24,7 @@ import com.logicaldoc.util.StringUtil;
  */
 public class AbiWordParser extends AbstractParser {
 
-	protected static Logger log = LoggerFactory.getLogger(AbiWordParser.class);
+	private static final Logger log = LoggerFactory.getLogger(AbiWordParser.class);
 
 	/**
 	 * Special Handler for AbiWord

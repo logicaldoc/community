@@ -39,7 +39,7 @@ import com.logicaldoc.core.security.user.Group;
  */
 public class LDAuthenticationProvider implements AuthenticationProvider {
 
-	private static Logger log = LoggerFactory.getLogger(LDAuthenticationProvider.class);
+	private static final Logger log = LoggerFactory.getLogger(LDAuthenticationProvider.class);
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {

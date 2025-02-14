@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class BaseHttpClientResponseHandler<T> extends AbstractHttpClientResponseHandler<T> {
 
-	protected static Logger log = LoggerFactory.getLogger(BaseHttpClientResponseHandler.class);
+	private static final Logger log = LoggerFactory.getLogger(BaseHttpClientResponseHandler.class);
 
 	private static final String UTF_8 = "UTF-8";
 

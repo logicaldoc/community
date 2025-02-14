@@ -43,7 +43,7 @@ import com.logicaldoc.webservice.soap.DocumentMetadataService;
  */
 public class SoapDocumentMetadataService extends AbstractService implements DocumentMetadataService {
 
-	protected static Logger log = LoggerFactory.getLogger(SoapDocumentMetadataService.class);
+	private static final Logger log = LoggerFactory.getLogger(SoapDocumentMetadataService.class);
 
 	private static final String TEMPLATE = "template ";
 

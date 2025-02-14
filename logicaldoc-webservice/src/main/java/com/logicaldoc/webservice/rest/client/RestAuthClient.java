@@ -16,7 +16,7 @@ import com.logicaldoc.webservice.rest.AuthService;
  */
 public class RestAuthClient extends AbstractRestClient<AuthService> implements AuthService {
 
-	protected static Logger log = LoggerFactory.getLogger(RestAuthClient.class);
+	private static final Logger log = LoggerFactory.getLogger(RestAuthClient.class);
 
 	public RestAuthClient(String endpoint) throws AuthenticationException {
 		super(AuthService.class, endpoint, null);

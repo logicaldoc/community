@@ -38,7 +38,7 @@ import com.logicaldoc.webservice.soap.SearchService;
  */
 public class SoapSearchService extends AbstractService implements SearchService {
 
-	protected static Logger log = LoggerFactory.getLogger(SoapSearchService.class);
+	private static final Logger log = LoggerFactory.getLogger(SoapSearchService.class);
 
 	@Override
 	public WSSearchResult find(String sid, WSSearchOptions opt)

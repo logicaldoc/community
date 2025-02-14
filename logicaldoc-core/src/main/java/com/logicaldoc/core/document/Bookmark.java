@@ -17,7 +17,7 @@ import com.logicaldoc.util.Context;
  */
 public class Bookmark extends PersistentObject {
 
-	private static Logger log = LoggerFactory.getLogger(Bookmark.class);
+	private static final Logger log = LoggerFactory.getLogger(Bookmark.class);
 
 	private static final long serialVersionUID = 1L;
 

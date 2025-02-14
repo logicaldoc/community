@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class P7M {
 
-	protected static Logger log = LoggerFactory.getLogger(P7M.class);
+	private static final Logger log = LoggerFactory.getLogger(P7M.class);
 
 	private File file;
 

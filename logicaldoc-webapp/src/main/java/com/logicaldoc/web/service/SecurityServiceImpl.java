@@ -138,7 +138,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(SecurityServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(SecurityServiceImpl.class);
 
 	public static GUITenant getTenant(long tenantId) {
 		TenantDAO dao = Context.get(TenantDAO.class);

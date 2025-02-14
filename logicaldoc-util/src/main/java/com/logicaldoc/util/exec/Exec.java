@@ -43,7 +43,7 @@ public class Exec {
 
 	private static final String ALLOWED_COMMANDS = "/allowed-commands.txt";
 
-	protected static Logger log = LoggerFactory.getLogger(Exec.class);
+	private static final Logger log = LoggerFactory.getLogger(Exec.class);
 
 	/**
 	 * For those methods that collect the output, this is the prefix to use for

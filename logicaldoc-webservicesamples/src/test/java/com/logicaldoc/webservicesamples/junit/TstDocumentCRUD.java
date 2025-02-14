@@ -8,8 +8,6 @@ import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
 import com.logicaldoc.webservice.model.WSDocument;
@@ -17,10 +15,8 @@ import com.logicaldoc.webservice.soap.client.SoapDocumentClient;
 
 public class TstDocumentCRUD extends BaseTestCase {
 
-	protected static Log log = LogFactory.getLog(TstDocumentCRUD.class);
-
 	private SoapDocumentClient documentClient;
-	
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();

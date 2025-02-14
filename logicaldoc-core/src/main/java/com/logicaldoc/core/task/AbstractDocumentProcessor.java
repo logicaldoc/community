@@ -51,7 +51,6 @@ public abstract class AbstractDocumentProcessor extends Task {
 		try {
 			int max = getBatchSize();
 
-			@SuppressWarnings("unchecked")
 			List<Long> ids = documentDao.queryForList("select ld_id from ld_document where " + prepareQueueQuery(null),
 					null, Long.class, max);
 			getSize(max, ids);
@@ -89,7 +88,6 @@ public abstract class AbstractDocumentProcessor extends Task {
 		// Now we can release the lock
 		lockManager.release(getName(), transactionId);
 
-		@SuppressWarnings("unchecked")
 		List<Object[]> records = documentDao.query(
 				"select ld_id, ld_filename from ld_document where ld_id in " + idsStr, new RowMapper<Object[]>() {
 					@Override

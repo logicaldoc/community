@@ -33,7 +33,7 @@ import com.logicaldoc.util.config.WebConfigurator;
  */
 public abstract class LogicalDOCPlugin extends Plugin {
 
-	private static Logger logger = LoggerFactory.getLogger(LogicalDOCPlugin.class);
+	private static final Logger logger = LoggerFactory.getLogger(LogicalDOCPlugin.class);
 
 	private static final String PLUGIN_PROPERTIES = "plugin.properties";
 

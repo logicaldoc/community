@@ -49,7 +49,7 @@ import com.logicaldoc.util.io.FileUtil;
 @AutomationDictionary
 public class MailTool {
 
-	protected static Logger log = LoggerFactory.getLogger(MailTool.class);
+	private static final Logger log = LoggerFactory.getLogger(MailTool.class);
 
 	/**
 	 * Sends some documents to a recipient

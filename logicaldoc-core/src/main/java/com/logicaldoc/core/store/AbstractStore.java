@@ -52,7 +52,7 @@ public abstract class AbstractStore implements Store {
 
 	protected static final int DEFAULT_BUFFER_SIZE = 1024;
 
-	protected static Logger log = LoggerFactory.getLogger(AbstractStore.class);
+	private static final Logger log = LoggerFactory.getLogger(AbstractStore.class);
 
 	protected static Logger deletionsLog = LoggerFactory.getLogger("STORE_DELETIONS");
 

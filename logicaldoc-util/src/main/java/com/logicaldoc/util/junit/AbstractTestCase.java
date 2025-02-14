@@ -43,7 +43,7 @@ import com.logicaldoc.util.time.Pause;
  */
 public abstract class AbstractTestCase {
 
-	private static Logger log = LoggerFactory.getLogger(AbstractTestCase.class);
+	private static final Logger log = LoggerFactory.getLogger(AbstractTestCase.class);
 
 	private static final String USER_HOME = "user.home";
 

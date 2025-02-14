@@ -10,9 +10,9 @@ import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
@@ -25,7 +25,7 @@ import com.logicaldoc.webservice.soap.client.SoapFolderClient;
 
 public class TstRecursiveImport extends BaseTestCase {
 
-	protected static Log log = LogFactory.getLog(TstRecursiveImport.class);
+	private static final Logger log = LoggerFactory.getLogger(TstRecursiveImport.class);
 
 	private static String[] extensionArray = new String[] { "pdf", "txt", "html", "gif", "jpg", "xls", "xlsx" };
 
@@ -40,8 +40,7 @@ public class TstRecursiveImport extends BaseTestCase {
 		super.setUp();
 
 		folderClient = new SoapFolderClient(settings.getProperty("url") + "/services/Folder");
-		documentClient = new SoapDocumentClient(
-				settings.getProperty("url") + "/services/Document");
+		documentClient = new SoapDocumentClient(settings.getProperty("url") + "/services/Document");
 	}
 
 	@Test

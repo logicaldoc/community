@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public class StreamHttpClientResponseHandler extends BaseHttpClientResponseHandler<String> {
 
-	protected static Logger log = LoggerFactory.getLogger(StreamHttpClientResponseHandler.class);
+	private static final Logger log = LoggerFactory.getLogger(StreamHttpClientResponseHandler.class);
 
 	private OutputStream stream;
 

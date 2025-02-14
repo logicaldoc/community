@@ -35,7 +35,7 @@ public class Geolocation {
 
 	private static final String CONST_GEOLOCATION = "geolocation";
 
-	private static Logger log = LoggerFactory.getLogger(Geolocation.class);
+	private static final Logger log = LoggerFactory.getLogger(Geolocation.class);
 
 	private String countryCode;
 

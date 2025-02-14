@@ -27,7 +27,7 @@ public class TagServiceImpl extends AbstractRemoteService implements TagService 
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(TagServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(TagServiceImpl.class);
 
 	@Override
 	public List<GUITag> getTagCloud() throws ServerException {

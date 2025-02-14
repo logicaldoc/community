@@ -24,7 +24,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
 public enum RunLevel {
 	DEFAULT("default"), BULKLOAD("bulkload"), DEVEL("devel"), DEMO("demo"), UPDATED("updated"), SLAVE("slave");
 
-	private static Logger log = LoggerFactory.getLogger(RunLevel.class);
+	private static final Logger log = LoggerFactory.getLogger(RunLevel.class);
 
 	private String level;
 

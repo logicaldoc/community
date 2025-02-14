@@ -35,7 +35,7 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class CacheControlFilter implements javax.servlet.Filter {
 
-	private static Logger log = LoggerFactory.getLogger(CacheControlFilter.class);
+	private static final Logger log = LoggerFactory.getLogger(CacheControlFilter.class);
 
 	/**
 	 * A map where key is the mapping pattern like *.js and value is the content

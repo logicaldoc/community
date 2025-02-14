@@ -11,9 +11,9 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
@@ -31,7 +31,7 @@ public class TstMassiveImport extends BaseTestCase {
 
 	private static final int MAX_DOCUMENTS_TOBE_INSERTED = 15000;
 
-	protected static Log log = LogFactory.getLog(TstMassiveImport.class);
+	private static final Logger log = LoggerFactory.getLogger(TstMassiveImport.class);
 
 	private long startTime;
 

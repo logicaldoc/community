@@ -7,8 +7,6 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
@@ -25,8 +23,6 @@ import com.logicaldoc.core.security.user.User;
  */
 @Component("apiKeyAuthenticator")
 public class ApiKeyAuthenticator extends DefaultAuthenticator {
-
-	protected static Logger log = LoggerFactory.getLogger(ApiKeyAuthenticator.class);
 
 	@Resource(name = "ApiKeyDAO")
 	protected ApiKeyDAO apiKeyDAO;

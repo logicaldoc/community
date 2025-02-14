@@ -9,8 +9,6 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.document.Document;
@@ -22,9 +20,7 @@ import com.logicaldoc.util.plugin.PluginException;
 import junit.framework.Assert;
 
 public class FulltextSearchTest extends AbstractCoreTestCase {
-
-	protected static Logger log = LoggerFactory.getLogger(FulltextSearchTest.class);
-
+	
 	protected SearchEngine testSubject;
 	
 	protected DocumentDAO documentDao;

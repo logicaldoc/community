@@ -22,7 +22,7 @@ import com.logicaldoc.util.io.ZipUtil;
  */
 public class ZipParser extends AbstractParser {
 
-	protected static Logger log = LoggerFactory.getLogger(ZipParser.class);
+	private static final Logger log = LoggerFactory.getLogger(ZipParser.class);
 
 	@Override
 	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content)

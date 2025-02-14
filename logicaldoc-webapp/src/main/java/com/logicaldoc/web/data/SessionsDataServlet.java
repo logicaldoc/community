@@ -35,7 +35,7 @@ import com.logicaldoc.web.util.ServletUtil;
  */
 public class SessionsDataServlet extends AbstractDataServlet {
 
-	protected static Logger log = LoggerFactory.getLogger(SessionsDataServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(SessionsDataServlet.class);
 
 	private static final String CLOSE_STATUS_LABEL = "</statusLabel>";
 

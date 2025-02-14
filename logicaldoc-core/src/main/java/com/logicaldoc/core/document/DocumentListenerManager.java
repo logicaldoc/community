@@ -27,7 +27,7 @@ public class DocumentListenerManager {
 
 	private static final String POSITION = "position";
 
-	protected static Logger log = LoggerFactory.getLogger(DocumentListenerManager.class);
+	private static final Logger log = LoggerFactory.getLogger(DocumentListenerManager.class);
 
 	private List<DocumentListener> listeners = new ArrayList<>();
 

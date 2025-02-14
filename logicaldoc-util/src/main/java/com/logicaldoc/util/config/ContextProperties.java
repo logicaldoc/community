@@ -46,7 +46,7 @@ public class ContextProperties extends OrderedProperties {
 
 	private File overrideFile;
 
-	protected static Logger log = LoggerFactory.getLogger(ContextProperties.class);
+	private static final Logger log = LoggerFactory.getLogger(ContextProperties.class);
 
 	protected int maxBackups = 10;
 

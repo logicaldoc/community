@@ -50,7 +50,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(DropboxServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(DropboxServiceImpl.class);
 
 	public static Session validateSession(HttpServletRequest request) throws InvalidSessionServerException {
 		String sid = SessionManager.get().getSessionId(request);

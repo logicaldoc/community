@@ -18,7 +18,7 @@ public class ImageDeskew {
 
 	private double minimumDeskewThreshold = 0.05d;
 
-	protected static Logger log = LoggerFactory.getLogger(ImageDeskew.class);
+	private static final Logger log = LoggerFactory.getLogger(ImageDeskew.class);
 
 	/**
 	 * Representation of a line in the image.

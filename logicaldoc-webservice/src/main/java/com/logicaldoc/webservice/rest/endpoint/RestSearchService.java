@@ -35,7 +35,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestSearchService extends SoapSearchService implements SearchService {
 
-	protected static Logger log = LoggerFactory.getLogger(RestSearchService.class);
+	private static final Logger log = LoggerFactory.getLogger(RestSearchService.class);
 
 	@POST
 	@Path("/find")

@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.util.io.FileUtil;
 
 public class CryptUtil {
-	private static Logger log = LoggerFactory.getLogger(CryptUtil.class);
+	private static final Logger log = LoggerFactory.getLogger(CryptUtil.class);
 
 	public static final String DESEDE_ENCRYPTION_SCHEME = "DESede";
 

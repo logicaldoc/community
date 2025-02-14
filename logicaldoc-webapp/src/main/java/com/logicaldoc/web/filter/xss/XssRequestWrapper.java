@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public class XssRequestWrapper extends HttpServletRequestWrapper {
 
-	protected static Logger log = LoggerFactory.getLogger(XssRequestWrapper.class);
+	private static final Logger log = LoggerFactory.getLogger(XssRequestWrapper.class);
 
 	public XssRequestWrapper(HttpServletRequest servletRequest) {
 		super(servletRequest);

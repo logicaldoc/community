@@ -43,7 +43,7 @@ public class ThumbnailManager {
 
 	public static final String SUFFIX_MOBILE = "mobile.png";
 
-	protected static Logger log = LoggerFactory.getLogger(ThumbnailManager.class);
+	private static final Logger log = LoggerFactory.getLogger(ThumbnailManager.class);
 
 	@Resource(name = "Store")
 	private Store store;

@@ -32,7 +32,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
 @Component("authenticationChain")
 public class AuthenticationChain extends AbstractAuthenticator {
 
-	private static Logger log = LoggerFactory.getLogger(AuthenticationChain.class);
+	private static final Logger log = LoggerFactory.getLogger(AuthenticationChain.class);
 
 	private List<Authenticator> authenticators = new ArrayList<>();
 

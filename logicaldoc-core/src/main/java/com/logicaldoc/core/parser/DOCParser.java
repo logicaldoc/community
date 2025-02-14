@@ -27,7 +27,7 @@ import com.logicaldoc.util.StringUtil;
  */
 public class DOCParser extends RTFParser {
 
-	protected static Logger log = LoggerFactory.getLogger(DOCParser.class);
+	private static final Logger log = LoggerFactory.getLogger(DOCParser.class);
 
 	@Override
 	public String parse(InputStream input, ParseParameters parameterObject) {

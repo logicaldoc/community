@@ -18,7 +18,7 @@ public class Client implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(Client.class);
+	private static final Logger log = LoggerFactory.getLogger(Client.class);
 
 	/**
 	 * An optional Identifier of the client, you must guarantee that this is

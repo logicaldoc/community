@@ -147,7 +147,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(DocumentServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(DocumentServiceImpl.class);
 
 	// Useful method for mocking the email sender inside unit tests
 	private static EMailSender emailSender;

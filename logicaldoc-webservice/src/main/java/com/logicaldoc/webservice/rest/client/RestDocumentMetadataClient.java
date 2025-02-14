@@ -16,7 +16,7 @@ import com.logicaldoc.webservice.rest.DocumentMetadataService;
 
 public class RestDocumentMetadataClient extends AbstractRestClient<DocumentMetadataService> {
 
-	protected static Logger log = LoggerFactory.getLogger(RestDocumentMetadataClient.class);
+	private static final Logger log = LoggerFactory.getLogger(RestDocumentMetadataClient.class);
 
 	public RestDocumentMetadataClient(String endpoint, String apiKey) {
 		this(endpoint, apiKey, -1);

@@ -56,7 +56,7 @@ public class FormatConverterManager {
 	 */
 	public static final String PDF_CONVERSION_SUFFIX = "conversion.pdf";
 
-	protected static Logger log = LoggerFactory.getLogger(FormatConverterManager.class);
+	private static final Logger log = LoggerFactory.getLogger(FormatConverterManager.class);
 
 	@Resource(name = "Store")
 	protected Store store;

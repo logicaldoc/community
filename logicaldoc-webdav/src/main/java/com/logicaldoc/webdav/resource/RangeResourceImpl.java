@@ -22,7 +22,7 @@ public class RangeResourceImpl extends DavResourceImpl {
 
 	private static final long serialVersionUID = 3923284739563663530L;
 
-	protected static Logger log = LoggerFactory.getLogger(RangeResourceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(RangeResourceImpl.class);
 
 	protected static final String CONTENT_TYPE_VALUE = "application/octet-stream";
 

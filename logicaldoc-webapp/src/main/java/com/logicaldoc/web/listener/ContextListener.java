@@ -19,7 +19,7 @@ import com.logicaldoc.util.config.ContextProperties;
  */
 public class ContextListener extends ContextLoaderListener {
 
-	private static Logger log = LoggerFactory.getLogger(ContextListener.class);
+	private static final Logger log = LoggerFactory.getLogger(ContextListener.class);
 
 	@Override
 	public void contextDestroyed(ServletContextEvent event) {

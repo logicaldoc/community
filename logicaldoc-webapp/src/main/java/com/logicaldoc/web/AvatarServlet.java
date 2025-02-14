@@ -33,7 +33,7 @@ public class AvatarServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -6956612970433309888L;
 
-	protected static Logger log = LoggerFactory.getLogger(AvatarServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(AvatarServlet.class);
 
 	/**
 	 * Constructor of the object.

@@ -24,7 +24,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  */
 public class SystemInfo {
 
-	protected static Logger log = LoggerFactory.getLogger(SystemInfo.class);
+	private static final Logger log = LoggerFactory.getLogger(SystemInfo.class);
 
 	protected static final long serialVersionUID = 1L;
 

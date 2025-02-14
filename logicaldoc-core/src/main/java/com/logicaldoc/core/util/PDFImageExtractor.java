@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PDFImageExtractor implements AutoCloseable {
 
-	protected static Logger log = LoggerFactory.getLogger(PDFImageExtractor.class);
+	private static final Logger log = LoggerFactory.getLogger(PDFImageExtractor.class);
 
 	private PDDocument document = null;
 

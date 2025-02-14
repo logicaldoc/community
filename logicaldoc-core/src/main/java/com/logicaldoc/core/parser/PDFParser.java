@@ -28,7 +28,7 @@ public class PDFParser extends AbstractParser {
 
 	private static final String CAN_NOT_GET_PDF_DOCUMENT_FOR_PARSING = "Can not get pdf document for parsing";
 
-	protected static Logger log = LoggerFactory.getLogger(PDFParser.class);
+	private static final Logger log = LoggerFactory.getLogger(PDFParser.class);
 
 	@Override
 	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content)

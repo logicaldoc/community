@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestSystemService extends SoapSystemService implements SystemService {
 
-	protected static Logger log = LoggerFactory.getLogger(RestSystemService.class);
+	private static final Logger log = LoggerFactory.getLogger(RestSystemService.class);
 
 	@Override
 	@GET

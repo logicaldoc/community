@@ -29,7 +29,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
 @Component("taskManager")
 public class TaskManager {
 
-	protected static Logger log = LoggerFactory.getLogger(TaskManager.class);
+	private static final Logger log = LoggerFactory.getLogger(TaskManager.class);
 
 	/**
 	 * Retrieves the collection of all defined tasks: the ones enlisted in the

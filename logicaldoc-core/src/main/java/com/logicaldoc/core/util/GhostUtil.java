@@ -31,7 +31,7 @@ public class GhostUtil {
 
 	private static final String D_BATCH = "-dBATCH";
 
-	protected static Logger log = LoggerFactory.getLogger(GhostUtil.class);
+	private static final Logger log = LoggerFactory.getLogger(GhostUtil.class);
 
 	private GhostUtil() {
 	}

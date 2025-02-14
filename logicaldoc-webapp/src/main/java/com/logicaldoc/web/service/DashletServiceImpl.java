@@ -29,7 +29,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(DashletServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(DashletServiceImpl.class);
 
 	@Override
 	public void save(GUIDashlet guiDashlet) throws ServerException {

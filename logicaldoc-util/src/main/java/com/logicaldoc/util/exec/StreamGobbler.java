@@ -16,7 +16,7 @@ public class StreamGobbler extends Thread {
 
 	private InputStream is;
 
-	protected static Logger log = LoggerFactory.getLogger(StreamGobbler.class);
+	private static final Logger log = LoggerFactory.getLogger(StreamGobbler.class);
 
 	public StreamGobbler(InputStream is) {
 		this.is = is;

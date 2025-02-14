@@ -36,7 +36,7 @@ import com.logicaldoc.webservice.soap.SystemService;
  */
 public class SoapSystemService extends AbstractService implements SystemService {
 
-	protected static Logger log = LoggerFactory.getLogger(SoapSystemService.class);
+	private static final Logger log = LoggerFactory.getLogger(SoapSystemService.class);
 
 	@Override
 	public List<WSParameter> getStatistics(String sid)

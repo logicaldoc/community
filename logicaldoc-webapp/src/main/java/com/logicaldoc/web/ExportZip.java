@@ -39,7 +39,7 @@ public class ExportZip extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(ExportZip.class);
+	private static final Logger log = LoggerFactory.getLogger(ExportZip.class);
 
 	/**
 	 * Constructor of the object.

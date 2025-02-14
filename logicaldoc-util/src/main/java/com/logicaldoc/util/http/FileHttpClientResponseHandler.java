@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FileHttpClientResponseHandler extends BaseHttpClientResponseHandler<String> {
 
-	protected static Logger log = LoggerFactory.getLogger(FileHttpClientResponseHandler.class);
+	private static final Logger log = LoggerFactory.getLogger(FileHttpClientResponseHandler.class);
 
 	private File file;
 

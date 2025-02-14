@@ -12,7 +12,7 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 
 public class TagSearchTest extends AbstractCoreTestCase {
 
-	protected static Logger log = LoggerFactory.getLogger(TagSearchTest.class);
+	private static final Logger log = LoggerFactory.getLogger(TagSearchTest.class);
 
 	@Test
 	public void testSearch() {

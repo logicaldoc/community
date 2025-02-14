@@ -22,7 +22,7 @@ public class EasyX509TrustManager implements X509TrustManager {
 
 	private static final String LDOC_SSL_VALIDATE = "ldoc.ssl.validate";
 
-	private static Logger log = LoggerFactory.getLogger(EasyX509TrustManager.class);
+	private static final Logger log = LoggerFactory.getLogger(EasyX509TrustManager.class);
 
 	private static X509TrustManager dafaultTrustManager = null;
 

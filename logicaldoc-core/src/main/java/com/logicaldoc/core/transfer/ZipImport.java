@@ -44,7 +44,7 @@ public class ZipImport {
 
 	protected User user;
 
-	protected static Logger log = LoggerFactory.getLogger(ZipImport.class);
+	private static final Logger log = LoggerFactory.getLogger(ZipImport.class);
 
 	protected File zipFile;
 

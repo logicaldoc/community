@@ -56,7 +56,7 @@ public class LogDownload extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(LogDownload.class);
+	private static final Logger log = LoggerFactory.getLogger(LogDownload.class);
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

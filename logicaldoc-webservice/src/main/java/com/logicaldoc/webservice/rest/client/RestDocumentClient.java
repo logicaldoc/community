@@ -28,7 +28,7 @@ import com.logicaldoc.webservice.rest.DocumentService;
 
 public class RestDocumentClient extends AbstractRestClient<DocumentService> {
 
-	protected static Logger log = LoggerFactory.getLogger(RestDocumentClient.class);
+	private static final Logger log = LoggerFactory.getLogger(RestDocumentClient.class);
 
 	public RestDocumentClient(String endpoint, String apiKey) {
 		this(endpoint, apiKey, -1);

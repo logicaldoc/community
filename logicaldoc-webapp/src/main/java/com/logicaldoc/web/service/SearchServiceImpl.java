@@ -53,7 +53,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(SearchServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(SearchServiceImpl.class);
 
 	@Override
 	public GUIResult search(GUISearchOptions options) throws ServerException {

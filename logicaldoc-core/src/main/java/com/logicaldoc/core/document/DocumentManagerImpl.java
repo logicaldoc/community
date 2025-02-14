@@ -89,7 +89,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	private static final String DOCUMENT_IS_IMMUTABLE = "Document is immutable";
 
-	protected static Logger log = LoggerFactory.getLogger(DocumentManagerImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(DocumentManagerImpl.class);
 
 	@Resource(name = "DocumentDAO")
 	protected DocumentDAO documentDAO;

@@ -56,7 +56,7 @@ public class EventEndpoint implements EventListener {
 	// FIFO queue
 	private Map<String, Queue<Long>> fifos = new HashMap<>();
 
-	private static Logger log = LoggerFactory.getLogger(EventEndpoint.class);
+	private static final Logger log = LoggerFactory.getLogger(EventEndpoint.class);
 
 	private static final Set<String> MONITORED_EVENTS = new HashSet<>(Arrays.asList(DocumentEvent.STORED.toString(),
 			DocumentEvent.CHANGED.toString(), DocumentEvent.CHECKEDIN.toString(), DocumentEvent.CHECKEDOUT.toString(),

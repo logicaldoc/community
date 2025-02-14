@@ -27,7 +27,7 @@ public class FolderListenerManager {
 
 	private static final String POSITION = "position";
 
-	protected static Logger log = LoggerFactory.getLogger(FolderListenerManager.class);
+	private static final Logger log = LoggerFactory.getLogger(FolderListenerManager.class);
 
 	private List<FolderListener> listeners = new ArrayList<>();
 

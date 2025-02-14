@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Utility methods to handle collections
  * 
@@ -15,8 +12,6 @@ import org.slf4j.LoggerFactory;
  */
 @AutomationDictionary
 public class CollectionTool {
-
-	protected static Logger log = LoggerFactory.getLogger(CollectionTool.class);
 
 	/**
 	 * Converts an array into a list

@@ -35,7 +35,7 @@ public class DefaultHandler implements IOHandler {
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(DefaultHandler.class);
+	private static final Logger log = LoggerFactory.getLogger(DefaultHandler.class);
 
 	private String collectionNodetype = JcrConstants.NT_FOLDER;
 

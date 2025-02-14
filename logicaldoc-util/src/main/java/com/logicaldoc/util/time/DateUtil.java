@@ -22,7 +22,7 @@ public class DateUtil {
 
 	private static final String YYYY_MM_DD = "yyyy-MM-dd";
 
-	protected static Logger log = LoggerFactory.getLogger(DateUtil.class);
+	private static final Logger log = LoggerFactory.getLogger(DateUtil.class);
 
 	private DateUtil() {
 		throw new IllegalStateException("Utility class");

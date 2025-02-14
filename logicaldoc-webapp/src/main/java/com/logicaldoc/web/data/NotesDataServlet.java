@@ -35,7 +35,7 @@ public class NotesDataServlet extends AbstractDataServlet {
 
 	private static final String FILE_VERSION = "fileVersion";
 
-	protected static Logger logger = LoggerFactory.getLogger(NotesDataServlet.class);
+	private static final Logger logger = LoggerFactory.getLogger(NotesDataServlet.class);
 
 	private static final long serialVersionUID = 1L;
 

@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EncodingWebdavRequest extends WebdavRequestImpl {
 	
-	protected static Logger log = LoggerFactory.getLogger(EncodingWebdavRequest.class);
+	private static final Logger log = LoggerFactory.getLogger(EncodingWebdavRequest.class);
 
 	private HttpServletRequest request;
 

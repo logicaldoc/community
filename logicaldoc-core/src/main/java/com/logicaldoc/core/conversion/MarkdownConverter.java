@@ -6,8 +6,6 @@ import java.io.IOException;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.Context;
@@ -20,8 +18,6 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 7.7
  */
 public class MarkdownConverter extends AbstractFormatConverter {
-
-	protected static Logger log = LoggerFactory.getLogger(MarkdownConverter.class);
 
 	@Override
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {

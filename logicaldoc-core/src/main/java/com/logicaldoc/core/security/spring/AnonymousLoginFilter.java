@@ -24,7 +24,7 @@ import com.logicaldoc.util.config.ContextProperties;
 
 public class AnonymousLoginFilter extends GenericFilterBean {
 
-	private static Logger log = LoggerFactory.getLogger(AnonymousLoginFilter.class);
+	private static final Logger log = LoggerFactory.getLogger(AnonymousLoginFilter.class);
 
 	static final String FILTER_APPLIED = "__com_logicaldoc_core_security_spring_AnonymousLoginFilter_applied";
 

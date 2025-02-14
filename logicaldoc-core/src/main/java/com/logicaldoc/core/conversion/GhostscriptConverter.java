@@ -6,9 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.exec.Exec;
 import com.logicaldoc.util.io.FileUtil;
@@ -20,8 +17,6 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 8.5.1
  */
 public class GhostscriptConverter extends AbstractFormatConverter {
-
-	protected static Logger log = LoggerFactory.getLogger(GhostscriptConverter.class);
 
 	@Override
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {

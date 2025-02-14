@@ -36,7 +36,7 @@ public class DocumentResourceUpload extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(DocumentResourceUpload.class);
+	private static final Logger log = LoggerFactory.getLogger(DocumentResourceUpload.class);
 
 	public static final String DOC_ID = "docId";
 

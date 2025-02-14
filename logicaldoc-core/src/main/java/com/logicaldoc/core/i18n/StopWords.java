@@ -24,7 +24,7 @@ import com.logicaldoc.util.io.ResourceUtil;
  */
 public abstract class StopWords {
 
-	protected static Logger log = LoggerFactory.getLogger(StopWords.class);
+	private static final Logger log = LoggerFactory.getLogger(StopWords.class);
 
 	private static final Map<Locale, Set<String>> cacheMap = new HashMap<>();
 	

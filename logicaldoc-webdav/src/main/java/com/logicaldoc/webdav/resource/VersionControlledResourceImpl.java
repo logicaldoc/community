@@ -40,7 +40,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(VersionControlledResourceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(VersionControlledResourceImpl.class);
 
 	public VersionControlledResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
 			ResourceConfig config, Resource resource) throws DavException {

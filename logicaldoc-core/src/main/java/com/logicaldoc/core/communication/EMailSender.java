@@ -81,7 +81,7 @@ public class EMailSender {
 
 	private static final String THREAD_POOL = "Email";
 
-	private static Logger log = LoggerFactory.getLogger(EMailSender.class);
+	private static final Logger log = LoggerFactory.getLogger(EMailSender.class);
 
 	public static final int SECURITY_NONE = 0;
 

@@ -3,9 +3,6 @@ package com.logicaldoc.core.conversion;
 import java.io.File;
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
@@ -18,8 +15,6 @@ import com.logicaldoc.util.io.P7M;
  * @since 7.7
  */
 public class P7MConverter extends AbstractFormatConverter {
-
-	protected static Logger log = LoggerFactory.getLogger(P7MConverter.class);
 
 	@Override
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {

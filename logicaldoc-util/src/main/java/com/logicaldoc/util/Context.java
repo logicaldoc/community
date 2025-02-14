@@ -36,7 +36,7 @@ import net.sf.ehcache.CacheManager;
  */
 public class Context implements ApplicationContextAware, ApplicationListener<ApplicationEvent> {
 
-	protected static Logger log = LoggerFactory.getLogger(Context.class);
+	private static final Logger log = LoggerFactory.getLogger(Context.class);
 
 	private static Map<SystemEventStatus, LinkedList<SystemEventListener>> systemEvents = new EnumMap<>(
 			SystemEventStatus.class);

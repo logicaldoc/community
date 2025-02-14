@@ -25,7 +25,7 @@ public class EMailAttachment implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(EMailAttachment.class);
+	private static final Logger log = LoggerFactory.getLogger(EMailAttachment.class);
 
 	private String icon = "";
 

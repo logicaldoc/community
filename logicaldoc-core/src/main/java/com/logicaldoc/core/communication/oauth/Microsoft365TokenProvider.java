@@ -28,7 +28,7 @@ import com.logicaldoc.util.http.HttpUtil;
  */
 public class Microsoft365TokenProvider implements TokenProvider {
 
-	protected static Logger log = LoggerFactory.getLogger(Microsoft365TokenProvider.class);
+	private static final Logger log = LoggerFactory.getLogger(Microsoft365TokenProvider.class);
 
 	private String clientSecret;
 

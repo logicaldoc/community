@@ -5,9 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
@@ -20,8 +17,6 @@ import com.logicaldoc.util.io.ZipUtil;
  * @since 8.4.1
  */
 public class ZipConverter extends CompressedArchiveConverter {
-
-	protected static Logger log = LoggerFactory.getLogger(ZipConverter.class);
 
 	@Override
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {

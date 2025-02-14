@@ -17,7 +17,7 @@ import com.logicaldoc.util.time.TimeDiff;
  */
 public class NotifyingThread extends Thread {
 
-	private static Logger log = LoggerFactory.getLogger(NotifyingThread.class);
+	private static final Logger log = LoggerFactory.getLogger(NotifyingThread.class);
 
 	/**
 	 * The start time in milliseconds

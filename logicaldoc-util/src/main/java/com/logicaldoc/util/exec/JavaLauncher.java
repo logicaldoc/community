@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JavaLauncher {
 
-	protected static Logger log = LoggerFactory.getLogger(JavaLauncher.class);
+	private static final Logger log = LoggerFactory.getLogger(JavaLauncher.class);
 
 	private static boolean debug = false;
 

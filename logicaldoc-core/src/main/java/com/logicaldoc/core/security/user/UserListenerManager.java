@@ -26,7 +26,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
 public class UserListenerManager {
 	private static final String POSITION = "position";
 
-	protected static Logger log = LoggerFactory.getLogger(UserListenerManager.class);
+	private static final Logger log = LoggerFactory.getLogger(UserListenerManager.class);
 
 	private List<UserListener> listeners = new ArrayList<>();
 

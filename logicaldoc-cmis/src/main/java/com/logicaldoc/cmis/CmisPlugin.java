@@ -20,7 +20,8 @@ import com.logicaldoc.util.plugin.PluginException;
  * @since 6.5.1
  */
 public class CmisPlugin extends LogicalDOCPlugin {
-	protected static Logger log = LoggerFactory.getLogger(CmisPlugin.class);
+	
+	private static final Logger log = LoggerFactory.getLogger(CmisPlugin.class);
 
 	private static final String SERVLET_NAME = "Cmis";
 

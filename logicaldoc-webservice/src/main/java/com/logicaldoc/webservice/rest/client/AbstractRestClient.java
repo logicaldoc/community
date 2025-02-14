@@ -21,7 +21,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
  */
 public abstract class AbstractRestClient<T> {
 
-	protected static Logger log = LoggerFactory.getLogger(AbstractRestClient.class);
+	private static final Logger log = LoggerFactory.getLogger(AbstractRestClient.class);
 
 	protected String endpoint;
 

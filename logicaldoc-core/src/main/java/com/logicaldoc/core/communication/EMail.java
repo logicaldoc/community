@@ -28,7 +28,7 @@ public class EMail extends Message {
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(EMail.class);
+	private static final Logger log = LoggerFactory.getLogger(EMail.class);
 
 	private String authorAddress = "";
 

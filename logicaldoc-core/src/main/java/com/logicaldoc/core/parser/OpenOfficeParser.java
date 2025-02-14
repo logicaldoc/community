@@ -34,7 +34,7 @@ import com.logicaldoc.util.io.ZipUtil;
  */
 public class OpenOfficeParser extends AbstractParser {
 
-	protected static Logger log = LoggerFactory.getLogger(OpenOfficeParser.class);
+	private static final Logger log = LoggerFactory.getLogger(OpenOfficeParser.class);
 
 	/**
 	 * XML handler to extract the texts crom the ODF content.xml

@@ -23,7 +23,7 @@ import com.logicaldoc.util.plugin.PluginException;
  */
 public class CorePlugin extends LogicalDOCPlugin {
 
-	protected static Logger log = LoggerFactory.getLogger(CorePlugin.class);
+	private static final Logger log = LoggerFactory.getLogger(CorePlugin.class);
 
 	@Override
 	protected void onStart() throws PluginException {

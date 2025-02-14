@@ -35,7 +35,7 @@ public class JobsDataServlet extends AbstractDataServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger logger = LoggerFactory.getLogger(JobsDataServlet.class);
+	private static final Logger logger = LoggerFactory.getLogger(JobsDataServlet.class);
 
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,

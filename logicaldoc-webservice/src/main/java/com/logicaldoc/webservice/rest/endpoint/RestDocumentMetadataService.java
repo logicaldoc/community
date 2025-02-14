@@ -40,7 +40,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestDocumentMetadataService extends SoapDocumentMetadataService implements DocumentMetadataService {
 
-	protected static Logger log = LoggerFactory.getLogger(RestDocumentMetadataService.class);
+	private static final Logger log = LoggerFactory.getLogger(RestDocumentMetadataService.class);
 
 	@Override
 	@PUT

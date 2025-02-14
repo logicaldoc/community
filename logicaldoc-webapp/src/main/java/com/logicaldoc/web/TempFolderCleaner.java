@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  * @since 8.8.2
  */
 public class TempFolderCleaner {
-	protected static Logger log = LoggerFactory.getLogger(TempFolderCleaner.class);
+	private static final Logger log = LoggerFactory.getLogger(TempFolderCleaner.class);
 
 	public void clean() {
 		File tempDir = new File(System.getProperty("java.io.tmpdir"));

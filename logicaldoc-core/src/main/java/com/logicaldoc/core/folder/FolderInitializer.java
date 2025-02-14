@@ -2,9 +2,6 @@ package com.logicaldoc.core.folder;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.metadata.initialization.Initializer;
 
@@ -17,8 +14,6 @@ import com.logicaldoc.core.metadata.initialization.Initializer;
 public class FolderInitializer extends Initializer implements FolderListener {
 
 	private static final String INITIALIZED_FLAG = "initialized";
-
-	protected static Logger log = LoggerFactory.getLogger(FolderInitializer.class);
 
 	@Override
 	public void beforeStore(Folder folder, FolderHistory transaction, Map<String, Object> dictionary)

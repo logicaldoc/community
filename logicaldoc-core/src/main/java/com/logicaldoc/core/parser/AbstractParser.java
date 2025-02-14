@@ -27,7 +27,7 @@ import com.logicaldoc.util.Context;
  */
 public abstract class AbstractParser implements Parser {
 
-	protected static Logger log = LoggerFactory.getLogger(AbstractParser.class);
+	protected static final Logger log = LoggerFactory.getLogger(AbstractParser.class);
 
 	@Override
 	public String parse(File file, String filename, String encoding, Locale locale, String tenant)

@@ -39,7 +39,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(AttributeSetServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(AttributeSetServiceImpl.class);
 
 	@Override
 	public void delete(long setId) throws ServerException {

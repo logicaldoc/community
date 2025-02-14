@@ -28,7 +28,7 @@ public abstract class AbstractDataServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(AbstractDataServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(AbstractDataServlet.class);
 
 	protected static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 

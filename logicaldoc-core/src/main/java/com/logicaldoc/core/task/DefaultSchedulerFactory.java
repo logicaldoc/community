@@ -29,7 +29,7 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 
 	private static final String SCHEDULED_TASKS = "scheduledTasks";
 
-	protected static Logger log = LoggerFactory.getLogger(DefaultSchedulerFactory.class);
+	private static final Logger log = LoggerFactory.getLogger(DefaultSchedulerFactory.class);
 
 	@Override
 	public void start() throws SchedulingException {

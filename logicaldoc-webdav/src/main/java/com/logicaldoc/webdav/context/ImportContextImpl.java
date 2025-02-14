@@ -24,7 +24,7 @@ import com.logicaldoc.webdav.resource.model.Resource;
  */
 public class ImportContextImpl implements ImportContext {
 
-	protected static Logger log = LoggerFactory.getLogger(ImportContextImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(ImportContextImpl.class);
 
 	private final Resource resource;
 

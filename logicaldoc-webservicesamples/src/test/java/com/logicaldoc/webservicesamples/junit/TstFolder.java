@@ -3,9 +3,9 @@ package com.logicaldoc.webservicesamples.junit;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
@@ -16,7 +16,7 @@ import com.logicaldoc.webservice.soap.client.SoapFolderClient;
 
 public class TstFolder extends BaseTestCase {
 
-	protected static Log log = LogFactory.getLog(TstFolder.class);
+	private static final Logger log = LoggerFactory.getLogger(TstFolder.class);
 
 	private SoapFolderClient folderClient;
 

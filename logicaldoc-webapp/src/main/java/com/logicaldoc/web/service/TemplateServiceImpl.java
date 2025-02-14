@@ -54,7 +54,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(TemplateServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(TemplateServiceImpl.class);
 
 	@Override
 	public void delete(long templateId) throws ServerException {

@@ -25,7 +25,7 @@ import com.logicaldoc.util.plugin.PluginException;
 
 public class PDFParserTest extends AbstractCoreTestCase {
 
-	protected static Logger log = LoggerFactory.getLogger(PDFParserTest.class);
+	private static final Logger log = LoggerFactory.getLogger(PDFParserTest.class);
 
 	/**
 	 * @throws java.lang.Exception

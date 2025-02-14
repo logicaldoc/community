@@ -63,7 +63,7 @@ public class Automation {
 
 	public static final String PARAMETERS_NAMES = "parametersnames";
 
-	private static Logger log = LoggerFactory.getLogger(Automation.class);
+	private static final Logger log = LoggerFactory.getLogger(Automation.class);
 
 	private String logTag = "AutomationEngine";
 

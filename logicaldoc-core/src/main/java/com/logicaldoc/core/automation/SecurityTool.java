@@ -22,7 +22,7 @@ import com.logicaldoc.util.Context;
 @AutomationDictionary
 public class SecurityTool {
 
-	protected static Logger log = LoggerFactory.getLogger(SecurityTool.class);
+	private static final Logger log = LoggerFactory.getLogger(SecurityTool.class);
 
 	/**
 	 * Retrieves a user object

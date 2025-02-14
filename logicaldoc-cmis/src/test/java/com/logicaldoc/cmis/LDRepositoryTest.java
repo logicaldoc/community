@@ -70,11 +70,11 @@ import com.logicaldoc.util.plugin.PluginException;
 
 public class LDRepositoryTest extends AbstractCmisTestCase {
 
+	private static final Logger log = LoggerFactory.getLogger(LDRepositoryTest.class);
+	
 	private FolderDAO fdao;
 
 	private DocumentDAO ddao;
-
-	protected static Logger log = LoggerFactory.getLogger(LDRepositoryTest.class);
 
 	protected SearchEngine engine;
 

@@ -34,7 +34,7 @@ import com.logicaldoc.util.StringUtil;
  */
 public class XMLParser extends AbstractParser {
 
-	protected static Logger log = LoggerFactory.getLogger(XMLParser.class);
+	private static final Logger log = LoggerFactory.getLogger(XMLParser.class);
 
 	@Override
 	public void internalParse(InputStream input, ParseParameters parameters, StringBuilder content) {

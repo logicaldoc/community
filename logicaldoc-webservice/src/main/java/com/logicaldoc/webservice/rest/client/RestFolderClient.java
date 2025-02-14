@@ -17,7 +17,7 @@ import com.logicaldoc.webservice.rest.FolderService;
 
 public class RestFolderClient extends AbstractRestClient<FolderService> {
 
-	protected static Logger log = LoggerFactory.getLogger(RestFolderClient.class);
+	private static final Logger log = LoggerFactory.getLogger(RestFolderClient.class);
 
 	public RestFolderClient(String endpoint, String apiKey) {
 		this(endpoint, apiKey, -1);

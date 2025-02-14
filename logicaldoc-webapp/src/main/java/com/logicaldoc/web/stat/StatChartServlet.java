@@ -37,7 +37,7 @@ public class StatChartServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger log = LoggerFactory.getLogger(StatChartServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(StatChartServlet.class);
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {

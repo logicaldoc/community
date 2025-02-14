@@ -20,7 +20,7 @@ public class FolderValidator extends Validator implements FolderListener {
 
 	private static final String VALIDATED_FLAG = "validated";
 
-	protected static Logger log = LoggerFactory.getLogger(FolderValidator.class);
+	private static final Logger log = LoggerFactory.getLogger(FolderValidator.class);
 
 	@Override
 	public void beforeStore(Folder folder, FolderHistory transaction, Map<String, Object> dictionary)

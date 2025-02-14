@@ -29,7 +29,7 @@ public class WSDocument implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@WSDoc(documented = false)
-	protected static Logger log = LoggerFactory.getLogger(WSDocument.class);
+	private static final Logger log = LoggerFactory.getLogger(WSDocument.class);
 
 	@WSDoc(documented = false)
 	public static final int DOC_UNLOCKED = 0;
