@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -137,6 +138,10 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			davSession.putObject("user", user);
 
 			webdavRequest.setDavSession(davSession);
+			
+			// Add session cookie to the response
+			Cookie scookie = new Cookie("ldoc-sid", session.getSid());
+			webdavResponse.addCookie(scookie);			
 
 			getPath(webdavRequest);
 
