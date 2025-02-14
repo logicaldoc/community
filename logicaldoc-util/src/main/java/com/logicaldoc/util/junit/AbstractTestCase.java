@@ -55,6 +55,8 @@ public abstract class AbstractTestCase {
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
+		System.setProperty("LOGICALDOC_REPOSITORY", "target");
+		
 		loadDevelSettings();
 
 		updateUserHome();

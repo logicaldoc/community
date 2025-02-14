@@ -27,10 +27,6 @@ import com.logicaldoc.util.plugin.PluginException;
  */
 public abstract class AbstractCmisTestCase extends AbstractTestCase {
 
-	static {
-		System.setProperty("LOGICALDOC_REPOSITORY", "target");
-	}
-
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();

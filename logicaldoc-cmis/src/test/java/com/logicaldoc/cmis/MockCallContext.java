@@ -105,7 +105,7 @@ public class MockCallContext implements CallContext {
 
 	@Override
 	public String getUsername() {
-		return "admin";
+		return username;
 	}
 
 	@Override
