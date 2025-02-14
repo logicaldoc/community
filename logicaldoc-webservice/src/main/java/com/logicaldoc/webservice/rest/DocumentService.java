@@ -17,6 +17,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
@@ -542,7 +543,7 @@ public interface DocumentService {
 	@GET
 	@Path("/thumbnail/{type}/{docpath:.*}")
 	@Produces("image/jpeg")
-	public DataHandler getThumbnail(@PathParam("type")
+	public Response getThumbnail(@PathParam("type")
 	String type, @PathParam("docpath")
 	String docPath, @PathParam("docpath")
 	List<PathSegment> docPathList)

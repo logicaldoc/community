@@ -105,7 +105,7 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 	public void testRename() throws Exception {
 		Folder folder = folderDao.findById(103);
 		assertNotNull(folder);
-		assertEquals("menu.admin", folder.getName());
+		assertEquals("menu.admin103", folder.getName());
 		folderDao.initialize(folder);
 
 		soapFolderService.rename("", 103, "paperino");
@@ -125,7 +125,7 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 		WSFolder wsFolder = soapFolderService.getFolder("", 103);
 
 		assertEquals(103, wsFolder.getId());
-		assertEquals("menu.admin", wsFolder.getName());
+		assertEquals("menu.admin103", wsFolder.getName());
 		assertEquals(101, wsFolder.getParentId());
 		assertEquals("description", wsFolder.getDescription());
 
@@ -196,4 +196,16 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 		assertEquals(1, folders.size());
 		assertEquals("Default", folders.get(0).getName());
 	}
+	
+	@Test
+	public void testGetPath()  throws Exception {
+		List<WSFolder> sss = soapFolderService.getPath("", 103);
+		for (WSFolder wsFolder : sss) {
+			System.out.println(wsFolder.getId());
+			System.out.println(wsFolder.getName());
+		}
+		assertNotNull(sss);
+		assertEquals(sss.size(), 4);		
+	}	
+	
 }
