@@ -65,7 +65,6 @@ public class StoresDataServlet extends AbstractDataServlet {
 				writer.print("<id />");
 				writer.print("<name />");
 				writer.print("<path />");
-				writer.print("<write>blank</write>");
 				writer.print("<type>fs</type>");
 				writer.print(CLOSE_STORE);
 			}
@@ -87,7 +86,7 @@ public class StoresDataServlet extends AbstractDataServlet {
 			writer.print("<id>" + i + "</id>");
 			writer.print("<name>Store " + i + "</name>");
 			writer.print("<path><![CDATA[" + path + "]]></path>");
-			writer.print("<write>" + (conf.getInt("store.write") == i ? "database_edit" : "blank") + "</write>");
+			writer.print("<write>" + Boolean.toString(conf.getInt("store.write") == i) + "</write>");
 			String type = conf.getProperty(STORE + i + ".type");
 			if (StringUtils.isEmpty(type))
 				type = "fs";

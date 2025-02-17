@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.data.StoresDS;
@@ -13,17 +13,17 @@ import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -42,8 +42,6 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 public class StoresPanel extends VLayout {
 
 	private static final String STORE = "store.";
-
-	private static final String DATABASE_EDIT = "database_edit";
 
 	private static final String VALUE = "value";
 
@@ -139,14 +137,21 @@ public class StoresPanel extends VLayout {
 
 		ListGridField type = prepareTypeField();
 
-		ListGridField write = new ListGridField(WRITE, " ", 20);
-		write.setType(ListGridFieldType.IMAGE);
+		ListGridField write = new ListGridField(WRITE, " ", 30);
 		write.setCanSort(false);
-		write.setAlign(Alignment.CENTER);
-		write.setShowDefaultContextMenu(false);
-		write.setImageURLPrefix(Util.imagePrefix());
-		write.setImageURLSuffix(".png");
 		write.setCanFilter(false);
+		write.setCellFormatter(new CellFormatter() {
+
+			@Override
+			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
+				String content = "";
+				if (Boolean.TRUE.equals(rec.getAttributeAsBoolean(WRITE))) {
+					content = "<div style='display: flex; text-align: center; justify-content: center;'>"
+							+ AwesomeFactory.getIconButtonHTML("database", null, "default", null, null) + "</div>";
+				}
+				return content;
+			}
+		});
 
 		storesGrid.setFields(id, write, name, type, path);
 		storesGrid.setAutoFetchData(true);
@@ -238,7 +243,7 @@ public class StoresPanel extends VLayout {
 	 * Prepares the context menu
 	 */
 	private void showContextMenu() {
-		MenuItem makeWrite = prepareMakeWriteMenuItem();
+		MenuItem makeWrite = prepareMakeDefaultWriteMenuItem();
 
 		MenuItem test = prepareTestMenuItem();
 
@@ -260,7 +265,7 @@ public class StoresPanel extends VLayout {
 				doRemoveStore(selectedStoreId);
 			}
 		}));
-		delete.setEnabled(!Session.get().isDemo() && !DATABASE_EDIT.equals(selectedRecord.getAttributeAsString(WRITE)));
+		delete.setEnabled(!Session.get().isDemo() && !selectedRecord.getAttributeAsBoolean(WRITE));
 		return delete;
 	}
 
@@ -298,17 +303,17 @@ public class StoresPanel extends VLayout {
 		return test;
 	}
 
-	private MenuItem prepareMakeWriteMenuItem() {
+	private MenuItem prepareMakeDefaultWriteMenuItem() {
 		MenuItem makeWrite = new MenuItem();
 		makeWrite.setTitle(I18N.message("makedefwritestore"));
 		makeWrite.addClickHandler(event -> {
 			ListGridRecord[] recs = storesGrid.getRecords();
 			for (ListGridRecord rec : recs) {
-				rec.setAttribute(WRITE, "blank");
+				rec.setAttribute(WRITE, false);
 				storesGrid.refreshRow(storesGrid.getRowNum(rec));
 			}
 			ListGridRecord selectedRecord = storesGrid.getSelectedRecord();
-			selectedRecord.setAttribute(WRITE, DATABASE_EDIT);
+			selectedRecord.setAttribute(WRITE, true);
 			storesGrid.refreshRow(storesGrid.getRowNum(storesGrid.getSelectedRecord()));
 		});
 		makeWrite.setEnabled(!Session.get().isDemo());
@@ -345,7 +350,7 @@ public class StoresPanel extends VLayout {
 						new GUIParameter(STORE + storeId + ".dir", storeRecord.getAttributeAsString("path").trim()));
 				settings.add(
 						new GUIParameter(STORE + storeId + ".type", storeRecord.getAttributeAsString("type").trim()));
-				if (DATABASE_EDIT.equals(storeRecord.getAttributeAsString(WRITE))) {
+				if (storeRecord.getAttributeAsBoolean(WRITE)) {
 					settings.add(new GUIParameter("store.write", storeId));
 				}
 
@@ -398,7 +403,7 @@ public class StoresPanel extends VLayout {
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

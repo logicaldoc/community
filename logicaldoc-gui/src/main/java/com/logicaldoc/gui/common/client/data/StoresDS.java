@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.common.client.data;
 
 import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.fields.DataSourceImageField;
+import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -19,7 +19,7 @@ public class StoresDS extends DataSource {
 		id.setPrimaryKey(true);
 		DataSourceTextField name = new DataSourceTextField("name");
 		DataSourceTextField path = new DataSourceTextField("path");
-		DataSourceImageField write = new DataSourceImageField("write");
+		DataSourceBooleanField write = new DataSourceBooleanField("write");
 		setFields(write, id, name, path);
 		setDataURL("data/stores.xml?empty=" + withEmpty + "&parameters=" + parameters);
 		setClientOnly(true);
