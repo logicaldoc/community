@@ -972,7 +972,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
         Date expdate = cal.getTime();
         ZonedDateTime date = ZonedDateTime.ofInstant(expdate.toInstant(), ZoneId.systemDefault());
             
-        resp.getHeaders().add("Expires", date.format(DateTimeFormatter.RFC_1123_DATE_TIME));
+        resp.getHeaders().add("Expires", date.format(DateTimeFormatter.RFC_1123_DATE_TIME));      
         
 		return resp;
 	}

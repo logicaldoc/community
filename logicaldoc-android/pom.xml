@@ -34,18 +34,24 @@
 		</dependency>
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
+			<artifactId>logicaldoc-core</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>		
+		<dependency>
+			<groupId>com.logicaldoc</groupId>
 			<artifactId>logicaldoc-util</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.logicaldoc</groupId>
-			<artifactId>logicaldoc-i18n</artifactId>
-			<version>${project.version}</version>
-			<type>jar</type>
-			<scope>provided</scope>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.logicaldoc</groupId>-->
+<!--			<artifactId>logicaldoc-i18n</artifactId>-->
+<!--			<version>${project.version}</version>-->
+<!--			<type>jar</type>-->
+<!--			<scope>provided</scope>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>

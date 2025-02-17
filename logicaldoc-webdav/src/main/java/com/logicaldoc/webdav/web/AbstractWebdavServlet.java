@@ -123,8 +123,8 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			log.debug("method {} {}", request.getMethod(), methodCode);
 
 			Session session = SessionManager.get().getSession(request);
-			if (session == null)
-				throw new DavException(HttpServletResponse.SC_FORBIDDEN);
+			if (session == null) 
+				throw new DavException(HttpServletResponse.SC_UNAUTHORIZED);
 
 			SessionManager.get().renew(session.getSid());
 
@@ -193,12 +193,10 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 	private void handleDavException(WebdavResponse webdavResponse, DavException e) {
 		log.error(e.getMessage(), e);
-		if (e.getErrorCode() != HttpServletResponse.SC_UNAUTHORIZED) {
-			try {
-				webdavResponse.sendError(e);
-			} catch (Exception t) {
-				// Nothing to do
-			}
+		try {
+			webdavResponse.sendError(e);
+		} catch (Exception t) {
+			// Nothing to do
 		}
 	}
 
