@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 
@@ -49,6 +50,7 @@ public class AbstractService {
 
 	private boolean validateSession = true;
 
+	@Resource(name = "currentMessage")
 	protected Message currentMessage;
 
 	public void setValidateSession(boolean validateSession) {

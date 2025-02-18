@@ -1,8 +1,5 @@
 package com.logicaldoc.webservice.soap.endpoint;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
@@ -17,7 +14,6 @@ import com.logicaldoc.webservice.soap.AuthService;
  * @since 5.2
  */
 public class SoapAuthService extends AbstractService implements AuthService {
-	private static final Logger log = LoggerFactory.getLogger(SoapAuthService.class);
 
 	@Override
 	public String login(String username, String password) throws AuthenticationException {
