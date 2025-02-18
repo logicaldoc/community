@@ -310,11 +310,18 @@ public class DavResourceImpl implements DavResource, Serializable {
 	}
 
 	private void addSizeProperty(DavPropertyName name, Namespace nameSpace) {
-		if (name.getName().equals("size") && !isCollection() && !resource.isFolder()) {
-			DefaultDavProperty<Long> defaultDavProperty = new DefaultDavProperty<>("size", resource.getContentLength(),
-					nameSpace);
-			properties.add(defaultDavProperty);
-		}
+		if (name.getName().equals("size")) {				
+			if (!isCollection() && !resource.isFolder()) {
+				DefaultDavProperty<Long> defaultDavProperty = new DefaultDavProperty<>("size", resource.getContentLength(),
+						nameSpace);
+				properties.add(defaultDavProperty);
+			}
+			if (isCollection() && resource.isFolder()) {
+				DefaultDavProperty<Long> defaultDavProperty = new DefaultDavProperty<>("size", resource.getSize(),
+						nameSpace);
+				properties.add(defaultDavProperty);
+			}				
+		}	
 	}
 
 	private void addIdProperty(Namespace nameSpace) {

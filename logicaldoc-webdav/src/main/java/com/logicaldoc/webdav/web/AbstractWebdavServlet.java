@@ -123,8 +123,20 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			log.debug("method {} {}", request.getMethod(), methodCode);
 
 			Session session = SessionManager.get().getSession(request);
-			if (session == null) 
+			if (session == null) {
+				// Try to invalidates previous session cookie
+				if (request.getCookies().length > 0) {
+					Cookie[] cooks = request.getCookies();
+					for (Cookie cookie : cooks) {
+						if (cookie.getName().equals("ldoc-sid")) {
+							//  A zero value causes the cookie to be deleted.
+							cookie.setMaxAge(0);
+							webdavResponse.addCookie(cookie);
+						}
+					}
+				}					
 				throw new DavException(HttpServletResponse.SC_UNAUTHORIZED);
+			}
 
 			SessionManager.get().renew(session.getSid());
 
@@ -141,6 +153,7 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			
 			// Add session cookie to the response
 			Cookie scookie = new Cookie("ldoc-sid", session.getSid());
+			scookie.setMaxAge(1800);
 			webdavResponse.addCookie(scookie);			
 
 			getPath(webdavRequest);

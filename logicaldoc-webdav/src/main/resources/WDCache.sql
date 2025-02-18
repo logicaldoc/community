@@ -1,0 +1,5 @@
+CREATE TABLE mycache (
+    ID BIGINT PRIMARY KEY,
+    path VARCHAR(255) NOT NULL,
+    size BIGINT NOT NULL
+);

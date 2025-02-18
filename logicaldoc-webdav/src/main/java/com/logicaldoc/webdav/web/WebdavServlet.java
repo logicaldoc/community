@@ -45,6 +45,8 @@ public class WebdavServlet extends AbstractWebdavServlet {
 	private static DavLocatorFactory locatorFactory;
 
 	private static ResourceConfig config;
+	
+	public static boolean foldersizeEnabled = true;
 
 	@Override
 	public void init() {
@@ -123,6 +125,10 @@ public class WebdavServlet extends AbstractWebdavServlet {
 				// Nothing to do
 			}
 
+		if ("true".equals(settings.get("webdav.foldersize.enabled")))
+			WebdavServlet.foldersizeEnabled = true;
+		else 
+			WebdavServlet.foldersizeEnabled = false;		
 	}
 
 	private static void setResourceFactory(DavResourceFactory resourceFactory) {

@@ -16,6 +16,7 @@ import com.logicaldoc.webdav.session.WebdavSession;
  * logicalDOC. Secure handlings will be managed through this.
  * 
  * @author Sebastian Wenzky
+ * @author Alessandro Gasparini
  */
 public interface Resource {
 
@@ -120,4 +121,8 @@ public interface Resource {
 	public void setETag(String string);
 
 	public String getETag();
+	
+	public void setSize(long l);
+
+	public long getSize();	
 }

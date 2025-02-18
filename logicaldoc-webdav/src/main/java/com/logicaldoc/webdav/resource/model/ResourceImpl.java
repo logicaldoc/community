@@ -77,6 +77,8 @@ public class ResourceImpl implements Resource {
 	WebdavSession session;
 
 	private String eTag;
+	
+	private long size;
 
 	public Long getContentLength() {
 		return contentLength;
@@ -374,4 +376,14 @@ public class ResourceImpl implements Resource {
 	public String getETag() {
 		return this.eTag;
 	}
+	
+
+	@Override
+	public void setSize(long size) {
+		this.size = size;
+	}
+	@Override
+	public long getSize() {
+		return size;
+	}	
 }
