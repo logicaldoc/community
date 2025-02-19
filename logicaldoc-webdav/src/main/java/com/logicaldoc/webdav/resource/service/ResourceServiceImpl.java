@@ -41,13 +41,12 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.webdav.cache.WDCache;
-import com.logicaldoc.webdav.cache.WDCacheFolder;
+import com.logicaldoc.webdav.cache.WebdavCache;
+import com.logicaldoc.webdav.cache.WebdavCacheFolder;
 import com.logicaldoc.webdav.context.ImportContext;
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.resource.model.ResourceImpl;
 import com.logicaldoc.webdav.session.WebdavSession;
-import com.logicaldoc.webdav.web.WebdavServlet;
 
 /**
  * Base implementation of a {@link ResourceService}
@@ -78,8 +77,8 @@ public class ResourceServiceImpl implements ResourceService {
 
 	@javax.annotation.Resource(name = "UserDAO")
 	private transient UserDAO userDAO;
-	
-	private static WDCache wdc = WDCache.getInstance();	
+
+	private static WebdavCache wdc = WebdavCache.getInstance();
 
 	public void setUserDAO(UserDAO userDAO) {
 		this.userDAO = userDAO;
@@ -123,11 +122,11 @@ public class ResourceServiceImpl implements ResourceService {
 		if (session != null && (Long) session.getObject("id") != null) {
 			resource.setRequestedPerson((Long) session.getObject("id"));
 		}
-		
-		if (WebdavServlet.foldersizeEnabled) {
+
+		if (Context.get().getProperties().getBoolean("webdav.cache.enabled", false)) {
 			// update folder path
 			wdc.setFolderPath(folder);
-			
+
 			long fsize = wdc.getFolderSize(folder.getId());
 			log.debug("folderSize: {}", fsize);
 			fsize = wdc.getTreeSize(folder.getId());
@@ -136,7 +135,6 @@ public class ResourceServiceImpl implements ResourceService {
 				resource.setSize(fsize);
 			}
 		}
-		
 
 		return resource;
 	}
@@ -204,7 +202,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 	private void getDocumentChildren(Resource parentResource, List<Resource> resourceList, User user)
 			throws PersistenceException {
-		
+
 		long folderSize = 0;
 
 		Collection<Document> documents = documentDAO.findByFileNameAndParentFolderId(
@@ -218,25 +216,26 @@ public class ResourceServiceImpl implements ResourceService {
 			folderSize += document.getFileSize();
 			resourceList.add(marshallDocument(document, parentResource.getSession()));
 		}
-		
-		if (WebdavServlet.foldersizeEnabled) {
-			log.debug("getID: {}, folderName: {},  Size: {}", parentResource.getID(), parentResource.getName(), folderSize);
-	 
+
+		if (Context.get().getProperties().getBoolean("webdav.cache.enabled", false)) {
+			log.debug("getID: {}, folderName: {},  Size: {}", parentResource.getID(), parentResource.getName(),
+					folderSize);
+
 			long folderID = Long.parseLong(parentResource.getID());
-			
+
 			// check if path is already calculated
 			String fpath = wdc.getFolderPath(folderID);
-			if (StringUtils.isEmpty(fpath)) {			
-				// calculate the path of the folder	only if needed	
+			if (StringUtils.isEmpty(fpath)) {
+				// calculate the path of the folder only if needed
 				fpath = folderDAO.computePath(folderID);
 				log.debug("computed Path: {}", fpath);
 			}
-			
+
 			// Add the WDCacheFolder to the cache
-			WDCacheFolder cf = new WDCacheFolder(folderID, fpath, folderSize);
+			WebdavCacheFolder cf = new WebdavCacheFolder(folderID, fpath, folderSize);
 			int result = wdc.addFolder(cf);
 			log.debug("result: {}", result);
-		}		
+		}
 	}
 
 	private boolean isFolderAccessible(Resource parentResource, final Long folderID) throws PersistenceException {
@@ -325,7 +324,7 @@ public class ResourceServiceImpl implements ResourceService {
 		} catch (PersistenceException e) {
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
 		}
-		
+
 		checkPublished(user, document);
 
 		return marshallDocument(document, session);

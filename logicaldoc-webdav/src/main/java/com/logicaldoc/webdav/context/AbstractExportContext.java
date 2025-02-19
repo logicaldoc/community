@@ -1,8 +1,6 @@
 package com.logicaldoc.webdav.context;
 
 import org.apache.jackrabbit.server.io.IOListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.webdav.resource.model.Resource;
 
@@ -15,8 +13,6 @@ import com.logicaldoc.webdav.resource.model.Resource;
  */
 public abstract class AbstractExportContext implements ExportContext {
 
-	private static final Logger log = LoggerFactory.getLogger(AbstractExportContext.class);
-
 	private final Resource resource;
 
 	private final boolean hasStream;
@@ -27,7 +23,7 @@ public abstract class AbstractExportContext implements ExportContext {
 		this.resource = resource;
 		this.hasStream = hasStream;
 	}
-	
+
 	@Override
 	public IOListener getIOListener() {
 		return null;

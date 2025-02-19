@@ -53,6 +53,7 @@ public class ApiKeys extends com.smartgwt.client.widgets.Window {
 				keyName -> SecurityService.Instance.get().createApiKey(keyName, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(String apikey) {
+						list.refresh(new ApiKeysDS());
 						StaticTextItem item = ItemFactory.newStaticTextItem("apikey", "apikey", apikey);
 						item.setIcons(new CopyTextFormItemIcon(apikey, "copytext"));
 						LD.askForValue("saveyourkey", "saveyourkeymessage", apikey, item, value -> {
@@ -60,6 +61,7 @@ public class ApiKeys extends com.smartgwt.client.widgets.Window {
 							Util.copyText(apikey);
 							destroy();
 						});
+						
 					}
 				})));
 

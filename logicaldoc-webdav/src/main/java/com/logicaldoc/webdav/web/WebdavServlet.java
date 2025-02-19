@@ -23,8 +23,9 @@ import com.logicaldoc.webdav.resource.ResourceConfig;
  * @author Sebastian Wenzky
  * 
  */
-@SuppressWarnings("serial")
 public class WebdavServlet extends AbstractWebdavServlet {
+
+	private static final long serialVersionUID = 1L;
 
 	private static final Logger log = LoggerFactory.getLogger(WebdavServlet.class);
 
@@ -45,8 +46,6 @@ public class WebdavServlet extends AbstractWebdavServlet {
 	private static DavLocatorFactory locatorFactory;
 
 	private static ResourceConfig config;
-	
-	public static boolean foldersizeEnabled = true;
 
 	@Override
 	public void init() {
@@ -124,11 +123,6 @@ public class WebdavServlet extends AbstractWebdavServlet {
 			} catch (Exception e) {
 				// Nothing to do
 			}
-
-		if ("true".equals(settings.get("webdav.foldersize.enabled")))
-			WebdavServlet.foldersizeEnabled = true;
-		else 
-			WebdavServlet.foldersizeEnabled = false;		
 	}
 
 	private static void setResourceFactory(DavResourceFactory resourceFactory) {

@@ -38,7 +38,7 @@ public class WebDAVPlugin extends LogicalDOCPlugin {
 			ContextProperties pbean = new ContextProperties();
 			pbean.setProperty("webdav.enabled", "true");
 			pbean.setProperty("webdav.depth", "1");
-			pbean.setProperty("webdav.foldersize.enabled", "true");
+			pbean.setProperty("webdav.cache.enabled", "false");
 			pbean.write();
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);

@@ -122,21 +122,7 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 		try {
 			log.debug("method {} {}", request.getMethod(), methodCode);
 
-			Session session = SessionManager.get().getSession(request);
-			if (session == null) {
-				// Try to invalidates previous session cookie
-				if (request.getCookies().length > 0) {
-					Cookie[] cooks = request.getCookies();
-					for (Cookie cookie : cooks) {
-						if (cookie.getName().equals("ldoc-sid")) {
-							//  A zero value causes the cookie to be deleted.
-							cookie.setMaxAge(0);
-							webdavResponse.addCookie(cookie);
-						}
-					}
-				}					
-				throw new DavException(HttpServletResponse.SC_UNAUTHORIZED);
-			}
+			Session session = getSession(request, webdavResponse);
 
 			SessionManager.get().renew(session.getSid());
 
@@ -150,11 +136,11 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			davSession.putObject("user", user);
 
 			webdavRequest.setDavSession(davSession);
-			
+
 			// Add session cookie to the response
 			Cookie scookie = new Cookie("ldoc-sid", session.getSid());
 			scookie.setMaxAge(1800);
-			webdavResponse.addCookie(scookie);			
+			webdavResponse.addCookie(scookie);
 
 			getPath(webdavRequest);
 
@@ -170,15 +156,28 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 			response.getOutputStream().flush();
 			response.getOutputStream().close();
-		} catch (DavException e) {
-			handleDavException(webdavResponse, e);
 		} catch (Exception e) {
-			try {
-				handleException(request, methodCode, e);
-			} catch (DavException e1) {
-				log.error(e.getMessage(), e);
-			}
+			handleException(request, webdavResponse, methodCode, e);
 		}
+	}
+
+	private Session getSession(HttpServletRequest request, WebdavResponse webdavResponse) throws DavException {
+		Session session = SessionManager.get().getSession(request);
+		if (session == null) {
+			// Try to invalidates previous session cookie
+			if (request.getCookies().length > 0) {
+				Cookie[] cooks = request.getCookies();
+				for (Cookie cookie : cooks) {
+					if (cookie.getName().equals("ldoc-sid")) {
+						// A zero value causes the cookie to be deleted.
+						cookie.setMaxAge(0);
+						webdavResponse.addCookie(cookie);
+					}
+				}
+			}
+			throw new DavException(HttpServletResponse.SC_UNAUTHORIZED);
+		}
+		return session;
 	}
 
 	private void getPath(WebdavRequest webdavRequest) throws DavException {
@@ -193,23 +192,20 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 		return new WebdavResponseImpl(response, noCache);
 	}
 
-	private void handleException(HttpServletRequest request, int methodCode, Throwable e) throws DavException {
+	private void handleException(HttpServletRequest request, WebdavResponse davResponse, int methodCode, Exception e) {
 		if (e instanceof UnsupportedOperationException) {
 			log.warn("{}: {} {}", e.getClass().getName(), request.getMethod(), methodCode);
 		} else if (e.getClass().getName().contains("ClientAbortException")) {
 			log.warn("{}: {} {} {}", e.getClass().getName(), e.getMessage(), request.getMethod(), methodCode);
+		} else if(e instanceof DavException de){
+			log.error(de.getMessage(), de);
+			try {
+				davResponse.sendError(de);
+			} catch (Exception t) {
+				// Nothing to do
+			}
 		} else {
 			log.error(e.getMessage(), e);
-			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-		}
-	}
-
-	private void handleDavException(WebdavResponse webdavResponse, DavException e) {
-		log.error(e.getMessage(), e);
-		try {
-			webdavResponse.sendError(e);
-		} catch (Exception t) {
-			// Nothing to do
 		}
 	}
 
@@ -317,13 +313,12 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 */
 	protected void doGet(WebdavRequest request, WebdavResponse response, DavResource resource)
 			throws IOException, DavException {
-
 		log.debug("doGet");
-
 		try {
 			spoolResource(request, response, resource, true);
 		} catch (DavException dave) {
-			log.debug(dave.getMessage(), dave);
+			if (log.isDebugEnabled())
+				log.debug(dave.getMessage(), dave);
 			response.setStatus(dave.getErrorCode());
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -386,7 +381,8 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 				Pair<String, String> parsedRange = null;
 				try {
 					parsedRange = parseRangeRequestHeader(rangeHeader);
-					log.debug("parsedRange {}", parsedRange);
+					if (log.isDebugEnabled())
+						log.debug("parsedRange {}", parsedRange);
 				} catch (DavException e) {
 					log.error(e.getMessage());
 				}
@@ -456,20 +452,23 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			throws IOException, DavException {
 		log.debug("doPropFind");
 
-		log.debug("[READ] FINDING {} {}",
-				(resource.isCollection() ? "DOCUMENTS WITHIN THE FOLDER" : "JUST THE DOCUMENT"),
-				resource.getDisplayName());
+		if (log.isDebugEnabled())
+			log.debug("[READ] FINDING {} {}",
+					(resource.isCollection() ? "DOCUMENTS WITHIN THE FOLDER" : "JUST THE DOCUMENT"),
+					resource.getDisplayName());
 
 		if (!resource.exists()) {
 			log.warn("Resource not found: {}", resource.getResourcePath());
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
-		
-		log.debug("Depth: {}", request.getHeader("Depth"));
-		log.debug("Accept-Encoding: {}", request.getHeader("Accept-Encoding"));
-		log.debug("Content-Type: {}", request.getHeader("Content-Type"));
-		
+
+		if (log.isDebugEnabled()) {
+			log.debug("Depth: {}", request.getHeader("Depth"));
+			log.debug("Accept-Encoding: {}", request.getHeader("Accept-Encoding"));
+			log.debug("Content-Type: {}", request.getHeader("Content-Type"));
+		}
+
 		DavPropertyNameSet requestProperties = request.getPropFindProperties();
 
 		if (log.isDebugEnabled()) {
@@ -555,7 +554,8 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 		log.debug("************doPut*****************");
 
-		log.debug("[ADD] Document {}", resource.getDisplayName());
+		if (log.isDebugEnabled())
+			log.debug("[ADD] Document {}", resource.getDisplayName());
 
 		try {
 			DavResource parentResource = resource.getCollection();
@@ -578,7 +578,8 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 			response.setStatus(status);
 		} catch (DavException dave) {
-			log.debug("A DavException occurred!", dave);
+			if (log.isDebugEnabled())
+				log.debug("A DavException occurred!", dave);
 
 			// return the status code
 			response.setStatus(dave.getErrorCode());
@@ -606,9 +607,9 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 */
 	protected void doMkCol(WebdavRequest request, WebdavResponse response, DavResource resource)
 			throws IOException, DavException {
-
 		log.debug("doMkCol");
-		log.debug("[ADD] Directory {}", resource.getDisplayName());
+		if (log.isDebugEnabled())
+			log.debug("[ADD] Directory {}", resource.getDisplayName());
 
 		try {
 			DavResource parentResource = resource.getCollection();
@@ -630,7 +631,8 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 			response.setStatus(HttpServletResponse.SC_CREATED);
 		} catch (DavException dave) {
-			log.debug("Error during folder creation", dave);
+			if (log.isDebugEnabled())
+				log.debug("Error during folder creation", dave);
 			response.setStatus(dave.getErrorCode());
 		} catch (Exception e) {
 			log.error("Error during folder creation", e);
@@ -658,7 +660,9 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 		log.debug("doDelete");
 		try {
-			log.debug("[DELETE] {} {}", (resource.isCollection() ? " FOLDER" : " DOCUMENT"), resource.getDisplayName());
+			if (log.isDebugEnabled())
+				log.debug("[DELETE] {} {}", (resource.isCollection() ? " FOLDER" : " DOCUMENT"),
+						resource.getDisplayName());
 
 			DavResource parent = resource.getCollection();
 			if (parent != null) {
@@ -668,7 +672,8 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Cannot remove the root resource.");
 			}
 		} catch (DavException dave) {
-			log.debug(dave.getMessage(), dave);
+			if (log.isDebugEnabled())
+				log.debug(dave.getMessage(), dave);
 			response.setStatus(dave.getErrorCode());
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -766,7 +771,8 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			resource.move(destResource);
 			response.setStatus(status);
 		} catch (DavException dave) {
-			log.debug("Exception during move", dave);
+			if (log.isDebugEnabled())
+				log.debug("Exception during move", dave);
 			response.setStatus(dave.getErrorCode());
 		} catch (Exception e) {
 			log.error("Error during move", e);
@@ -991,7 +997,7 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			}
 			return;
 		}
-		
+
 		((VersionControlledResource) resource).uncheckout();
 		response.setStatus(HttpServletResponse.SC_OK);
 	}

@@ -23,8 +23,6 @@ import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
 import org.apache.jackrabbit.webdav.version.report.SupportedReportSetProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.session.WebdavSession;
@@ -38,8 +36,6 @@ import com.logicaldoc.webdav.session.WebdavSession;
 public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResource, Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	private static final Logger log = LoggerFactory.getLogger(DeltaVResourceImpl.class);
 
 	protected transient SupportedReportSetProperty supportedReports = new SupportedReportSetProperty();
 

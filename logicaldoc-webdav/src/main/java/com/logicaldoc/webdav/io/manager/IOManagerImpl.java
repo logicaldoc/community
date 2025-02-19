@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.webdav.context.ExportContext;
 import com.logicaldoc.webdav.context.ImportContext;
@@ -23,8 +21,6 @@ import com.logicaldoc.webdav.io.handler.IOHandler;
 public class IOManagerImpl implements IOManager {
 
 	private static final long serialVersionUID = 1L;
-
-	private static final Logger log = LoggerFactory.getLogger(IOManagerImpl.class);
 
 	private final List<IOHandler> ioHandlers = new ArrayList<>();
 
