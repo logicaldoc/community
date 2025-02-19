@@ -43,24 +43,24 @@ public class RestDocumentServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testGetThumbnail() throws AuthenticationException, PersistenceException, PermissionException,
-			WebserviceException, IOException, InterruptedException {
-		
+			WebserviceException, IOException {
+
 		// First upload the resource
 		FileInputStream fis = new FileInputStream("src/test/resources/fortnightemail-(1)-(1).png");
 		DataHandler dh = new DataHandler(new InputStreamDataSource(fis, "image/png"));
 		testSubject.uploadResource("", 1, "1.0", "mobile.png", dh);
-		
+
 		// Then check that the server return the resource
 		Response res = testSubject.getThumbnail("mobile", "menu.adminxxx/text/menu.admin103/pippo", null);
 		assertNotNull(res);
-		
+
 		MultivaluedMap<String, Object> sss = res.getHeaders();
 		for (String element : sss.keySet()) {
 			System.out.println("element: " + element + ", value: " + sss.get(element));
-		}		
-		
+		}
+
 		assertEquals("image/png", res.getHeaderString("Content-Type"));
-		assertNotNull(res.getHeaderString("Expires"));		
+		assertNotNull(res.getHeaderString("Expires"));
 	}
 
 }

@@ -8,8 +8,6 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
@@ -20,8 +18,6 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
  * @since 6.9
  */
 public abstract class AbstractRestClient<T> {
-
-	private static final Logger log = LoggerFactory.getLogger(AbstractRestClient.class);
 
 	protected String endpoint;
 
@@ -65,12 +61,12 @@ public abstract class AbstractRestClient<T> {
 
 	protected void prepareProxy(Class<T> stub) {
 		JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-		
+
 		if (StringUtils.isNotEmpty(apiKey)) {
 			bean.setHeaders(Map.of("X-API-KEY", apiKey));
 			bean.setInheritHeaders(true);
 		}
-		
+
 		bean.setResourceClass(stub);
 		bean.setAddress(endpoint);
 		bean.setProviders(List.of(new JacksonJsonProvider()));

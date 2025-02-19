@@ -9,9 +9,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.webservice.WebserviceException;
@@ -29,8 +26,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestSystemService extends SoapSystemService implements SystemService {
 
-	private static final Logger log = LoggerFactory.getLogger(RestSystemService.class);
-
 	@Override
 	@GET
 	@Path("/getInfo")
@@ -47,12 +42,13 @@ public class RestSystemService extends SoapSystemService implements SystemServic
 		String sid = validateSessionREST();
 		return super.getStatistics(sid);
 	}
-	
+
 	@Override
 	@GET
 	@Path("/getTenantStatistics")
 	@Operation(summary = "Get tenant statistics", description = "Retrieves the statistics of a tenant")
-	public List<WSParameter> getTenantStatistics(@QueryParam("tenantId") long tenantId) throws AuthenticationException, WebserviceException, PersistenceException {
+	public List<WSParameter> getTenantStatistics(@QueryParam("tenantId")
+	long tenantId) throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
 		return super.getTenantStatistics(sid, tenantId);
 	}

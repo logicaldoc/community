@@ -11,9 +11,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -30,11 +27,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestBookmarkService extends SoapBookmarkService implements BookmarkService {
-	private static final Logger log = LoggerFactory.getLogger(RestBookmarkService.class);
 
 	@POST
 	@Path("/saveBookmark")
-	public WSBookmark saveBookmark(WSBookmark bookmark) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, UnexistingResourceException {
+	public WSBookmark saveBookmark(WSBookmark bookmark) throws AuthenticationException, PermissionException,
+			WebserviceException, PersistenceException, UnexistingResourceException {
 		String sid = validateSessionREST();
 		return super.saveBookmark(sid, bookmark);
 	}
@@ -42,7 +39,8 @@ public class RestBookmarkService extends SoapBookmarkService implements Bookmark
 	@GET
 	@Path("/bookmarkDocument")
 	public WSBookmark bookmarkDocument(@QueryParam("docId")
-	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, UnexistingResourceException {
+	long docId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException,
+			UnexistingResourceException {
 		String sid = validateSessionREST();
 		return super.bookmarkDocument(sid, docId);
 	}

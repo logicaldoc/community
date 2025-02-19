@@ -13,8 +13,6 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.AttachmentBuilder;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
@@ -27,8 +25,6 @@ import com.logicaldoc.webservice.model.WSRating;
 import com.logicaldoc.webservice.rest.DocumentService;
 
 public class RestDocumentClient extends AbstractRestClient<DocumentService> {
-
-	private static final Logger log = LoggerFactory.getLogger(RestDocumentClient.class);
 
 	public RestDocumentClient(String endpoint, String apiKey) {
 		this(endpoint, apiKey, -1);

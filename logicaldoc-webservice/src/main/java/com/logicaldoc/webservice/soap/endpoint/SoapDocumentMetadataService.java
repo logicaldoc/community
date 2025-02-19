@@ -8,8 +8,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.metadata.Attribute;
@@ -42,8 +40,6 @@ import com.logicaldoc.webservice.soap.DocumentMetadataService;
  * @since 6.1
  */
 public class SoapDocumentMetadataService extends AbstractService implements DocumentMetadataService {
-
-	private static final Logger log = LoggerFactory.getLogger(SoapDocumentMetadataService.class);
 
 	private static final String TEMPLATE = "template ";
 

@@ -5,8 +5,6 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
@@ -16,8 +14,6 @@ import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.rest.FolderService;
 
 public class RestFolderClient extends AbstractRestClient<FolderService> {
-
-	private static final Logger log = LoggerFactory.getLogger(RestFolderClient.class);
 
 	public RestFolderClient(String endpoint, String apiKey) {
 		this(endpoint, apiKey, -1);

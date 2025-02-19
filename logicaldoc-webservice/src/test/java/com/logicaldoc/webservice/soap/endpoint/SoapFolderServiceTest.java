@@ -199,13 +199,9 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 	
 	@Test
 	public void testGetPath()  throws Exception {
-		List<WSFolder> sss = soapFolderService.getPath("", 103);
-		for (WSFolder wsFolder : sss) {
-			System.out.println(wsFolder.getId());
-			System.out.println(wsFolder.getName());
-		}
-		assertNotNull(sss);
-		assertEquals(sss.size(), 4);		
+		List<WSFolder> path = soapFolderService.getPath("", 103);
+		assertNotNull(path);
+		assertEquals(4, path.size());		
 	}	
 	
 }

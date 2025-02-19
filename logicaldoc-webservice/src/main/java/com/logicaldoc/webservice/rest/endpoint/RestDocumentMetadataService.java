@@ -14,8 +14,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
@@ -39,8 +37,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Consumes({ MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestDocumentMetadataService extends SoapDocumentMetadataService implements DocumentMetadataService {
-
-	private static final Logger log = LoggerFactory.getLogger(RestDocumentMetadataService.class);
 
 	@Override
 	@PUT
@@ -129,8 +125,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 		String sid = validateSessionREST();
 		return super.getAttributeOptions(sid, setId, attribute);
 	}
-	
-	
+
 	@Override
 	@GET
 	@Path("/getAttributeOptionsByCategory")
@@ -138,7 +133,7 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	public List<WSAttributeOption> getAttributeOptionsByCategory(long setId, String attribute, String category)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		String sid = validateSessionREST();
-		return super.getAttributeOptionsByCategory(sid, setId, attribute,category);
+		return super.getAttributeOptionsByCategory(sid, setId, attribute, category);
 	}
 
 	@Override

@@ -3,9 +3,6 @@ package com.logicaldoc.webservice.soap.endpoint;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
@@ -38,7 +35,6 @@ import com.logicaldoc.webservice.soap.TagService;
  * @since 7.6.3
  */
 public class SoapTagService extends AbstractService implements TagService {
-	private static final Logger log = LoggerFactory.getLogger(SoapTagService.class);
 
 	private SoapDocumentService getDocumentService() {
 		SoapDocumentService docService = new SoapDocumentService();

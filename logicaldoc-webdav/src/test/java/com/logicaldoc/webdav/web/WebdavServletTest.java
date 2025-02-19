@@ -276,7 +276,6 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 			MockServletResponse response = new MockServletResponse(tempFile);
 			
 			MockServletRequest request = prepareRequest(DavMethods.METHOD_PROPFIND, "");
-			//request.setHeader("Depth", "1");
 			request.setHeader("Accept-Encoding", "identity");
 			request.setHeader("Content-Type", "application/xml; charset=utf-8");
 			request.setBody(PROPFIND_SPEC);
@@ -399,5 +398,4 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		request.setRequestURI(PREFIX + path);
 		return request;
 	}
-  
 }

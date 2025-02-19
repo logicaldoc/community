@@ -10,9 +10,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.searchengine.SearchException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
@@ -34,8 +31,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Consumes({ MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestSearchService extends SoapSearchService implements SearchService {
-
-	private static final Logger log = LoggerFactory.getLogger(RestSearchService.class);
 
 	@POST
 	@Path("/find")

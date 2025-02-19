@@ -2,9 +2,6 @@ package com.logicaldoc.webservice.rest.client;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -15,8 +12,6 @@ import com.logicaldoc.webservice.model.WSTemplate;
 import com.logicaldoc.webservice.rest.DocumentMetadataService;
 
 public class RestDocumentMetadataClient extends AbstractRestClient<DocumentMetadataService> {
-
-	private static final Logger log = LoggerFactory.getLogger(RestDocumentMetadataClient.class);
 
 	public RestDocumentMetadataClient(String endpoint, String apiKey) {
 		this(endpoint, apiKey, -1);

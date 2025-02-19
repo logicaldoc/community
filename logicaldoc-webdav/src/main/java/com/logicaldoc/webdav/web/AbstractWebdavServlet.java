@@ -165,13 +165,14 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 		Session session = SessionManager.get().getSession(request);
 		if (session == null) {
 			// Try to invalidates previous session cookie
-			if (request.getCookies().length > 0) {
+			if (request.getCookies() != null) {
 				Cookie[] cooks = request.getCookies();
 				for (Cookie cookie : cooks) {
 					if (cookie.getName().equals("ldoc-sid")) {
 						// A zero value causes the cookie to be deleted.
 						cookie.setMaxAge(0);
 						webdavResponse.addCookie(cookie);
+						break;
 					}
 				}
 			}
@@ -197,7 +198,7 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			log.warn("{}: {} {}", e.getClass().getName(), request.getMethod(), methodCode);
 		} else if (e.getClass().getName().contains("ClientAbortException")) {
 			log.warn("{}: {} {} {}", e.getClass().getName(), e.getMessage(), request.getMethod(), methodCode);
-		} else if(e instanceof DavException de){
+		} else if (e instanceof DavException de) {
 			log.error(de.getMessage(), de);
 			try {
 				davResponse.sendError(de);
@@ -362,33 +363,20 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			}
 		}
 
-		OutputStream outX = (sendContent) ? response.getOutputStream() : null;
+		OutputStream outX = sendContent ? response.getOutputStream() : null;
 		OutputContext oc = getOutputContext(response, outX);
 
-		if (!resource.isCollection() && resource instanceof DavResourceImpl dri) {
+		if (!resource.isCollection() && resource instanceof DavResourceImpl davRsource) {
 			log.debug("resource instanceof DavResourceImpl");
 
-			// Enforce download permission
-			ExportContext exportCtx = dri.getExportContext(oc);
-			if (!exportCtx.getResource().isDownloadEnabled()) {
-				throw new DavException(HttpServletResponse.SC_FORBIDDEN,
-						"Download permission not granted to this user");
-			}
+			ExportContext exportCtx = enforceDownloadPermission(oc, davRsource);
 
 			// Deals with ranges
 			String rangeHeader = request.getHeader(HttpHeaders.RANGE);
 			if (rangeHeader != null) {
-				Pair<String, String> parsedRange = null;
-				try {
-					parsedRange = parseRangeRequestHeader(rangeHeader);
-					if (log.isDebugEnabled())
-						log.debug("parsedRange {}", parsedRange);
-				} catch (DavException e) {
-					log.error(e.getMessage());
-				}
-
 				WebdavSession session = (com.logicaldoc.webdav.session.WebdavSession) request.getDavSession();
-				resource = getResourceFactory().createRangeResource(dri.getLocator(), session, parsedRange);
+				resource = getResourceFactory().createRangeResource(davRsource.getLocator(), session,
+						parseRangeRequestHeader(rangeHeader));
 
 				log.debug("Create RangeResourceImpl {}", resource);
 
@@ -400,6 +388,15 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 		}
 
 		resource.spool(oc);
+	}
+
+	private ExportContext enforceDownloadPermission(OutputContext oc, DavResourceImpl davRsource)
+			throws IOException, DavException {
+		ExportContext exportCtx = davRsource.getExportContext(oc);
+		if (!exportCtx.getResource().isDownloadEnabled()) {
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Download permission not granted to this user");
+		}
+		return exportCtx;
 	}
 
 	private void setETagHeader(WebdavRequest request, WebdavResponse response, ExportContext exportCtx) {

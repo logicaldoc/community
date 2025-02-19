@@ -61,7 +61,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Path("/")
 @Tag(name = "document")
-// @Api(value = "document", authorizations = {@Authorization(value = "basic")} )
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestDocumentService extends SoapDocumentService implements DocumentService {

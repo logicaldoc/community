@@ -1,8 +1,5 @@
 package com.logicaldoc.webservice.rest.client;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.webservice.model.WSCredentials;
 import com.logicaldoc.webservice.rest.AuthService;
@@ -15,8 +12,6 @@ import com.logicaldoc.webservice.rest.AuthService;
  * @since 6.9
  */
 public class RestAuthClient extends AbstractRestClient<AuthService> implements AuthService {
-
-	private static final Logger log = LoggerFactory.getLogger(RestAuthClient.class);
 
 	public RestAuthClient(String endpoint) throws AuthenticationException {
 		super(AuthService.class, endpoint, null);

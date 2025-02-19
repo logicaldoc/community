@@ -3,9 +3,6 @@ package com.logicaldoc.webservice.soap.endpoint;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.BookmarkDAO;
@@ -28,7 +25,6 @@ import com.logicaldoc.webservice.soap.BookmarkService;
  * @since 7.6.3
  */
 public class SoapBookmarkService extends AbstractService implements BookmarkService {
-	private static final Logger log = LoggerFactory.getLogger(SoapBookmarkService.class);
 
 	@Override
 	public WSBookmark saveBookmark(String sid, WSBookmark bookmark) throws AuthenticationException, WebserviceException,

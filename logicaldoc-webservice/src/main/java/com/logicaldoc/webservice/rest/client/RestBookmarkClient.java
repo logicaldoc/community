@@ -9,8 +9,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
@@ -21,8 +19,6 @@ import com.logicaldoc.webservice.model.WSBookmark;
 import com.logicaldoc.webservice.rest.BookmarkService;
 
 public class RestBookmarkClient extends AbstractRestClient<BookmarkService> {
-
-	private static final Logger log = LoggerFactory.getLogger(RestBookmarkClient.class);
 
 	public RestBookmarkClient(String endpoint, String apiKey) {
 		this(endpoint, apiKey, -1);
