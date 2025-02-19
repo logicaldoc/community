@@ -5,8 +5,6 @@ import java.io.IOException;
 
 import org.apache.chemistry.opencmis.server.impl.CmisRepositoryContextListener;
 import org.apache.chemistry.opencmis.server.shared.BasicAuthCallContextHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.WebConfigurator;
@@ -20,8 +18,6 @@ import com.logicaldoc.util.plugin.PluginException;
  * @since 6.5.1
  */
 public class CmisPlugin extends LogicalDOCPlugin {
-	
-	private static final Logger log = LoggerFactory.getLogger(CmisPlugin.class);
 
 	private static final String SERVLET_NAME = "Cmis";
 

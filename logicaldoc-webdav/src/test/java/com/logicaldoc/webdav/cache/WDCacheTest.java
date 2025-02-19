@@ -10,34 +10,34 @@ import com.logicaldoc.core.folder.Folder;
 
 public class WDCacheTest {
 	
-	WDCache wdc;
+	WebdavCache wdc;
 	
 	@Before
 	public void setUp() {
-		wdc = WDCache.getInstance();
+		wdc = WebdavCache.getInstance();
 		wdc.truncate();
 		addTestValues();
 	}
 
 	@Test
 	public void testGetInstance() {
-		wdc = WDCache.getInstance();
+		wdc = WebdavCache.getInstance();
 		assertNotNull(wdc);
 	}
 	
 	private void addTestValues() {
-		WDCacheFolder cf = new WDCacheFolder(4L, "/4", 54L);
+		WebdavCacheFolder cf = new WebdavCacheFolder(4L, "/4", 54L);
 		wdc.addFolder(cf);
-		cf = new WDCacheFolder(1124L, "/4/1124", 1000325L);
+		cf = new WebdavCacheFolder(1124L, "/4/1124", 1000325L);
 		wdc.addFolder(cf);
 	}	
 
 	@Test
 	public void testAddFolder() {
-		WDCacheFolder cf = new WDCacheFolder(1119L, "/4/1119", 54L);
+		WebdavCacheFolder cf = new WebdavCacheFolder(1119L, "/4/1119", 54L);
 		int result = wdc.addFolder(cf);
 		assertEquals(1, result);
-		cf = new WDCacheFolder(1120L, "/4/1119/1120", 1000325L);
+		cf = new WebdavCacheFolder(1120L, "/4/1119/1120", 1000325L);
 		result = wdc.addFolder(cf);
 		assertEquals(1, result);
 
@@ -47,10 +47,10 @@ public class WDCacheTest {
 
 	@Test
 	public void testGetFolder() {
-		WDCacheFolder cf = wdc.getFolder(1124L);
+		WebdavCacheFolder cf = wdc.getFolder(1124L);
 		assertNotNull(cf);
-		assertEquals(1124L, cf.id);
-		assertEquals("/4/1124", cf.path);
+		assertEquals(1124L, cf.getId());
+		assertEquals("/4/1124", cf.getPath());
 	}
 
 	@Test

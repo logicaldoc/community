@@ -5,8 +5,6 @@ import java.io.IOException;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A HTTP response handler that treats the response as a text content
@@ -16,8 +14,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class StringHttpClientResponseHandler extends BaseHttpClientResponseHandler<String> {
-
-	private static final Logger log = LoggerFactory.getLogger(StringHttpClientResponseHandler.class);
 
 	private static final String UTF_8 = "UTF-8";
 

@@ -6,8 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.owasp.esapi.ESAPI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This wrapper implements the checks for avoiding the Cross Site Scripting
@@ -26,8 +24,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class XssRequestWrapper extends HttpServletRequestWrapper {
-
-	private static final Logger log = LoggerFactory.getLogger(XssRequestWrapper.class);
 
 	public XssRequestWrapper(HttpServletRequest servletRequest) {
 		super(servletRequest);

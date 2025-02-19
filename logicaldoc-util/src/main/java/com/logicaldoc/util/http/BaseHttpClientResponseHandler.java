@@ -8,8 +8,6 @@ import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An extension of the standard HttpClientReponseHandler with utility methods
@@ -20,8 +18,6 @@ import org.slf4j.LoggerFactory;
  * @param <T> The type of attended response content
  */
 public abstract class BaseHttpClientResponseHandler<T> extends AbstractHttpClientResponseHandler<T> {
-
-	private static final Logger log = LoggerFactory.getLogger(BaseHttpClientResponseHandler.class);
 
 	private static final String UTF_8 = "UTF-8";
 

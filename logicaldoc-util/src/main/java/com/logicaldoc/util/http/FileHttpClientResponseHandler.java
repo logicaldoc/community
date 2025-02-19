@@ -7,8 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.apache.hc.core5.http.HttpEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A HTTP response handler that writes the response into a given file
@@ -17,8 +15,6 @@ import org.slf4j.LoggerFactory;
  * @since 8.9.3
  */
 public class FileHttpClientResponseHandler extends BaseHttpClientResponseHandler<String> {
-
-	private static final Logger log = LoggerFactory.getLogger(FileHttpClientResponseHandler.class);
 
 	private File file;
 

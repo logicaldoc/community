@@ -404,7 +404,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 		AttributeSetDAO setDao = Context.get(AttributeSetDAO.class);
 		Map<String, Attribute> attrs = template.getAttributes();
-		if (template == null || attrs == null || attrs.isEmpty())
+		if (attrs == null || attrs.isEmpty())
 			return attributes;
 
 		try {

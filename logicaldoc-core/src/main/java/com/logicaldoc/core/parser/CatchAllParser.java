@@ -1,7 +1,5 @@
 package com.logicaldoc.core.parser;
 
-import static com.logicaldoc.core.parser.AbstractParser.log;
-
 import java.io.File;
 import java.io.InputStream;
 

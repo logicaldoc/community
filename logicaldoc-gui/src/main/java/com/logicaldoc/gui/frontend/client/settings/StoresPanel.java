@@ -23,7 +23,6 @@ import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -140,17 +139,13 @@ public class StoresPanel extends VLayout {
 		ListGridField write = new ListGridField(WRITE, " ", 30);
 		write.setCanSort(false);
 		write.setCanFilter(false);
-		write.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord rec, int rowNum, int colNum) {
-				String content = "";
-				if (Boolean.TRUE.equals(rec.getAttributeAsBoolean(WRITE))) {
-					content = "<div style='display: flex; text-align: center; justify-content: center;'>"
-							+ AwesomeFactory.getIconButtonHTML("database", null, "default", null, null) + "</div>";
-				}
-				return content;
+		write.setCellFormatter((value, rec, rowNum, colNum) -> {
+			String content = "";
+			if (Boolean.TRUE.equals(rec.getAttributeAsBoolean(WRITE))) {
+				content = "<div style='display: flex; text-align: center; justify-content: center;'>"
+						+ AwesomeFactory.getIconButtonHTML("database", null, "default", null, null) + "</div>";
 			}
+			return content;
 		});
 
 		storesGrid.setFields(id, write, name, type, path);
@@ -350,7 +345,7 @@ public class StoresPanel extends VLayout {
 						new GUIParameter(STORE + storeId + ".dir", storeRecord.getAttributeAsString("path").trim()));
 				settings.add(
 						new GUIParameter(STORE + storeId + ".type", storeRecord.getAttributeAsString("type").trim()));
-				if (storeRecord.getAttributeAsBoolean(WRITE)) {
+				if (Boolean.TRUE.equals(storeRecord.getAttributeAsBoolean(WRITE))) {
 					settings.add(new GUIParameter("store.write", storeId));
 				}
 

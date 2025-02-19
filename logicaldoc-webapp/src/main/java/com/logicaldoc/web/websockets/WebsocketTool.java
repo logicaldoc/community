@@ -3,8 +3,6 @@ package com.logicaldoc.web.websockets;
 import java.util.Random;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.automation.AutomationDictionary;
 import com.logicaldoc.core.security.Session;
@@ -19,8 +17,6 @@ import com.logicaldoc.gui.common.client.websockets.WebsocketMessage;
  */
 @AutomationDictionary
 public class WebsocketTool {
-
-	private static final Logger log = LoggerFactory.getLogger(WebsocketTool.class);
 
 	protected static final Random random = new Random();
 

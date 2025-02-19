@@ -303,7 +303,7 @@ public class Automation {
 		try {
 			// Better to use a mutable shallow copy because we may receive an
 			// unmodifiable client dictionary
-			Map<String, Object> shallowCopy = new HashMap<String, Object>(clientDictionary);
+			Map<String, Object> shallowCopy = new HashMap<>(clientDictionary);
 			VelocityContext context = prepareContext(prepareDictionary(shallowCopy));
 			Velocity.evaluate(context, writer, StringUtils.isNotEmpty(logTag) ? logTag : "ScriptEngine", expression);
 		} catch (Exception e) {

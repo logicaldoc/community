@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -18,7 +18,6 @@ import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
@@ -49,6 +48,8 @@ public class ProtocolsPanel extends AdminPanel {
 	private GUIParameter wdEnabled = null;
 
 	private GUIParameter wdDepth = null;
+
+	private GUIParameter wdCache = null;
 
 	private GUIParameter ftpEnabled = null;
 
@@ -163,8 +164,13 @@ public class ProtocolsPanel extends AdminPanel {
 		wdDepthItem.setMin(0);
 		wdDepthItem.setMax(Integer.MAX_VALUE);
 
+		// Cache status
+		ToggleItem wdCacheItem = ItemFactory.newToggleItem("wdCache", "usecache", Boolean.valueOf(wdCache.getValue()));
+		wdCacheItem.setRequired(true);
+		wdCacheItem.setDisabled(!Session.get().isDefaultTenant());
+
 		if (Session.get().isDefaultTenant())
-			webDavForm.setItems(wdUrl, wdbUrl, wdEnabledItem, wdDepthItem);
+			webDavForm.setItems(wdUrl, wdbUrl, wdEnabledItem, wdDepthItem, wdCacheItem);
 		else
 			webDavForm.setItems(wdUrl, wdbUrl, wdEnabledItem);
 		webDav.setPane(webDavForm);
@@ -246,7 +252,7 @@ public class ProtocolsPanel extends AdminPanel {
 	private void addSaveButton() {
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler((ClickEvent event) -> onSave());
+		save.addClickHandler(click -> onSave());
 
 		addMember(save);
 		if (Session.get().isDemo()) {
@@ -267,14 +273,12 @@ public class ProtocolsPanel extends AdminPanel {
 			webservicesPanel.save();
 
 			ProtocolsPanel.this.cmisEnabled.setValue(values.get("cmisEnabled").toString());
-
 			ProtocolsPanel.this.cmisChangelog.setValue(values.get("cmisChangelog").toString());
-
 			ProtocolsPanel.this.cmisMaxItems.setValue(values.get("cmisMaxItems").toString());
 
 			ProtocolsPanel.this.wdEnabled.setValue(values.get("wdEnabled").toString());
-
 			ProtocolsPanel.this.wdDepth.setValue(values.get("wdDepth").toString());
+			ProtocolsPanel.this.wdCache.setValue(values.get("wdCache").toString());
 
 			ProtocolsPanel.this.ftpEnabled.setValue(values.get("ftpEnabled").toString());
 			ProtocolsPanel.this.ftpPort.setValue(values.get("ftpPort").toString());
@@ -289,9 +293,12 @@ public class ProtocolsPanel extends AdminPanel {
 		params.addAll(webservicesPanel.getSettings());
 		params.add(ProtocolsPanel.this.wdEnabled);
 		params.add(ProtocolsPanel.this.wdDepth);
+		params.add(ProtocolsPanel.this.wdCache);
+
 		params.add(ProtocolsPanel.this.cmisEnabled);
 		params.add(ProtocolsPanel.this.cmisChangelog);
 		params.add(ProtocolsPanel.this.cmisMaxItems);
+
 		params.add(ProtocolsPanel.this.ftpEnabled);
 		params.add(ProtocolsPanel.this.ftpPort);
 		params.add(ProtocolsPanel.this.ftpSsl);
@@ -345,6 +352,8 @@ public class ProtocolsPanel extends AdminPanel {
 				wdEnabled = parameter;
 			else if (parameter.getName().equals("webdav.depth"))
 				wdDepth = parameter;
+			else if (parameter.getName().equals("webdav.cache.enabled"))
+				wdCache = parameter;
 			else if (parameter.getName().equals("ftp.enabled"))
 				ftpEnabled = parameter;
 			else if (parameter.getName().equals("ftp.port"))
@@ -361,7 +370,7 @@ public class ProtocolsPanel extends AdminPanel {
 				ftpKeystorePassword = parameter;
 		}
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

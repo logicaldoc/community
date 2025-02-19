@@ -1,7 +1,5 @@
 package com.logicaldoc.core.searchengine;
 
-import static com.logicaldoc.core.searchengine.Search.log;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;

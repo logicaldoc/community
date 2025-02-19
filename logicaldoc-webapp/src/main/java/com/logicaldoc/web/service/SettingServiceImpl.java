@@ -223,8 +223,8 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		ContextProperties conf = Context.get().getProperties();
 		List<GUIParameter> params = new ArrayList<>();
 		for (Object key : conf.keySet())
-			if (key.toString().startsWith("webservice.") || key.toString().startsWith("webdav")
-					|| key.toString().startsWith("cmis") || key.toString().startsWith("ftp."))
+			if (key.toString().startsWith("webservice.") || key.toString().startsWith("webdav.")
+					|| key.toString().startsWith("cmis.") || key.toString().startsWith("ftp."))
 				params.add(new GUIParameter(key.toString(), conf.getProperty(key.toString())));
 
 		return params;

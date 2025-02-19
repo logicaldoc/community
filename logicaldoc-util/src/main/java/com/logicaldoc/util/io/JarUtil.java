@@ -11,8 +11,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.Context;
 
@@ -23,8 +21,6 @@ import com.logicaldoc.util.Context;
  * @version 4.0
  */
 public class JarUtil {
-
-	private static final Logger log = LoggerFactory.getLogger(JarUtil.class);
 
 	/**
 	 * Maximum number of entries in the compressed archive, config parameter
