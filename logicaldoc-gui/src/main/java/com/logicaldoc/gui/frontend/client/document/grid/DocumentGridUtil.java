@@ -228,7 +228,7 @@ public class DocumentGridUtil {
 			rec.setAttribute(FOLDER_ID, doc.getId());
 			rec.setAttribute(TENANT_ID, doc.getTenantId());
 		} else {
-			rec.setAttribute(SUMMARY, rec.getAttribute(SUMMARY));
+			rec.setAttribute(SUMMARY, doc.getSummary());
 
 			updateId(doc, rec);
 

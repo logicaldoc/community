@@ -134,6 +134,12 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	 */
 	protected List<String> extendedAttributes = new ArrayList<>();
 
+	/*
+	 * A cache of summaries, it seems that a bug in SmartGWT deletes the content
+	 * of the summary field when the user expands the row the second time
+	 */
+	protected Map<Long, String> summaries = new HashMap<>();
+
 	private DocumentsListGrid(GUIFolder folder, List<String> extendedAttributes) {
 		this.folder = folder;
 		if (extendedAttributes != null)
@@ -219,7 +225,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	 * Prepares the map that contains all the possible fields we can use
 	 */
 	protected void prepareFieldsMap() {
-		ListGridField id =new IdListGridField();
+		ListGridField id = new IdListGridField();
 		fieldsMap.put(id.getName(), id);
 
 		ListGridField size = new FileSizeListGridField("size", I18N.getAttributeLabel("size"));
@@ -763,21 +769,26 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		setCanExpandRecords(true);
 		setExpansionMode(ExpansionMode.DETAIL_FIELD);
 		setDetailField(SUMMARY);
-
 	}
 
 	@Override
 	protected Canvas getExpansionComponent(final ListGridRecord rec) {
-		return new HTMLFlow("<div class='details'>"
-				+ (rec.getAttributeAsString(SUMMARY) != null ? rec.getAttributeAsString(SUMMARY) : "") + "</div>");
+		return new HTMLFlow("<span class='details'>" + summaries.get(rec.getAttributeAsLong("id")) != null
+				? summaries.get(rec.getAttributeAsLong("id"))
+				: "" + "</span>");
 	}
 
 	@Override
 	public void setDocuments(List<GUIDocument> documents) {
 		List<ListGridRecord> records = new ArrayList<>();
+		summaries.clear();
 
-		for (GUIDocument document : documents)
-			records.add(DocumentGridUtil.fromDocument(document));
+		for (GUIDocument document : documents) {
+			ListGridRecord rec = DocumentGridUtil.fromDocument(document);
+			records.add(rec);
+			if (document.getSummary() != null && !document.getSummary().isBlank())
+				summaries.put(rec.getAttributeAsLong("id"), document.getSummary());
+		}
 
 		setRecords(records.toArray(new ListGridRecord[0]));
 	}
