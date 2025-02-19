@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.folder.Folder;
 
-public class WDCacheTest {
+public class WebdavCacheTest {
 	
 	WebdavCache wdc;
 	

@@ -140,6 +140,9 @@ public abstract class AbstractWebdavServlet extends HttpServlet implements DavCo
 			// Add session cookie to the response
 			Cookie scookie = new Cookie("ldoc-sid", session.getSid());
 			scookie.setMaxAge(1800);
+			scookie.setHttpOnly(true);
+			scookie.setSecure(Context.get().getProperties().getBoolean("cookies.secure", false));
+			
 			webdavResponse.addCookie(scookie);
 
 			getPath(webdavRequest);

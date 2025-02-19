@@ -24,6 +24,10 @@ public class WebdavCache {
 
 	private static final Logger log = LoggerFactory.getLogger(WebdavCache.class);
 
+	private static final String CACHE_TABLE = "ld_webdavcahe";
+
+	private static final String WHERE_ID = " WHERE ID = ?";
+	
 	private DataSource dataSource;
 
 	private JdbcTemplate jdbcTemplate;
@@ -46,7 +50,7 @@ public class WebdavCache {
 	}
 
 	private DataSource createDataSource() {
-		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL).addScript("classpath:WDCache.sql")
+		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL).addScript("classpath:wdcache.sql")
 				.build();
 	}
 
@@ -55,16 +59,16 @@ public class WebdavCache {
 	}
 
 	public int addFolder(WebdavCacheFolder cf) {
-		int result = jdbcTemplate.update("UPDATE mycache SET path = ?, size = ? WHERE ID = ?", cf.getId(), cf.getPath(),
-				cf.getSize());
+		int result = jdbcTemplate.update("UPDATE " + CACHE_TABLE + " SET path = ?, size = ? WHERE ID = ?", cf.getPath(),
+				cf.getSize(), cf.getId());
 		if (result == 0)
-			result = jdbcTemplate.update("INSERT INTO mycache VALUES (?, ?, ?)", cf.getId(), cf.getPath(),
+			result = jdbcTemplate.update("INSERT INTO " + CACHE_TABLE + " VALUES (?, ?, ?)", cf.getId(), cf.getPath(),
 					cf.getSize());
 		return result;
 	}
 
 	public WebdavCacheFolder getFolder(long id) {
-		String query = "SELECT * FROM mycache WHERE ID = ?";
+		String query = "SELECT * FROM " + CACHE_TABLE + WHERE_ID;
 		return jdbcTemplate.queryForObject(query, (rowSet, rowNum) -> new WebdavCacheFolder(rowSet.getLong("ID"),
 				rowSet.getString("path"), rowSet.getLong("size")), id);
 	}
@@ -72,7 +76,7 @@ public class WebdavCache {
 	public long getFolderSize(long id) {
 		try {
 			return jdbcTemplate != null
-					? jdbcTemplate.queryForObject("SELECT size FROM mycache WHERE ID = " + id, Long.class)
+					? jdbcTemplate.queryForObject("SELECT size FROM " + CACHE_TABLE + WHERE_ID, Long.class, id)
 					: 0L;
 		} catch (NullPointerException | DataAccessException e) {
 			return 0L;
@@ -82,8 +86,8 @@ public class WebdavCache {
 	public long getTreeSize(long id) {
 		try {
 			return jdbcTemplate != null
-					? jdbcTemplate.queryForObject("SELECT SUM(size) FROM mycache WHERE path LIKE '%" + id + "%'",
-							Long.class)
+					? jdbcTemplate.queryForObject("SELECT SUM(size) FROM " + CACHE_TABLE + " WHERE path LIKE ?",
+							Long.class, "%" + id + "%")
 					: 0L;
 		} catch (NullPointerException | DataAccessException e) {
 			return 0;
@@ -92,7 +96,8 @@ public class WebdavCache {
 
 	public int countElements() {
 		try {
-			return jdbcTemplate != null ? jdbcTemplate.queryForObject("SELECT COUNT(*) FROM mycache", Integer.class)
+			return jdbcTemplate != null
+					? jdbcTemplate.queryForObject("SELECT COUNT(*) FROM " + CACHE_TABLE, Integer.class)
 					: 0;
 		} catch (NullPointerException | DataAccessException e) {
 			return 0;
@@ -101,11 +106,11 @@ public class WebdavCache {
 
 	public int setFolderPath(Folder folder) {
 		if (folder != null && !StringUtils.isEmpty(folder.getPath())) {
-			int result = jdbcTemplate.update("UPDATE mycache SET path = ? WHERE ID = ?", folder.getPath(),
+			int result = jdbcTemplate.update("UPDATE " + CACHE_TABLE + " SET path = ? WHERE ID = ?", folder.getPath(),
 					folder.getId());
 			if (result == 0) {
-				result = jdbcTemplate.update("INSERT INTO mycache VALUES (?, ?, ?)", folder.getId(), folder.getPath(),
-						0);
+				result = jdbcTemplate.update("INSERT INTO " + CACHE_TABLE + " VALUES (?, ?, ?)", folder.getId(),
+						folder.getPath(), 0);
 			}
 			return result;
 		} else {
@@ -113,15 +118,16 @@ public class WebdavCache {
 		}
 	}
 
-	public String getFolderPath(long folderID) {
+	public String getFolderPath(long folderId) {
 		try {
-			return jdbcTemplate.queryForObject("SELECT path FROM mycache WHERE ID = " + folderID, String.class);
+			return jdbcTemplate.queryForObject("SELECT path FROM " + CACHE_TABLE + WHERE_ID, String.class,
+					folderId);
 		} catch (NullPointerException | DataAccessException e) {
 			return null;
 		}
 	}
 
 	public int truncate() {
-		return jdbcTemplate.update("DELETE FROM mycache");
+		return jdbcTemplate.update("DELETE FROM " + CACHE_TABLE);
 	}
 }

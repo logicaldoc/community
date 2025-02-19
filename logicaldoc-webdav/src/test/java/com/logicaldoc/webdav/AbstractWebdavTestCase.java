@@ -67,21 +67,17 @@ public abstract class AbstractWebdavTestCase extends AbstractTestCase {
 		device.setOperativeSystem("Windows");
 		client.setDevice(device);
 		session = SessionManager.get().newSession(username, password, null, client);
-		if (session != null) {
-			System.out.println("session enstablished");
-			User user = userDao.findByUsernameIgnoreCase(username);
-			userDao.initialize(user);
-			LDAuthenticationToken token = new LDAuthenticationToken(username);
-			token.setSid(session.getSid());
-			SecurityContextHolder.getContext().setAuthentication(token);
+		User user = userDao.findByUsernameIgnoreCase(username);
+		userDao.initialize(user);
+		LDAuthenticationToken token = new LDAuthenticationToken(username);
+		token.setSid(session.getSid());
+		SecurityContextHolder.getContext().setAuthentication(token);
 
-			LDSecurityContextRepository.bindServletSession(session.getSid(), servletSession);
+		LDSecurityContextRepository.bindServletSession(session.getSid(), servletSession);
 
-			davSession = new DavSessionImpl();
-			davSession.putObject("id", session.getUserId());
-			davSession.putObject("sid", session.getSid());
-		} else
-			System.out.println("session NOT enstablished");
+		davSession = new DavSessionImpl();
+		davSession.putObject("id", session.getUserId());
+		davSession.putObject("sid", session.getSid());
 	}
 
 	private void prepareRepository() throws IOException {
