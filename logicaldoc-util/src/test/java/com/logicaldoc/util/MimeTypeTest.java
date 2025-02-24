@@ -31,8 +31,11 @@ public class MimeTypeTest {
 		
 		// extension not defined, should default to "application/octet-stream"
 		res = MimeType.getByFilename("Smart Insert.edge");
-		assertFalse("video/webm".equals(res));
+		assertNotSame("video/webm", res);
 		assertEquals("application/octet-stream", res);
+		
+		res = MimeType.getByFilename("Fwd- R- Preavviso vacanze Ordini aperti.eml");
+		assertEquals("message/rfc822", res);
 	}
 	
 	@Test
@@ -49,6 +52,9 @@ public class MimeTypeTest {
 		
 		res = MimeType.get(".mp4");
 		assertEquals("video/mp4", res);
+		
+		res = MimeType.get(".eml");
+		assertEquals("message/rfc822", res);		
 	}	
 
 }
