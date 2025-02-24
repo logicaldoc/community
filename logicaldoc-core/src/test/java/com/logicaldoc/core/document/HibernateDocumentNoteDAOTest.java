@@ -1,7 +1,13 @@
 package com.logicaldoc.core.document;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -9,9 +15,10 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.folder.Folder;
+import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
-
-import junit.framework.Assert;
 
 /**
  * Test case for document note DAO
@@ -23,36 +30,155 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 
 	private DocumentNoteDAO dao;
 
+	private FolderDAO folderDao;
+
+	private DocumentDAO docDao;
+
+	private DocumentHistoryDAO historyDao;
+
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDocumentNoteDAO
-		dao = (DocumentNoteDAO) context.getBean("DocumentNoteDAO");
+		dao = Context.get(DocumentNoteDAO.class);
+		folderDao = Context.get(FolderDAO.class);
+		docDao = Context.get(DocumentDAO.class);
+		historyDao = Context.get(DocumentHistoryDAO.class);
 	}
 
 	@Test
 	public void testFindByDocId() throws PersistenceException {
 		List<DocumentNote> notes = dao.findByDocId(1L, null);
-		Assert.assertNotNull(notes);
-		Assert.assertEquals(2, notes.size());
+		assertNotNull(notes);
+		assertEquals(2, notes.size());
 		DocumentNote note = notes.get(0);
-		Assert.assertEquals("message for note 1", note.getMessage());
+		assertEquals("message for note 1", note.getMessage());
+		assertNotNull(notes.toString());
+
+		assertNotSame(0, note.hashCode());
+	}
+
+	@SuppressWarnings("unlikely-arg-type")
+	@Test
+	public void testEquals() throws PersistenceException {
+		DocumentNote note1 = dao.findById(1);
+		assertNotNull(note1);
+
+		DocumentNote note2 = dao.findById(2);
+		assertNotNull(note2);
+
+		String notANote = "Not a DocumentNote";
+
+		assertNotSame(note1, note2);
+
+		note2.setId(note1.getId());
+		assertNotSame(note1, note2);
+
+		note1.setDate(null);
+		assertNotSame(note1, note2);
+
+		note1.setDate(new Date());
+		assertNotSame(note1, note2);
+
+		assertEquals(note1, note1);
+
+		DocumentNote nullNote = null;
+		assertNotSame(note1, nullNote);
+		assertNotSame(note1, new Object());
+		assertNotSame(note1, notANote);
+
+		note1 = dao.findById(1);
+		note2 = dao.findById(2);
+		assertEquals(note1.getDate(), note2.getDate());
+
+		note2.setDate(null);
+		assertNotSame(note1.getDate(), note2.getDate());
+		assertNotSame(note2, note1);
+
+		note1 = dao.findById(1);
+		note2 = dao.findById(2);
+		note2.setFileVersion(null);
+		assertNotSame(note1.getFileVersion(), note2.getFileVersion());
+		assertNotSame(note2, note1);
 	}
 
 	@Test
 	public void testFindByDocIdAndType() throws PersistenceException {
 		List<DocumentNote> notes = dao.findByDocIdAndType(1L, null, "x");
-		Assert.assertNotNull(notes);
-		Assert.assertEquals(1, notes.size());
+		assertNotNull(notes);
+		assertEquals(1, notes.size());
 		DocumentNote note = notes.get(0);
-		Assert.assertEquals("message for note 2", note.getMessage());
+		assertEquals("message for note 2", note.getMessage());
+
+		notes = dao.findByDocIdAndType(3L, "1.3", "x");
+		assertNotNull(notes);
 	}
 
 	@Test
 	public void testCopyAnnotations() throws PersistenceException {
-		Assert.assertTrue(dao.findByDocId(4L, "2.0").isEmpty());
+		assertTrue(dao.findByDocId(4L, "2.0").isEmpty());
 		dao.copyAnnotations(3L, "1.0", "2.0");
-		Assert.assertEquals(1, dao.findByDocId(3L, "2.0").size());
+		assertEquals(1, dao.findByDocId(3L, "2.0").size());
+	}
+
+	@Test
+	public void testStore() throws PersistenceException {
+		DocumentNote note = new DocumentNote();
+		note.setFileName("documentNoteTest");
+		// non-existent docId
+		note.setDocId(999777L);
+		try {
+			dao.store(note);
+		} catch (PersistenceException e) {
+			// catch exception
+		}
+
+		// fileVersion() == null
+		Folder folder = folderDao.findById(6);
+		Document doc = new Document();
+		doc.setFileName("testDoc");
+		doc.setFolder(folder);
+		doc.setVersion(null);
+		docDao.store(doc);
+
+		note = new DocumentNote();
+		note.setFileName("noteTest");
+		note.setDocId(doc.getId());
+		dao.store(note);
+		assertNotNull(note);
+		assertEquals(null, note.getFileVersion());
+
+		// test overridden store method with DocumentNote and DocumentHistory
+		// parameters
+		DocumentHistory history = historyDao.findById(1L);
+		historyDao.initialize(history);
+		assertNotNull(history);
+
+		dao.store(note, history);
+	}
+
+	@Test
+	public void testFindByUserId() throws PersistenceException {
+		List<DocumentNote> notes = dao.findByUserId(1L);
+		assertNotNull(notes);
+	}
+
+	@Test
+	public void testDelete() throws PersistenceException {
+		Folder folder = folderDao.findById(6);
+		Document doc = new Document();
+		doc.setFileName("testDoc");
+		doc.setFolder(folder);
+		doc.setIndexed(AbstractDocument.INDEX_INDEXED);
+		docDao.store(doc);
+
+		DocumentNote note = new DocumentNote();
+		note.setFileName("noteTest");
+		note.setDocId(doc.getId());
+		dao.store(note);
+		assertNotNull(note);
+
+		dao.delete(note.getId(), 1);
 	}
 }

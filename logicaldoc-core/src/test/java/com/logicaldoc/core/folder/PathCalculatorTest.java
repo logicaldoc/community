@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
@@ -29,8 +30,8 @@ public class PathCalculatorTest extends AbstractCoreTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		testSubject = (PathCalculator) context.getBean("pathCalculator");
-		folderDao = (FolderDAO) context.getBean("FolderDAO");
+		testSubject = Context.get(PathCalculator.class);
+		folderDao = Context.get(FolderDAO.class);
 	}
 
 	@Test

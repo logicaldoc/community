@@ -39,8 +39,8 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateVersionDAO
-		testSubject = (VersionDAO) context.getBean("VersionDAO");
-		docDao = (DocumentDAO) context.getBean("DocumentDAO");
+		testSubject = Context.get(VersionDAO.class);
+		docDao = Context.get(DocumentDAO.class);
 	}
 
 	@Test
@@ -74,6 +74,10 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		assertEquals("0.1", version.getFileVersion());
 
 		version = testSubject.findByVersion(1, "30");
+		assertNull(version);
+		
+		// version is empty
+		version = testSubject.findByFileVersion(1, "");
 		assertNull(version);
 	}
 
@@ -144,5 +148,16 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 			String res = store.getResourceName(doc.getId(), ver.getFileVersion(), null);
 			store.exists(doc.getId(), res);
 		}
+	}
+
+	@Test
+	public void testUpdateDigest() throws PersistenceException {
+		Document document = docDao.findById(3);
+		assertNotNull(document);
+
+		Version version = testSubject.findByVersion(3, "1.3");
+		assertNotNull(version);
+
+		testSubject.updateDigest(version);
 	}
 }

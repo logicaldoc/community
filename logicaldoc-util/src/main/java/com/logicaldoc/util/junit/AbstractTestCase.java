@@ -56,14 +56,14 @@ public abstract class AbstractTestCase {
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		System.setProperty("LOGICALDOC_REPOSITORY", "target");
-		
+
 		loadDevelSettings();
 
 		updateUserHome();
 
 		createTestDirs();
 
-		initializePlugins();
+		initializePlugins(getPluginArchives());
 
 		context = buildApplicationContext();
 
@@ -116,8 +116,7 @@ public abstract class AbstractTestCase {
 	 * @throws IOException I/O error retrieving the plugin archives
 	 * @throws PluginException Error during plugin initialization
 	 */
-	protected void initializePlugins() throws IOException, PluginException {
-		List<String> pluginArchives = getPluginArchives();
+	protected void initializePlugins(List<String> pluginArchives) throws IOException, PluginException {
 		if (CollectionUtils.isEmpty(pluginArchives))
 			return;
 

@@ -773,9 +773,10 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 	@Override
 	protected Canvas getExpansionComponent(final ListGridRecord rec) {
-		return new HTMLFlow("<span class='details'>" + summaries.get(rec.getAttributeAsLong("id")) != null
-				? summaries.get(rec.getAttributeAsLong("id"))
-				: "" + "</span>");
+		return new HTMLFlow("<span class='details'>"
+				+ (summaries.get(rec.getAttributeAsLong("id")) != null ? summaries.get(rec.getAttributeAsLong("id"))
+						: "")
+				+ "</span>");
 	}
 
 	@Override

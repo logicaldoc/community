@@ -36,7 +36,6 @@ public class DigestProcessor extends Task {
 		log = LoggerFactory.getLogger(DigestProcessor.class);
 	}
 
-
 	@Override
 	public boolean isIndeterminate() {
 		return false;
@@ -57,15 +56,9 @@ public class DigestProcessor extends Task {
 			size = documentDao.queryForLong(
 					"select count(*) from ld_document where ld_deleted = 0 and ld_docref is null and ld_digest is null");
 
-			Integer max = config.getProperty("digest.batch") != null
-					? Integer.parseInt(config.getProperty("digest.batch"))
-					: null;
-
-			if (max != null && max.intValue() < size && max.intValue() > 0)
-				size = max.intValue();
-
-			if (max != null && max.intValue() < 1)
-				max = null;
+			int max = config.getInt("digest.batch", (int) size);
+			if (max < size && max > 0)
+				size = max;
 
 			log.info("Found a total of {} documents to process", size);
 

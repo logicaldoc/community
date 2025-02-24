@@ -66,24 +66,19 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	private TemplateDAO templateDao;
 
 	private static final Logger log = LoggerFactory.getLogger(HibernateFolderDAOTest.class);
-
-	@Override
-	protected List<String> getPluginArchives() {
-		return List.of("/logicaldoc-core-plugin.jar");
-	}
-
+	
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateFolderDAO
-		testSubject = (FolderDAO) context.getBean("FolderDAO");
-		userDao = (UserDAO) context.getBean("UserDAO");
-		docDao = (DocumentDAO) context.getBean("DocumentDAO");
-		historyDao = (FolderHistoryDAO) context.getBean("FolderHistoryDAO");
-		templateDao = (TemplateDAO) context.getBean("TemplateDAO");
-		docManager = (DocumentManager) context.getBean("documentManager");
+		testSubject = Context.get(FolderDAO.class);
+		userDao = Context.get(UserDAO.class);
+		docDao = Context.get(DocumentDAO.class);
+		historyDao = Context.get(FolderHistoryDAO.class);
+		templateDao = Context.get(TemplateDAO.class);
+		docManager = Context.get(DocumentManager.class);
 	}
 
 	@Test
@@ -148,8 +143,8 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	public void testCount() throws PersistenceException {
 		int docCount = testSubject.count(false);
 		int docCountDelete = testSubject.count(true);
-		assertEquals(4, docCount);
-		assertEquals(7, docCountDelete);
+		assertEquals(6, docCount);
+		assertEquals(9, docCountDelete);
 	}
 
 	@Test
@@ -213,7 +208,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		}
 
 		long count = testSubject.countDocsInTree(5L);
-		assertEquals(4, count);
+		assertEquals(6, count);
 
 		count = testSubject.countDocsInTree(4L);
 		assertEquals(0, count);
@@ -222,7 +217,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testCountDocs() throws PersistenceException {
 		long count = testSubject.countDocs(6L);
-		assertEquals(4, count);
+		assertEquals(6, count);
 	}
 
 	@Test
@@ -240,7 +235,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		}
 
 		long size = testSubject.computeTreeSize(5L);
-		assertEquals(391049L, size);
+		assertEquals(635739L, size);
 
 		size = testSubject.computeTreeSize(4L);
 		assertEquals(0, size);

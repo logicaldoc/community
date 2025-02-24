@@ -72,6 +72,9 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 
 		// Store the file of document 3
 		FileUtil.copyResource("/small.pdf", new File(rootStoreOne.getPath() + "/3/doc/1.3"));
+
+		// Store the file of document 8
+		FileUtil.copyResource("/small.pdf", new File(rootStoreOne.getPath() + "/8/doc/1.0"));
 	}
 
 	@Override

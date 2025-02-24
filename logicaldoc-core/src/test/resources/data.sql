@@ -160,8 +160,8 @@ values (2, '2008-11-07 00:00:00', '2008-11-07 00:00:00',0,'test2','test2_desc',0
 
 insert into ld_folder (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
 values (3000,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'Workspace X',5,1,0,1,1,1,0,'/Workspace X');
-insert into ld_folder (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
-values (6,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'folder6',3000,0,0,1,1,2,0,'/Workspace X/folder6');
+insert into ld_folder (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path,ld_maxversions)
+values (6,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'folder6',3000,0,0,1,1,2,0,'/Workspace X/folder6',1);
 insert into ld_folder (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_securityref,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
 values (7,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'folder7',3000,0,0,6,1,1,3,0,'/Workspace X/folder7');
 insert into ld_folder (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_deleteuserid,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
@@ -257,6 +257,16 @@ values     (7,6,'2010-04-01 00:00:00',0,0,'h','1.0','2006-12-19 00:00:00','2006-
 insert into ld_document_acl(ld_docid, ld_groupid, ld_read, ld_write, ld_security, ld_immutable, ld_delete, ld_rename, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_readingreq, ld_preview, ld_customid)
 values (7,-2,1,1,1,0,1,1,0,0,0,0,0,1,1,0,1,1,0,0,1,1);
 
+insert into ld_document
+           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_templateid,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_deleteuserid,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd,ld_previewpages,ld_docattrs)
+values     (8,6,'2010-04-01 00:00:00',0,0,'i','1.0','2025-02-17 00:00:00','2025-02-17 00:00:00','myself',1,1,'XML',3,'en','context.xml',122345,1,1,0,'',1,0,2,0,0,1,1,5,0,0,0,0,1,0);
+insert into ld_document_acl(ld_docid, ld_groupid, ld_read, ld_write, ld_security, ld_immutable, ld_delete, ld_rename, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_readingreq, ld_preview, ld_customid)
+values (8,-2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+
+insert into ld_document
+           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_templateid,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_deleteuserid,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd,ld_previewpages,ld_docattrs)
+values     (9,6,'2010-04-01 00:00:00',0,1,'l','1.0','2025-02-17 00:00:00','2025-02-17 00:00:00','myself',1,1,'XML',3,'en','context.xml',122345,1,1,0,'',1,0,2,0,0,1,1,5,0,0,0,0,1,0);
+
 
 insert into ld_ticket
            (ld_id,ld_lastmodified,ld_deleted,ld_ticketid,ld_docid,ld_userid,ld_type,ld_creation,ld_expired,ld_count,ld_tenantid,ld_recordversion, ld_enabled,ld_views)
@@ -287,6 +297,9 @@ values     (12,3,'1.2','1.2','testUser',1,'2006-12-20 00:00:00','testComment','2
 
 insert into ld_version(ld_id, ld_documentid, ld_version, ld_fileversion, ld_username, ld_userid, ld_versiondate, ld_comment, ld_lastmodified, ld_deleted, ld_immutable, ld_creation, ld_publisherid, ld_indexed, ld_signed, ld_status, ld_filesize, ld_folderid,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_filename,ld_links,ld_ocrd,ld_previewpages,ld_docattrs)
 values     (13,3,'1.3','1.3','testUser',1,'2006-12-20 00:00:00','testComment','2009-02-09 00:00:00',0,0,'2009-02-09 00:00:00',1,0,0,0,0,5,'',1,0,0,1,1,1,5,0,0,'pippo.pdf',0,0,1,0);
+
+insert into ld_version(ld_id, ld_documentid, ld_version, ld_fileversion, ld_username, ld_userid, ld_versiondate, ld_comment, ld_lastmodified, ld_deleted, ld_immutable, ld_creation, ld_publisherid, ld_indexed, ld_signed, ld_status, ld_filesize, ld_folderid,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_filename,ld_links,ld_ocrd,ld_previewpages,ld_docattrs,ld_templateid,ld_tgs)
+values     (14,8,'1.0','1.0','testUser',1,'2025-02-18 00:00:00','testComment','2009-02-09 00:00:00',0,0,'2009-02-09 00:00:00',1,0,0,0,0,5,'',1,0,0,1,1,1,5,0,0,'pippo.pdf',0,0,1,0,2,'tgs_string');
 
 
 insert into ld_tag(ld_docid, ld_tenantid, ld_tag)

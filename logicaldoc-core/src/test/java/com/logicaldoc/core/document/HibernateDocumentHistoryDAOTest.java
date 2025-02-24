@@ -13,6 +13,8 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.i18n.DateBean;
+import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 import junit.framework.Assert;
@@ -34,7 +36,7 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateHistoryDAO
-		dao = (DocumentHistoryDAO) context.getBean("DocumentHistoryDAO");
+		dao = Context.get(DocumentHistoryDAO.class);
 	}
 
 	@Test
@@ -208,8 +210,18 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(0, histories.size());
 
-		// Try with unexisting user
+		// Try with non-existing user
 		histories = dao.findByUserIdAndEvent(99, "data test 02", null);
+		Assert.assertNotNull(histories);
+		Assert.assertEquals(0, histories.size());
+		
+		// Try with non-null sessionId
+		DocumentHistory transaction = new DocumentHistory();
+		transaction.setSessionId("123");
+		transaction.setComment("");
+		transaction.setUser(new User());
+		
+		histories = dao.findByUserIdAndEvent(3, "data test 03", transaction.getSessionId());
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(0, histories.size());
 	}

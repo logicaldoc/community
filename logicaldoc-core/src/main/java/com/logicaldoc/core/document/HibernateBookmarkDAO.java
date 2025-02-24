@@ -31,24 +31,14 @@ public class HibernateBookmarkDAO extends HibernatePersistentObjectDAO<Bookmark>
 
 	@Override
 	public Bookmark findByUserIdAndDocId(long userId, long docId) throws PersistenceException {
-		List<Bookmark> list = findByWhere(ENTITY + USER_ID + userId + AND + ENTITY + ".targetId =" + docId + AND
-				+ ENTITY + ".type=" + Bookmark.TYPE_DOCUMENT, null, null);
-
-		if (list.isEmpty())
-			return null;
-		else
-			return list.get(0);
+		return findByWhere(ENTITY + USER_ID + userId + AND + ENTITY + ".targetId =" + docId + AND
+				+ ENTITY + ".type=" + Bookmark.TYPE_DOCUMENT, null, null).stream().findFirst().orElse(null);
 	}
 
 	@Override
 	public Bookmark findByUserIdAndFolderId(long userId, long folderId) throws PersistenceException {
-		List<Bookmark> list = findByWhere(ENTITY + USER_ID + userId + AND + ENTITY + ".targetId =" + folderId + AND
-				+ ENTITY + ".type=" + Bookmark.TYPE_FOLDER, null, null);
-
-		if (list.isEmpty())
-			return null;
-		else
-			return list.get(0);
+		return findByWhere(ENTITY + USER_ID + userId + AND + ENTITY + ".targetId =" + folderId + AND
+				+ ENTITY + ".type=" + Bookmark.TYPE_FOLDER, null, null).stream().findFirst().orElse(null);
 	}
 
 	@Override

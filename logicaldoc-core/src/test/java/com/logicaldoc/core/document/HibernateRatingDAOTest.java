@@ -1,5 +1,7 @@
 package com.logicaldoc.core.document;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -9,6 +11,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 import junit.framework.Assert;
@@ -29,7 +32,7 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateRatingDAO
-		dao = (RatingDAO) context.getBean("RatingDAO");
+		dao = Context.get(RatingDAO.class);
 	}
 
 	@Test
@@ -54,6 +57,15 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 		rat2 = dao.findById(2);
 		Assert.assertEquals(2, rat2.getVote());
 		Assert.assertEquals(4, rat2.getDocId());
+
+		// testing overridden method with Rating and DocumentHistory parameters
+		DocumentHistoryDAO historyDao = Context.get(DocumentHistoryDAO.class);
+
+		DocumentHistory history = historyDao.findById(1L);
+		historyDao.initialize(history);
+		assertNotNull(history);
+
+		dao.store(rat2, history);
 	}
 
 	@Test
@@ -68,7 +80,7 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 		Assert.assertEquals(1, rat1.getCount().intValue());
 		Assert.assertEquals(Float.valueOf(3.0F), rat1.getAverage().floatValue());
 
-		// Try with unexisting rating vote
+		// Try with non-existing rating vote
 		rat1 = dao.findVotesByDocId(99);
 		Assert.assertNull(rat1);
 	}
@@ -78,7 +90,7 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 		List<Rating> ratings = dao.findByDocId(1L);
 		Assert.assertEquals(2, ratings.size());
 
-		// Try with unexisting rating vote
+		// Try with non-existing rating vote
 		ratings = dao.findByDocId(99L);
 		Assert.assertTrue(ratings.isEmpty());
 	}
@@ -87,5 +99,31 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 	public void testFindByDocIdAndUserId() throws PersistenceException {
 		Assert.assertNotNull(dao.findByDocIdAndUserId(1, 1));
 		Assert.assertNull(dao.findByDocIdAndUserId(2, 2));
+	}
+
+	@Test
+	public void testUpdateDocumentRating() throws PersistenceException {
+		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		Document doc = docDao.findById(1L);
+		docDao.initialize(doc);
+		assertNotNull(doc);
+
+		DocumentHistoryDAO historyDao = Context.get(DocumentHistoryDAO.class);
+		DocumentHistory history = historyDao.findById(1L);
+		historyDao.initialize(history);
+		assertNotNull(history);
+
+		dao.updateDocumentRating(doc.getId(), history);
+	}
+
+	@Test
+	public void testDelete() throws PersistenceException {
+		Rating rat1 = new Rating();
+		rat1.setDocId(4);
+		rat1.setUserId(2);
+		dao.store(rat1);
+		assertNotNull(rat1);
+
+		dao.delete(1, 1);
 	}
 }

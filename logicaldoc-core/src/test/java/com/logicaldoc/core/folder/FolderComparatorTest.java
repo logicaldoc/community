@@ -13,6 +13,7 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
@@ -31,8 +32,8 @@ public class FolderComparatorTest extends AbstractCoreTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		testSubject = (FolderDAO) context.getBean("FolderDAO");
-		templateDao = (TemplateDAO) context.getBean("TemplateDAO");
+		testSubject = Context.get(FolderDAO.class);
+		templateDao = Context.get(TemplateDAO.class);
 	}
 
 	@Test

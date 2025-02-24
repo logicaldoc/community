@@ -169,10 +169,6 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 		}
 	}
 
-	public void setStore(Store store) {
-		this.store = store;
-	}
-
 	@Override
 	public void delete(long versionId, int delCode) throws PersistenceException {
 		if (!checkStoringAspect())
@@ -190,9 +186,5 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 		versionToDelete.setLastModified(new Date());
 		versionToDelete.setVersion(StringUtils.right(versionToDelete.getId() + "." + versionToDelete.getVersion(), 10));
 		saveOrUpdate(versionToDelete);
-	}
-
-	public void setFolderDAO(FolderDAO folderDAO) {
-		this.folderDAO = folderDAO;
 	}
 }
