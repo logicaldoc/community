@@ -6,11 +6,11 @@
 		  String sid = SessionManager.get().getSessionId(request);
 		  if (sid != null) {
 			  Cookie sidCookie = new Cookie("ldoc-sid", sid);
+			  sidCookie.setMaxAge(1800); 
+			  sidCookie.setHttpOnly(true);
 			  response.addCookie(sidCookie);
 		  }
-		} catch (Throwable t) {
-			t.printStackTrace();
-		} 
+		} catch (Throwable t) {} 
    }
 %>
 <% setCookie(request, response); %>
