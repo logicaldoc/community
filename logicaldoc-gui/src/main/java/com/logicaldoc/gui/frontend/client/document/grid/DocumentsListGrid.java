@@ -787,7 +787,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		for (GUIDocument document : documents) {
 			ListGridRecord rec = DocumentGridUtil.fromDocument(document);
 			records.add(rec);
-			if (document.getSummary() != null && !document.getSummary().isBlank())
+			if (document.getSummary() != null && !document.getSummary().trim().isEmpty())
 				summaries.put(rec.getAttributeAsLong("id"), document.getSummary());
 		}
 
