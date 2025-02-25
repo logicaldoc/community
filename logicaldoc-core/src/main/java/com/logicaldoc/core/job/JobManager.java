@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
@@ -115,6 +116,19 @@ public class JobManager {
 		scheduler.scheduleJob(jobDetail, trgs, true);
 	}
 
+	/**
+	 * Immediately runs a Job
+	 * 
+	 * @param job the Job to schedule
+	 * @param dictionary map of data to assign at fire-time to the Job
+	 * 
+	 * @throws SchedulerException error in the scheduler
+	 */
+	public void scheduleNow(AbstractJob job, Map<String, Object> dictionary)
+			throws SchedulerException {
+		schedule(job, dictionary, DateUtils.addMilliseconds(new Date(), 500));
+	}
+	
 	private Trigger prepareTrigger(AbstractJob job, Object triggerSpec, Map<Object, Map<String, Object>> triggersMap) {
 		if (!triggersMap.get(triggerSpec).containsKey(TENANT_ID))
 			triggersMap.get(triggerSpec).put(TENANT_ID, job.getTenantId());
