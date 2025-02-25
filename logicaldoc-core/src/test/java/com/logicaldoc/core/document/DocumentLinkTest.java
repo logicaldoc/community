@@ -99,11 +99,11 @@ public class DocumentLinkTest extends AbstractCoreTestCase {
 		link2.setDocument2(doc2);
 
 		assertEquals(link1, link1);
-		assertNotSame(link2, link1);
-		assertNotSame(link1, link2);
+		assertEquals(false, link2.equals(link1));
+		assertEquals(false, link1.equals(link2));
 
 		link2 = null;
-		assertNotSame(link1, link2);
+		assertEquals(false, link1.equals(link2));
 
 		link1 = new DocumentLink();
 		link1.setDocument1(null);
@@ -114,7 +114,7 @@ public class DocumentLinkTest extends AbstractCoreTestCase {
 		link2.setDocument2(doc3);
 		DocumentLink link3 = new DocumentLink();
 		link3.setDocument2(doc2);
-		assertNotSame(link2, link3);
+		assertEquals(false, link2.equals(link3));
 
 		link1 = new DocumentLink();
 		link1.setType("linkType1");
@@ -122,7 +122,7 @@ public class DocumentLinkTest extends AbstractCoreTestCase {
 		link2 = new DocumentLink();
 		link2.setType("linkType2");
 		assertNotNull(link2.getType());
-		assertNotSame(link1, link2);
-		assertNotSame(link2, link1);
+		assertEquals(false, link1.equals(link2));
+		assertEquals(false, link2.equals(link1));
 	}
 }

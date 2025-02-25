@@ -70,37 +70,38 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 
 		String notANote = "Not a DocumentNote";
 
-		assertNotSame(note1, note2);
+		assertEquals(false, note1.equals(note2));
 
 		note2.setId(note1.getId());
-		assertNotSame(note1, note2);
+		assertEquals(false, note1.equals(note2));
 
 		note1.setDate(null);
-		assertNotSame(note1, note2);
+		assertEquals(false, note1.equals(note2));
 
 		note1.setDate(new Date());
 		assertNotSame(note1, note2);
+		assertEquals(false, note1.equals(note2));
 
 		assertEquals(note1, note1);
 
 		DocumentNote nullNote = null;
-		assertNotSame(note1, nullNote);
-		assertNotSame(note1, new Object());
-		assertNotSame(note1, notANote);
+		assertEquals(false, note1.equals(nullNote));
+		assertEquals(false, note1.equals(new Object()));
+		assertEquals(false, note1.equals(notANote));
 
 		note1 = dao.findById(1);
 		note2 = dao.findById(2);
 		assertEquals(note1.getDate(), note2.getDate());
 
 		note2.setDate(null);
-		assertNotSame(note1.getDate(), note2.getDate());
-		assertNotSame(note2, note1);
+		assertEquals(false, note1.getDate().equals(note2.getDate()));
+		assertEquals(false, note1.equals(note2));
 
 		note1 = dao.findById(1);
 		note2 = dao.findById(2);
 		note2.setFileVersion(null);
-		assertNotSame(note1.getFileVersion(), note2.getFileVersion());
-		assertNotSame(note2, note1);
+		assertEquals(false, note1.getFileVersion().equals(note2.getFileVersion()));
+		assertEquals(false, note1.equals(note2));
 	}
 
 	@Test
