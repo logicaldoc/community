@@ -87,6 +87,11 @@ public class JobManager {
 	 */
 	public void schedule(AbstractJob job, Map<String, Object> dictionary, Map<Object, Map<String, Object>> triggers)
 			throws SchedulerException {
+		if(dictionary==null)
+			dictionary=new HashMap<>();
+		else
+			dictionary=new HashMap<>(dictionary);
+		
 		if (job.getTenantId() != null && !dictionary.containsKey(TENANT_ID))
 			dictionary.put(TENANT_ID, job.getTenantId());
 
