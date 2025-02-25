@@ -47,7 +47,7 @@ public class ThreadPools {
 
 	private static final Logger log = LoggerFactory.getLogger(ThreadPools.class);
 
-	private Map<String, ExecutorService> pools = new HashMap<>();
+	private Map<String, ThreadPoolExecutor> pools = new HashMap<>();
 
 	@Resource(name = "ContextProperties")
 	protected ContextProperties config;
@@ -67,8 +67,8 @@ public class ThreadPools {
 	 * @throws ThreadPoolNotAvailableException Raised in case the pool has been
 	 *         shutdown
 	 */
-	public synchronized ExecutorService getPool(String name) throws ThreadPoolNotAvailableException {
-		ExecutorService pool = pools.get(name);
+	public synchronized ThreadPoolExecutor getPool(String name) throws ThreadPoolNotAvailableException {
+		ThreadPoolExecutor pool = pools.get(name);
 
 		if (pool != null) {
 			if (pools.get(name).isShutdown())
@@ -142,7 +142,7 @@ public class ThreadPools {
 	@PreDestroy
 	public void shutdown() {
 		log.info("Shutting down {} thread pools", pools.size());
-		for (Map.Entry<String, ExecutorService> entry : pools.entrySet()) {
+		for (Map.Entry<String, ThreadPoolExecutor> entry : pools.entrySet()) {
 			log.info("Killing all the threads of pool {}", entry.getKey());
 
 			ExecutorService pool = entry.getValue();
