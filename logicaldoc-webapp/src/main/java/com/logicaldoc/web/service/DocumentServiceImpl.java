@@ -121,6 +121,7 @@ import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.html.HTMLSanitizer;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.web.UploadServlet;
+import com.logicaldoc.web.websockets.WebsocketTool;
 
 /**
  * The document service for the operations on the documents done through the
@@ -266,6 +267,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				addDocuments(importZip, charset, immediateIndexing, metadata, session, createdDocs);
 			} catch (ServerException | PersistenceException | ParsingException | IOException e) {
 				log.error(e.getMessage(), e);
+				new WebsocketTool().showMessage(session, e.getMessage(), "error");
 			}
 		}, session)) {
 			return createdDocs;

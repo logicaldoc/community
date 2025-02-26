@@ -16,7 +16,7 @@ public class TooManyDocumentsException extends PersistenceException {
 	private final long folderId;
 
 	public TooManyDocumentsException(Folder folder, long max) {
-		super(String.format("Folder %s (%d) cannot exceed the limit of %d documents configured in the settings",
+		super(String.format("Folder %s [id=%d] cannot exceed the limit of %d documents configured in the settings",
 				folder.getName(), folder.getId(), max));
 		this.folderId = folder.getId();
 	}
