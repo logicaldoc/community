@@ -346,7 +346,7 @@ public class TenantBrandingPanel extends HLayout {
 		evaluation.setColSpan(2);
 		evaluation.setWidth(360);
 		evaluation.addChangedHandler(changedHandler);
-		
+
 		form.setItems(product, productName, vendor, address, postalCode, city, country, support, sales, webSite, help,
 				forum, bugs, evaluation);
 
@@ -548,8 +548,8 @@ public class TenantBrandingPanel extends HLayout {
 
 	public boolean validate() {
 		vm.validate();
+		tenant.getBranding().setSkin(skin.getValueAsString());
 		if (Boolean.FALSE.equals(vm.hasErrors()) && Feature.enabled(Feature.BRANDING_FULL)) {
-			tenant.getBranding().setSkin(skin.getValueAsString());
 			tenant.getBranding().setProduct(vm.getValueAsString("product"));
 			tenant.getBranding().setProductName(vm.getValueAsString("productname"));
 			tenant.getBranding().setVendor(vm.getValueAsString("vendor"));
@@ -575,7 +575,7 @@ public class TenantBrandingPanel extends HLayout {
 		if (changedHandler != null)
 			changedHandler.onChanged(null);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

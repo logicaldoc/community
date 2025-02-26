@@ -51,25 +51,25 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 		updateLastNote(doc, note);
 	}
 
-	private void updateLastNote(Document doccument, DocumentNote note) {
+	private void updateLastNote(Document document, DocumentNote note) {
 		// In case of note on the whole document, update the document's lastNote
 		// field
 		if (note.getPage() == 0)
 			ThreadPools.get().execute(() -> {
 				try {
 					DocumentDAO dao = Context.get(DocumentDAO.class);
-					Document document = dao.findById(note.getDocId());
-					dao.initialize(document);
+					Document doc = dao.findById(note.getDocId());
+					dao.initialize(doc);
 
 					String lastNoteMessage = dao.queryForList(
-							"select ld_message from ld_note where ld_page=0 and ld_deleted=0 and ld_id=:id order by ld_date desc",
+							"select ld_message from ld_note where ld_page=0 and ld_deleted=0 and ld_docid=:id order by ld_date desc",
 							Map.of("id", note.getDocId()), String.class, null).stream().findFirst()
 							.orElse(note.getMessage());
 
-					document.setLastNote(HTMLSanitizer.sanitizeSimpleText(lastNoteMessage));
-					if (doccument.getIndexed() == AbstractDocument.INDEX_INDEXED)
-						doccument.setIndexed(AbstractDocument.INDEX_TO_INDEX);
-					dao.store(document);
+					doc.setLastNote(HTMLSanitizer.sanitizeSimpleText(lastNoteMessage));
+					if (document.getIndexed() == AbstractDocument.INDEX_INDEXED)
+						document.setIndexed(AbstractDocument.INDEX_TO_INDEX);
+					dao.store(doc);
 				} catch (PersistenceException e) {
 					log.error(e.getMessage(), e);
 				}
