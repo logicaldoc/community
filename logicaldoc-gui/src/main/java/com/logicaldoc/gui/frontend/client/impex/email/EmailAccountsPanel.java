@@ -271,7 +271,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		}
 
 		rec.setAttribute(EMAIL, account.getMailAddress());
-		rec.setAttribute(ENABLED, account.getEnabled() == 1 ? "0" : "2");
+		rec.setAttribute(ENABLED, account.getEnabled() == 1);
 		list.refreshRow(list.getRecordIndex(rec));
 	}
 

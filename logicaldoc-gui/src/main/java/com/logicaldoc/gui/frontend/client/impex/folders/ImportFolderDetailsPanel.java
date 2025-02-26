@@ -204,11 +204,11 @@ public class ImportFolderDetailsPanel extends VLayout {
 		if (validate()) {
 			ImportFolderService.Instance.get().save(importFolder, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIImportFolder share) {
+				public void onSuccess(GUIImportFolder importFolder) {
 					tabSet.hideSave();
-					if (share != null) {
-						foldersPanel.updateRecord(share);
-						foldersPanel.showShareDetails(share);
+					if (importFolder != null) {
+						foldersPanel.updateRecord(importFolder);
+						foldersPanel.showShareDetails(importFolder);
 					}
 				}
 			});

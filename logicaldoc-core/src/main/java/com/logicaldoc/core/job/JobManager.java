@@ -92,10 +92,9 @@ public class JobManager {
 			dictionary=new HashMap<>();
 		else
 			dictionary=new HashMap<>(dictionary);
-		
-		if (job.getTenantId() != null && !dictionary.containsKey(TENANT_ID))
-			dictionary.put(TENANT_ID, job.getTenantId());
 
+		dictionary.computeIfAbsent(TENANT_ID, k -> job.getTenantId());
+		
 		JobKey jobKey = JobKey.jobKey(job.getName(), job.getGroup());
 		JobDetail jobDetail = scheduler.getJobDetail(jobKey);
 		if (jobDetail != null) {

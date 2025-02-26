@@ -22,13 +22,9 @@ import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -112,11 +108,11 @@ public class ImportFoldersPanel extends AdminPanel {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler((ClickEvent event) -> refresh());
+		refresh.addClickHandler(click -> refresh());
 
 		ToolStripButton addImportFolder = new ToolStripButton();
 		addImportFolder.setTitle(I18N.message("addimportfolder"));
-		addImportFolder.addClickHandler((ClickEvent event) -> {
+		addImportFolder.addClickHandler(click -> {
 			list.deselectAllRecords();
 			GUIImportFolder share = new GUIImportFolder();
 			share.setProvider("file");
@@ -125,12 +121,12 @@ public class ImportFoldersPanel extends AdminPanel {
 		if (Feature.enabled(Feature.IMPORT_LOCAL_FOLDERS) || Feature.enabled(Feature.IMPORT_REMOTE_FOLDERS))
 			toolStrip.addButton(addImportFolder);
 
-		list.addCellContextClickHandler((CellContextClickEvent event) -> {
+		list.addCellContextClickHandler(click -> {
 			showContextMenu();
-			event.cancel();
+			click.cancel();
 		});
 
-		list.addSelectionChangedHandler((SelectionEvent event) -> {
+		list.addSelectionChangedHandler(selection -> {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				ImportFolderService.Instance.get().getImportFolder(Long.parseLong(rec.getAttributeAsString("id")),
@@ -142,7 +138,7 @@ public class ImportFoldersPanel extends AdminPanel {
 						});
 		});
 
-		list.addDataArrivedHandler((DataArrivedEvent event) -> infoPanel
+		list.addDataArrivedHandler(dataArrived -> infoPanel
 				.setMessage(I18N.message("showimportfolders", Integer.toString(list.getTotalRows()))));
 
 		detailsContainer.setAlign(Alignment.CENTER);
@@ -167,8 +163,8 @@ public class ImportFoldersPanel extends AdminPanel {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(
-				event -> LD.ask(I18N.message(QUESTION), I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
+				event -> LD.ask(I18N.message(QUESTION), I18N.message("confirmdelete"), choice -> {
+					if (Boolean.TRUE.equals(choice)) {
 						ImportFolderService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void result) {
@@ -280,7 +276,7 @@ public class ImportFoldersPanel extends AdminPanel {
 
 		rec.setAttribute("src", importFolder.getDisplayUrl());
 
-		rec.setAttribute(ENABLED, importFolder.getEnabled() == 1 ? "0" : "2");
+		rec.setAttribute(ENABLED, importFolder.getEnabled() == 1);
 
 		String type = I18N.message("localfolder");
 		if (importFolder.getProvider().startsWith("smb"))

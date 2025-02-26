@@ -43,7 +43,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		targetSelector = new FolderSelector("target", null);
 		targetSelector.setTitle(I18N.message("targetfolder"));
 		targetSelector.setWidth(250);
-		targetSelector.setStartRow(true);
+		targetSelector.setRequired(true);
 
 		if (account.getTarget() != null)
 			targetSelector.setFolder(account.getTarget());
@@ -62,6 +62,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 
 		form = new DynamicForm();
 		form.setNumCols(3);
+		form.setWidth(1);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
 		TextItem mailaddress = ItemFactory.newEmailItem("mailaddress", "email", false);
@@ -141,7 +142,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		clientSecret.setVisibleWhen(new AdvancedCriteria(PROTOCOL, OperatorId.CONTAINS, "365"));
 
 		form.setItems(mailaddress, protocol, ssl, server, port, username, password, clientId, clientTenant,
-				clientSecret, targetSelector, foldering, language, fakeUsername, fakeUsernameAgain, hiddenPassword,
+				clientSecret, foldering, targetSelector, language, fakeUsername, fakeUsernameAgain, hiddenPassword,
 				hiddenClientSecret);
 
 		formsContainer.addMember(form);
