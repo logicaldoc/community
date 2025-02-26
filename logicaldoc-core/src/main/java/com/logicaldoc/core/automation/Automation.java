@@ -301,10 +301,10 @@ public class Automation {
 		forbidRuntimeUsage(expression);
 
 		try {
-			// Better to use a mutable shallow copy because we may receive an
-			// unmodifiable client dictionary
-			Map<String, Object> shallowCopy = new HashMap<>(clientDictionary);
-			VelocityContext context = prepareContext(prepareDictionary(shallowCopy));
+			// Better to use a mutable shallow copy of the client dictionaty
+			// because we may receive an unmodifiable client dictionary
+			VelocityContext context = prepareContext(
+					prepareDictionary(clientDictionary != null ? new HashMap<>(clientDictionary) : null));
 			Velocity.evaluate(context, writer, StringUtils.isNotEmpty(logTag) ? logTag : "ScriptEngine", expression);
 		} catch (Exception e) {
 			throw new AutomationException(expression, e);
