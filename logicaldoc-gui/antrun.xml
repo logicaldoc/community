@@ -29,7 +29,7 @@
 				<exclude name="**/WEB-INF/**" />
 				<exclude name="**/common/**" />
 				<exclude name="**/skin/**" />
-				<exclude name="**/skin-Tahoe/**" />
+				<exclude name="**/skin-*/**" />
 			</fileset>
 		</copy>
 
@@ -38,7 +38,7 @@
 				<for list="login,setup,frontend" param="module">
 					<sequential>
 						<echo>Processing skin @{skin} for module @{module}</echo>
-						<copy todir="target/plugin/@{module}/sc/skins/@{skin}" overwrite="true">
+						<copy todir="target/plugin/@{module}/sc/skins/@{skin}" overwrite="true" failonerror="false">
 							<fileset dir="war/skin" includes="**" />
 						</copy>
 						<copy todir="target/plugin/@{module}/sc/skins/@{skin}" overwrite="true" failonerror="false">

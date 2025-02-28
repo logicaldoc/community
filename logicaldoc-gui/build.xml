@@ -50,6 +50,7 @@
 						<exclude name="**/*.jsp" />
 						<!-- exclude name="skin/" />
 						<exclude name="skin-Tahoe/" />
+						<exclude name="skin-Shiva/" />
 						<exclude name="prev/" />
 						<exclude name="*.jsp" / -->
 					</fileset>
