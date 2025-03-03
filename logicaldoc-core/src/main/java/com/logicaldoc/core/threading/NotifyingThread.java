@@ -1,6 +1,7 @@
 package com.logicaldoc.core.threading;
 
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.slf4j.Logger;
@@ -14,8 +15,10 @@ import com.logicaldoc.util.time.TimeDiff;
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.5.3
+ *
+ * @param <T> the type of callable
  */
-public class NotifyingThread extends Thread {
+public class NotifyingThread<T> implements Callable<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(NotifyingThread.class);
 
@@ -32,14 +35,16 @@ public class NotifyingThread extends Thread {
 	/**
 	 * List of listeners
 	 */
-	private final Set<ThreadCompleteListener> listeners = new CopyOnWriteArraySet<>();
-
-	private boolean useRunnable = false;
+	private final Set<ThreadCompleteListener<T>> listeners = new CopyOnWriteArraySet<>();
 
 	/**
 	 * The error that stopped the execution
 	 */
 	private Throwable error;
+
+	private Callable<T> wrappedCallable;
+
+	private String name;
 
 	/**
 	 * Interface to be implemented by the listeners
@@ -47,22 +52,30 @@ public class NotifyingThread extends Thread {
 	 * @author Marco Meschieri - LogicalDOC
 	 * @since 8.5.3
 	 */
-	public interface ThreadCompleteListener {
-		public void completed(final NotifyingThread thread);
+	public interface ThreadCompleteListener<T> {
+		public void completed(final NotifyingThread<T> thread);
 	}
 
-	public final void addListener(final ThreadCompleteListener listener) {
+	public final void addListener(final ThreadCompleteListener<T> listener) {
 		listeners.add(listener);
 	}
 
-	public final void removeListener(final ThreadCompleteListener listener) {
+	public final void removeListener(final ThreadCompleteListener<T> listener) {
 		listeners.remove(listener);
 	}
 
 	private final void notifyListeners() {
-		for (ThreadCompleteListener listener : listeners) {
+		for (ThreadCompleteListener<T> listener : listeners) {
 			listener.completed(this);
 		}
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**
@@ -93,16 +106,17 @@ public class NotifyingThread extends Thread {
 	}
 
 	@Override
-	public final void run() {
+	public final T call() {
 		try {
 			endTime = 0;
 			startTime = System.currentTimeMillis();
 			error = null;
 			log.debug("Thread {} started", getName());
-			if (useRunnable)
-				super.run();
-			else
-				doRun();
+			if (wrappedCallable != null) {
+				return wrappedCallable.call();
+			} else {
+				return doRun();
+			}
 		} catch (Exception t) {
 			error = t;
 			log.debug("Thread {} ended in error after {}", getName(), TimeDiff.printDuration(getElapsedTime()), t);
@@ -110,32 +124,25 @@ public class NotifyingThread extends Thread {
 			endTime = System.currentTimeMillis();
 			notifyListeners();
 		}
-
-	}
-
-	public NotifyingThread() {
-		super();
+		return null;
 	}
 
 	public NotifyingThread(String name) {
-		super(name);
+		super();
+		this.name = name;
 	}
 
-	public NotifyingThread(ThreadGroup group, String name) {
-		super(group, name);
-	}
-
-	public NotifyingThread(Runnable target, String name) {
-		super(target, name);
-		useRunnable = true;
+	public NotifyingThread(Callable<T> wrappedCallable, String name) {
+		this.wrappedCallable = wrappedCallable;
+		this.name = name;
 	}
 
 	/**
 	 * Concrete implementations should override this method to implement their
 	 * own processing.
 	 */
-	public void doRun() {
-		// Nothing to do
+	public T doRun() {
+		return null;
 	}
 
 	public Throwable getError() {

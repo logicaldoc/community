@@ -217,6 +217,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			} catch (ParsingException | PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
+			return null;
 		}, session);
 	}
 
@@ -245,6 +246,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			} catch (PersistenceException | PermissionException e) {
 				log.error(e.getMessage(), e);
 			}
+			return null;
 		}, session);
 	}
 
@@ -269,6 +271,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				log.error(e.getMessage(), e);
 				new WebsocketTool().showMessage(session, e.getMessage(), "error");
 			}
+			return null;
 		}, session)) {
 			return createdDocs;
 		} else {
@@ -2263,8 +2266,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 		String idsStr = Arrays.asList(ids).toString().replace('[', '(').replace(']', ')');
 		try {
-			Context.get(DocumentDAO.class)
-					.jdbcUpdate("update ld_document set ld_deleted=2 where ld_id in " + idsStr);
+			Context.get(DocumentDAO.class).jdbcUpdate("update ld_document set ld_deleted=2 where ld_id in " + idsStr);
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
 		}
@@ -3023,6 +3025,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 					log.warn(e.getMessage(), e);
 				}
 			}
+			return null;
 		}, session);
 	}
 

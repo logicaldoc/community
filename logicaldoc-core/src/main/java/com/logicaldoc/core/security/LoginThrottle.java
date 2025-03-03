@@ -328,6 +328,7 @@ public class LoginThrottle {
 			} catch (PersistenceException | AutomationException e) {
 				log.warn(e.getMessage(), e);
 			}
+			return null;
 		}, "BruteForceAttack", 500);
 	}
 

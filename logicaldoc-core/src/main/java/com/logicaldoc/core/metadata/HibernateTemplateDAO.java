@@ -148,6 +148,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			} catch (InterruptedException ie) {
 				Thread.currentThread().interrupt();
 			}
+			return null;
 		}, "TemplateSecuritySave", 100L);
 	}
 

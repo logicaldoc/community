@@ -107,6 +107,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 					} catch (PersistenceException e) {
 						log.error(e.getMessage(), e);
 					}
+					return null;
 				}, session);
 			} else {
 				saveACL(session, folder, guiFolder.getAccessControlList());
@@ -130,6 +131,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
+			return null;
 		}, session);
 	}
 
@@ -1095,6 +1097,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
+			return null;
 		}, session);
 	}
 
@@ -1127,6 +1130,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
+			return null;
 		}, session);
 	}
 
@@ -1143,6 +1147,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
+			return null;
 		}, session);
 	}
 
@@ -1160,6 +1165,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			} catch (PersistenceException | AccessDeniedException e) {
 				log.error(e.getMessage(), e);
 			}
+			return null;
 		}, session);
 	}
 
@@ -1187,6 +1193,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
+			return null;
 		}, session);
 	}
 

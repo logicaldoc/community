@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -109,9 +110,8 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 		Runnable task = () -> {
 			try {
-				Context.get(DocumentDAO.class)
-						.jdbcUpdate("update ld_document set ld_indexed=0 where ld_indexed=1 "
-								+ (!dropIndex ? " and ld_tenantid=" + session.getTenantId() : ""));
+				Context.get(DocumentDAO.class).jdbcUpdate("update ld_document set ld_indexed=0 where ld_indexed=1 "
+						+ (!dropIndex ? " and ld_tenantid=" + session.getTenantId() : ""));
 			} catch (Exception t) {
 				log.error(t.getMessage(), t);
 			}
@@ -268,12 +268,11 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		Session session = validateSession();
 
 		try {
-			Runnable runnable = () -> {
+			executeLongRunningOperation("Purge Index", () -> {
 				SearchEngine indexer = Context.get(SearchEngine.class);
 				indexer.purge();
-			};
-
-			executeLongRunningOperation("Purge Index", runnable, session);
+				return null;
+			}, session);
 		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
@@ -284,7 +283,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		Session session = validateSession();
 
 		try {
-			Runnable runnable = () -> {
+			Callable<Void> callable = () -> {
 				SearchEngine indexer = Context.get(SearchEngine.class);
 
 				indexer.deleteHits(entryIds);
@@ -323,9 +322,10 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 				} catch (PersistenceException e) {
 					log.error(e.getMessage(), e);
 				}
+				return null;
 			};
 
-			executeLongRunningOperation("Delete Index Entries", runnable, session);
+			executeLongRunningOperation("Delete Index Entries", callable, session);
 		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}

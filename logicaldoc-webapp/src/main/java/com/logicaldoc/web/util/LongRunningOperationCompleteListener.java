@@ -26,8 +26,10 @@ import com.logicaldoc.util.time.TimeDiff;
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.5.3
+ * 
+ * @param <T> type of listener
  */
-public class LongRunningOperationCompleteListener implements ThreadCompleteListener {
+public class LongRunningOperationCompleteListener<T> implements ThreadCompleteListener<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(LongRunningOperationCompleteListener.class);
 
@@ -54,7 +56,7 @@ public class LongRunningOperationCompleteListener implements ThreadCompleteListe
 	}
 
 	@Override
-	public void completed(NotifyingThread thread) {
+	public void completed(NotifyingThread<T> thread) {
 		SystemMessageDAO smdao = Context.get(SystemMessageDAO.class);
 		UserDAO uDao = Context.get(UserDAO.class);
 		Date now = new Date();

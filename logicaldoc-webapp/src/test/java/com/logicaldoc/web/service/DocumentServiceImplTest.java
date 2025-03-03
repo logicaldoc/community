@@ -282,7 +282,6 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	@Test
 	public void testRename() throws ServerException {
 		GUIDocument doc = testSubject.getById(7);
-		System.out.println(doc.getFileName());
 		assertEquals("New error indexing documents.eml", doc.getFileName());
 
 		testSubject.rename(doc.getId(), "newname.eml");

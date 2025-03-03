@@ -241,6 +241,7 @@ public class EMailSender {
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
+			return null;
 		}, THREAD_POOL);
 	}
 
@@ -297,6 +298,7 @@ public class EMailSender {
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
+			return null;
 		}, THREAD_POOL);
 	}
 

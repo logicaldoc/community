@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
@@ -324,33 +325,34 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	/**
 	 * This runnable takes care of synchronizing the counters into the database
 	 */
-	class WebserviceCallCounterSync implements Runnable {
+	class WebserviceCallCounterSync implements Callable<Void> {
 
 		@Override
-		public void run() {
+		public Void call() {
 			try {
 				syncCounters();
 				lastSync = new Date();
 			} catch (Exception t) {
 				log.warn(t.getMessage(), t);
 			}
+			return null;
 		}
 	}
 
 	/**
 	 * This runnable takes care of writing a call into the database
 	 */
-	class WebserviceCallStore implements Runnable {
+	class WebserviceCallStore implements Callable<Void> {
 
-		private WebserviceCall call;
+		private WebserviceCall wsCall;
 
-		public WebserviceCallStore(WebserviceCall call) {
+		public WebserviceCallStore(WebserviceCall wsCall) {
 			super();
-			this.call = call;
+			this.wsCall = wsCall;
 		}
 
 		@Override
-		public void run() {
+		public Void call() {
 			try {
 				WebserviceCallDAO dao = Context.get(WebserviceCallDAO.class);
 				Date now = new Date();
@@ -362,10 +364,11 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 				if (timeSinceLastClean >= 24)
 					dao.cleanOldCalls(settings.getInt("webservice.call.ttl", 90));
 
-				dao.store(call);
+				dao.store(wsCall);
 			} catch (Exception t) {
 				log.warn(t.getMessage(), t);
 			}
+			return null;
 		}
 	}
 

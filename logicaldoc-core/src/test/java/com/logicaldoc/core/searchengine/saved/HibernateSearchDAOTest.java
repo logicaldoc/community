@@ -123,7 +123,6 @@ public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 		xml = saved.getOptions();
 
 		assertNotNull(xml);
-		System.out.println(xml);
 		assertTrue(xml.length() > 600);
 
 		saved = new SavedSearch();

@@ -73,6 +73,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 				} catch (PersistenceException e) {
 					log.error(e.getMessage(), e);
 				}
+				return null;
 			}, "Note");
 	}
 
@@ -118,9 +119,8 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 				params.put(DOC_ID, docId);
 				params.put("types", types);
 
-				return findByWhere(
-						ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".type in (:types) and " + ENTITY + DELETED_0, params,
-						null, null);
+				return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".type in (:types) and " + ENTITY + DELETED_0,
+						params, null, null);
 			}
 		} else if (types == null || types.isEmpty()) {
 			Map<String, Object> params = new HashMap<>();

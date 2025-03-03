@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
@@ -256,7 +257,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 			throw new ServerValidationException(ie.getMessage(),
 					ie.getErrors().values().stream()
 							.map(e -> new ServerValidationError(e.getAttribute(), e.getLabel(), e.getDescription()))
-							.collect(Collectors.toList()) .toArray(new ServerValidationError[0]));
+							.collect(Collectors.toList()).toArray(new ServerValidationError[0]));
 		} else if (throwable instanceof PermissionException) {
 			throw new AccessDeniedException(throwable.getMessage());
 		} else if (throwable instanceof ServerException se) {
@@ -294,14 +295,14 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	 * time.
 	 * 
 	 * @param name Name of the operation
-	 * @param runnable The operation to execute
+	 * @param callable The operation to execute
 	 * @param session The current session
 	 * 
 	 * @return true if the runnable already completed successfully
 	 * 
 	 * @throws ServerException Whatever error that may occur
 	 */
-	protected boolean executeLongRunningOperation(String name, Runnable runnable, Session session)
+	protected boolean executeLongRunningOperation(String name, Callable<Void> callable, Session session)
 			throws ServerException {
 		ThreadPools pools = Context.get(ThreadPools.class);
 
@@ -309,7 +310,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		 * Build the notifying thread and schedule for immediate execution (1ms
 		 * delay)
 		 */
-		NotifyingThread task = new NotifyingThread(runnable, name);
+		NotifyingThread<Void> task = new NotifyingThread<>(callable, name);
 		pools.schedule(task, "LongRunningOperations", 1);
 
 		// Wait up to 20 seconds for completion
@@ -330,10 +331,10 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 			// Otherwise detach the current thread but add a listener to notify
 			// the pending users
 			log.warn("Operation {} invoked by user {} is taking too long and it will continue in background",
-					task.getName(), session.getUsername());
+					name, session.getUsername());
 			new WebsocketTool().showMessage(session,
 					I18N.message("operationtakestoolongotoback", session.getUser().getLocale()), "warn");
-			task.addListener(new LongRunningOperationCompleteListener(session.getUsername()));
+			task.addListener(new LongRunningOperationCompleteListener<Void>(session.getUsername()));
 		}
 
 		return task.isOver();

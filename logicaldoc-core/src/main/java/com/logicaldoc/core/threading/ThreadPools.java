@@ -2,7 +2,9 @@ package com.logicaldoc.core.threading;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -96,29 +98,19 @@ public class ThreadPools {
 	 * @param poolName The name of the pool
 	 * @param delay a delay expressed in milliseconds
 	 */
-	public void schedule(Runnable task, String poolName, long delay) {
+	public <T> Future<T> schedule(Callable<T> task, String poolName, long delay) {
 		try {
 			ExecutorService pool = getPool(poolName);
 			if (pool instanceof ScheduledExecutorService executorService)
-				executorService.schedule(task, delay, TimeUnit.MILLISECONDS);
+				return executorService.schedule(task, delay, TimeUnit.MILLISECONDS);
 			else {
 				log.debug("Pool {} does not support scheduling so the task has been started immediately", poolName);
-				execute(task, poolName);
+				return execute(task, poolName);
 			}
 		} catch (ThreadPoolNotAvailableException e) {
 			log.error(e.getMessage());
+			return null;
 		}
-	}
-
-	/**
-	 * Schedule the execution of a task in a thread pool.
-	 * 
-	 * @param task The task to execute
-	 * @param poolName The name of the pool
-	 * @param delay a delay expressed in milliseconds
-	 */
-	public void schedule(Thread task, String poolName, long delay) {
-		schedule((Runnable) task, poolName, delay);
 	}
 
 	/**
@@ -127,12 +119,13 @@ public class ThreadPools {
 	 * @param task The task to execute
 	 * @param poolName The name of the pool
 	 */
-	public void execute(Runnable task, String poolName) {
+	public <T> Future<T> execute(Callable<T> task, String poolName) {
 		try {
 			ExecutorService pool = getPool(poolName);
-			pool.execute(task);
+			return pool.submit(task);
 		} catch (ThreadPoolNotAvailableException e) {
 			log.error(e.getMessage());
+			return null;
 		}
 	}
 

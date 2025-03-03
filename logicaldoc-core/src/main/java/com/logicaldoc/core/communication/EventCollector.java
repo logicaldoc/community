@@ -114,16 +114,15 @@ public class EventCollector {
 			history.setDocument(clone);
 		}
 
-		Runnable notifier = () -> {
+		ThreadPools pools = Context.get(ThreadPools.class);
+		pools.execute(() -> {
 			log.debug("Notify history {}", history);
 			for (EventListener listener : listeners) {
 				listener.newEvent(history);
 			}
 			log.debug("Finished notification of history {}", history);
-		};
-
-		ThreadPools pools = Context.get(ThreadPools.class);
-		pools.execute(notifier, "EventCollector");
+			return null;
+		}, "EventCollector");
 	}
 
 	public static boolean isEnabled() {

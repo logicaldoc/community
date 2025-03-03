@@ -909,7 +909,10 @@ public class DocumentManagerImpl implements DocumentManager {
 			} catch (InterruptedException ie) {
 				Thread.currentThread().interrupt();
 			}
+
+			return null;
 		}, "VersionSave", 100L);
+
 	}
 
 	private void setAtributesForCreation(File file, Document docVO, DocumentHistory transaction) {

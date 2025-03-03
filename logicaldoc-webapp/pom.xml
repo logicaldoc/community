@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>9.1.1</version>
+		<version>9.2</version>
 	</parent>
 	<artifactId>logicaldoc-webapp</artifactId>
 	<name>logicaldoc-webapp</name>
@@ -660,13 +660,13 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
-					<excludes>**/.svnignore</excludes>
-					<excludes>WEB-INF/classes/**</excludes>
-					<excludes>WEB-INF/lib/*.jar</excludes>
+          			<packagingExcludes>
+                           WEB-INF/classes/**,WEB-INF/lib/*.jar
+          			</packagingExcludes>
 					<archive>
 						<addMavenDescriptor>false</addMavenDescriptor>
-					</archive>
-				</configuration>
+					</archive>          			
+        		</configuration>
 			</plugin>
 		</plugins>
 	</build>
