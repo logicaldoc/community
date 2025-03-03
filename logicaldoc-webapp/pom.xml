@@ -660,9 +660,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
-          			<packagingExcludes>
-                           WEB-INF/classes/**,WEB-INF/lib/*.jar
-          			</packagingExcludes>
 					<archive>
 						<addMavenDescriptor>false</addMavenDescriptor>
 					</archive>          			
