@@ -6,7 +6,7 @@ package com.logicaldoc.core.document;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.8
  */
-public class DuplicateDocumentExeption extends Exception {
+public class DuplicateDocumentException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
@@ -16,12 +16,12 @@ public class DuplicateDocumentExeption extends Exception {
 		return customId;
 	}
 	
-	public DuplicateDocumentExeption(String customId, Throwable cause) {
+	public DuplicateDocumentException(String customId, Throwable cause) {
 		super("Duplicate Document. customid: " + customId, cause);
 		this.customId = customId;
 	}
 
-	public DuplicateDocumentExeption(String customId) {
+	public DuplicateDocumentException(String customId) {
 		this(customId, null);
 	}
 }

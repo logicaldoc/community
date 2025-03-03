@@ -5,7 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -45,7 +44,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
- * Test case for <code>HibernateFolderDAO</code>
+ * Test case for {@link HibernateFolderDAO}
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
@@ -66,7 +65,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	private TemplateDAO templateDao;
 
 	private static final Logger log = LoggerFactory.getLogger(HibernateFolderDAOTest.class);
-	
+
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
@@ -1777,6 +1776,20 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		assertTrue(folder == null || folder.getDeleted() != 0);
 
 		docDao.findByPath("/Default/Target/Pollo/DEF/doc4.txt", 1L);
+
+		try {
+			testSubject.merge(null, target, fTransaction);
+		} catch (PersistenceException e) {
+			// catch exception
+		}
+
+		source = testSubject.findById(3000L);
+		assertNotNull(source);
+		try {
+			testSubject.merge(source, null, fTransaction);
+		} catch (PersistenceException e) {
+			// catch exception
+		}
 	}
 
 	@Test
@@ -1945,16 +1958,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFolderListener() {
-		FolderListenerManager folderListener = new FolderListenerManager();
-
-		List<FolderListener> listeners = folderListener.getListeners();
-		assertNotNull(listeners);
-		assertSame(listeners, folderListener.getListeners());
-	}
-
-	@Test
-	public void testBeforeStoreDictionaryValidatedTrue() throws PersistenceException {
+	public void testBeforeStore() throws PersistenceException {
 		FolderValidator folderValidator = new FolderValidator();
 		Map<String, Object> dictionary = new HashMap<>();
 		Folder folder = new Folder();
@@ -1964,5 +1968,40 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		folderValidator.beforeStore(folder, transaction, dictionary);
 		assertEquals("true", dictionary.get("validated"));
+
+		FolderValidator validator = new FolderValidator();
+
+		// transaction is null
+		dictionary = new HashMap<>();
+		folder = new Folder();
+		transaction = null;
+
+		validator.beforeStore(folder, transaction, dictionary);
+		assertEquals("true", dictionary.get("validated"));
+
+		// transaction event is not "CHANGED" or "CREATED"
+		dictionary = new HashMap<>();
+		folder = new Folder();
+		transaction = new FolderHistory();
+		transaction.setEvent("UPDATED");
+		validator.beforeStore(folder, transaction, dictionary);
+		assertEquals("true", dictionary.get("validated"));
+
+		// validate
+		folderValidator = new FolderValidator();
+		dictionary = new HashMap<>();
+		folder = new Folder();
+
+		Template template = new Template();
+		folder.setTemplate(template);
+
+		transaction = new FolderHistory();
+		transaction.setEvent(FolderEvent.CHANGED.toString());
+
+		dictionary.put("validated", "false");
+		folderValidator.beforeStore(folder, transaction, dictionary);
+		assertEquals("true", dictionary.get("validated"));
+
+		folderValidator.afterStore(folder, transaction, dictionary);
 	}
 }

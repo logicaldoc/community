@@ -20,7 +20,7 @@ import com.logicaldoc.util.plugin.PluginException;
 import junit.framework.Assert;
 
 /**
- * Test case for <code>HibernateDocumentHistoryDAO</code>
+ * Test case for {@link HibernateDocumentHistoryDAO}
  * 
  * @author Alessandro Gasparini - LogicalDOC
  * @since 3.0

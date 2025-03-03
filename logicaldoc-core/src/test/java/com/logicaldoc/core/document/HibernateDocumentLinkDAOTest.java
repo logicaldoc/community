@@ -18,7 +18,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
- * Test case for <code>HibernateDocumentLinkDAO</code>
+ * Test case for {@link HibernateDocumentLinkDAO}
  * 
  * @author Matteo Caruso - LogicalDOC
  * @since 4.0

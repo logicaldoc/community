@@ -18,7 +18,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
- * Test case for <code>DigestProcess</code>
+ * Test case for {@link DigestProcess}
  * 
  * @author Giuseppe Desiato - LogicalDOC
  * @since 9.1.1
@@ -40,12 +40,11 @@ public class DigestProcessorTest extends AbstractCoreTestCase {
 		
 		Context.get().getProperties().setProperty("digest.batch", "10");
 		assertEquals("10", Context.get().getProperties().getProperty("digest.batch"));
+		testSubject.runTask();
 		
-		Context.get().getProperties().setProperty("digest.batch", "2");
-		assertEquals("2", Context.get().getProperties().getProperty("digest.batch"));
-		
-		Context.get().getProperties().setProperty("digest.batch", "1000");
-		assertEquals("1000", Context.get().getProperties().getProperty("digest.batch"));
+		Context.get().getProperties().setProperty("digest.batch", "1");
+		assertEquals("1", Context.get().getProperties().getProperty("digest.batch"));
+		testSubject.runTask();
 		
 		assertFalse(testSubject.isIndeterminate());
 		assertTrue(testSubject.isConcurrent());

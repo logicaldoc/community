@@ -2,6 +2,7 @@ package com.logicaldoc.core.document;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
@@ -20,7 +21,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
- * Test case for <code>HibernateBookmarkDAOTest</code>
+ * Test case for {@link HibernateBookmarkDAOTest}
  * 
  * @author Matteo Caruso - LogicalDOC
  * @since 5.2
@@ -68,6 +69,36 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 		bookmarks = dao.findByUserId(99);
 		assertNotNull(bookmarks);
 		assertEquals(0, bookmarks.size());
+
+		// Test Bookmark class methods
+		Bookmark bookmark1 = dao.findByUserIdAndDocId(1, 1);
+		assertEquals("blank", bookmark1.getIcon());
+		assertNotNull(bookmark1.getPath());
+
+		Bookmark bookmark2 = dao.findByUserIdAndDocId(2, 1);
+		assertNotSame(bookmark1.hashCode(), bookmark2.hashCode());
+		assertEquals(true, bookmark1.equals(bookmark1));
+		assertEquals(false, bookmark1.equals(bookmark2));
+
+		Bookmark bookmark3 = new Bookmark();
+		bookmark3.setDescription("this is a bookmark");
+		dao.store(bookmark3);
+		
+		bookmark3.setId(1);
+		assertEquals(false, bookmark1.equals(bookmark3));
+		
+		bookmark3.setTitle("book1");
+		bookmark3.setType(Bookmark.TYPE_FOLDER);
+		assertEquals(false, bookmark1.equals(bookmark3));
+		
+		bookmark3.setType(Bookmark.TYPE_DOCUMENT);
+		bookmark3.setUserId(1);
+		assertEquals(bookmark1, bookmark3);
+		
+		bookmark3.setTitle(null);
+		assertEquals(null, bookmark3.getTitle());
+		
+		assertEquals(false, bookmark3.equals(bookmark1));
 	}
 
 	@Test
@@ -130,14 +161,14 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 		FolderDAO folderDao = Context.get(FolderDAO.class);
 		Folder folder = folderDao.findById(6);
 		assertNotNull(folder);
-		
+
 		DocumentDAO docDao = Context.get(DocumentDAO.class);
 		Document doc = docDao.findById(1);
 		assertNotNull(doc);
-		
+
 		Bookmark bookmark = dao.findByUserIdAndDocId(1, 1);
 		assertNotNull(bookmark);
-		
+
 		bookmark = dao.findByUserIdAndFolderId(1, 6);
 		assertNull(bookmark);
 	}

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,9 +98,9 @@ public class Language implements Comparable<Language> {
 		// Try to use constructor (Set<?> stopwords)
 		if (aClass != null && stopWords != null && (!stopWords.isEmpty())) {
 			try {
-				Constructor<?> constructor = aClass.getConstructor(java.util.Set.class);
+				Constructor<?> constructor = aClass.getConstructor(CharArraySet.class);
 				if (constructor != null)
-					analyzer = (Analyzer) constructor.newInstance(stopWords);
+					analyzer = (Analyzer) constructor.newInstance(new CharArraySet(stopWords, false));
 			} catch (Exception e) {
 				log.debug("constructor (Version matchVersion, Set<?> stopwords)  not found");
 			}

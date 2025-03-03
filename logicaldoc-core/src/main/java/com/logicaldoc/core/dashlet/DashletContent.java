@@ -127,6 +127,7 @@ public class DashletContent extends HttpServlet {
 	private void handleDocumentEvent(boolean showSid, Locale locale, Dashlet dashlet,
 			Map<String, Object> dashletDictionary, Automation automation, PrintWriter writer)
 			throws PersistenceException, AutomationException {
+		
 		if (StringUtils.isNotEmpty(dashlet.getContent())) {
 			String content = automation.evaluate(dashlet.getContent(), dashletDictionary);
 			if (StringUtils.isNotEmpty(content))
@@ -355,6 +356,7 @@ public class DashletContent extends HttpServlet {
 
 	private void handleDocument(Locale locale, Dashlet dashlet, Map<String, Object> dashletDictionary,
 			Automation automation, PrintWriter writer) throws PersistenceException, AutomationException {
+		
 		if (StringUtils.isNotEmpty(dashlet.getContent())) {
 			String content = automation.evaluate(dashlet.getContent(), dashletDictionary);
 			if (StringUtils.isNotEmpty(content))

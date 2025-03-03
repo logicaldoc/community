@@ -17,7 +17,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
- * Test case for <code>FolderComparator</code>
+ * Test case for {@link FolderComparator}
  * 
  * @author Giuseppe Desiato - LogicalDOC
  * @since 9.1.1

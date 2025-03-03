@@ -22,6 +22,12 @@ import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
+/**
+ * Test Case for {@link DocumentComparator}
+ * 
+ * @author Giuseppe Desiato - LogicalDOC
+ * @since 9.1.1
+ */
 public class DocumentComparatorTest extends AbstractCoreTestCase {
 
 	// Instance under test

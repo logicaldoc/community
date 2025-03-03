@@ -1,6 +1,7 @@
-package com.logicaldoc.core.document;
+package com.logicaldoc.core.folder;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -10,25 +11,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
-/**
- * Test case for {@link DocumentListenerManager}
- * 
- * @author Giuseppe Desiato - LogicalDOC
- * @since 9.1.1
- */
-public class DocumentListenerManagerTest extends AbstractCoreTestCase {
-
-	private DocumentListenerManager testSubject;
+public class FolderListenerManagerTest extends AbstractCoreTestCase {
 
 	@Before
-	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-
-		testSubject = Context.get(DocumentListenerManager.class);
 	}
 
 	@Override
@@ -37,7 +26,12 @@ public class DocumentListenerManagerTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testGetListener() {
-		assertNotNull(testSubject.getListeners());
+	public void testFolderListener() {
+		FolderListenerManager folderListener = new FolderListenerManager();
+
+		List<FolderListener> listeners = folderListener.getListeners();
+		assertNotNull(listeners);
+		assertSame(listeners, folderListener.getListeners());
 	}
+
 }

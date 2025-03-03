@@ -9,7 +9,7 @@ import java.util.Set;
 import org.junit.Test;
 
 /**
- * Test case for <code>StopWord</code>
+ * Test case for {@link StopWords}
  * 
  * @author Giuseppe Desiato - LogicalDOC
  * @since 9.1.1
@@ -37,5 +37,9 @@ public class StopWordsTest {
 		words = StopWords.getStopWords(Locale.ITALIAN);
 		assertNotNull(words);
 		assertEquals(true, words.contains("dei"));
+		
+		words = StopWords.getStopWords("en");
+		assertNotNull(words);
+		assertEquals(true, words.contains("a"));
 	}
 }

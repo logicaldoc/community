@@ -21,7 +21,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
- * Test case for document note DAO
+ * Test case for {@link DocumentNoteDAO}
  * 
  * @author Matteo Caruso - LogicalDOC
  * @since 6.2

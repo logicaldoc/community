@@ -47,7 +47,7 @@ import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
- * Test case for <code>HibernateDocumentDAO</code>
+ * Test case for {@link HibernateDocumentDAO}
  * 
  * @author Marco Meschieri - LogicalDOC
  * 
@@ -75,7 +75,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		lockManager = Context.get(LockManager.class);
 		templateDao = Context.get(TemplateDAO.class);
 	}
-	
+
 	@Test
 	public void testComputeTotalSize() throws PersistenceException {
 		long totalSize = dao.computeTotalSize(1L, null, false);
@@ -108,6 +108,28 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		} finally {
 			SessionManager.get().kill(session.getSid());
 		}
+		
+		// test TagCloud class methods
+		TagCloud tag1 = new TagCloud();
+		tag1.setTag("abc");
+		assertNotNull(tag1);
+		
+		TagCloud tag2 = new TagCloud("bcd");
+		tag2.setTag("cde");
+		tag2.setCount(2);
+		assertNotNull(tag2);
+		assertEquals(0, tag2.getScale());
+		
+		assertNotSame(tag1.hashCode(), tag2.hashCode());
+		
+		assertEquals(true, tag1.equals(tag1));
+		assertEquals(false, tag1.equals(tag2));
+		assertEquals(false, tag1.equals(null));
+		assertEquals(false, tag1.equals(new Object()));
+		
+		tag2.setTag(null);
+		TagCloud tag3 = new TagCloud("bcd");
+		assertEquals(false, tag2.equals(tag3));
 	}
 
 	@Test
@@ -559,6 +581,29 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 		tags = dao.findTags(1L);
 		assertNotNull(tags);
+
+		// testing Tag class methods
+		Document doc1 = dao.findById(1);
+		dao.initialize(doc1);
+		assertNotNull(doc1);
+
+		Tag tag1 = doc1.getTags().stream().findFirst().get();
+		Tag tag2 = doc1.getTags().stream().skip(1).findFirst().orElse(null);
+
+		assertTrue(tag1.compareTo(tag2) < 0);
+		assertEquals(true, tag1.compareTo(tag1) == 0);
+		assertNotNull(tag1.toString());
+
+		String nullTag = null;
+		tag1.setTag(nullTag);
+		assertNotNull(tag1.toString());
+		assertNotSame(tag1.hashCode(), tag2.hashCode());
+
+		assertEquals(false, tag1.equals(null));
+		assertEquals(false, tag2.equals(new Object()));
+
+		Tag tag3 = new Tag(1L, "tyi");
+		assertNotNull(tag3);
 	}
 
 	@Test
@@ -746,7 +791,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		dao.restore(4, 5, transaction);
 		assertNotNull(dao.findById(4));
 		assertEquals(5L, dao.findById(4).getFolder().getId());
-		
+
 	}
 
 	@Test

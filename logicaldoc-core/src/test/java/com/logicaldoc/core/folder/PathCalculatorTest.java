@@ -15,7 +15,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
- * Test case for <code>PathCalculator</code>
+ * Test case for {@link PathCalculator}
  * 
  * @author Giuseppe Desiato - LogicalDOC
  * @since 9.1.1
