@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
@@ -311,17 +314,15 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		 * delay)
 		 */
 		NotifyingThread<Void> task = new NotifyingThread<>(callable, name);
-		pools.schedule(task, "LongRunningOperations", 1);
-
-		// Wait up to 20 seconds for completion
-		while (task.getElapsedTime() < 20000 && !task.isOver()) {
-			synchronized (pools) {
-				try {
-					pools.wait(1000);
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-				}
-			}
+		try {
+			// Schedule and wait up to 20 seconds for completion
+			pools.schedule(task, "LongRunningOperations", 1).get(20, TimeUnit.SECONDS);
+		} catch (TimeoutException e) {
+			// All ok, the task did not complete within the expected time and it
+			// will continue in background
+			log.debug("Timout reached for operation {}", name);
+		} catch (InterruptedException | ExecutionException e) {
+			throw new ServerException(e.getMessage(), e);
 		}
 
 		if (task.isOver() && task.getError() != null) {
@@ -330,8 +331,8 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		} else if (!task.isOver()) {
 			// Otherwise detach the current thread but add a listener to notify
 			// the pending users
-			log.warn("Operation {} invoked by user {} is taking too long and it will continue in background",
-					name, session.getUsername());
+			log.warn("Operation {} invoked by user {} is taking too long and it will continue in background", name,
+					session.getUsername());
 			new WebsocketTool().showMessage(session,
 					I18N.message("operationtakestoolongotoback", session.getUser().getLocale()), "warn");
 			task.addListener(new LongRunningOperationCompleteListener<Void>(session.getUsername()));
