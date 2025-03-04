@@ -328,7 +328,7 @@ public class MailTool {
 							transaction.setUser(user);
 
 							DocumentManager manager = Context.get(DocumentManager.class);
-							Document attDoc = manager.create(tmpFile, docVO, transaction);
+							Document attDoc = manager.create(tmpFile, docVO, transaction).getDocument();
 							createdDocs.add(attDoc);
 						} finally {
 							if (tmpFile != null)

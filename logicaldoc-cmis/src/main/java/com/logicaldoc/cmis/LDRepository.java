@@ -487,7 +487,7 @@ public class LDRepository {
 			transaction.setUser(getSessionUser(context));
 			transaction.setComment("");
 
-			Document newDoc = documentManager.copyToFolder(doc, target, transaction, true, true, true);
+			Document newDoc = documentManager.copyToFolder(doc, target, transaction, true, true, true).getDocument();
 			return getId(newDoc);
 
 		} catch (Exception t) {
@@ -661,7 +661,7 @@ public class LDRepository {
 			transaction.setSessionId(sid);
 
 			document = documentManager.create(new BufferedInputStream(contentStream.getStream(), BUFFER_SIZE), document,
-					transaction);
+					transaction).getDocument();
 
 			return getId(document);
 		} catch (Exception t) {

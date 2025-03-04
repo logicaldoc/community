@@ -365,7 +365,6 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 				new DataHandler(new FileDataSource(file)));
 		assertTrue(docId > 0L);
 
-		System.out.println("----------------------");
 		long docId2 = testSubject.upload("xxxx", docId, null, true, "document test.txt", "en",
 				new DataHandler(new FileDataSource(file)));
 

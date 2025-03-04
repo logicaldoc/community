@@ -54,13 +54,7 @@ public class RestDocumentServiceTest extends AbstractWebserviceTestCase {
 		Response res = testSubject.getThumbnail("mobile", "menu.adminxxx/text/menu.admin103/pippo", null);
 		assertNotNull(res);
 
-		MultivaluedMap<String, Object> sss = res.getHeaders();
-		for (String element : sss.keySet()) {
-			System.out.println("element: " + element + ", value: " + sss.get(element));
-		}
-
 		assertEquals("image/png", res.getHeaderString("Content-Type"));
 		assertNotNull(res.getHeaderString("Expires"));
 	}
-
 }

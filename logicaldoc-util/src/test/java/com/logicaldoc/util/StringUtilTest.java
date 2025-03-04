@@ -6,8 +6,6 @@ import java.security.NoSuchAlgorithmException;
 
 import org.junit.Test;
 
-import com.logicaldoc.util.crypt.CryptUtil;
-
 /**
  * Test case for <code>StringUtil</code>
  * 
@@ -29,7 +27,5 @@ public class StringUtilTest {
 		assertEquals("123/456", StringUtil.split(str, '/', 3));
 		str="12345678";
 		assertEquals("123/456/78", StringUtil.split(str, '/', 3));
-		
-		System.out.println("Crypt J2A86bc26QnIpf1:"+CryptUtil.encryptSHA256("J2A86bc26QnIpf1"));
 	}
 }

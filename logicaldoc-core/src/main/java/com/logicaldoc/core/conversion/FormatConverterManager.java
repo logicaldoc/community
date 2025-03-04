@@ -69,6 +69,7 @@ public class FormatConverterManager {
 
 	@Resource(name = "ContextProperties")
 	protected ContextProperties config;
+
 	// Key is the src_extension-dst_extension, value is a collection of
 	// converters
 	private Map<String, List<FormatConverter>> converters = new HashMap<>();
@@ -223,7 +224,7 @@ public class FormatConverterManager {
 
 				DocumentHistory createHistory = new DocumentHistory(transaction);
 				createHistory.setComment(null);
-				return documentManager.create(out, docVO, createHistory);
+				return documentManager.create(out, docVO, createHistory).getDocument();
 			} else
 				throw new IOException("The conversion was not done");
 		} finally {

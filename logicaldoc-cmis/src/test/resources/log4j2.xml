@@ -5,8 +5,18 @@
 		<Property name="pattern">%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n</Property>
 		<Property name="dateformat">ISO8601</Property>
 	</Properties>
+
 	<Appenders>
 		<RollingFile name="file" fileName="${root}/file.log" filePattern="${root}/file.log.%i">
+			<PatternLayout>
+				<Pattern>${pattern}</Pattern>
+			</PatternLayout>
+			<Policies>
+				<SizeBasedTriggeringPolicy size="1 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="1" />
+		</RollingFile>
+		<RollingFile name="hikari" fileName="${root}/hikari.log" filePattern="${root}/hikari.log.%i">
 			<PatternLayout>
 				<Pattern>${pattern}</Pattern>
 			</PatternLayout>
@@ -20,15 +30,24 @@
 			<PatternLayout pattern="%m%n" />
 		</Console>
 	</Appenders>
+
 	<Loggers>
-		<Logger name="com.logicaldoc.cmis" level="info" additivity="true">
-			<AppenderRef ref="file" />
-		</Logger>
-	    <Logger name="com.logicaldoc" level="warn" additivity="false">
+		<Logger name="org.apache.cxf" level="fatal" additivity="false">
 			<Appender-Ref ref="file" />
 		</Logger>
-		<Logger name="org.hibernate" level="error" additivity="false">
-			<AppenderRef ref="file" />
+		<Logger name="com.logicaldoc.core.searchengine" level="error"
+			additivity="false">
+			<Appender-Ref ref="file" />
+		</Logger>
+		<Logger name="com.logicaldoc" level="warn" additivity="false">
+			<Appender-Ref ref="file" />
+		</Logger>
+		<Logger name="com.logicaldoc.util.spring.DatabasePropertySource"
+			level="fatal" additivity="false">
+			<Appender-Ref ref="file" />
+		</Logger>
+		<Logger name="com.zaxxer.hikari" level="debug" additivity="false">
+			<AppenderRef ref="hikari" />
 		</Logger>
 		<Logger name="java.sql" level="error" additivity="false">
 			<AppenderRef ref="file" />
@@ -36,9 +55,20 @@
 		<Logger name="org.hsqldb" level="error" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
-		<Root level="info">
+        <Logger name="com.logicaldoc.core.document.DocumentManagerImpl" level="info" additivity="false">
 			<AppenderRef ref="file" />
+		</Logger>
+		<Logger name="com.logicaldoc.util.io.FileUtil" level="debug" additivity="false">
+			<AppenderRef ref="file" />
+		</Logger>
+		<Logger name="org.hsqldb" level="debug" additivity="false">
+			<AppenderRef ref="file" />
+		</Logger>
+
+		<Root level="fatal">
 			<AppenderRef ref="console" />
 		</Root>
 	</Loggers>
-</Configuration>
+
+
+</Configuration>	

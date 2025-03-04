@@ -125,7 +125,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		transaction.setUser(user);
 
 		DocumentManager documentManager = Context.get(DocumentManager.class);
-		doc = documentManager.create(content, doc, transaction);
+		doc = documentManager.create(content, doc, transaction).getDocument();
 		return WSUtil.toWSDocument(doc);
 	}
 
@@ -492,7 +492,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		Folder folder = fdao.findFolder(folderId);
 
 		DocumentManager documentManager = Context.get(DocumentManager.class);
-		Document createdDoc = documentManager.copyToFolder(doc, folder, transaction, links, notes, security);
+		Document createdDoc = documentManager.copyToFolder(doc, folder, transaction, links, notes, security).getDocument();
 		return getDoc(createdDoc.getId());
 	}
 

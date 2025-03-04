@@ -249,7 +249,7 @@ public class SystemServiceImplTest extends AbstractWebappTestCase {
 			@Override
 			public void execute(JobExecutionContext arg0) throws JobExecutionException {
 				while (true)
-					System.out.println("hello");
+					;
 			}
 		}, Map.of(), DateUtils.addDays(new Date(), 1));
 

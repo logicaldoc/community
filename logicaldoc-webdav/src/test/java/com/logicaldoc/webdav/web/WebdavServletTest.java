@@ -304,7 +304,6 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 			testSubject.service(request, response);
 
 			String responseBody = callPROPFIND();
-			System.out.println(responseBody);
 			assertTrue(responseBody.contains(PREFIX + "/folder6/newfile1.pdf"));
 			assertTrue(responseBody.contains(PREFIX + "/folder6/newfile2.pdf"));
 		} finally {

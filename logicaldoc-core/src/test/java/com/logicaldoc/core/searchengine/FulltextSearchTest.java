@@ -56,9 +56,6 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 
 		FulltextSearchOptions opt2 = (FulltextSearchOptions) SearchOptions.read(file);
 		
-		System.out.println(opt);
-		
-
 		Assert.assertEquals("prova test", opt2.getExpression());
 		Assert.assertEquals("it", opt2.getExpressionLanguage());
 		Assert.assertEquals(1, opt2.getTemplate().longValue());

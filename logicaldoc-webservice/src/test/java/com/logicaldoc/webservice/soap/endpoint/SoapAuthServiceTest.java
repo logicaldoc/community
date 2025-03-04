@@ -89,7 +89,6 @@ public class SoapAuthServiceTest extends AbstractWebserviceTestCase {
 	@Test
 	public void testRenew() throws InterruptedException {
 		String sid = soapAuthServiceImpl.loginApiKey(apiKey.getDecodedKey());
-		System.err.println(sid);
 		assertNotNull(sid);
 		waiting();
 		soapAuthServiceImpl.renew(sid);

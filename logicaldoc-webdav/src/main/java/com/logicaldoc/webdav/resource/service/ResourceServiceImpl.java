@@ -440,7 +440,7 @@ public class ResourceServiceImpl implements ResourceService {
 			doc.setLocale(user.getLocale());
 			doc.setTenantId(session.getTenantId());
 
-			doc = documentManager.create(is, doc, transaction);
+			doc = documentManager.create(is, doc, transaction).getDocument();
 			log.debug("Created document {}", doc);
 			return marshallDocument(doc, session);
 		} catch (PersistenceException | IOException e) {
@@ -806,7 +806,7 @@ public class ResourceServiceImpl implements ResourceService {
 					document = documentDAO.findById(document.getDocRef());
 					createdDoc = documentManager.createAlias(document, folder, document.getDocRefType(), transaction);
 				} else {
-					createdDoc = documentManager.copyToFolder(document, folder, transaction, true, true, true);
+					createdDoc = documentManager.copyToFolder(document, folder, transaction, true, true, true).getDocument();
 				}
 
 				if (StringUtils.isNotEmpty(newName))

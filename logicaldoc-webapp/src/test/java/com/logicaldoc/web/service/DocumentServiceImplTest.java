@@ -105,11 +105,6 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	protected SearchEngine searchEngine;
 
 	@Override
-	protected List<String> getPluginArchives() {
-		return List.of("/logicaldoc-core-plugin.jar");
-	}
-
-	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
@@ -433,8 +428,6 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		testSubject.enforceFilesIntoFolderStore(1200);
 
-		waiting();
-
 		File movedFile = new File(repositoryDir + "/docs2/5/doc/1.0");
 		assertTrue(movedFile.exists());
 	}
@@ -530,8 +523,6 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		List<GUIDocument> createdDocs = testSubject.addDocuments(false, UTF_8, false, doc);
 		assertEquals(4, createdDocs.size());
-
-		waiting();
 
 		testSubject.cleanUploadedFileFolder();
 		prepareRepository();
@@ -704,7 +695,9 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testConvert() throws ServerException {
+	public void testConvert() throws ServerException, IOException, PluginException {
+		initializePlugins(List.of("/logicaldoc-core-plugin.jar"));
+
 		GUIDocument doc = testSubject.getById(7);
 		GUIDocument conversion = testSubject.convert(doc.getId(), doc.getFileVersion(), "pdf");
 		conversion = testSubject.getById(conversion.getId());

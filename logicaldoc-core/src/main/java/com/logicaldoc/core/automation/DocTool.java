@@ -304,7 +304,7 @@ public class DocTool {
 
 		DocumentManager manager = Context.get(DocumentManager.class);
 		try {
-			return manager.create(file, doc, transaction);
+			return manager.create(file, doc, transaction).getDocument();
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return null;
@@ -384,7 +384,7 @@ public class DocTool {
 		transaction.setUser(user);
 
 		try {
-			return manager.copyToFolder(doc, folder, transaction, links, notes, security);
+			return manager.copyToFolder(doc, folder, transaction, links, notes, security).getDocument();
 		} catch (PersistenceException | IOException e) {
 			log.error(e.getMessage(), e);
 			return null;
@@ -580,7 +580,7 @@ public class DocTool {
 			docVO.setLanguage(doc.getLanguage());
 
 			DocumentManager manager = Context.get(DocumentManager.class);
-			return manager.create(tmpFile, docVO, transaction);
+			return manager.create(tmpFile, docVO, transaction).getDocument();
 		} catch (IOException | PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return null;
@@ -683,7 +683,7 @@ public class DocTool {
 
 		DocumentManager manager = Context.get(DocumentManager.class);
 		try {
-			return manager.merge(documents, targetFolderId, fileName, transaction);
+			return manager.merge(documents, targetFolderId, fileName, transaction).getDocument();
 		} catch (IOException | PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return null;

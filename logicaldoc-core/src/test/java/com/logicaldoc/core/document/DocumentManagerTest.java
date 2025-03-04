@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,12 +51,12 @@ import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
- * Test case for {@link DocumentManagerImpl}
+ * Test case for {@link DocumentManager}
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 3.5
  */
-public class DocumentManagerImplTest extends AbstractCoreTestCase {
+public class DocumentManagerTest extends AbstractCoreTestCase {
 
 	private DocumentDAO docDao;
 
@@ -258,7 +259,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 
 		try {
 			store.setUseDummyFile(true);
-			Document newDoc = testSubject.copyToFolder(doc, newFolder, transaction, false, false, true);
+			Document newDoc = testSubject.copyToFolder(doc, newFolder, transaction, false, false, true).getDocument();
 			assertNotSame(doc.getId(), newDoc.getId());
 			assertEquals(newFolder, newDoc.getFolder());
 			assertTrue(documentLinkDao.findByDocId(newDoc.getId()).isEmpty());
@@ -269,7 +270,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 
 		try {
 			store.setUseDummyFile(true);
-			Document newDoc = testSubject.copyToFolder(doc, newFolder, transaction, true, true, false);
+			Document newDoc = testSubject.copyToFolder(doc, newFolder, transaction, true, true, false).getDocument();
 			assertNotSame(doc.getId(), newDoc.getId());
 			assertEquals(newFolder, newDoc.getFolder());
 
@@ -604,7 +605,8 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(userDao.findByUsername("admin"));
-		Document mergedDoc = testSubject.merge(Arrays.asList(doc1, doc3), 1200L, "merged.pdf", transaction);
+		Document mergedDoc = testSubject.merge(Arrays.asList(doc1, doc3), 1200L, "merged.pdf", transaction)
+				.getDocument();
 		assertNotNull(mergedDoc);
 
 		mergedDoc = docDao.findById(mergedDoc.getId());
@@ -627,7 +629,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testStoreVersionAsync() throws PersistenceException, InterruptedException {
+	public void testStoreVersionAsync() throws PersistenceException, InterruptedException, ExecutionException {
 		// A new document will have ID=101 so we prepare a fake document with
 		// that ID and create a version.
 		Document doc = docDao.findById(1);
@@ -670,17 +672,16 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		// This starts a new thread waiting for the referenced document to be
 		// written. This fails some times because the referenced document has
 		// not already available.
-		DocumentManagerImpl docMan = (DocumentManagerImpl) testSubject;
-		docMan.storeVersionAsync(version);
-
-		waiting();
+		DocumentManager docMan = (DocumentManager) testSubject;
+		docMan.storeVersionAsync(version, doc).get();
 
 		assertEquals(101L, version.getDocId());
 		assertNotNull(docDao.findById(version.getDocId()));
 	}
 
 	@Test
-	public void testCreate() throws PersistenceException, FileNotFoundException, InterruptedException {
+	public void testCreate()
+			throws PersistenceException, FileNotFoundException, InterruptedException, ExecutionException {
 		User user = userDao.findByUsername("admin");
 		Document doc = docDao.findById(1);
 		assertNotNull(doc);
@@ -696,22 +697,21 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		transaction.setComment("pippo_reason");
 		doc.setCustomId("xxxxxxxxxx");
 
-		Document newDoc = testSubject.create(new FileInputStream("pom.xml"), doc, transaction);
-
+		DocumentFuture result = testSubject.create(new FileInputStream("pom.xml"), doc, transaction);
+		Document newDoc = result.get();
 		assertEquals("1.0", newDoc.getVersion());
 		assertEquals("1.0", newDoc.getFileVersion());
-
-		waiting();
 
 		Version ver = verDao.findByVersion(newDoc.getId(), newDoc.getVersion());
 		assertNotNull(ver);
 
 		newDoc = docDao.findById(newDoc.getId());
 		assertEquals(newDoc.getFileName(), doc.getFileName());
-
+		
 		// Transaction is null
 		try {
-			newDoc = testSubject.create(new FileInputStream("pom.xml"), doc, null);
+			result = testSubject.create(new FileInputStream("pom.xml"), doc, null);
+			newDoc = result.getDocument();
 		} catch (IllegalArgumentException e) {
 			assertEquals(null, newDoc.getTransactionId());
 		}
@@ -719,7 +719,8 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		// DocumentVO is null
 		doc = docDao.findById(9999L);
 		try {
-			newDoc = testSubject.create(new FileInputStream("pom.xml"), doc, transaction);
+			result = testSubject.create(new FileInputStream("pom.xml"), doc, transaction);
+			newDoc = result.getDocument();
 		} catch (IllegalArgumentException e) {
 			assertEquals(null, doc);
 		}
@@ -730,7 +731,8 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		assertNotNull(doc);
 		docDao.initialize(doc);
 		try {
-			newDoc = testSubject.create(file, doc, null);
+			result = testSubject.create(file, doc, null);
+			newDoc = result.getDocument();
 		} catch (IllegalArgumentException e) {
 			// catch exception
 		}
@@ -738,7 +740,8 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		File emptyFile = new File("emptyFile");
 		// File with 0 length
 		try {
-			newDoc = testSubject.create(emptyFile, doc, transaction);
+			result = testSubject.create(emptyFile, doc, transaction);
+			newDoc = result.getDocument();
 		} catch (IllegalArgumentException e) {
 			assertEquals(0, emptyFile.length());
 		}
@@ -751,7 +754,8 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 			e.printStackTrace();
 		}
 
-		newDoc = testSubject.create(file, doc, transaction);
+		result = testSubject.create(file, doc, transaction);
+		newDoc = result.getDocument();
 		assertNotNull(newDoc);
 	}
 
@@ -817,7 +821,7 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 
 		try {
 			store.setUseDummyFile(true);
-			Document newDoc = testSubject.replaceAlias(alias.getId(), new DocumentHistory(transaction));
+			Document newDoc = testSubject.replaceAlias(alias.getId(), new DocumentHistory(transaction)).getDocument();
 
 			assertNotNull(newDoc);
 			assertEquals(originalDoc.getFileName(), newDoc.getFileName());
@@ -948,13 +952,17 @@ public class DocumentManagerImplTest extends AbstractCoreTestCase {
 		// immutable is not 0
 		doc = docDao.findById(9);
 		assertNotNull(doc);
-		testSubject.checkin(9, file, "testFile", true, doc, transaction);
+		try {
+			testSubject.checkin(9, file, "testFile", true, doc, transaction);
+		} catch (PersistenceException e) {
+			// All ok
+		}
 
 		// null filename
 		try {
 			testSubject.checkin(9, file, null, true, doc, transaction);
 		} catch (IllegalArgumentException e) {
-			// catch exception
+			// All ok
 		}
 
 		doc = docDao.findById(1);

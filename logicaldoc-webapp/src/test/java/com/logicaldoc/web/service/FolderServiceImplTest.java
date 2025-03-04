@@ -291,8 +291,6 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 
 		testSubject.applyMetadata(7L);
 
-		waiting();
-
 		folder9 = testSubject.getFolder(9L, false, false, false);
 		assertEquals(Long.valueOf(-1L), folder9.getTemplateId());
 		assertEquals("test", folder9.getValue("source"));
