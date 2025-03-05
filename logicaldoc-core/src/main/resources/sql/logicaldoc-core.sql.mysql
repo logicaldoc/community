@@ -689,6 +689,8 @@ insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld
 values (5,4,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,0);
 insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_store, ld_readingreq, ld_preview, ld_customid)
 values (5,-10000,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,1);
+insert into ld_folder_history (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_new, ld_path,ld_tenantid,ld_recordversion)
+values (1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,null,5,1,'CURRENT_TIMESTAMP','admin','event.folder.created',null,'1.0',0,1,'/',1,1);
 
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_creation, ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
 values (4,CURRENT_TIMESTAMP,0,'Default',5,1,CURRENT_TIMESTAMP,0,1,1,1,0,'/4');
@@ -700,6 +702,8 @@ insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write , ld_add, l
 values (4,4,1,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,0,1,1,1);
 insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_store, ld_readingreq, ld_preview, ld_customid)
 values (4,-10000,1,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,0,1,1,1);
+insert into ld_folder_history (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_new, ld_path,ld_tenantid,ld_recordversion)
+values (2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,null,4,1,'CURRENT_TIMESTAMP','admin','event.folder.created',null,'1.0',0,1,'/Default',1,1);
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
 values(1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'task.report','system','en', '$product - $task',
