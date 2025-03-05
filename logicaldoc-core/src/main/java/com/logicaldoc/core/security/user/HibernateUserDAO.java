@@ -84,6 +84,9 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	@Override
 	public User findByUsername(String username) throws PersistenceException {
+		if(StringUtils.isEmpty(username))
+			return null;
+		
 		User user = null;
 		Map<String, Object> params = new HashMap<>();
 		params.put(USERNAME, username);
@@ -97,6 +100,9 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	@Override
 	public User findByUsernameIgnoreCase(String username) throws PersistenceException {
+		if(StringUtils.isEmpty(username))
+			return null;
+		
 		User user = null;
 		Map<String, Object> params = new HashMap<>();
 		params.put(USERNAME, username.toLowerCase());
