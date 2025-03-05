@@ -139,10 +139,12 @@ public class DocumentManager {
 	 * @param newFile the file to use
 	 * @param transaction entry to log the event (set the user)
 	 * 
+     * @return A future to check the completion of all the checkin operations
+     * 
 	 * @throws PersistenceException error at data layer
 	 * @throws IOException I/O error
 	 */
-	public void replaceFile(long docId, String fileVersion, InputStream content, DocumentHistory transaction)
+	public DocumentFuture replaceFile(long docId, String fileVersion, InputStream content, DocumentHistory transaction)
 			throws IOException, PersistenceException {
 		if (transaction == null)
 			throw new IllegalArgumentException(TRANSACTION_CANNOT_BE_NULL);
@@ -152,7 +154,7 @@ public class DocumentManager {
 		try {
 			if (content != null)
 				FileUtil.writeFile(content, tmp.getPath());
-			replaceFile(docId, fileVersion, tmp, transaction);
+			return replaceFile(docId, fileVersion, tmp, transaction);
 		} finally {
 			FileUtils.deleteQuietly(tmp);
 		}
@@ -165,6 +167,8 @@ public class DocumentManager {
 	 * @param fileVersion the file version
 	 * @param newFile the file to use
 	 * @param transaction entry to log the event (set the user)
+	 * 
+     * @return A future to check the completion of all the checkin operations
 	 * 
 	 * @throws PersistenceException error at data layer
 	 * @throws IOException I/O error
@@ -241,10 +245,12 @@ public class DocumentManager {
 	 *        during the checkin (optional)
 	 * @param transaction entry to log the event, set the user and comment
 	 * 
+	 * @return A future to check the completion of all the checkin operations
+	 * 
 	 * @throws IOException I/O error
 	 * @throws PersistenceException error at data layer
 	 */
-	public void checkin(long docId, InputStream content, String filename, boolean release, AbstractDocument docVO,
+	public DocumentFuture checkin(long docId, InputStream content, String filename, boolean release, AbstractDocument docVO,
 			DocumentHistory transaction) throws IOException, PersistenceException {
 		validateTransaction(transaction);
 
@@ -252,7 +258,7 @@ public class DocumentManager {
 		File tmp = FileUtil.createTempFile("checkin", "." + FileUtil.getExtension(filename));
 		try {
 			FileUtil.writeFile(content, tmp.getPath());
-			checkin(docId, tmp, filename, release, docVO, transaction);
+			return checkin(docId, tmp, filename, release, docVO, transaction);
 		} finally {
 			FileUtils.deleteQuietly(tmp);
 		}
