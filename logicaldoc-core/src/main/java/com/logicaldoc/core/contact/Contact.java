@@ -1,5 +1,13 @@
 package com.logicaldoc.core.contact;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import com.logicaldoc.core.PersistentObject;
 
 /**
@@ -8,24 +16,35 @@ import com.logicaldoc.core.PersistentObject;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.8
  */
+@Entity
+@Table(name = "ld_contact")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Contact extends PersistentObject {
-
 	private static final long serialVersionUID = 1L;
 
+	@Column(name = "ld_userid")
 	private Long userId;
 
+	@Column(name = "ld_firstname", length = 255)
 	private String firstName;
 
+	@Column(name = "ld_lastname", length = 255)
 	private String lastName;
 
+	@Column(name = "ld_company", length = 255)
 	private String company;
 
+	@Column(name = "ld_email", length = 512)
 	private String email;
 
+	@Column(name = "ld_phone", length = 255)
 	private String phone;
 
+	@Column(name = "ld_mobile", length = 255)
 	private String mobile;
 
+	@Column(name = "ld_address", length = 512)
 	private String address;
 
 	public Contact() {

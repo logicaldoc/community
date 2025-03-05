@@ -28,36 +28,36 @@ import junit.framework.Assert;
 public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
-	private RatingDAO dao;
+	private RatingDAO testSubject;
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateRatingDAO
-		dao = Context.get(RatingDAO.class);
+		testSubject = Context.get(RatingDAO.class);
 	}
 
 	@Test
 	public void testStore() throws PersistenceException {
-		Rating rat1 = dao.findById(1);
-		dao.initialize(rat1);
+		Rating rat1 = testSubject.findById(1);
+		testSubject.initialize(rat1);
 		rat1.setVote(4);
 		rat1.setUserId(3);
-		dao.store(rat1);
+		testSubject.store(rat1);
 		Assert.assertNotNull(rat1);
 
-		Rating rat2 = dao.findById(2);
-		dao.initialize(rat2);
+		Rating rat2 = testSubject.findById(2);
+		testSubject.initialize(rat2);
 		rat2.setVote(2);
 		rat2.setDocId(4);
-		dao.store(rat2);
+		testSubject.store(rat2);
 		Assert.assertNotNull(rat2);
 
-		rat1 = dao.findById(1);
+		rat1 = testSubject.findById(1);
 		Assert.assertEquals(4, rat1.getVote());
 		Assert.assertEquals(3, rat1.getUserId());
-		rat2 = dao.findById(2);
+		rat2 = testSubject.findById(2);
 		Assert.assertEquals(2, rat2.getVote());
 		Assert.assertEquals(4, rat2.getDocId());
 
@@ -68,40 +68,40 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 		historyDao.initialize(history);
 		assertNotNull(history);
 
-		dao.store(rat2, history);
+		testSubject.store(rat2, history);
 	}
 
 	@Test
 	public void testFindVotesByDocId() throws PersistenceException {
-		Rating rat1 = dao.findVotesByDocId(1);
+		Rating rat1 = testSubject.findVotesByDocId(1);
 		Assert.assertNotNull(rat1);
 		Assert.assertEquals(2, rat1.getCount().intValue());
 		Assert.assertEquals(Float.valueOf(2.5F), rat1.getAverage().floatValue());
 
-		rat1 = dao.findVotesByDocId(2);
+		rat1 = testSubject.findVotesByDocId(2);
 		Assert.assertNotNull(rat1);
 		Assert.assertEquals(1, rat1.getCount().intValue());
 		Assert.assertEquals(Float.valueOf(3.0F), rat1.getAverage().floatValue());
 
 		// Try with non-existing rating vote
-		rat1 = dao.findVotesByDocId(99);
+		rat1 = testSubject.findVotesByDocId(99);
 		Assert.assertNull(rat1);
 	}
 
 	@Test
 	public void testFindByDocId() throws PersistenceException {
-		List<Rating> ratings = dao.findByDocId(1L);
+		List<Rating> ratings = testSubject.findByDocId(1L);
 		Assert.assertEquals(2, ratings.size());
 
 		// Try with non-existing rating vote
-		ratings = dao.findByDocId(99L);
+		ratings = testSubject.findByDocId(99L);
 		Assert.assertTrue(ratings.isEmpty());
 	}
 
 	@Test
 	public void testFindByDocIdAndUserId() throws PersistenceException {
-		Assert.assertNotNull(dao.findByDocIdAndUserId(1, 1));
-		Assert.assertNull(dao.findByDocIdAndUserId(2, 2));
+		Assert.assertNotNull(testSubject.findByDocIdAndUserId(1, 1));
+		Assert.assertNull(testSubject.findByDocIdAndUserId(2, 2));
 	}
 
 	@Test
@@ -116,7 +116,7 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 		historyDao.initialize(history);
 		assertNotNull(history);
 
-		dao.updateDocumentRating(doc.getId(), history);
+		testSubject.updateDocumentRating(doc.getId(), history);
 	}
 
 	@Test
@@ -124,18 +124,18 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 		Rating rat1 = new Rating();
 		rat1.setDocId(4);
 		rat1.setUserId(2);
-		dao.store(rat1);
+		testSubject.store(rat1);
 		assertNotNull(rat1);
 
-		dao.delete(1, 1);
+		testSubject.delete(1, 1);
 	}
 
 	@Test
 	public void testHashCode() throws PersistenceException {
-		Rating rating1 = dao.findById(1);
+		Rating rating1 = testSubject.findById(1);
 		assertNotNull(rating1);
 
-		Rating rating2 = dao.findById(2);
+		Rating rating2 = testSubject.findById(2);
 		assertNotNull(rating2);
 
 		assertNotSame(rating1.hashCode(), rating2.hashCode());
@@ -146,19 +146,19 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 		Rating rating1 = new Rating();
 		rating1.setDocId(1);
 		rating1.setCreation(new Date(2025 - 25 - 20));
-		dao.store(rating1);
+		testSubject.store(rating1);
 		assertNotNull(rating1);
 
 		Rating rating2 = new Rating();
 		rating2.setDocId(2);
 		rating2.setCreation(new Date(2025 - 25 - 21));
-		dao.store(rating2);
+		testSubject.store(rating2);
 		assertNotNull(rating2);
 
 		Rating rating3 = new Rating();
 		rating3.setDocId(3);
 		rating3.setCreation(new Date(2025 - 25 - 20));
-		dao.store(rating3);
+		testSubject.store(rating3);
 		assertNotNull(rating3);
 
 		assertEquals(rating1, rating1);

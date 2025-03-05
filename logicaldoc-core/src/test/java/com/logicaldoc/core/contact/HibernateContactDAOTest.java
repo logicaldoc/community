@@ -3,6 +3,7 @@ package com.logicaldoc.core.contact;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -17,7 +18,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
- * Test case for <code>HibernateContactDAO</code>
+ * Test case for {@link HibernateContactDAO}
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 6.8
@@ -25,28 +26,28 @@ import com.logicaldoc.util.plugin.PluginException;
 public class HibernateContactDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
-	private ContactDAO dao;
+	private ContactDAO testSubject;
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateContactDAO
-		dao = Context.get(ContactDAO.class);
+		testSubject = Context.get(ContactDAO.class);
 	}
 
 	@Test
 	public void testFindByUser() throws PersistenceException {
-		List<Contact> contacts = dao.findByUser(null, null);
+		List<Contact> contacts = testSubject.findByUser(null, null);
 		assertEquals(1, contacts.size());
-		contacts = dao.findByUser(1L, null);
+		contacts = testSubject.findByUser(1L, null);
 		assertEquals(2, contacts.size());
-		contacts = dao.findByUser(1L, "alessandro@acme.com");
+		contacts = testSubject.findByUser(1L, "alessandro@acme.com");
 		assertEquals(1, contacts.size());
-		contacts = dao.findByUser(1L, "xxx");
+		contacts = testSubject.findByUser(1L, "xxx");
 		assertEquals(0, contacts.size());
 
-		Contact contact1 = dao.findById(1L);
+		Contact contact1 = testSubject.findById(1L);
 		assertNotNull(contact1);
 
 		Contact contact2 = new Contact(contact1);
@@ -73,8 +74,30 @@ public class HibernateContactDAOTest extends AbstractCoreTestCase {
 		contact2.setUserId(-5L);
 
 		assertEquals(false, contact1.equals(contact2));
-		
+
 		contact1.setUserId(-3L);
 		assertEquals(false, contact1.equals(contact2));
+		
+		assertNull(testSubject.findById(4L));
 	}
+
+	@Test
+	public void testCreateContact() throws PersistenceException {
+		Contact contact = new Contact();
+		contact.setUserId(1L);
+		contact.setFirstName("Gino");
+		contact.setLastName("Marzulli");
+		contact.setCompany("companyName");
+		contact.setEmail("marzulli@mail.com");
+		contact.setPhone("211235709");
+		contact.setMobile("098234098");
+		contact.setAddress("addressName");
+
+		testSubject.store(contact);
+		assertNotNull(contact);
+		
+		Long nextVal = testSubject.queryForLong("select next_val from hibernate_sequences where sequence_name='ld_contact'");
+		assertEquals(100L, nextVal.longValue());
+	}
+
 }

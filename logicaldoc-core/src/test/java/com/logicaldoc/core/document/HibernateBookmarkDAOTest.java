@@ -29,60 +29,60 @@ import com.logicaldoc.util.plugin.PluginException;
 public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
-	private BookmarkDAO dao;
+	private BookmarkDAO testSubject;
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDiscussionDAO
-		dao = Context.get(BookmarkDAO.class);
+		testSubject = Context.get(BookmarkDAO.class);
 	}
 
 	@Test
 	public void testStore() throws PersistenceException {
-		Bookmark book1 = dao.findById(1);
-		dao.initialize(book1);
+		Bookmark book1 = testSubject.findById(1);
+		testSubject.initialize(book1);
 		book1.setDescription("pippo");
-		dao.store(book1);
+		testSubject.store(book1);
 		assertNotNull(book1);
 
-		Bookmark book2 = dao.findById(2);
-		dao.initialize(book2);
+		Bookmark book2 = testSubject.findById(2);
+		testSubject.initialize(book2);
 		book2.setDescription("paperino");
-		dao.store(book2);
+		testSubject.store(book2);
 		assertNotNull(book2);
 	}
 
 	@Test
 	@SuppressWarnings("rawtypes")
 	public void testFindByUserId() throws PersistenceException {
-		Collection bookmarks = dao.findByUserId(1);
+		Collection bookmarks = testSubject.findByUserId(1);
 		assertNotNull(bookmarks);
 		assertEquals(2, bookmarks.size());
 
-		bookmarks = dao.findByUserId(2);
+		bookmarks = testSubject.findByUserId(2);
 		assertNotNull(bookmarks);
 		assertEquals(1, bookmarks.size());
 
 		// Try with non-existing user
-		bookmarks = dao.findByUserId(99);
+		bookmarks = testSubject.findByUserId(99);
 		assertNotNull(bookmarks);
 		assertEquals(0, bookmarks.size());
 
 		// Test Bookmark class methods
-		Bookmark bookmark1 = dao.findByUserIdAndDocId(1, 1);
+		Bookmark bookmark1 = testSubject.findByUserIdAndDocId(1, 1);
 		assertEquals("blank", bookmark1.getIcon());
 		assertNotNull(bookmark1.getPath());
 
-		Bookmark bookmark2 = dao.findByUserIdAndDocId(2, 1);
+		Bookmark bookmark2 = testSubject.findByUserIdAndDocId(2, 1);
 		assertNotSame(bookmark1.hashCode(), bookmark2.hashCode());
 		assertEquals(true, bookmark1.equals(bookmark1));
 		assertEquals(false, bookmark1.equals(bookmark2));
 
 		Bookmark bookmark3 = new Bookmark();
 		bookmark3.setDescription("this is a bookmark");
-		dao.store(bookmark3);
+		testSubject.store(bookmark3);
 		
 		bookmark3.setId(1);
 		assertEquals(false, bookmark1.equals(bookmark3));
@@ -104,38 +104,38 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 	@Test
 	@SuppressWarnings("rawtypes")
 	public void testFindBookmarkedDocs() throws PersistenceException {
-		Collection bookmarks = dao.findByUserId(1);
+		Collection bookmarks = testSubject.findByUserId(1);
 		assertNotNull(bookmarks);
 		assertEquals(2, bookmarks.size());
 
-		List<Long> ids = dao.findBookmarkedDocs(1L);
+		List<Long> ids = testSubject.findBookmarkedDocs(1L);
 		assertEquals(2, ids.size());
 
-		ids = dao.findBookmarkedDocs(55L);
+		ids = testSubject.findBookmarkedDocs(55L);
 		assertEquals(0, ids.size());
 	}
 
 	@Test
 	public void testIsDocBookmarkedByUser() throws PersistenceException {
-		assertEquals(true, dao.isDocBookmarkedByUser(1L, 1L));
-		assertEquals(false, dao.isDocBookmarkedByUser(55L, 1L));
+		assertEquals(true, testSubject.isDocBookmarkedByUser(1L, 1L));
+		assertEquals(false, testSubject.isDocBookmarkedByUser(55L, 1L));
 	}
 
 	@Test
 	public void testFindByUserIdAndTargetId() throws PersistenceException {
-		Bookmark bookmark = dao.findByUserIdAndDocId(1, 1);
+		Bookmark bookmark = testSubject.findByUserIdAndDocId(1, 1);
 		assertNotNull(bookmark);
-		bookmark = dao.findByUserIdAndDocId(1, 2);
+		bookmark = testSubject.findByUserIdAndDocId(1, 2);
 		assertNotNull(bookmark);
 
-		Bookmark book1 = dao.findById(1);
-		dao.initialize(book1);
+		Bookmark book1 = testSubject.findById(1);
+		testSubject.initialize(book1);
 		book1.setTargetId(3);
-		dao.store(book1);
+		testSubject.store(book1);
 
-		bookmark = dao.findByUserIdAndDocId(1, 1);
+		bookmark = testSubject.findByUserIdAndDocId(1, 1);
 		assertNull(bookmark);
-		bookmark = dao.findByUserIdAndDocId(1, 2);
+		bookmark = testSubject.findByUserIdAndDocId(1, 2);
 		assertNotNull(bookmark);
 	}
 
@@ -148,11 +148,11 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 		bmark.setUserId(1);
 		bmark.setTargetId(244);
 
-		dao.store(bmark);
+		testSubject.store(bmark);
 		long bkmID = bmark.getId();
 
-		dao.delete(bkmID);
-		bmark = dao.findByUserIdAndDocId(1, bkmID);
+		testSubject.delete(bkmID);
+		bmark = testSubject.findByUserIdAndDocId(1, bkmID);
 		assertNull(bmark);
 	}
 
@@ -166,10 +166,10 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 		Document doc = docDao.findById(1);
 		assertNotNull(doc);
 
-		Bookmark bookmark = dao.findByUserIdAndDocId(1, 1);
+		Bookmark bookmark = testSubject.findByUserIdAndDocId(1, 1);
 		assertNotNull(bookmark);
 
-		bookmark = dao.findByUserIdAndFolderId(1, 6);
+		bookmark = testSubject.findByUserIdAndFolderId(1, 6);
 		assertNull(bookmark);
 	}
 }

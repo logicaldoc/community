@@ -24,6 +24,7 @@ import com.logicaldoc.util.plugin.PluginException;
  */
 public class FolderComparatorTest extends AbstractCoreTestCase {
 
+	// Instance under test
 	private FolderDAO testSubject;
 
 	private TemplateDAO templateDao;

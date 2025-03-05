@@ -17,10 +17,11 @@
             http://www.springframework.org/schema/aop/spring-aop.xsd
             http://www.springframework.org/schema/security
             http://www.springframework.org/schema/security/spring-security.xsd">
+            
+    <context:annotation-config />            
+            
     <import resource="classpath*:context/context-core.xml" />
     <import resource="classpath*:context/context-webservice.xml" />
-    
-    <context:annotation-config />
     
     <!-- This post processor ensures placeholders substitutions -->
 	<bean id="PropertyPlaceholderConfigurer"
@@ -49,7 +50,7 @@
   	</bean>
     
     <!-- Hibernate SessionFactory -->
-    <bean id="SessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"
+    <bean id="SessionFactory" class="com.logicaldoc.util.spring.LocalSessionFactory"
         abstract="false" lazy-init="default" autowire="default">
         <property name="dataSource">
             <ref bean="DataSource" />

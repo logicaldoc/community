@@ -56,7 +56,7 @@
 
 	<!-- Hibernate SessionFactory -->
 	<bean id="SessionFactory"
-		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"
+		class="com.logicaldoc.util.spring.LocalSessionFactory"
 		abstract="false" lazy-init="default" autowire="default">
 		<property name="dataSource">
 			<ref bean="DataSource" />

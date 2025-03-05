@@ -15,43 +15,42 @@ import junit.framework.Assert;
 public class SoapBookmarkServiceTest extends AbstractWebserviceTestCase {
 
 	// Instance under test
-	private SoapBookmarkService bookmarkService;
+	private SoapBookmarkService testSubject;
 
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		bookmarkService = new SoapBookmarkService();
-		bookmarkService.setValidateSession(false);
+		testSubject = new SoapBookmarkService();
+		testSubject.setValidateSession(false);
 	}
 
 	@Test
 	public void testBookmarkDocument() throws Exception {
-		bookmarkService.bookmarkDocument("", 1L);
-		bookmarkService.bookmarkDocument("", 2L);
+		testSubject.bookmarkDocument("", 1L);
+		testSubject.bookmarkDocument("", 2L);
 
-		List<WSBookmark> bookmarks = bookmarkService.getBookmarks("");
+		List<WSBookmark> bookmarks = testSubject.getBookmarks("");
 		Assert.assertEquals(2, bookmarks.size());
 
 		try {
-			bookmarkService.bookmarkDocument("", 3L);
+			testSubject.bookmarkDocument("", 3L);
 			Assert.fail("the document doesn't exist, why exception was not raised.");
 		} catch (Exception e) {
 			// Nothing to do
 		}
-
 	}
 
 	@Test
 	public void testBookmarkFolder() throws Exception {
-		bookmarkService.bookmarkFolder("", 5L);
-		bookmarkService.bookmarkFolder("", 4L);
+		testSubject.bookmarkFolder("", 5L);
+		testSubject.bookmarkFolder("", 4L);
 
-		List<WSBookmark> bookmarks = bookmarkService.getBookmarks("");
+		List<WSBookmark> bookmarks = testSubject.getBookmarks("");
 		Assert.assertEquals(2, bookmarks.size());
 
 		try {
-			bookmarkService.bookmarkDocument("", 99L);
+			testSubject.bookmarkDocument("", 99L);
 			Assert.fail("the folder doesn't exist, why exception was not raised.");
 		} catch (Exception e) {
 			// Nothing to do

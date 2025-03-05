@@ -20,7 +20,7 @@
    
     <context:annotation-config />
 
-    <import resource="classpath*:context/context-*.xml" />    
+    <import resource="classpath*:context/context-core.xml" />    
     
     <!-- This post processor ensures placeholders substitutions -->
 	<bean id="PropertyPlaceholderConfigurer"
@@ -48,7 +48,7 @@
   	</bean>
     
     <!-- Hibernate SessionFactory -->
-    <bean id="SessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"
+    <bean id="SessionFactory" class="com.logicaldoc.util.spring.LocalSessionFactory"
         abstract="false" lazy-init="default" autowire="default">
         <property name="dataSource">
             <ref bean="DataSource" />
@@ -56,6 +56,7 @@
         <property name="entityInterceptor">
             <bean class="com.logicaldoc.core.PersistenceObjectInterceptor" />
         </property>
+
         <property name="mappingLocations">
             <value>classpath*:mappings/*.hbm.xml</value>
         </property>

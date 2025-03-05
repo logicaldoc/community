@@ -28,7 +28,7 @@ import com.logicaldoc.util.plugin.PluginException;
  */
 public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 
-	private DocumentNoteDAO dao;
+	private DocumentNoteDAO testSubject;
 
 	private FolderDAO folderDao;
 
@@ -41,7 +41,7 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDocumentNoteDAO
-		dao = Context.get(DocumentNoteDAO.class);
+		testSubject = Context.get(DocumentNoteDAO.class);
 		folderDao = Context.get(FolderDAO.class);
 		docDao = Context.get(DocumentDAO.class);
 		historyDao = Context.get(DocumentHistoryDAO.class);
@@ -49,7 +49,7 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testFindByDocId() throws PersistenceException {
-		List<DocumentNote> notes = dao.findByDocId(1L, null);
+		List<DocumentNote> notes = testSubject.findByDocId(1L, null);
 		assertNotNull(notes);
 		assertEquals(2, notes.size());
 		DocumentNote note = notes.get(0);
@@ -62,10 +62,10 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 	@SuppressWarnings("unlikely-arg-type")
 	@Test
 	public void testEquals() throws PersistenceException {
-		DocumentNote note1 = dao.findById(1);
+		DocumentNote note1 = testSubject.findById(1);
 		assertNotNull(note1);
 
-		DocumentNote note2 = dao.findById(2);
+		DocumentNote note2 = testSubject.findById(2);
 		assertNotNull(note2);
 
 		String notANote = "Not a DocumentNote";
@@ -89,16 +89,16 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 		assertEquals(false, note1.equals(new Object()));
 		assertEquals(false, note1.equals(notANote));
 
-		note1 = dao.findById(1);
-		note2 = dao.findById(2);
+		note1 = testSubject.findById(1);
+		note2 = testSubject.findById(2);
 		assertEquals(note1.getDate(), note2.getDate());
 
 		note2.setDate(null);
 		assertEquals(false, note1.getDate().equals(note2.getDate()));
 		assertEquals(false, note1.equals(note2));
 
-		note1 = dao.findById(1);
-		note2 = dao.findById(2);
+		note1 = testSubject.findById(1);
+		note2 = testSubject.findById(2);
 		note2.setFileVersion(null);
 		assertEquals(false, note1.getFileVersion().equals(note2.getFileVersion()));
 		assertEquals(false, note1.equals(note2));
@@ -106,21 +106,21 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testFindByDocIdAndType() throws PersistenceException {
-		List<DocumentNote> notes = dao.findByDocIdAndType(1L, null, "x");
+		List<DocumentNote> notes = testSubject.findByDocIdAndType(1L, null, "x");
 		assertNotNull(notes);
 		assertEquals(1, notes.size());
 		DocumentNote note = notes.get(0);
 		assertEquals("message for note 2", note.getMessage());
 
-		notes = dao.findByDocIdAndType(3L, "1.3", "x");
+		notes = testSubject.findByDocIdAndType(3L, "1.3", "x");
 		assertNotNull(notes);
 	}
 
 	@Test
 	public void testCopyAnnotations() throws PersistenceException {
-		assertTrue(dao.findByDocId(4L, "2.0").isEmpty());
-		dao.copyAnnotations(3L, "1.0", "2.0");
-		assertEquals(1, dao.findByDocId(3L, "2.0").size());
+		assertTrue(testSubject.findByDocId(4L, "2.0").isEmpty());
+		testSubject.copyAnnotations(3L, "1.0", "2.0");
+		assertEquals(1, testSubject.findByDocId(3L, "2.0").size());
 	}
 
 	@Test
@@ -130,7 +130,7 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 		// non-existent docId
 		note.setDocId(999777L);
 		try {
-			dao.store(note);
+			testSubject.store(note);
 		} catch (PersistenceException e) {
 			// catch exception
 		}
@@ -146,7 +146,7 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 		note = new DocumentNote();
 		note.setFileName("noteTest");
 		note.setDocId(doc.getId());
-		dao.store(note);
+		testSubject.store(note);
 		assertNotNull(note);
 		assertEquals(null, note.getFileVersion());
 
@@ -156,12 +156,12 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 		historyDao.initialize(history);
 		assertNotNull(history);
 
-		dao.store(note, history);
+		testSubject.store(note, history);
 	}
 
 	@Test
 	public void testFindByUserId() throws PersistenceException {
-		List<DocumentNote> notes = dao.findByUserId(1L);
+		List<DocumentNote> notes = testSubject.findByUserId(1L);
 		assertNotNull(notes);
 	}
 
@@ -177,9 +177,9 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 		DocumentNote note = new DocumentNote();
 		note.setFileName("noteTest");
 		note.setDocId(doc.getId());
-		dao.store(note);
+		testSubject.store(note);
 		assertNotNull(note);
 
-		dao.delete(note.getId(), 1);
+		testSubject.delete(note.getId(), 1);
 	}
 }

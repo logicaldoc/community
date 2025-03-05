@@ -1,5 +1,12 @@
 package com.logicaldoc.core.document;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +22,10 @@ import com.logicaldoc.util.Context;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
+@Entity
+@Table(name = "ld_bookmark")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Bookmark extends PersistentObject {
 
 	private static final Logger log = LoggerFactory.getLogger(Bookmark.class);
@@ -25,19 +36,26 @@ public class Bookmark extends PersistentObject {
 
 	public static final int TYPE_FOLDER = 1;
 
+	@Column(name = "ld_userid", nullable = false)
 	private long userId;
 
+	@Column(name = "ld_docid", nullable = false)
 	private long targetId;
 
+	@Column(name = "ld_title", length = 255, nullable = false)
 	private String title = "";
 
+	@Column(name = "ld_description", length = 4000, nullable = false)
 	private String description = "";
 
+	@Column(name = "ld_position", nullable = false)
 	private int position = 0;
 
 	// The document file extension
+	@Column(name = "ld_filetype", length = 40)
 	private String fileType;
 
+	@Column(name = "ld_type", nullable = false)
 	private int type = TYPE_DOCUMENT;
 
 	public long getUserId() {

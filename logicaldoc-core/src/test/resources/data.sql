@@ -469,6 +469,8 @@ insert into ld_contact(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_useri
 values(2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 1, 'Marco', 'marco@acme.com',1,1);
 insert into ld_contact(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_userid, ld_firstname, ld_email,ld_tenantid,ld_recordversion)
 values(3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 1, 'Alessandro', 'alessandro@acme.com',1,1);
+insert into ld_contact(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_userid, ld_firstname, ld_email,ld_tenantid,ld_recordversion)
+values(4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1, 'Jushua Bloch', 'jusua@acme.com',1,1);
 
 insert into ld_template
 			(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid, ld_recordversion)

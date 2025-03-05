@@ -31,7 +31,7 @@ import com.logicaldoc.util.plugin.PluginException;
 public class DocumentComparatorTest extends AbstractCoreTestCase {
 
 	// Instance under test
-	private DocumentDAO dao;
+	private DocumentDAO testSubject;
 
 	private FolderDAO folderDao;
 
@@ -41,7 +41,7 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDocumentDAO
-		dao = Context.get(DocumentDAO.class);
+		testSubject = Context.get(DocumentDAO.class);
 		folderDao = Context.get(FolderDAO.class);
 	}
 
@@ -51,7 +51,7 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 		assertNotNull(fdatec);
 
 		// add some document to a list
-		List<Document> docs = dao.findAll();
+		List<Document> docs = testSubject.findAll();
 
 		// check that the list is sorted
 		Collections.sort(docs, fdatec);
@@ -78,12 +78,12 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 		Document doc1 = new Document();
 		doc1.setFileName("document1");
 		doc1.setFolder(folder1);
-		dao.store(doc1);
+		testSubject.store(doc1);
 
 		Document doc2 = new Document();
 		doc2.setFileName("document2");
 		doc2.setFolder(folder2);
-		dao.store(doc2);
+		testSubject.store(doc2);
 
 		Comparator<AbstractDocument> comparator = DocumentComparator.getComparator("id asc");
 		assertEquals(-1, comparator.compare(doc1, doc2));
