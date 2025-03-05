@@ -11,9 +11,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.webservice.model.WSCredentials;
 import com.logicaldoc.webservice.rest.AuthService;
@@ -38,7 +40,7 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	String password) throws AuthenticationException {
 		return super.login(username, password);
 	}
-	
+
 	@POST
 	@Path("/loginForm")
 	@Operation(operationId = "loginForm", summary = "Login with POST", description = "Deprecated, use loginApiKey instead")
@@ -58,12 +60,19 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	public String loginPostJSON(WSCredentials cred) {
 		return super.login(cred.getUsername(), cred.getPassword());
 	}
-	
+
 	@GET
 	@Path("/loginApiKey")
 	@Override
-	public String loginApiKey(@HeaderParam("X-API-KEY") String apikey) {
-		return super.loginApiKey(apikey);
+	public String loginApiKey(@HeaderParam("X-API-KEY")
+	String apikey) {
+		// The header was already processed by the SessionFilter so we must
+		// check the existing session first
+		String sid = SessionManager.get().getSessionId(getCurrentRequest());
+		if (StringUtils.isEmpty(sid))
+			return super.loginApiKey(apikey);
+		else
+			return sid;
 	}
 
 	@DELETE
