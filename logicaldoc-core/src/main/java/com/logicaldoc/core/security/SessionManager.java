@@ -451,6 +451,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * <li>Request attribute <code>PARAM_SID</code></li>
 	 * <li>Session attribute <code>PARAM_SID</code></li>
 	 * <li>Cookie <code>COOKIE_SID</code></li>
+	 * <li>Header <code>X-API-KEY</code></li>
 	 * <li>Spring SecurityContextHolder</li>
 	 * <li>Client ID</li>
 	 * </ol>
@@ -522,7 +523,24 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		else
 			sid = getSessionIdFromCookie(request);
 
+		if (StringUtils.isEmpty(sid))
+			sid = getSessionFromApiKey(request);
+
 		return sid;
+	}
+
+	private String getSessionFromApiKey(HttpServletRequest request) {
+		try {
+			if (StringUtils.isNotEmpty(request.getHeader(HEADER_APIKEY))) {
+				String apiKey = CryptUtil.encryptSHA256(request.getHeader(HEADER_APIKEY));
+				return getSessions().stream().filter(s -> apiKey.equals(s.getKey())).map(s -> s.getSid()).findFirst()
+						.orElse(null);
+			}
+		} catch (NoSuchAlgorithmException e) {
+			log.warn(e.getMessage(), e);
+		}
+
+		return null;
 	}
 
 	private String getSessionIdFromCookie(HttpServletRequest request) {
