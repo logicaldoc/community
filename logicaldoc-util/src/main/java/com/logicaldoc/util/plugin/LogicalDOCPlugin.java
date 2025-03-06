@@ -307,9 +307,16 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	 */
 	protected void addServlet(String name, String servletClass, String mapping, Integer loadOnStartup) {
 		try {
-			File dest = new File(getPluginPath());
-			dest = dest.getParentFile().getParentFile();
-			WebConfigurator config = new WebConfigurator(dest.getPath() + "/web.xml");
+			File webDescriptor = new File(getPluginPath());
+			webDescriptor = webDescriptor.getParentFile().getParentFile();
+			webDescriptor = new File(webDescriptor, "web.xml");
+			if (!webDescriptor.exists()) {
+				logger.warn("Cannot add servlet {} because no web descriptor located at {}", name,
+						webDescriptor.getAbsolutePath());
+				return;
+			}
+
+			WebConfigurator config = new WebConfigurator(webDescriptor.getAbsolutePath());
 			if (loadOnStartup != null)
 				config.addServlet(name, servletClass, loadOnStartup);
 			else
