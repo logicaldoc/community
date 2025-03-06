@@ -69,6 +69,7 @@ public class FormatConverterManager {
 
 	@Resource(name = "ContextProperties")
 	protected ContextProperties config;
+
 	// Key is the src_extension-dst_extension, value is a collection of
 	// converters
 	private Map<String, List<FormatConverter>> converters = new HashMap<>();
@@ -448,7 +449,8 @@ public class FormatConverterManager {
 			log.warn("No format converter for file {}", inFileName);
 
 		// Get the first available converter
-		FormatConverter converter = formatConverters != null ? formatConverters.get(0) : null;
+		FormatConverter converter = formatConverters != null
+				? formatConverters.stream().filter(c -> c.isEnabled()).findFirst().orElse(null) : null;
 
 		// Check if a special binding is configured
 		String currentConverter = config.getProperty("converter." + inOutkey);
