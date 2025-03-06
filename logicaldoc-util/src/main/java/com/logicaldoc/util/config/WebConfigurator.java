@@ -393,7 +393,6 @@ public class WebConfigurator extends XMLBean {
 	 * @param name The filter name
 	 * @param clazz The filter class fully qualified name
 	 */
-	@SuppressWarnings("unchecked")
 	public void addFilter(String name, String clazz) {
 		Element filter = null;
 		Element filterClass = null;

@@ -1,6 +1,5 @@
 package com.logicaldoc.core.history;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -13,10 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
-import org.springframework.core.type.classreading.MetadataReader;
-import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
-import org.springframework.core.type.filter.AssignableTypeFilter;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
@@ -551,14 +547,6 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
 		scanner.addIncludeFilter(new AnnotationTypeFilter(Table.class));
-		scanner.addExcludeFilter(new AssignableTypeFilter(History.class) {
-
-			@Override
-			public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory)
-					throws IOException {
-				return !super.match(metadataReader, metadataReaderFactory);
-			}
-		});
 
 		for (BeanDefinition bd : scanner.findCandidateComponents("com.logicaldoc")) {
 			String beanClassName = bd.getBeanClassName();
@@ -566,7 +554,8 @@ public abstract class History extends PersistentObject implements Comparable<His
 			try {
 				Class<?> beanClass = Class.forName(beanClassName);
 				Table annotation = beanClass.getAnnotation(Table.class);
-				if (annotation != null && StringUtils.isNotEmpty(annotation.name()))
+				if (annotation != null && StringUtils.isNotEmpty(annotation.name())
+						&& History.class.isAssignableFrom(beanClass))
 					tables.add(annotation.name());
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);

@@ -71,7 +71,7 @@ public class XMLBean {
 			docPath = URLDecoder.decode(docname.getPath(), "UTF-8");
 			docInputStream = null;
 		} catch (Exception ex) {
-			log.error(ex.getMessage());
+			log.error(ex.getMessage(), ex);
 		}
 
 		initDocument();
@@ -92,7 +92,7 @@ public class XMLBean {
 	 * Initializes the SAX builder
 	 */
 	private void initDocument() {
-		SAXBuilder builder = new SAXBuilder(XMLReaders.NONVALIDATING);
+		SAXBuilder builder = new SAXBuilder(XMLReaders.DTDVALIDATING);
 
 		builder.setFeature("http://xml.org/sax/features/validation", false);
 		builder.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
@@ -102,15 +102,17 @@ public class XMLBean {
 
 		builder.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
 		builder.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-
+		
 		if (docPath != null) {
 			try {
 				doc = builder.build(docPath);
 			} catch (Exception t) {
+				t.printStackTrace();
+				
 				// In some environments, during maven test phase a well formed
 				// URL must be used
 				// instead of ordinary path
-				log.error(t.getMessage());
+				log.error(t.getMessage(), t);
 
 				buildFromFileUrl(builder);
 			}
@@ -118,7 +120,7 @@ public class XMLBean {
 			try {
 				doc = builder.build(docInputStream);
 			} catch (Exception t) {
-				log.error(t.getMessage());
+				log.error(t.getMessage(), t);
 			}
 		}
 

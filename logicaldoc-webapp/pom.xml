@@ -13,6 +13,18 @@
 	<packaging>war</packaging>
 	<dependencies>
 		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom2</artifactId>
+		</dependency>		
+		<dependency>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis-ext</artifactId>
+		</dependency>	
+		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>
@@ -130,20 +142,7 @@
 			<groupId>org.hsqldb</groupId>
 			<artifactId>sqltool</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>xml-apis</groupId>
-			<artifactId>xml-apis</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>xml-apis</groupId>
-			<artifactId>xml-apis-ext</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.jdom</groupId>
-			<artifactId>jdom2</artifactId>
-		</dependency>
+
 		<dependency>
 			<groupId>torque</groupId>
 			<artifactId>torque</artifactId>
@@ -436,10 +435,6 @@
 			<version>9.1.6</version>
 		</dependency>
 		<dependency>
-			<groupId>org.dom4j</groupId>
-			<artifactId>dom4j</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.calcite</groupId>
 			<artifactId>calcite-core</artifactId>
 			<scope>test</scope>
@@ -454,15 +449,6 @@
 			<artifactId>batik-util</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<!-- dependency> <groupId>com.microsoft.graph</groupId>
-		<artifactId>microsoft-graph</artifactId> 
-			<version>5.32.0</version> </dependency> <dependency>
-		<groupId>com.azure</groupId> 
-			<artifactId>azure-identity</artifactId> <version>1.3.7</version> </dependency> 
-			<dependency> <groupId>com.microsoft.azure</groupId>
-		<artifactId>msal4j</artifactId> 
-			<version>1.13.0</version> </dependency -->
-
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>

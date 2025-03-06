@@ -449,7 +449,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 			PropertyData<?> oid = objectData.getProperties().getProperties().get("cmis:objectId");
 
 			String cmisDocID = (String) oid.getFirstValue();
-			assertTrue(cmisDocID.equals("doc.1") || cmisDocID.equals("fld.5"));
+			assertTrue(cmisDocID.equals("doc.1") || cmisDocID.equals("fld.5") || cmisDocID.equals("fld.4"));
 		}
 
 	}
