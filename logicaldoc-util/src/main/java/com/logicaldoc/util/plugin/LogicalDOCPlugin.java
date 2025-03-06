@@ -269,21 +269,21 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	 */
 	protected void addLogger(String name, String appender) {
 		try {
-		// Add notifier log issues
-		LogConfigurator logging = new LogConfigurator();
-		logging.addTextAppender(appender);
-		logging.write();
+			// Add notifier log issues
+			LogConfigurator logging = new LogConfigurator();
+			logging.addTextAppender(appender);
+			logging.write();
 
-		String appenderWeb = appender + "_WEB";
-		logging.addHtmlAppender(appenderWeb);
-		logging.write();
+			String appenderWeb = appender + "_WEB";
+			logging.addHtmlAppender(appenderWeb);
+			logging.write();
 
-		logging.addLogger(name, List.of(appender, appenderWeb));
-		logging.write();
-	} catch (Exception e) {
-		logger.warn("Cannot add logger {}", name);
-		logger.warn(e.getMessage(), e);
-	}
+			logging.addLogger(name, List.of(appender, appenderWeb));
+			logging.write();
+		} catch (Exception e) {
+			logger.warn("Cannot add logger {}", name);
+			logger.warn(e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -307,19 +307,19 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	 */
 	protected void addServlet(String name, String servletClass, String mapping, Integer loadOnStartup) {
 		try {
-		File dest = new File(getPluginPath());
-		dest = dest.getParentFile().getParentFile();
-		WebConfigurator config = new WebConfigurator(dest.getPath() + "/web.xml");
-		if (loadOnStartup != null)
-			config.addServlet(name, servletClass, loadOnStartup);
-		else
-			config.addServlet(name, servletClass);
-		config.writeXMLDoc();
-
-		if (mapping != null) {
-			config.addServletMapping(name, mapping);
+			File dest = new File(getPluginPath());
+			dest = dest.getParentFile().getParentFile();
+			WebConfigurator config = new WebConfigurator(dest.getPath() + "/web.xml");
+			if (loadOnStartup != null)
+				config.addServlet(name, servletClass, loadOnStartup);
+			else
+				config.addServlet(name, servletClass);
 			config.writeXMLDoc();
-		}
+
+			if (mapping != null) {
+				config.addServletMapping(name, mapping);
+				config.writeXMLDoc();
+			}
 		} catch (Exception e) {
 			logger.warn("Cannot add servlet {}", name);
 			logger.warn(e.getMessage(), e);
