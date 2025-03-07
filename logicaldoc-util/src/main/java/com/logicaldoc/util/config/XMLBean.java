@@ -107,8 +107,6 @@ public class XMLBean {
 			try {
 				doc = builder.build(docPath);
 			} catch (Exception t) {
-				t.printStackTrace();
-				
 				// In some environments, during maven test phase a well formed
 				// URL must be used
 				// instead of ordinary path
