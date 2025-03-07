@@ -111,7 +111,7 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 
 	@Override
 	public List<Rating> findByDocId(long docId) throws PersistenceException {
-		return findByWhere(ENTITY + ".docId = " + docId, " ENTITY + ".lastModified desc", null);
+		return findByWhere(ENTITY + ".docId = " + docId, ENTITY + ".lastModified desc", null);
 	}
 
 	@Override
