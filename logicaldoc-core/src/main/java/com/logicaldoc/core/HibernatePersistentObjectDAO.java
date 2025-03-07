@@ -136,8 +136,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			throws PersistenceException {
 		List<T> coll = new ArrayList<>();
 		try {
-			String sorting = StringUtils.isNotEmpty(order) && !order.toLowerCase().contains(ORDER_BY)
-					? ORDER_BY + " " + order
+			String sorting = StringUtils.isNotEmpty(order) && !order.toLowerCase().contains(ORDER_BY.trim())
+					? ORDER_BY + order
 					: order;
 			String query = "from " + entityClass.getCanonicalName() + DEFAULT_WHERE_PREAMBLE
 					+ (StringUtils.isNotEmpty(where) ? AND + where + ") " : " ")
@@ -195,7 +195,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			throws PersistenceException {
 		try {
 			String sorting = StringUtils.isNotEmpty(order) && !order.toLowerCase().contains(ORDER_BY)
-					? ORDER_BY + " " + order
+					? ORDER_BY + order
 					: order;
 			String query = "select " + ENTITY + ".id from " + entityClass.getCanonicalName() + DEFAULT_WHERE_PREAMBLE
 					+ (StringUtils.isNotEmpty(where) ? AND + where + ") " : " ")
