@@ -20,8 +20,8 @@ public class TimeDiff {
 	 * 
 	 * @param d1 Date one
 	 * @param d2 Date two
-	 * @param field The field we're interested in: day, hour, minute,
-	 *        second, millisecond
+	 * @param field The field we're interested in: day, hour, minute, second,
+	 *        millisecond
 	 * 
 	 * @return The value of the required field
 	 */
@@ -101,7 +101,17 @@ public class TimeDiff {
 	 */
 	public static String printDuration(long diffMillis) {
 		Duration duration = Duration.of(diffMillis, ChronoUnit.MILLIS);
+		return printDuration(duration);
+	}
 
+	/**
+	 * Prints the duration in the format HH:MM:ss.SSS
+	 * 
+	 * @param duration the Duration to printed in human readable format
+	 *
+	 * @return The formatted output
+	 */
+	public static String printDuration(Duration duration) {
 		long millis = duration.toMillis() % 1000;
 		long minutes = duration.toMinutes() % 60;
 		long seconds = (duration.toMillis() / 1000) % 60;

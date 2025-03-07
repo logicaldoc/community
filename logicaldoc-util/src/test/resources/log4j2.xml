@@ -30,9 +30,14 @@
 		<Logger name="org.hibernate" level="error" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
+		<Logger name="org.hibernate" level="error" additivity="false">
+			<AppenderRef ref="file" />
+		</Logger>
+		<Logger name="console" level="error" additivity="false">
+           <Appender-Ref ref="console" />
+        </Logger>
 		<Root level="info">
-			<!-- AppenderRef ref="file" / -->
-			<AppenderRef ref="console" />
+			<AppenderRef ref="file" />
 		</Root>
 	</Loggers>
 </Configuration>

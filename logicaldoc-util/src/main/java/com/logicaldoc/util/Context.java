@@ -102,9 +102,14 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	 * @return true if the bean is available
 	 */
 	public boolean containsBean(String id) {
-		// If not found with give ID try to lowercase the first char
-		return applicationContext.containsBean(id)
-				|| applicationContext.containsBean(Character.toLowerCase(id.charAt(0)) + id.substring(1));
+		try {
+			// If not found with give ID try to lowercase the first char
+			return applicationContext.containsBean(id)
+					|| applicationContext.containsBean(Character.toLowerCase(id.charAt(0)) + id.substring(1));
+		} catch (IllegalStateException ise) {
+			// the application context was not already initialized
+			return false;
+		}
 	}
 
 	/**
