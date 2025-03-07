@@ -448,6 +448,13 @@
 			<artifactId>mockito-core</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.12.2</version>
+			<scope>test</scope>
+		</dependency>		
 	</dependencies>
 	<build>
 		<plugins>

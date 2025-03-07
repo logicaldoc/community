@@ -49,7 +49,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	private static final String AND = " and (";
 
-	private static final String ORDER_BY = "order by";
+	protected static final String ORDER_BY = " order by ";
 
 	protected Logger log = LoggerFactory.getLogger(HibernatePersistentObjectDAO.class);
 
@@ -60,7 +60,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	protected static final String ASPECT_STORING = "storing";
 
-	private static final String DEFAULT_WHERE_PREAMBLE = " " + ENTITY + " where " + ENTITY + ".deleted=0 ";
+	protected static final String DEFAULT_WHERE_PREAMBLE = " " + ENTITY + " where " + ENTITY + ".deleted=0 ";
 
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;

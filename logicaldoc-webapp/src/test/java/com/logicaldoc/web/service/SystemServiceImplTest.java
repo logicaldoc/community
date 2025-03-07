@@ -54,6 +54,9 @@ public class SystemServiceImplTest extends AbstractWebappTestCase {
 		File testWebappFolder = new File("target/webapp");
 		testWebappFolder.mkdir();
 		SystemServiceImpl.defaultWebappRootFolder = testWebappFolder;
+		
+		// This is to make JAXP happy even when running inside Eclipse
+		System.setProperty("javax.xml.parsers.SAXParserFactory", "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl");
 	}
 
 	@Override

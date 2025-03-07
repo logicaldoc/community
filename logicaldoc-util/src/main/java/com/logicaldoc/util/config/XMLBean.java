@@ -92,7 +92,7 @@ public class XMLBean {
 	 * Initializes the SAX builder
 	 */
 	private void initDocument() {
-		SAXBuilder builder = new SAXBuilder(XMLReaders.DTDVALIDATING);
+		SAXBuilder builder = new SAXBuilder(XMLReaders.NONVALIDATING);
 
 		builder.setFeature("http://xml.org/sax/features/validation", false);
 		builder.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);

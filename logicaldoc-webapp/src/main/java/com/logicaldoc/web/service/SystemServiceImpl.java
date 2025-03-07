@@ -876,6 +876,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 		try (ZipUtil zipUtil = new ZipUtil();) {
 			File pluginPackage = uploadedFilesMap.values().iterator().next();
+			
 			ContextProperties config = Context.get().getProperties();
 			File rootFolder;
 			if (getThreadLocalRequest() != null)
