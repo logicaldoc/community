@@ -1,5 +1,14 @@
 package com.logicaldoc.core.document;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import com.logicaldoc.core.PersistentObject;
 
 /**
@@ -8,20 +17,30 @@ import com.logicaldoc.core.PersistentObject;
  * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
+@Entity
+@Table(name = "ld_rating")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Rating extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
 
+	@Column(name = "ld_docid", nullable = false)
 	private long docId;
 
+	@Column(name = "ld_userid", nullable = false)
 	private long userId;
 
+	@Column(name = "ld_username", length = 255)
+	private String username;
+	
+	@Column(name = "ld_vote", nullable = false)
 	private int vote = 0;
 
+	@Transient
 	private Integer count;
 
-	private String username;
-
+	@Transient
 	private Float average;
 
 	public long getUserId() {

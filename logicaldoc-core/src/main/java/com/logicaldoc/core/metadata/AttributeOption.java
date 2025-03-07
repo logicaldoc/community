@@ -1,5 +1,13 @@
 package com.logicaldoc.core.metadata;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import com.logicaldoc.core.PersistentObject;
 
 /**
@@ -8,26 +16,36 @@ import com.logicaldoc.core.PersistentObject;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.1
  */
+@Entity
+@Table(name = "ld_extoption")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AttributeOption extends PersistentObject implements Comparable<AttributeOption> {
 
 	private static final long serialVersionUID = 1L;
 
+	@Column(name = "ld_setid", nullable = false)
 	private long setId;
 
+	@Column(name = "ld_attribute", nullable = false)
 	private String attribute;
-
-	/**
-	 * An category, just to organize the values in groups
-	 */
-	private String category;
 
 	/**
 	 * The value of this option
 	 */
+	@Column(name = "ld_value", nullable = false)
 	private String value;
+	
+	/**
+	 * An category, just to organize the values in groups
+	 */
+	@Column(name = "ld_category", nullable = false)
+	private String category;
 
+	@Column(name = "ld_label", nullable = false)
 	private String label;
 
+	@Column(name = "ld_position", nullable = false)
 	private int position = 0;
 
 	public AttributeOption() {

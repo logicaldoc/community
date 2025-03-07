@@ -1,5 +1,13 @@
 package com.logicaldoc.core.dashlet;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import com.logicaldoc.core.PersistentObject;
 
 /**
@@ -8,6 +16,10 @@ import com.logicaldoc.core.PersistentObject;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.2.3
  */
+@Entity
+@Table(name = "ld_dashlet")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Dashlet extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
@@ -22,23 +34,31 @@ public class Dashlet extends PersistentObject {
 
 	public static final String TYPE_CONTENT = "content";
 
-	private String type = TYPE_DOCEVENT;
-
-	private String query;
-
-	private String content;
-
+	@Column(name = "ld_name", length = 255, nullable = false)
 	private String name;
-
+	
+	@Column(name = "ld_title", length = 255, nullable = false)
 	private String title;
-
+	
+	@Column(name = "ld_type", length = 255, nullable = false)
+	private String type = TYPE_DOCEVENT;
+	
+	@Column(name = "ld_max")
 	private Integer max;
 
 	/**
 	 * To mark that it must display just unique records
 	 */
+	@Column(name = "ld_unique", nullable = false)
 	private int unique = 0;
+	
+	@Column(name = "ld_query")
+	private String query;
 
+	@Column(name = "ld_content")
+	private String content;
+
+	@Column(name = "ld_columns")
 	private String columns;
 
 	public Dashlet() {

@@ -3,7 +3,15 @@ package com.logicaldoc.core.security.apikey;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.util.crypt.CryptUtil;
@@ -14,20 +22,30 @@ import com.logicaldoc.util.crypt.CryptUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.9.4
  */
+@Entity
+@Table(name = "ld_apikey")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ApiKey extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
 
+	@Column(name = "ld_userid", nullable = false)
 	private long userId;
 
+	@Column(name = "ld_name", length = 255, nullable = false)
 	private String name;
 
+	@Column(name = "ld_lastused")
+	private Date lastUsed;
+	
+	@Column(name = "ld_key", length = 255, nullable = false)
+	private String key;
+	
+	@Column(name = "ld_label", length = 255, nullable = false)
 	private String label;
 
-	private Date lastUsed;
-
-	private String key;
-
+	@Transient
 	private String decodedKey;
 
 	public ApiKey() {

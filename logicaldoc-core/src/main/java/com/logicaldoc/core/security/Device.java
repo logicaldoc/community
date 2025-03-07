@@ -3,10 +3,16 @@ package com.logicaldoc.core.security;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import com.logicaldoc.core.PersistentObject;
 
@@ -18,6 +24,10 @@ import eu.bitwalker.useragentutils.UserAgent;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.5.3
  */
+@Entity
+@Table(name = "ld_device")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Device extends PersistentObject implements Serializable {
 
 	public static final String PARAM_DEVICE = "device";
@@ -27,47 +37,58 @@ public class Device extends PersistentObject implements Serializable {
 	/**
 	 * A unique identifier of the device
 	 */
+	@Column(name = "ld_deviceid", length = 255, nullable = false)
 	private String deviceId;
 
+	@Column(name = "ld_userid")
+	private long userId;
+	
+	@Column(name = "ld_username", length = 255)
+	private String username;
+	
 	/**
 	 * Name of the browser
 	 */
+	@Column(name = "ld_browser", length = 255)
 	private String browser = "unknown";
-
+	
 	/**
 	 * Version of the browser
 	 */
+	@Column(name = "ld_browserversion", length = 255)
 	private String browserVersion;
 
 	/**
 	 * Name of the operative system
 	 */
+	@Column(name = "ld_operativesystem", length = 255)
 	private String operativeSystem;
 
 	/**
 	 * Type of device
 	 */
+	@Column(name = "ld_type", length = 255)
 	private String type;
 
 	/**
 	 * Instant of last login
 	 */
+	@Column(name = "ld_lastlogin")
 	private Date lastLogin;
 
+	@Column(name = "ld_trusted", nullable = false)
+	private int trusted = 0;
+	
 	/**
 	 * IP of last login
 	 */
+	@Column(name = "ld_ip", length = 255)
 	private String ip;
-
-	private long userId;
-
-	private String username;
-
-	private int trusted = 0;
 
 	/**
 	 * Optional label assigned to the device
 	 */
+	@Column(name = "ld_label", length = 255)
 	private String label;
 
 	public Device() {
@@ -81,7 +102,7 @@ public class Device extends PersistentObject implements Serializable {
 	 */
 	public Device(HttpServletRequest request) {
 		setDeviceId(getDeviceId(request));
-		
+
 		UserAgent agent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
 		setBrowser(agent.getBrowser().getName());
 
