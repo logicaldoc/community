@@ -39,10 +39,10 @@ public class AttributeOption extends PersistentObject implements Comparable<Attr
 	/**
 	 * An category, just to organize the values in groups
 	 */
-	@Column(name = "ld_category", nullable = false)
+	@Column(name = "ld_category")
 	private String category;
 
-	@Column(name = "ld_label", nullable = false)
+	@Column(name = "ld_label")
 	private String label;
 
 	@Column(name = "ld_position", nullable = false)
