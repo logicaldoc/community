@@ -660,8 +660,9 @@ public class LDRepository {
 			transaction.setUser(user);
 			transaction.setSessionId(sid);
 
-			document = documentManager.create(new BufferedInputStream(contentStream.getStream(), BUFFER_SIZE), document,
-					transaction).getDocument();
+			document = documentManager
+					.create(new BufferedInputStream(contentStream.getStream(), BUFFER_SIZE), document, transaction)
+					.getDocument();
 
 			return getId(document);
 		} catch (Exception t) {
@@ -2959,8 +2960,7 @@ public class LDRepository {
 			params.put("tenantId", getRoot().getTenantId());
 			params.put("minDate", new Date(minDate));
 
-			entries = historyDao.findByWhere(query.toString(), params,
-					"order by " + PersistentObjectDAO.ENTITY + ".date", max);
+			entries = historyDao.findByWhere(query.toString(), params, PersistentObjectDAO.ENTITY + ".date", max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -3025,8 +3025,7 @@ public class LDRepository {
 			params.put("tenantId", getRoot().getTenantId());
 			params.put("minDate", new Date(minDate));
 
-			entries = folderHistoryDao.findByWhere(query.toString(), params,
-					"order by " + PersistentObjectDAO.ENTITY + ".date", max);
+			entries = folderHistoryDao.findByWhere(query.toString(), params, PersistentObjectDAO.ENTITY + ".date", max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}

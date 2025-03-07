@@ -120,7 +120,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 						ENTITY + ".id!=" + ENTITY + ".parentId and " + ENTITY + DOT_PARENT_ID + parentId
 								+ (type == null ? "" : (AND + ENTITY + ".type=" + type))
 								+ (enabledOnly ? AND + ENTITY + ".enabled=1" : ""),
-						" order by  " + ENTITY + ".position asc, " + ENTITY + ".name asc", null);
+						ENTITY + ".position asc, " + ENTITY + ".name asc", null);
 			/*
 			 * Search for all those menus that defines its own security policies
 			 */

@@ -49,8 +49,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	private static final String AND = " and (";
 
-	protected static final String ORDER_BY = " order by ";
-
 	protected Logger log = LoggerFactory.getLogger(HibernatePersistentObjectDAO.class);
 
 	protected Class<T> entityClass;
@@ -58,6 +56,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	@Resource(name = "SessionFactory")
 	protected SessionFactory sessionFactory;
 
+	protected static final String ORDER_BY = " order by ";
+	
 	protected static final String ASPECT_STORING = "storing";
 
 	protected static final String DEFAULT_WHERE_PREAMBLE = " " + ENTITY + " where " + ENTITY + ".deleted=0 ";
@@ -194,7 +194,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	public List<Long> findIdsByWhere(String where, Map<String, Object> parameters, String order, Integer max)
 			throws PersistenceException {
 		try {
-			String sorting = StringUtils.isNotEmpty(order) && !order.toLowerCase().contains(ORDER_BY)
+			String sorting = StringUtils.isNotEmpty(order) && !order.toLowerCase().contains(ORDER_BY.trim())
 					? ORDER_BY + order
 					: order;
 			String query = "select " + ENTITY + ".id from " + entityClass.getCanonicalName() + DEFAULT_WHERE_PREAMBLE

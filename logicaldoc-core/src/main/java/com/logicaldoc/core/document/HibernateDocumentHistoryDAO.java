@@ -23,8 +23,6 @@ public class HibernateDocumentHistoryDAO extends HibernateHistoryDAO<DocumentHis
 
 	private static final String DATE_ASC = ".date asc";
 
-	private static final String ORDER_BY = "order by ";
-
 	private static final String AND = " and ";
 
 	private HibernateDocumentHistoryDAO() {
@@ -42,7 +40,7 @@ public class HibernateDocumentHistoryDAO extends HibernateHistoryDAO<DocumentHis
 		StringBuilder query = new StringBuilder(" " + ENTITY + ".docId = " + docId);
 		if (StringUtils.isNotEmpty(event))
 			query.append(AND + ENTITY + ".event='" + SqlUtil.doubleQuotes(event) + "'");
-		return findByWhere(query.toString(), ORDER_BY + ENTITY + ".date desc", null);
+		return findByWhere(query.toString(), ENTITY + ".date desc", null);
 	}
 
 	@Override
@@ -52,12 +50,12 @@ public class HibernateDocumentHistoryDAO extends HibernateHistoryDAO<DocumentHis
 
 	@Override
 	public List<DocumentHistory> findByFolderId(long folderId) throws PersistenceException {
-		return findByWhere(ENTITY + ".folderId =" + folderId, ORDER_BY + ENTITY + DATE_ASC, null);
+		return findByWhere(ENTITY + ".folderId =" + folderId, ENTITY + DATE_ASC, null);
 	}
 
 	@Override
 	public List<DocumentHistory> findNotNotified(Integer max) throws PersistenceException {
-		return findByWhere(ENTITY + ".notified = 0", ORDER_BY + ENTITY + DATE_ASC, max);
+		return findByWhere(ENTITY + ".notified = 0", ENTITY + DATE_ASC, max);
 	}
 
 	@Override
@@ -74,7 +72,7 @@ public class HibernateDocumentHistoryDAO extends HibernateHistoryDAO<DocumentHis
 		if (sessionId != null && StringUtils.isNotEmpty(sessionId))
 			query += AND + ENTITY + ".sessionId = '" + sessionId + "'";
 
-		return findByWhere(query, ORDER_BY + ENTITY + DATE_ASC, null);
+		return findByWhere(query, ENTITY + DATE_ASC, null);
 	}
 
 	@Override

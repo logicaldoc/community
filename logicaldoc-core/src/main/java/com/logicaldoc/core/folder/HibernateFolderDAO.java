@@ -328,7 +328,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		if (user.isMemberOf(Group.GROUP_ADMIN))
 			return findByWhere(ENTITY + ".id!=" + ENTITY + ".parentId and " + ENTITY + PARENTID_EQUAL + parentId,
-					" order by " + ENTITY + ".name ", null);
+					ENTITY + ".name ", null);
 		/*
 		 * Search for all those folders that defines its own security policies
 		 */
@@ -376,7 +376,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		Map<String, Object> params = new HashMap<>();
 		params.put(PARENT_ID, parent.getId());
 		return findByWhere(ENTITY + ".parentId = :parentId and " + ENTITY + ".id!=" + ENTITY + ".parentId", params,
-				"order by " + ENTITY + ".name", max);
+				ENTITY + ".name", max);
 	}
 
 	@Override

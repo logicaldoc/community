@@ -141,7 +141,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 
 	@Override
 	public List<DocumentNote> findByUserId(long userId) throws PersistenceException {
-		return findByWhere(ENTITY + ".userId =" + userId, "order by " + ENTITY + ".date desc", null);
+		return findByWhere(ENTITY + ".userId =" + userId, ENTITY + ".date desc", null);
 	}
 
 	@Override

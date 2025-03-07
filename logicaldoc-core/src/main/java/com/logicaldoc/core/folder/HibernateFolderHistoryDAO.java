@@ -25,8 +25,6 @@ public class HibernateFolderHistoryDAO extends HibernateHistoryDAO<FolderHistory
 
 	private static final String DATE_ASC = ".date asc";
 
-	private static final String ORDER_BY = "order by ";
-
 	private HibernateFolderHistoryDAO() {
 		super(FolderHistory.class);
 		super.log = LoggerFactory.getLogger(HibernateFolderHistoryDAO.class);
@@ -39,12 +37,12 @@ public class HibernateFolderHistoryDAO extends HibernateHistoryDAO<FolderHistory
 
 	@Override
 	public List<FolderHistory> findByFolderId(long folderId) throws PersistenceException {
-		return findByWhere(ENTITY + ".folderId =" + folderId, ORDER_BY + ENTITY + DATE_ASC, null);
+		return findByWhere(ENTITY + ".folderId =" + folderId, ENTITY + DATE_ASC, null);
 	}
 
 	@Override
 	public List<FolderHistory> findNotNotified(Integer max) throws PersistenceException {
-		return findByWhere(ENTITY + ".notified = 0", ORDER_BY + ENTITY + DATE_ASC, max);
+		return findByWhere(ENTITY + ".notified = 0", ENTITY + DATE_ASC, max);
 	}
 
 	@Override

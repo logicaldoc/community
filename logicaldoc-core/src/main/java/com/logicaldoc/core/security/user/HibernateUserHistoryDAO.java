@@ -29,14 +29,14 @@ public class HibernateUserHistoryDAO extends HibernateHistoryDAO<UserHistory> im
 	public List<UserHistory> findByUserIdAndEvent(long userId, String event) {
 		try {
 			if (StringUtils.isEmpty(event))
-				return findByWhere(ENTITY + ".userId =" + userId, "order by " + ENTITY + ".date desc", null);
+				return findByWhere(ENTITY + ".userId =" + userId, ENTITY + ".date desc", null);
 			else {
 				Map<String, Object> params = new HashMap<>();
 				params.put("userId", userId);
 				params.put("event", event);
 
 				return findByWhere(ENTITY + ".userId = :userId and " + ENTITY + ".event = :event", params,
-						"order by " + ENTITY + ".date desc", null);
+						ENTITY + ".date desc", null);
 			}
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);

@@ -38,6 +38,6 @@ public class HibernateContactDAO extends HibernatePersistentObjectDAO<Contact> i
 			params.put("email", email);
 		}
 
-		return findByWhere(sb.toString(), params, "order by " + ENTITY + ".firstName, " + ENTITY + ".lastName", null);
+		return findByWhere(sb.toString(), params, ENTITY + ".firstName, " + ENTITY + ".lastName", null);
 	}
 }

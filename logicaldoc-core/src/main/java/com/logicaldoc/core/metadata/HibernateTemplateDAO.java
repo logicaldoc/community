@@ -33,8 +33,6 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 
 	private static final String TENANT_ID_EQUAL = ".tenantId=";
 
-	private static final String ORDER_BY = "order by ";
-
 	@Resource(name = "UserDAO")
 	protected UserDAO userDAO;
 
@@ -46,7 +44,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	@Override
 	public List<Template> findAll() {
 		try {
-			return findByWhere(" 1=1", ORDER_BY + ENTITY + ".name", null);
+			return findByWhere(" 1=1", ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -56,7 +54,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	@Override
 	public List<Template> findAll(long tenantId) {
 		try {
-			return findByWhere(" " + ENTITY + TENANT_ID_EQUAL + tenantId, ORDER_BY + ENTITY + ".name", null);
+			return findByWhere(" " + ENTITY + TENANT_ID_EQUAL + tenantId, ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();

@@ -25,8 +25,6 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 
 	private static final String TENANT_ID_EQUAL = ".tenantId=";
 
-	private static final String ORDER_BY = "order by ";
-
 	@Resource(name = "AttributeOptionDAO")
 	protected AttributeOptionDAO optionsDao;
 
@@ -45,7 +43,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 
 	@Override
 	public List<AttributeSet> findAll(long tenantId) throws PersistenceException {
-		return findByWhere(" " + ENTITY + TENANT_ID_EQUAL + tenantId, ORDER_BY + ENTITY + ".name", null);
+		return findByWhere(" " + ENTITY + TENANT_ID_EQUAL + tenantId, ENTITY + ".name", null);
 	}
 
 	@Override
@@ -84,7 +82,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	@Override
 	public List<AttributeSet> findByType(int type, long tenantId) throws PersistenceException {
 		return findByWhere(ENTITY + ".type =" + type + " and " + ENTITY + TENANT_ID_EQUAL + tenantId,
-				ORDER_BY + ENTITY + ".name asc", null);
+				ENTITY + ".name asc", null);
 	}
 
 	@Override

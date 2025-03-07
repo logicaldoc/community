@@ -878,7 +878,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public List<Document> findByIndexed(int indexed) throws PersistenceException {
 		return findByWhere(ENTITY + ".docRef is null and " + ENTITY + ".indexed=" + indexed,
-				"order by " + ENTITY + ".lastModified asc", null);
+				ENTITY + ".lastModified asc", null);
 	}
 
 	@Override

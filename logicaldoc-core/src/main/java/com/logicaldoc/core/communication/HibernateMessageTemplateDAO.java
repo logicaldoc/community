@@ -34,7 +34,7 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 	@Override
 	public List<MessageTemplate> findByLanguage(String language, long tenantId) throws PersistenceException {
 		return findByWhere(" " + ENTITY + LANGUAGE + language + AND + ENTITY + TENANT_ID + tenantId,
-				"order by " + ENTITY + ".name", null);
+				ENTITY + ".name", null);
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 		if (StringUtils.isNotEmpty(type))
 			query.append(" and " + ENTITY + ".type='" + type + "' ");
 
-		return findByWhere(query.toString(), "order by " + ENTITY + ".name", null);
+		return findByWhere(query.toString(), ENTITY + ".name", null);
 	}
 
 	@Override

@@ -26,7 +26,7 @@ public class HibernateBookmarkDAO extends HibernatePersistentObjectDAO<Bookmark>
 
 	@Override
 	public List<Bookmark> findByUserId(long userId) throws PersistenceException {
-		return findByWhere(ENTITY + USER_ID + userId, "order by " + ENTITY + ".position asc", null);
+		return findByWhere(ENTITY + USER_ID + userId, ENTITY + ".position asc", null);
 	}
 
 	@Override
