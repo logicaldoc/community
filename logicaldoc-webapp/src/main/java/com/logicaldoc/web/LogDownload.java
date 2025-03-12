@@ -27,8 +27,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -276,7 +276,7 @@ public class LogDownload extends HttpServlet {
 		 * Write he log files in the updates/ folder
 		 */
 		Properties buildProperties = loadBuildProperties();
-		String dir = StrSubstitutor.replace(buildProperties.getProperty("update.dir"), buildProperties);
+		String dir = StringSubstitutor.replace(buildProperties.getProperty("update.dir"), buildProperties);
 		File logsDir = new File(dir);
 		File[] files = logsDir.listFiles();
 		if (files != null)
@@ -319,7 +319,7 @@ public class LogDownload extends HttpServlet {
 		 * Write he log files in the patches/ folder
 		 */
 		Properties buildProperties = loadBuildProperties();
-		String dir = StrSubstitutor.replace(buildProperties.getProperty("patch.dir"), buildProperties);
+		String dir = StringSubstitutor.replace(buildProperties.getProperty("patch.dir"), buildProperties);
 		File logsDir = new File(dir);
 		File[] files = logsDir.listFiles();
 		if (files != null)
