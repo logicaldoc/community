@@ -48,7 +48,8 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
 	@Override
 	public String getParameter(String parameter) {
 		String value = super.getParameter(parameter);
-		if (value != null && "tenant".equals(parameter)) {
+
+		if (value != null && ("tenant".equals(parameter) || "skin".equals(parameter))) {
 			// Check that the content of this special parameter is a tenant name
 			Pattern scriptPattern = Pattern.compile("[^a-z^0-9^\\-]", Pattern.CASE_INSENSITIVE);
 			value = scriptPattern.matcher(value).replaceAll("");
@@ -65,14 +66,32 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
 			Pattern scriptPattern = Pattern.compile("[\\W]", Pattern.CASE_INSENSITIVE);
 			value = scriptPattern.matcher(value).replaceAll("");
 		}
-		value = stripXSS(value);
-		return value;
+
+		return deepStripXSS(value);
 	}
 
 	@Override
 	public String getHeader(String name) {
-		String value = super.getHeader(name);
-		return stripXSS(value);
+		return stripXSS(super.getHeader(name));
+	}
+
+	/**
+	 * Recurrently strips XSS until when there is nothing more to strip
+	 * 
+	 * @param value The original value to process
+	 * 
+	 * @return The stripped value
+	 */
+	private String deepStripXSS(String value) {
+		if (value != null) {
+			boolean strippedSomething = true;
+			while (strippedSomething) {
+				String strippedValue = stripXSS(value);
+				strippedSomething = !strippedValue.equalsIgnoreCase(value);
+				value = strippedValue;
+			}
+		}
+		return value;
 	}
 
 	private String stripXSS(String value) {
