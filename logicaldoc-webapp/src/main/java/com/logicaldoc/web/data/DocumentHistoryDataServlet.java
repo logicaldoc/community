@@ -149,8 +149,10 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 			params.put(TENANT_ID, Long.parseLong(request.getParameter(TENANT_ID)));
 		}
 
-		final String event = request.getParameter(EVENT);
+		String event = request.getParameter(EVENT);
 		if (event != null) {
+			// avoid SQL injetion
+			event = event.replaceAll("[^a-zA-Z0-9.,]", "");
 			if (event.contains(",")) {
 				query.append(" and A.event in (");
 				query.append(Arrays.asList(event.split("\\,")).stream().map(ev -> "'" + ev + "'")
