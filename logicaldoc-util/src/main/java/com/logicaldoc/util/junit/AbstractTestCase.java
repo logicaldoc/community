@@ -71,7 +71,7 @@ public abstract class AbstractTestCase {
 	}
 
 	@After
-	public void tearDown() throws SQLException {
+	public void tearDown() throws IOException, SQLException {
 		try {
 			destroyDatabase();
 			File pluginsDir = new File(

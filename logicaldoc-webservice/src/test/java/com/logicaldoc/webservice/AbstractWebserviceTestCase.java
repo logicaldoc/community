@@ -48,7 +48,7 @@ public abstract class AbstractWebserviceTestCase extends AbstractTestCase {
 	}
 
 	@Override
-	public void tearDown() throws SQLException {
+	public void tearDown() throws SQLException, IOException {
 		SessionManager.get().kill(session.getSid());
 		super.tearDown();
 	}

@@ -78,7 +78,7 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 	}
 
 	@Override
-	public void tearDown() throws SQLException {
+	public void tearDown() throws IOException, SQLException {
 		super.tearDown();
 
 		FileUtil.delete(rootStoreOne);

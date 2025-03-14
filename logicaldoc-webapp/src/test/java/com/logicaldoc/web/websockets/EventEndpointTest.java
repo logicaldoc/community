@@ -38,7 +38,7 @@ public class EventEndpointTest extends AbstractWebappTestCase {
 	}
 
 	@After
-	public void tearDown() throws SQLException {
+	public void tearDown() throws SQLException, IOException {
 		endpoint.onClose(websocketSession);
 		super.tearDown();
 	}
