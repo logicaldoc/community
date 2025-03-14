@@ -1,14 +1,12 @@
 package com.logicaldoc.gui.frontend.client.settings.gui;
 
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.data.LanguagesDS;
+import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -36,14 +34,7 @@ public class GUILanguagesPanel extends VLayout {
 
 	@Override
 	public void onDraw() {
-		ListGridField enabled = new ListGridField(EENABLED, " ", 24);
-		enabled.setType(ListGridFieldType.IMAGE);
-		enabled.setCanSort(false);
-		enabled.setAlign(Alignment.CENTER);
-		enabled.setShowDefaultContextMenu(false);
-		enabled.setImageURLPrefix(Util.imagePrefix());
-		enabled.setImageURLSuffix(".gif");
-		enabled.setCanFilter(false);
+		ListGridField enabled = new EnabledListGridField();
 
 		ListGridField code = new ListGridField("code", I18N.message("code"), 80);
 		code.setCanEdit(false);
@@ -80,7 +71,7 @@ public class GUILanguagesPanel extends VLayout {
 				.setGUILanguageStatus(rec.getAttributeAsString("code"), true, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute(EENABLED, "0");
+						rec.setAttribute(EENABLED, true);
 						list.refreshRow(list.getRecordIndex(rec));
 						GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
 					}
@@ -92,19 +83,19 @@ public class GUILanguagesPanel extends VLayout {
 				.setGUILanguageStatus(rec.getAttributeAsString("code"), false, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute(EENABLED, "2");
+						rec.setAttribute(EENABLED, false);
 						list.refreshRow(list.getRecordIndex(rec));
 						GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
 					}
 				}));
 
-		if ("0".equals(rec.getAttributeAsString(EENABLED)))
+		if (Boolean.TRUE.equals(rec.getAttributeAsBoolean(EENABLED)))
 			contextMenu.setItems(disable);
 		else
 			contextMenu.setItems(enable);
 		contextMenu.showContextMenu();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
