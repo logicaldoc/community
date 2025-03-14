@@ -36,6 +36,25 @@ public class MimeTypeTest {
 		
 		res = MimeType.getByFilename("Fwd- R- Preavviso vacanze Ordini aperti.eml");
 		assertEquals("message/rfc822", res);
+		
+		// New checks 14/03/2025
+		res = MimeType.getByFilename("OriginalFile.ppt");
+		assertEquals("application/vnd.ms-powerpoint", res);
+		
+		res = MimeType.getByFilename("Business Process Reengineering.doc");
+		assertEquals("application/msword", res);
+		
+		res = MimeType.getByFilename("UNUS.xls");
+		assertEquals("application/vnd.ms-excel", res);
+		
+		res = MimeType.getByFilename("003-005-CT-f0c30c4b-75a1-4fb9-8fa1-4ccbce309869-1543533054430.rtf"); // text/richtext
+		assertEquals("application/rtf", res);
+		
+		// Sources:
+		// https://mimetype.io/
+		// https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/MIME_types/Common_types
+		// https://www.iana.org/assignments/media-types/media-types.xhtml
+		// Python 3.11.4 mimetypes - https://docs.python.org/3/library/mimetypes.html
 	}
 	
 	@Test
