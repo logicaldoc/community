@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.frontend.client.ai.sampler;
 
-import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.DocumentSelector;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -25,19 +25,19 @@ public class SamplerStandardProperties extends SamplerDetailsTab {
 
 	private FolderSelector folderSelector;
 
+	private DocumentSelector documentSelector;
+
 	public SamplerStandardProperties(GUISampler sampler, final ChangedHandler changedHandler) {
 		super(sampler, changedHandler);
 		setWidth100();
 		setHeight100();
 
 		setMembers(formsContainer);
-		folderSelector = new FolderSelector("source", null);
-		folderSelector.setRequired(true);
+		folderSelector = new FolderSelector("folder", null);
 		folderSelector.setWidth(250);
-		folderSelector.setTitle(I18N.message("sourcefolder"));
-		if (sampler.getFolder() != null)
-			folderSelector.setFolder(sampler.getFolder());
-		folderSelector.addFolderChangeListener(folder -> changedHandler.onChanged(null));
+
+		documentSelector = new DocumentSelector("document", null);
+		documentSelector.setWidth(250);
 
 		refresh();
 	}
@@ -72,7 +72,13 @@ public class SamplerStandardProperties extends SamplerDetailsTab {
 		type.addChangedHandler(changedHandler);
 		type.setRequired(true);
 
-		form.setItems(name, type, label, folderSelector);
+		folderSelector.setFolder(sampler.getFolder());
+		folderSelector.addFolderChangeListener(folder -> changedHandler.onChanged(null));
+
+		documentSelector.setDocument(sampler.getDocument());
+		documentSelector.addDocumentChangeListener(document -> changedHandler.onChanged(null));
+
+		form.setItems(name, type, label, folderSelector, documentSelector);
 
 		formsContainer.addMember(form);
 
@@ -85,6 +91,7 @@ public class SamplerStandardProperties extends SamplerDetailsTab {
 			sampler.setDescription(form.getValueAsString("description"));
 			sampler.setType(form.getValueAsString("type"));
 			sampler.setFolder(folderSelector.getFolder());
+			sampler.setDocument(documentSelector.getDocument());
 		}
 		return !form.hasErrors();
 	}
