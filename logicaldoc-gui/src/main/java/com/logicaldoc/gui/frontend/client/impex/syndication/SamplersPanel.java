@@ -36,7 +36,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
-public class SyndicationsPanel extends AdminPanel {
+public class SamplersPanel extends AdminPanel {
 
 	private static final String ENABLED = "eenabled";
 
@@ -48,7 +48,7 @@ public class SyndicationsPanel extends AdminPanel {
 
 	static final Canvas SELECT_FOLDER = new HTMLPanel("&nbsp;" + I18N.message("selectsyndication"));
 
-	public SyndicationsPanel() {
+	public SamplersPanel() {
 		super("syndication");
 	}
 

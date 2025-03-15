@@ -1,40 +1,39 @@
-package com.logicaldoc.gui.frontend.client.impex.syndication;
+package com.logicaldoc.gui.frontend.client.ai.sampler;
 
-import com.logicaldoc.gui.common.client.beans.GUISyndication;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
 /**
- * Superclass for all tab panels in the syndication details area
+ * Superclass for all tab panels in the sampler details area
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.1.2
  */
-public abstract class SyndicationDetailsTab extends HLayout {
-	protected GUISyndication syndication;
+public abstract class SamplerDetailsTab extends HLayout {
+	protected GUISampler sampler;
 
 	protected ChangedHandler changedHandler;
 
 	/**
 	 * 
-	 * @param syndication The syndication this instance refers to
+	 * @param sampler The sampler this instance refers to
 	 * @param changedHandler The handler to be invoked in case of changes in the
 	 *        syndication
 	 */
-	protected SyndicationDetailsTab(GUISyndication syndication, ChangedHandler changedHandler) {
+	protected SamplerDetailsTab(GUISampler sampler, ChangedHandler changedHandler) {
 		super();
-		this.syndication = syndication;
+		this.sampler = sampler;
 		this.changedHandler = changedHandler;
 	}
 
-	public GUISyndication getSyndication() {
-		return syndication;
+	public GUISampler getSampler() {
+		return sampler;
 	}
 
 	public ChangedHandler getChangedHandler() {
 		return changedHandler;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
