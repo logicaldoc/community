@@ -167,6 +167,10 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 		return folder;
 	}
 
+	public long getFolderId() {
+		return folder != null ? folder.getId() : 0L;
+	}
+
 	public void setFolder(Folder folder) {
 		this.folder = folder;
 		if (folder != null)
@@ -339,7 +343,7 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 	public void setAccessControlList(Set<DocumentAccessControlEntry> accessControlList) {
 		this.accessControlList = accessControlList;
 	}
-	
+
 	@Override
 	public AccessControlEntry getAccessControlEntry(long groupId) {
 		return getAccessControlList().stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);

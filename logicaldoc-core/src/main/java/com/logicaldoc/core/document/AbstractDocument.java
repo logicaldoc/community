@@ -4,8 +4,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.persistence.Column;
@@ -300,6 +300,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	protected AbstractDocument() {
 		super();
 	}
+
+	public abstract long getFolderId();
 
 	/**
 	 * The document status
@@ -962,7 +964,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 			tgs.stream().collect(Collectors.joining(","));
 		}
 	}
-	
+
 	public int getDocAttrs() {
 		return docAttrs;
 	}
