@@ -139,8 +139,8 @@ public class DocumentManager {
 	 * @param newFile the file to use
 	 * @param transaction entry to log the event (set the user)
 	 * 
-     * @return A future to check the completion of all the checkin operations
-     * 
+	 * @return A future to check the completion of all the checkin operations
+	 * 
 	 * @throws PersistenceException error at data layer
 	 * @throws IOException I/O error
 	 */
@@ -168,7 +168,7 @@ public class DocumentManager {
 	 * @param newFile the file to use
 	 * @param transaction entry to log the event (set the user)
 	 * 
-     * @return A future to check the completion of all the checkin operations
+	 * @return A future to check the completion of all the checkin operations
 	 * 
 	 * @throws PersistenceException error at data layer
 	 * @throws IOException I/O error
@@ -250,7 +250,7 @@ public class DocumentManager {
 	 * @throws IOException I/O error
 	 * @throws PersistenceException error at data layer
 	 */
-	public DocumentFuture checkin(long docId, InputStream content, String filename, boolean release, AbstractDocument docVO,
+	public DocumentFuture checkin(long docId, InputStream content, String filename, boolean release, Document docVO,
 			DocumentHistory transaction) throws IOException, PersistenceException {
 		validateTransaction(transaction);
 
@@ -280,7 +280,7 @@ public class DocumentManager {
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
-	public DocumentFuture checkin(long docId, File file, String filename, boolean release, AbstractDocument docVO,
+	public DocumentFuture checkin(long docId, File file, String filename, boolean release, Document docVO,
 			DocumentHistory transaction) throws PersistenceException {
 		validateTransaction(transaction);
 
@@ -974,8 +974,7 @@ public class DocumentManager {
 	 * 
 	 * @throws PersistenceException raised if the document cannot be created
 	 */
-	public DocumentFuture create(File file, Document docVO, DocumentHistory transaction)
-			throws PersistenceException {
+	public DocumentFuture create(File file, Document docVO, DocumentHistory transaction) throws PersistenceException {
 		if (transaction == null)
 			throw new IllegalArgumentException(TRANSACTION_CANNOT_BE_NULL);
 
@@ -1168,8 +1167,7 @@ public class DocumentManager {
 		documentDAO.initialize(doc);
 
 		if (doc.getDocRef() != null)
-			return new DocumentFuture(createAlias(doc, folder, doc.getDocRefType(), transaction),
-					new FutureValue<>());
+			return new DocumentFuture(createAlias(doc, folder, doc.getDocRefType(), transaction), new FutureValue<>());
 
 		String resource = store.getResourceName(doc, null, null);
 		try (InputStream is = store.getStream(doc.getId(), resource);) {
@@ -1332,8 +1330,7 @@ public class DocumentManager {
 	 * 
 	 * @throws PersistenceException if an error occurs, this exception is thrown
 	 */
-	public DocumentFuture rename(long docId, String newName, DocumentHistory transaction)
-			throws PersistenceException {
+	public DocumentFuture rename(long docId, String newName, DocumentHistory transaction) throws PersistenceException {
 		validateTransaction(transaction);
 
 		/*
@@ -1358,8 +1355,7 @@ public class DocumentManager {
 
 				Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
 						DocumentEvent.RENAMED.toString(), false);
-				DocumentFuture elaboration = new DocumentFuture(document,
-						storeVersionAsync(version, document));
+				DocumentFuture elaboration = new DocumentFuture(document, storeVersionAsync(version, document));
 
 				transaction.setEvent(DocumentEvent.RENAMED.toString());
 				documentDAO.store(document, transaction);
@@ -1848,7 +1844,7 @@ public class DocumentManager {
 			File tmp = FileUtil.createTempFile("promotion", "");
 			try {
 				Folder originalFolder = document.getFolder();
-				Version docVO = new Version(ver);
+				Document docVO = new Document(ver);
 				docVO.setFolder(originalFolder);
 				docVO.setCustomId(ver.getCustomId());
 				docVO.setId(0L);

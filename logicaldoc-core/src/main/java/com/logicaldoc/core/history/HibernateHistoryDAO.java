@@ -64,7 +64,7 @@ public abstract class HibernateHistoryDAO<T extends History> extends HibernatePe
 		EventCollector.get().newEvent(history);
 	}
 
-	protected String getTenantName(T history) throws PersistenceException {
+	protected String getTenantName(History history) throws PersistenceException {
 		if (HibernateHistoryDAO.tenantNames.containsKey(history.getTenantId()))
 			return HibernateHistoryDAO.tenantNames.get(history.getTenantId());
 

@@ -61,6 +61,7 @@ import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.BookmarkDAO;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentAccessControlEntry;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
@@ -943,8 +944,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			version1.setWorkflowStatus(docVersion.getWorkflowStatus());
 			version1.setWorkflowStatusDisplay(docVersion.getWorkflowStatusDisplay());
 			version1.setColor(docVersion.getColor());
-			if (docVersion.getRating() != null)
-				version1.setRating(docVersion.getRating());
 			version1.setStartPublishing(docVersion.getStartPublishing());
 			version1.setStopPublishing(docVersion.getStopPublishing());
 			version1.setPublished(docVersion.getPublished());
@@ -987,8 +986,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			version2.setFileVersion(docVersion.getFileVersion());
 			version2.setLanguage(docVersion.getLanguage());
 			version2.setFileSize(docVersion.getFileSize());
-			if (docVersion.getRating() != null)
-				version2.setRating(docVersion.getRating());
 			version2.setWorkflowStatus(docVersion.getWorkflowStatus());
 			version2.setColor(docVersion.getColor());
 			version2.setStartPublishing(docVersion.getStartPublishing());
@@ -3195,9 +3192,9 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			log.info("Applying {} security policies to document {}", guiDocument.getAccessControlList().size(),
 					guiDocument.getId());
 
-			Set<AccessControlEntry> acl = new HashSet<>();
+			Set<DocumentAccessControlEntry> acl = new HashSet<>();
 			for (GUIAccessControlEntry guiAce : guiDocument.getAccessControlList()) {
-				AccessControlEntry ace = new AccessControlEntry();
+				DocumentAccessControlEntry ace = new DocumentAccessControlEntry();
 				ace.setGroupId(guiAce.getEntityId());
 				ace.setRead(booleanToInt(guiAce.isRead()));
 				ace.setPreview(booleanToInt(guiAce.isPreview()));

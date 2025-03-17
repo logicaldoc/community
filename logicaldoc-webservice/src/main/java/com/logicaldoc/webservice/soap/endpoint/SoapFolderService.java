@@ -431,7 +431,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		folder.setSecurityRef(null);
 		folder.getAccessControlList().clear();
 		for (WSAccessControlEntry wsAcwe : acl)
-			folder.addAccessControlEntry(WSUtil.toAccessControlEntry(wsAcwe));
+			folder.addAccessControlEntry(WSUtil.toFolderAccessControlEntry(wsAcwe));
 
 		FolderHistory history = new FolderHistory();
 		history.setEvent(DocumentEvent.PERMISSION.toString());

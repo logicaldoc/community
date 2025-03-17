@@ -15,12 +15,13 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.AccessControlEntry;
-import com.logicaldoc.core.security.AccessControlUtil;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.user.Group;
+import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.threading.ThreadPools;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**
@@ -103,7 +104,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		boolean isNew = template.getId() == 0L;
 		super.store(template);
 
-		AccessControlUtil.removeForbiddenPermissionsForGuests(template);
+		removeForbiddenPermissionsForGuests(template);
 
 		if (isNew) {
 			flush();
@@ -113,6 +114,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		}
 	}
 
+	
 	/**
 	 * Saves the security settings in another thread waiting for the referenced
 	 * template to be available into the database.
@@ -161,6 +163,18 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			log.debug("Stored security settings of template {}", template.getId());
 	}
 
+	
+	private void removeForbiddenPermissionsForGuests(Template template) throws PersistenceException {
+		// Remove the forbidden permissions for the guests
+		GroupDAO gDao = Context.get(GroupDAO.class);
+		for (AccessControlEntry ace : template.getAccessControlList()) {
+			Group group = gDao.findById(ace.getGroupId());
+			if (group != null && group.isGuest()) {
+				ace.setWrite(0);
+			}
+		}
+	}
+	
 	public int countFolders(long id) {
 		try {
 			return queryForInt("select count(*) from ld_folder where ld_deleted=0 and ld_templateid=" + id);
@@ -186,9 +200,9 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		try {
 			refresh(template);
 
-			log.trace("Initialized {} attributes", template.getAttributes().size());
+			log.trace("Initialized {} attributes", template.getTemplateAttributes().size());
 
-			// Manually initialize the collegtion of ACEs
+			// Manually initialize the collection of ACEs
 			template.getAccessControlList().clear();
 
 			queryForResultSet(
@@ -287,7 +301,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		clonedTemplate.setDescription(originalTemplate.getDescription());
 		clonedTemplate.setReadonly(originalTemplate.getReadonly());
 		clonedTemplate.setValidation(originalTemplate.getValidation());
-		clonedTemplate.setAttributes(originalTemplate.getAttributes().entrySet().stream()
+		clonedTemplate.setTemplateAttributes(originalTemplate.getTemplateAttributes().entrySet().stream()
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 		store(clonedTemplate);
 		jdbcUpdate("insert into ld_template_acl(ld_templateid, ld_groupid, ld_read, ld_write) select "

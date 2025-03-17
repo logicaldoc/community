@@ -3,6 +3,9 @@ package com.logicaldoc.core.security;
 import java.io.IOException;
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.Transient;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -14,6 +17,7 @@ import org.slf4j.LoggerFactory;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5
  */
+@Embeddable
 public class Client implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -24,16 +28,22 @@ public class Client implements Serializable {
 	 * An optional Identifier of the client, you must guarantee that this is
 	 * unique.
 	 */
+	@Column(name = "ld_clientid", length = 255)
 	private String id;
 
+	@Transient
 	private String username;
 
+	@Column(name = "ld_clientaddr", length = 255)
 	private String address;
 
+	@Column(name = "ld_clienthost", length = 255)
 	private String host;
 
+	@Transient
 	private Device device;
 
+	@Transient
 	private transient Geolocation geolocation;
 
 	public Client() {

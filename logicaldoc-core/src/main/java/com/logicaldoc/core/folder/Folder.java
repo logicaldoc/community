@@ -9,12 +9,32 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.persistence.Cacheable;
+import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.LazyInitializationException;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import com.logicaldoc.core.document.FolderAccessControlEntry;
 import com.logicaldoc.core.document.Tag;
+import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.metadata.ExtensibleObject;
+import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.security.AccessControlEntry;
-import com.logicaldoc.core.security.SecurableExtensibleObject;
+import com.logicaldoc.core.security.Secure;
 import com.logicaldoc.util.Context;
 
 /**
@@ -29,7 +49,11 @@ import com.logicaldoc.util.Context;
  * @author Marco Meschieri - LogicalDOC
  * @version 6.0
  */
-public class Folder extends SecurableExtensibleObject implements Comparable<Folder> {
+@Entity
+@Table(name = "ld_folder")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class Folder extends ExtensibleObject implements Secure<FolderAccessControlEntry>, Comparable<Folder> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -45,89 +69,136 @@ public class Folder extends SecurableExtensibleObject implements Comparable<Fold
 
 	public static final int TYPE_ALIAS = 2;
 
+	@Column(name = "ld_name", length = 255)
 	private String name = "";
 
-	private long parentId = DEFAULTWORKSPACEID;
-
-	private Long securityRef;
-
-	private String description = "";
-
-	private int type = TYPE_DEFAULT;
-
-	private String creator;
-
-	private Long creatorId;
-
+	@Column(name = "ld_position", nullable = false)
 	private int position = 1;
 
-	private int hidden = 0;
+	@Column(name = "ld_parentid", nullable = false)
+	private long parentId = DEFAULTWORKSPACEID;
+
+	@Column(name = "ld_foldref")
+	private Long foldRef;
+
+	@Column(name = "ld_securityref")
+	private Long securityRef;
+
+	@Column(name = "ld_description", length = 4000)
+	private String description = "";
+
+	@Column(name = "ld_type", nullable = false)
+	private int type = TYPE_DEFAULT;
+
+	@Column(name = "ld_creator", length = 255)
+	private String creator;
+
+	@Column(name = "ld_creatorid")
+	private Long creatorId;
 
 	/**
 	 * If 1, the users cannot change the template of the contained documents
 	 */
+	@Column(name = "ld_templocked", nullable = false)
 	private int templateLocked = 0;
 
+	@Column(name = "ld_deleteuserid")
 	private Long deleteUserId;
 
+	@Column(name = "ld_deleteuser", length = 255)
 	private String deleteUser;
 
+	@Column(name = "ld_hidden", nullable = false)
+	private int hidden = 0;
+
+	@Column(name = "ld_quotadocs")
 	private Long quotaDocs = null;
 
+	@Column(name = "ld_quotasize")
 	private Long quotaSize = null;
 
+	@Column(name = "ld_qthreshold")
 	private Integer quotaThreshold = null;
 
+	@Column(name = "ld_qrecipients", length = 1000)
 	private String quotaAlertRecipients = null;
 
-	private Long foldRef;
-
-	/**
-	 * The default stores to use for this folder in the nodes(key: nodeId -
-	 * value: storeId)
-	 */
-	private Map<String, Integer> stores = new HashMap<>();
-
+	@Column(name = "ld_maxversions")
 	private Integer maxVersions;
 
+	@Column(name = "ld_color", length = 255)
 	private String color;
-
-	private Set<Tag> tags = new HashSet<>();
-
-	/**
-	 * Comma-separated tags, used for searching only
-	 */
-	private String tgs;
 
 	/**
 	 * Stores the absolute path of the folder composed by IDs like /5/4/12354
 	 */
+	@Column(name = "ld_path")
 	private String path;
-
-	/**
-	 * Transient attribute that stores a human readable path like
-	 * /Default/invoices
-	 */
-	private String pathExtended;
 
 	/**
 	 * Description of the grid that displays the list of documents
 	 */
+	@Column(name = "ld_grid")
 	private String grid;
 
 	/**
 	 * Identifier of the Zonal OCR template to use to process the documents
 	 * inside this folder
 	 */
+	@Column(name = "ld_ocrtemplateid")
 	private Long ocrTemplateId = null;
 
 	/**
 	 * Identifier of the barcode template to use to process the documents inside
 	 * this folder
 	 */
+	@Column(name = "ld_barcodetemplateid")
 	private Long barcodeTemplateId = null;
 
+	@Column(name = "ld_tile")
 	private String tile;
+
+	/**
+	 * Comma-separated tags, used for searching only
+	 */
+	@Column(name = "ld_tgs", length = 1000)
+	private String tgs;
+
+	/**
+	 * The default stores to use for this folder in the nodes(key: nodeId -
+	 * value: storeId)
+	 */
+	@ElementCollection
+	@CollectionTable(name = "ld_folder_store", joinColumns = @JoinColumn(name = "ld_folderid"))
+	@MapKeyColumn(name = "ld_nodeid")
+	@Column(name = "ld_storeid")
+	private Map<String, Integer> stores = new HashMap<>();
+
+	@ElementCollection
+	@CollectionTable(name = "ld_foldertag", joinColumns = @JoinColumn(name = "ld_folderid"))
+	@OrderBy("ld_tag")
+	private Set<Tag> tags = new HashSet<>();
+
+	/**
+	 * Transient attribute that stores a human readable path like
+	 * /Default/invoices
+	 */
+	@Transient
+	private String pathExtended;
+
+	@ElementCollection(fetch = FetchType.LAZY)
+	@CollectionTable(name = "ld_folder_acl", joinColumns = @JoinColumn(name = "ld_folderid"))
+	private Set<FolderAccessControlEntry> accessControlList = new HashSet<>();
+
+	@ElementCollection(fetch = FetchType.LAZY)
+	@CollectionTable(name = "ld_folder_ext", joinColumns = @JoinColumn(name = "ld_folderid"))
+	@MapKeyColumn(name = "ld_name")
+	@OrderBy("ld_position ASC, ld_name ASC")
+	private Map<String, Attribute> attributes = new HashMap<>();
+
+	@ManyToOne(cascade = CascadeType.DETACH)
+	@JoinColumn(name = "ld_templateid")
+	private Template template;
 
 	public Folder() {
 	}
@@ -171,8 +242,9 @@ public class Folder extends SecurableExtensibleObject implements Comparable<Fold
 		setTenantId(source.getTenantId());
 
 		try {
-			for (AccessControlEntry ace : source.getAccessControlList())
-				getAccessControlList().add(new AccessControlEntry(ace));
+			if (source instanceof Folder folder)
+				for (FolderAccessControlEntry ace : folder.getAccessControlList())
+					getAccessControlList().add(new FolderAccessControlEntry(ace));
 		} catch (LazyInitializationException x) {
 			// may happen do nothing
 		}
@@ -203,6 +275,16 @@ public class Folder extends SecurableExtensibleObject implements Comparable<Fold
 		} catch (LazyInitializationException x) {
 			// may happen do nothing
 		}
+	}
+
+	@Override
+	public Set<FolderAccessControlEntry> getAccessControlList() {
+		return accessControlList;
+	}
+
+	@Override
+	public void setAccessControlList(Set<FolderAccessControlEntry> accessControlList) {
+		this.accessControlList = accessControlList;
 	}
 
 	public boolean isWorkspace() {
@@ -561,6 +643,59 @@ public class Folder extends SecurableExtensibleObject implements Comparable<Fold
 
 	public void setTile(String tile) {
 		this.tile = tile;
+	}
+
+	@Override
+	public Map<String, Attribute> getAttributes() {
+		return attributes;
+	}
+
+	@Override
+	public void setAttributes(Map<String, Attribute> attributes) {
+		this.attributes = attributes;
+	}
+
+	@Override
+	public Long getTemplateId() {
+		return getTemplate() != null ? getTemplate().getId() : null;
+	}
+
+	@Override
+	public void setTemplateId(Long templateId) {
+		// Not implemented
+	}
+
+	@Override
+	public String getTemplateName() {
+		return getTemplate() != null ? getTemplate().getName() : null;
+	}
+
+	@Override
+	public void setTemplateName(String templateName) {
+		// Not implemented
+	}
+
+	@Override
+	public Template getTemplate() {
+		return template;
+	}
+
+	@Override
+	public void setTemplate(Template template) {
+		this.template = template;
+	}
+
+	@Override
+	public AccessControlEntry getAccessControlEntry(long groupId) {
+		return getAccessControlList().stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);
+	}
+
+	@Override
+	public void addAccessControlEntry(FolderAccessControlEntry ace) {
+		if (!getAccessControlList().add(ace)) {
+			getAccessControlList().remove(ace);
+			getAccessControlList().add(ace);
+		}
 	}
 
 	@Override

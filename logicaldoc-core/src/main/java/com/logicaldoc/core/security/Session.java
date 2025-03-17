@@ -11,7 +11,16 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +45,10 @@ import com.logicaldoc.util.crypt.CryptUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.6.0
  */
+@Entity
+@Table(name = "ld_session")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Session extends PersistentObject implements Comparable<Session> {
 
 	private static final long serialVersionUID = 1L;
@@ -54,51 +67,67 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 	private static final String INFO = "INFO";
 
-	// Map docId - Password used to unprotect it
+	// Map docId - Password used to not protect it
+	@Transient
 	private Map<Long, String> unprotectedDocs = Collections.synchronizedMap(new HashMap<>());
 
+	@Column(name = "ld_lastrenew")
 	private Date lastRenew = new Date();
 
+	@Column(name = "ld_finished")
 	private Date finished;
 
 	/**
 	 * Represents the auto generated identifier of the session
 	 */
+	@Column(name = "ld_sid", length = 255, nullable = false)
 	private String sid;
 
 	/**
 	 * A third parameter(other than the username and password) given by the
 	 * client at login time, or an API Key generated in LogicalDOC.
 	 */
+	@Column(name = "ld_key", length = 255)
 	private String key;
 
+	@Transient
 	private String decodedKey;
 
 	/**
 	 * A human readable visualization of part of the key
 	 */
+	@Column(name = "ld_keylabel", length = 255)
 	private String keyLabel;
 
+	@Column(name = "ld_username", length = 255)
 	private String username;
 
+	@Column(name = "ld_tenantname", length = 255)
 	private String tenantName;
 
+	@Column(name = "ld_node", length = 255)
 	private String node;
 
+	@Column(name = "ld_tenantid", nullable = false)
 	private long tenantId;
 
+	@Column(name = "ld_status", nullable = false)
 	private int status = STATUS_OPEN;
 
+	@Embedded
 	private Client client = null;
 
+	@Transient
 	private User user = null;
 
 	/**
 	 * Represents a dictionary of custom informations a client may save in the
 	 * session
 	 */
+	@Transient
 	private transient Map<String, Object> dictionary = new ConcurrentHashMap<>();
 
+	@Transient
 	private transient List<Log> logs = new ArrayList<>();
 
 	public Map<String, Object> getDictionary() {

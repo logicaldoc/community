@@ -3,12 +3,16 @@ package com.logicaldoc.core.document;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Locale;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.LazyInitializationException;
 import org.hibernate.exception.GenericJDBCException;
@@ -17,9 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.TransactionalObject;
-import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.metadata.Attribute;
-import com.logicaldoc.core.security.SecurableExtensibleObject;
+import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
@@ -50,7 +53,8 @@ import com.logicaldoc.util.io.FileUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
-public abstract class AbstractDocument extends SecurableExtensibleObject implements TransactionalObject {
+@MappedSuperclass
+public abstract class AbstractDocument extends ExtensibleObject implements TransactionalObject {
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractDocument.class);
 
@@ -111,14 +115,41 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 	 */
 	public static final int NATURE_DOC = 0;
 
+	@Column(name = "ld_immutable", nullable = false)
+	private int immutable = 0;
+
+	@Column(name = "ld_customid")
+	private String customId;
+
+	@Column(name = "ld_comment")
 	private String comment;
 
 	/**
 	 * The text of the last note put on the document
 	 */
+	@Column(name = "ld_lastnote")
 	private String lastNote;
 
-	private long fileSize = 0;
+	@Column(name = "ld_version", length = 10)
+	private String version;
+
+	@Column(name = "ld_fileversion", length = 10)
+	private String fileVersion;
+
+	@Column(name = "ld_date")
+	private Date date;
+
+	@Column(name = "ld_publisher", length = 255)
+	private String publisher;
+
+	@Column(name = "ld_publisherid", nullable = false)
+	private long publisherId;
+
+	@Column(name = "ld_creator", length = 255)
+	private String creator;
+
+	@Column(name = "ld_creatorid", nullable = false)
+	private long creatorId;
 
 	/**
 	 * Whether document is checked out,locked or unlocked
@@ -127,134 +158,144 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 	 * @see Document#DOC_CHECKED_OUT
 	 * @see Document#DOC_LOCKED
 	 */
+	@Column(name = "ld_status")
 	private int status = DOC_UNLOCKED;
 
-	private int exportStatus = EXPORT_UNLOCKED;
-
-	private String version;
-
-	private String exportVersion;
-
-	private String fileVersion;
-
-	private Date date;
-
-	private String publisher;
-
-	private long publisherId;
-
-	private String creator;
-
-	private long creatorId;
-
+	@Column(name = "ld_type", length = 255)
 	private String type;
 
+	@Column(name = "ld_lockuserid")
 	private Long lockUserId;
 
+	@Column(name = "ld_lockuser", length = 255)
 	private String lockUser;
 
+	@Column(name = "ld_language", length = 10)
 	private String language;
 
+	@Column(name = "ld_filename", length = 255)
 	private String fileName;
+
+	@Column(name = "ld_filesize")
+	private long fileSize = 0;
 
 	/**
 	 * The indexing status of the document, one of {@link #INDEX_TO_INDEX},
 	 * {@link #INDEX_TO_INDEX_METADATA}, {@link #INDEX_INDEXED} or
 	 * {@link #INDEX_SKIP}
 	 */
+	@Column(name = "ld_indexed", nullable = false)
 	private int indexed = INDEX_TO_INDEX;
 
+	/**
+	 * Identifier of the barcode template to use to process this document
+	 */
+	@Column(name = "ld_barcodetemplateid")
+	private Long barcodeTemplateId = null;
+
+	@Column(name = "ld_barcoded", nullable = false)
 	private int barcoded = 0;
 
+	@Column(name = "ld_signed", nullable = false)
 	private int signed = 0;
 
+	@Column(name = "ld_stamped", nullable = false)
 	private int stamped = 0;
 
-	private Set<Tag> tags = new HashSet<>();
-
-	private String tgs;
-
-	private Folder folder;
-
-	private String customId;
-
-	private int immutable = 0;
-
-	private String digest;
-
-	private String exportName;
-
-	private Long exportId = null;
-
-	private Long docRef;
-
-	private String docRefType;
-
-	private Long deleteUserId;
-
-	private String deleteUser;
-
-	private Integer rating;
-
-	private String workflowStatus;
-
-	private String workflowStatusDisplay;
-
-	private String color;
-
-	private int published = 1;
-
-	private Date startPublishing = new Date();
-
-	private Date stopPublishing;
-
-	private String transactionId;
-
-	private int pages = 1;
-
-	private int previewPages = -1;
-
+	@Column(name = "ld_links", nullable = false)
 	private int links = 0;
 
 	/**
 	 * Counter of extended attributes of type Document
 	 */
+	@Column(name = "ld_docattrs", nullable = false)
 	private int docAttrs = 0;
+
+	@Column(name = "ld_digest", length = 255)
+	private String digest;
+
+	@Column(name = "ld_exportstatus", nullable = false)
+	private int exportStatus = EXPORT_UNLOCKED;
+
+	@Column(name = "ld_exportid")
+	private Long exportId = null;
+
+	@Column(name = "ld_exportname", length = 255)
+	private String exportName;
+
+	@Column(name = "ld_exportversion", length = 10)
+	private String exportVersion;
+
+	@Column(name = "ld_deleteuserid")
+	private Long deleteUserId;
+
+	@Column(name = "ld_workflowstatus", length = 1000)
+	private String workflowStatus;
+
+	@Column(name = "ld_workflowstatusdisp", length = 1000)
+	private String workflowStatusDisplay;
+
+	@Column(name = "ld_color", length = 255)
+	private String color;
+
+	@Column(name = "ld_published")
+	private int published = 1;
+
+	@Column(name = "ld_startpublishing")
+	private Date startPublishing = new Date();
+
+	@Column(name = "ld_stoppublishing")
+	private Date stopPublishing;
+
+	@Column(name = "ld_transactionid", length = 255)
+	private String transactionId;
 
 	/**
 	 * Used for saving the external resource ID when editing online
 	 */
+	@Column(name = "ld_extresid", length = 255)
 	private String extResId;
 
+	@Column(name = "ld_tgs", length = 1000)
+	protected String tgs;
+
+	@Column(name = "ld_pages", nullable = false)
+	private int pages = 1;
+
+	@Column(name = "ld_previewpages", nullable = false)
+	private int previewPages = -1;
+
+	@Column(name = "ld_nature", nullable = false)
 	private int nature = NATURE_DOC;
 
+	@Column(name = "ld_formid")
 	private Long formId = null;
 
+	@Column(name = "ld_password", length = 255)
 	private String password;
 
+	/**
+	 * Identifier of the Zonal OCR template to use to process this document
+	 */
+	@Column(name = "ld_ocrtemplateid")
+	private Long ocrTemplateId = null;
+
+	/**
+	 * Indicates if the document has been processed by the zonal OCR: <b>0</b> =
+	 * to process, <b>1</b> = processed
+	 */
+	@Column(name = "ld_ocrd", nullable = false)
+	private int ocrd = 0;
+
+	@Transient
 	private String decodedPassword;
 
 	/**
 	 * Not persistent flag used to indicate that the document was modified and
 	 * should be saved back
 	 */
+	@Transient
 	private boolean modified = false;
-
-	/**
-	 * Identifier of the Zonal OCR template to use to process this document
-	 */
-	private Long ocrTemplateId = null;
-
-	/**
-	 * Identifier of the barcode template to use to process this document
-	 */
-	private Long barcodeTemplateId = null;
-
-	/**
-	 * Indicates if the document has been processed by the zonal OCR: <b>0</b> =
-	 * to process, <b>1</b> = processed
-	 */
-	private int ocrd = 0;
 
 	protected AbstractDocument() {
 		super();
@@ -396,73 +437,12 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 		this.language = language;
 	}
 
-	/**
-	 * The set of tags for this document.
-	 * 
-	 * @return the set of tags
-	 */
-	public Set<Tag> getTags() {
-		return tags;
-	}
-
-	public void setTags(Set<Tag> tags) {
-		this.tags = tags;
-	}
-
-	public void setTagsFromWords(Set<String> tgs) {
-		if (this.tags != null)
-			this.tags.clear();
-		else
-			this.tags = new HashSet<>();
-
-		if (tgs != null)
-			for (String word : tgs) {
-				Tag tag = new Tag(getTenantId(), word);
-				this.tags.add(tag);
-			}
-	}
-
-	public Set<String> getTagsAsWords() {
-		Set<String> words = new HashSet<>();
-		if (tags != null)
-			for (Tag tag : tags) {
-				words.add(tag.getTag());
-			}
-		return words;
-	}
-
 	public int getIndexed() {
 		return indexed;
 	}
 
 	public void setIndexed(int indexed) {
 		this.indexed = indexed;
-	}
-
-	public String getTagsString() {
-		StringBuilder sb = new StringBuilder(",");
-		if (tags == null)
-			return "";
-
-		Iterator<Tag> iter = tags.iterator();
-		boolean start = true;
-
-		while (iter.hasNext()) {
-			String words = iter.next().toString();
-			words = words.replace(",", "\\,");
-
-			if (!start) {
-				sb.append(",");
-			} else {
-				start = false;
-			}
-
-			sb.append(words);
-		}
-
-		sb.append(",");
-
-		return sb.toString();
 	}
 
 	/**
@@ -500,18 +480,13 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 		try {
 			String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
 			icon = IconSelector.selectIcon(extension);
-			if (docRef != null && docRef.longValue() != 0L && "pdf".equals(getDocRefType())) {
-				icon = IconSelector.selectIcon("pdf");
-			} else if ((getFileName().toLowerCase().endsWith(".eml") || getFileName().toLowerCase().endsWith(".msg"))
+			if ((getFileName().toLowerCase().endsWith(".eml") || getFileName().toLowerCase().endsWith(".msg"))
 					&& getPages() > 1) {
 				icon += "-clip";
 			}
 		} catch (Exception e) {
 			// Nothing to do
 		}
-
-		if (docRef != null && docRef.longValue() != 0L)
-			icon += "-shortcut";
 
 		return icon;
 	}
@@ -527,34 +502,6 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 
 	public void setFileSize(long fileSize) {
 		this.fileSize = fileSize;
-	}
-
-	/**
-	 * Retrieve the folder owning this document
-	 * 
-	 * @return the parent folder
-	 */
-	public Folder getFolder() {
-		return folder;
-	}
-
-	public void setFolder(Folder folder) {
-		this.folder = folder;
-		if (folder != null)
-			this.setTenantId(folder.getTenantId());
-	}
-
-	public void addTag(String word) {
-		Tag tg = new Tag();
-		tg.setTenantId(getTenantId());
-		tg.setTag(word);
-		tags.add(tg);
-	}
-
-	public void clearTags() {
-		tags.clear();
-		tags = new HashSet<>();
-		tgs = null;
 	}
 
 	public String getFileExtension() {
@@ -707,19 +654,6 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 		this.exportId = exportId;
 	}
 
-	/**
-	 * If the document is an alias, it is the id of the referenced document
-	 * 
-	 * @return identifier of the referenced document
-	 */
-	public Long getDocRef() {
-		return docRef;
-	}
-
-	public void setDocRef(Long docRef) {
-		this.docRef = docRef;
-	}
-
 	public boolean isToIndex() {
 		return indexed == INDEX_TO_INDEX;
 	}
@@ -730,14 +664,6 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 
 	public void setBarcoded(int barcoded) {
 		this.barcoded = barcoded;
-	}
-
-	public Integer getRating() {
-		return rating;
-	}
-
-	public void setRating(Integer rating) {
-		this.rating = rating;
 	}
 
 	public String getComment() {
@@ -826,14 +752,6 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 		this.extResId = extResId;
 	}
 
-	public String getDocRefType() {
-		return docRefType;
-	}
-
-	public void setDocRefType(String docRefType) {
-		this.docRefType = docRefType;
-	}
-
 	public int getPages() {
 		return pages;
 	}
@@ -906,14 +824,6 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 
 	public String getDecodedPassword() {
 		return decodedPassword;
-	}
-
-	public String getDeleteUser() {
-		return deleteUser;
-	}
-
-	public void setDeleteUser(String deleteUser) {
-		this.deleteUser = deleteUser;
 	}
 
 	/**
@@ -1015,22 +925,18 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 		setSigned(docVO.getSigned());
 		setStamped(docVO.getStamped());
 		setDigest(docVO.getDigest());
-		setDocRef(docVO.getDocRef());
-		setFolder(docVO.getFolder());
 		setTemplate(docVO.getTemplate());
 		setPages(docVO.getPages());
 		setWorkflowStatus(docVO.getWorkflowStatus());
 		setWorkflowStatusDisplay(docVO.getWorkflowStatusDisplay());
 		setColor(docVO.getColor());
+		setTemplateId(docVO.getTemplateId());
+		setTemplateName(docVO.getTemplateName());
 
 		setAttributes(new HashMap<>());
-		setTags(new HashSet<>());
-
 		try {
 			for (Entry<String, Attribute> entry : docVO.getAttributes().entrySet())
 				getAttributes().put(entry.getKey(), entry.getValue());
-			for (Tag tag : docVO.getTags())
-				getTags().add(tag);
 		} catch (GenericJDBCException | LazyInitializationException ex) {
 			log.debug("Got error when trying to copy collections from document {}", docVO, ex);
 
@@ -1042,8 +948,6 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 					docDao.initialize(testDocVO);
 					for (Entry<String, Attribute> entry : testDocVO.getAttributes().entrySet())
 						getAttributes().put(entry.getKey(), entry.getValue());
-					for (Tag tag : testDocVO.getTags())
-						getTags().add(tag);
 				}
 			} catch (PersistenceException e) {
 				log.warn("Cannot copy collections from document {}", docVO, e);
@@ -1051,6 +955,14 @@ public abstract class AbstractDocument extends SecurableExtensibleObject impleme
 		}
 	}
 
+	public void setTagsFromWords(Set<String> tgs) {
+		if (CollectionUtils.isEmpty(tgs)) {
+			this.tgs = null;
+		} else {
+			tgs.stream().collect(Collectors.joining(","));
+		}
+	}
+	
 	public int getDocAttrs() {
 		return docAttrs;
 	}

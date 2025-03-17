@@ -545,7 +545,12 @@ public class LDRepository {
 		log.debug("appendContent {}", documentId);
 		AbstractDocument doc = getDocument(documentId);
 
-		validatePermission(ID_PREFIX_FLD + doc.getFolder().getId(), context, Permission.WRITE);
+		long folderId = 0L;
+		if (doc instanceof Document document)
+			folderId = document.getFolder().getId();
+		else if (doc instanceof Version version)
+			folderId = version.getFolderId();
+		validatePermission(ID_PREFIX_FLD + folderId, context, Permission.WRITE);
 
 		NumberFormat nd = new DecimalFormat("0000000000");
 
@@ -1213,9 +1218,9 @@ public class LDRepository {
 			if (doc instanceof Document document)
 				transaction.setDocument(document);
 
-			if (doc instanceof Document) {
-				transaction.setFolderId(doc.getFolder().getId());
-				transaction.setPath(folderDao.computePathExtended(doc.getFolder().getId()));
+			if (doc instanceof Document document) {
+				transaction.setFolderId(document.getFolder().getId());
+				transaction.setPath(folderDao.computePathExtended(document.getFolder().getId()));
 			} else {
 				transaction.setFolderId(((Version) doc).getFolderId());
 				transaction.setPath(folderDao.computePathExtended(((Version) doc).getFolderId()));
@@ -1431,7 +1436,7 @@ public class LDRepository {
 				compileObjectType(context, object, null, false, false, objectInfos);
 
 			Folder parent;
-			if (object instanceof AbstractDocument document)
+			if (object instanceof Document document)
 				parent = document.getFolder();
 			else
 				parent = folderDao.findFolder(((Folder) object).getParentId());
@@ -1916,8 +1921,14 @@ public class LDRepository {
 		addPropertyBoolean(result, typeId, filter, PropertyIds.IS_IMMUTABLE, doc.getImmutable() != 0);
 
 		addPropertyString(result, typeId, filter, TypeManager.PROP_LANGUAGE, doc.getLanguage());
-		addPropertyInteger(result, typeId, filter, TypeManager.PROP_RATING,
-				doc.getRating() != null ? doc.getRating() : 0);
+
+		if (doc instanceof Document document) {
+			addPropertyInteger(result, typeId, filter, TypeManager.PROP_RATING,
+					document.getRating() != null ? document.getRating() : 0);
+		} else {
+			addPropertyInteger(result, typeId, filter, TypeManager.PROP_RATING, 0);
+		}
+		
 		addPropertyString(result, typeId, filter, TypeManager.PROP_FILEVERSION, doc.getFileVersion());
 		addPropertyString(result, typeId, filter, TypeManager.PROP_VERSION, doc.getVersion());
 		addPropertyString(result, typeId, filter, TypeManager.PROP_CUSTOMID, doc.getCustomId());
@@ -2126,14 +2137,16 @@ public class LDRepository {
 	}
 
 	private void updateDocumentTags(AbstractDocument doc, PropertyData<?> p) {
-		doc.getTags().clear();
-		doc.setTgs((String) p.getFirstValue());
-		if (doc.getTgs() != null) {
-			StringTokenizer st = new StringTokenizer(doc.getTgs(), ",", false);
-			while (st.hasMoreTokens()) {
-				String tg = st.nextToken();
-				if (StringUtils.isNotEmpty(tg))
-					doc.addTag(tg);
+		if (doc instanceof Document document) {
+			document.getTags().clear();
+			document.setTgs((String) p.getFirstValue());
+			if (document.getTgs() != null) {
+				StringTokenizer st = new StringTokenizer(document.getTgs(), ",", false);
+				while (st.hasMoreTokens()) {
+					String tg = st.nextToken();
+					if (StringUtils.isNotEmpty(tg))
+						document.addTag(tg);
+				}
 			}
 		}
 	}

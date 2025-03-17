@@ -2,6 +2,9 @@ package com.logicaldoc.core.document;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
 import com.logicaldoc.core.security.Tenant;
 
 /**
@@ -10,12 +13,15 @@ import com.logicaldoc.core.security.Tenant;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.2.1
  */
+@Embeddable
 public class Tag implements Comparable<Tag>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@Column(name = "ld_tag", length = 255, nullable = false)
 	private String tagWord;
 
+	@Column(name = "ld_tenantid", nullable = false)
 	private long tenantId = Tenant.DEFAULT_ID;
 
 	public Tag() {

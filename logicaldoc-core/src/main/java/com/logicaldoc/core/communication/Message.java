@@ -5,6 +5,13 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.JoinColumn;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
+
 import com.logicaldoc.core.PersistentObject;
 
 /**
@@ -14,6 +21,7 @@ import com.logicaldoc.core.PersistentObject;
  * @author Marco Meschieri
  * @version 1.0
  */
+@MappedSuperclass
 public abstract class Message extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
@@ -22,36 +30,47 @@ public abstract class Message extends PersistentObject {
 
 	public static final int TYPE_NOTIFICATION = 1;
 
+	@Column(name = "ld_author", length = 255)
+	private String author = "";
+	
+	@Column(name = "ld_messagetext")
 	private String messageText = "";
 
-	private String author = "";
-
+	@Column(name = "ld_subject", length = 255)
 	private String subject = "";
 
 	/**
 	 * When the message was sent
 	 */
+	@Column(name = "ld_sentdate", nullable = false)
 	private Date sentDate = new Date();
 
 	/**
 	 * When the message was received
 	 */
+	@Transient
 	private Date receivedDate = new Date();
 
+	@Column(name = "ld_type", nullable = false)
 	private int type = Message.TYPE_SYSTEM;
 
+	@ElementCollection
+	@CollectionTable(name = "ld_recipient", joinColumns = @JoinColumn(name = "ld_messageid"))
 	private Set<Recipient> recipients = new HashSet<>();
 
 	/**
 	 * The locale in which the message is written
 	 */
+	@Transient
 	protected Locale locale;
 
+	@Column(name = "ld_html", nullable = false)
 	protected int html = 0;
 
 	/**
 	 * A flag that can be used to specify if the message has to be notified
 	 */
+	@Transient
 	protected boolean notify = true;
 
 	public boolean isNotify() {

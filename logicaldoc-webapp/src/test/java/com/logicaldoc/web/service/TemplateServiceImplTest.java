@@ -5,15 +5,21 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentAccessControlEntry;
 import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.document.FolderAccessControlEntry;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Template;
@@ -24,6 +30,7 @@ import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.web.AbstractWebappTestCase;
 
@@ -37,7 +44,7 @@ public class TemplateServiceImplTest extends AbstractWebappTestCase {
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		templateDao = (TemplateDAO) context.getBean("TemplateDAO");
+		templateDao = Context.get(TemplateDAO.class);
 	}
 
 	@Test
@@ -115,9 +122,10 @@ public class TemplateServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testGetAttributes() throws ServerException, PersistenceException, PermissionException {
-		DocumentDAO documentDao = (DocumentDAO) context.getBean("DocumentDAO");
-		FolderDAO folderDao = (FolderDAO) context.getBean("FolderDAO");
+	public void testGetAttributes() throws ServerException, PersistenceException, PermissionException,
+			IllegalAccessException, InvocationTargetException {
+		DocumentDAO documentDao = Context.get(DocumentDAO.class);
+		FolderDAO folderDao = Context.get(FolderDAO.class);
 
 		Template template = templateDao.findById(-1L);
 
@@ -130,8 +138,14 @@ public class TemplateServiceImplTest extends AbstractWebappTestCase {
 		document.setFileName("test.pdf");
 		document.setFolder(folder);
 		document.setTemplate(template);
-		document.getAccessControlList().addAll(folder.getAccessControlList());
-		document.setValues("multi", List.of("a","b","c"));
+
+		for (FolderAccessControlEntry fAce : folder.getAccessControlList()) {
+			DocumentAccessControlEntry dAce = new DocumentAccessControlEntry();
+			BeanUtils.copyProperties(dAce, fAce);
+			document.getAccessControlList().add(dAce);
+		}
+
+		document.setValues("multi", List.of("a", "b", "c"));
 		documentDao.store(document);
 
 		List<GUIAttribute> extAttr = testSubject.getAttributes(template.getId(), null);
@@ -149,6 +163,11 @@ public class TemplateServiceImplTest extends AbstractWebappTestCase {
 		form.setTemplateId(template.getId());
 
 		extAttr = testSubject.getAttributes(template.getId(), form);
-		assertEquals(9, extAttr.size());
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("templateId", template.getId());
+
+		assertEquals(9L, templateDao
+				.queryForLong("select count(*) from ld_template_ext WHERE ld_templateid = :templateId", params));
 	}
 }

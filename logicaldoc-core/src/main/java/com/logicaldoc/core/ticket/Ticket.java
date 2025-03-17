@@ -3,6 +3,15 @@ package com.logicaldoc.core.ticket;
 import java.util.Date;
 import java.util.UUID;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import com.logicaldoc.core.PersistentObject;
 
 /**
@@ -11,6 +20,10 @@ import com.logicaldoc.core.PersistentObject;
  * @author Michael Scholz
  * @author Marco Meschieri
  */
+@Entity
+@Table(name = "ld_ticket")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Ticket extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
@@ -21,45 +34,58 @@ public class Ticket extends PersistentObject {
 
 	public static final int VIEW = 2;
 
+	@Column(name = "ld_ticketid", nullable = false)
 	private String ticketId = UUID.randomUUID().toString();
 
+	@Column(name = "ld_docid", nullable = false)
 	private long docId = 0;
 
+	@Column(name = "ld_suffix")
+	private String suffix;
+	
+	@Column(name = "ld_userid", nullable = false)
 	private long userId = -1;
 
+	@Column(name = "ld_type", nullable = false)
 	private int type = DOWNLOAD;
 
 	/**
 	 * A date when this ticket expires
 	 */
+	@Column(name = "ld_expired")
 	private Date expired = null;
 
+	@Column(name = "ld_count", nullable = false)
 	private int count = 0;
 
 	/**
 	 * Maximum number of downloads
 	 */
+	@Column(name = "ld_maxcount", nullable = true)
 	private Integer maxCount;
 
+	@Column(name = "ld_enabled", nullable = false)
 	private int enabled = 1;
 
+	@Column(name = "ld_views", nullable = false)
 	private int views = 0;
 
 	/**
 	 * Maximum number of views
 	 */
+	@Column(name = "ld_maxviews", nullable = true)
 	private Integer maxViews;
 
-	private String suffix;
-
-	/*
+	/**
 	 * Not persistent field
 	 */
+	@Transient
 	private String url;
 
 	/**
 	 * Not persistent field
 	 */
+	@Transient
 	private Integer expireHours;
 
 	public long getDocId() {

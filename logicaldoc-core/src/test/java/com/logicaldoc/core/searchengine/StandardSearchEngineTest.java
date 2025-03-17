@@ -33,7 +33,7 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
 
 	@After
 	@Override
-	public void tearDown() throws SQLException, IOException {
+	public void tearDown() throws SQLException {
 		testSubject.unlock();
 		testSubject.close();
 		super.tearDown();
@@ -162,7 +162,8 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
 		Assert.assertEquals(2, hits.getEstimatedCount());
 
 		hits = testSubject.search("content:document",
-				Set.of("templateId:0", "folderId:4", "date:[2012-01-01T00:00:00Z TO *]"), "en", 50);
+				Set.of("folderId:4", "date:[2012-01-01T00:00:00Z TO *]"), "en", 50);
+
 		Assert.assertEquals(1, hits.getCount());
 		Assert.assertEquals(111L, hits.next().getId());
 

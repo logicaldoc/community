@@ -1,8 +1,13 @@
 package com.logicaldoc.core.folder;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import com.logicaldoc.core.history.History;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import com.logicaldoc.core.history.AbstractDocumentHistory;
 
 /**
  * History entry due to an event on a folder.
@@ -10,8 +15,11 @@ import com.logicaldoc.core.history.History;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
+@Entity
 @Table(name = "ld_folder_history")
-public class FolderHistory extends History {
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class FolderHistory extends AbstractDocumentHistory {
 
 	private static final long serialVersionUID = 1L;
 

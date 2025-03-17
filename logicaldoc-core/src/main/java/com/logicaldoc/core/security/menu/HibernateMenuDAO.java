@@ -18,15 +18,17 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.security.AccessControlUtil;
+import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.user.Group;
+import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**
- * Hibernate implementation of <code>MenuDAO</code>
+ * Hibernate implementation of {@link MenuDAO}
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
@@ -67,8 +69,19 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 	@Override
 	public void store(Menu menu) throws PersistenceException {
-		AccessControlUtil.removeForbiddenPermissionsForGuests(menu);
+		removeForbiddenPermissionsForGuests(menu);
 		super.store(menu);
+	}
+
+	private void removeForbiddenPermissionsForGuests(Menu menu) throws PersistenceException {
+		// Remove the forbidden permissions for the guests
+		GroupDAO gDao = Context.get(GroupDAO.class);
+		for (AccessControlEntry ace : menu.getAccessControlList()) {
+			Group group = gDao.findById(ace.getGroupId());
+			if (group != null && group.isGuest()) {
+				ace.setWrite(0);
+			}
+		}
 	}
 
 	@Override

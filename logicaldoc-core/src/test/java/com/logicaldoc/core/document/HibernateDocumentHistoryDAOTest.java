@@ -61,7 +61,7 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(3, histories.size());
 
-		// Try with unexisting docId
+		// Try with non-existent docId
 		histories = testSubject.findByDocId(99);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(0, histories.size());
@@ -74,7 +74,7 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(4, histories.size());
 
-		// Try with unexisting user
+		// Try with non-existent user
 		histories = testSubject.findByUserId(99);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(0, histories.size());
@@ -87,7 +87,7 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(2, histories.size());
 
-		// Try with unexisting folderId
+		// Try with non-existent folderId
 		histories = testSubject.findByFolderId(99);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(0, histories.size());
@@ -210,7 +210,7 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(0, histories.size());
 
-		// Try with non-existing user
+		// Try with non-existent user
 		histories = testSubject.findByUserIdAndEvent(99, "data test 02", null);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(0, histories.size());

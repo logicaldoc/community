@@ -19,6 +19,7 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @since 4.0
  */
 public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> implements GenericDAO {
+	
 	private static final String AND = " and ";
 
 	public HibernateGenericDAO() {

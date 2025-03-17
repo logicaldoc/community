@@ -8,7 +8,15 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +35,10 @@ import com.logicaldoc.util.crypt.CryptUtil;
  * @author Marco Meschieri
  * @version 1.0
  */
+@Entity
+@Table(name = "ld_user")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class User extends PersistentObject implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(User.class);
@@ -49,144 +61,183 @@ public class User extends PersistentObject implements Serializable {
 
 	private static final long serialVersionUID = 8093874904302301982L;
 
+	@Column(name = "ld_username", length = 255, nullable = false)
 	private String username = "";
 
+	@Column(name = "ld_password", length = 255)
 	private String password = "";
 
+	@Column(name = "ld_passwordmd4", length = 255)
 	private String passwordmd4 = "";
 
+	@Column(name = "ld_name", length = 255)
 	private String name = "";
 
+	@Column(name = "ld_firstname", length = 255)
 	private String firstName = "";
 
+	@Column(name = "ld_street", length = 255)
 	private String street = "";
 
+	@Column(name = "ld_postalcode", length = 255)
 	private String postalcode = "";
 
+	@Column(name = "ld_city", length = 255)
 	private String city = "";
 
+	@Column(name = "ld_country", length = 255)
 	private String country = "";
 
+	@Column(name = "ld_state", length = 255)
 	private String state = "";
 
+	@Column(name = "ld_language", length = 10)
 	private String language = "";
 
+	@Column(name = "ld_email", length = 255)
 	private String email = "";
 
 	/**
 	 * A simple text to be used as a signature in the footer of the outgoing
 	 * emails
 	 */
+	@Column(name = "ld_emailsignature", length = 1000)
 	private String emailSignature;
 
+	@Column(name = "ld_email2", length = 255)
 	private String email2 = "";
 
+	@Column(name = "ld_emailsignature2", length = 1000)
 	private String emailSignature2;
 
+	@Column(name = "ld_telephone", length = 255)
 	private String telephone = "";
 
+	@Column(name = "ld_telephone2", length = 255)
 	private String telephone2 = "";
 
+	@Column(name = "ld_type", nullable = false)
 	private int type = TYPE_DEFAULT;
 
 	// Not persisted
+	@Transient
 	private Set<Group> groups = new HashSet<>();
 
+	@Column(name = "ld_enabled", nullable = false)
 	private int enabled = 1;
 
 	/**
 	 * The last time the password was changed
 	 */
+	@Column(name = "ld_passwordchanged")
 	private Date passwordChanged = new Date();
 
 	/**
 	 * If the password expires or not
 	 */
+	@Column(name = "ld_passwordexpires", nullable = false)
 	private int passwordExpires = 0;
 
 	/**
 	 * If the password already expired
 	 */
+	@Column(name = "ld_passwordexpired", nullable = false)
 	private int passwordExpired = 0;
 
 	/**
 	 * Only for GUI
 	 */
+	@Transient
 	private String repass;
 
+	@Column(name = "ld_source", nullable = false)
 	private int source = 0;
 
+	@Column(name = "ld_quota", nullable = false)
 	private long quota = -1;
 
+	@Column(name = "ld_welcomescreen", nullable = true)
 	private Integer welcomeScreen = 1520;
 
+	@Column(name = "ld_defworkspace")
+	private Long defaultWorkspace;
+	
+	@Column(name = "ld_ipwhitelist", length = 1000, nullable = true)
 	private String ipWhiteList;
 
+	@Column(name = "ld_ipblacklist", length = 1000, nullable = true)
 	private String ipBlackList;
-
-	private String decodedPassword;
 
 	/**
 	 * When the certificate expires
 	 */
+	@Column(name = "ld_certexpire")
 	private Date certExpire;
-
+	
 	/**
 	 * The distinguished name of the certificate
 	 */
+	@Column(name = "ld_certdn", length = 1000)
 	private String certDN;
-
-	private Long defaultWorkspace;
-
+	
 	/**
 	 * The second factor authenticator to use
 	 */
+	@Column(name = "ld_secondfactor", length = 255)
 	private String secondFactor;
-
+	
 	/**
 	 * A key used by the second factor authenticator
 	 */
+	@Column(name = "ld_key", length = 255)
 	private String key;
-
-	private Set<UserGroup> userGroups = new HashSet<>();
-
+	
 	/**
 	 * Description of the grid that displays the list of documents
 	 */
+	@Column(name = "ld_docsgrid", nullable = true)
 	private String docsGrid;
-
+	
 	/**
 	 * Description of the grid that shows the results of a search
 	 */
+	@Column(name = "ld_hitsgrid", nullable = true)
 	private String hitsGrid;
-
-	/**
-	 * Base64 representation of the avatar image
-	 */
-	private String avatar;
-
+	
+	@Column(name = "ld_dateformat", length = 255)
 	private String dateFormat;
 
+	@Column(name = "ld_dateformatshort", length = 255)
 	private String dateFormatShort;
 
+	@Column(name = "ld_dateformatlong", length = 255)
 	private String dateFormatLong;
 
 	/**
 	 * Comma separated list of searches that defines the order they are
 	 * displayed in the user interface
 	 */
+	@Column(name = "ld_searchpref", length = 255)
 	private String searchPref;
-
-	/**
-	 * When this account expires
-	 */
-	private Date expire;
-
+	
 	/**
 	 * Last time this account has been activated
 	 */
+	@Column(name = "ld_lastenabled")
 	private Date lastEnabled;
-
+	
+	/**
+	 * When this account expires
+	 */
+	@Column(name = "ld_expire")
+	private Date expire;
+	
+	/**
+	 * If the system must forbid the login outside the working time
+	 */
+	@Column(name = "ld_enforcewrktime", nullable = false)
+	private int enforceWorkingTime = 0;
+	
 	/**
 	 * Maximum number of inactivity days after which the account gets disabled.
 	 * Possible values are:
@@ -196,36 +247,52 @@ public class User extends PersistentObject implements Serializable {
 	 * <li>&gt;0: number of maximum inactivity days</li>
 	 * </ul>
 	 */
+	@Column(name = "ld_maxinactivity")
 	private Integer maxInactivity;
+	
+	@Column(name = "ld_timezone")
+	private String timeZone;
 
 	/**
-	 * If the system must forbid the login outside the working time
+	 * Base64 representation of the avatar image
 	 */
-	private int enforceWorkingTime = 0;
+	@Column(name = "ld_avatar")
+	private String avatar;
+	
+	/**
+	 * Last time the user successfully logged in
+	 */
+	@Column(name = "ld_lastlogin")
+	private Date lastLogin = new Date();
+	
+	@Transient
+	private String decodedPassword;
+
+	@Transient
+	private Set<UserGroup> userGroups = new HashSet<>();
 
 	/**
 	 * Collection of all the admitted working times
 	 */
+	@Transient
 	private Set<WorkingTime> workingTimes = new HashSet<>();
 
-	private String timeZone;
-
-	/**
-	 * Last time the user successfully logged in
-	 */
-	private Date lastLogin = new Date();
-
+	@Column(name = "ld_department", length = 255)
 	private String department;
 
+	@Column(name = "ld_organizationalunit", length = 255)
 	private String organizationalUnit;
 
+	@Column(name = "ld_building", length = 255)
 	private String building;
 
+	@Column(name = "ld_company", length = 255)
 	private String company;
 
 	/**
 	 * If the user wants to enable the evaluation form
 	 */
+	@Column(name = "ld_evalform", nullable = false)
 	private int evalFormEnabled = 1;
 
 	public int getEvalFormEnabled() {

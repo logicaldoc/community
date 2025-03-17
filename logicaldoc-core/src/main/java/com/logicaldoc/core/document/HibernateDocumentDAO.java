@@ -40,13 +40,13 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.metadata.Attribute;
-import com.logicaldoc.core.security.AccessControlUtil;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.user.Group;
+import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.Store;
@@ -274,7 +274,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 			setTags(doc);
 
-			AccessControlUtil.removeForbiddenPermissionsForGuests(doc);
+			removeForbiddenPermissionsForGuests(doc);
 
 			setType(doc);
 
@@ -350,6 +350,28 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		} catch (Exception e) {
 			handleStoreError(transaction, e);
 		}
+	}
+
+	private void removeForbiddenPermissionsForGuests(Document document) throws PersistenceException {
+		// Remove the forbidden permissions for the guests
+	    GroupDAO gDao = Context.get(GroupDAO.class);
+	    for (DocumentAccessControlEntry ace : document.getAccessControlList()) {
+	        Group group = gDao.findById(ace.getGroupId());
+	        if (group != null && group.isGuest()) {
+	            ace.setArchive(0);
+	            ace.setAutomation(0);
+	            ace.setCalendar(0);
+	            ace.setDelete(0);
+	            ace.setImmutable(0);
+	            ace.setMove(0);
+	            ace.setPassword(0);
+	            ace.setRename(0);
+	            ace.setSecurity(0);
+	            ace.setSign(0);
+	            ace.setWorkflow(0);
+	            ace.setWrite(0);
+	        }
+	    }
 	}
 
 	private void checkMaxDocsPerFolder(Document document) throws PersistenceException {

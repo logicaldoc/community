@@ -2,6 +2,7 @@ package com.logicaldoc.core.document;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -336,11 +337,11 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 		doc2.setTemplate(template2);
 		doc2.setTemplateName(template2.getTemplateName());
 
-		assertEquals(true, comparator.compare(doc1, doc2) > 0);
+		assertTrue(comparator.compare(doc1, doc2) > 0);
 
 		doc1.setTemplate(null);
 		doc2.setTemplate(null);
-		assertEquals(true, comparator.compare(doc1, doc2) > 0);
+		assertEquals(0, comparator.compare(doc1, doc2));
 
 		// testing case insensitive
 		comparator = DocumentComparator.getComparator("lower(template) asc");
@@ -352,7 +353,7 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 		doc2.setTemplate(template2);
 		doc2.setTemplateName(template2.getTemplateName());
 
-		assertEquals(true, comparator.compare(doc1, doc2) > 0);
+		assertEquals(0, comparator.compare(doc1, doc2));
 
 		doc1.setTemplate(null);
 		doc2.setTemplate(null);

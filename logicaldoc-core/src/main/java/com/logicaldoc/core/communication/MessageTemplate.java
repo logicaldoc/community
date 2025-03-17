@@ -2,6 +2,14 @@ package com.logicaldoc.core.communication;
 
 import java.util.Map;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.automation.AutomationException;
@@ -13,6 +21,10 @@ import com.logicaldoc.util.LocaleUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
+@Entity
+@Table(name = "ld_messagetemplate")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class MessageTemplate extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
@@ -21,16 +33,22 @@ public class MessageTemplate extends PersistentObject {
 
 	public static final String TYPE_USER = "user";
 
+	@Column(name = "ld_name", length = 255, nullable = false)
 	private String name = "";
 
+	@Column(name = "ld_language", length = 10, nullable = false)
+	private String language = "en";
+	
+	@Column(name = "ld_description", length = 1000)
 	private String description = "";
 
-	private String language = "en";
-
+	@Column(name = "ld_body", length = 4000)
 	private String body;
 
+	@Column(name = "ld_subject", length = 1000)
 	private String subject;
 
+	@Column(name = "ld_type", length = 255)
 	private String type = TYPE_SYSTEM;
 
 	public MessageTemplate() {

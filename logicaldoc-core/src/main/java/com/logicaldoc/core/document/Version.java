@@ -3,11 +3,27 @@ package com.logicaldoc.core.document;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
+
+import javax.persistence.Cacheable;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.util.config.ContextProperties;
 
@@ -17,29 +33,49 @@ import com.logicaldoc.util.config.ContextProperties;
  * @author Marco Meschieri - LogicalDOC
  * @version 1.0
  */
+@Entity
+@Table(name = "ld_version")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Version extends AbstractDocument implements Comparable<Version> {
 
 	private static final long serialVersionUID = 1L;
 
-	private String username;
-
-	private Date versionDate = new Date();
-
-	private long userId;
-
-	private long folderId;
-
+	@Column(name = "ld_documentid", nullable = false)
 	private long docId;
 
+	@Column(name = "ld_username", length = 255)
+	private String username;
+
+	@Column(name = "ld_userid")
+	private long userId;
+
+	@Column(name = "ld_versiondate")
+	private Date versionDate = new Date();
+
+	@Column(name = "ld_folderid")
+	private long folderId;
+
+	@Column(name = "ld_foldername", length = 1000)
 	private String folderName;
 
-	private Long templateId;
-
+	@Column(name = "ld_event", length = 255)
 	private String event;
 
+	@Column(name = "ld_creator", length = 255)
 	private String creator;
 
+	@Column(name = "ld_creatorid", nullable = false)
 	private long creatorId;
+
+	@Column(name = "ld_templateid")
+	private Long templateId;
+
+	@ElementCollection(fetch = FetchType.LAZY)
+	@CollectionTable(name = "ld_version_ext", joinColumns = @JoinColumn(name = "ld_versionid"))
+	@MapKeyColumn(name = "ld_name", length = 255)
+	@OrderBy("ld_position ASC, ld_name ASC")
+	private Map<String, Attribute> attributes = new HashMap<>();
 
 	public Version() {
 	}
@@ -47,9 +83,20 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 	public Version(Version source) {
 		copyAttributes(source);
 		setId(source.getId());
+		setFolderId(source.getFolderId());
 		if (source.getIndexed() != INDEX_INDEXED)
 			setIndexed(source.getIndexed());
 		setCustomId(null);
+	}
+
+	@Override
+	public Map<String, Attribute> getAttributes() {
+		return attributes;
+	}
+
+	@Override
+	public void setAttributes(Map<String, Attribute> attributes) {
+		this.attributes = attributes;
 	}
 
 	public long getUserId() {
@@ -176,16 +223,6 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		this.folderName = folderName;
 	}
 
-	@Override
-	public Long getTemplateId() {
-		return templateId;
-	}
-
-	@Override
-	public void setTemplateId(Long templateId) {
-		this.templateId = templateId;
-	}
-
 	/**
 	 * Factory method that creates a Version and replicate all given document's
 	 * properties.<br>
@@ -307,6 +344,39 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 
 	public void setDocId(long docId) {
 		this.docId = docId;
+	}
+
+	@Override
+	public Long getTemplateId() {
+		return templateId;
+	}
+
+	@Override
+	public void setTemplateId(Long templateId) {
+		this.templateId = templateId;
+	}
+
+	@Override
+	public String getTemplateName() {
+		return null;
+	}
+
+	@Override
+	public void setTemplateName(String templateName) {
+		// Not implemented
+	}
+
+	@Override
+	public Template getTemplate() {
+		return null;
+	}
+
+	@Override
+	public void setTemplate(Template template) {
+		if (template != null)
+			templateId = template.getId();
+		else
+			templateId = null;
 	}
 
 	@Override

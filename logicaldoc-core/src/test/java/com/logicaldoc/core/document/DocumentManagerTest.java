@@ -35,7 +35,6 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.parser.ParsingException;
-import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -707,7 +706,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		newDoc = docDao.findById(newDoc.getId());
 		assertEquals(newDoc.getFileName(), doc.getFileName());
-		
+
 		// Transaction is null
 		try {
 			result = testSubject.create(new FileInputStream("pom.xml"), doc, null);
@@ -846,8 +845,8 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		transaction.setUser(user);
 		transaction.setUserId(2L);
 
-		Set<AccessControlEntry> acl = new HashSet<>();
-		AccessControlEntry ace = new AccessControlEntry();
+		Set<FolderAccessControlEntry> acl = new HashSet<>();
+		FolderAccessControlEntry ace = new FolderAccessControlEntry();
 		ace.setGroupId(2L);
 		ace.setRead(1);
 		ace.setWrite(0);

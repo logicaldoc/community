@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,13 +23,17 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentAccessControlEntry;
+import com.logicaldoc.core.document.FolderAccessControlEntry;
 import com.logicaldoc.core.document.Tag;
+import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
 import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.metadata.TemplateAttribute;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.user.Group;
@@ -77,10 +82,7 @@ public class WSUtil {
 			wsDoc.setFileName(document.getFileName());
 			wsDoc.setFileSize(document.getFileSize());
 			wsDoc.setDigest(document.getDigest());
-			wsDoc.setDocRef(document.getDocRef());
-			wsDoc.setDocRefType(document.getDocRefType());
 			wsDoc.setLastModified(DateUtil.format(document.getLastModified()));
-			wsDoc.setRating(document.getRating());
 			wsDoc.setPages(document.getPages());
 			wsDoc.setSigned(document.getSigned());
 			wsDoc.setStamped(document.getStamped());
@@ -92,6 +94,12 @@ public class WSUtil {
 			wsDoc.setBarcodeTemplateId(document.getBarcodeTemplateId());
 			wsDoc.setBarcoded(document.getBarcoded());
 
+			if (document instanceof Document doc) {
+				wsDoc.setDocRef(doc.getDocRef());
+				wsDoc.setDocRefType(doc.getDocRefType());
+				wsDoc.setRating(doc.getRating());
+			}
+
 			setDatesIntoWsDocument(document, wsDoc);
 
 			wsDoc.setPublished(document.getPublished());
@@ -100,7 +108,10 @@ public class WSUtil {
 			setAttributesIntoWsDocument(document, wsDoc);
 
 			// Set the tags
-			wsDoc.setTags(document.getTags().stream().map(Tag::getTag).collect(Collectors.toList()));
+			if (document instanceof Document doc)
+				wsDoc.setTags(doc.getTags().stream().map(Tag::getTag).collect(Collectors.toList()));
+			else if (document instanceof Version ver)
+				wsDoc.setTags(Arrays.asList(ver.getTgs().split(",")));
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -135,8 +146,6 @@ public class WSUtil {
 
 					attribute.setType(attr.getType());
 					attribute.setDependsOn(attr.getDependsOn());
-					attribute.setValidation(attr.getValidation());
-					attribute.setInitialization(attr.getInitialization());
 					attributes.add(attribute);
 				}
 			}
@@ -147,8 +156,10 @@ public class WSUtil {
 	}
 
 	private static void setFolderIntoWsDocument(AbstractDocument document, WSDocument wsDocument) {
-		if (document.getFolder() != null)
-			wsDocument.setFolderId(document.getFolder().getId());
+		if (document instanceof Document doc && doc.getFolder() != null)
+			wsDocument.setFolderId(doc.getFolder().getId());
+		else if (document instanceof Version ver)
+			wsDocument.setFolderId(ver.getFolderId());
 	}
 
 	private static void setTemplateIntoWsDocument(AbstractDocument document, WSDocument wsDocument) {
@@ -259,8 +270,6 @@ public class WSUtil {
 						att.setSetId(wsAtt.getSetId());
 						att.setType(wsAtt.getType());
 						att.setDependsOn(wsAtt.getDependsOn());
-						att.setValidation(wsAtt.getValidation());
-						att.setInitialization(wsAtt.getInitialization());
 
 						attrs.put(wsAtt.getName(), att);
 					}
@@ -331,7 +340,7 @@ public class WSUtil {
 		if (CollectionUtils.isNotEmpty(wsAttributeSet.getAttributes())) {
 			wsAttributes = new ArrayList<>();
 			for (String name : attributeSet.getAttributeNames()) {
-				Attribute attr = attributeSet.getAttribute(name);
+				TemplateAttribute attr = attributeSet.getTemplateAttribute(name);
 				WSAttribute wsAttribute = new WSAttribute();
 				wsAttribute.setName(name);
 				wsAttribute.setLabel(attr.getLabel());
@@ -367,12 +376,12 @@ public class WSUtil {
 		set.setName(wsSet.getName());
 		set.setDescription(wsSet.getDescription());
 
-		Map<String, Attribute> attributes = null;
+		Map<String, TemplateAttribute> attributes = null;
 		if (CollectionUtils.isNotEmpty(wsSet.getAttributes())) {
 			set.getAttributes().clear();
 			attributes = new HashMap<>();
 			for (WSAttribute wsAtt : wsSet.getAttributes()) {
-				Attribute att = new Attribute();
+				TemplateAttribute att = new TemplateAttribute();
 				att.setLabel(wsAtt.getLabel());
 				att.setMandatory(wsAtt.getMandatory());
 				att.setHidden(wsAtt.getHidden());
@@ -393,7 +402,7 @@ public class WSUtil {
 				att.setInitialization(wsAtt.getInitialization());
 				attributes.put(wsAtt.getName(), att);
 			}
-			set.setAttributes(attributes);
+			set.setTemplateAttributes(attributes);
 		}
 
 		return set;
@@ -407,12 +416,12 @@ public class WSUtil {
 		template.setDescription(wsTemplate.getDescription());
 		template.setValidation(wsTemplate.getValidation());
 
-		Map<String, Attribute> attributes = null;
+		Map<String, TemplateAttribute> attributes = null;
 		if (CollectionUtils.isNotEmpty(wsTemplate.getAttributes())) {
 			template.getAttributes().clear();
 			attributes = new HashMap<>();
 			for (WSAttribute wsAtt : wsTemplate.getAttributes()) {
-				Attribute att = new Attribute();
+				TemplateAttribute att = new TemplateAttribute();
 				att.setLabel(wsAtt.getLabel());
 				att.setHidden(wsAtt.getHidden());
 				att.setReadonly(wsAtt.getReadonly());
@@ -432,7 +441,7 @@ public class WSUtil {
 				att.setInitialization(wsAtt.getInitialization());
 				attributes.put(wsAtt.getName(), att);
 			}
-			template.setAttributes(attributes);
+			template.setTemplateAttributes(attributes);
 		}
 
 		return template;
@@ -457,7 +466,7 @@ public class WSUtil {
 			if (MapUtils.isNotEmpty(template.getAttributes())) {
 				attributes = new ArrayList<>();
 				for (String name : template.getAttributeNames()) {
-					Attribute attr = template.getAttribute(name);
+					TemplateAttribute attr = template.getTemplateAttribute(name);
 					WSAttribute attribute = new WSAttribute();
 					attribute.setName(name);
 					attribute.setLabel(attr.getLabel());
@@ -506,7 +515,21 @@ public class WSUtil {
 	}
 
 	public static AccessControlEntry toAccessControlEntry(WSAccessControlEntry wsAce) throws PersistenceException {
-		AccessControlEntry ace = new AccessControlEntry();
+		return fillAccessControlEntry(new AccessControlEntry(), wsAce);
+	}
+
+	public static DocumentAccessControlEntry toDocumentAccessControlEntry(WSAccessControlEntry wsAce)
+			throws PersistenceException {
+		return (DocumentAccessControlEntry) fillAccessControlEntry(new DocumentAccessControlEntry(), wsAce);
+	}
+
+	public static FolderAccessControlEntry toFolderAccessControlEntry(WSAccessControlEntry wsAce)
+			throws PersistenceException {
+		return (FolderAccessControlEntry) fillAccessControlEntry(new FolderAccessControlEntry(), wsAce);
+	}
+
+	private static AccessControlEntry fillAccessControlEntry(AccessControlEntry ace, WSAccessControlEntry wsAce)
+			throws PersistenceException {
 		try {
 			BeanUtils.copyProperties(ace, wsAce);
 		} catch (IllegalAccessException | InvocationTargetException e) {
@@ -519,7 +542,6 @@ public class WSUtil {
 			userDao.initialize(user);
 			ace.setGroupId(user.getUserGroup().getId());
 		}
-
 		return ace;
 	}
 }

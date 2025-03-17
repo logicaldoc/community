@@ -3,6 +3,14 @@ package com.logicaldoc.core.searchengine.saved;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.searchengine.SearchOptions;
@@ -17,21 +25,31 @@ import com.logicaldoc.util.io.IOUtil;
  * @since 8.6.1
  *
  */
+@Entity
+@Table(name = "ld_search")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class SavedSearch extends PersistentObject implements Serializable, Comparable<SavedSearch> {
 
 	private static final long serialVersionUID = 1L;
 
+	@Column(name = "ld_userid", nullable = false)
 	private long userId;
 
+	@Column(name = "ld_date")
+	private Date date = new Date();
+	
+	@Column(name = "ld_options")
+	private String options = "";
+	
+	@Column(name = "ld_name")
 	private String name = "";
 
-	private String description = "";
-
+	@Column(name = "ld_type", nullable = false)
 	private int type = SearchOptions.TYPE_FULLTEXT;
-
-	private Date date = new Date();
-
-	private String options = "";
+	
+	@Column(name = "ld_description")
+	private String description = "";
 
 	public SavedSearch() {
 	}

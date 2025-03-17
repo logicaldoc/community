@@ -1,10 +1,26 @@
 package com.logicaldoc.core.generic;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.persistence.Cacheable;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
+import com.logicaldoc.core.metadata.Template;
 
 /**
  * Instances of this class represents generic informations in the database. Use
@@ -15,47 +31,76 @@ import com.logicaldoc.core.metadata.ExtensibleObject;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
+@Entity
+@Table(name = "ld_generic")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Generic extends ExtensibleObject implements Comparable<Generic> {
 
 	private static final long serialVersionUID = 1L;
 
+	@Column(name = "ld_type", length = 255, nullable = false)
 	private String type;
 
+	@Column(name = "ld_subtype", length = 255, nullable = false)
 	private String subtype;
 
+	@Column(name = "ld_qualifier")
 	private Long qualifier;
 
+	@Column(name = "ld_string1")
 	private String string1;
 
+	@Column(name = "ld_string2")
 	private String string2;
 
+	@Column(name = "ld_string3")
 	private String string3;
 
+	@Column(name = "ld_string4")
 	private String string4;
 
+	@Column(name = "ld_string5")
 	private String string5;
 
+	@Column(name = "ld_string6")
 	private String string6;
 
+	@Column(name = "ld_string7")
 	private String string7;
 
+	@Column(name = "ld_string8")
 	private String string8;
 
+	@Column(name = "ld_text1")
 	private String text1;
 
+	@Column(name = "ld_integer1")
 	private Long integer1;
 
+	@Column(name = "ld_integer2")
 	private Long integer2;
 
+	@Column(name = "ld_integer3")
 	private Long integer3;
 
+	@Column(name = "ld_double1")
 	private Double double1;
 
+	@Column(name = "ld_double2")
 	private Double double2;
 
+	@Column(name = "ld_date1")
 	private Date date1;
 
+	@Column(name = "ld_date2")
 	private Date date2;
+
+	@ElementCollection
+	@CollectionTable(name = "ld_generic_ext", joinColumns = @JoinColumn(name = "ld_genid"))
+	@MapKeyColumn(name = "ld_name", length = 255)
+	@OrderBy("ld_position ASC, ld_name ASC")
+	private Map<String, Attribute> attributes = new HashMap<>();
 
 	public Generic() {
 		super();
@@ -239,14 +284,54 @@ public class Generic extends ExtensibleObject implements Comparable<Generic> {
 	}
 
 	@Override
+	public Map<String, Attribute> getAttributes() {
+		return attributes;
+	}
+
+	@Override
+	public void setAttributes(Map<String, Attribute> attributes) {
+		this.attributes = attributes;
+	}
+
+	@Override
 	public int compareTo(Generic o) {
-		if(equals(o))
+		if (equals(o))
 			return 0;
-		
+
 		if (getType().compareTo(o.getType()) != 0)
 			return getType().compareTo(o.getType());
 		else
 			return getSubtype().compareTo(o.getSubtype());
+	}
+
+	@Override
+	public Long getTemplateId() {
+		return null;
+	}
+
+	@Override
+	public void setTemplateId(Long templateId) {
+		// Not implemented
+	}
+
+	@Override
+	public String getTemplateName() {
+		return null;
+	}
+
+	@Override
+	public void setTemplateName(String templateName) {
+		// Not implemented
+	}
+
+	@Override
+	public Template getTemplate() {
+		return null;
+	}
+
+	@Override
+	public void setTemplate(Template template) {
+		// not implemented
 	}
 
 	@Override
@@ -285,4 +370,5 @@ public class Generic extends ExtensibleObject implements Comparable<Generic> {
 			return false;
 		return true;
 	}
+
 }

@@ -90,7 +90,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		totalSize = testSubject.computeTotalSize(1L, 3L, true);
 		assertEquals(0L, totalSize);
 
-		// Non-existing tenant
+		// Non-existent tenant
 		totalSize = testSubject.computeTotalSize(99L, 1L, true);
 		assertEquals(0L, totalSize);
 	}
@@ -98,6 +98,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testGetTagCloud() throws PersistenceException {
 		Session session = SessionManager.get().newSession("admin", "admin", (Client) null);
+		
 		try {
 			testSubject.updateCountUniqueTags();
 
@@ -310,7 +311,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		assertTrue(ids.contains(2L));
 
 		// Try with a user without documents
-		ids = testSubject.findByUserId(2);
+		ids = testSubject.findByUserId(2L);
 		assertNotNull(ids);
 		assertEquals(0, ids.size());
 	}
@@ -659,7 +660,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 		ids = testSubject.findByUserIdAndTag(1, "ask", null);
 		assertNotNull(ids);
-		assertTrue(ids.isEmpty());
+		assertEquals(1, ids.size());
 
 		ids = testSubject.findByUserIdAndTag(99, "abc", null);
 		assertNotNull(ids);

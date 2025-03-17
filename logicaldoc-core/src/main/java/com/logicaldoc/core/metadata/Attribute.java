@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.annotation.Nullable;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.folder.Folder;
@@ -17,6 +21,8 @@ import com.logicaldoc.core.security.user.User;
  * @author Matteo Caruso - LogicalDOC
  * @since 4.5.1
  */
+@MappedSuperclass
+@Embeddable
 public class Attribute implements Comparable<Attribute>, Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -46,62 +52,69 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 	/**
 	 * Not persistent
 	 */
-	private String name;
+	@Transient
+	protected String name;
 
-	private String label;
-
-	private String stringValue;
-
-	/**
-	 * String representation of the multiple string values
-	 */
-	private String stringValues;
-
-	private Long intValue;
-
-	private Double doubleValue;
-
-	private Date dateValue;
-
-	private int type = TYPE_STRING;
-
-	private int hidden = 0;
-
-	private int mandatory = 0;
-
-	private int readonly = 0;
-
-	private int position = 0;
-
-	private int editor = EDITOR_DEFAULT;
-
-	/**
-	 * Reference to the Attribute Set
-	 */
-	private Long setId;
-
-	private int multiple = 0;
+	@Column(name = "ld_label", length = 255)
+	protected String label;
 
 	/**
 	 * Name of a parent attribute, used for multiple values attributes
 	 */
-	private String parent;
+	@Column(name = "ld_parent", length = 255)
+	protected String parent;
 
 	/**
 	 * Name of another attribute on which the value of this attribute also
 	 * depends, used for managing linked presets
 	 */
-	private String dependsOn;
+	@Column(name = "ld_dependson", length = 255)
+	protected String dependsOn;
 
 	/**
-	 * Optional validation script
+	 * Reference to the Attribute Set
 	 */
-	private String validation;
+	@Column(name = "ld_setid")
+	protected Long setId;
+
+	@Column(name = "ld_mandatory", nullable = false)
+	protected int mandatory = 0;
+
+	@Column(name = "ld_hidden", nullable = false)
+	protected int hidden = 0;
+
+	@Column(name = "ld_readonly", nullable = false)
+	protected int readonly = 0;
+
+	@Column(name = "ld_multiple", nullable = false)
+	protected int multiple = 0;
+
+	@Column(name = "ld_type", nullable = false)
+	protected int type = TYPE_STRING;
+
+	@Column(name = "ld_editor", nullable = false)
+	protected int editor = EDITOR_DEFAULT;
+
+	@Column(name = "ld_position", nullable = false)
+	protected int position = 0;
 
 	/**
-	 * Optional script that defines the initial value
+	 * String representation of the multiple string values
 	 */
-	private String initialization;
+	@Column(name = "ld_stringvalue", length = 4000)
+	protected String stringValue;
+
+	@Column(name = "ld_stringvalues", length = 4000)
+	protected String stringValues;
+
+	@Column(name = "ld_intvalue")
+	protected Long intValue;
+
+	@Column(name = "ld_doublevalue")
+	protected Double doubleValue;
+
+	@Column(name = "ld_datevalue")
+	protected Date dateValue;
 
 	public Attribute() {
 	}
@@ -124,8 +137,6 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 		this.multiple = source.multiple;
 		this.parent = source.parent;
 		this.dependsOn = source.dependsOn;
-		this.validation = source.validation;
-		this.initialization = source.initialization;
 	}
 
 	public String getStringValue() {
@@ -159,7 +170,7 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 	public void setDateValue(Date dateValue) {
 		this.dateValue = dateValue;
 	}
-	
+
 	@Nullable
 	public Boolean getBooleanValue() {
 		if (intValue != null)
@@ -410,22 +421,6 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 
 	public void setStringValues(String stringValues) {
 		this.stringValues = stringValues;
-	}
-
-	public String getValidation() {
-		return validation;
-	}
-
-	public void setValidation(String validation) {
-		this.validation = validation;
-	}
-
-	public String getInitialization() {
-		return initialization;
-	}
-
-	public void setInitialization(String initialization) {
-		this.initialization = initialization;
 	}
 
 	public String getDependsOn() {

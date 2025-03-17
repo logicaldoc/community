@@ -1,6 +1,12 @@
 package com.logicaldoc.core.security.user;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.security.Session;
@@ -11,11 +17,15 @@ import com.logicaldoc.core.security.Session;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.0
  */
+@Entity
 @Table(name = "ld_user_history")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class UserHistory extends History {
 
 	private static final long serialVersionUID = 1L;
 
+	@Column(name = "ld_author", length = 255)
 	private String author;
 
 	public UserHistory() {
@@ -26,7 +36,7 @@ public class UserHistory extends History {
 		super();
 		setSession(session);
 	}
-	
+
 	public UserHistory(UserHistory source) {
 		copyAttributesFrom(source);
 		setAuthor(source.getAuthor());

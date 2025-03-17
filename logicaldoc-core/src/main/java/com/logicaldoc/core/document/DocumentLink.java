@@ -1,5 +1,15 @@
 package com.logicaldoc.core.document;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import com.logicaldoc.core.PersistentObject;
 
 /**
@@ -9,14 +19,23 @@ import com.logicaldoc.core.PersistentObject;
  * @author Matteo Caruso - LogicalDOC
  * @since 4.0
  */
+@Entity
+@Table(name = "ld_link")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class DocumentLink extends PersistentObject {
 	
 	private static final long serialVersionUID = 1L;
 
+	@Column(name = "ld_type", length = 255, nullable = false)
 	private String type;
 
+	@ManyToOne()
+	@JoinColumn(name = "ld_docid1")
 	private Document document1;
 
+	@ManyToOne()
+	@JoinColumn(name = "ld_docid2")
 	private Document document2;
 
 	public String getType() {

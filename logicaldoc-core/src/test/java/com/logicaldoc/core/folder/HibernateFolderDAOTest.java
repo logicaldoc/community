@@ -33,9 +33,9 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
+import com.logicaldoc.core.document.FolderAccessControlEntry;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
-import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.user.User;
@@ -570,7 +570,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		Folder folder = new Folder();
 		folder.setName("text");
 		folder.setParentId(5);
-		folder.setAccessControlList(Set.of(new AccessControlEntry(1L), new AccessControlEntry(2L)));
+		folder.setAccessControlList(Set.of(new FolderAccessControlEntry(1L), new FolderAccessControlEntry(2L)));
 
 		folder.addTag("A");
 
@@ -597,7 +597,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		folder = testSubject.findById(folder.getId());
 		testSubject.initialize(folder);
 		assertEquals(2, folder.getAccessControlList().size());
-		AccessControlEntry ace = new AccessControlEntry();
+		FolderAccessControlEntry ace = new FolderAccessControlEntry();
 		ace.setGroupId(3L);
 		ace.grantPermissions(
 				Set.of(Permission.READ, Permission.WRITE, Permission.DELETE, Permission.MOVE, Permission.DOWNLOAD));
@@ -835,8 +835,11 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testDelete() throws PersistenceException {
-		testSubject.delete(1202);
-		Folder folder = testSubject.findById(12012);
+		Folder folder = testSubject.findById(1202L);
+		assertNotNull(folder);
+		
+		testSubject.delete(1202L);
+		folder = testSubject.findById(1202L);
 		assertNull(folder);
 
 		docDao.delete(1202);
@@ -979,7 +982,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		assertNotNull(folders);
 		assertEquals(3, folders.size());
 
-		// Existing user and non-existing folder
+		// Existing user and non-existent folder
 		folders = testSubject.findByUserId(1, 70);
 		assertNotNull(folders);
 		assertEquals(0, folders.size());
@@ -1024,7 +1027,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		Folder workspace = testSubject.findById(Folder.DEFAULTWORKSPACEID);
 		testSubject.initialize(workspace);
-		workspace.getAccessControlList().add(new AccessControlEntry(user4.getGroups().iterator().next().getId()));
+		workspace.getAccessControlList().add(new FolderAccessControlEntry(user4.getGroups().iterator().next().getId()));
 		testSubject.store(workspace);
 
 		folders = testSubject.findByUserId(user4.getId(), Folder.DEFAULTWORKSPACEID);
@@ -1410,12 +1413,14 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testRestore() throws PersistenceException {
-		Folder folder = testSubject.findById(1204);
-		assertNull(folder);
-
-		testSubject.restore(1204, 5L, null);
-		folder = testSubject.findById(1204);
+	public void testRestore() throws PersistenceException, InterruptedException {
+		assertEquals(1204L, testSubject.queryForLong("select ld_id from ld_folder where ld_id="+1204L+" and ld_deleted=1"));
+		
+		testSubject.restore(1204L, 5L, null);
+		
+		assertEquals(1204L, testSubject.queryForLong("select ld_id from ld_folder where ld_id="+1204L+" and ld_deleted=0"));
+		
+		Folder folder = testSubject.findById(1204L);
 		assertNotNull(folder);
 
 		FolderHistory transaction = new FolderHistory();

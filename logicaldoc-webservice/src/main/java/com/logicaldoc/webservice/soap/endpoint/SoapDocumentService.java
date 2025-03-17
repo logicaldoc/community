@@ -492,7 +492,8 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		Folder folder = fdao.findFolder(folderId);
 
 		DocumentManager documentManager = Context.get(DocumentManager.class);
-		Document createdDoc = documentManager.copyToFolder(doc, folder, transaction, links, notes, security).getDocument();
+		Document createdDoc = documentManager.copyToFolder(doc, folder, transaction, links, notes, security)
+				.getDocument();
 		return getDoc(createdDoc.getId());
 	}
 
@@ -1349,7 +1350,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		documentDao.initialize(document);
 		document.getAccessControlList().clear();
 		for (WSAccessControlEntry wsAcwe : acl)
-			document.addAccessControlEntry(WSUtil.toAccessControlEntry(wsAcwe));
+			document.addAccessControlEntry(WSUtil.toDocumentAccessControlEntry(wsAcwe));
 
 		DocumentHistory history = new DocumentHistory();
 		history.setEvent(DocumentEvent.PERMISSION.toString());

@@ -533,11 +533,11 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testRestore() throws Exception {
-		Folder folder = folderDao.findById(8L);
-		assertNull(folder);
+		assertEquals(8L, folderDao.queryForLong("select ld_id from ld_folder where ld_id="+8L+" and ld_deleted=1"));
 
 		testSubject.restore(List.of(8L), 1200L);
-		folder = folderDao.findById(8L);
+		Folder folder = folderDao.findById(8L);
+		folderDao.initialize(folder);
 		assertNotNull(folder);
 		assertEquals(1200L, folder.getParentId());
 	}

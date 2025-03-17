@@ -202,20 +202,30 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 	private static final DocumentComparator TEMPLATE_NAME_SORT_CS = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
-			if (d1.getTemplate() != null && d2.getTemplate() != null)
-				return d1.getTemplate().getName().compareTo(d2.getTemplate().getName());
+			String name1 = d1.getTemplate() != null ? d1.getTemplate().getName() : d1.getTemplateName();
+			String name2 = d2.getTemplate() != null ? d2.getTemplate().getName() : d2.getTemplateName();
+
+			if (name1 != null)
+				return name1.compareTo(name2);
+			else if (name2 == null)
+				return 0;
 			else
-				return d1.getTemplateName().compareTo(d2.getTemplateName());
+				return -1;
 		}
 	};
 
 	private static final DocumentComparator TEMPLATE_NAME_SORT_CI = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
-			if (d1.getTemplate() != null && d2.getTemplate() != null)
-				return d1.getTemplate().getName().compareTo(d2.getTemplate().getName());
+			String name1 = d1.getTemplate() != null ? d1.getTemplate().getName() : d1.getTemplateName();
+			String name2 = d2.getTemplate() != null ? d2.getTemplate().getName() : d2.getTemplateName();
+
+			if (name1 != null)
+				return name1.compareToIgnoreCase(name2);
+			else if (name2 == null)
+				return 0;
 			else
-				return d1.getTemplateName().toLowerCase().compareTo(d2.getTemplateName().toLowerCase());
+				return -1;
 		}
 	};
 

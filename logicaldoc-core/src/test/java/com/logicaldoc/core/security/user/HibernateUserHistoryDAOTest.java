@@ -11,6 +11,7 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.i18n.DateBean;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 import junit.framework.Assert;
@@ -24,7 +25,7 @@ import junit.framework.Assert;
 public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 
 	// Instance under test
-	private UserHistoryDAO dao;
+	private UserHistoryDAO testSubject;
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
@@ -32,36 +33,36 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateHistoryDAO
-		dao = (UserHistoryDAO) context.getBean("UserHistoryDAO");
+		testSubject = Context.get(UserHistoryDAO.class);
 	}
 
 	@Test
 	public void testDelete() throws PersistenceException {
-		Collection<UserHistory> histories = (Collection<UserHistory>) dao.findByUserId(1);
+		Collection<UserHistory> histories = (Collection<UserHistory>) testSubject.findByUserId(1);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(2, histories.size());
 
 		for (UserHistory history : histories)
-			dao.delete(history.getId());
+			testSubject.delete(history.getId());
 
-		histories = (Collection<UserHistory>) dao.findByUserId(4);
+		histories = (Collection<UserHistory>) testSubject.findByUserId(4);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(0, histories.size());
 	}
 
 	@Test
 	public void testFindByUserIdAndType() {
-		List<UserHistory> histories = dao.findByUserId(1);
+		List<UserHistory> histories = testSubject.findByUserId(1);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(2, histories.size());
 
-		histories = dao.findByUserIdAndEvent(1L, "data test 02");
+		histories = testSubject.findByUserIdAndEvent(1L, "data test 02");
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(1, histories.size());
 		Assert.assertEquals("data test 02", histories.get(0).getEvent());
 
 		// Try with unexisting user
-		histories = dao.findByUserId(99);
+		histories = testSubject.findByUserId(99);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(0, histories.size());
 	}
@@ -74,7 +75,7 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 		userHistory.setUserId(3L);
 		userHistory.setEvent("first test User History store");
 
-		dao.store(userHistory);
+		testSubject.store(userHistory);
 		Assert.assertNotNull(userHistory);
 
 		UserHistory newUserHistory = new UserHistory();
@@ -83,11 +84,11 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 		newUserHistory.setUserId(3L);
 		newUserHistory.setEvent("second test User History store");
 
-		dao.store(newUserHistory);
+		testSubject.store(newUserHistory);
 		Assert.assertNotNull(newUserHistory);
 
 		// Test the stored history
-		Collection<UserHistory> histories = (Collection<UserHistory>) dao.findByUserId(3L);
+		Collection<UserHistory> histories = (Collection<UserHistory>) testSubject.findByUserId(3L);
 		Assert.assertNotNull(histories);
 		Assert.assertFalse(histories.isEmpty());
 
@@ -107,11 +108,11 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testCleanOldHistories() throws PersistenceException {
-		dao.cleanOldHistories(5);
+		testSubject.cleanOldHistories(5);
 
-		UserHistory history = dao.findById(1);
+		UserHistory history = testSubject.findById(1);
 		Assert.assertNull(history);
-		List<UserHistory> histories = dao.findAll();
+		List<UserHistory> histories = testSubject.findAll();
 		Assert.assertEquals(0, histories.size());
 	}
 }

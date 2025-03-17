@@ -10,12 +10,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.AttributeOption;
 import com.logicaldoc.core.metadata.AttributeOptionDAO;
 import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
 import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.metadata.TemplateAttribute;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
@@ -87,12 +87,12 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 		Template template = loadTemplate(sid, wsTemplate, user);
 
 		TemplateDAO dao = Context.get(TemplateDAO.class);
-		Map<String, Attribute> attrs = new HashMap<>();
+		Map<String, TemplateAttribute> attrs = new HashMap<>();
 		if (CollectionUtils.isNotEmpty(wsTemplate.getAttributes())) {
 			template.getAttributes().clear();
 			for (WSAttribute wsAttribute : wsTemplate.getAttributes()) {
 				if (wsAttribute != null) {
-					Attribute attribute = new Attribute();
+					TemplateAttribute attribute = new TemplateAttribute();
 					attribute.setPosition(wsAttribute.getPosition());
 					attribute.setMandatory(wsAttribute.getMandatory());
 					attribute.setHidden(wsAttribute.getHidden());
@@ -118,7 +118,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			}
 		}
 		if (attrs.size() > 0)
-			template.setAttributes(attrs);
+			template.setTemplateAttributes(attrs);
 
 		dao.store(template);
 		return template.getId();
@@ -254,12 +254,12 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 		if (StringUtils.isEmpty(set.getName()))
 			throw new WebserviceException("Missing mandatory value 'Name'");
 
-		Map<String, Attribute> attrs = new HashMap<>();
+		Map<String, TemplateAttribute> attrs = new HashMap<>();
 		if (CollectionUtils.isNotEmpty(wsAttributeSet.getAttributes())) {
 			set.getAttributes().clear();
 			for (WSAttribute wsAttribute : wsAttributeSet.getAttributes()) {
 				if (wsAttribute != null) {
-					Attribute attribute = new Attribute();
+					TemplateAttribute attribute = new TemplateAttribute();
 					attribute.setPosition(wsAttribute.getPosition());
 					attribute.setMandatory(wsAttribute.getMandatory());
 					attribute.setHidden(wsAttribute.getHidden());
@@ -284,7 +284,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			}
 		}
 		if (attrs.size() > 0)
-			set.setAttributes(attrs);
+			set.setTemplateAttributes(attrs);
 
 		dao.store(set);
 		return set.getId();

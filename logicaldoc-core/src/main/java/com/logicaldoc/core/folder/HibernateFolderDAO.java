@@ -35,18 +35,18 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
+import com.logicaldoc.core.document.FolderAccessControlEntry;
 import com.logicaldoc.core.document.Tag;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
-import com.logicaldoc.core.security.AccessControlEntry;
-import com.logicaldoc.core.security.AccessControlUtil;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.user.Group;
+import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserGroup;
@@ -155,7 +155,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			// Remove the sections
 			folder.getAttributes().values().removeIf(Attribute::isSection);
 
-			AccessControlUtil.removeForbiddenPermissionsForGuests(folder);
+			removeForbiddenPermissionsForGuests(folder);
 
 			if (folder.getTemplate() == null) {
 				folder.setOcrTemplateId(null);
@@ -185,6 +185,33 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			saveFolderHistory(new Folder(folder), transaction);
 		} catch (PersistenceException e) {
 			handleStoreError(transaction, e);
+		}
+	}
+
+	private void removeForbiddenPermissionsForGuests(Folder folder) throws PersistenceException {
+		// Remove the forbidden permissions for the guests
+		GroupDAO gDao = Context.get(GroupDAO.class);
+		for (FolderAccessControlEntry ace : folder.getAccessControlList()) {
+			Group group = gDao.findById(ace.getGroupId());
+			if (group != null && group.isGuest()) {
+				ace.setAdd(0);
+				ace.setArchive(0);
+				ace.setAutomation(0);
+				ace.setCalendar(0);
+				ace.setDelete(0);
+				ace.setExport(0);
+				ace.setImmutable(0);
+				ace.setImport(0);
+				ace.setMove(0);
+				ace.setPassword(0);
+				ace.setRename(0);
+				ace.setSecurity(0);
+				ace.setSign(0);
+				ace.setWorkflow(0);
+				ace.setWrite(0);
+				ace.setCustomid(0);
+				ace.setReadingreq(0);
+			}
 		}
 	}
 
@@ -852,7 +879,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public void restore(long folderId, long parentId, FolderHistory transaction) throws PersistenceException {
 		// The parent folder
 		Folder parent = findFolder(parentId);
-
 		int count = jdbcUpdate("update ld_folder set ld_deleted=0, ld_parentid=" + parent.getId()
 				+ ", ld_lastmodified=CURRENT_TIMESTAMP where not ld_type=" + Folder.TYPE_WORKSPACE + " and ld_id="
 				+ folderId);
@@ -1371,7 +1397,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			userDAO.initialize(user);
 			if (!user.isMemberOf(Group.GROUP_ADMIN)) {
 				Group userGroup = user.getUserGroup();
-				AccessControlEntry ace = new AccessControlEntry(userGroup.getId());
+				FolderAccessControlEntry ace = new FolderAccessControlEntry(userGroup.getId());
 				ace.setAdd(1);
 				ace.setDelete(1);
 				ace.setDownload(1);
@@ -1634,8 +1660,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				newFolder.setSecurityRef(source.getSecurityRef());
 			} else {
 				newFolder.getAccessControlList().clear();
-				for (AccessControlEntry ace : source.getAccessControlList())
-					newFolder.addAccessControlEntry(new AccessControlEntry(ace));
+				for (FolderAccessControlEntry ace : source.getAccessControlList())
+					newFolder.addAccessControlEntry(new FolderAccessControlEntry(ace));
 			}
 			store(newFolder);
 		}

@@ -67,6 +67,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		Version version = testSubject.findByVersion(1, "0.2");
 		assertNotNull(version);
 		assertEquals("0.2", version.getVersion());
+		assertEquals(99L, version.getTemplateId().longValue());
 
 		version = testSubject.findByVersion(1, "xxxx");
 		assertNull(version);

@@ -19,6 +19,7 @@ import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.metadata.TemplateAttribute;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
@@ -116,7 +117,7 @@ public class Validator {
 			if (attribute == null)
 				continue;
 
-			Attribute templateAttribute = template.getAttribute(attributeName);
+			TemplateAttribute templateAttribute = (TemplateAttribute) template.getAttribute(attributeName);
 			if (StringUtils.isNotEmpty(templateAttribute.getValidation()))
 				executeAttributeValidation(object, transaction, errors, attributeName, attribute, templateAttribute);
 		}
@@ -145,7 +146,7 @@ public class Validator {
 	}
 
 	private void executeAttributeValidation(ExtensibleObject object, History transaction, Map<String, String> errors,
-			String attributeName, Attribute attribute, Attribute templateAttribute) throws AutomationException {
+			String attributeName, Attribute attribute, TemplateAttribute templateAttribute) throws AutomationException {
 		Map<String, Object> fieldValidationDictionary = new HashMap<>();
 		fieldValidationDictionary.put("object", object);
 		fieldValidationDictionary.put("event", transaction);

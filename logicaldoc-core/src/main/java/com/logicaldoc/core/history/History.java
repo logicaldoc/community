@@ -5,7 +5,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -17,6 +20,7 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.document.AbstractDocument;
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.security.Client;
@@ -31,6 +35,7 @@ import com.logicaldoc.util.Context;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.0
  */
+@MappedSuperclass
 public abstract class History extends PersistentObject implements Comparable<History> {
 
 	public static final String ASPECT = "saveHistory";
@@ -39,101 +44,100 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	private static final Logger log = LoggerFactory.getLogger(History.class);
 
+	@Column(name = "ld_docid")
 	protected Long docId;
 
+	@Column(name = "ld_folderid")
 	private Long folderId;
 
+	@Column(name = "ld_userid")
 	private Long userId;
 
+	@Column(name = "ld_date")
 	private Date date = new Date();
 
-	private String userLogin = "";
-
+	@Column(name = "ld_username", length = 255)
 	private String username = "";
 
+	@Column(name = "ld_userlogin", length = 255)
+	private String userLogin = "";
+
+	@Column(name = "ld_event", length = 255)
 	private String event = "";
 
 	/**
 	 * Comment left in regards of this event
 	 */
+	@Column(name = "ld_comment", length = 4000)
 	private String comment = "";
 
 	/**
 	 * Something to better qualify the event
 	 */
+	@Column(name = "ld_reason", length = 4000)
 	private String reason = null;
-
-	private String version = null;
-
-	private String fileVersion = null;
-
-	private String path = null;
-
-	private String pathOld = null;
 
 	/**
 	 * Used to mark this event notified by the auditing system
 	 */
+	@Column(name = "ld_notified", nullable = false)
 	private int notified = 0;
 
+	@Column(name = "ld_sessionid", length = 255)
 	private String sessionId = "";
 
+	@Column(name = "ld_keylabel", length = 255)
 	private String keyLabel = "";
 
+	@Column(name = "ld_path", length = 4000)
+	private String path = null;
+
+	@Column(name = "ld_new")
 	private int isNew = 1;
 
+	@Column(name = "ld_filename", length = 255)
 	private String filename = null;
 
-	private String filenameOld = null;
-
+	@Column(name = "ld_filesize")
 	private Long fileSize = null;
 
 	/**
 	 * Used when storing a document
 	 */
+	@Transient
 	private String file = null;
 
 	/**
-	 * Used as convenience to store the name of the tenant
+	 * Note persistent, used as convenience to store the name of the tenant
 	 */
+	@Transient
 	private String tenant = null;
 
 	// Not persistent
+	@Transient
 	private User user;
 
 	// Not persistent
+	@Transient
 	private AbstractDocument document;
 
 	// Not persistent
+	@Transient
 	private Folder folder;
 
 	// Not persistent, indicates if this event has to be notified by the events
 	// collector
+	@Transient
 	private boolean notifyEvent = true;
 
+	@Column(name = "ld_ip", length = 255)
 	private String ip;
 
+	@Column(name = "ld_geolocation", length = 255)
 	private String geolocation;
 
+	@Column(name = "ld_device", length = 255)
 	private String device;
-
-	private String color;
-
-	public String getFileVersion() {
-		return fileVersion;
-	}
-
-	public void setFileVersion(String fileVersion) {
-		this.fileVersion = fileVersion;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
-	}
 
 	public String getPath() {
 		return path;
@@ -281,11 +285,11 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 			this.setFilename(document.getFileName());
 			this.setFileSize(document.getFileSize());
-			if (document.getFolder() != null)
-				this.setFolderId(document.getFolder().getId());
-			this.setVersion(document.getVersion());
-			this.setFileVersion(document.getFileVersion());
-			this.setColor(document.getColor());
+
+			if (document instanceof Version ver)
+				this.setFolderId(ver.getFolderId());
+			else if (document instanceof Document doc)
+				this.setFolderId(doc.getFolder().getId());
 		}
 	}
 
@@ -321,22 +325,6 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	public void setFilename(String filename) {
 		this.filename = filename;
-	}
-
-	public String getFilenameOld() {
-		return filenameOld;
-	}
-
-	public void setFilenameOld(String filenameOld) {
-		this.filenameOld = filenameOld;
-	}
-
-	public String getPathOld() {
-		return pathOld;
-	}
-
-	public void setPathOld(String pathOld) {
-		this.pathOld = pathOld;
 	}
 
 	public String getFile() {
@@ -439,14 +427,6 @@ public abstract class History extends PersistentObject implements Comparable<His
 		this.fileSize = fileSize;
 	}
 
-	public String getColor() {
-		return color;
-	}
-
-	public void setColor(String color) {
-		this.color = color;
-	}
-
 	public String getKeyLabel() {
 		return keyLabel;
 	}
@@ -465,15 +445,11 @@ public abstract class History extends PersistentObject implements Comparable<His
 		setEvent(source.getEvent());
 		setComment(source.getComment());
 		setReason(source.getReason());
-		setVersion(source.getVersion());
-		setFileVersion(source.getFileVersion());
 		setPath(source.getPath());
-		setPathOld(source.getPathOld());
 		setNotified(source.getNotified());
 		setSessionId(source.getSessionId());
 		setIsNew(source.getIsNew());
 		setFilename(source.getFilename());
-		setFilenameOld(source.getFilenameOld());
 		setUserId(source.getUserId());
 		setUsername(source.getUsername());
 		setUserLogin(source.getUserLogin());
@@ -484,7 +460,6 @@ public abstract class History extends PersistentObject implements Comparable<His
 		setDevice(source.getDevice());
 		setGeolocation(source.getGeolocation());
 		setFileSize(source.getFileSize());
-		setColor(source.getColor());
 		setKeyLabel(source.getKeyLabel());
 	}
 

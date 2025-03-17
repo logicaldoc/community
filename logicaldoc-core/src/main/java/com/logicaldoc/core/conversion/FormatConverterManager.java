@@ -322,8 +322,7 @@ public class FormatConverterManager {
 				history.setEvent(UserEvent.FILE_CONVERSION.toString());
 				history.setFilename(FileUtil.getBaseName(inFilename) + "." + outFormat.toLowerCase());
 				history.setFileSize(in.length());
-				history.setFilenameOld(inFilename);
-				history.setComment(String.format("%s -> %s", history.getFilenameOld(), history.getFilename()));
+				history.setComment(String.format("%s -> %s", inFilename, history.getFilename()));
 				history.setIp(session.getClient().getAddress());
 
 				UserHistoryDAO dao = Context.get(UserHistoryDAO.class);

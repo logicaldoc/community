@@ -25,6 +25,7 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
+import com.logicaldoc.core.document.FolderAccessControlEntry;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderEvent;
@@ -32,7 +33,6 @@ import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
-import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -348,7 +348,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	private static void setACL(Folder securityRef, GUIFolder guiFolder) {
 		List<GUIAccessControlEntry> acl = new ArrayList<>();
 		if (securityRef != null && securityRef.getAccessControlList() != null)
-			for (AccessControlEntry ace : securityRef.getAccessControlList()) {
+			for (FolderAccessControlEntry ace : securityRef.getAccessControlList()) {
 				GUIAccessControlEntry guiAce = new GUIAccessControlEntry();
 				guiAce.setEntityId(ace.getGroupId());
 				guiAce.setAdd(ace.getAdd() == 1);
@@ -745,9 +745,9 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		log.info("Applying {} aces to folder {}", acl.size(), folder.getId());
 
 		folder.setSecurityRef(null);
-		Set<AccessControlEntry> grps = new HashSet<>();
+		Set<FolderAccessControlEntry> grps = new HashSet<>();
 		for (GUIAccessControlEntry ace : acl) {
-			AccessControlEntry fg = new AccessControlEntry();
+			FolderAccessControlEntry fg = new FolderAccessControlEntry();
 			fg.setGroupId(ace.getEntityId());
 			grps.add(fg);
 

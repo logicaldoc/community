@@ -1,6 +1,23 @@
 package com.logicaldoc.core.security.menu;
 
-import com.logicaldoc.core.security.SecurablePersistentObject;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.Cacheable;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import com.logicaldoc.core.PersistentObject;
+import com.logicaldoc.core.security.AccessControlEntry;
+import com.logicaldoc.core.security.Secure;
 
 /**
  * This class represents the key concept of security. A Menu not only models
@@ -13,7 +30,11 @@ import com.logicaldoc.core.security.SecurablePersistentObject;
  * @author Marco Meschieri - LogicalDOC
  * @version 1.0
  */
-public class Menu extends SecurablePersistentObject implements Comparable<Menu> {
+@Entity
+@Table(name = "ld_menu")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class Menu extends PersistentObject implements Secure<AccessControlEntry>, Comparable<Menu> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -48,7 +69,7 @@ public class Menu extends SecurablePersistentObject implements Comparable<Menu> 
 	public static final long RATING = 1610;
 
 	public static final long PARAMETERS = 100;
-	
+
 	public static final long AUDITING = 106;
 
 	public static final long ADMIN_SESSIONS = 71;
@@ -73,29 +94,42 @@ public class Menu extends SecurablePersistentObject implements Comparable<Menu> 
 
 	public static final long DESTROY_DOCUMENTS = -9;
 
+	@Column(name = "ld_name", length = 255)
 	private String name = "";
 
-	private long parentId = 0;
-
-	private String icon = "";
-
-	private int type = TYPE_DEFAULT;
-
-	private String description = "";
-
+	@Column(name = "ld_position", nullable = false)
 	private int position = 1;
 
+	@Column(name = "ld_parentid", nullable = false)
+	private long parentId = 0;
+
+	@Column(name = "ld_icon", length = 255)
+	private String icon = "";
+
+	@Column(name = "ld_type", nullable = false)
+	private int type = TYPE_DEFAULT;
+
+	@Column(name = "ld_enabled", nullable = false)
 	private int enabled = 1;
+
+	@Column(name = "ld_description", length = 4000)
+	private String description = "";
 
 	/**
 	 * The declared routine to execute
 	 */
+	@Column(name = "ld_routineid")
 	private Long routineId;
 
 	/**
 	 * Automation script to execute(in absence of routine specification)
 	 */
+	@Column(name = "ld_automation")
 	private String automation;
+
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "ld_menu_acl", joinColumns = @JoinColumn(name = "ld_menuid"))
+	private Set<AccessControlEntry> accessControlList = new HashSet<>();
 
 	public Menu() {
 		super();
@@ -171,6 +205,29 @@ public class Menu extends SecurablePersistentObject implements Comparable<Menu> 
 
 	public void setAutomation(String automation) {
 		this.automation = automation;
+	}
+
+	@Override
+	public void setAccessControlList(Set<AccessControlEntry> acl) {
+		accessControlList = acl;
+	}
+
+	@Override
+	public Set<AccessControlEntry> getAccessControlList() {
+		return accessControlList;
+	}
+
+	@Override
+	public AccessControlEntry getAccessControlEntry(long groupId) {
+		return getAccessControlList().stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);
+	}
+
+	@Override
+	public void addAccessControlEntry(AccessControlEntry ace) {
+		if (!getAccessControlList().add(ace)) {
+			getAccessControlList().remove(ace);
+			getAccessControlList().add(ace);
+		}
 	}
 
 	@Override

@@ -1,6 +1,18 @@
 package com.logicaldoc.core.metadata;
 
-import com.logicaldoc.core.security.SecurableExtensibleObject;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * A base class for attribute sets and templates
@@ -9,7 +21,8 @@ import com.logicaldoc.core.security.SecurableExtensibleObject;
  * 
  * @since 8.8.3
  */
-public class AbstractAttributeSet extends SecurableExtensibleObject {
+@MappedSuperclass
+public abstract class AbstractAttributeSet extends ExtensibleObject {
 
 	private static final long serialVersionUID = 1L;
 
@@ -18,15 +31,212 @@ public class AbstractAttributeSet extends SecurableExtensibleObject {
 	 */
 	public static final int TYPE_DEFAULT = 0;
 
+	@Column(name = "ld_name", length = 255, nullable = false)
 	private String name;
 
+	@Column(name = "ld_label", length = 255)
 	private String label;
 
+	@Column(name = "ld_description", length = 2000)
 	private String description;
 
+	@Column(name = "ld_readonly", nullable = false)
 	private int readonly = 0;
 
+	@Column(name = "ld_type", nullable = false)
 	private int type = TYPE_DEFAULT;
+
+	public abstract Map<String, TemplateAttribute> getTemplateAttributes();
+
+	public abstract void setTemplateAttributes(Map<String, TemplateAttribute> templateAttributes);
+
+	public TemplateAttribute getTemplateAttribute(String name) {
+		return getTemplateAttributes().get(name);
+	}
+
+	@Override
+	public Map<String, Attribute> getAttributes() {
+		Map<String, Attribute> buf = new HashMap<>();
+		for (Map.Entry<String, TemplateAttribute> entry : getTemplateAttributes().entrySet())
+			buf.put(entry.getKey(), new Attribute(entry.getValue()));
+		return buf;
+	}
+
+	@Override
+	public void setAttributes(Map<String, Attribute> attributes) {
+		getTemplateAttributes().clear();
+		for (Map.Entry<String, ? extends Attribute> att : attributes.entrySet()) {
+			if (att.getValue() instanceof TemplateAttribute ta)
+				getTemplateAttributes().put(att.getKey(), ta);
+		}
+	}
+
+	@Override
+	public List<Attribute> getValueAttributes(String name) {
+		Set<String> valueNames = getValueAttributesName(name);
+
+		// The names are ordered
+		List<Attribute> values = new ArrayList<>();
+		for (String n : valueNames) {
+			TemplateAttribute val = getTemplateAttributes().get(n);
+			val.setName(n);
+			values.add(val);
+		}
+
+		return values;
+	}
+
+	public Set<String> getValueAttributesName(String name) {
+		TreeSet<String> attNames = new TreeSet<>();
+		for (String n : getTemplateAttributes().keySet()) {
+			if (n.equals(name) || name.equals(getAttribute(n).getParent()))
+				attNames.add(n);
+		}
+		return attNames;
+	}
+
+	@Override
+	public List<Object> getValues(String name) {
+		List<Attribute> attrs = getValueAttributes(name);
+		return attrs.stream().map(a -> a.getValue()).toList();
+	}
+
+	@Override
+	public Object getValue(String name) {
+		TemplateAttribute att = getAttribute(name);
+		if (att != null)
+			return att.getValue();
+		else
+			return null;
+	}
+
+	@Override
+	public TemplateAttribute getAttribute(String name) {
+		if (getTemplateAttributes() != null && getTemplateAttributes().get(name) != null)
+			return getTemplateAttributes().get(name);
+		else
+			return null;
+	}
+
+	@Override
+	public List<String> getAttributeNames() {
+		List<String> names = new ArrayList<>();
+		if (getTemplateAttributes() != null)
+			names = getTemplateAttributes().keySet().stream().toList();
+		return names;
+	}
+
+	@Override
+	public List<String> getAttributeNames(long setId) {
+		List<String> names = new ArrayList<>();
+		if (getTemplateAttributes() != null) {
+			for (String name : getTemplateAttributes().keySet()) {
+				Attribute att = getAttribute(name);
+				if (att.getSetId() != null && setId == att.getSetId())
+					names.add(name);
+			}
+		}
+		return names;
+	}
+
+	@Override
+	public void removeAttribute(String name) {
+		if (getTemplateAttributes() != null && getTemplateAttributes().containsKey(name)) {
+			Set<String> valueNames = getValueAttributesName(name);
+			for (String n : valueNames)
+				getTemplateAttributes().remove(n);
+		}
+	}
+
+	@Override
+	public TemplateAttribute getAttributeAtPosition(int position) {
+		if (position < 0)
+			return null;
+		List<TemplateAttribute> attrs = new ArrayList<>(getTemplateAttributes().values());
+		if (position >= attrs.size())
+			return null;
+		TemplateAttribute attribute = null;
+		for (TemplateAttribute extendedAttribute : attrs) {
+			if (extendedAttribute.getPosition() == position) {
+				attribute = extendedAttribute;
+				break;
+			}
+		}
+		return attribute;
+	}
+
+	@Override
+	public List<Attribute> setValues(String name, List<Object> values) {
+		// clean the attributes that store the actual multiple values
+		Set<String> valNames = getValueAttributesName(name);
+		for (String n : valNames) {
+			if (name.equals(n))
+				continue;
+			removeAttribute(n);
+		}
+
+		List<Attribute> attrs = new ArrayList<>();
+
+		if (CollectionUtils.isEmpty(values))
+			return attrs;
+
+		TemplateAttribute master = setValue(name, values.get(0));
+		attrs.add(master);
+
+		if (values.size() > 1) {
+			master.setMultiple(1);
+			NumberFormat nf = new DecimalFormat("0000");
+			for (int i = 1; i < values.size(); i++) {
+				TemplateAttribute attribute = setValue(name + "-" + nf.format(i), values.get(i));
+				attribute.setParent(name);
+				attrs.add(attribute);
+			}
+		}
+
+		for (Attribute attribute : attrs)
+			attribute.setPosition(master.getPosition());
+
+		return attrs;
+	}
+
+	@Override
+	public void setAttribute(String name, Attribute attr) {
+		if (attr instanceof TemplateAttribute attribute) {
+			TemplateAttribute newAttribute = new TemplateAttribute(attribute);
+			Attribute oldAttribute = getTemplateAttributes().get(name);
+			if (oldAttribute != null) {
+				newAttribute.setPosition(oldAttribute.getPosition());
+				newAttribute.setLabel(oldAttribute.getLabel());
+			} else {
+				newAttribute.setPosition(getLastPosition() + 1);
+			}
+			getTemplateAttributes().put(name, newAttribute);
+		}
+	}
+
+	@Override
+	public TemplateAttribute setValue(String name, Object value) {
+		TemplateAttribute ext = getAttribute(name);
+		if (ext == null) {
+			ext = new TemplateAttribute();
+			ext.setPosition(getLastPosition() + 1);
+		}
+		ext.setValue(value);
+		getTemplateAttributes().put(name, ext);
+		return ext;
+	}
+
+	private int getLastPosition() {
+		int position = 0;
+
+		if (getTemplateAttributes() != null)
+			for (TemplateAttribute att : getTemplateAttributes().values()) {
+				if (position < att.getPosition())
+					position = att.getPosition();
+			}
+
+		return position;
+	}
 
 	public String getName() {
 		return name;
@@ -69,6 +279,36 @@ public class AbstractAttributeSet extends SecurableExtensibleObject {
 	}
 
 	@Override
+	public Long getTemplateId() {
+		return null;
+	}
+
+	@Override
+	public void setTemplateId(Long templateId) {
+		// Not implemented
+	}
+
+	@Override
+	public String getTemplateName() {
+		return null;
+	}
+
+	@Override
+	public void setTemplateName(String templateName) {
+		// Not implemented
+	}
+
+	@Override
+	public Template getTemplate() {
+		return null;
+	}
+
+	@Override
+	public void setTemplate(Template template) {
+		// not implemented
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
@@ -92,4 +332,5 @@ public class AbstractAttributeSet extends SecurableExtensibleObject {
 			return false;
 		return true;
 	}
+
 }

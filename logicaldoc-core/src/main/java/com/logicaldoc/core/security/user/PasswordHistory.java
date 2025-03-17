@@ -3,6 +3,14 @@ package com.logicaldoc.core.security.user;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import com.logicaldoc.core.PersistentObject;
 
 /**
@@ -12,15 +20,22 @@ import com.logicaldoc.core.PersistentObject;
  * 
  * @version 8.6.1
  */
+@Entity
+@Table(name = "ld_password_history")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class PasswordHistory extends PersistentObject implements Serializable, Comparable<PasswordHistory> {
 
 	private static final long serialVersionUID = 1L;
 
+	@Column(name = "ld_userid", nullable = false) 
 	private long userId;
 
-	private String password = "";
-
+	@Column(name = "ld_date")
 	private Date date = new Date();
+	
+	@Column(name = "ld_password")
+	private String password = "";
 
 	public long getUserId() {
 		return userId;

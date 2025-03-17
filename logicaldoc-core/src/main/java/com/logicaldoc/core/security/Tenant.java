@@ -6,7 +6,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import com.logicaldoc.core.PersistentObject;
 
@@ -18,6 +25,10 @@ import com.logicaldoc.core.PersistentObject;
  * 
  * @version 6.9
  */
+@Entity
+@Table(name = "ld_tenant")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Tenant extends PersistentObject implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -32,45 +43,64 @@ public class Tenant extends PersistentObject implements Serializable {
 
 	public static final int DEFAULT_TYPE = 0;
 
+	@Column(name = "ld_name", length = 255, nullable = false)
 	private String name;
 
+	@Column(name = "ld_displayname", length = 4000)
 	private String displayName;
-
+	
+	@Column(name = "ld_enabled", nullable = false)
+	private int enabled = 1;
+	
+	@Column(name = "ld_expire")
+	private Date expire;
+	
+	@Column(name = "ld_street", length = 255)
 	private String street;
-
+	
+	@Column(name = "ld_postalcode", length = 255)
 	private String postalCode;
 
+	@Column(name = "ld_city", length = 255)
 	private String city;
 
+	@Column(name = "ld_country", length = 255)
+	private String country;
+	
+	@Column(name = "ld_state", length = 255)
 	private String state;
 
-	private String country;
-
+	@Column(name = "ld_email", length = 255)
 	private String email;
 
+	@Column(name = "ld_telephone", length = 255)
 	private String telephone;
 
+	@Column(name = "ld_type", nullable = false)
 	private int type = DEFAULT_TYPE;
 
+	@Column(name = "ld_maxusers", nullable = true)
 	private Integer maxUsers;
 
+	@Column(name = "ld_maxguests", nullable = true)
 	private Integer maxGuests;
 
+	@Column(name = "ld_maxsessions", nullable = true)
 	private Integer maxSessions;
 
+	@Column(name = "ld_maxrepodocs", nullable = true)
 	private Long maxRepoDocs;
-
-	private int enabled = 1;
-
-	private Date expire;
 
 	/**
 	 * Maximum repository size expressed in MB
 	 */
+	@Column(name = "ld_maxreposize", nullable = true)
 	private Long maxRepoSize;
-
+	
+	@Column(name = "ld_qthreshold")
 	private Integer quotaThreshold = null;
-
+	
+	@Column(name = "ld_qrecipients", length = 1000)
 	private String quotaAlertRecipients = null;
 
 	public Tenant() {

@@ -44,7 +44,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	public Document findByCustomId(String customId, long tenantId) throws PersistenceException;
 
 	/**
-	 * Finds all documents for an user.
+	 * Finds all documents for a user.
 	 * 
 	 * @param userId ID of the user.
 	 * @return Collection of all documentId required for the specified user.

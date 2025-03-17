@@ -4,6 +4,14 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +32,10 @@ import com.logicaldoc.util.Context;
  * @author Marco Meschieri
  * @version 1.0
  */
+@Entity
+@Table(name = "ld_group")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Group extends PersistentObject implements Serializable {
 
 	private static final long serialVersionUID = 2L;
@@ -40,21 +52,26 @@ public class Group extends PersistentObject implements Serializable {
 
 	public static final int TYPE_USER = 1;
 
+	@Column(name = "ld_name", length = 255, nullable = false)
 	private String name = "";
 
+	@Column(name = "ld_description", length = 255)
 	private String descriprion = "";
-
-	private int type = TYPE_DEFAULT;
 
 	/**
 	 * Specifies the source: 'local' indicates the group was created in the
 	 * local database
 	 */
+	@Column(name = "ld_source", length = 255)
 	private String source = "local";
+
+	@Column(name = "ld_type", nullable = false)
+	private int type = TYPE_DEFAULT;
 
 	/**
 	 * Not persistent
 	 */
+	@Transient
 	private Set<User> users = new HashSet<>();
 
 	public int getType() {

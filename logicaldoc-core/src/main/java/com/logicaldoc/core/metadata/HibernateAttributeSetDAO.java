@@ -133,4 +133,16 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 
 		return attributes;
 	}
+
+	@Override
+	public void initialize(AttributeSet attributeSet) throws PersistenceException {
+		try {
+			refresh(attributeSet);
+
+			log.trace("Initialized {} attributes", attributeSet.getTemplateAttributes().size());
+		} catch (Exception e) {
+			if (log.isErrorEnabled())
+				log.error(e.getMessage(), e);
+		}
+	}
 }

@@ -49,12 +49,12 @@ public class FolderComparatorTest extends AbstractCoreTestCase {
 
 		Folder folder1 = new Folder();
 		folder1.setName("folder1");
-		folder1.setTemplateName("folder1Templ");
+		folder1.setTemplate(template1);
 		testSubject.store(folder1);
 
 		Folder folder2 = new Folder();
 		folder2.setName("folder2");
-		folder2.setTemplateName("folder2Templ");
+		folder2.setTemplate(template2);
 		testSubject.store(folder2);
 
 		Folder folder3 = new Folder();

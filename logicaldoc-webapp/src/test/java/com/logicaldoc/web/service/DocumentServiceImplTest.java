@@ -131,7 +131,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Override
-	public void tearDown() throws SQLException, IOException {
+	public void tearDown() throws SQLException {
 		searchEngine.unlock();
 		searchEngine.close();
 
@@ -1077,7 +1077,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		templateDao.initialize(template);
 
 		// Set the validator for attribute "attr1" to be email format
-		template.getAttribute("attr1").setValidation(
+		template.getTemplateAttribute("attr1").setValidation(
 				"#if(!$value.matches('^([\\w-\\.]+){1,64}@([\\w&&[^_]]+){2,255}.[a-z]{2,}$')) $error.setDescription($I18N.get('invalidformat')); #end");
 		templateDao.store(template);
 
@@ -1090,9 +1090,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		 * validate a document with template assigned
 		 */
 
-		// // The value of attribute "attr1" is: "val1" so this should produce
+		// The value of attribute "attr1" is: "val1" so this should produce
 		// an error
-
 		try {
 			testSubject.validate(gdoc);
 			fail("Expected exception was not thrown");

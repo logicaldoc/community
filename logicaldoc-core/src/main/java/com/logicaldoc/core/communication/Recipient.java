@@ -2,6 +2,9 @@ package com.logicaldoc.core.communication;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -9,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
  * 
  * @author Michael Scholz
  */
+@Embeddable
 public class Recipient implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -26,18 +30,23 @@ public class Recipient implements Serializable {
 	public static final String MODE_EMAIL_REPLYTO = "REPLYTO";
 
 	// The login
+	@Column(name = "ld_name", nullable = false)
 	private String name = "";
 
 	// The system login or the email address
+	@Column(name = "ld_address", nullable = false)
 	private String address = "";
 
 	// The recipient mode (for the system message is not useful, for the email
 	// can be To, CC, CCN, ecc.)
+	@Column(name = "ld_mode", nullable = false)
 	private String mode = MODE_EMAIL_TO;
 
 	// The recipient type (i.e. system, user, group, email)
+	@Column(name = "ld_type", nullable = false)
 	private int type = TYPE_SYSTEM;
 
+	@Column(name = "ld_read", nullable = false)
 	private int read = 0;
 
 	public Recipient(String name, String address) {
@@ -84,7 +93,7 @@ public class Recipient implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return  address.hashCode();
+		return address.hashCode();
 	}
 
 	public String getMode() {
