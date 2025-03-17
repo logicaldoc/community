@@ -3,8 +3,20 @@ package com.logicaldoc.core.metadata;
 import java.util.List;
 import java.util.Map;
 
+import com.logicaldoc.core.PersistentObject;
+
+/**
+ * Interface to be implemented by those {@link PersistentObject}s that have extensible attribtues
+ * 
+ * @author Giuseppe Desiato - LogicalDOC
+ * @since 9.2
+ */
 public interface Extensible {
 
+	public Map<String, Attribute> getAttributes();
+
+	public void setAttributes(Map<String, Attribute> attributes);
+	
 	public Long getTemplateId();
 
 	public void setTemplateId(Long templateId);
@@ -16,10 +28,6 @@ public interface Extensible {
 	public Template getTemplate();
 
 	public void setTemplate(Template template);
-
-	public Map<String, Attribute> getAttributes();
-
-	public void setAttributes(Map<String, Attribute> attributes);
 
 	public List<Attribute> getValueAttributes(String name);
 

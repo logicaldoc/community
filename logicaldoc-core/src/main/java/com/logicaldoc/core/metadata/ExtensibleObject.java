@@ -25,23 +25,6 @@ public abstract class ExtensibleObject extends PersistentObject implements Exten
 
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Retrieves the ordered set of the names of the attributes representing the
-	 * different values
-	 * 
-	 * @param name name of the attribute to get values from
-	 * 
-	 * @return the set of names
-	 */
-	private Set<String> getValueAttributesName(String name) {
-		TreeSet<String> attNames = new TreeSet<>();
-		for (String n : getAttributes().keySet()) {
-			if (n.equals(name) || name.equals(getAttribute(n).getParent()))
-				attNames.add(n);
-		}
-		return attNames;
-	}
-
 	@Override
 	public List<Attribute> getValueAttributes(String name) {
 		Set<String> valueNames = getValueAttributesName(name);
@@ -204,4 +187,22 @@ public abstract class ExtensibleObject extends PersistentObject implements Exten
 
 		return position;
 	}
+	
+	/**
+	 * Retrieves the ordered set of the names of the attributes representing the
+	 * different values
+	 * 
+	 * @param name name of the attribute to get values from
+	 * 
+	 * @return the set of names
+	 */
+	private Set<String> getValueAttributesName(String name) {
+		TreeSet<String> attNames = new TreeSet<>();
+		for (String n : getAttributes().keySet()) {
+			if (n.equals(name) || name.equals(getAttribute(n).getParent()))
+				attNames.add(n);
+		}
+		return attNames;
+	}
+
 }

@@ -237,16 +237,6 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 		return sb.toString();
 	}
 
-	@Override
-	public Set<DocumentAccessControlEntry> getAccessControlList() {
-		return accessControlList;
-	}
-
-	@Override
-	public void setAccessControlList(Set<DocumentAccessControlEntry> accessControlList) {
-		this.accessControlList = accessControlList;
-	}
-
 	public void addTag(String word) {
 		Tag tg = new Tag();
 		tg.setTenantId(getTenantId());
@@ -340,6 +330,16 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 		this.template = template;
 	}
 
+	@Override
+	public Set<DocumentAccessControlEntry> getAccessControlList() {
+		return accessControlList;
+	}
+
+	@Override
+	public void setAccessControlList(Set<DocumentAccessControlEntry> accessControlList) {
+		this.accessControlList = accessControlList;
+	}
+	
 	@Override
 	public AccessControlEntry getAccessControlEntry(long groupId) {
 		return getAccessControlList().stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);
