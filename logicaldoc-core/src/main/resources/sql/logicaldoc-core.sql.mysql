@@ -95,7 +95,7 @@ create table ld_attributeset_ext (ld_attsetid bigint not null, ld_mandatory int 
                                   ld_intvalue bigint, ld_doublevalue double, ld_datevalue datetime null, ld_validation varchar(4000),
                                   ld_initialization varchar(4000), ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint, 
                                   ld_hidden int not null, ld_readonly int not null, ld_multiple int not null, ld_parent varchar(255), 
-                                  ld_dependson varchar(255), primary key (ld_setid, ld_name)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+                                  ld_dependson varchar(255), primary key (ld_attsetid, ld_name)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_ticket (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_ticketid varchar(255) not null, 
                         ld_docid bigint not null, ld_userid bigint not null, ld_type int not null, 
