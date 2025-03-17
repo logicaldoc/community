@@ -142,7 +142,6 @@ public class Automation {
 	 * 
 	 * @return The complete dictionary to use
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private Map<String, Object> prepareDictionary(Map<String, Object> clientDictionary) {
 		if (clientDictionary == null)
 			clientDictionary = new ConcurrentHashMap<>();
@@ -157,7 +156,7 @@ public class Automation {
 			String beanClassName = bd.getBeanClassName();
 
 			try {
-				Class beanClass = Class.forName(beanClassName);
+				Class<?> beanClass = Class.forName(beanClassName);
 
 				String key = beanClass.getSimpleName();
 				AutomationDictionary annotation = (AutomationDictionary) beanClass

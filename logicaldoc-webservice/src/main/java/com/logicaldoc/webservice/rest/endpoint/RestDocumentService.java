@@ -280,18 +280,20 @@ public class RestDocumentService extends SoapDocumentService implements Document
 			@ApiResponse(responseCode = "401", description = "Authentication failed"),
 			@ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
 	@RequestBody(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @Schema(implementation = ReplaceFileMultipartRequest.class), encoding = @Encoding(name = "file", contentType = "application/octet-stream")))
-	public void replaceFile(@Multipart(value = "docId", required = true)
-	Integer docId, @Multipart(value = "fileVersion", required = false)
-	String fileVersion, @Multipart(value = "comment", required = false)
-	String comment, @Multipart(value = "filedata", required = true)
-	Attachment filedataDetail) {
+	public void replaceFile(
+			@Multipart(value = "docId", required = true) String docId, 
+			@Multipart(value = "fileVersion", required = false)	String fileVersion, 
+			@Multipart(value = "comment", required = false)	String comment, 
+			@Multipart(value = "filedata", required = true)	Attachment filedataDetail) {
 
 		String sid = validateSessionREST();
 
 		try {
 			DataHandler datah = filedataDetail.getDataHandler();
+			
+			Long docIdLong = Long.parseLong(docId);
 
-			super.replaceFile(sid, docId, fileVersion, comment, datah);
+			super.replaceFile(sid, docIdLong, fileVersion, comment, datah);
 		} catch (Exception t) {
 			throw new WebApplicationException(t.getMessage(), 500);
 		}
@@ -799,18 +801,20 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Operation(summary = "Uploads a new resource of the document", description = "Uploads a new resource attached to the given document. If the resource already exists it is overwritten")
 	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "successful operation") })
 	@RequestBody(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA, schema = @Schema(implementation = UploadResourceMultipartRequest.class), encoding = @Encoding(name = "file", contentType = "application/octet-stream")))
-	public void uploadResource(@Multipart(value = "docId", required = true)
-	Integer docId, @Multipart(value = "fileVersion", required = false)
-	String fileVersion, @Multipart(value = "suffix", required = true)
-	String suffix, @Multipart(value = "content", required = true)
-	Attachment contentDetail) throws AuthenticationException, PermissionException, WebserviceException,
-			PersistenceException, IOException {
+	public void uploadResource(
+			@Multipart(value = "docId", required = true) String docId, 
+			@Multipart(value = "fileVersion", required = false) String fileVersion, 
+			@Multipart(value = "suffix", required = true) String suffix, 
+			@Multipart(value = "content", required = true) Attachment contentDetail) 
+					throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException {
 
 		String sid = validateSessionREST();
 
 		DataHandler datah = contentDetail.getDataHandler();
 
-		super.uploadResource(sid, docId, fileVersion, suffix, datah);
+		Long docIdLong = Long.parseLong(docId);
+
+		super.uploadResource(sid, docIdLong, fileVersion, suffix, datah);
 	}
 
 	public class UploadResourceMultipartRequest {

@@ -145,11 +145,11 @@ public interface DocumentService {
 			@ApiResponse(responseCode = "400", description = "bad request"),
 			@ApiResponse(responseCode = "401", description = "Authentication failed"),
 			@ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
-	public void replaceFile(@Multipart(value = "docId", required = false)
-	Integer docId, @Multipart(value = "fileVersion", required = false)
-	String fileVersion, @Multipart(value = "comment", required = false)
-	String comment, @Multipart(value = "filedata", required = false)
-	Attachment filedataDetail);
+	public void replaceFile(
+			@Multipart(value = "docId", required = false) String docId, 
+			@Multipart(value = "fileVersion", required = false)	String fileVersion, 
+			@Multipart(value = "comment", required = false)	String comment, 
+			@Multipart(value = "filedata", required = false) Attachment filedataDetail);
 
 	/**
 	 * Uploads a document
@@ -916,11 +916,11 @@ public interface DocumentService {
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Operation(summary = "Uploads a new resource of the document")
 	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "successful operation") })
-	public void uploadResource(@Multipart(value = "docId", required = false)
-	Integer docId, @Multipart(value = "fileVersion", required = false)
-	String fileVersion, @Multipart(value = "suffix", required = false)
-	String suffix, @Multipart(value = "content", required = false)
-	Attachment contentDetail)
+	public void uploadResource(
+			@Multipart(value = "docId", required = false) String docId, 
+			@Multipart(value = "fileVersion", required = false)	String fileVersion, 
+			@Multipart(value = "suffix", required = false) String suffix, 
+			@Multipart(value = "content", required = false)	Attachment contentDetail)
 			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException, IOException;
 
 	/**

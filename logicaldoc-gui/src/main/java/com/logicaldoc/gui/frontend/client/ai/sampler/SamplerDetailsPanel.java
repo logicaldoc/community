@@ -1,51 +1,51 @@
-package com.logicaldoc.gui.frontend.client.impex.syndication;
+package com.logicaldoc.gui.frontend.client.ai.sampler;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
-import com.logicaldoc.gui.common.client.beans.GUISyndication;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
-import com.logicaldoc.gui.frontend.client.services.SyndicationService;
+import com.logicaldoc.gui.frontend.client.ai.AIService;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 
 /**
- * This panel collects details about a syndication
+ * This panel collects details about a sampler
  * 
  * @author Marco Meschieri - LogicalDOC
- * @since 8.1.2
+ * @since 9.2
  */
-public class SyndicationDetailsPanel extends VLayout {
-	private GUISyndication syndication;
+public class SamplerDetailsPanel extends VLayout {
+	private GUISampler sampler;
 
 	private Layout standardTabPanel;
 
-	private SyndicationStandardProperties standardPanel;
+	private SamplerStandardProperties standardPanel;
 
 	private EditingTabSet tabSet;
 
-	private SamplersPanel syndicationsPanel;
+	private SamplersPanel samplersPanel;
 
-	public SyndicationDetailsPanel(SamplersPanel syndicationsPanel) {
+	public SamplerDetailsPanel(SamplersPanel samplersPanel) {
 		super();
 
-		this.syndicationsPanel = syndicationsPanel;
+		this.samplersPanel = samplersPanel;
 		setHeight100();
 		setWidth100();
 		setMembersMargin(10);
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
-			if (syndication.getId() != 0) {
-				SyndicationService.Instance.get().getSyndication(syndication.getId(), new DefaultAsyncCallback<>() {
+			if (sampler.getId() != 0) {
+				AIService.Instance.get().getSampler(sampler.getId(), new DefaultAsyncCallback<>() {
+
 					@Override
-					public void onSuccess(GUISyndication share) {
-						setSyndication(share);
+					public void onSuccess(GUISampler sampler) {
+						setSampler(sampler);
 					}
+
 				});
 			} else {
-				GUISyndication newSyndication = new GUISyndication();
-				setSyndication(newSyndication);
+				setSampler(new GUISampler());
 			}
 			tabSet.hideSave();
 		});
@@ -72,17 +72,17 @@ public class SyndicationDetailsPanel extends VLayout {
 				standardTabPanel.removeMember(standardPanel);
 		}
 
-		standardPanel = new SyndicationStandardProperties(syndication, event -> onModified());
+		standardPanel = new SamplerStandardProperties(sampler, event -> onModified());
 		standardTabPanel.addMember(standardPanel);
 
 	}
 
-	public GUISyndication getShare() {
-		return syndication;
+	public GUISampler getShare() {
+		return sampler;
 	}
 
-	public void setSyndication(GUISyndication share) {
-		this.syndication = share;
+	public void setSampler(GUISampler sampler) {
+		this.sampler = sampler;
 		refresh();
 	}
 
@@ -99,19 +99,19 @@ public class SyndicationDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (validate()) {
-			SyndicationService.Instance.get().save(syndication, new DefaultAsyncCallback<>() {
+			AIService.Instance.get().saveSampler(sampler, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUISyndication syndication) {
+				public void onSuccess(GUISampler sampler) {
 					tabSet.hideSave();
-					if (syndication != null) {
-						syndicationsPanel.updateRecord(syndication);
-						syndicationsPanel.showSyndicationDetails(syndication);
+					if (sampler != null) {
+						samplersPanel.updateRecord(sampler);
+						samplersPanel.showSamplerDetails(sampler);
 					}
 				}
 			});
 		}
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

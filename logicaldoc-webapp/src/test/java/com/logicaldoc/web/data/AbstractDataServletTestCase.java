@@ -28,7 +28,7 @@ public abstract class AbstractDataServletTestCase extends AbstractWebappTestCase
 
 	@Override
 	@After
-	public void tearDown() throws SQLException {
+	public void tearDown() throws SQLException, IOException {
 		super.tearDown();
 		clearResponseFile();
 	}

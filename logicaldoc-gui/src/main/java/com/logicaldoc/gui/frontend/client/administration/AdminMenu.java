@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.administration;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.frontend.client.ai.AIMenu;
 import com.logicaldoc.gui.frontend.client.impex.ImpexMenu;
 import com.logicaldoc.gui.frontend.client.metadata.MetadataMenu;
 import com.logicaldoc.gui.frontend.client.reports.ReportsMenu;
@@ -70,6 +71,12 @@ public class AdminMenu extends SectionStack {
 			addSection(toolsSection);
 		}
 
+		if (Feature.visible(Feature.ARTIFICIAL_INTELLIGENCE) && Menu.enabled(Menu.ARTIFICIAL_INTELLIGENCE)) {
+			SectionStackSection aiSection = new SectionStackSection(I18N.message("artificialintelligence"));
+			aiSection.setExpanded(false);
+			aiSection.addItem(new AIMenu());
+			addSection(aiSection);
+		}
 		if (Menu.enabled(Menu.SETTINGS)) {
 			SectionStackSection settingsSection = new SectionStackSection(I18N.message("settings"));
 			settingsSection.setExpanded(false);

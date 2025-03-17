@@ -60,7 +60,7 @@ public class DashletContentTest extends AbstractCoreTestCase {
 	}
 
 	@Override
-	public void tearDown() throws SQLException {
+	public void tearDown() throws SQLException, IOException {
 		super.tearDown();
 		FileUtil.delete(responseFile);
 	}

@@ -31,15 +31,18 @@ public class LogConfiguratorTest {
 	@Test
 	public void testGetLoggers() {
 		LogConfigurator config = new LogConfigurator();
-		Assert.assertTrue(config.getLoggers().stream().map(l->l.getAttributeValue("name")).toList().contains("com.logicaldoc.core"));
+		Assert.assertTrue(config.getLoggers().stream().map(l -> l.getAttributeValue("name")).toList()
+				.contains("com.logicaldoc.core"));
 	}
-	
+
 	@Test
 	public void testRemoveLogger() {
 		LogConfigurator config = new LogConfigurator();
-		Assert.assertTrue(config.getLoggers().stream().map(l->l.getAttributeValue("name")).toList().contains("com.logicaldoc.core"));
+		Assert.assertTrue(config.getLoggers().stream().map(l -> l.getAttributeValue("name")).toList()
+				.contains("com.logicaldoc.core"));
 		config.removeLogger("com.logicaldoc.core");
-		Assert.assertFalse(config.getLoggers().stream().map(l->l.getAttributeValue("name")).toList().contains("com.logicaldoc.core"));
+		Assert.assertFalse(config.getLoggers().stream().map(l -> l.getAttributeValue("name")).toList()
+				.contains("com.logicaldoc.core"));
 	}
 
 	@Test
@@ -49,7 +52,7 @@ public class LogConfiguratorTest {
 		config.setRootLevel("debug");
 		Assert.assertEquals("debug", config.getRootLevel());
 	}
-	
+
 	@Test
 	public void testGetFile() {
 		LogConfigurator config = new LogConfigurator();

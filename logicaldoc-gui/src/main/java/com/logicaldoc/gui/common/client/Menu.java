@@ -219,6 +219,8 @@ public class Menu {
 
 	public static final long GOOGLE_CALENDAR = -2081;
 
+	public static final long ARTIFICIAL_INTELLIGENCE = 3000;
+
 	private static Set<Long> menus = new HashSet<>();
 
 	private Menu() {
