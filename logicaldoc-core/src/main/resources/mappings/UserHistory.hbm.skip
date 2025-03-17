@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-lazy="false">
+	<class name="com.logicaldoc.core.security.user.UserHistory" table="ld_user_history"
+		where="ld_deleted=0">
+		<cache usage="read-write" />
+		<id name="id" type="long" column="ld_id" unsaved-value="0">
+			<generator class="org.hibernate.id.enhanced.TableGenerator">
+				<param name="segment_value">ld_user_history</param>
+				<param name="optimizer">org.hibernate.id.enhanced.HiLoOptimizer</param>
+			</generator>
+		</id>
+		<version name="recordVersion" column="ld_recordversion" type="long" />
+		<property name="lastModified" type="timestamp" column="ld_lastmodified" not-null="true"/>
+		<property name="creation" type="timestamp" column="ld_creation" not-null="true" />
+		<property name="deleted" type="int" column="ld_deleted" not-null="true" />
+		<property name="tenantId" type="long" column="ld_tenantid" not-null="true" />
+		<property name="docId" type="long" column="ld_docid"/>
+		<property name="folderId" type="long" column="ld_folderid" />
+		<property name="userId" type="long" column="ld_userid" />
+		<property name="date" type="timestamp" column="ld_date" />
+		<property name="username" type="string" column="ld_username" length="255" />
+		<property name="userLogin" type="string" column="ld_userlogin" length="255" />
+		<property name="event" type="string" column="ld_event" length="255" />
+		<property name="comment" type="string" column="ld_comment" length="4000" />
+		<property name="reason" type="string" column="ld_reason" length="4000" />
+		<property name="notified" type="int" column="ld_notified" not-null="true" />
+		<property name="sessionId" type="string" column="ld_sessionid" length="255" />
+		<property name="keyLabel" type="string" column="ld_keylabel" length="255" />
+		<property name="isNew" type="int" column="ld_new" />
+		<property name="filename" type="string" column="ld_filename" length="255" />
+		<property name="fileSize" type="long" column="ld_filesize"/>
+		<property name="ip" type="string" column="ld_ip" length="255" />
+		<property name="author" type="string" column="ld_author" length="255" />
+		<property name="geolocation" type="string" column="ld_geolocation" length="255" />
+        <property name="device" type="string" column="ld_device" length="255" />
+        <property name="path" type="string" column="ld_path" length="4000" />
+	</class>
+</hibernate-mapping>
