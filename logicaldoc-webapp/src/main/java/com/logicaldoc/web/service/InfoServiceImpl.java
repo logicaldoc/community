@@ -26,6 +26,7 @@ import com.logicaldoc.core.i18n.Language;
 import com.logicaldoc.core.i18n.LanguageManager;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
+import com.logicaldoc.core.metadata.TemplateAttribute;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
@@ -140,10 +141,10 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 				log.debug("Tenant with name {} not found, fallback to the default", tenantName);
 				tenant = tDAO.findById(Tenant.DEFAULT_ID);
 			}
-			Map<String, Attribute> attributes = aDAO.findAttributes(tenant.getId(), null);
+			Map<String, TemplateAttribute> attributes = aDAO.findAttributes(tenant.getId(), null);
 			List<GUIAttribute> guiAttributes = new ArrayList<>();
 
-			for (Map.Entry<String, Attribute> entry : attributes.entrySet()) {
+			for (Map.Entry<String, TemplateAttribute> entry : attributes.entrySet()) {
 				Attribute att = entry.getValue();
 				GUIAttribute guiAtt = new GUIAttribute();
 				guiAtt.setName(entry.getKey());

@@ -3,7 +3,6 @@ package com.logicaldoc.core.metadata;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,10 +55,7 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
 
 	@Override
 	public Map<String, Attribute> getAttributes() {
-		Map<String, Attribute> buf = new HashMap<>();
-		for (Map.Entry<String, TemplateAttribute> entry : getTemplateAttributes().entrySet())
-			buf.put(entry.getKey(), new Attribute(entry.getValue()));
-		return buf;
+		return new AttributeMapWrapper(getTemplateAttributes());
 	}
 
 	@Override

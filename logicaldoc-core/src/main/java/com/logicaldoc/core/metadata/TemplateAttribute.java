@@ -23,7 +23,7 @@ public class TemplateAttribute extends Attribute {
 	public TemplateAttribute() {
 		super();
 	}
-	
+
 	public TemplateAttribute(TemplateAttribute source) {
 		super(source);
 		this.validation = source.validation;

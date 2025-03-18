@@ -115,18 +115,18 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	}
 
 	@Override
-	public Map<String, Attribute> findAttributes(long tenantId, Long setId) throws PersistenceException {
+	public Map<String, TemplateAttribute> findAttributes(long tenantId, Long setId) throws PersistenceException {
 		List<AttributeSet> sets = new ArrayList<>();
 		if (setId != null)
 			sets.add(findById(setId));
 		else
 			sets.addAll(findAll(tenantId));
 
-		Map<String, Attribute> attributes = new TreeMap<>();
+		Map<String, TemplateAttribute> attributes = new TreeMap<>();
 		for (AttributeSet set : sets) {
 			initialize(set);
-			Map<String, Attribute> localAttributes = set.getAttributes();
-			for (Map.Entry<String, Attribute> entry : localAttributes.entrySet())
+			Map<String, TemplateAttribute> localAttributes = set.getTemplateAttributes();
+			for (Map.Entry<String, TemplateAttribute> entry : localAttributes.entrySet())
 				if (!attributes.containsKey(entry.getKey()))
 					attributes.put(entry.getKey(), entry.getValue());
 		}

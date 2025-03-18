@@ -40,9 +40,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
+import com.logicaldoc.core.metadata.TemplateAttribute;
 import com.logicaldoc.util.Context;
 
 /**
@@ -339,7 +339,7 @@ public class TypeManager {
 		List<AttributeSet> sets = dao.findAll();
 		for (AttributeSet set : sets) {
 			dao.initialize(set);
-			Map<String, Attribute> attributes = set.getAttributes();
+			Map<String, TemplateAttribute> attributes = set.getTemplateAttributes();
 			for (String name : attributes.keySet()) {
 				type.addPropertyDefinition(createPropDef(PROP_EXT + name, name, name, PropertyType.STRING,
 						Cardinality.SINGLE, Updatability.READWRITE, false, false));
