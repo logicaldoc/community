@@ -69,6 +69,7 @@
             </props>
         </property>
     </bean>
+    
     <!--Transaction management -->
     <bean id="TransactionManager"
         class="org.springframework.orm.hibernate5.HibernateTransactionManager"

@@ -1,12 +1,10 @@
 package com.logicaldoc.web.websockets;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
-import javax.print.Doc;
 import javax.websocket.Session;
 
 import org.junit.After;
@@ -40,7 +38,7 @@ public class EventEndpointTest extends AbstractWebappTestCase {
 	}
 
 	@After
-	public void tearDown() throws SQLException {
+	public void tearDown() throws SQLException, IOException {
 		endpoint.onClose(websocketSession);
 		super.tearDown();
 	}

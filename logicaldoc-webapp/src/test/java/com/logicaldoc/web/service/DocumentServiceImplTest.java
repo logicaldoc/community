@@ -131,7 +131,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Override
-	public void tearDown() throws SQLException {
+	public void tearDown() throws SQLException, IOException {
 		searchEngine.unlock();
 		searchEngine.close();
 
