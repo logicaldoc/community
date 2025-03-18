@@ -361,7 +361,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			AttributeSet set = dao.findById(setId);
 			dao.initialize(set);
 
-			TemplateAttribute setAttribute = (TemplateAttribute) set.getAttribute(attribute);
+			TemplateAttribute setAttribute = set.getTemplateAttributes().get(attribute);
 			if (setAttribute == null)
 				return;
 
@@ -385,7 +385,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
 			AttributeSet set = dao.findById(setId);
 			dao.initialize(set);
-			TemplateAttribute setAttribute = (TemplateAttribute) set.getAttribute(attribute);
+			TemplateAttribute setAttribute = set.getTemplateAttributes().get(attribute);
 			if (setAttribute == null)
 				return;
 
@@ -408,7 +408,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		try {
 			AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
 			AttributeSet set = dao.findById(setId);
-			Attribute setAttribute = set.getAttribute(attributeName);
+			TemplateAttribute setAttribute = set.getTemplateAttributes().get(attributeName);
 
 			TemplateDAO templateDao = Context.get(TemplateDAO.class);
 
@@ -418,7 +418,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			List<Template> templates = templateDao.findAll(set.getTenantId());
 			for (Template template : templates) {
 				templateDao.initialize(template);
-				template.getAttributes().put(attributeName, new Attribute(setAttribute));
+				template.getTemplateAttributes().put(attributeName, new TemplateAttribute(setAttribute));
 				templateDao.store(template);
 			}
 		} catch (Exception t) {

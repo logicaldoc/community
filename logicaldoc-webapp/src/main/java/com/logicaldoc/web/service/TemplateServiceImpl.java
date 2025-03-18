@@ -417,7 +417,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			for (String attrName : template.getAttributeNames()) {
 				Attribute templateExtAttr = attrs.get(attrName);
 				AttributeSet aSet = sets.get(templateExtAttr.getSetId());
-				Attribute setExtAttr = aSet != null ? aSet.getAttribute(attrName) : null;
+				TemplateAttribute setExtAttr = aSet != null ? aSet.getAttribute(attrName) : null;
 
 				addGuiAttribute(extensibleObject, attrName, attributes, templateExtAttr, setExtAttr);
 			}
@@ -434,7 +434,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		if (template != null) {
 			try {
 				template.getAttributes();
-				int attrsCount = template.getAttributes().size();
+				int attrsCount = template.getTemplateAttributes().size();
 				if (log.isDebugEnabled())
 					log.debug("Initialized {} attributes", attrsCount);
 			} catch (LazyInitializationException e) {

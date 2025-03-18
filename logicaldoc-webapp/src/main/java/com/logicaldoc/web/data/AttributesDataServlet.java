@@ -16,6 +16,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
 import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.metadata.TemplateAttribute;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.i18n.I18N;
@@ -89,7 +90,7 @@ public class AttributesDataServlet extends AbstractDataServlet {
 		/*
 		 * Iterate over the collection of extended attributes
 		 */
-		Map<String, Attribute> attributes = new HashMap<>();
+		Map<String, TemplateAttribute> attributes = new HashMap<>();
 		if (templateId == null) {
 			AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
 			attributes = dao.findAttributes(session.getTenantId(), null);
@@ -102,7 +103,7 @@ public class AttributesDataServlet extends AbstractDataServlet {
 				attributes.put(name, template.getAttribute(name));
 		}
 
-		for (Map.Entry<String, Attribute> entry : attributes.entrySet()) {
+		for (Map.Entry<String, TemplateAttribute> entry : attributes.entrySet()) {
 			Attribute attribute = entry.getValue();
 			if (attribute.getHidden() == 1 || (!sections && attribute.isSection()))
 				continue;
