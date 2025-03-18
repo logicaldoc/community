@@ -99,12 +99,14 @@ public class SamplerProperties extends SamplerDetailsTab {
 		delimiter.setRequired(true);
 		delimiter.setWidth(50);
 		delimiter.setLength(1);
+		delimiter.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, "csv"));
 		
 		TextItem quote = ItemFactory.newSimpleTextItem("quote", sampler.getQuote());
 		quote.addChangedHandler(changedHandler);
 		quote.setRequired(true);
 		quote.setWidth(50);
 		quote.setLength(1);
+		quote.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, "csv"));
 		
 		SelectItem type = ItemFactory.newSelectItem(TYPE);
 		type.setOptionDataSource(new SamplerTypeDS());
