@@ -87,9 +87,8 @@ public class FolderSelector extends TextItem {
 		icons.add(search);
 		icons.add(open);
 		icons.add(clear);
-		if (additionalIcons != null && !additionalIcons.isEmpty()) {
+		if (additionalIcons != null && !additionalIcons.isEmpty())
 			icons.addAll(additionalIcons);
-		}
 		setIcons(icons.toArray(new FormItemIcon[0]));
 
 		addChangedHandler(event -> {

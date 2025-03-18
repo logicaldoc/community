@@ -20,7 +20,7 @@ public class SamplerDetailsPanel extends VLayout {
 
 	private Layout standardTabPanel;
 
-	private SamplerStandardProperties standardPanel;
+	private SamplerProperties standardPanel;
 
 	private EditingTabSet tabSet;
 
@@ -72,7 +72,7 @@ public class SamplerDetailsPanel extends VLayout {
 				standardTabPanel.removeMember(standardPanel);
 		}
 
-		standardPanel = new SamplerStandardProperties(sampler, event -> onModified());
+		standardPanel = new SamplerProperties(sampler, event -> onModified());
 		standardTabPanel.addMember(standardPanel);
 
 	}

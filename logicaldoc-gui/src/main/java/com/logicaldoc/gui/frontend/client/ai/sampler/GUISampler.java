@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.frontend.client.ai.sampler;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,11 +13,12 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2
- *
  */
-public class GUISampler extends GUIExtensibleObject {
+public class GUISampler implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	private long id = 0;
 
 	private String name;
 
@@ -32,7 +34,7 @@ public class GUISampler extends GUIExtensibleObject {
 
 	private GUIFolder folder;
 
-	private List<GUISampler> samplers = new ArrayList<>();
+	private List<GUISampler> chain = new ArrayList<>();
 
 	private List<GUIExtensibleObject> source = new ArrayList<>();
 
@@ -40,8 +42,61 @@ public class GUISampler extends GUIExtensibleObject {
 
 	private String automation;
 
+	private String delimiter = ",";
+
+	private String quote = "\"";
+
+	/**
+	 * The index of the column(starting form 0) containing the category.<br>
+	 * value -1 means the last column<br>
+	 * value -2 means no category column at all
+	 */
+	private int categoryIndex = -1;
+	
+	public GUISampler(long id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
+
+	public GUISampler() {
+		super();
+	}
+	
+	public String getDelimiter() {
+		return delimiter;
+	}
+
+	public String getQuote() {
+		return quote;
+	}
+
+	public int getCategoryIndex() {
+		return categoryIndex;
+	}
+
+	public void setDelimiter(String delimiter) {
+		this.delimiter = delimiter;
+	}
+
+	public void setQuote(String quote) {
+		this.quote = quote;
+	}
+
+	public void setCategoryIndex(int categoryIndex) {
+		this.categoryIndex = categoryIndex;
+	}
+
 	public String getName() {
 		return name;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public String getLabel() {
@@ -64,8 +119,8 @@ public class GUISampler extends GUIExtensibleObject {
 		return folder;
 	}
 
-	public List<GUISampler> getSamplers() {
-		return samplers;
+	public List<GUISampler> getChain() {
+		return chain;
 	}
 
 	public List<GUIExtensibleObject> getSource() {
@@ -104,8 +159,8 @@ public class GUISampler extends GUIExtensibleObject {
 		this.folder = folder;
 	}
 
-	public void setSamplers(List<GUISampler> samplers) {
-		this.samplers = samplers;
+	public void setChain(List<GUISampler> chain) {
+		this.chain = chain;
 	}
 
 	public void setSource(List<GUIExtensibleObject> source) {

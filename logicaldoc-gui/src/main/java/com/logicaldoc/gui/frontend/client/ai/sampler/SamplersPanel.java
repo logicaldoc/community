@@ -92,7 +92,7 @@ public class SamplersPanel extends VLayout {
 		list.setShowRecordComponentsByCell(true);
 		list.setCanFreezeFields(true);
 		list.setFilterOnKeypress(true);
-		list.setDataSource(new SamplerDS());
+		list.setDataSource(new SamplerDS(null));
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -105,7 +105,7 @@ public class SamplersPanel extends VLayout {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		refresh.addClickHandler(event -> {
-			list.refresh(new SamplerDS());
+			list.refresh(new SamplerDS(null));
 			detailsContainer.removeMembers(detailsContainer.getMembers());
 			details = SELECT_SAMPLER;
 			detailsContainer.setMembers(details);

@@ -9,7 +9,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.selector.DocumentSelectorDialog;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
-import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 
 /**
@@ -37,7 +36,12 @@ public class DocumentSelector extends StaticTextItem {
 		if (additionalIcons != null && !additionalIcons.isEmpty())
 			setWidth(180);
 
-		PickerIcon search = new PickerIcon(PickerIcon.SEARCH, evnt -> new DocumentSelectorDialog() {
+		FormItemIcon search = new FormItemIcon();
+		search.setPrompt(I18N.message("search"));
+		search.setSrc("[SKIN]/magnifying-glass.svg");
+		search.setWidth(12);
+		search.setHeight(12);
+		search.addFormItemClickHandler(click -> new DocumentSelectorDialog() {
 
 			@Override
 			protected void onSelection(List<GUIDocument> selection) {
@@ -45,22 +49,22 @@ public class DocumentSelector extends StaticTextItem {
 				close();
 			}
 		}.show());
-		search.setWidth(12);
-		search.setHeight(12);
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, event -> {
+		FormItemIcon clear = new FormItemIcon();
+		clear.setPrompt(I18N.message("clear"));
+		clear.setSrc("[SKIN]/trash.svg");
+		clear.setWidth(12);
+		clear.setHeight(12);
+		clear.addFormItemClickHandler(click -> {
 			clearValue();
 			setDocument(null, null);
 		});
-		clear.setWidth(12);
-		clear.setHeight(12);
 
 		List<FormItemIcon> icons = new ArrayList<>();
 		icons.add(search);
 		icons.add(clear);
-		if (additionalIcons != null && !additionalIcons.isEmpty()) {
+		if (additionalIcons != null && !additionalIcons.isEmpty())
 			icons.addAll(additionalIcons);
-		}
 		setIcons(icons.toArray(new FormItemIcon[0]));
 
 		addClickHandler(event -> {

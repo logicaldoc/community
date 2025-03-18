@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.ai.sampler;
 
 import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.fields.DataSourceDateTimeField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -12,11 +11,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  */
 public class SamplerDS extends DataSource {
 
-	public SamplerDS() {
-		init("data/ai.xml?object=sampler");
-	}
-
-	private void init(String url) {
+	public SamplerDS(String type) {
 		setRecordXPath("/list/sampler");
 
 		DataSourceTextField id = new DataSourceTextField("id");
@@ -26,11 +21,14 @@ public class SamplerDS extends DataSource {
 
 		DataSourceTextField name = new DataSourceTextField("name");
 		DataSourceTextField label = new DataSourceTextField("label");
-		DataSourceDateTimeField creation = new DataSourceDateTimeField("creation");
-		DataSourceTextField type = new DataSourceTextField("type");
+		DataSourceTextField typeField = new DataSourceTextField("type");
 
-		setFields(id, name, label, type, creation);
+		setFields(id, name, label, typeField);
 		setClientOnly(true);
+
+		String url = "data/ai.xml?object=sampler";
+		if (type != null)
+			url += "&type=" + type;
 
 		setDataURL(url);
 	}

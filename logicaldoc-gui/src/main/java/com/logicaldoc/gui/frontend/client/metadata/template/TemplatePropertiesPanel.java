@@ -37,7 +37,6 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
@@ -154,10 +153,10 @@ public class TemplatePropertiesPanel extends HLayout {
 		attributesList.setShowRecordComponents(true);
 		attributesList.setShowRecordComponentsByCell(true);
 
-		attributesList.addCellContextClickHandler((CellContextClickEvent event) -> {
+		attributesList.addCellContextClickHandler(contextClick -> {
 			if (!TemplatePropertiesPanel.this.template.isReadonly() && TemplatePropertiesPanel.this.template.isWrite())
 				showContextMenu();
-			event.cancel();
+			contextClick.cancel();
 		});
 
 		ListGridField name = new ListGridField("name", I18N.message("name"));

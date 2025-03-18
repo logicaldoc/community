@@ -13,9 +13,9 @@ public class IdListGridField extends ColoredListGridField {
 	public IdListGridField() {
 		this(null);
 	}
-	
+
 	public IdListGridField(String label) {
-		super("id", label);
+		super("id", label != null ? label : "id");
 		setAutoFitWidth(true);
 		setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 		setHidden(true);
