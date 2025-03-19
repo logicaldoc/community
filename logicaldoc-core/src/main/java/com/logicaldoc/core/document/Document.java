@@ -305,16 +305,6 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 	}
 
 	@Override
-	public Long getTemplateId() {
-		return getTemplate() != null ? getTemplate().getId() : super.getTemplateId();
-	}
-
-	@Override
-	public String getTemplateName() {
-		return getTemplate() != null ? getTemplate().getName() : super.getTemplateName();
-	}
-
-	@Override
 	public Template getTemplate() {
 		return template;
 	}
@@ -322,6 +312,10 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 	@Override
 	public void setTemplate(Template template) {
 		this.template = template;
+		if (template != null) {
+			setTemplateId(template.getId());
+			setTemplateName(template.getName());
+		}
 	}
 
 	@Override
