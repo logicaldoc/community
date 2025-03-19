@@ -1,31 +1,39 @@
 package com.logicaldoc.core.imaging;
 
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+
 /**
  * A zone specification inside an image.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.4.2
  */
+@MappedSuperclass
 public class ImageZone {
 
 	/**
 	 * Upper-left corner of the zone (percentage of the width 0..1)
 	 */
+	@Column(name = "ld_left")
 	private Double left = 0.0;
 
 	/**
 	 * Upper-left corner of the zone (percentage of the height 0..1)
 	 */
+	@Column(name = "ld_top")
 	private Double top = 0.0;
 
 	/**
 	 * Width of the zone (percentage of the width 0..1)
 	 */
+	@Column(name = "ld_width")
 	private Double width = 0.15;
 
 	/**
 	 * Height of the zone (percentage of the height 0..1)
 	 */
+	@Column(name = "ld_height")
 	private Double height = 0.10;
 
 	public ImageZone() {
