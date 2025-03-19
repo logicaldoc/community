@@ -71,6 +71,9 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 	@Column(name = "ld_templateid")
 	private Long templateId;
 
+	@Column(name = "ld_templatename")
+	private String templateName;
+
 	@ElementCollection(fetch = FetchType.LAZY)
 	@CollectionTable(name = "ld_version_ext", joinColumns = @JoinColumn(name = "ld_versionid"))
 	@MapKeyColumn(name = "ld_name", length = 255)
@@ -223,6 +226,16 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		this.folderName = folderName;
 	}
 
+	@Override
+	public String getTemplateName() {
+		return templateName;
+	}
+
+	@Override
+	public void setTemplateName(String templateName) {
+		this.templateName = templateName;
+	}
+
 	/**
 	 * Factory method that creates a Version and replicate all given document's
 	 * properties.<br>
@@ -357,26 +370,18 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 	}
 
 	@Override
-	public String getTemplateName() {
-		return null;
-	}
-
-	@Override
-	public void setTemplateName(String templateName) {
-		// Not implemented
-	}
-
-	@Override
 	public Template getTemplate() {
 		return null;
 	}
 
 	@Override
 	public void setTemplate(Template template) {
-		if (template != null)
+		if (template != null) {
 			templateId = template.getId();
-		else
+			setTemplateName(template.getName());
+		} else {
 			templateId = null;
+		}
 	}
 
 	@Override
