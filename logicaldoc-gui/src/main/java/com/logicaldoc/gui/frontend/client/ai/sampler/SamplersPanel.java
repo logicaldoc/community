@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.ai.sampler;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
@@ -147,14 +150,16 @@ public class SamplersPanel extends VLayout {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		final ListGridRecord rec = list.getSelectedRecord();
-		final long id = rec.getAttributeAsLong("id");
+		final ListGridRecord[] selection = list.getSelectedRecords();
+		List<Long> ids = new ArrayList<>();
+		for (ListGridRecord rec : selection)
+			ids.add(rec.getAttributeAsLong("id"));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				AIService.Instance.get().deleteSampler(id, new DefaultAsyncCallback<>() {
+				AIService.Instance.get().deleteSamplers(ids, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						list.removeSelectedData();

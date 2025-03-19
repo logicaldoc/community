@@ -1,11 +1,14 @@
 package com.logicaldoc.gui.frontend.client.ai;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.gui.frontend.client.ai.model.GUIModel;
 import com.logicaldoc.gui.frontend.client.ai.sampler.GUISampler;
 
 /**
@@ -18,13 +21,13 @@ import com.logicaldoc.gui.frontend.client.ai.sampler.GUISampler;
 @RemoteServiceRelativePath("ai")
 public interface AIService extends RemoteService {
 	/**
-	 * Deletes a given sampler
+	 * Deletes some samplers
 	 * 
-	 * @param samplerId identifier of the sampler
+	 * @param samplerIds identifiers of the samplers
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void deleteSampler(long samplerId) throws ServerException;
+	public void deleteSamplers(List<Long> samplerIds) throws ServerException;
 
 	/**
 	 * Creates or updates a sampler
@@ -47,6 +50,37 @@ public interface AIService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public GUISampler getSampler(long samplerId) throws ServerException;
+
+	/**
+	 * Deletes a a set of models
+	 * 
+	 * @param modelIds identifiers of the models to delete
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void deleteModels(List<Long> modelIds) throws ServerException;
+
+	/**
+	 * Creates or updates a model
+	 * 
+	 * @param model the model to save
+	 * 
+	 * @return the saved model
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public GUIModel saveModel(GUIModel model) throws ServerException;
+
+	/**
+	 * Retrieves a model from the data layer
+	 * 
+	 * @param modelId identifier of the model
+	 * 
+	 * @return the model
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public GUIModel getModel(long modelId) throws ServerException;
 
 	public static class Instance {
 		private static AIServiceAsync inst;
