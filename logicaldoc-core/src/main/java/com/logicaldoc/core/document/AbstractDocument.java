@@ -296,7 +296,13 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	 */
 	@Transient
 	private boolean modified = false;
+	
+	@Transient
+	private String documentTemplateName;
 
+	@Transient
+	private Long documentTemplateId;
+	
 	protected AbstractDocument() {
 		super();
 	}
@@ -899,6 +905,27 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		this.color = color;
 	}
 
+	@Override
+	public String getTemplateName() {
+		return documentTemplateName;
+	}
+
+	@Override
+	public void setTemplateName(String templateName) {
+		this.documentTemplateName = templateName;
+	}
+	
+	
+	@Override
+	public Long getTemplateId() {
+		return documentTemplateId;
+	}
+
+	@Override
+	public void setTemplateId(Long templateId) {
+		this.documentTemplateId = templateId;
+	}
+	
 	/**
 	 * Copies in the current instance the attributes of the passed values
 	 * object, but NOT the ID
@@ -980,7 +1007,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	public void setLastNote(String lastNote) {
 		this.lastNote = lastNote;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
