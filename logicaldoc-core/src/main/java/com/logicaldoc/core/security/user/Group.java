@@ -56,7 +56,7 @@ public class Group extends PersistentObject implements Serializable {
 	private String name = "";
 
 	@Column(name = "ld_description", length = 255)
-	private String descriprion = "";
+	private String description = "";
 
 	/**
 	 * Specifies the source: 'local' indicates the group was created in the
@@ -95,7 +95,7 @@ public class Group extends PersistentObject implements Serializable {
 	}
 
 	public String getDescription() {
-		return descriprion;
+		return description;
 	}
 
 	public void setName(String name) {
@@ -103,12 +103,12 @@ public class Group extends PersistentObject implements Serializable {
 	}
 
 	public void setDescription(String description) {
-		descriprion = description;
+		this.description = description;
 	}
 
 	public void reset() {
 		name = "";
-		descriprion = "";
+		description = "";
 		users = new HashSet<>();
 	}
 
