@@ -1,5 +1,13 @@
 package com.logicaldoc.webservice;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import com.logicaldoc.core.history.History;
 
 /**
@@ -8,6 +16,10 @@ import com.logicaldoc.core.history.History;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.7
  */
+@Entity
+@Table(name = "ld_webservicecall")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class WebserviceCall extends History {
 
 	private static final long serialVersionUID = 1L;
@@ -22,6 +34,7 @@ public class WebserviceCall extends History {
 	 * The protocol used for the communication, can be WebserviceCall.SOAP or
 	 * WebserviceCall.REST
 	 */
+	@Column(name = "ld_protocol")
 	private String protocol = SOAP;
 
 	public WebserviceCall() {

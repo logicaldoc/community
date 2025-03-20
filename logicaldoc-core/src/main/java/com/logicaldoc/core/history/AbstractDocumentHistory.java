@@ -2,8 +2,12 @@ package com.logicaldoc.core.history;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 
 import com.logicaldoc.core.document.AbstractDocument;
+import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.Version;
+import com.logicaldoc.core.folder.Folder;
 
 /**
  * A superclass for those histories tightly related to documents
@@ -16,9 +20,6 @@ public abstract class AbstractDocumentHistory extends History {
 
 	private static final long serialVersionUID = 1L;
 
-	@Column(name = "ld_color", length = 255)
-	protected String color;
-
 	@Column(name = "ld_version", length = 10)
 	protected String version = null;
 
@@ -30,17 +31,71 @@ public abstract class AbstractDocumentHistory extends History {
 
 	@Column(name = "ld_filenameold", length = 255)
 	protected String filenameOld = null;
+	
+	@Column(name = "ld_docid")
+	private Long docId;
+
+	@Column(name = "ld_folderid")
+	private Long folderId;
+
+	@Column(name = "ld_filename", length = 255)
+	private String filename = null;
+
+	@Column(name = "ld_filesize")
+	private Long fileSize = null;
+	
+	@Column(name = "ld_new")
+	private int isNew = 1;
+
+	/**
+	 * Something to better qualify the event
+	 */
+	@Column(name = "ld_reason")
+	private String reason = null;
+	
+	// Not persistent
+	@Transient
+	private AbstractDocument document;
+
+	// Not persistent
+	@Transient
+	private Folder folder;
+
 
 	public AbstractDocumentHistory() {
 		super();
 	}
-
-	public String getColor() {
-		return color;
+	
+	public Long getDocId() {
+		return docId;
 	}
 
-	public void setColor(String color) {
-		this.color = color;
+	public void setDocId(Long docId) {
+		this.docId = docId;
+	}
+
+	public Long getFolderId() {
+		return folderId;
+	}
+
+	public void setFolderId(Long folderId) {
+		this.folderId = folderId;
+	}
+
+	public String getFilename() {
+		return filename;
+	}
+
+	public void setFilename(String filename) {
+		this.filename = filename;
+	}
+
+	public Long getFileSize() {
+		return fileSize;
+	}
+
+	public void setFileSize(Long fileSize) {
+		this.fileSize = fileSize;
 	}
 
 	public String getVersion() {
@@ -74,23 +129,66 @@ public abstract class AbstractDocumentHistory extends History {
 	public void setFilenameOld(String filenameOld) {
 		this.filenameOld = filenameOld;
 	}
+	
+	public int getIsNew() {
+		return isNew;
+	}
 
-	@Override
+	public void setIsNew(int isNew) {
+		this.isNew = isNew;
+	}
+
+	public String getReason() {
+		return reason;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+
+	public Folder getFolder() {
+		return folder;
+	}
+
+	public void setFolder(Folder folder) {
+		this.folder = folder;
+	}
+
+	public AbstractDocument getDocument() {
+		return document;
+	}
+
 	public void setDocument(AbstractDocument document) {
-		super.setDocument(document);
+		this.document = document;
 		if (document != null) {
-			this.setVersion(document.getVersion());
-			this.setFileVersion(document.getFileVersion());
-			this.setColor(document.getColor());
+			this.setTenantId(document.getTenantId());
+			if (document instanceof Version ver)
+				this.setDocId(ver.getDocId());
+			else
+				this.setDocId(document.getId());
+
+			this.setFilename(document.getFileName());
+			this.setFileSize(document.getFileSize());
+
+			if (document instanceof Version ver)
+				this.setFolderId(ver.getFolderId());
+			else if (document instanceof Document doc)
+				this.setFolderId(doc.getFolder().getId());
 		}
 	}
 
+
 	protected void copyAttributesFrom(AbstractDocumentHistory source) {
 		super.copyAttributesFrom(source);
-		setColor(source.getColor());
 		setVersion(source.getVersion());
 		setFileVersion(source.getFileVersion());
 		setPathOld(source.getPathOld());
 		setFilenameOld(source.getFilenameOld());
+		setDocId(source.getDocId());
+		setFolderId(source.getFolderId());
+		setReason(source.getReason());
+		setIsNew(source.getIsNew());
+		setFilename(source.getFilename());
+		setFileSize(source.getFileSize());
 	}
 }

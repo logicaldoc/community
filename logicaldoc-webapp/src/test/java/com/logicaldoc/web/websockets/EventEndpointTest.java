@@ -15,7 +15,7 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.folder.Folder;
-import com.logicaldoc.core.history.History;
+import com.logicaldoc.core.history.AbstractDocumentHistory;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.util.plugin.PluginException;
@@ -58,7 +58,7 @@ public class EventEndpointTest extends AbstractWebappTestCase {
 		document.setVersion("1.0");
 		document.setFolder(folder);
 
-		History history = new DocumentHistory();
+		AbstractDocumentHistory history = new DocumentHistory();
 		history.setId(1L);
 		history.setDocument(document);
 		history.setFolder(folder);
@@ -96,17 +96,17 @@ public class EventEndpointTest extends AbstractWebappTestCase {
 		endpoint.newEvent(history);
 		assertEquals(4, endpoint.countQueueSize(DocumentHistory.class));
 
-		history = new UserHistory();
-		history.setId(5L);
-		history.setUserId(1L);
-		history.setFolderId(4L);
-		((UserHistory) history).setAuthor("me");
+		UserHistory history2 = new UserHistory();
+		history2.setId(5L);
+		history2.setUserId(1L);
+		history2.setFolderId(4L);
+		((UserHistory) history2).setAuthor("me");
 		history.setEvent(UserEvent.LOGOUT.toString());
 
 		endpoint.newEvent(history);
-		assertEquals(1, endpoint.countQueueSize(UserHistory.class));
+		assertEquals(0, endpoint.countQueueSize(UserHistory.class));
 
 		endpoint.newEvent(history);
-		assertEquals(1, endpoint.countQueueSize(UserHistory.class));
+		assertEquals(0, endpoint.countQueueSize(UserHistory.class));
 	}
 }

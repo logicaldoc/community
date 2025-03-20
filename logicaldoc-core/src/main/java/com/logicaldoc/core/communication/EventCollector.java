@@ -96,23 +96,25 @@ public class EventCollector {
 		if (!rememberHistory(history))
 			return;
 
-		if (history.getDocId() != null && history.getDocument() == null) {
-			DocumentDAO docDao = com.logicaldoc.util.Context.get(DocumentDAO.class);
-			try {
-				history.setDocument(docDao.findById(history.getDocId()));
-			} catch (PersistenceException e) {
-				log.error(e.getMessage(), e);
+		if (history instanceof AbstractDocumentHistory adh) {
+			if (adh.getDocId() != null && adh.getDocument() == null) {
+				DocumentDAO docDao = com.logicaldoc.util.Context.get(DocumentDAO.class);
+				try {
+					adh.setDocument(docDao.findById(adh.getDocId()));
+				} catch (PersistenceException e) {
+					log.error(e.getMessage(), e);
+				}
+			} else if (adh.getDocument() != null && adh.getDocument() instanceof Document doc) {
+				/*
+				 * Do not use the original document because to avoid
+				 * interactions with Hibernate session.
+				 */
+				Document clone = new Document(doc);
+				// Restore some attributes skipped by the clone method
+				clone.setCustomId(adh.getDocument().getCustomId());
+				clone.setStatus(adh.getDocument().getStatus());
+				adh.setDocument(clone);
 			}
-		} else if (history.getDocument() != null && history.getDocument() instanceof Document doc) {
-			/*
-			 * Do not use the original document because to avoid interactions
-			 * with Hibernate session.
-			 */
-			Document clone = new Document(doc);
-			// Restore some attributes skipped by the clone method
-			clone.setCustomId(history.getDocument().getCustomId());
-			clone.setStatus(history.getDocument().getStatus());
-			history.setDocument(clone);
 		}
 
 		ThreadPools pools = Context.get(ThreadPools.class);

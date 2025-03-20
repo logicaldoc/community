@@ -16,21 +16,27 @@
 		<property name="creation" type="timestamp" column="ld_creation" not-null="true" />
 		<property name="deleted" type="int" column="ld_deleted" not-null="true" />
 		<property name="tenantId" type="long" column="ld_tenantid" not-null="true" />
+
 		<property name="docId" type="long" column="ld_docid"/>
 		<property name="folderId" type="long" column="ld_folderid" />
+
 		<property name="userId" type="long" column="ld_userid" />
 		<property name="date" type="timestamp" column="ld_date" />
 		<property name="username" type="string" column="ld_username" length="255" />
 		<property name="userLogin" type="string" column="ld_userlogin" length="255" />
 		<property name="event" type="string" column="ld_event" length="255" />
 		<property name="comment" type="string" column="ld_comment" length="4000" />
+
 		<property name="reason" type="string" column="ld_reason" length="4000" />
+
 		<property name="notified" type="int" column="ld_notified" not-null="true" />
 		<property name="sessionId" type="string" column="ld_sessionid" length="255" />
 		<property name="keyLabel" type="string" column="ld_keylabel" length="255" />
 		<property name="isNew" type="int" column="ld_new" />
+
 		<property name="filename" type="string" column="ld_filename" length="255" />
 		<property name="fileSize" type="long" column="ld_filesize"/>
+
 		<property name="ip" type="string" column="ld_ip" length="255" />
 		<property name="author" type="string" column="ld_author" length="255" />
 		<property name="geolocation" type="string" column="ld_geolocation" length="255" />

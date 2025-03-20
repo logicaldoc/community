@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
@@ -27,7 +28,7 @@ public class HibernateWebserviceCallDAOTest extends AbstractWebserviceTestCase {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an WebserviceCallDAO
-		testSubject = (WebserviceCallDAO) context.getBean(WebserviceCallDAO.class);
+		testSubject = Context.get(WebserviceCallDAO.class);
 	}
 
 	@Test
@@ -35,6 +36,7 @@ public class HibernateWebserviceCallDAOTest extends AbstractWebserviceTestCase {
 		WebserviceCall call = new WebserviceCall();
 		call.setTenantId(1L);
 		call.setUserId(1L);
+		call.setNotified(0);
 		testSubject.store(call);
 
 		List<WebserviceCall> calls = testSubject.findAll(1L);

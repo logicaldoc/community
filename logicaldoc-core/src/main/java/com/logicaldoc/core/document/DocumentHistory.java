@@ -1,6 +1,7 @@
 package com.logicaldoc.core.document;
 
 import javax.persistence.Cacheable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -23,12 +24,24 @@ import com.logicaldoc.core.history.AbstractDocumentHistory;
 public class DocumentHistory extends AbstractDocumentHistory {
 	private static final long serialVersionUID = 1L;
 
+	@Column(name = "ld_color", length = 255)
+	protected String color;
+	
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
+	}
+
 	public DocumentHistory() {
 		super();
 	}
 
 	public DocumentHistory(DocumentHistory source) {
 		copyAttributesFrom(source);
+		this.color=source.color;
 	}
 
 	@Override

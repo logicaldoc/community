@@ -28,6 +28,7 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.folder.FolderEvent;
+import com.logicaldoc.core.history.AbstractDocumentHistory;
 import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.user.UserEvent;
@@ -167,8 +168,6 @@ public class EventEndpoint implements EventListener {
 
 	private WebsocketMessage prepareMessage(History event) throws PersistenceException, ServerException {
 		WebsocketMessage message = new WebsocketMessage(event.getSessionId(), event.getEvent());
-		message.setFolderId(event.getFolderId());
-		message.setDocId(event.getDocId());
 		message.setUserId(event.getUserId());
 		message.setUsername(event.getUserLogin());
 		message.setComment(event.getComment());
@@ -179,48 +178,53 @@ public class EventEndpoint implements EventListener {
 		if (event instanceof UserHistory userHistory)
 			message.setAuthor(userHistory.getAuthor());
 
-		GUIFolder folder = null;
-		if (event.getFolder() != null) {
-			String color = event.getFolder().getColor();
-			folder = new FolderServiceImpl().fromFolder(event.getFolder(), true);
-			folder.setColor(color);
-		} else if (event.getFolderId() != null)
-			folder = new FolderServiceImpl().getFolder(null, event.getFolderId(), true);
-		if (folder != null)
-			message.setFolder(folder);
+		if (event instanceof AbstractDocumentHistory adh) {
+			message.setFolderId(adh.getFolderId());
+			message.setDocId(adh.getDocId());
 
-		GUIDocument document = null;
-		if (event.getDocument() != null && event.getDocument() instanceof Document doc) {
-			Document clone = new Document(doc);
-			// Report some attributes skipped by the clone method
-			clone.setCustomId(event.getDocument().getCustomId());
-			clone.setStatus(event.getDocument().getStatus());
+			GUIFolder folder = null;
+			if (adh.getFolder() != null) {
+				String color = adh.getFolder().getColor();
+				folder = new FolderServiceImpl().fromFolder(adh.getFolder(), true);
+				folder.setColor(color);
+			} else if (adh.getFolderId() != null)
+				folder = new FolderServiceImpl().getFolder(null, adh.getFolderId(), true);
+			if (folder != null)
+				message.setFolder(folder);
 
-			// Put ID 0 in order to convert to GUIDocument without
-			// picking up ifos from DB
-			clone.setId(0L);
-			document = new DocumentServiceImpl().fromDocument(clone, null, null);
-			document.setId(event.getDocId());
-		} else if (event.getDocId() != null) {
-			DocumentDAO docDao = Context.get(DocumentDAO.class);
-			Document d = docDao.findById(event.getDocId());
-			if (d != null) {
-				document = new DocumentServiceImpl().fromDocument(d, null, null);
-			} else {
-				document = new GUIDocument();
-				document.setId(event.getDocId());
-				document.setFileName(event.getFilename());
-				document.setFolder(folder);
+			GUIDocument document = null;
+			if (adh.getDocument() != null && adh.getDocument() instanceof Document doc) {
+				Document clone = new Document(doc);
+				// Report some attributes skipped by the clone method
+				clone.setCustomId(adh.getDocument().getCustomId());
+				clone.setStatus(adh.getDocument().getStatus());
+
+				// Put ID 0 in order to convert to GUIDocument without
+				// picking up ifos from DB
+				clone.setId(0L);
+				document = new DocumentServiceImpl().fromDocument(clone, null, null);
+				document.setId(adh.getDocId());
+			} else if (adh.getDocId() != null) {
+				DocumentDAO docDao = Context.get(DocumentDAO.class);
+				Document d = docDao.findById(adh.getDocId());
+				if (d != null) {
+					document = new DocumentServiceImpl().fromDocument(d, null, null);
+				} else {
+					document = new GUIDocument();
+					document.setId(adh.getDocId());
+					document.setFileName(adh.getFilename());
+					document.setFolder(folder);
+				}
 			}
-		}
 
-		if (document != null && (event.getEvent().equals(DocumentEvent.CHECKEDOUT.toString())
-				|| event.getEvent().equals(DocumentEvent.LOCKED.toString()))) {
-			document.setLockUser(event.getUsername());
-			document.setLockUserId(event.getUserId());
-		}
+			if (document != null && (event.getEvent().equals(DocumentEvent.CHECKEDOUT.toString())
+					|| event.getEvent().equals(DocumentEvent.LOCKED.toString()))) {
+				document.setLockUser(event.getUsername());
+				document.setLockUserId(event.getUserId());
+			}
 
-		message.setDocument(document);
+			message.setDocument(document);
+		}
 		return message;
 	}
 

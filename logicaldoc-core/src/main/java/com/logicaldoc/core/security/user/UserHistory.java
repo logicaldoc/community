@@ -28,6 +28,18 @@ public class UserHistory extends History {
 	@Column(name = "ld_author", length = 255)
 	private String author;
 
+	@Column(name = "ld_filename", length = 255)
+	private String filename = null;
+
+	@Column(name = "ld_filesize")
+	private Long fileSize = null;
+
+	@Column(name = "ld_docid")
+	private Long docId;
+
+	@Column(name = "ld_folderid")
+	private Long folderId;
+
 	public UserHistory() {
 		super();
 	}
@@ -39,7 +51,19 @@ public class UserHistory extends History {
 
 	public UserHistory(UserHistory source) {
 		copyAttributesFrom(source);
-		setAuthor(source.getAuthor());
+		this.author = source.author;
+		this.filename = source.filename;
+		this.fileSize = source.fileSize;
+		this.folderId = source.folderId;
+		this.docId = source.docId;
+	}
+
+	public Long getFolderId() {
+		return folderId;
+	}
+
+	public void setFolderId(Long folderId) {
+		this.folderId = folderId;
 	}
 
 	public String getAuthor() {
@@ -48,6 +72,30 @@ public class UserHistory extends History {
 
 	public void setAuthor(String author) {
 		this.author = author;
+	}
+
+	public String getFilename() {
+		return filename;
+	}
+
+	public void setFilename(String filename) {
+		this.filename = filename;
+	}
+
+	public Long getFileSize() {
+		return fileSize;
+	}
+
+	public void setFileSize(Long fileSize) {
+		this.fileSize = fileSize;
+	}
+
+	public Long getDocId() {
+		return docId;
+	}
+
+	public void setDocId(Long docId) {
+		this.docId = docId;
 	}
 
 	@Override

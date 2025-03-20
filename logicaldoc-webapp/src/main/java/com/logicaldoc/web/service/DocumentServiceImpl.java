@@ -85,7 +85,6 @@ import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.metadata.validation.Validator;
 import com.logicaldoc.core.parser.ParsingException;
-import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.authorization.PermissionException;

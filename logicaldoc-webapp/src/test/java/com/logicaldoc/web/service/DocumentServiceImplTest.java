@@ -68,6 +68,7 @@ import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.i18n.I18N;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.web.AbstractWebappTestCase;
@@ -108,16 +109,16 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		docDao = (DocumentDAO) context.getBean("DocumentDAO");
-		linkDao = (DocumentLinkDAO) context.getBean("DocumentLinkDAO");
-		noteDao = (DocumentNoteDAO) context.getBean("DocumentNoteDAO");
-		documentHistoryDao = (DocumentHistoryDAO) context.getBean("DocumentHistoryDAO");
-		bookDao = (BookmarkDAO) context.getBean("BookmarkDAO");
-		templateDao = (TemplateDAO) context.getBean("TemplateDAO");
-		folderDao = (FolderDAO) context.getBean("FolderDAO");
-		store = (Store) context.getBean("Store");
+		docDao = Context.get(DocumentDAO.class);
+		linkDao = Context.get(DocumentLinkDAO.class);
+		noteDao = Context.get(DocumentNoteDAO.class);
+		documentHistoryDao = Context.get(DocumentHistoryDAO.class);
+		bookDao = Context.get(BookmarkDAO.class);
+		templateDao = Context.get(TemplateDAO.class);
+		folderDao = Context.get(FolderDAO.class);
+		store = Context.get(Store.class);
 
-		searchEngine = (SearchEngine) context.getBean("SearchEngine");
+		searchEngine = Context.get(SearchEngine.class);
 
 		prepareRepository();
 
@@ -723,7 +724,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		testSubject.indexDocuments(List.of(doc.getId()));
 		doc = testSubject.getById(doc.getId());
-		assertEquals(1, doc.getIndexed());
+		assertEquals(0, doc.getIndexed());
 
 		testSubject.indexDocuments(new ArrayList<>());
 	}

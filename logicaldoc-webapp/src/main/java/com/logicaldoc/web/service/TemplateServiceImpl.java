@@ -20,7 +20,7 @@ import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
-import com.logicaldoc.core.history.History;
+import com.logicaldoc.core.history.AbstractDocumentHistory;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
@@ -417,7 +417,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			for (String attrName : template.getAttributeNames()) {
 				Attribute templateExtAttr = attrs.get(attrName);
 				AttributeSet aSet = sets.get(templateExtAttr.getSetId());
-				TemplateAttribute setExtAttr = aSet != null ? aSet.getAttribute(attrName) : null;
+				Attribute setExtAttr = aSet != null ? aSet.getAttribute(attrName) : null;
 
 				addGuiAttribute(extensibleObject, attrName, attributes, templateExtAttr, setExtAttr);
 			}
@@ -434,7 +434,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		if (template != null) {
 			try {
 				template.getAttributes();
-				int attrsCount = template.getTemplateAttributes().size();
+				int attrsCount = template.getAttributes().size();
 				if (log.isDebugEnabled())
 					log.debug("Initialized {} attributes", attrsCount);
 			} catch (LazyInitializationException e) {
@@ -570,7 +570,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			if (extensibleObject.getAttributes().isEmpty())
 				extensibleObject.setAttributes(template.getAttributes());
 
-			History transaction = null;
+			AbstractDocumentHistory transaction = null;
 			if (extensibleObject instanceof Document document) {
 				transaction = new DocumentHistory();
 				transaction.setDocument(document);
