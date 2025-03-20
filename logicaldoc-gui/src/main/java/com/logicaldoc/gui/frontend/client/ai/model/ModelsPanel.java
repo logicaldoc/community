@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.ai.sampler;
+package com.logicaldoc.gui.frontend.client.ai.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +29,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
- * Panel showing the list of samplers
+ * Panel showing the list of models
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2
  */
-public class SamplersPanel extends VLayout {
+public class ModelsPanel extends VLayout {
 
 	private static final String LABEL = "label";
 
@@ -48,7 +48,7 @@ public class SamplersPanel extends VLayout {
 
 	static final Canvas SELECT_SAMPLER = new HTMLPanel("&nbsp;" + I18N.message("selecttasampler"));
 
-	public SamplersPanel() {
+	public ModelsPanel() {
 		setWidth100();
 	}
 
@@ -95,7 +95,7 @@ public class SamplersPanel extends VLayout {
 		list.setShowRecordComponentsByCell(true);
 		list.setCanFreezeFields(true);
 		list.setFilterOnKeypress(true);
-		list.setDataSource(new SamplerDS(null));
+		list.setDataSource(new ModelDS());
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -108,7 +108,7 @@ public class SamplersPanel extends VLayout {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		refresh.addClickHandler(event -> {
-			list.refresh(new SamplerDS(null));
+			list.refresh(new ModelDS());
 			detailsContainer.removeMembers(detailsContainer.getMembers());
 			details = SELECT_SAMPLER;
 			detailsContainer.setMembers(details);
@@ -116,7 +116,7 @@ public class SamplersPanel extends VLayout {
 		toolStrip.addButton(refresh);
 
 		ToolStripButton add = new ToolStripButton();
-		add.setTitle(I18N.message("addsampler"));
+		add.setTitle(I18N.message("addmodel"));
 		toolStrip.addButton(add);
 		add.addClickHandler(event -> onAddSampler());
 
@@ -130,10 +130,10 @@ public class SamplersPanel extends VLayout {
 		list.addSelectionChangedHandler(event -> {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
-				AIService.Instance.get().getSampler(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
+				AIService.Instance.get().getModel(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUISampler sampler) {
-						showSamplerDetails(sampler);
+					public void onSuccess(GUIModel model) {
+						showModelDetails(model);
 					}
 				});
 		});
@@ -159,12 +159,12 @@ public class SamplersPanel extends VLayout {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				AIService.Instance.get().deleteSamplers(ids, new DefaultAsyncCallback<>() {
+				AIService.Instance.get().deleteModels(ids, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
-						showSamplerDetails(null);
+						showModelDetails(null);
 					}
 				});
 			}
@@ -174,13 +174,13 @@ public class SamplersPanel extends VLayout {
 		contextMenu.showContextMenu();
 	}
 
-	protected void showSamplerDetails(GUISampler sampler) {
-		if (!(details instanceof SamplerDetailsPanel)) {
-			detailsContainer.removeMember(details);
-			details = new SamplerDetailsPanel(this);
-			detailsContainer.addMember(details);
-		}
-		((SamplerDetailsPanel) details).setSampler(sampler);
+	protected void showModelDetails(GUIModel model) {
+//		if (!(details instanceof SamplerDetailsPanel)) {
+//			detailsContainer.removeMember(details);
+//			details = new SamplerDetailsPanel(this);
+//			detailsContainer.addMember(details);
+//		}
+//		((SamplerDetailsPanel) details).setSampler(sampler);
 	}
 
 	public ListGrid getList() {
@@ -190,28 +190,28 @@ public class SamplersPanel extends VLayout {
 	/**
 	 * Updates the selected rec with new data
 	 * 
-	 * @param sampler the sampler to take data from
+	 * @param model the model to take data from
 	 */
-	public void updateRecord(GUISampler sampler) {
-		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, sampler.getId()));
+	public void updateRecord(GUIModel model) {
+		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, model.getId()));
 		if (rec == null) {
 			rec = new ListGridRecord();
 			// Append a new rec
-			rec.setAttribute("id", sampler.getId());
+			rec.setAttribute("id", model.getId());
 			list.addData(rec);
 			list.selectRecord(rec);
 		}
 
-		rec.setAttribute("name", sampler.getName());
-		rec.setAttribute(LABEL, sampler.getLabel() != null ? sampler.getLabel() : sampler.getName());
-		rec.setAttribute(DESCRIPTION, sampler.getDescription());
+		rec.setAttribute("name", model.getName());
+		rec.setAttribute(LABEL, model.getLabel() != null ? model.getLabel() : model.getName());
+		rec.setAttribute(DESCRIPTION, model.getDescription());
 		list.refreshRow(list.getRecordIndex(rec));
 
 	}
 
 	protected void onAddSampler() {
 		list.deselectAllRecords();
-		showSamplerDetails(new GUISampler());
+		showModelDetails(new GUIModel());
 	}
 
 	@Override

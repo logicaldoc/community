@@ -455,8 +455,9 @@ public class FormatConverterManager {
 		// Check if a special binding is configured and points to an enabled
 		// converter
 		String currentConverter = config.getProperty("converter." + inOutkey);
+
 		if (StringUtils.isNotEmpty(currentConverter) && formatConverters != null)
-			formatConverters.stream()
+			converter = formatConverters.stream()
 					.filter(conv -> conv.getClass().getName().equals(currentConverter) && conv.isEnabled()).findFirst()
 					.orElse(null);
 
