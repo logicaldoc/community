@@ -46,7 +46,7 @@ public class PswRecovery extends HttpServlet {
 
 	private static final long serialVersionUID = 9088160958327454062L;
 
-	private static final Logger log = LoggerFactory.getLogger(PswRecovery.class);
+	protected static Logger log = LoggerFactory.getLogger(PswRecovery.class);
 
 	/**
 	 * Constructor of the object.
@@ -85,20 +85,23 @@ public class PswRecovery extends HttpServlet {
 
 			log.debug("Recover password for ticket with ticketId={}", ticketId);
 
-			TicketDAO ticketDao = Context.get(TicketDAO.class);
+			TicketDAO ticketDao = Context.get().getBean(TicketDAO.class);
 			Ticket ticket = ticketDao.findByTicketId(ticketId);
 
 			if ((ticket != null) && ticket.getType() == Ticket.PSW_RECOVERY) {
-
 				if (ticket.isTicketExpired()) {
 					response.getWriter().println("Request has exprired");
 					return;
+				} else {
+					ticket.setCount(ticket.getCount() + 1);
+					ticket.setEnabled(0);
+					ticketDao.store(ticket);
 				}
 
-				UserDAO userDao = Context.get(UserDAO.class);
+				UserDAO userDao = Context.get().getBean(UserDAO.class);
 				User user = userDao.findById(Long.parseLong(userId));
 
-				sendEmail(request, response, tenant, ticket, user);
+				sendEmail(request, response, tenant, user);
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -115,8 +118,8 @@ public class PswRecovery extends HttpServlet {
 		}
 	}
 
-	private void sendEmail(HttpServletRequest request, HttpServletResponse response, String tenant, Ticket ticket,
-			User user) throws IOException, PersistenceException, MessagingException, NoSuchAlgorithmException,
+	private void sendEmail(HttpServletRequest request, HttpServletResponse response, String tenant, User user)
+			throws IOException, PersistenceException, MessagingException, NoSuchAlgorithmException,
 			AutomationException {
 
 		EMail email = new EMail();
@@ -137,7 +140,7 @@ public class PswRecovery extends HttpServlet {
 		user.setPasswordChanged(new Date());
 		user.setPasswordExpired(1);
 
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = Context.get().getBean(UserDAO.class);
 		userDao.store(user);
 
 		Locale locale = user.getLocale();
@@ -162,11 +165,6 @@ public class PswRecovery extends HttpServlet {
 		sender.send(email, "psw.rec1", dictionary);
 
 		response.getWriter().println(String.format("A message was sent to %s", user.getEmail()));
-
-		ticket.setCount(ticket.getCount() + 1);
-
-		TicketDAO ticketDao = Context.get(TicketDAO.class);
-		ticketDao.store(ticket);
 	}
 
 	/**
