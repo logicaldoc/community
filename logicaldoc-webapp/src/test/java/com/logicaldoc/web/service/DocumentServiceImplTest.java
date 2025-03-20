@@ -724,7 +724,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		testSubject.indexDocuments(List.of(doc.getId()));
 		doc = testSubject.getById(doc.getId());
-		assertEquals(0, doc.getIndexed());
+		assertEquals(1, doc.getIndexed());
 
 		testSubject.indexDocuments(new ArrayList<>());
 	}
