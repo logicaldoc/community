@@ -28,5 +28,6 @@
         <property name="geolocation" type="string" column="ld_geolocation" length="255" />
         <property name="device" type="string" column="ld_device" length="255" />
         <property name="protocol" type="string" column="ld_protocol" length="255" />
+        <property name="notified" type="int" column="ld_notified" not-null="true" />
 	</class>
 </hibernate-mapping>
