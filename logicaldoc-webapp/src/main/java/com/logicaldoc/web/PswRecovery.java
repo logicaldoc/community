@@ -89,16 +89,19 @@ public class PswRecovery extends HttpServlet {
 			Ticket ticket = ticketDao.findByTicketId(ticketId);
 
 			if ((ticket != null) && ticket.getType() == Ticket.PSW_RECOVERY) {
-
 				if (ticket.isTicketExpired()) {
 					response.getWriter().println("Request has exprired");
 					return;
+				} else {
+					ticket.setCount(ticket.getCount() + 1);
+					ticket.setEnabled(0);
+					ticketDao.store(ticket);
 				}
 
 				UserDAO userDao = Context.get().getBean(UserDAO.class);
 				User user = userDao.findById(Long.parseLong(userId));
 
-				sendEmail(request, response, tenant, ticket, user);
+				sendEmail(request, response, tenant, user);
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -115,7 +118,7 @@ public class PswRecovery extends HttpServlet {
 		}
 	}
 
-	private void sendEmail(HttpServletRequest request, HttpServletResponse response, String tenant, Ticket ticket,
+	private void sendEmail(HttpServletRequest request, HttpServletResponse response, String tenant,
 			User user) throws IOException, PersistenceException, MessagingException, NoSuchAlgorithmException,
 			AutomationException {
 
@@ -162,11 +165,6 @@ public class PswRecovery extends HttpServlet {
 		sender.send(email, "psw.rec1", dictionary);
 
 		response.getWriter().println(String.format("A message was sent to %s", user.getEmail()));
-
-		ticket.setCount(ticket.getCount() + 1);
-
-		TicketDAO ticketDao = Context.get().getBean(TicketDAO.class);
-		ticketDao.store(ticket);
 	}
 
 	/**

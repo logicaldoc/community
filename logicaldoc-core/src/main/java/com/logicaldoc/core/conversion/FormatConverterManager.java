@@ -448,17 +448,19 @@ public class FormatConverterManager {
 		if (formatConverters == null || formatConverters.isEmpty())
 			log.warn("No format converter for file {}", inFileName);
 
-		// Get the first available converter
-		FormatConverter converter = formatConverters != null ? formatConverters.get(0) : null;
+		// Get the first available and enabled converter
+		FormatConverter converter = formatConverters != null
+				? formatConverters.stream().filter(c -> c.isEnabled()).findFirst().orElse(null)
+				: null;
 
-		// Check if a special binding is configured
+		// Check if a special binding is configured and points to an enabled
+		// converter
 		String currentConverter = config.getProperty("converter." + inOutkey);
+
 		if (StringUtils.isNotEmpty(currentConverter) && formatConverters != null)
-			for (FormatConverter formatConverter : formatConverters) {
-				if (formatConverter.getClass().getName().equals(currentConverter)) {
-					converter = formatConverter;
-				}
-			}
+			converter = formatConverters.stream()
+					.filter(conv -> conv.getClass().getName().equals(currentConverter) && conv.isEnabled()).findFirst()
+					.orElse(null);
 
 		if (converter != null)
 			converter.loadParameters();
