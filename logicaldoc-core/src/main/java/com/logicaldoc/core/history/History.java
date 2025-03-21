@@ -1,33 +1,11 @@
 package com.logicaldoc.core.history;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
-import org.springframework.core.type.filter.AnnotationTypeFilter;
-
-import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.Version;
-import com.logicaldoc.core.folder.Folder;
-import com.logicaldoc.core.security.Client;
-import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.Context;
 
 /**
  * Superclass for history entries
@@ -36,61 +14,23 @@ import com.logicaldoc.util.Context;
  * @since 5.0
  */
 @MappedSuperclass
-public abstract class History extends PersistentObject implements Comparable<History> {
+public abstract class History extends BasicHistory {
 
 	public static final String ASPECT = "saveHistory";
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger log = LoggerFactory.getLogger(History.class);
-
 	@Column(name = "ld_docid")
-	protected Long docId;
+	private Long docId;
 
 	@Column(name = "ld_folderid")
 	private Long folderId;
-
-	@Column(name = "ld_userid")
-	private Long userId;
-
-	@Column(name = "ld_date")
-	private Date date = new Date();
-
-	@Column(name = "ld_username", length = 255)
-	private String username = "";
-
-	@Column(name = "ld_userlogin", length = 255)
-	private String userLogin = "";
-
-	@Column(name = "ld_event", length = 255)
-	private String event = "";
-
-	/**
-	 * Comment left in regards of this event
-	 */
-	@Column(name = "ld_comment", length = 4000)
-	private String comment = "";
 
 	/**
 	 * Something to better qualify the event
 	 */
 	@Column(name = "ld_reason", length = 4000)
 	private String reason = null;
-
-	/**
-	 * Used to mark this event notified by the auditing system
-	 */
-	@Column(name = "ld_notified", nullable = false)
-	private int notified = 0;
-
-	@Column(name = "ld_sessionid", length = 255)
-	private String sessionId = "";
-
-	@Column(name = "ld_keylabel", length = 255)
-	private String keyLabel = "";
-
-	@Column(name = "ld_path", length = 4000)
-	private String path = null;
 
 	@Column(name = "ld_new")
 	private int isNew = 1;
@@ -101,187 +41,61 @@ public abstract class History extends PersistentObject implements Comparable<His
 	@Column(name = "ld_filesize")
 	private Long fileSize = null;
 
-	/**
-	 * Used when storing a document
-	 */
-	@Transient
-	private String file = null;
-
-	/**
-	 * Note persistent, used as convenience to store the name of the tenant
-	 */
-	@Transient
-	private String tenant = null;
-
-	// Not persistent
-	@Transient
-	private User user;
-
-	// Not persistent
-	@Transient
-	private AbstractDocument document;
-
-	// Not persistent
-	@Transient
-	private Folder folder;
-
-	// Not persistent, indicates if this event has to be notified by the events
-	// collector
-	@Transient
-	private boolean notifyEvent = true;
-
-	@Column(name = "ld_ip", length = 255)
-	private String ip;
-
-	@Column(name = "ld_geolocation", length = 255)
-	private String geolocation;
-
-	@Column(name = "ld_device", length = 255)
-	private String device;
-
-	public String getPath() {
-		return path;
-	}
-
-	public void setPath(String path) {
-		this.path = path;
-	}
-
-	/**
-	 * @return Returns the date.
-	 */
-	public Date getDate() {
-		return date;
-	}
-
-	/**
-	 * @param date The date to set.
-	 */
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
-	/**
-	 * @return Returns the docId.
-	 */
 	public Long getDocId() {
 		return docId;
 	}
 
-	/**
-	 * @param docId The docId to set.
-	 */
 	public void setDocId(Long docId) {
 		this.docId = docId;
 	}
 
-	/**
-	 * @return Returns the event.
-	 */
-	public String getEvent() {
-		return event;
+	public Long getFolderId() {
+		return folderId;
 	}
 
-	/**
-	 * @param event The event to set.
-	 */
-	public void setEvent(String event) {
-		this.event = event;
+	public void setFolderId(Long folderId) {
+		this.folderId = folderId;
 	}
 
-	/**
-	 * @return Returns the username.
-	 */
-	public String getUsername() {
-		return username;
+	public String getReason() {
+		return reason;
 	}
 
-	/**
-	 * @param username The username to set.
-	 */
-	public void setUsername(String username) {
-		this.username = username;
+	public void setReason(String reason) {
+		this.reason = reason;
 	}
 
-	public String getComment() {
-		return comment;
+	public int getIsNew() {
+		return isNew;
 	}
 
-	public void setComment(String comment) {
-		this.comment = comment;
+	public void setIsNew(int isNew) {
+		this.isNew = isNew;
 	}
 
-	public int getNotified() {
-		return notified;
+	public String getFilename() {
+		return filename;
 	}
 
-	public void setNotified(int notified) {
-		this.notified = notified;
+	public void setFilename(String filename) {
+		this.filename = filename;
 	}
 
-	public String getSessionId() {
-		return sessionId;
+	public Long getFileSize() {
+		return fileSize;
 	}
 
-	public void setSessionId(String sessionId) {
-		this.sessionId = sessionId;
-	}
-
-	public User getUser() {
-		if (user == null && (userId != null && userId.longValue() != 0L)) {
-			UserDAO uDao = Context.get(UserDAO.class);
-			try {
-				user = uDao.findById(userId);
-				uDao.initialize(user);
-			} catch (PersistenceException e) {
-				log.error(e.getMessage(), e);
-			}
-		}
-		return user;
-	}
-
-	/**
-	 * This setter sets the sessionId, userId, username and other informations
-	 * that can be captured by the given session
-	 * 
-	 * @param session the session to read informations from
-	 */
-	public void setSession(Session session) {
-		if (session != null) {
-			setUser(session.getUser());
-			setSessionId(session.getSid());
-			setKeyLabel(session.getKeyLabel());
-			setTenantId(session.getTenantId());
-			setTenant(session.getTenantName());
-			if (session.getClient() != null)
-				setClient(session.getClient());
-		}
-	}
-
-	/**
-	 * This setter sets the userId and username and other informations that can
-	 * be captured by the given user
-	 * 
-	 * @param user the user to read informations from
-	 */
-	public void setUser(User user) {
-		this.user = user;
-		if (user != null) {
-			setUserId(user.getId());
-			setUserLogin(user.getUsername());
-			setUsername(user.getFullName());
-			setTenantId(user.getTenantId());
-		}
+	public void setFileSize(Long fileSize) {
+		this.fileSize = fileSize;
 	}
 
 	public void setDocument(AbstractDocument document) {
-		this.document = document;
+		super.setDocument(document);
 		if (document != null) {
-			this.setTenantId(document.getTenantId());
 			if (document instanceof Version ver)
 				this.setDocId(ver.getDocId());
 			else
-				this.setDocId(document.getId());
+				this.setDocId(getDocument().getId());
 
 			this.setFilename(document.getFileName());
 			this.setFileSize(document.getFileSize());
@@ -293,183 +107,24 @@ public abstract class History extends PersistentObject implements Comparable<His
 		}
 	}
 
-	/**
-	 * This setter sets the ip, device and other informations that can be
-	 * captured by the given client
-	 * 
-	 * @param client the client to read informations from
-	 */
-	public void setClient(Client client) {
-		if (client == null) {
-			ip = null;
-			geolocation = null;
-			device = null;
-		} else {
-			ip = client.getAddress();
-			device = client.getDevice() != null ? client.getDevice().toString() : null;
-			geolocation = client.getGeolocation() != null ? client.getGeolocation().toString() : null;
-		}
-	}
-
-	public int getIsNew() {
-		return isNew;
-	}
-
-	public void setIsNew(int nnew) {
-		this.isNew = nnew;
-	}
-
-	public String getFilename() {
-		return filename;
-	}
-
-	public void setFilename(String filename) {
-		this.filename = filename;
-	}
-
-	public String getFile() {
-		return file;
-	}
-
-	public void setFile(String file) {
-		this.file = file;
-	}
-
-	public String getTenant() {
-		return tenant;
-	}
-
-	public void setTenant(String tenant) {
-		this.tenant = tenant;
-	}
-
-	public String getUserLogin() {
-		return userLogin;
-	}
-
-	public void setUserLogin(String login) {
-		this.userLogin = login;
-	}
-
-	public AbstractDocument getDocument() {
-		return document;
-	}
-
-	public Folder getFolder() {
-		return folder;
-	}
-
-	public void setFolder(Folder folder) {
-		this.folder = folder;
-	}
-
-	public boolean isNotifyEvent() {
-		return notifyEvent;
-	}
-
-	public void setNotifyEvent(boolean notifyEvent) {
-		this.notifyEvent = notifyEvent;
-	}
-
-	public String getIp() {
-		return ip;
-	}
-
-	public void setIp(String ip) {
-		this.ip = ip;
-	}
-
-	public String getReason() {
-		return reason;
-	}
-
-	public void setReason(String reason) {
-		this.reason = reason;
-	}
-
-	public Long getFolderId() {
-		return folderId;
-	}
-
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setFolderId(Long folderId) {
-		this.folderId = folderId;
-	}
-
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
-
-	public String getGeolocation() {
-		return geolocation;
-	}
-
-	public void setGeolocation(String geolocation) {
-		this.geolocation = geolocation;
-	}
-
-	public String getDevice() {
-		return device;
-	}
-
-	public void setDevice(String device) {
-		this.device = device;
-	}
-
-	public Long getFileSize() {
-		return fileSize;
-	}
-
-	public void setFileSize(Long fileSize) {
-		this.fileSize = fileSize;
-	}
-
-	public String getKeyLabel() {
-		return keyLabel;
-	}
-
-	public void setKeyLabel(String keyLabel) {
-		this.keyLabel = keyLabel;
-	}
-
 	protected void copyAttributesFrom(History source) {
-		setTenantId(source.getTenantId());
-		setDate(source.getDate());
-		setCreation(source.getCreation());
+		super.copyAttributesFrom(source);
+
 		setDocId(source.getDocId());
 		setFolderId(source.getFolderId());
-		setUser(source.getUser());
-		setEvent(source.getEvent());
-		setComment(source.getComment());
 		setReason(source.getReason());
-		setPath(source.getPath());
-		setNotified(source.getNotified());
-		setSessionId(source.getSessionId());
 		setIsNew(source.getIsNew());
 		setFilename(source.getFilename());
-		setUserId(source.getUserId());
-		setUsername(source.getUsername());
-		setUserLogin(source.getUserLogin());
-		setFile(source.getFile());
-		setTenant(source.getTenant());
-		setNotifyEvent(isNotifyEvent());
-		setIp(source.getIp());
-		setDevice(source.getDevice());
-		setGeolocation(source.getGeolocation());
 		setFileSize(source.getFileSize());
-		setKeyLabel(source.getKeyLabel());
 	}
 
 	@Override
 	public String toString() {
-		return getId() + " - " + event;
+		return getId() + " - " + getEvent();
 	}
 
 	@Override
-	public int compareTo(History other) {
+	public int compareTo(BasicHistory other) {
 		return getDate().compareTo(other.getDate());
 	}
 
@@ -477,9 +132,8 @@ public abstract class History extends PersistentObject implements Comparable<His
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((date == null) ? 0 : date.hashCode());
 		result = prime * result + ((docId == null) ? 0 : docId.hashCode());
-		result = prime * result + ((event == null) ? 0 : event.hashCode());
+		result = prime * result + ((folderId == null) ? 0 : folderId.hashCode());
 		return result;
 	}
 
@@ -492,51 +146,16 @@ public abstract class History extends PersistentObject implements Comparable<His
 		if (getClass() != obj.getClass())
 			return false;
 		History other = (History) obj;
-		if (date == null) {
-			if (other.date != null)
-				return false;
-		} else if (date.getTime() != other.date.getTime())
-			return false;
 		if (docId == null) {
 			if (other.docId != null)
 				return false;
 		} else if (!docId.equals(other.docId))
 			return false;
-		if (event == null) {
-			if (other.event != null)
+		if (folderId == null) {
+			if (other.folderId != null)
 				return false;
-		} else if (!event.equals(other.event))
+		} else if (!folderId.equals(other.folderId))
 			return false;
 		return true;
-	}
-
-	/**
-	 * Retrieves those histories that refer to events stored in the database and
-	 * used for reports. It looks for those histories that also declare the
-	 * {@link Table} annotation.
-	 * 
-	 * @return Collection of table names
-	 */
-	public static Collection<String> eventTables() {
-		List<String> tables = new ArrayList<>();
-
-		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
-		scanner.addIncludeFilter(new AnnotationTypeFilter(Table.class));
-
-		for (BeanDefinition bd : scanner.findCandidateComponents("com.logicaldoc")) {
-			String beanClassName = bd.getBeanClassName();
-
-			try {
-				Class<?> beanClass = Class.forName(beanClassName);
-				Table annotation = beanClass.getAnnotation(Table.class);
-				if (annotation != null && StringUtils.isNotEmpty(annotation.name())
-						&& History.class.isAssignableFrom(beanClass))
-					tables.add(annotation.name());
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			}
-		}
-
-		return tables;
 	}
 }
