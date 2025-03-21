@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.frontend.client.ai.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A GUI bean representing an AI model
@@ -31,6 +33,8 @@ public class GUIModel implements Serializable {
 	private String weightInit = "XAVIER";
 
 	private String loss = "NEGATIVELOGLIKELIHOOD";
+
+	private List<GUINeuralNetworkLayer> layers = new ArrayList<>();
 
 	public GUIModel(long id, String name) {
 		super();
@@ -124,5 +128,13 @@ public class GUIModel implements Serializable {
 
 	public void setLoss(String loss) {
 		this.loss = loss;
+	}
+
+	public List<GUINeuralNetworkLayer> getLayers() {
+		return layers;
+	}
+
+	public void setLayers(List<GUINeuralNetworkLayer> layers) {
+		this.layers = layers;
 	}
 }

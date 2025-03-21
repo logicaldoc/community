@@ -201,6 +201,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 		ToggleItem keepMembership = ItemFactory.newToggleItem(KEEPMEMBERSHIP, "keepmembershiplocalgroups",
 				this.server.isKeepLocalMemberships());
 		keepMembership.setRequired(true);
+		keepMembership.setEndRow(true);
 
 		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation(VALIDATION, this.server.getValidation(),
 				null, false);

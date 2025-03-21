@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.ai.sampler;
 
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.DocumentSelector;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
@@ -155,7 +156,6 @@ public class SamplerProperties extends SamplerDetailsTab {
 		container.addMember(form);
 
 		prepareChain();
-
 	}
 
 	private void prepareChain() {
@@ -290,8 +290,13 @@ public class SamplerProperties extends SamplerDetailsTab {
 			sampler.setFolder(folderSelector.getFolder());
 			sampler.setDocument(documentSelector.getDocument());
 
+			if ("chain".equals(sampler.getType()) && chain.getRecordList().isEmpty()) {
+				GuiLog.error("samplerchainempty");
+				return false;
+			}
+				
 			sampler.getChain().clear();
-			if ("chain".equals(sampler.getType()) && !chain.getRecordList().isEmpty()) {
+			if ("chain".equals(sampler.getType())) {
 				com.smartgwt.client.data.Record[] chainRecords = chain.getRecordList().toArray();
 				for (com.smartgwt.client.data.Record chainRecord : chainRecords)
 					sampler.getChain()
