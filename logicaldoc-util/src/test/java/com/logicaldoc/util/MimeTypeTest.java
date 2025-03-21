@@ -21,7 +21,7 @@ public class MimeTypeTest {
 		assertEquals("image/svg+xml", res);
 		
 		res = MimeType.getByFilename("dddd.jfif");
-		assertEquals("image/pjpeg", res);	
+		assertEquals("image/jpeg", res);	
 		
 		res = MimeType.getByFilename("dddd.webp");
 		assertEquals("image/webp", res);
@@ -60,7 +60,7 @@ public class MimeTypeTest {
 	@Test
 	public void testGet() {
 		String res = MimeType.get("jfif");
-		assertEquals("image/pjpeg", res);
+		assertEquals("image/jpeg", res);
 		
 		res = MimeType.get("docx");
 		assertEquals("application/vnd.openxmlformats-officedocument.wordprocessingml.document", res);
@@ -73,7 +73,13 @@ public class MimeTypeTest {
 		assertEquals("video/mp4", res);
 		
 		res = MimeType.get(".eml");
-		assertEquals("message/rfc822", res);		
+		assertEquals("message/rfc822", res);
+		
+		res = MimeType.get(".jpg");
+		assertEquals("image/jpeg", res);
+		
+		res = MimeType.get(".jpeg");
+		assertEquals("image/jpeg", res);		
 	}	
 
 }
