@@ -46,7 +46,7 @@ public class SamplersPanel extends VLayout {
 
 	protected Canvas details = SELECT_SAMPLER;
 
-	static final Canvas SELECT_SAMPLER = new HTMLPanel("&nbsp;" + I18N.message("selecttasampler"));
+	static final Canvas SELECT_SAMPLER = new HTMLPanel("&nbsp;" + I18N.message("selectasampler"));
 
 	public SamplersPanel() {
 		setWidth100();
@@ -139,7 +139,7 @@ public class SamplersPanel extends VLayout {
 		});
 
 		list.addDataArrivedHandler(event -> infoPanel
-				.setMessage(I18N.message("showattributesets", Integer.toString(list.getTotalRows()))));
+				.setMessage(I18N.message("showsamplers", Integer.toString(list.getTotalRows()))));
 
 		detailsContainer.setAlign(Alignment.CENTER);
 		detailsContainer.addMember(details);

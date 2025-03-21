@@ -44,9 +44,9 @@ public class ModelsPanel extends VLayout {
 
 	protected RefreshableListGrid list;
 
-	protected Canvas details = SELECT_SAMPLER;
+	protected Canvas details = SELECT_MODEL;
 
-	static final Canvas SELECT_SAMPLER = new HTMLPanel("&nbsp;" + I18N.message("selecttasampler"));
+	static final Canvas SELECT_MODEL = new HTMLPanel("&nbsp;" + I18N.message("selectamodel"));
 
 	public ModelsPanel() {
 		setWidth100();
@@ -58,7 +58,7 @@ public class ModelsPanel extends VLayout {
 
 		final Layout listing = new VLayout();
 		detailsContainer = new VLayout();
-		details = SELECT_SAMPLER;
+		details = SELECT_MODEL;
 
 		// Initialize the listing panel
 		listing.setAlign(Alignment.CENTER);
@@ -80,8 +80,8 @@ public class ModelsPanel extends VLayout {
 		description.setCanFilter(true);
 		description.setCanSort(false);
 
-		ListGridField samplerType = new ListGridField("type", I18N.message("type"));
-		samplerType.setAutoFit(AutoFitWidthApproach.BOTH);
+		ListGridField modelType = new ListGridField("type", I18N.message("type"));
+		modelType.setAutoFit(AutoFitWidthApproach.BOTH);
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -89,7 +89,7 @@ public class ModelsPanel extends VLayout {
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(id, name, label, samplerType, description);
+		list.setFields(id, name, label, modelType, description);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
@@ -110,7 +110,7 @@ public class ModelsPanel extends VLayout {
 		refresh.addClickHandler(event -> {
 			list.refresh(new ModelDS());
 			detailsContainer.removeMembers(detailsContainer.getMembers());
-			details = SELECT_SAMPLER;
+			details = SELECT_MODEL;
 			detailsContainer.setMembers(details);
 		});
 		toolStrip.addButton(refresh);
@@ -118,7 +118,7 @@ public class ModelsPanel extends VLayout {
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("addmodel"));
 		toolStrip.addButton(add);
-		add.addClickHandler(event -> onAddSampler());
+		add.addClickHandler(event -> onAddModel());
 
 		toolStrip.addFill();
 
@@ -138,8 +138,8 @@ public class ModelsPanel extends VLayout {
 				});
 		});
 
-		list.addDataArrivedHandler(event -> infoPanel
-				.setMessage(I18N.message("showattributesets", Integer.toString(list.getTotalRows()))));
+		list.addDataArrivedHandler(
+				event -> infoPanel.setMessage(I18N.message("showmodels", Integer.toString(list.getTotalRows()))));
 
 		detailsContainer.setAlign(Alignment.CENTER);
 		detailsContainer.addMember(details);
@@ -175,12 +175,12 @@ public class ModelsPanel extends VLayout {
 	}
 
 	protected void showModelDetails(GUIModel model) {
-//		if (!(details instanceof SamplerDetailsPanel)) {
-//			detailsContainer.removeMember(details);
-//			details = new SamplerDetailsPanel(this);
-//			detailsContainer.addMember(details);
-//		}
-//		((SamplerDetailsPanel) details).setSampler(sampler);
+		if (!(details instanceof ModelDetailsPanel)) {
+			detailsContainer.removeMember(details);
+			details = new ModelDetailsPanel(this);
+			detailsContainer.addMember(details);
+		}
+		((ModelDetailsPanel) details).setModel(model);
 	}
 
 	public ListGrid getList() {
@@ -209,7 +209,7 @@ public class ModelsPanel extends VLayout {
 
 	}
 
-	protected void onAddSampler() {
+	protected void onAddModel() {
 		list.deselectAllRecords();
 		showModelDetails(new GUIModel());
 	}

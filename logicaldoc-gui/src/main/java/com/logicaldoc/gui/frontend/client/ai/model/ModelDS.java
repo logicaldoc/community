@@ -32,6 +32,6 @@ public class ModelDS extends DataSource {
 		setFields(id, name, label, description, typeField);
 		setClientOnly(true);
 
-		setDataURL("data/ai.xml?object=sampler");
+		setDataURL("data/ai.xml?object=model");
 	}
 }

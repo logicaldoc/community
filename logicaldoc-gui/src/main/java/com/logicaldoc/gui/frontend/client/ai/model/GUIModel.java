@@ -22,6 +22,16 @@ public class GUIModel implements Serializable {
 
 	private String type = "neural";
 
+	private String features;
+
+	private String categories;
+
+	private String activation = "RELU";
+
+	private String weightInit = "XAVIER";
+
+	private String loss = "NEGATIVELOGLIKELIHOOD";
+
 	public GUIModel(long id, String name) {
 		super();
 		this.id = id;
@@ -70,5 +80,49 @@ public class GUIModel implements Serializable {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getFeatures() {
+		return features;
+	}
+
+	public String getCategories() {
+		return categories;
+	}
+
+	public void setFeatures(String features) {
+		this.features = features;
+	}
+
+	public void setCategories(String categories) {
+		this.categories = categories;
+	}
+
+	public String getActivation() {
+		return activation;
+	}
+
+	public void setActivation(String activation) {
+		this.activation = activation;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public String getWeightInit() {
+		return weightInit;
+	}
+
+	public void setWeightInit(String weightInit) {
+		this.weightInit = weightInit;
+	}
+
+	public String getLoss() {
+		return loss;
+	}
+
+	public void setLoss(String loss) {
+		this.loss = loss;
 	}
 }

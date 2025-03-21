@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.ai.sampler;
+package com.logicaldoc.gui.frontend.client.ai.model;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -10,42 +10,42 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 
 /**
- * This panel collects details about a sampler
+ * This panel collects details about a model
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2
  */
-public class SamplerDetailsPanel extends VLayout {
-	private GUISampler sampler;
+public class ModelDetailsPanel extends VLayout {
+	private GUIModel model;
 
 	private Layout standardTabPanel;
 
-	private SamplerProperties standardPanel;
+	private ModelProperties standardPanel;
 
 	private EditingTabSet tabSet;
 
-	private SamplersPanel samplersPanel;
+	private ModelsPanel modelsPanel;
 
-	public SamplerDetailsPanel(SamplersPanel samplersPanel) {
+	public ModelDetailsPanel(ModelsPanel samplersPanel) {
 		super();
 
-		this.samplersPanel = samplersPanel;
+		this.modelsPanel = samplersPanel;
 		setHeight100();
 		setWidth100();
 		setMembersMargin(10);
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
-			if (sampler.getId() != 0) {
-				AIService.Instance.get().getSampler(sampler.getId(), new DefaultAsyncCallback<>() {
+			if (model.getId() != 0) {
+				AIService.Instance.get().getModel(model.getId(), new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(GUISampler sampler) {
-						setSampler(sampler);
+					public void onSuccess(GUIModel sampler) {
+						setModel(model);
 					}
 
 				});
 			} else {
-				setSampler(new GUISampler());
+				setModel(new GUIModel());
 			}
 			tabSet.hideSave();
 		});
@@ -72,17 +72,17 @@ public class SamplerDetailsPanel extends VLayout {
 				standardTabPanel.removeMember(standardPanel);
 		}
 
-		standardPanel = new SamplerProperties(sampler, event -> onModified());
+		standardPanel = new ModelProperties(model, event -> onModified());
 		standardTabPanel.addMember(standardPanel);
 
 	}
 
-	public GUISampler getSampler() {
-		return sampler;
+	public GUIModel getModel() {
+		return model;
 	}
 
-	public void setSampler(GUISampler sampler) {
-		this.sampler = sampler;
+	public void setModel(GUIModel model) {
+		this.model = model;
 		refresh();
 	}
 
@@ -99,13 +99,13 @@ public class SamplerDetailsPanel extends VLayout {
 
 	public void onSave() {
 		if (validate()) {
-			AIService.Instance.get().saveSampler(sampler, new DefaultAsyncCallback<>() {
+			AIService.Instance.get().saveModel(model, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUISampler sampler) {
+				public void onSuccess(GUIModel model) {
 					tabSet.hideSave();
-					if (sampler != null) {
-						samplersPanel.updateRecord(sampler);
-						samplersPanel.showSamplerDetails(sampler);
+					if (model != null) {
+						modelsPanel.updateRecord(model);
+						modelsPanel.showModelDetails(model);
 					}
 				}
 			});

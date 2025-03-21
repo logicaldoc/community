@@ -2,8 +2,8 @@ package com.logicaldoc.gui.frontend.client.ai;
 
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
+import com.logicaldoc.gui.frontend.client.ai.model.ModelsPanel;
 import com.logicaldoc.gui.frontend.client.ai.sampler.SamplersPanel;
-import com.logicaldoc.gui.frontend.client.metadata.template.TemplatesPanel;
 import com.smartgwt.client.widgets.tab.Tab;
 
 /**
@@ -14,9 +14,9 @@ import com.smartgwt.client.widgets.tab.Tab;
  */
 public class ModelsAndSamplersPanel extends AdminPanel {
 	public ModelsAndSamplersPanel() {
-		super("templates");
+		super("models");
 
-		body.setMembers(new TemplatesPanel());
+		body.setMembers(new ModelsPanel());
 
 		Tab attributesTab = new Tab(I18N.message("samplers"));
 		attributesTab.setPane(new SamplersPanel());

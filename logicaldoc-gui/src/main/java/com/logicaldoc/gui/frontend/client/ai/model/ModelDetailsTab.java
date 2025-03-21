@@ -1,33 +1,33 @@
-package com.logicaldoc.gui.frontend.client.ai.sampler;
+package com.logicaldoc.gui.frontend.client.ai.model;
 
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
 /**
- * Superclass for all tab panels in the sampler details area
+ * Superclass for all tab panels in the model details area
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2
  */
-public abstract class SamplerDetailsTab extends HLayout {
-	protected GUISampler sampler;
+public abstract class ModelDetailsTab extends HLayout {
+	protected GUIModel model;
 
 	protected ChangedHandler changedHandler;
 
 	/**
 	 * 
-	 * @param sampler The sampler this instance refers to
+	 * @param model The sampler this instance refers to
 	 * @param changedHandler The handler to be invoked in case of changes in the
 	 *        syndication
 	 */
-	protected SamplerDetailsTab(GUISampler sampler, ChangedHandler changedHandler) {
+	protected ModelDetailsTab(GUIModel model, ChangedHandler changedHandler) {
 		super();
-		this.sampler = sampler;
+		this.model = model;
 		this.changedHandler = changedHandler;
 	}
 
-	public GUISampler getSampler() {
-		return sampler;
+	public GUIModel getModel() {
+		return model;
 	}
 
 	public ChangedHandler getChangedHandler() {

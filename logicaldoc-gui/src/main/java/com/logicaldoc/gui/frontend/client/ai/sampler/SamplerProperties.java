@@ -149,7 +149,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		categoryAttribute.setRequiredWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
 		categoryAttribute.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
 		
-		form.setItems(id, name, type, typeValue, label, delimiter, quote, folderSelector, documentSelector, categoryAttribute, automation, description);
+		form.setItems(id, type, name, typeValue, label, delimiter, quote, folderSelector, documentSelector, categoryAttribute, automation, description);
 
 		container.setMembersMargin(3);
 		container.addMember(form);
