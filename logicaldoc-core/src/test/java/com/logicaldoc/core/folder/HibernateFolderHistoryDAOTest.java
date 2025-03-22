@@ -164,12 +164,11 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
 		Assert.assertEquals(hStored.getEvent(), "test FolderHistory store");
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Test
 	public void testFindNotNotified() throws PersistenceException {
-		Collection histories = dao.findNotNotified(null);
+		List<FolderHistory> histories = dao.findNotNotified(null);
 		Assert.assertNotNull(histories);
-		Assert.assertEquals(4, histories.size());
+		Assert.assertEquals(2, histories.size());
 
 		FolderHistory history = dao.findById(3);
 		dao.initialize(history);
@@ -178,24 +177,22 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
 
 		histories = dao.findNotNotified(null);
 		Assert.assertNotNull(histories);
-		Assert.assertEquals(3, histories.size());
+		Assert.assertEquals(1, histories.size());
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Test
 	public void testCleanOldHistories() throws PersistenceException {
 		dao.cleanOldHistories(5);
 
 		FolderHistory history = dao.findById(3);
 		Assert.assertNull(history);
-		Collection histories = dao.findAll();
+		List<FolderHistory> histories = dao.findAll();
 		Assert.assertEquals(2, histories.size());
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Test
 	public void testFindByUserIdAndEvent() throws PersistenceException {
-		Collection histories = dao.findByUserIdAndEvent(1, "data test 03");
+		List<FolderHistory> histories = dao.findByUserIdAndEvent(1, "data test 03");
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(1, histories.size());
 

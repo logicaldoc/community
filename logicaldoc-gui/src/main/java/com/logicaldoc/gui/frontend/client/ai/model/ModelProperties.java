@@ -2,18 +2,18 @@ package com.logicaldoc.gui.frontend.client.ai.model;
 
 import java.util.LinkedHashMap;
 
-import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.DocumentSelector;
-import com.logicaldoc.gui.frontend.client.ai.sampler.GUISampler;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
+import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -50,9 +50,9 @@ public class ModelProperties extends ModelDetailsTab {
 	private DocumentSelector documentSelector;
 
 	private ListGrid layers;
-	
+
 	private SectionStack layersStack = new SectionStack();
-	
+
 	public ModelProperties(GUIModel model, final ChangedHandler changedHandler) {
 		super(model, changedHandler);
 		setWidth100();
@@ -138,7 +138,7 @@ public class ModelProperties extends ModelDetailsTab {
 
 		container.setMembersMargin(3);
 		container.addMember(form);
-		
+
 		prepareLayers();
 	}
 
@@ -227,7 +227,7 @@ public class ModelProperties extends ModelDetailsTab {
 		}
 		return !form.hasErrors();
 	}
-	
+
 	private void prepareLayers() {
 		layers = new ListGrid();
 		layers.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -240,7 +240,7 @@ public class ModelProperties extends ModelDetailsTab {
 		layers.setLeaveScrollbarGap(false);
 		layers.setShowHeader(true);
 		layers.setSelectionType(SelectionStyle.MULTIPLE);
-		layers.setCanEdit(false);
+		layers.setCanEdit(true);
 		layers.setShowRowNumbers(true);
 		layers.setCanReorderRecords(true);
 		layers.setAutoFetchData(true);
@@ -252,7 +252,6 @@ public class ModelProperties extends ModelDetailsTab {
 			event.cancel();
 		});
 
-		
 		ListGridField name = new ListGridField(NAME, I18N.message(NAME));
 		name.setCanEdit(true);
 		name.setCanSort(false);
@@ -264,12 +263,16 @@ public class ModelProperties extends ModelDetailsTab {
 		outputNodes.setCanSort(false);
 		outputNodes.setAutoFitWidth(true);
 		outputNodes.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
+		SpinnerItem editor = ItemFactory.newSpinnerItem("outputnodes", 1);
+		editor.setMin(1);
+		outputNodes.setEditorProperties(editor);
 
 		ListGridField activation = new ListGridField("activation", I18N.message("activationfunction"));
 		activation.setCanEdit(true);
 		activation.setCanSort(false);
 		activation.setAutoFitWidth(true);
 		activation.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
+		activation.setEditorProperties(activationSeletor());
 
 		layers.setFields(name, outputNodes, activation);
 
@@ -282,16 +285,23 @@ public class ModelProperties extends ModelDetailsTab {
 			layers.addData(rec);
 		}
 
-		DynamicForm buttonsForm = new DynamicForm();
-//		buttonsForm.setItems(addSampler);
-
 		layersStack.setHeight100();
 		layersStack.setVisible("neural".equals(model.getType()));
+
+		IButton addLayer = new IButton(I18N.message("addlayer"));
+		addLayer.addClickHandler(click -> {
+			ListGridRecord rec = new ListGridRecord();
+			rec.setAttribute(NAME, "new_layer");
+			rec.setAttribute("outputnodes", 3);
+			rec.setAttribute("activation", "RELU");
+			layers.addData(rec);
+			changedHandler.onChanged(null);
+		});
 
 		SectionStackSection section = new SectionStackSection("<b>" + I18N.message("layers") + "</b>");
 		section.setCanCollapse(false);
 		section.setExpanded(true);
-		section.setItems(layers, buttonsForm);
+		section.setItems(layers, addLayer);
 
 		layersStack.setSections(section);
 		layersStack.draw();
@@ -311,7 +321,6 @@ public class ModelProperties extends ModelDetailsTab {
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();
 	}
-	
 
 	@Override
 	public boolean equals(Object other) {

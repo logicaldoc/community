@@ -8,7 +8,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-import com.logicaldoc.core.history.History;
+import com.logicaldoc.core.history.ExtendedHistory;
 import com.logicaldoc.core.security.Session;
 
 /**
@@ -21,7 +21,7 @@ import com.logicaldoc.core.security.Session;
 @Table(name = "ld_user_history")
 @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class UserHistory extends History {
+public class UserHistory extends ExtendedHistory {
 
 	private static final long serialVersionUID = 1L;
 

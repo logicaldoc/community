@@ -1204,7 +1204,7 @@ public class ItemFactory {
 
 	public static SelectItem newFolderSecurityOption(String name) {
 		SelectItem securityOption = newSelectItem(name);
-		securityOption.setWidth("*");
+//		securityOption.setWidth(80);
 		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("none", I18N.message("none").toLowerCase());
 		opts.put("inherit", I18N.message("inheritparentsec").toLowerCase());

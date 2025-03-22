@@ -335,12 +335,12 @@ values     (4,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,1,1,'2009-12-20 00
 
 
 insert into ld_folder_history 
-			   (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_new, ld_path,ld_tenantid,ld_recordversion)
-values     (3,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,null,5,1,'2006-12-27 00:00:00','sebastian','data test 03','reason test 03','1.0',0,1,'/Default/pippo',1,1);
+			   (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_path,ld_tenantid,ld_recordversion)
+values     (3,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,null,5,1,'2006-12-27 00:00:00','sebastian','data test 03','reason test 03','1.0',0,'/Default/pippo',1,1);
 
 insert into ld_folder_history 
-			   (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_new, ld_path,ld_tenantid,ld_recordversion)
-values     (4,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,null,5,1,'2006-12-30 00:00:00','sebastian','data test 04','reason test 04','1.0',0,1,'/Default/pippo/1',1,1);
+			   (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_path,ld_tenantid,ld_recordversion)
+values     (4,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,null,5,1,'2006-12-30 00:00:00','sebastian','data test 04','reason test 04','1.0',0,'/Default/pippo/1',1,1);
 
 
 insert into ld_systemmessage
@@ -398,16 +398,16 @@ insert into ld_generic(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_type,
 values(3, '2008-11-19 00:00:00', '2008-11-19 00:00:00',1,'a.3','a2.3','str1','str2',10,11,1.5,1.6,'2008-11-20 00:00:00','2008-11-20 00:00:00',1,1);
 
 insert into ld_user_history 
-				(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_notified, ld_new,ld_tenantid,ld_recordversion)
-values     (1,'2008-10-22 00:00:00','2008-10-22 00:00:00', 0,1,'2006-12-20 00:00:00','author','data test 01','reason test 01',0,1,1,1);
+				(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_notified, ld_tenantid,ld_recordversion)
+values     (1,'2008-10-22 00:00:00','2008-10-22 00:00:00', 0,1,'2006-12-20 00:00:00','author','data test 01','reason test 01',0,1,1);
 
 insert into ld_user_history 
-			    (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_notified, ld_new,ld_tenantid,ld_recordversion)
-values     (2,'2008-10-22 00:00:00','2008-10-22 00:00:00', 0,1,'2006-12-25 00:00:00','author','data test 02','reason test 02',0,1,1,1);
+			    (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_notified, ld_tenantid,ld_recordversion)
+values     (2,'2008-10-22 00:00:00','2008-10-22 00:00:00', 0,1,'2006-12-25 00:00:00','author','data test 02','reason test 02',0,1,1);
 
 insert into ld_user_history 
-			    (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_notified, ld_new,ld_tenantid,ld_recordversion)
-values     (3,'2008-10-22 00:00:00','2008-10-22 00:00:00', 0,3,'2006-12-27 00:00:00','sebastian','data test 03','reason test 03',1,1,1,1);
+			    (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_notified, ld_tenantid,ld_recordversion)
+values     (3,'2008-10-22 00:00:00','2008-10-22 00:00:00', 0,3,'2006-12-27 00:00:00','sebastian','data test 03','reason test 03',1,1,1);
 
 insert into ld_bookmark
 		(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_userid, ld_docid, ld_title, ld_description, ld_position, ld_type,ld_tenantid,ld_recordversion)

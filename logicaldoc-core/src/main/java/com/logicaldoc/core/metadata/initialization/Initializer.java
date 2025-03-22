@@ -13,7 +13,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.automation.AutomationException;
-import com.logicaldoc.core.history.History;
+import com.logicaldoc.core.history.ExtendedHistory;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.metadata.Template;
@@ -42,7 +42,7 @@ public class Initializer {
 	 * @param transaction the current transaction
 	 * 
 	 */
-	public void initialize(ExtensibleObject object, Template template, History transaction) {
+	public void initialize(ExtensibleObject object, Template template, ExtendedHistory transaction) {
 		if (!RunLevel.current().aspectEnabled("initialization"))
 			return;
 
@@ -93,7 +93,7 @@ public class Initializer {
 		return template;
 	}
 
-	private void executeInitialization(ExtensibleObject object, History transaction, String attributeName,
+	private void executeInitialization(ExtensibleObject object, ExtendedHistory transaction, String attributeName,
 			Attribute attribute, TemplateAttribute templateAttribute) throws AutomationException {
 		Map<String, Object> fieldValidationDictionary = new HashMap<>();
 		fieldValidationDictionary.put("object", object);
@@ -108,7 +108,7 @@ public class Initializer {
 		script.evaluate(templateAttribute.getInitialization(), fieldValidationDictionary);
 	}
 
-	private void setUser(History transaction) {
+	private void setUser(ExtendedHistory transaction) {
 		User user = transaction != null && transaction.getUser() != null ? transaction.getUser() : null;
 		if (user == null && transaction != null && transaction.getUserId() != null) {
 			UserDAO uDao = Context.get(UserDAO.class);

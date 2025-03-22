@@ -126,7 +126,7 @@ create table ld_user_history (ld_id bigint not null, ld_lastmodified timestamp n
                               ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint, 
                               ld_date timestamp, ld_username varchar(255), ld_event varchar(255), ld_keylabel varchar(255), 
                               ld_comment varchar(4000), ld_reason varchar(4000), ld_notified int not null, ld_sessionid varchar(255), 
-                              ld_new int, ld_filename varchar(255), ld_userlogin varchar(255), ld_ip varchar(255),
+                              ld_filename varchar(255), ld_userlogin varchar(255), ld_ip varchar(255),
                               ld_author varchar(255), ld_geolocation varchar(255), ld_device varchar(255), 
                               ld_filesize bigint, ld_folderid bigint, ld_docid bigint, ld_path varchar(4000), primary key (ld_id));
 create table ld_usergroup (ld_groupid bigint not null, ld_userid bigint not null, primary key (ld_groupid, ld_userid));
@@ -172,7 +172,7 @@ create table ld_folder_history (ld_id bigint not null, ld_lastmodified timestamp
                                 ld_folderid bigint, ld_userid bigint, ld_date timestamp, ld_username varchar(255), 
                                 ld_event varchar(255), ld_comment varchar(4000), ld_reason varchar(4000), ld_version varchar(255), ld_fileversion varchar(10),  
                                 ld_path varchar(4000), ld_pathold varchar(4000), ld_notified int not null, ld_sessionid varchar(255),
-                                ld_new int, ld_filename varchar(255), ld_filenameold varchar(255), ld_userlogin varchar(255),
+                                ld_filename varchar(255), ld_filenameold varchar(255), ld_userlogin varchar(255),
                                 ld_ip varchar(255), ld_geolocation varchar(255), ld_device varchar(255),  
                                 ld_filesize bigint, ld_color varchar(255), primary key (ld_id));
 create table ld_folder_acl (ld_folderid bigint not null, ld_groupid bigint not null, ld_read int not null, ld_write int not null, 
@@ -695,8 +695,8 @@ insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld
 values (5,4,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,0);
 insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_store, ld_readingreq, ld_preview, ld_customid)
 values (5,-10000,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,1);
-insert into ld_folder_history (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_new, ld_path,ld_tenantid,ld_recordversion)
-values (1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,null,5,1,CURRENT_TIMESTAMP,'admin','event.folder.created',null,'1.0',0,1,'/',1,1);
+insert into ld_folder_history (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_path, ld_tenantid, ld_recordversion)
+values (1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,null,5,1,CURRENT_TIMESTAMP,'admin','event.folder.created',null,'1.0',1,'/',1,1);
 
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_creation, ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
 values (4,CURRENT_TIMESTAMP,0,'Default',5,1,CURRENT_TIMESTAMP,0,1,1,1,0,'/4');
@@ -708,8 +708,8 @@ insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write , ld_add, l
 values (4,4,1,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,0,1,1,1);
 insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_store, ld_readingreq, ld_preview, ld_customid)
 values (4,-10000,1,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,0,1,1,1);
-insert into ld_folder_history (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_new, ld_path,ld_tenantid,ld_recordversion)
-values (2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,null,4,1,CURRENT_TIMESTAMP,'admin','event.folder.created',null,'1.0',0,1,'/Default',1,1);
+insert into ld_folder_history (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_path, ld_tenantid, ld_recordversion)
+values (2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,null,4,1,CURRENT_TIMESTAMP,'admin','event.folder.created',null,'1.0',1,'/Default',1,1);
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
 values(1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'task.report','system','en', '$product - $task',

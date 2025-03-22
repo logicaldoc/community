@@ -15,7 +15,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.automation.AutomationException;
-import com.logicaldoc.core.history.History;
+import com.logicaldoc.core.history.ExtendedHistory;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.metadata.Template;
@@ -48,7 +48,7 @@ public class Validator {
 	 * @throws AutomationException the automation has been evaluated but
 	 *         produced an error
 	 */
-	public void validate(ExtensibleObject object, Template template, History transaction)
+	public void validate(ExtensibleObject object, Template template, ExtendedHistory transaction)
 			throws ValidationException, AutomationException {
 		if (!RunLevel.current().aspectEnabled("validation"))
 			return;
@@ -110,7 +110,7 @@ public class Validator {
 		return template;
 	}
 
-	private void validateAttributes(ExtensibleObject object, Template template, History transaction,
+	private void validateAttributes(ExtensibleObject object, Template template, ExtendedHistory transaction,
 			Map<String, String> errors) throws AutomationException {
 		for (String attributeName : template.getAttributeNames()) {
 			Attribute attribute = object.getAttribute(attributeName);
@@ -123,7 +123,7 @@ public class Validator {
 		}
 	}
 
-	private void executeObjectValidation(ExtensibleObject object, Template template, History transaction,
+	private void executeObjectValidation(ExtensibleObject object, Template template, ExtendedHistory transaction,
 			Map<String, String> errors) throws AutomationException {
 
 		Map<String, Object> automationDictionary = new HashMap<>();
@@ -145,7 +145,7 @@ public class Validator {
 		}
 	}
 
-	private void executeAttributeValidation(ExtensibleObject object, History transaction, Map<String, String> errors,
+	private void executeAttributeValidation(ExtensibleObject object, ExtendedHistory transaction, Map<String, String> errors,
 			String attributeName, Attribute attribute, TemplateAttribute templateAttribute) throws AutomationException {
 		Map<String, Object> fieldValidationDictionary = new HashMap<>();
 		fieldValidationDictionary.put("object", object);
@@ -167,7 +167,7 @@ public class Validator {
 			errors.put(attributeName, error.getDescription());
 	}
 
-	private void setUser(History transaction) {
+	private void setUser(ExtendedHistory transaction) {
 		User user = transaction != null && transaction.getUser() != null ? transaction.getUser() : null;
 		if (user == null && transaction != null && transaction.getUserId() != null) {
 			UserDAO uDao = Context.get(UserDAO.class);

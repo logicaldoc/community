@@ -29,7 +29,7 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.folder.FolderEvent;
 import com.logicaldoc.core.history.AbstractDocumentHistory;
-import com.logicaldoc.core.history.History;
+import com.logicaldoc.core.history.ExtendedHistory;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
@@ -82,7 +82,7 @@ public class EventEndpoint implements EventListener {
 	 * @param history
 	 * @return true if it was not remembered already, false otherwise
 	 */
-	private boolean rememberHistory(History history) {
+	private boolean rememberHistory(ExtendedHistory history) {
 		Queue<Long> fifo = fifos.get(history.getClass().getName());
 		if (fifo == null) {
 			fifo = new CircularFifoQueue<>(FIFO_SIZE);
@@ -104,7 +104,7 @@ public class EventEndpoint implements EventListener {
 	 * 
 	 * @return number of cached events
 	 */
-	public <T extends History> int countQueueSize(Class<T> historyClass) {
+	public <T extends ExtendedHistory> int countQueueSize(Class<T> historyClass) {
 		Queue<Long> fifo = fifos.get(historyClass.getName());
 		return fifo != null ? fifo.size() : 0;
 	}
@@ -138,7 +138,7 @@ public class EventEndpoint implements EventListener {
 	}
 
 	@Override
-	public void newEvent(History event) {
+	public void newEvent(ExtendedHistory event) {
 		ContextProperties config = Context.get().getProperties();
 
 		try {
@@ -166,7 +166,7 @@ public class EventEndpoint implements EventListener {
 		}
 	}
 
-	private WebsocketMessage prepareMessage(History event) throws PersistenceException, ServerException {
+	private WebsocketMessage prepareMessage(ExtendedHistory event) throws PersistenceException, ServerException {
 		WebsocketMessage message = new WebsocketMessage(event.getSessionId(), event.getEvent());
 		message.setUserId(event.getUserId());
 		message.setUsername(event.getUserLogin());

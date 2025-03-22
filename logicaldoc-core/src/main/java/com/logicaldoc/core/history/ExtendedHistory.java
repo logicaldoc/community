@@ -10,33 +10,29 @@ import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.folder.Folder;
 
 /**
- * A superclass for those histories tightly related to documents
+ * Superclass for history entries with more information
  * 
- * @author Giuseppe Desiato - LogicalDOC
- * @since 9.2
+ * @author Matteo Caruso - LogicalDOC
+ * @since 5.0
  */
 @MappedSuperclass
-public abstract class AbstractDocumentHistory extends ExtendedHistory {
+public abstract class ExtendedHistory extends History {
+
+	public static final String ASPECT = "saveHistory";
 
 	private static final long serialVersionUID = 1L;
 
-	@Column(name = "ld_version", length = 10)
-	protected String version = null;
-
-	@Column(name = "ld_fileversion", length = 10)
-	protected String fileVersion = null;
-
-	@Column(name = "ld_pathold", length = 4000)
-	protected String pathOld = null;
-
-	@Column(name = "ld_filenameold", length = 255)
-	protected String filenameOld = null;
-	
 	@Column(name = "ld_docid")
 	private Long docId;
 
 	@Column(name = "ld_folderid")
 	private Long folderId;
+
+	/**
+	 * Something to better qualify the event
+	 */
+	@Column(name = "ld_reason", length = 4000)
+	private String reason = null;
 
 	@Column(name = "ld_filename", length = 255)
 	private String filename = null;
@@ -44,12 +40,6 @@ public abstract class AbstractDocumentHistory extends ExtendedHistory {
 	@Column(name = "ld_filesize")
 	private Long fileSize = null;
 
-	/**
-	 * Something to better qualify the event
-	 */
-	@Column(name = "ld_reason")
-	private String reason = null;
-	
 	// Not persistent
 	@Transient
 	private AbstractDocument document;
@@ -57,11 +47,6 @@ public abstract class AbstractDocumentHistory extends ExtendedHistory {
 	// Not persistent
 	@Transient
 	private Folder folder;
-
-
-	public AbstractDocumentHistory() {
-		super();
-	}
 	
 	public Long getDocId() {
 		return docId;
@@ -77,6 +62,14 @@ public abstract class AbstractDocumentHistory extends ExtendedHistory {
 
 	public void setFolderId(Long folderId) {
 		this.folderId = folderId;
+	}
+
+	public String getReason() {
+		return reason;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
 	}
 
 	public String getFilename() {
@@ -95,58 +88,6 @@ public abstract class AbstractDocumentHistory extends ExtendedHistory {
 		this.fileSize = fileSize;
 	}
 
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
-	}
-
-	public String getFileVersion() {
-		return fileVersion;
-	}
-
-	public void setFileVersion(String fileVersion) {
-		this.fileVersion = fileVersion;
-	}
-
-	public String getPathOld() {
-		return pathOld;
-	}
-
-	public void setPathOld(String pathOld) {
-		this.pathOld = pathOld;
-	}
-
-	public String getFilenameOld() {
-		return filenameOld;
-	}
-
-	public void setFilenameOld(String filenameOld) {
-		this.filenameOld = filenameOld;
-	}
-
-	public String getReason() {
-		return reason;
-	}
-
-	public void setReason(String reason) {
-		this.reason = reason;
-	}
-
-	public Folder getFolder() {
-		return folder;
-	}
-
-	public void setFolder(Folder folder) {
-		this.folder = folder;
-	}
-
-	public AbstractDocument getDocument() {
-		return document;
-	}
-
 	public void setDocument(AbstractDocument document) {
 		this.document = document;
 		if (document != null) {
@@ -154,7 +95,7 @@ public abstract class AbstractDocumentHistory extends ExtendedHistory {
 			if (document instanceof Version ver)
 				this.setDocId(ver.getDocId());
 			else
-				this.setDocId(document.getId());
+				this.setDocId(getDocument().getId());
 
 			this.setFilename(document.getFileName());
 			this.setFileSize(document.getFileSize());
@@ -166,17 +107,66 @@ public abstract class AbstractDocumentHistory extends ExtendedHistory {
 		}
 	}
 
+	public AbstractDocument getDocument() {
+		return document;
+	}
 
-	protected void copyAttributesFrom(AbstractDocumentHistory source) {
+	public Folder getFolder() {
+		return folder;
+	}
+
+	public void setFolder(Folder folder) {
+		this.folder = folder;
+	}
+
+	protected void copyAttributesFrom(ExtendedHistory source) {
 		super.copyAttributesFrom(source);
-		setVersion(source.getVersion());
-		setFileVersion(source.getFileVersion());
-		setPathOld(source.getPathOld());
-		setFilenameOld(source.getFilenameOld());
+
 		setDocId(source.getDocId());
 		setFolderId(source.getFolderId());
 		setReason(source.getReason());
 		setFilename(source.getFilename());
 		setFileSize(source.getFileSize());
+	}
+
+	@Override
+	public String toString() {
+		return getId() + " - " + getEvent();
+	}
+
+	@Override
+	public int compareTo(History other) {
+		return getDate().compareTo(other.getDate());
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((docId == null) ? 0 : docId.hashCode());
+		result = prime * result + ((folderId == null) ? 0 : folderId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ExtendedHistory other = (ExtendedHistory) obj;
+		if (docId == null) {
+			if (other.docId != null)
+				return false;
+		} else if (!docId.equals(other.docId))
+			return false;
+		if (folderId == null) {
+			if (other.folderId != null)
+				return false;
+		} else if (!folderId.equals(other.folderId))
+			return false;
+		return true;
 	}
 }
