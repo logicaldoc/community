@@ -16,7 +16,7 @@ import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.history.AbstractDocumentHistory;
-import com.logicaldoc.core.history.ExtendedHistory;
+import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.util.Context;
 
@@ -64,7 +64,7 @@ public class EventCollector {
 	 * @param history
 	 * @return true if it was not remembered already, false otherwise
 	 */
-	private boolean rememberHistory(ExtendedHistory history) {
+	private boolean rememberHistory(History history) {
 		Queue<Long> fifo = fifos.get(history.getClass().getName());
 		if (fifo == null) {
 			fifo = new CircularFifoQueue<>(FIFO_SIZE);
@@ -84,7 +84,7 @@ public class EventCollector {
 	 * 
 	 * @param history the history to notify
 	 */
-	public void newEvent(ExtendedHistory history) {
+	public void newEvent(History history) {
 		if (!isEnabled()) {
 			log.debug("Aspect {} not enabled", ASPECT);
 			return;

@@ -21,12 +21,13 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * Parent of all DAOs that handle histories
  * 
- * @param <T> Class of the implementation of a {@link ExtendedHistory} this DAO handles
+ * @param <T> Class of the implementation of a {@link ExtendedHistory} this DAO
+ *        handles
  * 
  * @author Alessandro Gasparini - LogicalDOC
  * @since 9.0.1
  */
-public abstract class HibernateHistoryDAO<T extends ExtendedHistory> extends HibernatePersistentObjectDAO<T>
+public abstract class HibernateHistoryDAO<T extends History> extends HibernatePersistentObjectDAO<T>
 		implements PersistentObjectDAO<T> {
 
 	@Resource(name = "ContextProperties")
@@ -64,7 +65,7 @@ public abstract class HibernateHistoryDAO<T extends ExtendedHistory> extends Hib
 		EventCollector.get().newEvent(history);
 	}
 
-	protected String getTenantName(ExtendedHistory history) throws PersistenceException {
+	protected String getTenantName(History history) throws PersistenceException {
 		if (HibernateHistoryDAO.tenantNames.containsKey(history.getTenantId()))
 			return HibernateHistoryDAO.tenantNames.get(history.getTenantId());
 

@@ -8,7 +8,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-import com.logicaldoc.core.history.ExtendedHistory;
+import com.logicaldoc.core.history.History;
 
 /**
  * Represents a call to the webservice
@@ -20,7 +20,7 @@ import com.logicaldoc.core.history.ExtendedHistory;
 @Table(name = "ld_webservicecall")
 @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class WebserviceCall extends ExtendedHistory {
+public class WebserviceCall extends History {
 
 	private static final long serialVersionUID = 1L;
 

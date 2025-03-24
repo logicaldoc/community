@@ -1,6 +1,6 @@
 package com.logicaldoc.core.communication;
 
-import com.logicaldoc.core.history.ExtendedHistory;
+import com.logicaldoc.core.history.History;
 
 /**
  * A listener for the event emitted by the collector
@@ -15,5 +15,5 @@ public interface EventListener {
 	 * 
 	 * @param event the event to process
 	 */
-	public void newEvent(ExtendedHistory event);
+	public void newEvent(History event);
 }
