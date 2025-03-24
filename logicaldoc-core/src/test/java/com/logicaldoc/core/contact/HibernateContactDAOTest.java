@@ -96,7 +96,7 @@ public class HibernateContactDAOTest extends AbstractCoreTestCase {
 		testSubject.store(contact);
 		assertNotNull(contact);
 		
-		Long nextVal = testSubject.queryForLong("select next_val from hibernate_sequences where sequence_name='ld_contact'");
+		Long nextVal = testSubject.queryForLong("select next_val from ld_hilo where sequence_name='ld_contact'");
 		assertEquals(100L, nextVal.longValue());
 	}
 

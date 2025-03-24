@@ -40,11 +40,11 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	private static final Logger log = LoggerFactory.getLogger(History.class);
 
-	@Column(name = "ld_userid")
-	private Long userId;
-
 	@Column(name = "ld_date")
 	private Date date = new Date();
+	
+	@Column(name = "ld_userid")
+	private Long userId;
 
 	@Column(name = "ld_username", length = 255)
 	private String username = "";
@@ -61,6 +61,9 @@ public abstract class History extends PersistentObject implements Comparable<His
 	@Column(name = "ld_comment")
 	private String comment = "";
 
+	@Column(name = "ld_path")
+	private String path = null;
+	
 	/**
 	 * Used to mark this event notified by the auditing system
 	 */
@@ -72,9 +75,6 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	@Column(name = "ld_keylabel", length = 255)
 	private String keyLabel = "";
-
-	@Column(name = "ld_path")
-	private String path = null;
 
 	@Column(name = "ld_ip", length = 255)
 	private String ip;

@@ -1,4 +1,4 @@
-update hibernate_sequences set next_val = 5000;
+update ld_hilo set next_val = 5000;
 
 insert into ld_attributeset
 			(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid, ld_recordversion)

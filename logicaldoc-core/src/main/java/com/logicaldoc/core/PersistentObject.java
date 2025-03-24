@@ -38,7 +38,7 @@ public abstract class PersistentObject implements Serializable {
 	@Id
 	@GeneratedValue(generator = "hilo")
 	@GenericGenerator(name = "hilo", strategy = "enhanced-table", parameters = {
-			@Parameter(name = "table_name", value = "hibernate_sequences"),
+			@Parameter(name = "table_name", value = "ld_hilo"),
 			@Parameter(name = "prefer_entity_table_as_segment_value", value = "true"),
 			@Parameter(name = "optimizer", value = "org.hibernate.id.enhanced.HiLoOptimizer"),
 			@Parameter(name = "initial_value", value = "100") })

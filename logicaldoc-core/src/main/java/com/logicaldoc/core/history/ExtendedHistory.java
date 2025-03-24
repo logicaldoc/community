@@ -1,5 +1,7 @@
 package com.logicaldoc.core.history;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
@@ -21,10 +23,13 @@ public abstract class ExtendedHistory extends History {
 	public static final String ASPECT = "saveHistory";
 
 	private static final long serialVersionUID = 1L;
+	
+	@Column(name = "ld_filename", length = 255)
+	private String filename = null;
 
-	@Column(name = "ld_docid")
-	private Long docId;
-
+	@Column(name = "ld_filesize")
+	private Long fileSize = null;
+	
 	@Column(name = "ld_folderid")
 	private Long folderId;
 
@@ -34,12 +39,6 @@ public abstract class ExtendedHistory extends History {
 	@Column(name = "ld_reason", length = 4000)
 	private String reason = null;
 
-	@Column(name = "ld_filename", length = 255)
-	private String filename = null;
-
-	@Column(name = "ld_filesize")
-	private Long fileSize = null;
-
 	// Not persistent
 	@Transient
 	private AbstractDocument document;
@@ -47,14 +46,6 @@ public abstract class ExtendedHistory extends History {
 	// Not persistent
 	@Transient
 	private Folder folder;
-	
-	public Long getDocId() {
-		return docId;
-	}
-
-	public void setDocId(Long docId) {
-		this.docId = docId;
-	}
 
 	public Long getFolderId() {
 		return folderId;
@@ -92,10 +83,6 @@ public abstract class ExtendedHistory extends History {
 		this.document = document;
 		if (document != null) {
 			this.setTenantId(document.getTenantId());
-			if (document instanceof Version ver)
-				this.setDocId(ver.getDocId());
-			else
-				this.setDocId(getDocument().getId());
 
 			this.setFilename(document.getFileName());
 			this.setFileSize(document.getFileSize());
@@ -122,7 +109,6 @@ public abstract class ExtendedHistory extends History {
 	protected void copyAttributesFrom(ExtendedHistory source) {
 		super.copyAttributesFrom(source);
 
-		setDocId(source.getDocId());
 		setFolderId(source.getFolderId());
 		setReason(source.getReason());
 		setFilename(source.getFilename());
@@ -143,8 +129,7 @@ public abstract class ExtendedHistory extends History {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((docId == null) ? 0 : docId.hashCode());
-		result = prime * result + ((folderId == null) ? 0 : folderId.hashCode());
+		result = prime * result + Objects.hash(folderId);
 		return result;
 	}
 
@@ -157,16 +142,6 @@ public abstract class ExtendedHistory extends History {
 		if (getClass() != obj.getClass())
 			return false;
 		ExtendedHistory other = (ExtendedHistory) obj;
-		if (docId == null) {
-			if (other.docId != null)
-				return false;
-		} else if (!docId.equals(other.docId))
-			return false;
-		if (folderId == null) {
-			if (other.folderId != null)
-				return false;
-		} else if (!folderId.equals(other.folderId))
-			return false;
-		return true;
+		return Objects.equals(folderId, other.folderId);
 	}
 }
