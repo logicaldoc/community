@@ -144,7 +144,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 			folder.setFolder(Search.get().getOptions().getFolder(), Search.get().getOptions().getFolderName());
 
 		SelectItem sizeOperator = ItemFactory.newSizeOperator("sizeOperator", "size");
-		IntegerItem size = ItemFactory.newIntegerItem("size", " ", null);
+		IntegerItem size = ItemFactory.newIntegerItem("size", " ", (Integer)null);
 		size.setWidth(50);
 		size.setShowTitle(false);
 		size.setHint("KB");

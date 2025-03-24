@@ -36,6 +36,12 @@ public class GUIModel implements Serializable {
 
 	private List<GUINeuralNetworkLayer> layers = new ArrayList<>();
 
+	private int batch = 200;
+
+	private long seed = 123;
+
+	private GUITraining training = new GUITraining();
+
 	public GUIModel(long id, String name) {
 		super();
 		this.id = id;
@@ -136,5 +142,29 @@ public class GUIModel implements Serializable {
 
 	public void setLayers(List<GUINeuralNetworkLayer> layers) {
 		this.layers = layers;
+	}
+
+	public int getBatch() {
+		return batch;
+	}
+
+	public void setBatch(int batch) {
+		this.batch = batch;
+	}
+
+	public long getSeed() {
+		return seed;
+	}
+
+	public void setSeed(long seed) {
+		this.seed = seed;
+	}
+
+	public GUITraining getTraining() {
+		return training;
+	}
+
+	public void setTraining(GUITraining training) {
+		this.training = training;
 	}
 }

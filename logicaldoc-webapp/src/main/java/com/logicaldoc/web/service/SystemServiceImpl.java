@@ -596,9 +596,30 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 			if (!query.isEmpty())
 				query.append(" union ");
+			query.append("select ");
+			if (table.equals("ld_webservicecall"))
+				query.append("''");
+			else
+				query.append("A.ld_username".replace("A", tableAlias));
+
+			query.append(", A.ld_event, A.ld_date,".replace("A", tableAlias));
+
+			if (table.equals("ld_webservicecall"))
+				query.append("'', null");
+			else
+				query.append("A.ld_filename, A.ld_folderid".replace("A", tableAlias));
 			query.append(
-					"select A.ld_username, A.ld_event, A.ld_date, A.ld_filename, A.ld_folderid, A.ld_path, A.ld_sessionid, A.ld_docid, A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment, A.ld_reason, A.ld_device, A.ld_geolocation, A.ld_keylabel from TABLE A where A.ld_tenantid = "
-							.replace("TABLE", table).replace("A", tableAlias) + session.getTenantId());
+					", A.ld_path, A.ld_sessionid".replace("A", tableAlias));
+			
+			if (table.equals("ld_webservicecall"))
+				query.append(", ''");
+			else
+				query.append(", A.ld_docid".replace("A", tableAlias));
+
+			query.append(", A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment, A.ld_reason, A.ld_device, A.ld_geolocation, A.ld_keylabel from TABLE A where A.ld_tenantid = "
+							.replace("TABLE", table).replace("A", tableAlias));
+			query.append(Long.toString(session.getTenantId()));
+
 			appendUserCondition(tableAlias, userId, query);
 			appendSessionCondition(tableAlias, historySid, query);
 			appendDatesCondition(tableAlias, from, till, query);
@@ -876,7 +897,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 		try (ZipUtil zipUtil = new ZipUtil();) {
 			File pluginPackage = uploadedFilesMap.values().iterator().next();
-			
+
 			ContextProperties config = Context.get().getProperties();
 			File rootFolder;
 			if (getThreadLocalRequest() != null)

@@ -18,9 +18,13 @@ import com.smartgwt.client.widgets.tab.Tab;
 public class ModelDetailsPanel extends VLayout {
 	private GUIModel model;
 
-	private Layout standardTabPanel;
+	private Layout propertiesTabPanel;
 
-	private ModelProperties standardPanel;
+	private ModelProperties propertiesPanel;
+
+	private Layout trainingTabPanel;
+
+	private ModelTraining trainingPanel;
 
 	private EditingTabSet tabSet;
 
@@ -50,12 +54,20 @@ public class ModelDetailsPanel extends VLayout {
 			tabSet.hideSave();
 		});
 
+		propertiesTabPanel = new HLayout();
+		propertiesTabPanel.setWidth100();
+		propertiesTabPanel.setHeight100();
 		Tab propertiesTab = new Tab(I18N.message("properties"));
-		standardTabPanel = new HLayout();
-		standardTabPanel.setWidth100();
-		standardTabPanel.setHeight100();
-		propertiesTab.setPane(standardTabPanel);
+		propertiesTab.setPane(propertiesTabPanel);
 		tabSet.addTab(propertiesTab);
+
+		
+		trainingTabPanel = new HLayout();
+		trainingTabPanel.setWidth100();
+		trainingTabPanel.setHeight100();
+		Tab trainingTab = new Tab(I18N.message("training"));
+		trainingTab.setPane(trainingTabPanel);
+		tabSet.addTab(trainingTab);
 
 		addMember(tabSet);
 	}
@@ -66,15 +78,23 @@ public class ModelDetailsPanel extends VLayout {
 		/*
 		 * Prepare the standard properties tab
 		 */
-		if (standardPanel != null) {
-			standardPanel.destroy();
-			if (Boolean.TRUE.equals(standardTabPanel.contains(standardPanel)))
-				standardTabPanel.removeMember(standardPanel);
+		if (propertiesPanel != null) {
+			propertiesPanel.destroy();
+			if (Boolean.TRUE.equals(propertiesTabPanel.contains(propertiesPanel)))
+				propertiesTabPanel.removeMember(propertiesPanel);
 		}
 
-		standardPanel = new ModelProperties(model, event -> onModified());
-		standardTabPanel.addMember(standardPanel);
+		if (trainingPanel != null) {
+			trainingPanel.destroy();
+			if (Boolean.TRUE.equals(trainingTabPanel.contains(trainingPanel)))
+				propertiesTabPanel.removeMember(trainingPanel);
+		}
 
+		propertiesPanel = new ModelProperties(model, event -> onModified());
+		propertiesTabPanel.addMember(propertiesPanel);
+
+		trainingPanel = new ModelTraining(model, event -> onModified());
+		trainingTabPanel.addMember(trainingPanel);
 	}
 
 	public GUIModel getModel() {
@@ -91,10 +111,15 @@ public class ModelDetailsPanel extends VLayout {
 	}
 
 	private boolean validate() {
-		boolean stdValid = standardPanel.validate();
-		if (!stdValid)
+		boolean valid = propertiesPanel.validate();
+		if (!valid)
 			tabSet.selectTab(0);
-		return stdValid;
+		
+		valid = trainingPanel.validate();
+		if (!valid)
+			tabSet.selectTab(1);
+		
+		return valid;
 	}
 
 	public void onSave() {

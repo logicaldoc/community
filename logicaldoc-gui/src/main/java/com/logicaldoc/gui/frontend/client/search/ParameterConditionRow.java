@@ -268,7 +268,7 @@ public class ParameterConditionRow extends HLayout {
 				|| criteriaField.equals("rating") || criteriaField.equals("template")
 				|| criteriaField.equals("published") || criteriaField.equals("indexed")
 				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_INT)) {
-			return ItemFactory.newIntegerItem(VALUE_STR, "integer", null);
+			return ItemFactory.newIntegerItem(VALUE_STR, "integer", (Integer)null);
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DOUBLE)) {
 			return ItemFactory.newFloatItem(VALUE_STR, "double", null);
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_BOOLEAN)) {

@@ -3,8 +3,8 @@ package com.logicaldoc.gui.frontend.client.ai.model;
 import java.util.LinkedHashMap;
 
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.DocumentSelector;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.OperatorId;
@@ -12,6 +12,8 @@ import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
@@ -35,6 +37,16 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class ModelProperties extends ModelDetailsTab {
 
+	private static final String SEED = "seed";
+
+	private static final String BATCH = "batch";
+
+	private static final String NEURAL = "neural";
+
+	private static final String ACTIVATION = "activation";
+
+	private static final String OUTPUTNODES = "outputnodes";
+
 	private static final String ID = "id";
 
 	private static final String NAME = "name";
@@ -47,8 +59,6 @@ public class ModelProperties extends ModelDetailsTab {
 
 	private HLayout container = new HLayout();
 
-	private DocumentSelector documentSelector;
-
 	private ListGrid layers;
 
 	private SectionStack layersStack = new SectionStack();
@@ -59,9 +69,6 @@ public class ModelProperties extends ModelDetailsTab {
 		setHeight100();
 
 		setMembers(container);
-
-		documentSelector = new DocumentSelector("document", null);
-		documentSelector.setWidth(250);
 
 		refresh();
 	}
@@ -105,7 +112,6 @@ public class ModelProperties extends ModelDetailsTab {
 
 		StaticTextItem id = ItemFactory.newStaticTextItem(ID, Long.toString(model.getId()));
 		id.setVisible(model.getId() != 0L);
-		documentSelector.addDocumentChangeListener(document -> changedHandler.onChanged(null));
 
 		TextItem features = ItemFactory.newTextItem("features", model.getFeatures());
 		features.addChangedHandler(changedHandler);
@@ -114,8 +120,7 @@ public class ModelProperties extends ModelDetailsTab {
 		features.setHint(I18N.message("valuescommaseparated"));
 		features.setShowHintInField(true);
 		features.setValue(model.getFeatures());
-		features.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, "neural"));
-		features.setRequiredWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, "neural"));
+		setNeuralNetworkVisibility(features);
 
 		TextItem categories = ItemFactory.newTextItem("categories", model.getCategories());
 		categories.addChangedHandler(changedHandler);
@@ -124,16 +129,25 @@ public class ModelProperties extends ModelDetailsTab {
 		categories.setWidth(400);
 		categories.setHint(I18N.message("valuescommaseparated"));
 		categories.setShowHintInField(true);
-		categories.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, "neural"));
-		categories.setRequiredWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, "neural"));
+		setNeuralNetworkVisibility(categories);
 
 		SelectItem activation = activationSeletor();
+		setNeuralNetworkVisibility(activation);
+		activation.addChangedHandler(changedHandler);
 
 		SelectItem weightInit = weightInitSeletor();
 
 		SelectItem loss = lossSeletor();
 
-		form.setItems(id, type, name, typeValue, label, features, categories, activation, weightInit, loss,
+		SpinnerItem batch = ItemFactory.newSpinnerItem(BATCH, model.getBatch());
+		batch.setMin(1);
+		batch.addChangedHandler(changedHandler);
+		setNeuralNetworkVisibility(batch);
+
+		IntegerItem seed = ItemFactory.newIntegerItem(SEED, SEED, model.getSeed());
+		setNeuralNetworkVisibility(seed);
+
+		form.setItems(id, typeValue, type, name, label, features, categories, activation, weightInit, loss, batch, seed,
 				description);
 
 		container.setMembersMargin(3);
@@ -142,8 +156,15 @@ public class ModelProperties extends ModelDetailsTab {
 		prepareLayers();
 	}
 
+	private void setNeuralNetworkVisibility(FormItem activation) {
+		activation.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, NEURAL));
+		activation.setRequiredWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, NEURAL));
+	}
+
 	private SelectItem lossSeletor() {
 		SelectItem item = ItemFactory.newSelectItem("loss", "lossfunction");
+		item.addChangedHandler(changedHandler);
+
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("MSE", "MSE");
 		map.put("XENT", "XENT");
@@ -154,14 +175,14 @@ public class ModelProperties extends ModelDetailsTab {
 
 		item.setValue(model.getLoss());
 
-		item.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, "neural"));
-		item.setRequiredWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, "neural"));
-
+		setNeuralNetworkVisibility(item);
 		return item;
 	}
 
 	private SelectItem weightInitSeletor() {
 		SelectItem item = ItemFactory.newSelectItem("weightInit", "weightinitscheme");
+		item.addChangedHandler(changedHandler);
+
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("DISTRIBUTION", "DISTRIBUTION");
 		map.put("NORMALIZED", "NORMALIZED");
@@ -175,13 +196,12 @@ public class ModelProperties extends ModelDetailsTab {
 
 		item.setValue(model.getWeightInit());
 
-		item.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, "neural"));
-		item.setRequiredWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, "neural"));
+		setNeuralNetworkVisibility(item);
 		return item;
 	}
 
 	private SelectItem activationSeletor() {
-		SelectItem item = ItemFactory.newSelectItem("activation", "activationfunction");
+		SelectItem item = ItemFactory.newSelectItem(ACTIVATION, "activationfunction");
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("CUBE", "CUBE");
 		map.put("ELU", "ELU");
@@ -207,9 +227,6 @@ public class ModelProperties extends ModelDetailsTab {
 		item.setValueMap(map);
 
 		item.setValue(model.getActivation());
-
-		item.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, "neural"));
-		item.setRequiredWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, "neural"));
 		return item;
 	}
 
@@ -221,9 +238,25 @@ public class ModelProperties extends ModelDetailsTab {
 			model.setType(form.getValueAsString(TYPE));
 			model.setFeatures(form.getValueAsString("features"));
 			model.setCategories(form.getValueAsString("categories"));
-			model.setActivation(form.getValueAsString("activation"));
+			model.setActivation(form.getValueAsString(ACTIVATION));
 			model.setWeightInit(form.getValueAsString("weightInit"));
 			model.setLoss(form.getValueAsString("loss"));
+			model.setBatch(Integer.parseInt(form.getValueAsString(BATCH)));
+			model.setSeed(Long.parseLong(form.getValueAsString(SEED)));
+
+			if (NEURAL.equals(model.getType())) {
+				com.smartgwt.client.data.Record[] layerRecords = layers.getRecordList().toArray();
+				if (layerRecords.length < 2) {
+					GuiLog.error("modulelayersnotenough");
+					return false;
+				}
+
+				model.getLayers().clear();
+				for (com.smartgwt.client.data.Record layerRecord : layerRecords)
+					model.getLayers().add(new GUINeuralNetworkLayer(layerRecord.getAttribute(NAME),
+							layerRecord.getAttributeAsInt(OUTPUTNODES), layerRecord.getAttribute(ACTIVATION)));
+			}
+
 		}
 		return !form.hasErrors();
 	}
@@ -241,12 +274,14 @@ public class ModelProperties extends ModelDetailsTab {
 		layers.setShowHeader(true);
 		layers.setSelectionType(SelectionStyle.MULTIPLE);
 		layers.setCanEdit(true);
+		layers.setEditByCell(true);
 		layers.setShowRowNumbers(true);
 		layers.setCanReorderRecords(true);
 		layers.setAutoFetchData(true);
 		layers.setShowRecordComponents(true);
 		layers.setShowRecordComponentsByCell(true);
 		layers.addDropCompleteHandler(dropCompleted -> changedHandler.onChanged(null));
+		layers.addEditCompleteHandler(editCompleted -> changedHandler.onChanged(null));
 		layers.addCellContextClickHandler(event -> {
 			showContextMenu();
 			event.cancel();
@@ -256,18 +291,19 @@ public class ModelProperties extends ModelDetailsTab {
 		name.setCanEdit(true);
 		name.setCanSort(false);
 		name.setAutoFitWidth(true);
+		name.setMinWidth(150);
 		name.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 
-		ListGridField outputNodes = new ListGridField("outputnodes", I18N.message("outputnodes"));
+		ListGridField outputNodes = new ListGridField(OUTPUTNODES, I18N.message(OUTPUTNODES));
 		outputNodes.setCanEdit(true);
 		outputNodes.setCanSort(false);
 		outputNodes.setAutoFitWidth(true);
 		outputNodes.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
-		SpinnerItem editor = ItemFactory.newSpinnerItem("outputnodes", 1);
+		SpinnerItem editor = ItemFactory.newSpinnerItem(OUTPUTNODES, 1);
 		editor.setMin(1);
 		outputNodes.setEditorProperties(editor);
 
-		ListGridField activation = new ListGridField("activation", I18N.message("activationfunction"));
+		ListGridField activation = new ListGridField(ACTIVATION, I18N.message("activationfunction"));
 		activation.setCanEdit(true);
 		activation.setCanSort(false);
 		activation.setAutoFitWidth(true);
@@ -280,20 +316,20 @@ public class ModelProperties extends ModelDetailsTab {
 		for (GUINeuralNetworkLayer layer : model.getLayers()) {
 			ListGridRecord rec = new ListGridRecord();
 			rec.setAttribute(NAME, layer.getName());
-			rec.setAttribute("outputnodes", layer.getOutputNodes());
-			rec.setAttribute("activation", layer.getActivation());
+			rec.setAttribute(OUTPUTNODES, layer.getOutputNodes());
+			rec.setAttribute(ACTIVATION, layer.getActivation());
 			layers.addData(rec);
 		}
 
 		layersStack.setHeight100();
-		layersStack.setVisible("neural".equals(model.getType()));
+		layersStack.setVisible(NEURAL.equals(model.getType()));
 
 		IButton addLayer = new IButton(I18N.message("addlayer"));
 		addLayer.addClickHandler(click -> {
 			ListGridRecord rec = new ListGridRecord();
 			rec.setAttribute(NAME, "new_layer");
-			rec.setAttribute("outputnodes", 3);
-			rec.setAttribute("activation", "RELU");
+			rec.setAttribute(OUTPUTNODES, 3);
+			rec.setAttribute(ACTIVATION, "RELU");
 			layers.addData(rec);
 			changedHandler.onChanged(null);
 		});

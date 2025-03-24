@@ -1026,7 +1026,7 @@ public class ItemFactory {
 	public static RadioGroupItem newBooleanSelector(String name) {
 		return newBooleanSelector(name, name);
 	}
-	
+
 	public static RadioGroupItem newBooleanSelector(String name, String title) {
 		RadioGroupItem radioGroupItem = newRadioGroup(name, title);
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
@@ -1785,6 +1785,10 @@ public class ItemFactory {
 		iv.setErrorMessage(I18N.message(WHOLENUMBER));
 		item.setValidators(iv);
 		return item;
+	}
+
+	public static IntegerItem newIntegerItem(String name, String title, Long value) {
+		return newIntegerItem(name, title, value != null ? value.intValue() : null);
 	}
 
 	/**

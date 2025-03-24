@@ -46,7 +46,7 @@ public class UserQuotaPanel extends HLayout {
 		form = new DynamicForm();
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		IntegerItem quota = ItemFactory.newIntegerItem(QUOTA, QUOTA, null);
+		IntegerItem quota = ItemFactory.newIntegerItem(QUOTA, QUOTA, (Integer)null);
 		quota.setRequired(true);
 		quota.setWidth(120);
 		quota.setValue(user.getQuota() >= 0 ? user.getQuota() / (1024 * 1024) : -1);

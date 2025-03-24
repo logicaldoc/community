@@ -150,7 +150,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		categoryAttribute.setRequiredWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
 		categoryAttribute.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
 		
-		form.setItems(id, type, name, typeValue, label, delimiter, quote, folderSelector, documentSelector, categoryAttribute, automation, description);
+		form.setItems(id, typeValue, type, name, label, delimiter, quote, folderSelector, documentSelector, categoryAttribute, automation, description);
 
 		container.setMembersMargin(3);
 		container.addMember(form);
@@ -247,18 +247,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 	}
 
 	private SelectItem prepareSamplerSelector() {
-		SelectItem addSampler = ItemFactory.newSelectItem("sampler");
-		addSampler.setOptionDataSource(new SamplerDS(null));
-		addSampler.setValueField(ID);
-		addSampler.setDisplayField("name");
-		addSampler.setSortField("name");
-
-		ListGridField id = new IdListGridField();
-		ListGridField name = new ListGridField(NAME, I18N.message(NAME));
-		ListGridField type = new ListGridField(TYPE, I18N.message(TYPE));
-		addSampler.setPickListWidth(200);
-		addSampler.setPickListFields(id, name, type);
-
+		SelectItem addSampler = new SamplerSelector();
 		addSampler.addChangedHandler(changed -> {
 			ListGridRecord selection = addSampler.getSelectedRecord();
 

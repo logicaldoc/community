@@ -148,7 +148,7 @@ public class AttributeInitializerComposer extends Window {
 	}
 
 	private DynamicForm prepareIntegerForm() {
-		IntegerItem number = ItemFactory.newIntegerItem(NUMBER, NUMBER, null);
+		IntegerItem number = ItemFactory.newIntegerItem(NUMBER, NUMBER, (Integer)null);
 		number.setWrapTitle(false);
 		number.setRequired(true);
 
