@@ -34,7 +34,7 @@ import com.logicaldoc.core.automation.AutomationDictionary;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.MailUtil;
-import com.logicaldoc.core.history.ExtendedHistory;
+import com.logicaldoc.core.history.History;
 import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.io.FileUtil;
 import com.talanlabs.avatargenerator.Avatar;

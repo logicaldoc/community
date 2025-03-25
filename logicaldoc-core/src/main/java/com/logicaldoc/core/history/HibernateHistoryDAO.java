@@ -21,7 +21,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * Parent of all DAOs that handle histories
  * 
- * @param <T> Class of the implementation of a {@link ExtendedHistory} this DAO
+ * @param <T> Class of the implementation of a {@link History} this DAO
  *        handles
  * 
  * @author Alessandro Gasparini - LogicalDOC
@@ -44,7 +44,7 @@ public abstract class HibernateHistoryDAO<T extends History> extends HibernatePe
 	@Override
 	public void store(T history) throws PersistenceException {
 		// Write only if the history is enabled
-		if (!RunLevel.current().aspectEnabled(ExtendedHistory.ASPECT))
+		if (!RunLevel.current().aspectEnabled(History.ASPECT))
 			return;
 
 		if (history.getDate() == null)

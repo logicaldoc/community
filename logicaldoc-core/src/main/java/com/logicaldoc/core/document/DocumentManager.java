@@ -38,7 +38,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderEvent;
 import com.logicaldoc.core.folder.FolderHistory;
-import com.logicaldoc.core.history.ExtendedHistory;
+import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
@@ -226,7 +226,7 @@ public class DocumentManager {
 		}
 	}
 
-	private void validateTransaction(ExtendedHistory transaction) {
+	private void validateTransaction(History transaction) {
 		if (transaction == null)
 			throw new IllegalArgumentException(TRANSACTION_CANNOT_BE_NULL);
 		if (transaction.getUser() == null)

@@ -37,7 +37,7 @@ import com.logicaldoc.core.document.DocumentHistoryDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
-import com.logicaldoc.core.history.ExtendedHistory;
+import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.job.JobManager;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -591,7 +591,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 		int i = 0;
 		StringBuilder query = new StringBuilder();
-		for (String table : ExtendedHistory.eventTables()) {
+		for (String table : History.eventTables()) {
 			String tableAlias = "A" + (i++);
 
 			if (!query.isEmpty())

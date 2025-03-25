@@ -8,7 +8,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-import com.logicaldoc.core.history.AbstractDocumentHistory;
+import com.logicaldoc.core.document.AbstractDocumentHistory;
 
 /**
  * History entry due to an event on a folder.

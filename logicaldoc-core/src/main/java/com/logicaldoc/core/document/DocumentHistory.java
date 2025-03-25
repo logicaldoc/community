@@ -9,8 +9,6 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-import com.logicaldoc.core.history.AbstractDocumentHistory;
-
 /**
  * Registers an event on folder or document
  * 
