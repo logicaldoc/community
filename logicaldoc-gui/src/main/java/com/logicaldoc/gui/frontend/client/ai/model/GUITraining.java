@@ -17,6 +17,8 @@ public class GUITraining implements Serializable {
 
 	private Date lastTrained;
 
+	private String report;
+
 	private int epochs = 1000;
 
 	private String cron;
@@ -24,7 +26,7 @@ public class GUITraining implements Serializable {
 	private boolean enabled = true;
 
 	private GUISampler sampler;
-
+	
 	public Date getLastTrained() {
 		return lastTrained;
 	}
@@ -63,5 +65,13 @@ public class GUITraining implements Serializable {
 
 	public void setSampler(GUISampler sampler) {
 		this.sampler = sampler;
+	}
+
+	public String getReport() {
+		return report;
+	}
+
+	public void setReport(String report) {
+		this.report = report;
 	}
 }

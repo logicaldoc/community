@@ -42,6 +42,8 @@ import com.logicaldoc.util.config.ContextProperties;
 @Component("jobManager")
 public class JobManager {
 
+	public static final String JOB = "job";
+
 	public static final String TENANT_ID = "tenantId";
 
 	public static final String MISSFIRE_RUNNOW = "runnow";
@@ -94,6 +96,7 @@ public class JobManager {
 			dictionary=new HashMap<>(dictionary);
 
 		dictionary.computeIfAbsent(TENANT_ID, k -> job.getTenantId());
+		dictionary.computeIfAbsent(JOB, k -> job);
 		
 		JobKey jobKey = JobKey.jobKey(job.getName(), job.getGroup());
 		JobDetail jobDetail = scheduler.getJobDetail(jobKey);

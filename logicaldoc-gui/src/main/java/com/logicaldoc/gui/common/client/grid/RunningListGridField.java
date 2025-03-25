@@ -20,14 +20,21 @@ public class RunningListGridField extends ColoredListGridField {
 		setCanSort(true);
 		setCellFormatter((value, rec, rowNum, colNum) -> formatStatusIconCell(rec));
 	}
+	
+	public RunningListGridField(String name) {
+		super(name, " ", 30);
+		setCanFilter(true);
+		setCanSort(true);
+		setCellFormatter((value, rec, rowNum, colNum) -> formatStatusIconCell(rec));
+	}
 
 	private String formatStatusIconCell(ListGridRecord rec) {
 		String color = rec.getAttributeAsString(colorFieldName);
 		String content = "<div style='display: flex; text-align: center; justify-content: center;'>";
-		if (Boolean.TRUE.equals(rec.getAttributeAsBoolean(RUNNING))) {
-			content += AwesomeFactory.getIconButtonHTML("cog", null, RUNNING, color, "spin", null);
+		if (Boolean.TRUE.equals(rec.getAttributeAsBoolean(getName()))) {
+			content += AwesomeFactory.getIconButtonHTML("refresh", null, getName(), color, "spin", null);
 		} else {
-			content += AwesomeFactory.getIconButtonHTML("cog", null, "idle", color, null);
+			content += AwesomeFactory.getIconButtonHTML("refresh", null, "idle", color, null);
 		}
 		content += "</div>";
 		return content;

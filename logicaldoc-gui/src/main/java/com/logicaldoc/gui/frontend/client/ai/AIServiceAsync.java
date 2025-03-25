@@ -19,4 +19,8 @@ public interface AIServiceAsync {
 	void saveModel(GUIModel model, AsyncCallback<GUIModel> callback);
 
 	void getModel(long modelId, AsyncCallback<GUIModel> callback);
+
+	void getModels(AsyncCallback<List<GUIModel>> callback);
+
+	void trainModel(long modelId, AsyncCallback<Void> callback);
 }

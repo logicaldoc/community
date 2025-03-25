@@ -42,6 +42,14 @@ public class GUIModel implements Serializable {
 
 	private GUITraining training = new GUITraining();
 
+	private int cutoff = 1;
+
+	private int ngramMin = 2;
+
+	private int ngramMax = 4;
+
+	private String language = "en";
+
 	public GUIModel(long id, String name) {
 		super();
 		this.id = id;
@@ -50,6 +58,38 @@ public class GUIModel implements Serializable {
 
 	public GUIModel() {
 		super();
+	}
+
+	public int getCutoff() {
+		return cutoff;
+	}
+
+	public void setCutoff(int cutoff) {
+		this.cutoff = cutoff;
+	}
+
+	public int getNgramMin() {
+		return ngramMin;
+	}
+
+	public void setNgramMin(int ngramMin) {
+		this.ngramMin = ngramMin;
+	}
+
+	public int getNgramMax() {
+		return ngramMax;
+	}
+
+	public void setNgramMax(int ngramMax) {
+		this.ngramMax = ngramMax;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
 	}
 
 	public long getId() {

@@ -82,6 +82,25 @@ public interface AIService extends RemoteService {
 	 */
 	public GUIModel getModel(long modelId) throws ServerException;
 
+	
+	/**
+	 * Retrieves all the models
+	 * 
+	 * @return the list of models
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public List<GUIModel> getModels() throws ServerException;
+	
+	/**
+	 * Trains a model
+	 * 
+	 * @param modelId identifier of the model to train
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void trainModel(long modelId) throws ServerException;
+
 	public static class Instance {
 		private static AIServiceAsync inst;
 

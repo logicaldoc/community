@@ -94,31 +94,31 @@ public class SamplerProperties extends SamplerDetailsTab {
 		TextItem label = ItemFactory.newTextItem("label", sampler.getLabel());
 		label.addChangedHandler(changedHandler);
 
-		TextItem delimiter = ItemFactory.newSimpleTextItem("delimiter", sampler.getDelimiter());
+		TextItem delimiter = ItemFactory.newTextItem("delimiter", sampler.getDelimiter());
 		delimiter.addChangedHandler(changedHandler);
 		delimiter.setWidth(30);
-		delimiter.setLength(1);
+		delimiter.setLength(2);
 		delimiter.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, CSV));
 		delimiter.setRequiredWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, CSV));
-		
-		TextItem quote = ItemFactory.newSimpleTextItem("quote", sampler.getQuote());
+
+		TextItem quote = ItemFactory.newTextItem("quote", sampler.getQuote());
 		quote.addChangedHandler(changedHandler);
 		quote.setWidth(30);
-		quote.setLength(1);
+		quote.setLength(2);
 		quote.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, CSV));
-		quote.setRequiredWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, CSV));
-		
+
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", sampler.getDescription());
 		description.addChangedHandler(changedHandler);
 		description.setColSpan(4);
 		description.setWidth("*");
-		
-		TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", sampler.getAutomation(), changedHandler, false);
+
+		TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", sampler.getAutomation(),
+				changedHandler, false);
 		automation.addChangedHandler(changedHandler);
 		automation.setColSpan(4);
 		automation.setWidth("*");
 		automation.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
-		
+
 		SelectItem type = ItemFactory.newSelectItem(TYPE);
 		type.setOptionDataSource(new SamplerTypeDS());
 		type.setValueField(VALUE);
@@ -149,8 +149,9 @@ public class SamplerProperties extends SamplerDetailsTab {
 		categoryAttribute.addChangedHandler(changedHandler);
 		categoryAttribute.setRequiredWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
 		categoryAttribute.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
-		
-		form.setItems(id, typeValue, type, name, label, delimiter, quote, folderSelector, documentSelector, categoryAttribute, automation, description);
+
+		form.setItems(id, typeValue, type, name, label, delimiter, quote, folderSelector, documentSelector,
+				categoryAttribute, automation, description);
 
 		container.setMembersMargin(3);
 		container.addMember(form);
@@ -283,7 +284,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 				GuiLog.error("samplerchainempty");
 				return false;
 			}
-				
+
 			sampler.getChain().clear();
 			if ("chain".equals(sampler.getType())) {
 				com.smartgwt.client.data.Record[] chainRecords = chain.getRecordList().toArray();

@@ -8,7 +8,7 @@ import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.StaticTextItem;
+import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
@@ -44,15 +44,6 @@ public class ModelTraining extends ModelDetailsTab {
 		if (Boolean.TRUE.equals(container.contains(form)))
 			container.removeChild(form);
 
-		form = new DynamicForm();
-		form.setNumCols(4);
-		form.setWidth(1);
-		form.setTitleOrientation(TitleOrientation.TOP);
-
-		StaticTextItem lastTrained = ItemFactory.newStaticTextItem("lasttrained",
-				model.getTraining().getLastTrained() != null ? I18N.formatDate(model.getTraining().getLastTrained())
-						: "");
-
 		ToggleItem enabled = ItemFactory.newToggleItem(ENABLED, "enableschedule", model.getTraining().isEnabled());
 		enabled.addChangedHandler(changedHandler);
 
@@ -73,10 +64,29 @@ public class ModelTraining extends ModelDetailsTab {
 		sampler.setRequired(true);
 		sampler.addChangedHandler(changedHandler);
 
-		form.setItems(lastTrained, enabled, cron, epochs, sampler);
+		form = new DynamicForm();
+		form.setNumCols(4);
+		form.setWidth(1);
+		form.setTitleOrientation(TitleOrientation.TOP);
+		form.setItems(enabled, cron, epochs, sampler);
 
+		container.setWidth100();
 		container.setMembersMargin(3);
 		container.addMember(form);
+
+		TextAreaItem report = ItemFactory.newTextAreaItem("report",
+				model.getTraining().getLastTrained() != null
+						? I18N.message("lasttrainedon", I18N.formatDate(model.getTraining().getLastTrained()))
+						: I18N.message("report"),
+				model.getTraining().getReport());
+		report.setWidth("*");
+
+		DynamicForm reportForm = new DynamicForm();
+		reportForm.setWidth100();
+		reportForm.setNumCols(1);
+		reportForm.setTitleOrientation(TitleOrientation.TOP);
+		reportForm.setItems(report);
+		container.addMember(reportForm);
 	}
 
 	boolean validate() {

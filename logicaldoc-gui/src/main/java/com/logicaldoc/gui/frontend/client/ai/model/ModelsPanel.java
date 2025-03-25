@@ -4,13 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.beans.GUITask;
+import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.grid.RunningListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.frontend.client.ai.AIService;
+import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
@@ -18,6 +22,7 @@ import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.Progressbar;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -83,13 +88,17 @@ public class ModelsPanel extends VLayout {
 		ListGridField modelType = new ListGridField("type", I18N.message("type"));
 		modelType.setAutoFit(AutoFitWidthApproach.BOTH);
 
+		DateListGridField trained = new DateListGridField("trained", I18N.message("lasttrained"));
+
+		ListGridField training = new RunningListGridField();
+
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowAllRecords(true);
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(id, name, label, modelType, description);
+		list.setFields(id, name, label, modelType, training, trained, description);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
@@ -170,7 +179,20 @@ public class ModelsPanel extends VLayout {
 			}
 		}));
 
-		contextMenu.setItems(delete);
+		MenuItem train = new MenuItem();
+		train.setTitle(I18N.message("starttraining"));
+		train.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmtraining"), confirm -> {
+			if (Boolean.TRUE.equals(confirm)) {
+				AIService.Instance.get().trainModel(ids.get(0), new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(Void result) {
+						// Nothing to do
+					}
+				});
+			}
+		}));
+
+		contextMenu.setItems(train, delete);
 		contextMenu.showContextMenu();
 	}
 
@@ -205,6 +227,7 @@ public class ModelsPanel extends VLayout {
 		rec.setAttribute("name", model.getName());
 		rec.setAttribute(LABEL, model.getLabel() != null ? model.getLabel() : model.getName());
 		rec.setAttribute(DESCRIPTION, model.getDescription());
+		rec.setAttribute("training", model.getTraining().isEnabled());
 		list.refreshRow(list.getRecordIndex(rec));
 
 	}
@@ -222,5 +245,16 @@ public class ModelsPanel extends VLayout {
 	@Override
 	public int hashCode() {
 		return super.hashCode();
+	}
+	
+	private void loadTasks() {
+		AIService.Instance.get().getModels(new DefaultAsyncCallback<>() {
+			@Override
+			public void onSuccess(List<GUIModel> models) {
+				for (GUIModel guiModel : models) {
+					updateRecord(guiModel);
+				}
+			}
+		});
 	}
 }

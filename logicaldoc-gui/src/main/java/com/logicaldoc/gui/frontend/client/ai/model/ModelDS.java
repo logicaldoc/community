@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.ai.model;
 
 import com.smartgwt.client.data.DataSource;
+import com.smartgwt.client.data.fields.DataSourceDateTimeField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -28,8 +29,9 @@ public class ModelDS extends DataSource {
 		DataSourceTextField label = new DataSourceTextField("label");
 		DataSourceTextField description = new DataSourceTextField("description");
 		DataSourceTextField typeField = new DataSourceTextField("type");
+		DataSourceDateTimeField trained = new DataSourceDateTimeField("trained");
 
-		setFields(id, name, label, description, typeField);
+		setFields(id, name, label, trained, description, typeField);
 		setClientOnly(true);
 
 		setDataURL("data/ai.xml?object=model");

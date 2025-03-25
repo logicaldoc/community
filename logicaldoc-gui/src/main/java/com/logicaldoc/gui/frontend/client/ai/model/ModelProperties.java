@@ -103,6 +103,7 @@ public class ModelProperties extends ModelDetailsTab {
 		type.setDisplayField(VALUE);
 		type.setValue(model.getType());
 		type.addChangedHandler(changedHandler);
+		type.addChangedHandler(changed -> layersStack.setVisible(NEURAL.equals(type.getValueAsString())));
 		type.setRequired(true);
 		type.setDisabled(model.getId() != 0L);
 		type.setVisible(model.getId() == 0L);
