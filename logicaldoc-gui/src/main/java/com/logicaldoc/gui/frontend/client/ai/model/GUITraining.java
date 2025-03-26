@@ -24,6 +24,11 @@ public class GUITraining implements Serializable {
 	private String cron;
 
 	private boolean enabled = true;
+	
+	/**
+	 * Indicates if there is a currently running training process
+	 */
+	private boolean training = true;
 
 	private GUISampler sampler;
 	
@@ -73,5 +78,13 @@ public class GUITraining implements Serializable {
 
 	public void setReport(String report) {
 		this.report = report;
+	}
+	
+	public boolean isTraining() {
+		return training;
+	}
+
+	public void setTraining(boolean training) {
+		this.training = training;
 	}
 }

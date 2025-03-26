@@ -1,14 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration packages="com.logicaldoc.util.log4j">
   <Properties>
-    <Property name="root"><![CDATA[logs]]></Property>
+    <Property name="root"><![CDATA[C:\LogicalDOC-Devel\repository\logs]]></Property>
     <Property name="pattern">%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p (%C:%4L) -- %m%n</Property>
     <Property name="dateformat">ISO8601</Property>
-    <Property name="fontsize">x-small</Property>
   </Properties>
   <Appenders>
+    <RollingFile name="workbench_WEB" fileName="${root}/workbench_web.log.html" filePattern="${root}/workbench_web.log.html.%i">
+      <LDHtmlLayout datePattern="${dateformat}" />
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>
+    <RollingFile name="workbench" fileName="${root}/workbench.log" filePattern="${root}/workbench.log.%i">
+      <PatternLayout>
+        <Pattern>${pattern}</Pattern>
+      </PatternLayout>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>
+    <RollingFile name="PatientTask_WEB" fileName="${root}/patienttask_web.log.html" filePattern="${root}/patienttask_web.log.html.%i">
+      <LDHtmlLayout datePattern="${dateformat}" />
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>
+    <RollingFile name="PatientTask" fileName="${root}/patienttask.log" filePattern="${root}/patienttask.log.%i">
+      <PatternLayout>
+        <Pattern>${pattern}</Pattern>
+      </PatternLayout>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>
+    <RollingFile name="GoogleCalendar_WEB" fileName="${root}/googlecalendar_web.log.html" filePattern="${root}/googlecalendar_web.log.html.%i">
+      <LDHtmlLayout datePattern="${dateformat}" />
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>
+    <RollingFile name="GoogleCalendar" fileName="${root}/googlecalendar.log" filePattern="${root}/googlecalendar.log.%i">
+      <PatternLayout>
+        <Pattern>${pattern}</Pattern>
+      </PatternLayout>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>
     <RollingFile name="DocuSignPoller_WEB" fileName="${root}/docusignpoller_web.log.html" filePattern="${root}/docusignpoller_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -24,7 +71,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="ZonalOCRProcessor_WEB" fileName="${root}/zonalocrprocessor_web.log.html" filePattern="${root}/zonalocrprocessor_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -40,7 +87,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="AutomationExecutor_WEB" fileName="${root}/automationexecutor_web.log.html" filePattern="${root}/automationexecutor_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -56,7 +103,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="SyndicationCrawler_WEB" fileName="${root}/syndicationcrawler_web.log.html" filePattern="${root}/syndicationcrawler_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -77,7 +124,7 @@
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
       <DefaultRolloverStrategy max="5" />
-    </RollingFile>    
+    </RollingFile>
     <RollingFile name="FTPSERVER" fileName="${root}/ftpserver.log" filePattern="${root}/ftpserver.log.%i">
       <PatternLayout>
         <Pattern>${pattern}</Pattern>
@@ -88,7 +135,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="VIAEmailCrawler_WEB" fileName="${root}/viaemailcrawler_web.log.html" filePattern="${root}/viaemailcrawler_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -104,7 +151,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="SystemDiagnosis_WEB" fileName="${root}/systemdiagnosisr_web.log.html" filePattern="${root}/systemdiagnosis_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -120,7 +167,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="ReportsProcessor_WEB" fileName="${root}/reportsprocessorr_web.log.html" filePattern="${root}/reportsprocessor_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -136,7 +183,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="RetentionProcessor_WEB" fileName="${root}/retentionprocessor_web.log.html" filePattern="${root}/retentionprocessor_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -152,7 +199,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="IncrementalArchiveCreator_WEB" fileName="${root}/incrementalarchivecreator_web.log.html" filePattern="${root}/incrementalarchivecreator_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -168,7 +215,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="DMS_WEB" fileName="${root}/dms_web.log.html" filePattern="${root}/dms_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -184,7 +231,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="ArchiveImporter_WEB" fileName="${root}/archiveimporter_web.log.html" filePattern="${root}/archiveimporter_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -200,7 +247,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="ArchiveBuilder_WEB" fileName="${root}/archivebuilder_web.log.html" filePattern="${root}/archivebuilder_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -216,7 +263,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="AuditTask_WEB" fileName="${root}/audit_web.log.html" filePattern="${root}/audit_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -232,7 +279,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="Notifier_WEB" fileName="${root}/notifier_web.log.html" filePattern="${root}/notifier_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -248,7 +295,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="BarcodeProcessor_WEB" fileName="${root}/barcodeprocessor_web.log.html" filePattern="${root}/barcodeprocessor_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -263,8 +310,15 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
+    <RollingFile name="NetworkBrowser_WEB" fileName="${root}/networkbrowser_web.log.html" filePattern="${root}/networkbrowser_web.log.html.%i">
+      <LDHtmlLayout datePattern="${dateformat}" />
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>
     <RollingFile name="ImportFolderCrawler_WEB" fileName="${root}/importfoldercrawler_web.log.html" filePattern="${root}/importfoldercrawler_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -280,7 +334,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="StatsCollector_WEB" fileName="${root}/stats_web.log.html" filePattern="${root}/stats_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -296,7 +350,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="EmailCrawler_WEB" fileName="${root}/emailcrawler_web.log.html" filePattern="${root}/emailcrawler_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -312,7 +366,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="Cleaner_WEB" fileName="${root}/cleaner_web.log.html" filePattern="${root}/cleaner_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -328,7 +382,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="FSCleaner_WEB" fileName="${root}/fscleaner_web.log.html" filePattern="${root}/fscleaner_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -349,7 +403,7 @@
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
       <DefaultRolloverStrategy max="5" />
-    </RollingFile>    
+    </RollingFile>
     <RollingFile name="DB" fileName="${root}/db.log" filePattern="${root}/db.log.%i">
       <PatternLayout>
         <Pattern>${pattern}</Pattern>
@@ -365,7 +419,7 @@
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
       <DefaultRolloverStrategy max="5" />
-    </RollingFile>      
+    </RollingFile>
     <RollingFile name="CP" fileName="${root}/cp.log" filePattern="${root}/cp.log.%i">
       <PatternLayout>
         <Pattern>${pattern}</Pattern>
@@ -381,7 +435,7 @@
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
       <DefaultRolloverStrategy max="5" />
-    </RollingFile>    
+    </RollingFile>
     <RollingFile name="CMIS" fileName="${root}/cmis.log" filePattern="${root}/cmis.log.%i">
       <PatternLayout>
         <Pattern>${pattern}</Pattern>
@@ -392,7 +446,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="IndexOptimizer_WEB" fileName="${root}/indexoptimizer_web.log.html" filePattern="${root}/indexoptimizer_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -408,7 +462,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="TagsProcessor_WEB" fileName="${root}/tagsprocessor_web.log.html" filePattern="${root}/tagsprocessor_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -424,7 +478,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="IndexerTask_WEB" fileName="${root}/indexertask_web.log.html" filePattern="${root}/indexertask_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -440,7 +494,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="DigestProcessor_WEB" fileName="${root}/digestprocessor_web.log.html" filePattern="${root}/digestprocessor_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -456,7 +510,7 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="PathCalculator_WEB" fileName="${root}/pathcalculator_web.log.html" filePattern="${root}/pathcalculator_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" fontSize="${fontsize}" />
+      <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
@@ -519,14 +573,14 @@
       </Policies>
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
-    <RollingFile name="STORE_DELETIONS_WEB" fileName="${root}/store_deletions_web.log.html" filePattern="${root}/store_deletions_web.log.html.%i">
+    <RollingFile name="STORAGE_DELETIONS_WEB" fileName="${root}/storage_deletions_web.log.html" filePattern="${root}/storage_deletions_web.log.html.%i">
       <LDHtmlLayout datePattern="${dateformat}" />
       <Policies>
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
       <DefaultRolloverStrategy max="5" />
-    </RollingFile>    
-    <RollingFile name="STORE_DELETIONS" fileName="${root}/store_deletions.log" filePattern="${root}/store_deletions.log.%i">
+    </RollingFile>
+    <RollingFile name="STORAGE_DELETIONS" fileName="${root}/storage_deletions.log" filePattern="${root}/storage_deletions.log.%i">
       <PatternLayout>
         <Pattern>%d{dd.MM.yyyy HH:mm:ss,SSS} - %m%n</Pattern>
       </PatternLayout>
@@ -543,12 +597,46 @@
         <SizeBasedTriggeringPolicy size="5 MB" />
       </Policies>
       <DefaultRolloverStrategy max="5" />
-    </RollingFile>     
+    </RollingFile>
+    <RollingFile name="NLP" fileName="${root}/nlp.log" filePattern="${root}/nlp.log.%i" immediateFlush="true">
+      <PatternLayout>
+        <Pattern>%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p %m%n</Pattern>
+      </PatternLayout>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="5 MB" />
+      </Policies>
+      <DefaultRolloverStrategy max="5" />
+    </RollingFile>    
     <Console name="console" target="SYSTEM_OUT">
-      <PatternLayout pattern="%m%n"/>
-    </Console>          
+      <PatternLayout pattern="%m%n" />
+    </Console>
   </Appenders>
   <Loggers>
+    <Logger name="opennlp" additivity="true" level="info">
+      <AppenderRef ref="NLP" level="info" />
+      <AppenderRef ref="DMS" level="error" />
+      <AppenderRef ref="DMS_WEB" level="error" />
+    </Logger>
+    <Logger name="com.logicaldoc.workbench" additivity="false" level="info">
+      <AppenderRef ref="workbench" />
+      <AppenderRef ref="workbench_WEB" />
+    </Logger>
+    <Logger name="com.logicaldoc.workbench.PatientTask" additivity="false" level="info">
+      <AppenderRef ref="PatientTask" />
+      <AppenderRef ref="PatientTask_WEB" />
+    </Logger>
+    <Logger name="com.logicaldoc.google.GoogleCalendar" additivity="false" level="info">
+      <AppenderRef ref="GoogleCalendar" />
+      <AppenderRef ref="GoogleCalendar_WEB" />
+    </Logger>
+    <Logger name="com.logicaldoc.enterprise.store.FSCleanerTask" additivity="false" level="info">
+      <AppenderRef ref="FSCleaner" />
+      <AppenderRef ref="FSCleaner_WEB" />
+    </Logger>
+    <Logger name="com.logicaldoc.conversion.HTMLConverter" additivity="true" level="debug" />
+    <Logger name="com.logicaldoc.util.io" additivity="true" level="debug" />
+    <Logger name="com.logicaldoc.core.security.spring.LDAccessDecisionManager" additivity="false" level="error" />
+    <Logger name="com.logicaldoc.stamp" additivity="false" level="debug" />
     <Logger name="com.logicaldoc.docusign.DocuSignPoller" level="info" additivity="false">
       <AppenderRef ref="DocuSignPoller" />
       <AppenderRef ref="DocuSignPoller_WEB" />
@@ -568,132 +656,133 @@
     <Logger name="org.hibernate.cache" level="warn" additivity="true">
       <AppenderRef ref="DB" />
       <AppenderRef ref="DB_WEB" />
-    </Logger>    
-    <Logger name="STORE_DELETIONS" level="info" additivity="false">
-      <AppenderRef ref="STORE_DELETIONS" />
-      <AppenderRef ref="STORE_DELETIONS_WEB" />
-    </Logger>    
-    <Logger name="org.apache.cxf" level="error" additivity="true">
-      <Appender-Ref ref="WEBSERVICE" />
-      <Appender-Ref ref="WEBSERVICE_WEB" />
     </Logger>
+    <Logger name="STORAGE_DELETIONS" level="info" additivity="false">
+      <AppenderRef ref="STORAGE_DELETIONS" />
+      <AppenderRef ref="STORAGE_DELETIONS_WEB" />
+    </Logger>
+    <Logger name="org.apache.cxf" level="error" additivity="true">
+      <AppenderRef ref="WEBSERVICE" />
+      <AppenderRef ref="WEBSERVICE_WEB" />
+    </Logger>
+    <Logger name="org.jgroups.protocols" level="error" additivity="true" />
+    <Logger name="com.logicaldoc.onlyoffice" level="debug" additivity="true" />
     <Logger name="com.logicaldoc.core.searchengine.IndexerTask" level="info" additivity="false">
-      <Appender-Ref ref="IndexerTask" />
-      <Appender-Ref ref="IndexerTask_WEB" />
+      <AppenderRef ref="IndexerTask" />
+      <AppenderRef ref="IndexerTask_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.enterprise.cleaner.CleanerTask" level="info" additivity="false">
-      <Appender-Ref ref="Cleaner" />
-      <Appender-Ref ref="Cleaner_WEB" />
+      <AppenderRef ref="Cleaner" />
+      <AppenderRef ref="Cleaner_WEB" />
     </Logger>
-    <Logger name="com.logicaldoc.enterprise.store.FSCleanerTask" level="info" additivity="false">
-      <Appender-Ref ref="FSCleaner" />
-      <Appender-Ref ref="FSCleaner_WEB" />
+    <Logger name="com.logicaldoc.enterprise.storer.FSCleanerTask" level="info" additivity="false">
+      <AppenderRef ref="FSCleaner" />
+      <AppenderRef ref="FSCleaner_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.email.EmailCrawler" level="info" additivity="false">
-      <Appender-Ref ref="EmailCrawler" />
-      <Appender-Ref ref="EmailCrawler_WEB" />
+      <AppenderRef ref="EmailCrawler" />
+      <AppenderRef ref="EmailCrawler_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.importfolder.ImportFolderCrawler" level="info" additivity="false">
-      <Appender-Ref ref="ImportFolderCrawler" />
-      <Appender-Ref ref="ImportFolderCrawler_WEB" />
+      <AppenderRef ref="ImportFolderCrawler" />
+      <AppenderRef ref="ImportFolderCrawler_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.core.stats.StatsCollector" level="info" additivity="false">
-      <Appender-Ref ref="StatsCollector" />
-      <Appender-Ref ref="StatsCollector_WEB" />
+      <AppenderRef ref="StatsCollector" />
+      <AppenderRef ref="StatsCollector_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.barcode.BarcodeProcessor" level="info" additivity="false">
-      <Appender-Ref ref="BarcodeProcessor" />
-      <Appender-Ref ref="BarcodeProcessor_WEB" />
+      <AppenderRef ref="BarcodeProcessor" />
+      <AppenderRef ref="BarcodeProcessor_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.notifier.Notifier" level="info" additivity="false">
-      <Appender-Ref ref="Notifier" />
-      <Appender-Ref ref="Notifier_WEB" />
+      <AppenderRef ref="Notifier" />
+      <AppenderRef ref="Notifier_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.audit.AuditTask" level="info" additivity="false">
-      <Appender-Ref ref="AuditTask" />
-      <Appender-Ref ref="AuditTask_WEB" />
+      <AppenderRef ref="AuditTask" />
+      <AppenderRef ref="AuditTask_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.impex.ArchiveBuilder" level="info" additivity="false">
-      <Appender-Ref ref="ArchiveBuilder" />
-      <Appender-Ref ref="ArchiveBuilder_WEB" />
+      <AppenderRef ref="ArchiveBuilder" />
+      <AppenderRef ref="ArchiveBuilder_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.impex.ArchiveImporter" level="info" additivity="false">
-      <Appender-Ref ref="ArchiveImporter" />
-      <Appender-Ref ref="ArchiveImporter_WEB" />
+      <AppenderRef ref="ArchiveImporter" />
+      <AppenderRef ref="ArchiveImporter_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.impex.IncrementalArchiveCreator" level="info" additivity="false">
-      <Appender-Ref ref="IncrementalArchiveCreator" />
-      <Appender-Ref ref="IncrementalArchiveCreator_WEB" />
+      <AppenderRef ref="IncrementalArchiveCreator" />
+      <AppenderRef ref="IncrementalArchiveCreator_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.core.folder.PathCalculator" level="info" additivity="false">
-      <Appender-Ref ref="PathCalculator" />
-      <Appender-Ref ref="PathCalculator_WEB" />
+      <AppenderRef ref="PathCalculator" />
+      <AppenderRef ref="PathCalculator_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.cmis" level="warn" additivity="false">
-      <Appender-Ref ref="CMIS" />
-      <Appender-Ref ref="CMIS_WEB" />
+      <AppenderRef ref="CMIS" />
+      <AppenderRef ref="CMIS_WEB" />
     </Logger>
     <Logger name="org.apache.chemistry.opencmis" level="warn" additivity="false">
-      <Appender-Ref ref="CMIS" />
-      <Appender-Ref ref="CMIS_WEB" />
+      <AppenderRef ref="CMIS" />
+      <AppenderRef ref="CMIS_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.retention.RetentionPoliciesProcessor" level="info" additivity="false">
-      <Appender-Ref ref="RetentionProcessor" />
-      <Appender-Ref ref="RetentionProcessor_WEB" />
+      <AppenderRef ref="RetentionProcessor" />
+      <AppenderRef ref="RetentionProcessor_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.core.document.DigestProcessor" level="info" additivity="false">
-      <Appender-Ref ref="DigestProcessor" />
-      <Appender-Ref ref="DigestProcessor_WEB" />
+      <AppenderRef ref="DigestProcessor" />
+      <AppenderRef ref="DigestProcessor_WEB" />
     </Logger>
     <Logger name="org.springframework.security.web.session.SessionManagementFilter" level="info" additivity="true">
-      <Appender-Ref ref="SPRING" />
-      <Appender-Ref ref="SPRING_WEB" />
+      <AppenderRef ref="SPRING" />
+      <AppenderRef ref="SPRING_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.core.automation" level="debug" additivity="true">
-      <Appender-Ref ref="AUTOMATION" />
-      <Appender-Ref ref="AUTOMATION_WEB" />
+      <AppenderRef ref="AUTOMATION" />
+      <AppenderRef ref="AUTOMATION_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.report.ReportsProcessor" level="info" additivity="false">
-      <Appender-Ref ref="ReportsProcessor" />
-      <Appender-Ref ref="ReportsProcessor_WEB" />
+      <AppenderRef ref="ReportsProcessor" />
+      <AppenderRef ref="ReportsProcessor_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.enterprise.diagnosis.SystemDiagnosis" level="info" additivity="false">
-      <Appender-Ref ref="SystemDiagnosis" />
-      <Appender-Ref ref="SystemDiagnosis_WEB" />
+      <AppenderRef ref="SystemDiagnosis" />
+      <AppenderRef ref="SystemDiagnosis_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.via.VIAEmailCrawler" level="info" additivity="false">
-      <Appender-Ref ref="VIAEmailCrawler" />
-      <Appender-Ref ref="VIAEmailCrawler_WEB" />
+      <AppenderRef ref="VIAEmailCrawler" />
+      <AppenderRef ref="VIAEmailCrawler_WEB" />
     </Logger>
     <Logger name="org.apache.ftpserver" level="info" additivity="false">
-      <Appender-Ref ref="FTPSERVER" />
-      <Appender-Ref ref="FTPSERVER_WEB" />
+      <AppenderRef ref="FTPSERVER" />
+      <AppenderRef ref="FTPSERVER_WEB" />
     </Logger>
-    <Logger name="com.logicaldoc.ftp" level="info" additivity="false">
-      <Appender-Ref ref="FTPSERVER" />
-      <Appender-Ref ref="FTPSERVER_WEB" />
+    <Logger name="com.logicaldoc.ftp" level="error" additivity="false">
+      <AppenderRef ref="FTPSERVER" />
+      <AppenderRef ref="FTPSERVER_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.syndication.SyndicationCrawler" level="info" additivity="false">
-      <Appender-Ref ref="SyndicationCrawler" />
-      <Appender-Ref ref="SyndicationCrawler_WEB" />
+      <AppenderRef ref="SyndicationCrawler" />
+      <AppenderRef ref="SyndicationCrawler_WEB" />
     </Logger>
     <Logger name="com.zaxxer.hikari" level="error" additivity="false">
-      <Appender-Ref ref="CP" />
-      <Appender-Ref ref="CP_WEB" />
+      <AppenderRef ref="CP" />
+      <AppenderRef ref="CP_WEB" />
     </Logger>
     <Logger name="org.apache.commons.dbcp2" level="error" additivity="false">
-      <Appender-Ref ref="CP" />
-      <Appender-Ref ref="CP_WEB" />
+      <AppenderRef ref="CP" />
+      <AppenderRef ref="CP_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.enterprise.automation.AutomationExecutor" level="info" additivity="false">
-      <Appender-Ref ref="AutomationExecutor" />
-      <Appender-Ref ref="AutomationExecutor_WEB" />
+      <AppenderRef ref="AutomationExecutor" />
+      <AppenderRef ref="AutomationExecutor_WEB" />
     </Logger>
     <Logger name="com.logicaldoc.zonalocr.ZonalOCRProcessor" level="info" additivity="false">
-      <Appender-Ref ref="ZonalOCRProcessor" />
-      <Appender-Ref ref="ZonalOCRProcessor_WEB" />
+      <AppenderRef ref="ZonalOCRProcessor" />
+      <AppenderRef ref="ZonalOCRProcessor_WEB" />
     </Logger>
-    
     <Logger name="com.logicaldoc.core" level="info" additivity="true" />
     <Logger name="com.logicaldoc.web" level="info" additivity="true" />
     <Logger name="com.logicaldoc.webdav" level="info" additivity="true" />
@@ -702,18 +791,15 @@
     <Logger name="org.jgroups.protocols" level="error" additivity="true" />
     <Logger name="org.apache.pdfbox" level="error" additivity="true" />
     <Logger name="org.apache.solr" level="error" additivity="true" />
-    <Logger name="org.jgroups.protocols" level="error" additivity="true" />
-    <Logger name="org.hibernate.cache" level="warn" additivity="true" />    
-    
+    <Logger name="org.hibernate.cache" level="warn" additivity="true" />
+    <Logger name="com.logicaldoc.importfolder" level="debug" additivity="true" />
     <Logger name="console" level="debug" additivity="false">
-       <Appender-Ref ref="console" />
-       <Appender-Ref ref="console_file" />
+      <AppenderRef ref="console" />
+      <AppenderRef ref="console_file" />
     </Logger>
-    
     <Root level="info">
       <AppenderRef ref="DMS" />
       <AppenderRef ref="DMS_WEB" />
     </Root>
   </Loggers>
 </Configuration>
-

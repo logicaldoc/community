@@ -7,6 +7,7 @@ import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configurator;
@@ -70,6 +71,30 @@ public class LogConfigurator {
 	}
 
 	/**
+	 * This method selects an appender
+	 * 
+	 * @param name name of the appender to find
+	 * 
+	 * @return the appender
+	 */
+	public Element getAppender(String name) {
+		Element appenders = xml.findElement(APPENDERS);
+		return appenders.getChildren().stream().filter(c -> name.equals(c.getAttributeValue("name"))).findFirst()
+				.orElse(null);
+	}
+
+	/**
+	 * This method selects a logger
+	 * 
+	 * @param name name of the logger to find
+	 * 
+	 * @return the logger
+	 */
+	public Element getLogger(String name) {
+		return getLoggers().stream().filter(c -> name.equals(c.getAttributeValue("name"))).findFirst().orElse(null);
+	}
+
+	/**
 	 * This method selects all the logger names
 	 * 
 	 * @return collection of the logger names
@@ -116,6 +141,10 @@ public class LogConfigurator {
 	}
 
 	public void addTextAppender(String name) {
+		addTextAppender(name, false, null);
+	}
+
+	public void addTextAppender(String name, boolean immediateFlush, String pattern) {
 		if (xml.findElement(ROLLING_FILE_NAME + name + "']") != null)
 			return;
 
@@ -127,8 +156,20 @@ public class LogConfigurator {
 		Element appenders = xml.findElement(APPENDERS);
 		appenders.addContent(0, newAppender);
 
+		if (StringUtils.isNotEmpty(pattern)) {
+			List<Element> patternLayouts = newAppender.getChildren("PatternLayout");
+			for (Element patternLayout : patternLayouts) {
+				Element patternElement = patternLayout.getChild("Pattern");
+				if (patternElement != null)
+					patternElement.setText(pattern);
+			}
+		}
+
 		// Setup the appender name
 		newAppender.setAttribute("name", name);
+
+		if (immediateFlush)
+			newAppender.setAttribute("immediateFlush", "true");
 
 		// Now setup the file name
 		String logfile = name.trim().toLowerCase() + ".log";
@@ -170,6 +211,20 @@ public class LogConfigurator {
 	 * @param appenders optional list of appenders to assign
 	 */
 	public void setLogger(String name, boolean additivity, String level, List<String> appenders) {
+		setLogger(name, additivity, level, appenders, null);
+	}
+
+	/**
+	 * Adds or modifies a logger
+	 * 
+	 * @param name the logger name
+	 * @param additivity the additivity flag
+	 * @param level the logger level
+	 * @param appenders optional list of appenders to assign
+	 * @param appenderLevels optional list of levels for each appender
+	 */
+	public void setLogger(String name, boolean additivity, String level, List<String> appenders,
+			List<String> appenderLevels) {
 		// Check logger existence
 		Element logger = xml.findElement("//Logger[@name='" + name + "']");
 		if (logger == null) {
@@ -188,6 +243,8 @@ public class LogConfigurator {
 			for (String app : appenders) {
 				Element appender = new Element("AppenderRef");
 				appender.setAttribute("ref", app);
+				if (appenderLevels != null && !appenderLevels.isEmpty())
+					appender.setAttribute("level", appenderLevels.get(appenders.indexOf(app)));
 				logger.addContent(appender);
 			}
 		}

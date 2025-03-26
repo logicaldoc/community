@@ -3,8 +3,8 @@ package com.logicaldoc.gui.frontend.client.ai.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.user.client.Timer;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
-import com.logicaldoc.gui.common.client.beans.GUITask;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
@@ -14,7 +14,6 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.frontend.client.ai.AIService;
-import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
@@ -22,7 +21,6 @@ import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.Progressbar;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -41,6 +39,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class ModelsPanel extends VLayout {
 
+	private static final String ID = "id";
+
+	private static final String TRAINING = "training";
+
+	static final Canvas SELECT_MODEL = new HTMLPanel("&nbsp;" + I18N.message("selectamodel"));
+
 	private static final String LABEL = "label";
 
 	private static final String DESCRIPTION = "description";
@@ -51,7 +55,7 @@ public class ModelsPanel extends VLayout {
 
 	protected Canvas details = SELECT_MODEL;
 
-	static final Canvas SELECT_MODEL = new HTMLPanel("&nbsp;" + I18N.message("selectamodel"));
+	private Timer timer;
 
 	public ModelsPanel() {
 		setWidth100();
@@ -139,7 +143,7 @@ public class ModelsPanel extends VLayout {
 		list.addSelectionChangedHandler(event -> {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
-				AIService.Instance.get().getModel(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
+				AIService.Instance.get().getModel(rec.getAttributeAsLong(ID), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIModel model) {
 						showModelDetails(model);
@@ -154,6 +158,16 @@ public class ModelsPanel extends VLayout {
 		detailsContainer.addMember(details);
 
 		setMembers(toolStrip, listing, detailsContainer);
+
+		/*
+		 * Create the timer that synchronize the view
+		 */
+		timer = new Timer() {
+			public void run() {
+				loadModels();
+			}
+		};
+		timer.scheduleRepeating(5 * 1000);
 	}
 
 	private void showContextMenu() {
@@ -162,7 +176,7 @@ public class ModelsPanel extends VLayout {
 		final ListGridRecord[] selection = list.getSelectedRecords();
 		List<Long> ids = new ArrayList<>();
 		for (ListGridRecord rec : selection)
-			ids.add(rec.getAttributeAsLong("id"));
+			ids.add(rec.getAttributeAsLong(ID));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
@@ -191,6 +205,7 @@ public class ModelsPanel extends VLayout {
 				});
 			}
 		}));
+		train.setEnabled(!selection[0].getAttributeAsBoolean(TRAINING));
 
 		contextMenu.setItems(train, delete);
 		contextMenu.showContextMenu();
@@ -215,11 +230,11 @@ public class ModelsPanel extends VLayout {
 	 * @param model the model to take data from
 	 */
 	public void updateRecord(GUIModel model) {
-		Record rec = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, model.getId()));
+		Record rec = list.find(new AdvancedCriteria(ID, OperatorId.EQUALS, model.getId()));
 		if (rec == null) {
 			rec = new ListGridRecord();
 			// Append a new rec
-			rec.setAttribute("id", model.getId());
+			rec.setAttribute(ID, model.getId());
 			list.addData(rec);
 			list.selectRecord(rec);
 		}
@@ -227,7 +242,7 @@ public class ModelsPanel extends VLayout {
 		rec.setAttribute("name", model.getName());
 		rec.setAttribute(LABEL, model.getLabel() != null ? model.getLabel() : model.getName());
 		rec.setAttribute(DESCRIPTION, model.getDescription());
-		rec.setAttribute("training", model.getTraining().isEnabled());
+		rec.setAttribute(TRAINING, model.getTraining().isEnabled());
 		list.refreshRow(list.getRecordIndex(rec));
 
 	}
@@ -235,6 +250,23 @@ public class ModelsPanel extends VLayout {
 	protected void onAddModel() {
 		list.deselectAllRecords();
 		showModelDetails(new GUIModel());
+	}
+
+	private void loadModels() {
+		AIService.Instance.get().getModels(new DefaultAsyncCallback<>() {
+			@Override
+			public void onSuccess(List<GUIModel> models) {
+				for (GUIModel guiModel : models) {
+					updateRecord(guiModel);
+				}
+			}
+		});
+	}
+
+	@Override
+	public void destroy() {
+		super.destroy();
+		this.timer.cancel();
 	}
 
 	@Override
@@ -245,16 +277,5 @@ public class ModelsPanel extends VLayout {
 	@Override
 	public int hashCode() {
 		return super.hashCode();
-	}
-	
-	private void loadTasks() {
-		AIService.Instance.get().getModels(new DefaultAsyncCallback<>() {
-			@Override
-			public void onSuccess(List<GUIModel> models) {
-				for (GUIModel guiModel : models) {
-					updateRecord(guiModel);
-				}
-			}
-		});
 	}
 }
