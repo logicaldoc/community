@@ -38,7 +38,9 @@ public class GUISampler implements Serializable {
 
 	private List<GUIExtensibleObject> source = new ArrayList<>();
 
-	private String categoryAttribute = null;
+	private String category;
+	
+	private String features;
 
 	private String automation;
 
@@ -127,8 +129,8 @@ public class GUISampler implements Serializable {
 		return source;
 	}
 
-	public String getCategoryAttribute() {
-		return categoryAttribute;
+	public String getCategory() {
+		return category;
 	}
 
 	public String getAutomation() {
@@ -167,8 +169,8 @@ public class GUISampler implements Serializable {
 		this.source = source;
 	}
 
-	public void setCategoryAttribute(String categoryAttribute) {
-		this.categoryAttribute = categoryAttribute;
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
 	public void setAutomation(String automation) {
@@ -181,5 +183,13 @@ public class GUISampler implements Serializable {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+	
+	public String getFeatures() {
+		return features;
+	}
+
+	public void setFeatures(String features) {
+		this.features = features;
 	}
 }

@@ -28,7 +28,7 @@ public class GUITraining implements Serializable {
 	/**
 	 * Indicates if there is a currently running training process
 	 */
-	private boolean training = true;
+	private boolean training = false;
 
 	private GUISampler sampler;
 	

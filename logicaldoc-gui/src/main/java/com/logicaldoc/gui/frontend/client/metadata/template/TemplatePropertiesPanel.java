@@ -754,7 +754,6 @@ public class TemplatePropertiesPanel extends HLayout {
 		templateForm.setTitleOrientation(TitleOrientation.LEFT);
 
 		StaticTextItem id = ItemFactory.newStaticTextItem("id", Long.toString(template.getId()));
-		id.setDisabled(true);
 
 		TextItem name = ItemFactory.newSimpleTextItem("name", template.getName());
 		name.setRequired(true);

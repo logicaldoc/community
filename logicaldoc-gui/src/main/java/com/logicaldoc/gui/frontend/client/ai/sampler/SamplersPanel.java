@@ -70,6 +70,7 @@ public class SamplersPanel extends VLayout {
 		ListGridField name = new ListGridField("name", I18N.message("name"));
 		name.setCanFilter(true);
 		name.setCanSort(true);
+		name.setMinWidth(110);
 		name.setAutoFit(AutoFitWidthApproach.BOTH);
 
 		ListGridField label = new ListGridField(LABEL, I18N.message(LABEL), 200);

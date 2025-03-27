@@ -79,6 +79,7 @@ public class ModelsPanel extends VLayout {
 		ListGridField name = new ListGridField("name", I18N.message("name"));
 		name.setCanFilter(true);
 		name.setCanSort(true);
+		name.setMinWidth(110);
 		name.setAutoFit(AutoFitWidthApproach.BOTH);
 
 		ListGridField label = new ListGridField(LABEL, I18N.message(LABEL), 200);
@@ -94,7 +95,7 @@ public class ModelsPanel extends VLayout {
 
 		DateListGridField trained = new DateListGridField("trained", I18N.message("lasttrained"));
 
-		ListGridField training = new RunningListGridField();
+		ListGridField training = new RunningListGridField("training");
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -242,7 +243,7 @@ public class ModelsPanel extends VLayout {
 		rec.setAttribute("name", model.getName());
 		rec.setAttribute(LABEL, model.getLabel() != null ? model.getLabel() : model.getName());
 		rec.setAttribute(DESCRIPTION, model.getDescription());
-		rec.setAttribute(TRAINING, model.getTraining().isEnabled());
+		rec.setAttribute(TRAINING, model.getTraining().isTraining());
 		list.refreshRow(list.getRecordIndex(rec));
 
 	}

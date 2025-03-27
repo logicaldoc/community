@@ -84,7 +84,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 			container.removeChild(form);
 
 		form = new DynamicForm();
-		form.setNumCols(4);
+		form.setNumCols(2);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
 		TextItem name = ItemFactory.newSimpleTextItem(NAME, sampler.getName());
@@ -98,6 +98,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		delimiter.addChangedHandler(changedHandler);
 		delimiter.setWidth(30);
 		delimiter.setLength(2);
+		delimiter.setStartRow(true);
 		delimiter.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, CSV));
 		delimiter.setRequiredWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, CSV));
 
@@ -110,13 +111,13 @@ public class SamplerProperties extends SamplerDetailsTab {
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", sampler.getDescription());
 		description.addChangedHandler(changedHandler);
 		description.setColSpan(4);
-		description.setWidth("*");
+		description.setWidth(400);
 
 		TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", sampler.getAutomation(),
 				changedHandler, false);
 		automation.addChangedHandler(changedHandler);
 		automation.setColSpan(4);
-		automation.setWidth("*");
+		automation.setWidth(400);
 		automation.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
 
 		SelectItem type = ItemFactory.newSelectItem(TYPE);
@@ -145,13 +146,20 @@ public class SamplerProperties extends SamplerDetailsTab {
 		documentSelector
 				.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.NOT_IN_SET, new String[] { METADATA, "chain" }));
 
-		TextItem categoryAttribute = ItemFactory.newTextItem("categoryattribute", sampler.getCategoryAttribute());
-		categoryAttribute.addChangedHandler(changedHandler);
-		categoryAttribute.setRequiredWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
-		categoryAttribute.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
+		TextItem category = ItemFactory.newTextItem("category", sampler.getCategory());
+		category.addChangedHandler(changedHandler);
+		category.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
 
-		form.setItems(id, typeValue, type, name, label, delimiter, quote, folderSelector, documentSelector,
-				categoryAttribute, automation, description);
+		TextItem features = ItemFactory.newTextItem("features", sampler.getFeatures());
+		features.addChangedHandler(changedHandler);
+		features.setColSpan(4);
+		features.setWidth(400);
+		features.setHint(I18N.message("valuescommaseparated"));
+		features.setShowHintInField(true);
+		features.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
+
+		form.setItems(id, typeValue, type, name, label, delimiter, quote, folderSelector, documentSelector, category,
+				features, automation, description);
 
 		container.setMembersMargin(3);
 		container.addMember(form);
@@ -279,6 +287,9 @@ public class SamplerProperties extends SamplerDetailsTab {
 			sampler.setType(form.getValueAsString(TYPE));
 			sampler.setFolder(folderSelector.getFolder());
 			sampler.setDocument(documentSelector.getDocument());
+			sampler.setCategory(form.getValueAsString("category"));
+			sampler.setFeatures(form.getValueAsString("features"));
+			sampler.setAutomation(form.getValueAsString("automation"));
 
 			if ("chain".equals(sampler.getType()) && chain.getRecordList().isEmpty()) {
 				GuiLog.error("samplerchainempty");

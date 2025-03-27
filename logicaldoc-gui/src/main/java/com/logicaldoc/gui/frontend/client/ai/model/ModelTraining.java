@@ -44,8 +44,9 @@ public class ModelTraining extends ModelDetailsTab {
 		if (Boolean.TRUE.equals(container.contains(form)))
 			container.removeChild(form);
 
-		ToggleItem enabled = ItemFactory.newToggleItem(ENABLED, "enableschedule", model.getTraining().isEnabled());
-		enabled.addChangedHandler(changedHandler);
+		ToggleItem enableSchedule = ItemFactory.newToggleItem(ENABLED, "enableschedule", model.getTraining().isEnabled());
+		enableSchedule.setWrapTitle(false);
+		enableSchedule.addChangedHandler(changedHandler);
 
 		TextItem cron = ItemFactory.newCronExpressionItem("cron", "schedule", model.getTraining().getCron(),
 				changedHandler);
@@ -65,10 +66,10 @@ public class ModelTraining extends ModelDetailsTab {
 		sampler.addChangedHandler(changedHandler);
 
 		form = new DynamicForm();
-		form.setNumCols(4);
+		form.setNumCols(1);
 		form.setWidth(1);
 		form.setTitleOrientation(TitleOrientation.TOP);
-		form.setItems(enabled, cron, epochs, sampler);
+		form.setItems(enableSchedule, cron, epochs, sampler);
 
 		container.setWidth100();
 		container.setMembersMargin(3);
