@@ -24,7 +24,6 @@ import com.smartgwt.client.types.PickerIconName;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.events.DropCompleteEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
@@ -50,7 +49,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
-public class TemplatePropertiesPanel extends HLayout {
+public class TemplatePropertiesPanel extends HLayout implements AttributeSelector.AttributeSelectorCallback {
 
 	private static final String DEPENDSON = "dependson";
 
@@ -101,7 +100,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		refresh();
 	}
 
-	public void addAttributes(ListGridRecord[] recs) {
+	private void addAttributes(ListGridRecord[] recs) {
 		if (recs == null)
 			return;
 
@@ -220,7 +219,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		dependsOn.setAutoFitWidth(true);
 		dependsOn.setMinWidth(70);
 
-		attributesList.addDropCompleteHandler((DropCompleteEvent event) -> {
+		attributesList.addDropCompleteHandler(dropCompleted -> {
 			List<String> attributes = new ArrayList<>();
 			for (int i = 0; i < attributesList.getTotalRows(); i++) {
 				ListGridRecord rec = attributesList.getRecord(i);
@@ -236,7 +235,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		Button addAttributes = new Button(I18N.message("addattributes"));
 		addAttributes.setMargin(2);
 		addAttributes.setHeight(30);
-		addAttributes.addClickHandler(click -> new AddTemplateAttributeDialog(TemplatePropertiesPanel.this).show());
+		addAttributes.addClickHandler(click -> new AttributeSelector(TemplatePropertiesPanel.this).show());
 
 		Button addSection = new Button(I18N.message("addsection"));
 		addSection.setMargin(2);
@@ -880,5 +879,10 @@ public class TemplatePropertiesPanel extends HLayout {
 	@Override
 	public int hashCode() {
 		return super.hashCode();
+	}
+
+	@Override
+	public void onSelection(ListGridRecord[] selection) {
+		addAttributes(selection);
 	}
 }

@@ -997,8 +997,8 @@ public class ItemFactory {
 		select.setOptionDataSource(new AutomationRoutinesDS(showEmpty));
 		select.setValue(value);
 
-		ChangedHandler setNullOnEmpty = (ChangedEvent event) -> {
-			if (event != null && event.getValue().equals("")) {
+		ChangedHandler setNullOnEmpty = changed -> {
+			if (changed != null && changed.getValue().equals("")) {
 				select.setValue((String) null);
 				select.clearValue();
 			}
@@ -1204,7 +1204,6 @@ public class ItemFactory {
 
 	public static SelectItem newFolderSecurityOption(String name) {
 		SelectItem securityOption = newSelectItem(name);
-//		securityOption.setWidth(80);
 		LinkedHashMap<String, String> opts = new LinkedHashMap<>();
 		opts.put("none", I18N.message("none").toLowerCase());
 		opts.put("inherit", I18N.message("inheritparentsec").toLowerCase());

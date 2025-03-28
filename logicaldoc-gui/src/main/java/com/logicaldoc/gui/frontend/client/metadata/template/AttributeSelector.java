@@ -17,7 +17,13 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
-public class AddTemplateAttributeDialog extends Window {
+/**
+ * A window to select extended attributes.
+ * 
+ * @author Marco Meschieri - LogicalDOC
+ * @since 9.2
+ */
+public class AttributeSelector extends Window {
 
 	private static final String PRESET = "preset";
 
@@ -25,13 +31,11 @@ public class AddTemplateAttributeDialog extends Window {
 
 	private ListGrid setAttributesList;
 
-	private TemplatePropertiesPanel propertiesPanel;
+	private AttributeSelectorCallback callback;
 
-	public AddTemplateAttributeDialog(TemplatePropertiesPanel panel) {
-		this.propertiesPanel = panel;
-
+	public AttributeSelector(AttributeSelectorCallback callback) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("attributesets"));
+		setTitle(I18N.message("attributesselector"));
 		setWidth(500);
 		setHeight(400);
 		setIsModal(true);
@@ -41,6 +45,8 @@ public class AddTemplateAttributeDialog extends Window {
 		setAutoSize(true);
 
 		addCloseClickHandler(event -> destroy());
+
+		this.callback = callback;
 	}
 
 	@Override
@@ -103,14 +109,14 @@ public class AddTemplateAttributeDialog extends Window {
 
 		toolStrip.addSeparator();
 
-		ToolStripButton add = new ToolStripButton();
-		add.setTitle(I18N.message("addselection"));
-		toolStrip.addButton(add);
-		add.addClickHandler(event -> {
+		ToolStripButton select = new ToolStripButton();
+		select.setTitle(I18N.message("select"));
+		toolStrip.addButton(select);
+		select.addClickHandler(event -> {
 			if (setAttributesList.getSelectedRecords() == null || setAttributesList.getSelectedRecords().length < 1)
 				SC.warn(I18N.message("pleaseselectanattribute"));
 			else
-				propertiesPanel.addAttributes(setAttributesList.getSelectedRecords());
+				callback.onSelection(setAttributesList.getSelectedRecords());
 		});
 
 		ToolStripButton close = new ToolStripButton();
@@ -152,7 +158,7 @@ public class AddTemplateAttributeDialog extends Window {
 			}
 		});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
@@ -161,5 +167,9 @@ public class AddTemplateAttributeDialog extends Window {
 	@Override
 	public int hashCode() {
 		return super.hashCode();
+	}
+
+	public interface AttributeSelectorCallback {
+		public void onSelection(ListGridRecord[] selection);
 	}
 }

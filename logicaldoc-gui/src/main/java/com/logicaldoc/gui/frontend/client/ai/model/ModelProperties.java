@@ -118,7 +118,8 @@ public class ModelProperties extends ModelDetailsTab {
 		features.addChangedHandler(changedHandler);
 		features.setColSpan(4);
 		features.setWidth(400);
-		features.setHint(I18N.message("valuescommaseparated"));
+		features.setHint(I18N.message("featuresseparated"));
+		features.setShowHintInField(true);
 		features.setShowHintInField(true);
 		features.setValue(model.getFeatures());
 		setNeuralNetworkVisibility(features);
@@ -128,7 +129,7 @@ public class ModelProperties extends ModelDetailsTab {
 		categories.setColSpan(4);
 		categories.setValue(model.getCategories());
 		categories.setWidth(400);
-		categories.setHint(I18N.message("valuescommaseparated"));
+		categories.setHint(I18N.message("catvalsseparated"));
 		categories.setShowHintInField(true);
 		setNeuralNetworkVisibility(categories);
 

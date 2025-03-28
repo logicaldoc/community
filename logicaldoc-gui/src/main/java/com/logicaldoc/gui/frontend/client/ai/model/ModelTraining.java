@@ -20,11 +20,13 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2
  */
-public class ModelTraining extends ModelDetailsTab {
+public class ModelTraining extends ModelDetailsTab implements ModelObserver {
 
 	private static final String ENABLED = "enabled";
 
 	private DynamicForm form = new DynamicForm();
+
+	private TextAreaItem report;
 
 	private HLayout container = new HLayout();
 
@@ -37,6 +39,8 @@ public class ModelTraining extends ModelDetailsTab {
 
 		setMembers(container);
 
+		ModelController.get().addObserver(this);
+
 		refresh();
 	}
 
@@ -44,7 +48,8 @@ public class ModelTraining extends ModelDetailsTab {
 		if (Boolean.TRUE.equals(container.contains(form)))
 			container.removeChild(form);
 
-		ToggleItem enableSchedule = ItemFactory.newToggleItem(ENABLED, "enableschedule", model.getTraining().isEnabled());
+		ToggleItem enableSchedule = ItemFactory.newToggleItem(ENABLED, "enableschedule",
+				model.getTraining().isEnabled());
 		enableSchedule.setWrapTitle(false);
 		enableSchedule.addChangedHandler(changedHandler);
 
@@ -75,12 +80,9 @@ public class ModelTraining extends ModelDetailsTab {
 		container.setMembersMargin(3);
 		container.addMember(form);
 
-		TextAreaItem report = ItemFactory.newTextAreaItem("report",
-				model.getTraining().getLastTrained() != null
-						? I18N.message("lasttrainedon", I18N.formatDate(model.getTraining().getLastTrained()))
-						: I18N.message("report"),
-				model.getTraining().getReport());
+		report = ItemFactory.newTextAreaItem("report", model.getTraining().getReport());
 		report.setWidth("*");
+		onModelChanged(model);
 
 		DynamicForm reportForm = new DynamicForm();
 		reportForm.setWidth100();
@@ -108,5 +110,15 @@ public class ModelTraining extends ModelDetailsTab {
 	@Override
 	public int hashCode() {
 		return super.hashCode();
+	}
+
+	@Override
+	public void onModelChanged(GUIModel mdl) {
+		if (this.model.getId() == mdl.getId()) {
+			report.setValue(mdl.getTraining().getReport());
+			report.setTitle(mdl.getTraining().getLastTrained() != null
+					? I18N.message("lasttrainedon", I18N.formatDate(mdl.getTraining().getLastTrained()))
+					: I18N.message("report"));
+		}
 	}
 }

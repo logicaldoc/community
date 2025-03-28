@@ -243,7 +243,10 @@ public class ModelsPanel extends VLayout {
 		rec.setAttribute("name", model.getName());
 		rec.setAttribute(LABEL, model.getLabel() != null ? model.getLabel() : model.getName());
 		rec.setAttribute(DESCRIPTION, model.getDescription());
-		rec.setAttribute(TRAINING, model.getTraining().isTraining());
+		if(!rec.getAttributeAsBoolean(TRAINING).equals(model.getTraining().isTraining())) {
+			rec.setAttribute(TRAINING, model.getTraining().isTraining());
+			ModelController.get().changed(model);
+		}
 		list.refreshRow(list.getRecordIndex(rec));
 
 	}

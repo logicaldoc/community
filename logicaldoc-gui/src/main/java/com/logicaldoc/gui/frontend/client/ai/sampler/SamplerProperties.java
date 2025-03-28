@@ -6,12 +6,15 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.DocumentSelector;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
+import com.logicaldoc.gui.frontend.client.metadata.template.AttributeSelector;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
+import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
@@ -148,15 +151,44 @@ public class SamplerProperties extends SamplerDetailsTab {
 
 		TextItem category = ItemFactory.newTextItem("category", sampler.getCategory());
 		category.addChangedHandler(changedHandler);
+		category.setHint(I18N.message("extattrname"));
+		category.setShowHintInField(true);
+		category.setIconVAlign(VerticalAlignment.CENTER);
 		category.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
+		FormItemIcon takeAttributeForCategory = new FormItemIcon();
+		takeAttributeForCategory.setName("takeattributes");
+		takeAttributeForCategory.setSrc("[SKIN]/ballot.svg");
+		takeAttributeForCategory.setPrompt(I18N.message("takeattributes"));
+		takeAttributeForCategory.addFormItemClickHandler(click -> new AttributeSelector(
+				selection -> click.getItem().setValue(selection[0].getAttributeAsString("name"))).show());
+		category.setIcons(takeAttributeForCategory);
 
 		TextItem features = ItemFactory.newTextItem("features", sampler.getFeatures());
 		features.addChangedHandler(changedHandler);
 		features.setColSpan(4);
 		features.setWidth(400);
-		features.setHint(I18N.message("valuescommaseparated"));
+		features.setHint(I18N.message("extattrnamesseparated"));
 		features.setShowHintInField(true);
+		features.setIconVAlign(VerticalAlignment.CENTER);
 		features.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
+
+		FormItemIcon takeAttributeForFeatures = new FormItemIcon();
+		takeAttributeForFeatures.setName("takeattributes");
+		takeAttributeForFeatures.setSrc("[SKIN]/ballot.svg");
+		takeAttributeForFeatures.setPrompt(I18N.message("takeattributes"));
+		takeAttributeForFeatures.addFormItemClickHandler(click -> new AttributeSelector(selection -> {
+			String str = click.getItem().getValue() != null ? click.getItem().getValue().toString() : "";
+			for (ListGridRecord listGridRecord : selection) {
+				String attrName = listGridRecord.getAttributeAsString("name");
+				if (!attrName.equals(category.getValue())) {
+					if (!str.isEmpty())
+						str += ",";
+					str += attrName;
+				}
+			}
+			click.getItem().setValue(str);
+		}).show());
+		features.setIcons(takeAttributeForFeatures);
 
 		form.setItems(id, typeValue, type, name, label, delimiter, quote, folderSelector, documentSelector, category,
 				features, automation, description);
