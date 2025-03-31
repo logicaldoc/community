@@ -28,8 +28,10 @@ public class ModelDS extends DataSource {
 		DataSourceTextField typeField = new DataSourceTextField("type");
 		DataSourceDateTimeField trained = new DataSourceDateTimeField("trained");
 		DataSourceBooleanField training = new DataSourceBooleanField("training");
+		DataSourceDateTimeField evaluated = new DataSourceDateTimeField("evaluated");
+		DataSourceBooleanField evaluation = new DataSourceBooleanField("evaluation");
 
-		setFields(id, name, label, training, trained, description, typeField);
+		setFields(id, name, label, training, trained, description, typeField, evaluated, evaluation);
 		setClientOnly(true);
 
 		setDataURL("data/ai.xml?object=model");

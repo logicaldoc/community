@@ -67,6 +67,10 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 		return get().getBean(id);
 	}
 
+	public boolean isInitialized() {
+		return applicationContext != null;
+	}
+
 	/**
 	 * Gets the registry with all the configuration properties for this context
 	 * 

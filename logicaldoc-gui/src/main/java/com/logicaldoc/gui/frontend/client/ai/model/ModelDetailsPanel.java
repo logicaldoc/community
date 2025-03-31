@@ -16,6 +16,8 @@ import com.smartgwt.client.widgets.tab.Tab;
  * @since 9.2
  */
 public class ModelDetailsPanel extends VLayout {
+	private static final String EVALUATION = "evaluation";
+
 	private GUIModel model;
 
 	private Layout propertiesTabPanel;
@@ -25,6 +27,10 @@ public class ModelDetailsPanel extends VLayout {
 	private Layout trainingTabPanel;
 
 	private ModelTraining trainingPanel;
+
+	private Layout evaluationTabPanel;
+
+	private ModelEvaluation evaluationPanel;
 
 	private EditingTabSet tabSet;
 
@@ -61,7 +67,6 @@ public class ModelDetailsPanel extends VLayout {
 		propertiesTab.setPane(propertiesTabPanel);
 		tabSet.addTab(propertiesTab);
 
-		
 		trainingTabPanel = new HLayout();
 		trainingTabPanel.setWidth100();
 		trainingTabPanel.setHeight100();
@@ -90,11 +95,24 @@ public class ModelDetailsPanel extends VLayout {
 				propertiesTabPanel.removeMember(trainingPanel);
 		}
 
+		if (evaluationPanel != null) {
+			evaluationPanel.destroy();
+			if (Boolean.TRUE.equals(evaluationTabPanel.contains(evaluationPanel)))
+				evaluationTabPanel.removeMember(evaluationPanel);
+		}
+
 		propertiesPanel = new ModelProperties(model, event -> onModified());
 		propertiesTabPanel.addMember(propertiesPanel);
 
 		trainingPanel = new ModelTraining(model, event -> onModified());
 		trainingTabPanel.addMember(trainingPanel);
+		
+		if (model.isNeuralNetwork()) {
+			evaluationPanel = new ModelEvaluation(model, event -> onModified());
+			evaluationTabPanel.addMember(evaluationPanel);
+		} else {
+			tabSet.removeTab(EVALUATION);
+		}
 	}
 
 	public GUIModel getModel() {
@@ -103,6 +121,17 @@ public class ModelDetailsPanel extends VLayout {
 
 	public void setModel(GUIModel model) {
 		this.model = model;
+
+		if (model.isNeuralNetwork()) {
+			evaluationTabPanel = new HLayout();
+			evaluationTabPanel.setWidth100();
+			evaluationTabPanel.setHeight100();
+			Tab evaluationTab = new Tab(I18N.message(EVALUATION));
+			evaluationTab.setID(EVALUATION);
+			evaluationTab.setPane(evaluationTabPanel);
+			tabSet.addTab(evaluationTab);
+		}
+
 		refresh();
 	}
 
@@ -114,11 +143,11 @@ public class ModelDetailsPanel extends VLayout {
 		boolean valid = propertiesPanel.validate();
 		if (!valid)
 			tabSet.selectTab(0);
-		
+
 		valid = trainingPanel.validate();
 		if (!valid)
 			tabSet.selectTab(1);
-		
+
 		return valid;
 	}
 

@@ -82,7 +82,6 @@ public interface AIService extends RemoteService {
 	 */
 	public GUIModel getModel(long modelId) throws ServerException;
 
-	
 	/**
 	 * Retrieves all the models
 	 * 
@@ -91,7 +90,7 @@ public interface AIService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public List<GUIModel> getModels() throws ServerException;
-	
+
 	/**
 	 * Trains a model
 	 * 
@@ -100,6 +99,15 @@ public interface AIService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public void trainModel(long modelId) throws ServerException;
+
+	/**
+	 * Evaluated a neural network model
+	 * 
+	 * @param modelId identifier of the neural network model to evaluate
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void evaluateModel(long modelId) throws ServerException;
 
 	public static class Instance {
 		private static AIServiceAsync inst;

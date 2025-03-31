@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.ai.model;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.user.client.Timer;
@@ -10,6 +11,7 @@ import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.grid.RunningListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
@@ -38,6 +40,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 9.2
  */
 public class ModelsPanel extends VLayout {
+
+	private static final String TRAINED = "trained";
+
+	private static final String EVALUATED = "evaluated";
+
+	private static final String EVALUATING = "evaluating";
 
 	private static final String ID = "id";
 
@@ -93,9 +101,17 @@ public class ModelsPanel extends VLayout {
 		ListGridField modelType = new ListGridField("type", I18N.message("type"));
 		modelType.setAutoFit(AutoFitWidthApproach.BOTH);
 
-		DateListGridField trained = new DateListGridField("trained", I18N.message("lasttrained"));
+		ListGridField training = new RunningListGridField(TRAINING);
+		training.setTitle(I18N.message(TRAINING));
+		training.setAutoFitWidth(true);
+		training.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
+		DateListGridField trained = new DateListGridField(TRAINED, I18N.message("lasttrained"));
 
-		ListGridField training = new RunningListGridField("training");
+		ListGridField evaluating = new RunningListGridField(EVALUATING);
+		evaluating.setTitle(I18N.message(EVALUATING));
+		evaluating.setAutoFitWidth(true);
+		evaluating.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
+		DateListGridField evaluated = new DateListGridField(EVALUATED, I18N.message("lastevaluated"));
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -103,7 +119,7 @@ public class ModelsPanel extends VLayout {
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(id, name, label, modelType, training, trained, description);
+		list.setFields(id, name, label, modelType, training, trained, evaluating, evaluated, description);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
@@ -208,7 +224,25 @@ public class ModelsPanel extends VLayout {
 		}));
 		train.setEnabled(!selection[0].getAttributeAsBoolean(TRAINING));
 
-		contextMenu.setItems(train, delete);
+		MenuItem evaluate = new MenuItem();
+		evaluate.setTitle(I18N.message("startevaluation"));
+		evaluate.addClickHandler(
+				event -> LD.ask(I18N.message("question"), I18N.message("confirmevaluation"), confirm -> {
+					if (Boolean.TRUE.equals(confirm)) {
+						AIService.Instance.get().evaluateModel(ids.get(0), new DefaultAsyncCallback<>() {
+							@Override
+							public void onSuccess(Void result) {
+								// Nothing to do
+							}
+						});
+					}
+				}));
+		evaluate.setEnabled(
+				!selection[0].getAttributeAsBoolean(TRAINING) && !selection[0].getAttributeAsBoolean(EVALUATING)
+						&& "neural".equals(selection[0].getAttributeAsString("type"))
+						&& selection[0].getAttribute(TRAINED) != null);
+
+		contextMenu.setItems(train, evaluate, delete);
 		contextMenu.showContextMenu();
 	}
 
@@ -243,12 +277,34 @@ public class ModelsPanel extends VLayout {
 		rec.setAttribute("name", model.getName());
 		rec.setAttribute(LABEL, model.getLabel() != null ? model.getLabel() : model.getName());
 		rec.setAttribute(DESCRIPTION, model.getDescription());
-		if(!rec.getAttributeAsBoolean(TRAINING).equals(model.getTraining().isTraining())) {
-			rec.setAttribute(TRAINING, model.getTraining().isTraining());
-			ModelController.get().changed(model);
-		}
+		rec.setAttribute(TRAINING, model.getTraining().isTraining());
+		rec.setAttribute(EVALUATING, model.getEvaluation().isEvaluating());
 		list.refreshRow(list.getRecordIndex(rec));
 
+		if (somethigChangedInStatus(model, rec) || somethigChangedInLastProcessed(model, rec))
+			ModelController.get().changed(model);
+	}
+
+	private boolean somethigChangedInLastProcessed(GUIModel model, Record rec) {
+		try {
+			Date recLastEvaluated = rec.getAttributeAsDate(EVALUATED);
+			Date recLastTrained = rec.getAttributeAsDate(TRAINED);
+
+			boolean changesInEvaluation = (recLastEvaluated == null && model.getEvaluation().getLastEvaluated() != null)
+					|| (recLastEvaluated != null && !recLastEvaluated.equals(model.getEvaluation().getLastEvaluated()));
+			boolean changesInTraining = (recLastTrained == null && model.getTraining().getLastTrained() != null)
+					|| (recLastTrained != null && !recLastTrained.equals(model.getTraining().getLastTrained()));
+
+			return changesInEvaluation || changesInTraining;
+		} catch (Throwable t) {
+			GuiLog.error(model.getName() + " " + t.getMessage());
+			return false;
+		}
+	}
+
+	private boolean somethigChangedInStatus(GUIModel model, Record rec) {
+		return !rec.getAttributeAsBoolean(TRAINING).equals(model.getTraining().isTraining())
+				|| !rec.getAttributeAsBoolean(EVALUATING).equals(model.getEvaluation().isEvaluating());
 	}
 
 	protected void onAddModel() {

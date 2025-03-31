@@ -23,4 +23,6 @@ public interface AIServiceAsync {
 	void getModels(AsyncCallback<List<GUIModel>> callback);
 
 	void trainModel(long modelId, AsyncCallback<Void> callback);
+
+	void evaluateModel(long modelId, AsyncCallback<Void> callback);
 }

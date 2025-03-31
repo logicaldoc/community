@@ -40,8 +40,6 @@ public class GUIModel implements Serializable {
 
 	private long seed = 123;
 
-	private GUITraining training = new GUITraining();
-
 	private int cutoff = 1;
 
 	private int ngramMin = 2;
@@ -49,6 +47,10 @@ public class GUIModel implements Serializable {
 	private int ngramMax = 4;
 
 	private String language = "en";
+
+	private GUITraining training = new GUITraining();
+
+	private GUIEvaluation evaluation = new GUIEvaluation();
 
 	public GUIModel(long id, String name) {
 		super();
@@ -206,5 +208,17 @@ public class GUIModel implements Serializable {
 
 	public void setTraining(GUITraining training) {
 		this.training = training;
+	}
+
+	public GUIEvaluation getEvaluation() {
+		return evaluation;
+	}
+
+	public void setEvaluation(GUIEvaluation evaluation) {
+		this.evaluation = evaluation;
+	}
+
+	public boolean isNeuralNetwork() {
+		return "neural".equals(type);
 	}
 }
