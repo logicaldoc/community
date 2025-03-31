@@ -448,7 +448,8 @@ public class FormatConverterManager {
 			log.warn("No format converter for file {}", inFileName);
 
 		// Get the first available and enabled converter
-		FormatConverter converter = formatConverters.stream().filter(c -> c.isEnabled()).findFirst().orElse(null);
+		FormatConverter converter = formatConverters.stream().filter(c -> c.isEnabled()).findFirst()
+				.orElse(new NotAvailableConverter());
 
 		// Check if a special binding is configured and points to an enabled
 		// converter
@@ -457,7 +458,7 @@ public class FormatConverterManager {
 		if (StringUtils.isNotEmpty(currentConverter) && formatConverters.size() > 1)
 			converter = formatConverters.stream()
 					.filter(conv -> conv.getClass().getName().equals(currentConverter) && conv.isEnabled()).findFirst()
-					.orElse(null);
+					.orElse(converter);
 
 		if (converter != null)
 			converter.loadParameters();
