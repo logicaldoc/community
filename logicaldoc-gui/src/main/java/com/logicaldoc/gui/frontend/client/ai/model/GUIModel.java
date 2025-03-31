@@ -3,6 +3,8 @@ package com.logicaldoc.gui.frontend.client.ai.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A GUI bean representing an AI model
@@ -137,7 +139,11 @@ public class GUIModel implements Serializable {
 	public String getFeatures() {
 		return features;
 	}
-
+	
+	public List<String> getFeaturesList() {
+		return Stream.of(features.split(",")).map(String::trim).collect(Collectors.toList());
+	}
+	
 	public String getCategories() {
 		return categories;
 	}

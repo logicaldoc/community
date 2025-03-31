@@ -278,7 +278,8 @@ public class ModelsPanel extends VLayout {
 		rec.setAttribute(LABEL, model.getLabel() != null ? model.getLabel() : model.getName());
 		rec.setAttribute(DESCRIPTION, model.getDescription());
 		rec.setAttribute(TRAINING, model.getTraining().isTraining());
-		rec.setAttribute(EVALUATING, model.getEvaluation().isEvaluating());
+		if(model.isNeuralNetwork())
+			rec.setAttribute(EVALUATING, model.getEvaluation().isEvaluating());
 		list.refreshRow(list.getRecordIndex(rec));
 
 		if (somethigChangedInStatus(model, rec) || somethigChangedInLastProcessed(model, rec))

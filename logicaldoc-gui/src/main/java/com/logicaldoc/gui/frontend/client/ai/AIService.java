@@ -9,6 +9,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.frontend.client.ai.model.GUIModel;
+import com.logicaldoc.gui.frontend.client.ai.model.GUIPredictionResult;
 import com.logicaldoc.gui.frontend.client.ai.sampler.GUISampler;
 
 /**
@@ -109,6 +110,18 @@ public interface AIService extends RemoteService {
 	 */
 	public void evaluateModel(long modelId) throws ServerException;
 
+	/**
+	 * Runs a model and gets the prediction
+	 * 
+	 * @param modelId identifier of the model
+	 * @param features ordered list of feature values
+	 * 
+	 * @return the list of predictions ordered by descending score 
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public List<GUIPredictionResult> predict(long modelId, List<String> features) throws ServerException;
+	
 	public static class Instance {
 		private static AIServiceAsync inst;
 

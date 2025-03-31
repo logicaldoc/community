@@ -28,14 +28,17 @@ public class RunningListGridField extends ColoredListGridField {
 	}
 
 	private String formatStatusIconCell(ListGridRecord rec) {
-		String color = rec.getAttributeAsString(colorFieldName);
-		String content = "<div style='display: flex; text-align: center; justify-content: center;'>";
-		if (Boolean.TRUE.equals(rec.getAttributeAsBoolean(getName()))) {
-			content += AwesomeFactory.getIconButtonHTML("refresh", null, getName(), color, "spin", null);
-		} else {
-			content += AwesomeFactory.getIconButtonHTML("refresh", null, "idle", color, null);
+		String content = "";
+		if (rec.getAttribute(getName()) != null && !rec.getAttributeAsString(getName()).isEmpty()) {
+			String color = rec.getAttributeAsString(colorFieldName);
+			content = "<div style='display: flex; text-align: center; justify-content: center;'>";
+			if (Boolean.TRUE.equals(rec.getAttributeAsBoolean(getName()))) {
+				content += AwesomeFactory.getIconButtonHTML("refresh", null, getName(), color, "spin", null);
+			} else {
+				content += AwesomeFactory.getIconButtonHTML("refresh", null, "idle", color, null);
+			}
+			content += "</div>";
 		}
-		content += "</div>";
 		return content;
 	}
 }
