@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2
  */
-public class GUIPredictionResult implements Serializable {
+public class GUIQueryResult implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -19,9 +19,13 @@ public class GUIPredictionResult implements Serializable {
 	 */
 	private double score = 0L;
 
-	private Object value;
+	private String value;
 
-	public GUIPredictionResult(String name, double score, Object value) {
+	public GUIQueryResult() {
+		super();
+	}
+	
+	public GUIQueryResult(String name, double score, String value) {
 		super();
 		this.name = name;
 		this.score = score;
@@ -44,11 +48,11 @@ public class GUIPredictionResult implements Serializable {
 		this.score = score;
 	}
 
-	public Object getValue() {
+	public String getValue() {
 		return value;
 	}
 
-	public void setValue(Object value) {
+	public void setValue(String value) {
 		this.value = value;
 	}
 }

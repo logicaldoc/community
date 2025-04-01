@@ -242,7 +242,19 @@ public class ModelsPanel extends VLayout {
 						&& "neural".equals(selection[0].getAttributeAsString("type"))
 						&& selection[0].getAttribute(TRAINED) != null);
 
-		contextMenu.setItems(train, evaluate, delete);
+		MenuItem query = new MenuItem();
+		query.setTitle(I18N.message("querymodel"));
+		query.addClickHandler(event -> AIService.Instance.get().getModel(selection[0].getAttributeAsLong("id"),
+				new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(GUIModel mdl) {
+						new QueryDialog(mdl).show();
+					}
+				}));
+		query.setEnabled(!selection[0].getAttributeAsBoolean(TRAINING)
+				&& !selection[0].getAttributeAsBoolean(EVALUATING) && selection[0].getAttribute(TRAINED) != null);
+
+		contextMenu.setItems(query, train, evaluate, delete);
 		contextMenu.showContextMenu();
 	}
 
@@ -278,7 +290,7 @@ public class ModelsPanel extends VLayout {
 		rec.setAttribute(LABEL, model.getLabel() != null ? model.getLabel() : model.getName());
 		rec.setAttribute(DESCRIPTION, model.getDescription());
 		rec.setAttribute(TRAINING, model.getTraining().isTraining());
-		if(model.isNeuralNetwork())
+		if (model.isNeuralNetwork())
 			rec.setAttribute(EVALUATING, model.getEvaluation().isEvaluating());
 		list.refreshRow(list.getRecordIndex(rec));
 
