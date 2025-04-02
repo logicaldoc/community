@@ -22,7 +22,8 @@ public enum UserEvent {
     DISABLED("event.user.disabled"),
     ENABLED("event.user.enabled"),
     NEWAPIKEY("event.user.newapikey"),
-    SEARCH("event.user.search");
+    SEARCH("event.user.search"),
+    AI_QUERY("event.user.aiquery");
 	
     private String event;
 

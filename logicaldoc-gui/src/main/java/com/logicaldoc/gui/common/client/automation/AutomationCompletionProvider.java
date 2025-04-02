@@ -28,7 +28,9 @@ public class AutomationCompletionProvider implements AceCompletionProvider {
 	public void getProposals(AceEditor editor, AceEditorCursorPosition pos, String prefix,
 			AceCompletionCallback callback) {
 
-		callback.invokeWithCompletions(new AceCompletion[] {
+		callback
+		.invokeWithCompletions(new AceCompletion[] {
+				new AceCompletionValue("$AITool", "$AITool",  VARIABLE, 10),
 				new AceCompletionValue("$DocTool", "$DocTool",  VARIABLE, 10),
 				new AceCompletionValue("$DateTool", "$DateTool", VARIABLE, 10),
 				new AceCompletionValue("$FolderTool", "$FolderTool", VARIABLE, 10),
