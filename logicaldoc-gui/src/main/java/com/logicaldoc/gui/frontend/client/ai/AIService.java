@@ -122,6 +122,17 @@ public interface AIService extends RemoteService {
 	 */
 	public List<GUIQueryResult> query(long modelId, List<String> features) throws ServerException;
 	
+	/**
+	 * Imports a new model
+	 * 
+	 * @param modelName Name to give to the new imported model
+	 * 
+	 * @return The created model
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public GUIModel importModel(String modelName) throws ServerException;
+	
 	public static class Instance {
 		private static AIServiceAsync inst;
 

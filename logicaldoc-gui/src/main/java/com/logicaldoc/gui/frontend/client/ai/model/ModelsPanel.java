@@ -13,6 +13,7 @@ import com.logicaldoc.gui.common.client.grid.RunningListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.frontend.client.ai.AIService;
@@ -137,26 +138,28 @@ public class ModelsPanel extends VLayout {
 
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
-		refresh.addClickHandler(event -> {
-			list.refresh(new ModelDS());
-			detailsContainer.removeMembers(detailsContainer.getMembers());
-			details = SELECT_MODEL;
-			detailsContainer.setMembers(details);
-		});
+		refresh.addClickHandler(click -> refresh());
 		toolStrip.addButton(refresh);
 
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("addmodel"));
 		toolStrip.addButton(add);
 		add.addClickHandler(event -> onAddModel());
-		
+
 		toolStrip.addSeparator();
 
 		ToolStripButton settings = new ToolStripButton();
 		settings.setTitle(I18N.message("settings"));
 		toolStrip.addButton(settings);
 		settings.addClickHandler(event -> new AISettings().show());
-		
+
+		toolStrip.addSeparator();
+
+		ToolStripButton importModel = new ToolStripButton();
+		importModel.setTitle(I18N.message("import"));
+		toolStrip.addButton(importModel);
+		importModel.addClickHandler(event -> new ModelImporter(changed -> refresh()).show());
+
 		toolStrip.addFill();
 
 		list.addCellContextClickHandler(event -> {
@@ -194,6 +197,13 @@ public class ModelsPanel extends VLayout {
 		timer.scheduleRepeating(5 * 1000);
 	}
 
+	private void refresh() {
+		list.refresh(new ModelDS());
+		detailsContainer.removeMembers(detailsContainer.getMembers());
+		details = SELECT_MODEL;
+		detailsContainer.setMembers(details);
+	}
+
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
@@ -201,6 +211,8 @@ public class ModelsPanel extends VLayout {
 		List<Long> ids = new ArrayList<>();
 		for (ListGridRecord rec : selection)
 			ids.add(rec.getAttributeAsLong(ID));
+
+		Long selectedModelId = selection[0].getAttributeAsLong("id");
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
@@ -251,17 +263,25 @@ public class ModelsPanel extends VLayout {
 
 		MenuItem query = new MenuItem();
 		query.setTitle(I18N.message("querymodel"));
-		query.addClickHandler(event -> AIService.Instance.get().getModel(selection[0].getAttributeAsLong("id"),
-				new DefaultAsyncCallback<>() {
-					@Override
-					public void onSuccess(GUIModel mdl) {
-						new QueryDialog(mdl).show();
-					}
-				}));
+		query.addClickHandler(event -> {
+			AIService.Instance.get().getModel(selectedModelId, new DefaultAsyncCallback<>() {
+				@Override
+				public void onSuccess(GUIModel mdl) {
+					new QueryDialog(mdl).show();
+				}
+			});
+		});
 		query.setEnabled(!selection[0].getAttributeAsBoolean(TRAINING)
 				&& !selection[0].getAttributeAsBoolean(EVALUATING) && selection[0].getAttribute(TRAINED) != null);
 
-		contextMenu.setItems(query, train, evaluate, delete);
+		MenuItem export = new MenuItem();
+		export.setTitle(I18N.message("export"));
+		export.addClickHandler(
+				click -> Util.download(Util.contextPath() + "ai/controller?command=export&modelId=" + selectedModelId));
+
+		com.smartgwt.client.widgets.menu.MenuItemSeparator sep = new com.smartgwt.client.widgets.menu.MenuItemSeparator();
+
+		contextMenu.setItems(query, train, evaluate, sep, export, sep, delete);
 		contextMenu.showContextMenu();
 	}
 

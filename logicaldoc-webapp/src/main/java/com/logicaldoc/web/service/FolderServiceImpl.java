@@ -1200,7 +1200,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	@Override
 	public String readImage() throws ServerException {
 		final Session session = validateSession();
-		List<String> allowedExts = Arrays.asList("png", "gif", "jpg", "jpeg", "webp", "jfif");
+		List<String> allowedExts = Arrays.asList("png", "gif", "jpg", "jpeg", "webp", "jfif", "svg");
 
 		Map<String, File> uploadedFilesMap = getUploadedFiles(session.getSid());
 		for (Map.Entry<String, File> entry : uploadedFilesMap.entrySet()) {

@@ -10,7 +10,6 @@ import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -59,7 +58,7 @@ public class FolderTile extends HLayout {
 			Img changeImage = new Img("[SKIN]/image.svg", 16, 16);
 			changeImage.setShowRollOver(true);
 			changeImage.setTooltip(I18N.message("changeimage"));
-			changeImage.addClickHandler((ClickEvent evn) -> new FolderImageUploader(folder, (ChangedEvent ev) -> {
+			changeImage.addClickHandler(click -> new FolderImageUploader(folder, ev -> {
 				initGUI();
 				changedHandler.onChanged(null);
 			}).show());
@@ -75,14 +74,14 @@ public class FolderTile extends HLayout {
 			setMembers(tileImage, icons);
 		} else {
 			IButton showThumbnail = new IButton(I18N.message("showtile"));
-			showThumbnail.addClickHandler((ClickEvent event) -> {
+			showThumbnail.addClickHandler(click -> {
 				Session.get().setShowThumbnail(true);
 				initGUI();
 			});
 			setMembers(showThumbnail);
 		}
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

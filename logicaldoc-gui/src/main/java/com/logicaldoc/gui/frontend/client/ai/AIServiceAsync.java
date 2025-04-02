@@ -28,4 +28,6 @@ public interface AIServiceAsync {
 	void evaluateModel(long modelId, AsyncCallback<Void> callback);
 
 	void query(long modelId, List<String> features, AsyncCallback<List<GUIQueryResult>> callback);
+
+	void importModel(String modelName, AsyncCallback<GUIModel> callback);
 }
