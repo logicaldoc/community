@@ -42,12 +42,9 @@ public class SoapWorkbench {
 
 		SoapSystemClient systemClient = new SoapSystemClient(BASE + "/System");
 
-		SoapDocumentMetadataClient metadataClient = new SoapDocumentMetadataClient(BASE + "/DocumentMetadata");
-
 		Properties develProps = new Properties();
-		develProps.load(new FileInputStream(new File(System.getProperty("user.home")+"/logicaldoc-dev.properties")));
-		
-		
+		develProps.load(new FileInputStream(new File(System.getProperty("user.home") + "/logicaldoc-dev.properties")));
+
 		// Open a session
 		String sid = auth.loginApiKey(develProps.getProperty("apikey.Development"));
 		System.out.println("Server date: " + systemClient.getInfo().getDate());
