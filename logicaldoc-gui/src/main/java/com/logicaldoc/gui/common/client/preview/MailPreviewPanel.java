@@ -86,7 +86,8 @@ public class MailPreviewPanel extends VLayout {
 			html.setWidth100();
 			html.setHeight100();
 			html.setContents("<iframe id='htmlmailpreview-" + getID()
-					+ "' style='border:0px solid white; width:100%; height:100%;'></iframe>");
+					+ "' style='border:0px solid white; width:100%; height:100%;' srcdoc='" + mail.getMessage()
+					+ "'></iframe>");
 			body = html;
 		} else {
 			if (document.getFileName().toLowerCase().endsWith(".msg") && mail.getMessage().contains("\\rtf1")) {
@@ -274,7 +275,7 @@ public class MailPreviewPanel extends VLayout {
 
 		return contextMenu;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		return super.equals(obj);
