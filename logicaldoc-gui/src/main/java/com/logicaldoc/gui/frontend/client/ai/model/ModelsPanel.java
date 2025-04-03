@@ -263,14 +263,26 @@ public class ModelsPanel extends VLayout {
 
 		MenuItem query = new MenuItem();
 		query.setTitle(I18N.message("querymodel"));
-		query.addClickHandler(event -> {
-			AIService.Instance.get().getModel(selectedModelId, new DefaultAsyncCallback<>() {
-				@Override
-				public void onSuccess(GUIModel mdl) {
-					new QueryDialog(mdl).show();
-				}
-			});
-		});
+		query.addClickHandler(event -> AIService.Instance.get().getModel(selectedModelId, new DefaultAsyncCallback<>() {
+			@Override
+			public void onSuccess(GUIModel mdl) {
+				new QueryDialog(mdl).show();
+			}
+		}));
+		query.setEnabled(!selection[0].getAttributeAsBoolean(TRAINING)
+				&& !selection[0].getAttributeAsBoolean(EVALUATING) && selection[0].getAttribute(TRAINED) != null);
+
+		MenuItem clone = new MenuItem();
+		clone.setTitle(I18N.message("clone"));
+		clone.addClickHandler(click -> LD.askForString("clone", "name",
+				selection[0].getAttributeAsString("name") + "Cloned",
+				value -> AIService.Instance.get().cloneModel(selectedModelId, value, new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(GUIModel mdl) {
+						refresh();
+					}
+				})));
+
 		query.setEnabled(!selection[0].getAttributeAsBoolean(TRAINING)
 				&& !selection[0].getAttributeAsBoolean(EVALUATING) && selection[0].getAttribute(TRAINED) != null);
 
@@ -281,7 +293,7 @@ public class ModelsPanel extends VLayout {
 
 		com.smartgwt.client.widgets.menu.MenuItemSeparator sep = new com.smartgwt.client.widgets.menu.MenuItemSeparator();
 
-		contextMenu.setItems(query, train, evaluate, sep, export, sep, delete);
+		contextMenu.setItems(query, train, evaluate, sep, clone, export, sep, delete);
 		contextMenu.showContextMenu();
 	}
 

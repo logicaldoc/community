@@ -133,6 +133,18 @@ public interface AIService extends RemoteService {
 	 */
 	public GUIModel importModel(String modelName) throws ServerException;
 	
+	/**
+	 * Clones a model
+	 * 
+	 * @param modelId Identifier of the model to clone
+	 * @param newName The name to give to the clone
+	 * 
+	 * @return The clone
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public GUIModel cloneModel(long modelId, String newName) throws ServerException;
+	
 	public static class Instance {
 		private static AIServiceAsync inst;
 
