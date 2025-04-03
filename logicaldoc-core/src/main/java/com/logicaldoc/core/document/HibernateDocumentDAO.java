@@ -88,6 +88,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Resource(name = "UserDAO")
 	private UserDAO userDAO;
 
+	@Resource(name = "GroupDAO")
+	private GroupDAO groupDAO;
+	
 	@Resource(name = "DocumentLinkDAO")
 	private DocumentLinkDAO linkDAO;
 
@@ -354,9 +357,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	private void removeForbiddenPermissionsForGuests(Document document) throws PersistenceException {
 		// Remove the forbidden permissions for the guests
-	    GroupDAO gDao = Context.get(GroupDAO.class);
 	    for (DocumentAccessControlEntry ace : document.getAccessControlList()) {
-	        Group group = gDao.findById(ace.getGroupId());
+	        Group group = groupDAO.findById(ace.getGroupId());
 	        if (group != null && group.isGuest()) {
 	            ace.setArchive(0);
 	            ace.setAutomation(0);

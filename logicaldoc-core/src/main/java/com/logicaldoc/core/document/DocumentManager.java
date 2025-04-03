@@ -988,7 +988,7 @@ public class DocumentManager {
 
 		/*
 		 * Better to synchronize this block because under high multi-threading
-		 * it may lead to hibernate's sessions rollbacks
+		 * it may lead to hibernate's session rollbacks
 		 */
 		synchronized (this) {
 			countPages(file, docVO);

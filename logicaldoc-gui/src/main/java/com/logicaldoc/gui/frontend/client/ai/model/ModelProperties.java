@@ -6,6 +6,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.data.AdvancedCriteria;
+import com.smartgwt.client.data.Criterion;
 import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
@@ -147,10 +148,29 @@ public class ModelProperties extends ModelDetailsTab {
 		setNeuralNetworkVisibility(batch);
 
 		IntegerItem seed = ItemFactory.newIntegerItem(SEED, SEED, model.getSeed());
+		seed.addChangedHandler(changedHandler);
 		setNeuralNetworkVisibility(seed);
 
+		SelectItem language = ItemFactory.newLanguageSelector("language", true, false);
+		setNLPVisibility(language);
+
+		SpinnerItem cutoff = ItemFactory.newSpinnerItem("cutoff", model.getCutoff());
+		cutoff.setMin(1);
+		cutoff.addChangedHandler(changedHandler);
+		setNLPVisibility(cutoff);
+
+		SpinnerItem ngramMin = ItemFactory.newSpinnerItem("ngrammin", model.getNgramMin());
+		ngramMin.setMin(2);
+		ngramMin.addChangedHandler(changedHandler);
+		setNLPVisibility(ngramMin);
+		
+		SpinnerItem ngramMax = ItemFactory.newSpinnerItem("ngrammax", model.getNgramMax());
+		ngramMax.setMin(2);
+		ngramMax.addChangedHandler(changedHandler);
+		setNLPVisibility(ngramMax);
+
 		form.setItems(id, typeValue, type, name, label, features, categories, activation, weightInit, loss, batch, seed,
-				description);
+				cutoff, ngramMin, ngramMax, language, description);
 
 		container.setMembersMargin(3);
 		container.addMember(form);
@@ -158,9 +178,18 @@ public class ModelProperties extends ModelDetailsTab {
 		prepareLayers();
 	}
 
-	private void setNeuralNetworkVisibility(FormItem activation) {
-		activation.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, NEURAL));
-		activation.setRequiredWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, NEURAL));
+	private void setNeuralNetworkVisibility(FormItem item) {
+		item.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, NEURAL));
+		item.setRequiredWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, NEURAL));
+	}
+
+	private void setNLPVisibility(FormItem item) {
+		AdvancedCriteria criteria = new AdvancedCriteria(OperatorId.OR,
+				new Criterion[] { new AdvancedCriteria(TYPE, OperatorId.EQUALS, "classifier"),
+						new AdvancedCriteria(TYPE, OperatorId.EQUALS, "tokens") });
+
+		item.setVisibleWhen(criteria);
+		item.setRequiredWhen(criteria);
 	}
 
 	private SelectItem lossSeletor() {
@@ -257,8 +286,12 @@ public class ModelProperties extends ModelDetailsTab {
 				for (com.smartgwt.client.data.Record layerRecord : layerRecords)
 					model.getLayers().add(new GUINeuralNetworkLayer(layerRecord.getAttribute(NAME),
 							layerRecord.getAttributeAsInt(OUTPUTNODES), layerRecord.getAttribute(ACTIVATION)));
+			} else {
+				model.setLanguage(form.getValueAsString("language"));
+				model.setCutoff(Integer.parseInt(form.getValueAsString("cutoff")));
+				model.setNgramMin(Integer.parseInt(form.getValueAsString("ngrammin")));
+				model.setNgramMax(Integer.parseInt(form.getValueAsString("ngrammax")));
 			}
-
 		}
 		return !form.hasErrors();
 	}
