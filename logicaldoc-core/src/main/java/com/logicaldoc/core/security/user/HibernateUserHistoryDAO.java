@@ -26,6 +26,7 @@ public class HibernateUserHistoryDAO extends HibernateHistoryDAO<UserHistory> im
 		return findByUserIdAndEvent(userId, null);
 	}
 
+	@Override
 	public List<UserHistory> findByUserIdAndEvent(long userId, String event) {
 		try {
 			if (StringUtils.isEmpty(event))

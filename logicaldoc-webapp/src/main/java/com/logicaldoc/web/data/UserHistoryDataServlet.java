@@ -85,7 +85,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 		if (columns[10] != null)
 			writer.print("<geolocation><![CDATA[" + columns[10] + "]]></geolocation>");
 		if (columns[11] != null)
-			writer.print("<geolocation><![CDATA[" + columns[11] + "]]></geolocation>");
+			writer.write("<key><![CDATA[" + columns[11] + "]]></key>");
 		writer.print("</history>");
 	}
 

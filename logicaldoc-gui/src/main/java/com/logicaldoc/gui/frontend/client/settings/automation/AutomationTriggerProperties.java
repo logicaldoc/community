@@ -154,7 +154,7 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 
 			if (changedHandler != null)
 				changedHandler.onChanged(event);
-		}, new EventSelectorOptions(true, true, true, true, true, true, false));
+		}, new EventSelectorOptions(true, true, true, true, true, true, true, false));
 		events.setRowSpan(2);
 		events.setColSpan(4);
 		events.setValues(trigger.getEventsArray());

@@ -42,6 +42,7 @@ public class EventsDataServlet extends AbstractDataServlet {
 
 		boolean folder = Boolean.parseBoolean(request.getParameter("folder"));
 		boolean workflow = Boolean.parseBoolean(request.getParameter("workflow"));
+		boolean ai = Boolean.parseBoolean(request.getParameter("ai"));
 		boolean user = Boolean.parseBoolean(request.getParameter("user"));
 		boolean importfolder = Boolean.parseBoolean(request.getParameter("importfolder"));
 		boolean ocr = Boolean.parseBoolean(request.getParameter("ocr"));
@@ -54,17 +55,17 @@ public class EventsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		if(all) {
+		if (all) {
 			writer.print(EVENT);
 			writer.print(CODE + "all" + CLOSE_CODE);
 			writer.print(LABEL_CDATA + I18N.message("allevents", locale) + CLOSE_LABEL);
 			writer.print("<type></type>");
 			writer.print(CLOSE_EVENT);
 		}
-		
+
 		if (folder)
 			writeFolderEvents(writer, locale);
-		
+
 		writeDocumentEvents(writer, locale);
 
 		if (folder)
@@ -81,8 +82,11 @@ public class EventsDataServlet extends AbstractDataServlet {
 
 		if (ocr)
 			writeOcrEvents(writer, locale);
-		
-		if(webservice) {
+
+		if (ai)
+			writeAiEvents(writer, locale);
+
+		if (webservice) {
 			writer.print(EVENT);
 			writer.print(CODE + "event.webservice.call" + CLOSE_CODE);
 			writer.print(LABEL_CDATA + I18N.message("event.webservice.call", locale) + CLOSE_LABEL);
@@ -91,6 +95,17 @@ public class EventsDataServlet extends AbstractDataServlet {
 		}
 
 		writer.write("</list>");
+	}
+
+	private void writeAiEvents(PrintWriter writer, Locale locale) {
+		String[] events = new String[] { "event.ai.query", "event.ai.trained" };
+		for (String event : events) {
+			writer.print(EVENT);
+			writer.print(CODE + event + CLOSE_CODE);
+			writer.print(LABEL_CDATA + I18N.message(event, locale) + CLOSE_LABEL);
+			writer.print("<type>ai</type>");
+			writer.print(CLOSE_EVENT);
+		}
 	}
 
 	private void writeOcrEvents(PrintWriter writer, Locale locale) {

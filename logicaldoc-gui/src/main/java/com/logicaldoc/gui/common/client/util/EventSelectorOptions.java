@@ -15,15 +15,17 @@ public class EventSelectorOptions {
 
 	private boolean allOption;
 
+	private boolean ai;
+
 	public EventSelectorOptions(boolean folder, boolean workflow, boolean user, boolean importfolder, boolean ocr,
-			boolean webservice, boolean allOption) {
+			boolean webservice, boolean ai, boolean allOption) {
 		this.folder = folder;
 		this.workflow = workflow;
 		this.user = user;
 		this.importfolder = importfolder;
 		this.ocr = ocr;
 		this.webservice = webservice;
-		this.allOption = allOption;
+		this.ai = ai;
 	}
 
 	public boolean isFolder() {
@@ -80,5 +82,13 @@ public class EventSelectorOptions {
 
 	public void setAllOption(boolean allOption) {
 		this.allOption = allOption;
+	}
+
+	public boolean isAi() {
+		return ai;
+	}
+
+	public void setAi(boolean ai) {
+		this.ai = ai;
 	}
 }

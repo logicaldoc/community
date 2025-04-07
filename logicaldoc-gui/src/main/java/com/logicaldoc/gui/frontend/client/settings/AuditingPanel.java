@@ -70,7 +70,7 @@ public class AuditingPanel extends AdminPanel {
 		String eventsParameterName = Session.get().getTenantName() + ".history.events";
 		final SelectItem eventsSelector = ItemFactory.newEventsSelector(eventsParameterName,
 				I18N.message("recordedevents"), null,
-				new EventSelectorOptions(true, true, true, true, true, true, true));
+				new EventSelectorOptions(true, true, true, true, true, true, true, true));
 		eventsSelector.setColSpan(2);
 		eventsSelector.setEndRow(true);
 

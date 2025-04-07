@@ -1227,7 +1227,7 @@ public class ItemFactory {
 		select.setMultipleAppearance(MultipleAppearance.GRID);
 		select.setMultiple(true);
 		select.setOptionDataSource(new EventsDS(options.isFolder(), options.isWorkflow(), options.isUser(),
-				options.isImportfolder(), options.isOcr(), options.isWebservice(), options.isAllOption()));
+				options.isImportfolder(), options.isOcr(), options.isWebservice(), options.isAi(), options.isAllOption()));
 		select.setValueField("code");
 		select.setDisplayField(LABEL);
 		if (handler != null)
@@ -1253,7 +1253,7 @@ public class ItemFactory {
 		select.setWidth(350);
 		select.setMultiple(false);
 		select.setOptionDataSource(new EventsDS(options.isFolder(), options.isWorkflow(), options.isUser(),
-				options.isImportfolder(), options.isOcr(), options.isWebservice(), options.isAllOption()));
+				options.isImportfolder(), options.isOcr(), options.isWebservice(), options.isAi(), options.isAllOption()));
 		select.setValueField("code");
 		select.setDisplayField(LABEL);
 		if (handler != null)

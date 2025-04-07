@@ -189,7 +189,7 @@ public class LastChangesReport extends AdminPanel {
 
 		// Event
 		SelectItem event = ItemFactory.newEventsSelector(EVENT, I18N.message(EVENT), null,
-				new EventSelectorOptions(true, true, true, true, true, false, false));
+				new EventSelectorOptions(true, true, true, true, true, false, true, false));
 		event.setColSpan(2);
 		event.setEndRow(true);
 
@@ -277,9 +277,9 @@ public class LastChangesReport extends AdminPanel {
 		histories.setAutoFetchData(true);
 		histories.sort("date", SortDirection.DESCENDING);
 		histories.addCellDoubleClickHandler(new CopyCellClickHandler());
-		histories.addCellContextClickHandler(evn -> {
+		histories.addCellContextClickHandler(click -> {
 			showContextMenu();
-			evn.cancel();
+			click.cancel();
 		});
 
 		results.addMember(histories);

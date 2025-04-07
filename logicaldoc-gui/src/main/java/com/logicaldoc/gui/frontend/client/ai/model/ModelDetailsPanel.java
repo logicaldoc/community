@@ -32,6 +32,10 @@ public class ModelDetailsPanel extends VLayout {
 
 	private ModelEvaluation evaluationPanel;
 
+	private Layout historyTabPanel;
+
+	private ModelHistoryPanel historyPanel;
+
 	private EditingTabSet tabSet;
 
 	private ModelsPanel modelsPanel;
@@ -74,6 +78,13 @@ public class ModelDetailsPanel extends VLayout {
 		trainingTab.setPane(trainingTabPanel);
 		tabSet.addTab(trainingTab);
 
+		historyTabPanel = new HLayout();
+		historyTabPanel.setWidth100();
+		historyTabPanel.setHeight100();
+		Tab historyTab = new Tab(I18N.message("history"));
+		historyTab.setPane(historyTabPanel);
+		tabSet.addTab(historyTab);
+
 		addMember(tabSet);
 	}
 
@@ -95,6 +106,12 @@ public class ModelDetailsPanel extends VLayout {
 				propertiesTabPanel.removeMember(trainingPanel);
 		}
 
+		if (historyPanel != null) {
+			historyPanel.destroy();
+			if (Boolean.TRUE.equals(historyTabPanel.contains(historyPanel)))
+				historyTabPanel.removeMember(historyPanel);
+		}
+		
 		if (evaluationPanel != null) {
 			evaluationPanel.destroy();
 			if (Boolean.TRUE.equals(evaluationTabPanel.contains(evaluationPanel)))
@@ -106,13 +123,16 @@ public class ModelDetailsPanel extends VLayout {
 
 		trainingPanel = new ModelTraining(model, event -> onModified());
 		trainingTabPanel.addMember(trainingPanel);
-		
+
 		if (model.isNeuralNetwork()) {
 			evaluationPanel = new ModelEvaluation(model, event -> onModified());
 			evaluationTabPanel.addMember(evaluationPanel);
 		} else {
 			tabSet.removeTab(EVALUATION);
 		}
+		
+		historyPanel = new ModelHistoryPanel(model.getId());
+		historyTabPanel.addMember(historyPanel);
 	}
 
 	public GUIModel getModel() {

@@ -594,29 +594,38 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		for (String table : History.eventTables()) {
 			String tableAlias = "A" + (i++);
 
+			System.out.println(tableAlias +" > "+table);
+			
 			if (!query.isEmpty())
 				query.append(" union ");
 			query.append("select ");
-			if (table.equals("ld_webservicecall"))
+			if (doesNotProvideDocumentReference(table))
 				query.append("''");
 			else
 				query.append("A.ld_username".replace("A", tableAlias));
 
 			query.append(", A.ld_event, A.ld_date,".replace("A", tableAlias));
 
-			if (table.equals("ld_webservicecall"))
+			if (doesNotProvideDocumentReference(table))
 				query.append("'', null");
 			else
 				query.append("A.ld_filename, A.ld_folderid".replace("A", tableAlias));
 			query.append(
 					", A.ld_path, A.ld_sessionid".replace("A", tableAlias));
 			
-			if (table.equals("ld_webservicecall"))
+			if (doesNotProvideDocumentReference(table))
 				query.append(", ''");
 			else
 				query.append(", A.ld_docid".replace("A", tableAlias));
 
-			query.append(", A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment, A.ld_reason, A.ld_device, A.ld_geolocation, A.ld_keylabel from TABLE A where A.ld_tenantid = "
+			query.append(", A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment".replace("A", tableAlias));
+			
+			if (doesNotProvideDocumentReference(table))
+				query.append(", ''");
+			else
+				query.append(", A.ld_reason".replace("A", tableAlias));
+			
+			query.append(", A.ld_device, A.ld_geolocation, A.ld_keylabel from TABLE A where A.ld_tenantid = "
 							.replace("TABLE", table).replace("A", tableAlias));
 			query.append(Long.toString(session.getTenantId()));
 
@@ -634,6 +643,11 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		} catch (PersistenceException e) {
 			return throwServerException(session, log, e);
 		}
+	}
+	
+	private boolean doesNotProvideDocumentReference(String table) {
+		return table.equals("ld_webservicecall") || table.equals("ld_aimodel_history")
+				|| table.equals("ld_robot_history") || table.equals("ld_chatmessage");
 	}
 
 	private void appendEventsCondition(String tableAlias, List<String> events, StringBuilder query) {
