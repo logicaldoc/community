@@ -13,7 +13,7 @@ import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.Avatar;
+import com.logicaldoc.gui.common.client.widgets.UserAvatar;
 import com.logicaldoc.gui.frontend.client.menu.MainMenu;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
@@ -124,7 +124,7 @@ public class Profile extends Window {
 				company, department, organizationalUnit, building, timeZone, quotaCount, quota);
 
 		HLayout detailsPanel = new HLayout();
-		detailsPanel.setMembers(detailsForm, new Avatar(user.getId()));
+		detailsPanel.setMembers(detailsForm, new UserAvatar(user.getId()));
 
 		final DynamicForm emailForm = new DynamicForm();
 		emailForm.setHeight100();

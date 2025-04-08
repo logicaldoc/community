@@ -2,6 +2,7 @@ package com.logicaldoc.gui.common.client.grid;
 
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.AutoFitWidthApproach;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
@@ -23,22 +24,22 @@ public class RunningListGridField extends ColoredListGridField {
 		super(name, " ", 30);
 		setCanFilter(true);
 		setCanSort(true);
+		setAutoFitWidth(true);
+		setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 		setAlign(Alignment.CENTER);
 		setCellFormatter((value, rec, rowNum, colNum) -> formatStatusIconCell(rec));
 	}
 
 	private String formatStatusIconCell(ListGridRecord rec) {
 		String content = "";
-		if (rec.getAttribute(getName()) != null && !rec.getAttributeAsString(getName()).isEmpty()) {
-			String color = rec.getAttributeAsString(colorFieldName);
-			content = "<div style='display: flex; text-align: center; justify-content: center;'>";
-			if (Boolean.TRUE.equals(rec.getAttributeAsBoolean(getName()))) {
-				content += AwesomeFactory.getIconButtonHTML("refresh", null, getName(), color, "spin", null);
-			} else {
-				content += AwesomeFactory.getIconButtonHTML("refresh", null, "idle", color, null);
-			}
-			content += "</div>";
+		String color = rec.getAttributeAsString(colorFieldName);
+		content = "<div style='display: flex; text-align: center; justify-content: center;'>";
+		if (rec.getAttribute(getName()) != null && Boolean.TRUE.equals(rec.getAttributeAsBoolean(getName()))) {
+			content += AwesomeFactory.getIconButtonHTML("refresh", null, getName(), color, "spin", null);
+		} else {
+			content += AwesomeFactory.getIconButtonHTML("refresh", null, "idle", color, null);
 		}
+		content += "</div>";
 		return content;
 	}
 }

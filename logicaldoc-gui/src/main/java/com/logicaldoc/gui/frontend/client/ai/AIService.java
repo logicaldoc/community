@@ -14,7 +14,7 @@ import com.logicaldoc.gui.frontend.client.ai.sampler.GUISampler;
 
 /**
  * The client side stub for the Artificial Intelligence Service. This service
- * gives all needed methods to handle templates.
+ * gives all needed methods to handle AI models and samplers.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2

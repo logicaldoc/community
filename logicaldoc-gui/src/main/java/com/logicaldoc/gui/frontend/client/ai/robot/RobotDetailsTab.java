@@ -1,34 +1,34 @@
-package com.logicaldoc.gui.frontend.client.ai.model;
+package com.logicaldoc.gui.frontend.client.ai.robot;
 
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
 /**
- * Superclass for all tab panels in the model details area
+ * Superclass for all tab panels in the robot details area
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2
  */
-public abstract class ModelDetailsTab extends HLayout {
-	protected GUIModel model;
+public abstract class RobotDetailsTab extends HLayout {
+	protected GUIRobot robot;
 
 	protected ChangedHandler changedHandler;
 
 	/**
 	 * Constructor
 	 * 
-	 * @param model The model this instance refers to
+	 * @param robot The robot this instance refers to
 	 * @param changedHandler The handler to be invoked in case of changes in the
-	 *        model
+	 *        robot
 	 */
-	protected ModelDetailsTab(GUIModel model, ChangedHandler changedHandler) {
+	protected RobotDetailsTab(GUIRobot robot, ChangedHandler changedHandler) {
 		super();
-		this.model = model;
+		this.robot = robot;
 		this.changedHandler = changedHandler;
 	}
 
-	public GUIModel getModel() {
-		return model;
+	public GUIRobot getRobot() {
+		return robot;
 	}
 
 	public ChangedHandler getChangedHandler() {

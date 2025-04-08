@@ -10,9 +10,9 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2
  */
-public class ModelTypeDS extends DataSource {
+public class ModelTypesDS extends DataSource {
 
-	public ModelTypeDS() {
+	public ModelTypesDS() {
 		init("data/ai.xml?object=modeltype");
 	}
 

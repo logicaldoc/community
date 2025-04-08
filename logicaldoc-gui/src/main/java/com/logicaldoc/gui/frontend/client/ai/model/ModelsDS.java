@@ -6,15 +6,18 @@ import com.smartgwt.client.data.fields.DataSourceDateTimeField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
- * Datasource to handle type of samplers drop-down lists. It is based on Xml
- * parsing
+ * Datasource to handle grids of ai models. It is based on Xml parsing
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2
  */
-public class ModelDS extends DataSource {
+public class ModelsDS extends DataSource {
 
-	public ModelDS() {
+	public ModelsDS() {
+		this(null);
+	}
+
+	public ModelsDS(String type) {
 		setRecordXPath("/list/model");
 
 		DataSourceTextField id = new DataSourceTextField("id");
@@ -34,6 +37,6 @@ public class ModelDS extends DataSource {
 		setFields(id, name, label, training, trained, description, typeField, evaluated, evaluation);
 		setClientOnly(true);
 
-		setDataURL("data/ai.xml?object=model");
+		setDataURL("data/ai.xml?object=model" + (type != null ? "&type=" + type : ""));
 	}
 }

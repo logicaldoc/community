@@ -126,7 +126,7 @@ public class ModelsPanel extends VLayout {
 		list.setShowRecordComponentsByCell(true);
 		list.setCanFreezeFields(true);
 		list.setFilterOnKeypress(true);
-		list.setDataSource(new ModelDS());
+		list.setDataSource(new ModelsDS());
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -198,7 +198,7 @@ public class ModelsPanel extends VLayout {
 	}
 
 	private void refresh() {
-		list.refresh(new ModelDS());
+		list.refresh(new ModelsDS());
 		detailsContainer.removeMembers(detailsContainer.getMembers());
 		details = SELECT_MODEL;
 		detailsContainer.setMembers(details);

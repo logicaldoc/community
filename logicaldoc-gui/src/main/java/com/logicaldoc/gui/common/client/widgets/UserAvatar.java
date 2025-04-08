@@ -22,12 +22,12 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 
 /**
- * Displays an Avatar
+ * Displays a user's avatar
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.6.1
  */
-public class Avatar extends HLayout {
+public class UserAvatar extends HLayout {
 
 	private static final String GUI_AVATAR_SIZE = "gui.avatar.size";
 
@@ -35,11 +35,11 @@ public class Avatar extends HLayout {
 
 	private AsyncCallback<Void> callback;
 
-	public Avatar(long userId) {
+	public UserAvatar(long userId) {
 		this(userId, null);
 	}
 
-	public Avatar(long userId, AsyncCallback<Void> callback) {
+	public UserAvatar(long userId, AsyncCallback<Void> callback) {
 		this.userId = userId;
 		this.callback = callback;
 
@@ -57,7 +57,7 @@ public class Avatar extends HLayout {
 				removeChild(canvas);
 
 		int avatarSize = Session.get().getConfigAsInt(GUI_AVATAR_SIZE);
-		Img avatarImage = new Img(Util.avatarUrl(Long.toString(userId), true), avatarSize, avatarSize);
+		Img avatarImage = new Img(Util.userAvatarUrl(Long.toString(userId), true), avatarSize, avatarSize);
 		avatarImage.setLeft(0);
 		avatarImage.setLayoutAlign(Alignment.LEFT);
 		avatarImage.setAlign(Alignment.LEFT);
@@ -71,7 +71,7 @@ public class Avatar extends HLayout {
 		reset.addClickHandler(event -> SecurityService.Instance.get().resetAvatar(userId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void arg) {
-				Avatar.this.initGUI();
+				UserAvatar.this.initGUI();
 				if (callback != null)
 					callback.onSuccess(null);
 			}
@@ -124,7 +124,7 @@ public class Avatar extends HLayout {
 			layout.addMember(hint);
 
 			upload = new Upload(saveButton);
-			upload.setFileTypes("*.png,*.jpg,*.jpeg,*.gif");
+			upload.setFileTypes("*.png,*.jpg,*.jpeg,*.gif,*.svg");
 			layout.addMember(upload);
 			layout.addMember(saveButton);
 
@@ -156,7 +156,7 @@ public class Avatar extends HLayout {
 
 				@Override
 				public void onSuccess(Void arg) {
-					Avatar.this.initGUI();
+					UserAvatar.this.initGUI();
 					DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 
 						@Override

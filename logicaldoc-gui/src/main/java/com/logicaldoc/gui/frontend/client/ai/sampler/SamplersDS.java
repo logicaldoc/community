@@ -9,9 +9,9 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2
  */
-public class SamplerDS extends DataSource {
+public class SamplersDS extends DataSource {
 
-	public SamplerDS(String type) {
+	public SamplersDS(String type) {
 		setRecordXPath("/list/sampler");
 
 		DataSourceTextField id = new DataSourceTextField("id");

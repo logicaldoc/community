@@ -14,7 +14,7 @@ import com.logicaldoc.gui.common.client.data.GroupsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.Avatar;
+import com.logicaldoc.gui.common.client.widgets.UserAvatar;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
@@ -164,7 +164,7 @@ public class UserPropertiesPanel extends HLayout {
 
 	private void addAvatar() {
 		if (user.getId() != 0L) {
-			Avatar avatar = new Avatar(user.getId(), new DefaultAsyncCallback<>() {
+			UserAvatar avatar = new UserAvatar(user.getId(), new DefaultAsyncCallback<>() {
 				@Override
 				public void onSuccess(Void result) {
 					if (usersPanel != null)

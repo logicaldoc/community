@@ -121,7 +121,7 @@ public class UserListGridField extends ColoredListGridField {
 			if (text != null && !text.isEmpty())
 				return Util.avatarWithText(avatarId.toString(), formattedValue);
 			else {
-				String url = Util.avatarUrl(avatarId.toString(), avoidCaching);
+				String url = Util.userAvatarUrl(avatarId.toString(), avoidCaching);
 				return "<img src='" + url + "' style='border: 0px height: " + size + "px; width: " + size + "px' />";
 			}
 		}

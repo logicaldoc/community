@@ -21,7 +21,7 @@ public class SamplerSelector extends SelectItem {
 		setTitle(I18N.message("sampler"));
 		setMultiple(false);
 
-		setOptionDataSource(new SamplerDS(null));
+		setOptionDataSource(new SamplersDS(null));
 		setValueField("id");
 		setDisplayField(NAME);
 		setSortField(NAME);

@@ -132,7 +132,7 @@ public class MessageTemplatesPanel extends VLayout {
 					editImg.setShowDown(false);
 					editImg.setShowRollOver(false);
 					editImg.setLayoutAlign(Alignment.CENTER);
-					editImg.setSrc("[SKIN]/actions/edit.png");
+					editImg.setSrc("[SKIN]/pencil.svg");
 					editImg.setPrompt(I18N.message("edit"));
 					editImg.setHeight(16);
 					editImg.setWidth(16);
@@ -176,8 +176,7 @@ public class MessageTemplatesPanel extends VLayout {
 	}
 
 	private void onEdit() {
-		MessageTemplateEditor editor = new MessageTemplateEditor(list, rollOverRecord);
-		editor.show();
+		new MessageTemplateEditor(list, rollOverRecord).show();
 	}
 
 	/**
@@ -269,7 +268,7 @@ public class MessageTemplatesPanel extends VLayout {
 			}
 		});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

@@ -43,8 +43,6 @@ public interface SecurityServiceAsync {
 
 	void saveProfile(GUIUser user, AsyncCallback<GUIUser> callback);
 
-	void saveAvatar(long userId, AsyncCallback<Void> callback);
-
 	void saveACL(GUIMenu menu, AsyncCallback<Void> callback);
 
 	void getMenu(long id, String locale, AsyncCallback<GUIMenu> callback);
@@ -78,6 +76,8 @@ public interface SecurityServiceAsync {
 
 	void syncGeolocationDB(String key, AsyncCallback<String> callback);
 
+	void saveAvatar(long userId, AsyncCallback<Void> callback);
+	
 	void resetAvatar(long userId, AsyncCallback<Void> callback);
 
 	void cloneWorkTimes(long srcUserId, List<Long> userIds, List<Long> groupIds, AsyncCallback<Void> callback);

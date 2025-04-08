@@ -99,7 +99,7 @@ public class ModelProperties extends ModelDetailsTab {
 		description.setWidth("*");
 
 		SelectItem type = ItemFactory.newSelectItem(TYPE);
-		type.setOptionDataSource(new ModelTypeDS());
+		type.setOptionDataSource(new ModelTypesDS());
 		type.setValueField(VALUE);
 		type.setDisplayField(VALUE);
 		type.setValue(model.getType());

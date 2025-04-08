@@ -362,19 +362,19 @@ public abstract class Util {
 	}
 
 	public static String avatarImg(String userIdOrName, int size) {
-		String url = avatarUrl(userIdOrName != null ? "" + userIdOrName : "0", false);
+		String url = userAvatarUrl(userIdOrName != null ? "" + userIdOrName : "0", false);
 		return "<img class='avatarIcon' src='" + url + WIDTH + size + PX_HEIGHT + size + "px' />";
 	}
 
 	public static String avatarUrl(long userId) {
-		return avatarUrl("" + userId, false);
+		return userAvatarUrl("" + userId, false);
 	}
 
 	public static String avatarUrl(String userIdOrName) {
-		return avatarUrl(userIdOrName, false);
+		return userAvatarUrl(userIdOrName, false);
 	}
 
-	public static String avatarUrl(String userIdOrName, boolean avoidCaching) {
+	public static String userAvatarUrl(String userIdOrName, boolean avoidCaching) {
 		return GWT.getHostPageBaseURL() + "avatar?userId=" + userIdOrName.trim()
 				+ (avoidCaching ? "&random=" + new Date().getTime() : "");
 	}

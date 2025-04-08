@@ -12,7 +12,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2
  */
-public class ModelHistoryDS extends DataSource {
+public class ModelHistoriesDS extends DataSource {
 
 	public static Integer getDefaultMaxHistories() {
 		try {
@@ -22,15 +22,13 @@ public class ModelHistoryDS extends DataSource {
 		}
 	}
 
-	public ModelHistoryDS(long modelId) {
+	public ModelHistoriesDS(long modelId) {
 		this(modelId, null);
 	}
 
-	public ModelHistoryDS(Long modelId, Integer max) {
+	public ModelHistoriesDS(Long modelId, Integer max) {
 		setRecordXPath("/list/history");
 		DataSourceTextField user = new DataSourceTextField("user");
-
-		DataSourceTextField folderId = new DataSourceTextField("folderId");
 
 		DataSourceDateTimeField date = new DataSourceDateTimeField("date");
 		DataSourceTextField evnt = new DataSourceTextField("event");
@@ -41,7 +39,7 @@ public class ModelHistoryDS extends DataSource {
 		DataSourceTextField device = new DataSourceTextField("device");
 		DataSourceTextField geolocation = new DataSourceTextField("geolocation");
 
-		setFields(user, date, evnt, ip, device, geolocation, comment, sid, key, folderId);
+		setFields(user, date, evnt, ip, device, geolocation, comment, sid, key);
 		setClientOnly(true);
 
 		String url = "data/ai.xml?object=history&locale=" + I18N.getLocale();

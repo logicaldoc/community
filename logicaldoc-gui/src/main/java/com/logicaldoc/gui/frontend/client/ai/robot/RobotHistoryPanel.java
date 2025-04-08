@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.ai.model;
+package com.logicaldoc.gui.frontend.client.ai.robot;
 
 import com.logicaldoc.gui.common.client.data.UserHistoryDS;
 import com.logicaldoc.gui.common.client.grid.CopyCellClickHandler;
@@ -15,16 +15,16 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
- * This panel shows the history of a model
+ * This panel shows the history of a robot
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2
  */
-public class ModelHistoryPanel extends VLayout {
+public class RobotHistoryPanel extends VLayout {
 
 	private long modelId;
 
-	public ModelHistoryPanel(long modelId) {
+	public RobotHistoryPanel(long modelId) {
 		this.modelId = modelId;
 	}
 
@@ -42,7 +42,7 @@ public class ModelHistoryPanel extends VLayout {
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
-		list.setDataSource(new ModelHistoriesDS(modelId));
+		list.setDataSource(new RobotHistoriesDS(modelId));
 		list.setFields(event, date, ip, geolocation, device, sid, comment);
 		list.addCellDoubleClickHandler(new CopyCellClickHandler());
 

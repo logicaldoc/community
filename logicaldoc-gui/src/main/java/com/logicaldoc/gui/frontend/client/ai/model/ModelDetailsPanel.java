@@ -40,10 +40,10 @@ public class ModelDetailsPanel extends VLayout {
 
 	private ModelsPanel modelsPanel;
 
-	public ModelDetailsPanel(ModelsPanel samplersPanel) {
+	public ModelDetailsPanel(ModelsPanel modelsPanel) {
 		super();
 
-		this.modelsPanel = samplersPanel;
+		this.modelsPanel = modelsPanel;
 		setHeight100();
 		setWidth100();
 		setMembersMargin(10);
