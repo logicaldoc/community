@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -50,8 +51,8 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 
 	@Override
 	public Version findByVersion(long docId, String version) throws PersistenceException {
-		List<Version> versions = findByWhere(
-				" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".version='" + version + "'", null, null);
+		List<Version> versions = findByWhere(" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".version = :version",
+				Map.of("version", version), null, null);
 
 		if (!versions.isEmpty())
 			return versions.get(0);
@@ -62,8 +63,8 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	@Override
 	public Version findByFileVersion(long docId, String fileVersion) throws PersistenceException {
 		List<Version> versions = findByWhere(
-				" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".fileVersion='" + fileVersion + "'",
-				ENTITY + ".date asc", null);
+				" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".fileVersion = :fileVersion",
+				Map.of("fileVersion", fileVersion), ENTITY + ".date asc", null);
 
 		if (!versions.isEmpty())
 			return versions.get(0);
