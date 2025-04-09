@@ -6,7 +6,7 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.RichTextItem;
+import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -72,8 +72,7 @@ public class AnswerEditor extends Window {
 		category.setWidth("*");
 		category.setHeight(30);
 
-		RichTextItem answer = ItemFactory.newRichTextItemForAutomation(ANSWER, ANSWER, rec.getAttributeAsString(ANSWER),
-				null);
+		TextAreaItem answer = ItemFactory.newTextAreaItemForAutomation(ANSWER, ANSWER, rec.getAttributeAsString(ANSWER), changedHandler, true);
 		answer.setRequired(true);
 		answer.setWidth("*");
 		answer.setHeight("*");

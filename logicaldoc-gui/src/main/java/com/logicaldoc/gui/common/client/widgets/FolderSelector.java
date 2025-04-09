@@ -55,7 +55,7 @@ public class FolderSelector extends TextItem {
 
 		FormItemIcon search = new FormItemIcon();
 		search.setPrompt(I18N.message("search"));
-		search.setSrc("[SKIN]/magnifying-glass.svg");
+		search.setSrc("[SKIN]/icons/magnifying-glass.png");
 		search.setWidth(12);
 		search.setHeight(12);
 		search.addFormItemClickHandler(click -> new FolderSearchDialog(FolderSelector.this).show());
@@ -64,7 +64,7 @@ public class FolderSelector extends TextItem {
 
 		FormItemIcon open = new FormItemIcon();
 		open.setPrompt(I18N.message("openfolder"));
-		open.setSrc("[SKIN]/folder.svg");
+		open.setSrc("[SKIN]/icons/folder.png");
 		open.setWidth(12);
 		open.setHeight(12);
 		open.addFormItemClickHandler(click -> {
@@ -74,7 +74,7 @@ public class FolderSelector extends TextItem {
 
 		FormItemIcon clear = new FormItemIcon();
 		clear.setPrompt(I18N.message("clear"));
-		clear.setSrc("[SKIN]/trash.svg");
+		clear.setSrc("[SKIN]/icons/trash.png");
 		clear.setWidth(12);
 		clear.setHeight(12);
 		clear.addFormItemClickHandler(click -> {

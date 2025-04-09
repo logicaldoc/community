@@ -157,7 +157,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		category.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
 		FormItemIcon takeAttributeForCategory = new FormItemIcon();
 		takeAttributeForCategory.setName("takeattributes");
-		takeAttributeForCategory.setSrc("[SKIN]/ballot.svg");
+		takeAttributeForCategory.setSrc("[SKIN]/icons/ballot.png");
 		takeAttributeForCategory.setPrompt(I18N.message("takeattributes"));
 		takeAttributeForCategory.addFormItemClickHandler(click -> new AttributeSelector(
 				selection -> click.getItem().setValue(selection[0].getAttributeAsString("name"))).show());
@@ -174,7 +174,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 
 		FormItemIcon takeAttributeForFeatures = new FormItemIcon();
 		takeAttributeForFeatures.setName("takeattributes");
-		takeAttributeForFeatures.setSrc("[SKIN]/ballot.svg");
+		takeAttributeForFeatures.setSrc("[SKIN]/icons/ballot.png");
 		takeAttributeForFeatures.setPrompt(I18N.message("takeattributes"));
 		takeAttributeForFeatures.addFormItemClickHandler(click -> new AttributeSelector(selection -> {
 			String str = click.getItem().getValue() != null ? click.getItem().getValue().toString() : "";

@@ -22,7 +22,7 @@ public class QRFormItemIcon extends FormItemIcon {
 		setName("qrcode");
 		if (Util.isCommercial()) {
 			setPrompt(I18N.message(tooltip));
-			setSrc("[SKIN]/qrcode.svg");
+			setSrc("[SKIN]/icons/qrcode.png");
 			addFormItemClickHandler(event -> {
 				String content = code;
 				if (content == null)
@@ -46,7 +46,7 @@ public class QRFormItemIcon extends FormItemIcon {
 	}
 
 	/**
-	 * The constructor, the current item's text will be user for the QR Code
+	 * The constructor, the current item's text will be used for the QR Code
 	 */
 	public QRFormItemIcon() {
 		this(null);

@@ -38,7 +38,7 @@ public class DocumentSelector extends StaticTextItem {
 
 		FormItemIcon search = new FormItemIcon();
 		search.setPrompt(I18N.message("search"));
-		search.setSrc("[SKIN]/magnifying-glass.svg");
+		search.setSrc("[SKIN]/icons/magnifying-glass.png");
 		search.setWidth(12);
 		search.setHeight(12);
 		search.addFormItemClickHandler(click -> new DocumentSelectorDialog() {
@@ -52,7 +52,7 @@ public class DocumentSelector extends StaticTextItem {
 
 		FormItemIcon clear = new FormItemIcon();
 		clear.setPrompt(I18N.message("clear"));
-		clear.setSrc("[SKIN]/trash.svg");
+		clear.setSrc("[SKIN]/icons/trash.png");
 		clear.setWidth(12);
 		clear.setHeight(12);
 		clear.addFormItemClickHandler(click -> {

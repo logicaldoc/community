@@ -1,5 +1,7 @@
 package com.logicaldoc.core.automation;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.logicaldoc.util.LocaleUtil;
 
 /**
@@ -9,7 +11,7 @@ import com.logicaldoc.util.LocaleUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.3
  */
-@AutomationDictionary(key="NumberTool")
+@AutomationDictionary(key = "NumberTool")
 public class AutomationNumberTool extends org.apache.velocity.tools.generic.NumberTool {
 
 	private static final long serialVersionUID = 1L;
@@ -25,5 +27,19 @@ public class AutomationNumberTool extends org.apache.velocity.tools.generic.Numb
 	 */
 	public String format(String format, Object obj, String locale) {
 		return super.format(format, obj, LocaleUtil.toLocale(locale));
+	}
+
+	/**
+	 * Converts a string into a Long
+	 * 
+	 * @param str The string to convert
+	 * 
+	 * @return The converted value
+	 */
+	public Long toLong(String str) {
+		if (StringUtils.isNotEmpty(str))
+			return Long.parseLong(str);
+		else
+			return null;
 	}
 }

@@ -152,7 +152,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 		if (Util.isCommercial()) {
 			FormItemIcon qrCode = new FormItemIcon();
 			qrCode.setPrompt(I18N.message("qrcode"));
-			qrCode.setSrc("[SKIN]/qrcode.svg");
+			qrCode.setSrc("[SKIN]/icons/qrcode.png");
 			qrCode.addFormItemClickHandler(click -> new PermaLinkDisplay(document.getId()).show());
 			permaLink.setIcons(qrCode);
 		}
@@ -245,7 +245,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 		pages.setWidth("1%");
 
 		FormItemIcon countPages = new FormItemIcon();
-		countPages.setSrc("[SKIN]/arrows-rotate.svg");
+		countPages.setSrc("[SKIN]/icons/arrows-rotate.png");
 		countPages.setPrompt(I18N.message("countpages"));
 		countPages.addFormItemClickHandler(click -> {
 			click.getItem().setValue(I18N.message("computing") + "...");
@@ -310,7 +310,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 
 		FormItemIcon editTags = new FormItemIcon();
 		editTags.setPrompt(I18N.message("edittags"));
-		editTags.setSrc("[SKIN]/pen-to-square.svg");
+		editTags.setSrc("[SKIN]/icons/pen-to-square.png");
 		editTags.addFormItemClickHandler(event -> {
 			tagsString.setVisible(false);
 			tagItem.setVisible(true);

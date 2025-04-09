@@ -128,7 +128,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class ItemFactory {
 
-	private static final String SKIN_TRASH = "[SKIN]/trash.svg";
+	private static final String SKIN_TRASH = "[SKIN]/icons/trash.png";
 
 	private static final String CLEAR = "clear";
 
@@ -316,6 +316,7 @@ public class ItemFactory {
 		spinnerItem.setIconHeight(ITEM_ICON_SIZE);
 		spinnerItem.setIconWidth(ITEM_ICON_SIZE);
 		spinnerItem.setIconVAlign(VerticalAlignment.CENTER);
+		spinnerItem.setWriteStackedIcons(true);
 		SpinnerItem.setDefaultProperties(spinnerItem);
 
 		PasswordItem passwordItem = new PasswordItem();
@@ -1321,7 +1322,7 @@ public class ItemFactory {
 		spinner.setTitle(I18N.message(title));
 		spinner.setMin(0);
 		spinner.setStep(1);
-		spinner.setWidth(60);
+		spinner.setWidth(60); 
 		if (value != null)
 			spinner.setValue(value.intValue());
 		else
@@ -1393,7 +1394,7 @@ public class ItemFactory {
 
 		FormItemIcon composer = new FormItemIcon();
 		composer.setPrompt(I18N.message("opencronexpressioncomposer"));
-		composer.setSrc("[SKIN]/calendar-lines-pen.svg");
+		composer.setSrc("[SKIN]/icons/calendar-lines-pen.png");
 		composer.addFormItemClickHandler(click -> {
 			new CronExpressionComposer(cron, handler).show();
 			click.cancel();
@@ -1401,7 +1402,7 @@ public class ItemFactory {
 
 		FormItemIcon validate = new FormItemIcon();
 		validate.setPrompt(I18N.message("validate"));
-		validate.setSrc("[SKIN]/check.svg");
+		validate.setSrc("[SKIN]/icons/check.png");
 		validate.addFormItemClickHandler(click -> InfoService.Instance.get().getCronDescription(cron.getValueAsString(),
 				I18N.getLocale(), new AsyncCallback<>() {
 
@@ -1606,7 +1607,7 @@ public class ItemFactory {
 	private static FormItemIcon newShowPasswordIcon() {
 		FormItemIcon showPassword = new FormItemIcon();
 		showPassword.setName("showpassword");
-		showPassword.setSrc("[SKIN]/eye.svg");
+		showPassword.setSrc("[SKIN]/icons/eye.png");
 		showPassword.setPrompt(I18N.message("showpassword"));
 		showPassword.addFormItemClickHandler(event -> {
 			NodeList<Element> inputElements = Document.get().getElementsByTagName("input");
@@ -1637,7 +1638,7 @@ public class ItemFactory {
 		if (withGeneratorTool) {
 			FormItemIcon generator = new FormItemIcon();
 			generator.setName("generator");
-			generator.setSrc("[SKIN]/key.svg");
+			generator.setSrc("[SKIN]/icons/key.png");
 			generator.setPrompt(I18N.message("passwordgenerator"));
 			generator.addFormItemClickHandler(event -> new PasswordGenerator().show());
 			password.setIcons(newShowPasswordIcon(), generator);
@@ -1676,7 +1677,7 @@ public class ItemFactory {
 
 		FormItemIcon edit = new FormItemIcon();
 		edit.setName("edit");
-		edit.setSrc("[SKIN]/pen-to-square.svg");
+		edit.setSrc("[SKIN]/icons/pen-to-square.png");
 		edit.setPrompt(I18N.message("edit"));
 		edit.addFormItemClickHandler(event -> {
 			PasswordItem password = newPasswordItem("psw", title,
@@ -2028,7 +2029,7 @@ public class ItemFactory {
 	private static void appendAutomationEditorIcon(FormItem item, ChangedHandler handler, boolean withHtmlEditor) {
 		FormItemIcon editAutomation = new FormItemIcon();
 		editAutomation.setName("editautomation");
-		editAutomation.setSrc("[SKIN]/java.svg");
+		editAutomation.setSrc("[SKIN]/icons/java.png");
 		editAutomation.setPrompt(I18N.message("openautomationeditor"));
 		editAutomation.addFormItemClickHandler(click -> new AutomationItemEditor(item, handler).show());
 
@@ -2042,7 +2043,7 @@ public class ItemFactory {
 	private static FormItemIcon prepareEditHtmlIcon(FormItem item, ChangedHandler handler) {
 		FormItemIcon editHtml = new FormItemIcon();
 		editHtml.setName(EDITHTML);
-		editHtml.setSrc("[SKIN]/code.svg");
+		editHtml.setSrc("[SKIN]/icons/code.png");
 		editHtml.setPrompt(I18N.message("openhtmleditor"));
 		editHtml.addFormItemClickHandler(click -> new HtmlItemEditor(item, handler).show());
 		return editHtml;
@@ -2769,7 +2770,7 @@ public class ItemFactory {
 		if (withSimplifiedHtmlEditor) {
 			FormItemIcon editHtml = new FormItemIcon();
 			editHtml.setName(EDITHTML);
-			editHtml.setSrc("[SKIN]/code.svg");
+			editHtml.setSrc("[SKIN]/icons/code.png");
 			editHtml.setPrompt(I18N.message("openhtmleditor"));
 			editHtml.addFormItemClickHandler(click -> {
 				RichTextItem htmlItem = newRichTextItemForNote("html", "html", item.getValueAsString());

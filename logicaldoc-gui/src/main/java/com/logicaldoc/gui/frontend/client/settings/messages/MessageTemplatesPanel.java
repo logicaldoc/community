@@ -132,7 +132,7 @@ public class MessageTemplatesPanel extends VLayout {
 					editImg.setShowDown(false);
 					editImg.setShowRollOver(false);
 					editImg.setLayoutAlign(Alignment.CENTER);
-					editImg.setSrc("[SKIN]/pencil.svg");
+					editImg.setSrc("[SKIN]/icons/pencil.png");
 					editImg.setPrompt(I18N.message("edit"));
 					editImg.setHeight(16);
 					editImg.setWidth(16);

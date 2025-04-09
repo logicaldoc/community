@@ -189,7 +189,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	private void addComputeStatsIcons(StaticTextItem documents, StaticTextItem subfolders, StaticTextItem size) {
 		FormItemIcon computeStats = new FormItemIcon();
 		computeStats.setPrompt(I18N.message("calculatestats"));
-		computeStats.setSrc("[SKIN]/arrows-rotate.svg");
+		computeStats.setSrc("[SKIN]/icons/arrows-rotate.png");
 		computeStats.addFormItemClickHandler(click -> {
 			click.getItem().setValue(I18N.message("computing") + "...");
 			FolderService.Instance.get().computeStats(folder.getId(), new DefaultAsyncCallback<>() {
@@ -224,7 +224,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	private FormItemIcon prepareEnforceStore() {
 		FormItemIcon enforceStore = new FormItemIcon();
 		enforceStore.setPrompt(I18N.message("enforcefilesintofolderstorage"));
-		enforceStore.setSrc("[SKIN]/boxes-stacked.svg");
+		enforceStore.setSrc("[SKIN]/icons/boxes-stacked.png");
 		enforceStore.addFormItemClickHandler(event -> {
 			LD.ask(I18N.message("enforcementofstorage"),
 					I18N.message("enforcefilesintofolderstorage") + ".\n" + I18N.message("doyouwanttoproceed"), yes -> {
@@ -248,7 +248,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 	private FormItemIcon prepareApplyStoreToSubfoldersItem() {
 		FormItemIcon applyStoreToSubfolders = new FormItemIcon();
 		applyStoreToSubfolders.setPrompt(I18N.message("applytosubfolders"));
-		applyStoreToSubfolders.setSrc("[SKIN]/clone.svg");
+		applyStoreToSubfolders.setSrc("[SKIN]/icons/clone.png");
 		applyStoreToSubfolders.addFormItemClickHandler(applyStoreToSubfoldersClick -> {
 			LD.contactingServer();
 			FolderService.Instance.get().applyStore(folder.getId(), new DefaultAsyncCallback<>() {
@@ -311,7 +311,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 		tagsString.setEndRow(true);
 		FormItemIcon editTags = new FormItemIcon();
 		editTags.setPrompt(I18N.message("edittags"));
-		editTags.setSrc("[SKIN]/pen-to-square.svg");
+		editTags.setSrc("[SKIN]/icons/pen-to-square.png");
 		editTags.addFormItemClickHandler(editTagClick -> {
 			tagsString.setVisible(false);
 			tagItem.setVisible(true);

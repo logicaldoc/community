@@ -48,14 +48,14 @@ public class FolderTile extends HLayout {
 					+ Session.get().getConfig("gui.thumbnail.size") + "px' style='float:body;' align='body'/>";
 			HTMLFlow tileImage = new HTMLFlow(html);
 
-			Img close = new Img("[SKIN]/rectangle-xmark.svg", 16, 16);
+			Img close = new Img("[SKIN]/icons/rectangle-xmark.png", 16, 16);
 			close.setShowRollOver(true);
 			close.addClickHandler((ClickEvent evn) -> {
 				Session.get().setShowThumbnail(false);
 				initGUI();
 			});
 
-			Img changeImage = new Img("[SKIN]/image.svg", 16, 16);
+			Img changeImage = new Img("[SKIN]/icons/image.png", 16, 16);
 			changeImage.setShowRollOver(true);
 			changeImage.setTooltip(I18N.message("changeimage"));
 			changeImage.addClickHandler(click -> new FolderImageUploader(folder, ev -> {

@@ -93,7 +93,7 @@ public class TagsForm extends VLayout {
 
 		FormItemIcon search = new FormItemIcon();
 		search.setPrompt(I18N.message("clear"));
-		search.setSrc("[SKIN]/magnifying-glass.svg");
+		search.setSrc("[SKIN]/icons/magnifying-glass.png");
 		search.addFormItemClickHandler(click -> {
 			if (!otherCharForm.validate())
 				return;

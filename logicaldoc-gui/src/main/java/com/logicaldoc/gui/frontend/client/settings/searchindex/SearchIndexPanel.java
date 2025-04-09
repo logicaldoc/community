@@ -363,7 +363,7 @@ public class SearchIndexPanel extends AdminPanel {
 
 		FormItemIcon computeStats = new FormItemIcon();
 		computeStats.setPrompt(I18N.message("calculatestats"));
-		computeStats.setSrc("[SKIN]/arrows-rotate.svg");
+		computeStats.setSrc("[SKIN]/icons/arrows-rotate.png");
 		computeStats.addFormItemClickHandler(click -> {
 			click.getItem().setValue(I18N.message("computing") + "...");
 			SearchEngineService.Instance.get().countEntries(new DefaultAsyncCallback<>() {
