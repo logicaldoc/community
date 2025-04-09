@@ -33,7 +33,10 @@ public class ShareFileTree extends TreeGrid {
 		setCanAcceptDrop(false);
 		setCanAcceptDroppedRecords(false);
 		setShowRoot(false);
-
+		setSelectionAppearance(SelectionAppearance.CHECKBOX);  
+        setShowSelectedStyle(false);  
+        setShowPartialSelection(true);  
+		
 		if (export)
 			setSelectionType(SelectionStyle.SINGLE);
 		else {

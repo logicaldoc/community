@@ -11,8 +11,8 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Window;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.CookiesManager;
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -33,6 +33,7 @@ import com.logicaldoc.gui.common.client.util.SecurityUtil;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.ValuesCallback;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
+import com.logicaldoc.gui.frontend.client.ai.robot.RobotTray;
 import com.logicaldoc.gui.frontend.client.chatgpt.ChatGPTTray;
 import com.logicaldoc.gui.frontend.client.docusign.DocuSignSettings;
 import com.logicaldoc.gui.frontend.client.docusign.EnvelopeDetails;
@@ -115,6 +116,9 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		setWidth100();
 
 		trays.add(new QuickSearchTray());
+		if (Feature.enabled(Feature.ROBOT)
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ROBOTS))
+			trays.add(new RobotTray());
 		if (Feature.enabled(Feature.CHATGPT)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.CHATGPT))
 			trays.add(new ChatGPTTray());
@@ -305,15 +309,16 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		}));
 
 		final MenuItem importFrom = new MenuItem(I18N.message("importfromdropbox"));
-		importFrom.addClickHandler(event -> DropboxService.Instance.get().isConnected(new DefaultAsyncCallback<Boolean>() {
-			@Override
-			public void onSuccess(Boolean connected) {
-				if (Boolean.FALSE.equals(connected))
-					DropboxAuthorization.get().show();
-				else
-					new DropboxDialog(false).show();
-			}
-		}));
+		importFrom.addClickHandler(
+				event -> DropboxService.Instance.get().isConnected(new DefaultAsyncCallback<Boolean>() {
+					@Override
+					public void onSuccess(Boolean connected) {
+						if (Boolean.FALSE.equals(connected))
+							DropboxAuthorization.get().show();
+						else
+							new DropboxDialog(false).show();
+					}
+				}));
 
 		final MenuItem authrorize = new MenuItem(I18N.message(AUTHORIZE));
 		authrorize.addClickHandler(event -> DropboxAuthorization.get().show());

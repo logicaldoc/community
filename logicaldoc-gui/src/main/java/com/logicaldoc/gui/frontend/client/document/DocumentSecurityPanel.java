@@ -3,8 +3,8 @@ package com.logicaldoc.gui.frontend.client.document;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -25,7 +25,6 @@ import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -311,7 +310,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, true, false);
 		userForm.setItems(user);
 
-		user.addChangedHandler(userChangedEvent -> {
+		user.addChangedHandler(changed -> {
 			ListGridRecord selectedRecord = user.getSelectedRecord();
 			if (selectedRecord == null)
 				return;
@@ -347,7 +346,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		final DynamicForm groupForm = new DynamicForm();
 		final SelectItem group = ItemFactory.newGroupSelector("group", "addgroup");
 		groupForm.setItems(group);
-		group.addChangedHandler((ChangedEvent changedEvent) -> {
+		group.addChangedHandler(changed -> {
 			ListGridRecord selectedRecord = group.getSelectedRecord();
 			if (selectedRecord == null)
 				return;

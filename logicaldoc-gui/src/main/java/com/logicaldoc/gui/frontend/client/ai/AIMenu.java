@@ -33,7 +33,7 @@ public class AIMenu extends VLayout {
 			addMember(models);
 		}
 
-		if (Menu.enabled(Menu.ROBOTS)) {
+		if (Menu.enabled(Menu.ADMIN_ROBOTS)) {
 			Button robots = new Button(I18N.message("robots"));
 			robots.setWidth100();
 			robots.setHeight(25);

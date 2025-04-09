@@ -27,7 +27,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.9.4
  */
-public class ThreadWindow extends Window {
+public class ChatGPTThread extends Window {
 
 	private static final String CHATGPT = "chatgpt";
 
@@ -37,15 +37,15 @@ public class ThreadWindow extends Window {
 
 	private MessageBox lastMessage;
 
-	private static ThreadWindow instance = new ThreadWindow();
+	private static ChatGPTThread instance = new ChatGPTThread();
 
 	private Timer answerPolling;
 
-	public static ThreadWindow get() {
+	public static ChatGPTThread get() {
 		return instance;
 	}
 
-	private ThreadWindow() {
+	private ChatGPTThread() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.MINIMIZE_BUTTON, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message(CHATGPT));
 		setCanDragResize(true);
@@ -198,7 +198,7 @@ public class ThreadWindow extends Window {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof ThreadWindow)
+		if (obj instanceof ChatGPTThread)
 			return super.equals(obj);
 		else
 			return false;

@@ -10,6 +10,7 @@ import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.exception.AspectDisabledException;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.plugin.PluginRegistry;
@@ -61,6 +62,12 @@ public enum RunLevel {
 		return config != null && config.getBoolean(getAspectProperty(aspect), false);
 	}
 
+	public void checkAspect(String aspect) throws AspectDisabledException {
+		if(!aspectEnabled(aspect))
+			throw new AspectDisabledException(aspect);
+	}
+
+	
 	public void setAspect(String aspect, boolean enabled) {
 		ContextProperties config = getConfig();
 		if (config != null)

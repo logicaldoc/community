@@ -12,11 +12,20 @@ public class FeatureDisabledException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
-	public FeatureDisabledException(int featureId) {
-		super("Feature " + I18N.message("feature.Feature_" + featureId));
+	protected FeatureDisabledException(String featureId, String messagePrefix, String featureKeyPrefix,
+			Throwable cause) {
+		super(messagePrefix + I18N.message(featureKeyPrefix + featureId), cause);
 	}
 
-	public FeatureDisabledException(int featureId, Throwable cause) {
-		super("Feature " + I18N.message("feature.Feature_" + featureId), cause);
+	protected FeatureDisabledException(String featureId, String messagePrefix, String featureKeyPrefix) {
+		super(messagePrefix + I18N.message(featureKeyPrefix + featureId));
+	}
+
+	public FeatureDisabledException(String featureId) {
+		this(featureId, "Feature ", "feature.Feature_");
+	}
+
+	public FeatureDisabledException(String featureId, Throwable cause) {
+		this(featureId, "Feature ", "feature.Feature_", cause);
 	}
 }

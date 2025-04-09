@@ -13,7 +13,7 @@ public class InvalidSessionException extends AuthenticationException {
 	private final String sid;
 
 	public InvalidSessionException() {
-		sid = null;
+		sid = "";
 	}
 
 	public InvalidSessionException(String sid) {

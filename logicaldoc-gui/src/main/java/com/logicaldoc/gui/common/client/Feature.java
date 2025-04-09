@@ -225,7 +225,7 @@ public class Feature {
 
 	public static final int ONLYOFFICE = 107;
 
-	public static final int BOT = 108;
+	public static final int ROBOT = 108;
 	
 	private static Set<String> features = new HashSet<>();
 

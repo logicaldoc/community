@@ -8,7 +8,7 @@ import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.frontend.client.chatgpt.ThreadWindow;
+import com.logicaldoc.gui.frontend.client.chatgpt.ChatGPTThread;
 import com.logicaldoc.gui.frontend.client.menu.MainMenu;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
@@ -158,7 +158,7 @@ public class RobotThread extends Window {
 	}
 
 	private String robotName() {
-		if (robot.getLabel() == null || robot.getLabel().isBlank())
+		if (robot.getLabel() == null || robot.getLabel().trim().isEmpty())
 			return robot.getName();
 		else
 			return robot.getLabel();
@@ -179,7 +179,7 @@ public class RobotThread extends Window {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof ThreadWindow)
+		if (obj instanceof ChatGPTThread)
 			return super.equals(obj);
 		else
 			return false;

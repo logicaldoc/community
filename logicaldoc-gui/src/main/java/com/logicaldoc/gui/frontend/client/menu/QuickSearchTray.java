@@ -31,7 +31,7 @@ public class QuickSearchTray extends MenuTray {
 
 	private TextItem searchBox = new TextItem();
 
-	SelectItem searchType = new SelectItem();
+	private SelectItem searchType = new SelectItem();
 
 	public QuickSearchTray() {
 		FormItemIcon search = new FormItemIcon();
