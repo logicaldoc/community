@@ -2,14 +2,12 @@
 <Configuration packages="com.logicaldoc.util.log4j">
 	<Properties>
 		<Property name="root">target</Property>
-		<Property name="pattern">%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p (%c:%4L) --
-			%m%n</Property>
+		<Property name="pattern">%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n</Property>
 		<Property name="dateformat">ISO8601</Property>
 	</Properties>
 
 	<Appenders>
-		<RollingFile name="file" fileName="${root}/file.log"
-			filePattern="${root}/file.log.%i">
+		<RollingFile name="file" fileName="${root}/file.log" filePattern="${root}/file.log.%i">
 			<PatternLayout>
 				<Pattern>${pattern}</Pattern>
 			</PatternLayout>
@@ -18,8 +16,7 @@
 			</Policies>
 			<DefaultRolloverStrategy max="1" />
 		</RollingFile>
-		<RollingFile name="hikari" fileName="${root}/hikari.log"
-			filePattern="${root}/hikari.log.%i">
+		<RollingFile name="hibernate" fileName="${root}/hibernate.log" filePattern="${root}/hikari.log.%i">
 			<PatternLayout>
 				<Pattern>${pattern}</Pattern>
 			</PatternLayout>
@@ -27,7 +24,7 @@
 				<SizeBasedTriggeringPolicy size="1 MB" />
 			</Policies>
 			<DefaultRolloverStrategy max="1" />
-		</RollingFile>
+		</RollingFile>		
 
 		<Console name="console" target="SYSTEM_OUT">
 			<PatternLayout pattern="%m%n" />
@@ -38,10 +35,6 @@
 		<Logger name="org.apache.cxf" level="fatal" additivity="false">
 			<Appender-Ref ref="file" />
 		</Logger>
-		<Logger name="com.logicaldoc.core.searchengine" level="error"
-			additivity="false">
-			<Appender-Ref ref="file" />
-		</Logger>
 		<Logger name="com.logicaldoc" level="error" additivity="false">
 			<Appender-Ref ref="file" />
 		</Logger>
@@ -49,35 +42,17 @@
 			level="fatal" additivity="false">
 			<Appender-Ref ref="file" />
 		</Logger>
-		<Logger name="com.zaxxer.hikari" level="error" additivity="false">
-			<AppenderRef ref="hikari" />
-		</Logger>
 		<Logger name="java.sql" level="error" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
 		<Logger name="org.hsqldb" level="error" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
-		<Logger name="com.logicaldoc.core.document.DocumentManagerImpl"
-			level="info" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-		<Logger name="org.hsqldb" level="error" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
 
-		<Logger name="com.logicaldoc.web.websockets" level="fatal"
-			additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-		<Logger name="org.apache.solr" level="fatal" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-		
-		
 		<Root level="fatal">
 			<AppenderRef ref="console" />
 		</Root>
 	</Loggers>
+
 
 </Configuration>	
