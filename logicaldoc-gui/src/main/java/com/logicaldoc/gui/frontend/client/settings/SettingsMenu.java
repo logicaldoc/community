@@ -48,8 +48,6 @@ public class SettingsMenu extends VLayout {
 
 		addKeystore();
 
-		addVia();
-
 		addAutomation();
 
 		addComparators();
@@ -104,18 +102,6 @@ public class SettingsMenu extends VLayout {
 			addMember(automation);
 			if (!Feature.enabled(Feature.AUTOMATION))
 				setFeatureDisabled(automation);
-		}
-	}
-
-	private void addVia() {
-		Button via = new Button(I18N.message("via"));
-		via.setWidth100();
-		via.setHeight(25);
-		via.addClickHandler((ClickEvent event) -> AdminScreen.get().setContent(new VIASettingsPanel()));
-		if (Feature.visible(Feature.ARTIFICIAL_INTELLIGENCE) && Menu.enabled(Menu.VIA)) {
-			addMember(via);
-			if (!Feature.enabled(Feature.ARTIFICIAL_INTELLIGENCE))
-				setFeatureDisabled(via);
 		}
 	}
 
