@@ -1,8 +1,12 @@
 package com.logicaldoc.gui.frontend.client.ai.robot;
 
+import com.google.gwt.core.client.UnsafeNativeLong;
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.Label;
 
@@ -13,6 +17,10 @@ import com.smartgwt.client.widgets.Label;
  * @since 8.9.4
  */
 class MessageBox extends Label {
+
+	private static final String CMD_END = "]cmd]";
+
+	private static final String CMD_START = "[cmd[";
 
 	private static final String ROBOT = "robot";
 
@@ -44,12 +52,60 @@ class MessageBox extends Label {
 			String copyButton = "<button onclick=\"copy(document.getElementById('" + messageTextElementId
 					+ "').innerText);\" style='width:32px'>" + AwesomeFactory.getIconHtml("paste") + "</button>";
 
+			if (isRobotAnswer())
+				message = parseRobotAnswer(message);
+
 			return "<table border='0' width='100%'><tr><td style='width:36px; align:center; vertical-align: top;'>"
-					+ avatarIcon + (ROBOT.equals(role) ? copyButton : "") + "</td><td><span id='" + messageTextElementId
+					+ avatarIcon + (isRobotAnswer() ? copyButton : "") + "</td><td><span id='" + messageTextElementId
 					+ "'>" + message + "</span></td></tr></table>";
 		} else {
 			return "";
 		}
+	}
+
+	@Override
+	protected void onInit() {
+		super.onInit();
+		declareCommandOpenDocument(DocumentsPanel.get());
+	}
+
+	protected boolean isRobotAnswer() {
+		return ROBOT.equals(role);
+	}
+
+	/**
+	 * Processes the answer looking for command tokens like
+	 * [cmd[<b>command</b>|<b>arg1</b>|<b>arg2</b>]cmd] and replace them with
+	 * proper rendering.
+	 * 
+	 * @param message The original message from the robot
+	 * 
+	 * @return The elaborated messages with command tokens expanded
+	 */
+	private String parseRobotAnswer(String message) {
+		RegExp p = RegExp.compile("\\[cmd\\[[a-zA-Z]*\\|.*\\|.*\\]cmd\\]");
+		MatchResult result = p.exec(message);
+
+		if (result != null) {
+			for (int i = 0; i < result.getGroupCount(); i++) {
+				String match = result.getGroup(i);
+				match = match.replace(CMD_START, "");
+				match = match.replace(CMD_END, "");
+				String link = processCommand(match.split("\\|"));
+				message = message.replace(CMD_START + match + CMD_END, link);
+			}
+		}
+
+		return message;
+	}
+
+	private String processCommand(String[] args) {
+		String command = args[0];
+		String link = "<a href='javascript:cmd" + command + "(";
+		if ("OpenDocument".equals(command)) {
+			link += args[1] + ");'>" + args[2] + "</a>";
+		}
+		return link;
 	}
 
 	public void updateMessage(String message) {
@@ -68,4 +124,11 @@ class MessageBox extends Label {
 	public int hashCode() {
 		return super.hashCode();
 	}
+
+	@UnsafeNativeLong
+	public static native void declareCommandOpenDocument(DocumentsPanel panel) /*-{
+		$wnd.cmdOpenDocument = function(docId) {
+			return panel.@com.logicaldoc.gui.frontend.client.document.DocumentsPanel::openInFolder(J)(docId);
+		};
+	}-*/;
 }

@@ -90,7 +90,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Resource(name = "GroupDAO")
 	private GroupDAO groupDAO;
-	
+
 	@Resource(name = "DocumentLinkDAO")
 	private DocumentLinkDAO linkDAO;
 
@@ -357,23 +357,23 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	private void removeForbiddenPermissionsForGuests(Document document) throws PersistenceException {
 		// Remove the forbidden permissions for the guests
-	    for (DocumentAccessControlEntry ace : document.getAccessControlList()) {
-	        Group group = groupDAO.findById(ace.getGroupId());
-	        if (group != null && group.isGuest()) {
-	            ace.setArchive(0);
-	            ace.setAutomation(0);
-	            ace.setCalendar(0);
-	            ace.setDelete(0);
-	            ace.setImmutable(0);
-	            ace.setMove(0);
-	            ace.setPassword(0);
-	            ace.setRename(0);
-	            ace.setSecurity(0);
-	            ace.setSign(0);
-	            ace.setWorkflow(0);
-	            ace.setWrite(0);
-	        }
-	    }
+		for (DocumentAccessControlEntry ace : document.getAccessControlList()) {
+			Group group = groupDAO.findById(ace.getGroupId());
+			if (group != null && group.isGuest()) {
+				ace.setArchive(0);
+				ace.setAutomation(0);
+				ace.setCalendar(0);
+				ace.setDelete(0);
+				ace.setImmutable(0);
+				ace.setMove(0);
+				ace.setPassword(0);
+				ace.setRename(0);
+				ace.setSecurity(0);
+				ace.setSign(0);
+				ace.setWorkflow(0);
+				ace.setWrite(0);
+			}
+		}
 	}
 
 	private void checkMaxDocsPerFolder(Document document) throws PersistenceException {
@@ -1420,6 +1420,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		final Set<Permission> permissions = new HashSet<>();
 		User user = getExistingtUser(userId);
 		userDAO.initialize(user);
+
+		if (findById(docId) == null)
+			throw new PersistenceException("Unexisting document " + docId);
 
 		// If the user is an administrator bypass all controls
 		if (user.isAdmin()) {

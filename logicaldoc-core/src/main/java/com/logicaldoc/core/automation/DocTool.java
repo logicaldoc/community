@@ -33,6 +33,7 @@ import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.searchengine.Hit;
 import com.logicaldoc.core.searchengine.SearchEngine;
+import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -1010,5 +1011,43 @@ public class DocTool {
 		if (StringUtils.isEmpty(text))
 			text = parse(document, null);
 		return text;
+	}
+
+	/**
+	 * This method checks if the given permission is enabled for a document and
+	 * an user.
+	 * 
+	 * @param permission the permission to check
+	 * @param documentId ID of the folder
+	 * @param userId ID of the user
+	 * 
+	 * @return if the permission is granted to the user
+	 * 
+	 * @throws PersistenceException error at data layer
+	 */
+	public boolean isPermissionAllowed(String permission, long documentId, long userId) {
+		try {
+			return Context.get(DocumentDAO.class).isPermissionAllowed(Permission.valueOf(permission), documentId,
+					userId);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return false;
+		}
+	}
+
+	public boolean isWriteAllowed(long documentId, long userId) {
+		return isPermissionAllowed(Permission.WRITE.name(), documentId, userId);
+	}
+
+	public boolean isReadAllowed(long documentId, long userId) {
+		return isPermissionAllowed(Permission.READ.name(), documentId, userId);
+	}
+
+	public boolean isPreviewAllowed(long documentId, long userId) {
+		return isPermissionAllowed(Permission.PREVIEW.name(), documentId, userId);
+	}
+
+	public boolean isDownloadAllowed(long documentId, long userId) {
+		return isPermissionAllowed(Permission.DOWNLOAD.name(), documentId, userId);
 	}
 }
