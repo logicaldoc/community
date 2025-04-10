@@ -67,8 +67,8 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 							.orElse(note.getMessage());
 
 					doc.setLastNote(HTMLSanitizer.sanitizeSimpleText(lastNoteMessage));
-					if (document.getIndexed() == AbstractDocument.INDEX_INDEXED)
-						document.setIndexed(AbstractDocument.INDEX_TO_INDEX);
+					if (document.getIndexed() == DocumentIndexed.INDEXED)
+						document.setIndexed(DocumentIndexed.TO_INDEX);
 					dao.store(doc);
 				} catch (PersistenceException e) {
 					log.error(e.getMessage(), e);
@@ -151,10 +151,10 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 			super.delete(id, code);
 			DocumentDAO documentDao = Context.get(DocumentDAO.class);
 			Document document = documentDao.findById(note.getDocId());
-			if (document != null && document.getIndexed() == AbstractDocument.INDEX_INDEXED) {
+			if (document != null && document.getIndexed() == DocumentIndexed.INDEXED) {
 				// Mark to index
 				documentDao.initialize(document);
-				document.setIndexed(AbstractDocument.INDEX_TO_INDEX);
+				document.setIndexed(DocumentIndexed.TO_INDEX);
 				documentDao.store(document);
 				updateLastNote(document, note);
 			}

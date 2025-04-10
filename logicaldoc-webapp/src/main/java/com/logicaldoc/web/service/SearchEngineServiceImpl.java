@@ -388,7 +388,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			document.setLockUserId(hit.getLockUserId());
 			document.setLockUser(hit.getLockUser());
 			document.setComment(hit.getComment());
-			document.setStatus(hit.getStatus());
+			document.setStatus(hit.getStatus().ordinal());
 			document.setWorkflowStatus(hit.getWorkflowStatus());
 			document.setWorkflowStatusDisplay(hit.getWorkflowStatusDisplay());
 			document.setImmutable(hit.getImmutable());
@@ -398,7 +398,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			document.setPublished(hit.getPublished());
 			document.setSigned(hit.getSigned());
 			document.setStamped(hit.getStamped());
-			document.setIndexed(hit.getIndexed());
+			document.setIndexed(hit.getIndexed().ordinal());
 			document.setExtResId(hit.getExtResId());
 			document.setPages(hit.getPages());
 			document.setPreviewPages(hit.getPreviewPages());

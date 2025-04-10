@@ -183,7 +183,7 @@ public class DocumentManager {
 		// identify the document and folder
 		Document document = documentDAO.findDocument(docId);
 
-		if (document.getImmutable() == 0 && document.getStatus() == AbstractDocument.DOC_UNLOCKED) {
+		if (document.getImmutable() == 0 && document.getStatus() == DocumentStatus.UNLOCKED) {
 			// Remove the ancillary files of the same fileVersion
 			final String newFilerResourceName = store.getResourceName(document, fileVersion, null);
 			for (String resource : store.listResources(document.getId(), fileVersion).stream()
@@ -198,8 +198,8 @@ public class DocumentManager {
 			// Update the document's gridRecord
 			documentDAO.initialize(document);
 			document.setFileSize(fileSize);
-			if (document.getIndexed() != AbstractDocument.INDEX_SKIP)
-				document.setIndexed(AbstractDocument.INDEX_TO_INDEX);
+			if (document.getIndexed() != DocumentIndexed.SKIP)
+				document.setIndexed(DocumentIndexed.TO_INDEX);
 			document.setOcrd(0);
 			document.setBarcoded(0);
 			document.setSigned(0);
@@ -346,8 +346,8 @@ public class DocumentManager {
 			document.setOcrd(0);
 			document.setBarcoded(0);
 
-			if (document.getIndexed() != AbstractDocument.INDEX_SKIP)
-				document.setIndexed(AbstractDocument.INDEX_TO_INDEX);
+			if (document.getIndexed() != DocumentIndexed.SKIP)
+				document.setIndexed(DocumentIndexed.TO_INDEX);
 
 			documentDAO.store(document);
 
@@ -363,7 +363,7 @@ public class DocumentManager {
 			document.setDate(new Date());
 			document.setPublisher(transaction.getUsername());
 			document.setPublisherId(transaction.getUserId());
-			document.setStatus(AbstractDocument.DOC_UNLOCKED);
+			document.setStatus(DocumentStatus.UNLOCKED);
 			document.setLockUserId(null);
 			document.setFolder(folder);
 			document.setDigest(null);
@@ -374,7 +374,7 @@ public class DocumentManager {
 			Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
 					DocumentEvent.CHECKEDIN.toString(), release);
 
-			document.setStatus(AbstractDocument.DOC_UNLOCKED);
+			document.setStatus(DocumentStatus.UNLOCKED);
 			documentDAO.store(document, transaction);
 
 			// store the document in the repository (on the file system)
@@ -436,7 +436,7 @@ public class DocumentManager {
 	public void checkout(long docId, DocumentHistory transaction) throws PersistenceException {
 		if (transaction.getEvent() == null)
 			transaction.setEvent(DocumentEvent.CHECKEDOUT.toString());
-		lock(docId, AbstractDocument.DOC_CHECKED_OUT, transaction);
+		lock(docId, DocumentStatus.CHECKEDOUT, transaction);
 	}
 
 	/**
@@ -448,7 +448,7 @@ public class DocumentManager {
 	 * @param transaction entry to log the event (set the user)
 	 * @throws PersistenceException if an error occurs, this exception is thrown
 	 */
-	public void lock(long docId, int status, DocumentHistory transaction) throws PersistenceException {
+	public void lock(long docId, DocumentStatus status, DocumentHistory transaction) throws PersistenceException {
 		validateTransaction(transaction);
 
 		/*
@@ -463,7 +463,7 @@ public class DocumentManager {
 				return;
 			}
 
-			if (document.getStatus() != AbstractDocument.DOC_UNLOCKED)
+			if (document.getStatus() != DocumentStatus.UNLOCKED)
 				throw new PersistenceException(
 						String.format("Document %s is already locked by user %s and cannot be locked by %s", document,
 								document.getLockUser(), transaction.getUser().getFullName()));
@@ -502,7 +502,7 @@ public class DocumentManager {
 			// Physically remove the document from full-text index
 			indexer.deleteHit(docId);
 
-			doc.setIndexed(AbstractDocument.INDEX_TO_INDEX);
+			doc.setIndexed(DocumentIndexed.TO_INDEX);
 			documentDAO.store(doc);
 
 			markAliasesToIndex(doc.getId());
@@ -586,7 +586,7 @@ public class DocumentManager {
 		Document doc = getExistingDocument(docId);
 
 		log.debug("Indexing document {} - {}", doc.getId(), doc.getFileName());
-		int currentIndexed = doc.getIndexed();
+		int currentIndexed = doc.getIndexed().ordinal();
 
 		long parsingTime;
 		String cont;
@@ -597,8 +597,8 @@ public class DocumentManager {
 				// We are indexing an alias, so index the real document first
 				Document realDoc = documentDAO.findById(doc.getDocRef());
 				if (realDoc != null) {
-					if (realDoc.getIndexed() == AbstractDocument.INDEX_TO_INDEX
-							|| realDoc.getIndexed() == AbstractDocument.INDEX_TO_INDEX_METADATA)
+					if (realDoc.getIndexed() == DocumentIndexed.TO_INDEX
+							|| realDoc.getIndexed() == DocumentIndexed.TO_INDEX_METADATA)
 						parsingTime = index(realDoc.getId(), content, new DocumentHistory(transaction));
 
 					// Take the content from the real document to avoid double
@@ -608,13 +608,13 @@ public class DocumentManager {
 				} else {
 					log.debug("Alias {} cannot be indexed because it references an unexisting document {}", doc,
 							doc.getDocRef());
-					documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + AbstractDocument.INDEX_SKIP
-							+ " where ld_id=" + doc.getId());
+					documentDAO.jdbcUpdate(
+							UPDATE_LD_DOCUMENT_SET_LD_INDEXED + DocumentIndexed.SKIP + " where ld_id=" + doc.getId());
 					return 0;
 				}
 			}
 
-			if (StringUtils.isEmpty(cont) && doc.getIndexed() != AbstractDocument.INDEX_TO_INDEX_METADATA) {
+			if (StringUtils.isEmpty(cont) && doc.getIndexed() != DocumentIndexed.TO_INDEX_METADATA) {
 				// Extracts the content from the file. This may take very long
 				// time.
 				Date beforeParsing = new Date();
@@ -632,8 +632,8 @@ public class DocumentManager {
 		}
 
 		// For additional safety update the DB directly
-		doc.setIndexed(AbstractDocument.INDEX_INDEXED);
-		documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + doc.getIndexed() + " where ld_id=" + doc.getId());
+		doc.setIndexed(DocumentIndexed.INDEXED);
+		documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + doc.getIndexed().ordinal() + " where ld_id=" + doc.getId());
 
 		// Save the event
 		if (transaction != null) {
@@ -671,7 +671,7 @@ public class DocumentManager {
 			if (Context.get().getProperties().getBoolean(tenant + ".index.skiponerror", false)) {
 				DocumentDAO dDao = Context.get(DocumentDAO.class);
 				dDao.initialize(document);
-				document.setIndexed(AbstractDocument.INDEX_SKIP);
+				document.setIndexed(DocumentIndexed.SKIP);
 				dDao.store(document);
 			}
 		}
@@ -693,7 +693,7 @@ public class DocumentManager {
 	}
 
 	private void markAliasesToIndex(long referencedDocId) throws PersistenceException {
-		documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + AbstractDocument.INDEX_TO_INDEX + " where ld_docref="
+		documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + DocumentIndexed.TO_INDEX.ordinal() + " where ld_docref="
 				+ referencedDocId + " and not ld_id = " + referencedDocId);
 	}
 
@@ -740,7 +740,7 @@ public class DocumentManager {
 			checkCustomIdUniquenesOnUpdate(document, docVO);
 
 			// The document must be re-indexed
-			document.setIndexed(AbstractDocument.INDEX_TO_INDEX);
+			document.setIndexed(DocumentIndexed.TO_INDEX);
 
 			document.setWorkflowStatus(docVO.getWorkflowStatus());
 			document.setColor(docVO.getColor());
@@ -894,12 +894,12 @@ public class DocumentManager {
 				doc.setFolder(folder);
 
 				// The document needs to be reindexed
-				if (doc.getIndexed() == AbstractDocument.INDEX_INDEXED) {
-					doc.setIndexed(AbstractDocument.INDEX_TO_INDEX);
+				if (doc.getIndexed() == DocumentIndexed.INDEXED) {
+					doc.setIndexed(DocumentIndexed.TO_INDEX);
 					indexer.deleteHit(doc.getId());
 
 					// The same thing should be done on each shortcut
-					documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + AbstractDocument.INDEX_TO_INDEX
+					documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + DocumentIndexed.TO_INDEX.ordinal()
 							+ " where ld_docref=" + doc.getId());
 				}
 
@@ -1097,7 +1097,7 @@ public class DocumentManager {
 		else
 			docVO.setCreatorId(transaction.getUserId());
 
-		docVO.setStatus(AbstractDocument.DOC_UNLOCKED);
+		docVO.setStatus(DocumentStatus.UNLOCKED);
 		docVO.setType(type);
 		docVO.setVersion(config.getProperty("document.startversion"));
 		docVO.setFileVersion(docVO.getVersion());
@@ -1177,8 +1177,8 @@ public class DocumentManager {
 				cloned.setFolder(folder);
 			cloned.setLastModified(null);
 			cloned.setDate(null);
-			if (cloned.getIndexed() == AbstractDocument.INDEX_INDEXED)
-				cloned.setIndexed(AbstractDocument.INDEX_TO_INDEX);
+			if (cloned.getIndexed() == DocumentIndexed.INDEXED)
+				cloned.setIndexed(DocumentIndexed.TO_INDEX);
 			cloned.setStamped(0);
 			cloned.setSigned(0);
 			cloned.setLinks(0);
@@ -1269,7 +1269,7 @@ public class DocumentManager {
 
 			if (transaction.getUser().isMemberOf(Group.GROUP_ADMIN)) {
 				document.setImmutable(0);
-			} else if (document.getLockUserId() == null || document.getStatus() == AbstractDocument.DOC_UNLOCKED) {
+			} else if (document.getLockUserId() == null || document.getStatus() == DocumentStatus.UNLOCKED) {
 				log.debug("The document {} is already unlocked", document);
 				return;
 			} else if (!transaction.getUserId().toString().equals(document.getLockUserId().toString())) {
@@ -1285,7 +1285,7 @@ public class DocumentManager {
 			document.setLockUserId(null);
 			document.setLockUser(null);
 			document.setExtResId(null);
-			document.setStatus(AbstractDocument.DOC_UNLOCKED);
+			document.setStatus(DocumentStatus.UNLOCKED);
 
 			// Modify document history entry
 			transaction.setEvent(DocumentEvent.UNLOCKED.toString());
@@ -1351,7 +1351,7 @@ public class DocumentManager {
 					document.setType(UNKNOWN);
 				}
 
-				document.setIndexed(AbstractDocument.INDEX_TO_INDEX);
+				document.setIndexed(DocumentIndexed.TO_INDEX);
 
 				Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
 						DocumentEvent.RENAMED.toString(), false);
@@ -1457,7 +1457,7 @@ public class DocumentManager {
 			alias.setPublisherId(transaction.getUserId());
 			alias.setCreator(transaction.getUsername());
 			alias.setCreatorId(transaction.getUserId());
-			alias.setStatus(AbstractDocument.DOC_UNLOCKED);
+			alias.setStatus(DocumentStatus.UNLOCKED);
 			alias.setType(type);
 
 			// Set the Doc Reference
@@ -1504,17 +1504,16 @@ public class DocumentManager {
 	 * @param doc The document for which will be changed the indexer status.
 	 * @param status The new document indexer status.
 	 */
-	public void changeIndexingStatus(Document doc, int status) {
-		if (status == AbstractDocument.INDEX_SKIP && doc.getIndexed() == AbstractDocument.INDEX_SKIP)
+	public void changeIndexingStatus(Document doc, DocumentIndexed status) {
+		if (status == DocumentIndexed.SKIP && doc.getIndexed() == DocumentIndexed.SKIP)
 			return;
-		if (status == AbstractDocument.INDEX_TO_INDEX && doc.getIndexed() == AbstractDocument.INDEX_TO_INDEX)
+		if (status == DocumentIndexed.TO_INDEX && doc.getIndexed() == DocumentIndexed.TO_INDEX)
 			return;
-		if (status == AbstractDocument.INDEX_TO_INDEX_METADATA
-				&& doc.getIndexed() == AbstractDocument.INDEX_TO_INDEX_METADATA)
+		if (status == DocumentIndexed.TO_INDEX_METADATA && doc.getIndexed() == DocumentIndexed.TO_INDEX_METADATA)
 			return;
 
 		documentDAO.initialize(doc);
-		if (doc.getIndexed() == AbstractDocument.INDEX_INDEXED)
+		if (doc.getIndexed() == DocumentIndexed.INDEXED)
 			deleteFromIndex(doc);
 		doc.setIndexed(status);
 		try {
@@ -1660,7 +1659,7 @@ public class DocumentManager {
 		Collection<Long> folderIds = folderDAO.findFolderIdByUserIdAndPermission(transaction.getUserId(),
 				Permission.ARCHIVE, root.getId(), true);
 		for (Long fid : folderIds) {
-			String where = " where ld_deleted=0 and not ld_status=" + AbstractDocument.DOC_ARCHIVED
+			String where = " where ld_deleted=0 and not ld_status=" + DocumentStatus.ARCHIVED.ordinal()
 					+ " and ld_folderid=" + fid;
 			archivedDocIds.addAll(documentDAO.queryForList("select ld_id from ld_document " + where, Long.class)
 					.stream().collect(Collectors.toSet()));
@@ -1831,7 +1830,7 @@ public class DocumentManager {
 
 		// identify the document and folder
 		Document document = documentDAO.findDocument(docId);
-		if (document.getImmutable() == 0 && document.getStatus() == AbstractDocument.DOC_UNLOCKED) {
+		if (document.getImmutable() == 0 && document.getStatus() == DocumentStatus.UNLOCKED) {
 			Version ver = versionDAO.findByVersion(document.getId(), version);
 			if (ver == null)
 				throw new PersistenceException(String.format("Unexisting version %s of document %d", version, docId));

@@ -69,14 +69,14 @@ public class WSUtil {
 
 			setFolderIntoWsDocument(document, wsDoc);
 
-			wsDoc.setIndexed(document.getIndexed());
+			wsDoc.setIndexed(document.getIndexed().ordinal());
 			wsDoc.setVersion(document.getVersion());
 			wsDoc.setFileVersion(document.getFileVersion());
 			wsDoc.setPublisher(document.getPublisher());
 			wsDoc.setPublisherId(document.getPublisherId());
 			wsDoc.setCreator(document.getCreator());
 			wsDoc.setCreatorId(document.getCreatorId());
-			wsDoc.setStatus(document.getStatus());
+			wsDoc.setStatus(document.getStatus().ordinal());
 			wsDoc.setType(document.getType());
 			wsDoc.setLockUserId(document.getLockUserId());
 			wsDoc.setFileName(document.getFileName());

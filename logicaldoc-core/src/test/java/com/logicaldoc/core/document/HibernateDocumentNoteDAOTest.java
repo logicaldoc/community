@@ -171,7 +171,7 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 		Document doc = new Document();
 		doc.setFileName("testDoc");
 		doc.setFolder(folder);
-		doc.setIndexed(AbstractDocument.INDEX_INDEXED);
+		doc.setIndexed(DocumentIndexed.INDEXED);
 		docDao.store(doc);
 
 		DocumentNote note = new DocumentNote();

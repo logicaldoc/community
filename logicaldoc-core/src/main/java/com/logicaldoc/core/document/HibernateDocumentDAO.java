@@ -111,9 +111,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public void archive(long docId, DocumentHistory transaction) throws PersistenceException {
 		Document doc = findById(docId);
-		doc.setStatus(AbstractDocument.DOC_ARCHIVED);
-		if (doc.getIndexed() != AbstractDocument.INDEX_SKIP)
-			doc.setIndexed(AbstractDocument.INDEX_TO_INDEX);
+		doc.setStatus(DocumentStatus.ARCHIVED);
+		if (doc.getIndexed() != DocumentIndexed.SKIP)
+			doc.setIndexed(DocumentIndexed.TO_INDEX);
 		doc.setLockUserId(transaction.getUserId());
 		transaction.setEvent(DocumentEvent.ARCHIVED.toString());
 		store(doc, transaction);
@@ -123,7 +123,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public void unarchive(long docId, DocumentHistory transaction) throws PersistenceException {
 		Document doc = findById(docId);
-		doc.setStatus(AbstractDocument.DOC_UNLOCKED);
+		doc.setStatus(DocumentStatus.UNLOCKED);
 		doc.setLockUserId(null);
 		transaction.setEvent(DocumentEvent.RESTORED.toString());
 		store(doc, transaction);
@@ -211,19 +211,19 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			query.append(folder.getId());
 			first = false;
 		}
-		query.append(") and not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED);
+		query.append(") and not " + ENTITY + STATUS + DocumentStatus.ARCHIVED.ordinal());
 		return findIdsByWhere(query.toString(), null, null);
 	}
 
 	@Override
-	public List<Document> findByLockUserAndStatus(Long userId, Integer status) {
+	public List<Document> findByLockUserAndStatus(Long userId, DocumentStatus status) {
 		StringBuilder sb = new StringBuilder(
 				"select ld_id, ld_folderid, ld_version, ld_fileversion, ld_lastmodified, ld_filename from ld_document where ld_deleted = 0 ");
 		if (userId != null)
 			sb.append(" and ld_lockuserid=" + userId);
 
 		if (status != null)
-			sb.append(" and ld_status=" + status);
+			sb.append(" and ld_status=" + status.ordinal());
 
 		try {
 			return query(sb.toString(), (resultSet, col) -> {
@@ -248,7 +248,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	public List<Long> findDocIdByTag(String tag) throws PersistenceException {
 		StringBuilder query = new StringBuilder(
 				"select distinct(A.ld_docid) from ld_tag A, ld_document B where A.ld_docid=B.ld_id and not B.ld_status="
-						+ AbstractDocument.DOC_ARCHIVED);
+						+ DocumentStatus.ARCHIVED.ordinal());
 		query.append(" and lower(ld_tag)='" + SqlUtil.doubleQuotesAndBackslashes(tag).toLowerCase() + "'");
 		return queryForList(query.toString(), Long.class);
 	}
@@ -494,18 +494,17 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	private void setIndexed(Document doc, Tenant tenant) {
-		if (doc.getIndexed() == AbstractDocument.INDEX_TO_INDEX
-				|| doc.getIndexed() == AbstractDocument.INDEX_TO_INDEX_METADATA) {
+		if (doc.getIndexed() == DocumentIndexed.TO_INDEX || doc.getIndexed() == DocumentIndexed.TO_INDEX_METADATA) {
 			// Check if the document must be indexed
 			if (!FileUtil.matches(doc.getFileName(), config.getProperty(tenant.getName() + ".index.includes", ""),
 					config.getProperty(tenant.getName() + ".index.excludes", "")))
-				doc.setIndexed(AbstractDocument.INDEX_SKIP);
+				doc.setIndexed(DocumentIndexed.SKIP);
 
 			// Check if the document must be indexed
-			if (doc.getIndexed() == AbstractDocument.INDEX_SKIP && FileUtil.matches(doc.getFileName(),
+			if (doc.getIndexed() == DocumentIndexed.SKIP && FileUtil.matches(doc.getFileName(),
 					config.getProperty(tenant.getName() + ".index.includes.metadata", ""),
 					config.getProperty(tenant.getName() + ".index.excludes.metadata", "")))
-				doc.setIndexed(AbstractDocument.INDEX_TO_INDEX_METADATA);
+				doc.setIndexed(DocumentIndexed.TO_INDEX_METADATA);
 		}
 	}
 
@@ -708,7 +707,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 			query.append("select distinct(C.ld_id) from ld_document C, ld_tag D "
 					+ " where C.ld_id=D.ld_docid AND C.ld_deleted=0 and not C.ld_status="
-					+ AbstractDocument.DOC_ARCHIVED);
+					+ DocumentStatus.ARCHIVED.ordinal());
 			query.append(" AND C.ld_folderid in ");
 			query.append(precollString);
 			query.append(" AND lower(D.ld_tag)='" + SqlUtil.doubleQuotes(tag.toLowerCase()) + "' ");
@@ -741,7 +740,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 
 		query = new StringBuilder("from Document " + ENTITY + " ");
-		query.append(" where not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED);
+		query.append(" where not " + ENTITY + STATUS + DocumentStatus.ARCHIVED.ordinal());
 		query.append(AND + ENTITY + ".id in (");
 
 		for (int i = 0; i < docIds.size(); i++) {
@@ -775,7 +774,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public List<Long> findDocIdByFolder(long folderId, Integer max) throws PersistenceException {
 		String sql = "select ld_id from ld_document where ld_deleted=0 and ld_folderid = " + folderId
-				+ " and not ld_status=" + AbstractDocument.DOC_ARCHIVED;
+				+ " and not ld_status=" + DocumentStatus.ARCHIVED.ordinal();
 		return queryForList(sql, null, Long.class, max);
 	}
 
@@ -788,8 +787,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public List<Document> findArchivedByFolder(long folderId) throws PersistenceException {
-		return findByWhere(ENTITY + ".folder.id = " + folderId + AND + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED,
-				null, null);
+		return findByWhere(
+				ENTITY + ".folder.id = " + folderId + AND + ENTITY + STATUS + DocumentStatus.ARCHIVED.ordinal(), null,
+				null);
 	}
 
 	@Override
@@ -813,7 +813,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			return new ArrayList<>();
 		else
 			return findByWhere(ENTITY + ".id in (" + ids.stream().map(Object::toString).collect(Collectors.joining(","))
-					+ ") and not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED, null, null);
+					+ ") and not " + ENTITY + STATUS + DocumentStatus.ARCHIVED.ordinal(), null, null);
 	}
 
 	@Override
@@ -828,7 +828,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 		if (excludeId != null)
 			query += " and not(" + ENTITY + ".id = " + excludeId + ")";
-		query += " and not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED;
+		query += " and not " + ENTITY + STATUS + DocumentStatus.ARCHIVED.ordinal();
 
 		return findByWhere(query, null, max);
 	}
@@ -892,7 +892,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		if (!computeDeleted)
 			query += " and ld_deleted = 0 ";
 		if (!computeArchived)
-			query += " and not ld_status = " + AbstractDocument.DOC_ARCHIVED;
+			query += " and not ld_status = " + DocumentStatus.ARCHIVED.ordinal();
 		if (tenantId != null)
 			query += " and ld_tenantid = " + tenantId;
 
@@ -944,7 +944,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		Document doc = findById(docId);
 		initialize(doc);
 		doc.setImmutable(1);
-		doc.setStatus(AbstractDocument.DOC_UNLOCKED);
+		doc.setStatus(DocumentStatus.UNLOCKED);
 		store(doc, transaction);
 	}
 
@@ -1076,8 +1076,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public Collection<Long> findPublishedIds(Collection<Long> folderIds) throws PersistenceException {
-		StringBuilder query = new StringBuilder(
-				"select ld_id from ld_document where ld_deleted=0 and not ld_status=" + AbstractDocument.DOC_ARCHIVED);
+		StringBuilder query = new StringBuilder("select ld_id from ld_document where ld_deleted=0 and not ld_status="
+				+ DocumentStatus.ARCHIVED.ordinal());
 		if (folderIds != null && !folderIds.isEmpty()) {
 			query.append(" and ld_folderid in (");
 			query.append(folderIds.toString().replace('[', ' ').replace(']', ' '));

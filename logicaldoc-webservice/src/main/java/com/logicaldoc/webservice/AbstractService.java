@@ -15,9 +15,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
@@ -196,7 +196,7 @@ public class AbstractService {
 	}
 
 	protected void checkNotArchived(Document doc) throws WebserviceException {
-		if (doc.getStatus() == AbstractDocument.DOC_ARCHIVED)
+		if (doc.getStatus() == DocumentStatus.ARCHIVED)
 			throw new WebserviceException("Document is archived");
 	}
 

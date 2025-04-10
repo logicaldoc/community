@@ -124,6 +124,7 @@ import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
 import com.logicaldoc.core.document.DocumentManager;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.folder.Folder;
@@ -807,7 +808,7 @@ public class LDRepository {
 		PersistentObject object = getObject(objectId);
 
 		if (object instanceof Document document) {
-			if (document.getStatus() != AbstractDocument.DOC_UNLOCKED)
+			if (document.getStatus() != DocumentStatus.UNLOCKED)
 				cancelCheckOut(objectId);
 			else
 				deleteObject(context, objectId);
@@ -978,7 +979,7 @@ public class LDRepository {
 
 			Document doc = (Document) object;
 
-			if (doc.getStatus() == AbstractDocument.DOC_CHECKED_OUT
+			if (doc.getStatus() == DocumentStatus.CHECKEDOUT
 					&& ((getSessionUser().getId() != doc.getLockUserId())
 							&& (!getSessionUser().isMemberOf(Group.GROUP_ADMIN))))
 				throw new CmisPermissionDeniedException("You can't change the checkout status on this object!");
@@ -991,7 +992,7 @@ public class LDRepository {
 			transaction.setUser(getSessionUser());
 
 			documentDao.initialize(doc);
-			doc.setStatus(AbstractDocument.DOC_UNLOCKED);
+			doc.setStatus(DocumentStatus.UNLOCKED);
 			documentDao.store(doc, transaction);
 		} catch (Exception t) {
 			catchError(t);
@@ -1011,7 +1012,7 @@ public class LDRepository {
 
 			Document doc = (Document) object;
 
-			if (doc.getStatus() == AbstractDocument.DOC_CHECKED_OUT
+			if (doc.getStatus() == DocumentStatus.CHECKEDOUT
 					&& ((getSessionUser().getId() != doc.getLockUserId())
 							&& (!getSessionUser().isMemberOf(Group.GROUP_ADMIN)))) {
 				throw new CmisPermissionDeniedException(
@@ -1885,7 +1886,7 @@ public class LDRepository {
 		}
 		addPropertyString(result, typeId, filter, PropertyIds.VERSION_LABEL, doc.getVersion());
 		addPropertyId(result, typeId, filter, PropertyIds.VERSION_SERIES_ID, getId(doc));
-		if (doc.getStatus() != AbstractDocument.DOC_CHECKED_OUT) {
+		if (doc.getStatus() != DocumentStatus.CHECKEDOUT) {
 			addPropertyBoolean(result, typeId, filter, PropertyIds.IS_VERSION_SERIES_CHECKED_OUT, false);
 			addPropertyString(result, typeId, filter, PropertyIds.VERSION_SERIES_CHECKED_OUT_BY, null);
 			addPropertyString(result, typeId, filter, PropertyIds.VERSION_SERIES_CHECKED_OUT_ID, null);
@@ -2585,11 +2586,11 @@ public class LDRepository {
 			addAction(aas, Action.CAN_GET_CONTENT_STREAM, true);
 			addAction(aas, Action.CAN_GET_ALL_VERSIONS, true);
 			addAction(aas, Action.CAN_SET_CONTENT_STREAM, write);
-			addAction(aas, Action.CAN_CHECK_OUT, document.getStatus() == AbstractDocument.DOC_UNLOCKED && write);
-			addAction(aas, Action.CAN_CHECK_IN, document.getStatus() == AbstractDocument.DOC_CHECKED_OUT
+			addAction(aas, Action.CAN_CHECK_OUT, document.getStatus() == DocumentStatus.UNLOCKED && write);
+			addAction(aas, Action.CAN_CHECK_IN, document.getStatus() == DocumentStatus.CHECKEDOUT
 					&& document.getLockUserId().longValue() == getSessionUser().getId() && write);
 			addAction(aas, Action.CAN_CANCEL_CHECK_OUT,
-					document.getStatus() != AbstractDocument.DOC_UNLOCKED
+					document.getStatus() != DocumentStatus.UNLOCKED
 							&& (document.getLockUserId().longValue() == getSessionUser().getId()
 									|| getSessionUser().isMemberOf(Group.GROUP_ADMIN)));
 		} else {

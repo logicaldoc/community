@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.RowMapper;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.security.Tenant;
@@ -111,7 +112,7 @@ public class TagSearch extends Search {
 		query.append(" where A.ld_deleted=0 and A.ld_nature=" + AbstractDocument.NATURE_DOC
 				+ " and A.ld_folderid=B.ld_id and A.ld_tenantid = ");
 		query.append(tenantId);
-		query.append(" and not A.ld_status = " + AbstractDocument.DOC_ARCHIVED);
+		query.append(" and not A.ld_status = " + DocumentStatus.ARCHIVED.ordinal());
 
 		// Ids string to be used in the query
 		String ids = null;
@@ -176,7 +177,7 @@ public class TagSearch extends Search {
 			hit.setIndexed(rs.getInt(13));
 			hit.setLockUserId(rs.getLong(14));
 			hit.setFileName(rs.getString(15));
-			hit.setStatus(rs.getInt(16));
+			hit.setStatus( rs.getInt(16));
 			hit.setSigned(rs.getInt(17));
 			hit.setType(rs.getString(18));
 			hit.setRating(rs.getInt(19));

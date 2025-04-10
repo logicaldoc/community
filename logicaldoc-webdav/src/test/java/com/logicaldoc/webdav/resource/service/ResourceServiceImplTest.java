@@ -18,10 +18,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.BookmarkDAO;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.IOUtil;
 import com.logicaldoc.util.plugin.PluginException;
@@ -310,7 +310,7 @@ public class ResourceServiceImplTest extends AbstractWebdavTestCase {
 	@Test
 	public void testCheckout() throws DavException, PersistenceException {
 		Document doc = docDao.findById(1L);
-		assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 
 		Resource resource = testSubject.getResource("/Default/one.pdf", davSession);
 		assertNotNull(resource);
@@ -320,14 +320,14 @@ public class ResourceServiceImplTest extends AbstractWebdavTestCase {
 		testSubject.checkout(resource, davSession);
 
 		doc = docDao.findById(1L);
-		assertEquals(AbstractDocument.DOC_CHECKED_OUT, doc.getStatus());
+		assertEquals(DocumentStatus.CHECKEDOUT, doc.getStatus());
 
 		// Test uncheckout
 		resource = testSubject.getResource("/Default/one.pdf", davSession);
 		testSubject.uncheckout(resource, davSession);
 
 		doc = docDao.findById(1L);
-		assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 	}
 
 	@Test

@@ -40,9 +40,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.document.DocumentIndexed;
 import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.DocumentNoteDAO;
 import com.logicaldoc.core.metadata.Attribute;
@@ -223,7 +223,7 @@ public class StandardSearchEngine implements SearchEngine {
 
 			String contentString = null;
 
-			if (doc.getIndexed() != AbstractDocument.INDEX_TO_INDEX_METADATA)
+			if (doc.getIndexed() != DocumentIndexed.TO_INDEX_METADATA)
 				ParserFactory.parse(content, doc.getFileName(), null, locale, doc.getTenantId(), doc, null);
 
 			addHit(doc, contentString);
@@ -405,8 +405,8 @@ public class StandardSearchEngine implements SearchEngine {
 	protected SolrQuery prepareSearchQuery(String expression, Set<String> filters, String expressionLanguage,
 			Integer rows) {
 		// Don't want any limit in the number of conditions processed by Lucene
-		BooleanQuery.setMaxClauseCount( Integer.MAX_VALUE );
-		
+		BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
+
 		SolrQuery query = new SolrQuery().setQuery(expression);
 		if (rows != null)
 			query = query.setRows(rows);

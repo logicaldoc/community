@@ -25,6 +25,7 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.document.FolderAccessControlEntry;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
@@ -242,7 +243,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		dao.queryForResultSet(
 				"select count(D.ld_id), sum(D.ld_filesize) from ld_document D, ld_folder F where D.ld_deleted=0 and F.ld_deleted=0 and D.ld_folderid=F.ld_id and (F.ld_id="
 						+ folderId + " or F.ld_path like '" + pathPrefix + "/%') " + " and not ld_status="
-						+ AbstractDocument.DOC_ARCHIVED,
+						+ DocumentStatus.ARCHIVED.ordinal(),
 				null, null, rows -> {
 					if (rows.next()) {
 						stats[0] = rows.getLong(1);
@@ -264,7 +265,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	private static int countDirectDocs(long folderId) throws PersistenceException {
 		FolderDAO dao = Context.get(FolderDAO.class);
 		return dao.queryForInt("select count(ld_id) from ld_document where ld_deleted=0 and ld_folderid=" + folderId
-				+ " and not ld_status=" + AbstractDocument.DOC_ARCHIVED);
+				+ " and not ld_status=" + DocumentStatus.ARCHIVED.ordinal());
 	}
 
 	private static int countDirectSubfolders(long folderId) throws PersistenceException {
@@ -854,7 +855,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	private void checkLocked(Document doc) throws PermissionException {
-		if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED
+		if (doc.getStatus() != DocumentStatus.UNLOCKED
 				|| doc.getExportStatus() != AbstractDocument.EXPORT_UNLOCKED) {
 			throw new PermissionException("Document " + doc.getId() + " is locked");
 		}

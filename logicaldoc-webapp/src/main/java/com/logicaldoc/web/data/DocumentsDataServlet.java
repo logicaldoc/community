@@ -24,11 +24,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentComparator;
 import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.document.DocumentIndexed;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
@@ -49,7 +50,7 @@ import com.logicaldoc.util.io.FileUtil;
 public class DocumentsDataServlet extends AbstractDataServlet {
 
 	private static final String INDEXED = "indexed";
-	
+
 	private static final Logger log = LoggerFactory.getLogger(DocumentsDataServlet.class);
 
 	private final class ExtendedAttributeRowMapper implements RowMapper<Long> {
@@ -136,7 +137,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
 		Document hiliteDoc = null;
 
-		if (status != null && status.intValue() != AbstractDocument.DOC_ARCHIVED) {
+		if (status != null && status.intValue() != DocumentStatus.ARCHIVED.ordinal()) {
 			findDocumentsByStatus(session, maxRecords, page, status, documentsInCurrentPage);
 		} else if (StringUtils.isNotEmpty(request.getParameter("docIds"))) {
 			findDocumentsByIds(request, session, documentsInCurrentPage);
@@ -199,13 +200,13 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
 		writer.print("<rating>" + (document.getRating() != null ? document.getRating() : "0") + "</rating>");
 		writer.print("<fileVersion><![CDATA[" + document.getFileVersion() + "]]></fileVersion>");
-		
+
 		if (StringUtils.isNotEmpty(document.getComment()))
 			writer.print("<comment><![CDATA[" + document.getComment() + "]]></comment>");
-		
+
 		if (StringUtils.isNotEmpty(document.getLastNote()))
 			writer.print("<lastNote><![CDATA[" + document.getLastNote() + "]]></lastNote>");
-		
+
 		if (StringUtils.isNotEmpty(document.getWorkflowStatus()))
 			writer.print("<workflowStatus><![CDATA[" + document.getWorkflowStatus() + "]]></workflowStatus>");
 		if (StringUtils.isNotEmpty(document.getWorkflowStatusDisplay()))
@@ -319,7 +320,8 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			List<Document> documentsInCurrentPage) throws PersistenceException {
 		DocumentDAO dao = Context.get(DocumentDAO.class);
 
-		List<Document> docs = dao.findByLockUserAndStatus(session.getUserId(), status);
+		List<Document> docs = dao.findByLockUserAndStatus(session.getUserId(),
+				status != null ? DocumentStatus.values()[status] : null);
 		int begin = (page - 1) * maxRecords;
 		int end = Math.min(begin + maxRecords - 1, docs.size() - 1);
 		for (int i = begin; i <= end; i++) {
@@ -385,7 +387,7 @@ select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.
   left outer join A.template as B
  where A.deleted = 0
    and not A.status=""");
-		query.append(AbstractDocument.DOC_ARCHIVED);
+		query.append(DocumentStatus.ARCHIVED.ordinal());
 
 		if (folderId != null) {
 			query.append(" and A.folder.id=" + folderId);
@@ -460,7 +462,6 @@ select ld_docid
 		List<Document> documents = new ArrayList<>();
 		for (int i = 0; i < records.size(); i++) {
 			Object[] cols = (Object[]) records.get(i);
-
 			Document doc = new Document();
 			doc.setId((Long) cols[0]);
 			doc.setDocRef((Long) cols[2]);
@@ -469,8 +470,7 @@ select ld_docid
 			doc.setDocRefType((String) cols[27]);
 			doc.setColor((String) cols[38]);
 			doc.setTenantId((Long) cols[40]);
-			doc.setIndexed((Integer) cols[12]);
-			
+			doc.setIndexed((DocumentIndexed) cols[12]);
 
 			Folder f = new Folder();
 			f.setId((Long) cols[39]);
@@ -484,7 +484,7 @@ select ld_docid
 				String aliasFileName = doc.getFileName();
 				String aliasColor = doc.getColor();
 				String aliasType = doc.getType();
-				int aliasIndexed = doc.getIndexed();
+				int aliasIndexed = doc.getIndexed().ordinal();
 				doc = dao.findById(aliasDocRef);
 
 				if (doc != null) {
@@ -525,9 +525,9 @@ select ld_docid
 			doc.setCreator((String) cols[9]);
 			doc.setFileSize((Long) cols[10]);
 			doc.setImmutable((Integer) cols[11]);
-			doc.setIndexed((Integer) cols[12]);
+			doc.setIndexed((DocumentIndexed) cols[12]);
 			doc.setLockUserId((Long) cols[13]);
-			doc.setStatus((Integer) cols[15]);
+			doc.setStatus((DocumentStatus) cols[15]);
 			doc.setSigned((Integer) cols[16]);
 			doc.setRating((Integer) cols[18]);
 			doc.setFileVersion((String) cols[19]);

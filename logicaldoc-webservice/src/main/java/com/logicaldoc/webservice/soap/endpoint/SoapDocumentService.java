@@ -25,7 +25,6 @@ import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.communication.Recipient;
 import com.logicaldoc.core.conversion.FormatConverterManager;
-import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentComparator;
 import com.logicaldoc.core.document.DocumentDAO;
@@ -37,6 +36,7 @@ import com.logicaldoc.core.document.DocumentLinkDAO;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.DocumentNoteDAO;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.document.Rating;
 import com.logicaldoc.core.document.RatingDAO;
 import com.logicaldoc.core.document.Version;
@@ -163,7 +163,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		document = ddao.findDocument(docId);
 
-		if (document.getStatus() == AbstractDocument.DOC_CHECKED_OUT
+		if (document.getStatus() == DocumentStatus.CHECKEDOUT
 				&& (user.getId() == document.getLockUserId() || user.isMemberOf(Group.GROUP_ADMIN))) {
 			ddao.initialize(document);
 
@@ -203,7 +203,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (doc.getImmutable() == 1)
 			throw new PermissionException(THE_DOCUMENT + docId + IS_IMMUTABLE);
 
-		if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED)
+		if (doc.getStatus() != DocumentStatus.UNLOCKED)
 			throw new PermissionException("The document is locked or already checked out");
 
 		checkDocumentPermission(Permission.WRITE, user, docId);
@@ -250,7 +250,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (doc.getImmutable() == 1)
 			throw new PermissionException(THE_DOCUMENT + doc.getId() + IS_IMMUTABLE);
 
-		if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED && user.getId() != doc.getLockUserId())
+		if (doc.getStatus() != DocumentStatus.UNLOCKED && user.getId() != doc.getLockUserId())
 			throw new PermissionException(THE_DOCUMENT + doc.getId() + IS_LOCKED);
 	}
 
@@ -429,7 +429,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		transaction.setUser(user);
 
 		DocumentManager documentManager = Context.get(DocumentManager.class);
-		documentManager.lock(doc.getId(), AbstractDocument.DOC_LOCKED, transaction);
+		documentManager.lock(doc.getId(), DocumentStatus.LOCKED, transaction);
 	}
 
 	@Override
@@ -535,7 +535,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		checkLocked(user, doc);
 
 		// Document is already unlocked, no need to do anything else
-		if (doc.getStatus() == AbstractDocument.DOC_UNLOCKED)
+		if (doc.getStatus() == DocumentStatus.UNLOCKED)
 			return;
 
 		// Create the document history event
@@ -1249,7 +1249,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		DocumentDAO ddao = Context.get(DocumentDAO.class);
 		doc = ddao.findDocument(docId);
-		if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED)
+		if (doc.getStatus() != DocumentStatus.UNLOCKED)
 			throw new PermissionException(THE_DOCUMENT + docId + IS_LOCKED);
 
 		DocumentHistory transaction = new DocumentHistory();
@@ -1272,7 +1272,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		DocumentDAO ddao = Context.get(DocumentDAO.class);
 		doc = ddao.findDocument(docId);
-		if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED)
+		if (doc.getStatus() != DocumentStatus.UNLOCKED)
 			throw new PermissionException(THE_DOCUMENT + docId + IS_LOCKED);
 
 		DocumentHistory transaction = new DocumentHistory();

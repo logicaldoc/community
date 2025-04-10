@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
-import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.BookmarkDAO;
 import com.logicaldoc.core.document.Document;
@@ -28,6 +27,7 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.folder.Folder;
@@ -147,8 +147,8 @@ public class ResourceServiceImpl implements ResourceService {
 		resource.setCreationDate(document.getCreation());
 		resource.setLastModified(document.getDate());
 		resource.setFolder(false);
-		resource.setCheckedOut(document.getStatus() == AbstractDocument.DOC_CHECKED_OUT
-				|| document.getStatus() == AbstractDocument.DOC_LOCKED);
+		resource.setCheckedOut(
+				document.getStatus() == DocumentStatus.CHECKEDOUT || document.getStatus() == DocumentStatus.LOCKED);
 		resource.setVersionLabel(document.getVersion());
 		resource.setAuthor(document.getPublisher());
 		resource.setDocRef(document.getDocRef());
@@ -158,8 +158,8 @@ public class ResourceServiceImpl implements ResourceService {
 		resource.setETag(String.format("d-%d_%s", document.getId(), document.getVersion()));
 
 		resource.setSession(session);
-		resource.setLocked(document.getStatus() == AbstractDocument.DOC_LOCKED
-				|| document.getStatus() == AbstractDocument.DOC_CHECKED_OUT);
+		resource.setLocked(
+				document.getStatus() == DocumentStatus.LOCKED || document.getStatus() == DocumentStatus.CHECKEDOUT);
 		resource.setLockUser(document.getLockUser());
 
 		if (session != null && (Long) session.getObject("id") != null) {
@@ -496,8 +496,7 @@ public class ResourceServiceImpl implements ResourceService {
 			if (!parent.isWriteEnabled())
 				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "No rights to write resource.");
 
-			if ((document.getStatus() == AbstractDocument.DOC_CHECKED_OUT
-					|| document.getStatus() == AbstractDocument.DOC_LOCKED)
+			if ((document.getStatus() == DocumentStatus.CHECKEDOUT || document.getStatus() == DocumentStatus.LOCKED)
 					&& (user.getId() != document.getLockUserId() && !"admin".equals(user.getUsername()))) {
 				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Current user didn't locked the document");
 			}
@@ -806,7 +805,8 @@ public class ResourceServiceImpl implements ResourceService {
 					document = documentDAO.findById(document.getDocRef());
 					createdDoc = documentManager.createAlias(document, folder, document.getDocRefType(), transaction);
 				} else {
-					createdDoc = documentManager.copyToFolder(document, folder, transaction, true, true, true).getDocument();
+					createdDoc = documentManager.copyToFolder(document, folder, transaction, true, true, true)
+							.getDocument();
 				}
 
 				if (StringUtils.isNotEmpty(newName))

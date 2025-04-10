@@ -593,8 +593,6 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		StringBuilder query = new StringBuilder();
 		for (String table : History.eventTables()) {
 			String tableAlias = "A" + (i++);
-
-			System.out.println(tableAlias +" > "+table);
 			
 			if (!query.isEmpty())
 				query.append(" union ");

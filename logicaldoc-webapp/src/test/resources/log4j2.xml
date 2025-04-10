@@ -42,14 +42,14 @@
 			additivity="false">
 			<Appender-Ref ref="file" />
 		</Logger>
-		<Logger name="com.logicaldoc" level="warn" additivity="false">
+		<Logger name="com.logicaldoc" level="error" additivity="false">
 			<Appender-Ref ref="file" />
 		</Logger>
 		<Logger name="com.logicaldoc.util.spring.DatabasePropertySource"
 			level="fatal" additivity="false">
 			<Appender-Ref ref="file" />
 		</Logger>
-		<Logger name="com.zaxxer.hikari" level="debug" additivity="false">
+		<Logger name="com.zaxxer.hikari" level="error" additivity="false">
 			<AppenderRef ref="hikari" />
 		</Logger>
 		<Logger name="java.sql" level="error" additivity="false">
@@ -62,11 +62,7 @@
 			level="info" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
-		<Logger name="com.logicaldoc.util.io.FileUtil" level="debug"
-			additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-		<Logger name="org.hsqldb" level="debug" additivity="false">
+		<Logger name="org.hsqldb" level="error" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
 

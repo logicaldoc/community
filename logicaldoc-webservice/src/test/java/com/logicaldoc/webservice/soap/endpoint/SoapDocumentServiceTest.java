@@ -22,11 +22,11 @@ import javax.mail.MessagingException;
 import org.junit.Test;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.parser.ParsingException;
@@ -37,6 +37,7 @@ import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.authorization.UnexistingResourceException;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
@@ -67,8 +68,8 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		docDao = (DocumentDAO) context.getBean("DocumentDAO");
-		folderDao = (FolderDAO) context.getBean("FolderDAO");
+		docDao = Context.get(DocumentDAO.class);
+		folderDao = Context.get(FolderDAO.class);
 
 		// Make sure that this is a DocumentServiceImpl instance
 		testSubject = new SoapDocumentService();
@@ -157,7 +158,7 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 		Document doc = docDao.findById(1);
 		assertNotNull(doc);
 		docDao.initialize(doc);
-		assertEquals(2, doc.getStatus());
+		assertEquals(DocumentStatus.LOCKED, doc.getStatus());
 		assertEquals(1L, doc.getLockUserId().longValue());
 
 		testSubject.unlock("", 1);
@@ -380,7 +381,7 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 		Document doc = docDao.findById(1);
 		assertNotNull(doc);
 		docDao.initialize(doc);
-		assertEquals(Document.DOC_CHECKED_OUT, doc.getStatus());
+		assertEquals(DocumentStatus.CHECKEDOUT, doc.getStatus());
 
 		File file = new File("pom.xml");
 		testSubject.checkin("", 1, "comment", "pom.xml", true, new DataHandler(new FileDataSource(file)));
@@ -390,7 +391,7 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 		docDao.initialize(doc);
 
 		assertEquals(0, doc.getSigned());
-		assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 	}
 
 	@Test

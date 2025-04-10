@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
@@ -61,26 +63,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Document's status unlocked: 0
-	 */
-	public static final int DOC_UNLOCKED = 0;
-
-	/**
-	 * Document's status checked out: 1
-	 */
-	public static final int DOC_CHECKED_OUT = 1;
-
-	/**
-	 * Document's status locked: 2
-	 */
-	public static final int DOC_LOCKED = 2;
-
-	/**
-	 * Document's status archived: 3
-	 */
-	public static final int DOC_ARCHIVED = 3;
-
-	/**
 	 * Document's export status unlocked: 0
 	 */
 	public static final int EXPORT_UNLOCKED = 0;
@@ -89,26 +71,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	 * Document's export status unlocked: 0
 	 */
 	public static final int EXPORT_LOCKED = 1;
-
-	/**
-	 * Document's indexed status to index: 0
-	 */
-	public static final int INDEX_TO_INDEX = 0;
-
-	/**
-	 * Document's indexed status indexed: 1
-	 */
-	public static final int INDEX_INDEXED = 1;
-
-	/**
-	 * Document's indexed status skip: 2
-	 */
-	public static final int INDEX_SKIP = 2;
-
-	/**
-	 * Document's indexed status index just metadata: 3
-	 */
-	public static final int INDEX_TO_INDEX_METADATA = 3;
 
 	/**
 	 * Document's nature regular document: 0
@@ -151,15 +113,13 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	@Column(name = "ld_creatorid", nullable = false)
 	private long creatorId;
 
-	/**
-	 * Whether document is checked out,locked or unlocked
-	 * 
-	 * @see Document#DOC_UNLOCKED
-	 * @see Document#DOC_CHECKED_OUT
-	 * @see Document#DOC_LOCKED
-	 */
 	@Column(name = "ld_status")
-	private int status = DOC_UNLOCKED;
+	@Enumerated(EnumType.ORDINAL)
+	private DocumentStatus status = DocumentStatus.UNLOCKED;
+	
+	@Column(name = "ld_indexed", nullable = false)
+	@Enumerated(EnumType.ORDINAL)
+	private DocumentIndexed indexed = DocumentIndexed.TO_INDEX;
 
 	@Column(name = "ld_type", length = 255)
 	private String type;
@@ -178,14 +138,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	@Column(name = "ld_filesize")
 	private long fileSize = 0;
-
-	/**
-	 * The indexing status of the document, one of {@link #INDEX_TO_INDEX},
-	 * {@link #INDEX_TO_INDEX_METADATA}, {@link #INDEX_INDEXED} or
-	 * {@link #INDEX_SKIP}
-	 */
-	@Column(name = "ld_indexed", nullable = false)
-	private int indexed = INDEX_TO_INDEX;
 
 	/**
 	 * Identifier of the barcode template to use to process this document
@@ -310,23 +262,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	public abstract long getFolderId();
 
 	/**
-	 * The document status
-	 * 
-	 * @see Document#DOC_UNLOCKED
-	 * @see Document#DOC_CHECKED_OUT
-	 * @see Document#DOC_LOCKED
-	 * 
-	 * @return the document's status
-	 */
-	public int getStatus() {
-		return status;
-	}
-
-	public void setStatus(int status) {
-		this.status = status;
-	}
-
-	/**
 	 * The working version (the most recent version)
 	 * 
 	 * @return the version
@@ -342,6 +277,30 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	 */
 	public void setVersion(String version) {
 		this.version = version;
+	}
+	
+	public DocumentStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(DocumentStatus status) {
+		this.status = status;
+	}
+	
+	public void setStatus(int status) {
+		this.status = DocumentStatus.values()[status];
+	}
+	
+	public DocumentIndexed getIndexed() {
+		return indexed;
+	}
+
+	public void setIndexed(DocumentIndexed indexed) {
+		this.indexed = indexed;
+	}
+	
+	public void setIndexed(int indexed) {
+		this.indexed = DocumentIndexed.values()[indexed];
 	}
 
 	/**
@@ -443,14 +402,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	 */
 	public void setLanguage(String language) {
 		this.language = language;
-	}
-
-	public int getIndexed() {
-		return indexed;
-	}
-
-	public void setIndexed(int indexed) {
-		this.indexed = indexed;
 	}
 
 	/**
@@ -663,7 +614,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	}
 
 	public boolean isToIndex() {
-		return indexed == INDEX_TO_INDEX;
+		return indexed == DocumentIndexed.TO_INDEX;
 	}
 
 	public int getBarcoded() {

@@ -14,16 +14,17 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.conversion.FormatConverterManager;
-import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
+import com.logicaldoc.core.document.DocumentIndexed;
 import com.logicaldoc.core.document.DocumentLink;
 import com.logicaldoc.core.document.DocumentLinkDAO;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.DocumentNoteDAO;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
@@ -499,7 +500,7 @@ public class DocTool {
 		transaction.setUser(user);
 
 		try {
-			manager.lock(docId, AbstractDocument.DOC_LOCKED, transaction);
+			manager.lock(docId, DocumentStatus.LOCKED, transaction);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -1001,7 +1002,7 @@ public class DocTool {
 	public String getText(Document document) {
 		String text = null;
 
-		if (document.getIndexed() == AbstractDocument.INDEX_INDEXED) {
+		if (document.getIndexed() == DocumentIndexed.INDEXED) {
 			SearchEngine indexer = Context.get(SearchEngine.class);
 			Hit hit = indexer.getHit(document.getId());
 			if (hit != null)

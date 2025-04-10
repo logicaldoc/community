@@ -57,7 +57,6 @@ import com.logicaldoc.core.communication.SystemMessageDAO;
 import com.logicaldoc.core.contact.Contact;
 import com.logicaldoc.core.contact.ContactDAO;
 import com.logicaldoc.core.conversion.FormatConverterManager;
-import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.BookmarkDAO;
 import com.logicaldoc.core.document.Document;
@@ -66,11 +65,13 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
+import com.logicaldoc.core.document.DocumentIndexed;
 import com.logicaldoc.core.document.DocumentLink;
 import com.logicaldoc.core.document.DocumentLinkDAO;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.DocumentNoteDAO;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.document.Rating;
 import com.logicaldoc.core.document.RatingDAO;
 import com.logicaldoc.core.document.Version;
@@ -331,7 +332,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 					FutureElaboration<Document, Document> elaboration = documentManager.create(file, doc, transaction);
 					doc = elaboration.get();
 
-					if (immediateIndexing && doc.getIndexed() == AbstractDocument.INDEX_TO_INDEX)
+					if (immediateIndexing && doc.getIndexed() == DocumentIndexed.TO_INDEX)
 						docIdsToIndex.add(doc.getId());
 
 					createdDocs.add(fromDocument(doc, metadata.getFolder(), null));
@@ -601,7 +602,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			if (!fDao.isWriteAllowed(doc.getFolder().getId(), session.getUserId()))
 				throw new PermissionException(session.getUsername(), DOCUMENT_STR + docId, Permission.WRITE);
 
-			if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED)
+			if (doc.getStatus() != DocumentStatus.UNLOCKED)
 				throw new PermissionException("The document " + docId + " is locked");
 
 			DocumentHistory transaction = new DocumentHistory();
@@ -660,7 +661,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			for (long id : docIds) {
 				Document doc = dao.findDocument(id);
 				if (doc != null)
-					documentManager.lock(doc.getId(), AbstractDocument.DOC_LOCKED, new DocumentHistory(transaction));
+					documentManager.lock(doc.getId(), DocumentStatus.LOCKED, new DocumentHistory(transaction));
 			}
 		} catch (PersistenceException e) {
 			throwServerException(session, log, e);
@@ -708,7 +709,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		}
 
 		// The document must be not locked
-		if (doc.getStatus() == AbstractDocument.DOC_LOCKED) {
+		if (doc.getStatus() == DocumentStatus.LOCKED) {
 			log.debug("Document {} was not deleted because locked", docId);
 			return;
 		}
@@ -839,7 +840,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		guiDocument.setLockUser(realDoc.getLockUser());
 		guiDocument.setComment(realDoc.getComment());
 		guiDocument.setLastNote(realDoc.getLastNote());
-		guiDocument.setStatus(realDoc.getStatus());
+		guiDocument.setStatus(realDoc.getStatus().ordinal());
 		guiDocument.setWorkflowStatus(realDoc.getWorkflowStatus());
 		guiDocument.setWorkflowStatusDisplay(realDoc.getWorkflowStatusDisplay());
 		guiDocument.setImmutable(realDoc.getImmutable());
@@ -849,7 +850,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		guiDocument.setPublished(realDoc.getPublished());
 		guiDocument.setSigned(realDoc.getSigned());
 		guiDocument.setStamped(realDoc.getStamped());
-		guiDocument.setIndexed(realDoc.getIndexed());
+		guiDocument.setIndexed(realDoc.getIndexed().ordinal());
 		guiDocument.setExtResId(realDoc.getExtResId());
 		guiDocument.setPages(realDoc.getPages());
 		guiDocument.setPreviewPages(realDoc.getPreviewPages());
@@ -1090,7 +1091,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				if (doc.getImmutable() == 0) {
 					// The document of the selected documentRecord must be
 					// not locked
-					if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED) {
+					if (doc.getStatus() != DocumentStatus.UNLOCKED) {
 						continue;
 					}
 
@@ -1126,7 +1127,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		DocumentDAO docDao = Context.get(DocumentDAO.class);
 		for (long id : docIds)
 			try {
-				manager.changeIndexingStatus(docDao.findById(id), policy);
+				manager.changeIndexingStatus(docDao.findById(id), DocumentIndexed.values()[policy]);
 			} catch (PersistenceException e) {
 				throwServerException(session, log, e);
 			}
@@ -1141,7 +1142,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		DocumentDAO docDao = Context.get(DocumentDAO.class);
 		for (long id : docIds)
 			try {
-				manager.changeIndexingStatus(docDao.findById(id), AbstractDocument.INDEX_SKIP);
+				manager.changeIndexingStatus(docDao.findById(id), DocumentIndexed.SKIP);
 			} catch (PersistenceException e) {
 				throwServerException(session, log, e);
 			}
@@ -2091,7 +2092,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			throws ServerException {
 		GUIDocument document = getById(docId);
 
-		if (document.getImmutable() == 1 || document.getStatus() != AbstractDocument.DOC_UNLOCKED) {
+		if (document.getImmutable() == 1 || document.getStatus() != DocumentStatus.UNLOCKED.ordinal()) {
 			log.warn("Skip document {} because immutable or locked", docId);
 			return null;
 		}
@@ -2502,7 +2503,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			if (!fDao.isWriteAllowed(doc.getFolder().getId(), session.getUserId()))
 				throw new PermissionException(session.getUsername(), DOCUMENT_STR + docId, Permission.WRITE);
 
-			if (doc.getStatus() != AbstractDocument.DOC_CHECKED_OUT || doc.getLockUserId() != session.getUserId())
+			if (doc.getStatus() != DocumentStatus.CHECKEDOUT || doc.getLockUserId() != session.getUserId())
 				throw new PermissionException("You have not checked out the file " + docId);
 
 			DocumentHistory transaction = new DocumentHistory();
@@ -2541,7 +2542,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 			doc = docDao.findDocument(docId);
 
-			if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED)
+			if (doc.getStatus() != DocumentStatus.UNLOCKED)
 				throw new IOException("The document is locked");
 
 			DocumentHistory transaction = new DocumentHistory();

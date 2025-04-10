@@ -33,8 +33,8 @@ import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.communication.Message;
 import com.logicaldoc.core.communication.Recipient;
 import com.logicaldoc.core.communication.SystemMessageDAO;
-import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.AccessControlEntry;
@@ -223,10 +223,9 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 		try {
 			guiUser.setPasswordExpired(false);
-			guiUser.setLockedDocs(
-					documentDao.findByLockUserAndStatus(user.getId(), AbstractDocument.DOC_LOCKED).size());
+			guiUser.setLockedDocs(documentDao.findByLockUserAndStatus(user.getId(), DocumentStatus.LOCKED).size());
 			guiUser.setCheckedOutDocs(
-					documentDao.findByLockUserAndStatus(user.getId(), AbstractDocument.DOC_CHECKED_OUT).size());
+					documentDao.findByLockUserAndStatus(user.getId(), DocumentStatus.CHECKEDOUT).size());
 			guiUser.setUnreadMessages(messageDao.getUnreadCount(user.getUsername(), Message.TYPE_SYSTEM));
 			guiUser.setQuota(user.getQuota());
 			guiUser.setQuotaCount(seqDao.getCurrentValue("userquota", user.getId(), user.getTenantId()));

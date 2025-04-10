@@ -87,7 +87,7 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		copyAttributes(source);
 		setId(source.getId());
 		setFolderId(source.getFolderId());
-		if (source.getIndexed() != INDEX_INDEXED)
+		if (source.getIndexed() != DocumentIndexed.INDEXED)
 			setIndexed(source.getIndexed());
 		setCustomId(null);
 	}

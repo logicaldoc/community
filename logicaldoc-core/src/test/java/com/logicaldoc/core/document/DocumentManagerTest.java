@@ -435,12 +435,12 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 	@Test
 	public void testReindex() throws PersistenceException, ParsingException {
 		Document doc = docDao.findById(1);
-		assertEquals(1, doc.getIndexed());
+		assertEquals(DocumentIndexed.INDEXED, doc.getIndexed());
 		docDao.initialize(doc);
 		doc.setIndexed(0);
 		docDao.store(doc);
 		doc = docDao.findById(1);
-		assertEquals(0, doc.getIndexed());
+		assertEquals(DocumentIndexed.TO_INDEX, doc.getIndexed());
 
 		Folder folder = folderDao.createPath(folderDao.findById(Folder.ROOTID), "/Default/test", true, null);
 
@@ -454,22 +454,22 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		testSubject.index(doc.getId(), null, transaction);
 
 		doc = docDao.findById(1);
-		assertEquals(1, doc.getIndexed());
+		assertEquals(DocumentIndexed.INDEXED, doc.getIndexed());
 
 		doc = docDao.findById(1);
-		assertEquals(1, doc.getIndexed());
+		assertEquals(DocumentIndexed.INDEXED, doc.getIndexed());
 		docDao.initialize(doc);
 		doc.setIndexed(0);
 		docDao.store(doc);
 		doc = docDao.findById(1);
-		assertEquals(0, doc.getIndexed());
+		assertEquals(DocumentIndexed.TO_INDEX, doc.getIndexed());
 
 		transaction = new DocumentHistory();
 		transaction.setUser(userDao.findByUsername("admin"));
 		testSubject.index(alias.getId(), null, transaction);
 
 		doc = docDao.findById(1);
-		assertEquals(1, doc.getIndexed());
+		assertEquals(DocumentIndexed.INDEXED, doc.getIndexed());
 
 		try {
 			transaction = new DocumentHistory();
@@ -514,15 +514,15 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		assertNotNull(doc);
 		transaction.setComment("pippo_reason");
 		transaction.setEvent(null);
-		testSubject.lock(doc.getId(), 2, transaction);
+		testSubject.lock(doc.getId(), DocumentStatus.LOCKED, transaction);
 		doc = docDao.findById(1);
-		assertEquals(2, doc.getStatus());
+		assertEquals(2, doc.getStatus().ordinal());
 		assertEquals(1L, doc.getLockUserId().longValue());
 
 		// double lock with same user just to check that no exceptions are
 		// raised
-		testSubject.lock(doc.getId(), 2, transaction);
-		testSubject.lock(doc.getId(), 2, transaction);
+		testSubject.lock(doc.getId(), DocumentStatus.LOCKED, transaction);
+		testSubject.lock(doc.getId(), DocumentStatus.LOCKED, transaction);
 
 		// Now try to lock with an other user
 		transaction = new DocumentHistory();
@@ -530,7 +530,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		boolean exceptionHappened = false;
 		try {
-			testSubject.lock(doc.getId(), 2, transaction);
+			testSubject.lock(doc.getId(), DocumentStatus.LOCKED, transaction);
 		} catch (PersistenceException e) {
 			exceptionHappened = true;
 			assertTrue(e.getMessage().contains("is already locked by user"));
@@ -547,14 +547,14 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		// Already locked by same user
 		try {
-			testSubject.lock(1L, 2, transaction);
+			testSubject.lock(1L, DocumentStatus.LOCKED, transaction);
 			fail("An exception should have been raised here");
 		} catch (PersistenceException e) {
 			// All ok
 		}
 
 		Document doc = docDao.findById(1);
-		assertEquals(1, doc.getStatus());
+		assertEquals(1, doc.getStatus().ordinal());
 		assertEquals(1L, doc.getLockUserId().longValue());
 
 		transaction = new DocumentHistory();
@@ -570,7 +570,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		}
 
 		doc = docDao.findById(1);
-		assertEquals(1, doc.getStatus());
+		assertEquals(1, doc.getStatus().ordinal());
 		assertEquals(1L, doc.getLockUserId().longValue());
 
 		transaction = new DocumentHistory();
@@ -579,14 +579,14 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		testSubject.unlock(doc.getId(), transaction);
 
 		doc = docDao.findById(1);
-		assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 		assertNull(doc.getLockUserId());
 
 		// Already unlocked
 		testSubject.unlock(doc.getId(), transaction);
 		transaction.setUser(userDao.findByUsername("boss"));
 		doc = docDao.findById(1);
-		assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 		assertNull(doc.getLockUserId());
 	}
 
@@ -898,10 +898,10 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		Document doc = docDao.findById(1L);
 		assertNotNull(doc);
-		assertEquals(AbstractDocument.INDEX_INDEXED, doc.getIndexed());
+		assertEquals(DocumentIndexed.INDEXED, doc.getIndexed());
 		docDao.initialize(doc);
 
-		assertEquals(Document.DOC_CHECKED_OUT, doc.getStatus());
+		assertEquals(DocumentStatus.CHECKEDOUT, doc.getStatus());
 		assertEquals("1.0", doc.getFileVersion());
 		assertNotNull(documentNoteDao.findById(2L));
 
@@ -910,16 +910,16 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		}
 		doc = docDao.findById(1L);
 
-		assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 		assertEquals("2.0", doc.getFileVersion());
 
 		doc = docDao.findById(1);
 		assertNotNull(doc);
 		docDao.initialize(doc);
 
-		assertEquals(AbstractDocument.INDEX_TO_INDEX, doc.getIndexed());
+		assertEquals(DocumentIndexed.TO_INDEX, doc.getIndexed());
 		assertEquals(0, doc.getSigned());
-		assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 
 		testSubject.checkout(1L, transaction);
 
@@ -975,35 +975,35 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 	public void testChangeIndexingStatus() throws PersistenceException {
 		Document doc = docDao.findById(1L);
 		assertNotNull(doc);
-		assertEquals(AbstractDocument.INDEX_INDEXED, doc.getIndexed());
-		testSubject.changeIndexingStatus(doc, AbstractDocument.INDEX_SKIP);
-		assertEquals(AbstractDocument.INDEX_SKIP, doc.getIndexed());
+		assertEquals(DocumentIndexed.INDEXED, doc.getIndexed());
+		testSubject.changeIndexingStatus(doc, DocumentIndexed.SKIP);
+		assertEquals(DocumentIndexed.SKIP, doc.getIndexed());
 
 		doc = docDao.findById(2);
 		assertNotNull(doc);
-		assertEquals(AbstractDocument.INDEX_TO_INDEX, doc.getIndexed());
-		testSubject.changeIndexingStatus(doc, AbstractDocument.INDEX_SKIP);
-		assertEquals(AbstractDocument.INDEX_SKIP, doc.getIndexed());
+		assertEquals(DocumentIndexed.TO_INDEX, doc.getIndexed());
+		testSubject.changeIndexingStatus(doc, DocumentIndexed.SKIP);
+		assertEquals(DocumentIndexed.SKIP, doc.getIndexed());
 
 		Document docTest = new Document();
 		docTest.setFileName("docTest");
 		docTest.setFolder(folderDao.findById(Folder.DEFAULTWORKSPACEID));
 		docDao.store(docTest);
 
-		docTest.setStatus(AbstractDocument.INDEX_SKIP);
-		docTest.setIndexed(AbstractDocument.INDEX_SKIP);
-		testSubject.changeIndexingStatus(docTest, AbstractDocument.INDEX_SKIP);
-		assertEquals(docTest.getStatus(), docTest.getIndexed());
+		docTest.setIndexed(DocumentIndexed.SKIP);
+		docTest.setStatus(DocumentStatus.LOCKED);
+		testSubject.changeIndexingStatus(docTest, DocumentIndexed.SKIP);
+		assertEquals(DocumentIndexed.SKIP, docTest.getIndexed());
 
-		docTest.setStatus(AbstractDocument.INDEX_TO_INDEX);
-		docTest.setIndexed(AbstractDocument.INDEX_TO_INDEX);
-		testSubject.changeIndexingStatus(docTest, AbstractDocument.INDEX_TO_INDEX);
-		assertEquals(docTest.getStatus(), docTest.getIndexed());
+		docTest.setIndexed(DocumentIndexed.TO_INDEX);
+		docTest.setStatus(DocumentStatus.UNLOCKED);
+		testSubject.changeIndexingStatus(docTest, DocumentIndexed.TO_INDEX);
+		assertEquals(DocumentIndexed.TO_INDEX, docTest.getIndexed());
 
-		docTest.setStatus(AbstractDocument.INDEX_TO_INDEX_METADATA);
-		docTest.setIndexed(AbstractDocument.INDEX_TO_INDEX_METADATA);
-		testSubject.changeIndexingStatus(docTest, AbstractDocument.INDEX_TO_INDEX_METADATA);
-		assertEquals(docTest.getStatus(), docTest.getIndexed());
+		docTest.setIndexed(DocumentIndexed.TO_INDEX_METADATA);
+		docTest.setStatus(DocumentStatus.ARCHIVED);
+		testSubject.changeIndexingStatus(docTest, DocumentIndexed.TO_INDEX_METADATA);
+		assertEquals(DocumentIndexed.TO_INDEX_METADATA, docTest.getIndexed());
 	}
 
 	@Test
@@ -1046,7 +1046,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		testSubject.archiveDocuments(Set.of(1L), transaction);
 
 		Document doc = docDao.findById(1L);
-		assertEquals(AbstractDocument.DOC_ARCHIVED, doc.getStatus());
+		assertEquals(DocumentStatus.ARCHIVED, doc.getStatus());
 
 		// Non-existing user
 		user = userDao.findById(9999);
@@ -1068,7 +1068,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		transaction.setSessionId("1234");
 		transaction.setUser(user);
 		testSubject.archiveDocuments(Set.of(1L), transaction);
-		assertEquals(AbstractDocument.DOC_ARCHIVED, doc.getStatus());
+		assertEquals(DocumentStatus.ARCHIVED, doc.getStatus());
 	}
 
 	@Test
@@ -1176,23 +1176,16 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		docDao.initialize(doc8);
 		assertNotNull(doc8);
 		assertEquals("1.0", doc8.getVersion());
-		doc8.setStatus(0);
+		doc8.setStatus(DocumentStatus.UNLOCKED);
 		docDao.store(doc8);
 		testSubject.promoteVersion(doc8.getId(), "1.0", history);
-
-		// Non-existing document
-		try {
-			testSubject.promoteVersion(3L, null, history);
-		} catch (PersistenceException e) {
-			// catching exception
-		}
 	}
 
 	@Test
 	public void testArchiveFolder() throws PersistenceException {
 		Document doc = docDao.findById(1L);
 		assertNotNull(doc);
-		assertEquals(AbstractDocument.DOC_CHECKED_OUT, doc.getStatus());
+		assertEquals(DocumentStatus.CHECKEDOUT, doc.getStatus());
 
 		DocumentHistory history = new DocumentHistory();
 		history.setUserId(1L);
@@ -1200,13 +1193,13 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		history.setSession(SessionManager.get().newSession("admin", "admin", (Client) null));
 		testSubject.unlock(1L, history);
 		doc = docDao.findById(1L);
-		assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 
 		assertEquals(6, testSubject.archiveFolder(6L, history));
 
 		doc = docDao.findById(1L);
 		assertNotNull(doc);
-		assertEquals(AbstractDocument.DOC_ARCHIVED, doc.getStatus());
+		assertEquals(DocumentStatus.ARCHIVED, doc.getStatus());
 	}
 
 	@Test
@@ -1254,10 +1247,10 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		Document doc = docDao.findById(1L);
 		assertNotNull(doc);
-		assertEquals(AbstractDocument.INDEX_INDEXED, doc.getIndexed());
+		assertEquals(DocumentIndexed.INDEXED, doc.getIndexed());
 		docDao.initialize(doc);
 
-		assertEquals(Document.DOC_CHECKED_OUT, doc.getStatus());
+		assertEquals(DocumentStatus.CHECKEDOUT, doc.getStatus());
 		assertEquals("1.0", doc.getFileVersion());
 		assertNotNull(documentNoteDao.findById(2L));
 
@@ -1273,7 +1266,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		doc = docDao.findById(1L);
 
-		assertEquals(Document.DOC_CHECKED_OUT, doc.getStatus());
+		assertEquals(DocumentStatus.CHECKEDOUT, doc.getStatus());
 		assertEquals("1.0", doc.getFileVersion());
 	}
 }

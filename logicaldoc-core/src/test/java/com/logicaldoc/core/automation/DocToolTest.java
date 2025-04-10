@@ -14,11 +14,11 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentLink;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
@@ -186,7 +186,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 		assertNotNull(doc);
 		testSubject.lock(doc.getId(), "admin");
 		doc = testSubject.findById(1);
-		assertEquals(1, doc.getStatus());
+		assertEquals(DocumentStatus.CHECKEDOUT, doc.getStatus());
 		assertEquals(1L, doc.getLockUserId().longValue());
 
 		// double lock with same user just to check that no exceptions are
@@ -200,26 +200,26 @@ public class DocToolTest extends AbstractCoreTestCase {
 		testSubject.lock(1L, "admin");
 
 		Document doc = testSubject.findById(1L);
-		assertEquals(1, doc.getStatus());
+		assertEquals(DocumentStatus.CHECKEDOUT, doc.getStatus());
 		assertEquals(1L, doc.getLockUserId().longValue());
 
 		// Locked by a different user
 		testSubject.unlock(doc.getId(), "admin");
 
 		doc = testSubject.findById(1);
-		assertEquals(0, doc.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 		assertNull(doc.getLockUserId());
 
 		testSubject.unlock(doc.getId(), "admin");
 
 		doc = testSubject.findById(1);
-		assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 		assertNull(doc.getLockUserId());
 
 		// Already unlocked
 		testSubject.unlock(doc.getId(), "admin");
 		doc = testSubject.findById(1);
-		assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 		assertNull(doc.getLockUserId());
 	}
 

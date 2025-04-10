@@ -98,7 +98,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testGetTagCloud() throws PersistenceException {
 		Session session = SessionManager.get().newSession("admin", "admin", (Client) null);
-		
+
 		try {
 			testSubject.updateCountUniqueTags();
 
@@ -109,25 +109,25 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		} finally {
 			SessionManager.get().kill(session.getSid());
 		}
-		
+
 		// test TagCloud class methods
 		TagCloud tag1 = new TagCloud();
 		tag1.setTag("abc");
 		assertNotNull(tag1);
-		
+
 		TagCloud tag2 = new TagCloud("bcd");
 		tag2.setTag("cde");
 		tag2.setCount(2);
 		assertNotNull(tag2);
 		assertEquals(0, tag2.getScale());
-		
+
 		assertNotSame(tag1.hashCode(), tag2.hashCode());
-		
+
 		assertEquals(true, tag1.equals(tag1));
 		assertEquals(false, tag1.equals(tag2));
 		assertEquals(false, tag1.equals(null));
 		assertEquals(false, tag1.equals(new Object()));
-		
+
 		tag2.setTag(null);
 		TagCloud tag3 = new TagCloud("bcd");
 		assertEquals(false, tag2.equals(tag3));
@@ -217,7 +217,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		testSubject.archive(1, transaction);
 		Document doc = testSubject.findById(1);
 		assertNotNull(doc);
-		assertEquals(AbstractDocument.DOC_ARCHIVED, doc.getStatus());
+		assertEquals(DocumentStatus.ARCHIVED, doc.getStatus());
 	}
 
 	@Test
@@ -247,12 +247,12 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		testSubject.archive(1, transaction);
 		Document doc = testSubject.findById(1);
 		assertNotNull(doc);
-		assertEquals(AbstractDocument.DOC_ARCHIVED, doc.getStatus());
+		assertEquals(DocumentStatus.ARCHIVED, doc.getStatus());
 
 		testSubject.unarchive(1, transaction);
 		doc = testSubject.findById(1);
 		assertNotNull(doc);
-		assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 	}
 
 	@Test
@@ -809,10 +809,10 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testFindByLockUserAndStatus() {
 		assertEquals(5, testSubject.findByLockUserAndStatus(3L, null).size());
-		assertEquals(4, testSubject.findByLockUserAndStatus(3L, AbstractDocument.DOC_CHECKED_OUT).size());
-		assertEquals(5, testSubject.findByLockUserAndStatus(null, AbstractDocument.DOC_CHECKED_OUT).size());
+		assertEquals(4, testSubject.findByLockUserAndStatus(3L, DocumentStatus.CHECKEDOUT).size());
+		assertEquals(5, testSubject.findByLockUserAndStatus(null, DocumentStatus.CHECKEDOUT).size());
 		assertEquals(1, testSubject.findByLockUserAndStatus(1L, null).size());
-		assertEquals(1, testSubject.findByLockUserAndStatus(1L, AbstractDocument.DOC_CHECKED_OUT).size());
+		assertEquals(1, testSubject.findByLockUserAndStatus(1L, DocumentStatus.CHECKEDOUT).size());
 		assertEquals(0, testSubject.findByLockUserAndStatus(987541L, null).size());
 	}
 

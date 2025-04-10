@@ -87,7 +87,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @return Collection of all Documents locked by the specified user and of
 	 *         the specified status.
 	 */
-	public List<Document> findByLockUserAndStatus(Long userId, Integer status);
+	public List<Document> findByLockUserAndStatus(Long userId, DocumentStatus status);
 
 	/**
 	 * Finds a max number of documents last modified by an user.

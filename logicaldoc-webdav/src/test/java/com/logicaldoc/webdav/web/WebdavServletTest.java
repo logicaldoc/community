@@ -16,9 +16,9 @@ import org.apache.jackrabbit.webdav.DavMethods;
 import org.junit.Test;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.servlet.MockServletRequest;
@@ -94,7 +94,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		testVERSIONCONTROL();
 
 		testDELETE();
-		
+
 		testUNCHECKOUT();
 	}
 
@@ -137,14 +137,14 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
 			Document doc = docDao.findById(5L);
-			assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+			assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 
 			MockServletResponse response = new MockServletResponse(tempFile);
 			MockServletRequest request = prepareRequest(DavMethods.METHOD_CHECKOUT, "/five.pdf");
 			testSubject.service(request, response);
 
 			doc = docDao.findById(5L);
-			assertEquals(AbstractDocument.DOC_CHECKED_OUT, doc.getStatus());
+			assertEquals(DocumentStatus.CHECKEDOUT, doc.getStatus());
 
 			request = prepareRequest("CHECKIN", "/five.pdf");
 			request.setPayload(this.getClass().getResourceAsStream("/pdf2.pdf"));
@@ -152,7 +152,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 			testSubject.service(request, response);
 
 			doc = docDao.findById(5L);
-			assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+			assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 		} finally {
 			FileUtil.delete(tempFile);
 		}
@@ -162,20 +162,20 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
 			Document doc = docDao.findById(5L);
-			assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+			assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 
 			MockServletResponse response = new MockServletResponse(tempFile);
 			MockServletRequest request = prepareRequest(DavMethods.METHOD_LOCK, "/five.pdf");
 			testSubject.service(request, response);
 
 			doc = docDao.findById(5L);
-			assertEquals(AbstractDocument.DOC_CHECKED_OUT, doc.getStatus());
+			assertEquals(DocumentStatus.CHECKEDOUT, doc.getStatus());
 
 			request = prepareRequest("UNLOCK", "/five.pdf");
 			testSubject.service(request, response);
 
 			doc = docDao.findById(5L);
-			assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+			assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 		} finally {
 			FileUtil.delete(tempFile);
 		}
@@ -274,7 +274,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
 			MockServletResponse response = new MockServletResponse(tempFile);
-			
+
 			MockServletRequest request = prepareRequest(DavMethods.METHOD_PROPFIND, "");
 			request.setHeader("Accept-Encoding", "identity");
 			request.setHeader("Content-Type", "application/xml; charset=utf-8");
@@ -359,20 +359,21 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 			FileUtil.delete(tempFile);
 		}
 	}
-	
+
 	public void testUNCHECKOUT() throws IOException, PersistenceException {
 		File tempFile = FileUtil.createTempFile("webdav", ".xml");
 		try {
 			Document doc = docDao.findById(7L);
-			assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
-			
+			assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
+
 			// SET THE STATUS TO CHECKOUT
 			MockServletResponse response = new MockServletResponse(tempFile);
-			MockServletRequest request = prepareRequest(DavMethods.METHOD_CHECKOUT, "/New error indexing documents.eml");
+			MockServletRequest request = prepareRequest(DavMethods.METHOD_CHECKOUT,
+					"/New error indexing documents.eml");
 			testSubject.service(request, response);
 
 			doc = docDao.findById(7L);
-			assertEquals(AbstractDocument.DOC_CHECKED_OUT, doc.getStatus());
+			assertEquals(DocumentStatus.CHECKEDOUT, doc.getStatus());
 
 			// Perform the uncheckout
 			response = new MockServletResponse(tempFile);
@@ -381,14 +382,14 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 
 			// Check the response
 			assertEquals(HttpServletResponse.SC_OK, response.getStatus());
-			
+
 			// Check the value
 			doc = docDao.findById(7L);
-			assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+			assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 		} finally {
 			FileUtil.delete(tempFile);
 		}
-	}	
+	}
 
 	protected MockServletRequest prepareRequest(String method, String path) {
 		MockServletRequest request = new MockServletRequest(servletSession);

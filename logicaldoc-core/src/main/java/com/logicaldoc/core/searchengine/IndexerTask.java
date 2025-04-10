@@ -22,11 +22,12 @@ import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
-import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentHistory;
+import com.logicaldoc.core.document.DocumentIndexed;
 import com.logicaldoc.core.document.DocumentManager;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.task.Task;
@@ -298,9 +299,9 @@ public class IndexerTask extends Task {
 			sorting = sortingCustom;
 
 		String where = PersistentObjectDAO.ENTITY + ".deleted = 0 and (" + PersistentObjectDAO.ENTITY + ".indexed = "
-				+ AbstractDocument.INDEX_TO_INDEX + " or " + PersistentObjectDAO.ENTITY + ".indexed = "
-				+ AbstractDocument.INDEX_TO_INDEX_METADATA + ") and not " + PersistentObjectDAO.ENTITY + ".status = "
-				+ AbstractDocument.DOC_ARCHIVED;
+				+ DocumentIndexed.TO_INDEX.ordinal() + " or " + PersistentObjectDAO.ENTITY + ".indexed = "
+				+ DocumentIndexed.TO_INDEX_METADATA.ordinal() + ") and not " + PersistentObjectDAO.ENTITY + ".status = "
+				+ DocumentStatus.ARCHIVED.ordinal();
 
 		return new String[] { where, sorting };
 	}
@@ -388,7 +389,7 @@ public class IndexerTask extends Task {
 								config.getProperty(tenant.getName() + ".index.excludes") == null ? ""
 										: config.getProperty(tenant.getName() + ".index.excludes"))) {
 							documentDao.initialize(doc);
-							doc.setIndexed(AbstractDocument.INDEX_SKIP);
+							doc.setIndexed(DocumentIndexed.SKIP);
 							documentDao.store(doc);
 							log.warn("Thread {}: Document {} with filename '{}' marked as unindexable", number, id,
 									doc.getFileName());

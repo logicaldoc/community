@@ -51,6 +51,7 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.folder.Folder;
@@ -71,7 +72,7 @@ import com.logicaldoc.util.plugin.PluginException;
 public class LDRepositoryTest extends AbstractCmisTestCase {
 
 	private static final Logger log = LoggerFactory.getLogger(LDRepositoryTest.class);
-	
+
 	private FolderDAO fdao;
 
 	private DocumentDAO ddao;
@@ -92,7 +93,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		fdao = (FolderDAO) context.getBean("FolderDAO");
 
 		ddao = (DocumentDAO) context.getBean("DocumentDAO");
-		
+
 		try {
 			addHits();
 		} catch (Exception e) {
@@ -363,13 +364,13 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		Document document = new Document();
 		document.setFileName("newDocument");
 		document.setFolder(folder);
-		document.setStatus(2);
+		document.setStatus(DocumentStatus.LOCKED);
 		ddao.store(document);
 
 		testSubject.cancelCheckOut("doc." + document.getId());
 
 		document = ddao.findById(document.getId());
-		assertEquals(0, document.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED, document.getStatus());
 	}
 
 	@Test
@@ -564,28 +565,28 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 	@Test
 	public void testCheckOut() throws PersistenceException {
-		int status = ddao.findById(1L).getStatus();
-		assertEquals(0, status);
+		DocumentStatus status = ddao.findById(1L).getStatus();
+		assertEquals(DocumentStatus.UNLOCKED, status);
 
 		Holder<String> stringHolder = new Holder<String>("doc.1");
 		Holder<Boolean> booleanHolder = new Holder<Boolean>(true);
 		testSubject.checkOut(stringHolder, booleanHolder);
 
 		status = ddao.findById(1L).getStatus();
-		assertEquals(1, status);
+		assertEquals(DocumentStatus.CHECKEDOUT, status);
 	}
 
 	@Test
 	public void testCheckIn() throws PersistenceException, UnsupportedEncodingException {
-		int status = ddao.findById(6L).getStatus();
-		assertEquals(0, status);
+		DocumentStatus status = ddao.findById(6L).getStatus();
+		assertEquals(DocumentStatus.UNLOCKED, status);
 
 		Holder<String> stringHolder = new Holder<String>("doc.6");
 		Holder<Boolean> booleanHolder = new Holder<Boolean>(true);
 		testSubject.checkOut(stringHolder, booleanHolder);
 
 		status = ddao.findById(6L).getStatus();
-		assertEquals(1, status);
+		assertEquals(DocumentStatus.CHECKEDOUT, status);
 
 		ObjectInfoImpl cmisObject = (ObjectInfoImpl) testSubject.getObjectInfo("doc.6", null);
 		assertNotNull(cmisObject);
@@ -626,7 +627,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		testSubject.checkIn(stringHolder, true, contentStream, props, content);
 
 		status = ddao.findById(6L).getStatus();
-		assertEquals(0, status);
+		assertEquals(DocumentStatus.UNLOCKED, status);
 	}
 
 	@Test
@@ -741,21 +742,21 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 	@Test
 	public void testDeleteObjectOrCancelCheckOut() throws PersistenceException {
-		int status = ddao.findById(1L).getStatus();
-		assertEquals(0, status);
+		DocumentStatus status = ddao.findById(1L).getStatus();
+		assertEquals(DocumentStatus.UNLOCKED, status);
 
 		Holder<String> stringHolder = new Holder<String>("doc.1");
 		Holder<Boolean> booleanHolder = new Holder<Boolean>(true);
 		testSubject.checkOut(stringHolder, booleanHolder);
 
 		status = ddao.findById(1L).getStatus();
-		assertEquals(1, status);
+		assertEquals(DocumentStatus.CHECKEDOUT, status);
 
 		ddao.findById(1L);
 		testSubject.deleteObjectOrCancelCheckOut(null, "doc.1");
 
 		status = ddao.findById(1L).getStatus();
-		assertEquals(0, status);
+		assertEquals(DocumentStatus.UNLOCKED, status);
 
 		Document doc = ddao.findById(1L);
 		assertEquals(0, doc.getDeleted());

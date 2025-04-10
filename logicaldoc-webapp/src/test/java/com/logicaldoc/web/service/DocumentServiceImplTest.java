@@ -34,18 +34,19 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailSender;
-import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.BookmarkDAO;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
+import com.logicaldoc.core.document.DocumentIndexed;
 import com.logicaldoc.core.document.DocumentLink;
 import com.logicaldoc.core.document.DocumentLinkDAO;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.DocumentNoteDAO;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
@@ -215,11 +216,11 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		testSubject.archiveDocuments(List.of(doc.getId()), "archive comment");
 
 		Document document = docDao.findById(7);
-		assertEquals(Document.DOC_ARCHIVED, document.getStatus());
+		assertEquals(DocumentStatus.ARCHIVED, document.getStatus());
 
 		testSubject.unarchiveDocuments(List.of(doc.getId()));
 		document = docDao.findById(7);
-		assertEquals(Document.DOC_UNLOCKED, document.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED, document.getStatus());
 	}
 
 	@Test
@@ -234,7 +235,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertEquals(1, testSubject.archiveFolder(1200L, "archive comment"));
 
 		Document document = docDao.findById(5);
-		assertEquals(Document.DOC_ARCHIVED, document.getStatus());
+		assertEquals(DocumentStatus.ARCHIVED, document.getStatus());
 	}
 
 	@Test
@@ -448,14 +449,14 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	public void testPromoteVersion() throws ServerException {
 		testCheckin();
 		GUIDocument doc = testSubject.getById(7);
-		assertEquals(GUIDocument.DOC_UNLOCKED, doc.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED.ordinal(), doc.getStatus());
 		assertEquals("1.1", doc.getVersion());
 		assertEquals("1.1", doc.getFileVersion());
 
 		testSubject.promoteVersion(doc.getId(), "1.0");
 
 		doc = testSubject.getById(7);
-		assertEquals(GUIDocument.DOC_UNLOCKED, doc.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED.ordinal(), doc.getStatus());
 		assertEquals("1.2", doc.getVersion());
 		assertEquals("1.2", doc.getFileVersion());
 
@@ -484,11 +485,11 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	@Test
 	public void testCheckout() throws ServerException {
 		GUIDocument doc = testSubject.getById(7);
-		assertEquals(Document.DOC_UNLOCKED, doc.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED.ordinal(), doc.getStatus());
 
 		testSubject.checkout(List.of(7L));
 		doc = testSubject.getById(7);
-		assertEquals(Document.DOC_CHECKED_OUT, doc.getStatus());
+		assertEquals(DocumentStatus.CHECKEDOUT.ordinal(), doc.getStatus());
 	}
 
 	@Test
@@ -509,7 +510,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		testSubject.checkin(doc, false);
 
 		doc = testSubject.getById(7);
-		assertEquals(GUIDocument.DOC_UNLOCKED, doc.getStatus());
+		assertEquals(DocumentStatus.UNLOCKED.ordinal(), doc.getStatus());
 		assertEquals("1.1", doc.getVersion());
 		assertEquals("1.1", doc.getFileVersion());
 	}
@@ -1027,33 +1028,33 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	public void testIndexable() throws ServerException, PersistenceException {
 		Document doc1 = docDao.findById(1);
 		assertNotNull(doc1);
-		assertEquals(AbstractDocument.INDEX_INDEXED, doc1.getIndexed());
+		assertEquals(DocumentIndexed.INDEXED, doc1.getIndexed());
 		Document doc2 = docDao.findById(2);
 		assertNotNull(doc2);
-		assertEquals(AbstractDocument.INDEX_TO_INDEX, doc2.getIndexed());
+		assertEquals(DocumentIndexed.TO_INDEX, doc2.getIndexed());
 		Document doc3 = docDao.findById(3);
 		assertNotNull(doc3);
-		assertEquals(AbstractDocument.INDEX_INDEXED, doc3.getIndexed());
+		assertEquals(DocumentIndexed.INDEXED, doc3.getIndexed());
 		testSubject.markUnindexable(List.of(1L, 2L, 3L));
 
 		doc1 = docDao.findById(1);
 		assertNotNull(doc1);
-		assertEquals(AbstractDocument.INDEX_SKIP, doc1.getIndexed());
+		assertEquals(DocumentIndexed.SKIP, doc1.getIndexed());
 		doc2 = docDao.findById(2);
 		assertNotNull(doc2);
-		assertEquals(AbstractDocument.INDEX_SKIP, doc2.getIndexed());
+		assertEquals(DocumentIndexed.SKIP, doc2.getIndexed());
 		doc3 = docDao.findById(3);
 		assertNotNull(doc3);
-		assertEquals(AbstractDocument.INDEX_SKIP, doc3.getIndexed());
+		assertEquals(DocumentIndexed.SKIP, doc3.getIndexed());
 
-		testSubject.markIndexable(List.of(1L, 3L), AbstractDocument.INDEX_TO_INDEX);
+		testSubject.markIndexable(List.of(1L, 3L), DocumentIndexed.TO_INDEX.ordinal());
 
 		doc1 = docDao.findById(1);
 		assertNotNull(doc1);
-		assertEquals(AbstractDocument.INDEX_TO_INDEX, doc1.getIndexed());
+		assertEquals(DocumentIndexed.TO_INDEX, doc1.getIndexed());
 		doc3 = docDao.findById(3);
 		assertNotNull(doc3);
-		assertEquals(AbstractDocument.INDEX_TO_INDEX, doc3.getIndexed());
+		assertEquals(DocumentIndexed.TO_INDEX, doc3.getIndexed());
 	}
 
 	@Test
@@ -1292,7 +1293,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		Document doc = docDao.findDocument(5);
 		docDao.initialize(doc);
-		doc.setStatus(AbstractDocument.DOC_CHECKED_OUT);
+		doc.setStatus(DocumentStatus.CHECKEDOUT);
 		docDao.store(doc);
 
 		ids = List.of(5L, 6L);

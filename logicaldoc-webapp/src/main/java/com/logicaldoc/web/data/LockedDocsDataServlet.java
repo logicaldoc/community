@@ -15,9 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.util.Context;
@@ -51,7 +51,7 @@ public class LockedDocsDataServlet extends AbstractDataServlet {
 		query.append(" B.ld_firstname, B.ld_name, A.ld_fileversion, A.ld_color, A.ld_fileversion ");
 		query.append(" from ld_document A ");
 		query.append(" left outer join ld_user B on A.ld_lockuserid=B.ld_id ");
-		query.append(" where A.ld_deleted = 0 and not A.ld_status=" + AbstractDocument.DOC_ARCHIVED);
+		query.append(" where A.ld_deleted = 0 and not A.ld_status=" + DocumentStatus.ARCHIVED.ordinal());
 		query.append(" and A.ld_tenantid=");
 		query.append(Long.toString(session.getTenantId()));
 		query.append(" and A.ld_docref is null ");
@@ -79,6 +79,7 @@ public class LockedDocsDataServlet extends AbstractDataServlet {
 				folder.setId(rs.getLong(10));
 				folder.setTenantId(session.getTenantId());
 				doc.setFolder(folder);
+
 				doc.setStatus(rs.getInt(11));
 				doc.setLockUserId(rs.getLong(12));
 

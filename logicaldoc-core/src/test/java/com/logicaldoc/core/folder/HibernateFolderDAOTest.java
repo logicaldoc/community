@@ -28,10 +28,10 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
-import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentHistory;
+import com.logicaldoc.core.document.DocumentIndexed;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.FolderAccessControlEntry;
 import com.logicaldoc.core.metadata.Template;
@@ -457,13 +457,13 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		Document doc = docDao.findById(1);
 		docDao.initialize(doc);
 		doc.setFolder(folderC);
-		doc.setIndexed(AbstractDocument.INDEX_INDEXED);
+		doc.setIndexed(DocumentIndexed.INDEXED);
 		docDao.store(doc);
 
 		Document doc2 = docDao.findById(2);
 		docDao.initialize(doc2);
 		doc2.setFolder(folderD);
-		doc2.setIndexed(AbstractDocument.INDEX_INDEXED);
+		doc2.setIndexed(DocumentIndexed.INDEXED);
 		docDao.store(doc2);
 
 		user = userDao.findByUsername("admin");
@@ -837,7 +837,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	public void testDelete() throws PersistenceException {
 		Folder folder = testSubject.findById(1202L);
 		assertNotNull(folder);
-		
+
 		testSubject.delete(1202L);
 		folder = testSubject.findById(1202L);
 		assertNull(folder);
@@ -1414,12 +1414,14 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testRestore() throws PersistenceException, InterruptedException {
-		assertEquals(1204L, testSubject.queryForLong("select ld_id from ld_folder where ld_id="+1204L+" and ld_deleted=1"));
-		
+		assertEquals(1204L,
+				testSubject.queryForLong("select ld_id from ld_folder where ld_id=" + 1204L + " and ld_deleted=1"));
+
 		testSubject.restore(1204L, 5L, null);
-		
-		assertEquals(1204L, testSubject.queryForLong("select ld_id from ld_folder where ld_id="+1204L+" and ld_deleted=0"));
-		
+
+		assertEquals(1204L,
+				testSubject.queryForLong("select ld_id from ld_folder where ld_id=" + 1204L + " and ld_deleted=0"));
+
 		Folder folder = testSubject.findById(1204L);
 		assertNotNull(folder);
 
