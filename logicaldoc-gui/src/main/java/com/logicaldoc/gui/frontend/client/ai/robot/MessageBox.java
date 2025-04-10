@@ -7,6 +7,7 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
+import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.Label;
 
@@ -18,9 +19,9 @@ import com.smartgwt.client.widgets.Label;
  */
 class MessageBox extends Label {
 
-	private static final String CMD_END = "]cmd]";
+	private static final String ACT_END = "]act]";
 
-	private static final String CMD_START = "[cmd[";
+	private static final String ACT_START = "[act[";
 
 	private static final String ROBOT = "robot";
 
@@ -66,7 +67,7 @@ class MessageBox extends Label {
 	@Override
 	protected void onInit() {
 		super.onInit();
-		declareCommandOpenDocument(DocumentsPanel.get());
+		declareOpenDocument(DocumentsPanel.get());
 	}
 
 	protected boolean isRobotAnswer() {
@@ -74,8 +75,8 @@ class MessageBox extends Label {
 	}
 
 	/**
-	 * Processes the answer looking for command tokens like
-	 * [cmd[<b>command</b>|<b>arg1</b>|<b>arg2</b>]cmd] and replace them with
+	 * Processes the answer looking for action tokens like
+	 * [act[<b>command</b>|<b>arg1</b>|<b>arg2</b>]act] and replace them with
 	 * proper rendering.
 	 * 
 	 * @param message The original message from the robot
@@ -83,16 +84,16 @@ class MessageBox extends Label {
 	 * @return The elaborated messages with command tokens expanded
 	 */
 	private String parseRobotAnswer(String message) {
-		RegExp p = RegExp.compile("\\[cmd\\[[a-zA-Z]*\\|.*\\|.*\\]cmd\\]");
+		RegExp p = RegExp.compile("\\[act\\[[a-zA-Z]*\\|.*\\|.*\\]act\\]");
 		MatchResult result = p.exec(message);
 
 		if (result != null) {
 			for (int i = 0; i < result.getGroupCount(); i++) {
 				String match = result.getGroup(i);
-				match = match.replace(CMD_START, "");
-				match = match.replace(CMD_END, "");
+				match = match.replace(ACT_START, "");
+				match = match.replace(ACT_END, "");
 				String link = processCommand(match.split("\\|"));
-				message = message.replace(CMD_START + match + CMD_END, link);
+				message = message.replace(ACT_START + match + ACT_END, link);
 			}
 		}
 
@@ -101,8 +102,8 @@ class MessageBox extends Label {
 
 	private String processCommand(String[] args) {
 		String command = args[0];
-		String link = "<a href='javascript:cmd" + command + "(";
-		if ("OpenDocument".equals(command)) {
+		String link = "<a style='cursor: pointer' onclick='act" + command + "(";
+		if ("OpenDocument".equals(command) || "OpenFolder".equals(command)) {
 			link += args[1] + ");'>" + args[2] + "</a>";
 		}
 		return link;
@@ -126,9 +127,16 @@ class MessageBox extends Label {
 	}
 
 	@UnsafeNativeLong
-	public static native void declareCommandOpenDocument(DocumentsPanel panel) /*-{
-		$wnd.cmdOpenDocument = function(docId) {
+	public static native void declareOpenDocument(DocumentsPanel panel) /*-{
+		$wnd.actOpenDocument = function(docId) {
 			return panel.@com.logicaldoc.gui.frontend.client.document.DocumentsPanel::openInFolder(J)(docId);
+		};
+	}-*/;
+	
+	@UnsafeNativeLong
+	public static native void declareOpenFolder(FolderNavigator navigator) /*-{
+		$wnd.actOpenFolder = function(folderId) {
+			return navigator.@com.logicaldoc.gui.frontend.client.folder.FolderNavigator::openFolder(J)(folderId);
 		};
 	}-*/;
 }
