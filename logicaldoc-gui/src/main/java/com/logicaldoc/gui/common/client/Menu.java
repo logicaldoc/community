@@ -137,8 +137,6 @@ public class Menu {
 
 	public static final long KEYSTORE = -1160;
 
-	public static final long VIA = -1170;
-
 	public static final long COMPARATORS = 1660;
 
 	public static final long AUTOMATION = 1570;

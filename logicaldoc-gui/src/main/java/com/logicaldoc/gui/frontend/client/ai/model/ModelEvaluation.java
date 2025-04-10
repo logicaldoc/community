@@ -41,10 +41,12 @@ public class ModelEvaluation extends ModelDetailsTab implements ModelObserver {
 		if (Boolean.TRUE.equals(container.contains(form)))
 			container.removeChild(form);
 
-		report = ItemFactory.newTextAreaItem("report", model.getEvaluation().getReport());
+		report = ItemFactory.newTextAreaItem("report",
+				model.getEvaluation() != null ? model.getEvaluation().getReport() : "");
 		report.setWidth("*");
 
-		confusionMatrix = ItemFactory.newStaticTextItem("confusionmatrix", model.getEvaluation().getConfusionMatrix());
+		confusionMatrix = ItemFactory.newStaticTextItem("confusionmatrix",
+				model.getEvaluation() != null ? model.getEvaluation().getConfusionMatrix() : "");
 
 		onModelChanged(model);
 
@@ -75,7 +77,7 @@ public class ModelEvaluation extends ModelDetailsTab implements ModelObserver {
 
 	@Override
 	public void onModelChanged(GUIModel mdl) {
-		if (this.model.getId() == mdl.getId() && mdl.isNeuralNetwork()) {
+		if (this.model.getId() == mdl.getId() && mdl.isNeuralNetwork() && mdl.getEvaluation() != null) {
 			report.setValue(mdl.getEvaluation().getReport());
 			report.setTitle(mdl.getEvaluation().getLastEvaluated() != null
 					? I18N.message("lastevaluatedon", I18N.formatDate(mdl.getEvaluation().getLastEvaluated()))

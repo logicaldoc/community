@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration packages="com.logicaldoc.util.log4j">
   <Properties>
-    <Property name="root"><![CDATA[C:\LogicalDOC-Devel\repository\logs]]></Property>
+    <Property name="root"><![CDATA[logs]]></Property>
     <Property name="pattern">%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p (%C:%4L) -- %m%n</Property>
     <Property name="dateformat">ISO8601</Property>
   </Properties>
@@ -135,22 +135,6 @@
       <DefaultRolloverStrategy max="5" />
     </RollingFile>
     <RollingFile name="FTPSERVER" fileName="${root}/ftpserver.log" filePattern="${root}/ftpserver.log.%i">
-      <PatternLayout>
-        <Pattern>${pattern}</Pattern>
-      </PatternLayout>
-      <Policies>
-        <SizeBasedTriggeringPolicy size="5 MB" />
-      </Policies>
-      <DefaultRolloverStrategy max="5" />
-    </RollingFile>
-    <RollingFile name="VIAEmailCrawler_WEB" fileName="${root}/viaemailcrawler_web.log.html" filePattern="${root}/viaemailcrawler_web.log.html.%i">
-      <LDHtmlLayout datePattern="${dateformat}" />
-      <Policies>
-        <SizeBasedTriggeringPolicy size="5 MB" />
-      </Policies>
-      <DefaultRolloverStrategy max="5" />
-    </RollingFile>
-    <RollingFile name="VIAEmailCrawler" fileName="${root}/viaemailcrawler.log" filePattern="${root}/viaemailcrawler.log.%i">
       <PatternLayout>
         <Pattern>${pattern}</Pattern>
       </PatternLayout>
@@ -763,10 +747,6 @@
     <Logger name="com.logicaldoc.enterprise.diagnosis.SystemDiagnosis" level="info" additivity="false">
       <AppenderRef ref="SystemDiagnosis" />
       <AppenderRef ref="SystemDiagnosis_WEB" />
-    </Logger>
-    <Logger name="com.logicaldoc.via.VIAEmailCrawler" level="info" additivity="false">
-      <AppenderRef ref="VIAEmailCrawler" />
-      <AppenderRef ref="VIAEmailCrawler_WEB" />
     </Logger>
     <Logger name="org.apache.ftpserver" level="info" additivity="false">
       <AppenderRef ref="FTPSERVER" />
