@@ -28,7 +28,7 @@ import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentComparator;
 import com.logicaldoc.core.document.DocumentDAO;
-import com.logicaldoc.core.document.DocumentIndexed;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
@@ -177,7 +177,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
 		writer.print("<status>" + document.getStatus() + "</status>");
 		writer.print("<immutable>" + document.getImmutable() + "</immutable>");
-		writer.print("<indexed>" + document.getIndexed() + "</indexed>");
+		writer.print("<indexed>" + document.getIndexed().ordinal() + "</indexed>");
 		writer.print("<password>" + StringUtils.isNotEmpty(document.getPassword()) + "</password>");
 		writer.print("<signed>" + document.getSigned() + "</signed>");
 		writer.print("<stamped>" + document.getStamped() + "</stamped>");
@@ -380,7 +380,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
 		DocumentDAO dao = Context.get(DocumentDAO.class);
 		StringBuilder query = new StringBuilder("""
-select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.publisher, A.creation, A.creator, A.fileSize, A.immutable, A.indexed, A.lockUserId, A.fileName, A.status,
+select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.publisher, A.creation, A.creator, A.fileSize, A.immutable, A.indexingStatus, A.lockUserId, A.fileName, A.status,
        A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus, A.startPublishing, A.stopPublishing, A.published, A.extResId, B.name, A.docRefType, A.stamped, A.lockUser,
        A.password, A.pages, A.workflowStatusDisplay, A.language, A.links+A.docAttrs, A.tgs, A.creatorId, A.publisherId, A.color, A.folder.id, A.tenantId, A.lastNote
   from Document as A
@@ -403,7 +403,7 @@ select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.
 		if (formId != null)
 			query.append(" and A.formId=" + Long.toString(formId));
 		if (StringUtils.isNotEmpty(request.getParameter(INDEXED)))
-			query.append(" and A.indexed=" + request.getParameter(INDEXED));
+			query.append(" and A.indexingStatus=" + request.getParameter(INDEXED));
 
 		Map<String, Object> params = new HashMap<>();
 		if (filename != null) {
@@ -470,7 +470,7 @@ select ld_docid
 			doc.setDocRefType((String) cols[27]);
 			doc.setColor((String) cols[38]);
 			doc.setTenantId((Long) cols[40]);
-			doc.setIndexed((DocumentIndexed) cols[12]);
+			doc.setIndexingStatus((IndexingStatus) cols[12]);
 
 			Folder f = new Folder();
 			f.setId((Long) cols[39]);
@@ -495,7 +495,7 @@ select ld_docid
 					doc.setFileName(aliasFileName);
 					doc.setColor(aliasColor);
 					doc.setType(aliasType);
-					doc.setIndexed(aliasIndexed);
+					doc.setIndexingStatus(aliasIndexed);
 
 					enrichAliasExtendedAttributes(doc, aliasId, extendedAttributes, extendedAttributesValues);
 				} else
@@ -525,7 +525,7 @@ select ld_docid
 			doc.setCreator((String) cols[9]);
 			doc.setFileSize((Long) cols[10]);
 			doc.setImmutable((Integer) cols[11]);
-			doc.setIndexed((DocumentIndexed) cols[12]);
+			doc.setIndexingStatus((IndexingStatus) cols[12]);
 			doc.setLockUserId((Long) cols[13]);
 			doc.setStatus((DocumentStatus) cols[15]);
 			doc.setSigned((Integer) cols[16]);

@@ -119,7 +119,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	
 	@Column(name = "ld_indexed", nullable = false)
 	@Enumerated(EnumType.ORDINAL)
-	private DocumentIndexed indexed = DocumentIndexed.TO_INDEX;
+	private IndexingStatus indexingStatus = IndexingStatus.TO_INDEX;
 
 	@Column(name = "ld_type", length = 255)
 	private String type;
@@ -291,16 +291,16 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		this.status = DocumentStatus.values()[status];
 	}
 	
-	public DocumentIndexed getIndexed() {
-		return indexed;
+	public IndexingStatus getIndexed() {
+		return indexingStatus;
 	}
 
-	public void setIndexed(DocumentIndexed indexed) {
-		this.indexed = indexed;
+	public void setIndexingStatus(IndexingStatus indexingStatus) {
+		this.indexingStatus = indexingStatus;
 	}
 	
-	public void setIndexed(int indexed) {
-		this.indexed = DocumentIndexed.values()[indexed];
+	public void setIndexingStatus(int indexingStatus) {
+		this.indexingStatus = IndexingStatus.values()[indexingStatus];
 	}
 
 	/**
@@ -614,7 +614,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	}
 
 	public boolean isToIndex() {
-		return indexed == DocumentIndexed.TO_INDEX;
+		return indexingStatus == IndexingStatus.TO_INDEX;
 	}
 
 	public int getBarcoded() {
@@ -900,7 +900,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		setLanguage(docVO.getLanguage());
 		setFileName(docVO.getFileName());
 		setFileSize(docVO.getFileSize());
-		setIndexed(docVO.getIndexed());
+		setIndexingStatus(docVO.getIndexed());
 		setBarcoded(docVO.getBarcoded());
 		setSigned(docVO.getSigned());
 		setStamped(docVO.getStamped());

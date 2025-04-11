@@ -357,13 +357,13 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testFindIndexed() throws PersistenceException {
-		List<Document> docs = testSubject.findByIndexed(1);
+	public void testFindByIndexingStatus() throws PersistenceException {
+		List<Document> docs = testSubject.findByIndexingStatus(IndexingStatus.INDEXED);
 		assertNotNull(docs);
 		assertEquals(4, docs.size());
 		assertEquals(1, docs.get(0).getId());
 
-		docs = testSubject.findByIndexed(0);
+		docs = testSubject.findByIndexingStatus(IndexingStatus.TO_INDEX);
 		assertNotNull(docs);
 		assertEquals(1, docs.size());
 	}

@@ -174,7 +174,7 @@ public class TagSearch extends Search {
 			hit.setCreator(rs.getString(10));
 			hit.setFileSize(rs.getLong(11));
 			hit.setImmutable(rs.getInt(12));
-			hit.setIndexed(rs.getInt(13));
+			hit.setIndexingStatus(rs.getInt(13));
 			hit.setLockUserId(rs.getLong(14));
 			hit.setFileName(rs.getString(15));
 			hit.setStatus( rs.getInt(16));

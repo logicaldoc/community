@@ -296,14 +296,14 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	public long count(Long tenantId, boolean computeDeleted, boolean computeArchived) throws PersistenceException;
 
 	/**
-	 * Finds all documents by the indexed state. Order by ascending lastModifed
+	 * Finds all documents by the indexing status. Order by ascending lastModifed
 	 * 
-	 * @param indexed the indexed property
+	 * @param indexingStatus the indexed property
 	 * @return Collection of all documents
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
-	public List<Document> findByIndexed(int indexed) throws PersistenceException;
+	public List<Document> findByIndexingStatus(IndexingStatus indexingStatus) throws PersistenceException;
 
 	/**
 	 * Counts the number of documents in a given indexation status(@see

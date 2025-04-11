@@ -112,8 +112,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	public void archive(long docId, DocumentHistory transaction) throws PersistenceException {
 		Document doc = findById(docId);
 		doc.setStatus(DocumentStatus.ARCHIVED);
-		if (doc.getIndexed() != DocumentIndexed.SKIP)
-			doc.setIndexed(DocumentIndexed.TO_INDEX);
+		if (doc.getIndexed() != IndexingStatus.SKIP)
+			doc.setIndexingStatus(IndexingStatus.TO_INDEX);
 		doc.setLockUserId(transaction.getUserId());
 		transaction.setEvent(DocumentEvent.ARCHIVED.toString());
 		store(doc, transaction);
@@ -494,17 +494,17 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	private void setIndexed(Document doc, Tenant tenant) {
-		if (doc.getIndexed() == DocumentIndexed.TO_INDEX || doc.getIndexed() == DocumentIndexed.TO_INDEX_METADATA) {
+		if (doc.getIndexed() == IndexingStatus.TO_INDEX || doc.getIndexed() == IndexingStatus.TO_INDEX_METADATA) {
 			// Check if the document must be indexed
 			if (!FileUtil.matches(doc.getFileName(), config.getProperty(tenant.getName() + ".index.includes", ""),
 					config.getProperty(tenant.getName() + ".index.excludes", "")))
-				doc.setIndexed(DocumentIndexed.SKIP);
+				doc.setIndexingStatus(IndexingStatus.SKIP);
 
 			// Check if the document must be indexed
-			if (doc.getIndexed() == DocumentIndexed.SKIP && FileUtil.matches(doc.getFileName(),
+			if (doc.getIndexed() == IndexingStatus.SKIP && FileUtil.matches(doc.getFileName(),
 					config.getProperty(tenant.getName() + ".index.includes.metadata", ""),
 					config.getProperty(tenant.getName() + ".index.excludes.metadata", "")))
-				doc.setIndexed(DocumentIndexed.TO_INDEX_METADATA);
+				doc.setIndexingStatus(IndexingStatus.TO_INDEX_METADATA);
 		}
 	}
 
@@ -900,8 +900,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public List<Document> findByIndexed(int indexed) throws PersistenceException {
-		return findByWhere(ENTITY + ".docRef is null and " + ENTITY + ".indexed=" + indexed,
+	public List<Document> findByIndexingStatus(IndexingStatus indexingStatus) throws PersistenceException {
+		return findByWhere(ENTITY + ".docRef is null and " + ENTITY + ".indexingStatus = " + indexingStatus.ordinal(),
 				ENTITY + ".lastModified asc", null);
 	}
 

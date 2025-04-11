@@ -25,7 +25,7 @@ import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentHistory;
-import com.logicaldoc.core.document.DocumentIndexed;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.security.Tenant;
@@ -298,9 +298,9 @@ public class IndexerTask extends Task {
 		if (StringUtils.isNotEmpty(sortingCustom))
 			sorting = sortingCustom;
 
-		String where = PersistentObjectDAO.ENTITY + ".deleted = 0 and (" + PersistentObjectDAO.ENTITY + ".indexed = "
-				+ DocumentIndexed.TO_INDEX.ordinal() + " or " + PersistentObjectDAO.ENTITY + ".indexed = "
-				+ DocumentIndexed.TO_INDEX_METADATA.ordinal() + ") and not " + PersistentObjectDAO.ENTITY + ".status = "
+		String where = PersistentObjectDAO.ENTITY + ".deleted = 0 and (" + PersistentObjectDAO.ENTITY + ".indexingStatus = "
+				+ IndexingStatus.TO_INDEX.ordinal() + " or " + PersistentObjectDAO.ENTITY + ".indexingStatus = "
+				+ IndexingStatus.TO_INDEX_METADATA.ordinal() + ") and not " + PersistentObjectDAO.ENTITY + ".status = "
 				+ DocumentStatus.ARCHIVED.ordinal();
 
 		return new String[] { where, sorting };
@@ -389,7 +389,7 @@ public class IndexerTask extends Task {
 								config.getProperty(tenant.getName() + ".index.excludes") == null ? ""
 										: config.getProperty(tenant.getName() + ".index.excludes"))) {
 							documentDao.initialize(doc);
-							doc.setIndexed(DocumentIndexed.SKIP);
+							doc.setIndexingStatus(IndexingStatus.SKIP);
 							documentDao.store(doc);
 							log.warn("Thread {}: Document {} with filename '{}' marked as unindexable", number, id,
 									doc.getFileName());

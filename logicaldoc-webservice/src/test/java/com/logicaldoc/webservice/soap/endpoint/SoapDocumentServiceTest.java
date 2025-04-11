@@ -141,7 +141,7 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 
 		Folder newFolder = folderDao.findById(80);
 		docDao.initialize(doc);
-		doc.setIndexed(0);
+		doc.setIndexingStatus(0);
 		docDao.store(doc);
 		testSubject.move("", doc.getId(), newFolder.getId());
 		// NOTA: attenzione errore optimistic lock

@@ -18,7 +18,7 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
-import com.logicaldoc.core.document.DocumentIndexed;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.DocumentLink;
 import com.logicaldoc.core.document.DocumentLinkDAO;
 import com.logicaldoc.core.document.DocumentManager;
@@ -1002,7 +1002,7 @@ public class DocTool {
 	public String getText(Document document) {
 		String text = null;
 
-		if (document.getIndexed() == DocumentIndexed.INDEXED) {
+		if (document.getIndexed() == IndexingStatus.INDEXED) {
 			SearchEngine indexer = Context.get(SearchEngine.class);
 			Hit hit = indexer.getHit(document.getId());
 			if (hit != null)

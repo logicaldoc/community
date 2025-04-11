@@ -98,8 +98,8 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 		setTemplateId(source.getTemplateId());
 		setTemplateName(source.getTemplateName());
 
-		if (source.getIndexed() != DocumentIndexed.INDEXED)
-			setIndexed(source.getIndexed());
+		if (source.getIndexed() != IndexingStatus.INDEXED)
+			setIndexingStatus(source.getIndexed());
 		setCustomId(null);
 
 		try {

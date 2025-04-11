@@ -65,7 +65,7 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
-import com.logicaldoc.core.document.DocumentIndexed;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.DocumentLink;
 import com.logicaldoc.core.document.DocumentLinkDAO;
 import com.logicaldoc.core.document.DocumentManager;
@@ -332,7 +332,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 					FutureElaboration<Document, Document> elaboration = documentManager.create(file, doc, transaction);
 					doc = elaboration.get();
 
-					if (immediateIndexing && doc.getIndexed() == DocumentIndexed.TO_INDEX)
+					if (immediateIndexing && doc.getIndexed() == IndexingStatus.TO_INDEX)
 						docIdsToIndex.add(doc.getId());
 
 					createdDocs.add(fromDocument(doc, metadata.getFolder(), null));
@@ -1127,7 +1127,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		DocumentDAO docDao = Context.get(DocumentDAO.class);
 		for (long id : docIds)
 			try {
-				manager.changeIndexingStatus(docDao.findById(id), DocumentIndexed.values()[policy]);
+				manager.changeIndexingStatus(docDao.findById(id), IndexingStatus.values()[policy]);
 			} catch (PersistenceException e) {
 				throwServerException(session, log, e);
 			}
@@ -1142,7 +1142,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		DocumentDAO docDao = Context.get(DocumentDAO.class);
 		for (long id : docIds)
 			try {
-				manager.changeIndexingStatus(docDao.findById(id), DocumentIndexed.SKIP);
+				manager.changeIndexingStatus(docDao.findById(id), IndexingStatus.SKIP);
 			} catch (PersistenceException e) {
 				throwServerException(session, log, e);
 			}

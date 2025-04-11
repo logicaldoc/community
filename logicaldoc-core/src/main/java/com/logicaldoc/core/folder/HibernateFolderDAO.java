@@ -33,7 +33,7 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
-import com.logicaldoc.core.document.DocumentIndexed;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.document.FolderAccessControlEntry;
@@ -1599,7 +1599,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				newDoc.setVersion(null);
 				newDoc.setFileVersion(null);
 				newDoc.setFolder(newFolder);
-				newDoc.setIndexed(DocumentIndexed.TO_INDEX);
+				newDoc.setIndexingStatus(IndexingStatus.TO_INDEX);
 				newDoc.setStatus(DocumentStatus.UNLOCKED);
 				newDoc.setImmutable(0);
 				newDoc.setBarcoded(0);

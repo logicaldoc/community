@@ -198,8 +198,8 @@ public class DocumentManager {
 			// Update the document's gridRecord
 			documentDAO.initialize(document);
 			document.setFileSize(fileSize);
-			if (document.getIndexed() != DocumentIndexed.SKIP)
-				document.setIndexed(DocumentIndexed.TO_INDEX);
+			if (document.getIndexed() != IndexingStatus.SKIP)
+				document.setIndexingStatus(IndexingStatus.TO_INDEX);
 			document.setOcrd(0);
 			document.setBarcoded(0);
 			document.setSigned(0);
@@ -346,8 +346,8 @@ public class DocumentManager {
 			document.setOcrd(0);
 			document.setBarcoded(0);
 
-			if (document.getIndexed() != DocumentIndexed.SKIP)
-				document.setIndexed(DocumentIndexed.TO_INDEX);
+			if (document.getIndexed() != IndexingStatus.SKIP)
+				document.setIndexingStatus(IndexingStatus.TO_INDEX);
 
 			documentDAO.store(document);
 
@@ -386,7 +386,7 @@ public class DocumentManager {
 				document.setOcrTemplateId(oldDocument.getOcrTemplateId());
 				document.setBarcoded(oldDocument.getBarcoded());
 				document.setBarcodeTemplateId(oldDocument.getBarcodeTemplateId());
-				document.setIndexed(oldDocument.getIndexed());
+				document.setIndexingStatus(oldDocument.getIndexed());
 				document.setCustomId(oldDocument.getCustomId());
 				document.setStatus(oldDocument.getStatus());
 				document.setStamped(oldDocument.getStamped());
@@ -502,7 +502,7 @@ public class DocumentManager {
 			// Physically remove the document from full-text index
 			indexer.deleteHit(docId);
 
-			doc.setIndexed(DocumentIndexed.TO_INDEX);
+			doc.setIndexingStatus(IndexingStatus.TO_INDEX);
 			documentDAO.store(doc);
 
 			markAliasesToIndex(doc.getId());
@@ -597,8 +597,8 @@ public class DocumentManager {
 				// We are indexing an alias, so index the real document first
 				Document realDoc = documentDAO.findById(doc.getDocRef());
 				if (realDoc != null) {
-					if (realDoc.getIndexed() == DocumentIndexed.TO_INDEX
-							|| realDoc.getIndexed() == DocumentIndexed.TO_INDEX_METADATA)
+					if (realDoc.getIndexed() == IndexingStatus.TO_INDEX
+							|| realDoc.getIndexed() == IndexingStatus.TO_INDEX_METADATA)
 						parsingTime = index(realDoc.getId(), content, new DocumentHistory(transaction));
 
 					// Take the content from the real document to avoid double
@@ -609,12 +609,12 @@ public class DocumentManager {
 					log.debug("Alias {} cannot be indexed because it references an unexisting document {}", doc,
 							doc.getDocRef());
 					documentDAO.jdbcUpdate(
-							UPDATE_LD_DOCUMENT_SET_LD_INDEXED + DocumentIndexed.SKIP + " where ld_id=" + doc.getId());
+							UPDATE_LD_DOCUMENT_SET_LD_INDEXED + IndexingStatus.SKIP + " where ld_id=" + doc.getId());
 					return 0;
 				}
 			}
 
-			if (StringUtils.isEmpty(cont) && doc.getIndexed() != DocumentIndexed.TO_INDEX_METADATA) {
+			if (StringUtils.isEmpty(cont) && doc.getIndexed() != IndexingStatus.TO_INDEX_METADATA) {
 				// Extracts the content from the file. This may take very long
 				// time.
 				Date beforeParsing = new Date();
@@ -632,7 +632,7 @@ public class DocumentManager {
 		}
 
 		// For additional safety update the DB directly
-		doc.setIndexed(DocumentIndexed.INDEXED);
+		doc.setIndexingStatus(IndexingStatus.INDEXED);
 		documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + doc.getIndexed().ordinal() + " where ld_id=" + doc.getId());
 
 		// Save the event
@@ -671,7 +671,7 @@ public class DocumentManager {
 			if (Context.get().getProperties().getBoolean(tenant + ".index.skiponerror", false)) {
 				DocumentDAO dDao = Context.get(DocumentDAO.class);
 				dDao.initialize(document);
-				document.setIndexed(DocumentIndexed.SKIP);
+				document.setIndexingStatus(IndexingStatus.SKIP);
 				dDao.store(document);
 			}
 		}
@@ -693,7 +693,7 @@ public class DocumentManager {
 	}
 
 	private void markAliasesToIndex(long referencedDocId) throws PersistenceException {
-		documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + DocumentIndexed.TO_INDEX.ordinal() + " where ld_docref="
+		documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + IndexingStatus.TO_INDEX.ordinal() + " where ld_docref="
 				+ referencedDocId + " and not ld_id = " + referencedDocId);
 	}
 
@@ -740,7 +740,7 @@ public class DocumentManager {
 			checkCustomIdUniquenesOnUpdate(document, docVO);
 
 			// The document must be re-indexed
-			document.setIndexed(DocumentIndexed.TO_INDEX);
+			document.setIndexingStatus(IndexingStatus.TO_INDEX);
 
 			document.setWorkflowStatus(docVO.getWorkflowStatus());
 			document.setColor(docVO.getColor());
@@ -894,12 +894,12 @@ public class DocumentManager {
 				doc.setFolder(folder);
 
 				// The document needs to be reindexed
-				if (doc.getIndexed() == DocumentIndexed.INDEXED) {
-					doc.setIndexed(DocumentIndexed.TO_INDEX);
+				if (doc.getIndexed() == IndexingStatus.INDEXED) {
+					doc.setIndexingStatus(IndexingStatus.TO_INDEX);
 					indexer.deleteHit(doc.getId());
 
 					// The same thing should be done on each shortcut
-					documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + DocumentIndexed.TO_INDEX.ordinal()
+					documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + IndexingStatus.TO_INDEX.ordinal()
 							+ " where ld_docref=" + doc.getId());
 				}
 
@@ -1177,8 +1177,8 @@ public class DocumentManager {
 				cloned.setFolder(folder);
 			cloned.setLastModified(null);
 			cloned.setDate(null);
-			if (cloned.getIndexed() == DocumentIndexed.INDEXED)
-				cloned.setIndexed(DocumentIndexed.TO_INDEX);
+			if (cloned.getIndexed() == IndexingStatus.INDEXED)
+				cloned.setIndexingStatus(IndexingStatus.TO_INDEX);
 			cloned.setStamped(0);
 			cloned.setSigned(0);
 			cloned.setLinks(0);
@@ -1351,7 +1351,7 @@ public class DocumentManager {
 					document.setType(UNKNOWN);
 				}
 
-				document.setIndexed(DocumentIndexed.TO_INDEX);
+				document.setIndexingStatus(IndexingStatus.TO_INDEX);
 
 				Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
 						DocumentEvent.RENAMED.toString(), false);
@@ -1504,18 +1504,18 @@ public class DocumentManager {
 	 * @param doc The document for which will be changed the indexer status.
 	 * @param status The new document indexer status.
 	 */
-	public void changeIndexingStatus(Document doc, DocumentIndexed status) {
-		if (status == DocumentIndexed.SKIP && doc.getIndexed() == DocumentIndexed.SKIP)
+	public void changeIndexingStatus(Document doc, IndexingStatus status) {
+		if (status == IndexingStatus.SKIP && doc.getIndexed() == IndexingStatus.SKIP)
 			return;
-		if (status == DocumentIndexed.TO_INDEX && doc.getIndexed() == DocumentIndexed.TO_INDEX)
+		if (status == IndexingStatus.TO_INDEX && doc.getIndexed() == IndexingStatus.TO_INDEX)
 			return;
-		if (status == DocumentIndexed.TO_INDEX_METADATA && doc.getIndexed() == DocumentIndexed.TO_INDEX_METADATA)
+		if (status == IndexingStatus.TO_INDEX_METADATA && doc.getIndexed() == IndexingStatus.TO_INDEX_METADATA)
 			return;
 
 		documentDAO.initialize(doc);
-		if (doc.getIndexed() == DocumentIndexed.INDEXED)
+		if (doc.getIndexed() == IndexingStatus.INDEXED)
 			deleteFromIndex(doc);
-		doc.setIndexed(status);
+		doc.setIndexingStatus(status);
 		try {
 			documentDAO.store(doc);
 		} catch (PersistenceException e) {

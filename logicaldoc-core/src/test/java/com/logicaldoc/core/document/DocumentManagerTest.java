@@ -435,12 +435,12 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 	@Test
 	public void testReindex() throws PersistenceException, ParsingException {
 		Document doc = docDao.findById(1);
-		assertEquals(DocumentIndexed.INDEXED, doc.getIndexed());
+		assertEquals(IndexingStatus.INDEXED, doc.getIndexed());
 		docDao.initialize(doc);
-		doc.setIndexed(0);
+		doc.setIndexingStatus(0);
 		docDao.store(doc);
 		doc = docDao.findById(1);
-		assertEquals(DocumentIndexed.TO_INDEX, doc.getIndexed());
+		assertEquals(IndexingStatus.TO_INDEX, doc.getIndexed());
 
 		Folder folder = folderDao.createPath(folderDao.findById(Folder.ROOTID), "/Default/test", true, null);
 
@@ -454,22 +454,22 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		testSubject.index(doc.getId(), null, transaction);
 
 		doc = docDao.findById(1);
-		assertEquals(DocumentIndexed.INDEXED, doc.getIndexed());
+		assertEquals(IndexingStatus.INDEXED, doc.getIndexed());
 
 		doc = docDao.findById(1);
-		assertEquals(DocumentIndexed.INDEXED, doc.getIndexed());
+		assertEquals(IndexingStatus.INDEXED, doc.getIndexed());
 		docDao.initialize(doc);
-		doc.setIndexed(0);
+		doc.setIndexingStatus(0);
 		docDao.store(doc);
 		doc = docDao.findById(1);
-		assertEquals(DocumentIndexed.TO_INDEX, doc.getIndexed());
+		assertEquals(IndexingStatus.TO_INDEX, doc.getIndexed());
 
 		transaction = new DocumentHistory();
 		transaction.setUser(userDao.findByUsername("admin"));
 		testSubject.index(alias.getId(), null, transaction);
 
 		doc = docDao.findById(1);
-		assertEquals(DocumentIndexed.INDEXED, doc.getIndexed());
+		assertEquals(IndexingStatus.INDEXED, doc.getIndexed());
 
 		try {
 			transaction = new DocumentHistory();
@@ -898,7 +898,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		Document doc = docDao.findById(1L);
 		assertNotNull(doc);
-		assertEquals(DocumentIndexed.INDEXED, doc.getIndexed());
+		assertEquals(IndexingStatus.INDEXED, doc.getIndexed());
 		docDao.initialize(doc);
 
 		assertEquals(DocumentStatus.CHECKEDOUT, doc.getStatus());
@@ -917,7 +917,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		assertNotNull(doc);
 		docDao.initialize(doc);
 
-		assertEquals(DocumentIndexed.TO_INDEX, doc.getIndexed());
+		assertEquals(IndexingStatus.TO_INDEX, doc.getIndexed());
 		assertEquals(0, doc.getSigned());
 		assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
 
@@ -975,35 +975,35 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 	public void testChangeIndexingStatus() throws PersistenceException {
 		Document doc = docDao.findById(1L);
 		assertNotNull(doc);
-		assertEquals(DocumentIndexed.INDEXED, doc.getIndexed());
-		testSubject.changeIndexingStatus(doc, DocumentIndexed.SKIP);
-		assertEquals(DocumentIndexed.SKIP, doc.getIndexed());
+		assertEquals(IndexingStatus.INDEXED, doc.getIndexed());
+		testSubject.changeIndexingStatus(doc, IndexingStatus.SKIP);
+		assertEquals(IndexingStatus.SKIP, doc.getIndexed());
 
 		doc = docDao.findById(2);
 		assertNotNull(doc);
-		assertEquals(DocumentIndexed.TO_INDEX, doc.getIndexed());
-		testSubject.changeIndexingStatus(doc, DocumentIndexed.SKIP);
-		assertEquals(DocumentIndexed.SKIP, doc.getIndexed());
+		assertEquals(IndexingStatus.TO_INDEX, doc.getIndexed());
+		testSubject.changeIndexingStatus(doc, IndexingStatus.SKIP);
+		assertEquals(IndexingStatus.SKIP, doc.getIndexed());
 
 		Document docTest = new Document();
 		docTest.setFileName("docTest");
 		docTest.setFolder(folderDao.findById(Folder.DEFAULTWORKSPACEID));
 		docDao.store(docTest);
 
-		docTest.setIndexed(DocumentIndexed.SKIP);
+		docTest.setIndexingStatus(IndexingStatus.SKIP);
 		docTest.setStatus(DocumentStatus.LOCKED);
-		testSubject.changeIndexingStatus(docTest, DocumentIndexed.SKIP);
-		assertEquals(DocumentIndexed.SKIP, docTest.getIndexed());
+		testSubject.changeIndexingStatus(docTest, IndexingStatus.SKIP);
+		assertEquals(IndexingStatus.SKIP, docTest.getIndexed());
 
-		docTest.setIndexed(DocumentIndexed.TO_INDEX);
+		docTest.setIndexingStatus(IndexingStatus.TO_INDEX);
 		docTest.setStatus(DocumentStatus.UNLOCKED);
-		testSubject.changeIndexingStatus(docTest, DocumentIndexed.TO_INDEX);
-		assertEquals(DocumentIndexed.TO_INDEX, docTest.getIndexed());
+		testSubject.changeIndexingStatus(docTest, IndexingStatus.TO_INDEX);
+		assertEquals(IndexingStatus.TO_INDEX, docTest.getIndexed());
 
-		docTest.setIndexed(DocumentIndexed.TO_INDEX_METADATA);
+		docTest.setIndexingStatus(IndexingStatus.TO_INDEX_METADATA);
 		docTest.setStatus(DocumentStatus.ARCHIVED);
-		testSubject.changeIndexingStatus(docTest, DocumentIndexed.TO_INDEX_METADATA);
-		assertEquals(DocumentIndexed.TO_INDEX_METADATA, docTest.getIndexed());
+		testSubject.changeIndexingStatus(docTest, IndexingStatus.TO_INDEX_METADATA);
+		assertEquals(IndexingStatus.TO_INDEX_METADATA, docTest.getIndexed());
 	}
 
 	@Test
@@ -1247,7 +1247,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		Document doc = docDao.findById(1L);
 		assertNotNull(doc);
-		assertEquals(DocumentIndexed.INDEXED, doc.getIndexed());
+		assertEquals(IndexingStatus.INDEXED, doc.getIndexed());
 		docDao.initialize(doc);
 
 		assertEquals(DocumentStatus.CHECKEDOUT, doc.getStatus());

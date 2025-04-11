@@ -40,7 +40,7 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
-import com.logicaldoc.core.document.DocumentIndexed;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.DocumentLink;
 import com.logicaldoc.core.document.DocumentLinkDAO;
 import com.logicaldoc.core.document.DocumentManager;
@@ -1028,33 +1028,33 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	public void testIndexable() throws ServerException, PersistenceException {
 		Document doc1 = docDao.findById(1);
 		assertNotNull(doc1);
-		assertEquals(DocumentIndexed.INDEXED, doc1.getIndexed());
+		assertEquals(IndexingStatus.INDEXED, doc1.getIndexed());
 		Document doc2 = docDao.findById(2);
 		assertNotNull(doc2);
-		assertEquals(DocumentIndexed.TO_INDEX, doc2.getIndexed());
+		assertEquals(IndexingStatus.TO_INDEX, doc2.getIndexed());
 		Document doc3 = docDao.findById(3);
 		assertNotNull(doc3);
-		assertEquals(DocumentIndexed.INDEXED, doc3.getIndexed());
+		assertEquals(IndexingStatus.INDEXED, doc3.getIndexed());
 		testSubject.markUnindexable(List.of(1L, 2L, 3L));
 
 		doc1 = docDao.findById(1);
 		assertNotNull(doc1);
-		assertEquals(DocumentIndexed.SKIP, doc1.getIndexed());
+		assertEquals(IndexingStatus.SKIP, doc1.getIndexed());
 		doc2 = docDao.findById(2);
 		assertNotNull(doc2);
-		assertEquals(DocumentIndexed.SKIP, doc2.getIndexed());
+		assertEquals(IndexingStatus.SKIP, doc2.getIndexed());
 		doc3 = docDao.findById(3);
 		assertNotNull(doc3);
-		assertEquals(DocumentIndexed.SKIP, doc3.getIndexed());
+		assertEquals(IndexingStatus.SKIP, doc3.getIndexed());
 
-		testSubject.markIndexable(List.of(1L, 3L), DocumentIndexed.TO_INDEX.ordinal());
+		testSubject.markIndexable(List.of(1L, 3L), IndexingStatus.TO_INDEX.ordinal());
 
 		doc1 = docDao.findById(1);
 		assertNotNull(doc1);
-		assertEquals(DocumentIndexed.TO_INDEX, doc1.getIndexed());
+		assertEquals(IndexingStatus.TO_INDEX, doc1.getIndexed());
 		doc3 = docDao.findById(3);
 		assertNotNull(doc3);
-		assertEquals(DocumentIndexed.TO_INDEX, doc3.getIndexed());
+		assertEquals(IndexingStatus.TO_INDEX, doc3.getIndexed());
 	}
 
 	@Test

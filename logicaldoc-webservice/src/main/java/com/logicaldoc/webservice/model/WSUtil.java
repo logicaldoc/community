@@ -211,7 +211,7 @@ public class WSUtil {
 		doc.setLanguage(wsDoc.getLanguage());
 		doc.setImmutable(wsDoc.getImmutable());
 		if (wsDoc.getIndexed() != WSDocument.INDEX_INDEXED)
-			doc.setIndexed(wsDoc.getIndexed());
+			doc.setIndexingStatus(wsDoc.getIndexed());
 		doc.setVersion(wsDoc.getVersion());
 		doc.setFileVersion(wsDoc.getFileVersion());
 		doc.setPages(wsDoc.getPages());

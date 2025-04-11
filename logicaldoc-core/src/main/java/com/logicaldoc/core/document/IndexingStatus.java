@@ -1,6 +1,6 @@
 package com.logicaldoc.core.document;
 
-public enum DocumentIndexed {
+public enum IndexingStatus {
 	TO_INDEX,
 	INDEXED,
 	SKIP,

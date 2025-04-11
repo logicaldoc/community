@@ -31,7 +31,7 @@ import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentHistory;
-import com.logicaldoc.core.document.DocumentIndexed;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.FolderAccessControlEntry;
 import com.logicaldoc.core.metadata.Template;
@@ -457,13 +457,13 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		Document doc = docDao.findById(1);
 		docDao.initialize(doc);
 		doc.setFolder(folderC);
-		doc.setIndexed(DocumentIndexed.INDEXED);
+		doc.setIndexingStatus(IndexingStatus.INDEXED);
 		docDao.store(doc);
 
 		Document doc2 = docDao.findById(2);
 		docDao.initialize(doc2);
 		doc2.setFolder(folderD);
-		doc2.setIndexed(DocumentIndexed.INDEXED);
+		doc2.setIndexingStatus(IndexingStatus.INDEXED);
 		docDao.store(doc2);
 
 		user = userDao.findByUsername("admin");
@@ -485,7 +485,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		folderList = testSubject.findChildren(folderB.getId(), null);
 		assertEquals(0, folderList.size());
 
-		List<Document> docs = docDao.findByIndexed(0);
+		List<Document> docs = docDao.findByIndexingStatus(IndexingStatus.TO_INDEX);
 		assertEquals(1, docs.size());
 
 		// Check the history creation

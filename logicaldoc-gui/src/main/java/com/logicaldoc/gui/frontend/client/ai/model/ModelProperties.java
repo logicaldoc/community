@@ -152,6 +152,8 @@ public class ModelProperties extends ModelDetailsTab {
 		setNeuralNetworkVisibility(seed);
 
 		SelectItem language = ItemFactory.newLanguageSelector("language", true, false);
+		language.setValue(model.getLanguage());
+		language.addChangedHandler(changedHandler);
 		setNLPVisibility(language);
 
 		SpinnerItem cutoff = ItemFactory.newSpinnerItem("cutoff", model.getCutoff());
@@ -266,6 +268,7 @@ public class ModelProperties extends ModelDetailsTab {
 			model.setName(form.getValueAsString(NAME));
 			model.setLabel(form.getValueAsString("label"));
 			model.setDescription(form.getValueAsString("description"));
+			model.setLanguage(form.getValueAsString("language"));
 			model.setType(form.getValueAsString(TYPE));
 			model.setFeatures(form.getValueAsString("features"));
 			model.setCategories(form.getValueAsString("categories"));

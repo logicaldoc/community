@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
-import com.logicaldoc.core.document.DocumentIndexed;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.DocumentNoteDAO;
 import com.logicaldoc.core.metadata.Attribute;
@@ -223,7 +223,7 @@ public class StandardSearchEngine implements SearchEngine {
 
 			String contentString = null;
 
-			if (doc.getIndexed() != DocumentIndexed.TO_INDEX_METADATA)
+			if (doc.getIndexed() != IndexingStatus.TO_INDEX_METADATA)
 				ParserFactory.parse(content, doc.getFileName(), null, locale, doc.getTenantId(), doc, null);
 
 			addHit(doc, contentString);
