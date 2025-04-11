@@ -175,7 +175,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		writer.print("<size>" + document.getFileSize() + "</size>");
 		writer.print("<pages>" + document.getPages() + "</pages>");
 
-		writer.print("<status>" + document.getStatus() + "</status>");
+		writer.print("<status>" + document.getStatus().ordinal() + "</status>");
 		writer.print("<immutable>" + document.getImmutable() + "</immutable>");
 		writer.print("<indexed>" + document.getIndexed().ordinal() + "</indexed>");
 		writer.print("<password>" + StringUtils.isNotEmpty(document.getPassword()) + "</password>");
