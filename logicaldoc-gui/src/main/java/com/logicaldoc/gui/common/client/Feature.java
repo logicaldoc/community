@@ -105,7 +105,7 @@ public class Feature {
 
 	public static final int CLOUD_STORE = 46;
 
-	public static final int ARTIFICIAL_INTELLIGENCE = 47;
+	public static final int ROBOT = 47;
 
 	public static final int AUTOMATION = 48;
 
@@ -225,7 +225,7 @@ public class Feature {
 
 	public static final int ONLYOFFICE = 107;
 
-	public static final int ROBOT = 108;
+	public static final int ARTIFICIAL_INTELLIGENCE = 108;
 	
 	private static Set<String> features = new HashSet<>();
 
