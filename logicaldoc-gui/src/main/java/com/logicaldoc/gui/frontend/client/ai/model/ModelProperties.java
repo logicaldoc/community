@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Criterion;
 import com.smartgwt.client.types.AutoFitWidthApproach;
@@ -165,7 +166,7 @@ public class ModelProperties extends ModelDetailsTab {
 		ngramMin.setMin(2);
 		ngramMin.addChangedHandler(changedHandler);
 		setNLPVisibility(ngramMin);
-		
+
 		SpinnerItem ngramMax = ItemFactory.newSpinnerItem("ngrammax", model.getNgramMax());
 		ngramMax.setMin(2);
 		ngramMax.addChangedHandler(changedHandler);
@@ -258,8 +259,18 @@ public class ModelProperties extends ModelDetailsTab {
 		map.put("GELU", "GELU");
 		map.put("MISH", "MISH");
 		item.setValueMap(map);
-
 		item.setValue(model.getActivation());
+
+		ListGridField functionField = new ListGridField("function", I18N.message("function"));
+		ListGridField graphField = new ListGridField("graph", I18N.message("graph"));
+		graphField.setCellFormatter((value, record, rowNum, colNum) -> Util
+				.imageHTML("AI/activation/" + record.getAttributeAsString("function") + ".png", null, 80, null));
+
+		item.setValueField("function");
+		item.setDisplayField("function");
+		item.setPickListWidth(450);
+		item.setPickListFields(functionField, graphField);
+
 		return item;
 	}
 
