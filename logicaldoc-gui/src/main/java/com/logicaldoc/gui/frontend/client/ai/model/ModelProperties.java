@@ -292,7 +292,7 @@ public class ModelProperties extends ModelDetailsTab {
 			if (NEURAL.equals(model.getType())) {
 				com.smartgwt.client.data.Record[] layerRecords = layers.getRecordList().toArray();
 				if (layerRecords.length < 2) {
-					GuiLog.error("modulelayersnotenough");
+					GuiLog.error(I18N.message("modulelayersnotenough"));
 					return false;
 				}
 
