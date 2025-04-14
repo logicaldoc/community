@@ -22,9 +22,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IOUtil {
+
 	private static final int DEFAULT_BUFFER_SIZE = 10240; // ..bytes = 10KB.
+
+	private static final Logger log = LoggerFactory.getLogger(IOUtil.class);
 
 	private IOUtil() {
 		throw new IllegalStateException("Utility class");
@@ -101,6 +106,7 @@ public class IOUtil {
 	public static String serialize(Serializable object, String charset) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try (XMLEncoder encoder = new XMLEncoder(baos, StringUtils.defaultString(charset, "UTF-8"), false, 0);) {
+			encoder.setExceptionListener(e -> log.warn(e.getMessage(), e));
 			encoder.writeObject(object);
 		}
 		return baos.toString().trim().replace("\n", "");
@@ -129,7 +135,8 @@ public class IOUtil {
 	 * @throws IOException I/O error
 	 * @throws URISyntaxException The URL is invalid
 	 */
-	public static void download(final String url, File dest, int timeout, int bufferSize) throws IOException, URISyntaxException {
+	public static void download(final String url, File dest, int timeout, int bufferSize)
+			throws IOException, URISyntaxException {
 		if (url == null || url.isEmpty()) {
 			throw new IOException("Url argument is not specified"); // URL
 																	// isn't
