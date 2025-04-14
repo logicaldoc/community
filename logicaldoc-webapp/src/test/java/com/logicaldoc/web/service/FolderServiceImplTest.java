@@ -49,8 +49,8 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		folderDao = (FolderDAO) context.getBean("FolderDAO");
-		documentDao = (DocumentDAO) context.getBean("DocumentDAO");
+		folderDao = (FolderDAO) context.getBean("folderDAO");
+		documentDao = (DocumentDAO) context.getBean("documentDAO");
 	}
 
 	@Test

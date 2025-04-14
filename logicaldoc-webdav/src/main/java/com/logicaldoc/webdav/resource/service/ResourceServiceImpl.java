@@ -60,13 +60,13 @@ public class ResourceServiceImpl implements ResourceService {
 
 	private static final Logger log = LoggerFactory.getLogger(ResourceServiceImpl.class);
 
-	@javax.annotation.Resource(name = "DocumentDAO")
+	@javax.annotation.Resource(name = "documentDAO")
 	private transient DocumentDAO documentDAO;
 
 	@javax.annotation.Resource(name = "VersionDAO")
 	private transient VersionDAO versionDAO;
 
-	@javax.annotation.Resource(name = "FolderDAO")
+	@javax.annotation.Resource(name = "folderDAO")
 	private transient FolderDAO folderDAO;
 
 	@javax.annotation.Resource(name = "documentManager")

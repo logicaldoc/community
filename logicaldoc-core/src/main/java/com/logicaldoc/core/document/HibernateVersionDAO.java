@@ -36,7 +36,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	@Resource(name = "Store")
 	protected Store store;
 
-	@Resource(name = "FolderDAO")
+	@Resource(name = "folderDAO")
 	protected FolderDAO folderDAO;
 
 	public HibernateVersionDAO() {

@@ -72,7 +72,7 @@ public class StandardSearchEngine implements SearchEngine {
 	@Resource(name = "ContextProperties")
 	private ContextProperties config;
 
-	@Resource(name = "DocumentDAO")
+	@Resource(name = "documentDAO")
 	protected DocumentDAO documentDao;
 
 	@Resource(name = "DocumentNoteDAO")

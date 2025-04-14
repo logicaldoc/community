@@ -23,7 +23,7 @@ public class PathCalculator extends Task {
 
 	public static final String NAME = "PathCalculator";
 	
-	@Resource(name = "FolderDAO")
+	@Resource(name = "folderDAO")
 	protected FolderDAO folderDao;
 
 	private long processed = 0;

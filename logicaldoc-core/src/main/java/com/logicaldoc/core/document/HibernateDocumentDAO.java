@@ -82,7 +82,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Resource(name = "DocumentNoteDAO")
 	private DocumentNoteDAO noteDAO;
 
-	@Resource(name = "FolderDAO")
+	@Resource(name = "folderDAO")
 	private FolderDAO folderDAO;
 
 	@Resource(name = "UserDAO")

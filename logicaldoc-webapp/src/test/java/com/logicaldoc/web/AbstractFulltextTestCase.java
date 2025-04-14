@@ -43,7 +43,7 @@ public abstract class AbstractFulltextTestCase extends AbstractWebappTestCase {
 	}
 
 	private void addHits() throws Exception {
-		DocumentDAO documentDao = (DocumentDAO) context.getBean("DocumentDAO");
+		DocumentDAO documentDao = (DocumentDAO) context.getBean("documentDAO");
 		Document document = documentDao.findById(1L);
 		documentDao.initialize(document);
 	

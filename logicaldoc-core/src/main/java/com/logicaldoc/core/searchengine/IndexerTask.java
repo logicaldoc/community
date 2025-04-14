@@ -62,7 +62,7 @@ public class IndexerTask extends Task {
 	@Resource(name = "documentManager")
 	protected DocumentManager documentManager;
 
-	@Resource(name = "DocumentDAO")
+	@Resource(name = "documentDAO")
 	protected DocumentDAO documentDao;
 
 	@Resource(name = "TenantDAO")

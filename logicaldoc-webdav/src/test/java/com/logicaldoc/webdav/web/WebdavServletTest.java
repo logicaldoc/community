@@ -57,7 +57,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		docDao = (DocumentDAO) context.getBean("DocumentDAO");
+		docDao = (DocumentDAO) context.getBean("documentDAO");
 	}
 
 	@Test

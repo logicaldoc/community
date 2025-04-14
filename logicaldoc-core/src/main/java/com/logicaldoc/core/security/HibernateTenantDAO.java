@@ -28,7 +28,7 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 	@Resource(name = "ContextProperties")
 	private ContextProperties config;
 
-	@Resource(name = "FolderDAO")
+	@Resource(name = "folderDAO")
 	private FolderDAO folderDao;
 
 	@Resource(name = "GroupDAO")

@@ -25,7 +25,7 @@ public class IndexOptimizer extends Task {
 	@Resource(name = "SearchEngine")
 	protected SearchEngine indexer;
 
-	@Resource(name = "DocumentDAO")
+	@Resource(name = "documentDAO")
 	protected DocumentDAO documentDao;
 
 	public IndexOptimizer() {

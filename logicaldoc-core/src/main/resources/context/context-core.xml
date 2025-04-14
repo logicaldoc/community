@@ -48,7 +48,7 @@
          <bean class="com.logicaldoc.core.folder.HibernateFolderHistoryDAO" />
       </property>
    </bean>
-   <bean id="FolderDAO" parent="ApplicationBaseTransactionProxy">
+   <bean id="folderDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
          <bean class="com.logicaldoc.core.folder.HibernateFolderDAO" />
       </property>
@@ -73,7 +73,7 @@
          <bean class="com.logicaldoc.core.document.HibernateVersionDAO" />
       </property>
    </bean>
-   <bean id="DocumentDAO" parent="ApplicationBaseTransactionProxy">
+   <bean id="documentDAO" parent="ApplicationBaseTransactionProxy">
       <property name="target">
          <bean class="com.logicaldoc.core.document.HibernateDocumentDAO" />
       </property>

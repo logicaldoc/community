@@ -55,10 +55,10 @@ public class StatsCollector extends Task {
 
 	public static final String NAME = "StatsCollector";
 
-	@Resource(name = "DocumentDAO")
+	@Resource(name = "documentDAO")
 	private DocumentDAO documentDAO;
 
-	@Resource(name = "FolderDAO")
+	@Resource(name = "folderDAO")
 	private FolderDAO folderDAO;
 
 	@Resource(name = "GroupDAO")

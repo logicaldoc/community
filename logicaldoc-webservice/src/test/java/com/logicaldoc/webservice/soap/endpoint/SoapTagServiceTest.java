@@ -26,7 +26,7 @@ public class SoapTagServiceTest extends AbstractWebserviceTestCase {
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		folderDao = (FolderDAO) context.getBean("FolderDAO");
+		folderDao = (FolderDAO) context.getBean("folderDAO");
 
 		tagService = new SoapTagService();
 		tagService.setValidateSession(false);
