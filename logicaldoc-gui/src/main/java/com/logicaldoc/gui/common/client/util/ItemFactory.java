@@ -1359,19 +1359,19 @@ public class ItemFactory {
 		Img img = null;
 
 		if (name.equals("logo.png"))
-			img = new Img(info.getBranding().getLogoSrc());
+			img = new Img(info.getBranding().getLogo());
 		else if (name.equals("logo_head.png"))
-			img = new Img(info.getBranding().getLogoHeadSrc());
+			img = new Img(info.getBranding().getLogoHead());
 		else if (name.equals("logo_oem.png"))
-			img = new Img(info.getBranding().getLogoOemSrc());
+			img = new Img(info.getBranding().getLogoOem());
 		else if (name.equals("logo_head_oem.png"))
-			img = new Img(info.getBranding().getLogoHeadOemSrc());
+			img = new Img(info.getBranding().getLogoHeadOem());
 		else if (name.equals("banner.png"))
-			img = new Img(info.getBranding().getBannerSrc());
+			img = new Img(info.getBranding().getBanner());
 		else if (name.equals("favicon.png"))
-			img = new Img(info.getBranding().getFaviconSrc());
+			img = new Img(info.getBranding().getFavicon());
 		else if (name.equals("logo_menu.png"))
-			img = new Img(info.getBranding().getLogoMenuSrc());
+			img = new Img(info.getBranding().getLogoMenu());
 		return img;
 	}
 

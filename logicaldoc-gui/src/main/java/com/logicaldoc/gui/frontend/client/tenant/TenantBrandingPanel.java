@@ -374,37 +374,37 @@ public class TenantBrandingPanel extends HLayout {
 		ListGridField image = prepareImageField();
 
 		grid.setFields(nameField, image);
-
+		
 		List<ListGridRecord> records = new ArrayList<>();
 
 		ListGridRecord rec = new ListGridRecord();
 		rec.setAttribute(NAME, "logo");
-		rec.setAttribute(IMAGE, tenant.getBranding().getLogoSrc());
+		rec.setAttribute(IMAGE, tenant.getBranding().getLogo());
 		records.add(rec);
 		rec = new ListGridRecord();
 		rec.setAttribute(NAME, LOGO_HEAD);
-		rec.setAttribute(IMAGE, tenant.getBranding().getLogoHeadSrc());
+		rec.setAttribute(IMAGE, tenant.getBranding().getLogoHead());
 		records.add(rec);
 		rec = new ListGridRecord();
 		rec.setAttribute(NAME, LOGO_MENU);
-		rec.setAttribute(IMAGE, tenant.getBranding().getLogoMenuSrc());
+		rec.setAttribute(IMAGE, tenant.getBranding().getLogoMenu());
 		records.add(rec);
 		rec = new ListGridRecord();
 		rec.setAttribute(NAME, BANNER);
-		rec.setAttribute(IMAGE, tenant.getBranding().getBannerSrc());
+		rec.setAttribute(IMAGE, tenant.getBranding().getBanner());
 		records.add(rec);
 
 		rec = new ListGridRecord();
 		rec.setAttribute(NAME, LOGO_OEM);
-		rec.setAttribute(IMAGE, tenant.getBranding().getLogoOemSrc());
+		rec.setAttribute(IMAGE, tenant.getBranding().getLogoOem());
 		records.add(rec);
 		rec = new ListGridRecord();
 		rec.setAttribute(NAME, LOGO_HEAD_OEM);
-		rec.setAttribute(IMAGE, tenant.getBranding().getLogoHeadOemSrc());
+		rec.setAttribute(IMAGE, tenant.getBranding().getLogoHeadOem());
 		records.add(rec);
 		rec = new ListGridRecord();
 		rec.setAttribute(NAME, FAVICON);
-		rec.setAttribute(IMAGE, tenant.getBranding().getFaviconSrc());
+		rec.setAttribute(IMAGE, tenant.getBranding().getFavicon());
 		records.add(rec);
 		grid.setRecords(records.toArray(new ListGridRecord[0]));
 
@@ -424,30 +424,32 @@ public class TenantBrandingPanel extends HLayout {
 		image.setCanSort(false);
 		image.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> {
 			String html = "";
+			String maxWidth = "400px";
 			String name = rec.getAttributeAsString(NAME);
 			if (name.equals("logo"))
-				html = tenant.getBranding().getLogoSrc();
+				html = tenant.getBranding().getLogo();
 			else if (name.equals(LOGO_HEAD))
-				html = tenant.getBranding().getLogoHeadSrc();
+				html = tenant.getBranding().getLogoHead();
 			else if (name.equals(LOGO_MENU))
-				html = tenant.getBranding().getLogoMenuSrc();
+				html = tenant.getBranding().getLogoMenu();
 			else if (name.equals(LOGO_OEM))
-				html = tenant.getBranding().getLogoOemSrc();
+				html = tenant.getBranding().getLogoOem();
 			else if (name.equals(LOGO_HEAD_OEM))
-				html = tenant.getBranding().getLogoHeadOemSrc();
+				html = tenant.getBranding().getLogoHeadOem();
 			else if (name.equals(BANNER))
-				html = tenant.getBranding().getBannerSrc();
-			else if (name.equals(FAVICON))
-				html = tenant.getBranding().getFaviconSrc();
+				html = tenant.getBranding().getBanner();
+			else if (name.equals(FAVICON)) {
+				html = tenant.getBranding().getFavicon();
+				maxWidth = "64px";
+			}
 
-			if (html != null && !html.isEmpty()) {
+			if (html != null && !html.isEmpty()) {			
+				html = "<img src='" + html + "' style='margin-top:4px; margin-bottom:4px; max-width: "+maxWidth+";'/>";
 
-				html = "<img src='" + html + "' style='margin-top:4px; margin-bottom:4px;'/>";
-
-				// In chase of header logos, show the banner below
+				// In case of header logos, show the banner below
 				if (name.contains("_head")) {
-					html = "<div style=\" background-image: url('" + tenant.getBranding().getBannerSrc()
-							+ "'); width:100%; margin-top:4px; margin-bottom:4px; \">" + html + "</div>";
+					html = "<div style=\" background-image: url('" + tenant.getBranding().getBanner()
+							+ "'); width:100%; margin:4px; \">" + html + "</div>";
 				} else {
 					html = "<div style='width:100%; margin-top:4px; margin-bottom:4px;'>" + html + "</div>";
 				}
@@ -473,25 +475,25 @@ public class TenantBrandingPanel extends HLayout {
 
 			String image = "";
 			if ("logo".equals(name)) {
-				tenant.getBranding().setLogoSrc(model.getLogoSrc());
+				tenant.getBranding().setLogo(model.getLogo());
 				image = model.getLogo();
 			} else if (LOGO_HEAD.equals(name)) {
-				tenant.getBranding().setLogoHeadSrc(model.getLogoHeadSrc());
+				tenant.getBranding().setLogoHead(model.getLogoHead());
 				image = model.getLogoHead();
 			} else if (LOGO_MENU.equals(name)) {
-				tenant.getBranding().setLogoMenuSrc(model.getLogoMenuSrc());
+				tenant.getBranding().setLogoMenu(model.getLogoMenu());
 				image = model.getLogoMenu();
 			} else if (LOGO_OEM.equals(name)) {
-				tenant.getBranding().setLogoOemSrc(model.getLogoOemSrc());
+				tenant.getBranding().setLogoOem(model.getLogoOem());
 				image = model.getLogoOem();
 			} else if (LOGO_HEAD_OEM.equals(name)) {
-				tenant.getBranding().setLogoHeadOemSrc(model.getLogoHeadOemSrc());
+				tenant.getBranding().setLogoHeadOem(model.getLogoHeadOem());
 				image = model.getLogoHeadOem();
 			} else if (FAVICON.equals(name)) {
-				tenant.getBranding().setFaviconSrc(model.getFaviconSrc());
+				tenant.getBranding().setFavicon(model.getFavicon());
 				image = model.getFavicon();
 			} else if (BANNER.equals(name)) {
-				tenant.getBranding().setBannerSrc(model.getBannerSrc());
+				tenant.getBranding().setBanner(model.getBanner());
 				image = model.getBanner();
 			}
 
@@ -509,23 +511,23 @@ public class TenantBrandingPanel extends HLayout {
 
 	void updateImage(String imageName, String imageContent) {
 		String content = imageContent;
-		if (content.startsWith(GUIBranding.SRC_PREFIX))
-			content = GUIBranding.SRC_PREFIX + imageContent;
+		if (!content.startsWith(GUIBranding.DATA_PREFIX))
+			content = GUIBranding.PNG_PREFIX + imageContent;
 
 		if (imageName.equals("logo"))
-			tenant.getBranding().setLogoSrc(content);
+			tenant.getBranding().setLogo(content);
 		else if (imageName.equals(LOGO_HEAD))
-			tenant.getBranding().setLogoHeadSrc(content);
+			tenant.getBranding().setLogoHead(content);
 		else if (imageName.equals(LOGO_MENU))
-			tenant.getBranding().setLogoMenuSrc(content);
+			tenant.getBranding().setLogoMenu(content);
 		else if (imageName.equals(LOGO_OEM))
-			tenant.getBranding().setLogoOemSrc(content);
+			tenant.getBranding().setLogoOem(content);
 		else if (imageName.equals(LOGO_HEAD_OEM))
-			tenant.getBranding().setLogoHeadOemSrc(content);
+			tenant.getBranding().setLogoHeadOem(content);
 		else if (imageName.equals(BANNER))
-			tenant.getBranding().setBannerSrc(content);
+			tenant.getBranding().setBanner(content);
 		else if (imageName.equals(FAVICON))
-			tenant.getBranding().setFaviconSrc(content);
+			tenant.getBranding().setFavicon(content);
 
 		Record rec = null;
 
