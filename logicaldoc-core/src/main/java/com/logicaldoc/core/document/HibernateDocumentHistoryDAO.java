@@ -36,10 +36,12 @@ public class HibernateDocumentHistoryDAO extends HibernateHistoryDAO<DocumentHis
 	}
 
 	@Override
-	public List<DocumentHistory> findByDocIdAndEvent(long docId, String event) throws PersistenceException {
-		StringBuilder query = new StringBuilder(" " + ENTITY + ".docId = " + docId);
-		if (StringUtils.isNotEmpty(event))
-			query.append(AND + ENTITY + ".event='" + SqlUtil.doubleQuotes(event) + "'");
+	public List<DocumentHistory> findByDocIdAndEvent(long docId, DocumentEvent event) throws PersistenceException {
+		StringBuilder query = new StringBuilder(ENTITY + ".docId = " + docId);
+
+		if (event != null && StringUtils.isNotEmpty(event.toString()))
+			query.append(AND + ENTITY + ".event='" + SqlUtil.doubleQuotes(event.toString()) + "'");
+
 		return findByWhere(query.toString(), ENTITY + ".date desc", null);
 	}
 

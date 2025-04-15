@@ -110,9 +110,9 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 			store.exists(doc.getId(), res);
 		}
 
-		Version version = Version.create(doc, user, "", DocumentEvent.STORED.toString(), true);
+		Version version = Version.create(doc, user, "", DocumentEvent.STORED, true);
 		testSubject.store(version);
-		assertEquals("1.0", testSubject.findById(version.getId()).getVersion());
+		assertEquals("2.0", testSubject.findById(version.getId()).getVersion());
 
 		String resourceName = store.getResourceName(doc.getId(), version.getFileVersion(), null);
 		try (InputStream is = this.getClass().getResourceAsStream("/data.sql")) {
@@ -125,9 +125,9 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 			store.exists(doc.getId(), res);
 		}
 
-		version = Version.create(doc, user, "", DocumentEvent.CHANGED.toString(), true);
+		version = Version.create(doc, user, "", DocumentEvent.CHANGED, true);
 		testSubject.store(version);
-		assertEquals("2.0", version.getVersion());
+		assertEquals("3.0", version.getVersion());
 
 		resourceName = store.getResourceName(doc.getId(), version.getFileVersion(), null);
 		try (InputStream is = this.getClass().getResourceAsStream("/data.sql")) {
@@ -140,9 +140,9 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 			store.exists(doc.getId(), res);
 		}
 
-		version = Version.create(doc, user, "", DocumentEvent.CHECKEDIN.toString(), false);
+		version = Version.create(doc, user, "", DocumentEvent.CHECKEDIN, false);
 		testSubject.store(version);
-		assertEquals("2.1", version.getVersion());
+		assertEquals("3.1", version.getVersion());
 
 		resourceName = store.getResourceName(doc.getId(), version.getFileVersion(), null);
 		try (InputStream is = this.getClass().getResourceAsStream("/data.sql")) {
@@ -170,9 +170,9 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		assertNotNull(doc1);
 		assertEquals("1.0", doc1.getVersion());
 
-		version = Version.create(doc1, user, "", DocumentEvent.STORED.toString(), false);
+		version = Version.create(doc1, user, "", DocumentEvent.STORED, false);
 		testSubject.store(version);
-		assertEquals("1.0", testSubject.findById(version.getId()).getVersion());
+		assertEquals("1.1", testSubject.findById(version.getId()).getVersion());
 	}
 
 	@Test
@@ -198,7 +198,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		userDao.initialize(user);
 		assertNotNull(user);
 
-		assertNotNull(Version.create(doc, user, "testVersion", "testing", false));
+		assertNotNull(Version.create(doc, user, "testVersion", DocumentEvent.COPYED, false));
 
 		Version version1 = new Version();
 		version1.setComment("version1Comment");

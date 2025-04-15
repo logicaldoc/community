@@ -58,6 +58,16 @@ public class UserHistory extends History {
 		this.docId = source.docId;
 	}
 
+	public void setEvent(UserEvent event) {
+		this.event = (event != null) ? event.toString() : null;
+	}
+
+	public UserEvent getEventEnum() {
+		if (event == null)
+			return null;
+		return UserEvent.fromKey(event);
+	}
+
 	public Long getFolderId() {
 		return folderId;
 	}

@@ -82,7 +82,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * user
 	 * 
 	 * @param userId The user id(optional)
-	 * @param status The status code(optional)
+	 * @param status The status(optional)
 	 * 
 	 * @return Collection of all Documents locked by the specified user and of
 	 *         the specified status.
@@ -298,7 +298,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	/**
 	 * Finds all documents by the indexing status. Order by ascending lastModifed
 	 * 
-	 * @param indexingStatus the indexed property
+	 * @param indexingStatus the indexing status
 	 * @return Collection of all documents
 	 * 
 	 * @throws PersistenceException error at data layer
@@ -315,7 +315,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
-	public long countByIndexed(int indexed) throws PersistenceException;
+	public long countByIndexed(IndexingStatus indexingStatus) throws PersistenceException;
 
 	/**
 	 * Restores a previously deleted document

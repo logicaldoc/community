@@ -484,7 +484,7 @@ public class LDRepository {
 
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
-			transaction.setEvent(DocumentEvent.STORED.toString());
+			transaction.setEvent(DocumentEvent.STORED);
 			transaction.setUser(getSessionUser(context));
 			transaction.setComment("");
 
@@ -763,7 +763,7 @@ public class LDRepository {
 				FolderHistory transaction = new FolderHistory();
 				transaction.setUser(getSessionUser(context));
 				transaction.setSessionId(sid);
-				transaction.setEvent(FolderEvent.MOVED.toString());
+				transaction.setEvent(FolderEvent.MOVED);
 
 				folderDao.move((Folder) object, target, transaction);
 
@@ -782,7 +782,7 @@ public class LDRepository {
 			if (object instanceof Folder folder) {
 				FolderHistory transaction = new FolderHistory();
 				transaction.setUser(user);
-				transaction.setEvent(FolderEvent.DELETED.toString());
+				transaction.setEvent(FolderEvent.DELETED);
 				transaction.setSessionId(sid);
 
 				folderDao.delete(folder.getId(), transaction);
@@ -790,7 +790,7 @@ public class LDRepository {
 				Document doc = (Document) object;
 				DocumentHistory transaction = new DocumentHistory();
 				transaction.setUser(user);
-				transaction.setEvent(FolderEvent.DELETED.toString());
+				transaction.setEvent(DocumentEvent.DELETED);
 				transaction.setSessionId(sid);
 
 				documentDao.delete(doc.getId(), transaction);
@@ -875,7 +875,7 @@ public class LDRepository {
 				Document doc = (Document) object;
 				DocumentHistory transaction = new DocumentHistory();
 				transaction.setUser(getSessionUser(context));
-				transaction.setEvent(FolderEvent.DELETED.toString());
+				transaction.setEvent(DocumentEvent.DELETED);
 				transaction.setSessionId(sid);
 
 				documentDao.delete(doc.getId(), transaction);
@@ -953,7 +953,7 @@ public class LDRepository {
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
-			transaction.setEvent(DocumentEvent.CHECKEDOUT.toString());
+			transaction.setEvent(DocumentEvent.CHECKEDOUT);
 			transaction.setComment("");
 			transaction.setUser(getSessionUser());
 
@@ -979,15 +979,14 @@ public class LDRepository {
 
 			Document doc = (Document) object;
 
-			if (doc.getStatus() == DocumentStatus.CHECKEDOUT
-					&& ((getSessionUser().getId() != doc.getLockUserId())
-							&& (!getSessionUser().isMemberOf(Group.GROUP_ADMIN))))
+			if (doc.getStatus() == DocumentStatus.CHECKEDOUT && ((getSessionUser().getId() != doc.getLockUserId())
+					&& (!getSessionUser().isMemberOf(Group.GROUP_ADMIN))))
 				throw new CmisPermissionDeniedException("You can't change the checkout status on this object!");
 
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
-			transaction.setEvent(DocumentEvent.UNLOCKED.toString());
+			transaction.setEvent(DocumentEvent.UNLOCKED);
 			transaction.setComment("");
 			transaction.setUser(getSessionUser());
 
@@ -1012,16 +1011,15 @@ public class LDRepository {
 
 			Document doc = (Document) object;
 
-			if (doc.getStatus() == DocumentStatus.CHECKEDOUT
-					&& ((getSessionUser().getId() != doc.getLockUserId())
-							&& (!getSessionUser().isMemberOf(Group.GROUP_ADMIN)))) {
+			if (doc.getStatus() == DocumentStatus.CHECKEDOUT && ((getSessionUser().getId() != doc.getLockUserId())
+					&& (!getSessionUser().isMemberOf(Group.GROUP_ADMIN)))) {
 				throw new CmisPermissionDeniedException(
 						String.format("You can't do a checkin on object %s!", objectId.getValue()));
 			}
 
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
-			transaction.setEvent(DocumentEvent.CHECKEDIN.toString());
+			transaction.setEvent(DocumentEvent.CHECKEDIN);
 			transaction.setUser(getSessionUser());
 			transaction.setComment(checkinComment);
 
@@ -1207,7 +1205,7 @@ public class LDRepository {
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
-			transaction.setEvent(DocumentEvent.DOWNLOADED.toString());
+			transaction.setEvent(DocumentEvent.DOWNLOADED);
 			transaction.setComment("");
 			transaction.setUser(getSessionUser(context));
 			transaction.setDocId(doc.getId());
@@ -1929,7 +1927,7 @@ public class LDRepository {
 		} else {
 			addPropertyInteger(result, typeId, filter, TypeManager.PROP_RATING, 0);
 		}
-		
+
 		addPropertyString(result, typeId, filter, TypeManager.PROP_FILEVERSION, doc.getFileVersion());
 		addPropertyString(result, typeId, filter, TypeManager.PROP_VERSION, doc.getVersion());
 		addPropertyString(result, typeId, filter, TypeManager.PROP_CUSTOMID, doc.getCustomId());
@@ -2288,7 +2286,7 @@ public class LDRepository {
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setUser(getSessionUser());
 			transaction.setSessionId(sid);
-			transaction.setEvent(DocumentEvent.CHANGED.toString());
+			transaction.setEvent(DocumentEvent.CHANGED);
 			Document actualDoc = documentDao.findById(document.getId());
 			documentDao.initialize(actualDoc);
 			document.setId(0);
@@ -2305,7 +2303,7 @@ public class LDRepository {
 			transaction.setSessionId(sid);
 
 			// FolderEvent.RENAMED for the LDSynch
-			transaction.setEvent(FolderEvent.CHANGED.toString());
+			transaction.setEvent(FolderEvent.CHANGED);
 			folderDao.store(folder, transaction);
 		}
 

@@ -28,21 +28,31 @@ public class DocumentHistory extends AbstractDocumentHistory {
 
 	@Column(name = "ld_new")
 	private int isNew = 1;
-	
+
 	@Transient
 	private String file = null;
 
 	public DocumentHistory() {
 		super();
 	}
-	
+
 	public DocumentHistory(DocumentHistory source) {
 		copyAttributesFrom(source);
 		this.color = source.color;
 		setFile(source.getFile());
 		setIsNew(source.getIsNew());
 	}
-	
+
+	public void setEvent(DocumentEvent event) {
+		this.event = (event != null) ? event.toString() : null;
+	}
+
+	public DocumentEvent getEventEnum() {
+		if (event == null)
+			return null;
+		return DocumentEvent.fromKey(event);
+	}
+
 	public String getFile() {
 		return file;
 	}

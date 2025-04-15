@@ -91,7 +91,7 @@ public class InMemoryZipImport extends ZipImport {
 				doc.setFolder(folder);
 
 				DocumentHistory history = new DocumentHistory();
-				history.setEvent(DocumentEvent.STORED.toString());
+				history.setEvent(DocumentEvent.STORED);
 				history.setComment("");
 				history.setUser(user);
 				history.setSessionId(sessionId);

@@ -196,7 +196,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 		// Add a user history entry
 		UserHistoryDAO userHistoryDAO = Context.get(UserHistoryDAO.class);
-		userHistoryDAO.createUserHistory(user, UserEvent.TIMEOUT.toString(), null, sid, client);
+		userHistoryDAO.createUserHistory(user, UserEvent.TIMEOUT, null, sid, client);
 	}
 
 	public void setClosed() {
@@ -208,7 +208,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 		// Add a user history entry
 		UserHistoryDAO userHistoryDAO = Context.get(UserHistoryDAO.class);
-		userHistoryDAO.createUserHistory(user, UserEvent.LOGOUT.toString(), null, sid, client);
+		userHistoryDAO.createUserHistory(user, UserEvent.LOGOUT, null, sid, client);
 	}
 
 	public String getDecodedKey() {
@@ -350,7 +350,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 		// Add a user history entry
 		UserHistoryDAO userHistoryDAO = Context.get(UserHistoryDAO.class);
-		UserHistory history = userHistoryDAO.createUserHistory(user, UserEvent.LOGIN.toString(), historyComment, sid,
+		UserHistory history = userHistoryDAO.createUserHistory(user, UserEvent.LOGIN, historyComment, sid,
 				client);
 
 		// Update the last login into the DB

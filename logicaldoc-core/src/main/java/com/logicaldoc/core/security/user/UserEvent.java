@@ -8,42 +8,33 @@ package com.logicaldoc.core.security.user;
  */
 public enum UserEvent {
 
-	LOGIN("event.user.login"),
-	LOGIN_FAILED("event.user.login.failed"),
-	LOGOUT("event.user.logout"),
-    TIMEOUT("event.user.timeout"),
-    PASSWORDCHANGED("event.user.passwordchanged"),
-    TWOFACHANGED("event.user.2fachanged"),
-    DELETED("event.user.deleted"),
-    FILE_CONVERSION("event.user.fileconversion"),
-    MESSAGE_RECEIVED("event.user.messagereceived"),
-    CREATED("event.user.created"),
-    UPDATED("event.user.updated"),
-    DISABLED("event.user.disabled"),
-    ENABLED("event.user.enabled"),
-    NEWAPIKEY("event.user.newapikey"),
-    SEARCH("event.user.search"),
-    AI_QUERY("event.user.aiquery");
-	
-    private String event;
+	LOGIN, LOGIN_FAILED, LOGOUT, TIMEOUT, PASSWORDCHANGED, TWOFACHANGED, DELETED, FILE_CONVERSION, MESSAGE_RECEIVED, CREATED, UPDATED, DISABLED, ENABLED, NEWAPIKEY, SEARCH, AI_QUERY;
 
-	UserEvent(String event) {
-	    this.event = event;
+	/**
+	 * Gets the right enumeration entry from the corresponding resource bundle
+	 * key
+	 * 
+	 * @param key the resource bundle key
+	 * 
+	 * @return The corresponding entry
+	 */
+	public static UserEvent fromKey(String key) {
+		return UserEvent
+				.valueOf(key.contains(".") ? key.replace("event.user.", "").toUpperCase().replace(".", "_") : key);
+	}
+
+	/**
+	 * Converts the enumeration entry to the corresponding key in the resource
+	 * bundle
+	 * 
+	 * @return The key
+	 */
+	public String toKey() {
+		return "event.user." + name().toLowerCase().replace("_", ".");
 	}
 
 	@Override
 	public String toString() {
-	    return this.event;
+		return toKey();
 	}
-
-	public static UserEvent fromString(String event) {
-	    if (event != null) {
-	      for (UserEvent b : UserEvent.values()) {
-	        if (event.equalsIgnoreCase(b.event)) {
-	          return b;
-	        }
-	      }
-	    }
- 	    return null;
-    }
 }

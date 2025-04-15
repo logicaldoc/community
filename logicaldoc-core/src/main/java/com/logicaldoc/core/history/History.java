@@ -42,7 +42,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	@Column(name = "ld_date")
 	private Date date = new Date();
-	
+
 	@Column(name = "ld_userid")
 	private Long userId;
 
@@ -53,7 +53,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 	private String userLogin = "";
 
 	@Column(name = "ld_event", length = 255)
-	private String event = "";
+	protected String event = "";
 
 	/**
 	 * Comment left in regards of this event
@@ -63,7 +63,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	@Column(name = "ld_path")
 	private String path = null;
-	
+
 	/**
 	 * Used to mark this event notified by the auditing system
 	 */
@@ -127,13 +127,6 @@ public abstract class History extends PersistentObject implements Comparable<His
 	 */
 	public String getEvent() {
 		return event;
-	}
-
-	/**
-	 * @param event The event to set.
-	 */
-	public void setEvent(String event) {
-		this.event = event;
 	}
 
 	/**
@@ -308,7 +301,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 		setDate(source.getDate());
 		setCreation(source.getCreation());
 		setUser(source.getUser());
-		setEvent(source.getEvent());
+		this.event = source.event;
 		setComment(source.getComment());
 		setPath(source.getPath());
 		setNotified(source.getNotified());

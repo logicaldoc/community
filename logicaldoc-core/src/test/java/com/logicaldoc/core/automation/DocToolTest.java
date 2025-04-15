@@ -338,7 +338,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 		List<DocumentHistory> result = testSubject.getHistories(1L, null);
 		assertEquals(3, result.size());
 
-		result = testSubject.getHistories(1L, DocumentEvent.STORED.toString());
+		result = testSubject.getHistories(1L, DocumentEvent.STORED);
 		assertEquals(0, result.size());
 	}
 

@@ -161,7 +161,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId("123");
-		transaction.setEvent(DocumentEvent.DELETED.toString());
+		transaction.setEvent(DocumentEvent.DELETED);
 		transaction.setComment("");
 		transaction.setUser(new User());
 
@@ -196,7 +196,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId("123");
-		transaction.setEvent(DocumentEvent.DELETED.toString());
+		transaction.setEvent(DocumentEvent.DELETED);
 		transaction.setUser(new User());
 
 		List<Document> documentsToDelete = Arrays.asList(retrievedDoc1, retrievedDoc2);
@@ -777,8 +777,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testCountByIndexed() throws PersistenceException {
-		assertEquals(2L, testSubject.countByIndexed(0));
-		assertEquals(4L, testSubject.countByIndexed(1));
+		assertEquals(2L, testSubject.countByIndexed(IndexingStatus.TO_INDEX));
+		assertEquals(4L, testSubject.countByIndexed(IndexingStatus.INDEXED));
 	}
 
 	@Test

@@ -207,7 +207,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 			FolderDAO fdao = Context.get(FolderDAO.class);
 			history.setPath(fdao.computePathExtended(doc.getFolder().getId()));
-			history.setEvent(DocumentEvent.DOWNLOADED.toString());
+			history.setEvent(DocumentEvent.DOWNLOADED);
 
 			try {
 				ddao.saveDocumentHistory(doc, history);
@@ -346,7 +346,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 				FolderDAO fdao = Context.get(FolderDAO.class);
 				history.setPath(fdao.computePathExtended(root.getId()));
-				history.setEvent(DocumentEvent.STORED.toString());
+				history.setEvent(DocumentEvent.STORED);
 
 				manager.create(temp, docVO, history);
 			}

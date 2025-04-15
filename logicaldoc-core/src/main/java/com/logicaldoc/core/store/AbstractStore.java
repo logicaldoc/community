@@ -387,7 +387,7 @@ public abstract class AbstractStore implements Store {
 
 		DocumentHistoryDAO documentHistoryDAO = Context.get(DocumentHistoryDAO.class);
 		DocumentHistory history = new DocumentHistory();
-		history.setEvent(DocumentEvent.RESOURCE_DELETED.toString());
+		history.setEvent(DocumentEvent.RESOURCE_DELETED);
 		history.setDocId(docId);
 		history.setComment(path);
 		history.setFilename(StringUtils.right(path, 255));

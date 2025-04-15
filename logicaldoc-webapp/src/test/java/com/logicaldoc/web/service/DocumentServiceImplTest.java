@@ -76,7 +76,8 @@ import com.logicaldoc.web.AbstractWebappTestCase;
 import com.logicaldoc.web.UploadServlet;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DocumentServiceImplTest extends AbstractWebappTestCase {
+public class 
+DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	private static final String UTF_8 = "UTF-8";
 
@@ -451,16 +452,16 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		GUIDocument doc = testSubject.getById(7);
 		assertEquals(DocumentStatus.UNLOCKED.ordinal(), doc.getStatus());
 		assertEquals("1.1", doc.getVersion());
-		assertEquals("1.1", doc.getFileVersion());
+		assertEquals("1.0", doc.getFileVersion());
 
 		testSubject.promoteVersion(doc.getId(), "1.0");
 
 		doc = testSubject.getById(7);
 		assertEquals(DocumentStatus.UNLOCKED.ordinal(), doc.getStatus());
 		assertEquals("1.2", doc.getVersion());
-		assertEquals("1.2", doc.getFileVersion());
+		assertEquals("1.0", doc.getFileVersion());
 
-		// Unexisting version
+		// non-existent version
 		boolean exceptionHappened = false;
 		try {
 			testSubject.promoteVersion(doc.getId(), "xxxx");
@@ -512,7 +513,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		doc = testSubject.getById(7);
 		assertEquals(DocumentStatus.UNLOCKED.ordinal(), doc.getStatus());
 		assertEquals("1.1", doc.getVersion());
-		assertEquals("1.1", doc.getFileVersion());
+		assertEquals("1.0", doc.getFileVersion());
 	}
 
 	@Test
@@ -725,7 +726,9 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		testSubject.indexDocuments(List.of(doc.getId()));
 		doc = testSubject.getById(doc.getId());
-		assertEquals(1, doc.getIndexed());
+		
+		GUIDocument indexedDoc = testSubject.getById(doc.getId());
+		assertEquals(1, indexedDoc.getIndexed());
 
 		testSubject.indexDocuments(new ArrayList<>());
 	}

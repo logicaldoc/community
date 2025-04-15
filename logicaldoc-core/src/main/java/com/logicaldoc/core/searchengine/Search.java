@@ -220,7 +220,7 @@ public abstract class Search {
 			transaction = new UserHistory();
 		transaction.setUser(searchUser);
 		transaction.setComment(StringUtils.left(options.toString(), 500));
-		transaction.setEvent(UserEvent.SEARCH.toString());
+		transaction.setEvent(UserEvent.SEARCH);
 		try {
 			historyDao.store(transaction);
 		} catch (PersistenceException e) {

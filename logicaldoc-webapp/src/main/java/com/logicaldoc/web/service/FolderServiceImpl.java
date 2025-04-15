@@ -102,7 +102,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				executeLongRunningOperation("Apply Rights to Tree", () -> {
 					FolderHistory history = new FolderHistory();
 					history.setSession(session);
-					history.setEvent(FolderEvent.PERMISSION.toString());
+					history.setEvent(FolderEvent.PERMISSION);
 					try {
 						fdao.applySecurityToTree(guiFolder.getId(), history);
 					} catch (PersistenceException e) {
@@ -155,7 +155,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		// Add a folder history entry
 		FolderHistory transaction = new FolderHistory();
 		transaction.setSession(session);
-		transaction.setEvent(FolderEvent.DELETED.toString());
+		transaction.setEvent(FolderEvent.DELETED);
 		dao.deleteTree(folderId, PersistentObject.DELETED_CODE_DEFAULT, transaction);
 	}
 
@@ -573,7 +573,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			FolderHistory history = new FolderHistory();
 			history.setFilenameOld(folder.getName());
 			history.setPathOld(dao.computePathExtended(folderId));
-			history.setEvent(FolderEvent.RENAMED.toString());
+			history.setEvent(FolderEvent.RENAMED);
 			history.setSession(session);
 
 			folder.setName(name.trim());
@@ -620,13 +620,13 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 					folder.setMaxVersions(guiFolder.getMaxVersions());
 				}
 
-				saveTransaction.setEvent(FolderEvent.CHANGED.toString());
+				saveTransaction.setEvent(FolderEvent.CHANGED);
 
 				if (!folder.getName().trim().equals(folderName)) {
 					folder.setName(folderName.trim());
 
 					renameTransaction = new FolderHistory();
-					renameTransaction.setEvent(FolderEvent.RENAMED.toString());
+					renameTransaction.setEvent(FolderEvent.RENAMED);
 					renameTransaction.setFilenameOld(folder.getName());
 					renameTransaction.setPathOld(folderDao.computePathExtended(folder.getId()));
 					renameTransaction.setSession(session);
@@ -674,7 +674,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 		FolderHistory transaction = new FolderHistory();
 		transaction.setSession(session);
-		transaction.setEvent(FolderEvent.CREATED.toString());
+		transaction.setEvent(FolderEvent.CREATED);
 
 		Folder folderVO = new Folder();
 		folderVO.setName(folderName);
@@ -722,7 +722,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		// Prepare the transaction
 		FolderHistory transaction = new FolderHistory();
 		transaction.setSession(session);
-		transaction.setEvent(FolderEvent.CREATED.toString());
+		transaction.setEvent(FolderEvent.CREATED);
 
 		// Finally create the alias
 		Folder f;
@@ -783,7 +783,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 
 		// Add a folder history entry
 		FolderHistory history = new FolderHistory();
-		history.setEvent(FolderEvent.PERMISSION.toString());
+		history.setEvent(FolderEvent.PERMISSION);
 		history.setSession(session);
 		fdao.store(folder, history);
 	}
@@ -833,7 +833,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				// Check if the selected document is a shortcut
 				if (doc.getDocRef() != null) {
 					if (doc.getFolder().getId() != selectedFolderFolder.getId()) {
-						transaction.setEvent(DocumentEvent.SHORTCUT_MOVED.toString());
+						transaction.setEvent(DocumentEvent.SHORTCUT_MOVED);
 						docManager.moveToFolder(doc, selectedFolderFolder, transaction);
 					} else
 						continue;
@@ -855,8 +855,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	private void checkLocked(Document doc) throws PermissionException {
-		if (doc.getStatus() != DocumentStatus.UNLOCKED
-				|| doc.getExportStatus() != AbstractDocument.EXPORT_UNLOCKED) {
+		if (doc.getStatus() != DocumentStatus.UNLOCKED || doc.getExportStatus() != AbstractDocument.EXPORT_UNLOCKED) {
 			throw new PermissionException("Document " + doc.getId() + " is locked");
 		}
 	}
@@ -880,14 +879,14 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				// Create the document history event
 				DocumentHistory transaction = new DocumentHistory();
 				transaction.setSession(session);
-				transaction.setEvent(DocumentEvent.STORED.toString());
+				transaction.setEvent(DocumentEvent.STORED);
 				transaction.setComment("");
 
 				if (doc.getDocRef() == null) {
 					docManager.copyToFolder(doc, selectedFolderFolder, transaction, links, notes, security);
 				} else {
 					if (doc.getFolder().getId() != selectedFolderFolder.getId()) {
-						transaction.setEvent(DocumentEvent.SHORTCUT_STORED.toString());
+						transaction.setEvent(DocumentEvent.SHORTCUT_STORED);
 						docManager.copyToFolder(doc, selectedFolderFolder, transaction, false, false, false);
 					}
 				}
@@ -913,7 +912,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				// Create the document history event
 				DocumentHistory transaction = new DocumentHistory();
 				transaction.setSession(session);
-				transaction.setEvent(DocumentEvent.SHORTCUT_STORED.toString());
+				transaction.setEvent(DocumentEvent.SHORTCUT_STORED);
 				transaction.setComment("");
 
 				if (doc.getFolder().getId() != selectedFolderFolder.getId())

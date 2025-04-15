@@ -65,13 +65,13 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
-import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.DocumentLink;
 import com.logicaldoc.core.document.DocumentLinkDAO;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.DocumentNoteDAO;
 import com.logicaldoc.core.document.DocumentStatus;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.Rating;
 import com.logicaldoc.core.document.RatingDAO;
 import com.logicaldoc.core.document.Version;
@@ -317,7 +317,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 					// Create the document history event
 					DocumentHistory transaction = new DocumentHistory();
 					transaction.setSession(session);
-					transaction.setEvent(DocumentEvent.STORED.toString());
+					transaction.setEvent(DocumentEvent.STORED);
 					transaction.setComment(HTMLSanitizer.sanitizeSimpleText(metadata.getComment()));
 
 					/*
@@ -413,7 +413,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSession(session);
-		transaction.setEvent(DocumentEvent.CHECKEDIN.toString());
+		transaction.setEvent(DocumentEvent.CHECKEDIN);
 		transaction.setComment(HTMLSanitizer.sanitizeSimpleText(document.getComment()));
 
 		Document doc;
@@ -631,7 +631,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSession(session);
-			transaction.setEvent(DocumentEvent.CHECKEDOUT.toString());
+			transaction.setEvent(DocumentEvent.CHECKEDOUT);
 			for (long id : docIds) {
 				Document doc = dao.findDocument(id);
 				if (doc != null)
@@ -654,7 +654,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSession(session);
-		transaction.setEvent(DocumentEvent.LOCKED.toString());
+		transaction.setEvent(DocumentEvent.LOCKED);
 		transaction.setComment(HTMLSanitizer.sanitizeSimpleText(comment));
 
 		try {
@@ -690,13 +690,13 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSession(session);
-		transaction.setEvent(DocumentEvent.DELETED.toString());
+		transaction.setEvent(DocumentEvent.DELETED);
 		transaction.setComment("");
 
 		// If it is a shortcut, we delete only the shortcut
 		if (doc.getDocRef() != null
 				|| (doc.getImmutable() == 1 && !transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
-			transaction.setEvent(DocumentEvent.SHORTCUT_DELETED.toString());
+			transaction.setEvent(DocumentEvent.SHORTCUT_DELETED);
 			dao.delete(doc.getId(), transaction);
 			return;
 		}
@@ -1175,8 +1175,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSession(session);
-			transaction.setEvent(
-					document.getId() == 0L ? DocumentEvent.CHANGED.toString() : DocumentEvent.STORED.toString());
+			transaction.setEvent(document.getId() == 0L ? DocumentEvent.CHANGED : DocumentEvent.STORED);
 			transaction.setComment(HTMLSanitizer.sanitizeSimpleText(document.getComment()));
 
 			Validator validator = new Validator();
@@ -1241,7 +1240,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSession(session);
-			transaction.setEvent(DocumentEvent.CHANGED.toString());
+			transaction.setEvent(DocumentEvent.CHANGED);
 			transaction.setComment(HTMLSanitizer.sanitizeSimpleText(guiDocument.getComment()));
 
 			DocumentManager documentManager = Context.get(DocumentManager.class);
@@ -1541,7 +1540,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSession(session);
-			transaction.setEvent(DocumentEvent.DOWNLOADED.toString());
+			transaction.setEvent(DocumentEvent.DOWNLOADED);
 
 			ZipExport export = new ZipExport();
 			export.process(docIds.toArray(new Long[0]), out, pdfConversion, transaction);
@@ -1611,7 +1610,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				DocumentHistory history = new DocumentHistory();
 				history.setSession(session);
 				history.setDocument(doc);
-				history.setEvent(DocumentEvent.SENT.toString());
+				history.setEvent(DocumentEvent.SENT);
 				history.setComment(
 						StringUtils.abbreviate(StringUtil.collectionToString(mail.getRecipients(), ", "), 4000));
 				history.setFilename(doc.getFileName());
@@ -2237,7 +2236,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSession(session);
-			transaction.setEvent(DocumentEvent.STORED.toString());
+			transaction.setEvent(DocumentEvent.STORED);
 			Document document;
 			if (StringUtils.isEmpty(content))
 				document = documentManager.create(IOUtils.toInputStream(" ", StandardCharsets.UTF_8), doc, transaction)
@@ -2933,7 +2932,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			transaction.setSession(session);
 			transaction.setDocument(doc);
 			transaction.setComment("Deleted by deduplication");
-			transaction.setEvent(DocumentEvent.DELETED.toString());
+			transaction.setEvent(DocumentEvent.DELETED);
 			transaction.setFilename(doc.getFileName());
 			transaction.setVersion(doc.getVersion());
 			transaction.setFileVersion(doc.getFileVersion());
@@ -3224,7 +3223,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 			// Add a document history entry
 			DocumentHistory history = new DocumentHistory();
-			history.setEvent(DocumentEvent.PERMISSION.toString());
+			history.setEvent(DocumentEvent.PERMISSION);
 			history.setSession(session);
 			docDao.store(document, history);
 		} catch (PersistenceException e) {

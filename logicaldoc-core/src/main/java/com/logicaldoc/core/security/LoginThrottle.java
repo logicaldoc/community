@@ -114,7 +114,7 @@ public class LoginThrottle {
 				user.setName(username);
 			}
 			UserHistoryDAO dao = Context.get(UserHistoryDAO.class);
-			dao.createUserHistory(user, UserEvent.LOGIN_FAILED.toString(), exception.getMessage(), null, client);
+			dao.createUserHistory(user, UserEvent.LOGIN_FAILED, exception.getMessage(), null, client);
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
 		}
@@ -250,7 +250,7 @@ public class LoginThrottle {
 					user.setEnabled(0);
 
 					UserHistory transaction = new UserHistory();
-					transaction.setEvent(UserEvent.DISABLED.toString());
+					transaction.setEvent(UserEvent.DISABLED);
 					transaction.setUser(user);
 					transaction.setComment("too many login failures");
 

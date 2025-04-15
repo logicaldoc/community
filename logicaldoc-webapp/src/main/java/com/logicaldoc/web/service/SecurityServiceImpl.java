@@ -56,6 +56,7 @@ import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.GroupDAO;
+import com.logicaldoc.core.security.user.GroupType;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserEvent;
@@ -336,7 +337,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			// Add a user history entry
 			history = new UserHistory();
 			history.setUser(user);
-			history.setEvent(UserEvent.PASSWORDCHANGED.toString());
+			history.setEvent(UserEvent.PASSWORDCHANGED);
 			history.setComment("");
 
 			/*
@@ -422,7 +423,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		// Create the user history event
 		UserHistory transaction = new UserHistory();
 		transaction.setSession(session);
-		transaction.setEvent(UserEvent.DELETED.toString());
+		transaction.setEvent(UserEvent.DELETED);
 		transaction.setComment("");
 		try {
 			transaction.setUser(userDao.findById(userId));
@@ -523,7 +524,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 					guiGroup.setId(group.getId());
 					guiGroup.setName(group.getName());
 					guiGroup.setDescription(group.getDescription());
-					guiGroup.setType(group.getType());
+					guiGroup.setType(group.getType().ordinal());
 					guiGroup.setSource(group.getSource());
 					grps.add(guiGroup);
 				}
@@ -731,7 +732,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 			UserHistory transaction = new UserHistory();
 			transaction.setSession(session);
-			transaction.setEvent(UserEvent.UPDATED.toString());
+			transaction.setEvent(UserEvent.UPDATED);
 			userDao.store(user, transaction);
 
 			guiUser.setId(user.getId());
@@ -947,7 +948,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 			UserHistory transaction = new UserHistory();
 			transaction.setSession(session);
-			transaction.setEvent(UserEvent.UPDATED.toString());
+			transaction.setEvent(UserEvent.UPDATED);
 			userDao.store(user, transaction);
 
 			return guiUser;
@@ -1324,7 +1325,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			if (group == null)
 				continue;
 
-			if (group.getType() == Group.TYPE_DEFAULT) {
+			if (group.getType() == GroupType.DEFAULT) {
 				ace.setLabel(group.getName());
 				ace.setName(I18N.message("group", LocaleUtil.toLocale(locale)) + ": " + group.getName());
 			} else {
@@ -1631,7 +1632,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 						user.getWorkingTimes().add(new WorkingTime(wt));
 				UserHistory transaction = new UserHistory();
 				transaction.setSession(session);
-				transaction.setEvent(UserEvent.UPDATED.toString());
+				transaction.setEvent(UserEvent.UPDATED);
 				userDao.store(user, transaction);
 			}
 		} catch (PersistenceException e) {
@@ -1656,7 +1657,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 			UserHistory transaction = new UserHistory();
 			transaction.setSession(session);
-			transaction.setEvent(enabled ? UserEvent.UPDATED.toString() : UserEvent.DISABLED.toString());
+			transaction.setEvent(enabled ? UserEvent.UPDATED : UserEvent.DISABLED);
 
 			user.setEnabled(enabled ? 1 : 0);
 			userDao.store(user, transaction);
@@ -1713,7 +1714,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			UserHistory transaction = new UserHistory();
 			transaction.setSession(session);
 			transaction.setComment(name + " (" + apiKey.getLabel() + ")");
-			transaction.setEvent(UserEvent.NEWAPIKEY.toString());
+			transaction.setEvent(UserEvent.NEWAPIKEY);
 
 			UserHistoryDAO historyDao = Context.get(UserHistoryDAO.class);
 			historyDao.store(transaction);

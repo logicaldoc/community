@@ -85,7 +85,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 			if (transaction != null) {
 				DocumentDAO documentDao = Context.get(DocumentDAO.class);
 				Document doc = documentDao.findById(note.getDocId());
-				transaction.setEvent(DocumentEvent.NEW_NOTE.toString());
+				transaction.setEvent(DocumentEvent.NEW_NOTE);
 				documentDao.saveDocumentHistory(doc, transaction);
 			}
 		} catch (Exception e) {

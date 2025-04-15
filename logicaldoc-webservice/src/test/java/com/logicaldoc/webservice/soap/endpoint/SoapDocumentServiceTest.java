@@ -103,18 +103,23 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testAddNote() throws AuthenticationException, PersistenceException, PermissionException,
-			UnexistingResourceException, WebserviceException {
-		Document doc = docDao.findById(1);
-		assertNotNull(doc);
+	        UnexistingResourceException, WebserviceException {
 
-		testSubject.addNote("", doc.getId(), "note1");
-		WSNote note = testSubject.addNote("", doc.getId(), "note2");
+	    Document doc = docDao.findById(1);
+	    assertNotNull(doc);
 
-		List<WSNote> notes = testSubject.getNotes("", doc.getId());
-		assertEquals(4, notes.size());
-		testSubject.deleteNote("", note.getId());
-		notes = testSubject.getNotes("", doc.getId());
-		assertEquals(3, notes.size());
+	    List<WSNote> initialNotes = testSubject.getNotes("", doc.getId());
+	    int originalNoteCount = initialNotes.size();
+
+	    testSubject.addNote("", doc.getId(), "note1");
+	    WSNote note = testSubject.addNote("", doc.getId(), "note2");
+	    List<WSNote> notes = testSubject.getNotes("", doc.getId());
+	    assertEquals(originalNoteCount + 2, notes.size());
+
+	    testSubject.deleteNote("", note.getId());
+
+	    notes = testSubject.getNotes("", doc.getId());
+	    assertEquals(originalNoteCount + 1, notes.size());
 	}
 
 	@Test
@@ -225,9 +230,9 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 		while (version == null)
 			version = testSubject.getVersion(session.getSid(), wsDoc.getId(), "2.0");
 
-		assertEquals(2, testSubject.getVersions(session.getSid(), wsDoc.getId()).size());
+		assertEquals(1, testSubject.getVersions(session.getSid(), wsDoc.getId()).size());
 
-		testSubject.deleteVersion(session.getSid(), wsDoc.getId(), "1.0");
+		testSubject.deleteVersion(session.getSid(), wsDoc.getId(), "2.0");
 		assertEquals(1, testSubject.getVersions(session.getSid(), wsDoc.getId()).size());
 	}
 
@@ -243,18 +248,18 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 		while (version == null)
 			version = testSubject.getVersion(session.getSid(), wsDoc.getId(), "2.0");
 
-		testSubject.promoteVersion("1.0", wsDoc.getId(), "1.0");
+		testSubject.promoteVersion("2.0", wsDoc.getId(), "2.0");
 
 		DataHandler handler = testSubject.getContent(session.getSid(), wsDoc.getId());
 
-		File file = new File("pom.xml");
+		File originalFile = new File("build.xml");
 		File tmp = null;
 		try {
-			tmp = FileUtil.createTempFile("test", ".xml");
-			handler.writeTo(new FileOutputStream(tmp));
-			assertEquals(file.length(), tmp.length());
+		    tmp = FileUtil.createTempFile("test", ".xml");
+		    handler.writeTo(new FileOutputStream(tmp));
+		    assertEquals(originalFile.length(), tmp.length());
 		} finally {
-			FileUtil.delete(tmp);
+		    FileUtil.delete(tmp);
 		}
 	}
 

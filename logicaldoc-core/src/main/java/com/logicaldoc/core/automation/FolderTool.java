@@ -365,7 +365,7 @@ public class FolderTool {
 			String path = (String) st.nextElement();
 
 			FolderHistory history = new FolderHistory();
-			history.setEvent(FolderEvent.CREATED.toString());
+			history.setEvent(FolderEvent.CREATED);
 			history.setTenantId(root.getTenantId());
 			history.setUser(user);
 

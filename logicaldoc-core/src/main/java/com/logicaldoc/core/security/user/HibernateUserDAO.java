@@ -84,9 +84,9 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	@Override
 	public User findByUsername(String username) throws PersistenceException {
-		if(StringUtils.isEmpty(username))
+		if (StringUtils.isEmpty(username))
 			return null;
-		
+
 		User user = null;
 		Map<String, Object> params = new HashMap<>();
 		params.put(USERNAME, username);
@@ -100,9 +100,9 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	@Override
 	public User findByUsernameIgnoreCase(String username) throws PersistenceException {
-		if(StringUtils.isEmpty(username))
+		if (StringUtils.isEmpty(username))
 			return null;
-		
+
 		User user = null;
 		Map<String, Object> params = new HashMap<>();
 		params.put(USERNAME, username.toLowerCase());
@@ -311,7 +311,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (grp == null) {
 			grp = new Group();
 			grp.setName(userGroupName);
-			grp.setType(Group.TYPE_USER);
+			grp.setType(GroupType.USER);
 			grp.setTenantId(user.getTenantId());
 			groupDAO.store(grp);
 		}
@@ -414,7 +414,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			UserHistory createdHistory = new UserHistory();
 			if (transaction != null)
 				createdHistory = new UserHistory(transaction);
-			createdHistory.setEvent(UserEvent.CREATED.toString());
+			createdHistory.setEvent(UserEvent.CREATED);
 			createdHistory.setComment(user.getUsername());
 			saveUserHistory(user, createdHistory);
 		} else {
@@ -466,7 +466,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				enabledOrDisabledHistory.setUser(user);
 			}
 			enabledOrDisabledHistory
-					.setEvent(user.getEnabled() == 1 ? UserEvent.ENABLED.toString() : UserEvent.DISABLED.toString());
+					.setEvent(user.getEnabled() == 1 ? UserEvent.ENABLED : UserEvent.DISABLED);
 			enabledOrDisabledHistory.setComment(null);
 			saveUserHistory(user, enabledOrDisabledHistory);
 		}

@@ -27,6 +27,16 @@ public class FolderHistory extends AbstractDocumentHistory {
 	@Column(name = "ld_color", length = 255)
 	protected String color;
 
+	public void setEvent(FolderEvent event) {
+		this.event = (event != null) ? event.toString() : null;
+	}
+
+	public FolderEvent getEventEnum() {
+		if (event == null)
+			return null;
+		return FolderEvent.fromKey(event);
+	}
+
 	public String getColor() {
 		return color;
 	}

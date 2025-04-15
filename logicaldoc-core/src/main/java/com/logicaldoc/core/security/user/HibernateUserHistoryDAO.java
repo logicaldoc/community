@@ -46,7 +46,7 @@ public class HibernateUserHistoryDAO extends HibernateHistoryDAO<UserHistory> im
 	}
 
 	@Override
-	public UserHistory createUserHistory(User user, String eventType, String comment, String sessionId, Client client) {
+	public UserHistory createUserHistory(User user, UserEvent eventType, String comment, String sessionId, Client client) {
 		UserHistory history = new UserHistory();
 		history.setComment(comment);
 		history.setEvent(eventType);

@@ -73,7 +73,7 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 		userHistory.setDate(DateBean.dateFromCompactString("20061220"));
 		userHistory.setUsername("sebastian");
 		userHistory.setUserId(3L);
-		userHistory.setEvent("first test User History store");
+		userHistory.setEvent(UserEvent.CREATED);
 
 		testSubject.store(userHistory);
 		Assert.assertNotNull(userHistory);
@@ -82,7 +82,7 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 		newUserHistory.setDate(DateBean.dateFromCompactString("20061220"));
 		newUserHistory.setUsername("sebastian");
 		newUserHistory.setUserId(3L);
-		newUserHistory.setEvent("second test User History store");
+		newUserHistory.setEvent(UserEvent.CREATED);
 
 		testSubject.store(newUserHistory);
 		Assert.assertNotNull(newUserHistory);
@@ -103,7 +103,7 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 		Assert.assertEquals(hStored, newUserHistory);
 		Assert.assertEquals(hStored.getDate().getTime(), DateBean.dateFromCompactString("20061220").getTime());
 		Assert.assertEquals(hStored.getUsername(), "sebastian");
-		Assert.assertEquals(hStored.getEvent(), "second test User History store");
+		Assert.assertEquals(UserEvent.CREATED, hStored.getEventEnum());
 	}
 
 	@Test

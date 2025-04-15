@@ -15,6 +15,7 @@ import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.GroupDAO;
+import com.logicaldoc.core.security.user.GroupType;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserEvent;
@@ -99,7 +100,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			List<WSGroup> groups = new ArrayList<>();
 			GroupDAO dao = Context.get(GroupDAO.class);
 			for (Group grp : dao.findAll(user.getTenantId())) {
-				if (grp.getType() == Group.TYPE_DEFAULT) {
+				if (grp.getType() == GroupType.DEFAULT) {
 					dao.initialize(grp);
 					groups.add(WSGroup.fromGroup(grp));
 				}
@@ -210,7 +211,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			if (group.getId() != 0) {
 				grp = dao.findById(group.getId());
 				dao.initialize(grp);
-				if (grp.getType() != Group.TYPE_DEFAULT) {
+				if (grp.getType() != GroupType.DEFAULT) {
 					throw new PermissionException(String
 							.format("You cannot edit group with id %s because it is a system group", grp.getId()));
 				}
@@ -280,7 +281,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		try {
 			GroupDAO dao = Context.get(GroupDAO.class);
 			Group grp = dao.findById(groupId);
-			if (grp.getType() != Group.TYPE_DEFAULT) {
+			if (grp.getType() != GroupType.DEFAULT) {
 				throw new PermissionException(
 						"You cannot delete group with id " + grp.getId() + " because it is a system group");
 			}
@@ -312,7 +313,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			// Add a user history entry
 			history = new UserHistory();
 			history.setUser(user);
-			history.setEvent(UserEvent.PASSWORDCHANGED.toString());
+			history.setEvent(UserEvent.PASSWORDCHANGED);
 			history.setComment("");
 			user.setRepass("");
 

@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.GroupDAO;
+import com.logicaldoc.core.security.user.GroupType;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 
@@ -35,7 +35,7 @@ public class GroupsDataServlet extends AbstractDataServlet {
 
 		StringBuilder query = new StringBuilder("select A.id, A.name, A.description, A.source "
 				+ "from com.logicaldoc.core.security.user.Group A where A.deleted = 0 and A.type = "
-				+ Group.TYPE_DEFAULT + " and A.tenantId=" + session.getTenantId());
+				+ GroupType.DEFAULT.ordinal() + " and A.tenantId=" + session.getTenantId());
 
 		GroupDAO dao = Context.get(GroupDAO.class);
 		List<?> records = dao.findByQuery(query.toString(), (Map<String, Object>) null, null);

@@ -115,7 +115,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		if (doc.getIndexed() != IndexingStatus.SKIP)
 			doc.setIndexingStatus(IndexingStatus.TO_INDEX);
 		doc.setLockUserId(transaction.getUserId());
-		transaction.setEvent(DocumentEvent.ARCHIVED.toString());
+		transaction.setEvent(DocumentEvent.ARCHIVED);
 		store(doc, transaction);
 		log.debug("Archived document {}", docId);
 	}
@@ -125,7 +125,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		Document doc = findById(docId);
 		doc.setStatus(DocumentStatus.UNLOCKED);
 		doc.setLockUserId(null);
-		transaction.setEvent(DocumentEvent.RESTORED.toString());
+		transaction.setEvent(DocumentEvent.RESTORED);
 		store(doc, transaction);
 		log.debug("Unarchived document {}", docId);
 	}
@@ -916,7 +916,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		Document doc = findById(docId);
 		if (doc != null && transaction != null) {
 			transaction.setDocId(docId);
-			transaction.setEvent(DocumentEvent.RESTORED.toString());
+			transaction.setEvent(DocumentEvent.RESTORED);
 
 			initialize(doc);
 			store(doc, transaction);
@@ -958,7 +958,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			throws PersistenceException {
 		for (Document document : documents) {
 			DocumentHistory deleteHistory = new DocumentHistory(transaction);
-			deleteHistory.setEvent(DocumentEvent.DELETED.toString());
+			deleteHistory.setEvent(DocumentEvent.DELETED);
 			delete(document.getId(), delCode, deleteHistory);
 		}
 	}
@@ -1007,8 +1007,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public long countByIndexed(int indexed) throws PersistenceException {
-		return queryForLong("select count(*) from ld_document where ld_deleted=0 and ld_indexed = " + indexed);
+	public long countByIndexed(IndexingStatus indexingStatus) throws PersistenceException {
+		return queryForLong("select count(*) from ld_document where ld_deleted=0 and ld_indexed = " + indexingStatus.ordinal());
 	}
 
 	@Override
@@ -1283,7 +1283,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		if (transaction.getUsername() == null)
 			throw new IllegalArgumentException("transaction username cannot be null");
 
-		transaction.setEvent(DocumentEvent.PASSWORD_PROTECTED.toString());
+		transaction.setEvent(DocumentEvent.PASSWORD_PROTECTED);
 
 		Document doc = findDocument(docId);
 		if (doc != null) {
@@ -1314,7 +1314,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		if (transaction.getUsername() == null)
 			throw new IllegalArgumentException("transaction username cannot be null");
 
-		transaction.setEvent(DocumentEvent.PASSWORD_UNPROTECTED.toString());
+		transaction.setEvent(DocumentEvent.PASSWORD_UNPROTECTED);
 
 		Document doc = findDocument(docId);
 		if (doc != null) {
@@ -1516,7 +1516,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		log.debug("Copied {} security policies of folder {} into document {}", count, folder.getId(), docId);
 
 		if (transaction != null) {
-			transaction.setEvent(DocumentEvent.PERMISSION.toString());
+			transaction.setEvent(DocumentEvent.PERMISSION);
 			Document document = findById(docId);
 			saveDocumentHistory(document, transaction);
 		}

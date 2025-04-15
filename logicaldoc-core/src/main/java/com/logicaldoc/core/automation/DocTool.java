@@ -16,6 +16,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
 import com.logicaldoc.core.document.IndexingStatus;
@@ -839,7 +840,7 @@ public class DocTool {
 	 * 
 	 * @return list of histories
 	 */
-	public List<DocumentHistory> getHistories(long docId, String event) {
+	public List<DocumentHistory> getHistories(long docId, DocumentEvent event) {
 		DocumentHistoryDAO hDao = Context.get(DocumentHistoryDAO.class);
 
 		try {

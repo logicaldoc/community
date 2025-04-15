@@ -11,7 +11,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.logicaldoc.core.document.AbstractDocumentHistory;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
@@ -58,11 +57,11 @@ public class EventEndpointTest extends AbstractWebappTestCase {
 		document.setVersion("1.0");
 		document.setFolder(folder);
 
-		AbstractDocumentHistory history = new DocumentHistory();
+		DocumentHistory history = new DocumentHistory();
 		history.setId(1L);
 		history.setDocument(document);
 		history.setFolder(folder);
-		history.setEvent(DocumentEvent.CHECKEDOUT.toString());
+		history.setEvent(DocumentEvent.CHECKEDOUT);
 
 		endpoint.newEvent(history);
 		assertEquals(1, endpoint.countQueueSize(DocumentHistory.class));
@@ -71,7 +70,7 @@ public class EventEndpointTest extends AbstractWebappTestCase {
 		history.setId(2L);
 		history.setDocument(document);
 		history.setFolder(folder);
-		history.setEvent(DocumentEvent.LOCKED.toString());
+		history.setEvent(DocumentEvent.LOCKED);
 
 		endpoint.newEvent(history);
 		assertEquals(2, endpoint.countQueueSize(DocumentHistory.class));
@@ -81,7 +80,7 @@ public class EventEndpointTest extends AbstractWebappTestCase {
 		history.setDocument(null);
 		history.setDocId(1L);
 		history.setFolderId(4L);
-		history.setEvent(DocumentEvent.STORED.toString());
+		history.setEvent(DocumentEvent.STORED);
 
 		endpoint.newEvent(history);
 		assertEquals(3, endpoint.countQueueSize(DocumentHistory.class));
@@ -91,17 +90,18 @@ public class EventEndpointTest extends AbstractWebappTestCase {
 		history.setDocId(999L);
 		history.setDocument(null);
 		history.setFolderId(4L);
-		history.setEvent(DocumentEvent.STORED.toString());
+		history.setEvent(DocumentEvent.STORED);
 
 		endpoint.newEvent(history);
 		assertEquals(4, endpoint.countQueueSize(DocumentHistory.class));
 
+		UserHistory history1 = new UserHistory();
 		UserHistory history2 = new UserHistory();
 		history2.setId(5L);
 		history2.setUserId(1L);
 		history2.setFolderId(4L);
 		((UserHistory) history2).setAuthor("me");
-		history.setEvent(UserEvent.LOGOUT.toString());
+		history1.setEvent(UserEvent.LOGOUT);
 
 		endpoint.newEvent(history);
 		assertEquals(0, endpoint.countQueueSize(UserHistory.class));

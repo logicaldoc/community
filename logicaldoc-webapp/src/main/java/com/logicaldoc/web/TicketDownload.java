@@ -272,8 +272,8 @@ public class TicketDownload extends HttpServlet {
 
 		FolderDAO fdao = Context.get(FolderDAO.class);
 		history.setPath(fdao.computePathExtended(document.getFolder().getId()));
-		history.setEvent(isPreviewDownload(ticket, request, document) ? DocumentEvent.VIEWED.toString()
-				: DocumentEvent.DOWNLOADED.toString());
+		history.setEvent(
+				isPreviewDownload(ticket, request, document) ? DocumentEvent.VIEWED : DocumentEvent.DOWNLOADED);
 		history.setFilename(document.getFileName());
 		history.setFolderId(document.getFolder().getId());
 		history.setComment("Ticket " + ticket);

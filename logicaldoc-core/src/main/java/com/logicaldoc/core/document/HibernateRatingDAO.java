@@ -37,7 +37,7 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 
 		try {
 			if (transaction != null) {
-				transaction.setEvent(DocumentEvent.RATING_NEW.toString());
+				transaction.setEvent(DocumentEvent.RATING_NEW);
 				transaction.setComment("rating: " + rating.getVote());
 			}
 			updateDocumentRating(rating.getDocId(), transaction);

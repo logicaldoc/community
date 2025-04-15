@@ -185,7 +185,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 				UserHistory history = new UserHistory();
 				history.setTenantId(message.getTenantId());
 				history.setComment(message.getMessageText());
-				history.setEvent(UserEvent.MESSAGE_RECEIVED.toString());
+				history.setEvent(UserEvent.MESSAGE_RECEIVED);
 				history.setAuthor(message.getAuthor());
 				history.setNotifyEvent(message.isNotify() && RunLevel.current().aspectEnabled("sendingMessages"));
 

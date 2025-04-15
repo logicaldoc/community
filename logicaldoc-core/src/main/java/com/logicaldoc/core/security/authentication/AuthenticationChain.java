@@ -142,7 +142,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
 			UserHistory transaction = new UserHistory();
 			transaction.setUser(user);
 			transaction.setClient(client);
-			transaction.setEvent(UserEvent.DISABLED.toString());
+			transaction.setEvent(UserEvent.DISABLED);
 			transaction.setComment("inactive for too many days");
 
 			user.setEnabled(0);

@@ -93,7 +93,7 @@ public class ZipExport {
 		/*
 		 * Record the export event
 		 */
-		transaction.setEvent(FolderEvent.EXPORTED.toString());
+		transaction.setEvent(FolderEvent.EXPORTED);
 		folderDao.saveFolderHistory(folder, transaction);
 
 		return bos;
@@ -179,7 +179,7 @@ public class ZipExport {
 		DocumentDAO ddao = Context.get(DocumentDAO.class);
 		if (transaction != null) {
 			DocumentHistory t = new DocumentHistory(transaction);
-			transaction.setEvent(DocumentEvent.DOWNLOADED.toString());
+			transaction.setEvent(DocumentEvent.DOWNLOADED);
 			try {
 				ddao.saveDocumentHistory(doc, t);
 			} catch (PersistenceException e) {

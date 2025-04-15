@@ -33,10 +33,10 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
-import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.document.FolderAccessControlEntry;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.Tag;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
@@ -252,7 +252,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	private void setCreator(Folder folder, FolderHistory transaction) {
 		if (transaction != null) {
 			if (folder.getId() == 0 && StringUtils.isEmpty(transaction.getEvent()))
-				transaction.setEvent(FolderEvent.CREATED.toString());
+				transaction.setEvent(FolderEvent.CREATED);
 
 			// In case of creation event we set the creator
 			if (FolderEvent.CREATED.toString().equals(transaction.getEvent())) {
@@ -808,17 +808,17 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		if (transaction.getEvent().equals(FolderEvent.CREATED.toString())
 				|| transaction.getEvent().equals(FolderEvent.MOVED.toString())) {
-			parentHistory.setEvent(FolderEvent.SUBFOLDER_CREATED.toString());
+			parentHistory.setEvent(FolderEvent.SUBFOLDER_CREATED);
 		} else if (transaction.getEvent().equals(FolderEvent.RENAMED.toString())) {
-			parentHistory.setEvent(FolderEvent.SUBFOLDER_RENAMED.toString());
+			parentHistory.setEvent(FolderEvent.SUBFOLDER_RENAMED);
 		} else if (transaction.getEvent().equals(FolderEvent.PERMISSION.toString())) {
-			parentHistory.setEvent(FolderEvent.SUBFOLDER_PERMISSION.toString());
+			parentHistory.setEvent(FolderEvent.SUBFOLDER_PERMISSION);
 		} else if (transaction.getEvent().equals(FolderEvent.DELETED.toString())) {
-			parentHistory.setEvent(FolderEvent.SUBFOLDER_DELETED.toString());
+			parentHistory.setEvent(FolderEvent.SUBFOLDER_DELETED);
 		} else if (transaction.getEvent().equals(FolderEvent.CHANGED.toString())) {
-			parentHistory.setEvent(FolderEvent.SUBFOLDER_CHANGED.toString());
+			parentHistory.setEvent(FolderEvent.SUBFOLDER_CHANGED);
 		} else if (transaction.getEvent().equals(FolderEvent.RESTORED.toString())) {
-			parentHistory.setEvent(FolderEvent.SUBFOLDER_RESTORED.toString());
+			parentHistory.setEvent(FolderEvent.SUBFOLDER_RESTORED);
 		}
 
 		if (StringUtils.isNotEmpty(parentHistory.getEvent()))
@@ -896,7 +896,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		Folder fld = findFolder(folderId);
 		if (fld != null && transaction != null) {
-			transaction.setEvent(FolderEvent.RESTORED.toString());
+			transaction.setEvent(FolderEvent.RESTORED);
 			saveFolderHistory(fld, transaction);
 		}
 
@@ -1175,7 +1175,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public void deleteAll(Collection<Folder> folders, int code, FolderHistory transaction) throws PersistenceException {
 		for (Folder folder : folders) {
 			FolderHistory deleteHistory = new FolderHistory(transaction);
-			deleteHistory.setEvent(FolderEvent.DELETED.toString());
+			deleteHistory.setEvent(FolderEvent.DELETED);
 			deleteHistory.setFolderId(folder.getId());
 			deleteHistory.setPath(computePathExtended(folder.getId()));
 			try {
@@ -1254,7 +1254,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private void prepareHistory(Folder folder, int delCode, FolderHistory transaction) throws PersistenceException {
 		transaction.setPath(computePathExtended(folder.getId()));
-		transaction.setEvent(FolderEvent.DELETED.toString());
+		transaction.setEvent(FolderEvent.DELETED);
 		transaction.setFolderId(folder.getId());
 		transaction.setTenantId(folder.getTenantId());
 
@@ -1351,7 +1351,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		if (aliasFolder != null && transaction != null) {
 			FolderHistory aliasHistory = new FolderHistory(transaction);
 			aliasHistory.setFolder(targetFolder);
-			aliasHistory.setEvent(FolderEvent.ALIAS_CREATED.toString());
+			aliasHistory.setEvent(FolderEvent.ALIAS_CREATED);
 			saveFolderHistory(targetFolder, aliasHistory);
 		}
 
@@ -1413,7 +1413,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		}
 
 		if (transaction != null)
-			transaction.setEvent(FolderEvent.CREATED.toString());
+			transaction.setEvent(FolderEvent.CREATED);
 
 		/*
 		 * Replicate the parent's metadata
@@ -1612,7 +1612,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				documentTransaction.setUserId(transaction.getUserId());
 				documentTransaction.setUsername(transaction.getUsername());
 				documentTransaction.setComment(transaction.getComment());
-				documentTransaction.setEvent(DocumentEvent.STORED.toString());
+				documentTransaction.setEvent(DocumentEvent.STORED);
 
 				String oldDocResource = store.getResourceName(srcDoc, null, null);
 				try (InputStream is = store.getStream(srcDoc.getId(), oldDocResource);) {
@@ -1701,7 +1701,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		setUniqueName(source);
 
 		// Modify folder history entry
-		transaction.setEvent(FolderEvent.MOVED.toString());
+		transaction.setEvent(FolderEvent.MOVED);
 
 		store(source, transaction);
 
@@ -1710,7 +1710,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 */
 		FolderHistory hist = new FolderHistory();
 		hist.setFolderId(oldParent);
-		hist.setEvent(FolderEvent.SUBFOLDER_MOVED.toString());
+		hist.setEvent(FolderEvent.SUBFOLDER_MOVED);
 		hist.setSessionId(transaction.getSessionId());
 		hist.setUserId(transaction.getUserId());
 		hist.setUsername(transaction.getUsername());
@@ -2023,7 +2023,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			securityRef = rightsFolder.getSecurityRef();
 
 		if (transaction != null)
-			transaction.setEvent(FolderEvent.PERMISSION.toString());
+			transaction.setEvent(FolderEvent.PERMISSION);
 
 		f.setSecurityRef(securityRef);
 		store(f, transaction);
@@ -2128,7 +2128,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		Folder parent = getExistingFolder(id);
 
 		initialize(parent);
-		transaction.setEvent(FolderEvent.CHANGED.toString());
+		transaction.setEvent(FolderEvent.CHANGED);
 		transaction.setTenantId(parent.getTenantId());
 		transaction.setNotifyEvent(false);
 
@@ -2166,7 +2166,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		Folder parent = getExistingFolder(id);
 
 		initialize(parent);
-		transaction.setEvent(FolderEvent.CHANGED.toString());
+		transaction.setEvent(FolderEvent.CHANGED);
 		transaction.setTenantId(parent.getTenantId());
 		transaction.setNotifyEvent(false);
 
@@ -2195,7 +2195,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public void applyGridToTree(long id, FolderHistory transaction) throws PersistenceException {
 		Folder parent = getExistingFolder(id);
 
-		transaction.setEvent(FolderEvent.CHANGED.toString());
+		transaction.setEvent(FolderEvent.CHANGED);
 		transaction.setTenantId(parent.getTenantId());
 		transaction.setNotifyEvent(false);
 
@@ -2220,7 +2220,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		Folder parent = getExistingFolder(id);
 		initialize(parent);
 
-		transaction.setEvent(FolderEvent.CHANGED.toString());
+		transaction.setEvent(FolderEvent.CHANGED);
 		transaction.setTenantId(parent.getTenantId());
 		transaction.setNotifyEvent(false);
 
@@ -2244,7 +2244,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public void applyOCRToTree(long id, FolderHistory transaction) throws PersistenceException {
 		Folder parent = getExistingFolder(id);
 
-		transaction.setEvent(FolderEvent.CHANGED.toString());
+		transaction.setEvent(FolderEvent.CHANGED);
 		transaction.setTenantId(parent.getTenantId());
 		transaction.setNotifyEvent(false);
 

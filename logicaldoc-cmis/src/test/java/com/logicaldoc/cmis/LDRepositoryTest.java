@@ -389,23 +389,23 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		DocumentHistoryDAO dao = (DocumentHistoryDAO) context.getBean("DocumentHistoryDAO");
 		DocumentHistory hist = new DocumentHistory();
-		hist.setEvent(DocumentEvent.STORED.toString());
+		hist.setEvent(DocumentEvent.STORED);
 		hist.setDate(df.parse("2019-15-12"));
 		hist.setDocument(document);
 		dao.store(hist);
 
 		hist = new DocumentHistory();
-		hist.setEvent(DocumentEvent.CHANGED.toString());
+		hist.setEvent(DocumentEvent.CHANGED);
 		hist.setDate(df.parse("2020-15-12"));
 		hist.setDocument(document);
 		dao.store(hist);
 
-		hist.setEvent(DocumentEvent.MOVED.toString());
+		hist.setEvent(DocumentEvent.MOVED);
 		hist.setDate(df.parse("2018-15-12"));
 		hist.setDocument(document);
 		dao.store(hist);
 
-		hist.setEvent(DocumentEvent.DELETED.toString());
+		hist.setEvent(DocumentEvent.DELETED);
 		hist.setDate(df.parse("2021-15-12"));
 		hist.setDocument(document);
 		dao.store(hist);
@@ -413,28 +413,28 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		Folder folder = fdao.findById(4L);
 		FolderHistoryDAO folderHistoryDao = (FolderHistoryDAO) context.getBean("FolderHistoryDAO");
 		FolderHistory folderHistory = new FolderHistory();
-		folderHistory.setEvent(FolderEvent.CREATED.toString());
+		folderHistory.setEvent(FolderEvent.CREATED);
 		folderHistory.setDate(df.parse("2018-15-12"));
 		folderHistory.setDocument(document);
 		folderHistory.setFolder(folder);
 		folderHistoryDao.store(folderHistory);
 
 		folderHistory = new FolderHistory();
-		folderHistory.setEvent(FolderEvent.RENAMED.toString());
+		folderHistory.setEvent(FolderEvent.RENAMED);
 		folderHistory.setDate(df.parse("2019-15-12"));
 		folderHistory.setDocument(document);
 		folderHistory.setFolder(folder);
 		folderHistoryDao.store(folderHistory);
 
 		folderHistory = new FolderHistory();
-		folderHistory.setEvent(FolderEvent.CHANGED.toString());
+		folderHistory.setEvent(FolderEvent.CHANGED);
 		folderHistory.setDate(df.parse("2020-15-12"));
 		folderHistory.setDocument(document);
 		folderHistory.setFolder(folder);
 		folderHistoryDao.store(folderHistory);
 
 		folderHistory = new FolderHistory();
-		folderHistory.setEvent(FolderEvent.DELETED.toString());
+		folderHistory.setEvent(FolderEvent.DELETED);
 		folderHistory.setDate(df.parse("2021-15-12"));
 		folderHistory.setDocument(document);
 		folderHistory.setFolder(folder);

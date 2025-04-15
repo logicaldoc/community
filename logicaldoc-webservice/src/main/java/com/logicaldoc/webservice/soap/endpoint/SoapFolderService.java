@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderComparator;
 import com.logicaldoc.core.folder.FolderDAO;
@@ -149,7 +148,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		// Add a folder history entry
 		FolderHistory transaction = new FolderHistory();
 		transaction.setUser(user);
-		transaction.setEvent(FolderEvent.DELETED.toString());
+		transaction.setEvent(FolderEvent.DELETED);
 		transaction.setSessionId(sid);
 		folderDao.deleteTree(folderId, transaction);
 	}
@@ -211,7 +210,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 		// In case of pagination, extract just the wanted page
 		if (max != null && page != null && max < folders.size())
-			folders = folders.stream().skip((page - 1) * (long)max).limit(max).collect(Collectors.toList());
+			folders = folders.stream().skip((page - 1) * (long) max).limit(max).collect(Collectors.toList());
 
 		List<WSFolder> wsFolders = new ArrayList<>();
 		for (Folder folder : folders) {
@@ -334,7 +333,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			// Add a folder history entry
 			FolderHistory transaction = new FolderHistory();
 			transaction.setUser(user);
-			transaction.setEvent(FolderEvent.RENAMED.toString());
+			transaction.setEvent(FolderEvent.RENAMED);
 			transaction.setSessionId(sid);
 			transaction.setFilenameOld(folder.getName());
 			transaction.setPathOld(folderDao.computePathExtended(folderId));
@@ -434,7 +433,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			folder.addAccessControlEntry(WSUtil.toFolderAccessControlEntry(wsAcwe));
 
 		FolderHistory history = new FolderHistory();
-		history.setEvent(DocumentEvent.PERMISSION.toString());
+		history.setEvent(FolderEvent.PERMISSION);
 		history.setSession(SessionManager.get().get(sid));
 		folderDao.store(folder, history);
 
@@ -503,7 +502,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			// Add a folder history entry
 			FolderHistory transaction = new FolderHistory();
 			transaction.setUser(user);
-			transaction.setEvent(FolderEvent.RENAMED.toString());
+			transaction.setEvent(FolderEvent.RENAMED);
 			transaction.setSessionId(sid);
 			folderDao.store(folder, transaction);
 		}
@@ -521,7 +520,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 		FolderHistory transaction = new FolderHistory();
 		transaction.setUser(user);
-		transaction.setEvent(FolderEvent.CREATED.toString());
+		transaction.setEvent(FolderEvent.CREATED);
 		transaction.setSessionId(sid);
 		transaction.setTenantId(user.getTenantId());
 

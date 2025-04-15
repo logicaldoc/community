@@ -171,7 +171,7 @@ public class ZipImport {
 			DocumentManager docManager = Context.get(DocumentManager.class);
 			try {
 				DocumentHistory history = new DocumentHistory();
-				history.setEvent(DocumentEvent.STORED.toString());
+				history.setEvent(DocumentEvent.STORED);
 				history.setComment("");
 				history.setUser(user);
 				history.setSessionId(sessionId);

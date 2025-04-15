@@ -153,7 +153,7 @@ public class WSGroup implements Serializable {
 			wsGroup.setId(group.getId());
 			wsGroup.setName(group.getName());
 			wsGroup.setDescription(group.getDescription());
-			wsGroup.setType(group.getType());
+			wsGroup.setType(group.getType().ordinal());
 			wsGroup.setLastModified(DateUtil.format(group.getLastModified()));
 			wsGroup.setSource(group.getSource());
 			wsGroup.setUserIds(group.getUsers().stream().map(u -> u.getId()).collect(Collectors.toList()));

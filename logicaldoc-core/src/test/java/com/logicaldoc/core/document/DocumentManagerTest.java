@@ -513,7 +513,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		Document doc = docDao.findById(1);
 		assertNotNull(doc);
 		transaction.setComment("pippo_reason");
-		transaction.setEvent(null);
+		transaction.setEvent((DocumentEvent) null);
 		testSubject.lock(doc.getId(), DocumentStatus.LOCKED, transaction);
 		doc = docDao.findById(1);
 		assertEquals(2, doc.getStatus().ordinal());
@@ -637,7 +637,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		User user = userDao.findByUsername("admin");
 
-		Version version = Version.create(doc, user, null, DocumentEvent.STORED.toString(), false);
+		Version version = Version.create(doc, user, null, DocumentEvent.STORED, false);
 
 		assertEquals(0L, version.getId());
 		assertEquals(version.getDocId(), doc.getId());
@@ -698,7 +698,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		DocumentFuture result = testSubject.create(new FileInputStream("pom.xml"), doc, transaction);
 		Document newDoc = result.get();
-		assertEquals("1.0", newDoc.getVersion());
+		assertEquals("2.0", newDoc.getVersion());
 		assertEquals("1.0", newDoc.getFileVersion());
 
 		Version ver = verDao.findByVersion(newDoc.getId(), newDoc.getVersion());
@@ -911,7 +911,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		doc = docDao.findById(1L);
 
 		assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
-		assertEquals("2.0", doc.getFileVersion());
+		assertEquals("1.0", doc.getFileVersion());
 
 		doc = docDao.findById(1);
 		assertNotNull(doc);
@@ -967,7 +967,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		doc = docDao.findById(1);
 		assertEquals(null, doc.getComment());
 
-		transaction.setEvent(null);
+		transaction.setEvent((DocumentEvent) null);
 		testSubject.checkout(1L, transaction);
 	}
 

@@ -444,9 +444,9 @@ public class ServletUtil {
 		FolderDAO fdao = Context.get(FolderDAO.class);
 		history.setPath(fdao.computePathExtended(document.getFolder().getId()));
 		if ("preview".equals(request.getParameter("control")))
-			history.setEvent(DocumentEvent.VIEWED.toString());
+			history.setEvent(DocumentEvent.VIEWED);
 		else
-			history.setEvent(DocumentEvent.DOWNLOADED.toString());
+			history.setEvent(DocumentEvent.DOWNLOADED);
 
 		/*
 		 * Avoid to save frequent views of this document in the same session. So
@@ -737,13 +737,13 @@ public class ServletUtil {
 		Store store = Context.get(Store.class);
 
 		DiskFileItemFactory factory = new DiskFileItemFactory();
-		
+
 		// Configure the factory here, if desired.
 		ServletFileUpload upload = new ServletFileUpload(factory);
-		
+
 		// Configure the uploader here, if desired.
 		List<FileItem> fileItems = getUploadFileItems(request, upload);
-		
+
 		for (FileItem item : fileItems) {
 			if (!item.isFormField()) {
 				File savedFile = writeItemToFile(item);

@@ -177,7 +177,7 @@ public class DocumentManager {
 			throws PersistenceException, IOException {
 		validateTransaction(transaction);
 
-		transaction.setEvent(DocumentEvent.VERSION_REPLACED.toString());
+		transaction.setEvent(DocumentEvent.VERSION_REPLACED);
 		transaction.setComment(String.format("file version %s - %s", fileVersion, transaction.getComment()));
 
 		// identify the document and folder
@@ -287,7 +287,7 @@ public class DocumentManager {
 		if (filename == null)
 			throw new IllegalArgumentException("File name is mandatory");
 
-		transaction.setEvent(DocumentEvent.CHECKEDIN.toString());
+		transaction.setEvent(DocumentEvent.CHECKEDIN);
 		transaction.setFile(file.getAbsolutePath());
 
 		/*
@@ -372,7 +372,7 @@ public class DocumentManager {
 
 			// Create new version (a new version number is created)
 			Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
-					DocumentEvent.CHECKEDIN.toString(), release);
+					DocumentEvent.CHECKEDIN, release);
 
 			document.setStatus(DocumentStatus.UNLOCKED);
 			documentDAO.store(document, transaction);
@@ -435,7 +435,7 @@ public class DocumentManager {
 	 */
 	public void checkout(long docId, DocumentHistory transaction) throws PersistenceException {
 		if (transaction.getEvent() == null)
-			transaction.setEvent(DocumentEvent.CHECKEDOUT.toString());
+			transaction.setEvent(DocumentEvent.CHECKEDOUT);
 		lock(docId, DocumentStatus.CHECKEDOUT, transaction);
 	}
 
@@ -475,7 +475,7 @@ public class DocumentManager {
 			document.setFolder(document.getFolder());
 
 			if (transaction.getEvent() == null)
-				transaction.setEvent(DocumentEvent.LOCKED.toString());
+				transaction.setEvent(DocumentEvent.LOCKED);
 
 			// Modify document history entry
 			documentDAO.store(document, transaction);
@@ -637,7 +637,7 @@ public class DocumentManager {
 
 		// Save the event
 		if (transaction != null) {
-			transaction.setEvent(DocumentEvent.INDEXED.toString());
+			transaction.setEvent(DocumentEvent.INDEXED);
 			transaction.setComment(HTMLSanitizer.sanitize(StringUtils.abbreviate(cont, 100)));
 			transaction.setReason(Integer.toString(currentIndexed));
 			transaction.setDocument(doc);
@@ -658,7 +658,7 @@ public class DocumentManager {
 		if (transaction == null)
 			return;
 
-		transaction.setEvent(DocumentEvent.INDEXED_ERROR.toString());
+		transaction.setEvent(DocumentEvent.INDEXED_ERROR);
 		transaction.setComment(exception.getMessage());
 		transaction.setDocument(document);
 		transaction.setPath(folderDAO.computePathExtended(document.getFolder().getId()));
@@ -774,7 +774,7 @@ public class DocumentManager {
 
 			// create a new version
 			Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
-					DocumentEvent.CHANGED.toString(), false);
+					DocumentEvent.CHANGED, false);
 
 			// Modify document history entry
 			document.setVersion(version.getVersion());
@@ -798,7 +798,7 @@ public class DocumentManager {
 		if (!document.getFileName().equals(docVO.getFileName()) && docVO.getFileName() != null) {
 			renameTransaction = new DocumentHistory(transaction);
 			renameTransaction.setFilenameOld(document.getFileName());
-			renameTransaction.setEvent(DocumentEvent.RENAMED.toString());
+			renameTransaction.setEvent(DocumentEvent.RENAMED);
 		}
 		return renameTransaction;
 	}
@@ -889,7 +889,7 @@ public class DocumentManager {
 				documentDAO.initialize(doc);
 				transaction.setPathOld(folderDAO.computePathExtended(doc.getFolder().getId()));
 				transaction.setFilenameOld(doc.getFileName());
-				transaction.setEvent(DocumentEvent.MOVED.toString());
+				transaction.setEvent(DocumentEvent.MOVED);
 
 				doc.setFolder(folder);
 
@@ -905,10 +905,10 @@ public class DocumentManager {
 
 				// Modify document history entry
 				if (transaction.getEvent().trim().isEmpty())
-					transaction.setEvent(DocumentEvent.MOVED.toString());
+					transaction.setEvent(DocumentEvent.MOVED);
 
 				Version version = Version.create(doc, transaction.getUser(), transaction.getComment(),
-						DocumentEvent.MOVED.toString(), false);
+						DocumentEvent.MOVED, false);
 				version.setId(0);
 
 				documentDAO.store(doc, transaction);
@@ -999,7 +999,7 @@ public class DocumentManager {
 			transaction.setFile(file.getAbsolutePath());
 
 			// Create the gridRecord
-			transaction.setEvent(DocumentEvent.STORED.toString());
+			transaction.setEvent(DocumentEvent.STORED);
 			documentDAO.store(docVO, transaction);
 
 			/* store the document into filesystem */
@@ -1014,7 +1014,7 @@ public class DocumentManager {
 			// The document record has been written, now store the initial
 			// version (default 1.0)
 			Version version = Version.create(docVO, userDAO.findById(transaction.getUserId()), transaction.getComment(),
-					DocumentEvent.STORED.toString(), true);
+					DocumentEvent.STORED, true);
 
 			return new DocumentFuture(docVO, storeVersionAsync(version, docVO));
 		}
@@ -1196,7 +1196,7 @@ public class DocumentManager {
 			DocumentHistory copyEvent = new DocumentHistory(transaction);
 			copyEvent.setDocument(doc);
 			copyEvent.setFolder(doc.getFolder());
-			copyEvent.setEvent(DocumentEvent.COPYED.toString());
+			copyEvent.setEvent(DocumentEvent.COPYED);
 
 			String newPath = folderDAO.computePathExtended(folder.getId());
 			copyEvent.setComment(newPath + "/" + createdDocument.getFileName());
@@ -1288,7 +1288,7 @@ public class DocumentManager {
 			document.setStatus(DocumentStatus.UNLOCKED);
 
 			// Modify document history entry
-			transaction.setEvent(DocumentEvent.UNLOCKED.toString());
+			transaction.setEvent(DocumentEvent.UNLOCKED);
 			documentDAO.store(document, transaction);
 		}
 		log.debug("Unlocked document {}", docId);
@@ -1310,7 +1310,7 @@ public class DocumentManager {
 		Document document = documentDAO.findById(docId);
 		if (document.getImmutable() == 0) {
 			// Modify document history entry
-			transaction.setEvent(DocumentEvent.IMMUTABLE.toString());
+			transaction.setEvent(DocumentEvent.IMMUTABLE);
 			documentDAO.makeImmutable(docId, transaction);
 
 			log.debug("The document {} has been marked as immutable", docId);
@@ -1354,10 +1354,10 @@ public class DocumentManager {
 				document.setIndexingStatus(IndexingStatus.TO_INDEX);
 
 				Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
-						DocumentEvent.RENAMED.toString(), false);
+						DocumentEvent.RENAMED, false);
 				DocumentFuture elaboration = new DocumentFuture(document, storeVersionAsync(version, document));
 
-				transaction.setEvent(DocumentEvent.RENAMED.toString());
+				transaction.setEvent(DocumentEvent.RENAMED);
 				documentDAO.store(document, transaction);
 
 				markAliasesToIndex(docId);
@@ -1471,7 +1471,7 @@ public class DocumentManager {
 			alias.setDocRefType(aliasType);
 
 			// Modify document history entry
-			transaction.setEvent(DocumentEvent.SHORTCUT_STORED.toString());
+			transaction.setEvent(DocumentEvent.SHORTCUT_STORED);
 
 			documentDAO.store(alias, transaction);
 
@@ -1579,7 +1579,7 @@ public class DocumentManager {
 		DocumentHistory delHistory = null;
 		if (transaction != null) {
 			delHistory = new DocumentHistory(transaction);
-			delHistory.setEvent(DocumentEvent.VERSION_DELETED.toString());
+			delHistory.setEvent(DocumentEvent.VERSION_DELETED);
 			delHistory.setComment(versionToDeleteSpec + " - " + versionToDelete.getFileVersion());
 		}
 		documentDAO.saveDocumentHistory(document, delHistory);
@@ -1631,7 +1631,7 @@ public class DocumentManager {
 			document.setFileVersion(lastVersion.getFileVersion());
 
 			if (transaction != null) {
-				transaction.setEvent(DocumentEvent.CHANGED.toString());
+				transaction.setEvent(DocumentEvent.CHANGED);
 				transaction.setComment(
 						"Version changed to " + document.getVersion() + " (" + document.getFileVersion() + ")");
 			}
@@ -1754,7 +1754,7 @@ public class DocumentManager {
 			ticket.setExpired(cal.getTime());
 		}
 
-		transaction.setEvent(DocumentEvent.TICKET_CREATED.toString());
+		transaction.setEvent(DocumentEvent.TICKET_CREATED);
 		transaction.setSessionId(transaction.getSessionId());
 
 		ticketDAO.store(ticket, transaction);
@@ -1836,7 +1836,7 @@ public class DocumentManager {
 				throw new PersistenceException(String.format("Unexisting version %s of document %d", version, docId));
 			versionDAO.initialize(ver);
 
-			transaction.setEvent(DocumentEvent.CHECKEDOUT.toString());
+			transaction.setEvent(DocumentEvent.CHECKEDOUT);
 			checkout(document.getId(), transaction);
 
 			// Write the version file into a temporary file
@@ -1887,7 +1887,7 @@ public class DocumentManager {
 			throw new PersistenceException("Unexisting folder ID  " + rootFolderId);
 
 		if (transaction != null)
-			transaction.setEvent(DocumentEvent.CHANGED.toString());
+			transaction.setEvent(DocumentEvent.CHANGED);
 
 		int totalMovedFiles = 0;
 
@@ -1987,7 +1987,7 @@ public class DocumentManager {
 			if (transaction != null)
 				for (Long id : docIds) {
 					DocumentHistory trans = new DocumentHistory(transaction);
-					trans.setEvent(DocumentEvent.EXPORTPDF.toString());
+					trans.setEvent(DocumentEvent.EXPORTPDF);
 					docDao.saveDocumentHistory(docDao.findById(id), trans);
 				}
 
@@ -2065,7 +2065,7 @@ public class DocumentManager {
 		}
 
 		transaction.setDocId(docId);
-		transaction.setEvent(FolderEvent.DOCUMENT_DESTROYED.toString());
+		transaction.setEvent(FolderEvent.DOCUMENT_DESTROYED);
 
 		log.debug("Destroying document {}", docId);
 

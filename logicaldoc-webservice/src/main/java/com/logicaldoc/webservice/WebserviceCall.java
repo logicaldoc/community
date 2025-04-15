@@ -38,7 +38,16 @@ public class WebserviceCall extends History {
 	private String protocol = SOAP;
 
 	public WebserviceCall() {
-		setEvent("event.webservice.call");
+		setEvent(WebserviceCallEvent.CALL);
+	}
+	
+	public void setEvent(WebserviceCallEvent event) {
+		this.event = (event != null) ? event.toString() : null;
+	}
+
+	public WebserviceCallEvent getEventEnum() {
+		if (event == null) return null;
+		return WebserviceCallEvent.fromKey(event);
 	}
 
 	public WebserviceCall(WebserviceCall source) {

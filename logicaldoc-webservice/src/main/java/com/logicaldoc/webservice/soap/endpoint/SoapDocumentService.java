@@ -120,7 +120,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.STORED.toString());
+		transaction.setEvent(DocumentEvent.STORED);
 		transaction.setComment(document.getComment());
 		transaction.setUser(user);
 
@@ -170,7 +170,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
-			transaction.setEvent(DocumentEvent.CHECKEDIN.toString());
+			transaction.setEvent(DocumentEvent.CHECKEDIN);
 			transaction.setUser(user);
 			transaction.setComment(comment);
 
@@ -215,7 +215,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.CHECKEDOUT.toString());
+		transaction.setEvent(DocumentEvent.CHECKEDOUT);
 		transaction.setComment("");
 		transaction.setUser(user);
 
@@ -236,7 +236,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.DELETED.toString());
+		transaction.setEvent(DocumentEvent.DELETED);
 		transaction.setComment("");
 		transaction.setUser(user);
 
@@ -424,7 +424,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.LOCKED.toString());
+		transaction.setEvent(DocumentEvent.LOCKED);
 		transaction.setComment("");
 		transaction.setUser(user);
 
@@ -457,7 +457,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.MOVED.toString());
+		transaction.setEvent(DocumentEvent.MOVED);
 		transaction.setComment("");
 		transaction.setUser(user);
 
@@ -485,7 +485,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.COPYED.toString());
+		transaction.setEvent(DocumentEvent.COPYED);
 		transaction.setComment("");
 		transaction.setUser(user);
 
@@ -541,7 +541,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.UNLOCKED.toString());
+		transaction.setEvent(DocumentEvent.UNLOCKED);
 		transaction.setComment("");
 		transaction.setUser(user);
 
@@ -577,7 +577,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.CHANGED.toString());
+		transaction.setEvent(DocumentEvent.CHANGED);
 		transaction.setComment(document.getComment());
 		transaction.setUser(user);
 
@@ -743,7 +743,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			history.setSessionId(sid);
 			history.setDocument(doc);
 			history.setDocId(doc.getId());
-			history.setEvent(DocumentEvent.SENT.toString());
+			history.setEvent(DocumentEvent.SENT);
 			history.setUser(user);
 			history.setComment(StringUtils.abbreviate(recipients, 4000));
 			history.setFilename(doc.getFileName());
@@ -817,7 +817,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
-		transaction.setEvent(DocumentEvent.SHORTCUT_STORED.toString());
+		transaction.setEvent(DocumentEvent.SHORTCUT_STORED);
 		transaction.setComment("");
 		transaction.setUser(user);
 
@@ -1353,10 +1353,9 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			document.addAccessControlEntry(WSUtil.toDocumentAccessControlEntry(wsAcwe));
 
 		DocumentHistory history = new DocumentHistory();
-		history.setEvent(DocumentEvent.PERMISSION.toString());
+		history.setEvent(DocumentEvent.PERMISSION);
 		history.setSession(SessionManager.get().get(sid));
 		documentDao.store(document, history);
-
 	}
 
 	@Override

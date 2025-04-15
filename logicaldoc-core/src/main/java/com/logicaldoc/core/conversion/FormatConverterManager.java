@@ -267,7 +267,7 @@ public class FormatConverterManager {
 						converter.getClass().getSimpleName(), document.getId() + " - " + fileName));
 
 			if (transaction != null) {
-				transaction.setEvent(DocumentEvent.CONVERTED.toString());
+				transaction.setEvent(DocumentEvent.CONVERTED);
 				transaction.setComment("format: " + FileUtil.getExtension(out.getName()));
 				DocumentDAO dao = Context.get(DocumentDAO.class);
 				try {
@@ -319,7 +319,7 @@ public class FormatConverterManager {
 				UserHistory history = new UserHistory();
 
 				history.setSession(session);
-				history.setEvent(UserEvent.FILE_CONVERSION.toString());
+				history.setEvent(UserEvent.FILE_CONVERSION);
 				history.setFilename(FileUtil.getBaseName(inFilename) + "." + outFormat.toLowerCase());
 				history.setFileSize(in.length());
 				history.setComment(String.format("%s -> %s", inFilename, history.getFilename()));

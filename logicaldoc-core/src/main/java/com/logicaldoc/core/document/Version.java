@@ -252,7 +252,7 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 	 *        subversion(eg: 1.1)
 	 * @return The newly created version
 	 */
-	public static Version create(Document document, User user, String comment, String event, boolean release) {
+	public static Version create(Document document, User user, String comment, DocumentEvent event, boolean release) {
 		Version version = new Version();
 		try {
 			BeanUtils.copyProperties(version, document);
@@ -323,12 +323,18 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		return version;
 	}
 
-	public String getEvent() {
-		return event;
+	public void setEvent(DocumentEvent event) {
+		this.event = (event != null) ? event.toString() : null;
 	}
 
-	public void setEvent(String event) {
-		this.event = event;
+	public DocumentEvent getEventEnum() {
+		if (event == null)
+			return null;
+		return DocumentEvent.fromKey(event);
+	}
+
+	public String getEvent() {
+		return event;
 	}
 
 	@Override

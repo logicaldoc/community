@@ -205,7 +205,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 		user.getWorkingTimes().add(wt);
 
 		UserHistory transaction = new UserHistory();
-		transaction.setEvent(UserEvent.LOGIN.toString());
+		transaction.setEvent(UserEvent.LOGIN);
 		transaction.setUserId(user.getId());
 		transaction.setNotified(0);
 		dao.store(user, transaction);
@@ -229,7 +229,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 		user = dao.findById(1);
 		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
 		transaction = new UserHistory();
-		transaction.setEvent(UserEvent.PASSWORDCHANGED.toString());
+		transaction.setEvent(UserEvent.PASSWORDCHANGED);
 		transaction.setUserId(user.getId());
 		transaction.setNotified(0);
 		dao.store(user, transaction);

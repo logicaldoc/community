@@ -35,7 +35,7 @@ public interface DocumentHistoryDAO extends PersistentObjectDAO<DocumentHistory>
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	public List<DocumentHistory> findByDocIdAndEvent(long docId, String event) throws PersistenceException;
+	public List<DocumentHistory> findByDocIdAndEvent(long docId, DocumentEvent event) throws PersistenceException;
 
 	/**
 	 * This method selects all histories of a given user.

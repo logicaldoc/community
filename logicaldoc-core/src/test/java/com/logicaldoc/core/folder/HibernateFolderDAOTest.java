@@ -494,7 +494,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		boolean eventPresent = false;
 		for (FolderHistory history : folderFolderHistory) {
-			if (history.getEvent().equals(FolderEvent.MOVED.toString()))
+			if (FolderEvent.MOVED.equals(history.getEventEnum()))
 				eventPresent = true;
 		}
 		assertTrue(eventPresent);
@@ -540,7 +540,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		folderVO.setName("folderBVO");
 
 		FolderHistory transaction = new FolderHistory();
-		transaction.setEvent(null);
+		transaction.setEvent((FolderEvent) null);
 
 		Folder folderB = testSubject.create(docsFolder, folderVO, true, transaction);
 		folderB.setName("folderB");
@@ -555,7 +555,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		transaction = new FolderHistory();
 		testSubject.store(folderVO, transaction);
 
-		assertEquals(FolderEvent.CREATED.toString(), transaction.getEvent());
+		assertEquals(transaction.getEventEnum(), FolderEvent.CREATED);
 	}
 
 	@Test
@@ -648,13 +648,13 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		transaction = new FolderHistory();
 		transaction.setFolderId(folder.getId());
-		transaction.setEvent(FolderEvent.RENAMED.toString());
+		transaction.setEvent(FolderEvent.RENAMED);
 		transaction.setUser(userDao.findById(1));
 		transaction.setNotified(0);
 		testSubject.store(folder, transaction);
 
-		assertEquals(FolderEvent.RENAMED, FolderEvent.fromString("event.folder.renamed"));
-		assertEquals(false, folder.isAlias());
+		assertEquals(FolderEvent.RENAMED, transaction.getEventEnum());
+		assertFalse(folder.isAlias());
 
 		folder = testSubject.findById(7);
 		testSubject.initialize(folder);
@@ -665,7 +665,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		folder.setName("xxxx");
 		transaction = new FolderHistory();
 		transaction.setFolderId(folder.getId());
-		transaction.setEvent(FolderEvent.RENAMED.toString());
+		transaction.setEvent(FolderEvent.RENAMED);
 		transaction.setUser(userDao.findById(1));
 		transaction.setNotified(0);
 		testSubject.store(folder, transaction);
@@ -1430,7 +1430,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		testSubject.restore(1300, 1201, transaction);
 
 		Folder restoredFolder = testSubject.findById(1300);
-		assertEquals(FolderEvent.RESTORED.toString(), transaction.getEvent());
+		assertEquals(FolderEvent.RESTORED, transaction.getEventEnum());
 		assertNotNull(restoredFolder);
 		assertNotSame(1, restoredFolder.getDeleted());
 
@@ -1990,7 +1990,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		dictionary = new HashMap<>();
 		folder = new Folder();
 		transaction = new FolderHistory();
-		transaction.setEvent("UPDATED");
+		transaction.setEvent(FolderEvent.CHANGED);
 		validator.beforeStore(folder, transaction, dictionary);
 		assertEquals("true", dictionary.get("validated"));
 
@@ -2003,7 +2003,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		folder.setTemplate(template);
 
 		transaction = new FolderHistory();
-		transaction.setEvent(FolderEvent.CHANGED.toString());
+		transaction.setEvent(FolderEvent.CHANGED);
 
 		dictionary.put("validated", "false");
 		folderValidator.beforeStore(folder, transaction, dictionary);

@@ -48,7 +48,7 @@ public class ExportZip extends HttpServlet {
 		super();
 	}
 
-    @Override
+	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			Session session = ServletUtil.validateSession(request);
@@ -102,7 +102,7 @@ public class ExportZip extends HttpServlet {
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(session.getSid());
-			transaction.setEvent(DocumentEvent.DOWNLOADED.toString());
+			transaction.setEvent(DocumentEvent.DOWNLOADED);
 			transaction.setSession(session);
 
 			bos = exporter.process(docIds.toArray(new Long[0]), false, transaction);

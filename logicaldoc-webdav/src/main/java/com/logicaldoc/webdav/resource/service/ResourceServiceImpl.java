@@ -430,7 +430,7 @@ public class ResourceServiceImpl implements ResourceService {
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
-			transaction.setEvent(DocumentEvent.STORED.toString());
+			transaction.setEvent(DocumentEvent.STORED);
 			transaction.setComment("");
 			transaction.setUser(user);
 
@@ -606,7 +606,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 			Folder folder = folderDAO.findById(targetFolderId);
 			if (document.getDocRef() != null)
-				transaction.setEvent(DocumentEvent.SHORTCUT_MOVED.toString());
+				transaction.setEvent(DocumentEvent.SHORTCUT_MOVED);
 			documentManager.moveToFolder(document, folder, transaction);
 
 			if (StringUtils.isNotEmpty(newName) && !document.getFileName().equals(newName)) {
@@ -637,7 +637,7 @@ public class ResourceServiceImpl implements ResourceService {
 		if (!source.getName().equals(folder.getName())) {
 			FolderHistory transaction = new FolderHistory();
 			transaction.setUser(user);
-			transaction.setEvent(FolderEvent.RENAMED.toString());
+			transaction.setEvent(FolderEvent.RENAMED);
 			transaction.setSessionId(sid);
 
 			if (!source.isRenameEnabled())
@@ -690,7 +690,7 @@ public class ResourceServiceImpl implements ResourceService {
 		if (StringUtils.isNoneEmpty(newName)) {
 			currentFolder.setName(newName);
 			FolderHistory ft = new FolderHistory(transaction);
-			ft.setEvent(FolderEvent.RENAMED.toString());
+			ft.setEvent(FolderEvent.RENAMED);
 			folderDAO.store(currentFolder, ft);
 		}
 
@@ -721,7 +721,7 @@ public class ResourceServiceImpl implements ResourceService {
 				transaction.setUser(user);
 				transaction.setSessionId(sid);
 				transaction.setUser(user);
-				transaction.setEvent(FolderEvent.DELETED.toString());
+				transaction.setEvent(FolderEvent.DELETED);
 				List<Folder> notDeletableFolders = folderDAO.deleteTree(folder, PersistentObject.DELETED_CODE_DEFAULT,
 						transaction);
 
@@ -738,7 +738,7 @@ public class ResourceServiceImpl implements ResourceService {
 				transaction.setUser(user);
 				transaction.setSessionId(sid);
 				transaction.setUser(user);
-				transaction.setEvent(DocumentEvent.DELETED.toString());
+				transaction.setEvent(DocumentEvent.DELETED);
 
 				Document document = documentDAO.findById(Long.parseLong(resource.getID()));
 				assertDocumentIsNotImmutable(user, document);
@@ -796,7 +796,7 @@ public class ResourceServiceImpl implements ResourceService {
 				// Create the document history event
 				DocumentHistory transaction = new DocumentHistory();
 				transaction.setSessionId(sid);
-				transaction.setEvent(DocumentEvent.STORED.toString());
+				transaction.setEvent(DocumentEvent.STORED);
 				transaction.setComment("");
 				transaction.setUser(user);
 
@@ -911,7 +911,7 @@ public class ResourceServiceImpl implements ResourceService {
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
-			transaction.setEvent(DocumentEvent.CHECKEDOUT.toString());
+			transaction.setEvent(DocumentEvent.CHECKEDOUT);
 			transaction.setComment("");
 			transaction.setUser(user);
 

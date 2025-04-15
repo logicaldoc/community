@@ -43,7 +43,7 @@ public interface UserHistoryDAO extends PersistentObjectDAO<UserHistory> {
 	 * 
 	 * @return the created history
 	 */
-	public UserHistory createUserHistory(User user, String event, String comment, String sessionId, Client client);
+	public UserHistory createUserHistory(User user, UserEvent event, String comment, String sessionId, Client client);
 
 	/**
 	 * This method deletes all the user history entries oldest than the given

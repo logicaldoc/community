@@ -107,7 +107,7 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 		history.setDate(new Date());
 		history.setUserId(1L);
 		history.setUsername("mario");
-		history.setEvent(DocumentEvent.STORED.toString());
+		history.setEvent(DocumentEvent.STORED);
 		history.setIp("127.0.0.1");
 		history.setComment("The document has been created.");
 
@@ -130,7 +130,7 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 		history.setUsername("sebastian");
 		history.setFilenameOld("file.old");
 		history.setUserId(3L);
-		history.setEvent("test History store");
+		history.setEvent(DocumentEvent.CHANGED);
 
 		testSubject.store(history);
 		Assert.assertNotNull(history);
@@ -142,7 +142,7 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 		folderHistory.setDate(DateBean.dateFromCompactString("20061220"));
 		folderHistory.setUsername("sebastian");
 		folderHistory.setUserId(3L);
-		folderHistory.setEvent("test History store");
+		folderHistory.setEvent(DocumentEvent.CHANGED);
 
 		testSubject.store(folderHistory);
 		Assert.assertNotNull(folderHistory);
@@ -164,7 +164,7 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 		Assert.assertEquals(hStored.getFolderId(), Long.valueOf(5L));
 		Assert.assertEquals(hStored.getDate().getTime(), DateBean.dateFromCompactString("20061220").getTime());
 		Assert.assertEquals(hStored.getUsername(), "sebastian");
-		Assert.assertEquals(hStored.getEvent(), "test History store");
+		Assert.assertEquals(DocumentEvent.CHANGED, hStored.getEventEnum());
 	}
 
 	@SuppressWarnings("rawtypes")

@@ -7,46 +7,34 @@ package com.logicaldoc.core.folder;
  * @since 6.6
  */
 public enum FolderEvent {
-	
-	CREATED("event.folder.created"),
-	RENAMED("event.folder.renamed"),
-	PERMISSION("event.folder.permission"),
-	DELETED("event.folder.deleted"),
-	MOVED("event.folder.moved"),
-	CHANGED("event.folder.changed"),
-	SUBFOLDER_CREATED("event.folder.subfolder.created"),
-	SUBFOLDER_RENAMED("event.folder.subfolder.renamed"),
-	SUBFOLDER_PERMISSION("event.folder.subfolder.permission"),
-	SUBFOLDER_DELETED("event.folder.subfolder.deleted"),
-	SUBFOLDER_CHANGED("event.folder.subfolder.changed"),
-	SUBFOLDER_MOVED("event.folder.subfolder.moved"),
-	SUBFOLDER_RESTORED("event.folder.subfolder.restored"),
-	RESTORED("event.folder.restored"),
-	EXPORTED("event.folder.exported"),
-	SUBSCRIBED("event.folder.subscribed"),
-	QUOTA_OVERTHRESHOLD("event.folder.quota.overthreshold"),
-	ALIAS_CREATED("event.folder.alias.created"),
-	DOCUMENT_DESTROYED("event.folder.doc.destroyed");
-	
-    private String event;
+	CREATED, RENAMED, PERMISSION, DELETED, MOVED, CHANGED, SUBFOLDER_CREATED, SUBFOLDER_RENAMED, SUBFOLDER_PERMISSION, SUBFOLDER_DELETED, SUBFOLDER_CHANGED, SUBFOLDER_MOVED, SUBFOLDER_RESTORED, RESTORED, EXPORTED, SUBSCRIBED, QUOTA_OVERTHRESHOLD, ALIAS_CREATED, DOCUMENT_DESTROYED;
 
-	FolderEvent(String event) {
-	    this.event = event;
+	/**
+	 * Gets the right enumeration entry from the corresponding resource bundle
+	 * key
+	 * 
+	 * @param key the resource bundle key
+	 * 
+	 * @return The corresponding entry
+	 */
+	public static FolderEvent fromKey(String key) {
+		return FolderEvent
+				.valueOf(key.contains(".") ? key.replace("event.folder.", "").toUpperCase().replace(".", "_") : key);
+	}
+
+	/**
+	 * Converts the enumeration entry to the corresponding key in the resource
+	 * bundle
+	 * 
+	 * @return The key
+	 */
+	public String toKey() {
+		return "event.folder." + name().toLowerCase().replace("_", ".");
 	}
 
 	@Override
 	public String toString() {
-	    return this.event;
+		return toKey();
 	}
 
-	public static FolderEvent fromString(String event) {
-	    if (event != null) {
-	      for (FolderEvent b : FolderEvent.values()) {
-	        if (event.equalsIgnoreCase(b.event)) {
-	          return b;
-	        }
-	      }
-	    }
- 	    return null;
-    }
 }

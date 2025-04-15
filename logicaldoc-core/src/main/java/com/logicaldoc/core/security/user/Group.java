@@ -7,6 +7,8 @@ import java.util.Set;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -48,10 +50,6 @@ public class Group extends PersistentObject implements Serializable {
 
 	public static final long GROUPID_PUBLISHER = -10000;
 
-	public static final int TYPE_DEFAULT = 0;
-
-	public static final int TYPE_USER = 1;
-
 	@Column(name = "ld_name", length = 255, nullable = false)
 	private String name = "";
 
@@ -66,7 +64,8 @@ public class Group extends PersistentObject implements Serializable {
 	private String source = "local";
 
 	@Column(name = "ld_type", nullable = false)
-	private int type = TYPE_DEFAULT;
+	@Enumerated(EnumType.ORDINAL)
+	private GroupType type = GroupType.DEFAULT;
 
 	/**
 	 * Not persistent
@@ -74,12 +73,16 @@ public class Group extends PersistentObject implements Serializable {
 	@Transient
 	private Set<User> users = new HashSet<>();
 
-	public int getType() {
+	public GroupType getType() {
 		return type;
 	}
 
-	public void setType(int type) {
+	public void setType(GroupType type) {
 		this.type = type;
+	}
+
+	public void setType(int type) {
+		this.type = GroupType.values()[type];
 	}
 
 	public Set<User> getUsers() {
@@ -123,7 +126,7 @@ public class Group extends PersistentObject implements Serializable {
 	}
 
 	public boolean isUserGroup() {
-		return type == TYPE_USER;
+		return type == GroupType.USER;
 	}
 
 	/**
