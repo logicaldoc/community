@@ -89,6 +89,7 @@ import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.WebConfigurator;
 import com.logicaldoc.util.config.WebContextConfigurator;
 import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.security.PasswordCriteria;
 import com.logicaldoc.util.security.PasswordGenerator;
 import com.logicaldoc.util.security.PasswordValidator;
@@ -1572,12 +1573,12 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		Session session = validateSession();
 
 		Map<String, File> uploadedFilesMap = UploadServlet.getUploads(session.getSid());
-		File file = uploadedFilesMap.values().iterator().next();
+		Map.Entry<String, File> file = uploadedFilesMap.entrySet().iterator().next();
 		try {
 			UserDAO userDao = Context.get(UserDAO.class);
 			User user = userDao.findById(userId);
 			if (user != null)
-				UserUtil.saveAvatar(user, file);
+				UserUtil.saveAvatar(user, file.getValue(), FileUtil.getExtension(file.getKey()));
 		} catch (PersistenceException e) {
 			log.error("Unable to store the avatar", e);
 		} finally {

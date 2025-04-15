@@ -1,18 +1,17 @@
 package com.logicaldoc.web;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Base64;
 import java.util.Base64.Decoder;
 
-import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +31,8 @@ public class AvatarServlet extends HttpServlet {
 	public static final String USER_ID = "userId";
 
 	private static final long serialVersionUID = -6956612970433309888L;
+
+	private static final String DATA_PREFIX = "data:image/";
 
 	private static final Logger log = LoggerFactory.getLogger(AvatarServlet.class);
 
@@ -57,11 +58,12 @@ public class AvatarServlet extends HttpServlet {
 		try {
 			String id = request.getParameter(USER_ID);
 
-			String fileName = "avatar-" + id + ".png";
+			String content = UserUtil.getAvatarImage(id);
+			String fileName = "avatar-" + id + "." + getExtension(content);
+
 			response.setContentType(MimeType.getByFilename(fileName));
 			ServletUtil.setContentDisposition(request, response, fileName);
 
-			String content = UserUtil.getAvatarImage(id);
 			saveImage(content, response.getOutputStream());
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -69,17 +71,27 @@ public class AvatarServlet extends HttpServlet {
 		}
 	}
 
+	private String getExtension(String content) {
+		String extension = "png";
+		if (content.startsWith(DATA_PREFIX)) {
+			extension = content.substring(content.indexOf('/') + 1, content.indexOf(';') - 1);
+			if (extension.contains("+"))
+				extension = extension.substring(0, extension.indexOf('+'));
+		}
+		
+		System.out.println(extension);
+		
+		return extension;
+	}
+
 	private void saveImage(String content, OutputStream out) throws IOException {
-		BufferedImage image = null;
-		byte[] imageByte;
+		if (content.startsWith(DATA_PREFIX))
+			content = content.substring(content.indexOf(',') + 1);
 
 		Decoder decoder = Base64.getDecoder();
-		imageByte = decoder.decode(content);
+		byte[] imageByte = decoder.decode(content);
 		try (ByteArrayInputStream bis = new ByteArrayInputStream(imageByte)) {
-			image = ImageIO.read(bis);
+			IOUtils.write(imageByte, out);
 		}
-
-		// write the image to a file
-		ImageIO.write(image, "png", out);
 	}
 }
