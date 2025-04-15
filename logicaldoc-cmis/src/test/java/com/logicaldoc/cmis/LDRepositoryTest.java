@@ -90,9 +90,9 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 		engine = (SearchEngine) context.getBean("SearchEngine");
 
-		fdao = (FolderDAO) context.getBean("FolderDAO");
+		fdao = (FolderDAO) context.getBean("folderDAO");
 
-		ddao = (DocumentDAO) context.getBean("DocumentDAO");
+		ddao = (DocumentDAO) context.getBean("documentDAO");
 
 		try {
 			addHits();

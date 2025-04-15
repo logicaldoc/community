@@ -21,7 +21,7 @@ public class TagsProcessor extends Task {
 
 	public static final String NAME = "TagsProcessor";
 
-	@Resource(name = "DocumentDAO")
+	@Resource(name = "documentDAO")
 	private DocumentDAO documentDao;
 
 

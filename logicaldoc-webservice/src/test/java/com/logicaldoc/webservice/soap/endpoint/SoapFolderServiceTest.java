@@ -46,7 +46,7 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		folderDao = (FolderDAO) context.getBean("FolderDAO");
+		folderDao = (FolderDAO) context.getBean("folderDAO");
 		userDao = (UserDAO) context.getBean("UserDAO");
 
 		// Make sure that this is a SoapFolderService instance

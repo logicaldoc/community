@@ -95,7 +95,7 @@ public class DocumentManager {
 
 	private static final Logger log = LoggerFactory.getLogger(DocumentManager.class);
 
-	@Resource(name = "DocumentDAO")
+	@Resource(name = "documentDAO")
 	protected DocumentDAO documentDAO;
 
 	@Resource(name = "DocumentLinkDAO")
@@ -104,7 +104,7 @@ public class DocumentManager {
 	@Resource(name = "DocumentNoteDAO")
 	protected DocumentNoteDAO documentNoteDAO;
 
-	@Resource(name = "FolderDAO")
+	@Resource(name = "folderDAO")
 	protected FolderDAO folderDAO;
 
 	@Resource(name = "TemplateDAO")

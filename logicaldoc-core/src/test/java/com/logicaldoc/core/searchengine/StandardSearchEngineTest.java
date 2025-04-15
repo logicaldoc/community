@@ -28,7 +28,7 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		testSubject = (SearchEngine) context.getBean("SearchEngine");
-		documentDao = (DocumentDAO) context.getBean("DocumentDAO");
+		documentDao = (DocumentDAO) context.getBean("documentDAO");
 	}
 
 	@After

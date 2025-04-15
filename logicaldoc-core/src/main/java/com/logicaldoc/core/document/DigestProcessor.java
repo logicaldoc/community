@@ -24,7 +24,7 @@ import com.logicaldoc.i18n.I18N;
 public class DigestProcessor extends Task {
 	public static final String NAME = "DigestProcessor";
 
-	@Resource(name = "DocumentDAO")
+	@Resource(name = "documentDAO")
 	protected DocumentDAO documentDao;
 
 	private long processed = 0;

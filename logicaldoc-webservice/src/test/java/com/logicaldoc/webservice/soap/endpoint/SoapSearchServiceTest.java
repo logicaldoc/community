@@ -25,7 +25,7 @@ public class SoapSearchServiceTest extends AbstractWebserviceTestCase {
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		docDao = (DocumentDAO) context.getBean("DocumentDAO");
+		docDao = (DocumentDAO) context.getBean("documentDAO");
 
 		// Make sure that this is a SoapSearchService instance
 		searchServiceImpl = new SoapSearchService();

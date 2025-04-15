@@ -13,6 +13,7 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
@@ -70,7 +71,8 @@ public class ReportStandardProperties extends ReportDetailsTab {
 
 		StaticTextItem id = ItemFactory.newStaticTextItem("id", Long.toString(report.getId()));
 
-		StaticTextItem name = ItemFactory.newStaticTextItem("name", report.getName());
+		TextItem name = ItemFactory.newSimpleTextItem("name", report.getName());
+		name.addChangedHandler(changedHandler);
 
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", report.getDescription());
 		description.setWidth(250);

@@ -30,7 +30,7 @@ public abstract class AbstractDocumentProcessor extends Task {
 
 	protected int errors = 0;
 
-	@Resource(name = "DocumentDAO")
+	@Resource(name = "documentDAO")
 	protected DocumentDAO documentDao;
 
 	protected AbstractDocumentProcessor(String name) {

@@ -45,21 +45,20 @@ public class TarUtil {
 		try {
 			try (FileInputStream fis = new FileInputStream(tarFile);
 					BufferedInputStream bis = new BufferedInputStream(fis);
-					ArchiveInputStream input = new ArchiveStreamFactory().createArchiveInputStream(bis);) {
+					ArchiveInputStream<TarArchiveEntry> tarInput = new ArchiveStreamFactory()
+							.createArchiveInputStream(bis);) {
 
-				if (input instanceof TarArchiveInputStream tarInput) {
-					try {
-						TarArchiveEntry entry = tarInput.getNextTarEntry();
-						while (entry != null) {
-							String name = entry.getName();
-							if (name.endsWith("/"))
-								name = name.substring(0, name.lastIndexOf('/'));
-							entries.add(name);
-							entry = tarInput.getNextTarEntry();
-						}
-					} finally {
-						tarInput.close();
+				try {
+					TarArchiveEntry entry = tarInput.getNextEntry();
+					while (entry != null) {
+						String name = entry.getName();
+						if (name.endsWith("/"))
+							name = name.substring(0, name.lastIndexOf('/'));
+						entries.add(name);
+						entry = tarInput.getNextEntry();
 					}
+				} finally {
+					tarInput.close();
 				}
 			}
 		} catch (ArchiveException e) {

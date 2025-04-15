@@ -141,7 +141,6 @@ public class FormDetailsPanel extends VLayout {
 		TextItem name = ItemFactory.newSimpleTextItem("name", form.getName());
 		name.addChangedHandler(changedHandler);
 		name.setRequired(true);
-		name.setDisabled(form.getId() != 0L);
 
 		SelectItem template = ItemFactory.newTemplateSelector(true, null);
 		template.addChangedHandler(changedHandler);

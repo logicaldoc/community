@@ -209,7 +209,7 @@ public class LogDownload extends HttpServlet {
 	}
 
 	private String printDatabaseEnvironment() {
-		DocumentDAO dao = (DocumentDAO) Context.get("DocumentDAO");
+		DocumentDAO dao = (DocumentDAO) Context.get("documentDAO");
 		Properties prop = new Properties();
 		prop.putAll(dao.getDatabaseMetadata());
 

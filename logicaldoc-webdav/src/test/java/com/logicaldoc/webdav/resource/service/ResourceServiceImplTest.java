@@ -45,7 +45,7 @@ public class ResourceServiceImplTest extends AbstractWebdavTestCase {
 
 		testSubject = (ResourceServiceImpl) context.getBean("resourceService");
 
-		docDao = (DocumentDAO) context.getBean("DocumentDAO");
+		docDao = (DocumentDAO) context.getBean("documentDAO");
 		bookmarkDao = (BookmarkDAO) context.getBean("BookmarkDAO");
 	}
 

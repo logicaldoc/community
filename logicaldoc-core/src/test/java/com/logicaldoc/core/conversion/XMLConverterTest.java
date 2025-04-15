@@ -29,7 +29,7 @@ public class XMLConverterTest extends AbstractCoreTestCase {
 		super.setUp();
 
 		// Retrieve the instance under test from spring context.
-		ddao = (DocumentDAO) context.getBean("DocumentDAO");
+		ddao = (DocumentDAO) context.getBean("documentDAO");
 	}
 
 	@Test

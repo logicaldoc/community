@@ -29,7 +29,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		testSubject = (SearchEngine) context.getBean("SearchEngine");
-		documentDao = (DocumentDAO) context.getBean("DocumentDAO");
+		documentDao = (DocumentDAO) context.getBean("documentDAO");
 		try {
 			addHits();
 		} catch (Exception e) {
@@ -153,7 +153,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testSearchInFolder() throws Exception {
-		FolderDAO folderDao = (FolderDAO) context.getBean("FolderDAO");
+		FolderDAO folderDao = (FolderDAO) context.getBean("folderDAO");
 		for (Long folderId : folderDao.findAllIds()) {
 			folderDao.computePath(folderId);
 		}
