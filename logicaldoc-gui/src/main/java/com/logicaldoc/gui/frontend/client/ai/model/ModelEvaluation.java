@@ -33,7 +33,10 @@ public class ModelEvaluation extends ModelDetailsTab implements ModelObserver {
 		setMembers(container);
 
 		ModelController.get().addObserver(this);
+	}
 
+	@Override
+	protected void onDraw() {
 		refresh();
 	}
 

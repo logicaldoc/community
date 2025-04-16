@@ -78,9 +78,6 @@ public class AvatarServlet extends HttpServlet {
 			if (extension.contains("+"))
 				extension = extension.substring(0, extension.indexOf('+'));
 		}
-		
-		System.out.println(extension);
-		
 		return extension;
 	}
 

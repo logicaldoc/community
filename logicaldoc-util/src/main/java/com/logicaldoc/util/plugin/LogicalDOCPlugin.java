@@ -9,6 +9,8 @@ import java.net.URLDecoder;
 import java.util.List;
 import java.util.Properties;
 
+import javax.servlet.Servlet;
+
 import org.java.plugin.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -290,10 +292,10 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	 * Utility method to add a servlet in the web descriptor
 	 * 
 	 * @param name Name of the servlet
-	 * @param clazz The qualified name of the servlet class
+	 * @param servletClass the servlet class
 	 * @param mapping The mapping specification
 	 */
-	protected void addServlet(String name, String servletClass, String mapping) {
+	protected void addServlet(String name, Class<? extends Servlet> servletClass, String mapping) {
 		addServlet(name, servletClass, mapping, null);
 	}
 
@@ -301,11 +303,11 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	 * Utility method to add a servlet in the web descriptor
 	 * 
 	 * @param name Name of the servlet
-	 * @param clazz The qualified name of the servlet class
+	 * @param servletClass the servlet class
 	 * @param mapping The mapping specification
 	 * @param optional index when loading the servlet on startup
 	 */
-	protected void addServlet(String name, String servletClass, String mapping, Integer loadOnStartup) {
+	protected void addServlet(String name, Class<? extends Servlet> servletClass, String mapping, Integer loadOnStartup) {
 		try {
 			File webDescriptor = new File(getPluginPath());
 			webDescriptor = webDescriptor.getParentFile().getParentFile();
@@ -318,9 +320,9 @@ public abstract class LogicalDOCPlugin extends Plugin {
 
 			WebConfigurator config = new WebConfigurator(webDescriptor.getAbsolutePath());
 			if (loadOnStartup != null)
-				config.addServlet(name, servletClass, loadOnStartup);
+				config.addServlet(name, servletClass.getName(), loadOnStartup);
 			else
-				config.addServlet(name, servletClass);
+				config.addServlet(name, servletClass.getName());
 			config.writeXMLDoc();
 
 			if (mapping != null) {

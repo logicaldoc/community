@@ -25,7 +25,7 @@ public class CmisPlugin extends LogicalDOCPlugin {
 	public void install() throws PluginException {
 		super.install();
 
-		addServlet(SERVLET_NAME, CmisServlet.class.getName(), "/service/cmis/*", 4);
+		addServlet(SERVLET_NAME, CmisServlet.class, "/service/cmis/*", 4);
 
 		File dest = new File(getPluginPath());
 		dest = dest.getParentFile().getParentFile();

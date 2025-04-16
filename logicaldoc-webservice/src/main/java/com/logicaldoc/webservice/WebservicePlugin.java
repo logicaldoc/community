@@ -1,10 +1,8 @@
 package com.logicaldoc.webservice;
 
-import java.io.File;
 import java.io.IOException;
 
 import com.logicaldoc.util.config.ContextProperties;
-import com.logicaldoc.util.config.WebConfigurator;
 import com.logicaldoc.util.plugin.LogicalDOCPlugin;
 import com.logicaldoc.util.plugin.PluginException;
 
@@ -39,21 +37,11 @@ public class WebservicePlugin extends LogicalDOCPlugin {
 			log.error(e.getMessage(), e);
 		}
 
-		File dest = new File(getPluginPath());
-		dest = dest.getParentFile().getParentFile();
-		WebConfigurator config = new WebConfigurator(dest.getPath() + "/web.xml");
-		config.addServlet("CXFServlet", WebserviceServlet.class.getName());
-		config.writeXMLDoc();
-		config.addServletMapping("CXFServlet", "/services/*");
-		config.writeXMLDoc();
-
-		config.addServlet("WebserviceChart", WebserviceChartServlet.class.getName());
-		config.writeXMLDoc();
-		config.addServletMapping("WebserviceChart", "/webservicechart");
-		config.writeXMLDoc();
+		addServlet("CXFServlet", WebserviceServlet.class, "/services/*");
+		addServlet("WebserviceChart", WebserviceChartServlet.class, "/webservicechart");
 
 		addLogger("org.apache.cxf", true, "error", "WEBSERVICE");
-		
+
 		setRestartRequired();
 	}
 }

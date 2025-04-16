@@ -8,6 +8,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.frontend.client.ai.model.GUIModel;
 import com.logicaldoc.gui.frontend.client.ai.model.GUIQueryResult;
 import com.logicaldoc.gui.frontend.client.ai.sampler.GUISampler;
@@ -144,6 +145,18 @@ public interface AIService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public GUIModel cloneModel(long modelId, String newName) throws ServerException;
+	
+	/**
+	 * Loads the statistics from of the AI
+	 * 
+	 * @param modelId Optional indentifier of the model
+	 * @param tenantId Optional indentifier of the tenant
+	 * 
+	 * @return all the stats
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public List<GUIParameter> getStats(Long modelId, Long tenantId) throws ServerException;
 	
 	public static class Instance {
 		private static AIServiceAsync inst;

@@ -111,35 +111,40 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 		}
 
 		try {
-			if (RunLevel.current().aspectEnabled(WebserviceCall.ASPECT)
-					&& settings.getBoolean("webservice.call.record", false)) {
-				WebserviceCall call = new WebserviceCall();
-				call.setTenantId(Tenant.SYSTEM_ID);
-
-				if (Context.get().getProperties().getBoolean("webservice.call.record.payload", false)) {
-					/*
-					 * Retrieve the full payload
-					 */
-					payload = getPayload(message, null);
-					call.setPayload(payload);
-				} else
-					call.setPayload(null);
-
-				HttpServletRequest req = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
-				if (req != null)
-					call.setIp(req.getRemoteAddr());
-
-				if (session != null)
-					call.setSession(session);
-
-				saveCall(call, message);
-			}
+			recordWebserviceCall(message, session);
 		} catch (Exception t) {
 			log.warn(t.getMessage(), t);
 		}
 	}
 
-	public void saveCall(WebserviceCall call, Message message) {
+	private void recordWebserviceCall(Message message, Session session) {
+		String payload;
+		if (RunLevel.current().aspectEnabled(WebserviceCall.ASPECT)
+				&& settings.getBoolean("webservice.call.record", false)) {
+			WebserviceCall call = new WebserviceCall();
+
+			if (Context.get().getProperties().getBoolean("webservice.call.record.payload", false)) {
+				/*
+				 * Retrieve the full payload
+				 */
+				payload = getPayload(message, null);
+				call.setPayload(payload);
+			} else
+				call.setPayload(null);
+
+			HttpServletRequest req = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
+			if (req != null)
+				call.setIp(req.getRemoteAddr());
+
+			call.setTenantId(Tenant.SYSTEM_ID);
+			if (session != null)
+				call.setSession(session);
+
+			saveCall(call, message);
+		}
+	}
+
+	private void saveCall(WebserviceCall call, Message message) {
 		call.setProtocol(message instanceof SoapMessage ? WebserviceCall.SOAP : WebserviceCall.REST);
 		call.setUri(getURI(message));
 

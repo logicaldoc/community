@@ -15,8 +15,8 @@ public class DropboxPlugin extends LogicalDOCPlugin {
 	public void install() throws PluginException {
 		super.install();
 
-		addServlet("DropboxService", DropboxServiceImpl.class.getName(), "/frontend/dropbox");
-		addServlet("DropboxData", DropboxDataServlet.class.getName(), "/data/dropbox.xml");
+		addServlet("DropboxService", DropboxServiceImpl.class, "/frontend/dropbox");
+		addServlet("DropboxData", DropboxDataServlet.class, "/data/dropbox.xml");
 
 		setRestartRequired();
 	}
