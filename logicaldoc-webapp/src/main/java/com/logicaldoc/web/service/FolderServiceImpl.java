@@ -1208,7 +1208,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			if (!allowedExts.contains(ext))
 				continue;
 			StringBuilder sb = new StringBuilder("data:image/");
-			sb.append(ext);
+			sb.append(ext.equals("svg") ? "svg+xml" : ext);
 			sb.append(";base64,");
 
 			try {
