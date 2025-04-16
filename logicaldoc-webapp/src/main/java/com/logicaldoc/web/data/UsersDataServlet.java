@@ -22,6 +22,7 @@ import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.GroupType;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
+import com.logicaldoc.core.security.user.UserType;
 import com.logicaldoc.util.Context;
 
 /**
@@ -59,7 +60,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 		 */
 		UserDAO userDao = Context.get(UserDAO.class);
 		for (User user : users) {
-			if (user.getType() == User.TYPE_SYSTEM || (skipdisabled && user.getEnabled() != 1))
+			if (user.getType() == UserType.SYSTEM || (skipdisabled && user.getEnabled() != 1))
 				continue;
 
 			userDao.initialize(user);

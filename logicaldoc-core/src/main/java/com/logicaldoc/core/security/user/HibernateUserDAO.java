@@ -207,8 +207,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 		validateUsernameUniquenes(user, newUser);
 
-		if (user.getType() == User.TYPE_SYSTEM)
-			user.setType(User.TYPE_DEFAULT);
+		if (user.getType() == UserType.SYSTEM)
+			user.setType(UserType.DEFAULT);
 
 		enforceReadOnlyUserGroups(user);
 
@@ -465,8 +465,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			else {
 				enabledOrDisabledHistory.setUser(user);
 			}
-			enabledOrDisabledHistory
-					.setEvent(user.getEnabled() == 1 ? UserEvent.ENABLED : UserEvent.DISABLED);
+			enabledOrDisabledHistory.setEvent(user.getEnabled() == 1 ? UserEvent.ENABLED : UserEvent.DISABLED);
 			enabledOrDisabledHistory.setComment(null);
 			saveUserHistory(user, enabledOrDisabledHistory);
 		}
@@ -511,7 +510,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	private boolean processPasswordChanged(User user) throws PersistenceException {
 		// Do not implement password change logic in case of users imported from
 		// another system
-		if (user.getSource() != User.SOURCE_DEFAULT)
+		if (user.getSource() != UserSource.DEFAULT)
 			return false;
 
 		boolean passwordChanged;
@@ -560,7 +559,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	private boolean isPasswordExpired(User user) throws PersistenceException {
 		// Never consider changed the password of a user imported from another
 		// system
-		if (user == null || user.getSource() != User.SOURCE_DEFAULT)
+		if (user == null || user.getSource() != UserSource.DEFAULT)
 			return false;
 
 		if (user.getPasswordExpired() == 1)
@@ -676,15 +675,15 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	@Override
 	public int count(Long tenantId) throws PersistenceException {
-		String query = "select count(*) from ld_user where ld_type=" + User.TYPE_DEFAULT + " and ld_deleted=0 "
+		String query = "select count(*) from ld_user where ld_type=" + UserType.DEFAULT.ordinal() + " and ld_deleted=0 "
 				+ (tenantId != null ? " and ld_tenantid=" + tenantId : "");
 		return queryForInt(query);
 	}
 
 	@Override
 	public int countGuests(Long tenantId) throws PersistenceException {
-		String query = "select count(*) from ld_user where ld_type=" + User.TYPE_READONLY + " and ld_deleted=0 "
-				+ (tenantId != null ? " and ld_tenantid=" + tenantId : "");
+		String query = "select count(*) from ld_user where ld_type=" + UserType.READONLY.ordinal()
+				+ " and ld_deleted=0 " + (tenantId != null ? " and ld_tenantid=" + tenantId : "");
 		return queryForInt(query);
 	}
 

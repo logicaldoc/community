@@ -62,6 +62,7 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.core.security.user.UserHistoryDAO;
+import com.logicaldoc.core.security.user.UserType;
 import com.logicaldoc.core.security.user.WorkingTime;
 import com.logicaldoc.core.sequence.Sequence;
 import com.logicaldoc.core.sequence.SequenceDAO;
@@ -503,7 +504,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				guiUser.setCertDN(user.getCertDN());
 				guiUser.setSecondFactor(user.getSecondFactor());
 				guiUser.setKey(user.getKey());
-				guiUser.setType(user.getType());
+				guiUser.setType(user.getType().ordinal());
 				guiUser.setDocsGrid(user.getDocsGrid());
 				guiUser.setHitsGrid(user.getHitsGrid());
 				guiUser.setDateFormat(user.getDateFormat());
@@ -514,7 +515,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				guiUser.setEnforceWorkingTime(user.getEnforceWorkingTime() == 1);
 				guiUser.setMaxInactivity(user.getMaxInactivity());
 				guiUser.setTimeZone(user.getTimeZone());
-				guiUser.setSource(user.getSource());
+				guiUser.setSource(user.getSource().ordinal());
 				guiUser.setCreation(user.getCreation());
 				guiUser.setLastLogin(user.getLastLogin());
 
@@ -1352,7 +1353,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				"select A.ld_id, A.ld_username, A.ld_name, A.ld_firstname from ld_user A ");
 		if (StringUtils.isNotEmpty(groupId))
 			query.append(", ld_usergroup B");
-		query.append(" where A.ld_deleted=0 and A.ld_type=" + User.TYPE_DEFAULT);
+		query.append(" where A.ld_deleted=0 and A.ld_type=" + UserType.DEFAULT.ordinal());
 		if (StringUtils.isNotEmpty(username))
 			query.append(" and A.ld_username like '%" + SqlUtil.doubleQuotes(username) + "%'");
 		if (StringUtils.isNotEmpty(groupId))

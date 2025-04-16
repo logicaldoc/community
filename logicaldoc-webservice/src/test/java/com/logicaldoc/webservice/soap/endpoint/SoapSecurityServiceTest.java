@@ -20,6 +20,8 @@ import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
+import com.logicaldoc.core.security.user.UserType;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSGroup;
@@ -43,8 +45,8 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		userDao = (UserDAO) context.getBean("UserDAO");
-		groupDao = (GroupDAO) context.getBean("GroupDAO");
+		userDao = Context.get(UserDAO.class);
+		groupDao = Context.get(GroupDAO.class);
 
 		// Make sure that this is a SoapSecurityService instance
 		securityServiceImpl = new SoapSecurityService();
@@ -144,7 +146,7 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 		wsUserTest.setEmail("l.haze@midnights.com");
 		wsUserTest.setUsername("lavhaze");
 		wsUserTest.setFirstName("Lavender");
-		wsUserTest.setType(User.TYPE_SYSTEM);
+		wsUserTest.setType(UserType.SYSTEM.ordinal());
 
 		try {
 			securityServiceImpl.storeUser("", wsUserTest);

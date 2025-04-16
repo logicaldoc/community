@@ -40,9 +40,8 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateUserDAO
-		dao = (UserDAO) context.getBean("UserDAO");
-
-		groupDao = (GroupDAO) context.getBean("GroupDAO");
+		dao = Context.get(UserDAO.class);
+		groupDao = Context.get(GroupDAO.class);
 	}
 
 	@Test

@@ -12,6 +12,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
+import com.logicaldoc.core.security.user.UserType;
 import com.logicaldoc.util.crypt.CryptUtil;
 
 /**
@@ -78,7 +79,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 			throw new AccountNotFoundException(this);
 
 		// Check the type
-		if (user.getType() != User.TYPE_DEFAULT && user.getType() != User.TYPE_READONLY)
+		if (user.getType() != UserType.DEFAULT && user.getType() != UserType.READONLY)
 			throw new AccountTypeNotAllowedException();
 
 		try {

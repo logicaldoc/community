@@ -11,6 +11,8 @@ import java.util.Set;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -43,23 +45,19 @@ public class User extends PersistentObject implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(User.class);
 
-	public static final int TYPE_DEFAULT = 0;
-
-	public static final int TYPE_SYSTEM = 1;
-
-	public static final int TYPE_READONLY = 2;
-
-	public static final int SOURCE_DEFAULT = 0;
-
-	public static final int SOURCE_LDAP = 1;
-
-	public static final int SOURCE_SAML = 2;
-
 	public static final long USERID_ADMIN = 1;
 
 	public static final long USERID_SYSTEM = -1010;
 
 	private static final long serialVersionUID = 8093874904302301982L;
+	
+	@Column(name = "ld_type", nullable = false)
+	@Enumerated(EnumType.ORDINAL)
+	private UserType type = UserType.DEFAULT;
+
+	@Column(name = "ld_source", nullable = false)
+	@Enumerated(EnumType.ORDINAL)
+	private UserSource source = UserSource.DEFAULT;
 
 	@Column(name = "ld_username", length = 255, nullable = false)
 	private String username = "";
@@ -115,10 +113,7 @@ public class User extends PersistentObject implements Serializable {
 
 	@Column(name = "ld_telephone2", length = 255)
 	private String telephone2 = "";
-
-	@Column(name = "ld_type", nullable = false)
-	private int type = TYPE_DEFAULT;
-
+	
 	// Not persisted
 	@Transient
 	private Set<Group> groups = new HashSet<>();
@@ -150,9 +145,6 @@ public class User extends PersistentObject implements Serializable {
 	@Transient
 	private String repass;
 
-	@Column(name = "ld_source", nullable = false)
-	private int source = 0;
-
 	@Column(name = "ld_quota", nullable = false)
 	private long quota = -1;
 
@@ -161,7 +153,7 @@ public class User extends PersistentObject implements Serializable {
 
 	@Column(name = "ld_defworkspace")
 	private Long defaultWorkspace;
-	
+
 	@Column(name = "ld_ipwhitelist", length = 1000, nullable = true)
 	private String ipWhiteList;
 
@@ -173,37 +165,37 @@ public class User extends PersistentObject implements Serializable {
 	 */
 	@Column(name = "ld_certexpire")
 	private Date certExpire;
-	
+
 	/**
 	 * The distinguished name of the certificate
 	 */
 	@Column(name = "ld_certdn", length = 1000)
 	private String certDN;
-	
+
 	/**
 	 * The second factor authenticator to use
 	 */
 	@Column(name = "ld_secondfactor", length = 255)
 	private String secondFactor;
-	
+
 	/**
 	 * A key used by the second factor authenticator
 	 */
 	@Column(name = "ld_key", length = 255)
 	private String key;
-	
+
 	/**
 	 * Description of the grid that displays the list of documents
 	 */
 	@Column(name = "ld_docsgrid", nullable = true)
 	private String docsGrid;
-	
+
 	/**
 	 * Description of the grid that shows the results of a search
 	 */
 	@Column(name = "ld_hitsgrid", nullable = true)
 	private String hitsGrid;
-	
+
 	@Column(name = "ld_dateformat", length = 255)
 	private String dateFormat;
 
@@ -219,25 +211,25 @@ public class User extends PersistentObject implements Serializable {
 	 */
 	@Column(name = "ld_searchpref", length = 255)
 	private String searchPref;
-	
+
 	/**
 	 * Last time this account has been activated
 	 */
 	@Column(name = "ld_lastenabled")
 	private Date lastEnabled;
-	
+
 	/**
 	 * When this account expires
 	 */
 	@Column(name = "ld_expire")
 	private Date expire;
-	
+
 	/**
 	 * If the system must forbid the login outside the working time
 	 */
 	@Column(name = "ld_enforcewrktime", nullable = false)
 	private int enforceWorkingTime = 0;
-	
+
 	/**
 	 * Maximum number of inactivity days after which the account gets disabled.
 	 * Possible values are:
@@ -249,7 +241,7 @@ public class User extends PersistentObject implements Serializable {
 	 */
 	@Column(name = "ld_maxinactivity")
 	private Integer maxInactivity;
-	
+
 	@Column(name = "ld_timezone")
 	private String timeZone;
 
@@ -258,13 +250,13 @@ public class User extends PersistentObject implements Serializable {
 	 */
 	@Column(name = "ld_avatar")
 	private String avatar;
-	
+
 	/**
 	 * Last time the user successfully logged in
 	 */
 	@Column(name = "ld_lastlogin")
 	private Date lastLogin = new Date();
-	
+
 	@Transient
 	private String decodedPassword;
 
@@ -311,12 +303,16 @@ public class User extends PersistentObject implements Serializable {
 		this.company = company;
 	}
 
-	public int getType() {
+	public UserType getType() {
 		return type;
 	}
 
-	public void setType(int type) {
+	public void setType(UserType type) {
 		this.type = type;
+	}
+	
+	public void setType(int type) {
+		this.type = UserType.values()[type];
 	}
 
 	public String getRepass() {
@@ -642,17 +638,23 @@ public class User extends PersistentObject implements Serializable {
 	/**
 	 * The source from which the user has been created
 	 * 
-	 * @see User#SOURCE_DEFAULT
-	 * @see User#SOURCE_LDAP
+	 * @see UserSource.DEFAULT
+	 * @see UserSource.LDAP
+	 * @see UserSource.SAML
 	 * 
 	 * @return the source
 	 */
-	public int getSource() {
+	
+	public UserSource getSource() {
 		return source;
 	}
 
-	public void setSource(int source) {
+	public void setSource(UserSource source) {
 		this.source = source;
+	}
+	
+	public void setSource(int source) {
+		this.source = UserSource.values()[source];
 	}
 
 	public long getQuota() {
@@ -785,7 +787,7 @@ public class User extends PersistentObject implements Serializable {
 	}
 
 	public boolean isReadonly() {
-		return type == TYPE_READONLY;
+		return type == UserType.READONLY;
 	}
 
 	public String getDocsGrid() {

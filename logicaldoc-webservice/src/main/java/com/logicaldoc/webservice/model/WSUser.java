@@ -522,7 +522,7 @@ public class WSUser {
 		try {
 			UserDAO dao = Context.get(UserDAO.class);
 			dao.initialize(user);
-			
+
 			wsUser.setId(user.getId());
 			wsUser.setCity(user.getCity());
 			wsUser.setCountry(user.getCountry());
@@ -545,8 +545,8 @@ public class WSUser {
 			wsUser.setPasswordExpires(user.getPasswordExpires());
 			wsUser.setEvalFormEnabled(user.getEvalFormEnabled());
 			wsUser.setQuota(user.getQuota());
-			wsUser.setType(user.getType());
-			wsUser.setSource(user.getSource());
+			wsUser.setType(user.getType().ordinal());
+			wsUser.setSource(user.getSource().ordinal());
 			wsUser.setPassword(user.getPassword());
 			wsUser.setPasswordmd4(user.getPasswordmd4());
 			wsUser.setPasswordChanged(DateUtil.format(user.getPasswordChanged()));

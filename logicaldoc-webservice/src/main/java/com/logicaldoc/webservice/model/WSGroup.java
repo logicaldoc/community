@@ -14,6 +14,7 @@ import org.apache.commons.collections.CollectionUtils;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
+import com.logicaldoc.core.security.user.UserType;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.time.DateUtil;
 import com.logicaldoc.webservice.doc.WSDoc;
@@ -133,7 +134,7 @@ public class WSGroup implements Serializable {
 				Set<User> users = new HashSet<>();
 				for (long userId : getUserIds()) {
 					User user = userDao.findById(userId);
-					if (user != null && user.getType() == User.TYPE_DEFAULT)
+					if (user != null && user.getType() == UserType.DEFAULT)
 						users.add(user);
 				}
 				if (CollectionUtils.isNotEmpty(users))

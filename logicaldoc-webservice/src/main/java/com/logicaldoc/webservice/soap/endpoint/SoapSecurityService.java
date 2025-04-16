@@ -20,6 +20,7 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
+import com.logicaldoc.core.security.user.UserType;
 import com.logicaldoc.core.security.user.WorkingTime;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.crypt.CryptUtil;
@@ -75,7 +76,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		if (StringUtils.isEmpty(group)) {
 			for (User usr : dao.findAll(user.getTenantId())) {
 				dao.initialize(user);
-				if (usr.getType() != User.TYPE_SYSTEM)
+				if (usr.getType() != UserType.SYSTEM)
 					users.add(WSUser.fromUser(usr));
 			}
 		} else {
@@ -84,7 +85,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			gDao.initialize(grp);
 			for (User usr : grp.getUsers()) {
 				dao.initialize(user);
-				if (usr.getType() != User.TYPE_SYSTEM)
+				if (usr.getType() != UserType.SYSTEM)
 					users.add(WSUser.fromUser(usr));
 			}
 		}
@@ -124,7 +125,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 			if (wsUser.getId() != 0) {
 				usr = dao.findById(wsUser.getId());
-				if (usr.getType() == User.TYPE_SYSTEM)
+				if (usr.getType() == UserType.SYSTEM)
 					throw new PermissionException(
 							"You cannot edit user with id " + usr.getId() + " because it is a system user");
 				dao.initialize(usr);
@@ -260,7 +261,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		try {
 			UserDAO dao = Context.get(UserDAO.class);
 			User usr = dao.findById(userId);
-			if (usr.getType() == User.TYPE_SYSTEM) {
+			if (usr.getType() == UserType.SYSTEM) {
 				throw new PermissionException(
 						"You cannot delete user with id " + usr.getId() + " because it is a system user");
 			}
