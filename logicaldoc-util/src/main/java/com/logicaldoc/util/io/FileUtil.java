@@ -254,7 +254,7 @@ public class FileUtil {
 	 */
 	public static String getExtension(String fileName) {
 		if (fileName != null && fileName.contains(".")) {
-			return fileName.substring(fileName.lastIndexOf('.') + 1);
+			return fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
 		} else
 			return "";
 	}

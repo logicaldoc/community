@@ -44,7 +44,7 @@ public class UserUtil {
 	/**
 	 * A transparent 1x1 PNG
 	 */
-	private static final String TRANSPARENT_IMAGE = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+	private static final String TRANSPARENT_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
 	private static final Logger log = LoggerFactory.getLogger(UserUtil.class);
 
@@ -119,22 +119,29 @@ public class UserUtil {
 	 * 
 	 * @param user The user to elaborate
 	 * @param avatarImageFile The file containing the avatar image
+	 * @param avatarImageFile The image type(eg png, svg)
 	 */
-	public static void saveAvatar(User user, File avatarImageFile) {
+	public static void saveAvatar(User user, File avatarImageFile, String imageType) {
 		UserDAO userDao = Context.get(UserDAO.class);
 		TenantDAO tenantDao = Context.get(TenantDAO.class);
 
 		File tmpAvatarImage = null;
 		try {
 			userDao.initialize(user);
-			String tenantName = tenantDao.getTenantName(user.getTenantId());
-			int size = Context.get().getProperties().getInt(tenantName + ".gui.avatar.size", 128);
+			if ("svg".equalsIgnoreCase(imageType)) {
+				// In case of SVG we save the image as is
+				user.setAvatar("data:image/svg+xml;base64," + ImageUtil.encodeImage(avatarImageFile));
+			} else {
+				// In case of raster image we crop and resize
+				String tenantName = tenantDao.getTenantName(user.getTenantId());
+				int size = Context.get().getProperties().getInt(tenantName + ".gui.avatar.size", 128);
+				tmpAvatarImage = FileUtil.createTempFile(AVATAR, ".png");
+				BufferedImage avatar = ImageIO.read(avatarImageFile);
+				avatar = ImageUtil.cropCenterSquare(avatar, size);
+				ImageIO.write(avatar, "png", tmpAvatarImage);
+				user.setAvatar("data:image/png;base64," + ImageUtil.encodeImage(tmpAvatarImage));
+			}
 
-			tmpAvatarImage = FileUtil.createTempFile(AVATAR, ".png");
-			BufferedImage avatar = ImageIO.read(avatarImageFile);
-			avatar = ImageUtil.cropCenterSquare(avatar, size);
-			ImageIO.write(avatar, "png", tmpAvatarImage);
-			user.setAvatar(ImageUtil.encodeImage(tmpAvatarImage));
 			userDao.store(user);
 		} catch (Exception t) {
 			log.warn(ERROR_GENERATING_DEFAULT_THE_AVATAR_FOR_USER, user, t);
@@ -163,7 +170,7 @@ public class UserUtil {
 
 			BufferedImage avatar = UserUtil.generateDefaultAvatarImage(user, size);
 			ImageIO.write(avatar, "png", tmpAvatarImage);
-			user.setAvatar(ImageUtil.encodeImage(tmpAvatarImage));
+			user.setAvatar("data:image/png;base64," + ImageUtil.encodeImage(tmpAvatarImage));
 
 			if (user.getType() != UserType.SYSTEM) {
 				userDao.store(user);

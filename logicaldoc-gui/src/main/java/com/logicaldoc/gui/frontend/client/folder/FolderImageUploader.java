@@ -11,7 +11,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -45,10 +44,10 @@ public class FolderImageUploader extends Window {
 		this.changedHandler = changedHandler;
 
 		save = new IButton(I18N.message("save"));
-		save.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> onUpload());
+		save.addClickHandler(click -> onUpload());
 
 		IButton delete = new IButton(I18N.message("ddelete"));
-		delete.addClickHandler((com.smartgwt.client.widgets.events.ClickEvent event) -> onDelete());
+		delete.addClickHandler(click -> onDelete());
 
 		uploader = new Upload(save);
 
@@ -63,7 +62,7 @@ public class FolderImageUploader extends Window {
 		layout.addMember(buttons);
 		addItem(layout);
 
-		addCloseClickHandler((CloseClickEvent event) -> cleanUploads());
+		addCloseClickHandler(click -> cleanUploads());
 	}
 
 	private void cleanUploads() {
@@ -102,7 +101,7 @@ public class FolderImageUploader extends Window {
 
 		});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

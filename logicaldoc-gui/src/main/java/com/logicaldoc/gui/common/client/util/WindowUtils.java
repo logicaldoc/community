@@ -103,7 +103,7 @@ public class WindowUtils {
 			link.setId("favicon");
 			link.setAttribute("rel", "shortcut icon");
 			link.setAttribute("type", "image/png");
-			link.setAttribute("href", info.getBranding().getFaviconSrc());
+			link.setAttribute("href", info.getBranding().getFavicon());
 
 			DOM.appendChild(parent, link);
 		} catch (Exception t) {

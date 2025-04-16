@@ -16,7 +16,7 @@ public class TopPanel extends HLayout {
 	public TopPanel() {
 		setWidth100();
 		if (Session.get().getConfigAsBoolean("gui.banner")) {
-			setBackgroundImage(Session.get().getInfo().getBranding().getBannerSrc());
+			setBackgroundImage(Session.get().getInfo().getBranding().getBanner());
 			setBackgroundRepeat(BackgroundRepeat.REPEAT_X);
 			setBackgroundPosition("top left");
 

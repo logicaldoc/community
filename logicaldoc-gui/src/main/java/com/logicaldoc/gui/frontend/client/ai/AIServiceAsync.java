@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.ai;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.frontend.client.ai.model.GUIModel;
 import com.logicaldoc.gui.frontend.client.ai.model.GUIQueryResult;
 import com.logicaldoc.gui.frontend.client.ai.sampler.GUISampler;
@@ -32,4 +33,6 @@ public interface AIServiceAsync {
 	void importModel(String modelName, AsyncCallback<GUIModel> callback);
 
 	void cloneModel(long modelId, String newName, AsyncCallback<GUIModel> callback);
+
+	void getStats(Long modelId, Long tenantId, AsyncCallback<List<GUIParameter>> callaback);
 }

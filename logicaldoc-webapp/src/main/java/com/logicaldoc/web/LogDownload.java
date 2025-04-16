@@ -265,7 +265,7 @@ public class LogDownload extends HttpServlet {
 			if (file.isDirectory())
 				continue;
 
-			if (file.getName().toLowerCase().endsWith(DOT_PROPERTIES) || file.getName().toLowerCase().endsWith(".xml")
+			if (file.getName().toLowerCase().contains(DOT_PROPERTIES) || file.getName().toLowerCase().endsWith(".xml")
 					|| file.getName().toLowerCase().endsWith(".txt"))
 				writeEntry(out, "logicaldoc/conf/" + file.getName(), file);
 		}

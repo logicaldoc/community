@@ -79,10 +79,7 @@ public class UserAvatar extends HLayout {
 
 		MenuItem update = new MenuItem();
 		update.setTitle(I18N.message("update"));
-		update.addClickHandler(event -> {
-			Uploader uploader = new Uploader(userId);
-			uploader.show();
-		});
+		update.addClickHandler(click -> new Uploader(userId).show());
 
 		Menu contextMenu = new Menu();
 		contextMenu.setItems(reset, update);
@@ -110,7 +107,7 @@ public class UserAvatar extends HLayout {
 			setAutoSize(true);
 
 			saveButton = new IButton(I18N.message("save"));
-			saveButton.addClickHandler(event -> onSave());
+			saveButton.addClickHandler(click -> onSave());
 
 			Label hint = new Label(I18N.message("avatarhint", Session.get().getConfig(GUI_AVATAR_SIZE),
 					Session.get().getConfig(GUI_AVATAR_SIZE)));
@@ -175,7 +172,7 @@ public class UserAvatar extends HLayout {
 		public boolean equals(Object other) {
 			return super.equals(other);
 		}
-		
+
 		@Override
 		public int hashCode() {
 			return super.hashCode();
@@ -186,7 +183,7 @@ public class UserAvatar extends HLayout {
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

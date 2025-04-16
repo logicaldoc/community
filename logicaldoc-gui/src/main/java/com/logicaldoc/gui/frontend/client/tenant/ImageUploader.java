@@ -51,7 +51,7 @@ public class ImageUploader extends Window {
 		layout.setWidth100();
 
 		uploader = new Upload(uploadButton);
-		uploader.setFileTypes("*.png");
+		uploader.setFileTypes("*.png,*.svg");
 		layout.addMember(uploader);
 		layout.addMember(uploadButton);
 
