@@ -153,6 +153,11 @@ public class ModelsPanel extends VLayout {
 		toolStrip.addButton(settings);
 		settings.addClickHandler(event -> new AISettings().show());
 
+		ToolStripButton stats = new ToolStripButton();
+		stats.setTitle(I18N.message("stats"));
+		toolStrip.addButton(stats);
+		stats.addClickHandler(event -> new AIStats().show());
+		
 		toolStrip.addSeparator();
 
 		ToolStripButton importModel = new ToolStripButton();
