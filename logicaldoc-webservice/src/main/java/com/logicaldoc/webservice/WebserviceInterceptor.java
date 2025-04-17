@@ -53,7 +53,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 	public static final String THREADPOOL_CALL_STORE = "WebserviceCallStore";
 
-	private static final String WSCALL = "wscall";
+	public static final String WSCALL = "wscall";
 
 	public static final String WSCALL_HYPHEN = WSCALL + "-";
 
