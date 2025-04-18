@@ -1,5 +1,10 @@
 package com.logicaldoc.core.security.user;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.logicaldoc.core.folder.FolderEvent;
+
 /**
  * Possible events in the user's history
  * 
@@ -31,6 +36,15 @@ public enum UserEvent {
 	 */
 	public String toKey() {
 		return "event.user." + name().toLowerCase().replace("_", ".");
+	}
+
+	/**
+	 * Retrieves the all resource bundle keys
+	 * 
+	 * @return A list of keys
+	 */
+	public List<String> allKeys() {
+		return Arrays.asList(FolderEvent.values()).stream().map(e -> e.toKey()).toList();
 	}
 
 	@Override

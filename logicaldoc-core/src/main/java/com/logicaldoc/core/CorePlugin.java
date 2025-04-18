@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.dashlet.DashletContent;
+import com.logicaldoc.core.searchengine.indexer.IndexerTask;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.plugin.LogicalDOCPlugin;
@@ -60,6 +61,8 @@ public class CorePlugin extends LogicalDOCPlugin {
 			pbean.setProperty("threadpool.Email.type", "default");
 			pbean.setProperty("threadpool.EventCollector.max", "20");
 			pbean.setProperty("threadpool.EventCollector.type", "default");
+			pbean.setProperty("threadpool."+IndexerTask.NAME+".max", "2");
+			pbean.setProperty("threadpool."+IndexerTask.NAME+".type", "default");
 
 			pbean.write();
 		} catch (IOException e) {

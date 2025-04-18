@@ -664,7 +664,7 @@
     </Logger>
     <Logger name="org.jgroups.protocols" level="error" additivity="true" />
     <Logger name="com.logicaldoc.onlyoffice" level="debug" additivity="true" />
-    <Logger name="com.logicaldoc.core.searchengine.IndexerTask" level="info" additivity="false">
+    <Logger name="com.logicaldoc.core.searchengine.indexer.IndexerTask" level="info" additivity="false">
       <AppenderRef ref="IndexerTask" />
       <AppenderRef ref="IndexerTask_WEB" />
     </Logger>

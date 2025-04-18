@@ -1,5 +1,8 @@
 package com.logicaldoc.core.folder;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Possible events in the folder's history
  * 
@@ -30,6 +33,15 @@ public enum FolderEvent {
 	 */
 	public String toKey() {
 		return "event.folder." + name().toLowerCase().replace("_", ".");
+	}
+
+	/**
+	 * Retrieves the all resource bundle keys
+	 * 
+	 * @return A list of keys
+	 */
+	public List<String> allKeys() {
+		return Arrays.asList(FolderEvent.values()).stream().map(e -> e.toKey()).toList();
 	}
 
 	@Override

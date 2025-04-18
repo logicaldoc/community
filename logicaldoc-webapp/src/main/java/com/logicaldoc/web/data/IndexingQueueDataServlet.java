@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.searchengine.IndexerTask;
+import com.logicaldoc.core.searchengine.indexer.IndexerTask;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
@@ -195,6 +195,6 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 				(StringUtils.isNotEmpty(queryFragments[1]) ? " order by " + queryFragments[1].replace("_entity.", "ld_")
 						: ""));
 
-		return where.toString();
+		return where.toString().replace("ld_indexingStatus", "ld_indexed");
 	}
 }

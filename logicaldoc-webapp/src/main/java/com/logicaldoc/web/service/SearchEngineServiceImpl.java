@@ -77,7 +77,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			searchEngine.setDir(conf.getProperty("index.dir"));
 			searchEngine.setSorting(conf.getProperty("index.sorting"));
 			searchEngine.setCustomSorting(conf.getProperty("index.sorting.custom"));
-			searchEngine.setThreads(conf.getInt("index.threads", 2));
+			searchEngine.setThreads(conf.getInt("threadpool.IndexerTask.max", 2));
 			searchEngine.setBatch(conf.getInt("index.batch", 0));
 			searchEngine.setMaxText(conf.getInt("index.maxtext", 0));
 
@@ -174,7 +174,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 				conf.setProperty("index.dir", searchEngine.getDir());
 				conf.setProperty("index.sorting", searchEngine.getSorting());
 				conf.setProperty("index.sorting.custom", searchEngine.getCustomSorting());
-				conf.setProperty("index.threads", "" + searchEngine.getThreads());
+				conf.setProperty("threadpool.IndexerTask.max", "" + searchEngine.getThreads());
 			}
 
 			conf.write();

@@ -1,5 +1,8 @@
 package com.logicaldoc.core.document;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Possible events in the document's history
  * 
@@ -32,6 +35,15 @@ public enum DocumentEvent {
 		return "event." + name().toLowerCase().replace("_", ".");
 	}
 
+	/**
+	 * Retrieves the all resource bundle keys
+	 * 
+	 * @return A list of keys
+	 */
+	public List<String> allKeys() {
+		return Arrays.asList(DocumentEvent.values()).stream().map(e -> e.toKey()).toList();
+	}
+	
 	@Override
 	public String toString() {
 		return toKey();
