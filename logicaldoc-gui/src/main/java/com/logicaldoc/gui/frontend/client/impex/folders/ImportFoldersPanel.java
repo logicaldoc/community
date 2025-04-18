@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.impex.folders;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIImportFolder;
 import com.logicaldoc.gui.common.client.data.ImportFoldersDS;
 import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
@@ -121,14 +122,15 @@ public class ImportFoldersPanel extends AdminPanel {
 		if (Feature.enabled(Feature.IMPORT_LOCAL_FOLDERS) || Feature.enabled(Feature.IMPORT_REMOTE_FOLDERS))
 			toolStrip.addButton(addImportFolder);
 
-		toolStrip.addSeparator();
-		
-		ToolStripButton settings = new ToolStripButton();
-		settings.setTitle(I18N.message("settings"));
-		toolStrip.addButton(settings);
-		settings.addClickHandler(click -> new ImportFolderSettings().show());
+		if (Session.get().isDefaultTenant()) {
+			toolStrip.addSeparator();
 
-		
+			ToolStripButton settings = new ToolStripButton();
+			settings.setTitle(I18N.message("settings"));
+			toolStrip.addButton(settings);
+			settings.addClickHandler(click -> new ImportFolderSettings().show());
+		}
+
 		list.addCellContextClickHandler(click -> {
 			showContextMenu();
 			click.cancel();
@@ -170,19 +172,18 @@ public class ImportFoldersPanel extends AdminPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(
-				event -> LD.ask(I18N.message(QUESTION), I18N.message("confirmdelete"), choice -> {
-					if (Boolean.TRUE.equals(choice)) {
-						ImportFolderService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
-							@Override
-							public void onSuccess(Void result) {
-								list.removeSelectedData();
-								list.deselectAllRecords();
-								showShareDetails(null);
-							}
-						});
+		delete.addClickHandler(event -> LD.ask(I18N.message(QUESTION), I18N.message("confirmdelete"), choice -> {
+			if (Boolean.TRUE.equals(choice)) {
+				ImportFolderService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(Void result) {
+						list.removeSelectedData();
+						list.deselectAllRecords();
+						showShareDetails(null);
 					}
-				}));
+				});
+			}
+		}));
 
 		MenuItem test = new MenuItem();
 		test.setTitle(I18N.message("testconnection"));

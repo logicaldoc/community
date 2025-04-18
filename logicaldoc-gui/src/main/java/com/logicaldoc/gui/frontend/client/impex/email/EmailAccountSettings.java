@@ -1,4 +1,4 @@
-package com.logicaldoc.gui.frontend.client.impex.folders;
+package com.logicaldoc.gui.frontend.client.impex.email;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,18 +19,18 @@ import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 
 /**
- * This popup window is used to edit general settings related to Import Folders
+ * This popup window is used to edit general settings related to Email Accounts
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2
  */
-public class ImportFolderSettings extends Window {
+public class EmailAccountSettings extends Window {
 
-	private static final String THREADS_SETTING = "threadpool.ImportFolderCrawler.max";
+	private static final String THREADS_SETTING = "threadpool.EmailCrawler.max";
 
 	private DynamicForm form = new DynamicForm();
 
-	public ImportFolderSettings() {
+	public EmailAccountSettings() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 
 		setTitle(I18N.message("settings"));

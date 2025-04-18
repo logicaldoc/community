@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.impex.email;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIEmailAccount;
 import com.logicaldoc.gui.common.client.data.EmailAccountsDS;
 import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
@@ -21,13 +22,9 @@ import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -107,7 +104,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler((ClickEvent event) -> {
+		refresh.addClickHandler(click -> {
 			list.refresh(new EmailAccountsDS("default"));
 			detailsContainer.removeMembers(detailsContainer.getMembers());
 			details = SELECT_ACCOUNT;
@@ -117,18 +114,27 @@ public class EmailAccountsPanel extends AdminPanel {
 		ToolStripButton addAccount = new ToolStripButton();
 		addAccount.setTitle(I18N.message("addaccount"));
 		toolStrip.addButton(addAccount);
-		addAccount.addClickHandler((ClickEvent event) -> {
+		addAccount.addClickHandler(click -> {
 			list.deselectAllRecords();
 			GUIEmailAccount account = new GUIEmailAccount();
 			showDetails(account);
 		});
 
-		list.addCellContextClickHandler((CellContextClickEvent event) -> {
+		if (Session.get().isDefaultTenant()) {
+			toolStrip.addSeparator();
+
+			ToolStripButton settings = new ToolStripButton();
+			settings.setTitle(I18N.message("settings"));
+			toolStrip.addButton(settings);
+			settings.addClickHandler(click -> new EmailAccountSettings().show());
+		}
+
+		list.addCellContextClickHandler(click -> {
 			showContextMenu();
-			event.cancel();
+			click.cancel();
 		});
 
-		list.addSelectionChangedHandler((SelectionEvent event) -> {
+		list.addSelectionChangedHandler(changed -> {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
 				EmailAccountService.Instance.get().get(Long.parseLong(rec.getAttributeAsString("id")),
@@ -140,8 +146,8 @@ public class EmailAccountsPanel extends AdminPanel {
 						});
 		});
 
-		list.addDataArrivedHandler((DataArrivedEvent event) -> infoPanel
-				.setMessage(I18N.message("showaccounts", Integer.toString(list.getTotalRows()))));
+		list.addDataArrivedHandler(
+				arrived -> infoPanel.setMessage(I18N.message("showaccounts", Integer.toString(list.getTotalRows()))));
 
 		detailsContainer.setAlign(Alignment.CENTER);
 		detailsContainer.addMember(details);
