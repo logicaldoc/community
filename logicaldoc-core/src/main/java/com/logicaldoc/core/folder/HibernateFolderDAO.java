@@ -917,6 +917,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public Set<Permission> getAllowedPermissions(long folderId, long userId) throws PersistenceException {
 		final Set<Permission> permissions = new HashSet<>();
 		User user = getExistingtUser(userId);
+		if (user == null)
+			return new HashSet<>();
 
 		// If the user is an administrator bypass all controls
 		if (user.isMemberOf(Group.GROUP_ADMIN))
@@ -930,6 +932,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		// the policies
 		long id = folderId;
 		Folder folder = findById(folderId);
+		if (folder == null)
+			return new HashSet<>();
 
 		if (folder.getSecurityRef() != null) {
 			id = folder.getSecurityRef().longValue();
