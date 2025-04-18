@@ -25,9 +25,9 @@ import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentHistory;
-import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.DocumentStatus;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.task.Task;
@@ -152,7 +152,8 @@ public class IndexerTask extends Task {
 				log.info("Distribute the indexing among {} threads", threadsTotal);
 
 				// Divide the docs in groups of N
-				Collection<List<Long>> partitions = CollectionUtil.partition(docIds, threadsTotal);
+				Collection<List<Long>> partitions = CollectionUtil.partition(docIds,
+						(int) Math.ceil((double) docIds.size() / (double) threadsTotal));
 
 				startIndexerThreads(threadsTotal);
 				List<IndexerThread> threads = new ArrayList<>();
@@ -298,10 +299,10 @@ public class IndexerTask extends Task {
 		if (StringUtils.isNotEmpty(sortingCustom))
 			sorting = sortingCustom;
 
-		String where = PersistentObjectDAO.ENTITY + ".deleted = 0 and (" + PersistentObjectDAO.ENTITY + ".indexingStatus = "
-				+ IndexingStatus.TO_INDEX.ordinal() + " or " + PersistentObjectDAO.ENTITY + ".indexingStatus = "
-				+ IndexingStatus.TO_INDEX_METADATA.ordinal() + ") and not " + PersistentObjectDAO.ENTITY + ".status = "
-				+ DocumentStatus.ARCHIVED.ordinal();
+		String where = PersistentObjectDAO.ENTITY + ".deleted = 0 and (" + PersistentObjectDAO.ENTITY
+				+ ".indexingStatus = " + IndexingStatus.TO_INDEX.ordinal() + " or " + PersistentObjectDAO.ENTITY
+				+ ".indexingStatus = " + IndexingStatus.TO_INDEX_METADATA.ordinal() + ") and not "
+				+ PersistentObjectDAO.ENTITY + ".status = " + DocumentStatus.ARCHIVED.ordinal();
 
 		return new String[] { where, sorting };
 	}

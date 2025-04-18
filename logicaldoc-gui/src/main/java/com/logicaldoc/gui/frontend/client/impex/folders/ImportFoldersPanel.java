@@ -121,6 +121,14 @@ public class ImportFoldersPanel extends AdminPanel {
 		if (Feature.enabled(Feature.IMPORT_LOCAL_FOLDERS) || Feature.enabled(Feature.IMPORT_REMOTE_FOLDERS))
 			toolStrip.addButton(addImportFolder);
 
+		toolStrip.addSeparator();
+		
+		ToolStripButton settings = new ToolStripButton();
+		settings.setTitle(I18N.message("settings"));
+		toolStrip.addButton(settings);
+		settings.addClickHandler(click -> new ImportFolderSettings().show());
+
+		
 		list.addCellContextClickHandler(click -> {
 			showContextMenu();
 			click.cancel();
