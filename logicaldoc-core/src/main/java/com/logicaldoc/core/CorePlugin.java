@@ -24,6 +24,8 @@ import com.logicaldoc.util.plugin.PluginException;
  */
 public class CorePlugin extends LogicalDOCPlugin {
 
+	protected static final String DEFAULT = "default";
+	
 	private static final Logger log = LoggerFactory.getLogger(CorePlugin.class);
 
 	@Override
@@ -58,11 +60,11 @@ public class CorePlugin extends LogicalDOCPlugin {
 					pbean.setProperty("aspect." + aspect + "." + level.toString(), "true");
 			}
 
-			pbean.setProperty("threadpool.Email.type", "default");
+			pbean.setProperty("threadpool.Email.type", DEFAULT);
 			pbean.setProperty("threadpool.EventCollector.max", "20");
-			pbean.setProperty("threadpool.EventCollector.type", "default");
+			pbean.setProperty("threadpool.EventCollector.type", DEFAULT);
 			pbean.setProperty("threadpool."+IndexerTask.NAME+".max", "2");
-			pbean.setProperty("threadpool."+IndexerTask.NAME+".type", "default");
+			pbean.setProperty("threadpool."+IndexerTask.NAME+".type", DEFAULT);
 
 			pbean.write();
 		} catch (IOException e) {

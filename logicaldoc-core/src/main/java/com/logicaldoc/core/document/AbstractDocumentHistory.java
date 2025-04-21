@@ -23,13 +23,13 @@ public abstract class AbstractDocumentHistory extends History {
 
 	@Column(name = "ld_folderid")
 	private Long folderId;
-	
+
 	@Column(name = "ld_filesize")
 	private Long fileSize = null;
-	
+
 	@Column(name = "ld_filename", length = 255)
 	private String filename = null;
-	
+
 	/**
 	 * Something to better qualify the event
 	 */
@@ -47,7 +47,7 @@ public abstract class AbstractDocumentHistory extends History {
 
 	@Column(name = "ld_filenameold", length = 255)
 	private String filenameOld = null;
-	
+
 	@Transient
 	private AbstractDocument document;
 
@@ -55,7 +55,7 @@ public abstract class AbstractDocumentHistory extends History {
 	@Transient
 	private Folder folder;
 
-	public AbstractDocumentHistory() {
+	protected AbstractDocumentHistory() {
 		super();
 	}
 
@@ -74,7 +74,7 @@ public abstract class AbstractDocumentHistory extends History {
 	public void setFolderId(Long folderId) {
 		this.folderId = folderId;
 	}
-	
+
 	public Long getFileSize() {
 		return fileSize;
 	}
@@ -82,7 +82,7 @@ public abstract class AbstractDocumentHistory extends History {
 	public void setFileSize(Long fileSize) {
 		this.fileSize = fileSize;
 	}
-	
+
 	public String getFilename() {
 		return filename;
 	}
@@ -90,7 +90,7 @@ public abstract class AbstractDocumentHistory extends History {
 	public void setFilename(String filename) {
 		this.filename = filename;
 	}
-	
+
 	public String getReason() {
 		return reason;
 	}
@@ -98,7 +98,7 @@ public abstract class AbstractDocumentHistory extends History {
 	public void setReason(String reason) {
 		this.reason = reason;
 	}
-	
+
 	public AbstractDocument getDocument() {
 		return document;
 	}
@@ -158,12 +158,12 @@ public abstract class AbstractDocumentHistory extends History {
 	}
 
 	public void setDocument(AbstractDocument document) {
-	    this.document = document;
-	    
+		this.document = document;
+
 		if (document != null) {
 			this.setFileSize(document.getFileSize());
 			this.setFilename(document.getFileName());
-			
+
 			if (document instanceof Version ver) {
 				this.setDocId(ver.getDocId());
 				this.setFolderId(ver.getFolderId());
@@ -172,5 +172,42 @@ public abstract class AbstractDocumentHistory extends History {
 				this.setFolderId(doc.getFolder().getId());
 			}
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((docId == null) ? 0 : docId.hashCode());
+		result = prime * result + ((folderId == null) ? 0 : folderId.hashCode());
+		result = prime * result + ((version == null) ? 0 : version.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AbstractDocumentHistory other = (AbstractDocumentHistory) obj;
+		if (docId == null) {
+			if (other.docId != null)
+				return false;
+		} else if (!docId.equals(other.docId))
+			return false;
+		if (folderId == null) {
+			if (other.folderId != null)
+				return false;
+		} else if (!folderId.equals(other.folderId))
+			return false;
+		if (version == null) {
+			if (other.version != null)
+				return false;
+		} else if (!version.equals(other.version))
+			return false;
+		return true;
 	}
 }

@@ -221,6 +221,9 @@ public abstract class Task implements Runnable {
 			transactionId = UUID.randomUUID().toString();
 			if (isConcurrent() || (lockManager != null && lockManager.get(getName(), transactionId)))
 				runTask();
+		} catch (InterruptedException ie) {
+			log.error("The task gets interrupted");
+			Thread.currentThread().interrupt();
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			log.error("The task is stopped");
@@ -418,7 +421,7 @@ public abstract class Task implements Runnable {
 	 * 
 	 * @throws IndexException If something goes wrong this exception is raised
 	 */
-	protected abstract void runTask() throws TaskException;
+	protected abstract void runTask() throws TaskException, InterruptedException;
 
 	/**
 	 * Concrete implementations must override this method declaring if the task

@@ -533,7 +533,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		try {
 			if (StringUtils.isNotEmpty(request.getHeader(HEADER_APIKEY))) {
 				String apiKey = CryptUtil.encryptSHA256(request.getHeader(HEADER_APIKEY));
-				return getSessions().stream().filter(s -> apiKey.equals(s.getKey())).map(s -> s.getSid()).findFirst()
+				return getSessions().stream().filter(s -> apiKey.equals(s.getKey())).map(Session::getSid).findFirst()
 						.orElse(null);
 			}
 		} catch (NoSuchAlgorithmException e) {

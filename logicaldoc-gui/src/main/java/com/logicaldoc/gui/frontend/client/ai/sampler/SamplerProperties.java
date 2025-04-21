@@ -37,11 +37,15 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class SamplerProperties extends SamplerDetailsTab {
 
+	private static final String TAKEATTRIBUTES = "takeattributes";
+
+	private static final String CHAIN = "chain";
+
 	private static final String CSV = "csv";
 
 	private static final String ID = "id";
 
-	private static final String DECRIPTION = "decription";
+	private static final String DESCRIPTION = "description";
 
 	private static final String NAME = "name";
 
@@ -59,7 +63,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 
 	private DocumentSelector documentSelector;
 
-	private ListGrid chain;
+	private ListGrid chainGrid;
 
 	private SectionStack chainStack = new SectionStack();
 
@@ -111,7 +115,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		quote.setLength(2);
 		quote.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, CSV));
 
-		TextAreaItem description = ItemFactory.newTextAreaItem("description", sampler.getDescription());
+		TextAreaItem description = ItemFactory.newTextAreaItem(DESCRIPTION, sampler.getDescription());
 		description.addChangedHandler(changedHandler);
 		description.setColSpan(4);
 		description.setWidth(400);
@@ -129,7 +133,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		type.setDisplayField(VALUE);
 		type.setValue(sampler.getType());
 		type.addChangedHandler(changedHandler);
-		type.addChangedHandler(changed -> chainStack.setVisible("chain".equals(type.getValueAsString())));
+		type.addChangedHandler(changed -> chainStack.setVisible(CHAIN.equals(type.getValueAsString())));
 		type.setRequired(true);
 		type.setDisabled(sampler.getId() != 0L);
 		type.setVisible(sampler.getId() == 0L);
@@ -147,7 +151,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		documentSelector.setDocument(sampler.getDocument());
 		documentSelector.addDocumentChangeListener(document -> changedHandler.onChanged(null));
 		documentSelector
-				.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.NOT_IN_SET, new String[] { METADATA, "chain" }));
+				.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.NOT_IN_SET, new String[] { METADATA, CHAIN }));
 
 		TextItem category = ItemFactory.newTextItem("category", sampler.getCategory());
 		category.addChangedHandler(changedHandler);
@@ -155,12 +159,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		category.setShowHintInField(true);
 		category.setIconVAlign(VerticalAlignment.CENTER);
 		category.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
-		FormItemIcon takeAttributeForCategory = new FormItemIcon();
-		takeAttributeForCategory.setName("takeattributes");
-		takeAttributeForCategory.setSrc("[SKIN]/icons/ballot.png");
-		takeAttributeForCategory.setPrompt(I18N.message("takeattributes"));
-		takeAttributeForCategory.addFormItemClickHandler(click -> new AttributeSelector(
-				selection -> click.getItem().setValue(selection[0].getAttributeAsString("name"))).show());
+		FormItemIcon takeAttributeForCategory = prepareTakeAttributeForCategory();
 		category.setIcons(takeAttributeForCategory);
 
 		TextItem features = ItemFactory.newTextItem("features", sampler.getFeatures());
@@ -171,24 +170,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		features.setShowHintInField(true);
 		features.setIconVAlign(VerticalAlignment.CENTER);
 		features.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
-
-		FormItemIcon takeAttributeForFeatures = new FormItemIcon();
-		takeAttributeForFeatures.setName("takeattributes");
-		takeAttributeForFeatures.setSrc("[SKIN]/icons/ballot.png");
-		takeAttributeForFeatures.setPrompt(I18N.message("takeattributes"));
-		takeAttributeForFeatures.addFormItemClickHandler(click -> new AttributeSelector(selection -> {
-			String str = click.getItem().getValue() != null ? click.getItem().getValue().toString() : "";
-			for (ListGridRecord listGridRecord : selection) {
-				String attrName = listGridRecord.getAttributeAsString("name");
-				if (!attrName.equals(category.getValue())) {
-					if (!str.isEmpty())
-						str += ",";
-					str += attrName;
-				}
-			}
-			click.getItem().setValue(str);
-		}).show());
-		features.setIcons(takeAttributeForFeatures);
+		features.setIcons(prepareTakeAttributeForFeatures(category));
 
 		form.setItems(id, typeValue, type, name, label, delimiter, quote, folderSelector, documentSelector, category,
 				features, automation, description);
@@ -199,26 +181,58 @@ public class SamplerProperties extends SamplerDetailsTab {
 		prepareChain();
 	}
 
+	protected FormItemIcon prepareTakeAttributeForCategory() {
+		FormItemIcon takeAttributeForCategory = new FormItemIcon();
+		takeAttributeForCategory.setName(TAKEATTRIBUTES);
+		takeAttributeForCategory.setSrc("[SKIN]/icons/ballot.png");
+		takeAttributeForCategory.setPrompt(I18N.message(TAKEATTRIBUTES));
+		takeAttributeForCategory.addFormItemClickHandler(click -> new AttributeSelector(
+				selection -> click.getItem().setValue(selection[0].getAttributeAsString("name"))).show());
+		return takeAttributeForCategory;
+	}
+
+	protected FormItemIcon prepareTakeAttributeForFeatures(TextItem category) {
+		FormItemIcon takeAttributeForFeatures = new FormItemIcon();
+		takeAttributeForFeatures.setName(TAKEATTRIBUTES);
+		takeAttributeForFeatures.setSrc("[SKIN]/icons/ballot.png");
+		takeAttributeForFeatures.setPrompt(I18N.message(TAKEATTRIBUTES));
+		takeAttributeForFeatures.addFormItemClickHandler(click -> new AttributeSelector(selection -> {
+			StringBuilder str = new StringBuilder(
+					click.getItem().getValue() != null ? click.getItem().getValue().toString() : "");
+
+			for (ListGridRecord listGridRecord : selection) {
+				String attrName = listGridRecord.getAttributeAsString("name");
+				if (!attrName.equals(category.getValue())) {
+					if (str.length() > 0)
+						str.append(",");
+					str.append(attrName);
+				}
+			}
+			click.getItem().setValue(str.toString());
+		}).show());
+		return takeAttributeForFeatures;
+	}
+
 	private void prepareChain() {
-		chain = new ListGrid();
-		chain.setEmptyMessage(I18N.message("notitemstoshow"));
-		chain.setWidth100();
-		chain.setHeight100();
-		chain.setEmptyMessage(I18N.message("norecords"));
-		chain.setCanSort(false);
-		chain.setCanFreezeFields(false);
-		chain.setCanGroupBy(false);
-		chain.setLeaveScrollbarGap(false);
-		chain.setShowHeader(true);
-		chain.setSelectionType(SelectionStyle.MULTIPLE);
-		chain.setCanEdit(false);
-		chain.setShowRowNumbers(true);
-		chain.setCanReorderRecords(true);
-		chain.setAutoFetchData(true);
-		chain.setShowRecordComponents(true);
-		chain.setShowRecordComponentsByCell(true);
-		chain.addDropCompleteHandler(dropCompleted -> changedHandler.onChanged(null));
-		chain.addCellContextClickHandler(event -> {
+		chainGrid = new ListGrid();
+		chainGrid.setEmptyMessage(I18N.message("notitemstoshow"));
+		chainGrid.setWidth100();
+		chainGrid.setHeight100();
+		chainGrid.setEmptyMessage(I18N.message("norecords"));
+		chainGrid.setCanSort(false);
+		chainGrid.setCanFreezeFields(false);
+		chainGrid.setCanGroupBy(false);
+		chainGrid.setLeaveScrollbarGap(false);
+		chainGrid.setShowHeader(true);
+		chainGrid.setSelectionType(SelectionStyle.MULTIPLE);
+		chainGrid.setCanEdit(false);
+		chainGrid.setShowRowNumbers(true);
+		chainGrid.setCanReorderRecords(true);
+		chainGrid.setAutoFetchData(true);
+		chainGrid.setShowRecordComponents(true);
+		chainGrid.setShowRecordComponentsByCell(true);
+		chainGrid.addDropCompleteHandler(dropCompleted -> changedHandler.onChanged(null));
+		chainGrid.addCellContextClickHandler(event -> {
 			showContextMenu();
 			event.cancel();
 		});
@@ -237,13 +251,13 @@ public class SamplerProperties extends SamplerDetailsTab {
 		type.setAutoFitWidth(true);
 		type.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 
-		ListGridField description = new ListGridField("description", I18N.message("description"));
+		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
 		description.setCanEdit(false);
 		description.setCanSort(false);
 		description.setAutoFitWidth(true);
 		description.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 
-		chain.setFields(id, name, type, description);
+		chainGrid.setFields(id, name, type, description);
 
 		SelectItem addSampler = prepareSamplerSelector();
 
@@ -253,20 +267,20 @@ public class SamplerProperties extends SamplerDetailsTab {
 			rec.setAttribute(ID, chanedSampler.getId());
 			rec.setAttribute(NAME, chanedSampler.getName());
 			rec.setAttribute(TYPE, chanedSampler.getType());
-			rec.setAttribute(DECRIPTION, chanedSampler.getDescription());
-			chain.addData(rec);
+			rec.setAttribute(DESCRIPTION, chanedSampler.getDescription());
+			chainGrid.addData(rec);
 		}
 
 		DynamicForm buttonsForm = new DynamicForm();
 		buttonsForm.setItems(addSampler);
 
 		chainStack.setHeight100();
-		chainStack.setVisible("chain".equals(sampler.getType()));
+		chainStack.setVisible(CHAIN.equals(sampler.getType()));
 
-		SectionStackSection section = new SectionStackSection("<b>" + I18N.message("chain") + "</b>");
+		SectionStackSection section = new SectionStackSection("<b>" + I18N.message(CHAIN) + "</b>");
 		section.setCanCollapse(false);
 		section.setExpanded(true);
-		section.setItems(chain, buttonsForm);
+		section.setItems(chainGrid, buttonsForm);
 
 		chainStack.setSections(section);
 		chainStack.draw();
@@ -279,7 +293,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(click -> {
-			chain.removeSelectedData();
+			chainGrid.removeSelectedData();
 			changedHandler.onChanged(null);
 		});
 
@@ -292,7 +306,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		addSampler.addChangedHandler(changed -> {
 			ListGridRecord selection = addSampler.getSelectedRecord();
 
-			boolean alreadyInChain = chain
+			boolean alreadyInChain = chainGrid
 					.find(new AdvancedCriteria(ID, OperatorId.EQUALS, selection.getAttributeAsString(ID))) != null;
 
 			if (!alreadyInChain && selection.getAttributeAsLong(ID) != sampler.getId()) {
@@ -300,8 +314,8 @@ public class SamplerProperties extends SamplerDetailsTab {
 				rec.setAttribute(ID, selection.getAttributeAsLong(ID));
 				rec.setAttribute(NAME, selection.getAttribute(NAME));
 				rec.setAttribute(TYPE, selection.getAttribute(TYPE));
-				rec.setAttribute(DECRIPTION, selection.getAttribute(DECRIPTION));
-				chain.getRecordList().add(rec);
+				rec.setAttribute(DESCRIPTION, selection.getAttribute(DESCRIPTION));
+				chainGrid.getRecordList().add(rec);
 			}
 		});
 		addSampler.addChangedHandler(changedHandler);
@@ -313,7 +327,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		if (form.validate()) {
 			sampler.setName(form.getValueAsString(NAME));
 			sampler.setLabel(form.getValueAsString("label"));
-			sampler.setDescription(form.getValueAsString("description"));
+			sampler.setDescription(form.getValueAsString(DESCRIPTION));
 			sampler.setDelimiter(form.getValueAsString("delimiter"));
 			sampler.setQuote(form.getValueAsString("quote"));
 			sampler.setType(form.getValueAsString(TYPE));
@@ -323,14 +337,14 @@ public class SamplerProperties extends SamplerDetailsTab {
 			sampler.setFeatures(form.getValueAsString("features"));
 			sampler.setAutomation(form.getValueAsString("automation"));
 
-			if ("chain".equals(sampler.getType()) && chain.getRecordList().isEmpty()) {
+			if (CHAIN.equals(sampler.getType()) && Boolean.TRUE.equals(chainGrid.getRecordList().isEmpty())) {
 				GuiLog.error("samplerchainempty");
 				return false;
 			}
 
 			sampler.getChain().clear();
-			if ("chain".equals(sampler.getType())) {
-				com.smartgwt.client.data.Record[] chainRecords = chain.getRecordList().toArray();
+			if (CHAIN.equals(sampler.getType())) {
+				com.smartgwt.client.data.Record[] chainRecords = chainGrid.getRecordList().toArray();
 				for (com.smartgwt.client.data.Record chainRecord : chainRecords)
 					sampler.getChain()
 							.add(new GUISampler(chainRecord.getAttributeAsLong(ID), chainRecord.getAttribute(NAME)));

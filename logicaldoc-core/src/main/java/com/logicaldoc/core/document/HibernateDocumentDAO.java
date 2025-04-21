@@ -1419,8 +1419,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	public Set<Permission> getAllowedPermissions(long docId, long userId) throws PersistenceException {
 		final Set<Permission> permissions = new HashSet<>();
 		User user = getExistingtUser(userId);
-		if(user==null)
-			return new HashSet<>();
 		
 		userDAO.initialize(user);
 

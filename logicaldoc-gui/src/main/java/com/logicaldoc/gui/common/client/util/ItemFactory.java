@@ -33,6 +33,7 @@ import com.logicaldoc.gui.common.client.data.ContactsDS;
 import com.logicaldoc.gui.common.client.data.ConversionFormatsDS;
 import com.logicaldoc.gui.common.client.data.DashletsDS;
 import com.logicaldoc.gui.common.client.data.EventsDS;
+import com.logicaldoc.gui.common.client.data.EventsDSParameter;
 import com.logicaldoc.gui.common.client.data.FolderTemplatesDS;
 import com.logicaldoc.gui.common.client.data.FoldersDS;
 import com.logicaldoc.gui.common.client.data.FormatConvertersDS;
@@ -1227,8 +1228,11 @@ public class ItemFactory {
 		select.setHeight(250);
 		select.setMultipleAppearance(MultipleAppearance.GRID);
 		select.setMultiple(true);
-		select.setOptionDataSource(new EventsDS(options.isFolder(), options.isWorkflow(), options.isUser(),
-				options.isImportfolder(), options.isOcr(), options.isWebservice(), options.isAi(), options.isAllOption()));
+
+		EventsDSParameter param = new EventsDSParameter(options.isFolder(), options.isWorkflow(), options.isUser(),
+				options.isImportfolder(), options.isOcr(), options.isWebservice(), options.isAi());
+		param.setAll(options.isAll());
+		select.setOptionDataSource(new EventsDS(param));
 		select.setValueField("code");
 		select.setDisplayField(LABEL);
 		if (handler != null)
@@ -1253,8 +1257,10 @@ public class ItemFactory {
 		final SelectItem select = newSelectItem(originalItemName(name), title);
 		select.setWidth(350);
 		select.setMultiple(false);
-		select.setOptionDataSource(new EventsDS(options.isFolder(), options.isWorkflow(), options.isUser(),
-				options.isImportfolder(), options.isOcr(), options.isWebservice(), options.isAi(), options.isAllOption()));
+		
+		EventsDSParameter param = new EventsDSParameter(options.isFolder(), options.isWorkflow(), options.isUser(), options.isImportfolder(), options.isOcr(), options.isWebservice(), options.isAi());
+		param.setAll(options.isAll());
+		select.setOptionDataSource(new EventsDS(param));
 		select.setValueField("code");
 		select.setDisplayField(LABEL);
 		if (handler != null)
@@ -1322,7 +1328,7 @@ public class ItemFactory {
 		spinner.setTitle(I18N.message(title));
 		spinner.setMin(0);
 		spinner.setStep(1);
-		spinner.setWidth(60); 
+		spinner.setWidth(60);
 		if (value != null)
 			spinner.setValue(value.intValue());
 		else

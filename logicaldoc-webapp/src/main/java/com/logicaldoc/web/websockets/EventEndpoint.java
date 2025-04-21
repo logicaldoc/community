@@ -30,7 +30,6 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.folder.FolderEvent;
 import com.logicaldoc.core.history.History;
-import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;

@@ -17,7 +17,15 @@ public class WebserviceChartServlet extends ChartServlet {
 	 */
 	public WebserviceChartServlet() {
 		super();
-		super.prefix = WebserviceInterceptor.WSCALL;
-		super.rowKey = "calls";
+	}
+
+	@Override
+	protected String sequencePrefix() {
+		return WebserviceInterceptor.WSCALL;
+	}
+
+	@Override
+	protected String messageTitle() {
+		return "calls";
 	}
 }

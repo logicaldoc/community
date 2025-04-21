@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import javax.activation.DataHandler;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;

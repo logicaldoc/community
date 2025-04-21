@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.EventSelectorOptions;
+import com.logicaldoc.gui.common.client.util.EventSelectorOptionsParameter;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
@@ -70,7 +71,7 @@ public class AuditingPanel extends AdminPanel {
 		String eventsParameterName = Session.get().getTenantName() + ".history.events";
 		final SelectItem eventsSelector = ItemFactory.newEventsSelector(eventsParameterName,
 				I18N.message("recordedevents"), null,
-				new EventSelectorOptions(true, true, true, true, true, true, true, true));
+				new EventSelectorOptions(new EventSelectorOptionsParameter(true)));
 		eventsSelector.setColSpan(2);
 		eventsSelector.setEndRow(true);
 

@@ -10,7 +10,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Utility calass to mask a {@link Map}<String,TemplateAttribute> with
+ * Utility class to mask a {@link Map}<String,TemplateAttribute> with
  * a{@link Map}<String,Attribute>
  * 
  * @author Marco Meschieri - LogicalDOC
@@ -28,26 +28,32 @@ class AttributeMapWrapper extends HashMap<String, Attribute> {
 		this.wrappedAttributesMap = wrappedAttributesMap;
 	}
 
+	@Override
 	public int size() {
 		return wrappedAttributesMap.size();
 	}
 
+	@Override
 	public boolean isEmpty() {
 		return wrappedAttributesMap.isEmpty();
 	}
 
+	@Override
 	public boolean containsKey(Object key) {
 		return wrappedAttributesMap.containsKey(key);
 	}
 
+	@Override
 	public boolean containsValue(Object value) {
 		return wrappedAttributesMap.containsValue(value);
 	}
 
+	@Override
 	public TemplateAttribute get(Object key) {
 		return wrappedAttributesMap.get(key);
 	}
 
+	@Override
 	public TemplateAttribute put(String key, Attribute value) {
 		if (value instanceof TemplateAttribute ta)
 			return wrappedAttributesMap.put(key, ta);
@@ -55,29 +61,36 @@ class AttributeMapWrapper extends HashMap<String, Attribute> {
 			return null;
 	}
 
+	@Override
 	public TemplateAttribute remove(Object key) {
 		return wrappedAttributesMap.remove(key);
 	}
 
+	@Override
 	public void putAll(Map<? extends String, ? extends Attribute> m) {
-		for (Map.Entry<? extends String, ? extends Attribute> e : m.entrySet()) {
+		for (Map.Entry<String, ? extends Attribute> e : m.entrySet().stream()
+				.collect(Collectors.toMap(String.class::cast, v -> (Attribute) v)).entrySet()) {
 			if (e.getValue() instanceof TemplateAttribute ta)
-				wrappedAttributesMap.put(e.getKey().toString(), ta);
+				wrappedAttributesMap.put(e.getKey(), ta);
 		}
 	}
 
+	@Override
 	public void clear() {
 		wrappedAttributesMap.clear();
 	}
 
+	@Override
 	public Set<String> keySet() {
 		return wrappedAttributesMap.keySet();
 	}
 
+	@Override
 	public Collection<Attribute> values() {
 		return wrappedAttributesMap.values().stream().map(a -> (Attribute) a).toList();
 	}
 
+	@Override
 	public Set<Entry<String, Attribute>> entrySet() {
 		return wrappedAttributesMap.entrySet().stream().map(e -> new Map.Entry<String, Attribute>() {
 
@@ -101,26 +114,37 @@ class AttributeMapWrapper extends HashMap<String, Attribute> {
 		}).collect(Collectors.toSet());
 	}
 
+	@Override
 	public boolean equals(Object o) {
 		return wrappedAttributesMap.equals(o);
 	}
 
+	@Override
 	public int hashCode() {
 		return wrappedAttributesMap.hashCode();
 	}
 
-	public TemplateAttribute getOrDefault(Object key, TemplateAttribute defaultValue) {
-		return wrappedAttributesMap.getOrDefault(key, defaultValue);
+	@Override
+	public Attribute getOrDefault(Object key, Attribute defaultValue) {
+		TemplateAttribute ta = wrappedAttributesMap.get(key);
+		if (ta != null) {
+			return ta;
+		} else {
+			return defaultValue;
+		}
 	}
 
+	@Override
 	public void forEach(BiConsumer<? super String, ? super Attribute> action) {
 		wrappedAttributesMap.forEach(action);
 	}
 
+	@Override
 	public void replaceAll(BiFunction<? super String, ? super Attribute, ? extends Attribute> function) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public TemplateAttribute putIfAbsent(String key, Attribute value) {
 		if (value instanceof TemplateAttribute ta)
 			return wrappedAttributesMap.putIfAbsent(key, ta);
@@ -128,10 +152,12 @@ class AttributeMapWrapper extends HashMap<String, Attribute> {
 			return null;
 	}
 
+	@Override
 	public boolean remove(Object key, Object value) {
 		return wrappedAttributesMap.remove(key, value);
 	}
 
+	@Override
 	public boolean replace(String key, Attribute oldValue, Attribute newValue) {
 		if (oldValue instanceof TemplateAttribute oldTA && newValue instanceof TemplateAttribute newTA)
 			return wrappedAttributesMap.replace(key, oldTA, newTA);
@@ -139,6 +165,7 @@ class AttributeMapWrapper extends HashMap<String, Attribute> {
 			return false;
 	}
 
+	@Override
 	public TemplateAttribute replace(String key, Attribute value) {
 		if (value instanceof TemplateAttribute ta)
 			return wrappedAttributesMap.replace(key, ta);
@@ -146,22 +173,25 @@ class AttributeMapWrapper extends HashMap<String, Attribute> {
 			return null;
 	}
 
-	public TemplateAttribute computeIfAbsent(String key,
-			Function<? super String, ? extends Attribute> mappingFunction) {
+	@Override
+	public Attribute computeIfAbsent(String key, Function<? super String, ? extends Attribute> mappingFunction) {
 		throw new UnsupportedOperationException();
 	}
 
-	public TemplateAttribute computeIfPresent(String key,
-			BiFunction<? super String, ? super TemplateAttribute, ? extends Attribute> remappingFunction) {
+	@Override
+	public Attribute computeIfPresent(String key,
+			BiFunction<? super String, ? super Attribute, ? extends Attribute> remappingFunction) {
 		throw new UnsupportedOperationException();
 	}
 
-	public TemplateAttribute compute(String key,
-			BiFunction<? super String, ? super TemplateAttribute, ? extends Attribute> remappingFunction) {
+	@Override
+	public Attribute compute(String key,
+			BiFunction<? super String, ? super Attribute, ? extends Attribute> remappingFunction) {
 		throw new UnsupportedOperationException();
 	}
 
-	public TemplateAttribute merge(String key, Attribute value,
+	@Override
+	public Attribute merge(String key, Attribute value,
 			BiFunction<? super Attribute, ? super Attribute, ? extends Attribute> remappingFunction) {
 		throw new UnsupportedOperationException();
 	}

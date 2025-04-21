@@ -31,9 +31,9 @@ import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentHistory;
-import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.FolderAccessControlEntry;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Permission;
@@ -555,7 +555,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		transaction = new FolderHistory();
 		testSubject.store(folderVO, transaction);
 
-		assertEquals(transaction.getEventEnum(), FolderEvent.CREATED);
+		assertEquals(FolderEvent.CREATED, transaction.getEventEnum());
 	}
 
 	@Test
@@ -1413,7 +1413,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testRestore() throws PersistenceException, InterruptedException {
+	public void testRestore() throws PersistenceException {
 		assertEquals(1204L,
 				testSubject.queryForLong("select ld_id from ld_folder where ld_id=" + 1204L + " and ld_deleted=1"));
 

@@ -277,7 +277,7 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testApplyMetadata() throws PersistenceException, ServerException, InterruptedException {
+	public void testApplyMetadata() throws PersistenceException, ServerException {
 		GUIFolder folder9 = testSubject.getFolder(9L, false, false, false);
 		assertNull(folder9.getTemplateId());
 

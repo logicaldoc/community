@@ -1870,10 +1870,10 @@ public class LDRepository {
 		addPropertyId(result, typeId, filter, PropertyIds.OBJECT_TYPE_ID, TypeManager.DOCUMENT_TYPE_ID);
 
 		// file properties
-		if (doc instanceof Document) {
+		if (doc instanceof Document document) {
 			addPropertyBoolean(result, typeId, filter, PropertyIds.IS_LATEST_VERSION, true);
 			addPropertyBoolean(result, typeId, filter, PropertyIds.IS_MAJOR_VERSION,
-					doc.getVersion() == null || doc.getVersion().endsWith(".0"));
+					document.getVersion() == null || document.getVersion().endsWith(".0"));
 		} else {
 			Version ver = (Version) doc;
 			AbstractDocument d = getDocument(ID_PREFIX_DOC + ver.getDocId());
@@ -1882,9 +1882,11 @@ public class LDRepository {
 					d.getVersion().equals(ver.getVersion()));
 			addPropertyBoolean(result, typeId, filter, PropertyIds.IS_MAJOR_VERSION, ver.getVersion().endsWith(".0"));
 		}
+
 		addPropertyString(result, typeId, filter, PropertyIds.VERSION_LABEL, doc.getVersion());
 		addPropertyId(result, typeId, filter, PropertyIds.VERSION_SERIES_ID, getId(doc));
-		if (doc.getStatus() != DocumentStatus.CHECKEDOUT) {
+
+		if (doc.getStatus().equals(DocumentStatus.CHECKEDOUT)) {
 			addPropertyBoolean(result, typeId, filter, PropertyIds.IS_VERSION_SERIES_CHECKED_OUT, false);
 			addPropertyString(result, typeId, filter, PropertyIds.VERSION_SERIES_CHECKED_OUT_BY, null);
 			addPropertyString(result, typeId, filter, PropertyIds.VERSION_SERIES_CHECKED_OUT_ID, null);
@@ -1897,6 +1899,7 @@ public class LDRepository {
 					checkoutUser != null ? checkoutUser.getFullName() : null);
 			addPropertyString(result, typeId, filter, PropertyIds.VERSION_SERIES_CHECKED_OUT_ID, getId(doc));
 		}
+		
 		addPropertyString(result, typeId, filter, PropertyIds.CHECKIN_COMMENT, doc.getComment());
 		addPropertyInteger(result, typeId, filter, PropertyIds.CONTENT_STREAM_LENGTH, doc.getFileSize());
 		objectInfo.setHasContent(true);
@@ -1931,12 +1934,7 @@ public class LDRepository {
 		addPropertyString(result, typeId, filter, TypeManager.PROP_FILEVERSION, doc.getFileVersion());
 		addPropertyString(result, typeId, filter, TypeManager.PROP_VERSION, doc.getVersion());
 		addPropertyString(result, typeId, filter, TypeManager.PROP_CUSTOMID, doc.getCustomId());
-
-		try {
-			addPropertyString(result, typeId, filter, TypeManager.PROP_TAGS, doc.getTgs());
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
+		addPropertyString(result, typeId, filter, TypeManager.PROP_TAGS, StringUtils.defaultString(doc.getTgs()));
 
 		compileDocumentOrVersionExtAttrsProperties(doc, typeId, result, filter);
 	}

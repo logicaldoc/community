@@ -18,6 +18,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.preview.PreviewPopup;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.EventSelectorOptions;
+import com.logicaldoc.gui.common.client.util.EventSelectorOptionsParameter;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -189,7 +190,7 @@ public class LastChangesReport extends AdminPanel {
 
 		// Event
 		SelectItem event = ItemFactory.newEventsSelector(EVENT, I18N.message(EVENT), null,
-				new EventSelectorOptions(true, true, true, true, true, false, true, false));
+				new EventSelectorOptions(new EventSelectorOptionsParameter(true, true, true, true, true, false, true)));
 		event.setColSpan(2);
 		event.setEndRow(true);
 

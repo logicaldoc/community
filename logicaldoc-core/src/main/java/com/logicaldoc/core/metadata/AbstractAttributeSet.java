@@ -82,7 +82,8 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
 		return values;
 	}
 
-	public Set<String> getValueAttributesName(String name) {
+	@Override
+	protected Set<String> getValueAttributesName(String name) {
 		TreeSet<String> attNames = new TreeSet<>();
 		for (String n : getTemplateAttributes().keySet()) {
 			if (n.equals(name) || name.equals(getAttribute(n).getParent()))
@@ -126,10 +127,10 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
 	public List<String> getAttributeNames(long setId) {
 		List<String> names = new ArrayList<>();
 		if (getTemplateAttributes() != null) {
-			for (String name : getTemplateAttributes().keySet()) {
-				Attribute att = getAttribute(name);
+			for (String attributeName : getTemplateAttributes().keySet()) {
+				Attribute att = getAttribute(attributeName);
 				if (att.getSetId() != null && setId == att.getSetId())
-					names.add(name);
+					names.add(attributeName);
 			}
 		}
 		return names;
@@ -222,7 +223,8 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
 		return ext;
 	}
 
-	private int getLastPosition() {
+	@Override
+	protected int getLastPosition() {
 		int position = 0;
 
 		if (getTemplateAttributes() != null)

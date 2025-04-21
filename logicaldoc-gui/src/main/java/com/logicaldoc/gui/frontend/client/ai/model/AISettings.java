@@ -39,7 +39,7 @@ public class AISettings extends Window {
 		setShowModalMask(true);
 		centerInPage();
 
-		SettingService.Instance.get().loadSettingsByNames(Arrays.asList(new String[] { modelsSettingName() }),
+		SettingService.Instance.get().loadSettingsByNames(Arrays.asList(modelsSettingName()),
 				new DefaultAsyncCallback<>() {
 
 					@Override

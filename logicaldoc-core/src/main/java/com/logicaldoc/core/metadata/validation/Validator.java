@@ -117,7 +117,7 @@ public class Validator {
 			if (attribute == null)
 				continue;
 
-			TemplateAttribute templateAttribute = (TemplateAttribute) template.getAttribute(attributeName);
+			TemplateAttribute templateAttribute = template.getAttribute(attributeName);
 			if (StringUtils.isNotEmpty(templateAttribute.getValidation()))
 				executeAttributeValidation(object, transaction, errors, attributeName, attribute, templateAttribute);
 		}

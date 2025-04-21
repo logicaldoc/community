@@ -176,7 +176,7 @@ public abstract class ExtensibleObject extends PersistentObject implements Exten
 		return getAttributes().get(name);
 	}
 
-	private int getLastPosition() {
+	protected int getLastPosition() {
 		int position = 0;
 
 		if (getAttributes() != null)
@@ -187,7 +187,7 @@ public abstract class ExtensibleObject extends PersistentObject implements Exten
 
 		return position;
 	}
-	
+
 	/**
 	 * Retrieves the ordered set of the names of the attributes representing the
 	 * different values
@@ -196,7 +196,7 @@ public abstract class ExtensibleObject extends PersistentObject implements Exten
 	 * 
 	 * @return the set of names
 	 */
-	private Set<String> getValueAttributesName(String name) {
+	protected Set<String> getValueAttributesName(String name) {
 		TreeSet<String> attNames = new TreeSet<>();
 		for (String n : getAttributes().keySet()) {
 			if (n.equals(name) || name.equals(getAttribute(n).getParent()))
@@ -204,5 +204,4 @@ public abstract class ExtensibleObject extends PersistentObject implements Exten
 		}
 		return attNames;
 	}
-
 }

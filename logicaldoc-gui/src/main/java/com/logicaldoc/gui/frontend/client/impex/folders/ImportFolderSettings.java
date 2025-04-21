@@ -40,14 +40,13 @@ public class ImportFolderSettings extends Window {
 		setShowModalMask(true);
 		centerInPage();
 
-		SettingService.Instance.get().loadSettingsByNames(Arrays.asList(new String[] { THREADS_SETTING }),
-				new DefaultAsyncCallback<>() {
+		SettingService.Instance.get().loadSettingsByNames(Arrays.asList(THREADS_SETTING), new DefaultAsyncCallback<>() {
 
-					@Override
-					public void onSuccess(List<GUIParameter> params) {
-						init(params);
-					}
-				});
+			@Override
+			public void onSuccess(List<GUIParameter> params) {
+				init(params);
+			}
+		});
 	}
 
 	private void init(List<GUIParameter> params) {

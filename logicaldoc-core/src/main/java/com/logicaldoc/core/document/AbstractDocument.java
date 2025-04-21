@@ -939,7 +939,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		if (CollectionUtils.isEmpty(tgs)) {
 			this.tgs = null;
 		} else {
-			tgs.stream().collect(Collectors.joining(","));
+			this.tgs = tgs.stream().collect(Collectors.joining(","));
 		}
 	}
 

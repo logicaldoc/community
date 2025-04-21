@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.EventSelectorOptions;
+import com.logicaldoc.gui.common.client.util.EventSelectorOptionsParameter;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
@@ -120,7 +121,7 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 		toolStrip.addFormItem(folderSelector);
 
 		event = ItemFactory.newEventSelector("event", "event", evnt -> refresh(),
-				new EventSelectorOptions(true, true, true, true, true, true, false, false));
+				new EventSelectorOptions(new EventSelectorOptionsParameter(true, true, true, true, true, true, false)));
 		toolStrip.addFormItem(event);
 
 		toolStrip.addSeparator();

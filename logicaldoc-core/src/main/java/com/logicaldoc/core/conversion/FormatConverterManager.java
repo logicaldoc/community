@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
@@ -442,9 +443,9 @@ public class FormatConverterManager {
 		String inOutkey = composeKey(inFileName, outFileName);
 
 		List<FormatConverter> formatConverters = getConverters().get(inOutkey);
-		if (formatConverters == null || formatConverters.isEmpty())
+		if (CollectionUtils.isEmpty(formatConverters))
 			formatConverters = getConverters().get("*-pdf");
-		if (formatConverters == null || formatConverters.isEmpty())
+		if (CollectionUtils.isEmpty(formatConverters))
 			log.warn("No format converter for file {}", inFileName);
 
 		// Get the first available and enabled converter

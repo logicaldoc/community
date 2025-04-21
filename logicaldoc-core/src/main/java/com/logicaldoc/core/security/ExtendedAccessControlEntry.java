@@ -72,10 +72,10 @@ public abstract class ExtendedAccessControlEntry extends AccessControlEntry {
 	@Column(name = "ld_customid", nullable = false)
 	protected int customid = 0;
 
-	public ExtendedAccessControlEntry() {
+	protected ExtendedAccessControlEntry() {
 	}
 
-	public ExtendedAccessControlEntry(ExtendedAccessControlEntry source) {
+	protected ExtendedAccessControlEntry(ExtendedAccessControlEntry source) {
 		super(source);
 		this.archive = source.archive;
 		this.automation = source.automation;
@@ -97,7 +97,7 @@ public abstract class ExtendedAccessControlEntry extends AccessControlEntry {
 		this.customid = source.customid;
 	}
 
-	public ExtendedAccessControlEntry(long groupId) {
+	protected ExtendedAccessControlEntry(long groupId) {
 		super(groupId);
 	}
 

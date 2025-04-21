@@ -8,6 +8,7 @@ import com.logicaldoc.gui.common.client.beans.GUIAutomationTrigger;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.EventSelectorOptions;
+import com.logicaldoc.gui.common.client.util.EventSelectorOptionsParameter;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.smartgwt.client.types.TitleOrientation;
@@ -154,7 +155,7 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 
 			if (changedHandler != null)
 				changedHandler.onChanged(event);
-		}, new EventSelectorOptions(true, true, true, true, true, true, true, false));
+		}, new EventSelectorOptions(new EventSelectorOptionsParameter(true, true, true, true, true, true, true)));
 		events.setRowSpan(2);
 		events.setColSpan(4);
 		events.setValues(trigger.getEventsArray());

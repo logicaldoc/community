@@ -39,6 +39,10 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class ModelProperties extends ModelDetailsTab {
 
+	private static final String FUNCTION = "function";
+
+	private static final String LANGUAGE = "language";
+
 	private static final String SEED = "seed";
 
 	private static final String BATCH = "batch";
@@ -152,7 +156,7 @@ public class ModelProperties extends ModelDetailsTab {
 		seed.addChangedHandler(changedHandler);
 		setNeuralNetworkVisibility(seed);
 
-		SelectItem language = ItemFactory.newLanguageSelector("language", true, false);
+		SelectItem language = ItemFactory.newLanguageSelector(LANGUAGE, true, false);
 		language.setValue(model.getLanguage());
 		language.addChangedHandler(changedHandler);
 		setNLPVisibility(language);
@@ -261,13 +265,13 @@ public class ModelProperties extends ModelDetailsTab {
 		item.setValueMap(map);
 		item.setValue(model.getActivation());
 
-		ListGridField functionField = new ListGridField("function", I18N.message("function"));
+		ListGridField functionField = new ListGridField(FUNCTION, I18N.message(FUNCTION));
 		ListGridField graphField = new ListGridField("graph", I18N.message("graph"));
-		graphField.setCellFormatter((value, record, rowNum, colNum) -> Util
-				.imageHTML("AI/activation/" + record.getAttributeAsString("function") + ".png", null, 80, null));
+		graphField.setCellFormatter((value, rcd, rowNum, colNum) -> Util
+				.imageHTML("AI/activation/" + rcd.getAttributeAsString(FUNCTION) + ".png", null, 80, null));
 
-		item.setValueField("function");
-		item.setDisplayField("function");
+		item.setValueField(FUNCTION);
+		item.setDisplayField(FUNCTION);
 		item.setPickListWidth(450);
 		item.setPickListFields(functionField, graphField);
 
@@ -279,7 +283,7 @@ public class ModelProperties extends ModelDetailsTab {
 			model.setName(form.getValueAsString(NAME));
 			model.setLabel(form.getValueAsString("label"));
 			model.setDescription(form.getValueAsString("description"));
-			model.setLanguage(form.getValueAsString("language"));
+			model.setLanguage(form.getValueAsString(LANGUAGE));
 			model.setType(form.getValueAsString(TYPE));
 			model.setFeatures(form.getValueAsString("features"));
 			model.setCategories(form.getValueAsString("categories"));
@@ -301,7 +305,7 @@ public class ModelProperties extends ModelDetailsTab {
 					model.getLayers().add(new GUINeuralNetworkLayer(layerRecord.getAttribute(NAME),
 							layerRecord.getAttributeAsInt(OUTPUTNODES), layerRecord.getAttribute(ACTIVATION)));
 			} else {
-				model.setLanguage(form.getValueAsString("language"));
+				model.setLanguage(form.getValueAsString(LANGUAGE));
 				model.setCutoff(Integer.parseInt(form.getValueAsString("cutoff")));
 				model.setNgramMin(Integer.parseInt(form.getValueAsString("ngrammin")));
 				model.setNgramMax(Integer.parseInt(form.getValueAsString("ngrammax")));

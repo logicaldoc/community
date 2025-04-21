@@ -40,13 +40,13 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
-import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.DocumentLink;
 import com.logicaldoc.core.document.DocumentLinkDAO;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.DocumentNoteDAO;
 import com.logicaldoc.core.document.DocumentStatus;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
@@ -76,8 +76,7 @@ import com.logicaldoc.web.AbstractWebappTestCase;
 import com.logicaldoc.web.UploadServlet;
 
 @RunWith(MockitoJUnitRunner.class)
-public class 
-DocumentServiceImplTest extends AbstractWebappTestCase {
+public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	private static final String UTF_8 = "UTF-8";
 
@@ -416,7 +415,7 @@ DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testEnforceFilesIntoFolderStore() throws ServerException, PersistenceException, InterruptedException {
+	public void testEnforceFilesIntoFolderStore() throws ServerException, PersistenceException {
 		Folder folder = folderDao.findById(1200);
 		folderDao.initialize(folder);
 		assertEquals(Integer.valueOf(2), folder.getStore());
@@ -452,14 +451,14 @@ DocumentServiceImplTest extends AbstractWebappTestCase {
 		GUIDocument doc = testSubject.getById(7);
 		assertEquals(DocumentStatus.UNLOCKED.ordinal(), doc.getStatus());
 		assertEquals("1.1", doc.getVersion());
-		assertEquals("1.0", doc.getFileVersion());
+		assertEquals("1.1", doc.getFileVersion());
 
 		testSubject.promoteVersion(doc.getId(), "1.0");
 
 		doc = testSubject.getById(7);
 		assertEquals(DocumentStatus.UNLOCKED.ordinal(), doc.getStatus());
 		assertEquals("1.2", doc.getVersion());
-		assertEquals("1.0", doc.getFileVersion());
+		assertEquals("1.2", doc.getFileVersion());
 
 		// non-existent version
 		boolean exceptionHappened = false;
@@ -513,11 +512,11 @@ DocumentServiceImplTest extends AbstractWebappTestCase {
 		doc = testSubject.getById(7);
 		assertEquals(DocumentStatus.UNLOCKED.ordinal(), doc.getStatus());
 		assertEquals("1.1", doc.getVersion());
-		assertEquals("1.0", doc.getFileVersion());
+		assertEquals("1.1", doc.getFileVersion());
 	}
 
 	@Test
-	public void testAddDocuments() throws ServerException, IOException, InterruptedException, PersistenceException {
+	public void testAddDocuments() throws ServerException, IOException, PersistenceException {
 		GUIDocument doc = testSubject.getById(7);
 		doc.setId(0L);
 		doc.setCustomId(null);
@@ -726,7 +725,7 @@ DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		testSubject.indexDocuments(List.of(doc.getId()));
 		doc = testSubject.getById(doc.getId());
-		
+
 		GUIDocument indexedDoc = testSubject.getById(doc.getId());
 		assertEquals(1, indexedDoc.getIndexed());
 

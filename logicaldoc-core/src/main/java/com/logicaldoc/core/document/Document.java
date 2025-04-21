@@ -340,4 +340,29 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 			getAccessControlList().add(ace);
 		}
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((docRef == null) ? 0 : docRef.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Document other = (Document) obj;
+		if (docRef == null) {
+			if (other.docRef != null)
+				return false;
+		} else if (!docRef.equals(other.docRef))
+			return false;
+		return true;
+	}
 }

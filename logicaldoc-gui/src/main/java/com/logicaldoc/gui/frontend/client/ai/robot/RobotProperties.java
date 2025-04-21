@@ -37,6 +37,10 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class RobotProperties extends RobotDetailsTab {
 
+	private static final String CLASSIFIER = "classifier";
+
+	private static final String LABEL = "label";
+
 	private static final String CATEGORY = "category";
 
 	private static final String ANSWER = "answer";
@@ -81,11 +85,11 @@ public class RobotProperties extends RobotDetailsTab {
 		name.addChangedHandler(changedHandler);
 		name.setRequired(true);
 
-		TextItem label = ItemFactory.newTextItem("label", robot.getLabel());
+		TextItem label = ItemFactory.newTextItem(LABEL, robot.getLabel());
 		label.addChangedHandler(changedHandler);
 
-		SelectItem classifier = new SelectItem("classifier", I18N.message("classifier"));
-		classifier.setDisplayField("label");
+		SelectItem classifier = new SelectItem(CLASSIFIER, I18N.message(CLASSIFIER));
+		classifier.setDisplayField(LABEL);
 		classifier.setValueField("id");
 		classifier.setWidth(150);
 		classifier.setMultiple(false);
@@ -93,12 +97,12 @@ public class RobotProperties extends RobotDetailsTab {
 		classifier.setRequired(true);
 		classifier.setStartRow(true);
 		classifier.setMultipleAppearance(MultipleAppearance.PICKLIST);
-		classifier.setOptionDataSource(new ModelsDS("classifier"));
+		classifier.setOptionDataSource(new ModelsDS(CLASSIFIER));
 		classifier.setValue(robot.getClassifierId());
 		classifier.addChangedHandler(changedHandler);
 
 		SelectItem tokensDetector = new SelectItem("tokensDetector", I18N.message("tokensdetector"));
-		tokensDetector.setDisplayField("label");
+		tokensDetector.setDisplayField(LABEL);
 		tokensDetector.setValueField("id");
 		tokensDetector.setWidth(150);
 		tokensDetector.setMultiple(false);
@@ -128,9 +132,9 @@ public class RobotProperties extends RobotDetailsTab {
 	boolean validate() {
 		if (form.validate()) {
 			robot.setName(form.getValueAsString(NAME));
-			robot.setLabel(form.getValueAsString("label"));
+			robot.setLabel(form.getValueAsString(LABEL));
 			robot.setDescription(form.getValueAsString("description"));
-			robot.setClassifierId(Long.parseLong(form.getValueAsString("classifier")));
+			robot.setClassifierId(Long.parseLong(form.getValueAsString(CLASSIFIER)));
 			robot.setTokensDetectorId(Long.parseLong(form.getValueAsString("tokensDetector")));
 
 			com.smartgwt.client.data.Record[] answerRecords = answers.getRecordList().toArray();
@@ -248,7 +252,6 @@ public class RobotProperties extends RobotDetailsTab {
 				@Override
 				public void onSuccess(String avatar) {
 					robot.setAvatar(avatar);
-					// usersPanel.updateRecord(user);
 				}
 			});
 

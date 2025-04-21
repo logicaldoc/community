@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -49,15 +50,12 @@ public abstract class ChartServlet extends HttpServlet {
 
 	private static final Logger log = LoggerFactory.getLogger(ChartServlet.class);
 
-	protected String prefix = "prefix";
+	protected String sequencePrefix() {
+		return "prefix";
+	}
 
-	protected String rowKey = "key";
-
-	/**
-	 * Constructor of the object.
-	 */
-	public ChartServlet() {
-		super();
+	protected String messageTitle() {
+		return "key";
 	}
 
 	/**
@@ -102,14 +100,12 @@ public abstract class ChartServlet extends HttpServlet {
 	}
 
 	protected long getObjectId(HttpServletRequest request) throws IOException, PersistenceException {
-		return 0L;
+		return Long.parseLong(StringUtils.defaultString(request.getParameter("objectId"), "0"));
 	}
 
 	protected long getTenantId(HttpServletRequest request) throws IOException, PersistenceException {
-		long tenantId = Tenant.SYSTEM_ID;
-		if (request.getParameter("tenantId") != null)
-			tenantId = Long.parseLong(request.getParameter("tenantId"));
-		return tenantId;
+		return Long.parseLong(
+				StringUtils.defaultString(request.getParameter("tenantId"), String.valueOf(Tenant.SYSTEM_ID)));
 	}
 
 	protected void drawChart(File chartFile, int width, int height, Locale locale, long objectId, long tenantId)
@@ -127,8 +123,8 @@ public abstract class ChartServlet extends HttpServlet {
 			cal.add(Calendar.MONTH, -i);
 			String month = dfNumber.format(cal.getTime());
 			String monthName = dfName.format(cal.getTime());
-			dataset.addValue(dao.getCurrentValue(prefix + "-" + month, objectId, tenantId),
-					I18N.message(rowKey, locale), monthName);
+			dataset.addValue(dao.getCurrentValue(sequencePrefix() + "-" + month, objectId, tenantId),
+					I18N.message(messageTitle(), locale), monthName);
 		}
 
 		JFreeChart chart = ChartFactory.createBarChart("", null, null, dataset, PlotOrientation.VERTICAL, false, false,

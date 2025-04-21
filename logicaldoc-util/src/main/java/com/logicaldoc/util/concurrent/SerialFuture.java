@@ -34,12 +34,12 @@ public class SerialFuture<V> implements Future<V> {
 
 	@Override
 	public boolean isCancelled() {
-		return futures.stream().allMatch(f -> f.isCancelled());
+		return futures.stream().allMatch(Future::isCancelled);
 	}
 
 	@Override
 	public boolean isDone() {
-		return futures.stream().allMatch(f -> f.isDone());
+		return futures.stream().allMatch(Future::isDone);
 	}
 
 	@Override

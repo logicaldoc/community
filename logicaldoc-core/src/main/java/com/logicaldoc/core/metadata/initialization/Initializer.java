@@ -63,7 +63,7 @@ public class Initializer {
 		for (String attributeName : template.getAttributeNames()) {
 			try {
 				Attribute attribute = object.getAttribute(attributeName);
-				TemplateAttribute templateAttribute = (TemplateAttribute) template.getAttribute(attributeName);
+				TemplateAttribute templateAttribute = template.getAttribute(attributeName);
 				if (attribute != null && templateAttribute != null && attribute.getValue() == null
 						&& StringUtils.isNotEmpty(templateAttribute.getInitialization()))
 					executeInitialization(object, transaction, attributeName, attribute, templateAttribute);

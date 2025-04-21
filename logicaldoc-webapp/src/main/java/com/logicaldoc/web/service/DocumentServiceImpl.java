@@ -135,6 +135,8 @@ import com.logicaldoc.web.websockets.WebsocketTool;
  */
 public class DocumentServiceImpl extends AbstractRemoteService implements DocumentService {
 
+	private static final String ERROR = "error";
+
 	private static final String DOCUMENT_STR = "Document ";
 
 	private static final String UNEXISTING_DOCUMENT = "Unexisting document";
@@ -272,7 +274,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				addDocuments(importZip, charset, immediateIndexing, metadata, session, createdDocs);
 			} catch (ServerException | PersistenceException | ParsingException | IOException e) {
 				log.error(e.getMessage(), e);
-				new WebsocketTool().showMessage(session, e.getMessage(), "error");
+				new WebsocketTool().showMessage(session, e.getMessage(), ERROR);
 			}
 			return null;
 		}, session)) {
@@ -1516,7 +1518,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			return sendEmail(mail, session, attachedDocs);
 		} catch (PermissionException | PersistenceException | IOException | AutomationException e) {
 			log.warn(e.getMessage(), e);
-			return "error";
+			return ERROR;
 		}
 	}
 
@@ -1637,7 +1639,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			return "ok";
 		} catch (Exception ex) {
 			log.warn(ex.getMessage(), ex);
-			return "error";
+			return ERROR;
 		}
 	}
 

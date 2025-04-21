@@ -91,8 +91,6 @@ public class DocumentManager {
 
 	private static final String UNKNOWN = "unknown";
 
-	private static final String DOCUMENT_IS_IMMUTABLE = "Document is immutable";
-
 	private static final Logger log = LoggerFactory.getLogger(DocumentManager.class);
 
 	@Resource(name = "documentDAO")
@@ -220,7 +218,7 @@ public class DocumentManager {
 
 			log.debug("Replaced fileVersion {} of document {}", fileVersion, docId);
 
-			return new DocumentFuture(document, new SerialFuture<Document>(futures));
+			return new DocumentFuture(document, new SerialFuture<>(futures));
 		} else {
 			return new DocumentFuture(null, null);
 		}
@@ -302,8 +300,7 @@ public class DocumentManager {
 			document.setComment(transaction.getComment());
 
 			Document oldDocument = null;
-			if (document.getImmutable() != 0)
-				throw new PersistenceException("Document is immutable");
+			checkImmutability(document, null);
 
 			documentDAO.initialize(document);
 
@@ -414,6 +411,11 @@ public class DocumentManager {
 
 			return elaboration;
 		}
+	}
+
+	protected void checkImmutability(Document document, User user) throws PersistenceException {
+		if (document.getImmutable() == 1 && (user == null || !user.isMemberOf(Group.GROUP_ADMIN)))
+			throw new PersistenceException("Document is immutable");
 	}
 
 	private void checkCustomIdUniquenessOnCheckin(Document document, AbstractDocument docVO)
@@ -633,7 +635,8 @@ public class DocumentManager {
 
 		// For additional safety update the DB directly
 		doc.setIndexingStatus(IndexingStatus.INDEXED);
-		documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + doc.getIndexed().ordinal() + " where ld_id=" + doc.getId());
+		documentDAO.jdbcUpdate(
+				UPDATE_LD_DOCUMENT_SET_LD_INDEXED + doc.getIndexed().ordinal() + " where ld_id=" + doc.getId());
 
 		// Save the event
 		if (transaction != null) {
@@ -693,8 +696,8 @@ public class DocumentManager {
 	}
 
 	private void markAliasesToIndex(long referencedDocId) throws PersistenceException {
-		documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + IndexingStatus.TO_INDEX.ordinal() + " where ld_docref="
-				+ referencedDocId + " and not ld_id = " + referencedDocId);
+		documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + IndexingStatus.TO_INDEX.ordinal()
+				+ " where ld_docref=" + referencedDocId + " and not ld_id = " + referencedDocId);
 	}
 
 	/**
@@ -878,45 +881,41 @@ public class DocumentManager {
 		if (folder.equals(doc.getFolder()))
 			return new DocumentFuture(doc, new FutureValue<>(doc));
 
-		if (doc.getImmutable() == 0
-				|| (doc.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
+		/*
+		 * Better to synchronize this block because under high multi-threading
+		 * may lead to hibernate's sessions rollbacks
+		 */
+		synchronized (this) {
+			checkImmutability(doc, transaction.getUser());
 
-			/*
-			 * Better to synchronize this block because under high
-			 * multi-threading may lead to hibernate's sessions rollbacks
-			 */
-			synchronized (this) {
-				documentDAO.initialize(doc);
-				transaction.setPathOld(folderDAO.computePathExtended(doc.getFolder().getId()));
-				transaction.setFilenameOld(doc.getFileName());
+			documentDAO.initialize(doc);
+			transaction.setPathOld(folderDAO.computePathExtended(doc.getFolder().getId()));
+			transaction.setFilenameOld(doc.getFileName());
+			transaction.setEvent(DocumentEvent.MOVED);
+
+			doc.setFolder(folder);
+
+			// The document needs to be reindexed
+			if (doc.getIndexed() == IndexingStatus.INDEXED) {
+				doc.setIndexingStatus(IndexingStatus.TO_INDEX);
+				indexer.deleteHit(doc.getId());
+
+				// The same thing should be done on each shortcut
+				documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + IndexingStatus.TO_INDEX.ordinal()
+						+ " where ld_docref=" + doc.getId());
+			}
+
+			// Modify document history entry
+			if (transaction.getEvent().trim().isEmpty())
 				transaction.setEvent(DocumentEvent.MOVED);
 
-				doc.setFolder(folder);
+			Version version = Version.create(doc, transaction.getUser(), transaction.getComment(), DocumentEvent.MOVED,
+					false);
+			version.setId(0);
 
-				// The document needs to be reindexed
-				if (doc.getIndexed() == IndexingStatus.INDEXED) {
-					doc.setIndexingStatus(IndexingStatus.TO_INDEX);
-					indexer.deleteHit(doc.getId());
+			documentDAO.store(doc, transaction);
 
-					// The same thing should be done on each shortcut
-					documentDAO.jdbcUpdate(UPDATE_LD_DOCUMENT_SET_LD_INDEXED + IndexingStatus.TO_INDEX.ordinal()
-							+ " where ld_docref=" + doc.getId());
-				}
-
-				// Modify document history entry
-				if (transaction.getEvent().trim().isEmpty())
-					transaction.setEvent(DocumentEvent.MOVED);
-
-				Version version = Version.create(doc, transaction.getUser(), transaction.getComment(),
-						DocumentEvent.MOVED, false);
-				version.setId(0);
-
-				documentDAO.store(doc, transaction);
-
-				return new DocumentFuture(doc, storeVersionAsync(version, doc));
-			}
-		} else {
-			throw new PersistenceException(DOCUMENT_IS_IMMUTABLE);
+			return new DocumentFuture(doc, storeVersionAsync(version, doc));
 		}
 	}
 
@@ -1308,15 +1307,13 @@ public class DocumentManager {
 		validateTransaction(transaction);
 
 		Document document = documentDAO.findById(docId);
-		if (document.getImmutable() == 0) {
-			// Modify document history entry
-			transaction.setEvent(DocumentEvent.IMMUTABLE);
-			documentDAO.makeImmutable(docId, transaction);
+		checkImmutability(document, null);
 
-			log.debug("The document {} has been marked as immutable", docId);
-		} else {
-			throw new PersistenceException(DOCUMENT_IS_IMMUTABLE);
-		}
+		// Modify document history entry
+		transaction.setEvent(DocumentEvent.IMMUTABLE);
+		documentDAO.makeImmutable(docId, transaction);
+
+		log.debug("The document {} has been marked as immutable", docId);
 	}
 
 	/**
@@ -1339,34 +1336,30 @@ public class DocumentManager {
 		 */
 		synchronized (this) {
 			Document document = documentDAO.findById(docId);
+			checkImmutability(document, transaction.getUser());
 
-			if (document.getImmutable() == 0
-					|| (document.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
-				documentDAO.initialize(document);
-				document.setFileName(newName.trim());
-				String extension = FileUtil.getExtension(newName.trim());
-				if (StringUtils.isNotEmpty(extension)) {
-					document.setType(FileUtil.getExtension(newName));
-				} else {
-					document.setType(UNKNOWN);
-				}
-
-				document.setIndexingStatus(IndexingStatus.TO_INDEX);
-
-				Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
-						DocumentEvent.RENAMED, false);
-				DocumentFuture elaboration = new DocumentFuture(document, storeVersionAsync(version, document));
-
-				transaction.setEvent(DocumentEvent.RENAMED);
-				documentDAO.store(document, transaction);
-
-				markAliasesToIndex(docId);
-				log.debug("Document renamed: {}", document.getId());
-
-				return elaboration;
+			documentDAO.initialize(document);
+			document.setFileName(newName.trim());
+			String extension = FileUtil.getExtension(newName.trim());
+			if (StringUtils.isNotEmpty(extension)) {
+				document.setType(FileUtil.getExtension(newName));
 			} else {
-				throw new PersistenceException(DOCUMENT_IS_IMMUTABLE);
+				document.setType(UNKNOWN);
 			}
+
+			document.setIndexingStatus(IndexingStatus.TO_INDEX);
+
+			Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
+					DocumentEvent.RENAMED, false);
+			DocumentFuture elaboration = new DocumentFuture(document, storeVersionAsync(version, document));
+
+			transaction.setEvent(DocumentEvent.RENAMED);
+			documentDAO.store(document, transaction);
+
+			markAliasesToIndex(docId);
+			log.debug("Document renamed: {}", document.getId());
+
+			return elaboration;
 		}
 	}
 

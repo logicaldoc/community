@@ -593,38 +593,12 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		StringBuilder query = new StringBuilder();
 		for (String table : History.eventTables()) {
 			String tableAlias = "A" + (i++);
-			
-			if (!query.isEmpty())
-				query.append(" union ");
-			query.append("select ");
-			if (doesNotProvideDocumentReference(table))
-				query.append("''");
-			else
-				query.append("A.ld_username".replace("A", tableAlias));
 
-			query.append(", A.ld_event, A.ld_date,".replace("A", tableAlias));
+			appendUnion(query);
 
-			if (doesNotProvideDocumentReference(table))
-				query.append("'', null");
-			else
-				query.append("A.ld_filename, A.ld_folderid".replace("A", tableAlias));
-			query.append(
-					", A.ld_path, A.ld_sessionid".replace("A", tableAlias));
-			
-			if (doesNotProvideDocumentReference(table))
-				query.append(", ''");
-			else
-				query.append(", A.ld_docid".replace("A", tableAlias));
+			appendSelect(table, tableAlias, query);
 
-			query.append(", A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment".replace("A", tableAlias));
-			
-			if (doesNotProvideDocumentReference(table))
-				query.append(", ''");
-			else
-				query.append(", A.ld_reason".replace("A", tableAlias));
-			
-			query.append(", A.ld_device, A.ld_geolocation, A.ld_keylabel from TABLE A where A.ld_tenantid = "
-							.replace("TABLE", table).replace("A", tableAlias));
+			query.append(" from TABLE A where A.ld_tenantid = ".replace("TABLE", table).replace("A", tableAlias));
 			query.append(Long.toString(session.getTenantId()));
 
 			appendUserCondition(tableAlias, userId, query);
@@ -642,7 +616,43 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			return throwServerException(session, log, e);
 		}
 	}
-	
+
+	protected void appendSelect(String table, String tableAlias, StringBuilder query) {
+		query.append("select ");
+
+		if (doesNotProvideDocumentReference(table))
+			query.append("''");
+		else
+			query.append("A.ld_username".replace("A", tableAlias));
+
+		query.append(", A.ld_event, A.ld_date,".replace("A", tableAlias));
+
+		if (doesNotProvideDocumentReference(table))
+			query.append("'', null");
+		else
+			query.append("A.ld_filename, A.ld_folderid".replace("A", tableAlias));
+		query.append(", A.ld_path, A.ld_sessionid".replace("A", tableAlias));
+
+		if (doesNotProvideDocumentReference(table))
+			query.append(", ''");
+		else
+			query.append(", A.ld_docid".replace("A", tableAlias));
+
+		query.append(", A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment".replace("A", tableAlias));
+
+		if (doesNotProvideDocumentReference(table))
+			query.append(", ''");
+		else
+			query.append(", A.ld_reason".replace("A", tableAlias));
+
+		query.append(", A.ld_device, A.ld_geolocation, A.ld_keylabel ".replace("A", tableAlias));
+	}
+
+	protected void appendUnion(StringBuilder query) {
+		if (!query.isEmpty())
+			query.append(" union ");
+	}
+
 	private boolean doesNotProvideDocumentReference(String table) {
 		return table.equals("ld_webservicecall") || table.equals("ld_aimodel_history")
 				|| table.equals("ld_robot_history") || table.equals("ld_chatmessage");

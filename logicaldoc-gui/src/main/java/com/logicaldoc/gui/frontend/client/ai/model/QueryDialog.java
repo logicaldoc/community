@@ -32,6 +32,12 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class QueryDialog extends Window {
 
+	private static final String NAME = "name";
+
+	private static final String VALUE = "value";
+
+	private static final String SCORE = "score";
+
 	private DynamicForm form = new DynamicForm();
 
 	private ButtonItem query;
@@ -95,13 +101,13 @@ public class QueryDialog extends Window {
 		resultGrid.setCanFreezeFields(true);
 		resultGrid.setFilterOnKeypress(true);
 
-		ListGridField name = new ListGridField("name", I18N.message("name"));
+		ListGridField name = new ListGridField(NAME, I18N.message(NAME));
 		name.setAutoFitWidth(true);
 		name.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 		
-		ListGridField score = new ListGridField("score", I18N.message("score"));
+		ListGridField score = new ListGridField(SCORE, I18N.message(SCORE));
 		
-		ListGridField value = new ListGridField("value", I18N.message("value"));
+		ListGridField value = new ListGridField(VALUE, I18N.message(VALUE));
 		value.setAutoFitWidth(true);
 		value.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
 
@@ -125,9 +131,9 @@ public class QueryDialog extends Window {
 						query.setDisabled(false);
 						resultGrid.setData(new RecordList(answers.stream().map(answer -> {
 							ListGridRecord rec = new ListGridRecord();
-							rec.setAttribute("name", answer.getName());
-							rec.setAttribute("score", answer.getScore());
-							rec.setAttribute("value", answer.getValue());
+							rec.setAttribute(NAME, answer.getName());
+							rec.setAttribute(SCORE, answer.getScore());
+							rec.setAttribute(VALUE, answer.getValue());
 							return rec;
 						}).collect(Collectors.toList())));
 					}

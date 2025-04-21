@@ -46,11 +46,8 @@ public class IndexerTask extends Task {
 	@Resource(name = "documentDAO")
 	protected DocumentDAO documentDao;
 
-	@Resource(name = "threadPools")
-	private ThreadPools threadPools;
-
 	@Resource(name = "SearchEngine")
-	protected SearchEngine indexer;
+	protected SearchEngine searchEngine;
 
 	private long totalIndexedDocuments = 0;
 
@@ -58,7 +55,7 @@ public class IndexerTask extends Task {
 
 	private long totalIndexingTime = 0;
 
-	private long totalParsingTime = 0;
+	private long totalParsingTime = 0L;
 
 	private List<Indexer> threads = new ArrayList<>();
 
@@ -91,7 +88,7 @@ public class IndexerTask extends Task {
 	@Override
 	protected void runTask() throws TaskException {
 
-		if (indexer.isLocked()) {
+		if (searchEngine.isLocked()) {
 			log.warn("Index locked, skipping indexing");
 			return;
 		}
@@ -154,22 +151,12 @@ public class IndexerTask extends Task {
 				for (List<Long> segment : segments) {
 					Indexer indexer = new Indexer(segment, this, log);
 					threads.add(indexer);
-					futures.add(threadPools.schedule(indexer, NAME, 1));
+					futures.add(Context.get(ThreadPools.class).schedule(indexer, NAME, 1));
 					log.debug("Launched the indexer for documents {}", segment);
 				}
 
 				// Wait for the completion of all the indexers
-				try {
-					List<IndexerStats> stats = new SerialFuture<IndexerStats>(futures).getAll();
-					for (IndexerStats stat : stats) {
-						totalErrors += stat.getErrors();
-						totalIndexedDocuments += stat.getIndexed();
-						totalIndexingTime += stat.getIndexingTime();
-						totalParsingTime += stat.getParsingTime();
-					}
-				} catch (InterruptedException | ExecutionException e) {
-					log.error(e.getMessage(), e);
-				}
+				waitForIndexersCompletion(futures);
 
 				log.info("All indexers have completed");
 			}
@@ -184,7 +171,7 @@ public class IndexerTask extends Task {
 				log.info("Errors: {}", totalErrors);
 			}
 
-			indexer.unlock();
+			searchEngine.unlock();
 
 			try {
 				// To be safer always release the lock
@@ -205,6 +192,29 @@ public class IndexerTask extends Task {
 			next();
 			if (log.isInfoEnabled())
 				log.info("Documents released from transaction {}", transactionId);
+		}
+	}
+
+	/**
+	 * Stays waiting for the completion of all the indexers, collecting the
+	 * total time spent in indexing.
+	 * 
+	 * @param futures The futures containing the stats from each one of the
+	 *        running indexers
+	 */
+	protected void waitForIndexersCompletion(List<Future<IndexerStats>> futures) {
+		try {
+			List<IndexerStats> stats = new SerialFuture<IndexerStats>(futures).getAll();
+			for (IndexerStats stat : stats) {
+				totalErrors += stat.getErrors();
+				totalIndexedDocuments += stat.getIndexed();
+				totalIndexingTime += stat.getIndexingTime();
+				totalParsingTime += stat.getParsingTime();
+			}
+		} catch (ExecutionException e) {
+			log.error(e.getMessage(), e);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 		}
 	}
 

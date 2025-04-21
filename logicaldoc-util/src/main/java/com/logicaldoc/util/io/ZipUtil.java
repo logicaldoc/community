@@ -510,7 +510,7 @@ public class ZipUtil implements Closeable {
 					TarArchiveInputStream archive = new TarArchiveInputStream(tarBIS)) {
 
 				TarArchiveEntry entry;
-				while ((entry = archive.getNextTarEntry()) != null) {
+				while ((entry = archive.getNextEntry()) != null) {
 					File file = new File(targetDir + "/" + entry.getName());
 					if (!entry.isFile()) {
 						file.mkdirs();

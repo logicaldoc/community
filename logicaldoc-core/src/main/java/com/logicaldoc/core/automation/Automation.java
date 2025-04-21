@@ -159,8 +159,7 @@ public class Automation {
 				Class<?> beanClass = Class.forName(beanClassName);
 
 				String key = beanClass.getSimpleName();
-				AutomationDictionary annotation = (AutomationDictionary) beanClass
-						.getAnnotation(AutomationDictionary.class);
+				AutomationDictionary annotation = beanClass.getAnnotation(AutomationDictionary.class);
 				if (annotation != null && StringUtils.isNotEmpty(annotation.key()))
 					key = annotation.key();
 

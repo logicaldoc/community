@@ -11,8 +11,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * @since 6.0
  */
 public class EventsDS extends DataSource {
-	public EventsDS(boolean folder, boolean workflow, boolean user, boolean importfolder, boolean ocr,
-			boolean webservice, boolean ai, boolean allOption) {
+	public EventsDS(EventsDSParameter parameter) {
 		setRecordXPath("/list/event");
 		DataSourceTextField code = new DataSourceTextField("code");
 		code.setPrimaryKey(true);
@@ -24,8 +23,8 @@ public class EventsDS extends DataSource {
 		setFields(code, type, label);
 		setClientOnly(true);
 
-		setDataURL("data/events.xml?locale=" + I18N.getLocale() + "&folder=" + folder + "&workflow=" + workflow
-				+ "&user=" + user + "&importfolder=" + importfolder + "&ocr=" + ocr + "&webservice=" + webservice+ "&ai=" + ai
-				+ "&all=" + allOption);
+		setDataURL("data/events.xml?locale=" + I18N.getLocale() + "&folder=" + parameter.isFolder() + "&workflow=" + parameter.isWorkflow()
+				+ "&user=" + parameter.isUser() + "&importfolder=" + parameter.isImportfolder() + "&ocr=" + parameter.isOcr() + "&webservice=" + parameter.isWebservice()+ "&ai=" + parameter.isAi()
+				+ "&all=" + parameter.isAll());
 	}
 }

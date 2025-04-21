@@ -155,13 +155,17 @@ public class ModelDetailsPanel extends VLayout {
 		statsPanel = new ModelStats(model);
 		statsTabPanel.addMember(statsPanel);
 
+		toggleEvaluationTab();
+
+		historyPanel = new ModelHistoryPanel(model.getId());
+		historyTabPanel.addMember(historyPanel);
+	}
+
+	protected void toggleEvaluationTab() {
 		if (model.isNeuralNetwork())
 			tabSet.showTab(EVALUATION);
 		else
 			tabSet.hideTab(EVALUATION);
-
-		historyPanel = new ModelHistoryPanel(model.getId());
-		historyTabPanel.addMember(historyPanel);
 	}
 
 	public GUIModel getModel() {

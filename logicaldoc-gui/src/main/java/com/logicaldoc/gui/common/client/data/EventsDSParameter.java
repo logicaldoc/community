@@ -1,7 +1,6 @@
-package com.logicaldoc.gui.common.client.util;
+package com.logicaldoc.gui.common.client.data;
 
-public class EventSelectorOptions {
-	
+public class EventsDSParameter {
 	private boolean folder;
 
 	private boolean workflow;
@@ -14,19 +13,19 @@ public class EventSelectorOptions {
 
 	private boolean webservice;
 
-	private boolean all;
-
 	private boolean ai;
 
-	public EventSelectorOptions(EventSelectorOptionsParameter parameter) {
-		this.folder = parameter.isFolder();
-		this.workflow = parameter.isWorkflow();
-		this.user = parameter.isUser();
-		this.importfolder = parameter.isImportfolder();
-		this.ocr = parameter.isOcr();
-		this.webservice = parameter.isWebservice();
-		this.ai = parameter.isAi();
-		this.all=parameter.isAll();
+	private boolean all;
+
+	public EventsDSParameter(boolean folder, boolean workflow, boolean user, boolean importfolder, boolean ocr,
+			boolean webservice, boolean ai) {
+		this.folder = folder;
+		this.workflow = workflow;
+		this.user = user;
+		this.importfolder = importfolder;
+		this.ocr = ocr;
+		this.webservice = webservice;
+		this.ai = ai;
 	}
 
 	public boolean isFolder() {
@@ -77,19 +76,19 @@ public class EventSelectorOptions {
 		this.webservice = webservice;
 	}
 
-	public boolean isAll() {
-		return all;
-	}
-
-	public void setAll(boolean all) {
-		this.all = all;
-	}
-
 	public boolean isAi() {
 		return ai;
 	}
 
 	public void setAi(boolean ai) {
 		this.ai = ai;
+	}
+
+	public boolean isAll() {
+		return all;
+	}
+
+	public void setAll(boolean all) {
+		this.all = all;
 	}
 }

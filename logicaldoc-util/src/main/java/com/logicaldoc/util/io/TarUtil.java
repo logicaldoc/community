@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
@@ -42,24 +43,17 @@ public class TarUtil {
 	public List<String> listEntries(File tarFile) throws IOException {
 		List<String> entries = new ArrayList<>();
 
-		try {
-			try (FileInputStream fis = new FileInputStream(tarFile);
-					BufferedInputStream bis = new BufferedInputStream(fis);
-					ArchiveInputStream<TarArchiveEntry> tarInput = new ArchiveStreamFactory()
-							.createArchiveInputStream(bis);) {
-
-				try {
-					TarArchiveEntry entry = tarInput.getNextEntry();
-					while (entry != null) {
-						String name = entry.getName();
-						if (name.endsWith("/"))
-							name = name.substring(0, name.lastIndexOf('/'));
-						entries.add(name);
-						entry = tarInput.getNextEntry();
-					}
-				} finally {
-					tarInput.close();
-				}
+		try (FileInputStream fis = new FileInputStream(tarFile);
+				BufferedInputStream bis = new BufferedInputStream(fis);
+				ArchiveInputStream<TarArchiveEntry> tarInput = new ArchiveStreamFactory()
+						.createArchiveInputStream(bis);) {
+			TarArchiveEntry entry = tarInput.getNextEntry();
+			while (entry != null) {
+				String name = entry.getName();
+				if (name.endsWith("/"))
+					name = name.substring(0, name.lastIndexOf('/'));
+				entries.add(name);
+				entry = tarInput.getNextEntry();
 			}
 		} catch (ArchiveException e) {
 			throw new IOException(e.getMessage());
@@ -80,7 +74,7 @@ public class TarUtil {
 		try {
 			try (FileInputStream fis = new FileInputStream(tarFile);
 					BufferedInputStream bis = new BufferedInputStream(fis);
-					ArchiveInputStream input = new ArchiveStreamFactory().createArchiveInputStream(bis);
+					ArchiveInputStream<? extends ArchiveEntry> input = new ArchiveStreamFactory().createArchiveInputStream(bis);
 					BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest));) {
 
 				if (input instanceof TarArchiveInputStream tarInput) {

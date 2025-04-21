@@ -305,14 +305,14 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		version.setStopPublishing(document.getStopPublishing());
 
 		String newVersionName = document.getVersion();
-		if (!event.equals(DocumentEvent.STORED.toString())) {
+		if (!event.equals(DocumentEvent.STORED)) {
 			newVersionName = version.getNewVersionName(document.getVersion(), release);
 			version.setVersion(newVersionName);
 			document.setVersion(newVersionName);
 		}
 
 		// If the file changed, than the file version must be changed also
-		if (DocumentEvent.CHECKEDIN.toString().equals(event) || DocumentEvent.STORED.toString().equals(event)
+		if (DocumentEvent.CHECKEDIN.equals(event) || DocumentEvent.STORED.equals(event)
 				|| StringUtils.isEmpty(document.getFileVersion())) {
 			version.setFileVersion(newVersionName);
 			document.setFileVersion(newVersionName);

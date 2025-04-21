@@ -36,7 +36,7 @@ public class SevenZipUtil {
 	public List<String> listEntries(File sevenZipFile) throws IOException {
 		List<String> entries = new ArrayList<>();
 
-		try (SevenZFile archiveFile = new SevenZFile(sevenZipFile);) {
+		try (SevenZFile archiveFile = SevenZFile.builder().setFile(sevenZipFile).get()) {
 			SevenZArchiveEntry entry;
 			while ((entry = archiveFile.getNextEntry()) != null)
 				entries.add(entry.getName());
@@ -48,7 +48,7 @@ public class SevenZipUtil {
 	}
 
 	public void extractEntry(File sevenZipFile, String entryName, File dest) throws IOException {
-		try (SevenZFile archiveFile = new SevenZFile(sevenZipFile);) {
+		try (SevenZFile archiveFile = SevenZFile.builder().setFile(sevenZipFile).get()) {
 			SevenZArchiveEntry entry;
 			while ((entry = archiveFile.getNextEntry()) != null) {
 				if (entry.getName().equals(entryName) && entry.hasStream()) {

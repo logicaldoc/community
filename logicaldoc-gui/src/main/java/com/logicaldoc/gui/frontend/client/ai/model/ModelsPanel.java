@@ -42,6 +42,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class ModelsPanel extends VLayout {
 
+	private static final String QUESTION = "question";
+
 	private static final String TRAINED = "trained";
 
 	private static final String EVALUATED = "evaluated";
@@ -221,7 +223,7 @@ public class ModelsPanel extends VLayout {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+		delete.addClickHandler(event -> LD.ask(I18N.message(QUESTION), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
 				AIService.Instance.get().deleteModels(ids, new DefaultAsyncCallback<>() {
 					@Override
@@ -236,7 +238,7 @@ public class ModelsPanel extends VLayout {
 
 		MenuItem train = new MenuItem();
 		train.setTitle(I18N.message("starttraining"));
-		train.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmtraining"), confirm -> {
+		train.addClickHandler(event -> LD.ask(I18N.message(QUESTION), I18N.message("confirmtraining"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
 				AIService.Instance.get().trainModel(ids.get(0), new DefaultAsyncCallback<>() {
 					@Override
@@ -251,7 +253,7 @@ public class ModelsPanel extends VLayout {
 		MenuItem evaluate = new MenuItem();
 		evaluate.setTitle(I18N.message("startevaluation"));
 		evaluate.addClickHandler(
-				event -> LD.ask(I18N.message("question"), I18N.message("confirmevaluation"), confirm -> {
+				event -> LD.ask(I18N.message(QUESTION), I18N.message("confirmevaluation"), confirm -> {
 					if (Boolean.TRUE.equals(confirm)) {
 						AIService.Instance.get().evaluateModel(ids.get(0), new DefaultAsyncCallback<>() {
 							@Override
@@ -354,8 +356,8 @@ public class ModelsPanel extends VLayout {
 					|| (recLastTrained != null && !recLastTrained.equals(model.getTraining().getLastTrained()));
 
 			return changesInEvaluation || changesInTraining;
-		} catch (Throwable t) {
-			GuiLog.error(model.getName() + " " + t.getMessage());
+		} catch (Exception e) {
+			GuiLog.error(model.getName() + " " + e.getMessage());
 			return false;
 		}
 	}

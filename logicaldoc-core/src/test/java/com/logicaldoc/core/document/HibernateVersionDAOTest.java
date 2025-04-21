@@ -112,7 +112,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 
 		Version version = Version.create(doc, user, "", DocumentEvent.STORED, true);
 		testSubject.store(version);
-		assertEquals("2.0", testSubject.findById(version.getId()).getVersion());
+		assertEquals("1.0", testSubject.findById(version.getId()).getVersion());
 
 		String resourceName = store.getResourceName(doc.getId(), version.getFileVersion(), null);
 		try (InputStream is = this.getClass().getResourceAsStream("/data.sql")) {
@@ -127,7 +127,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 
 		version = Version.create(doc, user, "", DocumentEvent.CHANGED, true);
 		testSubject.store(version);
-		assertEquals("3.0", version.getVersion());
+		assertEquals("2.0", version.getVersion());
 
 		resourceName = store.getResourceName(doc.getId(), version.getFileVersion(), null);
 		try (InputStream is = this.getClass().getResourceAsStream("/data.sql")) {
@@ -142,7 +142,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 
 		version = Version.create(doc, user, "", DocumentEvent.CHECKEDIN, false);
 		testSubject.store(version);
-		assertEquals("3.1", version.getVersion());
+		assertEquals("2.1", version.getVersion());
 
 		resourceName = store.getResourceName(doc.getId(), version.getFileVersion(), null);
 		try (InputStream is = this.getClass().getResourceAsStream("/data.sql")) {
@@ -172,7 +172,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 
 		version = Version.create(doc1, user, "", DocumentEvent.STORED, false);
 		testSubject.store(version);
-		assertEquals("1.1", testSubject.findById(version.getId()).getVersion());
+		assertEquals("1.0", testSubject.findById(version.getId()).getVersion());
 	}
 
 	@Test

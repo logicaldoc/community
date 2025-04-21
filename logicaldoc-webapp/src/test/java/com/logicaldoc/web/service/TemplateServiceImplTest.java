@@ -162,7 +162,7 @@ public class TemplateServiceImplTest extends AbstractWebappTestCase {
 		GUIForm form = new GUIForm();
 		form.setTemplateId(template.getId());
 
-		extAttr = testSubject.getAttributes(template.getId(), form);
+		testSubject.getAttributes(template.getId(), form);
 
 		Map<String, Object> params = new HashMap<>();
 		params.put("templateId", template.getId());

@@ -66,7 +66,7 @@ public class RobotAvatar extends HLayout {
 				avatarImage.setAlign(Alignment.LEFT);
 				avatarImage.setContextMenu(prepareContextMenu());
 				setMembers(avatarImage);
-				
+
 				if (callback != null)
 					callback.onSuccess(rbt.getAvatar());
 			}
@@ -85,9 +85,7 @@ public class RobotAvatar extends HLayout {
 
 		MenuItem update = new MenuItem();
 		update.setTitle(I18N.message("update"));
-		update.addClickHandler(event -> {
-			new Uploader(robotId).show();
-		});
+		update.addClickHandler(event -> new Uploader(robotId).show());
 
 		Menu contextMenu = new Menu();
 		contextMenu.setItems(reset, update);

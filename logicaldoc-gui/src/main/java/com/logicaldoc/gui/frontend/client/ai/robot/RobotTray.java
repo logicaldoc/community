@@ -16,8 +16,10 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
  */
 public class RobotTray extends MenuTray {
 
+	private static final String QUESTION = "question";
+
 	public RobotTray() {
-		TextItem question = ItemFactory.newTextItem("question", "");
+		TextItem question = ItemFactory.newTextItem(QUESTION, "");
 		question.setShowTitle(false);
 		question.setWidth(200);
 		question.addKeyPressHandler(event -> {
@@ -35,9 +37,9 @@ public class RobotTray extends MenuTray {
 		RobotSelector robot = new RobotSelector();
 		robot.setDefaultToFirstOption(true);
 		robot.setWidth(100);
-		
+
 		setNumCols(3);
-		
+
 		setItems(robot, question);
 	}
 
@@ -47,7 +49,7 @@ public class RobotTray extends MenuTray {
 
 				@Override
 				public void onSuccess(GUIRobot rbt) {
-					RobotThread.get(rbt).open(getValueAsString("question"));
+					RobotThread.get(rbt).open(question);
 				}
 			});
 		}

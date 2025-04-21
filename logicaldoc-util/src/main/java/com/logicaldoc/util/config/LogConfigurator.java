@@ -244,7 +244,7 @@ public class LogConfigurator {
 				Element appender = new Element("AppenderRef");
 				appender.setAttribute("ref", app);
 				if (appenderLevels != null && !appenderLevels.isEmpty())
-					appender.setAttribute("level", appenderLevels.get(appenders.indexOf(app)));
+					appender.setAttribute(LEVEL, appenderLevels.get(appenders.indexOf(app)));
 				logger.addContent(appender);
 			}
 		}

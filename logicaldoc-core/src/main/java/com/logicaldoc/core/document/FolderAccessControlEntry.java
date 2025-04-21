@@ -103,4 +103,33 @@ public class FolderAccessControlEntry extends ExtendedAccessControlEntry {
 	public void setStore(int store) {
 		this.store = store;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + add;
+		result = prime * result + export;
+		result = prime * result + iimport;
+		result = prime * result + store;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		FolderAccessControlEntry other = (FolderAccessControlEntry) obj;
+		if (add != other.add)
+			return false;
+		if (export != other.export)
+			return false;
+		if (iimport != other.iimport)
+			return false;
+		return store == other.store;
+	}
 }

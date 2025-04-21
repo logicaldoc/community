@@ -698,7 +698,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		DocumentFuture result = testSubject.create(new FileInputStream("pom.xml"), doc, transaction);
 		Document newDoc = result.get();
-		assertEquals("2.0", newDoc.getVersion());
+		assertEquals("1.0", newDoc.getVersion());
 		assertEquals("1.0", newDoc.getFileVersion());
 
 		Version ver = verDao.findByVersion(newDoc.getId(), newDoc.getVersion());
@@ -911,7 +911,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		doc = docDao.findById(1L);
 
 		assertEquals(DocumentStatus.UNLOCKED, doc.getStatus());
-		assertEquals("1.0", doc.getFileVersion());
+		assertEquals("2.0", doc.getFileVersion());
 
 		doc = docDao.findById(1);
 		assertNotNull(doc);

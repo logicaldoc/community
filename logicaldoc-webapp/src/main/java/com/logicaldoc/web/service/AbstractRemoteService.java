@@ -321,8 +321,10 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 			// All ok, the task did not complete within the expected time and it
 			// will continue in background
 			log.debug("Timout reached for operation {}", name);
-		} catch (InterruptedException | ExecutionException e) {
+		} catch (ExecutionException e) {
 			throw new ServerException(e.getMessage(), e);
+		} catch(InterruptedException ie) {
+			 Thread.currentThread().interrupt();
 		}
 
 		if (task.isOver() && task.getError() != null) {
@@ -335,7 +337,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 					session.getUsername());
 			new WebsocketTool().showMessage(session,
 					I18N.message("operationtakestoolongotoback", session.getUser().getLocale()), "warn");
-			task.addListener(new LongRunningOperationCompleteListener<Void>(session.getUsername()));
+			task.addListener(new LongRunningOperationCompleteListener<>(session.getUsername()));
 		}
 
 		return task.isOver();
