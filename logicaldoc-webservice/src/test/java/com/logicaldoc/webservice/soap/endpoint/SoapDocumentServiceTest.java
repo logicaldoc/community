@@ -230,7 +230,7 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 		while (version == null)
 			version = testSubject.getVersion(session.getSid(), wsDoc.getId(), "2.0");
 
-		assertEquals(1, testSubject.getVersions(session.getSid(), wsDoc.getId()).size());
+		assertEquals(2, testSubject.getVersions(session.getSid(), wsDoc.getId()).size());
 
 		testSubject.deleteVersion(session.getSid(), wsDoc.getId(), "2.0");
 		assertEquals(1, testSubject.getVersions(session.getSid(), wsDoc.getId()).size());

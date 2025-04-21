@@ -13,23 +13,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
-			<artifactId>logicaldoc-webapp</artifactId>
-			<version>${project.version}</version>
-			<classifier>api</classifier>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>xml-apis</groupId>
-					<artifactId>xml-apis</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>xml-apis</groupId>
-					<artifactId>xml-apis-ext</artifactId>
-				</exclusion>
-			</exclusions>			
-		</dependency>
-		<dependency>
-			<groupId>com.logicaldoc</groupId>
 			<artifactId>logicaldoc-core</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>

@@ -877,14 +877,14 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testDeleteNotes() throws ServerException, PersistenceException {
-		List<DocumentNote> notes = noteDao.findByDocId(1, "1.0");
+		List<DocumentNote> notes = noteDao.findByDocId(1L, "1.0");
 		assertNotNull(notes);
 		assertEquals(2, notes.size());
 		assertEquals("message for note 1", notes.get(0).getMessage());
 
-		testSubject.deleteNotes(List.of(1L));
+		testSubject.deleteNotes(List.of(notes.get(0).getId()));
 
-		notes = noteDao.findByDocId(1, "1.0");
+		notes = noteDao.findByDocId(1L, "1.0");
 		assertNotNull(notes);
 		assertEquals(1, notes.size());
 	}
