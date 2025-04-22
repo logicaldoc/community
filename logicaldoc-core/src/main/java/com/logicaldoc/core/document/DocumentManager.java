@@ -3,8 +3,6 @@ package com.logicaldoc.core.document;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -2009,8 +2007,7 @@ public class DocumentManager {
 	 * @throws IOException
 	 */
 	private File preparePdfs(User user, List<Long> docIds) throws IOException {
-		Path tempPath = Files.createTempDirectory(MERGE);
-		File tempDir = tempPath.toFile();
+		File tempDir = FileUtil.createTempDirectory(MERGE);
 
 		DecimalFormat nf = new DecimalFormat("00000000");
 		int i = 0;

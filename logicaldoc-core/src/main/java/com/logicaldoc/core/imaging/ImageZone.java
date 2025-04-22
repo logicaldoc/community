@@ -1,5 +1,7 @@
 package com.logicaldoc.core.imaging;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
@@ -10,7 +12,9 @@ import javax.persistence.MappedSuperclass;
  * @since 8.4.2
  */
 @MappedSuperclass
-public class ImageZone {
+public class ImageZone implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Upper-left corner of the zone (percentage of the width 0..1)

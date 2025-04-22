@@ -182,15 +182,7 @@ public class EventEndpoint implements EventListener {
 			message.setFolderId(adh.getFolderId());
 			message.setDocId(adh.getDocId());
 
-			GUIFolder folder = null;
-			if (adh.getFolder() != null) {
-				String color = adh.getFolder().getColor();
-				folder = new FolderServiceImpl().fromFolder(adh.getFolder(), true);
-				folder.setColor(color);
-			} else if (adh.getFolderId() != null)
-				folder = new FolderServiceImpl().getFolder(null, adh.getFolderId(), true);
-			if (folder != null)
-				message.setFolder(folder);
+			GUIFolder folder = setFolder(message, adh);
 
 			GUIDocument document = null;
 			if (adh.getDocument() != null && adh.getDocument() instanceof Document doc) {
@@ -226,6 +218,20 @@ public class EventEndpoint implements EventListener {
 			message.setDocument(document);
 		}
 		return message;
+	}
+
+	protected GUIFolder setFolder(WebsocketMessage message, AbstractDocumentHistory adh)
+			throws PersistenceException, ServerException {
+		GUIFolder folder = null;
+		if (adh.getFolder() != null) {
+			String color = adh.getFolder().getColor();
+			folder = new FolderServiceImpl().fromFolder(adh.getFolder(), true);
+			folder.setColor(color);
+		} else if (adh.getFolderId() != null)
+			folder = new FolderServiceImpl().getFolder(null, adh.getFolderId(), true);
+		if (folder != null)
+			message.setFolder(folder);
+		return folder;
 	}
 
 	@OnError
