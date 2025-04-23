@@ -14,6 +14,8 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.CalendarService;
 import com.smartgwt.client.types.TimeDisplayFormat;
 import com.smartgwt.client.widgets.calendar.Calendar;
+import com.smartgwt.client.widgets.calendar.CalendarView;
+import com.smartgwt.client.widgets.calendar.DateHeaderCustomizer;
 
 /**
  * Represents a calendar containing events related to documents.
@@ -53,6 +55,20 @@ public class EventsCalendar extends Calendar {
 			setChosenDate(date);
 		else
 			setChosenDate(new Date());
+
+		// Localization of the day names
+		setDateHeaderCustomizer(new DateHeaderCustomizer() {
+
+			@Override
+			public String getHeaderTitle(Date date, int dayOfWeek, String defaultValue, CalendarView calendarView) {
+				String key = "dayname_" + dayOfWeek;
+				String label = I18N.message(key);
+				if (label.equals(key))
+					return defaultValue;
+				else
+					return label;
+			}
+		});
 
 		addEventClickHandler(event -> {
 			CalendarService.Instance.get().getEvent(event.getEvent().getAttributeAsLong("eventId"),
