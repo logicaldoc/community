@@ -37,7 +37,7 @@
     <!-- CXF OpenApiFeature --> 
     <bean id="openApiFeature" class="org.apache.cxf.jaxrs.openapi.OpenApiFeature">
             <property name="title" value="LogicalDOC REST API"/>
-            <property name="version" value="8.9.3"/>
+            <property name="version" value="9.2"/>
             <property name="contactEmail" value="devel@logicaldoc.com"/>
             <property name="description" value="This is the interactive documentation of the REST APIs exposed by LogicalDOC. You can find more information about LogicalDOC at https://www.logicaldoc.com or on X @logicaldoc.&lt;br/&gt;   
             Note: The access path to the API is protected with basic authentication, to be able to run the samples you must log in using the credentials of a Logicaldoc user, or passing to the request the session ID (SID) as a cookie (cookie name: `ldoc-sid`).&lt;br/&gt;&lt;br/&gt;
