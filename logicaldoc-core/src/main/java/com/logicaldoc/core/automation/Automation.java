@@ -193,7 +193,7 @@ public class Automation {
 				I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_date"),
 				I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_datelong"),
 				I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_dateshort"));
-		dictionary.put(AutomationDateTool.class.getSimpleName(), dateTool);
+		dictionary.put("DateTool", dateTool);
 
 		// Put the current date
 		dictionary.put(CURRENT_DATE, new Date());
