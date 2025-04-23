@@ -142,7 +142,6 @@ public class Automation {
 	 * 
 	 * @return The complete dictionary to use
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private Map<String, Object> prepareDictionary(Map<String, Object> clientDictionary) {
 		if (clientDictionary == null)
 			clientDictionary = new ConcurrentHashMap<>();
@@ -157,11 +156,10 @@ public class Automation {
 			String beanClassName = bd.getBeanClassName();
 
 			try {
-				Class beanClass = Class.forName(beanClassName);
+				Class<?> beanClass = Class.forName(beanClassName);
 
 				String key = beanClass.getSimpleName();
-				AutomationDictionary annotation = (AutomationDictionary) beanClass
-						.getAnnotation(AutomationDictionary.class);
+				AutomationDictionary annotation = beanClass.getAnnotation(AutomationDictionary.class);
 				if (annotation != null && StringUtils.isNotEmpty(annotation.key()))
 					key = annotation.key();
 
@@ -195,7 +193,7 @@ public class Automation {
 				I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_date"),
 				I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_datelong"),
 				I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_dateshort"));
-		dictionary.put(AutomationDateTool.class.getSimpleName(), dateTool);
+		dictionary.put("DateTool", dateTool);
 
 		// Put the current date
 		dictionary.put(CURRENT_DATE, new Date());
