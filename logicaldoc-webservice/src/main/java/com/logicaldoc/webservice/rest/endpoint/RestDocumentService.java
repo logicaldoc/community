@@ -421,6 +421,11 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@PUT
 	@Path("/update")
 	@Operation(summary = "Updates an existing document", description = "Updates the metadata of an existing document. The ID of the document must be specified in the WSDocument value object. The provided example moves document with ID 1111111 to folder 3435433")
+	@ApiResponses(value = { 
+			@ApiResponse(responseCode = "204", description = "Successful operation"),
+			@ApiResponse(responseCode = "401", description = "Operation failed, authentication error. See system logs"),
+			@ApiResponse(responseCode = "406", description = "Operation failed, the server could not produce a response matching the list of acceptable values defined in the request"),
+			@ApiResponse(responseCode = "500", description = "Operation failed, there may be a problem with the data provided for the update. Please see system logs")})	
 	public void update(
 			@Parameter(description = "Document object that needs to be updated", required = true, example = "{ \"id\": 1111111, \"folderId\": 3435433 }")
 			WSDocument document) throws AuthenticationException, PermissionException, WebserviceException,
