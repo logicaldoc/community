@@ -1111,7 +1111,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		StringBuilder query1 = new StringBuilder(
 				"select distinct(A.ld_folderid) from ld_folder_acl A where A.ld_read=1 ");
 		if (permission != Permission.READ)
-			query1.append(" and A.ld_" + permission.getName() + "=1 ");
+			query1.append(" and A.ld_" + permission.name().toLowerCase() + "=1 ");
 
 		appendUserGroupIdsCondition(user, query1);
 

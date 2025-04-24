@@ -163,7 +163,7 @@ public class AbstractService {
 		FolderDAO dao = Context.get(FolderDAO.class);
 		if (!dao.isPermissionAllowed(permission, folderId, user.getId())) {
 			String message = String.format("User %s doesn't have permission %s on folder %s", user.getUsername(),
-					permission.getName(), folderId);
+					permission.name(), folderId);
 			log.error(message);
 			throw new PermissionException(user.getUsername(), FOLDER + folderId, permission);
 		}
@@ -174,7 +174,7 @@ public class AbstractService {
 		DocumentDAO dao = Context.get(DocumentDAO.class);
 		if (!dao.isPermissionAllowed(permission, docId, user.getId())) {
 			String message = String.format("User %s doesn't have permission %s on document %s", user.getUsername(),
-					permission.getName(), docId);
+					permission.name(), docId);
 			log.error(message);
 			throw new PermissionException(user.getUsername(), "document " + docId, permission);
 		}

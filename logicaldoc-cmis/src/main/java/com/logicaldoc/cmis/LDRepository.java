@@ -2824,7 +2824,7 @@ public class LDRepository {
 			throws CmisPermissionDeniedException {
 		if (!checkPermission(objectId != null ? getObject(objectId) : null, context, permission)) {
 			CmisPermissionDeniedException exception = new CmisPermissionDeniedException(
-					"Permission " + (permission != null ? permission.getName() : "") + " not granted on " + objectId);
+					"Permission " + (permission != null ? permission.name() : "") + " not granted on " + objectId);
 			if (log.isDebugEnabled())
 				log.error(exception.getMessage(), exception);
 			throw exception;

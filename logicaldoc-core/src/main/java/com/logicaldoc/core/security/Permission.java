@@ -38,22 +38,7 @@ import java.util.Set;
  * @since 4.0
  */
 public enum Permission {
-	READ("read"), DOWNLOAD("download"), WRITE("write"), ADD("add"), SECURITY("security"), IMMUTABLE(
-			"immutable"), DELETE("delete"), RENAME("rename"), IMPORT("import"), EXPORT("export"), SIGN("sign"), ARCHIVE(
-					"archive"), WORKFLOW("workflow"), CALENDAR("calendar"), SUBSCRIPTION("subscription"), PRINT(
-							"print"), PASSWORD("password"), MOVE("move"), EMAIL("email"), AUTOMATION(
-									"automation"), STORE("store"), READINGREQ(
-											"readingreq"), PREVIEW("preview"), CUSTOMID("customid");
-
-	private final String name;
-
-	private Permission(String name) {
-		this.name = name;
-	}
-
-	public String getName() {
-		return name;
-	}
+	READ, DOWNLOAD, WRITE, ADD, SECURITY, IMMUTABLE, DELETE, RENAME, IMPORT, EXPORT, SIGN, ARCHIVE, WORKFLOW, CALENDAR, SUBSCRIPTION, PRINT, PASSWORD, MOVE, EMAIL, AUTOMATION, STORE, READINGREQ, PREVIEW, CUSTOMID;
 
 	public static Set<Permission> all() {
 		return new HashSet<>(Arrays.asList(Permission.values()));
@@ -73,12 +58,7 @@ public enum Permission {
 		set.add(DOWNLOAD);
 		set.add(PRINT);
 		set.add(EMAIL);
-		set.add(Permission.SUBSCRIPTION);
+		set.add(SUBSCRIPTION);
 		return set;
-	}
-
-	@Override
-	public String toString() {
-		return name;
 	}
 }

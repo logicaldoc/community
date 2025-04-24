@@ -193,7 +193,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 		try {
 			if (!dao.isPermissionAllowed(permission, folderId, user.getId())) {
 				String message = String.format("User %s doesn't have permission %s on folder %s", user.getUsername(),
-						permission.getName(), folderId);
+						permission.name(), folderId);
 				throw new AccessDeniedException(message);
 			}
 		} catch (PersistenceException e) {

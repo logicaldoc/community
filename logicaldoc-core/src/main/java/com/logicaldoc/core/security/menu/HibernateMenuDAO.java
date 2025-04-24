@@ -494,7 +494,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				if (enabledOnly)
 					query1.append(" and B.ld_enabled=1 ");
 
-				query1.append(" and A.ld_" + permission.getName() + "=1 ");
+				query1.append(" and A.ld_" + permission.name().toLowerCase() + "=1 ");
 				query1.append(" and A.ld_groupid in (");
 				query1.append(
 						user.getGroups().stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));

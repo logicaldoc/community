@@ -57,18 +57,7 @@ public class EventsCalendar extends Calendar {
 			setChosenDate(new Date());
 
 		// Localization of the day names
-		setDateHeaderCustomizer(new DateHeaderCustomizer() {
-
-			@Override
-			public String getHeaderTitle(Date date, int dayOfWeek, String defaultValue, CalendarView calendarView) {
-				String key = "dayname_" + dayOfWeek;
-				String label = I18N.message(key);
-				if (label.equals(key))
-					return defaultValue;
-				else
-					return label;
-			}
-		});
+		localizeDayNames();
 
 		addEventClickHandler(event -> {
 			CalendarService.Instance.get().getEvent(event.getEvent().getAttributeAsLong("eventId"),
@@ -103,6 +92,21 @@ public class EventsCalendar extends Calendar {
 						}
 					});
 			event.cancel();
+		});
+	}
+
+	private void localizeDayNames() {
+		setDateHeaderCustomizer(new DateHeaderCustomizer() {
+
+			@Override
+			public String getHeaderTitle(Date date, int dayOfWeek, String defaultValue, CalendarView calendarView) {
+				String key = "dayname_" + dayOfWeek;
+				String label = I18N.message(key);
+				if (label.equals(key))
+					return defaultValue;
+				else
+					return label;
+			}
 		});
 	}
 }

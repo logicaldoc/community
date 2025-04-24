@@ -73,11 +73,6 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 	}
 
 	@Override
-	public void initialize(Session session) {
-		refresh(session);
-	}
-
-	@Override
 	public List<Session> findByNode(String node) {
 		try {
 			if (StringUtils.isEmpty(node))

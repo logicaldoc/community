@@ -7,7 +7,8 @@ import javax.persistence.Embeddable;
 import javax.persistence.MappedSuperclass;
 
 /**
- * Class for grouping common permissions for DocumentAccessControlEntry and FolderAccessControlEntry
+ * Class for grouping common permissions for DocumentAccessControlEntry and
+ * FolderAccessControlEntry
  * 
  * @author Giuseppe Desiato - LogicalDOC
  * @since 9.2
@@ -120,6 +121,29 @@ public abstract class ExtendedAccessControlEntry extends AccessControlEntry {
 			granted.add(Permission.PRINT);
 		if (email == 1)
 			granted.add(Permission.EMAIL);
+	}
+
+	@Override
+	public void grantPermissions(Set<Permission> permissions) {
+		super.grantPermissions(permissions);
+		preview = booleanToInt(permissions.contains(Permission.PREVIEW));
+		download = booleanToInt(permissions.contains(Permission.DOWNLOAD));
+		security = booleanToInt(permissions.contains(Permission.SECURITY));
+		delete = booleanToInt(permissions.contains(Permission.DELETE));
+		rename = booleanToInt(permissions.contains(Permission.RENAME));
+		immutable = booleanToInt(permissions.contains(Permission.IMMUTABLE));
+		sign = booleanToInt(permissions.contains(Permission.SIGN));
+		archive = booleanToInt(permissions.contains(Permission.ARCHIVE));
+		workflow = booleanToInt(permissions.contains(Permission.WORKFLOW));
+		calendar = booleanToInt(permissions.contains(Permission.CALENDAR));
+		subscription = booleanToInt(permissions.contains(Permission.SUBSCRIPTION));
+		password = booleanToInt(permissions.contains(Permission.PASSWORD));
+		print = booleanToInt(permissions.contains(Permission.PRINT));
+		move = booleanToInt(permissions.contains(Permission.MOVE));
+		email = booleanToInt(permissions.contains(Permission.EMAIL));
+		automation = booleanToInt(permissions.contains(Permission.AUTOMATION));
+		readingreq = booleanToInt(permissions.contains(Permission.READINGREQ));
+		customid = booleanToInt(permissions.contains(Permission.CUSTOMID));
 	}
 
 	public int getPreview() {

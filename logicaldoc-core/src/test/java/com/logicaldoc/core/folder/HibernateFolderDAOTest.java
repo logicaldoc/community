@@ -36,6 +36,7 @@ import com.logicaldoc.core.document.FolderAccessControlEntry;
 import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
+import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.user.User;
@@ -587,7 +588,6 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		assertNotNull(alias);
 
 		folder.clearTags();
-		assertEquals("[]", folder.getTags().toString());
 
 		Set<String> words = Set.of("C", "DDDDDDDDDDDD");
 		folder.setTagsFromWords(words);
@@ -602,13 +602,31 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		ace.grantPermissions(
 				Set.of(Permission.READ, Permission.WRITE, Permission.DELETE, Permission.MOVE, Permission.DOWNLOAD));
 		folder.addAccessControlEntry(ace);
+		
+		ace = new FolderAccessControlEntry();
+		ace.setGroupId(4L);
+		ace.grantPermissions(Permission.forGuests());
+		folder.addAccessControlEntry(ace);
+		
+		ace = new FolderAccessControlEntry();
+		ace.setGroupId(10L);
+		ace.grantPermissions(Permission.match("read", "download"));
+		folder.addAccessControlEntry(ace);
+		
 		testSubject.store(folder);
-		assertNotNull(folder);
 
 		folder = testSubject.findById(folder.getId());
 		testSubject.initialize(folder);
-		assertEquals(3, folder.getAccessControlList().size());
+		assertEquals(5, folder.getAccessControlList().size());
 
+		AccessControlEntry face = folder.getAccessControlEntry(4L);
+		assertTrue(face.grantedPermissions().contains(Permission.PREVIEW));
+		assertFalse(face.grantedPermissions().contains(Permission.WRITE));
+		
+		face = folder.getAccessControlEntry(10L);
+		assertTrue(face.grantedPermissions().contains(Permission.DOWNLOAD));
+		assertFalse(face.grantedPermissions().contains(Permission.PREVIEW));
+		
 		// Set a securityRef
 		folder.setSecurityRef(5L);
 		testSubject.store(folder);
@@ -627,15 +645,13 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		folder.setName("unexisting parent");
 		folder.setParentId(99999L);
 
-		boolean runOk = false;
 		try {
 			transaction.setSessionId("xxxxx");
 			testSubject.store(folder, transaction);
-			runOk = true;
+			fail("No error here, but should be");
 		} catch (PersistenceException e) {
 			assertEquals("Unexisting parent folder " + folder.getParentId(), e.getMessage());
 		}
-		assertFalse(runOk);
 
 		folder = testSubject.findById(6);
 		testSubject.initialize(folder);
@@ -675,7 +691,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		folder.getAccessControlList().remove(folder.getAccessControlEntry(2));
 		assertEquals(2, folder.getAccessControlList().size());
 		testSubject.store(folder);
-		assertNotNull(folder);
+		
 		folder = testSubject.findById(Folder.ROOTID);
 		testSubject.initialize(folder);
 		assertEquals(4, folder.getAccessControlList().size());

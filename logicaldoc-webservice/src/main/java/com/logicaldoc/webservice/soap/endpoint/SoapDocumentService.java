@@ -1378,19 +1378,19 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	@Override
 	public boolean isRead(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		return isGranted(sid, docId, Permission.READ.getName());
+		return isGranted(sid, docId, Permission.READ.name());
 	}
 
 	@Override
 	public boolean isWrite(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		return isGranted(sid, docId, Permission.WRITE.getName());
+		return isGranted(sid, docId, Permission.WRITE.name());
 	}
 
 	@Override
 	public boolean isDownload(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
-		return isGranted(sid, docId, Permission.DOWNLOAD.getName());
+		return isGranted(sid, docId, Permission.DOWNLOAD.name());
 	}
 
 	@Override

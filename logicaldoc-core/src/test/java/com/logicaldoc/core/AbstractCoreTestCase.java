@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.Before;
 
+import com.logicaldoc.core.security.SessionDAO;
 import com.logicaldoc.core.security.apikey.ApiKey;
 import com.logicaldoc.core.security.apikey.ApiKeyDAO;
 import com.logicaldoc.core.store.Store;
@@ -79,6 +80,8 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 
 	@Override
 	public void tearDown() throws IOException, SQLException {
+		Context.get(SessionDAO.class).cleanOldSessions(-1);
+
 		super.tearDown();
 
 		FileUtil.delete(rootStoreOne);
