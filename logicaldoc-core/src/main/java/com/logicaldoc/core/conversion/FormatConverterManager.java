@@ -27,7 +27,6 @@ import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
-import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
@@ -334,17 +333,6 @@ public class FormatConverterManager {
 				}
 			}
 		}
-	}
-
-	protected String getTenantName(Document document) {
-		String tenantName = "default";
-		try {
-			Tenant tenant = tenantDao.findById(document.getTenantId());
-			tenantName = tenant.getName();
-		} catch (Exception t) {
-			log.error(t.getMessage());
-		}
-		return tenantName;
 	}
 
 	/**

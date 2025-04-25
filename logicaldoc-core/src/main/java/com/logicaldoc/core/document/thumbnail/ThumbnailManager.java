@@ -20,7 +20,6 @@ import com.logicaldoc.core.store.Store;
 import com.logicaldoc.core.util.DocUtil;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.MimeType;
-import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
 
@@ -93,7 +92,7 @@ public class ThumbnailManager {
 	 */
 	public void createTumbnail(Document document, String fileVersion, int size, Integer quality, String sid)
 			throws IOException {
-		createImage(document, fileVersion, size, quality, THUMB + size + ".png", sid);
+		createImage(document, fileVersion, size, quality, SUFFIX_THUMB, sid);
 	}
 
 	/**
@@ -109,6 +108,18 @@ public class ThumbnailManager {
 	public void createTile(Document document, String fileVersion, String sid) throws IOException {
 		createImage(document, fileVersion, "tile", SUFFIX_TILE, sid);
 	}
+	
+	/**
+	 * Creates the tile for the specified document
+	 * 
+	 * @param document The document to be treated
+	 * @param sid The session identifier (optional)
+	 * 
+	 * @throws IOException raised in case the tile file cannot be created
+	 */
+	public void createTile(Document document, String sid) throws IOException {
+		createTile(document, null, sid);
+	}
 
 	/**
 	 * Creates the mobile image for the specified document and file version. The
@@ -123,6 +134,20 @@ public class ThumbnailManager {
 	public void createMobile(Document document, String fileVersion, String sid) throws IOException {
 		createImage(document, fileVersion, "mobile", SUFFIX_MOBILE, sid);
 	}
+	
+	/**
+	 * Creates the mobile image for the specified document. The
+	 * mobile is an image rendering of the first page only.
+	 * 
+	 * @param document The document to be treated
+	 * @param sid The session identifier(optional)
+	 * 
+	 * @throws IOException in case an error happens during image creation
+	 */
+	public void createMobile(Document document, String sid) throws IOException {
+		createImage(document, null, "mobile", SUFFIX_MOBILE, sid);
+	}
+
 
 	protected void createImage(Document document, String fileVersion, int size, Integer quality, String suffix,
 			String sid) throws IOException {
@@ -142,7 +167,9 @@ public class ThumbnailManager {
 			src = writeToTempFile(document, fileVersion);
 
 			builder.buildThumbnail(sid, document, fileVersion, src, dest, size,
-					quality != null ? quality : getQuality("thumbnail", tDao.getTenantName(document.getTenantId())));
+					quality != null ? quality
+							: Context.get().getProperties()
+									.getInt(tDao.getTenantName(document.getTenantId()) + ".gui.thumbnail.quality", 93));
 
 			// Put the resource
 			String resource = store.getResourceName(document, getSuitableFileVersion(document, fileVersion), suffix);
@@ -159,31 +186,9 @@ public class ThumbnailManager {
 	protected void createImage(Document document, String fileVersion, String type, String suffix, String sid)
 			throws IOException {
 		String tenantName = DocUtil.getTenantName(document);
-
-		int size = 150;
-		try {
-			ContextProperties conf = Context.get().getProperties();
-			size = Integer.parseInt(conf.getProperty(tenantName + ".gui." + type + ".size"));
-		} catch (Exception t) {
-			log.error(t.getMessage());
-		}
-
-		createImage(document, fileVersion, size, getQuality(type, tenantName), suffix, sid);
-	}
-
-	private int getQuality(String type, String tenantName) {
-		try {
-			ContextProperties conf = Context.get().getProperties();
-			int buf = Integer.parseInt(conf.getProperty(tenantName + ".gui." + type + ".quality"));
-			if (buf < 1)
-				buf = 1;
-			if (buf > 100)
-				buf = 100;
-			return buf;
-		} catch (Exception t) {
-			log.error(t.getMessage());
-			return 100;
-		}
+		createImage(document, fileVersion,
+				Context.get().getProperties().getInt(tenantName + ".gui." + type + ".size", 200),
+				Context.get().getProperties().getInt(tenantName + ".gui." + type + ".quality", 93), suffix, sid);
 	}
 
 	/**

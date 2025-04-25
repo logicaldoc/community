@@ -90,7 +90,6 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		store = Context.get(MockStore.class);
 		store2 = Context.get(Store.class);
 
-		// Make sure that this is a DocumentManagerImpl instance
 		testSubject = Context.get(DocumentManager.class);
 	}
 

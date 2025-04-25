@@ -6,15 +6,25 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.junit.Before;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.logicaldoc.core.security.Client;
+import com.logicaldoc.core.security.Device;
+import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionDAO;
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.apikey.ApiKey;
 import com.logicaldoc.core.security.apikey.ApiKeyDAO;
+import com.logicaldoc.core.security.spring.LDAuthenticationToken;
+import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
+import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.junit.AbstractTestCase;
 import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.servlet.MockServletSession;
 
 /**
  * Abstract test case for the Core module. This class initialises a test
@@ -33,6 +43,10 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 	protected File rootStoreTwo;
 
 	protected ApiKey apiKey;
+
+	protected MockServletSession servletSession = new MockServletSession();
+
+	protected Session session;
 
 	@Before
 	@Override
@@ -80,11 +94,33 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 
 	@Override
 	public void tearDown() throws IOException, SQLException {
+		if (session != null)
+			Context.get(SessionManager.class).kill(session.getSid());
 		Context.get(SessionDAO.class).cleanOldSessions(-1);
 
 		super.tearDown();
 
 		FileUtil.delete(rootStoreOne);
 		FileUtil.delete(rootStoreTwo);
+	}
+
+	protected void prepareSession(String username, String password) throws PersistenceException {
+		UserDAO userDao = Context.get(UserDAO.class);
+
+		Client client = new Client("xyz", "192.168.2.231", "ghost");
+		Device device = new Device();
+		device.setBrowser("Firefox");
+		device.setBrowserVersion("18");
+		device.setOperativeSystem("Windows");
+		client.setDevice(device);
+		session = SessionManager.get().newSession(username, password, null, client);
+		if (session != null) {
+			User user = userDao.findByUsernameIgnoreCase(username);
+			userDao.initialize(user);
+			LDAuthenticationToken token = new LDAuthenticationToken(username);
+			token.setSid(session.getSid());
+			SecurityContextHolder.getContext().setAuthentication(token);
+			LDSecurityContextRepository.bindServletSession(session.getSid(), servletSession);
+		}
 	}
 }

@@ -57,7 +57,7 @@ public abstract class AbstractTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		System.setProperty("LOGICALDOC_REPOSITORY", "target");
 
-		loadDevelSettings();
+		loadDevelSettingsInEnvironment();
 
 		updateUserHome();
 
@@ -66,6 +66,8 @@ public abstract class AbstractTestCase {
 		initializePlugins(getPluginArchives());
 
 		context = buildApplicationContext();
+
+		loadDevelSettingsInContext();
 
 		createDatabase();
 	}
@@ -184,12 +186,27 @@ public abstract class AbstractTestCase {
 	 * 
 	 * @throws IOException Error reading the development file
 	 */
-	private void loadDevelSettings() throws IOException {
+	private void loadDevelSettingsInEnvironment() throws IOException {
 		Properties devSettings = new Properties();
 		try (FileReader reader = new FileReader(new File(originalUserHome + "/logicaldoc-dev.properties"))) {
 			devSettings.load(reader);
 			for (Map.Entry<Object, Object> entry : devSettings.entrySet())
 				System.setProperty(entry.getKey().toString(), entry.getValue().toString());
+		}
+	}
+
+	/**
+	 * Loads the settigs in the file user.home/logicaldoc-dev.properties putting
+	 * them as context settings
+	 * 
+	 * @throws IOException Error reading the development file
+	 */
+	private void loadDevelSettingsInContext() throws IOException {
+		Properties devSettings = new Properties();
+		try (FileReader reader = new FileReader(new File(originalUserHome + "/logicaldoc-dev.properties"))) {
+			devSettings.load(reader);
+			for (Map.Entry<Object, Object> entry : devSettings.entrySet())
+				Context.get().getProperties().setProperty(entry.getKey().toString(), entry.getValue().toString());
 		}
 	}
 
