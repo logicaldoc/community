@@ -22,6 +22,10 @@ import com.logicaldoc.webservice.rest.AuthService;
 import com.logicaldoc.webservice.soap.endpoint.SoapAuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Path("/")
@@ -35,9 +39,8 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	@GET
 	@Path("/login")
 	@Override
-	public String login(@QueryParam("u")
-	String username, @QueryParam("pw")
-	String password) throws AuthenticationException {
+	public String login(@QueryParam("u") String username, @QueryParam("pw") String password) 
+			throws AuthenticationException {
 		return super.login(username, password);
 	}
 
@@ -46,9 +49,7 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	@Operation(operationId = "loginForm", summary = "Login with POST", description = "Deprecated, use loginApiKey instead")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Override
-	public String loginForm(@FormParam("username")
-	String username, @FormParam("password")
-	String password) {
+	public String loginForm(@FormParam("username") String username, @FormParam("password") String password) {
 		return super.login(username, password);
 	}
 
@@ -63,9 +64,12 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 
 	@GET
 	@Path("/loginApiKey")
+	@Operation(summary = "Login by API Key", description = "Performs login by passing the API Key in the header. Read more at https://docs.logicaldoc.com/en/web-services-api/api-keys")
+	@ApiResponses(value = { 
+			@ApiResponse(responseCode = "200", description = "Successful operation. The Session ID (sid) is returned.", content = @Content(schema = @Schema(implementation = String.class, description = "The session ID (sid) created", example = "ca3c411d-b043-49a3-b151-e363dddcecef"))),
+			@ApiResponse(responseCode = "500", description = "Authentication failed")})
 	@Override
-	public String loginApiKey(@HeaderParam("X-API-KEY")
-	String apikey) {
+	public String loginApiKey(@HeaderParam("X-API-KEY") String apikey) {
 		// The header was already processed by the SessionFilter so we must
 		// check the existing session first
 		String sid = SessionManager.get().getSessionId(getCurrentRequest());
