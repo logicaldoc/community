@@ -130,7 +130,7 @@ public class UserUtil {
 			userDao.initialize(user);
 			if ("svg".equalsIgnoreCase(imageType)) {
 				// In case of SVG we save the image as is
-				user.setAvatar("data:image/svg+xml;base64," + ImageUtil.encodeImage(avatarImageFile));
+				user.setAvatar("data:image/svg+xml;base64," + ImageUtil.encode(avatarImageFile));
 			} else {
 				// In case of raster image we crop and resize
 				String tenantName = tenantDao.getTenantName(user.getTenantId());
@@ -139,7 +139,7 @@ public class UserUtil {
 				BufferedImage avatar = ImageIO.read(avatarImageFile);
 				avatar = ImageUtil.cropCenterSquare(avatar, size);
 				ImageIO.write(avatar, "png", tmpAvatarImage);
-				user.setAvatar("data:image/png;base64," + ImageUtil.encodeImage(tmpAvatarImage));
+				user.setAvatar("data:image/png;base64," + ImageUtil.encode(tmpAvatarImage));
 			}
 
 			userDao.store(user);
@@ -170,7 +170,7 @@ public class UserUtil {
 
 			BufferedImage avatar = UserUtil.generateDefaultAvatarImage(user, size);
 			ImageIO.write(avatar, "png", tmpAvatarImage);
-			user.setAvatar("data:image/png;base64," + ImageUtil.encodeImage(tmpAvatarImage));
+			user.setAvatar("data:image/png;base64," + ImageUtil.encode(tmpAvatarImage));
 
 			if (user.getType() != UserType.SYSTEM) {
 				userDao.store(user);

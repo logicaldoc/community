@@ -21,6 +21,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSAccessControlEntry;
@@ -38,20 +39,19 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 
 	private UserDAO userDao;
 
-	// Instance under test
-	private SoapFolderService soapFolderService;
+	private SoapFolderService testSubject;
 
 	private SoapSecurityService soapSecurityService;
 
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		folderDao = (FolderDAO) context.getBean("folderDAO");
-		userDao = (UserDAO) context.getBean("UserDAO");
+		folderDao = Context.get(FolderDAO.class);
+		userDao = Context.get(UserDAO.class);
 
 		// Make sure that this is a SoapFolderService instance
-		soapFolderService = new SoapFolderService();
-		soapFolderService.setValidateSession(false);
+		testSubject = new SoapFolderService();
+		testSubject.setValidateSession(false);
 
 		soapSecurityService = new SoapSecurityService();
 		soapSecurityService.setValidateSession(false);
@@ -65,9 +65,24 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 		Folder parentFolder = folderDao.findById(1200);
 		assertNotNull(parentFolder);
 
-		soapFolderService.move("", folderToMove.getId(), 1200L);
+		testSubject.move("", folderToMove.getId(), 1200L);
 		folderToMove = folderDao.findById(1203);
 		assertEquals(1200, folderToMove.getParentId());
+	}
+
+	@Test
+	public void testCopy() throws Exception {
+		assertEquals(2, testSubject.listChildren("", 1200L).size());
+		assertTrue(testSubject.listChildren("", 1200L).stream().noneMatch(f -> f.getName().equals("menu.adminxxx")));
+
+		testSubject.copy("", 80L, 1200L, 0, "inherit");
+
+		assertEquals(3, testSubject.listChildren("", 1200L).size());
+		assertTrue(testSubject.listChildren("", 1200L).stream().anyMatch(f -> f.getName().equals("menu.adminxxx")));
+
+		testSubject.copy("", 99L, 1200L, 1, "replicate");
+		assertEquals(4, testSubject.listChildren("", 1200L).size());
+		assertTrue(testSubject.listChildren("", 1200L).stream().anyMatch(f -> f.getName().equals("menu.admin")));
 	}
 
 	@Test
@@ -77,12 +92,12 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 		wsFolderTest.setDescription("descr folder test");
 		wsFolderTest.setParentId(103);
 
-		WSFolder wsFolder = soapFolderService.create("", wsFolderTest);
+		WSFolder wsFolder = testSubject.create("", wsFolderTest);
 		assertNotNull(wsFolder);
 		assertEquals("folder test", wsFolder.getName());
 		assertEquals(103, wsFolder.getParentId());
 
-		wsFolder = soapFolderService.getFolder("", wsFolder.getId());
+		wsFolder = testSubject.getFolder("", wsFolder.getId());
 		assertNotNull(wsFolder);
 
 		assertEquals("folder test", wsFolder.getName());
@@ -95,8 +110,29 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 	}
 
 	@Test
+	public void testCreateAlias() throws Exception {
+		WSFolder alias = testSubject.createAlias("", 1201L, 101L);
+		assertEquals(101L, alias.getFoldRef().longValue());
+	}
+
+	@Test
+	public void testCreateFolder() throws Exception {
+		long folderId = testSubject.createFolder("", 1201L, "test");
+		WSFolder folder = testSubject.getFolder("", folderId);
+
+		assertEquals(1201L, folder.getParentId());
+		assertEquals("test", folder.getName());
+	}
+
+	@Test
+	public void testFindByPath() throws Exception {
+		WSFolder folder = testSubject.findByPath("", "/menu.adminxxx/text");
+		assertEquals(101L, folder.getId());
+	}
+
+	@Test
 	public void testDelete() throws Exception {
-		soapFolderService.delete("", 1201);
+		testSubject.delete("", 1201);
 		Folder folder = folderDao.findById(1201);
 		assertNull(folder);
 	}
@@ -108,7 +144,7 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 		assertEquals("menu.admin103", folder.getName());
 		folderDao.initialize(folder);
 
-		soapFolderService.rename("", 103, "paperino");
+		testSubject.rename("", 103, "paperino");
 
 		folder = folderDao.findById(103);
 		assertEquals("paperino", folder.getName());
@@ -122,7 +158,7 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 		Folder folder = folderDao.findById(103);
 		assertNotNull(folder);
 
-		WSFolder wsFolder = soapFolderService.getFolder("", 103);
+		WSFolder wsFolder = testSubject.getFolder("", 103);
 
 		assertEquals(103, wsFolder.getId());
 		assertEquals("menu.admin103", wsFolder.getName());
@@ -130,15 +166,11 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 		assertEquals("description", wsFolder.getDescription());
 
 		// trying to get a non existent folder
-		try {
-			soapFolderService.getFolder("", 2510);
-			fail("Expected exception was not thrown");
-		} catch (Exception e) {
-			// nothing to do here
-		}
+		assertNull(testSubject.getFolder("", 2510));
+		
 
 		// trying to get a folder alias
-		wsFolder = soapFolderService.getFolder("", 1204);
+		wsFolder = testSubject.getFolder("", 1204);
 		assertNotNull(wsFolder);
 		assertEquals(101, wsFolder.getFoldRef().longValue());
 		assertEquals("text", wsFolder.getName());
@@ -149,20 +181,27 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 		Session session1 = sm.newSession("guest", "admin", (Client) null);
 
 		try {
-			soapFolderService.setValidateSession(true);
-			soapFolderService.getFolder(session1.getSid(), 99);
+			testSubject.setValidateSession(true);
+			testSubject.getFolder(session1.getSid(), 99);
 			fail("Expected exception was not thrown");
 		} catch (Exception e) {
 			// nothing to do here
 		} finally {
-			soapFolderService.setValidateSession(false);
+			testSubject.setValidateSession(false);
 		}
 	}
 
 	@Test
 	public void testIsReadable() throws Exception {
-		assertTrue(soapFolderService.isReadable("", 1200));
-		assertTrue(soapFolderService.isReadable("", 99));
+		assertTrue(testSubject.isReadable("", 1200));
+		assertTrue(testSubject.isReadable("", 99));
+	}
+
+	@Test
+	public void testList() throws Exception {
+		List<WSFolder> folders = testSubject.listChildren("", 5L);
+		assertEquals(4, folders.size());
+		assertTrue(folders.stream().anyMatch(f -> f.getName().equals("menu.admin")));
 	}
 
 	@Test
@@ -176,13 +215,13 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 		ace.setUserId(user.getId());
 		ace.setGroupId(user.getUserGroup().getId());
 
-		soapFolderService.setAccessControlList("", 80L, List.of(ace));
+		testSubject.setAccessControlList("", 80L, List.of(ace));
 	}
 
 	@Test
 	public void testGetAccessControlList() {
 		try {
-			List<WSAccessControlEntry> acl = soapFolderService.getAccessControlList("", 80);
+			List<WSAccessControlEntry> acl = testSubject.getAccessControlList("", 80);
 			assertEquals(4, acl.size());
 		} catch (Exception e) {
 			// Nothing to do
@@ -191,17 +230,49 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testListWorkspaces() throws Exception {
-		List<WSFolder> folders = soapFolderService.listWorkspaces("");
+		List<WSFolder> folders = testSubject.listWorkspaces("");
 		assertNotNull(folders);
 		assertEquals(1, folders.size());
 		assertEquals("Default", folders.get(0).getName());
 	}
+
+	@Test
+	public void testGetPath() throws Exception {
+		List<WSFolder> path = testSubject.getPath("", 103);
+		assertNotNull(path);
+		assertEquals(4, path.size());
+	}
+
+	@Test
+	public void testGetDefault() throws Exception {
+		WSFolder folder = testSubject.getDefaultWorkspace("");
+		assertEquals(Folder.DEFAULTWORKSPACEID, folder.getId());
+
+		folder = testSubject.getRootFolder("");
+		assertEquals(Folder.ROOTID, folder.getId());
+	}
+
+	@Test
+	public void testIsWritable() throws Exception {
+		assertTrue(testSubject.isWritable("", 1200L));
+		assertTrue(testSubject.isGranted("", 1200L, Permission.DOWNLOAD.name()));
+	}
+
+	@Test
+	public void testCreatePath() throws Exception {
+		WSFolder folder = testSubject.createPath("", Folder.DEFAULTWORKSPACEID, "pippo/pluto/paperino");
+		assertEquals("paperino", folder.getName());
+
+		WSFolder folder2 = testSubject.findByPath("", "/Default/pippo/pluto/paperino");
+		assertEquals(folder.getId(), folder2.getId());
+	}
 	
 	@Test
-	public void testGetPath()  throws Exception {
-		List<WSFolder> path = soapFolderService.getPath("", 103);
-		assertNotNull(path);
-		assertEquals(4, path.size());		
-	}	
-	
+	public void testMerge() throws Exception {
+		assertEquals(2, testSubject.listChildren("", 101L).size());
+		assertEquals(2, testSubject.listChildren("", 1200L).size());
+		testSubject.merge("", 101L, 1200L);
+		assertNull(testSubject.getFolder("", 101L));
+		assertEquals(3, testSubject.listChildren("", 1200L).size());
+	}
 }

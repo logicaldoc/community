@@ -5,12 +5,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
 import java.awt.Transparency;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
@@ -24,7 +20,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.codec.binary.Base64;
@@ -59,7 +54,7 @@ public class ImageUtil {
 	 * 
 	 * @throws IOException in case of I/O error
 	 */
-	public static void saveImage(String content, File file) throws IOException {
+	public static void save(String content, File file) throws IOException {
 		BufferedImage image = null;
 		byte[] imageByte = Base64.decodeBase64(content);
 		ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
@@ -72,7 +67,7 @@ public class ImageUtil {
 	}
 
 	/**
-	 * Crops an area and stores it in a given .jpg file
+	 * Crops an area and stores it in a given file
 	 * 
 	 * @param content the content of the source image Base64 encoded
 	 * @param zone the zone definition
@@ -80,19 +75,19 @@ public class ImageUtil {
 	 * 
 	 * @throws IOException an I/O error
 	 */
-	public static void cropImageToFile(String content, ImageZone zone, File file) throws IOException {
+	public static void cropToFile(String content, ImageZone zone, File file) throws IOException {
 		File tmpFile = null;
 		try {
-			tmpFile = FileUtil.createTempFile("zonalocr", ".jpg");
-			saveImage(content, tmpFile);
-			cropImageToFile(tmpFile, zone, file);
+			tmpFile = FileUtil.createTempFile("zonalocr", "." + FileUtil.getExtension(file.getName()));
+			save(content, tmpFile);
+			cropToFile(tmpFile, zone, file);
 		} finally {
 			FileUtil.delete(tmpFile);
 		}
 	}
 
 	/**
-	 * Crops an area and stores it in a given .jpg file
+	 * Crops an area and stores it in a given image file
 	 * 
 	 * @param originalFile The original image to croop
 	 * @param zone the zone definition
@@ -100,11 +95,11 @@ public class ImageUtil {
 	 * 
 	 * @throws IOException an I/O error
 	 */
-	private static void cropImageToFile(File originalFile, ImageZone zone, File file) throws IOException {
+	private static void cropToFile(File originalFile, ImageZone zone, File file) throws IOException {
 		BufferedImage scanImage = ImageIO.read(originalFile);
-		BufferedImage zoneImage = ImageUtil.cropImage(scanImage, zone);
+		BufferedImage zoneImage = ImageUtil.crop(scanImage, zone);
 		// write the zone image to a file
-		ImageIO.write(zoneImage, "jpg", file);
+		ImageIO.write(zoneImage, FileUtil.getExtension(file.getName()), file);
 	}
 
 	/**
@@ -115,7 +110,7 @@ public class ImageUtil {
 	 * 
 	 * @return the cropped image
 	 */
-	public static BufferedImage cropImage(BufferedImage originalImage, ImageZone zone) {
+	public static BufferedImage crop(BufferedImage originalImage, ImageZone zone) {
 		int width = originalImage.getWidth();
 		int height = originalImage.getHeight();
 
@@ -238,7 +233,7 @@ public class ImageUtil {
 	 * @param x left coordinate
 	 * @param y top coordinate
 	 */
-	public static void pasteImage(BufferedImage container, BufferedImage imageIn, float opaque, int x, int y) {
+	public static void paste(BufferedImage container, BufferedImage imageIn, float opaque, int x, int y) {
 		Graphics2D g2d = container.createGraphics();
 		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opaque));
 		g2d.drawImage(imageIn, x, y, null);
@@ -254,7 +249,7 @@ public class ImageUtil {
 	 * 
 	 * @throws IOException error in the elaboration of the image
 	 */
-	public static String encodeImage(File image) throws IOException {
+	public static String encode(File image) throws IOException {
 		byte[] bytes = IOUtils.toByteArray(new FileInputStream(image));
 		return Base64.encodeBase64String(bytes);
 	}
@@ -264,7 +259,7 @@ public class ImageUtil {
 	 * 
 	 * @param originalFile the original file
 	 * @param originalFileName the original filename
-	 * @param out the output .jpg file
+	 * @param out the output file
 	 * 
 	 * @throws IOException a generic I/O error
 	 */
@@ -272,16 +267,17 @@ public class ImageUtil {
 		/*
 		 * In case of an image, just use the original document's file
 		 */
-		String ext = FileUtil.getExtension(originalFileName).toLowerCase();
+		String inputExt = FileUtil.getExtension(originalFileName).toLowerCase();
+		String outputExt = FileUtil.getExtension(out.getName()).toLowerCase();
 
-		if (ext.equals("jpg") || ext.equals("jpeg")) {
+		if (inputExt.equals(outputExt)) {
 			FileUtil.copyFile(originalFile, out);
 		} else {
-			File pdfFile = FileUtil.createTempFile("zonalocr", ".pdf");
+			File pdfFile = FileUtil.createTempFile("firstpage", ".pdf");
 			try {
-				if (!"pdf".equals(ext)) {
+				if (!"pdf".equals(inputExt)) {
 					FormatConverterManager manager = Context.get(FormatConverterManager.class);
-					manager.convertFile(originalFile, originalFileName, pdfFile, "jpg", null);
+					manager.convertFile(originalFile, originalFileName, pdfFile, outputExt, null);
 				} else {
 					pdfFile = originalFile;
 				}
@@ -349,7 +345,7 @@ public class ImageUtil {
 	 * Rotates image.
 	 * 
 	 * @param image source image
-	 * @param angle by degrees
+	 * @param angle expressed degrees
 	 * @param cx x-coordinate of pivot point
 	 * @param cy y-coordinate of pivot point
 	 * @return rotated image
@@ -417,7 +413,7 @@ public class ImageUtil {
 	 * @param targetHeight the desired height of the scaled instance, in pixels
 	 * @return a scaled version of the original {@code BufferedImage}
 	 */
-	public static BufferedImage getScaledInstance(BufferedImage image, int targetWidth, int targetHeight) {
+	public static BufferedImage scale(BufferedImage image, int targetWidth, int targetHeight) {
 		int type = (image.getTransparency() == Transparency.OPAQUE) ? BufferedImage.TYPE_INT_RGB
 				: BufferedImage.TYPE_INT_ARGB;
 		BufferedImage tmp = new BufferedImage(targetWidth, targetHeight, type);
@@ -426,29 +422,6 @@ public class ImageUtil {
 		g2.drawImage(image, 0, 0, targetWidth, targetHeight, null);
 		g2.dispose();
 		return tmp;
-	}
-
-	/**
-	 * Convenience method that returns a scaled instance of the provided
-	 * {@code IIOImage}.
-	 *
-	 * @param iioSource the original image to be scaled
-	 * @param scale the desired scale
-	 * @return a scaled version of the original {@code IIOImage}
-	 */
-	public static IIOImage getScaledInstance(IIOImage iioSource, float scale) {
-		if (!(iioSource.getRenderedImage() instanceof BufferedImage)) {
-			throw new IllegalArgumentException("RenderedImage in IIOImage must be BufferedImage");
-		}
-
-		if (Math.abs(scale - 1.0) < 0.001) {
-			return iioSource;
-		}
-
-		BufferedImage source = (BufferedImage) iioSource.getRenderedImage();
-		BufferedImage target = getScaledInstance(source, (int) (scale * source.getWidth()),
-				(int) (scale * source.getHeight()));
-		return new IIOImage(target, null, null);
 	}
 
 	/**
@@ -480,7 +453,7 @@ public class ImageUtil {
 	 * @param image input image
 	 * @return a monochrome image
 	 */
-	public static BufferedImage convertImageToBinary(BufferedImage image) {
+	public static BufferedImage convertToBinary(BufferedImage image) {
 		BufferedImage tmp = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_BINARY);
 		Graphics2D g2 = tmp.createGraphics();
 		g2.drawImage(image, 0, 0, null);
@@ -494,7 +467,7 @@ public class ImageUtil {
 	 * @param image input image
 	 * @return a monochrome image
 	 */
-	public static BufferedImage convertImageToGrayscale(BufferedImage image) {
+	public static BufferedImage convertToGrayscale(BufferedImage image) {
 		BufferedImage tmp = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
 		Graphics2D g2 = tmp.createGraphics();
 		g2.drawImage(image, 0, 0, null);
@@ -517,7 +490,7 @@ public class ImageUtil {
 	 * @param image input image
 	 * @return an inverted-color image
 	 */
-	public static BufferedImage invertImageColor(BufferedImage image) {
+	public static BufferedImage invertColors(BufferedImage image) {
 		BufferedImage tmp = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 		BufferedImageOp invertOp = new LookupOp(new ShortLookupTable(0, invertTable), null);
 		return invertOp.filter(image, tmp);
@@ -530,7 +503,7 @@ public class ImageUtil {
 	 * @param angle the degree of rotation
 	 * @return a rotated image
 	 */
-	public static BufferedImage rotateImage(BufferedImage image, double angle) {
+	public static BufferedImage rotate(BufferedImage image, double angle) {
 		double theta = Math.toRadians(angle);
 		double sin = Math.abs(Math.sin(theta));
 		double cos = Math.abs(Math.cos(theta));
@@ -550,26 +523,12 @@ public class ImageUtil {
 	}
 
 	/**
-	 * Gets an image from Clipboard.
-	 *
-	 * @return image the image to process
-	 */
-	public static Image getClipboardImage() {
-		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-		try {
-			return (Image) clipboard.getData(DataFlavor.imageFlavor);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	/**
 	 * Clones an image.
 	 *
 	 * @param bi the image to clone
 	 * @return the cloned image
 	 */
-	public static BufferedImage cloneImage(BufferedImage bi) {
+	public static BufferedImage clone(BufferedImage bi) {
 		ColorModel cm = bi.getColorModel();
 		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
 		WritableRaster raster = bi.copyData(null);
@@ -577,12 +536,12 @@ public class ImageUtil {
 	}
 
 	/**
-	 * Creates an images with the given text printed inside
+	 * Creates an image frfom the given Base64 encoded text
 	 * 
 	 * @param text the text to print in the image
 	 * @return The generated image
 	 */
-	public static BufferedImage textToImage(String text) {
+	public static BufferedImage decode(String text) {
 		BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 
 		Graphics2D graphics2d = image.createGraphics();
@@ -626,7 +585,7 @@ public class ImageUtil {
 	 * 
 	 * @throws IOException I/O error
 	 */
-	public static byte[] getImageBytes(BufferedImage image) throws IOException {
+	public static byte[] getBytes(BufferedImage image) throws IOException {
 		try (ByteArrayOutputStream out = new ByteArrayOutputStream();) {
 			ImageIO.write(image, "png", out);
 			out.flush();

@@ -160,6 +160,9 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		checkFolderPermission(Permission.READ, user, folderId);
 		FolderDAO folderDao = Context.get(FolderDAO.class);
 		Folder folder = folderDao.findById(folderId);
+		if (folder == null)
+			return null;
+
 		folderDao.initialize(folder);
 
 		return WSFolder.fromFolder(folder);

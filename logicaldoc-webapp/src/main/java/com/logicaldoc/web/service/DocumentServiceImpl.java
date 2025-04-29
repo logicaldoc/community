@@ -1559,7 +1559,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		try {
 			thumbnailFile = createTile(doc, session.getSid());
 			if (thumbnailFile != null && thumbnailFile.length() > 0) {
-				message += "<p><img src='data:image/png;base64," + ImageUtil.encodeImage(thumbnailFile) + "'/></p>";
+				message += "<p><img src='data:image/png;base64," + ImageUtil.encode(thumbnailFile) + "'/></p>";
 			}
 			mail.setMessageText("<html><head><meta charset='utf-8' /></head><body>" + message + "<rl /></body></html>");
 		} catch (IOException ioe) {
@@ -3157,7 +3157,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		File tileFile = null;
 		try {
 			tileFile = createTile(doc, session.getSid());
-			tile = ImageUtil.encodeImage(tileFile);
+			tile = ImageUtil.encode(tileFile);
 			if (tile != null)
 				tile = "data:image/png;base64," + tile;
 		} catch (IOException e) {

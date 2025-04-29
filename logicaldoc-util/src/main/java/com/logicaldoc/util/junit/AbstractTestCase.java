@@ -56,6 +56,7 @@ public abstract class AbstractTestCase {
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		System.setProperty("LOGICALDOC_REPOSITORY", "target");
+		System.setProperty("java.io.tmpdir", tempDir.getAbsolutePath());
 
 		loadDevelSettingsInEnvironment();
 

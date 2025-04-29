@@ -11,6 +11,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Tenant;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.plugin.PluginException;
 
@@ -23,8 +24,8 @@ import junit.framework.Assert;
  * @since 6.5
  */
 public class LockManagerTest extends AbstractCoreTestCase {
-	
-	private LockManager manager;
+
+	private LockManager testSubject;
 
 	private GenericDAO dao;
 
@@ -34,17 +35,17 @@ public class LockManagerTest extends AbstractCoreTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		manager = (LockManager) context.getBean("lockManager");
-		dao = (GenericDAO) context.getBean("GenericDAO");
-		config = (ContextProperties) context.getBean("ContextProperties");
+		testSubject = Context.get(LockManager.class);
+		dao = Context.get(GenericDAO.class);
+		config = Context.get().getProperties();
 	}
 
 	@Test
 	public void testGet() throws PersistenceException {
-		Assert.assertTrue(manager.get("test", "t1"));
-		Assert.assertTrue(manager.get("test", "t1"));
-		Assert.assertFalse(manager.get("test", "t2"));
-		
+		Assert.assertTrue(testSubject.get("test", "t1"));
+		Assert.assertTrue(testSubject.get("test", "t1"));
+		Assert.assertFalse(testSubject.get("test", "t2"));
+
 		synchronized (this) {
 			try {
 				wait(3000);
@@ -53,8 +54,8 @@ public class LockManagerTest extends AbstractCoreTestCase {
 			}
 		}
 
-		Assert.assertTrue(manager.get("test", "t2"));
-		manager.release("test", "t2");
+		Assert.assertTrue(testSubject.get("test", "t2"));
+		testSubject.release("test", "t2");
 
 		Generic lock = dao.findByAlternateKey("lock", "test-" + config.getProperty("id"), null, Tenant.DEFAULT_ID);
 		Assert.assertNotNull(lock);

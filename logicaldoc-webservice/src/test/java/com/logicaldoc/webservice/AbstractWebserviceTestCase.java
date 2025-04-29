@@ -38,6 +38,10 @@ public abstract class AbstractWebserviceTestCase extends AbstractTestCase {
 		apiKey = new ApiKey(1L, "MyKey");
 		dao.store(apiKey);
 
+		prepareSession();
+	}
+
+	protected void prepareSession() {
 		Client client = new Client("xyz", "192.168.2.231", "ghost");
 		Device device = new Device();
 		device.setBrowser("Firefox");

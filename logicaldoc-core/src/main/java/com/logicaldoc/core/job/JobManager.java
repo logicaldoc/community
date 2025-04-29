@@ -221,10 +221,10 @@ public class JobManager {
 				jobs.add(job);
 		}
 
-		jobs.sort((JobDetail o1, JobDetail o2) -> {
-			int cmp = o1.getKey().getGroup().compareTo(o2.getKey().getGroup());
+		jobs.sort((jobDetails1, jobDetails2) -> {
+			int cmp = jobDetails1.getKey().getGroup().compareTo(jobDetails2.getKey().getGroup());
 			if (cmp == 0)
-				cmp = o1.getKey().getName().compareTo(o2.getKey().getName());
+				cmp = jobDetails1.getKey().getName().compareTo(jobDetails2.getKey().getName());
 			return cmp;
 		});
 		return jobs;

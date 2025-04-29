@@ -29,6 +29,9 @@ public class GhostscriptConverter extends AbstractFormatConverter {
 			if (arguments != null)
 				commandLine.addAll(Arrays.asList(arguments.split(" ")));
 
+			commandLine.add("-dNOPAUSE");
+			commandLine.add("-dBATCH");
+			
 			List<String> pages = null;
 			String device = "jpeg";
 			if ("tif".equals(ext) || "tiff".equals(ext))
@@ -41,8 +44,6 @@ public class GhostscriptConverter extends AbstractFormatConverter {
 				pages = List.of("-dFirstPage=1", "-dLastPage=1");
 			} else if ("txt".equals(ext))
 				device = "txtwrite";
-			else if ("eps".equals(ext))
-				device = "eps2write ";
 
 			commandLine.add("-sDEVICE=" + device);
 			if (pages != null)
