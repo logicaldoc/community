@@ -95,7 +95,7 @@ public class NotesDataServlet extends AbstractDataServlet {
 			writer.print("<noteColor><![CDATA[" + set.getString(9) + "]]></noteColor>");
 		writer.print("<page>" + set.getInt(8) + "</page>");
 		writer.print("<user><![CDATA[" + set.getString(3) + "]]></user>");
-
+		
 		Date date = null;
 		Object obj = set.getObject(4);
 		if (obj instanceof oracle.sql.TIMESTAMP timestamp) {
@@ -105,8 +105,9 @@ public class NotesDataServlet extends AbstractDataServlet {
 				logger.warn(e.getMessage());
 			}
 		} else {
-			date = set.getDate(4);
+			date = set.getTimestamp(4);
 		}
+		
 		writer.print("<date>" + (date != null ? df.format(date) : "") + "</date>");
 		writer.print("<message><![CDATA[" + set.getString(2) + "]]></message>");
 		writer.print("<docId>" + set.getLong(5) + "</docId>");
