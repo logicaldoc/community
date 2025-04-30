@@ -57,7 +57,7 @@ public class GroupPropertiesPanel extends HLayout {
 
 		StaticTextItem id = ItemFactory.newStaticTextItem("id", Long.toString(group.getId()));
 
-		TextItem name = ItemFactory.newSimpleTextItem("name", group.getName());
+		TextItem name = ItemFactory.newSimpleTextItemWithHyphen("name", group.getName());
 		if (readonly || group.getId() != 0) {
 			// In case of already existing group we do not need to enforce any
 			// validation
