@@ -15,21 +15,22 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 import junit.framework.Assert;
 
 public class FulltextSearchTest extends AbstractCoreTestCase {
 	
-	protected SearchEngine testSubject;
+	private SearchEngine testSubject;
 	
-	protected DocumentDAO documentDao;
+	private DocumentDAO documentDao;
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		testSubject = (SearchEngine) context.getBean("SearchEngine");
-		documentDao = (DocumentDAO) context.getBean("documentDAO");
+		testSubject = Context.get(SearchEngine.class);
+		documentDao = Context.get(DocumentDAO.class);
 		try {
 			addHits();
 		} catch (Exception e) {

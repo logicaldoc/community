@@ -478,6 +478,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		Folder folder = folderDao.findById(folderId);
 		if (folder == null)
 			throw new WebserviceException(String.format("cannot find folder %s", folderId));
+		String oldName = folder.getName();
 
 		List<Folder> folders = folderDao.findByNameAndParentId(name, folder.getParentId());
 		if (CollectionUtils.isNotEmpty(folders) && folders.get(0).getId() != folder.getId()) {
@@ -497,7 +498,6 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			folder.setBarcodeTemplateId(wsFolder.getBarcodeTemplateId());
 			folder.setStore(wsFolder.getStore());
 			folder.setMaxVersions(wsFolder.getMaxVersions());
-
 			folder.setTagsFromWords(new HashSet<>(wsFolder.getTags()));
 
 			wsFolder.updateAttributes(folder);
@@ -505,9 +505,18 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			// Add a folder history entry
 			FolderHistory transaction = new FolderHistory();
 			transaction.setUser(user);
-			transaction.setEvent(FolderEvent.RENAMED);
+			transaction.setEvent(FolderEvent.CHANGED);
 			transaction.setSessionId(sid);
+			
 			folderDao.store(folder, transaction);
+			
+			if(!oldName.equals(name)) {
+				FolderHistory renameHistory = new FolderHistory();
+				renameHistory.setUser(user);
+				renameHistory.setEvent(FolderEvent.RENAMED);
+				renameHistory.setSessionId(sid);
+				folderDao.saveFolderHistory(folder, renameHistory);
+			}
 		}
 	}
 

@@ -25,6 +25,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSAccessControlEntry;
+import com.logicaldoc.webservice.model.WSAttribute;
 import com.logicaldoc.webservice.model.WSFolder;
 
 /**
@@ -260,12 +261,42 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testCreatePath() throws Exception {
-		WSFolder folder = testSubject.createPath("", Folder.DEFAULTWORKSPACEID, "pippo/pluto/paperino");
+		WSFolder folder = testSubject.createPath("", Folder.DEFAULTWORKSPACEID, "/pippo/pluto/paperino");
 		assertEquals("paperino", folder.getName());
 
 		WSFolder folder2 = testSubject.findByPath("", "/Default/pippo/pluto/paperino");
 		assertEquals(folder.getId(), folder2.getId());
+		
+		folder = testSubject.createPath("", Folder.DEFAULTWORKSPACEID, "pippo/pluto/paperino/archimede");
+		assertEquals("archimede", folder.getName());
+		
+		folder = testSubject.createPath("", Folder.ROOTID, "/abc/def");
+		assertEquals("def", folder.getName());
+		
+		folder = testSubject.createPath("", Folder.ROOTID, "/Default/ghi/lmn");
+		assertEquals("lmn", folder.getName());
 	}
+	
+	@Test
+	public void testUpdate() throws Exception {
+		WSFolder folder = testSubject.getFolder("", 1201L);
+		assertEquals("abc", folder.getName());
+		assertTrue(folder.getAttributes().isEmpty());
+
+		folder.setName("newname");
+		folder.setTemplateId(-1L);
+		WSAttribute att=new WSAttribute();
+		att.setName("source");
+		att.setStringValue("val1");
+		folder.addAttribute(att);
+		
+		testSubject.update("", folder);
+		
+		folder = testSubject.getFolder("", 1201L);
+		assertEquals("newname", folder.getName());
+		assertEquals("val1", folder.getAttributes().get(0).getStringValue());
+	}
+	
 	
 	@Test
 	public void testMerge() throws Exception {

@@ -30,16 +30,13 @@ import junit.framework.Assert;
  */
 public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 
-	// Instance under test
-	private SearchDAO dao;
+	private SearchDAO testSubject;
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		// Retrieve the instance under test from spring context. Make sure that
-		// it is an HibernateSearchDAO
-		dao = (SearchDAO) context.getBean("SearchDAO");
+		testSubject = Context.get(SearchDAO.class);
 	}
 
 	@Test
@@ -60,7 +57,7 @@ public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 		search.setUserId(1L);
 		search.setTenantId(1L);
 		search.saveOptions(opt);
-		dao.store(search);
+		testSubject.store(search);
 
 		opt.setExpression("prova test 2");
 		search = new SavedSearch();
@@ -68,13 +65,13 @@ public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 		search.setUserId(1L);
 		search.setTenantId(1L);
 		search.saveOptions(opt);
-		dao.store(search);
+		testSubject.store(search);
 
-		List<SavedSearch> searches = dao.findByUserId(1L);
+		List<SavedSearch> searches = testSubject.findByUserId(1L);
 		Assert.assertEquals(2, searches.size());
 		Assert.assertEquals("search1", searches.get(0).getName());
 
-		searches = dao.findByUserId(5L);
+		searches = testSubject.findByUserId(5L);
 		Assert.assertEquals(0, searches.size());
 	}
 

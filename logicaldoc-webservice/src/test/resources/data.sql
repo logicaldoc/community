@@ -1,35 +1,5 @@
 update ld_hilo set next_val = 5000;
 
-insert into ld_attributeset
-			(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid, ld_recordversion)
-values (-1,CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'default','default',1,0,1,1);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
-values (-1,0,0,0,'source', 'Source', 0, -1, 0, 0, 0);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
-values (-1,0,0,1,'sourceAuthor', 'Author', 0, -1, 0, 0, 0);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
-values (-1,0,0,2,'sourceId', 'Original ID', 0, -1, 0, 0, 0);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
-values (-1,0,0,3,'sourceType', 'Type', 0, -1, 0, 0, 0);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
-values (-1,0,0,4,'object', 'Object', 0, -1, 0, 0, 0);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
-values (-1,0,0,5,'coverage', 'Coverage', 0, -1, 0, 0, 0);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
-values (-1,0,0,6,'recipient', 'Recipient', 0, -1, 0, 0, 0);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
-values (-1,0,3,7,'sourceDate', 'Date', 0, -1, 0, 0, 0);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
-values (-1,0,3,7,'multi', 'Multi', 0, -1, 0, 1, 0);
-
-insert into ld_template
-			(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid, ld_recordversion)
-values (-1,CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'default','default',0,0,1,1);
-
-insert into ld_template_ext(ld_templateid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
-select -1, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly from ld_attributeset_ext where ld_setid=-1;
-
-
 insert into ld_user
            (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_enabled,ld_username,ld_password,ld_name,ld_firstname,ld_street,ld_postalcode,ld_city,ld_country,ld_language,ld_email,ld_telephone,ld_type,ld_passwordchanged,ld_passwordexpires,ld_source,ld_quota,ld_passwordexpired,ld_tenantid,ld_recordversion,ld_enforcewrktime,ld_evalform)
 values     (2,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'boss','8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918','Meschieri','Marco','','','','','it','m.meschieri@logicalobjects.it','',0,null,0,0,-1,0,1,1,0,0);
@@ -70,11 +40,51 @@ values (-5,5);
 insert into ld_user
            (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_enabled,ld_username,ld_password,ld_name,ld_firstname,ld_street,ld_postalcode,ld_city,ld_country,ld_language,ld_email,ld_telephone,ld_type,ld_passwordchanged,ld_passwordexpires,ld_source,ld_quota,ld_passwordexpired,ld_tenantid,ld_recordversion,ld_enforcewrktime,ld_evalform)
 values     (6,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'guest','8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918','test','Test','','','','','de','test@acme.com','',0,null,0,0,-1,0,1,1,0,0);
---insert into ld_group
---           (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_tenantid,ld_name,ld_type,ld_recordversion)
---values     (-6,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,1,'_user_6',1,1);
---insert into ld_usergroup
---values (-6,6);
+
+
+insert into ld_attributeset
+			(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid, ld_recordversion)
+values (-1,CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'default','default',1,0,1,1);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,0,0,'source', 'Source', 0, -1, 0, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,0,1,'sourceAuthor', 'Author', 0, -1, 0, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,0,2,'sourceId', 'Original ID', 0, -1, 0, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,0,3,'sourceType', 'Type', 0, -1, 0, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,0,4,'object', 'Object', 0, -1, 0, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,0,5,'coverage', 'Coverage', 0, -1, 0, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,0,6,'recipient', 'Recipient', 0, -1, 0, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,3,7,'sourceDate', 'Date', 0, -1, 0, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,3,7,'multi', 'Multi', 0, -1, 0, 1, 0);
+
+INSERT INTO ld_extoption (ld_id,ld_lastmodified,ld_recordversion,ld_deleted,ld_tenantid,ld_setid,ld_attribute,ld_value,ld_label,ld_position,ld_category,ld_creation) 
+VALUES (-1, CURRENT_TIMESTAMP,0,0,1,-1,'multi','Italy',null,4,'country',CURRENT_TIMESTAMP);
+INSERT INTO ld_extoption (ld_id,ld_lastmodified,ld_recordversion,ld_deleted,ld_tenantid,ld_setid,ld_attribute,ld_value,ld_label,ld_position,ld_category,ld_creation) 
+VALUES (-2, CURRENT_TIMESTAMP,0,0,1,-1,'multi','Germany',null,4,'country',CURRENT_TIMESTAMP);
+INSERT INTO ld_extoption (ld_id,ld_lastmodified,ld_recordversion,ld_deleted,ld_tenantid,ld_setid,ld_attribute,ld_value,ld_label,ld_position,ld_category,ld_creation) 
+VALUES (-3, CURRENT_TIMESTAMP,0,0,1,-1,'multi','Carpi',null,4,'city',CURRENT_TIMESTAMP);
+
+insert into ld_template
+			(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid, ld_recordversion)
+values (-1,CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'default','default',0,0,1,1);
+
+insert into ld_template_ext(ld_templateid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+select -1, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly from ld_attributeset_ext where ld_setid=-1;
+
+insert into ld_template_acl
+			   (ld_templateid, ld_groupid, ld_read, ld_write)
+values     (-1,-5,1,1);
+insert into ld_template_acl
+			   (ld_templateid, ld_groupid, ld_read, ld_write)
+values     (-1,-3,1,0);
+
 
 insert into ld_folder
            (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
@@ -247,6 +257,13 @@ values     (2, 1,'ask');
 
 insert into ld_tag(ld_docid, ld_tenantid, ld_tag)
 values     (3, 1,'zzz');
+
+
+INSERT INTO ld_generic (ld_id,ld_lastmodified,ld_deleted,ld_type,ld_subtype,ld_string1,ld_string2,ld_integer1,ld_integer2,ld_double1,ld_double2,ld_date1,ld_date2,ld_qualifier,ld_integer3,ld_string3,ld_tenantid,ld_recordversion,ld_string4,ld_string5,ld_string6,ld_string7,ld_string8,ld_creation,ld_text1) 
+VALUES (-1000,CURRENT_TIMESTAMP,0,'tag','tagx',null,null,null,null,null,null,null,null,null,null,null,1,0,null,null,null,null,null,CURRENT_TIMESTAMP,null);
+INSERT INTO ld_generic (ld_id,ld_lastmodified,ld_deleted,ld_type,ld_subtype,ld_string1,ld_string2,ld_integer1,ld_integer2,ld_double1,ld_double2,ld_date1,ld_date2,ld_qualifier,ld_integer3,ld_string3,ld_tenantid,ld_recordversion,ld_string4,ld_string5,ld_string6,ld_string7,ld_string8,ld_creation,ld_text1) 
+VALUES (-1001,CURRENT_TIMESTAMP,0,'tag','tagy',null,null,null,null,null,null,null,null,null,null,null,1,0,null,null,null,null,null,CURRENT_TIMESTAMP,null);
+
 
 insert into ld_history 
 				(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified,ld_tenantid,ld_recordversion)

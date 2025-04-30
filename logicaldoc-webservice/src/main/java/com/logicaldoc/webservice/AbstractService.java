@@ -22,6 +22,7 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
+import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.authentication.AccountNotFoundException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authentication.InvalidSessionException;
@@ -92,8 +93,8 @@ public class AbstractService {
 		UserDAO userDao = Context.get(UserDAO.class);
 		if (!validateSession) {
 			User user = new User();
-			user.setId(1L);
-			user.setTenantId(1L);
+			user.setId(User.USERID_ADMIN);
+			user.setTenantId(Tenant.DEFAULT_ID);
 			user.setName("admin");
 			Set<Group> groups = new HashSet<>();
 			GroupDAO grpDao = Context.get(GroupDAO.class);

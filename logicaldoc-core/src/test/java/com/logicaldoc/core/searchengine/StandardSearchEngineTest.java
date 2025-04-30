@@ -14,21 +14,22 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 import junit.framework.Assert;
 
 public class StandardSearchEngineTest extends AbstractCoreTestCase {
-	
+
 	protected SearchEngine testSubject;
-	
+
 	protected DocumentDAO documentDao;
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		testSubject = (SearchEngine) context.getBean("SearchEngine");
-		documentDao = (DocumentDAO) context.getBean("documentDAO");
+		testSubject = Context.get(SearchEngine.class);
+		documentDao = Context.get(DocumentDAO.class);
 	}
 
 	@After
@@ -161,8 +162,8 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
 		Assert.assertEquals(1, hits.getCount());
 		Assert.assertEquals(2, hits.getEstimatedCount());
 
-		hits = testSubject.search("content:document",
-				Set.of("folderId:4", "date:[2012-01-01T00:00:00Z TO *]"), "en", 50);
+		hits = testSubject.search("content:document", Set.of("folderId:4", "date:[2012-01-01T00:00:00Z TO *]"), "en",
+				50);
 
 		Assert.assertEquals(1, hits.getCount());
 		Assert.assertEquals(111L, hits.next().getId());

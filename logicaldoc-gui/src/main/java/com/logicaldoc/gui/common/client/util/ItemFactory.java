@@ -61,6 +61,7 @@ import com.logicaldoc.gui.common.client.services.InfoService;
 import com.logicaldoc.gui.common.client.validators.EmailValidator;
 import com.logicaldoc.gui.common.client.validators.EmailsValidator;
 import com.logicaldoc.gui.common.client.validators.SimpleTextValidator;
+import com.logicaldoc.gui.common.client.validators.SimpleTextValidatorWithHyphen;
 import com.logicaldoc.gui.common.client.widgets.CopyTextFormItemIcon;
 import com.logicaldoc.gui.common.client.widgets.CronExpressionComposer;
 import com.logicaldoc.gui.common.client.widgets.DocumentSelector;
@@ -1718,7 +1719,7 @@ public class ItemFactory {
 		item.setValidators(new SimpleTextValidator());
 		return item;
 	}
-
+	
 	/**
 	 * Creates a new TextItem that validates a simple text
 	 * 
@@ -1731,6 +1732,16 @@ public class ItemFactory {
 		return newSimpleTextItem(name, name, value);
 	}
 
+	public static TextItem newSimpleTextItemWithHyphen(String name, String title, String value) {
+		TextItem item = newTextItem(originalItemName(name), I18N.message(title), value);
+		item.setValidators(new SimpleTextValidatorWithHyphen());
+		return item;
+	}
+	
+	public static TextItem newSimpleTextItemWithHyphen(String name, String value) {
+		return newSimpleTextItemWithHyphen(name, name, value);
+	}
+	
 	public static TextItem newSimpleTextItemPreventAutocomplete(String name, String title, String value) {
 		TextItem item = newSimpleTextItem(name, title, value);
 		item.setAutoCompleteKeywords("nope");

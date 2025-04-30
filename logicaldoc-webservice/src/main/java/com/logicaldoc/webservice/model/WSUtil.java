@@ -337,7 +337,7 @@ public class WSUtil {
 
 		// Populate extended attributes
 		List<WSAttribute> wsAttributes;
-		if (CollectionUtils.isNotEmpty(wsAttributeSet.getAttributes())) {
+		if (MapUtils.isNotEmpty(attributeSet.getAttributes())) {
 			wsAttributes = new ArrayList<>();
 			for (String name : attributeSet.getAttributeNames()) {
 				TemplateAttribute attr = attributeSet.getTemplateAttribute(name);

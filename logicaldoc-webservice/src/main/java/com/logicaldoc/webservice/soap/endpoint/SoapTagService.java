@@ -130,8 +130,7 @@ public class SoapTagService extends AbstractService implements TagService {
 	@Override
 	public List<String> getTags(String sid) throws PersistenceException, AuthenticationException, WebserviceException {
 		User user = validateSession(sid);
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
-		return docDao.findAllTags(null, user.getTenantId());
+		return Context.get(DocumentDAO.class).findAllTags(null, user.getTenantId());
 	}
 
 	@Override
