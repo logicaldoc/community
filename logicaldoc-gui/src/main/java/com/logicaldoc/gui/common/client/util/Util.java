@@ -1239,25 +1239,29 @@ public abstract class Util {
 		try {
 			return params.stream().filter(param -> param.getName().equals(Session.get().getTenantName() + "." + name)
 					|| param.getName().equals(name)).findFirst().orElse(null);
-		} catch (RuntimeException re) {
+		} catch (Exception re) {
 			return null;
 		}
 	}
 
-	public static String getParameterValue(List<GUIParameter> params, String name) {
+	public static String getParameterValue(List<GUIParameter> params, String name, String defaultValue) {
 		try {
 			GUIParameter param = getParameter(params, name);
 			return param != null ? param.getValue() : null;
-		} catch (RuntimeException re) {
-			return null;
+		} catch (Exception re) {
+			return defaultValue;
 		}
+	}
+	
+	public static String getParameterValue(List<GUIParameter> params, String name) {
+		return getParameterValue(params, name, null);
 	}
 
 	public static Boolean getParameterValueAsBoolean(List<GUIParameter> params, String name) {
 		try {
 			GUIParameter param = getParameter(params, name);
 			return param != null ? param.getValueAsBoolean() : null;
-		} catch (RuntimeException re) {
+		} catch (Exception re) {
 			return Boolean.FALSE;
 		}
 	}

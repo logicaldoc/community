@@ -3,8 +3,8 @@ package com.logicaldoc.gui.frontend.client.settings.gui;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -106,15 +106,15 @@ public class GUISettingsPanel extends AdminPanel {
 		welcome.setWidth(400);
 
 		SelectItem density = ItemFactory.newDensitySelector();
-		density.setValue(Util.getParameterValue(settings, "gui.density").trim());
+		density.setValue(Util.getParameterValue(settings, "gui.density", "dense").trim());
 
 		ToggleItem saveLogin = ItemFactory.newToggleItem("savelogin",
 				Util.getParameterValueAsBoolean(settings, "gui.savelogin"));
 		saveLogin.setHint(I18N.message("saveloginhint"));
 		saveLogin.setWrapTitle(false);
-
+		
 		SpinnerItem previewSize = ItemFactory.newSpinnerItem("previewsize", "previewwindow",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.preview.size").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.preview.size", "100").trim()));
 		previewSize.setHint("%");
 		previewSize.setRequired(true);
 		previewSize.setWrapTitle(false);
@@ -123,13 +123,13 @@ public class GUISettingsPanel extends AdminPanel {
 		previewSize.setStep(10);
 
 		SpinnerItem previewTimeout = ItemFactory.newSpinnerItem("previewtimeout",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.preview.timeout").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.preview.timeout", "30").trim()));
 		previewTimeout.setHint(I18N.message(SECONDS));
 		previewTimeout.setWrapTitle(false);
 		previewTimeout.setRequired(true);
 		previewSize.setMin(1);
 		previewSize.setStep(10);
-
+		
 		ToggleItem banner = ItemFactory.newToggleItem("banner",
 				Util.getParameterValueAsBoolean(settings, "gui.banner"));
 		banner.setWrapTitle(false);
@@ -137,7 +137,7 @@ public class GUISettingsPanel extends AdminPanel {
 		ToggleItem openPreviewPanel = ItemFactory.newToggleItem("openpreviewpanel",
 				Util.getParameterValueAsBoolean(settings, "gui.preview.openpanel"));
 		openPreviewPanel.setWrapTitle(false);
-
+		
 		ToggleItem showDocAttrsAsLinks = ItemFactory.newToggleItem("showdocattrsaslinks",
 				Util.getParameterValueAsBoolean(settings, "gui.showdocattrsaslinks"));
 		showDocAttrsAsLinks.setWrapTitle(false);
@@ -145,7 +145,7 @@ public class GUISettingsPanel extends AdminPanel {
 		ToggleItem reactToRemoteEvents = ItemFactory.newToggleItem("reacttoremoteevents",
 				Util.getParameterValueAsBoolean(settings, "gui.serverpush"));
 		reactToRemoteEvents.setWrapTitle(false);
-
+		
 		ToggleItem showPushErrors = ItemFactory.newToggleItem("reacttoremoteeventsshowerrors",
 				Util.getParameterValueAsBoolean(settings, "gui.serverpush.showerror"));
 		showPushErrors.setWrapTitle(false);
@@ -161,7 +161,7 @@ public class GUISettingsPanel extends AdminPanel {
 		ToggleItem showUpdateAlertsInLogin = ItemFactory.newToggleItem("showupdatealertsinlogin",
 				Util.getParameterValueAsBoolean(settings, "gui.update.showloginalerts"));
 		showUpdateAlertsInLogin.setWrapTitle(false);
-
+		
 		ToggleItem showVersionAlertsInLogin = ItemFactory.newToggleItem("showversionalertsinlogin",
 				Util.getParameterValueAsBoolean(settings, "gui.version.showloginalerts"));
 		showVersionAlertsInLogin.setWrapTitle(false);
@@ -173,7 +173,7 @@ public class GUISettingsPanel extends AdminPanel {
 		ToggleItem showLanguageInLogin = ItemFactory.newToggleItem("showlanguageinlogin",
 				Util.getParameterValueAsBoolean(settings, "gui.login.lang"));
 		showLicenseAlertsInLogin.setWrapTitle(false);
-
+		
 		ToggleItem showLostPassword = ItemFactory.newToggleItem("showlostpassword",
 				I18N.message("showlostpasswordlink"),
 				Util.getParameterValueAsBoolean(settings, "gui.lostpassword.show"));
@@ -190,17 +190,17 @@ public class GUISettingsPanel extends AdminPanel {
 		ToggleItem saveInputs = ItemFactory.newToggleItem("saveinputs",
 				Util.getParameterValueAsBoolean(settings, "gui.saveinputs"));
 		galleryEnabled.setWrapTitle(false);
-
+		
 		SpinnerItem attrTextAreaW = ItemFactory.newSpinnerItem("textareaw", I18N.message("attrtextareaw"),
-				Integer.parseInt(Util.getParameterValue(settings, "gui.textarea.w").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.textarea.w", "250").trim()));
 		attrTextAreaW.setHint(PIXELS);
 		attrTextAreaW.setRequired(true);
 		attrTextAreaW.setWrapTitle(false);
 		attrTextAreaW.setStep(50);
 		attrTextAreaW.setMin(50);
-
+		
 		SpinnerItem attrTextAreaH = ItemFactory.newSpinnerItem("textareah", I18N.message("attrtextareah"),
-				Integer.parseInt(Util.getParameterValue(settings, "gui.textarea.h").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.textarea.h", "100").trim()));
 		attrTextAreaH.setHint(PIXELS);
 		attrTextAreaH.setRequired(true);
 		attrTextAreaH.setWrapTitle(false);
@@ -208,7 +208,7 @@ public class GUISettingsPanel extends AdminPanel {
 		attrTextAreaH.setMin(50);
 
 		SpinnerItem attrTextBoxW = ItemFactory.newSpinnerItem("textboxw", I18N.message("attrtextboxw"),
-				Integer.parseInt(Util.getParameterValue(settings, "gui.textbox.w").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.textbox.w", "150").trim()));
 		attrTextBoxW.setHint(PIXELS);
 		attrTextBoxW.setRequired(true);
 		attrTextBoxW.setWrapTitle(false);
@@ -216,16 +216,16 @@ public class GUISettingsPanel extends AdminPanel {
 		attrTextBoxW.setMin(50);
 
 		SpinnerItem noteMaxSize = ItemFactory.newSpinnerItem("notemaxsize",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.note.maxlength").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.note.maxlength", "4000").trim()));
 		noteMaxSize.setHint(I18N.message("chars").toLowerCase());
 		noteMaxSize.setRequired(true);
 		noteMaxSize.setWrapTitle(false);
 		noteMaxSize.setStep(100);
 		noteMaxSize.setMin(0);
 		noteMaxSize.setWidth(70);
-
+		
 		SpinnerItem emailMaxSize = ItemFactory.newSpinnerItem("emailmaxsize",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.email.maxlength").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.email.maxlength", "20000").trim()));
 		emailMaxSize.setHint(I18N.message("chars").toLowerCase());
 		emailMaxSize.setRequired(true);
 		emailMaxSize.setWrapTitle(false);
@@ -234,7 +234,7 @@ public class GUISettingsPanel extends AdminPanel {
 		emailMaxSize.setWidth(70);
 
 		SpinnerItem thumbSize = ItemFactory.newSpinnerItem("thumbsize",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.thumbnail.size").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.thumbnail.size", "200").trim()));
 		thumbSize.setHint(PIXELS);
 		thumbSize.setRequired(true);
 		thumbSize.setWrapTitle(false);
@@ -242,7 +242,7 @@ public class GUISettingsPanel extends AdminPanel {
 		thumbSize.setStep(10);
 
 		SpinnerItem thumbQuality = ItemFactory.newSpinnerItem("thumbquality",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.thumbnail.quality").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.thumbnail.quality", "90").trim()));
 		thumbQuality.setHint("%");
 		thumbQuality.setRequired(true);
 		thumbQuality.setWrapTitle(false);
@@ -251,7 +251,7 @@ public class GUISettingsPanel extends AdminPanel {
 		thumbQuality.setMax(100);
 
 		SpinnerItem mobileSize = ItemFactory.newSpinnerItem("mobilesize",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.mobile.size").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.mobile.size", "336").trim()));
 		mobileSize.setHint(PIXELS);
 		mobileSize.setRequired(true);
 		mobileSize.setWrapTitle(false);
@@ -259,7 +259,7 @@ public class GUISettingsPanel extends AdminPanel {
 		mobileSize.setStep(10);
 
 		SpinnerItem mobileQuality = ItemFactory.newSpinnerItem("mobilequality",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.mobile.quality").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.mobile.quality", "90").trim()));
 		mobileQuality.setHint("%");
 		mobileQuality.setRequired(true);
 		mobileQuality.setWrapTitle(false);
@@ -267,23 +267,23 @@ public class GUISettingsPanel extends AdminPanel {
 		mobileQuality.setStep(10);
 
 		SpinnerItem tileSize = ItemFactory.newSpinnerItem("tilesize",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.tile.size").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.tile.size", "800").trim()));
 		tileSize.setHint(PIXELS);
 		tileSize.setRequired(true);
 		tileSize.setMin(1);
 		tileSize.setStep(10);
 
 		SpinnerItem tileQuality = ItemFactory.newSpinnerItem("tilequality",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.tile.quality").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.tile.quality", "90").trim()));
 		tileQuality.setHint("%");
 		tileQuality.setRequired(true);
 		tileQuality.setWrapTitle(false);
 		tileQuality.setMin(1);
 		tileQuality.setStep(10);
 		tileQuality.setMax(100);
-
+		
 		SpinnerItem uploadMax = ItemFactory.newSpinnerItem("uploadmax",
-				Integer.parseInt(Util.getParameterValue(settings, "upload.maxsize").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "upload.maxsize", "100").trim()));
 		uploadMax.setHint("MB");
 		uploadMax.setRequired(true);
 		uploadMax.setWrapTitle(false);
@@ -292,7 +292,7 @@ public class GUISettingsPanel extends AdminPanel {
 		uploadMax.setWidth(70);
 
 		SpinnerItem previewMaxFileSize = ItemFactory.newSpinnerItem("previewmaxfilesize",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.preview.maxfilesize").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.preview.maxfilesize", "0").trim()));
 		previewMaxFileSize.setHint("MB");
 		previewMaxFileSize.setRequired(true);
 		previewMaxFileSize.setWrapTitle(false);
@@ -312,7 +312,7 @@ public class GUISettingsPanel extends AdminPanel {
 		textExtensions.setWidth(350);
 		textExtensions.setRequired(false);
 		textExtensions.setWrapTitle(false);
-
+		
 		RadioGroupItem ondoubleclick = ItemFactory.newRadioGroup("ondoubleclick");
 		ondoubleclick.setValueMap(DOWNLOAD, "preview");
 		ondoubleclick.setValue(Util.getParameterValue(settings, "gui.doubleclick"));
@@ -332,7 +332,7 @@ public class GUISettingsPanel extends AdminPanel {
 		RadioGroupItem webstartMode = ItemFactory.newRadioGroup("webstartmode");
 		webstartMode.setValueMap("webstart", DOWNLOAD);
 		webstartMode.setValue(Util.getParameterValue(settings, "gui.webstart.mode"));
-
+		
 		ToggleItem foldOpentree = ItemFactory.newToggleItem("foldopentree", "openfolderstree",
 				Util.getParameterValueAsBoolean(settings, "gui.folder.opentree"));
 		foldOpentree.setWrapTitle(false);
@@ -368,7 +368,8 @@ public class GUISettingsPanel extends AdminPanel {
 
 		SelectItem securitySecurityOptionDefault = ItemFactory.newFolderSecurityOption("securityoptiondef");
 		securitySecurityOptionDefault.setWrapTitle(false);
-		securitySecurityOptionDefault.setValue(Util.getParameterValue(settings, "gui.security.inheritoption.default"));
+		securitySecurityOptionDefault
+				.setValue(Util.getParameterValue(settings, "gui.security.inheritoption.default", "inherit"));
 
 		TextItem webcontentFolders = ItemFactory.newTextItem("webcontentfolders",
 				Util.getParameterValue(settings, "gui.webcontent.folders"));
@@ -376,15 +377,15 @@ public class GUISettingsPanel extends AdminPanel {
 		webcontentFolders.setWidth(350);
 
 		SpinnerItem sessionTimeout = ItemFactory.newSpinnerItem("sessiontimeout",
-				Integer.parseInt(Util.getParameterValue(settings, "session.timeout").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "session.timeout", "30").trim()));
 		sessionTimeout.setHint(I18N.message("minutes"));
 		sessionTimeout.setRequired(true);
 		sessionTimeout.setWrapTitle(false);
 		sessionTimeout.setMin(1);
 		sessionTimeout.setStep(5);
-
+		
 		SpinnerItem rpcTimeout = ItemFactory.newSpinnerItem("rpctimeout",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.rpc.timeout").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.rpc.timeout", "2").trim()));
 		rpcTimeout.setHint(I18N.message("minutes"));
 		rpcTimeout.setRequired(true);
 		rpcTimeout.setWrapTitle(false);
@@ -392,7 +393,7 @@ public class GUISettingsPanel extends AdminPanel {
 		rpcTimeout.setStep(1);
 
 		SpinnerItem sessionHeartbeat = ItemFactory.newSpinnerItem("sessionheartbeat",
-				Integer.parseInt(Util.getParameterValue(settings, "session.heartbeat").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "session.heartbeat", "60").trim()));
 		sessionHeartbeat.setHint(I18N.message(SECONDS));
 		sessionHeartbeat.setRequired(true);
 		sessionHeartbeat.setWrapTitle(false);
@@ -400,7 +401,7 @@ public class GUISettingsPanel extends AdminPanel {
 		sessionHeartbeat.setStep(10);
 
 		SpinnerItem popupTimeout = ItemFactory.newSpinnerItem("popuptimeout",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.popup.timeout").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.popup.timeout", "4").trim()));
 		popupTimeout.setHint(I18N.message(SECONDS));
 		popupTimeout.setRequired(true);
 		popupTimeout.setWrapTitle(false);
@@ -410,26 +411,26 @@ public class GUISettingsPanel extends AdminPanel {
 		ToggleItem askVersionCommentOnSave = ItemFactory.newToggleItem("askversioncommentonsave",
 				Util.getParameterValueAsBoolean(settings, "gui.onsave.askversioncomment"));
 		askVersionCommentOnSave.setWrapTitle(false);
-
+		
 		ToggleItem lockOnEditing = ItemFactory.newToggleItem("lockonediting",
 				Util.getParameterValueAsBoolean(settings, "gui.onedit.lock"));
 		lockOnEditing.setWrapTitle(false);
 
 		SpinnerItem avatarSize = ItemFactory.newSpinnerItem("avatarsize",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.avatar.size").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.avatar.size", "128").trim()));
 		avatarSize.setHint(PIXELS);
 		avatarSize.setRequired(true);
 		avatarSize.setWrapTitle(false);
 		avatarSize.setStep(16);
 		avatarSize.setMin(16);
-
+		
 		SpinnerItem wfDashletRows = ItemFactory.newSpinnerItem("wfdashletrows",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.wf.dashlet.rows").trim()));
+				Integer.parseInt(Util.getParameterValue(settings, "gui.wf.dashlet.rows", "50").trim()));
 		wfDashletRows.setRequired(true);
 		wfDashletRows.setWrapTitle(false);
 		wfDashletRows.setMin(5);
 		wfDashletRows.setStep(10);
-
+		
 		ToggleItem showAvatarsInGrids = ItemFactory.newToggleItem("showavatarsingrids",
 				Util.getParameterValueAsBoolean(settings, "gui.avatar.showingrids"));
 		showAvatarsInGrids.setWrapTitle(false);
