@@ -118,7 +118,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		T entity = null;
 		try {
 			entity = sessionFactory.getCurrentSession().get(entityClass, id);
-			if (entity != null && entity.getDeleted() == 1)
+			if (entity != null && entity.getDeleted() != 0)
 				return null;
 			return entity;
 		} catch (Exception e) {
