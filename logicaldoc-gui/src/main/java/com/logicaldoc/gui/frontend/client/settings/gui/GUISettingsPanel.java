@@ -23,7 +23,6 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.ToggleItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.tab.Tab;
 
 /**
@@ -347,7 +346,7 @@ public class GUISettingsPanel extends AdminPanel {
 		maxHistories.setWrapTitle(false);
 
 		SpinnerItem maxVersions = ItemFactory.newSpinnerItem("maxversions",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.maxversions").trim()));
+				Util.getParameterValueAsInt(settings, "gui.maxversions", 100));
 		maxVersions.setStep(10);
 		maxVersions.setWrapTitle(false);
 
@@ -377,7 +376,7 @@ public class GUISettingsPanel extends AdminPanel {
 		webcontentFolders.setWidth(350);
 
 		SpinnerItem sessionTimeout = ItemFactory.newSpinnerItem("sessiontimeout",
-				Integer.parseInt(Util.getParameterValue(settings, "session.timeout", "30").trim()));
+				Util.getParameterValueAsInt(settings, "session.timeout", 30));
 		sessionTimeout.setHint(I18N.message("minutes"));
 		sessionTimeout.setRequired(true);
 		sessionTimeout.setWrapTitle(false);
@@ -385,7 +384,7 @@ public class GUISettingsPanel extends AdminPanel {
 		sessionTimeout.setStep(5);
 
 		SpinnerItem rpcTimeout = ItemFactory.newSpinnerItem("rpctimeout",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.rpc.timeout", "2").trim()));
+				Util.getParameterValueAsInt(settings, "gui.rpc.timeout", 2));
 		rpcTimeout.setHint(I18N.message("minutes"));
 		rpcTimeout.setRequired(true);
 		rpcTimeout.setWrapTitle(false);
@@ -393,7 +392,7 @@ public class GUISettingsPanel extends AdminPanel {
 		rpcTimeout.setStep(1);
 
 		SpinnerItem sessionHeartbeat = ItemFactory.newSpinnerItem("sessionheartbeat",
-				Integer.parseInt(Util.getParameterValue(settings, "session.heartbeat", "60").trim()));
+				Util.getParameterValueAsInt(settings, "session.heartbeat", 60));
 		sessionHeartbeat.setHint(I18N.message(SECONDS));
 		sessionHeartbeat.setRequired(true);
 		sessionHeartbeat.setWrapTitle(false);
@@ -401,7 +400,7 @@ public class GUISettingsPanel extends AdminPanel {
 		sessionHeartbeat.setStep(10);
 
 		SpinnerItem popupTimeout = ItemFactory.newSpinnerItem("popuptimeout",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.popup.timeout", "4").trim()));
+				Util.getParameterValueAsInt(settings, "gui.popup.timeout", 4));
 		popupTimeout.setHint(I18N.message(SECONDS));
 		popupTimeout.setRequired(true);
 		popupTimeout.setWrapTitle(false);
@@ -417,7 +416,7 @@ public class GUISettingsPanel extends AdminPanel {
 		lockOnEditing.setWrapTitle(false);
 
 		SpinnerItem avatarSize = ItemFactory.newSpinnerItem("avatarsize",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.avatar.size", "128").trim()));
+				Util.getParameterValueAsInt(settings, "gui.avatar.size", 128));
 		avatarSize.setHint(PIXELS);
 		avatarSize.setRequired(true);
 		avatarSize.setWrapTitle(false);
@@ -425,7 +424,7 @@ public class GUISettingsPanel extends AdminPanel {
 		avatarSize.setMin(16);
 
 		SpinnerItem wfDashletRows = ItemFactory.newSpinnerItem("wfdashletrows",
-				Integer.parseInt(Util.getParameterValue(settings, "gui.wf.dashlet.rows", "50").trim()));
+				Util.getParameterValueAsInt(settings, "gui.wf.dashlet.rows", 50));
 		wfDashletRows.setRequired(true);
 		wfDashletRows.setWrapTitle(false);
 		wfDashletRows.setMin(5);
@@ -440,7 +439,7 @@ public class GUISettingsPanel extends AdminPanel {
 
 		ButtonItem save = new ButtonItem();
 		save.setTitle(I18N.message("save"));
-		save.addClickHandler((ClickEvent event) -> {
+		save.addClickHandler(click -> {
 			if (Boolean.FALSE.equals(vm.validate()))
 				return;
 			onSave();
