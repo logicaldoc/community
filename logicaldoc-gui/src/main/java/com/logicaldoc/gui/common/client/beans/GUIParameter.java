@@ -34,9 +34,13 @@ public class GUIParameter implements Serializable {
 	public String getValue() {
 		return value;
 	}
-	
+
 	public Boolean getValueAsBoolean() {
 		return "1".equals(getValue()) || Boolean.valueOf(getValue());
+	}
+
+	public Integer getValueAsInteger() {
+		return getValue() != null ? Integer.parseInt(getValue().trim()) : null;
 	}
 
 	public void setValue(String value) {

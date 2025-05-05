@@ -1266,6 +1266,15 @@ public abstract class Util {
 		}
 	}
 
+	public static int getParameterValueAsInt(List<GUIParameter> params, String name, int defaultValue) {
+		try {
+			GUIParameter param = getParameter(params, name);
+			return param.getValueAsInteger() != null ? param.getValueAsInteger() : defaultValue;
+		} catch (Exception re) {
+			return defaultValue;
+		}
+	}
+	
 	public static void removeChildren(Layout container) {
 		Canvas[] members = container.getMembers();
 		if (members != null)
