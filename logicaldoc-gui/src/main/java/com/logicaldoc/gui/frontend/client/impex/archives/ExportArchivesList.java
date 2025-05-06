@@ -36,8 +36,6 @@ public class ExportArchivesList extends VLayout {
 
 	private static final String STATUS = "status";
 
-	private static final String STATUSICON = "statusicon";
-
 	protected Layout detailsContainer;
 
 	protected RefreshableListGrid list;
@@ -150,8 +148,7 @@ public class ExportArchivesList extends VLayout {
 		list.addSelectionChangedHandler(event -> {
 			ListGridRecord rec = list.getSelectedRecord();
 			try {
-				showDetails(Long.parseLong(rec.getAttribute("id")),
-						!Integer.toString(GUIArchive.STATUS_OPEN).equals(rec.getAttribute(STATUS)));
+				showDetails(rec.getAttributeAsLong("id"), GUIArchive.STATUS_OPEN != rec.getAttributeAsInt(STATUS));
 			} catch (Exception t) {
 				// Nothing to do
 			}
@@ -173,7 +170,7 @@ public class ExportArchivesList extends VLayout {
 		Menu contextMenu = new Menu();
 
 		final ListGridRecord rec = list.getSelectedRecord();
-		final long id = Long.parseLong(rec.getAttributeAsString("id"));
+		final long id = rec.getAttributeAsLong("id");
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
@@ -203,10 +200,10 @@ public class ExportArchivesList extends VLayout {
 					}
 				}));
 
-		if (GUIArchive.STATUS_OPEN != Integer.parseInt(rec.getAttributeAsString(STATUS)))
+		if (GUIArchive.STATUS_OPEN != rec.getAttributeAsInt(STATUS))
 			close.setEnabled(false);
 
-		if (GUIArchive.STATUS_ERROR != Integer.parseInt(rec.getAttributeAsString(STATUS)))
+		if (GUIArchive.STATUS_ERROR != rec.getAttributeAsInt(STATUS))
 			open.setEnabled(false);
 
 		contextMenu.setItems(close, open, delete);
@@ -234,7 +231,6 @@ public class ExportArchivesList extends VLayout {
 					@Override
 					public void onSuccess(Void result) {
 						rec.setAttribute(STATUS, GUIArchive.STATUS_CLOSED);
-						rec.setAttribute(STATUSICON, "lock");
 						list.refreshRow(list.getRecordIndex(rec));
 						showDetails(Long.parseLong(rec.getAttributeAsString("id")), true);
 					}
@@ -262,14 +258,13 @@ public class ExportArchivesList extends VLayout {
 	}
 
 	protected void openArchive(final ListGridRecord rec) {
-		ImpexService.Instance.get().setStatus(Long.parseLong(rec.getAttributeAsString("id")), GUIArchive.STATUS_OPEN,
+		ImpexService.Instance.get().setStatus(rec.getAttributeAsLong("id"), GUIArchive.STATUS_OPEN,
 				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute(STATUS, "0");
-						rec.setAttribute(STATUSICON, "lock_open");
+						rec.setAttribute(STATUS, GUIArchive.STATUS_OPEN);
 						list.refreshRow(list.getRecordIndex(rec));
-						showDetails(Long.parseLong(rec.getAttributeAsString("id")), true);
+						showDetails(rec.getAttributeAsLong("id"), true);
 					}
 				});
 	}

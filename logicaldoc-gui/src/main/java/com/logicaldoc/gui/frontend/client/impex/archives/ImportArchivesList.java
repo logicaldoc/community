@@ -141,7 +141,7 @@ public class ImportArchivesList extends VLayout {
 		Menu contextMenu = new Menu();
 
 		final ListGridRecord rec = list.getSelectedRecord();
-		final long id = Long.parseLong(rec.getAttributeAsString("id"));
+		final long id = rec.getAttributeAsLong("id");
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
