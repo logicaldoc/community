@@ -15,6 +15,54 @@ public class GUIAccessControlEntry implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	public static final String PERMISSION_DELETE = "DELETE";
+
+	public static final String PERMISSION_IMMUTABLE = "IMMUTABLE";
+
+	public static final String PERMISSION_SECURITY = "SECURITY";
+
+	public static final String PERMISSION_READ = "READ";
+
+	public static final String PERMISSION_PREVIEW = "PREVIEW";
+
+	public static final String PERMISSION_WRITE = "WRITE";
+
+	public static final String PERMISSION_ADD = "ADD";
+
+	public static final String PERMISSION_RENAME = "RENAME";
+
+	public static final String PERMISSION_IMPORT = "IMPORT";
+
+	public static final String PERMISSION_EXPORT = "EXPORT";
+
+	public static final String PERMISSION_SIGN = "SIGN";
+
+	public static final String PERMISSION_ARCHIVE = "ARCHIVE";
+
+	public static final String PERMISSION_WORKFLOW = "WORKFLOW";
+
+	public static final String PERMISSION_DOWNLOAD = "DOWNLOAD";
+
+	public static final String PERMISSION_CALENDAR = "CALENDAR";
+
+	public static final String PERMISSION_SUBSCRIPTION = "SUBSCRIPTION";
+
+	public static final String PERMISSION_PASSWORD = "PASSWORD";
+
+	public static final String PERMISSION_MOVE = "MOVE";
+
+	public static final String PERMISSION_EMAIL = "EMAIL";
+
+	public static final String PERMISSION_AUTOMATION = "AUTOMATION";
+
+	public static final String PERMISSION_STORE = "STORE";
+
+	public static final String PERMISSION_READINGREQ = "READINGREQ";
+
+	public static final String PERMISSION_PRINT = "PRINT";
+
+	public static final String PERMISSION_CUSTOMID = "CUSTOMID";
+	
 	private long entityId = 0;
 
 	private String name;
@@ -27,54 +75,6 @@ public class GUIAccessControlEntry implements Serializable {
 	 */
 	private ArrayList<GUIValue> permissions = new ArrayList<>();
 
-	public static final String PERMISSION_DELETE = "delete";
-
-	public static final String PERMISSION_IMMUTABLE = "immutable";
-
-	public static final String PERMISSION_SECURITY = "security";
-
-	public static final String PERMISSION_READ = "read";
-
-	public static final String PERMISSION_PREVIEW = "preview";
-
-	public static final String PERMISSION_WRITE = "write";
-
-	public static final String PERMISSION_ADD = "add";
-
-	public static final String PERMISSION_RENAME = "rename";
-
-	public static final String PERMISSION_IMPORT = "import";
-
-	public static final String PERMISSION_EXPORT = "export";
-
-	public static final String PERMISSION_SIGN = "sign";
-
-	public static final String PERMISSION_ARCHIVE = "archive";
-
-	public static final String PERMISSION_WORKFLOW = "workflow";
-
-	public static final String PERMISSION_DOWNLOAD = "download";
-
-	public static final String PERMISSION_CALENDAR = "calendar";
-
-	public static final String PERMISSION_SUBSCRIPTION = "subscription";
-
-	public static final String PERMISSION_PASSWORD = "password";
-
-	public static final String PERMISSION_MOVE = "move";
-
-	public static final String PERMISSION_EMAIL = "email";
-
-	public static final String PERMISSION_AUTOMATION = "automation";
-
-	public static final String PERMISSION_STORE = "store";
-
-	public static final String PERMISSION_READINGREQ = "readingreq";
-
-	public static final String PERMISSION_PRINT = "print";
-
-	public static final String PERMISSION_CUSTOMID = "customid";
-
 	public GUIAccessControlEntry() {
 	}
 
@@ -82,14 +82,14 @@ public class GUIAccessControlEntry implements Serializable {
 		this.entityId = entityId;
 		permissions.clear();
 		for (String permission : allowedPermissions) {
-			permissions.add(new GUIValue(permission.toLowerCase(), Boolean.TRUE.toString()));
+			permissions.add(new GUIValue(permission.toUpperCase(), Boolean.TRUE.toString()));
 		}
 	}
 
 	public GUIAccessControlEntry(String... allowedPermissions) {
 		permissions.clear();
 		for (String permission : allowedPermissions) {
-			permissions.add(new GUIValue(permission.toLowerCase(), Boolean.TRUE.toString()));
+			permissions.add(new GUIValue(permission.toUpperCase(), Boolean.TRUE.toString()));
 		}
 	}
 
@@ -311,11 +311,11 @@ public class GUIAccessControlEntry implements Serializable {
 	}
 
 	public boolean isPermissionAllowed(String permission) {
-		return getAllowedPermissions().contains(permission.toLowerCase());
+		return getAllowedPermissions().contains(permission.toUpperCase());
 	}
 
 	public Set<String> getAllowedPermissions() {
-		return permissions.stream().filter(e -> Boolean.valueOf(e.getValue())).map(e -> e.getCode().toLowerCase())
+		return permissions.stream().filter(e -> Boolean.valueOf(e.getValue())).map(e -> e.getCode().toUpperCase())
 				.collect(Collectors.toSet());
 	}
 

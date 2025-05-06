@@ -39,8 +39,6 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class WorkflowSecurity extends Window {
 
-	private static final String WRITE = "write";
-
 	private static final String AVATAR = "avatar";
 
 	private static final String ENTITY = "entity";
@@ -89,12 +87,14 @@ public class WorkflowSecurity extends Window {
 		entity.setCanEdit(false);
 		entity.setRotateTitle(false);
 
-		ListGridField read = new ListGridField("read", I18N.message("read"), 80);
+		ListGridField read = new ListGridField(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(),
+				I18N.message(GUIAccessControlEntry.PERMISSION_READ.toLowerCase()), 80);
 		read.setType(ListGridFieldType.BOOLEAN);
 		read.setCanEdit(true);
 		read.setAutoFitWidth(true);
 
-		ListGridField write = new ListGridField(WRITE, I18N.message(WRITE), 80);
+		ListGridField write = new ListGridField(GUIAccessControlEntry.PERMISSION_WRITE,
+				I18N.message(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase()), 80);
 		write.setType(ListGridFieldType.BOOLEAN);
 		write.setCanEdit(true);
 		write.setAutoFitWidth(true);
@@ -188,7 +188,7 @@ public class WorkflowSecurity extends Window {
 			rec.setAttribute(AVATAR, selectedRecord.getAttribute("id"));
 			rec.setAttribute(ENTITY,
 					selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
-			rec.setAttribute("read", true);
+			rec.setAttribute(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), true);
 
 			list.addData(rec);
 			user.clearValue();
@@ -221,7 +221,7 @@ public class WorkflowSecurity extends Window {
 			rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("id"));
 			rec.setAttribute(AVATAR, "group");
 			rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
-			rec.setAttribute("read", true);
+			rec.setAttribute(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), true);
 			list.addData(rec);
 			group.clearValue();
 		});
@@ -240,8 +240,10 @@ public class WorkflowSecurity extends Window {
 				GUIAccessControlEntry right = new GUIAccessControlEntry();
 				right.setName(rec.getAttributeAsString(ENTITY));
 				right.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
-				right.setWrite(Boolean.TRUE.equals(rec.getAttributeAsBoolean(WRITE)));
-				right.setRead(Boolean.TRUE.equals(rec.getAttributeAsBoolean("read")));
+				right.setWrite(Boolean.TRUE
+						.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase())));
+				right.setRead(Boolean.TRUE
+						.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_READ.toLowerCase())));
 				acl.add(right);
 			}
 

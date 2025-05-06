@@ -226,7 +226,7 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 		GUIFolder folder = testSubject.getFolder(6, true, true, true);
 		int aclBefore = folder.getAccessControlList().size();
 
-		folder.getAccessControlList().add(new GUIAccessControlEntry(4L, "read", "write"));
+		folder.getAccessControlList().add(new GUIAccessControlEntry(4L, Permission.READ.name(), Permission.WRITE.name()));
 		testSubject.saveACL(folder, false);
 
 		folder = testSubject.getFolder(6, true, true, true);

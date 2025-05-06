@@ -317,7 +317,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		User user = validateSession(sid);
 		FolderDAO folderDao = Context.get(FolderDAO.class);
 		if (!folderDao.isPermissionAllowed(Permission.RENAME, folderId, user.getId()))
-			throw new PermissionException(user.getUsername(), FOLDER + folderId, Permission.RENAME.toString());
+			throw new PermissionException(user.getUsername(), FOLDER + folderId, Permission.RENAME);
 
 		long rootId = folderDao.findRoot(user.getTenantId()).getId();
 		if (folderId == rootId)

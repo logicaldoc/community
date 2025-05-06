@@ -24,6 +24,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
+import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
@@ -86,7 +87,8 @@ public class TemplateServiceImplTest extends AbstractWebappTestCase {
 
 		template.setName("pippo");
 		template.setDescription("paperino");
-		template.getAccessControlList().add(new GUIAccessControlEntry(4L, "read", "write"));
+		template.getAccessControlList()
+				.add(new GUIAccessControlEntry(4L, Permission.READ.name(), Permission.WRITE.name()));
 
 		testSubject.save(template);
 

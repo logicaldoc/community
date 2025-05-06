@@ -36,10 +36,6 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class AutomationRoutineSecurity extends AutomationRoutineDetailsTab {
 
-	private static final String READ = "read";
-
-	private static final String WRITE = "write";
-
 	private static final String AVATAR = "avatar";
 
 	private static final String ENTITY = "entity";
@@ -67,14 +63,16 @@ public class AutomationRoutineSecurity extends AutomationRoutineDetailsTab {
 		entity.setCanEdit(false);
 		entity.setRotateTitle(false);
 
-		ListGridField read = new ListGridField(READ, I18N.message(READ), 80);
+		ListGridField read = new ListGridField(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(),
+				I18N.message(GUIAccessControlEntry.PERMISSION_READ.toLowerCase()), 80);
 		read.setType(ListGridFieldType.BOOLEAN);
 		read.setCanEdit(true);
 		read.setAutoFitWidth(true);
 		if (changedHandler != null)
 			read.addChangedHandler(event -> changedHandler.onChanged(null));
 
-		ListGridField write = new ListGridField(WRITE, I18N.message(WRITE), 80);
+		ListGridField write = new ListGridField(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase(),
+				I18N.message(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase()), 80);
 		write.setType(ListGridFieldType.BOOLEAN);
 		write.setCanEdit(true);
 		write.setAutoFitWidth(true);
@@ -111,8 +109,10 @@ public class AutomationRoutineSecurity extends AutomationRoutineDetailsTab {
 				for (ListGridRecord rec : list.getSelectedRecords()) {
 					GUIAccessControlEntry acl = routine.getAce(rec.getAttributeAsLong(ENTITY_ID));
 					if (acl != null) {
-						acl.setWrite(rec.getAttributeAsBoolean(WRITE, false));
-						acl.setRead(rec.getAttributeAsBoolean(READ, false));
+						acl.setWrite(
+								rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase(), false));
+						acl.setRead(
+								rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), false));
 					}
 				}
 				changedHandler.onChanged(null);
@@ -171,7 +171,7 @@ public class AutomationRoutineSecurity extends AutomationRoutineDetailsTab {
 			rec.setAttribute(AVATAR, selectedRecord.getAttribute("id"));
 			rec.setAttribute(ENTITY,
 					selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
-			rec.setAttribute(READ, true);
+			rec.setAttribute(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), true);
 
 			addRecord(rec);
 
@@ -185,8 +185,8 @@ public class AutomationRoutineSecurity extends AutomationRoutineDetailsTab {
 
 		GUIAccessControlEntry ace = new GUIAccessControlEntry();
 		ace.setEntityId(rec.getAttributeAsLong(ENTITY_ID));
-		ace.setRead(rec.getAttributeAsBoolean(READ, false));
-		ace.setWrite(rec.getAttributeAsBoolean(WRITE, false));
+		ace.setRead(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), false));
+		ace.setWrite(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase(), false));
 		routine.addAce(ace);
 
 		changedHandler.onChanged(null);
@@ -217,7 +217,7 @@ public class AutomationRoutineSecurity extends AutomationRoutineDetailsTab {
 			rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("id"));
 			rec.setAttribute(AVATAR, "group");
 			rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
-			rec.setAttribute(READ, true);
+			rec.setAttribute(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), true);
 
 			addRecord(rec);
 			group.clearValue();
@@ -238,8 +238,8 @@ public class AutomationRoutineSecurity extends AutomationRoutineDetailsTab {
 			GUIAccessControlEntry ace = new GUIAccessControlEntry();
 			ace.setName(rec.getAttributeAsString(ENTITY));
 			ace.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
-			ace.setWrite(rec.getAttributeAsBoolean(WRITE));
-			ace.setRead(rec.getAttributeAsBoolean(READ));
+			ace.setWrite(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase()));
+			ace.setRead(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_READ.toLowerCase()));
 			acl.add(ace);
 		}
 
@@ -280,7 +280,7 @@ public class AutomationRoutineSecurity extends AutomationRoutineDetailsTab {
 	public boolean validate() {
 		return true;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

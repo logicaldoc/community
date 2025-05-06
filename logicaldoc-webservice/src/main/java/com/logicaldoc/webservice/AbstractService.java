@@ -155,7 +155,7 @@ public class AbstractService {
 		if (!dao.isReadEnable(menuId, user.getId())) {
 			String message = String.format("User %s cannot access menu %s", user.getUsername(), menuId);
 			log.error(message);
-			throw new PermissionException(user.getUsername(), "menu " + menuId, "access");
+			throw new PermissionException(user.getUsername(), "menu " + menuId, Permission.READ);
 		}
 	}
 

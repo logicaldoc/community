@@ -37,8 +37,6 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class MenuSecurityPanel extends VLayout {
 
-	private static final String READ = "read";
-
 	private static final String AVATAR = "avatar";
 
 	private static final String ENTITY = "entity";
@@ -138,7 +136,7 @@ public class MenuSecurityPanel extends VLayout {
 			rec.setAttribute(ENTITY,
 					selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
 			rec.setAttribute(AVATAR, selectedRecord.getAttribute("id"));
-			rec.setAttribute(READ, true);
+			rec.setAttribute(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), true);
 			aclGrid.addData(rec);
 			user.clearValue();
 		});
@@ -172,7 +170,7 @@ public class MenuSecurityPanel extends VLayout {
 			rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("id"));
 			rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
 			rec.setAttribute(AVATAR, "group");
-			rec.setAttribute(READ, true);
+			rec.setAttribute(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), true);
 			aclGrid.addData(rec);
 			group.clearValue();
 		});
@@ -190,7 +188,7 @@ public class MenuSecurityPanel extends VLayout {
 			GUIAccessControlEntry ace = new GUIAccessControlEntry();
 			ace.setName(rec.getAttributeAsString(ENTITY));
 			ace.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
-			ace.setRead(Boolean.TRUE.equals(rec.getAttributeAsBoolean(READ)));
+			ace.setRead(Boolean.TRUE.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_READ.toLowerCase())));
 			acl.add(ace);
 		}
 		return acl;

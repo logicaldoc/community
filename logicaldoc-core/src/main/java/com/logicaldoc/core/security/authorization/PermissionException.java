@@ -19,24 +19,14 @@ public class PermissionException extends AuthorizationException {
 	 */
 	private final String securityObject;
 
-	private final String permission;
+	private final Permission permission;
 
 	public PermissionException(String username, String securityObject, Permission permission) {
-		this(username, securityObject, permission.toString());
+		this(username, securityObject, permission, null);
+
 	}
 
 	public PermissionException(String username, String securityObject, Permission permission, Throwable cause) {
-		this(username, securityObject, permission.toString(), cause);
-	}
-
-	public PermissionException(String username, String securityObject, String permission) {
-		super(buildMessage(username, securityObject, permission));
-		this.username = username;
-		this.securityObject = securityObject;
-		this.permission = permission;
-	}
-
-	public PermissionException(String username, String securityObject, String permission, Throwable cause) {
 		super(buildMessage(username, securityObject, permission), cause);
 		this.username = username;
 		this.securityObject = securityObject;
@@ -78,11 +68,11 @@ public class PermissionException extends AuthorizationException {
 		return securityObject;
 	}
 
-	public String getPermission() {
+	public Permission getPermission() {
 		return permission;
 	}
 
-	private static String buildMessage(String username, String securityObject, String permission) {
-		return String.format("User %s does not have permission %s on %s", username, permission, securityObject);
+	private static String buildMessage(String username, String securityObject, Permission permission) {
+		return String.format("User %s does not have permission %s on %s", username, permission.name(), securityObject);
 	}
 }

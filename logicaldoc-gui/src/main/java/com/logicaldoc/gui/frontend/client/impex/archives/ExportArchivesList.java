@@ -229,11 +229,11 @@ public class ExportArchivesList extends VLayout {
 	}
 
 	protected void closeArchive(final ListGridRecord rec) {
-		ImpexService.Instance.get().setStatus(Long.parseLong(rec.getAttributeAsString("id")), GUIArchive.STATUS_CLOSED,
+		ImpexService.Instance.get().setStatus(rec.getAttributeAsLong("id"), GUIArchive.STATUS_CLOSED,
 				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
-						rec.setAttribute(STATUS, "1");
+						rec.setAttribute(STATUS, GUIArchive.STATUS_CLOSED);
 						rec.setAttribute(STATUSICON, "lock");
 						list.refreshRow(list.getRecordIndex(rec));
 						showDetails(Long.parseLong(rec.getAttributeAsString("id")), true);

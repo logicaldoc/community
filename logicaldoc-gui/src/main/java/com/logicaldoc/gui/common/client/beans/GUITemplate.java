@@ -171,7 +171,7 @@ public class GUITemplate implements Serializable {
 	}
 
 	public boolean isWrite() {
-		return hasPermission(GUIAccessControlEntry.PERMISSION_WRITE);
+		return hasPermission(GUIAccessControlEntry.PERMISSION_WRITE.toUpperCase());
 	}
 
 	public boolean hasPermission(String permission) {

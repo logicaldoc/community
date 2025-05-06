@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.common.client.data;
 
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
@@ -18,8 +19,8 @@ public class WorkflowAclDS extends DataSource {
 		DataSourceTextField entity = new DataSourceTextField("entity");
 		DataSourceTextField entityId = new DataSourceTextField("entityId");
 		entityId.setPrimaryKey(true);
-		DataSourceBooleanField read = new DataSourceBooleanField("read");
-		DataSourceBooleanField write = new DataSourceBooleanField("write");
+		DataSourceBooleanField read = new DataSourceBooleanField(GUIAccessControlEntry.PERMISSION_READ.toLowerCase());
+		DataSourceBooleanField write = new DataSourceBooleanField(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase());
 		DataSourceTextField type = new DataSourceTextField("type");
 
 		setFields(entityId, entity, read, write, type);

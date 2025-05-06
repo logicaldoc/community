@@ -29,9 +29,6 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  * @since 8.9.1
  */
 public class StampSecurity extends StampDetailsTab {
-	private static final String READ = "read";
-
-	private static final String WRITE = "write";
 
 	private static final String AVATAR = "avatar";
 
@@ -66,12 +63,12 @@ public class StampSecurity extends StampDetailsTab {
 		entity.setCanEdit(false);
 		entity.setRotateTitle(false);
 
-		ListGridField read = new ListGridField(READ, I18N.message(READ), 80);
+		ListGridField read = new ListGridField(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), I18N.message(GUIAccessControlEntry.PERMISSION_READ.toLowerCase()), 80);
 		read.setType(ListGridFieldType.BOOLEAN);
 		read.setCanEdit(true);
 		read.setAutoFitWidth(true);
 
-		ListGridField write = new ListGridField(WRITE, I18N.message(WRITE), 80);
+		ListGridField write = new ListGridField(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase(), I18N.message(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase()), 80);
 		write.setType(ListGridFieldType.BOOLEAN);
 		write.setCanEdit(true);
 		write.setAutoFitWidth(true);
@@ -90,8 +87,8 @@ public class StampSecurity extends StampDetailsTab {
 				for (ListGridRecord rec : list.getSelectedRecords()) {
 					GUIAccessControlEntry acl = stamp.getAce(rec.getAttributeAsLong(ENTITY_ID));
 					if (acl != null) {
-						acl.setWrite(Boolean.TRUE.equals(rec.getAttributeAsBoolean(WRITE, false)));
-						acl.setRead(Boolean.TRUE.equals(rec.getAttributeAsBoolean(READ, false)));
+						acl.setWrite(Boolean.TRUE.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase(), false)));
+						acl.setRead(Boolean.TRUE.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), false)));
 					}
 				}
 				changedHandler.onChanged(null);
@@ -136,7 +133,7 @@ public class StampSecurity extends StampDetailsTab {
 			rec.setAttribute(ENTITY_ID, selectedRecord.getAttribute("id"));
 			rec.setAttribute(AVATAR, "group");
 			rec.setAttribute(ENTITY, selectedRecord.getAttribute("name"));
-			rec.setAttribute(READ, true);
+			rec.setAttribute(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), true);
 
 			addRecord(rec);
 
@@ -169,7 +166,7 @@ public class StampSecurity extends StampDetailsTab {
 			rec.setAttribute(AVATAR, selectedRecord.getAttribute("id"));
 			rec.setAttribute(ENTITY,
 					selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
-			rec.setAttribute(READ, true);
+			rec.setAttribute(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), true);
 
 			addRecord(rec);
 
@@ -196,8 +193,8 @@ public class StampSecurity extends StampDetailsTab {
 
 		GUIAccessControlEntry ace = new GUIAccessControlEntry();
 		ace.setEntityId(rec.getAttributeAsLong(ENTITY_ID));
-		ace.setRead(Boolean.TRUE.equals(rec.getAttributeAsBoolean(READ, false)));
-		ace.setWrite(Boolean.TRUE.equals(rec.getAttributeAsBoolean(WRITE, false)));
+		ace.setRead(Boolean.TRUE.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_READ.toLowerCase(), false)));
+		ace.setWrite(Boolean.TRUE.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase(), false)));
 		stamp.addAce(ace);
 
 		changedHandler.onChanged(null);
