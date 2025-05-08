@@ -106,7 +106,7 @@ public class ModelProperties extends ModelDetailsTab {
 		SelectItem type = ItemFactory.newSelectItem(TYPE);
 		type.setOptionDataSource(new ModelTypesDS());
 		type.setValueField(VALUE);
-		type.setDisplayField(VALUE);
+		type.setDisplayField("label");
 		type.setValue(model.getType());
 		type.addChangedHandler(changedHandler);
 		type.addChangedHandler(changed -> layersStack.setVisible(NEURAL.equals(type.getValueAsString())));
@@ -114,7 +114,8 @@ public class ModelProperties extends ModelDetailsTab {
 		type.setDisabled(model.getId() != 0L);
 		type.setVisible(model.getId() == 0L);
 
-		StaticTextItem typeValue = ItemFactory.newStaticTextItem("typeValue", TYPE, model.getType());
+		StaticTextItem typeValue = ItemFactory.newStaticTextItem("typeValue", TYPE,
+				I18N.message("aimodeltype." + model.getType()));
 		typeValue.setVisible(model.getId() != 0L);
 
 		StaticTextItem id = ItemFactory.newStaticTextItem(ID, Long.toString(model.getId()));

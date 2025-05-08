@@ -103,6 +103,7 @@ public class ModelsPanel extends VLayout {
 
 		ListGridField modelType = new ListGridField("type", I18N.message("type"));
 		modelType.setAutoFit(AutoFitWidthApproach.BOTH);
+		modelType.setCellFormatter((value, record, rowNum, colNum) -> I18N.message("aimodeltype." + value));
 
 		ListGridField training = new RunningListGridField(TRAINING);
 		training.setTitle(I18N.message(TRAINING));
@@ -159,7 +160,7 @@ public class ModelsPanel extends VLayout {
 		stats.setTitle(I18N.message("stats"));
 		toolStrip.addButton(stats);
 		stats.addClickHandler(event -> new AIStats().show());
-		
+
 		toolStrip.addSeparator();
 
 		ToolStripButton importModel = new ToolStripButton();
@@ -252,17 +253,16 @@ public class ModelsPanel extends VLayout {
 
 		MenuItem evaluate = new MenuItem();
 		evaluate.setTitle(I18N.message("startevaluation"));
-		evaluate.addClickHandler(
-				event -> LD.ask(I18N.message(QUESTION), I18N.message("confirmevaluation"), confirm -> {
-					if (Boolean.TRUE.equals(confirm)) {
-						AIService.Instance.get().evaluateModel(ids.get(0), new DefaultAsyncCallback<>() {
-							@Override
-							public void onSuccess(Void result) {
-								// Nothing to do
-							}
-						});
+		evaluate.addClickHandler(event -> LD.ask(I18N.message(QUESTION), I18N.message("confirmevaluation"), confirm -> {
+			if (Boolean.TRUE.equals(confirm)) {
+				AIService.Instance.get().evaluateModel(ids.get(0), new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(Void result) {
+						// Nothing to do
 					}
-				}));
+				});
+			}
+		}));
 		evaluate.setEnabled(
 				!selection[0].getAttributeAsBoolean(TRAINING) && !selection[0].getAttributeAsBoolean(EVALUATING)
 						&& "neural".equals(selection[0].getAttributeAsString("type"))
@@ -305,11 +305,12 @@ public class ModelsPanel extends VLayout {
 	}
 
 	protected void showModelDetails(GUIModel model) {
-		if (!(details instanceof ModelDetailsPanel)) {
-			detailsContainer.removeMember(details);
+		detailsContainer.removeMember(details);
+		if (model!=null)
 			details = new ModelDetailsPanel(this);
-			detailsContainer.addMember(details);
-		}
+		else
+			details = SELECT_MODEL;
+		detailsContainer.addMember(details);
 		((ModelDetailsPanel) details).setModel(model);
 	}
 

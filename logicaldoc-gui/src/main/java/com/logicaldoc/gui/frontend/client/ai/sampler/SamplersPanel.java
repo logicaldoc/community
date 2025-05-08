@@ -82,6 +82,7 @@ public class SamplersPanel extends VLayout {
 		description.setCanSort(false);
 
 		ListGridField samplerType = new ListGridField("type", I18N.message("type"));
+		samplerType.setCellFormatter((value, record, rowNum, colNum) -> I18N.message("aisamplertype." + value));
 		samplerType.setAutoFit(AutoFitWidthApproach.BOTH);
 
 		list = new RefreshableListGrid();
@@ -139,8 +140,8 @@ public class SamplersPanel extends VLayout {
 				});
 		});
 
-		list.addDataArrivedHandler(event -> infoPanel
-				.setMessage(I18N.message("showsamplers", Integer.toString(list.getTotalRows()))));
+		list.addDataArrivedHandler(
+				event -> infoPanel.setMessage(I18N.message("showsamplers", Integer.toString(list.getTotalRows()))));
 
 		detailsContainer.setAlign(Alignment.CENTER);
 		detailsContainer.addMember(details);
@@ -176,11 +177,12 @@ public class SamplersPanel extends VLayout {
 	}
 
 	protected void showSamplerDetails(GUISampler sampler) {
-		if (!(details instanceof SamplerDetailsPanel)) {
-			detailsContainer.removeMember(details);
+		detailsContainer.removeMember(details);
+		if (sampler != null)
 			details = new SamplerDetailsPanel(this);
-			detailsContainer.addMember(details);
-		}
+		else
+			details = SELECT_SAMPLER;
+		detailsContainer.addMember(details);
 		((SamplerDetailsPanel) details).setSampler(sampler);
 	}
 

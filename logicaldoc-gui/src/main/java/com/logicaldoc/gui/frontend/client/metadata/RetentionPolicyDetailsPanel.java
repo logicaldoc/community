@@ -90,7 +90,7 @@ public class RetentionPolicyDetailsPanel extends VLayout implements FolderChange
 		form.setNumCols(2);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextItem name = ItemFactory.newSimpleTextItem("name", policy.getName());
+		TextItem name = ItemFactory.newSimpleTextItemWithHyphen ("name", policy.getName());
 		name.addChangedHandler(changedHandler);
 		name.setWidth(200);
 		name.setRequired(true);

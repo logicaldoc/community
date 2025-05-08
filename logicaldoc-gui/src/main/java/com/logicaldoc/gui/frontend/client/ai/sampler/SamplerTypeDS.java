@@ -23,7 +23,9 @@ public class SamplerTypeDS extends DataSource {
 		value.setPrimaryKey(true);
 		value.setRequired(true);
 
-		setFields(value);
+		DataSourceTextField label = new DataSourceTextField("label");
+		
+		setFields(value, label);
 		setClientOnly(true);
 
 		setDataURL(url);

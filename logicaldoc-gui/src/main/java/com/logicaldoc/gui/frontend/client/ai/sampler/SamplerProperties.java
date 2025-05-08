@@ -106,14 +106,15 @@ public class SamplerProperties extends SamplerDetailsTab {
 		delimiter.setWidth(30);
 		delimiter.setLength(2);
 		delimiter.setStartRow(true);
-		delimiter.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, CSV));
-		delimiter.setRequiredWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, CSV));
+		AdvancedCriteria delimiterCriteria = new AdvancedCriteria(TYPE, OperatorId.EQUALS, CSV);
+		delimiter.setVisibleWhen(delimiterCriteria);
+		delimiter.setRequiredWhen(delimiterCriteria);
 
 		TextItem quote = ItemFactory.newTextItem("quote", sampler.getQuote());
 		quote.addChangedHandler(changedHandler);
 		quote.setWidth(30);
 		quote.setLength(2);
-		quote.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, CSV));
+		quote.setVisibleWhen(delimiterCriteria);
 
 		TextAreaItem description = ItemFactory.newTextAreaItem(DESCRIPTION, sampler.getDescription());
 		description.addChangedHandler(changedHandler);
@@ -125,12 +126,13 @@ public class SamplerProperties extends SamplerDetailsTab {
 		automation.addChangedHandler(changedHandler);
 		automation.setColSpan(4);
 		automation.setWidth(400);
-		automation.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
+		AdvancedCriteria folderCriteria = new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA);
+		automation.setVisibleWhen(folderCriteria);
 
 		SelectItem type = ItemFactory.newSelectItem(TYPE);
 		type.setOptionDataSource(new SamplerTypeDS());
 		type.setValueField(VALUE);
-		type.setDisplayField(VALUE);
+		type.setDisplayField("label");
 		type.setValue(sampler.getType());
 		type.addChangedHandler(changedHandler);
 		type.addChangedHandler(changed -> chainStack.setVisible(CHAIN.equals(type.getValueAsString())));
@@ -138,7 +140,8 @@ public class SamplerProperties extends SamplerDetailsTab {
 		type.setDisabled(sampler.getId() != 0L);
 		type.setVisible(sampler.getId() == 0L);
 
-		StaticTextItem typeValue = ItemFactory.newStaticTextItem("typeValue", TYPE, sampler.getType());
+		StaticTextItem typeValue = ItemFactory.newStaticTextItem("typeValue", TYPE,
+				I18N.message("aisamplertype." + sampler.getType()));
 		typeValue.setVisible(sampler.getId() != 0L);
 
 		StaticTextItem id = ItemFactory.newStaticTextItem(ID, Long.toString(sampler.getId()));
@@ -146,19 +149,22 @@ public class SamplerProperties extends SamplerDetailsTab {
 
 		folderSelector.setFolder(sampler.getFolder());
 		folderSelector.addFolderChangeListener(folder -> changedHandler.onChanged(null));
-		folderSelector.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
+		folderSelector.setVisibleWhen(folderCriteria);
+		documentSelector.setRequiredWhen(folderCriteria);
 
 		documentSelector.setDocument(sampler.getDocument());
 		documentSelector.addDocumentChangeListener(document -> changedHandler.onChanged(null));
-		documentSelector
-				.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.NOT_IN_SET, new String[] { METADATA, CHAIN }));
+		AdvancedCriteria documentCriteria = new AdvancedCriteria(TYPE, OperatorId.NOT_IN_SET,
+				new String[] { METADATA, CHAIN });
+		documentSelector.setVisibleWhen(documentCriteria);
+		documentSelector.setRequiredWhen(documentCriteria);
 
 		TextItem category = ItemFactory.newTextItem("category", sampler.getCategory());
 		category.addChangedHandler(changedHandler);
 		category.setHint(I18N.message("extattrname"));
 		category.setShowHintInField(true);
 		category.setIconVAlign(VerticalAlignment.CENTER);
-		category.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
+		category.setVisibleWhen(folderCriteria);
 		FormItemIcon takeAttributeForCategory = prepareTakeAttributeForCategory();
 		category.setIcons(takeAttributeForCategory);
 
@@ -169,7 +175,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		features.setHint(I18N.message("extattrnamesseparated"));
 		features.setShowHintInField(true);
 		features.setIconVAlign(VerticalAlignment.CENTER);
-		features.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA));
+		features.setVisibleWhen(folderCriteria);
 		features.setIcons(prepareTakeAttributeForFeatures(category));
 
 		form.setItems(id, typeValue, type, name, label, delimiter, quote, folderSelector, documentSelector, category,
