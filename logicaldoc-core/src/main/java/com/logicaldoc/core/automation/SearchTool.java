@@ -3,6 +3,7 @@ package com.logicaldoc.core.automation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,7 +72,9 @@ public class SearchTool {
 	 * @since 8.7.4
 	 */
 	public List<Hit> search(long tenantId, String expression, String expressionLanguage) {
-		return search(tenantId, expression, Set.of(HitField.TENANT_ID.getName() + ":" + tenantId), expressionLanguage);
+		Set<String> filters = new HashSet<>();
+		filters.add(HitField.TENANT_ID.getName() + ":" + tenantId);
+		return search(tenantId, expression, filters, expressionLanguage);
 	}
 
 	/**

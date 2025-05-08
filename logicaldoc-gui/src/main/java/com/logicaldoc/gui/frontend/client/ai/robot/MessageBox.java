@@ -84,19 +84,20 @@ class MessageBox extends Label {
 	 * @return The elaborated messages with command tokens expanded
 	 */
 	private String parseRobotAnswer(String message) {
-		RegExp p = RegExp.compile("\\[act\\[[a-zA-Z]*\\|.*\\|.*\\]act\\]");
-		MatchResult result = p.exec(message);
+		RegExp p = RegExp.compile("\\[act\\[([^\\]]+)]act\\]", "g");
+		MatchResult result;
 
-		if (result != null) {
-			for (int i = 0; i < result.getGroupCount(); i++) {
-				String match = result.getGroup(i);
-				match = match.replace(ACT_START, "");
-				match = match.replace(ACT_END, "");
-				String link = processCommand(match.split("\\|"));
-				message = message.replace(ACT_START + match + ACT_END, link);
+		while ((result = p.exec(message)) != null) {
+			if (result.getGroupCount() > 1) {
+				String fullMatch = result.getGroup(0); // whole [act[...]]act]
+				String matchContent = result.getGroup(1); // inner part
+
+				String[] parts = matchContent.split("\\|");
+				String link = processCommand(parts);
+
+				message = message.replace(fullMatch, link);
 			}
 		}
-
 		return message;
 	}
 
@@ -132,7 +133,7 @@ class MessageBox extends Label {
 			return panel.@com.logicaldoc.gui.frontend.client.document.DocumentsPanel::openInFolder(J)(docId);
 		};
 	}-*/;
-	
+
 	@UnsafeNativeLong
 	public static native void declareOpenFolder(FolderNavigator navigator) /*-{
 		$wnd.actOpenFolder = function(folderId) {
