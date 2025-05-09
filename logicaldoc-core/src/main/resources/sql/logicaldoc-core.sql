@@ -125,7 +125,7 @@ create table ld_workingtime (ld_userid bigint not null, ld_dayofweek int not nul
 create table ld_user_history (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null,
                               ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint, 
                               ld_date timestamp, ld_username varchar(255), ld_event varchar(255), ld_keylabel varchar(255), 
-                              ld_comment varchar(4000), ld_reason varchar(4000), ld_notified int not null, ld_sessionid varchar(255), 
+                              ld_comment varchar(4000), ld_notified int not null, ld_sessionid varchar(255), 
                               ld_filename varchar(255), ld_userlogin varchar(255), ld_ip varchar(255),
                               ld_author varchar(255), ld_geolocation varchar(255), ld_device varchar(255), 
                               ld_filesize bigint, ld_folderid bigint, ld_docid bigint, ld_path varchar(4000), primary key (ld_id));

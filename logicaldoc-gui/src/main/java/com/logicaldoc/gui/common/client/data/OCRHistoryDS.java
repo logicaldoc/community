@@ -3,14 +3,12 @@ package com.logicaldoc.gui.common.client.data;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceDateTimeField;
 import com.smartgwt.client.data.fields.DataSourceImageField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
- * Datasource to handle the grids of OCR histories. It is based on Xml
- * parsing
+ * Datasource to handle the grids of OCR histories. It is based on Xml parsing
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.7.1
@@ -36,12 +34,11 @@ public class OCRHistoryDS extends DataSource {
 		DataSourceTextField filename = new DataSourceTextField("filename");
 		DataSourceImageField icon = new DataSourceImageField("icon");
 		icon.setHidden(true);
-		DataSourceBooleanField newField = new DataSourceBooleanField("new");
 		DataSourceTextField documentId = new DataSourceTextField("docId");
 		DataSourceTextField folderId = new DataSourceTextField("folderId");
 		DataSourceTextField path = new DataSourceTextField("path");
 
-		setFields(filename, date, event, comment, icon, newField, documentId, folderId, path);
+		setFields(filename, date, event, comment, icon, documentId, folderId, path);
 		setClientOnly(true);
 
 		setDataURL(url);

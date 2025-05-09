@@ -73,19 +73,17 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 		writer.print("<date>" + df.format((Date) columns[3]) + "</date>");
 		if (columns[4] != null)
 			writer.print("<comment><![CDATA[" + columns[4] + "]]></comment>");
-		if (columns[5] != null)
-			writer.print("<reason><![CDATA[" + columns[5] + "]]></reason>");
-		if (columns[6] != null && showSid)
-			writer.print("<sid><![CDATA[" + columns[6] + "]]></sid>");
-		writer.print("<userId>" + columns[7] + "</userId>");
+		if (columns[5] != null && showSid)
+			writer.print("<sid><![CDATA[" + columns[5] + "]]></sid>");
+		writer.print("<userId>" + columns[6] + "</userId>");
+		if (columns[7] != null)
+			writer.print("<ip><![CDATA[" + columns[7] + "]]></ip>");
 		if (columns[8] != null)
-			writer.print("<ip><![CDATA[" + columns[8] + "]]></ip>");
+			writer.print("<device><![CDATA[" + columns[8] + "]]></device>");
 		if (columns[9] != null)
-			writer.print("<device><![CDATA[" + columns[9] + "]]></device>");
+			writer.print("<geolocation><![CDATA[" + columns[9] + "]]></geolocation>");
 		if (columns[10] != null)
-			writer.print("<geolocation><![CDATA[" + columns[10] + "]]></geolocation>");
-		if (columns[11] != null)
-			writer.write("<key><![CDATA[" + columns[11] + "]]></key>");
+			writer.write("<key><![CDATA[" + columns[10] + "]]></key>");
 		writer.print("</history>");
 	}
 
@@ -94,7 +92,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 		Map<String, Object> params = new HashMap<>();
 
 		StringBuilder query = new StringBuilder(
-				"select A.id, A.username, A.event, A.date, A.comment, A.reason, A.sessionId, A.userId, A.ip, A.device, A.geolocation, A.keyLabel from UserHistory A where A.deleted = 0 ");
+				"select A.id, A.username, A.event, A.date, A.comment, A.sessionId, A.userId, A.ip, A.device, A.geolocation, A.keyLabel from UserHistory A where A.deleted = 0 ");
 		if (StringUtils.isNotEmpty(event)) {
 			query.append(" and A.event = :event ");
 			params.put("event", event);
