@@ -10,7 +10,7 @@ import com.logicaldoc.gui.frontend.client.impex.archives.ImportArchivesPanel;
 import com.logicaldoc.gui.frontend.client.impex.converters.FormatConvertersPanel;
 import com.logicaldoc.gui.frontend.client.impex.email.EmailAccountsPanel;
 import com.logicaldoc.gui.frontend.client.impex.folders.ImportFoldersPanel;
-import com.logicaldoc.gui.frontend.client.impex.syndication.SamplersPanel;
+import com.logicaldoc.gui.frontend.client.impex.syndication.SyndicationsPanel;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -46,7 +46,7 @@ public class ImpexMenu extends VLayout {
 		Button syndication = new Button(I18N.message("syndication"));
 		syndication.setWidth100();
 		syndication.setHeight(25);
-		syndication.addClickHandler(click -> AdminScreen.get().setContent(new SamplersPanel()));
+		syndication.addClickHandler(click -> AdminScreen.get().setContent(new SyndicationsPanel()));
 		if (Feature.visible(Feature.SYNDICATION) && Menu.enabled(Menu.SYNDICATION)) {
 			addMember(syndication);
 			if (!Feature.enabled(Feature.SYNDICATION))

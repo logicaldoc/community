@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 import com.google.gwt.http.client.RequestTimeoutException;
 import com.google.gwt.user.client.Window;
 import com.logicaldoc.gui.common.client.Constants;
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
@@ -39,6 +39,7 @@ import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.tree.TreeNode;
 
 /**
@@ -108,11 +109,11 @@ public class ContextMenu extends Menu {
 		pasteAsAlias.setEnabled(!Clipboard.getInstance().getLastAction().equals(Clipboard.CUT));
 
 		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN) && Feature.visible(Feature.MULTI_WORKSPACE)) {
-			setItems(reload, search, create, createAlias, rename, createWorkspace, delete, addBookmark, paste,
-					pasteAsAlias, move, copy, merge, exportZip);
+			setItems(reload, search, create, createAlias, rename, createWorkspace, addBookmark, paste, pasteAsAlias,
+					move, copy, merge, exportZip);
 		} else {
-			setItems(reload, search, create, createAlias, rename, delete, addBookmark, paste, pasteAsAlias, move, copy,
-					merge, exportZip);
+			setItems(reload, search, create, createAlias, rename, addBookmark, paste, pasteAsAlias, move, copy, merge,
+					exportZip);
 		}
 
 		addSubscribeMenuItem();
@@ -126,6 +127,9 @@ public class ContextMenu extends Menu {
 		addAutomationMenuItem();
 
 		addCustomActionsMenuItem();
+
+		addItem(new MenuItemSeparator());
+		addItem(delete);
 
 		if (selectedFolders.size() == 1)
 			FolderService.Instance.get().getFolder(firstSelectedFolder.getId(), false, false, false,
@@ -354,23 +358,24 @@ public class ContextMenu extends Menu {
 	private void onDelete() {
 		final List<Long> selectedIds = tree.getSelectedIds();
 		LD.contactingServer();
-		DocumentService.Instance.get().countDocuments(selectedIds, Constants.DOC_ARCHIVED, new DefaultAsyncCallback<>() {
-			@Override
-			public void onSuccess(Long count) {
-				LD.clearPrompt();
-				final String folderMessage = selectedIds.size() == 1 ? "confirmdeletefolder" : "confirmdeletefolders";
-				final String documentMessage = selectedIds.size() == 1 ? "confirmdeletefolderarchdocs"
-						: "confirmdeletefoldersarchdocs";
-				LD.ask(I18N.message("question"),
-						count.longValue() == 0L ? (I18N.message(folderMessage)) : (I18N.message(documentMessage)),
-						yes -> {
-							if (Boolean.TRUE.equals(yes)) {
-								LD.contactingServer();
-								doDelete(selectedIds);
-							}
-						});
-			}
-		});
+		DocumentService.Instance.get().countDocuments(selectedIds, Constants.DOC_ARCHIVED,
+				new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(Long count) {
+						LD.clearPrompt();
+						final String folderMessage = selectedIds.size() == 1 ? "confirmdeletefolder"
+								: "confirmdeletefolders";
+						final String documentMessage = selectedIds.size() == 1 ? "confirmdeletefolderarchdocs"
+								: "confirmdeletefoldersarchdocs";
+						LD.ask(I18N.message("question"), count.longValue() == 0L ? (I18N.message(folderMessage))
+								: (I18N.message(documentMessage)), yes -> {
+									if (Boolean.TRUE.equals(yes)) {
+										LD.contactingServer();
+										doDelete(selectedIds);
+									}
+								});
+					}
+				});
 	}
 
 	private void doDelete(final List<Long> selectedIds) {

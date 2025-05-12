@@ -27,6 +27,7 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
@@ -234,7 +235,7 @@ public class TicketsReport extends ReportPanel {
 			delete.setEnabled(false);
 		}
 
-		contextMenu.setItems(enable, disable, ticketURL, download, preview, openInFolder, delete);
+		contextMenu.setItems(enable, disable, ticketURL, download, preview, openInFolder, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 

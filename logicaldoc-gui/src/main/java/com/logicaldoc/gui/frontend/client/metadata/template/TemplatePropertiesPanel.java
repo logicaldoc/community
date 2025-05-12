@@ -41,6 +41,7 @@ import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
@@ -344,10 +345,11 @@ public class TemplatePropertiesPanel extends HLayout implements AttributeSelecto
 		}
 		if (selectionInSelection)
 			contextMenu.setItems(label, makeMandatory, makeOptional, initialization, resetInitialization, reset,
-					delete);
+					new MenuItemSeparator(), delete);
 		else
 			contextMenu.setItems(label, makeMandatory, makeOptional, makeVisible, makeReadonly, makeHidden, dependsOn,
-					initialization, resetInitialization, validation, resetValidation, reset, delete);
+					initialization, resetInitialization, validation, resetValidation, reset, new MenuItemSeparator(),
+					delete);
 		contextMenu.showContextMenu();
 	}
 

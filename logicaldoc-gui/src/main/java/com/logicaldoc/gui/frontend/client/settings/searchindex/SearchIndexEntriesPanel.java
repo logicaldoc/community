@@ -20,6 +20,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -166,7 +167,7 @@ public class SearchIndexEntriesPanel extends VLayout {
 
 		openInFolder.setEnabled(selection.getAttributeAsLong("tenantId").longValue() == Session.get().getTenantId());
 
-		contextMenu.setItems(openInFolder, deleteEntry);
+		contextMenu.setItems(openInFolder, new MenuItemSeparator(), deleteEntry);
 		contextMenu.showContextMenu();
 	}
 

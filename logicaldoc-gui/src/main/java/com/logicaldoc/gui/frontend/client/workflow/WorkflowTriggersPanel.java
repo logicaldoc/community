@@ -16,6 +16,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 
 /**
  * Displays the list of all workflow triggers on a folder.
@@ -100,7 +101,7 @@ public class WorkflowTriggersPanel extends VLayout {
 		MenuItem deleteTrigger = new MenuItem();
 		deleteTrigger.setTitle(I18N.message("ddelete"));
 		deleteTrigger.addClickHandler(
-				event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
+				click -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), (Boolean value) -> {
 					if (Boolean.TRUE.equals(value)) {
 						ListGridRecord rec = list.getSelectedRecord();
 						WorkflowService.Instance.get().deleteTrigger(Long.parseLong(rec.getAttributeAsString("id")),
@@ -116,9 +117,9 @@ public class WorkflowTriggersPanel extends VLayout {
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
-		edit.addClickHandler(event -> new TriggerDialog(WorkflowTriggersPanel.this).show());
+		edit.addClickHandler(click -> new TriggerDialog(WorkflowTriggersPanel.this).show());
 
-		contextMenu.setItems(edit, deleteTrigger);
+		contextMenu.setItems(edit, new MenuItemSeparator(),  deleteTrigger);
 		contextMenu.showContextMenu();
 	}
 

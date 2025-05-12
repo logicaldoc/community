@@ -67,7 +67,7 @@ public class GUILanguagesPanel extends VLayout {
 		Menu contextMenu = new Menu();
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler(event -> SystemService.Instance.get()
+		enable.addClickHandler(click -> SystemService.Instance.get()
 				.setGUILanguageStatus(rec.getAttributeAsString("code"), true, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
@@ -79,7 +79,7 @@ public class GUILanguagesPanel extends VLayout {
 
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler(event -> SystemService.Instance.get()
+		disable.addClickHandler(click -> SystemService.Instance.get()
 				.setGUILanguageStatus(rec.getAttributeAsString("code"), false, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {

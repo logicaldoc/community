@@ -20,6 +20,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 
 /**
  * This panel shows the saved searches of the user
@@ -147,9 +148,9 @@ public class SavedSearchesPanel extends VLayout {
 		});
 
 		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.SHARE_SEARCH))
-			contextMenu.setItems(execute, share, delete);
+			contextMenu.setItems(execute, share, new MenuItemSeparator(), delete);
 		else
-			contextMenu.setItems(execute, delete);
+			contextMenu.setItems(execute, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 

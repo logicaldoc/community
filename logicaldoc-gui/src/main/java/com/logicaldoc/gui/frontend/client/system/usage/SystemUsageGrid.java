@@ -67,9 +67,9 @@ public class SystemUsageGrid extends ListGrid {
 		setDataSource(new SystemUsageDS(tenantId));
 
 		if (withContextMenu)
-			addCellContextClickHandler(contextClickEvent -> {
+			addCellContextClickHandler(click -> {
 				prepateContextMenu(tenantId).showContextMenu();
-				contextClickEvent.cancel();
+				click.cancel();
 			});
 	}
 

@@ -130,8 +130,6 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 	}
 
 	private void handleEvent(WebsocketMessage event) {
-		GuiLog.info(event.getEvent());
-		
 		if (isDocumentModifiedEvent(event)) {
 			handleDocumentModifiedEvent(event);
 		} else if ("event.stored".equals(event.getEvent())) {

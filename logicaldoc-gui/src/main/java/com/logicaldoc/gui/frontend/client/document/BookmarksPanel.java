@@ -22,6 +22,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 
 /**
  * This panel shows the current user's bookmarks
@@ -146,9 +147,10 @@ public class BookmarksPanel extends VLayout {
 		}
 
 		if (isDocument)
-			contextMenu.setItems(edit, download, delete, openInFolder);
+			contextMenu.setItems(edit, download, new MenuItemSeparator(), delete, new MenuItemSeparator(),
+					openInFolder);
 		else
-			contextMenu.setItems(edit, delete, openInFolder);
+			contextMenu.setItems(edit, new MenuItemSeparator(), delete, new MenuItemSeparator(), openInFolder);
 		contextMenu.showContextMenu();
 	}
 

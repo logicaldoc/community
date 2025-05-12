@@ -38,6 +38,7 @@ import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -360,6 +361,7 @@ public class UsersPanel extends AdminPanel {
 			items.add(twoTactorsAuth);
 
 		items.add(replicate);
+		items.add(new MenuItemSeparator());
 		items.add(delete);
 
 		contextMenu.setItems(items.toArray(new MenuItem[0]));

@@ -37,6 +37,7 @@ import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -307,7 +308,7 @@ public class CustomReportsPanel extends AdminPanel {
 		export.addClickHandler(event -> Util.download(
 				Util.contextPath() + "report/controller?command=export&reportId=" + rec.getAttributeAsString("id")));
 
-		contextMenu.setItems(enable, disable, execute, preview, upload, export, openInFolder, download, delete);
+		contextMenu.setItems(enable, disable, execute, preview, upload, export, openInFolder, download, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 

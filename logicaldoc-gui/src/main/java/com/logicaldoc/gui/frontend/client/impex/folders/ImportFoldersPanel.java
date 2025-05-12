@@ -30,6 +30,7 @@ import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -251,7 +252,8 @@ public class ImportFoldersPanel extends AdminPanel {
 					}
 				}));
 
-		contextMenu.setItems(test, enable, disable, delete, resetCache, resetCounter);
+		contextMenu.setItems(test, enable, disable, new MenuItemSeparator(), resetCache, resetCounter,
+				new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 

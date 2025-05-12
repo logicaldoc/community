@@ -39,6 +39,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 
 /**
@@ -213,7 +214,7 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 				.getAttributeAsLong("requestorId").longValue());
 
 		Menu contextMenu = new Menu();
-		contextMenu.setItems(preview, download, openInFolder, invite, delete);
+		contextMenu.setItems(preview, download, openInFolder, invite, new MenuItemSeparator(), delete);
 
 		return contextMenu;
 	}

@@ -25,6 +25,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
@@ -145,7 +146,7 @@ public class TrashPanel extends VLayout {
 
 		restore.setEnabled(records.length == 1);
 
-		contextMenu.setItems(restore, remove, emptyTrash);
+		contextMenu.setItems(restore, new MenuItemSeparator(), remove, new MenuItemSeparator(), emptyTrash);
 		contextMenu.showContextMenu();
 	}
 

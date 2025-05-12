@@ -71,9 +71,9 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 			}
 		});
 
-		onlineUsers.addCellContextClickHandler(event -> {
+		onlineUsers.addCellContextClickHandler(click -> {
 			prepareContextMenu().showContextMenu();
-			event.cancel();
+			click.cancel();
 		});
 
 		setMembers(onlineUsers);

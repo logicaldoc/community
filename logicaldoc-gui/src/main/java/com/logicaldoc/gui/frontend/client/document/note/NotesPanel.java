@@ -23,6 +23,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -155,7 +156,7 @@ public class NotesPanel extends DocumentDetailTab {
 
 			prnt.setEnabled(selection.length == 1);
 
-			contextMenu.setItems(edit, prnt, delete);
+			contextMenu.setItems(edit, prnt, new MenuItemSeparator(), delete);
 			contextMenu.showContextMenu();
 			event.cancel();
 		});
@@ -179,12 +180,11 @@ public class NotesPanel extends DocumentDetailTab {
 		});
 	}
 
-	
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

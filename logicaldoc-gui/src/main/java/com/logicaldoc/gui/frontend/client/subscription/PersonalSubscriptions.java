@@ -28,6 +28,7 @@ import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -184,7 +185,7 @@ public class PersonalSubscriptions extends com.smartgwt.client.widgets.Window {
 			}
 		});
 
-		contextMenu.setItems(openInFolder, edit, delete);
+		contextMenu.setItems(openInFolder, edit, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 	

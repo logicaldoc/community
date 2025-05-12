@@ -223,7 +223,7 @@ public class StampSecurity extends StampDetailsTab {
 
 		MenuItem deleteItem = new MenuItem();
 		deleteItem.setTitle(I18N.message("ddelete"));
-		deleteItem.addClickHandler(event -> onDelete());
+		deleteItem.addClickHandler(click -> onDelete());
 
 		contextMenu.setItems(deleteItem);
 		return contextMenu;

@@ -12,6 +12,7 @@ import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 
 /**
  * A generic panel displaying a zone inside an image.
@@ -84,7 +85,7 @@ public abstract class ZoneCanvas extends Label {
 		Menu contextMenu = new Menu();
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+		delete.addClickHandler(click -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
 				zonePanel.getSelectedOcrTemplate().removeZone(zone.getName());
 				zonePanel.getSample().clearCanvases();
@@ -94,9 +95,9 @@ public abstract class ZoneCanvas extends Label {
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
-		edit.addClickHandler(event -> onEdit());
+		edit.addClickHandler(click -> onEdit());
 
-		contextMenu.setItems(edit, delete);
+		contextMenu.setItems(edit, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 

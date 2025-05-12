@@ -106,7 +106,7 @@ public class DocumentDashlet extends Dashlet {
 				DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
 						Long.parseLong(rec.getAttributeAsString(docIdAttribute)));
 			else
-				DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString(docIdAttribute)));
+				DocumentsPanel.get().openInFolder(rec.getAttributeAsLong(docIdAttribute));
 		});
 	}
 
@@ -188,12 +188,12 @@ public class DocumentDashlet extends Dashlet {
 	protected DataSource getDataSource() {
 		return new DocumentsDS(getDataSourceUrl(), guiDashlet.getExtendedAttributes());
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

@@ -12,7 +12,6 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
-import com.logicaldoc.gui.frontend.client.ai.AIService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
@@ -27,6 +26,7 @@ import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -168,7 +168,7 @@ public class RobotsPanel extends AdminPanel {
 		delete.setTitle(I18N.message("ddelete"));
 		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm)) {
-				AIService.Instance.get().deleteModels(ids, new DefaultAsyncCallback<>() {
+				RobotService.Instance.get().delete(ids, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						list.removeSelectedData();
@@ -224,8 +224,7 @@ public class RobotsPanel extends AdminPanel {
 					}
 				})));
 
-		contextMenu.setItems(ask, enable, disable, clone, new com.smartgwt.client.widgets.menu.MenuItemSeparator(),
-				delete);
+		contextMenu.setItems(ask, enable, disable, clone, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 

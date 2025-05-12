@@ -13,6 +13,7 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 
 /**
  * Base visual representation of a Workflow object (a state or a transition).
@@ -92,9 +93,9 @@ public class StateWidget extends Label {
 			if (start.isFork() || start.isJoin())
 				// No edit in case the transition starts from a fork or join
 				// node
-				contextMenu.setItems(straight, delete);
+				contextMenu.setItems(straight, new MenuItemSeparator(), delete);
 			else
-				contextMenu.setItems(edit, straight, delete);
+				contextMenu.setItems(edit, straight, new MenuItemSeparator(), delete);
 		} else
 			contextMenu.setItems(edit, delete);
 		contextMenu.showContextMenu();

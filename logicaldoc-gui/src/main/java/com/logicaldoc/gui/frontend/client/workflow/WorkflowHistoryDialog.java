@@ -27,6 +27,7 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -244,7 +245,7 @@ public class WorkflowHistoryDialog extends Window {
 					}
 				}));
 
-		contextMenu.setItems(completionDiagram, delete);
+		contextMenu.setItems(completionDiagram, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 

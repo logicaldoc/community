@@ -38,6 +38,7 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -247,7 +248,7 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 			}
 		}
 
-		contextMenu.setItems(download, preview, delete, openInFolder);
+		contextMenu.setItems(download, preview, new MenuItemSeparator(), delete, new MenuItemSeparator(), openInFolder);
 		contextMenu.showContextMenu();
 	}
 

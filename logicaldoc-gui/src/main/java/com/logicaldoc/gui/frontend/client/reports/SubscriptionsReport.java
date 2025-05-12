@@ -30,6 +30,7 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -183,7 +184,7 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 			}
 		});
 
-		contextMenu.setItems(openInFolder, edit, delete);
+		contextMenu.setItems(openInFolder, edit, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 
