@@ -299,13 +299,19 @@ public class ModelsPanel extends VLayout {
 		export.addClickHandler(
 				click -> Util.download(Util.contextPath() + "ai/controller?command=export&modelId=" + selectedModelId));
 
-		contextMenu.setItems(query, train, evaluate, new MenuItemSeparator(), clone, export, new MenuItemSeparator(), delete);
+		MenuItem iimport = new MenuItem();
+		iimport.setTitle(I18N.message("import"));
+		iimport.addClickHandler(
+				click -> new ModelImporter(selection[0].getAttributeAsString("name"), changed -> refresh()).show());
+
+		contextMenu.setItems(query, train, evaluate, new MenuItemSeparator(), clone, iimport, export,
+				new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 
 	protected void showModelDetails(GUIModel model) {
 		detailsContainer.removeMember(details);
-		if (model!=null)
+		if (model != null)
 			details = new ModelDetailsPanel(this);
 		else
 			details = SELECT_MODEL;
