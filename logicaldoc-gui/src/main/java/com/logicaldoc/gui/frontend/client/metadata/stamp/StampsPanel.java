@@ -28,6 +28,7 @@ import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -201,7 +202,7 @@ public class StampsPanel extends AdminPanel {
 					}
 				}));
 
-		contextMenu.setItems(enable, disable, delete);
+		contextMenu.setItems(enable, disable, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 

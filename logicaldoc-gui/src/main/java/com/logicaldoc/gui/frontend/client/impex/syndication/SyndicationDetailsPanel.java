@@ -25,9 +25,9 @@ public class SyndicationDetailsPanel extends VLayout {
 
 	private EditingTabSet tabSet;
 
-	private SamplersPanel syndicationsPanel;
+	private SyndicationsPanel syndicationsPanel;
 
-	public SyndicationDetailsPanel(SamplersPanel syndicationsPanel) {
+	public SyndicationDetailsPanel(SyndicationsPanel syndicationsPanel) {
 		super();
 
 		this.syndicationsPanel = syndicationsPanel;

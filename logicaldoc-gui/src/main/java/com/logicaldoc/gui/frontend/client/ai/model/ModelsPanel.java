@@ -31,6 +31,7 @@ import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -298,15 +299,19 @@ public class ModelsPanel extends VLayout {
 		export.addClickHandler(
 				click -> Util.download(Util.contextPath() + "ai/controller?command=export&modelId=" + selectedModelId));
 
-		com.smartgwt.client.widgets.menu.MenuItemSeparator sep = new com.smartgwt.client.widgets.menu.MenuItemSeparator();
+		MenuItem iimport = new MenuItem();
+		iimport.setTitle(I18N.message("import"));
+		iimport.addClickHandler(
+				click -> new ModelImporter(selection[0].getAttributeAsString("name"), changed -> refresh()).show());
 
-		contextMenu.setItems(query, train, evaluate, sep, clone, export, sep, delete);
+		contextMenu.setItems(query, train, evaluate, new MenuItemSeparator(), clone, iimport, export,
+				new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 
 	protected void showModelDetails(GUIModel model) {
 		detailsContainer.removeMember(details);
-		if (model!=null)
+		if (model != null)
 			details = new ModelDetailsPanel(this);
 		else
 			details = SELECT_MODEL;

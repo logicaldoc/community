@@ -69,6 +69,8 @@ public class ModelProperties extends ModelDetailsTab {
 
 	private SectionStack layersStack = new SectionStack();
 
+	private SelectItem activation; 
+	
 	public ModelProperties(GUIModel model, final ChangedHandler changedHandler) {
 		super(model, changedHandler);
 		setWidth100();
@@ -140,13 +142,14 @@ public class ModelProperties extends ModelDetailsTab {
 		categories.setShowHintInField(true);
 		setNeuralNetworkVisibility(categories);
 
-		SelectItem activation = activationSeletor();
+		activation = activationSeletor();
 		setNeuralNetworkVisibility(activation);
 		activation.addChangedHandler(changedHandler);
 
 		SelectItem weightInit = weightInitSeletor();
 
 		SelectItem loss = lossSeletor();
+		loss.setEndRow(true);
 
 		SpinnerItem batch = ItemFactory.newSpinnerItem(BATCH, model.getBatch());
 		batch.setMin(1);
@@ -383,7 +386,7 @@ public class ModelProperties extends ModelDetailsTab {
 			ListGridRecord rec = new ListGridRecord();
 			rec.setAttribute(NAME, "new_layer");
 			rec.setAttribute(OUTPUTNODES, 3);
-			rec.setAttribute(ACTIVATION, "RELU");
+			rec.setAttribute(ACTIVATION, form.getValueAsString(ACTIVATION));
 			layers.addData(rec);
 			changedHandler.onChanged(null);
 		});

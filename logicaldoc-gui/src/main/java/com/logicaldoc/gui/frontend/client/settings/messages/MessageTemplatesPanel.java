@@ -28,6 +28,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
@@ -243,7 +244,7 @@ public class MessageTemplatesPanel extends VLayout {
 		delete.setEnabled(!"system".equals(list.getSelectedRecord().getAttributeAsString("type")));
 		copyFromDefault.setEnabled(!"en".equals(langSelector.getValueAsString()));
 
-		contextMenu.setItems(copyFromDefault, delete);
+		contextMenu.setItems(copyFromDefault, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 

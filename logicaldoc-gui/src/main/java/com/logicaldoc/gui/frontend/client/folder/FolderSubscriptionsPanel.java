@@ -24,6 +24,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 
 /**
  * This panel shows the subscriptions on a folder.
@@ -161,9 +162,9 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 
 		MenuItem edit = new MenuItem();
 		edit.setTitle(I18N.message("edit"));
-		edit.addClickHandler(event -> new SubscriptionDialog(list).show());
+		edit.addClickHandler(click -> new SubscriptionDialog(list).show());
 
-		contextMenu.setItems(edit, delete);
+		contextMenu.setItems(edit, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 

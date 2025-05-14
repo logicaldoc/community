@@ -97,14 +97,14 @@ public class PositionalBarcodesGrid extends ListGrid {
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
-		MenuItem clean = new MenuItem();
-		clean.setTitle(I18N.message("ddelete"));
-		clean.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+		MenuItem delete = new MenuItem();
+		delete.setTitle(I18N.message("ddelete"));
+		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 			if (Boolean.TRUE.equals(confirm))
 				removeData(getSelectedRecord());
 		}));
 
-		contextMenu.setItems(clean);
+		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();
 	}
 }

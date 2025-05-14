@@ -618,6 +618,9 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	}
 
 	protected void appendSelect(String table, String tableAlias, StringBuilder query) {
+		if (log.isDebugEnabled())
+			log.debug("Appending table {} with alias {}", table, tableAlias);
+
 		query.append("select ");
 
 		if (doesNotProvideDocumentReference(table))
@@ -640,7 +643,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 		query.append(", A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment".replace("A", tableAlias));
 
-		if (doesNotProvideDocumentReference(table))
+		if (doesNotProvideReason(table))
 			query.append(", ''");
 		else
 			query.append(", A.ld_reason".replace("A", tableAlias));
@@ -651,6 +654,10 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	protected void appendUnion(StringBuilder query) {
 		if (!query.isEmpty())
 			query.append(" union ");
+	}
+
+	private boolean doesNotProvideReason(String table) {
+		return doesNotProvideDocumentReference(table) || table.equals("ld_user_history");
 	}
 
 	private boolean doesNotProvideDocumentReference(String table) {

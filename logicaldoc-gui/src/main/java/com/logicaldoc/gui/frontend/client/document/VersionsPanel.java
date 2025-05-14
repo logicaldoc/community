@@ -33,6 +33,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
@@ -250,10 +251,10 @@ public class VersionsPanel extends DocumentDetailTab {
 		}
 
 		if (Feature.visible(Feature.COMPARISON))
-			contextMenu.setItems(preview, download, notes, compareMetadata, compareContent, delete, promote,
+			contextMenu.setItems(preview, download, notes, compareMetadata, compareContent, new MenuItemSeparator(), delete, promote,
 					replaceFile);
 		else
-			contextMenu.setItems(preview, download, notes, compareMetadata, delete, promote, replaceFile);
+			contextMenu.setItems(preview, download, notes, compareMetadata, new MenuItemSeparator(), delete, promote, replaceFile);
 
 		return contextMenu;
 	}

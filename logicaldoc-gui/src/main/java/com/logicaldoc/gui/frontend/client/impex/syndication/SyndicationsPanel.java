@@ -27,6 +27,7 @@ import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -36,7 +37,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
-public class SamplersPanel extends AdminPanel {
+public class SyndicationsPanel extends AdminPanel {
 
 	private static final String ENABLED = "eenabled";
 
@@ -48,7 +49,7 @@ public class SamplersPanel extends AdminPanel {
 
 	static final Canvas SELECT_FOLDER = new HTMLPanel("&nbsp;" + I18N.message("selectsyndication"));
 
-	public SamplersPanel() {
+	public SyndicationsPanel() {
 		super("syndication");
 	}
 
@@ -221,7 +222,8 @@ public class SamplersPanel extends AdminPanel {
 					}
 				}));
 
-		contextMenu.setItems(test, enable, disable, delete, resetCache);
+		contextMenu.setItems(test, enable, disable, new MenuItemSeparator(), resetCache, new MenuItemSeparator(),
+				delete);
 		contextMenu.showContextMenu();
 	}
 

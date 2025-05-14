@@ -22,6 +22,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 
 /**
  * This panel shows the automation triggers of a folder.
@@ -156,7 +157,7 @@ public class FolderAutomationPanel extends FolderDetailTab {
 		edit.setTitle(I18N.message("edit"));
 		edit.addClickHandler(event -> onEdit());
 
-		contextMenu.setItems(edit, delete);
+		contextMenu.setItems(edit, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 

@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.SystemUtil;
@@ -202,6 +203,11 @@ public class LogDownload extends HttpServlet {
 			writeUpdateLogs(out);
 			writePatchLogs(out);
 
+			/*
+			 * Dume the statistics
+			 */
+			dumpStats(out);
+
 			prop.store(new FileOutputStream(buf), "Support Request");
 		}
 
@@ -309,6 +315,30 @@ public class LogDownload extends HttpServlet {
 					});
 
 			writeEntry(out, "logicaldoc/updates/updates.csv", buf);
+		} finally {
+			FileUtil.delete(buf);
+		}
+	}
+
+	private void dumpStats(ZipOutputStream out) throws IOException, PersistenceException {
+		File buf = FileUtil.createTempFile("stats", ".csv");
+		try {
+			GenericDAO dao = Context.get(GenericDAO.class);
+			dao.queryForResultSet(
+					"select ld_subtype, ld_tenantid, ld_integer1 from ld_generic where ld_type = 'stat' order by ld_subtype, ld_tenantid",
+					null, null, rows -> {
+						try (CSVFileWriter csv = new CSVFileWriter(buf.getAbsolutePath(), ',')) {
+							csv.writeFields(List.of("Stat", "Tenant", "Value"));
+							while (rows.next()) {
+								csv.writeFields(List.of(rows.getString(1), Long.toString(rows.getLong(2)),
+										Long.toString(rows.getLong(3))));
+							}
+						} catch (IOException ioe) {
+							throw new PersistenceException(ioe);
+						}
+					});
+
+			writeEntry(out, "stats.csv", buf);
 		} finally {
 			FileUtil.delete(buf);
 		}

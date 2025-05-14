@@ -27,8 +27,10 @@ public class IndexedListGridField extends ColoredListGridField {
 			if (value == null)
 				return "";
 
-			if ("0".equals(value.toString()))
+			if ("0".equals(value.toString()) || "1".equals(value.toString()))
 				return I18N.message("all");
+			else if ("2".equals(value.toString()))
+				return I18N.message("skip");
 			else if ("3".equals(value.toString()))
 				return I18N.message("metadata");
 			return "";

@@ -31,6 +31,7 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeNode;
 
@@ -149,7 +150,7 @@ public class LinksPanel extends DocumentDetailTab {
 					delete.setEnabled(delete.getEnabled() && fld.isDelete());
 					openInFolder.setEnabled(com.logicaldoc.gui.common.client.Menu
 							.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS));
-					contextMenu.setItems(preview, download, downloadPackage, openInFolder, delete);
+					contextMenu.setItems(preview, download, downloadPackage, openInFolder, new MenuItemSeparator(), delete);
 					contextMenu.showContextMenu();
 				}
 			});

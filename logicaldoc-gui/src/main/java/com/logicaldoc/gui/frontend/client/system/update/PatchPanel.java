@@ -49,6 +49,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 
 /**
  * Patches check panel
@@ -476,7 +477,7 @@ public class PatchPanel extends VLayout {
 		delete.addClickHandler(event -> onDelete(patch.getFile()));
 		delete.setEnabled(patch.isLocal());
 
-		contextMenu.setItems(install, delete);
+		contextMenu.setItems(install, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 

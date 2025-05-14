@@ -642,6 +642,7 @@ public class DocumentManager {
 			transaction.setComment(HTMLSanitizer.sanitize(StringUtils.abbreviate(cont, 100)));
 			transaction.setReason(Integer.toString(currentIndexed));
 			transaction.setDocument(doc);
+			
 		}
 		DocumentHistoryDAO hDao = Context.get(DocumentHistoryDAO.class);
 		hDao.store(transaction);

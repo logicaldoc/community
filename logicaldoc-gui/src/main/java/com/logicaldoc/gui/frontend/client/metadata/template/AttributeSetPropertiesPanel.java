@@ -43,6 +43,7 @@ import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 
 /**
  * This panel shows the properties of an attribute set.
@@ -646,7 +647,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 		MenuItem applyAllToTemplates = prepareApplyAllToTemplatesContextMenuItem();
 
-		contextMenu.setItems(applyInitializationToTemplates, applyValidationToTemplates, applyAllToTemplates, delete);
+		contextMenu.setItems(applyInitializationToTemplates, applyValidationToTemplates, applyAllToTemplates, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 

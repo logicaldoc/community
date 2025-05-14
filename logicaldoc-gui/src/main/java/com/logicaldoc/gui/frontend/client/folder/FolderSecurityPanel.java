@@ -577,7 +577,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 		MenuItem deleteItem = new MenuItem();
 		deleteItem.setTitle(I18N.message("ddelete"));
-		deleteItem.addClickHandler((MenuItemClickEvent event) -> onDeleteItem());
+		deleteItem.addClickHandler(click -> onDeleteItem());
 
 		contextMenu.setItems(deleteItem);
 		return contextMenu;

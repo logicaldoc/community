@@ -29,6 +29,7 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -201,7 +202,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		delete.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length > 0);
 		restore.setEnabled(list.getSelectedRecords() != null && list.getSelectedRecords().length > 0);
 
-		contextMenu.setItems(download, preview, openFolder, restore, sendToExpArchive, delete);
+		contextMenu.setItems(download, preview, openFolder, restore, sendToExpArchive, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 

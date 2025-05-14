@@ -23,6 +23,7 @@ import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -206,7 +207,7 @@ public class ExportArchivesList extends VLayout {
 		if (GUIArchive.STATUS_ERROR != rec.getAttributeAsInt(STATUS))
 			open.setEnabled(false);
 
-		contextMenu.setItems(close, open, delete);
+		contextMenu.setItems(close, open, new MenuItemSeparator(), delete);
 		addUsefulMenuItem(contextMenu);
 		contextMenu.showContextMenu();
 	}

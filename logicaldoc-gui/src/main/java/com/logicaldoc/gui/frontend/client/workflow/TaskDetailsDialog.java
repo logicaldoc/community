@@ -67,6 +67,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 
@@ -625,7 +626,7 @@ public class TaskDetailsDialog extends Window {
 
 			print.setEnabled(selection.length == 1);
 
-			contextMenu.setItems(print, delete);
+			contextMenu.setItems(print, new MenuItemSeparator(), delete);
 			contextMenu.showContextMenu();
 			eevent.cancel();
 		});

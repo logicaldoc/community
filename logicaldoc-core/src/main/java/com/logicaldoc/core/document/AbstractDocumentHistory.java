@@ -4,8 +4,15 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
+import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.history.History;
+import com.logicaldoc.util.Context;
 
 /**
  * A superclass for those histories tightly related to documents
@@ -15,6 +22,8 @@ import com.logicaldoc.core.history.History;
  */
 @MappedSuperclass
 public abstract class AbstractDocumentHistory extends History {
+
+	private final static Logger log = LoggerFactory.getLogger(AbstractDocumentHistory.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -171,6 +180,13 @@ public abstract class AbstractDocumentHistory extends History {
 				this.setDocId(doc.getId());
 				this.setFolderId(doc.getFolder().getId());
 			}
+
+			if (StringUtils.isEmpty(getPath()))
+				try {
+					setPath(Context.get(FolderDAO.class).computePathExtended(getFolderId()));
+				} catch (PersistenceException e) {
+					log.warn("Cannot calculate path of folder {}");
+				}
 		}
 	}
 

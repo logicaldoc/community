@@ -55,7 +55,7 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 				"event.locked", "event.unlocked", "event.immutable", "event.signed", "event.stamped", "event.indexed",
 				"event.password.protected", "event.password.unprotected", "event.stored", "event.moved",
 				"event.deleted", "event.folder.renamed", "event.folder.changed", "event.folder.deleted",
-				"event.folder.created", "event.folder.moved", "event.workflowstatus", "event.user.messagereceived",
+				"event.folder.created", "event.folder.moved", "event.workflowstatus", "event.user.message.received",
 				"event.chat.newmessage", "event.user.login", "event.user.logout", "event.user.timeout",
 				"event.reading.confirmed", "event.reading.requested", COMMAND));
 	}

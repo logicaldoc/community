@@ -19,7 +19,6 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.grid.ListGridField;
-import com.smartgwt.client.widgets.menu.Menu;
 
 /**
  * Portlet specialized in showing the bookmarks
@@ -64,13 +63,12 @@ public class BookmarkDashlet extends Dashlet {
 		ret.addCellContextClickHandler(event -> {
 			event.cancel();
 			Record rec = event.getRecord();
-			DocumentService.Instance.get().getById(Long.parseLong(rec.getAttributeAsString(docIdAttribute)),
+			DocumentService.Instance.get().getById(rec.getAttributeAsLong(docIdAttribute),
 					new DefaultAsyncCallback<>() {
 
 						@Override
 						public void onSuccess(GUIDocument document) {
-							Menu contextMenu = prepareContextMenu(document);
-							contextMenu.showContextMenu();
+							prepareContextMenu(document).showContextMenu();
 						}
 					});
 		});
@@ -107,15 +105,15 @@ public class BookmarkDashlet extends Dashlet {
 		ListGridField id = new ColoredListGridField("id", "id");
 		id.setHidden(true);
 		id.setAutoFitWidth(true);
-		
+
 		ListGridField name = new FileNameListGridField("name", "icon");
 		name.setTitle(I18N.message("name"));
 		name.setAutoFitWidth(true);
 		name.setMinWidth(250);
-		
+
 		ListGridField description = new ColoredListGridField("description", I18N.message("description"));
 		description.setWidth("*");
-		
+
 		ListGridField targetId = new ColoredListGridField(TARGET_ID, I18N.message("targetid"));
 		targetId.setHidden(true);
 		targetId.setAutoFitWidth(true);
@@ -138,12 +136,12 @@ public class BookmarkDashlet extends Dashlet {
 	protected DataSource getDataSource() {
 		return new BookmarksDS();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

@@ -28,6 +28,7 @@ import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -206,9 +207,9 @@ public class FormsPanel extends AdminPanel {
 		getPrefilledLink.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(WEB_ENABLED)));
 
 		if (Feature.enabled(Feature.WEB_FORM))
-			contextMenu.setItems(edit, preview, invite, getPrefilledLink, delete);
+			contextMenu.setItems(edit, preview, invite, getPrefilledLink, new MenuItemSeparator(),delete);
 		else
-			contextMenu.setItems(edit, delete);
+			contextMenu.setItems(edit, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 

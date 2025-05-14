@@ -29,6 +29,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 
 /**
  * This panel shows the tags list with each tag count.
@@ -195,6 +196,7 @@ public class TagsForm extends VLayout {
 					});
 				}
 			}));
+			contextMenu.addItem(new MenuItemSeparator());
 			contextMenu.addItem(delete);
 		}
 
@@ -231,7 +233,7 @@ public class TagsForm extends VLayout {
 		Search.get().setOptions(options);
 		Search.get().search();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

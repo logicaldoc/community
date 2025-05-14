@@ -33,7 +33,7 @@ public class ModelImporter extends Window {
 
 	private ChangedHandler changedHandler;
 
-	public ModelImporter(ChangedHandler changedHandler) {
+	public ModelImporter(String modelName, ChangedHandler changedHandler) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("uploadmodel"));
 		setWidth(430);
@@ -48,8 +48,9 @@ public class ModelImporter extends Window {
 		save = new IButton(I18N.message("import"));
 		save.addClickHandler(click -> onUpload());
 
-		TextItem name = ItemFactory.newSimpleTextItem("name", "name", "newmodel");
+		TextItem name = ItemFactory.newSimpleTextItem("name", "name", modelName != null ? modelName : "newmodel");
 		name.setRequired(true);
+		name.setVisible(modelName == null);
 
 		form.setItems(name);
 
@@ -70,6 +71,10 @@ public class ModelImporter extends Window {
 		addCloseClickHandler(click -> cleanUploads());
 	}
 
+	public ModelImporter(ChangedHandler changedHandler) {
+		this(null, changedHandler);
+	}
+
 	private void cleanUploads() {
 		DocumentService.Instance.get().cleanUploadedFileFolder(new IgnoreAsyncCallback<>());
 	}
@@ -82,7 +87,7 @@ public class ModelImporter extends Window {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}
-		
+
 		LD.contactingServer();
 		save.setDisabled(true);
 		AIService.Instance.get().importModel(form.getValueAsString("name"), new DefaultAsyncCallback<>() {

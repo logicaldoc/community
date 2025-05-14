@@ -26,6 +26,7 @@ import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -203,7 +204,7 @@ public class TemplatesPanel extends VLayout {
 
 				}));
 
-		contextMenu.setItems(clone, delete);
+		contextMenu.setItems(clone, new MenuItemSeparator(),delete);
 		contextMenu.showContextMenu();
 	}
 

@@ -48,6 +48,7 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 
 /**
  * This context menu is used for grids containing document records.
@@ -226,8 +227,8 @@ public class ContextMenu extends Menu {
 		readingRequest.setTitle(I18N.message("requestreading"));
 		readingRequest.addClickHandler(event -> new ReadingRequestDialog(grid.getSelectedIds()).show());
 
-		setItems(download, preview, openInFolder, cut, copy, rename, delete, bookmark, sendMail, links, office,
-				checkout, checkin, lock, unlock);
+		setItems(download, preview, openInFolder, cut, copy, rename, bookmark, sendMail, links, office, checkout,
+				checkin, lock, unlock);
 
 		MenuItem more = new MenuItem(I18N.message("more"));
 		addItem(more);
@@ -260,6 +261,9 @@ public class ContextMenu extends Menu {
 		addAutomationItem(automation, moreMenu);
 
 		more.setSubmenu(moreMenu);
+
+		addItem(new MenuItemSeparator());
+		addItem(delete);
 
 		/**
 		 * Now implement the security policies
@@ -465,20 +469,21 @@ public class ContextMenu extends Menu {
 		item.addClickHandler(
 				event -> LD.askForStringMandatory(I18N.message("merge"), I18N.message(FILENAME), null, value -> {
 					LD.contactingServer();
-					DocumentService.Instance.get().merge(selectionIds, folder.getId(), value, new DefaultAsyncCallback<>() {
+					DocumentService.Instance.get().merge(selectionIds, folder.getId(), value,
+							new DefaultAsyncCallback<>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							super.onFailure(caught);
-							LD.clearPrompt();
-						}
+								@Override
+								public void onFailure(Throwable caught) {
+									super.onFailure(caught);
+									LD.clearPrompt();
+								}
 
-						@Override
-						public void onSuccess(GUIDocument mergedDoc) {
-							LD.clearPrompt();
-							DocumentController.get().stored(mergedDoc);
-						}
-					});
+								@Override
+								public void onSuccess(GUIDocument mergedDoc) {
+									LD.clearPrompt();
+									DocumentController.get().stored(mergedDoc);
+								}
+							});
 				}));
 		return item;
 	}
@@ -763,8 +768,8 @@ public class ContextMenu extends Menu {
 	private MenuItem prepareCheckoutItem(GUIFolder folder, List<GUIDocument> selection) {
 		MenuItem item = new MenuItem();
 		item.setTitle(I18N.message("checkout"));
-		item.addClickHandler(
-				event -> DocumentService.Instance.get().checkout(getSelectionIds(selection), new DefaultAsyncCallback<>() {
+		item.addClickHandler(event -> DocumentService.Instance.get().checkout(getSelectionIds(selection),
+				new DefaultAsyncCallback<>() {
 
 					@Override
 					public void onSuccess(Void result) {
@@ -827,13 +832,14 @@ public class ContextMenu extends Menu {
 		item.setTitle(I18N.message("unsetpassword"));
 		item.addClickHandler(event -> {
 			if (Session.get().isAdmin()) {
-				DocumentService.Instance.get().unsetPassword(selection.get(0).getId(), "", new DefaultAsyncCallback<>() {
-					@Override
-					public void onSuccess(Void result) {
-						selection.get(0).setPasswordProtected(false);
-						grid.updateDocument(selection.get(0));
-					}
-				});
+				DocumentService.Instance.get().unsetPassword(selection.get(0).getId(), "",
+						new DefaultAsyncCallback<>() {
+							@Override
+							public void onSuccess(Void result) {
+								selection.get(0).setPasswordProtected(false);
+								grid.updateDocument(selection.get(0));
+							}
+						});
 			} else
 				LD.askForValue(I18N.message("unsetpassword"), I18N.message("currentpassword"), "", 300, value -> {
 					if (value == null)
@@ -1159,12 +1165,13 @@ public class ContextMenu extends Menu {
 	}
 
 	private void executeRoutine(long folderId, List<Long> docIds, GUIAutomationRoutine routine) {
-		AutomationService.Instance.get().execute(routine, docIds, Arrays.asList(folderId), new DefaultAsyncCallback<>() {
-			@Override
-			public void onSuccess(Void arg0) {
-				// Nothing to do
-			}
-		});
+		AutomationService.Instance.get().execute(routine, docIds, Arrays.asList(folderId),
+				new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(Void arg0) {
+						// Nothing to do
+					}
+				});
 	}
 
 	private void onRename(long docId, String newFilename) {
