@@ -55,9 +55,9 @@ public class ModelTraining extends ModelDetailsTab implements ModelObserver {
 
 		TextItem cron = ItemFactory.newCronExpressionItem("cron", "schedule", model.getTraining().getCron(),
 				changedHandler);
-		cron.setVisibleWhen(new AdvancedCriteria(ENABLED, OperatorId.EQUALS, true));
-		cron.setRequiredWhen(new AdvancedCriteria(ENABLED, OperatorId.EQUALS, true));
-		cron.setRequired(true);
+		AdvancedCriteria visibleCriteria = new AdvancedCriteria(ENABLED, OperatorId.EQUALS, true);
+		cron.setVisibleWhen(visibleCriteria);
+		cron.setRequiredWhen(visibleCriteria);
 
 		SpinnerItem epochs = ItemFactory.newSpinnerItem("epochs", model.getTraining().getEpochs());
 		epochs.setRequired(true);
