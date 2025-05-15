@@ -75,10 +75,6 @@ values (-5,5);
 
 insert into ld_menu
            (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
-values     (99,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,'menu.admin1',2,'administration.gif',5,1,1,1,1);
-
-insert into ld_menu
-           (ld_id,ld_lastmodified, ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
 values     (2000,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,'menu',2,'administration.gif',3,1,1,1,1);
 
 insert into ld_menu
@@ -133,8 +129,6 @@ insert into ld_menu_acl (ld_menuid, ld_groupid, ld_read, ld_write) values (102,-
 insert into ld_menu_acl (ld_menuid, ld_groupid, ld_read, ld_write) values (103,-4,1,1);
 
 insert into ld_menu_acl (ld_menuid, ld_groupid, ld_read, ld_write) values (103,2,1,1);
-
-insert into ld_menu_acl (ld_menuid, ld_groupid, ld_read, ld_write) values (99,1,1,0);
 
 insert into ld_usergroup (ld_userid,ld_groupid) values (3,1);
 

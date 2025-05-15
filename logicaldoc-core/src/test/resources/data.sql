@@ -74,7 +74,7 @@ values (-5,5);
 
 insert into ld_menu
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
-values     (99,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,'menu.admin',2,'administration.gif',1,1,1,1,1);
+values     (98,'2008-10-22 00:00:00','2008-10-22 00:00:00',0,'menu.admin',2,'administration.gif',1,1,1,1,1);
 
 insert into ld_menu
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
