@@ -435,7 +435,11 @@ values     (90,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'reports',2,'reports.png',1
 
 insert into ld_menu 
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
-values     (100,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'parameters',7,'settings.png',1,1,1,6,10);
+values     (99,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'proxy',7,'proxy.png',1,1,1,6,1);
+
+insert into ld_menu 
+           (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (100,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'parameters',7,'parameters.png',1,1,1,6,1);
 
 insert into ld_menu 
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)

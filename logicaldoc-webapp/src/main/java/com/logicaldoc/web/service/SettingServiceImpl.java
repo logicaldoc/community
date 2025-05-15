@@ -1,5 +1,6 @@
 package com.logicaldoc.web.service;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,6 +12,11 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.AbstractHttpClientResponseHandler;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +39,7 @@ import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.sql.SqlUtil;
 import com.logicaldoc.web.firewall.HttpFirewall;
 import com.logicaldoc.web.util.ServletUtil;
@@ -131,9 +138,10 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 			conf.setProperty(session.getTenantName() + SMTP_PROTOCOL, settings.getProtocol());
 			conf.setProperty(session.getTenantName() + SMTP_HOST, settings.getServer());
 			conf.setProperty(session.getTenantName() + SMTP_PORT, Integer.toString(settings.getPort()));
-			conf.setProperty(session.getTenantName() + SMTP_USERNAME,StringUtils.defaultString(settings.getUsername(), ""));
+			conf.setProperty(session.getTenantName() + SMTP_USERNAME,
+					StringUtils.defaultString(settings.getUsername(), ""));
 			conf.setProperty(session.getTenantName() + SMTP_PASSWORD, StringUtils.defaultString(settings.getPwd(), ""));
-			
+
 			conf.setProperty(session.getTenantName() + SMTP_CONNECTION_SECURITY, settings.getConnSecurity());
 			conf.setProperty(session.getTenantName() + SMTP_AUTH_ENCRYPTED, settings.isSecureAuth() ? "true" : "false");
 			conf.setProperty(session.getTenantName() + SMTP_SENDER, settings.getSenderEmail());
@@ -560,5 +568,32 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		}
 
 		return params;
+	}
+
+	@Override
+	public Boolean testProxy(String host, int port, String username, String password) throws ServerException {
+		Session session = validateSession();
+		HttpGet get = new HttpGet("https://activation.logicaldoc.com");
+		try (CloseableHttpClient httpClient = HttpUtil.getNotValidatingClient(40, host, port, username, password);) {
+			return httpClient.execute(get, new AbstractHttpClientResponseHandler<Boolean>() {
+
+				@Override
+				public Boolean handleResponse(ClassicHttpResponse response) throws IOException {
+					int responseStatusCode = response.getCode();
+					String responseBody = HttpUtil.getBodyString(response);
+					String responseReasonPhrase = StringUtils.defaultString(response.getReasonPhrase());
+					log.debug("Received LM response {} - {} - {}", responseStatusCode, responseReasonPhrase,
+							responseBody);
+					return responseStatusCode == 200 && responseBody.toLowerCase().contains("<body");
+				}
+
+				@Override
+				public Boolean handleEntity(HttpEntity arg0) throws IOException {
+					return Boolean.FALSE;
+				}
+			});
+		} catch (IOException e) {
+			return throwServerException(session, log, e);
+		}
 	}
 }

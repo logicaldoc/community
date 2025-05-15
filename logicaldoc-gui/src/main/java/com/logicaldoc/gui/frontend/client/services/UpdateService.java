@@ -25,19 +25,23 @@ public interface UpdateService extends RemoteService {
 	 * Check if the current installation has an update package available
 	 * 
 	 * @return List of informations about the available update package or null
+	 * 
+	 * @throws ServerException an error happened in the server application
 	 */
-	public List<GUIParameter> checkUpdate();
+	public List<GUIParameter> checkUpdate() throws ServerException;
 
 	/**
 	 * Check if the current installation has patches available
 	 * 
 	 * @return List of available patches
+	 * 
+	 * @throws ServerException an error happened in the server application
 	 */
-	public List<GUIPatch> checkPatch();
+	public List<GUIPatch> checkPatch() throws ServerException;
 
-	void downloadUpdate(String id, String fileName, long fileSize);
+	void downloadUpdate(String id, String fileName, long fileSize) throws ServerException;
 
-	void downloadPatch(String id, String fileName, long fileSize);
+	void downloadPatch(String id, String fileName, long fileSize) throws ServerException;
 
 	/**
 	 * Confirms an update package

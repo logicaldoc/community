@@ -12,12 +12,12 @@ public interface SettingServiceAsync {
 
 	void saveSettings(List<GUIParameter> settings, AsyncCallback<Void> callback);
 
-	void loadEmailSettings(AsyncCallback<GUIEmailSettings> callback);
+	void loadEmailSettings(AsyncCallback<GUIEmailSettings> cOallback);
 
 	void saveEmailSettings(GUIEmailSettings settings, AsyncCallback<Void> callback);
 
 	void loadGUISettings(AsyncCallback<List<GUIParameter>> callback);
-	
+
 	void loadAuditingSettings(AsyncCallback<List<GUIParameter>> callback);
 
 	void loadSettingsByNames(List<String> names, AsyncCallback<List<GUIParameter>> callback);
@@ -41,4 +41,6 @@ public interface SettingServiceAsync {
 	void loadWebserviceStats(Long tenantId, AsyncCallback<List<GUIParameter>> callback);
 
 	void saveFirewallSettings(List<GUIParameter> settings, AsyncCallback<Void> callback);
+
+	void testProxy(String host, int port, String username, String password, AsyncCallback<Boolean> callback);
 }

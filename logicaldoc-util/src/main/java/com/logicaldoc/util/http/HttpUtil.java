@@ -57,10 +57,12 @@ public class HttpUtil {
 			if (config == null)
 				config = new ContextProperties();
 
-			proxy[0] = config.getProperty("proxy.host");
-			proxy[1] = config.getProperty("proxy.port");
-			proxy[2] = config.getProperty("proxy.username");
-			proxy[3] = config.getProperty("proxy.password");
+			if (config.getBoolean("proxy.enabled", false)) {
+				proxy[0] = config.getProperty("proxy.host");
+				proxy[1] = config.getProperty("proxy.port");
+				proxy[2] = config.getProperty("proxy.username");
+				proxy[3] = config.getProperty("proxy.password");
+			}
 		} catch (Exception e) {
 			// Ingnore
 		}

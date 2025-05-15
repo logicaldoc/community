@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.frontend.client.settings;
 
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIEmailSettings;
@@ -54,7 +54,18 @@ public class SettingsMenu extends VLayout {
 
 		addAuditing();
 
+		addProxy();
+		
 		addParameters();
+	}
+
+	private void addProxy() {
+		Button parameters = new Button(I18N.message("proxy"));
+		parameters.setWidth100();
+		parameters.setHeight(25);
+		parameters.addClickHandler(click -> AdminScreen.get().setContent(new ProxyPanel()));
+		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.PROXY))
+			addMember(parameters);
 	}
 
 	private void addParameters() {

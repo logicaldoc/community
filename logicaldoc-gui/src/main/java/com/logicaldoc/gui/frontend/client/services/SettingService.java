@@ -121,8 +121,8 @@ public interface SettingService extends RemoteService {
 	public void saveFirewallSettings(List<GUIParameter> settings) throws ServerException;
 
 	/**
-	 * Tries to delete a store and fails in case at least one folder is using
-	 * it and also if the store is marked as the default write one
+	 * Tries to delete a store and fails in case at least one folder is using it
+	 * and also if the store is marked as the default write one
 	 * 
 	 * @param storeId identifier of the store to remove
 	 * 
@@ -158,7 +158,7 @@ public interface SettingService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public List<GUIParameter> loadAuditingSettings() throws ServerException;
-	
+
 	/**
 	 * Loads the parameters of a specified converter
 	 * 
@@ -191,12 +191,26 @@ public interface SettingService extends RemoteService {
 	 */
 	public void saveExtensionAliases(String extension, String aliases) throws ServerException;
 
+	/**
+	 * Tests the connection to a proxy
+	 * 
+	 * @param host the proxy host name
+	 * @param port the proxy port
+	 * @param username the username to connect to the proxy
+	 * @param password the password to connect to the proxy
+	 * 
+	 * @return if the connection has been succesful or not
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public Boolean testProxy(String host, int port, String username, String password) throws ServerException;
+
 	public static class Instance {
 		private static SettingServiceAsync inst;
 
 		private Instance() {
 		}
-		
+
 		public static SettingServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(SettingService.class);

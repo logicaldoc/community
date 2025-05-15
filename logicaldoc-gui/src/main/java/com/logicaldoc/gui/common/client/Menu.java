@@ -109,6 +109,8 @@ public class Menu {
 
 	public static final long CUSTOMREPORTS = 1560;
 
+	public static final long PROXY = 99;
+	
 	public static final long PARAMETERS = 100;
 
 	public static final long SEARCH_AND_INDEXING = 101;
