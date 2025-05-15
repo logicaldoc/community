@@ -43,10 +43,16 @@ public class HttpUtil {
 	 */
 	private static String[] getProxy() {
 		String[] proxy = new String[] { null, "0", null, null };
+
+		ContextProperties config = null;
 		try {
 			// Try to get the config of the application context
-			ContextProperties config = Context.get().getProperties();
+			config = Context.get().getProperties();
+		} catch (Exception e) {
+			// Ignore
+		}
 
+		try {
 			// fallback to the classpath resource
 			if (config == null)
 				config = new ContextProperties();
@@ -55,8 +61,8 @@ public class HttpUtil {
 			proxy[1] = config.getProperty("proxy.port");
 			proxy[2] = config.getProperty("proxy.username");
 			proxy[3] = config.getProperty("proxy.password");
-		} catch (NoClassDefFoundError | Exception t) {
-			// Nothing to do
+		} catch (Exception e) {
+			// Ingnore
 		}
 
 		// The port must be an integer
