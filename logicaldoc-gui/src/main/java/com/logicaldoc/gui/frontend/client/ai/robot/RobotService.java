@@ -93,7 +93,7 @@ public interface RobotService extends RemoteService {
 	/**
 	 * Resets the avatar to the default one
 	 * 
-	 * @param userId Identifier of the robot
+	 * @param robotId Identifier of the robot
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */

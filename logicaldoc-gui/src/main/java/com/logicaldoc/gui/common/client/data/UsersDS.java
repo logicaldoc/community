@@ -5,7 +5,6 @@ import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceDateField;
 import com.smartgwt.client.data.fields.DataSourceImageField;
-import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -44,7 +43,7 @@ public class UsersDS extends DataSource {
 		DataSourceDateField expire = new DataSourceDateField("expire");
 		DataSourceDateField lastlogin = new DataSourceDateField("lastLogin");
 		DataSourceDateField creation = new DataSourceDateField("creation");
-		DataSourceIntegerField source = new DataSourceIntegerField("source");
+		DataSourceTextField source = new DataSourceTextField("source");
 
 		setFields(id, username, label, enabled, name, firstName, email, phone, cell, city, company, department,
 				organizationalUnit, building, groups, usergroup, guest, lastlogin, expire, creation, avatar, timeZone,

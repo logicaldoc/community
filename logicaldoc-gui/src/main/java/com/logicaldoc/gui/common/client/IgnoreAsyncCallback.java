@@ -8,7 +8,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * @author Marco Meschieri - LogicalDOC
  * @since 9.1.1
  *
- * @param <T>
+ * @param <T> The type of the return value that was declared in the synchronous
+ *        version of the service method.
  */
 public class IgnoreAsyncCallback<T> implements AsyncCallback<T> {
 

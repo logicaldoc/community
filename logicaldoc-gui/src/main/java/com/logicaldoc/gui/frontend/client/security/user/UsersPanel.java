@@ -229,8 +229,6 @@ public class UsersPanel extends AdminPanel {
 		source.setCanFilter(true);
 		source.setHidden(true);
 		source.setAlign(Alignment.CENTER);
-		source.setCellFormatter(
-				(value, rec, rowNum, colNum) -> "0".equals(value.toString()) ? "" : I18N.message("ldap"));
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -367,7 +365,7 @@ public class UsersPanel extends AdminPanel {
 		contextMenu.setItems(items.toArray(new MenuItem[0]));
 
 		password.setEnabled(selectedUsers.length == 1 && !Session.get().isDemo()
-				&& selectedUsers[0].getAttributeAsInt(SOURCE) == 0);
+				&& "DEFAULT".equals(selectedUsers[0].getAttributeAsString(SOURCE)));
 		twoTactorsAuth.setEnabled(selectedUsers.length == 1 && !Session.get().isDemo());
 		delete.setEnabled(selectedUsers.length == 1 && !Session.get().isDemo());
 		enableUser.setEnabled(selectedUsers.length == 1);
