@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.webservice.doc.WSDoc;
 
 /**
@@ -63,9 +64,7 @@ public class WSDocument implements Serializable {
 	/**
 	 * Whether document is checked out,locked or unlocked
 	 * 
-	 * @see Document#DOC_UNLOCKED
-	 * @see Document#DOC_CHECKED_OUT
-	 * @see Document#DOC_LOCKED
+	 * @see DocumentStatus
 	 */
 	@WSDoc(required = false, description = "<b>0</b> = unlocked, <b>1</b> = checked out, <b>2</b> = locked")
 	private int status = DOC_UNLOCKED;

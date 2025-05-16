@@ -51,6 +51,8 @@ public class NotifyingThread<T> implements Callable<T> {
 	 * 
 	 * @author Marco Meschieri - LogicalDOC
 	 * @since 8.5.3
+	 * 
+	 * @param <T> the type of callable
 	 */
 	public interface ThreadCompleteListener<T> {
 		public void completed(final NotifyingThread<T> thread);

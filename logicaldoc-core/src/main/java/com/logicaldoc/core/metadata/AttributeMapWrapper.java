@@ -10,8 +10,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Utility class to mask a {@link Map}<String,TemplateAttribute> with
- * a{@link Map}<String,Attribute>
+ * Utility class to mask a {@link Map}&lt;String,TemplateAttribute&gt; with
+ * a{@link Map}&lt;String,Attribute&gt;
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2

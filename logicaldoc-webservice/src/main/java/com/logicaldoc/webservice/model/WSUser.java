@@ -19,6 +19,7 @@ import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
+import com.logicaldoc.core.security.user.UserSource;
 import com.logicaldoc.core.security.user.WorkingTime;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.crypt.CryptUtil;
@@ -388,8 +389,7 @@ public class WSUser {
 	/**
 	 * The source from which the user has been created
 	 * 
-	 * @see User#SOURCE_DEFAULT
-	 * @see User#SOURCE_LDAP
+	 * @see UserSource
 	 * 
 	 * @return the source
 	 */

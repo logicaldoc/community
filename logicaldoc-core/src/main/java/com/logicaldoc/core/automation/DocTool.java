@@ -993,7 +993,7 @@ public class DocTool {
 	}
 
 	/**
-	 * Same as {@link #DocTool.parse()} but first it tries to get the text from
+	 * Same as parse() but first it tries to get the text from
 	 * the already built fulltext index
 	 * 
 	 * @param document The document to elaborate
@@ -1024,8 +1024,6 @@ public class DocTool {
 	 * @param userId ID of the user
 	 * 
 	 * @return if the permission is granted to the user
-	 * 
-	 * @throws PersistenceException error at data layer
 	 */
 	public boolean isPermissionAllowed(String permission, long documentId, long userId) {
 		try {

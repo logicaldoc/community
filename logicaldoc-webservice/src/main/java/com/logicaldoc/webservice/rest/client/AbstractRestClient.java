@@ -16,6 +16,8 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 6.9
+ * 
+ * @param <T> The web service class
  */
 public abstract class AbstractRestClient<T> {
 

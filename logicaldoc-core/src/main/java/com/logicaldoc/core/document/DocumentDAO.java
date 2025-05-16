@@ -309,7 +309,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * Counts the number of documents in a given indexation status(@see
 	 * {@link AbstractDocument#getIndexed()}
 	 * 
-	 * @param indexed the indexation status to check
+	 * @param indexingStatus the indexation status to check
 	 * 
 	 * @return number of documents
 	 * 

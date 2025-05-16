@@ -638,13 +638,10 @@ public class User extends PersistentObject implements Serializable {
 	/**
 	 * The source from which the user has been created
 	 * 
-	 * @see UserSource.DEFAULT
-	 * @see UserSource.LDAP
-	 * @see UserSource.SAML
+	 * @see UserSource
 	 * 
 	 * @return the source
 	 */
-	
 	public UserSource getSource() {
 		return source;
 	}

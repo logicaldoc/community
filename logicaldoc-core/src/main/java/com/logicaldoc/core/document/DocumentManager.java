@@ -132,7 +132,7 @@ public class DocumentManager {
 	 * 
 	 * @param docId the document to be updated
 	 * @param fileVersion the file version
-	 * @param newFile the file to use
+	 * @param content the new content
 	 * @param transaction entry to log the event (set the user)
 	 * 
 	 * @return A future to check the completion of all the checkin operations
@@ -233,7 +233,7 @@ public class DocumentManager {
 	 * Checks in the given document
 	 * 
 	 * @param docId the document to be checked in
-	 * @param fileInputStream input stream pointing to the new document version
+	 * @param content input stream pointing to the new document version
 	 * @param filename new filename (can also be the old one)
 	 * @param release True if this is a new release(eg: 2.0) rather than a
 	 *        subversion(eg: 1.1)
@@ -702,7 +702,7 @@ public class DocumentManager {
 	/**
 	 * Updates an existing document and marks it to be re-indexed
 	 * 
-	 * @param doc The document to be updated
+	 * @param document The document to be updated
 	 * @param docVO value object containing the new metadata
 	 * @param transaction entry to log the event (set the user)
 	 * 
@@ -1406,7 +1406,7 @@ public class DocumentManager {
 	 * 
 	 * @param doc The document for which will be created the shortcut
 	 * @param folder The target folder
-	 * @param type the alias type(<b>null</b> for the original file or
+	 * @param aliasType the alias type(<b>null</b> for the original file or
 	 *        <b>pdf</b> for it's pdf conversion)
 	 * @param transaction entry to log the event (set the user)
 	 * 
@@ -1477,20 +1477,20 @@ public class DocumentManager {
 	 * Utility method used to declare that:
 	 * <ol>
 	 * <li>the document must be taken into consideration by the indexer (status
-	 * = {@link AbstractDocument#INDEX_TO_INDEX}.</li>
+	 * = {@link IndexingStatus#TO_INDEX} .</li>
 	 * <li>the document must be taken into consideration by the indexer for the
 	 * metadata only(status =
-	 * {@link AbstractDocument#INDEX_TO_INDEX_METADATA}.</li>
+	 * {@link IndexingStatus#TO_INDEX_METADATA}.</li>
 	 * <li>the document must not be taken into consideration by the indexer
-	 * (status = {@link AbstractDocument#INDEX_SKIP}). If the document was
+	 * (status = {@link IndexingStatus#SKIP}). If the document was
 	 * previously indexed it is removed from the index.</li>
 	 * </ol>
 	 * 
 	 * Status:
 	 * <ol>
-	 * <li>{@link AbstractDocument#INDEX_TO_INDEX}</li>
-	 * <li>{@link AbstractDocument#INDEX_TO_INDEX_METADATA}</li>
-	 * <li>{@link AbstractDocument#INDEX_SKIP}</li>
+	 * <li>{@link IndexingStatus#TO_INDEX}</li>
+	 * <li>{@link IndexingStatus#TO_INDEX_METADATA}</li>
+	 * <li>{@link IndexingStatus#SKIP}</li>
 	 * </ol>
 	 * 
 	 * @param doc The document for which will be changed the indexer status.
