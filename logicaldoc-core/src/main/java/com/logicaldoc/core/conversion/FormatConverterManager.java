@@ -349,7 +349,7 @@ public class FormatConverterManager {
 			String[] inOut = key.split("-");
 			FormatConverter assignedConverter = getConverter(srcFilename, inOut[1]);
 			// The actually assigned converter must be anabled
-			if (!formats.contains(inOut[1]) && assignedConverter.isEnabled() && !inExt.equalsIgnoreCase(inOut[1])
+			if (!formats.contains(inOut[1]) && assignedConverter!=null && assignedConverter.isEnabled() && !inExt.equalsIgnoreCase(inOut[1])
 					&& inExt.equalsIgnoreCase(inOut[0]))
 				formats.add(inOut[1]);
 		}
