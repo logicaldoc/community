@@ -124,7 +124,7 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 			boolean parameters) {
 		ContextProperties conf = Context.get().getProperties();
 
-		if (converter.getClass().equals(NotAvailableConverter.class))
+		if (converter==null || converter.getClass().equals(NotAvailableConverter.class))
 			return;
 
 		writer.print("<converter>");
