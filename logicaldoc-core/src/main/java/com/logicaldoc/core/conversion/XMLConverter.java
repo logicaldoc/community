@@ -195,7 +195,7 @@ public class XMLConverter extends AbstractFormatConverter {
 
 				// Found a style sheet, download it and check the output
 				// format
-				xsltOutFormat = chectStyleSheet(xslt, builder, pi);
+				xsltOutFormat = checkStyleSheet(xslt, builder, pi);
 			}
 		}
 
@@ -235,7 +235,7 @@ public class XMLConverter extends AbstractFormatConverter {
 	 * @throws JDOMException JDOM parsing error
 	 * @throws URISyntaxException URL not valid
 	 */
-	private String chectStyleSheet(File xslt, SAXBuilder builder, ProcessingInstruction pi)
+	private String checkStyleSheet(File xslt, SAXBuilder builder, ProcessingInstruction pi)
 			throws IOException, JDOMException, URISyntaxException {
 		String xsltOutFormat = null;
 		try {
