@@ -118,7 +118,7 @@ public class RobotsPanel extends AdminPanel {
 		ToolStripButton add = new ToolStripButton();
 		add.setTitle(I18N.message("addrobot"));
 		toolStrip.addButton(add);
-		add.addClickHandler(event -> onAddModel());
+		add.addClickHandler(event -> onAddRobot());
 
 		toolStrip.addFill();
 
@@ -260,9 +260,11 @@ public class RobotsPanel extends AdminPanel {
 		rec.setAttribute(LABEL, robot.getLabel() != null ? robot.getLabel() : robot.getName());
 		rec.setAttribute(DESCRIPTION, robot.getDescription());
 		rec.setAttribute(ENABLED, robot.isEnabled());
+		rec.setAttribute("avatar", robot.getAvatar());
+		
 	}
 
-	protected void onAddModel() {
+	protected void onAddRobot() {
 		list.deselectAllRecords();
 		showRobotDetails(new GUIRobot());
 	}
