@@ -98,7 +98,8 @@ public class RobotProperties extends RobotDetailsTab {
 		classifier.setStartRow(true);
 		classifier.setMultipleAppearance(MultipleAppearance.PICKLIST);
 		classifier.setOptionDataSource(new ModelsDS(CLASSIFIER));
-		classifier.setValue(robot.getClassifierId());
+		if (robot.getClassifierId() != 0L)
+			classifier.setValue(robot.getClassifierId());
 		classifier.addChangedHandler(changedHandler);
 
 		SelectItem tokensDetector = new SelectItem("tokensDetector", I18N.message("tokensdetector"));
@@ -110,7 +111,8 @@ public class RobotProperties extends RobotDetailsTab {
 		tokensDetector.setRequired(true);
 		tokensDetector.setMultipleAppearance(MultipleAppearance.PICKLIST);
 		tokensDetector.setOptionDataSource(new ModelsDS("tokens"));
-		tokensDetector.setValue(robot.getTokensDetectorId());
+		if (robot.getTokensDetectorId() != 0L)
+			tokensDetector.setValue(robot.getTokensDetectorId());
 		tokensDetector.addChangedHandler(changedHandler);
 
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", robot.getDescription());
