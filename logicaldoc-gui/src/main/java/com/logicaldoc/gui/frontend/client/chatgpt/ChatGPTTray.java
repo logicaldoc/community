@@ -21,6 +21,7 @@ public class ChatGPTTray extends MenuTray {
 	public ChatGPTTray() {
 		TextItem question = ItemFactory.newTextItem("chatgpt", "");
 		question.setWidth(250);
+		question.setRequired(true);
 		question.addKeyPressHandler(event -> {
 			if (event.getKeyName() != null && "enter".equalsIgnoreCase(event.getKeyName()))
 				onAsk(question.getValueAsString());
@@ -37,6 +38,9 @@ public class ChatGPTTray extends MenuTray {
 	}
 
 	private void onAsk(String question) {
+		if(!validate())
+			return;
+		
 		if (DocumentController.get().getCurrentSelection().isEmpty())
 			SC.warn(I18N.message("nodocsselected"));
 		else

@@ -100,7 +100,8 @@ public class RobotThread extends Window {
 
 		addItem(contents);
 
-		ask(initialQuestion);
+		if(initialQuestion!=null && !initialQuestion.isEmpty())
+			ask(initialQuestion);
 
 		show();
 	}
