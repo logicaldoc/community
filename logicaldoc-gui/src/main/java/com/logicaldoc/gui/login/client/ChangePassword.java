@@ -22,10 +22,8 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
-import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.form.validator.MatchesFieldValidator;
 
 /**
@@ -61,30 +59,17 @@ public class ChangePassword extends Window {
 		form.setWidth(300);
 		form.setMargin(5);
 
-		PasswordItem password = ItemFactory.newPasswordItemPreventAutocomplete(PASSWORD, "currentpassword", null);
+		PasswordItem password = ItemFactory.newPasswordItemPreventAutocomplete(PASSWORD, PASSWORD, null);
 		password.setRequired(true);
 
 		MatchesFieldValidator equalsValidator = new MatchesFieldValidator();
 		equalsValidator.setOtherField(NEWPASSWORDAGAIN);
 		equalsValidator.setErrorMessage(I18N.message("passwordnotmatch"));
 
-		PasswordItem newPass = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORD, NEWPASSWORD, null);
+		PasswordItem newPass = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORD, NEWPASSWORD, null, true);
+		newPass.setWrapTitle(false);
 		newPass.setRequired(true);
 		newPass.setValidators(equalsValidator, new MinLengthValidator(user.getPasswordMinLenght()));
-
-		FormItemIcon generator = new FormItemIcon();
-		generator.setName("generator");
-		generator.setWidth(16);
-		generator.setHeight(16);
-
-		generator.setSrc("[SKIN]/key.png");
-		generator.setPrompt(I18N.message("passwordgenerator"));
-		generator.addFormItemClickHandler((FormItemIconClickEvent event) -> {
-			PasswordGenerator pswGenerator = new PasswordGenerator(user.getUsername());
-			pswGenerator.show();
-		});
-		newPass.setIcons(generator);
-		newPass.setIconVAlign(VerticalAlignment.CENTER);
 
 		PasswordItem newPassAgain = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORDAGAIN, NEWPASSWORDAGAIN,
 				null);
@@ -167,7 +152,7 @@ public class ChangePassword extends Window {
 					}
 				});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
