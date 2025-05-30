@@ -92,7 +92,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 				+ "]]></organizationalUnit>");
 		writer.print("<company><![CDATA[" + StringUtils.defaultString(user.getCompany()) + "]]></company>");
 
-		writer.print("<source>" + user.getSource() + "</source>");
+		writer.print("<source>" + user.getSource().name() + "</source>");
 		if (user.getExpire() != null)
 			writer.print("<expire>" + df.format(user.getExpire()) + "</expire>");
 		if (user.getLastLogin() != null)

@@ -299,7 +299,7 @@ public class UsersPanel extends AdminPanel {
 		rec.setAttribute("expire", user.getExpire());
 		rec.setAttribute(ENABLED, user.isEnabled());
 		rec.setAttribute(GUEST, user.isReadOnly());
-		rec.setAttribute(SOURCE, user.getSource());
+		rec.setAttribute(SOURCE, user.getSource() == GUIUser.TYPE_DEFAULT ? "DEFAULT" : user.getSource());
 		rec.setAttribute("city", user.getCity());
 		rec.setAttribute(BUILDING, user.getBuilding());
 		rec.setAttribute("organizationalUnit", user.getOrganizationalUnit());
