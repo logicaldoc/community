@@ -71,7 +71,7 @@ public class ReportStandardProperties extends ReportDetailsTab {
 
 		StaticTextItem id = ItemFactory.newStaticTextItem("id", Long.toString(report.getId()));
 
-		TextItem name = ItemFactory.newSimpleTextItem("name", report.getName());
+		TextItem name = ItemFactory.newSimpleTextItemWithHyphen("name", report.getName());
 		name.addChangedHandler(changedHandler);
 
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", report.getDescription());

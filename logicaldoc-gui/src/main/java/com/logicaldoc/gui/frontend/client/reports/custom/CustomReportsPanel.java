@@ -174,7 +174,7 @@ public class CustomReportsPanel extends AdminPanel {
 		});
 	}
 
-	private void updateReportRecord(GUIReport report) {
+	void updateReportRecord(GUIReport report) {
 		for (ListGridRecord rcd : list.getRecords()) {
 			if (Long.parseLong(rcd.getAttributeAsString("id")) == report.getId()) {
 				updateRecord(rcd, report);
@@ -188,6 +188,7 @@ public class CustomReportsPanel extends AdminPanel {
 
 		rcd.setAttribute("running",
 				rcd.getAttribute("name").equals(report.getName()) && report.getStatus() == GUIReport.STATUS_RUNNING);
+		rcd.setAttribute("name", report.getName());
 		rcd.setAttribute("status", report.getStatus());
 		rcd.setAttribute("lastRun", report.getLastRun());
 		rcd.setAttribute("lastModified", report.getLastModified());

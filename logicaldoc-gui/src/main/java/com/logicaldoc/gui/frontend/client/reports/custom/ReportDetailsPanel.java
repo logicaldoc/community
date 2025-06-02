@@ -128,14 +128,14 @@ public class ReportDetailsPanel extends VLayout {
 				public void onSuccess(GUIReport report) {
 					tabSet.hideSave();
 					if (report != null) {
-						reportsPanel.updateRecord(report);
+						reportsPanel.updateReportRecord(report);
 						reportsPanel.showReportDetails(report);
 					}
 				}
 			});
 		}
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
