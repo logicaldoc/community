@@ -1611,7 +1611,7 @@ public class ItemFactory {
 		return password;
 	}
 
-	private static FormItemIcon newShowPasswordIcon() {
+	public static FormItemIcon newShowPasswordIcon() {
 		FormItemIcon showPassword = new FormItemIcon();
 		showPassword.setName("showpassword");
 		showPassword.setSrc("[SKIN]/icons/eye.png");

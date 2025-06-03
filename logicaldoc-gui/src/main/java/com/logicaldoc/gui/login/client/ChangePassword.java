@@ -83,7 +83,7 @@ public class ChangePassword extends Window {
 			PasswordGenerator pswGenerator = new PasswordGenerator(user.getUsername());
 			pswGenerator.show();
 		});
-		newPass.setIcons(generator);
+		newPass.setIcons(ItemFactory.newShowPasswordIcon(), generator);
 		newPass.setIconVAlign(VerticalAlignment.CENTER);
 
 		PasswordItem newPassAgain = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORDAGAIN, NEWPASSWORDAGAIN,
@@ -167,7 +167,7 @@ public class ChangePassword extends Window {
 					}
 				});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
