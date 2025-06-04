@@ -342,7 +342,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testCheckinContext() throws ServerException, PersistenceException {
+	public void testCheckinContent() throws ServerException, PersistenceException {
 		testCreateWithContent();
 		testSubject.checkout(List.of(7L));
 
