@@ -1301,6 +1301,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		ids = List.of(5L, 6L);
 		vo = new GUIDocument();
 		vo.setPublished(0);
+		vo.setColor("yellow");
 
 		try {
 			List<GUIDocument> gdocs = testSubject.bulkUpdate(ids, vo, true);
@@ -1309,6 +1310,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 			// only one document updated because 1 was locked (checked-out)
 			assertEquals(1, gdocs.size());
+			assertEquals("yellow", gdocs.get(0).getColor());
 		} catch (ServerException e) {
 			fail("Unexpected exception was thrown");
 		}

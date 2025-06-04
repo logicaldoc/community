@@ -2115,6 +2115,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			document.setStopPublishing(model.getStopPublishing());
 		if (StringUtils.isNotEmpty(model.getLanguage()))
 			document.setLanguage(model.getLanguage());
+		if (StringUtils.isNotEmpty(model.getColor()))
+			document.setColor(model.getColor());
 		document.setTags(model.getTags());
 		if (model.getTemplateId() != null)
 			document.setTemplateId(model.getTemplateId());
