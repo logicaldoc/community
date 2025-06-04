@@ -342,13 +342,25 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testCheckinContext() throws ServerException {
+	public void testCheckinContext() throws ServerException, PersistenceException {
 		testCreateWithContent();
 		testSubject.checkout(List.of(7L));
 
 		testSubject.checkinContent(7, "checkedin contents");
 
-		assertEquals("checkedin contents", testSubject.getContentAsString(7));
+		// try to work on an alias
+		Document alias=new Document();
+		alias.setFileName("alias.txt");
+		alias.setDocRef(7L);
+		alias.setFolder(folderDao.findById(5L));
+		
+		assertEquals("checkedin contents", testSubject.getContentAsString(7L));
+		
+		docDao.store(alias);
+		testSubject.checkout(List.of(alias.getId()));
+		testSubject.checkinContent(alias.getId(), "checkedin contents2");
+		
+		assertEquals("checkedin contents2", testSubject.getContentAsString(alias.getId()));
 	}
 
 	@Test

@@ -2498,13 +2498,11 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 		try {
 			DocumentDAO docDao = Context.get(DocumentDAO.class);
-			Document doc = docDao.findById(docId);
+			Document doc = docDao.findDocument(docId);
 			if (doc == null)
 				throw new ServerException(UNEXISTING_DOCUMENT);
 
-			FolderDAO fDao = Context.get(FolderDAO.class);
-			if (!fDao.isWriteAllowed(doc.getFolder().getId(), session.getUserId()))
-				throw new PermissionException(session.getUsername(), DOCUMENT_STR + docId, Permission.WRITE);
+			docDao.isWriteAllowed(docId, session.getUserId());
 
 			if (doc.getStatus() != DocumentStatus.CHECKEDOUT || doc.getLockUserId() != session.getUserId())
 				throw new PermissionException("You have not checked out the file " + docId);
@@ -2535,15 +2533,11 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 		try {
 			DocumentDAO docDao = Context.get(DocumentDAO.class);
-			Document doc = docDao.findById(docId);
+			Document doc = docDao.findDocument(docId);
 			if (doc == null)
 				throw new ServerException(UNEXISTING_DOCUMENT);
 
-			FolderDAO fDao = Context.get(FolderDAO.class);
-			if (!fDao.isWriteAllowed(doc.getFolder().getId(), session.getUserId()))
-				throw new IOException("You don't have the WRITE permission");
-
-			doc = docDao.findDocument(docId);
+			docDao.isWriteAllowed(docId, session.getUserId());
 
 			if (doc.getStatus() != DocumentStatus.UNLOCKED)
 				throw new IOException("The document is locked");
