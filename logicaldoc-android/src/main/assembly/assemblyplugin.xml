@@ -10,6 +10,13 @@
         <fileSet>
             <directory>src/main/webapp/android</directory>
             <outputDirectory>android</outputDirectory>
-        </fileSet>            
+        </fileSet>
+		<fileSet>
+			<directory>src/main/webapp</directory>
+			<outputDirectory>/</outputDirectory>
+			<includes>
+				<include>androidstatus.jsp</include>
+			</includes>
+		</fileSet>    
     </fileSets> 
 </assembly>
