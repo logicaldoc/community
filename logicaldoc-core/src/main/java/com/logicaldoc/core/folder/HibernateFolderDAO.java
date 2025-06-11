@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -95,7 +95,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private static final String SELECT_DISTINCT = "select distinct(";
 
-	private static final String WHERE_GROUP_GROUPID_IN = " where _acl.groupId in (";
+	private static final String WHERE_GROUP_GROUPID_IN = " where _acl.ace.ace.groupId in (";
 
 	@Resource(name = "UserDAO")
 	protected UserDAO userDAO;
@@ -153,15 +153,15 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			setTags(folder);
 
-			// Remove the sections
-			folder.getAttributes().values().removeIf(Attribute::isSection);
-
-			removeForbiddenPermissionsForGuests(folder);
-
 			if (folder.getTemplate() == null) {
 				folder.setOcrTemplateId(null);
 				folder.setBarcodeTemplateId(null);
 			}
+
+			// Remove the sections
+			folder.getAttributes().values().removeIf(Attribute::isSection);
+
+			removeForbiddenPermissionsForGuests(folder);
 
 			log.debug("Invoke listeners before store");
 			Map<String, Object> dictionary = new HashMap<>();
@@ -571,7 +571,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 */
 		StringBuilder query = new StringBuilder(SELECT_DISTINCT + ENTITY + ") " + FROM_FOLDER + ENTITY + "  ");
 		query.append(LEFT_JOIN + ENTITY + FOLDER_ACL_AS_ACL);
-		query.append(WHERE + ENTITY + ".deleted=0 and _acl.groupId =" + groupId);
+		query.append(WHERE + ENTITY + ".deleted=0 and _acl.ace.ace.groupId =" + groupId);
 
 		List<Folder> coll = findByObjectQuery(query.toString(), (Map<String, Object>) null, null);
 

@@ -2,7 +2,7 @@ package com.logicaldoc.webdav.resource;
 
 import java.io.Serializable;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavMethods;

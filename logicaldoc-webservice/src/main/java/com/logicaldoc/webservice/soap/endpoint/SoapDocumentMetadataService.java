@@ -15,7 +15,7 @@ import com.logicaldoc.core.metadata.AttributeOptionDAO;
 import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
 import com.logicaldoc.core.metadata.Template;
-import com.logicaldoc.core.metadata.TemplateAttribute;
+import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
@@ -87,12 +87,12 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 		Template template = loadTemplate(sid, wsTemplate, user);
 
 		TemplateDAO dao = Context.get(TemplateDAO.class);
-		Map<String, TemplateAttribute> attrs = new HashMap<>();
+		Map<String, Attribute> attrs = new HashMap<>();
 		if (CollectionUtils.isNotEmpty(wsTemplate.getAttributes())) {
 			template.getAttributes().clear();
 			for (WSAttribute wsAttribute : wsTemplate.getAttributes()) {
 				if (wsAttribute != null) {
-					TemplateAttribute attribute = new TemplateAttribute();
+					Attribute attribute = new Attribute();
 					attribute.setPosition(wsAttribute.getPosition());
 					attribute.setMandatory(wsAttribute.getMandatory());
 					attribute.setHidden(wsAttribute.getHidden());
@@ -254,12 +254,12 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 		if (StringUtils.isEmpty(set.getName()))
 			throw new WebserviceException("Missing mandatory value 'Name'");
 
-		Map<String, TemplateAttribute> attrs = new HashMap<>();
+		Map<String, Attribute> attrs = new HashMap<>();
 		if (CollectionUtils.isNotEmpty(wsAttributeSet.getAttributes())) {
 			set.getAttributes().clear();
 			for (WSAttribute wsAttribute : wsAttributeSet.getAttributes()) {
 				if (wsAttribute != null) {
-					TemplateAttribute attribute = new TemplateAttribute();
+					Attribute attribute = new Attribute();
 					attribute.setPosition(wsAttribute.getPosition());
 					attribute.setMandatory(wsAttribute.getMandatory());
 					attribute.setHidden(wsAttribute.getHidden());

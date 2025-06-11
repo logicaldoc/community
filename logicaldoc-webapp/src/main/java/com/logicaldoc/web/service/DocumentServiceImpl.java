@@ -28,9 +28,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -125,6 +122,9 @@ import com.logicaldoc.util.html.HTMLSanitizer;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.web.UploadServlet;
 import com.logicaldoc.web.websockets.WebsocketTool;
+
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * The document service for the operations on the documents done through the
@@ -2895,37 +2895,14 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				maintainedDoc.getDate());
 
 		duplications.remove(0);
-		List<Long> duplicatedIds = duplications.stream().map(d -> d.getId()).toList();
-
-		log.warn("Deleting the duplicated documents {}", duplicatedIds);
-		StringBuilder updateStatement = new StringBuilder("update ld_document set ld_deleted=1 where ");
-		if (docDao.isOracle()) {
-			/*
-			 * In Oracle The limit of 1000 elements applies to sets of single
-			 * items: (x) IN ((1), (2), (3), ...). There is no limit if the sets
-			 * contain two or more items: (x, 0) IN ((1,0), (2,0), (3,0), ...):
-			 */
-			updateStatement.append(" (ld_id,0) in ( ");
-			boolean firstItem = true;
-			for (Long id : duplicatedIds) {
-				if (!firstItem)
-					updateStatement.append(",");
-				updateStatement.append("(");
-				updateStatement.append(id);
-				updateStatement.append(",0)");
-				firstItem = false;
-			}
-			updateStatement.append(" )");
-		} else {
-			updateStatement.append(" ld_id in ");
-			updateStatement.append(duplicatedIds.toString().replace('[', '(').replace(']', ')'));
-		}
-		docDao.jdbcUpdate(updateStatement.toString());
-
-		log.debug("Prepare the histories");
+		
+		log.debug("Delete {} documents", duplications.size());
 		for (Document doc : duplications) {
 			if (doc.getId() == maintainedDoc.getId())
 				continue;
+			
+			doc.setDeleted(1);
+			
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSession(session);
 			transaction.setDocument(doc);
@@ -2935,7 +2912,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			transaction.setVersion(doc.getVersion());
 			transaction.setFileVersion(doc.getFileVersion());
 			transaction.setPath(doc.getFolder().getPathExtended());
-			docDao.saveDocumentHistory(doc, transaction);
+			docDao.delete(doc.getId(), transaction);
 		}
 
 		// Create the aliases

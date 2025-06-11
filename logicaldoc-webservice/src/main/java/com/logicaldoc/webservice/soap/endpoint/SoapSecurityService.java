@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.user.Group;
@@ -176,7 +177,11 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 			validateMandatoryFields(usr);
 
-			dao.store(usr);
+			UserHistory transaction = new UserHistory();
+			transaction.setSession(SessionManager.get().get(sid));
+			transaction.setEvent(wsUser.getId()==0 ? UserEvent.CREATED : UserEvent.UPDATED);
+			
+			dao.store(usr, transaction);
 
 			if (CollectionUtils.isNotEmpty(wsUser.getGroupIds())) {
 				usr.removeGroupMemberships(null);

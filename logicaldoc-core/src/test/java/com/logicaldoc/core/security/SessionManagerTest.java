@@ -11,11 +11,6 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,10 +22,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.spring.LDAuthenticationToken;
-import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
+import com.logicaldoc.core.security.spring.LDDeferredSecurityContext;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.plugin.PluginException;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import com.logicaldoc.core.security.SessionManager;
 
 /**
  * Test case for the <code>SessionManager</code>
@@ -131,7 +133,7 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 
 		when(request.getSession(false)).thenReturn(httpSession);
 
-		LDSecurityContextRepository.bindServletSession(session.getSid(), httpSession);
+		LDDeferredSecurityContext.bindServletSession(session.getSid(), httpSession);
 
 		LDAuthenticationToken authentication = new LDAuthenticationToken("admin");
 		authentication.setSid(session.getSid());

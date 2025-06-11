@@ -15,7 +15,7 @@ import com.logicaldoc.core.security.Device;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.spring.LDAuthenticationToken;
-import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
+import com.logicaldoc.core.security.spring.LDDeferredSecurityContext;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.gui.common.client.ServerException;
@@ -58,16 +58,15 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 
 		File docs = new File(repositoryDir, "docs");
 		docs.mkdir();
-		File docDir = new File(docs+"/1/doc");
+		File docDir = new File(docs + "/1/doc");
 		docDir.mkdirs();
 		docDir.mkdir();
 		FileUtil.copyResource("/pdf1.pdf", new File(docDir, "1.0"));
-		docDir = new File(docs+"/3/doc");
+		docDir = new File(docs + "/3/doc");
 		docDir.mkdirs();
 		docDir.mkdir();
 		FileUtil.copyResource("/pdf2.pdf", new File(docDir, "1.1"));
-		
-		
+
 		File docs2 = new File(repositoryDir, "docs2");
 		docs2.mkdir();
 
@@ -85,8 +84,8 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 		UserDAO userDao = Context.get(UserDAO.class);
 
 		guiSession = new GUISession();
-		Client client=new Client("xyz", "192.168.2.231", "ghost");
-		Device device=new Device();
+		Client client = new Client("xyz", "192.168.2.231", "ghost");
+		Device device = new Device();
 		device.setBrowser("Firefox");
 		device.setBrowserVersion("18");
 		device.setOperativeSystem("Windows");
@@ -100,7 +99,7 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 			SecurityContextHolder.getContext().setAuthentication(token);
 			guiSession = new SecurityServiceImpl().loadSession(session, null);
 
-			LDSecurityContextRepository.bindServletSession(guiSession.getSid(), servletSession);
+			LDDeferredSecurityContext.bindServletSession(guiSession.getSid(), servletSession);
 		}
 	}
 

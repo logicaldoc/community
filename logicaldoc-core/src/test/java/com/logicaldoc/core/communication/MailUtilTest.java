@@ -8,8 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 
 import org.bouncycastle.cms.CMSException;
 import org.junit.Test;

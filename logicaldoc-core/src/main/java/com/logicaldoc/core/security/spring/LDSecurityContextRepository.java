@@ -1,21 +1,14 @@
 package com.logicaldoc.core.security.spring;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.context.DeferredSecurityContext;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextImpl;
-import org.springframework.security.web.context.HttpRequestResponseHolder;
-import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
-import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * This repository avoid the use of sessions and simply use the current request
@@ -24,39 +17,16 @@ import com.logicaldoc.core.security.SessionManager;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5
  */
-public class LDSecurityContextRepository implements SecurityContextRepository {
-
-	private static Map<String, HttpSession> servletSessionMapping = new HashMap<>();
+public class LDSecurityContextRepository extends HttpSessionSecurityContextRepository {
 
 	@Override
 	public boolean containsContext(HttpServletRequest request) {
-		String sid = SessionManager.get().getSessionId(request);
-		return sid != null;
+		return SessionManager.get().getSessionId(request) != null;
 	}
 
 	@Override
-	public SecurityContext loadContext(HttpRequestResponseHolder request) {
-		String sid = SessionManager.get().getSessionId(request.getRequest());
-		if (sid == null || !SessionManager.get().isOpen(sid))
-			return SecurityContextHolder.createEmptyContext();
-
-		Session session = SessionManager.get().get(sid);
-
-		String username = session.getClient() != null && StringUtils.isNotEmpty(session.getClient().getUsername())
-				? session.getClient().getUsername()
-				: session.getUsername();
-
-		LDAuthenticationToken token = new LDAuthenticationToken(username, "", null);
-		token.setSid(sid);
-
-		SecurityContextImpl context = new SecurityContextImpl();
-		context.setAuthentication(token);
-
-		HttpSession servletSession = request.getRequest().getSession(false);
-		if (servletSession != null)
-			servletSessionMapping.put(sid, servletSession);
-
-		return context;
+	public DeferredSecurityContext loadDeferredContext(HttpServletRequest request) {
+		return new LDDeferredSecurityContext(request);
 	}
 
 	@Override
@@ -70,22 +40,10 @@ public class LDSecurityContextRepository implements SecurityContextRepository {
 			SessionManager.get().saveSid(request, response, token.getSid());
 
 			HttpSession servletSession = request.getSession(false);
+
 			if (servletSession != null && servletSession.getAttribute(SessionManager.PARAM_SID) != null)
-				servletSessionMapping.put(servletSession.getAttribute(SessionManager.PARAM_SID).toString(),
-						servletSession);
+				LDDeferredSecurityContext.bindServletSession(
+						servletSession.getAttribute(SessionManager.PARAM_SID).toString(), servletSession);
 		}
-	}
-
-	public static void bindServletSession(String sid, HttpServletRequest request) {
-		bindServletSession(sid, request.getSession());
-	}
-
-	public static void bindServletSession(String sid, HttpSession servletSession) {
-		servletSession.setAttribute(SessionManager.PARAM_SID, sid);
-		servletSessionMapping.put(sid, servletSession);
-	}
-
-	public static HttpSession getServletSession(String sid) {
-		return servletSessionMapping.get(sid);
 	}
 }

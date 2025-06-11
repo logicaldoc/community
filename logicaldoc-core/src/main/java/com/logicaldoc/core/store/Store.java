@@ -7,8 +7,8 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 import com.logicaldoc.core.document.Document;
 

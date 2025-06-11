@@ -6,7 +6,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebMethod;
+import jakarta.jws.WebMethod;
 
 import com.logicaldoc.webservice.doc.model.WebServiceStubSet;
 

@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
 
 import com.logicaldoc.webservice.doc.model.JavaLanguageVariable;
 import com.logicaldoc.webservice.doc.model.Stub;

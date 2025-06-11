@@ -33,7 +33,7 @@ import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
 import com.logicaldoc.core.metadata.Template;
-import com.logicaldoc.core.metadata.TemplateAttribute;
+import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.user.Group;
@@ -340,7 +340,7 @@ public class WSUtil {
 		if (MapUtils.isNotEmpty(attributeSet.getAttributes())) {
 			wsAttributes = new ArrayList<>();
 			for (String name : attributeSet.getAttributeNames()) {
-				TemplateAttribute attr = attributeSet.getTemplateAttribute(name);
+				Attribute attr = attributeSet.getTemplateAttribute(name);
 				WSAttribute wsAttribute = new WSAttribute();
 				wsAttribute.setName(name);
 				wsAttribute.setLabel(attr.getLabel());
@@ -376,12 +376,12 @@ public class WSUtil {
 		set.setName(wsSet.getName());
 		set.setDescription(wsSet.getDescription());
 
-		Map<String, TemplateAttribute> attributes = null;
+		Map<String, Attribute> attributes = null;
 		if (CollectionUtils.isNotEmpty(wsSet.getAttributes())) {
 			set.getAttributes().clear();
 			attributes = new HashMap<>();
 			for (WSAttribute wsAtt : wsSet.getAttributes()) {
-				TemplateAttribute att = new TemplateAttribute();
+				Attribute att = new Attribute();
 				att.setLabel(wsAtt.getLabel());
 				att.setMandatory(wsAtt.getMandatory());
 				att.setHidden(wsAtt.getHidden());
@@ -416,12 +416,12 @@ public class WSUtil {
 		template.setDescription(wsTemplate.getDescription());
 		template.setValidation(wsTemplate.getValidation());
 
-		Map<String, TemplateAttribute> attributes = null;
+		Map<String, Attribute> attributes = null;
 		if (CollectionUtils.isNotEmpty(wsTemplate.getAttributes())) {
 			template.getAttributes().clear();
 			attributes = new HashMap<>();
 			for (WSAttribute wsAtt : wsTemplate.getAttributes()) {
-				TemplateAttribute att = new TemplateAttribute();
+				Attribute att = new Attribute();
 				att.setLabel(wsAtt.getLabel());
 				att.setHidden(wsAtt.getHidden());
 				att.setReadonly(wsAtt.getReadonly());
@@ -466,7 +466,7 @@ public class WSUtil {
 			if (MapUtils.isNotEmpty(template.getAttributes())) {
 				attributes = new ArrayList<>();
 				for (String name : template.getAttributeNames()) {
-					TemplateAttribute attr = template.getTemplateAttribute(name);
+					Attribute attr = template.getTemplateAttribute(name);
 					WSAttribute attribute = new WSAttribute();
 					attribute.setName(name);
 					attribute.setLabel(attr.getLabel());

@@ -11,9 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.activation.DataHandler;
-import javax.mail.MessagingException;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;
 import org.slf4j.Logger;
@@ -70,6 +67,9 @@ import com.logicaldoc.webservice.model.WSNote;
 import com.logicaldoc.webservice.model.WSRating;
 import com.logicaldoc.webservice.model.WSUtil;
 import com.logicaldoc.webservice.soap.DocumentService;
+
+import jakarta.activation.DataHandler;
+import jakarta.mail.MessagingException;
 
 /**
  * Document Web Service Implementation (SOAP)

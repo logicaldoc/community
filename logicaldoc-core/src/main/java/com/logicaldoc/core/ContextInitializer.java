@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutionException;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

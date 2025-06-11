@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -19,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.Metadata;
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
@@ -39,6 +36,10 @@ import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.frontend.client.dropbox.DropboxService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 
 /**
  * Implementation of the DropboxService

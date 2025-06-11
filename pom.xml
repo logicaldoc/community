@@ -3,12 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.logicaldoc</groupId>
-        <artifactId>logicaldoc-parent-pom</artifactId>
-        <version>111</version>
+        <artifactId>logicaldoc-parent</artifactId>
+        <version>112</version>
+        <relativePath>logicaldoc-parent/pom.xml</relativePath>
     </parent>
     <groupId>com.logicaldoc</groupId>
     <artifactId>logicaldoc</artifactId>
-    <version>9.2.0</version>
+    <version>9.2.1</version>
     <packaging>pom</packaging>
     <name>logicaldoc</name>
     <description>LogicalDOC is an open-source enterprise class Document Management System developed by LogicalDOC Srl, based on the Java Platform</description>
@@ -58,12 +59,23 @@
             <email>m.caruso@logicalobjects.it</email>
             <id>matteo</id>
             <organization>Logical Objects</organization>
-            <organizationUrl>http://www.logicalobjects.it</organizationUrl>
+            <organizationUrl>http://www.logicaldoc.com</organizationUrl>
             <roles>
                 <role>developer</role>
             </roles>
             <timezone>+1</timezone>
         </developer>
+        <developer>
+            <name>Giuseppe Desiato</name>
+            <email>g.desiato@logicaldoc.com</email>
+            <id>matteo</id>
+            <organization>LogicalDOC</organization>
+            <organizationUrl>http://www.logicaldoc.com</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>        
         <developer>
             <name>Sebastian Wenzky</name>
             <id>cheffilet</id>
@@ -162,6 +174,7 @@
     </reporting>
     
     <modules>
+        <module>logicaldoc-i18n</module>
         <module>logicaldoc-util</module>
         <module>logicaldoc-core</module>
         <module>logicaldoc-webservice</module>
@@ -170,7 +183,6 @@
         <module>logicaldoc-webdav</module>
         <module>logicaldoc-cmis</module>
         <module>logicaldoc-dropbox</module>
-        <module>logicaldoc-i18n</module>
         <module>logicaldoc-gui</module>
         <module>logicaldoc-android</module>
         <module>logicaldoc-ios</module>

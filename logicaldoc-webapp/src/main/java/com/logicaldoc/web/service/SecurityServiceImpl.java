@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.mail.MessagingException;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
+import jakarta.mail.MessagingException;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;

@@ -10,8 +10,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebParam;
-import javax.jws.WebResult;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
 
 import com.logicaldoc.webservice.doc.WSDoc;
 import com.logicaldoc.webservice.doc.model.JavaLanguageVariable;

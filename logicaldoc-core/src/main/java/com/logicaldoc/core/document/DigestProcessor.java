@@ -3,7 +3,7 @@ package com.logicaldoc.core.document;
 import java.util.List;
 import java.util.Locale;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

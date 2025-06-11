@@ -13,8 +13,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -35,6 +33,8 @@ import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.security.PasswordCriteria;
 import com.logicaldoc.util.security.PasswordValidator;
+
+import jakarta.annotation.Resource;
 
 /**
  * Hibernate implementation of <code>UserDAO</code>
@@ -418,6 +418,11 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			createdHistory.setComment(user.getUsername());
 			saveUserHistory(user, createdHistory);
 		} else {
+			if (transaction == null) {
+				transaction = new UserHistory();
+				transaction.setEvent(UserEvent.UPDATED);
+				transaction.setComment(user.getUsername());
+			}
 			saveUserHistory(user, transaction);
 		}
 	}

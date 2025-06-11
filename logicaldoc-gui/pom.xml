@@ -6,7 +6,8 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>9.2.0</version>
+		<version>9.2.1</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>logicaldoc-gui</artifactId>
 	<name>logicaldoc-gui</name>
@@ -30,6 +31,11 @@
 			<artifactId>gwt-servlet</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.gwtproject</groupId>
+			<artifactId>gwt-servlet-jakarta</artifactId>
+			<scope>provided</scope>
+		</dependency>		
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-incubator</artifactId>
@@ -144,13 +150,21 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>jakarta.annotation</groupId>
+			<artifactId>jakarta.annotation-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	
+		
+		
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
 			<artifactId>logicaldoc-util</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.eclipse.jetty.websocket</groupId>
 			<artifactId>websocket-api</artifactId>

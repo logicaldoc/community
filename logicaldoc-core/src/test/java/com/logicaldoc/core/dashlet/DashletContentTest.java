@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 import org.junit.Before;
 import org.junit.Test;

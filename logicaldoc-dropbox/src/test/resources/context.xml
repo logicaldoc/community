@@ -68,20 +68,16 @@
         </property>
         
 		<property name="hibernateProperties">
-			<props>
-				<prop key="hibernate.dialect">
-					org.hibernate.dialect.HSQLDialect
-				</prop>
-				<prop key="javax.persistence.validation.mode">
-				   none
-				</prop>
-				<prop key="hibernate.cache.use_second_level_cache">
-					true
-				</prop>
-				<prop key="hibernate.cache.provider_class">
-					org.hibernate.cache.EhCacheProvider
-				</prop>
-			</props>
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+                <prop key="hibernate.generate_statistics">true</prop>
+                <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                
+                <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                <prop key="hibernate.cache.use_query_cache">true</prop>
+                <prop key="hibernate.cache.region.factory_class">org.infinispan.hibernate.cache.v62.InfinispanRegionFactory</prop>
+                <prop key="hibernate.cache.infinispan.cfg">org/infinispan/hibernate/cache/commons/builder/infinispan-configs-local.xml</prop>
+            </props>
 		</property>
 	</bean>
 

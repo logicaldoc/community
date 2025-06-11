@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -45,11 +45,11 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
 	@Column(name = "ld_type", nullable = false)
 	private int type = TYPE_DEFAULT;
 
-	public abstract Map<String, TemplateAttribute> getTemplateAttributes();
+	public abstract Map<String, Attribute> getTemplateAttributes();
 
-	public abstract void setTemplateAttributes(Map<String, TemplateAttribute> templateAttributes);
+	public abstract void setTemplateAttributes(Map<String, Attribute> templateAttributes);
 
-	public TemplateAttribute getTemplateAttribute(String name) {
+	public Attribute getTemplateAttribute(String name) {
 		return getTemplateAttributes().get(name);
 	}
 
@@ -62,7 +62,7 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
 	public void setAttributes(Map<String, Attribute> attributes) {
 		getTemplateAttributes().clear();
 		for (Map.Entry<String, ? extends Attribute> att : attributes.entrySet()) {
-			if (att.getValue() instanceof TemplateAttribute ta)
+			if (att.getValue() instanceof Attribute ta)
 				getTemplateAttributes().put(att.getKey(), ta);
 		}
 	}
@@ -74,7 +74,7 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
 		// The names are ordered
 		List<Attribute> values = new ArrayList<>();
 		for (String n : valueNames) {
-			TemplateAttribute val = getTemplateAttributes().get(n);
+			Attribute val = getTemplateAttributes().get(n);
 			val.setName(n);
 			values.add(val);
 		}
@@ -100,7 +100,7 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
 
 	@Override
 	public Object getValue(String name) {
-		TemplateAttribute att = getAttribute(name);
+		Attribute att = getAttribute(name);
 		if (att != null)
 			return att.getValue();
 		else
@@ -108,7 +108,7 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
 	}
 
 	@Override
-	public TemplateAttribute getAttribute(String name) {
+	public Attribute getAttribute(String name) {
 		if (getTemplateAttributes() != null && getTemplateAttributes().get(name) != null)
 			return getTemplateAttributes().get(name);
 		else
@@ -146,14 +146,14 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
 	}
 
 	@Override
-	public TemplateAttribute getAttributeAtPosition(int position) {
+	public Attribute getAttributeAtPosition(int position) {
 		if (position < 0)
 			return null;
-		List<TemplateAttribute> attrs = new ArrayList<>(getTemplateAttributes().values());
+		List<Attribute> attrs = new ArrayList<>(getTemplateAttributes().values());
 		if (position >= attrs.size())
 			return null;
-		TemplateAttribute attribute = null;
-		for (TemplateAttribute extendedAttribute : attrs) {
+		Attribute attribute = null;
+		for (Attribute extendedAttribute : attrs) {
 			if (extendedAttribute.getPosition() == position) {
 				attribute = extendedAttribute;
 				break;
@@ -177,14 +177,14 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
 		if (CollectionUtils.isEmpty(values))
 			return attrs;
 
-		TemplateAttribute master = setValue(name, values.get(0));
+		Attribute master = setValue(name, values.get(0));
 		attrs.add(master);
 
 		if (values.size() > 1) {
 			master.setMultiple(1);
 			NumberFormat nf = new DecimalFormat("0000");
 			for (int i = 1; i < values.size(); i++) {
-				TemplateAttribute attribute = setValue(name + "-" + nf.format(i), values.get(i));
+				Attribute attribute = setValue(name + "-" + nf.format(i), values.get(i));
 				attribute.setParent(name);
 				attrs.add(attribute);
 			}
@@ -198,8 +198,8 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
 
 	@Override
 	public void setAttribute(String name, Attribute attr) {
-		if (attr instanceof TemplateAttribute attribute) {
-			TemplateAttribute newAttribute = new TemplateAttribute(attribute);
+		if (attr instanceof Attribute attribute) {
+			Attribute newAttribute = new Attribute(attribute);
 			Attribute oldAttribute = getTemplateAttributes().get(name);
 			if (oldAttribute != null) {
 				newAttribute.setPosition(oldAttribute.getPosition());
@@ -212,10 +212,10 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
 	}
 
 	@Override
-	public TemplateAttribute setValue(String name, Object value) {
-		TemplateAttribute ext = getAttribute(name);
+	public Attribute setValue(String name, Object value) {
+		Attribute ext = getAttribute(name);
 		if (ext == null) {
-			ext = new TemplateAttribute();
+			ext = new Attribute();
 			ext.setPosition(getLastPosition() + 1);
 		}
 		ext.setValue(value);
@@ -228,7 +228,7 @@ public abstract class AbstractAttributeSet extends ExtensibleObject {
 		int position = 0;
 
 		if (getTemplateAttributes() != null)
-			for (TemplateAttribute att : getTemplateAttributes().values()) {
+			for (Attribute att : getTemplateAttributes().values()) {
 				if (position < att.getPosition())
 					position = att.getPosition();
 			}

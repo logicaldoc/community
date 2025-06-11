@@ -1,6 +1,7 @@
 package com.logicaldoc.cmis;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -647,6 +648,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 		List<Folder> list = fdao.findAll();
 		assertEquals(7, list.size());
+		assertFalse(list.stream().anyMatch(f -> "pippo.txt".equals(f.getName())));
 
 		LDRepository ldrep = new LDRepository(folder, sess.getSid());
 		String id = ldrep.createFolder(null, props, "fld.4");
@@ -654,7 +656,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 		list = fdao.findAll();
 		assertEquals(8, list.size());
-		assertEquals("pippo.txt", list.get(4).getName());
+		assertTrue(list.stream().anyMatch(f -> "pippo.txt".equals(f.getName())));
 
 		ldrep = new LDRepository(folder, null);
 		id = ldrep.createFolder(new MockCallContext(null, sess.getSid()), props, "fld.4");

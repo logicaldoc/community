@@ -2,8 +2,8 @@ package com.logicaldoc.core.imaging;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 
 /**
  * A zone specification inside an image.

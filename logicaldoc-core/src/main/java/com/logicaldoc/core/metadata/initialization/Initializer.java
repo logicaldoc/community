@@ -17,7 +17,7 @@ import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.metadata.Template;
-import com.logicaldoc.core.metadata.TemplateAttribute;
+import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
@@ -63,7 +63,7 @@ public class Initializer {
 		for (String attributeName : template.getAttributeNames()) {
 			try {
 				Attribute attribute = object.getAttribute(attributeName);
-				TemplateAttribute templateAttribute = template.getAttribute(attributeName);
+				Attribute templateAttribute = template.getAttribute(attributeName);
 				if (attribute != null && templateAttribute != null && attribute.getValue() == null
 						&& StringUtils.isNotEmpty(templateAttribute.getInitialization()))
 					executeInitialization(object, transaction, attributeName, attribute, templateAttribute);
@@ -94,7 +94,7 @@ public class Initializer {
 	}
 
 	private void executeInitialization(ExtensibleObject object, History transaction, String attributeName,
-			Attribute attribute, TemplateAttribute templateAttribute) throws AutomationException {
+			Attribute attribute, Attribute templateAttribute) throws AutomationException {
 		Map<String, Object> fieldValidationDictionary = new HashMap<>();
 		fieldValidationDictionary.put("object", object);
 		fieldValidationDictionary.put("event", transaction);

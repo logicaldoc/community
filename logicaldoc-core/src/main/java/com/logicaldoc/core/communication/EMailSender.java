@@ -19,24 +19,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.URLDataSource;
-import javax.mail.Authenticator;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MailDateFormat;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.MimeUtility;
-import javax.mail.util.ByteArrayDataSource;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -62,8 +44,25 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.http.UrlUtil;
 import com.logicaldoc.util.io.FileUtil;
-import com.sun.mail.smtp.SMTPTransport;
+// import com.sun.mail.smtp.SMTPTransport;
 
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.activation.URLDataSource;
+import jakarta.mail.Authenticator;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MailDateFormat;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.internet.MimeUtility;
+import jakarta.mail.util.ByteArrayDataSource;
 import net.sf.jmimemagic.Magic;
 import net.sf.jmimemagic.MagicMatch;
 
@@ -259,7 +258,7 @@ public class EMailSender {
 	public void send(EMail email, String templateName, Map<String, Object> dictionary)
 			throws MessagingException, AutomationException {
 		if (!RunLevel.current().aspectEnabled("sendingMessages")) {
-			log.error("Aspect sendingMessages not enabled");
+			log.warn("Aspect sendingMessages not enabled");
 			return;
 		}
 
@@ -333,11 +332,11 @@ public class EMailSender {
 		Set<InternetAddress> bcc = email.getAddressesBCC();
 		message.setFrom(from);
 		if (CollectionUtils.isNotEmpty(to))
-			message.setRecipients(javax.mail.Message.RecipientType.TO, to.toArray(new InternetAddress[0]));
+			message.setRecipients(jakarta.mail.Message.RecipientType.TO, to.toArray(new InternetAddress[0]));
 		if (CollectionUtils.isNotEmpty(cc))
-			message.setRecipients(javax.mail.Message.RecipientType.CC, cc.toArray(new InternetAddress[0]));
+			message.setRecipients(jakarta.mail.Message.RecipientType.CC, cc.toArray(new InternetAddress[0]));
 		if (CollectionUtils.isNotEmpty(bcc))
-			message.setRecipients(javax.mail.Message.RecipientType.BCC, bcc.toArray(new InternetAddress[0]));
+			message.setRecipients(jakarta.mail.Message.RecipientType.BCC, bcc.toArray(new InternetAddress[0]));
 		message.setSubject(email.getSubject(), UTF_8);
 
 		/*
@@ -362,7 +361,19 @@ public class EMailSender {
 		Date now = new Date();
 		message.setHeader("Date", formatter.format(now));
 
-		if (!Context.get().getProperties().getBoolean("smtp.nosend", false)) {
+		boolean noSend = false;
+		try {
+			noSend = Context.get().getProperties().getBoolean("smtp.nosend", false);
+		} catch (Exception e) {
+			// Context has not been initialized
+			try {
+				noSend = new ContextProperties().getBoolean("smtp.nosend", false);
+			} catch (IOException e1) {
+				log.warn(e1.getMessage());
+			}
+		}
+
+		if (!noSend) {
 			try (Transport transport = buildTransport(session);) {
 				transport.sendMessage(message, message.getAllRecipients());
 			} catch (IOException e) {
@@ -515,6 +526,7 @@ public class EMailSender {
 			props.put(MAIL_TRANSPORT_PROTOCOL, "smtp");
 			props.put("mail.smtp.host", host);
 			props.put("mail.smtp.port", port);
+			props.put("mail.debug", "true");
 		}
 	}
 
@@ -543,11 +555,10 @@ public class EMailSender {
 			transport = session.getTransport("smtp");
 
 		if (protocol.equals(PROTOCOL_SMTP_MICROSOFT365)) {
-			String token = new Microsoft365TokenProvider(clientSecret, clientId, clientTenant).getAccessToken();
-
 			transport = session.getTransport();
-			transport.connect(host, username, null);
-			((SMTPTransport) transport).issueCommand("AUTH XOAUTH2 " + tokenForSMTP(username, token), 235);
+
+			String token = new Microsoft365TokenProvider(clientSecret, clientId, clientTenant).getAccessToken();
+			transport.connect(username, token);
 		} else {
 			if (StringUtils.isEmpty(username)) {
 				transport.connect(host, port, null, null);

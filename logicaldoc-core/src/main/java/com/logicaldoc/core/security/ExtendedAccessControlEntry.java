@@ -2,9 +2,9 @@ package com.logicaldoc.core.security;
 
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 
 /**
  * Class for grouping common permissions for DocumentAccessControlEntry and
@@ -13,11 +13,13 @@ import javax.persistence.MappedSuperclass;
  * @author Giuseppe Desiato - LogicalDOC
  * @since 9.2
  */
-@MappedSuperclass
 @Embeddable
-public abstract class ExtendedAccessControlEntry extends AccessControlEntry {
+public class ExtendedAccessControlEntry extends AccessControlEntry {
 
 	private static final long serialVersionUID = 1L;
+
+	@Embedded
+	private AccessControlEntry ace = new AccessControlEntry();
 
 	@Column(name = "ld_preview", nullable = false)
 	protected int preview = 1;
@@ -73,11 +75,12 @@ public abstract class ExtendedAccessControlEntry extends AccessControlEntry {
 	@Column(name = "ld_customid", nullable = false)
 	protected int customid = 0;
 
-	protected ExtendedAccessControlEntry() {
+	public ExtendedAccessControlEntry() {
 	}
 
-	protected ExtendedAccessControlEntry(ExtendedAccessControlEntry source) {
+	public ExtendedAccessControlEntry(ExtendedAccessControlEntry source) {
 		super(source);
+		this.ace = new AccessControlEntry(source.getAce());
 		this.archive = source.archive;
 		this.automation = source.automation;
 		this.calendar = source.calendar;
@@ -100,6 +103,15 @@ public abstract class ExtendedAccessControlEntry extends AccessControlEntry {
 
 	protected ExtendedAccessControlEntry(long groupId) {
 		super(groupId);
+		ace.setGroupId(groupId);
+	}
+
+	public AccessControlEntry getAce() {
+		return ace;
+	}
+
+	public void setAce(AccessControlEntry ace) {
+		this.ace = ace;
 	}
 
 	protected void grantedBasicPermissions(Set<Permission> granted) {
@@ -126,6 +138,7 @@ public abstract class ExtendedAccessControlEntry extends AccessControlEntry {
 	@Override
 	public void grantPermissions(Set<Permission> permissions) {
 		super.grantPermissions(permissions);
+		ace.grantPermissions(permissions);
 		preview = booleanToInt(permissions.contains(Permission.PREVIEW));
 		download = booleanToInt(permissions.contains(Permission.DOWNLOAD));
 		security = booleanToInt(permissions.contains(Permission.SECURITY));
@@ -289,4 +302,106 @@ public abstract class ExtendedAccessControlEntry extends AccessControlEntry {
 	public void setCustomid(int customid) {
 		this.customid = customid;
 	}
+
+	public long getGroupId() {
+		return ace.getGroupId();
+	}
+
+	public int getWrite() {
+		return ace.getWrite();
+	}
+
+	public void setGroupId(long groupId) {
+		ace.setGroupId(groupId);
+	}
+
+	public void setWrite(int write) {
+		ace.setWrite(write);
+	}
+
+	public int getRead() {
+		return ace.getRead();
+	}
+
+	public void setRead(int read) {
+		ace.setRead(read);
+	}
+
+	public Set<Permission> grantedPermissions() {
+		Set<Permission> granted = ace.grantedPermissions();
+		if(preview==1)
+			granted.add(Permission.PREVIEW);
+		if(download==1)
+			granted.add(Permission.DOWNLOAD);
+		if(security==1)
+			granted.add(Permission.SECURITY);
+		if(delete==1)
+			granted.add(Permission.DELETE);
+		if(rename==1)
+			granted.add(Permission.RENAME);
+		if(immutable==1)
+			granted.add(Permission.IMMUTABLE);
+		if(sign==1)
+			granted.add(Permission.SIGN);
+		if(archive==1)
+			granted.add(Permission.ARCHIVE);
+		if(workflow==1)
+			granted.add(Permission.WORKFLOW);
+		if(calendar==1)
+			granted.add(Permission.CALENDAR);
+		if(subscription==1)
+			granted.add(Permission.SUBSCRIPTION);
+		if(password==1)
+			granted.add(Permission.PASSWORD);
+		if(print==1)
+			granted.add(Permission.PRINT);
+		if(move==1)
+			granted.add(Permission.MOVE);
+		if(email==1)
+			granted.add(Permission.EMAIL);
+		if(automation==1)
+			granted.add(Permission.AUTOMATION);
+		if(readingreq==1)
+			granted.add(Permission.READINGREQ);
+		if(customid==1)
+			granted.add(Permission.CUSTOMID);
+		return granted;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((ace == null) ? 0 : ace.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ExtendedAccessControlEntry other = (ExtendedAccessControlEntry) obj;
+		if (ace == null) {
+			if (other.ace != null)
+				return false;
+		} else if (!ace.equals(other.ace))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "ExtendedAccessControlEntry [ace=" + ace + ", preview=" + preview + ", download=" + download
+				+ ", security=" + security + ", delete=" + delete + ", rename=" + rename + ", immutable=" + immutable
+				+ ", sign=" + sign + ", archive=" + archive + ", workflow=" + workflow + ", calendar=" + calendar
+				+ ", subscription=" + subscription + ", password=" + password + ", print=" + print + ", move=" + move
+				+ ", email=" + email + ", automation=" + automation + ", readingreq=" + readingreq + ", customid="
+				+ customid + "]";
+	}
+	
+	
 }

@@ -26,7 +26,6 @@ import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.metadata.Template;
-import com.logicaldoc.core.metadata.TemplateAttribute;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.metadata.initialization.Initializer;
 import com.logicaldoc.core.security.AccessControlEntry;
@@ -159,7 +158,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 	}
 
 	private Attribute prepareAttribute(GUIAttribute attribute) {
-		TemplateAttribute att = new TemplateAttribute();
+		Attribute att = new Attribute();
 		att.setMandatory(attribute.isMandatory() ? 1 : 0);
 		att.setHidden(attribute.isHidden() ? 1 : 0);
 		att.setReadonly(attribute.isReadonly() ? 1 : 0);
@@ -297,7 +296,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 	private void toGuiAttributes(Template template, GUITemplate guiTemplate, Map<Long, AttributeSet> sets) {
 		guiTemplate.getAttributes().clear();
 		for (String attrName : template.getAttributeNames()) {
-			TemplateAttribute templateExtAttr = template.getTemplateAttributes().get(attrName);
+			Attribute templateExtAttr = template.getTemplateAttributes().get(attrName);
 			AttributeSet aSet = sets.get(templateExtAttr.getSetId());
 			Attribute setExtAttr = aSet != null ? aSet.getAttribute(attrName) : null;
 
@@ -306,7 +305,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		guiTemplate.getAttributes().sort(null);
 	}
 
-	private GUIAttribute toGuiAttribute(String attrName, TemplateAttribute templateExtAttr, Attribute setExtAttr,
+	private GUIAttribute toGuiAttribute(String attrName, Attribute templateExtAttr, Attribute setExtAttr,
 			AttributeSet aSet) {
 		GUIAttribute guiAttribute = new GUIAttribute();
 		guiAttribute.setName(attrName);

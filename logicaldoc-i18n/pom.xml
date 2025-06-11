@@ -6,7 +6,8 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>9.2.0</version>
+		<version>9.2.1</version>
+        <relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>logicaldoc-i18n</artifactId>
 	<name>logicaldoc-i18n</name>

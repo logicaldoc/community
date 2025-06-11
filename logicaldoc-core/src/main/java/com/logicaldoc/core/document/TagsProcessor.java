@@ -1,6 +1,6 @@
 package com.logicaldoc.core.document;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

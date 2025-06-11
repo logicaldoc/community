@@ -4,9 +4,8 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 
 /**
  * Represents all the permissions granted to a group against a business object
@@ -14,7 +13,6 @@ import javax.persistence.MappedSuperclass;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.9.1
  */
-@MappedSuperclass
 @Embeddable
 public class AccessControlEntry implements Serializable {
 
@@ -97,5 +95,10 @@ public class AccessControlEntry implements Serializable {
 	@Override
 	public int hashCode() {
 		return Long.valueOf(groupId).hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return "AccessControlEntry [read=" + read + ", write=" + write + ", groupId=" + groupId + "]";
 	}
 }

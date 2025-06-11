@@ -5,7 +5,8 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>9.2.0</version>
+		<version>9.2.1</version>
+        <relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>logicaldoc-webservice</artifactId>
 	<name>logicaldoc-webservice</name>
@@ -121,6 +122,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		
+		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<scope>provided</scope>
@@ -172,7 +179,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-ehcache</artifactId>
+			<artifactId>hibernate-jcache</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

@@ -9,7 +9,7 @@ import java.net.URLDecoder;
 import java.util.List;
 import java.util.Properties;
 
-import javax.servlet.Servlet;
+import jakarta.servlet.Servlet;
 
 import org.java.plugin.Plugin;
 import org.slf4j.Logger;

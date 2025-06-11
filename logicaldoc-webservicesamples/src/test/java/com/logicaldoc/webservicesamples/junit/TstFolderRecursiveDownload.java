@@ -5,7 +5,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import javax.activation.DataHandler;
+import jakarta.activation.DataHandler;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;

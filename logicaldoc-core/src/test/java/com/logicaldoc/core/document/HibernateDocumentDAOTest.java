@@ -353,7 +353,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		testSubject.store(doc1);
 		assertNotSame(null, doc1);
 
-		assertNotNull(testSubject.findDocument(101));
+		assertNotNull(testSubject.findDocument(doc1.getId()));
 	}
 
 	@Test

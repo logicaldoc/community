@@ -1,6 +1,6 @@
 package com.logicaldoc.webservice.model;
 
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlType;
 
 import com.logicaldoc.core.document.TagCloud;
 

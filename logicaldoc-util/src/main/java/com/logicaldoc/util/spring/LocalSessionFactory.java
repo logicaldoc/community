@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Entity;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+
+import jakarta.persistence.Entity;
 
 /**
  * Our own implementation of a {@link LocalSessionFactoryBean} that lookup for

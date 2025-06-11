@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jackrabbit.webdav.DavConstants;

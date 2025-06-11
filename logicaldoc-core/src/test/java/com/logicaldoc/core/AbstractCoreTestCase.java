@@ -16,7 +16,7 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.apikey.ApiKey;
 import com.logicaldoc.core.security.apikey.ApiKeyDAO;
 import com.logicaldoc.core.security.spring.LDAuthenticationToken;
-import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
+import com.logicaldoc.core.security.spring.LDDeferredSecurityContext;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.Store;
@@ -120,7 +120,7 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 			LDAuthenticationToken token = new LDAuthenticationToken(username);
 			token.setSid(session.getSid());
 			SecurityContextHolder.getContext().setAuthentication(token);
-			LDSecurityContextRepository.bindServletSession(session.getSid(), servletSession);
+			LDDeferredSecurityContext.bindServletSession(session.getSid(), servletSession);
 		}
 	}
 }

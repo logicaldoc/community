@@ -17,7 +17,7 @@ import com.logicaldoc.core.security.Device;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.spring.LDAuthenticationToken;
-import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
+import com.logicaldoc.core.security.spring.LDDeferredSecurityContext;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.Context;
@@ -73,7 +73,7 @@ public abstract class AbstractWebdavTestCase extends AbstractTestCase {
 		token.setSid(session.getSid());
 		SecurityContextHolder.getContext().setAuthentication(token);
 
-		LDSecurityContextRepository.bindServletSession(session.getSid(), servletSession);
+		LDDeferredSecurityContext.bindServletSession(session.getSid(), servletSession);
 
 		davSession = new DavSessionImpl();
 		davSession.putObject("id", session.getUserId());

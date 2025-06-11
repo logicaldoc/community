@@ -3,15 +3,15 @@ package com.logicaldoc.core;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Version;
-
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Version;
 
 /**
  * This abstract class defines the minimum requirements of persistent objects.
@@ -20,7 +20,7 @@ import org.hibernate.annotations.Where;
  * @since 4.0
  */
 @MappedSuperclass
-@Where(clause = "ld_deleted=0")
+@SQLRestriction("ld_deleted=0")
 public abstract class PersistentObject implements Serializable {
 
 	private static final long serialVersionUID = 1L;

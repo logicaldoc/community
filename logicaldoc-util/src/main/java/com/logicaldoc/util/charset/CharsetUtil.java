@@ -1,6 +1,6 @@
 package com.logicaldoc.util.charset;
 
-import javax.mail.internet.MimeUtility;
+import jakarta.mail.internet.MimeUtility;
 
 /**
  * Some utility methods related to charset

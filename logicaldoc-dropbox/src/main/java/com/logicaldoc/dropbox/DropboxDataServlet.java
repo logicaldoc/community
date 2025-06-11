@@ -4,10 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +17,10 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.security.StringEncrypter.EncryptionException;
+
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for retrieving Dropbox entries.

@@ -2,14 +2,8 @@ package com.logicaldoc.core;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -34,7 +28,6 @@ import com.logicaldoc.core.automation.AutomationDictionary;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.MailUtil;
-import com.logicaldoc.core.history.History;
 import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.io.FileUtil;
 import com.talanlabs.avatargenerator.Avatar;
@@ -52,7 +45,7 @@ public class CoreWorkbench {
 		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
 		scanner.addIncludeFilter(new AnnotationTypeFilter(AutomationDictionary.class));
 		for (BeanDefinition bd : scanner.findCandidateComponents("com.logicaldoc")) {
-			if(bd.isAbstract())
+			if (bd.isAbstract())
 				continue;
 			System.out.println(bd.getBeanClassName());
 		}
@@ -195,39 +188,5 @@ public class CoreWorkbench {
 			FileUtil.delete(copy);
 			return 0L;
 		}
-	}
-
-	private static void copyFileUsingStream(File source, File dest) throws IOException {
-		InputStream is = null;
-		OutputStream os = null;
-		try {
-			is = new FileInputStream(source);
-			os = new FileOutputStream(dest);
-			byte[] buffer = new byte[1024];
-			int length;
-			while ((length = is.read(buffer)) > 0) {
-				os.write(buffer, 0, length);
-			}
-		} finally {
-			is.close();
-			os.close();
-		}
-	}
-
-	private static void copyFileUsingChannel(File source, File dest) throws IOException {
-		FileChannel sourceChannel = null;
-		FileChannel destChannel = null;
-		try {
-			sourceChannel = new FileInputStream(source).getChannel();
-			destChannel = new FileOutputStream(dest).getChannel();
-			destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
-		} finally {
-			sourceChannel.close();
-			destChannel.close();
-		}
-	}
-
-	private static void copyFileUsingJava7Files(File source, File dest) throws IOException {
-		Files.copy(source.toPath(), dest.toPath());
 	}
 }

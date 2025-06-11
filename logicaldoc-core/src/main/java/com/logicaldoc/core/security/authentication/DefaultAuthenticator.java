@@ -2,7 +2,7 @@ package com.logicaldoc.core.security.authentication;
 
 import java.security.NoSuchAlgorithmException;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

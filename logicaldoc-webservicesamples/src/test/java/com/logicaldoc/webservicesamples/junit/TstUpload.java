@@ -3,9 +3,9 @@ package com.logicaldoc.webservicesamples.junit;
 import java.io.File;
 import java.io.IOException;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.activation.FileDataSource;
 
 import org.junit.Test;
 import org.slf4j.Logger;

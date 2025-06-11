@@ -5,7 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import javax.activation.DataHandler;
+import jakarta.activation.DataHandler;
 
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.searchengine.SearchOptions;

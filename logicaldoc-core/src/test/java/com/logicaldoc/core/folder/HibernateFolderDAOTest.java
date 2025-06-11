@@ -596,23 +596,25 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		// Test updating the security rules
 		folder = testSubject.findById(folder.getId());
 		testSubject.initialize(folder);
+
 		assertEquals(2, folder.getAccessControlList().size());
+
 		FolderAccessControlEntry ace = new FolderAccessControlEntry();
 		ace.setGroupId(3L);
 		ace.grantPermissions(
 				Set.of(Permission.READ, Permission.WRITE, Permission.DELETE, Permission.MOVE, Permission.DOWNLOAD));
 		folder.addAccessControlEntry(ace);
-		
+
 		ace = new FolderAccessControlEntry();
 		ace.setGroupId(4L);
 		ace.grantPermissions(Permission.forGuests());
 		folder.addAccessControlEntry(ace);
-		
+
 		ace = new FolderAccessControlEntry();
 		ace.setGroupId(10L);
-		ace.grantPermissions(Permission.match("read", "download"));
+		ace.grantPermissions(Permission.match("read", "download", "add"));
 		folder.addAccessControlEntry(ace);
-		
+
 		testSubject.store(folder);
 
 		folder = testSubject.findById(folder.getId());
@@ -620,13 +622,15 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		assertEquals(5, folder.getAccessControlList().size());
 
 		AccessControlEntry face = folder.getAccessControlEntry(4L);
+
 		assertTrue(face.grantedPermissions().contains(Permission.PREVIEW));
 		assertFalse(face.grantedPermissions().contains(Permission.WRITE));
-		
+
 		face = folder.getAccessControlEntry(10L);
+		assertTrue(face.grantedPermissions().contains(Permission.ADD));
 		assertTrue(face.grantedPermissions().contains(Permission.DOWNLOAD));
 		assertFalse(face.grantedPermissions().contains(Permission.PREVIEW));
-		
+
 		// Set a securityRef
 		folder.setSecurityRef(5L);
 		testSubject.store(folder);
@@ -691,7 +695,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		folder.getAccessControlList().remove(folder.getAccessControlEntry(2));
 		assertEquals(2, folder.getAccessControlList().size());
 		testSubject.store(folder);
-		
+
 		folder = testSubject.findById(Folder.ROOTID);
 		testSubject.initialize(folder);
 		assertEquals(4, folder.getAccessControlList().size());
@@ -820,7 +824,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		testSubject.initialize(folder);
 		assertEquals("test1", folder.getTemplate().getName());
 		assertEquals("test_val_1", folder.getValue("val1"));
-		assertEquals("xxxx(101)", folder.toString());
+		assertEquals("xxxx(" + folder.getId() + ")", folder.toString());
 	}
 
 	@Test
@@ -1009,7 +1013,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		user.setGroups(new HashSet<>());
 		userDao.store(user);
 
-		folders = testSubject.findByUserId(101L, 1200L);
+		folders = testSubject.findByUserId(user.getId(), 1200L);
 		assertNotNull(folders);
 
 		// Non-existing user
@@ -1163,7 +1167,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		User storedUser = userDao.findByUsername("userWithNoGroup");
 		assertNotNull(storedUser);
-		assertEquals(false, testSubject.isReadAllowed(6L, 101L));
+		assertEquals(false, testSubject.isReadAllowed(6L, user.getId()));
 	}
 
 	@Test
@@ -1242,7 +1246,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		user.setGroups(new HashSet<>());
 		userDao.store(user);
 
-		permissions = testSubject.getAllowedPermissions(1202, 101);
+		permissions = testSubject.getAllowedPermissions(1202, user.getId());
 		assertNotNull(permissions);
 		assertTrue(permissions.isEmpty());
 	}

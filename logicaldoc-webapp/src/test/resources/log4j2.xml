@@ -32,6 +32,9 @@
 	</Appenders>
 
 	<Loggers>
+		<Logger name="org.apache.commons" level="debug" additivity="false">
+			<Appender-Ref ref="file" />
+		</Logger>	
 		<Logger name="org.apache.cxf" level="fatal" additivity="false">
 			<Appender-Ref ref="file" />
 		</Logger>

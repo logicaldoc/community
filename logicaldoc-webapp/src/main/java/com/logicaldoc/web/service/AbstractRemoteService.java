@@ -16,13 +16,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
@@ -52,6 +49,9 @@ import com.logicaldoc.web.UploadServlet;
 import com.logicaldoc.web.util.LongRunningOperationCompleteListener;
 import com.logicaldoc.web.util.ServletUtil;
 import com.logicaldoc.web.websockets.WebsocketTool;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Main class for the GWT remote service implementations
@@ -323,8 +323,8 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 			log.debug("Timout reached for operation {}", name);
 		} catch (ExecutionException e) {
 			throw new ServerException(e.getMessage(), e);
-		} catch(InterruptedException ie) {
-			 Thread.currentThread().interrupt();
+		} catch (InterruptedException ie) {
+			Thread.currentThread().interrupt();
 		}
 
 		if (task.isOver() && task.getError() != null) {

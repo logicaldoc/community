@@ -96,7 +96,7 @@ public class HibernateAttributeSetDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testFindAttributes() throws PersistenceException {
-		Map<String, TemplateAttribute> attributes = testSubject.findAttributes(1L, null);
+		Map<String, Attribute> attributes = testSubject.findAttributes(1L, null);
 		Assert.assertEquals(9, attributes.size());
 		Assert.assertTrue(attributes.containsKey("sourceAuthor"));
 	}

@@ -1,8 +1,8 @@
 package com.logicaldoc.webservice.soap;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
 
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.webservice.doc.WSDoc;

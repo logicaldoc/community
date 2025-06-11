@@ -8,8 +8,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -48,6 +46,8 @@ import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.resource.model.ResourceImpl;
 import com.logicaldoc.webdav.session.WebdavSession;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 /**
  * Base implementation of a {@link ResourceService}
  * 
@@ -60,22 +60,22 @@ public class ResourceServiceImpl implements ResourceService {
 
 	private static final Logger log = LoggerFactory.getLogger(ResourceServiceImpl.class);
 
-	@javax.annotation.Resource(name = "documentDAO")
+	@jakarta.annotation.Resource(name = "documentDAO")
 	private transient DocumentDAO documentDAO;
 
-	@javax.annotation.Resource(name = "VersionDAO")
+	@jakarta.annotation.Resource(name = "VersionDAO")
 	private transient VersionDAO versionDAO;
 
-	@javax.annotation.Resource(name = "folderDAO")
+	@jakarta.annotation.Resource(name = "folderDAO")
 	private transient FolderDAO folderDAO;
 
-	@javax.annotation.Resource(name = "documentManager")
+	@jakarta.annotation.Resource(name = "documentManager")
 	private transient DocumentManager documentManager;
 
-	@javax.annotation.Resource(name = "Store")
+	@jakarta.annotation.Resource(name = "Store")
 	private transient Store store;
 
-	@javax.annotation.Resource(name = "UserDAO")
+	@jakarta.annotation.Resource(name = "UserDAO")
 	private transient UserDAO userDAO;
 
 	private static WebdavCache wdc = WebdavCache.getInstance();

@@ -5,13 +5,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,7 @@ import com.logicaldoc.util.io.FileUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.9
  */
-public class CacheControlFilter implements javax.servlet.Filter {
+public class CacheControlFilter implements jakarta.servlet.Filter {
 
 	private static final Logger log = LoggerFactory.getLogger(CacheControlFilter.class);
 

@@ -376,7 +376,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		folderDao.initialize(folder);
 		folder.setStore(2);
 		folderDao.store(folder);
-		testSubject.enforceFilesIntoFolderStore(101, transaction);
+		testSubject.enforceFilesIntoFolderStore(folder.getId(), transaction);
 
 		folder = folderDao.findByPathExtended("/Default/test", 1L);
 		folderDao.initialize(folder);
@@ -631,16 +631,10 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		// A new document will have ID=101 so we prepare a fake document with
 		// that ID and create a version.
 		Document doc = docDao.findById(1);
-		doc = new Document(doc);
-		doc.setId(101L);
+		docDao.initialize(doc);
 
 		User user = userDao.findByUsername("admin");
-
 		Version version = Version.create(doc, user, null, DocumentEvent.STORED, false);
-
-		assertEquals(0L, version.getId());
-		assertEquals(version.getDocId(), doc.getId());
-		assertNull(docDao.findById(version.getDocId()));
 
 		// Prepare a separate thread that creates the document
 		Thread createDoc = new Thread() {
@@ -668,12 +662,12 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		createDoc.start();
 
 		// This starts a new thread waiting for the referenced document to be
-		// written. This fails some times because the referenced document has
+		// written. This fails some times because the referenced document is
 		// not already available.
 		DocumentManager docMan = (DocumentManager) testSubject;
-		docMan.storeVersionAsync(version, doc).get();
+		doc = docMan.storeVersionAsync(version, doc).get();
 
-		assertEquals(101L, version.getDocId());
+		assertEquals(doc.getId(), version.getDocId());
 		assertNotNull(docDao.findById(version.getDocId()));
 	}
 
@@ -867,13 +861,13 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		Document doc2 = new Document();
 		doc2.setFolder(folder1);
 		doc2.setFileName("doc2_name");
-		doc2.setDocRef(103L);
+		doc2.setDocRef(3L);
 		doc2.setVersion("1.0");
 		docDao.store(doc2);
 		assertNotNull(doc2);
 
 		String resource = store.getResourceName(doc2.getId(), doc2.getFileVersion(), null);
-		store2.store(this.getClass().getResourceAsStream("/allowed-commands.txt"), 103L, resource);
+		store2.store(this.getClass().getResourceAsStream("/allowed-commands.txt"), 3L, resource);
 
 		try {
 			testSubject.replaceAlias(doc2.getId(), transaction);

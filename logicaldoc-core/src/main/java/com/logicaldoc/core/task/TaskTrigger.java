@@ -1,6 +1,6 @@
 package com.logicaldoc.core.task;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;

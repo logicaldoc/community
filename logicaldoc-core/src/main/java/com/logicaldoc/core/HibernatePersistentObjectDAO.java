@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
@@ -31,6 +30,8 @@ import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+
+import jakarta.annotation.Resource;
 
 /**
  * Hibernate implementation of <code>PersistentObjectDAO</code>
@@ -57,7 +58,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	protected SessionFactory sessionFactory;
 
 	protected static final String ORDER_BY = " order by ";
-	
+
 	protected static final String ASPECT_STORING = "storing";
 
 	protected static final String DEFAULT_WHERE_PREAMBLE = " " + ENTITY + " where " + ENTITY + ".deleted=0 ";
@@ -165,7 +166,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	@Override
-	public List<Object[]> findByQuery(String query, Map<String, Object> parameters, Integer max) throws PersistenceException {
+	public List<Object[]> findByQuery(String query, Map<String, Object> parameters, Integer max)
+			throws PersistenceException {
 		try {
 			logQuery(query);
 			return prepareQuery(query, parameters, max).list();

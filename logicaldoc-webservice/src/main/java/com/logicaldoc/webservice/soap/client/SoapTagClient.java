@@ -3,7 +3,7 @@ package com.logicaldoc.webservice.soap.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;

@@ -18,11 +18,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -53,7 +48,13 @@ import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.MimeType;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.io.IOUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Some helper utilities to download/upload a document and its resources. The
@@ -758,11 +759,7 @@ public class ServletUtil {
 
 	private static File writeItemToFile(FileItem item) throws IOException {
 		File savedFile = FileUtil.createTempFile("upload", "");
-		try {
-			item.write(savedFile);
-		} catch (Exception e) {
-			throw new IOException(e);
-		}
+		IOUtil.write(item.getInputStream(), savedFile);
 		return savedFile;
 	}
 

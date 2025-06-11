@@ -10,7 +10,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Utility class to mask a {@link Map}&lt;String,TemplateAttribute&gt; with
+ * Utility class to mask a {@link Map}&lt;String,Attribute&gt; with
  * a{@link Map}&lt;String,Attribute&gt;
  * 
  * @author Marco Meschieri - LogicalDOC
@@ -21,9 +21,9 @@ class AttributeMapWrapper extends HashMap<String, Attribute> {
 
 	private static final long serialVersionUID = 1L;
 
-	private Map<String, TemplateAttribute> wrappedAttributesMap;
+	private Map<String, Attribute> wrappedAttributesMap;
 
-	public AttributeMapWrapper(Map<String, TemplateAttribute> wrappedAttributesMap) {
+	public AttributeMapWrapper(Map<String, Attribute> wrappedAttributesMap) {
 		super();
 		this.wrappedAttributesMap = wrappedAttributesMap;
 	}
@@ -49,20 +49,20 @@ class AttributeMapWrapper extends HashMap<String, Attribute> {
 	}
 
 	@Override
-	public TemplateAttribute get(Object key) {
+	public Attribute get(Object key) {
 		return wrappedAttributesMap.get(key);
 	}
 
 	@Override
-	public TemplateAttribute put(String key, Attribute value) {
-		if (value instanceof TemplateAttribute ta)
+	public Attribute put(String key, Attribute value) {
+		if (value instanceof Attribute ta)
 			return wrappedAttributesMap.put(key, ta);
 		else
 			return null;
 	}
 
 	@Override
-	public TemplateAttribute remove(Object key) {
+	public Attribute remove(Object key) {
 		return wrappedAttributesMap.remove(key);
 	}
 
@@ -70,7 +70,7 @@ class AttributeMapWrapper extends HashMap<String, Attribute> {
 	public void putAll(Map<? extends String, ? extends Attribute> m) {
 		for (Map.Entry<String, ? extends Attribute> e : m.entrySet().stream()
 				.collect(Collectors.toMap(String.class::cast, v -> (Attribute) v)).entrySet()) {
-			if (e.getValue() instanceof TemplateAttribute ta)
+			if (e.getValue() instanceof Attribute ta)
 				wrappedAttributesMap.put(e.getKey(), ta);
 		}
 	}
@@ -106,7 +106,7 @@ class AttributeMapWrapper extends HashMap<String, Attribute> {
 
 			@Override
 			public Attribute setValue(Attribute value) {
-				if (value instanceof TemplateAttribute tv)
+				if (value instanceof Attribute tv)
 					return e.setValue(tv);
 				else
 					return value;
@@ -126,7 +126,7 @@ class AttributeMapWrapper extends HashMap<String, Attribute> {
 
 	@Override
 	public Attribute getOrDefault(Object key, Attribute defaultValue) {
-		TemplateAttribute ta = wrappedAttributesMap.get(key);
+		Attribute ta = wrappedAttributesMap.get(key);
 		if (ta != null) {
 			return ta;
 		} else {
@@ -145,8 +145,8 @@ class AttributeMapWrapper extends HashMap<String, Attribute> {
 	}
 
 	@Override
-	public TemplateAttribute putIfAbsent(String key, Attribute value) {
-		if (value instanceof TemplateAttribute ta)
+	public Attribute putIfAbsent(String key, Attribute value) {
+		if (value instanceof Attribute ta)
 			return wrappedAttributesMap.putIfAbsent(key, ta);
 		else
 			return null;
@@ -159,15 +159,15 @@ class AttributeMapWrapper extends HashMap<String, Attribute> {
 
 	@Override
 	public boolean replace(String key, Attribute oldValue, Attribute newValue) {
-		if (oldValue instanceof TemplateAttribute oldTA && newValue instanceof TemplateAttribute newTA)
+		if (oldValue instanceof Attribute oldTA && newValue instanceof Attribute newTA)
 			return wrappedAttributesMap.replace(key, oldTA, newTA);
 		else
 			return false;
 	}
 
 	@Override
-	public TemplateAttribute replace(String key, Attribute value) {
-		if (value instanceof TemplateAttribute ta)
+	public Attribute replace(String key, Attribute value) {
+		if (value instanceof Attribute ta)
 			return wrappedAttributesMap.replace(key, ta);
 		else
 			return null;

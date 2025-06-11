@@ -23,7 +23,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -907,11 +907,17 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public void restore(long docId, long folderId, final DocumentHistory transaction) throws PersistenceException {
-		bulkUpdate("set ld_deleted=0, ld_folderid=" + folderId + ", ld_lastmodified=CURRENT_TIMESTAMP where ld_id="
-				+ docId, (Map<String, Object>) null);
 
-		versionDAO.bulkUpdate("set ld_deleted=0, ld_folderid=" + folderId
-				+ ", ld_lastmodified=CURRENT_TIMESTAMP where ld_documentid=" + docId, (Map<String, Object>) null);
+		// Update the document using HQL
+		bulkUpdate("set deleted=0, lastModified=CURRENT_TIMESTAMP where id = :docId", Map.of("docId", docId));
+		bulkUpdate("set folder = :folder where id = :docId",
+				Map.of("folder", getCurrentSession().get(Folder.class, folderId), "docId", docId));
+
+		// Update the version using HQL
+		versionDAO.bulkUpdate("set deleted=0, lastModified=CURRENT_TIMESTAMP where id = :docId",
+				Map.of("docId", docId));
+		versionDAO.bulkUpdate("set folderId = :folderId where id = :docId",
+				Map.of("folderId", folderId, "docId", docId));
 
 		Document doc = findById(docId);
 		if (doc != null && transaction != null) {
@@ -1008,7 +1014,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public long countByIndexed(IndexingStatus indexingStatus) throws PersistenceException {
-		return queryForLong("select count(*) from ld_document where ld_deleted=0 and ld_indexed = " + indexingStatus.ordinal());
+		return queryForLong(
+				"select count(*) from ld_document where ld_deleted=0 and ld_indexed = " + indexingStatus.ordinal());
 	}
 
 	@Override
@@ -1419,7 +1426,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	public Set<Permission> getAllowedPermissions(long docId, long userId) throws PersistenceException {
 		final Set<Permission> permissions = new HashSet<>();
 		User user = getExistingtUser(userId);
-		
+
 		userDAO.initialize(user);
 
 		if (findById(docId) == null)

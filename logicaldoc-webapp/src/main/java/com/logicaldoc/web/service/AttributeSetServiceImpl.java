@@ -18,7 +18,6 @@ import com.logicaldoc.core.metadata.AttributeOptionDAO;
 import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
 import com.logicaldoc.core.metadata.Template;
-import com.logicaldoc.core.metadata.TemplateAttribute;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.gui.common.client.ServerException;
@@ -165,7 +164,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	}
 
 	private void saveAttribute(GUIAttribute attribute, GUIAttributeSet attributeSet, Map<String, Attribute> attrs) {
-		TemplateAttribute att = new TemplateAttribute();
+		Attribute att = new Attribute();
 		att.setSetId(attributeSet.getId());
 		att.setPosition(attribute.getPosition());
 		att.setMandatory(attribute.isMandatory() ? 1 : 0);
@@ -248,7 +247,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	}
 
 	private GUIAttribute readAttribute(String attrName, AttributeSet attributeSet) {
-		TemplateAttribute extAttr = attributeSet.getTemplateAttributes().get(attrName);
+		Attribute extAttr = attributeSet.getTemplateAttributes().get(attrName);
 		GUIAttribute att = new GUIAttribute();
 		att.setName(attrName);
 		att.setParent(extAttr.getParent());
@@ -361,7 +360,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			AttributeSet set = dao.findById(setId);
 			dao.initialize(set);
 
-			TemplateAttribute setAttribute = set.getTemplateAttributes().get(attribute);
+			Attribute setAttribute = set.getTemplateAttributes().get(attribute);
 			if (setAttribute == null)
 				return;
 
@@ -385,7 +384,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
 			AttributeSet set = dao.findById(setId);
 			dao.initialize(set);
-			TemplateAttribute setAttribute = set.getTemplateAttributes().get(attribute);
+			Attribute setAttribute = set.getTemplateAttributes().get(attribute);
 			if (setAttribute == null)
 				return;
 
@@ -408,7 +407,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		try {
 			AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
 			AttributeSet set = dao.findById(setId);
-			TemplateAttribute setAttribute = set.getTemplateAttributes().get(attributeName);
+			Attribute setAttribute = set.getTemplateAttributes().get(attributeName);
 
 			TemplateDAO templateDao = Context.get(TemplateDAO.class);
 
@@ -418,7 +417,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 			List<Template> templates = templateDao.findAll(set.getTenantId());
 			for (Template template : templates) {
 				templateDao.initialize(template);
-				template.getTemplateAttributes().put(attributeName, new TemplateAttribute(setAttribute));
+				template.getTemplateAttributes().put(attributeName, new Attribute(setAttribute));
 				templateDao.store(template);
 			}
 		} catch (Exception t) {

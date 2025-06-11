@@ -2,7 +2,7 @@ package com.logicaldoc.webservice.mobile;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "Item")
 public class CommentVO implements Serializable {

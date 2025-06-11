@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
-import javax.jws.WebService;
-import javax.mail.MessagingException;
+import jakarta.activation.DataHandler;
+import jakarta.activation.FileDataSource;
+import jakarta.jws.WebService;
+import jakarta.mail.MessagingException;
 
 import org.apache.commons.lang.StringUtils;
 

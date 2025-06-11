@@ -15,26 +15,11 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.mail.Address;
-import javax.mail.BodyPart;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Part;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.URLName;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MailDateFormat;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.MimeUtility;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.cms.CMSException;
+import org.simplejavamail.utils.mail.smime.SmimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +30,21 @@ import com.auxilii.msgparser.attachment.FileAttachment;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.P7M;
 
-import net.markenwerk.utils.mail.smime.SmimeUtil;
+import jakarta.mail.Address;
+import jakarta.mail.BodyPart;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.Part;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.URLName;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MailDateFormat;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.internet.MimeUtility;
 
 /**
  * Utility methods for handling emails
@@ -295,7 +294,7 @@ public class MailUtil {
 	 * @throws MessagingException error reading the message
 	 * @throws IOException error in I/O operations
 	 */
-	public static EMail messageToMail(javax.mail.Message msg, boolean extractAttachmentContent)
+	public static EMail messageToMail(jakarta.mail.Message msg, boolean extractAttachmentContent)
 			throws MessagingException, IOException {
 		EMail email = new EMail();
 
@@ -344,7 +343,7 @@ public class MailUtil {
 		return email;
 	}
 
-	private static void setReplyTo(javax.mail.Message msg, EMail email) throws MessagingException {
+	private static void setReplyTo(jakarta.mail.Message msg, EMail email) throws MessagingException {
 		Address[] addresses = msg.getReplyTo();
 		if (addresses != null) {
 			try {
@@ -362,7 +361,7 @@ public class MailUtil {
 		}
 	}
 
-	private static void setBCC(javax.mail.Message msg, EMail email) throws MessagingException {
+	private static void setBCC(jakarta.mail.Message msg, EMail email) throws MessagingException {
 		Address[] addresses = msg.getRecipients(Message.RecipientType.BCC);
 		if (addresses != null) {
 			try {
@@ -380,7 +379,7 @@ public class MailUtil {
 		}
 	}
 
-	private static void setCC(javax.mail.Message msg, EMail email) throws MessagingException {
+	private static void setCC(jakarta.mail.Message msg, EMail email) throws MessagingException {
 		Address[] addresses = msg.getRecipients(Message.RecipientType.CC);
 		if (addresses != null) {
 			try {
@@ -398,7 +397,7 @@ public class MailUtil {
 		}
 	}
 
-	private static void setTO(javax.mail.Message msg, EMail email) throws MessagingException {
+	private static void setTO(jakarta.mail.Message msg, EMail email) throws MessagingException {
 		Address[] addresses = msg.getRecipients(Message.RecipientType.TO);
 		if (addresses != null) {
 			try {
@@ -416,13 +415,13 @@ public class MailUtil {
 		}
 	}
 
-	private static void setMessageText(javax.mail.Message msg, EMail email) throws MessagingException, IOException {
+	private static void setMessageText(jakarta.mail.Message msg, EMail email) throws MessagingException, IOException {
 		String body = getText(msg);
 		email.setHtml(body.charAt(0) == 'H' ? 1 : 0);
 		email.setMessageText(body.substring(1));
 	}
 
-	private static void setReceivedDate(javax.mail.Message msg, EMail email) throws MessagingException {
+	private static void setReceivedDate(jakarta.mail.Message msg, EMail email) throws MessagingException {
 		Date receivedDate = msg.getReceivedDate();
 		if (receivedDate == null) {
 			String[] date = msg.getHeader("Delivery-Date");

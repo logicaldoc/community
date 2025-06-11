@@ -11,12 +11,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.annotation.PreDestroy;
+import jakarta.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -30,12 +26,17 @@ import com.logicaldoc.core.security.apikey.ApiKeyDAO;
 import com.logicaldoc.core.security.authentication.AuthenticationChain;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.spring.LDAuthenticationToken;
-import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
+import com.logicaldoc.core.security.spring.LDDeferredSecurityContext;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.sql.SqlUtil;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Repository of all current user sessions.
@@ -605,7 +606,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	public HttpSession getServletSession(String sid) {
 		if (sid == null)
 			return null;
-		return LDSecurityContextRepository.getServletSession(sid);
+		return LDDeferredSecurityContext.getServletSession(sid);
 	}
 
 	/**

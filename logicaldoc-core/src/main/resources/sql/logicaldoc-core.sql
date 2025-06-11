@@ -26,7 +26,7 @@ create table ld_document_ext (ld_docid bigint not null, ld_mandatory int not nul
                               ld_intvalue bigint, ld_doublevalue float, ld_datevalue timestamp null, 
                               ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint,
                               ld_hidden int not null, ld_readonly int not null, ld_multiple int not null, ld_parent varchar(255),
-                              ld_dependson varchar(255), primary key (ld_docid, ld_name));
+                              ld_dependson varchar(255), ld_validation varchar(1), ld_initialization varchar(1), primary key (ld_docid, ld_name));
 create table ld_document_acl (ld_docid bigint not null, ld_groupid bigint not null, ld_read int not null, ld_write int not null, 
                              ld_security int not null, ld_immutable int not null, ld_delete int not null, ld_customid int not null, 
                              ld_rename int not null, ld_sign int not null, ld_preview int not null,  
@@ -46,7 +46,7 @@ create table ld_generic_ext (ld_genid bigint not null, ld_mandatory int not null
                              ld_intvalue bigint, ld_doublevalue float, ld_datevalue timestamp null, 
                              ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint, 
                              ld_hidden int not null, ld_readonly int not null, ld_multiple int not null, ld_parent varchar(255), 
-                             ld_dependson varchar(255), primary key (ld_genid, ld_name));
+                             ld_dependson varchar(255), ld_validation varchar(1), ld_initialization varchar(1), primary key (ld_genid, ld_name));
 create table ld_group (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null, 
                        ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null, 
                        ld_description varchar(255), ld_type int not null, ld_source varchar(255), primary key (ld_id));
@@ -150,7 +150,7 @@ create table ld_version_ext (ld_versionid bigint not null, ld_mandatory int not 
                              ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 
                              ld_intvalue bigint, ld_doublevalue float, ld_datevalue timestamp null, ld_name varchar(255) not null, 
                              ld_label varchar(255), ld_setid bigint, ld_hidden int not null, ld_readonly int not null, ld_multiple int not null, 
-                             ld_parent varchar(255), ld_dependson varchar(255), primary key (ld_versionid, ld_name));
+                             ld_parent varchar(255), ld_dependson varchar(255), ld_validation varchar(1), ld_initialization varchar(1), primary key (ld_versionid, ld_name));
 create table ld_folder (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255), 
                         ld_parentid bigint not null, ld_securityref bigint, ld_description varchar(4000), 
@@ -165,7 +165,7 @@ create table ld_folder_ext (ld_folderid bigint not null, ld_mandatory int not nu
                             ld_intvalue bigint, ld_doublevalue float, ld_datevalue timestamp null, 
                             ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint, 
                             ld_hidden int not null, ld_readonly int not null, ld_multiple int not null, ld_parent varchar(255), 
-                            ld_dependson varchar(255), primary key (ld_folderid, ld_name));
+                            ld_dependson varchar(255), ld_validation varchar(1), ld_initialization varchar(1), primary key (ld_folderid, ld_name));
 create table ld_folder_store (ld_folderid bigint not null, ld_nodeid varchar(255) not null, ld_storeid int not null, primary key (ld_folderid, ld_nodeid));                          
 create table ld_folder_history (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null,
                                 ld_deleted int not null, ld_tenantid bigint not null, ld_docid bigint, ld_keylabel varchar(255),

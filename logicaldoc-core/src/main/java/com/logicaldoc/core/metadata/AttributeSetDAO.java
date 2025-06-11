@@ -56,5 +56,5 @@ public interface AttributeSetDAO extends PersistentObjectDAO<AttributeSet> {
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	public Map<String, TemplateAttribute> findAttributes(long tenantId, Long setId) throws PersistenceException;
+	public Map<String, Attribute> findAttributes(long tenantId, Long setId) throws PersistenceException;
 }

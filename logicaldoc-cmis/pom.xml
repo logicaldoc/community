@@ -8,7 +8,8 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>9.2.0</version>
+		<version>9.2.1</version>
+        <relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>logicaldoc-cmis</artifactId>
@@ -16,15 +17,15 @@
 	<packaging>jar</packaging>
 
 	<properties>
-		<opencmis.version>0.14.0</opencmis.version>
+		<opencmis.version>1.0.0-jakarta-4</opencmis.version>
 	</properties>
 
 	<dependencies>
 
-		<dependency>
+		<!-- dependency>
 			<groupId>javax.activation</groupId>
 			<artifactId>activation</artifactId>
-		</dependency>
+		</dependency -->
 
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
@@ -55,8 +56,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
@@ -146,6 +147,12 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<scope>provided</scope>
+		</dependency>	
+
 
 		<!-- For testing purpose -->
 		<dependency>
@@ -161,14 +168,13 @@
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
-			<version>1.9.4</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jdom</groupId>
 			<artifactId>jdom2</artifactId>
 			<scope>provided</scope>
-		</dependency>
+		</dependency>	
 	</dependencies>
 
 	<build>

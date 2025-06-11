@@ -3,15 +3,15 @@ package com.logicaldoc.core.metadata;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.annotation.Nullable;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
+import jakarta.annotation.Nullable;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.security.user.User;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Transient;
 
 /**
  * This class defines the value of an attribute associated to an extensible
@@ -21,7 +21,6 @@ import com.logicaldoc.core.security.user.User;
  * @author Matteo Caruso - LogicalDOC
  * @since 4.5.1
  */
-@MappedSuperclass
 @Embeddable
 public class Attribute implements Comparable<Attribute>, Serializable {
 
@@ -101,10 +100,10 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 	/**
 	 * String representation of the multiple string values
 	 */
-	@Column(name = "ld_stringvalue", length = 4000)
+	@Column(name = "ld_stringvalue")
 	protected String stringValue;
 
-	@Column(name = "ld_stringvalues", length = 4000)
+	@Column(name = "ld_stringvalues")
 	protected String stringValues;
 
 	@Column(name = "ld_intvalue")
@@ -116,6 +115,19 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 	@Column(name = "ld_datevalue")
 	protected Date dateValue;
 
+	/**
+	 * Optional validation script
+	 */
+	@Column(name = "ld_validation")
+	private String validation;
+
+	/**
+	 * Optional script that defines the initial value
+	 */
+	@Column(name = "ld_initialization")
+	private String initialization;
+
+	
 	public Attribute() {
 	}
 
@@ -137,6 +149,8 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 		this.multiple = source.multiple;
 		this.parent = source.parent;
 		this.dependsOn = source.dependsOn;
+		this.validation = source.validation;
+		this.initialization = source.initialization;
 	}
 
 	public String getStringValue() {
@@ -437,5 +451,21 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 
 	public void setReadonly(int readonly) {
 		this.readonly = readonly;
+	}
+	
+	public String getValidation() {
+		return validation;
+	}
+
+	public void setValidation(String validation) {
+		this.validation = validation;
+	}
+
+	public String getInitialization() {
+		return initialization;
+	}
+
+	public void setInitialization(String initialization) {
+		this.initialization = initialization;
 	}
 }

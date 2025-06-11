@@ -21,6 +21,9 @@
 		</Console>
 	</Appenders>
 	<Loggers>
+		<Logger name="jakarta.activation" level="debug" additivity="false">
+			<AppenderRef ref="file" />
+		</Logger>		
 		<Logger name="com.logicaldoc.util.exec" level="debug" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>		

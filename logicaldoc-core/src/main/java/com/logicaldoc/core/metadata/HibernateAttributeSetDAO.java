@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
@@ -115,18 +115,18 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	}
 
 	@Override
-	public Map<String, TemplateAttribute> findAttributes(long tenantId, Long setId) throws PersistenceException {
+	public Map<String, Attribute> findAttributes(long tenantId, Long setId) throws PersistenceException {
 		List<AttributeSet> sets = new ArrayList<>();
 		if (setId != null)
 			sets.add(findById(setId));
 		else
 			sets.addAll(findAll(tenantId));
 
-		Map<String, TemplateAttribute> attributes = new TreeMap<>();
+		Map<String, Attribute> attributes = new TreeMap<>();
 		for (AttributeSet set : sets) {
 			initialize(set);
-			Map<String, TemplateAttribute> localAttributes = set.getTemplateAttributes();
-			for (Map.Entry<String, TemplateAttribute> entry : localAttributes.entrySet())
+			Map<String, Attribute> localAttributes = set.getTemplateAttributes();
+			for (Map.Entry<String, Attribute> entry : localAttributes.entrySet())
 				if (!attributes.containsKey(entry.getKey()))
 					attributes.put(entry.getKey(), entry.getValue());
 		}

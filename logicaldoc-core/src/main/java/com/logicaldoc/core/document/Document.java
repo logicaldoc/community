@@ -6,16 +6,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.Cacheable;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapKeyColumn;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
+import jakarta.persistence.Cacheable;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.Table;
 
 import org.hibernate.LazyInitializationException;
 import org.hibernate.annotations.Cache;
@@ -80,7 +80,7 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 	@Column(name = "ld_rating")
 	private Integer rating;
 
-	@ManyToOne(cascade = javax.persistence.CascadeType.DETACH)
+	@ManyToOne(cascade = jakarta.persistence.CascadeType.DETACH)
 	@JoinColumn(name = "ld_templateid")
 	private Template template;
 

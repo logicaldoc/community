@@ -9,12 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -27,9 +21,15 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionListener;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
-import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
+import com.logicaldoc.core.security.spring.LDDeferredSecurityContext;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * This servlet is responsible for document resource upload. It receives the
@@ -213,7 +213,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 			// No SID already associated to the current session, so do it
 			request.getSession(true);
 			if (sid != null)
-				LDSecurityContextRepository.bindServletSession(sid, request);
+				LDDeferredSecurityContext.bindServletSession(sid, request);
 		}
 
 		return sid;
