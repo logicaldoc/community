@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<infinispan xmlns="urn:infinispan:config:15.2"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="urn:infinispan:config:15.2 https://infinispan.org/schemas/infinispan-config-15.2.xsd">
+
+  <cache-container name="logicaldoc" default-cache="default" statistics="false">
+
+    <!-- Default template configuration for all unspecified entity caches -->
+    <local-cache-configuration name="default" simple-cache="true" statistics="false">
+      <encoding media-type="application/x-java-object"/>
+      <transaction mode="NONE"/>
+      <memory max-count="300" when-full="REMOVE"/>
+      <expiration lifespan="120000" max-idle="120000" interval="10000"/>
+    </local-cache-configuration>
+
+    <!-- Declare a default cache fallback -->
+    <local-cache name="default" configuration="default"/>
+
+    <!-- Declare Custom Folder cache -->
+    <local-cache name="com.logicaldoc.core.folder.Folder">
+      <encoding media-type="application/x-java-object"/>
+      <transaction mode="NONE"/>
+      <memory max-count="10000" when-full="REMOVE"/>
+      <expiration lifespan="600000" max-idle="300000" interval="10000"/>
+    </local-cache>
+
+    <!-- Declare Custom Document cache -->
+    <local-cache name="com.logicaldoc.core.document.Document">
+      <encoding media-type="application/x-java-object"/>
+      <transaction mode="NONE"/>
+      <memory max-count="10000" when-full="REMOVE"/>
+      <expiration lifespan="600000" max-idle="300000" interval="10000"/>
+    </local-cache>
+
+  </cache-container>
+</infinispan>
