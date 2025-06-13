@@ -18,7 +18,7 @@
             http://www.springframework.org/schema/security
             http://www.springframework.org/schema/security/spring-security.xsd">
    
-	<bean id="HttpFirewall" class="com.logicaldoc.web.firewall.HttpFirewall">
+	<bean id="httpFirewall" class="com.logicaldoc.web.firewall.HttpFirewall">
 	    <property name="unsafeAllowAnyHttpMethod" value="true"/>
     	<property name="allowSemicolon" value="#{T(java.lang.Boolean).parseBoolean('${firewall.allowSemicolon}')}"/>
     	<property name="allowBackSlash" value="#{T(java.lang.Boolean).parseBoolean('${firewall.allowBackSlash}')}"/>
@@ -26,20 +26,20 @@
     	<property name="allowUrlEncodedSlash" value="#{T(java.lang.Boolean).parseBoolean('${firewall.allowUrlEncodedSlash}')}"/>
     	<property name="allowUrlEncodedPeriod" value="#{T(java.lang.Boolean).parseBoolean('${firewall.allowUrlEncodedPeriod}')}"/>
 	</bean>
-	<security:http-firewall ref="HttpFirewall"/>   
-   
-    <bean id="DefaultBasicAuthenticationEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
+	<security:http-firewall ref="httpFirewall"/>
+    
+    <bean id="basicAuthenticationEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
       <property name="realmName" value="Security Realm" />
     </bean>
     <bean id="WebserviceBasicAuthenticationFilter" class="com.logicaldoc.core.security.spring.ConditionalBasicAuthenticationFilter">
-        <constructor-arg index="0" ref="AuthenticationManager"/>
-        <constructor-arg index="1" ref="DefaultBasicAuthenticationEntryPoint"/>
+        <constructor-arg index="0" ref="authenticationManager"/>
+        <constructor-arg index="1" ref="basicAuthenticationEntryPoint"/>
         <property name="enableParam" value="webservice.basicauth.enabled" />
      </bean>
     
     <bean id="LDAuthenticationDetailsSource" class="com.logicaldoc.core.security.spring.LDAuthenticationDetailsSource" />
     <bean id="LDAuthenticationProvider" class="com.logicaldoc.core.security.spring.LDAuthenticationProvider" />
-    <bean id="AdminAuthenticationProvider"  class="${security.adminauthprovider}" />
+    <bean id="adminAuthenticationProvider"  class="${security.adminauthprovider}" />
     <bean id="LDAccessDecisionManager" class="com.logicaldoc.core.security.spring.LDAccessDecisionManager">
         <constructor-arg>
             <list>
@@ -53,159 +53,135 @@
         class="com.logicaldoc.core.security.spring.LDAuthenticationSuccessHandler" />
     <bean id="LDAuthenticationFailureHandler"
         class="com.logicaldoc.core.security.spring.LDAuthenticationFailureHandler" />
-    <security:authentication-manager id="AuthenticationManager">
-        <security:authentication-provider ref='LDAuthenticationProvider' />
-    </security:authentication-manager>
+    
     <bean id="AnonymousLoginFilter" class="com.logicaldoc.core.security.spring.AnonymousLoginFilter" />
     <bean id="SessionFilter" class="com.logicaldoc.core.security.spring.SessionFilter" />
     <bean id="LDSecurityContextRepository"
         class="com.logicaldoc.core.security.spring.LDSecurityContextRepository" />
-    <security:authentication-manager id="AdminAuthenticationManager">
-        <security:authentication-provider ref='AdminAuthenticationProvider' />
+    
+    
+    <security:authentication-manager id="authenticationManager">
+        <security:authentication-provider ref='LDAuthenticationProvider' />
     </security:authentication-manager>
+    <security:authentication-manager id="adminAuthenticationManager">
+        <security:authentication-provider ref='adminAuthenticationProvider' />
+    </security:authentication-manager>
+    
     <security:http pattern="/setup/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
-        authentication-manager-ref="AdminAuthenticationManager"
+        authentication-manager-ref="adminAuthenticationManager"
         security-context-repository-ref="LDSecurityContextRepository">
         
         <security:headers disabled="true" />
         <security:csrf disabled="true" />
-        
-        <!-- Protected areas -->
-        <security:intercept-url pattern="/**"
-            access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="DefaultBasicAuthenticationEntryPoint" />
-    </security:http>
-    <security:http pattern="/license/**" use-expressions="true"
-        create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
-        authentication-manager-ref="AdminAuthenticationManager"
-        security-context-repository-ref="LDSecurityContextRepository">
-        
-        <security:headers disabled="true" />
-        <security:csrf disabled="true" />
-        
-        <!-- Protected areas -->
-        <security:intercept-url pattern="/**"
-            access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="DefaultBasicAuthenticationEntryPoint" />
+
+        <security:intercept-url pattern="/**" access="isAuthenticated()" />
+        <security:http-basic entry-point-ref="basicAuthenticationEntryPoint" />
     </security:http>
     <security:http pattern="/sessions/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
-        authentication-manager-ref="AdminAuthenticationManager"
+        authentication-manager-ref="adminAuthenticationManager"
+        security-context-repository-ref="LDSecurityContextRepository">
+        
+        <security:headers disabled="true" />
+        <security:csrf disabled="true" />
+
+        <security:intercept-url pattern="/**" access="isAuthenticated()" />
+        <security:http-basic entry-point-ref="basicAuthenticationEntryPoint" />
+    </security:http>   
+    <security:http pattern="/license/**" use-expressions="true"
+        create-session="never" disable-url-rewriting="true" auto-config="false"
+        authentication-manager-ref="adminAuthenticationManager"
+        security-context-repository-ref="LDSecurityContextRepository">
+        
+        <security:headers disabled="true" />
+        <security:csrf disabled="true" />
+ 
+        <security:intercept-url pattern="/**" access="isAuthenticated()" />
+        <security:http-basic entry-point-ref="basicAuthenticationEntryPoint" />
+    </security:http>     
+    <security:http pattern="/download-ticket/**" use-expressions="true"
+        create-session="never" disable-url-rewriting="true" auto-config="false"
+        authentication-manager-ref="authenticationManager"
         security-context-repository-ref="LDSecurityContextRepository">
         
         <security:headers disabled="true" />
         <security:csrf disabled="true" />
         
-        <!-- Protected areas -->
-        <security:intercept-url pattern="/**"
-            access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="DefaultBasicAuthenticationEntryPoint" />
-    </security:http>
-    
-    <security:http pattern="/services/rest/auth/**" security="none" />
-    
-    <security:http pattern="/services/rest/**" use-expressions="true"
+        <security:intercept-url pattern="/nosecurity" access="isAuthenticated()" />
+        <security:http-basic entry-point-ref="basicAuthenticationEntryPoint" />
+    </security:http>    
+    <security:http pattern="/webform/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
-        authentication-manager-ref="AuthenticationManager"
-        security-context-repository-ref="LDSecurityContextRepository"
-        entry-point-ref="DefaultBasicAuthenticationEntryPoint">
+        authentication-manager-ref="authenticationManager"
+        security-context-repository-ref="LDSecurityContextRepository">
         
         <security:headers disabled="true" />
         <security:csrf disabled="true" />
         
-        <!-- Protected areas -->
-        <security:intercept-url pattern="/auth" access="permitAll" />
-        <security:intercept-url pattern="^(?!/auth).*$"
-            access="isAuthenticated()" />            
-            
-        <!-- Some session-related custom filters -->
-        <security:custom-filter ref="SessionFilter" before="PRE_AUTH_FILTER" />            
-            
-        <security:custom-filter ref="WebserviceBasicAuthenticationFilter" before="BASIC_AUTH_FILTER" />
-    </security:http>
+        <security:intercept-url pattern="/nosecurity" access="isAuthenticated()" />
+        <security:http-basic entry-point-ref="basicAuthenticationEntryPoint" />
+    </security:http>  
     
+ 
     <security:http pattern="/webdav/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
-        authentication-manager-ref="AuthenticationManager"
+        authentication-manager-ref="authenticationManager"
         security-context-repository-ref="LDSecurityContextRepository">
         
         <security:headers disabled="true" />
         <security:csrf disabled="true" />
         
-        <!-- Protected areas -->
-        <security:intercept-url pattern="/**"
-            access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="DefaultBasicAuthenticationEntryPoint" />
+        <security:intercept-url pattern="/**" access="isAuthenticated()" />
+        <security:http-basic entry-point-ref="basicAuthenticationEntryPoint" />
     </security:http>
     <security:http pattern="/webdavb/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
-        authentication-manager-ref="AuthenticationManager"
+        authentication-manager-ref="authenticationManager"
         security-context-repository-ref="LDSecurityContextRepository">
         
         <security:headers disabled="true" />
         <security:csrf disabled="true" />
         
-        <!-- Protected areas -->
         <security:intercept-url pattern="/**"
             access="isAuthenticated()" />       
-        <security:http-basic entry-point-ref="DefaultBasicAuthenticationEntryPoint" />
+        <security:http-basic entry-point-ref="basicAuthenticationEntryPoint" />
     </security:http>    
     <security:http pattern="/service/cmis/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
-        authentication-manager-ref="AuthenticationManager"
+        authentication-manager-ref="authenticationManager"
         security-context-repository-ref="LDSecurityContextRepository">
         
         <security:headers disabled="true" />
         <security:csrf disabled="true" />
         
-        <!-- Protected areas -->
         <security:intercept-url pattern="/**"
             access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="DefaultBasicAuthenticationEntryPoint" />
+        <security:http-basic entry-point-ref="basicAuthenticationEntryPoint" />
     </security:http>
-       
-    <security:http pattern="/download-ticket/**" use-expressions="true"
+ 
+ 
+    <security:http pattern="/services/rest/auth/**" security="none" />
+    <security:http pattern="/services/rest/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
-        authentication-manager-ref="AuthenticationManager"
-        security-context-repository-ref="LDSecurityContextRepository">
+        authentication-manager-ref="authenticationManager"
+        security-context-repository-ref="LDSecurityContextRepository"
+        entry-point-ref="basicAuthenticationEntryPoint">
         
         <security:headers disabled="true" />
         <security:csrf disabled="true" />
         
-        <!-- We do not want any protection -->
-        <security:intercept-url pattern="/nosecurity"
-            access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="DefaultBasicAuthenticationEntryPoint" />
-    </security:http>    
-    
-    <security:http pattern="/webform/**" use-expressions="true"
-        create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
-        authentication-manager-ref="AuthenticationManager"
-        security-context-repository-ref="LDSecurityContextRepository">
-        
-        <security:headers disabled="true" />
-        <security:csrf disabled="true" />
-        
-        <!-- We do not want any protection -->
-        <security:intercept-url pattern="/nosecurity"
-            access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="DefaultBasicAuthenticationEntryPoint" />
-    </security:http>  
-    
+        <security:intercept-url pattern="/auth" access="permitAll" />
+        <security:intercept-url pattern="^(?!/auth).*$" access="isAuthenticated()" />            
+            
+        <security:custom-filter ref="SessionFilter" before="PRE_AUTH_FILTER" />            
+        <security:custom-filter ref="WebserviceBasicAuthenticationFilter" before="BASIC_AUTH_FILTER" />
+    </security:http>
+ 
+ 
     <security:http use-expressions="true" create-session="never"
         disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
-        authentication-manager-ref="AuthenticationManager"
+        authentication-manager-ref="authenticationManager"
         security-context-repository-ref="LDSecurityContextRepository">
         
         <security:headers>
@@ -215,23 +191,20 @@
             <!--security:header name="Content-Security-Policy" value="default-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' blob: data: https://*.google.com https://*.zoho.com; img-src 'self' blob: data: https://*.googleapis.com; font-src 'self' data:; frame-ancestors 'self' blob: data:; form-action 'self'; object-src 'none'" / -->
             <security:header name="Content-Security-Policy" value="${security.csp}" />
             <security:frame-options policy="SAMEORIGIN"/>
-            <security:xss-protection block="true"/>
+            <!-- security:xss-protection block="true"/ -->
+            <security:xss-protection />
         </security:headers>
         <security:csrf disabled="true" />
         
-        <!-- Protected areas -->
-        <security:intercept-url pattern="/frontend.jsp"
-            access="isAuthenticated()" />
-        <security:intercept-url pattern="/frontend/**"
-            access="isAuthenticated()" />
-        <security:intercept-url pattern="/mobile.jsp"
-            access="isAuthenticated()" />
-        <security:intercept-url pattern="/mobile/**"
-            access="isAuthenticated()" />
-        <security:intercept-url pattern="/download/**"
-            access="isAuthenticated()" />
-                
-        <!-- Login page -->
+        <security:intercept-url pattern="/fontawesome/**" access="permitAll()" />
+        
+        <security:intercept-url pattern="/frontend.jsp" access="isAuthenticated()" />
+        <security:intercept-url pattern="/frontend/**" access="isAuthenticated()" />
+        <security:intercept-url pattern="/mobile.jsp" access="isAuthenticated()" />
+        <security:intercept-url pattern="/mobile/**" access="isAuthenticated()" />
+        <security:intercept-url pattern="/download/**" access="isAuthenticated()" />
+        <security:intercept-url pattern="/**" access="permitAll()"/>
+        
         <security:form-login login-page="/login.jsp"
             login-processing-url="/j_spring_security_check"
             username-parameter="j_username" password-parameter="j_password"

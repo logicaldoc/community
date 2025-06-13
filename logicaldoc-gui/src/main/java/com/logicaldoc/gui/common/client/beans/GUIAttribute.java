@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import jakarta.annotation.Nullable;
-
 /**
  * This class defines the value of an attribute associated to an extensible
  * object. For each value, is possible to define the type and if it is mandatory
@@ -339,7 +337,6 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 		this.options = options;
 	}
 
-    @Nullable	
 	public Boolean getBooleanValue() {
 		return booleanValue;
 	}

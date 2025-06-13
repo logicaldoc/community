@@ -81,8 +81,8 @@
 		<property name="dbcpConfig" ref="DbcpConfig" />
 	</bean>
 
-	<!-- Hibernate SessionFactory -->
-	<bean id="SessionFactory" class="com.logicaldoc.util.spring.LocalSessionFactory"
+<!-- Hibernate SessionFactory -->
+    <bean id="SessionFactory" class="com.logicaldoc.util.spring.LocalSessionFactory"
 		abstract="false" lazy-init="default" autowire="default">
 		<property name="dataSource" ref="DataSource" />
 		<property name="entityInterceptor">
@@ -127,7 +127,6 @@
 			</props>
 		</property>
 	</bean>
-
 	<bean id="TempFolderCleanerJob"
 		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
 		<property name="targetObject">

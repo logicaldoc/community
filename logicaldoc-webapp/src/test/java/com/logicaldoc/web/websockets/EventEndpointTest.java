@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import javax.websocket.Session;
+import jakarta.websocket.Session;
 
 import org.junit.After;
 import org.junit.Before;

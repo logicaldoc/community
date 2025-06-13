@@ -20,11 +20,9 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 
 /**
- * This Authentication provider extends the standard
- * <code>LDAuthenticationProvider</code> but in addition it is able to checks if
- * the provided password matches the context property 'adminpswd' in cases when
- * the database is not available or the max concurrent sessions number is
- * reached.
+ * This {@link AuthenticationProvider} checks if the provided password matches
+ * the context property 'adminpswd' in cases when the database is not available
+ * or the max concurrent sessions number is reached.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5

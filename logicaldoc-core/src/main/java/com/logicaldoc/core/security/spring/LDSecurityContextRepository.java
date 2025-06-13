@@ -11,8 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 /**
- * This repository avoid the use of sessions and simply use the current request
- * to store and retrieve the session ID.
+ * This makes use of sessions nut also uses our request-sid binding.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5
@@ -21,16 +20,18 @@ public class LDSecurityContextRepository extends HttpSessionSecurityContextRepos
 
 	@Override
 	public boolean containsContext(HttpServletRequest request) {
-		return SessionManager.get().getSessionId(request) != null;
+		return super.containsContext(request) || SessionManager.get().getSessionId(request) != null;
 	}
 
 	@Override
 	public DeferredSecurityContext loadDeferredContext(HttpServletRequest request) {
-		return new LDDeferredSecurityContext(request);
+		DeferredSecurityContext context = super.loadDeferredContext(request);
+		return context != null ? context : new LDDeferredSecurityContext(request);
 	}
 
 	@Override
 	public void saveContext(SecurityContext context, HttpServletRequest request, HttpServletResponse response) {
+		super.saveContext(context, request, response);
 		if (context.getAuthentication() == null)
 			return;
 
