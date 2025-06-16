@@ -646,11 +646,11 @@
       <AppenderRef ref="TagsProcessor" />
       <AppenderRef ref="TagsProcessor_WEB" />
     </Logger>
-    <Logger name="org.hibernate" level="error" additivity="true">
+    <Logger name="org.hibernate.orm" level="error" additivity="true">
       <AppenderRef ref="DB" />
       <AppenderRef ref="DB_WEB" />
     </Logger>
-    <Logger name="org.hibernate.cache" level="warn" additivity="true">
+    <Logger name="org.hibernate.orm.cache" level="warn" additivity="true">
       <AppenderRef ref="DB" />
       <AppenderRef ref="DB_WEB" />
     </Logger>
@@ -784,7 +784,7 @@
     <Logger name="org.jgroups.protocols" level="error" additivity="true" />
     <Logger name="org.apache.pdfbox" level="error" additivity="true" />
     <Logger name="org.apache.solr" level="error" additivity="true" />
-    <Logger name="org.hibernate.cache" level="warn" additivity="true" />
+    <Logger name="org.hibernate.orm.cache" level="warn" additivity="true" />
     <Logger name="com.logicaldoc.importfolder" level="debug" additivity="true" />
     <Logger name="org.deeplearning4j" level="trace" additivity="false">
       <AppenderRef ref="AI_ORGDEAPLEARNING4J" level="trace" />

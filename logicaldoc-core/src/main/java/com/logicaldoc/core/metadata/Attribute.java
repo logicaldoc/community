@@ -3,12 +3,11 @@ package com.logicaldoc.core.metadata;
 import java.io.Serializable;
 import java.util.Date;
 
-import jakarta.annotation.Nullable;
-
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.security.user.User;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Transient;
@@ -112,7 +111,7 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 	@Column(name = "ld_doublevalue")
 	protected Double doubleValue;
 
-	@Column(name = "ld_datevalue")
+	@Column(name = "ld_datevalue", columnDefinition = "DATETIME(3)")
 	protected Date dateValue;
 
 	/**
@@ -127,7 +126,6 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 	@Column(name = "ld_initialization")
 	private String initialization;
 
-	
 	public Attribute() {
 	}
 
@@ -452,7 +450,7 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 	public void setReadonly(int readonly) {
 		this.readonly = readonly;
 	}
-	
+
 	public String getValidation() {
 		return validation;
 	}

@@ -1,14 +1,11 @@
 package com.logicaldoc.core.folder;
 
+import com.logicaldoc.core.document.AbstractDocumentHistory;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.document.AbstractDocumentHistory;
 
 /**
  * History entry due to an event on a folder.
@@ -19,7 +16,6 @@ import com.logicaldoc.core.document.AbstractDocumentHistory;
 @Entity
 @Table(name = "ld_folder_history")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class FolderHistory extends AbstractDocumentHistory {
 
 	private static final long serialVersionUID = 1L;

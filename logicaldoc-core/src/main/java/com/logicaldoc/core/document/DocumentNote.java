@@ -2,16 +2,14 @@ package com.logicaldoc.core.document;
 
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
+
+import com.logicaldoc.core.PersistentObject;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.PersistentObject;
 
 /**
  * A note over a document
@@ -22,7 +20,6 @@ import com.logicaldoc.core.PersistentObject;
 @Entity
 @Table(name = "ld_note")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class DocumentNote extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
@@ -49,7 +46,7 @@ public class DocumentNote extends PersistentObject {
 
 	@Column(name = "ld_filename", length = 255)
 	private String fileName;
-		
+
 	/**
 	 * Unique username of the user that created this note
 	 */
@@ -61,47 +58,47 @@ public class DocumentNote extends PersistentObject {
 	 */
 	@Column(name = "ld_userid")
 	private long userId;
-	
-	@Column(name = "ld_date")
+
+	@Column(name = "ld_date", columnDefinition = "DATETIME(3)")
 	private Date date = new Date();
 
 	@Column(name = "ld_message", length = 4000)
 	private String message;
-	
+
 	@Column(name = "ld_page", nullable = false)
 	private int page = 0;
-	
+
 	@Column(name = "ld_opacity", nullable = false)
 	private int opacity = 80;
-	
+
 	@Column(name = "ld_color", length = 255)
 	private String color = "#FFCC00";
-	
+
 	@Column(name = "ld_left", nullable = false)
 	private double left = 0.5;
-	
+
 	@Column(name = "ld_top", nullable = false)
 	private double top = 0.5;
-	
+
 	@Column(name = "ld_width", nullable = false)
 	private double width = 0.15;
-	
+
 	@Column(name = "ld_height", nullable = false)
 	private double height = 0.10;
-	
+
 	/**
 	 * A type of note, for normal notes it is null
 	 */
 	@Column(name = "ld_type", length = 255)
 	private String type;
-	
+
 	/**
 	 * A reference to a recipient, it could be a username or the full name of a
 	 * person, normally this field is not used
 	 */
 	@Column(name = "ld_recipient", length = 255)
 	private String recipient;
-	
+
 	/**
 	 * An email associated to the note, normally this field is not used
 	 */
@@ -110,16 +107,16 @@ public class DocumentNote extends PersistentObject {
 
 	@Column(name = "ld_shape")
 	private String shape = SHAPE_SQUARE;
-	
+
 	@Column(name = "ld_linewidth", nullable = false)
 	private int lineWidth = 1;
-	
+
 	@Column(name = "ld_lineopacity", nullable = false)
 	private int lineOpacity = 80;
-	
+
 	@Column(name = "ld_linecolor", length = 255)
 	private String lineColor = "#a1a1a1";
-	
+
 	@Column(name = "ld_rotation", nullable = false)
 	private double rotation = 0.0;
 

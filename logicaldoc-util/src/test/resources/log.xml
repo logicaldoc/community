@@ -610,7 +610,7 @@
 			<AppenderRef ref="TagsProcessor" />
 			<AppenderRef ref="TagsProcessor_WEB" />
 		</Logger>
-		<Logger name="org.hibernate" level="error" additivity="true">
+		<Logger name="org.hibernate.orm" level="error" additivity="true">
 			<AppenderRef ref="DB" />
 		</Logger>
 		<Logger name="com.logicaldoc.core" level="info" additivity="true"></Logger>

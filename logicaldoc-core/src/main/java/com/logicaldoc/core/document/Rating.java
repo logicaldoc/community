@@ -20,7 +20,6 @@ import com.logicaldoc.core.PersistentObject;
 @Entity
 @Table(name = "ld_rating")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Rating extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;

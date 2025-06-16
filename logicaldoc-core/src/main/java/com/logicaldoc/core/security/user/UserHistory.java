@@ -1,15 +1,12 @@
 package com.logicaldoc.core.security.user;
 
+import com.logicaldoc.core.history.History;
+import com.logicaldoc.core.security.Session;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.history.History;
-import com.logicaldoc.core.security.Session;
 
 /**
  * History entry due to an event on a user.
@@ -20,7 +17,6 @@ import com.logicaldoc.core.security.Session;
 @Entity
 @Table(name = "ld_user_history")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class UserHistory extends History {
 
 	private static final long serialVersionUID = 1L;

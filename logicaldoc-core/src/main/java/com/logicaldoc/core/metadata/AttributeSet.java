@@ -25,7 +25,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "ld_attributeset")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AttributeSet extends AbstractAttributeSet {
 
 	private static final long serialVersionUID = 1L;

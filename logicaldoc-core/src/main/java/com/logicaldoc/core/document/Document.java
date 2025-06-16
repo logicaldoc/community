@@ -6,20 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import jakarta.persistence.Cacheable;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapKeyColumn;
-import jakarta.persistence.OrderBy;
-import jakarta.persistence.Table;
-
 import org.hibernate.LazyInitializationException;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.exception.GenericJDBCException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +20,17 @@ import com.logicaldoc.core.security.Secure;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
 
+import jakarta.persistence.Cacheable;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.Table;
+
 /**
  * Basic concrete implementation of {@link AbstractDocument}
  * 
@@ -42,7 +40,6 @@ import com.logicaldoc.util.Context;
 @Entity
 @Table(name = "ld_document")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Document extends AbstractDocument implements Secure<DocumentAccessControlEntry> {
 
 	private static final long serialVersionUID = 1L;

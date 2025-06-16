@@ -16,10 +16,10 @@
         <gwt.source.level>17</gwt.source.level>
         <smartgwt.version>14.1p</smartgwt.version>
         <smartgwt.skins>Tahoe,Shiva,Simplicity</smartgwt.skins>
-        <spring.version>6.0.23</spring.version>
-        <spring-security.version>6.0.8</spring-security.version>
-        <hibernate.version>6.6.17.Final</hibernate.version>
-        <infinispan.version>15.2.2.Final</infinispan.version>
+        <spring.version>6.2.8</spring.version>
+        <spring-security.version>6.2.8</spring-security.version>
+        <hibernate.version>6.6.18.Final</hibernate.version>
+        <infinispan.version>15.2.4.Final</infinispan.version>
         <infinispan.hibernate.artifact>infinispan-hibernate-cache-v62</infinispan.hibernate.artifact>
         <ehcache.version>2.10.9.2</ehcache.version>
         <lucene.version>8.11.2</lucene.version>
@@ -38,7 +38,7 @@
         <jdom.version>2.0.6.1</jdom.version>
         <hsqldb.version>2.7.1</hsqldb.version>
         <zxing.version>3.5.2</zxing.version>
-        <servlet.version>5.0.0</servlet.version>
+        <servlet.version>6.1.0</servlet.version>
         <dependency-check-maven.version>7.2.0</dependency-check-maven.version>
         <sonar.coverage.exclusions>**/Mock*.*,**/Workbench*.*</sonar.coverage.exclusions>
         <sonar.exclusions>**/Mock*.*,**/Workbench*.*</sonar.exclusions>
@@ -341,11 +341,11 @@
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
                 <version>3.2.2</version>
-            </dependency>
+            </dependency>          
             <dependency>
                 <groupId>org.apache.commons</groupId>
-                <artifactId>mmons-collections4</artifactId>
-                <version>4.1</version>
+                <artifactId>commons-collections4</artifactId>
+                <version>4.5.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-validator</groupId>
@@ -393,11 +393,6 @@
                 <groupId>org.tukaani</groupId>
                 <artifactId>xz</artifactId>
                 <version>1.10</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-collections4</artifactId>
-                <version>4.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -593,22 +588,22 @@
                 <version>${spring-security.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate</artifactId>
                 <version>${hibernate.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-core</artifactId>
                 <version>${hibernate.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-jcache</artifactId>
                 <version>${hibernate.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-annotations</artifactId>
                 <version>${hibernate.version}</version>
             </dependency>

@@ -25,7 +25,7 @@
 		<Logger name="com.logicaldoc" level="error" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
-		<Logger name="org.hibernate" level="error" additivity="false">
+		<Logger name="org.hibernate.orm" level="error" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>	
 		<Root level="info">

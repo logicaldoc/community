@@ -40,7 +40,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	private static final Logger log = LoggerFactory.getLogger(History.class);
 
-	@Column(name = "ld_date")
+	@Column(name = "ld_date", columnDefinition = "DATETIME(3)")
 	private Date date = new Date();
 
 	@Column(name = "ld_userid")

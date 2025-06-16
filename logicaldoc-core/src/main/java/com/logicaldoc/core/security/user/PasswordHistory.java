@@ -8,9 +8,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import com.logicaldoc.core.PersistentObject;
 
 /**
@@ -23,7 +20,6 @@ import com.logicaldoc.core.PersistentObject;
 @Entity
 @Table(name = "ld_password_history")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class PasswordHistory extends PersistentObject implements Serializable, Comparable<PasswordHistory> {
 
 	private static final long serialVersionUID = 1L;
@@ -31,7 +27,7 @@ public class PasswordHistory extends PersistentObject implements Serializable, C
 	@Column(name = "ld_userid", nullable = false) 
 	private long userId;
 
-	@Column(name = "ld_date")
+	@Column(name = "ld_date", columnDefinition = "DATETIME(3)")
 	private Date date = new Date();
 	
 	@Column(name = "ld_password")

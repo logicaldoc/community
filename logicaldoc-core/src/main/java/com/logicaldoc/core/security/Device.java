@@ -3,20 +3,17 @@ package com.logicaldoc.core.security;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.logicaldoc.core.PersistentObject;
+
+import eu.bitwalker.useragentutils.UserAgent;
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.PersistentObject;
-
-import eu.bitwalker.useragentutils.UserAgent;
 
 /**
  * Represents a device with wich a user connects to the platform
@@ -27,7 +24,6 @@ import eu.bitwalker.useragentutils.UserAgent;
 @Entity
 @Table(name = "ld_device")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Device extends PersistentObject implements Serializable {
 
 	public static final String PARAM_DEVICE = "device";
@@ -42,16 +38,16 @@ public class Device extends PersistentObject implements Serializable {
 
 	@Column(name = "ld_userid")
 	private long userId;
-	
+
 	@Column(name = "ld_username", length = 255)
 	private String username;
-	
+
 	/**
 	 * Name of the browser
 	 */
 	@Column(name = "ld_browser", length = 255)
 	private String browser = "unknown";
-	
+
 	/**
 	 * Version of the browser
 	 */
@@ -73,12 +69,12 @@ public class Device extends PersistentObject implements Serializable {
 	/**
 	 * Instant of last login
 	 */
-	@Column(name = "ld_lastlogin")
+	@Column(name = "ld_lastlogin", columnDefinition = "DATETIME(3)")
 	private Date lastLogin;
 
 	@Column(name = "ld_trusted", nullable = false)
 	private int trusted = 0;
-	
+
 	/**
 	 * IP of last login
 	 */

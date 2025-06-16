@@ -5,6 +5,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.logicaldoc.core.security.AccessControlEntry;
+import com.logicaldoc.core.security.Secure;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -16,12 +19,6 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.security.AccessControlEntry;
-import com.logicaldoc.core.security.Secure;
-
 /**
  * A template collects a set of attributesets ant is itself an extensible
  * object.
@@ -32,7 +29,6 @@ import com.logicaldoc.core.security.Secure;
 @Entity
 @Table(name = "ld_template")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Template extends AbstractAttributeSet implements Secure<AccessControlEntry> {
 
 	private static final long serialVersionUID = 1L;

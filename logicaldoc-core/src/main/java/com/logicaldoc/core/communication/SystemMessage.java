@@ -9,9 +9,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 /**
  * SystemMessages are messages which an user only can send to other system
  * users.
@@ -23,7 +20,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "ld_systemmessage")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class SystemMessage extends Message {
 
 	private static final long serialVersionUID = 1L;
@@ -49,7 +45,7 @@ public class SystemMessage extends Message {
 	/**
 	 * The date this message was last notified
 	 */
-	@Column(name = "ld_lastnotified")
+	@Column(name = "ld_lastnotified", columnDefinition = "DATETIME(3)")
 	private Date lastNotified = null;
 
 	@Column(name = "ld_status", nullable = false)

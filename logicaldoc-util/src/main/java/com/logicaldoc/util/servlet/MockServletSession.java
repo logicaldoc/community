@@ -6,7 +6,6 @@ import java.util.Map;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.HttpSessionContext;
 
 /**
  * A servlet session useful for doing tests, you can easily setup the map of
@@ -15,7 +14,6 @@ import jakarta.servlet.http.HttpSessionContext;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.3.3
  */
-@SuppressWarnings("deprecation")
 public class MockServletSession implements HttpSession {
 
 	private Map<String, Object> attributes = new HashMap<>();
@@ -37,9 +35,8 @@ public class MockServletSession implements HttpSession {
 		return attributes.get(name);
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public Enumeration getAttributeNames() {
+	public Enumeration<String> getAttributeNames() {
 		return null;
 	}
 
@@ -74,21 +71,6 @@ public class MockServletSession implements HttpSession {
 	}
 
 	@Override
-	public HttpSessionContext getSessionContext() {
-		return null;
-	}
-
-	@Override
-	public Object getValue(String arg0) {
-		return null;
-	}
-
-	@Override
-	public String[] getValueNames() {
-		return new String[0];
-	}
-
-	@Override
 	public void invalidate() {
 		// Nothing to do
 	}
@@ -99,17 +81,7 @@ public class MockServletSession implements HttpSession {
 	}
 
 	@Override
-	public void putValue(String arg0, Object arg1) {
-		// Nothing to do
-	}
-
-	@Override
 	public void removeAttribute(String arg0) {
-		// Nothing to do
-	}
-
-	@Override
-	public void removeValue(String arg0) {
 		// Nothing to do
 	}
 
@@ -122,5 +94,4 @@ public class MockServletSession implements HttpSession {
 	public void setMaxInactiveInterval(int arg0) {
 		// Nothing to do
 	}
-
 }

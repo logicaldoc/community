@@ -203,17 +203,7 @@ public class MockServletResponse implements HttpServletResponse {
 	}
 
 	@Override
-	public String encodeRedirectUrl(String arg0) {
-		return null;
-	}
-
-	@Override
 	public String encodeURL(String arg0) {
-		return null;
-	}
-
-	@Override
-	public String encodeUrl(String arg0) {
 		return null;
 	}
 
@@ -249,11 +239,6 @@ public class MockServletResponse implements HttpServletResponse {
 
 	@Override
 	public void setStatus(int status) {
-		this.status = status;
-	}
-
-	@Override
-	public void setStatus(int status, String statusMessage) {
 		this.status = status;
 	}
 
@@ -295,5 +280,10 @@ public class MockServletResponse implements HttpServletResponse {
 	public void clear() {
 		FileUtil.delete(output);
 		
+	}
+
+	@Override
+	public void sendRedirect(String arg0, int arg1, boolean arg2) throws IOException {
+		// Do nothing
 	}
 }

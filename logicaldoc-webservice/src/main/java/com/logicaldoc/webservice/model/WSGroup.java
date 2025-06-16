@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import jakarta.xml.bind.annotation.XmlType;
-
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
@@ -18,6 +16,8 @@ import com.logicaldoc.core.security.user.UserType;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.time.DateUtil;
 import com.logicaldoc.webservice.doc.WSDoc;
+
+import jakarta.xml.bind.annotation.XmlType;
 
 /**
  * Web Service Group. Useful class to create repository Groups.

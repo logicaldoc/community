@@ -65,7 +65,7 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCompareDifferentParameters() throws PersistenceException {
+	public void testCompareDifferentParameters() throws PersistenceException, InterruptedException {
 		Folder folder1 = new Folder();
 		folder1.setName("folder1");
 		folder1.setTemplateName("folder1Templ");
@@ -84,6 +84,9 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 		Document doc2 = new Document();
 		doc2.setFileName("document2");
 		doc2.setFolder(folder2);
+		
+		// Just to have more delta in lastUpdated
+		waiting();
 		testSubject.store(doc2);
 
 		Comparator<AbstractDocument> comparator = DocumentComparator.getComparator("id asc");

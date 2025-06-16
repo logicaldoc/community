@@ -1,12 +1,5 @@
 package com.logicaldoc.core.document;
 
-import jakarta.persistence.Cacheable;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +8,11 @@ import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
+
+import jakarta.persistence.Cacheable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 /**
  * A bookmark over a document
@@ -25,7 +23,6 @@ import com.logicaldoc.util.Context;
 @Entity
 @Table(name = "ld_bookmark")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Bookmark extends PersistentObject {
 
 	private static final Logger log = LoggerFactory.getLogger(Bookmark.class);

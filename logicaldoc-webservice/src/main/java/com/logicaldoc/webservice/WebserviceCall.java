@@ -1,14 +1,11 @@
 package com.logicaldoc.webservice;
 
+import com.logicaldoc.core.history.History;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.history.History;
 
 /**
  * Represents a call to the webservice
@@ -19,7 +16,6 @@ import com.logicaldoc.core.history.History;
 @Entity
 @Table(name = "ld_webservicecall")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class WebserviceCall extends History {
 
 	private static final long serialVersionUID = 1L;

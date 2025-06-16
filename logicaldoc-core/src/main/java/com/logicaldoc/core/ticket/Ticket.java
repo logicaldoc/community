@@ -3,16 +3,13 @@ package com.logicaldoc.core.ticket;
 import java.util.Date;
 import java.util.UUID;
 
+import com.logicaldoc.core.PersistentObject;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.PersistentObject;
 
 /**
  * Represents ticket, most of the time this is used to model download tickets.
@@ -23,7 +20,6 @@ import com.logicaldoc.core.PersistentObject;
 @Entity
 @Table(name = "ld_ticket")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Ticket extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
@@ -42,7 +38,7 @@ public class Ticket extends PersistentObject {
 
 	@Column(name = "ld_suffix")
 	private String suffix;
-	
+
 	@Column(name = "ld_userid", nullable = false)
 	private long userId = -1;
 
@@ -52,7 +48,7 @@ public class Ticket extends PersistentObject {
 	/**
 	 * A date when this ticket expires
 	 */
-	@Column(name = "ld_expired")
+	@Column(name = "ld_expired", columnDefinition = "DATETIME(3)")
 	private Date expired = null;
 
 	@Column(name = "ld_count", nullable = false)

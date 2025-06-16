@@ -4,6 +4,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
+import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.metadata.ExtensibleObject;
+import com.logicaldoc.core.metadata.Template;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -13,14 +19,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
-
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.metadata.Attribute;
-import com.logicaldoc.core.metadata.ExtensibleObject;
-import com.logicaldoc.core.metadata.Template;
 
 /**
  * Instances of this class represents generic informations in the database. Use
@@ -34,7 +32,6 @@ import com.logicaldoc.core.metadata.Template;
 @Entity
 @Table(name = "ld_generic")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Generic extends ExtensibleObject implements Comparable<Generic> {
 
 	private static final long serialVersionUID = 1L;
@@ -90,10 +87,10 @@ public class Generic extends ExtensibleObject implements Comparable<Generic> {
 	@Column(name = "ld_double2")
 	private Double double2;
 
-	@Column(name = "ld_date1")
+	@Column(name = "ld_date1", columnDefinition = "DATETIME(3)")
 	private Date date1;
 
-	@Column(name = "ld_date2")
+	@Column(name = "ld_date2", columnDefinition = "DATETIME(3)")
 	private Date date2;
 
 	@ElementCollection

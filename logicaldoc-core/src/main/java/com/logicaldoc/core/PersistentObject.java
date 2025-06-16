@@ -51,10 +51,10 @@ public abstract class PersistentObject implements Serializable {
 	@Column(name = "ld_deleted", nullable = false)
 	private int deleted = 0;
 
-	@Column(name = "ld_lastmodified", nullable = false)
+	@Column(name = "ld_lastmodified", nullable = false, columnDefinition = "DATETIME(3)")
 	private Date lastModified = new Date();
 
-	@Column(name = "ld_creation", nullable = false)
+	@Column(name = "ld_creation", nullable = false, columnDefinition = "DATETIME(3)")
 	private Date creation = new Date();
 
 	@Version

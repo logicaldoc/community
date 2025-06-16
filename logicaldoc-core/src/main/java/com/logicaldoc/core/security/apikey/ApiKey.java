@@ -3,18 +3,16 @@ package com.logicaldoc.core.security.apikey;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
+
+import com.logicaldoc.core.PersistentObject;
+import com.logicaldoc.util.crypt.CryptUtil;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.PersistentObject;
-import com.logicaldoc.util.crypt.CryptUtil;
 
 /**
  * A secret key to use when connecting to the Webservices API
@@ -25,7 +23,6 @@ import com.logicaldoc.util.crypt.CryptUtil;
 @Entity
 @Table(name = "ld_apikey")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ApiKey extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
@@ -36,12 +33,12 @@ public class ApiKey extends PersistentObject {
 	@Column(name = "ld_name", length = 255, nullable = false)
 	private String name;
 
-	@Column(name = "ld_lastused")
+	@Column(name = "ld_lastused", columnDefinition = "DATETIME(3)")
 	private Date lastUsed;
-	
+
 	@Column(name = "ld_key", length = 255, nullable = false)
 	private String key;
-	
+
 	@Column(name = "ld_label", length = 255, nullable = false)
 	private String label;
 

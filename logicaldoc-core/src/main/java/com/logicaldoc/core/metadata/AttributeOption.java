@@ -1,14 +1,11 @@
 package com.logicaldoc.core.metadata;
 
+import com.logicaldoc.core.PersistentObject;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.PersistentObject;
 
 /**
  * Represents an option for a multi-choice attribute
@@ -19,7 +16,6 @@ import com.logicaldoc.core.PersistentObject;
 @Entity
 @Table(name = "ld_extoption")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AttributeOption extends PersistentObject implements Comparable<AttributeOption> {
 
 	private static final long serialVersionUID = 1L;
@@ -35,7 +31,7 @@ public class AttributeOption extends PersistentObject implements Comparable<Attr
 	 */
 	@Column(name = "ld_value", nullable = false)
 	private String value;
-	
+
 	/**
 	 * An category, just to organize the values in groups
 	 */

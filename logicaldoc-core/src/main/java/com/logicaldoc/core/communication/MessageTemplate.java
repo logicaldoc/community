@@ -2,18 +2,15 @@ package com.logicaldoc.core.communication;
 
 import java.util.Map;
 
-import jakarta.persistence.Cacheable;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.automation.AutomationException;
 import com.logicaldoc.util.LocaleUtil;
+
+import jakarta.persistence.Cacheable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 /**
  * A template for messaging purposes.
@@ -24,7 +21,6 @@ import com.logicaldoc.util.LocaleUtil;
 @Entity
 @Table(name = "ld_messagetemplate")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class MessageTemplate extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
@@ -38,7 +34,7 @@ public class MessageTemplate extends PersistentObject {
 
 	@Column(name = "ld_language", length = 10, nullable = false)
 	private String language = "en";
-	
+
 	@Column(name = "ld_description", length = 1000)
 	private String description = "";
 

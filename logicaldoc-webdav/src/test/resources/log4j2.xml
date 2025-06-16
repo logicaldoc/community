@@ -32,7 +32,7 @@
 		<Logger name="com.logicaldoc.core.system" level="fatal" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
-		<Logger name="org.hibernate" level="error" additivity="false">
+		<Logger name="org.hibernate.orm" level="error" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
         <Logger name="org.apache.solr" level="fatal" additivity="false">

@@ -6,16 +6,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang.StringUtils;
+
+import com.logicaldoc.core.PersistentObject;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.PersistentObject;
 
 /**
  * This class represents a Tenant, that is a branch of the organization or an
@@ -28,7 +26,6 @@ import com.logicaldoc.core.PersistentObject;
 @Entity
 @Table(name = "ld_tenant")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Tenant extends PersistentObject implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -48,16 +45,16 @@ public class Tenant extends PersistentObject implements Serializable {
 
 	@Column(name = "ld_displayname", length = 4000)
 	private String displayName;
-	
+
 	@Column(name = "ld_enabled", nullable = false)
 	private int enabled = 1;
-	
-	@Column(name = "ld_expire")
+
+	@Column(name = "ld_expire", columnDefinition = "DATETIME(3)")
 	private Date expire;
-	
+
 	@Column(name = "ld_street", length = 255)
 	private String street;
-	
+
 	@Column(name = "ld_postalcode", length = 255)
 	private String postalCode;
 
@@ -66,7 +63,7 @@ public class Tenant extends PersistentObject implements Serializable {
 
 	@Column(name = "ld_country", length = 255)
 	private String country;
-	
+
 	@Column(name = "ld_state", length = 255)
 	private String state;
 
@@ -96,10 +93,10 @@ public class Tenant extends PersistentObject implements Serializable {
 	 */
 	@Column(name = "ld_maxreposize", nullable = true)
 	private Long maxRepoSize;
-	
+
 	@Column(name = "ld_qthreshold")
 	private Integer quotaThreshold = null;
-	
+
 	@Column(name = "ld_qrecipients", length = 1000)
 	private String quotaAlertRecipients = null;
 

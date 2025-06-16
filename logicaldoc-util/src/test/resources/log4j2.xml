@@ -30,10 +30,10 @@
 		<Logger name="com.logicaldoc" level="info" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
-		<Logger name="org.hibernate" level="error" additivity="false">
+		<Logger name="org.hibernate.orm" level="error" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
-		<Logger name="org.hibernate" level="error" additivity="false">
+		<Logger name="org.hibernate.orm" level="error" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
 		<Logger name="console" level="error" additivity="false">

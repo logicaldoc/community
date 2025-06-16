@@ -19,6 +19,7 @@ import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -30,8 +31,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpUpgradeHandler;
 import jakarta.servlet.http.Part;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * A servlet created for tests
@@ -61,7 +60,7 @@ public class MockServletRequest implements HttpServletRequest {
 
 	private Map<String, String> headers = new HashMap<>();
 
-	private Map<String, String> parameters = new HashMap<>();
+	private Map<String, String[]> parameters = new HashMap<>();
 
 	private Map<String, Object> attributes = new HashMap<>();
 
@@ -85,12 +84,12 @@ public class MockServletRequest implements HttpServletRequest {
 		this.pathInfo = pathInfo;
 	}
 
-	public void setParameters(Map<String, String> parameters) {
+	public void setParameters(Map<String, String[]> parameters) {
 		this.parameters = parameters;
 	}
 
 	public void setParameter(String name, String value) {
-		parameters.put(name, value);
+		parameters.put(name, new String[] { value });
 	}
 
 	public String getUserAgent() {
@@ -122,9 +121,8 @@ public class MockServletRequest implements HttpServletRequest {
 		return null;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public Enumeration getAttributeNames() {
+	public Enumeration<String> getAttributeNames() {
 		return null;
 	}
 
@@ -197,21 +195,14 @@ public class MockServletRequest implements HttpServletRequest {
 		return null;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public Enumeration getLocales() {
+	public Enumeration<Locale> getLocales() {
 		return null;
 	}
 
 	@Override
 	public String getParameter(String param) {
-		return parameters.get(param);
-	}
-
-	@SuppressWarnings("rawtypes")
-	@Override
-	public Map getParameterMap() {
-		return parameters;
+		return parameters.get(param) != null ? parameters.get(param)[0] : null;
 	}
 
 	@Override
@@ -221,10 +212,7 @@ public class MockServletRequest implements HttpServletRequest {
 
 	@Override
 	public String[] getParameterValues(String param) {
-		String[] values = new String[0];
-		if (StringUtils.isNotEmpty(parameters.get(param)))
-			values = parameters.get(param).split("\\,");
-		return values;
+		return parameters.get(param);
 	}
 
 	@Override
@@ -238,11 +226,6 @@ public class MockServletRequest implements HttpServletRequest {
 			return new BufferedReader(new StringReader(body));
 		else
 			return null;
-	}
-
-	@Override
-	public String getRealPath(String arg0) {
-		return null;
 	}
 
 	@Override
@@ -341,7 +324,7 @@ public class MockServletRequest implements HttpServletRequest {
 		String myhead = headers.get(arg0);
 		if (myhead != null)
 			result.add(myhead);
-		
+
 		return Collections.enumeration(result);
 	}
 
@@ -419,11 +402,6 @@ public class MockServletRequest implements HttpServletRequest {
 
 	@Override
 	public boolean isRequestedSessionIdFromURL() {
-		return false;
-	}
-
-	@Override
-	public boolean isRequestedSessionIdFromUrl() {
 		return false;
 	}
 
@@ -555,5 +533,25 @@ public class MockServletRequest implements HttpServletRequest {
 	@Override
 	public <T extends HttpUpgradeHandler> T upgrade(Class<T> arg0) throws IOException, ServletException {
 		return null;
+	}
+
+	@Override
+	public String getProtocolRequestId() {
+		return null;
+	}
+
+	@Override
+	public String getRequestId() {
+		return null;
+	}
+
+	@Override
+	public ServletConnection getServletConnection() {
+		return null;
+	}
+
+	@Override
+	public Map<String, String[]> getParameterMap() {
+		return parameters;
 	}
 }

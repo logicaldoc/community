@@ -1,16 +1,13 @@
 package com.logicaldoc.core.document;
 
+import com.logicaldoc.core.PersistentObject;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.PersistentObject;
 
 /**
  * Represents a document link. It represents a link between two documents
@@ -22,9 +19,8 @@ import com.logicaldoc.core.PersistentObject;
 @Entity
 @Table(name = "ld_link")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class DocumentLink extends PersistentObject {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	@Column(name = "ld_type", length = 255, nullable = false)

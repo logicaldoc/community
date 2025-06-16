@@ -9,6 +9,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang.StringUtils;
+
+import com.logicaldoc.core.document.FolderAccessControlEntry;
+import com.logicaldoc.core.document.Tag;
+import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.metadata.ExtensibleObject;
+import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.security.AccessControlEntry;
+import com.logicaldoc.core.security.Secure;
+import com.logicaldoc.util.Context;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
@@ -22,20 +33,6 @@ import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.LazyInitializationException;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.document.FolderAccessControlEntry;
-import com.logicaldoc.core.document.Tag;
-import com.logicaldoc.core.metadata.Attribute;
-import com.logicaldoc.core.metadata.ExtensibleObject;
-import com.logicaldoc.core.metadata.Template;
-import com.logicaldoc.core.security.AccessControlEntry;
-import com.logicaldoc.core.security.Secure;
-import com.logicaldoc.util.Context;
 
 /**
  * This class represents the key concept of security of documents. The Folder is
@@ -52,7 +49,6 @@ import com.logicaldoc.util.Context;
 @Entity
 @Table(name = "ld_folder")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Folder extends ExtensibleObject implements Secure<FolderAccessControlEntry>, Comparable<Folder> {
 
 	private static final long serialVersionUID = 1L;
@@ -245,7 +241,7 @@ public class Folder extends ExtensibleObject implements Secure<FolderAccessContr
 			if (source instanceof Folder folder)
 				for (FolderAccessControlEntry ace : folder.getAccessControlList())
 					getAccessControlList().add(new FolderAccessControlEntry(ace));
-		} catch (LazyInitializationException x) {
+		} catch (org.hibernate.LazyInitializationException x) {
 			// may happen do nothing
 		}
 
@@ -254,7 +250,7 @@ public class Folder extends ExtensibleObject implements Secure<FolderAccessContr
 			for (String attName : source.getAttributes().keySet()) {
 				getAttributes().put(attName, source.getAttributes().get(attName));
 			}
-		} catch (LazyInitializationException x) {
+		} catch (org.hibernate.LazyInitializationException x) {
 			// may happen do nothing
 		}
 
@@ -263,7 +259,7 @@ public class Folder extends ExtensibleObject implements Secure<FolderAccessContr
 			for (Tag tag : source.getTags()) {
 				getTags().add(tag);
 			}
-		} catch (LazyInitializationException x) {
+		} catch (org.hibernate.LazyInitializationException x) {
 			// may happen do nothing
 		}
 
@@ -272,7 +268,7 @@ public class Folder extends ExtensibleObject implements Secure<FolderAccessContr
 			for (String nodeId : source.getStores().keySet()) {
 				getStores().put(nodeId, source.getStores().get(nodeId));
 			}
-		} catch (LazyInitializationException x) {
+		} catch (org.hibernate.LazyInitializationException x) {
 			// may happen do nothing
 		}
 	}

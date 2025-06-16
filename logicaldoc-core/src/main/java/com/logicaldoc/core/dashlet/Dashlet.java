@@ -1,14 +1,11 @@
 package com.logicaldoc.core.dashlet;
 
+import com.logicaldoc.core.PersistentObject;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.PersistentObject;
 
 /**
  * Represents a sub-window of a dashboard
@@ -19,7 +16,6 @@ import com.logicaldoc.core.PersistentObject;
 @Entity
 @Table(name = "ld_dashlet")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Dashlet extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
@@ -36,13 +32,13 @@ public class Dashlet extends PersistentObject {
 
 	@Column(name = "ld_name", length = 255, nullable = false)
 	private String name;
-	
+
 	@Column(name = "ld_title", length = 255, nullable = false)
 	private String title;
-	
+
 	@Column(name = "ld_type", length = 255, nullable = false)
 	private String type = TYPE_DOCEVENT;
-	
+
 	@Column(name = "ld_max")
 	private Integer max;
 
@@ -51,7 +47,7 @@ public class Dashlet extends PersistentObject {
 	 */
 	@Column(name = "ld_unique", nullable = false)
 	private int unique = 0;
-	
+
 	@Column(name = "ld_query")
 	private String query;
 

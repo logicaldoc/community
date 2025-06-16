@@ -2,15 +2,12 @@ package com.logicaldoc.core.sequence;
 
 import java.util.Date;
 
+import com.logicaldoc.core.PersistentObject;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.PersistentObject;
 
 /**
  * A sequence in the database
@@ -21,18 +18,17 @@ import com.logicaldoc.core.PersistentObject;
 @Entity
 @Table(name = "ld_sequence")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Sequence extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
 
 	@Column(name = "ld_objectid", nullable = false)
 	private long objectId = 0L;
-	
+
 	@Column(name = "ld_name", nullable = false)
 	private String name;
 
-	@Column(name = "ld_lastreset")
+	@Column(name = "ld_lastreset", columnDefinition = "DATETIME(3)")
 	private Date lastReset = new Date();
 
 	@Column(name = "ld_value", nullable = false)

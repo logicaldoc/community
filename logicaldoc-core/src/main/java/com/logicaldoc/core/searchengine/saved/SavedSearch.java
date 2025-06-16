@@ -28,7 +28,6 @@ import com.logicaldoc.util.io.IOUtil;
 @Entity
 @Table(name = "ld_search")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class SavedSearch extends PersistentObject implements Serializable, Comparable<SavedSearch> {
 
 	private static final long serialVersionUID = 1L;
@@ -36,7 +35,7 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 	@Column(name = "ld_userid", nullable = false)
 	private long userId;
 
-	@Column(name = "ld_date")
+	@Column(name = "ld_date", columnDefinition = "DATETIME(3)")
 	private Date date = new Date();
 	
 	@Column(name = "ld_options")

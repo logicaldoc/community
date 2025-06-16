@@ -8,12 +8,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Transient;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.LazyInitializationException;
@@ -30,6 +24,12 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.io.FileUtil;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Transient;
 
 /**
  * The Document is the central entity of LogicalDOC. A Document is a persistent
@@ -193,10 +193,10 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	@Column(name = "ld_published")
 	private int published = 1;
 
-	@Column(name = "ld_startpublishing")
+	@Column(name = "ld_startpublishing", columnDefinition = "DATETIME(3)")
 	private Date startPublishing = new Date();
 
-	@Column(name = "ld_stoppublishing")
+	@Column(name = "ld_stoppublishing", columnDefinition = "DATETIME(3)")
 	private Date stopPublishing;
 
 	@Column(name = "ld_transactionid", length = 255)

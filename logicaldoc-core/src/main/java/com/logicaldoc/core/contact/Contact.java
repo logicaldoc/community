@@ -1,14 +1,11 @@
 package com.logicaldoc.core.contact;
 
+import com.logicaldoc.core.PersistentObject;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.PersistentObject;
 
 /**
  * A generic contact represented by a set of personal informations.
@@ -19,7 +16,6 @@ import com.logicaldoc.core.PersistentObject;
 @Entity
 @Table(name = "ld_contact")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Contact extends PersistentObject {
 	private static final long serialVersionUID = 1L;
 

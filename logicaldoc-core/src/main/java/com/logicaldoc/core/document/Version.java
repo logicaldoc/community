@@ -6,6 +6,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
+
+import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.util.config.ContextProperties;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -17,16 +25,6 @@ import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.metadata.Attribute;
-import com.logicaldoc.core.metadata.Template;
-import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.util.config.ContextProperties;
-
 /**
  * This class represents versions.
  * 
@@ -36,7 +34,6 @@ import com.logicaldoc.util.config.ContextProperties;
 @Entity
 @Table(name = "ld_version")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Version extends AbstractDocument implements Comparable<Version> {
 
 	private static final long serialVersionUID = 1L;
@@ -50,7 +47,7 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 	@Column(name = "ld_userid")
 	private long userId;
 
-	@Column(name = "ld_versiondate")
+	@Column(name = "ld_versiondate", columnDefinition = "DATETIME(3)")
 	private Date versionDate = new Date();
 
 	@Column(name = "ld_folderid")

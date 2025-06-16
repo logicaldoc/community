@@ -11,16 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import jakarta.persistence.Cacheable;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
-
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +29,13 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.crypt.CryptUtil;
 
+import jakarta.persistence.Cacheable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+
 /**
  * A single user session with it's unique identifier and the reference to the
  * user
@@ -48,7 +46,6 @@ import com.logicaldoc.util.crypt.CryptUtil;
 @Entity
 @Table(name = "ld_session")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Session extends PersistentObject implements Comparable<Session> {
 
 	private static final long serialVersionUID = 1L;
@@ -71,10 +68,10 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	@Transient
 	private Map<Long, String> unprotectedDocs = Collections.synchronizedMap(new HashMap<>());
 
-	@Column(name = "ld_lastrenew")
+	@Column(name = "ld_lastrenew", columnDefinition = "DATETIME(3)")
 	private Date lastRenew = new Date();
 
-	@Column(name = "ld_finished")
+	@Column(name = "ld_finished", columnDefinition = "DATETIME(3)")
 	private Date finished;
 
 	/**
@@ -350,8 +347,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 		// Add a user history entry
 		UserHistoryDAO userHistoryDAO = Context.get(UserHistoryDAO.class);
-		UserHistory history = userHistoryDAO.createUserHistory(user, UserEvent.LOGIN, historyComment, sid,
-				client);
+		UserHistory history = userHistoryDAO.createUserHistory(user, UserEvent.LOGIN, historyComment, sid, client);
 
 		// Update the last login into the DB
 		try {

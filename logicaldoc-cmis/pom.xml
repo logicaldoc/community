@@ -21,12 +21,6 @@
 	</properties>
 
 	<dependencies>
-
-		<!-- dependency>
-			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
-		</dependency -->
-
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
 			<artifactId>logicaldoc-core</artifactId>
@@ -148,7 +142,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.hibernate</groupId>
+			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<scope>provided</scope>
 		</dependency>	
@@ -175,6 +169,17 @@
 			<artifactId>jdom2</artifactId>
 			<scope>provided</scope>
 		</dependency>	
+		
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-core</artifactId>
+			<scope>test</scope>
+		</dependency>		
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>${infinispan.hibernate.artifact}</artifactId>
+			<scope>test</scope>
+		</dependency>		
 	</dependencies>
 
 	<build>

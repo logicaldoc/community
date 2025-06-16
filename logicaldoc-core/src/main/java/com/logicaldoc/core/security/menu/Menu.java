@@ -3,6 +3,10 @@ package com.logicaldoc.core.security.menu;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.logicaldoc.core.PersistentObject;
+import com.logicaldoc.core.security.AccessControlEntry;
+import com.logicaldoc.core.security.Secure;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -11,13 +15,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.PersistentObject;
-import com.logicaldoc.core.security.AccessControlEntry;
-import com.logicaldoc.core.security.Secure;
 
 /**
  * This class represents the key concept of security. A Menu not only models
@@ -33,7 +30,6 @@ import com.logicaldoc.core.security.Secure;
 @Entity
 @Table(name = "ld_menu")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Menu extends PersistentObject implements Secure<AccessControlEntry>, Comparable<Menu> {
 
 	private static final long serialVersionUID = 1L;

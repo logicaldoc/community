@@ -4,6 +4,13 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.PersistentObject;
+import com.logicaldoc.util.Context;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,15 +18,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.PersistentObject;
-import com.logicaldoc.util.Context;
 
 /**
  * This class represents groups. <br>
@@ -37,7 +35,6 @@ import com.logicaldoc.util.Context;
 @Entity
 @Table(name = "ld_group")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Group extends PersistentObject implements Serializable {
 
 	private static final long serialVersionUID = 2L;

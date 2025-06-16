@@ -17,8 +17,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +38,6 @@ import com.logicaldoc.util.crypt.CryptUtil;
 @Entity
 @Table(name = "ld_user")
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class User extends PersistentObject implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(User.class);
@@ -124,7 +121,7 @@ public class User extends PersistentObject implements Serializable {
 	/**
 	 * The last time the password was changed
 	 */
-	@Column(name = "ld_passwordchanged")
+	@Column(name = "ld_passwordchanged", columnDefinition = "DATETIME(3)")
 	private Date passwordChanged = new Date();
 
 	/**
@@ -163,7 +160,7 @@ public class User extends PersistentObject implements Serializable {
 	/**
 	 * When the certificate expires
 	 */
-	@Column(name = "ld_certexpire")
+	@Column(name = "ld_certexpire", columnDefinition = "DATETIME(3)")
 	private Date certExpire;
 
 	/**
@@ -221,7 +218,7 @@ public class User extends PersistentObject implements Serializable {
 	/**
 	 * When this account expires
 	 */
-	@Column(name = "ld_expire")
+	@Column(name = "ld_expire", columnDefinition = "DATETIME(3)")
 	private Date expire;
 
 	/**
@@ -254,7 +251,7 @@ public class User extends PersistentObject implements Serializable {
 	/**
 	 * Last time the user successfully logged in
 	 */
-	@Column(name = "ld_lastlogin")
+	@Column(name = "ld_lastlogin", columnDefinition = "DATETIME(3)")
 	private Date lastLogin = new Date();
 
 	@Transient
