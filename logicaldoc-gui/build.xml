@@ -22,8 +22,7 @@
 					src="target/${pom.artifactId}-${pom.version}-plugin.zip"
 					dest="@{webroot}" overwrite="true"/>
 
-				<copy todir="@{webroot}/fontawesome" overwrite="true"
-					failonerror="false">
+				<copy todir="@{webroot}/fontawesome" overwrite="true" failonerror="false">
 					<fileset
 						dir="../../../enterprise/logicaldoc/logicaldoc-enterprise-gui/war/fontawesome"
 						includes="**" />
