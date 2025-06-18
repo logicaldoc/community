@@ -92,20 +92,13 @@
 		<property name="hibernateProperties">
             <props>
                 <prop key="hibernate.dialect">${hibernate.dialect}</prop>
+                <prop key="hibernate.id.optimizer.pooled.preferred">${hibernate.id.optimizer}</prop>
                 <prop key="hibernate.generate_statistics">true</prop>
                 <prop key="hibernate.cache.use_second_level_cache">true</prop>
                 <prop key="hibernate.cache.use_query_cache">true</prop>
                 <prop key="hibernate.cache.region.factory_class">org.infinispan.hibernate.cache.v62.InfinispanRegionFactory</prop>
-                <prop key="hibernate.cache.infinispan.cfg">org/infinispan/hibernate/cache/commons/builder/infinispan-configs-local.xml</prop>
+                <prop key="hibernate.cache.infinispan.cfg">/infinispan.xml</prop>
             </props>
-            		
-			<!-- props>
-				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
-                <prop key="hibernate.id.new_generator_mappings">true</prop>
-				<prop key="hibernate.cache.use_second_level_cache">true</prop>
-                <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
-                <prop key="net.sf.ehcache.configurationResourceName">#{ContextProperties.get('cluster.enabled') == 'true' ? '/ehcache-cluster.xml' : '/ehcache.xml'}</prop>
-			</props -->
 		</property>
 	</bean>
 	<!--Transaction management -->

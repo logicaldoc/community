@@ -2,13 +2,20 @@ package com.logicaldoc.webservice;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.searchengine.SearchOptions;
 import com.logicaldoc.core.security.Tenant;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.core.security.authorization.UnexistingResourceException;
+import com.logicaldoc.util.time.TimeDiff;
 import com.logicaldoc.webservice.model.WSAttribute;
 import com.logicaldoc.webservice.model.WSBookmark;
 import com.logicaldoc.webservice.model.WSDocument;
@@ -53,7 +60,7 @@ public class SoapWorkbench {
 		try {
 			System.out.println(info.getInfo().getProductName() + "  " + info.getInfo().getDate());
 
-			systemStuff(sid);
+//			systemStuff(sid);
 
 //			String[] features = systemClient.getInfo().getFeatures();
 //			System.out.println("Features:");
@@ -152,9 +159,25 @@ public class SoapWorkbench {
 			// System.out.println("**************************************");
 			// }
 
+			massiveInsert(sid);
 		} finally {
 			auth.logout(sid);
 		}
+	}
+
+	private static void massiveInsert(String sid) throws AuthenticationException, PermissionException, PersistenceException, UnexistingResourceException, WebserviceException, IOException {
+		SoapFolderClient folderClient = new SoapFolderClient(BASE + "/Folder");
+
+		Date start=new Date();		
+		for(int i=0; i<1000; i++) {
+			WSFolder folder = new WSFolder();
+			folder.setName("dummy--"+i);
+			folder.setParentId(717514744L);
+			folder = folderClient.create(sid, folder);
+		}
+		Date end=new Date();
+		
+		System.out.println("Completed in "+TimeDiff.printDuration(start, end));
 	}
 
 	private static void systemStuff(String sid) throws Exception {

@@ -2,11 +2,12 @@ package com.logicaldoc.core.security.spring;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
-import jakarta.servlet.http.HttpServletRequest;
-
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.DisabledException;
@@ -29,6 +30,9 @@ import com.logicaldoc.core.security.authentication.AccountNotFoundException;
 import com.logicaldoc.core.security.authentication.OutsideWorkingTimeException;
 import com.logicaldoc.core.security.authentication.PasswordExpiredException;
 import com.logicaldoc.core.security.user.Group;
+import com.logicaldoc.util.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * This Authentication provider users the <code>AuthenticationChain</code> to
@@ -43,19 +47,26 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) authentication;
-		String username = String.valueOf(auth.getPrincipal());
+		if (authentication instanceof AnonymousAuthenticationToken anonymousAuthentication)
+			return authenticateAnonymous(anonymousAuthentication);
+		else if (authentication instanceof UsernamePasswordAuthenticationToken credentialsAuthentication)
+			return authenticateCredentials(credentialsAuthentication);
+		else
+			return authentication;
+	}
+
+	protected Authentication authenticateCredentials(UsernamePasswordAuthenticationToken authentication) {
+		String username = String.valueOf(authentication.getPrincipal());
 
 		HttpServletRequest httpReq = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 				.getRequest();
 
-		String password = getPassword(auth, httpReq);
+		String password = getPassword(authentication, httpReq);
 
 		String key = httpReq.getParameter("key");
 
-		if (authentication.getDetails() instanceof LDAuthenticationDetails ldAuthenticationDetails) {
+		if (authentication.getDetails() instanceof LDAuthenticationDetails ldAuthenticationDetails)
 			key = ldAuthenticationDetails.getSecretKey();
-		}
 
 		log.debug("Authenticate user {} with key {}", username, key != null ? key : "-");
 
@@ -126,6 +137,23 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 					? String.format("Security checks failed for user %s - %s", username, e.getMessage())
 					: "badcredentials");
 		}
+	}
+
+	private AnonymousAuthenticationToken authenticateAnonymous(AnonymousAuthenticationToken authentication)
+			throws AuthenticationException {
+		log.debug("Authenticate anonymous user");
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+				.getRequest();
+		if ("login".equals(request.getParameter("anonymous"))) {
+			String tenant = "default";
+			if (StringUtils.isNotEmpty(request.getParameter("tenant")))
+				tenant = request.getParameter("tenant");
+
+			authentication
+					.setAuthenticated(Context.get().getProperties().getBoolean(tenant + ".anonymous.enabled", false));
+		}
+
+		return authentication;
 	}
 
 	private String getPassword(UsernamePasswordAuthenticationToken auth, HttpServletRequest httpReq) {

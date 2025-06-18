@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 /**
- * This makes use of sessions nut also uses our request-sid binding.
+ * This makes use of sessions but also uses our request-sid binding.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5

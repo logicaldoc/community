@@ -1,6 +1,7 @@
 package com.logicaldoc.core.security.spring;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ public class AnonymousLoginFilter extends GenericFilterBean {
 	@Override
 	public void doFilter(ServletRequest rec, ServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
+				
 		HttpServletRequest request = (HttpServletRequest) rec;
 		HttpServletResponse response = (HttpServletResponse) res;
 

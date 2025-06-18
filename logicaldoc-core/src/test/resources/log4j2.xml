@@ -25,14 +25,14 @@
 			</Policies>
 			<DefaultRolloverStrategy max="1" />
 		</RollingFile>
-		<RollingFile name="hibernate" fileName="${root}/hibernate.log" filePattern="${root}/hikari.log.%i">
+		<RollingFile name="hibernate" fileName="${root}/hibernate.log" filePattern="${root}/hibernate.log.%i">
 			<PatternLayout>
 				<Pattern>${pattern}</Pattern>
 			</PatternLayout>
 			<Policies>
 				<SizeBasedTriggeringPolicy size="1 MB" />
 			</Policies>
-			<DefaultRolloverStrategy max="1" />
+			<DefaultRolloverStrategy max="10" />
 		</RollingFile>		
 
 		<Console name="console" target="SYSTEM_OUT">
@@ -41,6 +41,10 @@
 	</Appenders>
 
 	<Loggers>
+	    <Logger name="org.hibernate" level="debug" additivity="false">
+	     	<Appender-Ref ref="hibernate" />
+		</Logger>
+	
 	    <Logger name="com.logicaldoc.core.conversion" level="debug" additivity="false">
 	     	<Appender-Ref ref="file" />
 		</Logger>

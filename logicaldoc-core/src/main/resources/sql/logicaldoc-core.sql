@@ -250,7 +250,36 @@ create table ld_apikey (ld_id bigint not null, ld_lastmodified timestamp not nul
                         ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint not null, ld_lastused timestamp, ld_key varchar(255) not null,
                         ld_name varchar(255) not null, ld_label varchar(255), primary key (ld_id));
                           
-create table ld_hilo (sequence_name varchar(40) NOT NULL, next_val bigint NOT NULL, primary key (sequence_name));
+-- Create the sequences for ID generation
+create sequence ld_bookmark_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_document_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_generic_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_group_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_history_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_link_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_menu_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_systemmessage_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_template_SEQ start with 100 INCREMENT BY 50;                             
+create sequence ld_attributeset_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_ticket_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_user_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_user_history_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_version_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_folder_SEQ start with 100 INCREMENT BY 50;                         
+create sequence ld_folder_history_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_rating_SEQ start with 100 INCREMENT BY 50;                      
+create sequence ld_note_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_messagetemplate_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_contact_SEQ start with 100 INCREMENT BY 50;                                 
+create sequence ld_tenant_SEQ start with 100 INCREMENT BY 50;  
+create sequence ld_sequence_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_extoption_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_session_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_dashlet_SEQ start with 100 INCREMENT BY 50;                          
+create sequence ld_device_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_password_history_SEQ start with 100 INCREMENT BY 50;                   
+create sequence ld_search_SEQ start with 100 INCREMENT BY 50;
+create sequence ld_apikey_SEQ start with 100 INCREMENT BY 50;
 
 
 alter table ld_document add constraint FK75ED9C0276C86307 foreign key (ld_templateid) references ld_template(ld_id);
@@ -811,32 +840,3 @@ and date >= ''$DateTool.formatSQL($DateTool.addDays($CURRENT_DATE, -10))''
 order by date desc',null,'docevent', 10, 1);
 insert into ld_dashlet	(ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_recordversion, ld_tenantid, ld_name, ld_title, ld_query, ld_content, ld_type, ld_max, ld_unique)
 values(9,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,1,1,'bookmark','bookmarks','',null,'bookmark', 10, 0);
-
-insert into ld_hilo(sequence_name, next_val) values ('ld_document', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_bookmark', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_generic', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_group', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_history', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_link', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_menu', 5000);
-insert into ld_hilo(sequence_name, next_val) values ('ld_systemmessage', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_template', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_ticket', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_user', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_user_history', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_version', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_folder', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_folder_history', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_rating', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_note', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_messagetemplate', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_tenant', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_sequence', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_extoption', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_attributeset', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_session', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_dashlet', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_device', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_password_history', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_search', 100);
-insert into ld_hilo(sequence_name, next_val) values ('ld_apikey', 100);

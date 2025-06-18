@@ -77,7 +77,7 @@ public class HibernateContactDAOTest extends AbstractCoreTestCase {
 
 		contact1.setUserId(-3L);
 		assertEquals(false, contact1.equals(contact2));
-		
+
 		assertNull(testSubject.findById(4L));
 	}
 
@@ -95,9 +95,5 @@ public class HibernateContactDAOTest extends AbstractCoreTestCase {
 
 		testSubject.store(contact);
 		assertNotNull(contact);
-		
-		Long nextVal = testSubject.queryForLong("select next_val from ld_hilo where sequence_name='ld_contact'");
-		assertEquals(100L, nextVal.longValue());
 	}
-
 }

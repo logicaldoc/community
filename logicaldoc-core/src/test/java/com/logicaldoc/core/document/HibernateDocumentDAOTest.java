@@ -493,6 +493,26 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
+	public void testStoreMassive() throws PersistenceException, InterruptedException {
+		assertEquals(0L, testSubject.queryForLong("select count(*) from ld_document where ld_filename like 'test-%'"));
+
+		int total = Context.get().getProperties().getInt("maxdocsperfolder") - 100;
+		Document master = testSubject.findById(1);
+		testSubject.initialize(master);
+		for (int i = 0; i < total; i++) {
+			Document newDoc = new Document();
+			newDoc.setFileName("test-" + i + ".txt");
+			newDoc.setId(0L);
+			newDoc.setCustomId(null);
+			newDoc.setFolder(master.getFolder());
+			testSubject.store(newDoc);
+		}
+
+		assertEquals(total,
+				testSubject.queryForLong("select count(*) from ld_document where ld_filename like 'test-%'"));
+	}
+
+	@Test
 	public void testStore() throws PersistenceException {
 		Document doc = testSubject.findById(1);
 		assertNotNull(doc);

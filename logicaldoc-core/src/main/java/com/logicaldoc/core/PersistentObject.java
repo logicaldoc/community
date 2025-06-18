@@ -3,12 +3,11 @@ package com.logicaldoc.core;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Version;
@@ -36,12 +35,7 @@ public abstract class PersistentObject implements Serializable {
 	public static final int DELETED_CODE_STRONG = 2;
 
 	@Id
-	@GeneratedValue(generator = "hilo")
-	@GenericGenerator(name = "hilo", strategy = "enhanced-table", parameters = {
-			@Parameter(name = "table_name", value = "ld_hilo"),
-			@Parameter(name = "prefer_entity_table_as_segment_value", value = "true"),
-			@Parameter(name = "optimizer", value = "org.hibernate.id.enhanced.HiLoOptimizer"),
-			@Parameter(name = "initial_value", value = "100") })
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "ld_id")
 	public long id = 0;
 

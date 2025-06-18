@@ -31,7 +31,7 @@
     <bean id="basicAuthenticationEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
       <property name="realmName" value="Security Realm" />
     </bean>
-    <bean id="WebserviceBasicAuthenticationFilter" class="com.logicaldoc.core.security.spring.ConditionalBasicAuthenticationFilter">
+    <bean id="webserviceBasicAuthenticationFilter" class="com.logicaldoc.core.security.spring.ConditionalBasicAuthenticationFilter">
         <constructor-arg index="0" ref="authenticationManager"/>
         <constructor-arg index="1" ref="basicAuthenticationEntryPoint"/>
         <property name="enableParam" value="webservice.basicauth.enabled" />
@@ -40,15 +40,7 @@
     <bean id="LDAuthenticationDetailsSource" class="com.logicaldoc.core.security.spring.LDAuthenticationDetailsSource" />
     <bean id="LDAuthenticationProvider" class="com.logicaldoc.core.security.spring.LDAuthenticationProvider" />
     <bean id="adminAuthenticationProvider"  class="${security.adminauthprovider}" />
-    <bean id="LDAccessDecisionManager" class="com.logicaldoc.core.security.spring.LDAccessDecisionManager">
-        <constructor-arg>
-            <list>
-                <bean
-                    class="org.springframework.security.web.access.expression.WebExpressionVoter" />
-                <bean class="org.springframework.security.access.vote.RoleVoter" />
-            </list>
-        </constructor-arg>
-    </bean>
+
     <bean id="LDAuthenticationSuccessHandler"
         class="com.logicaldoc.core.security.spring.LDAuthenticationSuccessHandler" />
     <bean id="LDAuthenticationFailureHandler"
@@ -175,7 +167,7 @@
         <security:intercept-url pattern="^(?!/auth).*$" access="isAuthenticated()" />            
             
         <security:custom-filter ref="SessionFilter" before="PRE_AUTH_FILTER" />            
-        <security:custom-filter ref="WebserviceBasicAuthenticationFilter" before="BASIC_AUTH_FILTER" />
+        <security:custom-filter ref="webserviceBasicAuthenticationFilter" before="BASIC_AUTH_FILTER" />
     </security:http>
  
  

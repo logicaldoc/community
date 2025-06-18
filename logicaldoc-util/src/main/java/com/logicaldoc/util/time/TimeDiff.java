@@ -88,8 +88,8 @@ public class TimeDiff {
 		return getTimeDifference(t1, t2);
 	}
 
-	public static String printDuration(Date start, Date stop) {
-		return printDuration(Math.abs(start.getTime() - stop.getTime()));
+	public static String printDuration(Date start, Date end) {
+		return printDuration(Math.abs(start.getTime() - end.getTime()));
 	}
 
 	/**

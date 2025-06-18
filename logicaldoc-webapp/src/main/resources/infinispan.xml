@@ -14,7 +14,7 @@
     </local-cache-configuration>
 
     <!-- Declare a default cache fallback -->
-    <local-cache name="default" configuration="default"/>
+    <!-- local-cache name="default" configuration="default"/ -->
 
     <!-- Declare Custom Folder cache -->
     <local-cache name="com.logicaldoc.core.folder.Folder">
