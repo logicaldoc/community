@@ -14,11 +14,13 @@ public class PrepareSequencesReset {
 			"ld_history", "ld_link", "ld_menu", "ld_systemmessage", "ld_template", "ld_attributeset", "ld_ticket",
 			"ld_user", "ld_user_history", "ld_version", "ld_folder", "ld_folder_history", "ld_rating", "ld_note",
 			"ld_messagetemplate", "ld_contact", "ld_tenant", "ld_sequence", "ld_extoption", "ld_session", "ld_dashlet",
-			"ld_device", "ld_password_history", "ld_search", "ld_apikey", "ld_bookmark", "ld_webservicecall");
+			"ld_device", "ld_password_history", "ld_search", "ld_apikey", "ld_bookmark", "ld_webservicecall",
+			"ld_aimodel", "ld_aimodel_history", "ld_sampler", "ld_audit", "ld_barcodetemplate", "ld_event",
+			"ld_event_ref", "ld_chatmessage", "ld_emailaccount", "ld_automation_routine", "ld_automation_trigger");
 
 	public static void main(String[] args) {
 		resetMariaDB();
-		
+
 		resetMySQL();
 	}
 
@@ -36,10 +38,10 @@ public class PrepareSequencesReset {
 	private static void resetMySQL() {
 		System.out.println("\n\n--------------\nMySQL:\n");
 
-		for (String table : tables) 
+		for (String table : tables)
 			System.out.println("delete from " + table + "_SEQ");
 		System.out.println(" ");
-		for (String table : tables) 	
+		for (String table : tables)
 			System.out.println("insert into " + table + "_SEQ(next_val) select max(ld_id) + 50 from " + table + ";");
 
 		System.out.println("\n--------------\n");
