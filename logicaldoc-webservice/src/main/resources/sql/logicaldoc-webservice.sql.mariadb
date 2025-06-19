@@ -6,4 +6,4 @@ create table ld_webservicecall (ld_id bigint not null, ld_lastmodified datetime 
                                 ld_device varchar(255), ld_protocol varchar(255), ld_notified int not null, 
                                 primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
                                 
-insert into ld_hilo(sequence_name, next_val) values ('ld_webservicecall', 100);                                
+create sequence ld_bookmark_SEQ as bigint increment by 50 start with 100;                          

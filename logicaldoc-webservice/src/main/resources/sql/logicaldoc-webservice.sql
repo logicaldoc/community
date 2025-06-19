@@ -7,5 +7,5 @@ create table ld_webservicecall (ld_id bigint not null, ld_lastmodified timestamp
                                 ld_comment varchar(4000), ld_path varchar(4000), ld_sessionid varchar(255),
                                 ld_userlogin varchar(255), ld_ip varchar(255), ld_geolocation varchar(255), 
                                 ld_device varchar(255), ld_protocol varchar(255), ld_notified int not null, primary key (ld_id));
-                                
-insert into ld_hilo(sequence_name, next_val) values ('ld_webservicecall', 100);
+                               
+create sequence ld_webservicecall_SEQ start with 100 INCREMENT BY 50;
