@@ -42,7 +42,7 @@ public abstract class Message extends PersistentObject {
 	/**
 	 * When the message was sent
 	 */
-	@Column(name = "ld_sentdate", nullable = false)
+	@Column(name = "ld_sentdate", nullable = false, columnDefinition = "DATETIME(3)")
 	private Date sentDate = new Date();
 
 	/**
