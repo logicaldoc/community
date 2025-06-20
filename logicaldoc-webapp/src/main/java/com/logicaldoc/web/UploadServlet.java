@@ -168,7 +168,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	}
 
 	/**
-	 * Retrieves the map containing the files uploaded in the current reqeust
+	 * Retrieves the map containing the files uploaded in the current request
 	 * 
 	 * @param request The current request
 	 * 
