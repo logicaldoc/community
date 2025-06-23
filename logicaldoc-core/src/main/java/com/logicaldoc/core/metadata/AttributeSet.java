@@ -13,9 +13,6 @@ import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 /**
  * Represents a set of attributes
  * 
@@ -28,7 +25,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 public class AttributeSet extends AbstractAttributeSet {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "ld_attributeset_ext", joinColumns = @JoinColumn(name = "ld_attsetid"))
 	@MapKeyColumn(name = "ld_name", length = 255)
