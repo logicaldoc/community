@@ -4,18 +4,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -23,6 +17,13 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.user.Group;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This filter looks for a sid parameter in the request or X-API-KEY header and
@@ -62,8 +63,6 @@ public class SessionFilter extends GenericFilterBean {
 		String sid = getSidFromRequest(request);
 
 		if (StringUtils.isNotEmpty(sid)) {
-			log.debug("The request refers the sid {}", sid);
-
 			try {
 				Session session = SessionManager.get().get(sid);
 				if (session == null || !session.isOpen()) {
@@ -85,9 +84,11 @@ public class SessionFilter extends GenericFilterBean {
 
 				// Return an authenticated token, containing user data and
 				// authorities
-				LDAuthenticationToken a = new LDAuthenticationToken(session.getUser(), null, authorities);
-				a.setSid(session.getSid());
-				SecurityContextHolder.getContext().setAuthentication(a);
+				LDAuthenticationToken auth = new LDAuthenticationToken(session.getUser(), null, authorities);
+				auth.setSid(session.getSid());
+
+				SecurityContext sc = SecurityContextHolder.getContext();
+				sc.setAuthentication(auth);
 			} catch (AuthenticationException ae) {
 				log.error(ae.getMessage(), ae);
 			} catch (Exception t) {

@@ -632,7 +632,6 @@
     </Logger>
     <Logger name="com.logicaldoc.conversion.HTMLConverter" additivity="true" level="debug" />
     <Logger name="com.logicaldoc.util.io" additivity="true" level="debug" />
-    <Logger name="com.logicaldoc.core.security.spring.LDAccessDecisionManager" additivity="false" level="error" />
     <Logger name="com.logicaldoc.stamp" additivity="false" level="debug" />
     <Logger name="com.logicaldoc.docusign.DocuSignPoller" level="info" additivity="false">
       <AppenderRef ref="DocuSignPoller" />
@@ -732,7 +731,7 @@
       <AppenderRef ref="DigestProcessor" />
       <AppenderRef ref="DigestProcessor_WEB" />
     </Logger>
-    <Logger name="org.springframework.security.web.session.SessionManagementFilter" level="info" additivity="true">
+    <Logger name="org.springframework.security" level="info" additivity="true">
       <AppenderRef ref="SPRING" />
       <AppenderRef ref="SPRING_WEB" />
     </Logger>
