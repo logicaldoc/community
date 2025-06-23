@@ -530,17 +530,21 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	}
 
 	private String getSessionFromApiKey(HttpServletRequest request) {
+		String sid = null;
 		try {
 			if (StringUtils.isNotEmpty(request.getHeader(HEADER_APIKEY))) {
+				log.debug("Found API Key in header {}", HEADER_APIKEY);
 				String apiKey = CryptUtil.encryptSHA256(request.getHeader(HEADER_APIKEY));
-				return getSessions().stream().filter(s -> apiKey.equals(s.getKey())).map(Session::getSid).findFirst()
-						.orElse(null);
+				sid = getSessions().stream().filter(s -> apiKey.equals(s.getKey()) && s.isOpen())
+						.map(Session::getSid).findFirst().orElse(null);
+				if (StringUtils.isNotEmpty(sid))
+					log.debug("Found SID bound to API Key in header {}", HEADER_APIKEY);
 			}
 		} catch (NoSuchAlgorithmException e) {
 			log.warn(e.getMessage(), e);
 		}
 
-		return null;
+		return sid;
 	}
 
 	private String getSessionIdFromCookie(HttpServletRequest request) {
