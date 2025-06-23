@@ -509,18 +509,44 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 		String sid = null;
 		if (StringUtils.isNotEmpty(request.getParameter(PARAM_SID))
-				&& Context.get().getProperties().getBoolean("security.acceptsid", false))
+				&& Context.get().getProperties().getBoolean("security.acceptsid", false)) {
+			log.debug("Got SID in request {}", PARAM_SID);
 			sid = request.getParameter(PARAM_SID);
-		else if (StringUtils.isNotEmpty(request.getHeader(PARAM_SID)))
+		} else if (StringUtils.isNotEmpty(request.getHeader(PARAM_SID))) {
+			log.debug("Got SID in request header {}", PARAM_SID);
 			sid = request.getHeader(PARAM_SID);
-		else if (request.getAttribute(PARAM_SID) != null
-				&& StringUtils.isNotEmpty((String) request.getAttribute(PARAM_SID)))
+		} else if (request.getAttribute(PARAM_SID) != null
+				&& StringUtils.isNotEmpty((String) request.getAttribute(PARAM_SID))) {
+			log.debug("Got SID in request attribute {}", PARAM_SID);
 			sid = (String) request.getAttribute(PARAM_SID);
-		else if (request.getSession(true).getAttribute(PARAM_SID) != null
-				&& StringUtils.isNotEmpty((String) request.getSession(true).getAttribute(PARAM_SID)))
+		} else if (request.getSession(true).getAttribute(PARAM_SID) != null
+				&& StringUtils.isNotEmpty((String) request.getSession(true).getAttribute(PARAM_SID))) {
+			log.debug("Got SID in session attribute {}", PARAM_SID);
 			sid = (String) request.getSession(true).getAttribute(PARAM_SID);
-		else
+		} else {
 			sid = getSessionIdFromCookie(request);
+		}
+
+		if (StringUtils.isEmpty(sid))
+			sid = getSessionFromApiKey(request);
+
+		return sid;
+	}
+
+	private String getSessionFromApiKey(HttpServletRequest request) {
+		String sid = null;
+		try {
+			if (StringUtils.isNotEmpty(request.getHeader(HEADER_APIKEY))) {
+				log.debug("Found API Key in header {}", HEADER_APIKEY);
+				String apiKey = CryptUtil.encryptSHA256(request.getHeader(HEADER_APIKEY));
+				sid = getSessions().stream().filter(s -> apiKey.equals(s.getKey()) && s.isOpen())
+						.map(Session::getSid).findFirst().orElse(null);
+				if (StringUtils.isNotEmpty(sid))
+					log.debug("Found SID bound to API Key in header {}", HEADER_APIKEY);
+			}
+		} catch (NoSuchAlgorithmException e) {
+			log.warn(e.getMessage(), e);
+		}
 
 		return sid;
 	}
