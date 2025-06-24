@@ -44,8 +44,8 @@ public class LDAuthenticationSuccessHandler extends SavedRequestAwareAuthenticat
 		 * Deduct the destination URL
 		 */
 		String requestedUrl = request.getParameter(PARAM_SUCCESSURL);
-		if (requestedUrl == null && request.getSession(false) != null)
-			request.getSession(false).removeAttribute(LDAccessDecisionManager.REQUESTED_URL);
+//		if (requestedUrl == null && request.getSession(false) != null)
+//			request.getSession(false).removeAttribute(LDAccessDecisionManager.REQUESTED_URL);
 
 		LDAuthenticationToken token = (LDAuthenticationToken) authentication;
 

@@ -1,8 +1,8 @@
 package com.logicaldoc.core;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-import junit.framework.Assert;
+import org.junit.Test;
 
 /**
  * Simple test to check the system infos
@@ -14,11 +14,11 @@ public class SystemInfoTest extends AbstractCoreTestCase {
 	@Test
 	public void testGet() {
 		SystemInfo info = SystemInfo.get();
-		Assert.assertEquals("LogicalDOC", info.getProduct());
-		Assert.assertEquals("LogicalDOC Community", info.getProductName());
+		assertEquals("LogicalDOC", info.getProduct());
+		assertEquals("LogicalDOC Community", info.getProductName());
 
-		Assert.assertEquals(7, info.getMajor());
-		Assert.assertEquals(7, info.getMinor());
-		Assert.assertEquals(4, info.getMicro());
+		assertEquals(7, info.getMajor());
+		assertEquals(7, info.getMinor());
+		assertEquals(4, info.getMicro());
 	}
 }
