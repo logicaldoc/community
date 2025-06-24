@@ -17,7 +17,7 @@ public class TimeDiffTest extends AbstractTestCase {
 
 	@Override
 	protected List<String> getDatabaseScripts() {
-		return List.of( "/sql1.sql" );
+		return List.of( "sql1.sql" );
 	}
 	
 	@Test

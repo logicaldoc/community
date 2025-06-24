@@ -21,7 +21,7 @@ public class SecurityConfiguratorTest {
 
 	@Before
 	public void setUp() throws IOException {
-		FileUtil.copyResource("/context-security.xml", contextSecurityXml);
+		FileUtil.copyResource("context-security.xml", contextSecurityXml);
 	}
 
 	@Test

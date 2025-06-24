@@ -1,5 +1,9 @@
 package com.logicaldoc.util.config;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -8,8 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.util.io.FileUtil;
-
-import junit.framework.Assert;
 
 /**
  * Test case for <code>WebConfigurator</code>
@@ -23,12 +25,13 @@ public class WebConfiguratorTest {
 
 	@Before
 	public void setUp() throws IOException {
-		FileUtil.copyResource("/web.xml", webXml);
+		FileUtil.delete(webXml);
+		FileUtil.copyResource("web.xml", webXml);
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		// Nothing to do
+	    FileUtil.delete(webXml);
 	}
 
 	@Test
@@ -41,14 +44,14 @@ public class WebConfiguratorTest {
 		} catch (Exception t) {
 			// Nothing to do
 		}
-		Assert.assertNotNull(notThrownTest);
+		assertNotNull(notThrownTest);
 	}
 
 	@Test
 	public void testSetTransportGuarantee() {
 		WebConfigurator config = new WebConfigurator(webXml.getPath());
-		Assert.assertTrue(config.setTransportGuarantee("CONFIDENCIAL"));
-		Assert.assertFalse(config.setTransportGuarantee("CONFIDENCIAL"));
+		assertTrue(config.setTransportGuarantee("CONFIDENCIAL"));
+		assertFalse(config.setTransportGuarantee("CONFIDENCIAL"));
 
 		String notThrownTest = null;
 		try {
@@ -56,6 +59,6 @@ public class WebConfiguratorTest {
 		} catch (Exception t) {
 			// Nothing to do
 		}
-		Assert.assertNotNull(notThrownTest);
+		assertNotNull(notThrownTest);
 	}
 }

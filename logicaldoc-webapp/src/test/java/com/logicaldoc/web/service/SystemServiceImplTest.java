@@ -231,7 +231,7 @@ public class SystemServiceImplTest extends AbstractWebappTestCase {
 		libFolder.mkdirs();
 
 		File pluginFile = new File("target/logicaldoc-dummy-8.9.2-plugin.zip");
-		FileUtil.copyResource("/" + pluginFile.getName(), pluginFile);
+		FileUtil.copyResource("" + pluginFile.getName(), pluginFile);
 
 		Map<String, File> uploadedFilesMap = new HashMap<>();
 		uploadedFilesMap.put(pluginFile.getName(), pluginFile);

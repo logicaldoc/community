@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
@@ -20,7 +21,11 @@ import org.apache.commons.io.FilenameUtils;
 import org.hsqldb.cmdline.SqlFile;
 import org.hsqldb.cmdline.SqlToolError;
 import org.junit.After;
+import org.junit.AssumptionViolatedException;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.Stopwatch;
+import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -34,6 +39,7 @@ import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.util.time.Pause;
+import com.logicaldoc.util.time.TimeDiff;
 
 /**
  * Abstract test case that of database and context initialization.
@@ -52,6 +58,48 @@ public abstract class AbstractTestCase {
 	protected File tempDir = new File("target/tmp");
 
 	protected final String originalUserHome = System.getProperty(USER_HOME);
+
+	/**
+	 * Utility method to print the time spent executing the current test
+	 * 
+	 * @param description the current execution description as provided by JUnit
+	 * @param status How the test completed(eg succeeded, failed, finished)
+	 * @param nanos The time spent in nanoseconds
+	 */
+	protected static void logDuration(Description description, String status, long nanos) {
+		String testName = description.getClassName() + "#" + description.getMethodName();
+		String message = String.format("Test %s %s, spent %s", testName, status,
+				TimeDiff.printDuration(TimeUnit.NANOSECONDS.toMillis(nanos)));
+		switch(status) {
+		case "failed" -> log.error(message);
+		case "succeeded"-> log.debug(message);
+		case "skipped"-> log.debug(message);
+	    default -> log.info(message);
+		}
+	}
+
+	@Rule
+	public Stopwatch stopwatch = new Stopwatch() {
+		@Override
+		protected void succeeded(long nanos, Description description) {
+			logDuration(description, "succeeded", nanos);
+		}
+
+		@Override
+		protected void failed(long nanos, Throwable e, Description description) {
+			logDuration(description, "failed", nanos);
+		}
+
+		@Override
+		protected void skipped(long nanos, AssumptionViolatedException e, Description description) {
+			logDuration(description, "skipped", nanos);
+		}
+
+		@Override
+		protected void finished(long nanos, Description description) {
+			logDuration(description, "finished", nanos);
+		}
+	};
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {

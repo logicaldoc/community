@@ -23,7 +23,7 @@ public class RarUtilTest {
 		dir.mkdirs();
 		dir.mkdir();
 
-		FileUtil.copyResource("/kofax.rar", file);
+		FileUtil.copyResource("kofax.rar", file);
 	}
 
 	@After

@@ -1,5 +1,9 @@
 package com.logicaldoc.util.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -9,8 +13,6 @@ import org.junit.Test;
 
 import com.logicaldoc.util.io.FileUtil;
 
-import junit.framework.Assert;
-
 /**
  * Test case for <code>WebContextConfigurator</code>
  * 
@@ -19,31 +21,32 @@ import junit.framework.Assert;
  */
 public class WebContextConfiguratorTest {
 
-	File webXml = new File("target/metainfcontext.xml");
+	File metainfXml = new File("target/metainfcontext.xml");
 
 	@Before
 	public void setUp() throws IOException {
-		FileUtil.copyResource("/metainfcontext.xml", webXml);
+		FileUtil.delete(metainfXml);
+		FileUtil.copyResource("metainfcontext.xml", metainfXml);
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		// Nothing to do
+		FileUtil.delete(metainfXml);
 	}
 
 	@Test
 	public void testGetSameSiteCookies() {
-		WebContextConfigurator config = new WebContextConfigurator(webXml.getPath());
-		Assert.assertEquals("strict", config.getSameSiteCookies());
+		WebContextConfigurator config = new WebContextConfigurator(metainfXml.getPath());
+		assertEquals("strict", config.getSameSiteCookies());
 	}
 
 	@Test
 	public void testSetSameSiteCookies() {
-		WebContextConfigurator config = new WebContextConfigurator(webXml.getPath());
-		Assert.assertEquals("strict", config.getSameSiteCookies());
-		Assert.assertTrue(config.setSameSiteCookies("lax"));
-		config = new WebContextConfigurator(webXml.getPath());
-		Assert.assertEquals("lax", config.getSameSiteCookies());
-		Assert.assertFalse(config.setSameSiteCookies("lax"));
+		WebContextConfigurator config = new WebContextConfigurator(metainfXml.getPath());
+		assertEquals("strict", config.getSameSiteCookies());
+		assertTrue(config.setSameSiteCookies("lax"));
+		config = new WebContextConfigurator(metainfXml.getPath());
+		assertEquals("lax", config.getSameSiteCookies());
+		assertFalse(config.setSameSiteCookies("lax"));
 	}
 }

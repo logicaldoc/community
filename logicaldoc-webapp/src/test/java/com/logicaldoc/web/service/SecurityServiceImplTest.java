@@ -418,7 +418,7 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 		String oldAvatar = user.getAvatar();
 
 		File avatarFile = new File("target/avatar.png");
-		FileUtil.copyResource("/avatar.png", avatarFile);
+		FileUtil.copyResource("avatar.png", avatarFile);
 		try {
 			Map<String, File> uploadedFilesMap = new HashMap<>();
 			uploadedFilesMap.put(avatarFile.getName(), avatarFile);

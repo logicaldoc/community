@@ -31,7 +31,7 @@ public class FileUtilTest {
 			dir.mkdirs();
 			dir.mkdir();
 
-			FileUtil.copyResource("/kofax.rar", new File(root.getPath() + "/1/doc/1.0"));
+			FileUtil.copyResource("allowed-commands.txt", new File(root.getPath() + "/1/doc/1.0"));
 		}
 
 		assertEquals(total, root.listFiles().length);
@@ -97,7 +97,7 @@ public class FileUtilTest {
 	@Test
 	public void testReplaceInFile() throws IOException {
 		File file = new File("target/test.txt");
-		FileUtil.copyResource("/allowed-commands.txt", file);
+		FileUtil.copyResource("allowed-commands.txt", file);
 		FileUtil.replaceInFile(file.getPath(), "test-classes", "XYZ");
 		String content = FileUtil.readFile(file);
 		assertTrue(content.contains("XYZ"));

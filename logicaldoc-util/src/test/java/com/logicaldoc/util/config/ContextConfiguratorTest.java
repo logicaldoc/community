@@ -22,7 +22,7 @@ public class ContextConfiguratorTest {
 
 	@Before
 	public void setUp() throws IOException {
-		FileUtil.copyResource("/contexttest.xml", contextXml);
+		FileUtil.copyResource("contexttest.xml", contextXml);
 	}
 
 	@Test

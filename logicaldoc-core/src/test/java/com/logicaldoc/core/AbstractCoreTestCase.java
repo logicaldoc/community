@@ -62,7 +62,7 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 
 	@Override
 	protected List<String> getDatabaseScripts() {
-		return List.of("/sql/logicaldoc-core.sql", "/data.sql");
+		return List.of("sql/logicaldoc-core.sql", "data.sql");
 	}
 
 	private void prepareStore() throws IOException {
@@ -82,14 +82,14 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 		 */
 
 		// Store the file of document 1
-		FileUtil.copyResource("/loremipsum.pdf", new File(rootStoreOne.getPath() + "/1/doc/1.0"));
-		FileUtil.copyResource("/loremipsum.pdf", new File(rootStoreOne.getPath() + "/1/doc/1.0-conversion.pdf"));
+		FileUtil.copyResource("loremipsum.pdf", new File(rootStoreOne.getPath() + "/1/doc/1.0"));
+		FileUtil.copyResource("loremipsum.pdf", new File(rootStoreOne.getPath() + "/1/doc/1.0-conversion.pdf"));
 
 		// Store the file of document 3
-		FileUtil.copyResource("/small.pdf", new File(rootStoreOne.getPath() + "/3/doc/1.3"));
+		FileUtil.copyResource("small.pdf", new File(rootStoreOne.getPath() + "/3/doc/1.3"));
 
 		// Store the file of document 8
-		FileUtil.copyResource("/small.pdf", new File(rootStoreOne.getPath() + "/8/doc/1.0"));
+		FileUtil.copyResource("small.pdf", new File(rootStoreOne.getPath() + "/8/doc/1.0"));
 	}
 
 	@Override

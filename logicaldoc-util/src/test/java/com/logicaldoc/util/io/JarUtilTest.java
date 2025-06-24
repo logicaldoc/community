@@ -22,7 +22,7 @@ public class JarUtilTest {
 		dir.mkdirs();
 		dir.mkdir();
 
-		FileUtil.copyResource("/test.zip", file);
+		FileUtil.copyResource("test.zip", file);
 	}
 
 	@After

@@ -143,21 +143,21 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	private void prepareRepository() throws IOException {
 		File file3 = new File(repositoryDir.getPath() + "/docs/3/doc/1.0");
 		file3.getParentFile().mkdirs();
-		FileUtil.copyResource("/test.zip", file3);
+		FileUtil.copyResource("test.zip", file3);
 
 		File file5 = new File(repositoryDir.getPath() + "/docs/5/doc/1.0");
 		file5.getParentFile().mkdirs();
-		FileUtil.copyResource("/Joyce Jinks shared the Bruce Duo post.eml", file5);
-		FileUtil.copyResource("/Joyce Jinks shared the Bruce Duo post.eml",
+		FileUtil.copyResource("Joyce Jinks shared the Bruce Duo post.eml", file5);
+		FileUtil.copyResource("Joyce Jinks shared the Bruce Duo post.eml",
 				new File(repositoryDir.getPath() + "/docs/5/doc/1.0-conversion.pdf"));
 
 		File file6 = new File(repositoryDir.getPath() + "/docs/6/doc/1.0");
 		file6.getParentFile().mkdirs();
-		FileUtil.copyResource("/Hurry up! Only a few hours for the Prime Day VGA promos !!!.msg", file6);
+		FileUtil.copyResource("Hurry up! Only a few hours for the Prime Day VGA promos !!!.msg", file6);
 
 		File file7 = new File(repositoryDir.getPath() + "/docs/7/doc/1.0");
 		file7.getParentFile().mkdirs();
-		FileUtil.copyResource("/New error indexing documents.eml", file7);
+		FileUtil.copyResource("New error indexing documents.eml", file7);
 
 		Map<String, File> uploadedFiles = new HashMap<>();
 		uploadedFiles.put("file3.zip", file3);
@@ -618,8 +618,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		File pdf2 = new File(tempDir, "pdf2.pdf");
 
 		try {
-			FileUtil.copyResource("/pdf1.pdf", pdf1);
-			FileUtil.copyResource("/pdf2.pdf", pdf2);
+			FileUtil.copyResource("pdf1.pdf", pdf1);
+			FileUtil.copyResource("pdf2.pdf", pdf2);
 
 			Map<String, File> uploadedFiles = new HashMap<>();
 			uploadedFiles.put(pdf1.getName(), pdf1);
@@ -650,7 +650,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		File pdf2 = new File(tempDir, "pdf2.pdf");
 		try {
-			FileUtil.copyResource("/pdf2.pdf", pdf2);
+			FileUtil.copyResource("pdf2.pdf", pdf2);
 
 			Map<String, File> uploadedFiles = new HashMap<>();
 			uploadedFiles.put(pdf2.getName(), pdf2);
@@ -732,7 +732,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertEquals(0, doc.getIndexed());
 		assertEquals("test.txt", doc.getFileName());
 
-		FileUtil.copyResource("/New error indexing documents.eml",
+		FileUtil.copyResource("New error indexing documents.eml",
 				new File(repositoryDir.getPath() + "/docs/" + doc.getId() + "/doc/" + doc.getFileVersion()));
 
 		testSubject.indexDocuments(List.of(doc.getId()));
@@ -755,7 +755,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertEquals(0, doc.getIndexed());
 		assertEquals("test.txt", doc.getFileName());
 
-		FileUtil.copyResource("/New error indexing documents.eml",
+		FileUtil.copyResource("New error indexing documents.eml",
 				new File(repositoryDir.getPath() + "/docs/" + doc.getId() + "/doc/" + doc.getFileVersion()));
 		assertTrue(testSubject.getContentAsString(doc.getId()).contains("Gracias por tu pronta respuesta"));
 	}

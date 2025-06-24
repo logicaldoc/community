@@ -30,7 +30,7 @@ public class ZipUtilTest {
 	@Before
 	public void setUp() throws IOException {
 		folder.mkdir();
-		FileUtil.copyResource("/test.zip", file);
+		FileUtil.copyResource("test.zip", file);
 	}
 
 	@After
@@ -93,7 +93,7 @@ public class ZipUtilTest {
 		String notThrownTest = null;
 		try {
 			File zipFile = new File("target/NeuesZip.zip");
-			FileUtil.copyResource("/NeuesZip.zip", zipFile);
+			FileUtil.copyResource("NeuesZip.zip", zipFile);
 			testSubject.setFileNameCharset("utf-8");
 			List<String> entries = testSubject.listEntries(zipFile);
 			log.debug("Found {} entries", entries.size());

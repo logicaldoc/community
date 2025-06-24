@@ -32,6 +32,10 @@
 	</Appenders>
 
 	<Loggers>
+		<Logger name="com.logicaldoc.util.junit.AbstractTestCase" level="info" additivity="true">
+			<AppenderRef ref="console" />
+		</Logger>
+	
 		<Logger name="org.apache.cxf" level="fatal" additivity="false">
 			<Appender-Ref ref="file" />
 		</Logger>

@@ -588,7 +588,7 @@ public class StandardSearchEngine implements SearchEngine {
 				indexHome.mkdir();
 			}
 			if (!solrXml.exists()) {
-				FileUtil.copyResource("/index/solr.xml", solrXml);
+				FileUtil.copyResource("index/solr.xml", solrXml);
 			}
 
 			File ldoc = new File(config.getProperty(INDEX_DIR));
@@ -599,7 +599,7 @@ public class StandardSearchEngine implements SearchEngine {
 			}
 			File coreProp = new File(ldoc, "core.properties");
 			if (!coreProp.exists())
-				FileUtil.copyResource("/index/logicaldoc/core.properties", coreProp);
+				FileUtil.copyResource("index/logicaldoc/core.properties", coreProp);
 
 			File conf = new File(ldoc, "conf");
 			if (!conf.exists()) {
@@ -608,23 +608,23 @@ public class StandardSearchEngine implements SearchEngine {
 			}
 			File solrconfigXml = new File(conf, "solrconfig.xml");
 			if (!solrconfigXml.exists()) {
-				FileUtil.copyResource("/index/logicaldoc/conf/solrconfig.xml", solrconfigXml);
+				FileUtil.copyResource("index/logicaldoc/conf/solrconfig.xml", solrconfigXml);
 			}
 			File schemaXml = new File(conf, "schema.xml");
 			if (!schemaXml.exists()) {
-				FileUtil.copyResource("/index/logicaldoc/conf/schema.xml", schemaXml);
+				FileUtil.copyResource("index/logicaldoc/conf/schema.xml", schemaXml);
 			}
 			File synonymsTxt = new File(conf, "synonyms.txt");
 			if (!synonymsTxt.exists()) {
-				FileUtil.copyResource("/index/logicaldoc/conf/synonyms.txt", synonymsTxt);
+				FileUtil.copyResource("index/logicaldoc/conf/synonyms.txt", synonymsTxt);
 			}
 			File protwordsTxt = new File(conf, "protwords.txt");
 			if (!protwordsTxt.exists()) {
-				FileUtil.copyResource("/index/logicaldoc/conf/protwords.txt", protwordsTxt);
+				FileUtil.copyResource("index/logicaldoc/conf/protwords.txt", protwordsTxt);
 			}
 			File alphatypesTxt = new File(conf, "alphatypes.txt");
 			if (!alphatypesTxt.exists()) {
-				FileUtil.copyResource("/index/logicaldoc/conf/alphatypes.txt", alphatypesTxt);
+				FileUtil.copyResource("index/logicaldoc/conf/alphatypes.txt", alphatypesTxt);
 			}
 
 			// Delete the lock file if it exists

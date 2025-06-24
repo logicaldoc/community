@@ -23,7 +23,7 @@ public class SevenZipUtilTest {
 		dir.mkdirs();
 		dir.mkdir();
 
-		FileUtil.copyResource("/kofax.7z", file);
+		FileUtil.copyResource("kofax.7z", file);
 	}
 
 	@After

@@ -13,11 +13,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
-import java.net.URL;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.CopyOption;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -226,22 +226,11 @@ public class FileUtil {
 	public static void copyResource(String resourceName, File out) throws IOException {
 		out.getParentFile().mkdirs();
 
-		URL resourceUrl = FileUtil.class.getResource(resourceName);
-		if (resourceUrl == null)
-			resourceUrl = Thread.currentThread().getContextClassLoader().getResource(resourceName);
-		if (resourceUrl == null)
-			throw new IOException("Resource cannot be found: " + resourceName);
-
-		try (InputStream is = resourceUrl.openStream();
-				BufferedInputStream bis = new BufferedInputStream(is);
-				OutputStream os = new FileOutputStream(out);
-				BufferedOutputStream bos = new BufferedOutputStream(os);) {
-			for (;;) {
-				int b = is.read();
-				if (b == -1)
-					break;
-				os.write(b);
-			}
+		try (InputStream is = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream(resourceName.startsWith("/") ? resourceName.substring(1) : resourceName)) {
+			Files.copy(is, out.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
 		}
 	}
 

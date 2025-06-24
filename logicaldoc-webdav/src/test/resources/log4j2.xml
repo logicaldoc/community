@@ -23,6 +23,9 @@
 	</Appenders>
 	
 	<Loggers>
+	    <Logger name="com.logicaldoc.util.junit.AbstractTestCase" level="info" additivity="true">
+			<AppenderRef ref="console" />
+		</Logger>		
 		<Logger name="com.logicaldoc" level="info" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>

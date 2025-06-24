@@ -213,7 +213,7 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 		}
 
 		File imageFile = new File("target/zone.jpg");
-		FileUtil.copyResource("/zone.jpg", imageFile);
+		FileUtil.copyResource("zone.jpg", imageFile);
 		UploadServlet.cleanUploads(servletSession);
 		Map<String, File> uploads = UploadServlet.getUploads(session.getSid());
 		uploads.put("zone.jpg", imageFile);

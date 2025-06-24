@@ -86,12 +86,12 @@ public abstract class AbstractWebdavTestCase extends AbstractTestCase {
 
 		File file3 = new File(repositoryDir.getPath() + "/docs/1/doc/1.0");
 		file3.getParentFile().mkdirs();
-		FileUtil.copyResource("/pdf1.pdf", file3);
+		FileUtil.copyResource("pdf1.pdf", file3);
 
 		File file5 = new File(repositoryDir.getPath() + "/docs/5/doc/1.0");
 		file5.getParentFile().mkdirs();
-		FileUtil.copyResource("/pdf2.pdf", file5);
-		FileUtil.copyResource("/pdf2.pdf", new File(repositoryDir.getPath() + "/docs/5/doc/1.0-conversion.pdf"));
+		FileUtil.copyResource("pdf2.pdf", file5);
+		FileUtil.copyResource("pdf2.pdf", new File(repositoryDir.getPath() + "/docs/5/doc/1.0-conversion.pdf"));
 	}
 
 	@Override

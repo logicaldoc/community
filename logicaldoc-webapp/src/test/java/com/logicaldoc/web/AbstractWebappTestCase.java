@@ -61,11 +61,11 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 		File docDir = new File(docs + "/1/doc");
 		docDir.mkdirs();
 		docDir.mkdir();
-		FileUtil.copyResource("/pdf1.pdf", new File(docDir, "1.0"));
+		FileUtil.copyResource("pdf1.pdf", new File(docDir, "1.0"));
 		docDir = new File(docs + "/3/doc");
 		docDir.mkdirs();
 		docDir.mkdir();
-		FileUtil.copyResource("/pdf2.pdf", new File(docDir, "1.1"));
+		FileUtil.copyResource("pdf2.pdf", new File(docDir, "1.1"));
 
 		File docs2 = new File(repositoryDir, "docs2");
 		docs2.mkdir();
