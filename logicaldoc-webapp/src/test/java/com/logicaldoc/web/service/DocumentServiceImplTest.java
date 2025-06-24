@@ -22,8 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.mail.MessagingException;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -72,8 +70,11 @@ import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.time.TimeDiff;
 import com.logicaldoc.web.AbstractWebappTestCase;
 import com.logicaldoc.web.UploadServlet;
+
+import jakarta.mail.MessagingException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DocumentServiceImplTest extends AbstractWebappTestCase {
@@ -106,6 +107,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 	protected SearchEngine searchEngine;
 
+	protected Date start=new Date();
+	
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
@@ -130,6 +133,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		} catch (MessagingException e) {
 			throw new IOException(e.getMessage(), e);
 		}
+		
+		start=new Date();
 	}
 
 	@Override
@@ -168,18 +173,28 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		session.getDictionary().put(UploadServlet.UPLOADS, uploadedFiles);
 	}
 
+	protected void printDuration(String  testName) {
+		System.out.println(testName + " completed in " + TimeDiff.printDuration(start, new Date()));
+	}
+	
 	@Test
 	public void testDestroyDocuments() throws ServerException, PersistenceException {
 		assertNotNull(docDao.findById(1L));
 		testSubject.destroyDocuments(List.of(1L));
 		assertEquals(0L, docDao.queryForLong("select count(ld_id) from ld_document where ld_id=1"));
+		
+		printDuration("testDestroyDocuments");
 	}
+
+	
 
 	@Test
 	public void testApplyParentFolderSecurity() throws ServerException, PersistenceException {
 		assertEquals(0L, docDao.queryForLong("select count(*) from ld_document_acl where ld_docid=1"));
 		testSubject.applyParentFolderSecurity(1L);
 		assertEquals(4L, docDao.queryForLong("select count(*) from ld_document_acl where ld_docid=1"));
+		
+		printDuration("testApplyParentFolderSecurity");
 	}
 
 	@Test
@@ -194,6 +209,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertEquals(0, docIds.size());
 		docIds = (List<Long>) docDao.queryForList("select ld_id from ld_document where ld_deleted=2", Long.class);
 		assertEquals(1, docIds.size());
+		
+		printDuration("testDeleteFromTrash");
 	}
 
 	@Test
@@ -208,6 +225,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertEquals(0, docIds.size());
 		docIds = (List<Long>) docDao.queryForList("select ld_id from ld_document where ld_deleted=2", Long.class);
 		assertEquals(1, docIds.size());
+		
+		printDuration("testEmptyTrash");
 	}
 
 	@Test
@@ -221,6 +240,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		testSubject.unarchiveDocuments(List.of(doc.getId()));
 		document = docDao.findById(7);
 		assertEquals(DocumentStatus.UNLOCKED, document.getStatus());
+		
+		printDuration("testArchiveAndUnarchiveDocuments");
 	}
 
 	@Test
@@ -236,6 +257,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		Document document = docDao.findById(5);
 		assertEquals(DocumentStatus.ARCHIVED, document.getStatus());
+		
+		printDuration("testArchiveFolder");
 	}
 
 	@Test
@@ -249,6 +272,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		Ticket t = tDao.findByTicketId(ticket.get(0));
 		assertNotNull(t);
 		assertEquals(5L, t.getDocId());
+		
+		printDuration("testCreateDownloadTicket");
 	}
 
 	@Test
@@ -274,6 +299,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		testSubject.deleteTicket(t.getId());
 		t = tDao.findByTicketId(ticket.get(0));
 		assertNull(t);
+		
+		printDuration("testDeleteEnableDisableTicket");
 	}
 
 	@Test
@@ -284,6 +311,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		testSubject.rename(doc.getId(), "newname.eml");
 		doc = testSubject.getById(7);
 		assertEquals("newname.eml", doc.getFileName());
+		
+		printDuration("testRename");
 	}
 
 	@Test
@@ -296,6 +325,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		testSubject.unsetPassword(5, "paperino");
 		doc = docDao.findById(5);
 		assertNull(doc.getPassword());
+		
+		printDuration("testSetAndUnsetPassword");
 	}
 
 	@Test
@@ -311,6 +342,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		// Try to uprotect with correct password
 		testSubject.unprotect(5, "pippo");
 		assertTrue(session.getUnprotectedDocs().containsKey(5L));
+		
+		printDuration("testUprotect");
 	}
 
 	@Test
@@ -339,6 +372,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertNotNull(doc);
 		assertEquals(" ", store.getString(doc.getId(), store.getResourceName(doc.getId(), null, null)));
 		testSubject.checkout(List.of(doc.getId()));
+		
+		printDuration("testCreateWithContent");
 	}
 
 	@Test
@@ -349,18 +384,20 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		testSubject.checkinContent(7, "checkedin contents");
 
 		// try to work on an alias
-		Document alias=new Document();
+		Document alias = new Document();
 		alias.setFileName("alias.txt");
 		alias.setDocRef(7L);
 		alias.setFolder(folderDao.findById(5L));
-		
+
 		assertEquals("checkedin contents", testSubject.getContentAsString(7L));
-		
+
 		docDao.store(alias);
 		testSubject.checkout(List.of(alias.getId()));
 		testSubject.checkinContent(alias.getId(), "checkedin contents2");
-		
+
 		assertEquals("checkedin contents2", testSubject.getContentAsString(alias.getId()));
+		
+		printDuration("testCheckinContent");
 	}
 
 	@Test
@@ -388,6 +425,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertEquals(Integer.valueOf(0), testSubject.deleteRating(rating.getId()));
 		rating = testSubject.getRating(doc.getId());
 		assertEquals(0, rating.getVote());
+		
+		printDuration("testSaveAndGetRating");
 	}
 
 	@Test
@@ -411,6 +450,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		} finally {
 			FileUtil.delete(tmpFile);
 		}
+		
+		printDuration("testReplaceFile");
 	}
 
 	@Test
@@ -424,6 +465,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertNotNull(doc);
 
 		assertEquals("document content", testSubject.getContentAsString(doc.getId()));
+		
+		printDuration("testCreateDocument");
 	}
 
 	@Test
@@ -444,6 +487,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		File movedFile = new File(repositoryDir + "/docs2/5/doc/1.0");
 		assertTrue(movedFile.exists());
+		
+		printDuration("testEnforceFilesIntoFolderStore");
 	}
 
 	@Test
@@ -455,6 +500,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		doc = testSubject.getById(7);
 		assertEquals(1, doc.getImmutable());
+		
+		printDuration("testMakeImmutable");
 	}
 
 	@Test
@@ -492,6 +539,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 			assertEquals("The document 7 is locked", e.getMessage());
 		}
 		assertTrue(exceptionHappened);
+		
+		printDuration("testPromoteVersion");
 	}
 
 	@Test
@@ -502,6 +551,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		testSubject.checkout(List.of(7L));
 		doc = testSubject.getById(7);
 		assertEquals(DocumentStatus.CHECKEDOUT.ordinal(), doc.getStatus());
+		
+		printDuration("testCheckout");
 	}
 
 	@Test
@@ -525,6 +576,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertEquals(DocumentStatus.UNLOCKED.ordinal(), doc.getStatus());
 		assertEquals("1.1", doc.getVersion());
 		assertEquals("1.1", doc.getFileVersion());
+		
+		printDuration("testCheckin");
 	}
 
 	@Test
@@ -605,6 +658,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 			assertEquals("Cannot add documents in the root", e.getMessage());
 		}
 		assertTrue(exceptionHappened);
+		
+		printDuration("testAddDocuments");
 	}
 
 	@Test
@@ -639,6 +694,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 			FileUtil.delete(pdf1);
 			FileUtil.delete(pdf2);
 		}
+		
+		printDuration("testMerge");
 	}
 
 	@Test
@@ -665,6 +722,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		} finally {
 			FileUtil.delete(pdf2);
 		}
+		
+		printDuration("testUpdatePages");
 	}
 
 	@Test
@@ -683,6 +742,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertNotNull(newDoc);
 		assertNull(newDoc.getDocRef());
 		assertEquals(alias.getFileName(), newDoc.getFileName());
+		
+		printDuration("testReplaceAlias");
 	}
 
 	@Test
@@ -706,6 +767,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		GUIDocument dc = testSubject.getById(newDoc.getId());
 		assertNotNull(dc);
 		assertEquals(1201, dc.getFolder().getId());
+		
+		printDuration("testDeduplicate");
 	}
 
 	@Test
@@ -717,6 +780,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		conversion = testSubject.getById(conversion.getId());
 		assertNotNull(conversion);
 		assertTrue(conversion.getFileName().endsWith(".pdf"));
+		
+		printDuration("testConvert");
 	}
 
 	@Test
@@ -742,6 +807,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertEquals(1, indexedDoc.getIndexed());
 
 		testSubject.indexDocuments(new ArrayList<>());
+		
+		printDuration("testIndex");
 	}
 
 	@Test
@@ -758,6 +825,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		FileUtil.copyResource("/New error indexing documents.eml",
 				new File(repositoryDir.getPath() + "/docs/" + doc.getId() + "/doc/" + doc.getFileVersion()));
 		assertTrue(testSubject.getContentAsString(doc.getId()).contains("Gracias por tu pronta respuesta"));
+		
+		printDuration("testGetContentAsString");
 	}
 
 	@Test
@@ -780,6 +849,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		versions = testSubject.getVersionsById(21, 22);
 		assertNotNull(versions);
 		assertEquals(0, versions.size());
+		
+		printDuration("testGetVersionsById");
 	}
 
 	@Test
@@ -797,6 +868,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		gdoc = testSubject.deleteVersions(ids);
 		assertNotNull(gdoc);
 		assertEquals(1, gdoc.getId());
+		
+		printDuration("testDeleteVersions");
 	}
 
 	@Test
@@ -815,6 +888,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		// Try with unexisting document
 		doc = testSubject.getById(99);
 		assertNull(doc);
+		
+		printDuration("testGetById");
 	}
 
 	@Test
@@ -830,6 +905,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		doc = testSubject.save(doc);
 		assertNotNull(doc);
+		
+		printDuration("testSave");
 	}
 
 	@Test
@@ -843,6 +920,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		link = linkDao.findById(1);
 		assertNotNull(link);
 		assertEquals("pippo", link.getType());
+		
+		printDuration("testUpdateLink");
 	}
 
 	@Test
@@ -860,6 +939,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertNull(link);
 		link = linkDao.findById(2);
 		assertNull(link);
+		
+		printDuration("testDeleteLinks");
 	}
 
 	@Test
@@ -885,6 +966,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertNull(doc);
 		doc = docDao.findById(3);
 		assertNull(doc);
+		
+		printDuration("testDelete");
 	}
 
 	@Test
@@ -899,6 +982,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		notes = noteDao.findByDocId(1L, "1.0");
 		assertNotNull(notes);
 		assertEquals(1, notes.size());
+		
+		printDuration("testDeleteNotes");
 	}
 
 	@Test
@@ -925,6 +1010,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 			exceptionHappened = true;
 		}
 		assertTrue(exceptionHappened);
+		
+		printDuration("testAddNote");
 	}
 
 	@Test
@@ -951,6 +1038,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertEquals(1L, doc.getLockUserId().longValue());
 		doc = docDao.findDocument(2);
 		assertEquals(1L, doc.getLockUserId().longValue());
+		
+		printDuration("testLock");
 	}
 
 	@Test
@@ -967,6 +1056,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertNotNull(link);
 		link = linkDao.findByDocIdsAndType(3, 4, "default");
 		assertNull(link);
+		
+		printDuration("testLinkDocuments");
 	}
 
 	@Test
@@ -977,6 +1068,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertNotNull(docDao.findById(4));
 		assertNotNull(docDao.findById(4));
 		assertEquals(5L, docDao.findById(4).getFolder().getId());
+		
+		printDuration("testRestore");
 	}
 
 	@Test
@@ -1021,6 +1114,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 			exceptionHappened = true;
 		}
 		assertTrue(exceptionHappened);
+		
+		printDuration("testBookmarks");
 	}
 
 	@Test
@@ -1036,6 +1131,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertEquals(2, histories.size());
 		assertEquals(0, histories.get(0).getIsNew());
 		assertEquals(0, histories.get(1).getIsNew());
+		
+		printDuration("testMarkHistoryAsRead");
 	}
 
 	@Test
@@ -1069,12 +1166,16 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		doc3 = docDao.findById(3);
 		assertNotNull(doc3);
 		assertEquals(IndexingStatus.TO_INDEX, doc3.getIndexed());
+		
+		printDuration("testIndexable");
 	}
 
 	@Test
 	public void testCountDocuments() throws ServerException {
 		assertEquals(7, testSubject.countDocuments(List.of(5L), 0));
 		assertEquals(0, testSubject.countDocuments(List.of(5L), 3));
+		
+		printDuration("testCountDocuments");
 	}
 
 	@Test
@@ -1136,6 +1237,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		// The value of attribute "attr1" is "test.xx@acme.de" this will
 		// validate correctly
 		testSubject.validate(gdoc);
+		
+		printDuration("testValidate");
 	}
 
 	@Test
@@ -1198,6 +1301,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		retvalue = testSubject.sendAsEmail(guiMail, "en-US");
 		log.info("returned message: {}", retvalue);
 		assertEquals("ok", retvalue);
+		
+		printDuration("testSendAsEmail");
 	}
 
 	@Test
@@ -1221,6 +1326,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		notes = testSubject.getNotes(4, null, null);
 		assertEquals(1, notes.size());
 
+		printDuration("testGetNotes");
 	}
 
 	@Test
@@ -1234,6 +1340,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertEquals(1, notes2.size());
 		assertEquals(notes.get(0).getId(), notes2.get(0).getId());
 		assertEquals("updated message", notes2.get(0).getMessage());
+		
+		printDuration("testUpdateNote");
 	}
 
 	@Test
@@ -1259,6 +1367,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		notes.add(gdn01);
 		notes.add(gdn02);
 		testSubject.saveNotes(5, null, notes, null);
+		
+		printDuration("testSaveNotes");
 	}
 
 	@Test
@@ -1326,6 +1436,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		} catch (ServerException e) {
 			fail("Unexpected exception was thrown");
 		}
+		
+		printDuration("testBulkUpdate");
 	}
 
 	@Test
@@ -1345,6 +1457,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		} catch (ServerException e) {
 			fail("Unexpected exception was thrown");
 		}
+		
+		printDuration("testExtractEmail");
 	}
 
 	@Test
@@ -1372,6 +1486,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		} catch (ServerException e) {
 			fail("Unexpected exception was thrown");
 		}
+		
+		printDuration("testSaveEmailAttachment");
 	}
 
 	@Test
@@ -1393,5 +1509,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		assertTrue(permissions.isReadingreq());
 		assertTrue(permissions.isPrint());
 		assertEquals(4, permissions.getAllowedPermissions().size());
+		
+		printDuration("testGetEnabledPermissions");
 	}
 }

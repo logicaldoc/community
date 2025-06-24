@@ -43,7 +43,7 @@ public class PrepareSequencesReset {
 		System.out.println("\n\n--------------\nMySQL:\n");
 
 		for (String table : tables)
-			System.out.println("delete from " + table + "_SEQ");
+			System.out.println("delete from " + table + "_SEQ;");
 		System.out.println(" ");
 		for (String table : tables)
 			System.out.println("insert into " + table + "_SEQ(next_val) select max(ld_id) + 50 from " + table + ";");
