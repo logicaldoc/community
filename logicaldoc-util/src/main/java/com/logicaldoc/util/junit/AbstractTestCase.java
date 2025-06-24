@@ -212,7 +212,7 @@ public abstract class AbstractTestCase {
 				SqlFile sql = new SqlFile(sqlFile, "Cp1252", false);
 				sql.setConnection(con);
 				try {
-					log.info("Running script {}", sqlScript);
+					log.trace("Running script {}", sqlScript);
 					sql.execute();
 				} catch (SqlToolError e) {
 					throw new SQLException(e.getMessage(), e);

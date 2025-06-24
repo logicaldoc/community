@@ -3,8 +3,6 @@ package com.logicaldoc.core.security.spring;
 import java.util.Collection;
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +19,15 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 /**
  * Our customization of an <code>AffirmativeBased</code>
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5
  */
+@Deprecated
 public class LDAccessDecisionManager extends UnanimousBased {
 
 	private static final Logger log = LoggerFactory.getLogger(LDAccessDecisionManager.class);
