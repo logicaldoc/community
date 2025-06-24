@@ -2,12 +2,14 @@
 <Configuration packages="com.logicaldoc.util.log4j">
 	<Properties>
 		<Property name="root">target</Property>
-		<Property name="pattern">%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n</Property>
+		<Property name="pattern">%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p (%c:%4L) --
+			%m%n</Property>
 		<Property name="dateformat">ISO8601</Property>
 	</Properties>
-	
+
 	<Appenders>
-		<RollingFile name="file" fileName="${root}/file.log" filePattern="${root}/file.log.%i">
+		<RollingFile name="file" fileName="${root}/file.log"
+			filePattern="${root}/file.log.%i">
 			<PatternLayout>
 				<Pattern>${pattern}</Pattern>
 			</PatternLayout>
@@ -21,54 +23,25 @@
 			<PatternLayout pattern="%m%n" />
 		</Console>
 	</Appenders>
-	
+
 	<Loggers>
-	    <Logger name="com.logicaldoc.util.junit.AbstractTestCase" level="info" additivity="true">
-			<AppenderRef ref="console" />
-		</Logger>		
-		<Logger name="com.logicaldoc" level="info" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-		<Logger name="com.logicaldoc.web.service" level="info" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-		<Logger name="com.logicaldoc.core.system" level="fatal" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-		<Logger name="org.hibernate.orm" level="error" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-        <Logger name="org.apache.solr" level="fatal" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-		<Logger name="org.eclipse.jetty" level="fatal" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-		<Logger name="java.sql" level="error" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-		<Logger name="org.hsqldb" level="error" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-		<Logger name="org.apache.solr" level="fatal" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>		
-		<Logger name="com.logicaldoc.util.exec" level="warn" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>				
-		
-		<Logger name="com.logicaldoc.util.spring.DatabasePropertySource" level="fatal" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>		
-		
-		<Logger name="com.logicaldoc.webdav" level="debug" additivity="false">
-			<AppenderRef ref="file" />
-		</Logger>
-		
-		
+		<Logger name="com.logicaldoc" level="info" />
+		<Logger name="com.logicaldoc.util.junit.AbstractTestCase" level="fatal" />
+		<Logger name="com.logicaldoc.web.service" level="info" />
+		<Logger name="com.logicaldoc.core.system" level="fatal" />
+		<Logger name="com.logicaldoc.util.exec" level="warn" />
+		<Logger name="com.logicaldoc.util.spring.DatabasePropertySource"
+			level="fatal" />
+		<Logger name="com.logicaldoc.webdav" level="debug" />
+
+		<Logger name="org.hibernate" level="error" />
+		<Logger name="org.apache.solr" level="fatal" />
+		<Logger name="org.eclipse.jetty" level="fatal" />
+		<Logger name="java.sql" level="error" />
+		<Logger name="org.hsqldb" level="error" />
+
 		<Root level="fatal">
-			<AppenderRef ref="console" />
+			<AppenderRef ref="file" />
 		</Root>
 	</Loggers>
-	
 </Configuration>
