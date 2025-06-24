@@ -8,16 +8,15 @@ import org.hibernate.Interceptor;
 import org.hibernate.type.Type;
 
 /**
- * An {@link Interceptor} that takes care about updating the last modified date of a persistence object
+ * An {@link Interceptor} that takes care about updating the last modified date
+ * of a persistence object
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 6.9
  */
-public class LastModifiedInterceptor implements Interceptor
-{
+public class LastModifiedInterceptor implements Interceptor {
 
 	protected static final String LAST_MODIFIED = "lastModified";
-
 
 	public LastModifiedInterceptor() {
 		super();
