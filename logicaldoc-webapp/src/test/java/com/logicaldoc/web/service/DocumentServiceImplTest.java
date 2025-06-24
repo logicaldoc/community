@@ -113,6 +113,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
+		Date startSetup=new Date();
+		
 		docDao = Context.get(DocumentDAO.class);
 		linkDao = Context.get(DocumentLinkDAO.class);
 		noteDao = Context.get(DocumentNoteDAO.class);
@@ -133,6 +135,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		} catch (MessagingException e) {
 			throw new IOException(e.getMessage(), e);
 		}
+		
+		System.out.println("setupDuration: " + TimeDiff.printDuration(startSetup, new Date()));
 		
 		start=new Date();
 	}
