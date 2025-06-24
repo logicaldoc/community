@@ -5,16 +5,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.AbstractDocument;
-import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.webservice.doc.WSDoc;
+
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 /**
  * Web Service Document. Useful class to create repository Documents.
@@ -162,7 +161,7 @@ public class WSDocument implements Serializable {
 
 	@WSDoc(required = false)
 	private String comment;
-	
+
 	@WSDoc(required = false)
 	private String lastNote;
 

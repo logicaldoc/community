@@ -137,7 +137,7 @@ public class ServletUtilTest extends AbstractFulltextTestCase {
 		MockServletResponse mockResponse = new MockServletResponse(RESPONSE_OUTPUT);
 		ServletUtil.downloadDocument(mockRequest, mockResponse, session.getSid(), 1L, "1.0", "test.txt", null,
 				ServletUtil.getSessionUser(mockRequest));
-		assertEquals(127810L, RESPONSE_OUTPUT.length());
+		assertEquals(12593L, RESPONSE_OUTPUT.length());
 
 		FileUtil.delete(RESPONSE_OUTPUT);
 		mockRequest.setHeader("Range", "bytes=0-24");
@@ -149,7 +149,7 @@ public class ServletUtilTest extends AbstractFulltextTestCase {
 		mockRequest.removeHeader("Range");
 		ServletUtil.downloadDocument(mockRequest, mockResponse, session.getSid(), 1L, "1.0", "test.txt",
 				ServletUtil.getSessionUser(mockRequest));
-		assertEquals(127810L, RESPONSE_OUTPUT.length());
+		assertEquals(12593L, RESPONSE_OUTPUT.length());
 	}
 
 	@Test

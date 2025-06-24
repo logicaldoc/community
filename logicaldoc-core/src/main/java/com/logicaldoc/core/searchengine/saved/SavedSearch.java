@@ -3,20 +3,17 @@ package com.logicaldoc.core.searchengine.saved;
 import java.io.Serializable;
 import java.util.Date;
 
-import jakarta.persistence.Cacheable;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.searchengine.SearchOptions;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.IOUtil;
+
+import jakarta.persistence.Cacheable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 /**
  * A search saved in the database
@@ -37,16 +34,16 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 
 	@Column(name = "ld_date", columnDefinition = "DATETIME(3)")
 	private Date date = new Date();
-	
+
 	@Column(name = "ld_options")
 	private String options = "";
-	
+
 	@Column(name = "ld_name")
 	private String name = "";
 
 	@Column(name = "ld_type", nullable = false)
 	private int type = SearchOptions.TYPE_FULLTEXT;
-	
+
 	@Column(name = "ld_description")
 	private String description = "";
 
@@ -83,7 +80,7 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 	public int compareTo(SavedSearch other) {
 		return this.getOptions().compareTo(other.getOptions());
 	}
-	
+
 	public long getUserId() {
 		return userId;
 	}
@@ -131,7 +128,7 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 	public void setType(int type) {
 		this.type = type;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

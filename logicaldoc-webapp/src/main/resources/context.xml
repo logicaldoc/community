@@ -86,7 +86,7 @@
 		abstract="false" lazy-init="default" autowire="default">
 		<property name="dataSource" ref="DataSource" />
 		<property name="entityInterceptor">
-			<bean class="com.logicaldoc.core.PersistenceObjectInterceptor" />
+			<bean class="com.logicaldoc.core.LastModifiedInterceptor" />
 		</property>
 		<property name="mappingLocations" value="classpath*:mappings/*.hbm.xml" />
 		<property name="hibernateProperties">

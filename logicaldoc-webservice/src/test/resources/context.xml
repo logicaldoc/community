@@ -56,7 +56,7 @@
             <ref bean="DataSource" />
         </property>
         <property name="entityInterceptor">
-            <bean class="com.logicaldoc.core.PersistenceObjectInterceptor" />
+            <bean class="com.logicaldoc.core.LastModifiedInterceptor" />
         </property>
         <property name="mappingLocations">
             <value>classpath*:mappings/*.hbm.xml</value>

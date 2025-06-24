@@ -38,7 +38,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
 /**
  * This panel shows the security policies.
@@ -507,7 +506,8 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			GUIAccessControlEntry ace = new GUIAccessControlEntry();
 			ace.setName(rec.getAttributeAsString(ENTITY));
 			ace.setEntityId(Long.parseLong(rec.getAttribute(ENTITY_ID)));
-			ace.setRead(Boolean.TRUE.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_READ.toLowerCase())));
+			ace.setRead(Boolean.TRUE
+					.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_READ.toLowerCase())));
 			ace.setPreview(Boolean.TRUE
 					.equals(rec.getAttributeAsBoolean(GUIAccessControlEntry.PERMISSION_PREVIEW.toLowerCase())));
 			ace.setPrint(Boolean.TRUE

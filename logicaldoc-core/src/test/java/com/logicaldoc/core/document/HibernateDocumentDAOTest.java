@@ -541,6 +541,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		testSubject.initialize(doc);
 		doc.setFolder(alias);
 		testSubject.store(doc);
+		
+		assertNotNull(testSubject.findById(doc.getId()).getLastModified());
 
 		// The document should be stored in the referenced folder
 		doc = testSubject.findById(1);

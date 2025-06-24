@@ -1,15 +1,12 @@
 package com.logicaldoc.core.document;
 
+import com.logicaldoc.core.PersistentObject;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.logicaldoc.core.PersistentObject;
 
 /**
  * A rating over a document
@@ -32,7 +29,7 @@ public class Rating extends PersistentObject {
 
 	@Column(name = "ld_username", length = 255)
 	private String username;
-	
+
 	@Column(name = "ld_vote", nullable = false)
 	private int vote = 0;
 

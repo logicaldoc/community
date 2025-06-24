@@ -32,8 +32,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import com.logicaldoc.core.security.SessionManager;
-
 /**
  * Test case for the <code>SessionManager</code>
  * 
@@ -68,7 +66,7 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 		when(client.getId()).thenReturn("testid");
 		when(request.getHeader("Authorization")).thenReturn("Basic YWRtaW46YWRtaW4=");
 		when(request.getSession(true)).thenReturn(httpSession);
-		
+
 		SecurityContextHolder.getContext().setAuthentication(null);
 	}
 

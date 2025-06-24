@@ -7,20 +7,19 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
 import com.logicaldoc.core.metadata.Template;
-import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for attribute sets data.

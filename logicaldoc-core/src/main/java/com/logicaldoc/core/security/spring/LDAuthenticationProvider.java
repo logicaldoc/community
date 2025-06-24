@@ -2,7 +2,6 @@ package com.logicaldoc.core.security.spring;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
