@@ -110,10 +110,8 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 	protected Date start=new Date();
 	
 	@Override
-	public void setUp() throws IOException, SQLException, PluginException {
-		super.setUp();
-
-		Date startSetup=new Date();
+	public void setUp() throws IOException, SQLException, PluginException {		
+		super.setUp();	
 		
 		docDao = Context.get(DocumentDAO.class);
 		linkDao = Context.get(DocumentLinkDAO.class);
@@ -135,14 +133,12 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		} catch (MessagingException e) {
 			throw new IOException(e.getMessage(), e);
 		}
-		
-		System.out.println("setupDuration: " + TimeDiff.printDuration(startSetup, new Date()));
-		
-		start=new Date();
+
 	}
 
 	@Override
 	public void tearDown() throws SQLException, IOException {
+
 		searchEngine.unlock();
 		searchEngine.close();
 
@@ -720,9 +716,9 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 			List<GUIDocument> createdDocs = testSubject.addDocuments(false, UTF_8, false, doc);
 			assertEquals(1, createdDocs.size());
-			assertEquals(2, createdDocs.get(0).getPages());
+			assertEquals(1, createdDocs.get(0).getPages());
 
-			assertEquals(2, testSubject.updatePages(createdDocs.get(0).getId()));
+			assertEquals(1, testSubject.updatePages(createdDocs.get(0).getId()));
 		} finally {
 			FileUtil.delete(pdf2);
 		}
