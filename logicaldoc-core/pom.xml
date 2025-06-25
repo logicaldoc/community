@@ -7,7 +7,7 @@
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
 		<version>9.2.1</version>
-        <relativePath>../pom.xml</relativePath>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>logicaldoc-core</artifactId>
 	<name>logicaldoc-core</name>
@@ -20,13 +20,13 @@
 			<version>${project.version}</version>
 			<type>jar</type>
 			<scope>provided</scope>
-		</dependency>	
+		</dependency>
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
 			<artifactId>logicaldoc-util</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-	
+
 		<dependency>
 			<groupId>net.sf.jpf</groupId>
 			<artifactId>jpf-boot</artifactId>
@@ -45,6 +45,10 @@
 		<dependency>
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -67,11 +71,6 @@
 			<groupId>betelio</groupId>
 			<artifactId>betelio</artifactId>
 			<version>1.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-validator</groupId>
-			<artifactId>commons-validator</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -184,7 +183,7 @@
 			<artifactId>spring-security-config</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-core</artifactId>
@@ -389,14 +388,14 @@
 				<exclusion>
 					<groupId>org.bytedeco</groupId>
 					<artifactId>openblas-platform</artifactId>
-				</exclusion>				
-				
+				</exclusion>
+
 				<exclusion>
 					<groupId>org.bytedeco</groupId>
 					<artifactId>ffmpeg-platform</artifactId>
-				</exclusion>	
-				
-				
+				</exclusion>
+
+
 				<exclusion>
 					<groupId>org.bytedeco</groupId>
 					<artifactId>flycapture</artifactId>
@@ -464,7 +463,7 @@
 				<exclusion>
 					<groupId>org.bytedeco</groupId>
 					<artifactId>librealsense-platform</artifactId>
-				</exclusion>				
+				</exclusion>
 				<exclusion>
 					<groupId>org.bytedeco</groupId>
 					<artifactId>librealsense</artifactId>
@@ -476,7 +475,7 @@
 				<exclusion>
 					<groupId>org.bytedeco</groupId>
 					<artifactId>librealsense2</artifactId>
-				</exclusion>				
+				</exclusion>
 				<exclusion>
 					<groupId>org.bytedeco</groupId>
 					<artifactId>librealsense2-platform</artifactId>
@@ -608,13 +607,13 @@
 					<artifactId>slf4j-api</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>	
+		</dependency>
 		<dependency>
 			<groupId>org.passay</groupId>
 			<artifactId>passay</artifactId>
 			<version>1.6.2</version>
 			<scope>test</scope>
-		</dependency>			
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
