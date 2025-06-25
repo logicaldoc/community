@@ -1,5 +1,7 @@
 package com.logicaldoc.core.security.user;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -10,8 +12,6 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.plugin.PluginException;
-
-import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernatePasswordHistoryDAO</code>
@@ -36,24 +36,24 @@ public class HibernatePasswordHistoryDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testCleanOldHistories() throws PersistenceException {
 		List<PasswordHistory> histories = dao.findByUserId(1L, null);
-		Assert.assertEquals(3, histories.size());
+		assertEquals(3, histories.size());
 
 		dao.cleanOldHistories(1L, 2);
 
 		histories = dao.findByUserId(1L, null);
-		Assert.assertEquals(2, histories.size());
+		assertEquals(2, histories.size());
 	}
 
 	@Test
 	public void testFindByUserId() throws PersistenceException {
 		List<PasswordHistory> histories = dao.findByUserId(1L, null);
-		Assert.assertEquals(3, histories.size());
+		assertEquals(3, histories.size());
 
 		histories = dao.findByUserId(1L, 100);
-		Assert.assertEquals(3, histories.size());
+		assertEquals(3, histories.size());
 
 		histories = dao.findByUserId(1L, 2);
-		Assert.assertEquals(2, histories.size());
-		Assert.assertEquals("psw1", histories.get(0).getPassword());
+		assertEquals(2, histories.size());
+		assertEquals("psw1", histories.get(0).getPassword());
 	}
 }

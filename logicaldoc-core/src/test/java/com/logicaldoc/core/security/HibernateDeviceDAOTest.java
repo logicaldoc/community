@@ -1,5 +1,9 @@
 package com.logicaldoc.core.security;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
@@ -12,8 +16,6 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.i18n.DateBean;
 import com.logicaldoc.util.plugin.PluginException;
-
-import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateUserHistoryDAO</code>
@@ -48,7 +50,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 		device.setType("COMPUTER");
 
 		dao.store(device);
-		Assert.assertNotNull(device.getDeviceId());
+		assertNotNull(device.getDeviceId());
 	}
 
 	@Test
@@ -88,9 +90,9 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 		device.setType("COMPUTER");
 		dao.store(device);
 
-		Assert.assertEquals(3, dao.findAll(1L).size());
-		Assert.assertEquals(1, dao.findTrustedDevices(1L).size());
-		Assert.assertEquals(0, dao.findTrustedDevices(3L).size());
+		assertEquals(3, dao.findAll(1L).size());
+		assertEquals(1, dao.findTrustedDevices(1L).size());
+		assertEquals(0, dao.findTrustedDevices(3L).size());
 	}
 
 	@Test
@@ -116,12 +118,12 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 		device.setType("COMPUTER");
 		dao.store(device);
 
-		Assert.assertEquals(2, dao.findAll(1L).size());
+		assertEquals(2, dao.findAll(1L).size());
 
 		dao.cleanOldDevices(1);
 		List<Device> devices = dao.findAll();
-		Assert.assertEquals(1, devices.size());
-		Assert.assertEquals("sebastian", devices.get(0).getUsername());
+		assertEquals(1, devices.size());
+		assertEquals("sebastian", devices.get(0).getUsername());
 	}
 
 	@Test
@@ -142,15 +144,15 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 		requestDevice.setDeviceId(id);
 
 		device = dao.findByDevice(requestDevice);
-		Assert.assertNotNull(device);
-		Assert.assertEquals(id, device.getDeviceId());
+		assertNotNull(device);
+		assertEquals(id, device.getDeviceId());
 
 		requestDevice = new Device();
 		requestDevice.setBrowser("Firefox");
 		requestDevice.setOperativeSystem("Windows 10");
 		requestDevice.setUserId(3L);
 		device = dao.findByDevice(requestDevice);
-		Assert.assertNull(device);
+		assertNull(device);
 
 		requestDevice = new Device();
 		requestDevice.setBrowser("Firefox");
@@ -158,7 +160,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 		requestDevice.setType("COMPUTER");
 		requestDevice.setUserId(3L);
 		device = dao.findByDevice(requestDevice);
-		Assert.assertNotNull(device);
-		Assert.assertEquals(id, device.getDeviceId());
+		assertNotNull(device);
+		assertEquals(id, device.getDeviceId());
 	}
 }

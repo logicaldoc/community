@@ -1,5 +1,7 @@
 package com.logicaldoc.util.config;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -7,8 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.util.io.FileUtil;
-
-import junit.framework.Assert;
 
 /**
  * Test case for <code>WebConfigurator</code>
@@ -35,6 +35,6 @@ public class ContextConfiguratorTest {
 		} catch (Exception t) {
 			// Ignore
 		}
-		Assert.assertNotNull(notThrownTest);
+		assertNotNull(notThrownTest);
 	}
 }

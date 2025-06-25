@@ -1,5 +1,10 @@
 package com.logicaldoc.core.ticket;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -10,8 +15,6 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.plugin.PluginException;
-
-import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateTicketDAO</code>
@@ -36,58 +39,58 @@ public class HibernateTicketDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testDelete() {
 		Ticket ticket = dao.findByTicketId("1");
-		Assert.assertNotNull(ticket);
-		Assert.assertTrue(dao.deleteByTicketId("1"));
+		assertNotNull(ticket);
+		assertTrue(dao.deleteByTicketId("1"));
 		ticket = dao.findByTicketId("1");
-		Assert.assertNull(ticket);
+		assertNull(ticket);
 	}
 
 	@Test
 	public void testDeleteByDocId() {
 		Ticket ticket = dao.findByTicketId("1");
-		Assert.assertNotNull(ticket);
-		Assert.assertEquals(1, ticket.getDocId());
+		assertNotNull(ticket);
+		assertEquals(1, ticket.getDocId());
 		ticket = dao.findByTicketId("3");
-		Assert.assertNotNull(ticket);
-		Assert.assertEquals(1, ticket.getDocId());
+		assertNotNull(ticket);
+		assertEquals(1, ticket.getDocId());
 
-		Assert.assertTrue(dao.deleteByDocId(1));
+		assertTrue(dao.deleteByDocId(1));
 		ticket = dao.findByTicketId("1");
-		Assert.assertNull(ticket);
+		assertNull(ticket);
 		ticket = dao.findByTicketId("3");
-		Assert.assertNull(ticket);
+		assertNull(ticket);
 	}
 
 	@Test
 	public void testDeleteExpired() throws PersistenceException {
 		List<Ticket> tickets = dao.findAll();
-		Assert.assertEquals(3, tickets.size());
+		assertEquals(3, tickets.size());
 
 		dao.deleteExpired();
 		tickets = dao.findAll();
-		Assert.assertEquals(0, tickets.size());
+		assertEquals(0, tickets.size());
 	}
 
 	@Test
 	public void testFindByTicketId() {
 		Ticket ticket = dao.findByTicketId("1");
-		Assert.assertNotNull(ticket);
-		Assert.assertEquals(1, ticket.getUserId());
-		Assert.assertEquals(1, ticket.getDocId());
+		assertNotNull(ticket);
+		assertEquals(1, ticket.getUserId());
+		assertEquals(1, ticket.getDocId());
 
 		ticket = dao.findByTicketId("99");
-		Assert.assertNull(ticket);
+		assertNull(ticket);
 	}
 
 	@Test
 	public void testFindById() throws PersistenceException {
 		Ticket ticket = dao.findById(1);
-		Assert.assertNotNull(ticket);
-		Assert.assertEquals(1, ticket.getUserId());
-		Assert.assertEquals(1, ticket.getDocId());
+		assertNotNull(ticket);
+		assertEquals(1, ticket.getUserId());
+		assertEquals(1, ticket.getDocId());
 
 		ticket = dao.findById(99);
-		Assert.assertNull(ticket);
+		assertNull(ticket);
 	}
 
 	@Test
@@ -99,7 +102,7 @@ public class HibernateTicketDAOTest extends AbstractCoreTestCase {
 		dao.store(ticket);
 
 		Ticket storedTicket = dao.findByTicketId("5");
-		Assert.assertNotNull(storedTicket);
-		Assert.assertEquals(ticket, storedTicket);
+		assertNotNull(storedTicket);
+		assertEquals(ticket, storedTicket);
 	}
 }

@@ -1,5 +1,8 @@
 package com.logicaldoc.web.service;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -12,8 +15,6 @@ import com.logicaldoc.core.communication.MessageTemplateDAO;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.web.AbstractWebappTestCase;
-
-import junit.framework.Assert;
 
 public class MessageServiceImplTest extends AbstractWebappTestCase {
 
@@ -33,13 +34,13 @@ public class MessageServiceImplTest extends AbstractWebappTestCase {
 	public void testDelete() throws ServerException, PersistenceException {
 		service.deleteTemplates("psw.rec1");
 		MessageTemplate template = templateDao.findById(2L);
-		Assert.assertNotNull(template);
+		assertNotNull(template);
 
 		template = templateDao.findById(500L);
-		Assert.assertNotNull(template);
+		assertNotNull(template);
 
 		service.deleteTemplates("test");
 		template = templateDao.findById(500L);
-		Assert.assertNull(template);
+		assertNull(template);
 	}
 }

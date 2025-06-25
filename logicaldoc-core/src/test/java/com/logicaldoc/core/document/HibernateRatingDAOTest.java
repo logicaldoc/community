@@ -3,6 +3,8 @@ package com.logicaldoc.core.document;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -16,8 +18,6 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
-
-import junit.framework.Assert;
 
 /**
  * Test case for {@link HibernateRatingDAOTest}
@@ -45,21 +45,21 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 		rat1.setVote(4);
 		rat1.setUserId(3);
 		testSubject.store(rat1);
-		Assert.assertNotNull(rat1);
+		assertNotNull(rat1);
 
 		Rating rat2 = testSubject.findById(2);
 		testSubject.initialize(rat2);
 		rat2.setVote(2);
 		rat2.setDocId(4);
 		testSubject.store(rat2);
-		Assert.assertNotNull(rat2);
+		assertNotNull(rat2);
 
 		rat1 = testSubject.findById(1);
-		Assert.assertEquals(4, rat1.getVote());
-		Assert.assertEquals(3, rat1.getUserId());
+		assertEquals(4, rat1.getVote());
+		assertEquals(3, rat1.getUserId());
 		rat2 = testSubject.findById(2);
-		Assert.assertEquals(2, rat2.getVote());
-		Assert.assertEquals(4, rat2.getDocId());
+		assertEquals(2, rat2.getVote());
+		assertEquals(4, rat2.getDocId());
 
 		// testing overridden method with Rating and DocumentHistory parameters
 		DocumentHistoryDAO historyDao = Context.get(DocumentHistoryDAO.class);
@@ -74,34 +74,34 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testFindVotesByDocId() throws PersistenceException {
 		Rating rat1 = testSubject.findVotesByDocId(1);
-		Assert.assertNotNull(rat1);
-		Assert.assertEquals(2, rat1.getCount().intValue());
-		Assert.assertEquals(Float.valueOf(2.5F), rat1.getAverage().floatValue());
+		assertNotNull(rat1);
+		assertEquals(2, rat1.getCount().intValue());
+		assertEquals(2.5F, rat1.getAverage().floatValue(), 0.0001F);
 
 		rat1 = testSubject.findVotesByDocId(2);
-		Assert.assertNotNull(rat1);
-		Assert.assertEquals(1, rat1.getCount().intValue());
-		Assert.assertEquals(Float.valueOf(3.0F), rat1.getAverage().floatValue());
+		assertNotNull(rat1);
+		assertEquals(1, rat1.getCount().intValue());
+		assertEquals(3.0F, rat1.getAverage().floatValue(), 0.0001F);
 
 		// Try with non-existing rating vote
 		rat1 = testSubject.findVotesByDocId(99);
-		Assert.assertNull(rat1);
+		assertNull(rat1);
 	}
 
 	@Test
 	public void testFindByDocId() throws PersistenceException {
 		List<Rating> ratings = testSubject.findByDocId(1L);
-		Assert.assertEquals(2, ratings.size());
+		assertEquals(2, ratings.size());
 
 		// Try with non-existing rating vote
 		ratings = testSubject.findByDocId(99L);
-		Assert.assertTrue(ratings.isEmpty());
+		assertTrue(ratings.isEmpty());
 	}
 
 	@Test
 	public void testFindByDocIdAndUserId() throws PersistenceException {
-		Assert.assertNotNull(testSubject.findByDocIdAndUserId(1, 1));
-		Assert.assertNull(testSubject.findByDocIdAndUserId(2, 2));
+		assertNotNull(testSubject.findByDocIdAndUserId(1, 1));
+		assertNull(testSubject.findByDocIdAndUserId(2, 2));
 	}
 
 	@Test
@@ -164,7 +164,7 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 		assertEquals(rating1, rating1);
 		assertEquals(false, rating2.equals(rating1));
 		assertEquals(false, rating1.equals(rating2));
-		
+
 		assertEquals(false, rating1.equals(new Object()));
 
 		assertEquals(false, rating1.getCreation().equals(rating2.getCreation()));
@@ -176,22 +176,22 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 
 		rating2.setId(2);
 		assertEquals(false, rating1.equals(rating2));
-		
-		rating1.setId(100);
-	    rating1.setDocId(1);
-	    rating1.setUserId(4);
-	    rating1.setVote(5);
-	    rating2.setId(100);
-	    rating2.setDocId(1);
-	    rating2.setUserId(2);
-	    rating2.setVote(5);
-	    assertEquals(false, rating1.equals(rating2));
-	    
-	    rating1.setUserId(2);
-	    rating2.setVote(4);
-	    assertEquals(false, rating1.equals(rating2));
-	    rating2.setVote(5);
 
-	    assertEquals(true, rating1.equals(rating2));
+		rating1.setId(100);
+		rating1.setDocId(1);
+		rating1.setUserId(4);
+		rating1.setVote(5);
+		rating2.setId(100);
+		rating2.setDocId(1);
+		rating2.setUserId(2);
+		rating2.setVote(5);
+		assertEquals(false, rating1.equals(rating2));
+
+		rating1.setUserId(2);
+		rating2.setVote(4);
+		assertEquals(false, rating1.equals(rating2));
+		rating2.setVote(5);
+
+		assertEquals(true, rating1.equals(rating2));
 	}
 }

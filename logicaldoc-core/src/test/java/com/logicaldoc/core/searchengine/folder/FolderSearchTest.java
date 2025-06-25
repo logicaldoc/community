@@ -1,5 +1,7 @@
 package com.logicaldoc.core.searchengine.folder;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,8 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.searchengine.Hit;
-
-import junit.framework.Assert;
 
 public class FolderSearchTest extends AbstractCoreTestCase {
 
@@ -34,7 +34,7 @@ public class FolderSearchTest extends AbstractCoreTestCase {
 		opt.setUserId(1);
 		opt.setRetrieveAliases(true);
 		opt.setCriteria(criteria);
-		opt.setOrder( Arrays.asList(new String[] { "lastmodified desc", "name asc" }));
+		opt.setOrder(Arrays.asList(new String[] { "lastmodified desc", "name asc" }));
 
 		FolderSearch search = new FolderSearch();
 		search.setOptions(opt);
@@ -46,10 +46,10 @@ public class FolderSearchTest extends AbstractCoreTestCase {
 		}
 
 		List<Hit> results = search.getHits();
-		Assert.assertEquals(1, results.size());
-		
-		Assert.assertEquals(1201, results.get(0).getId());
-		Assert.assertEquals(1200, results.get(0).getFolder().getId());
+		assertEquals(1, results.size());
+
+		assertEquals(1201, results.get(0).getId());
+		assertEquals(1200, results.get(0).getFolder().getId());
 
 		criteria.clear();
 		criterion = new FolderCriterion();
@@ -84,7 +84,7 @@ public class FolderSearchTest extends AbstractCoreTestCase {
 		}
 
 		results = search.getHits();
-		Assert.assertEquals(2, results.size());
-		Assert.assertEquals(1201L, results.get(0).getId());
+		assertEquals(2, results.size());
+		assertEquals(1201L, results.get(0).getId());
 	}
 }

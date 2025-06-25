@@ -1,5 +1,7 @@
 package com.logicaldoc.web;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -26,8 +28,6 @@ import com.logicaldoc.util.junit.AbstractTestCase;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.servlet.MockServletSession;
 import com.logicaldoc.web.service.SecurityServiceImpl;
-
-import junit.framework.Assert;
 
 /**
  * Abstract test case for the Webapp module. This class initialises a test
@@ -76,8 +76,8 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 			throw new IOException(e);
 		}
 
-		Assert.assertNotNull(guiSession);
-		Assert.assertNotNull(SessionManager.get().get(guiSession.getSid()));
+		assertNotNull(guiSession);
+		assertNotNull(SessionManager.get().get(guiSession.getSid()));
 	}
 
 	protected void prepareSession(String username, String password) throws ServerException, PersistenceException {

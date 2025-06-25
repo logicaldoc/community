@@ -1,5 +1,10 @@
 package com.logicaldoc.core.document;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -16,8 +21,6 @@ import com.logicaldoc.core.i18n.DateBean;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
-
-import junit.framework.Assert;
 
 /**
  * Test case for {@link HibernateDocumentHistoryDAO}
@@ -42,55 +45,55 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testDelete() throws PersistenceException {
 		Collection<DocumentHistory> histories = (Collection<DocumentHistory>) testSubject.findByUserId(1);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(4, histories.size());
+		assertNotNull(histories);
+		assertEquals(4, histories.size());
 
 		for (DocumentHistory history : histories) {
 			testSubject.delete(history.getId());
 		}
 
 		histories = (Collection<DocumentHistory>) testSubject.findByUserId(4);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(0, histories.size());
+		assertNotNull(histories);
+		assertEquals(0, histories.size());
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Test
 	public void testFindByDocId() throws PersistenceException {
 		Collection histories = testSubject.findByDocId(1);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(3, histories.size());
+		assertNotNull(histories);
+		assertEquals(3, histories.size());
 
 		// Try with non-existent docId
 		histories = testSubject.findByDocId(99);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(0, histories.size());
+		assertNotNull(histories);
+		assertEquals(0, histories.size());
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Test
 	public void testFindByUserId() throws PersistenceException {
 		Collection histories = testSubject.findByUserId(1);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(4, histories.size());
+		assertNotNull(histories);
+		assertEquals(4, histories.size());
 
 		// Try with non-existent user
 		histories = testSubject.findByUserId(99);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(0, histories.size());
+		assertNotNull(histories);
+		assertEquals(0, histories.size());
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Test
 	public void testFindByFolderId() throws PersistenceException {
 		Collection histories = testSubject.findByFolderId(5);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(2, histories.size());
+		assertNotNull(histories);
+		assertEquals(2, histories.size());
 
 		// Try with non-existent folderId
 		histories = testSubject.findByFolderId(99);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(0, histories.size());
+		assertNotNull(histories);
+		assertEquals(0, histories.size());
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -114,11 +117,11 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 		testSubject.store(history);
 
 		history = testSubject.findById(history.getId());
-		Assert.assertEquals("127.0.0.1", history.getIp());
+		assertEquals("127.0.0.1", history.getIp());
 
 		Collection histories = testSubject.findByDocId(1);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(4, histories.size());
+		assertNotNull(histories);
+		assertEquals(4, histories.size());
 	}
 
 	@Test
@@ -133,9 +136,9 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 		history.setEvent(DocumentEvent.CHANGED);
 
 		testSubject.store(history);
-		Assert.assertNotNull(history);
+		assertNotNull(history);
 		history = testSubject.findById(history.getId());
-		Assert.assertEquals("file.old", history.getFilenameOld());
+		assertEquals("file.old", history.getFilenameOld());
 
 		DocumentHistory folderHistory = new DocumentHistory();
 		folderHistory.setFolderId(5L);
@@ -145,12 +148,12 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 		folderHistory.setEvent(DocumentEvent.CHANGED);
 
 		testSubject.store(folderHistory);
-		Assert.assertNotNull(folderHistory);
+		assertNotNull(folderHistory);
 
 		// Test the stored history
 		Collection<DocumentHistory> histories = (Collection<DocumentHistory>) testSubject.findByUserId(3);
-		Assert.assertNotNull(histories);
-		Assert.assertFalse(histories.isEmpty());
+		assertNotNull(histories);
+		assertFalse(histories.isEmpty());
 
 		DocumentHistory hStored = null;
 		for (DocumentHistory history2 : histories) {
@@ -160,19 +163,19 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 			}
 		}
 
-		Assert.assertEquals(folderHistory, hStored);
-		Assert.assertEquals(hStored.getFolderId(), Long.valueOf(5L));
-		Assert.assertEquals(hStored.getDate().getTime(), DateBean.dateFromCompactString("20061220").getTime());
-		Assert.assertEquals(hStored.getUsername(), "sebastian");
-		Assert.assertEquals(DocumentEvent.CHANGED, hStored.getEventEnum());
+		assertEquals(folderHistory, hStored);
+		assertEquals(hStored.getFolderId(), Long.valueOf(5L));
+		assertEquals(hStored.getDate().getTime(), DateBean.dateFromCompactString("20061220").getTime());
+		assertEquals(hStored.getUsername(), "sebastian");
+		assertEquals(DocumentEvent.CHANGED, hStored.getEventEnum());
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Test
 	public void testFindNotNotified() throws PersistenceException {
 		Collection histories = testSubject.findNotNotified(null);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(4, histories.size());
+		assertNotNull(histories);
+		assertEquals(4, histories.size());
 
 		DocumentHistory history = testSubject.findById(1);
 		testSubject.initialize(history);
@@ -180,8 +183,8 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 		testSubject.store(history);
 
 		histories = testSubject.findNotNotified(null);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(3, histories.size());
+		assertNotNull(histories);
+		assertEquals(3, histories.size());
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -190,56 +193,56 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 		testSubject.cleanOldHistories(5);
 
 		DocumentHistory history = testSubject.findById(1);
-		Assert.assertNull(history);
+		assertNull(history);
 		Collection histories = testSubject.findAll();
-		Assert.assertEquals(0, histories.size());
+		assertEquals(0, histories.size());
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Test
 	public void testFindByUserIdAndEvent() throws PersistenceException {
 		Collection histories = testSubject.findByUserIdAndEvent(1, "event.checkedin", null);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(1, histories.size());
+		assertNotNull(histories);
+		assertEquals(1, histories.size());
 
 		histories = testSubject.findByUserIdAndEvent(1, "data test 02", null);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(1, histories.size());
+		assertNotNull(histories);
+		assertEquals(1, histories.size());
 
 		histories = testSubject.findByUserIdAndEvent(2, "data test 02", null);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(0, histories.size());
+		assertNotNull(histories);
+		assertEquals(0, histories.size());
 
 		// Try with non-existent user
 		histories = testSubject.findByUserIdAndEvent(99, "data test 02", null);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(0, histories.size());
-		
+		assertNotNull(histories);
+		assertEquals(0, histories.size());
+
 		// Try with non-null sessionId
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId("123");
 		transaction.setComment("");
 		transaction.setUser(new User());
-		
+
 		histories = testSubject.findByUserIdAndEvent(3, "data test 03", transaction.getSessionId());
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(0, histories.size());
+		assertNotNull(histories);
+		assertEquals(0, histories.size());
 	}
 
 	@Test
 	public void testFindByPath() throws PersistenceException {
 		List<DocumentHistory> histories = testSubject.findByPath("/Default/pippo%", null, null, null);
-		Assert.assertEquals(4, histories.size());
+		assertEquals(4, histories.size());
 
 		histories = testSubject.findByPath("/Default/pippo%", DateBean.dateFromCompactString("20061221"),
 				Arrays.asList(new String[] { "data test 01", "data test 02" }), null);
-		Assert.assertEquals(1, histories.size());
+		assertEquals(1, histories.size());
 
 		histories = testSubject.findByPath("/Default/pippo%", DateBean.dateFromCompactString("20061221"),
 				Arrays.asList(new String[] { "data test 01" }), null);
-		Assert.assertEquals(0, histories.size());
+		assertEquals(0, histories.size());
 
 		histories = testSubject.findByPath("/xxxx%", null, null, null);
-		Assert.assertEquals(0, histories.size());
+		assertEquals(0, histories.size());
 	}
 }
