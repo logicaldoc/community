@@ -24,6 +24,7 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.IOUtil;
+import com.logicaldoc.util.io.ResourceUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.webdav.AbstractWebdavTestCase;
 import com.logicaldoc.webdav.context.ImportContextImpl;
@@ -125,7 +126,7 @@ public class ResourceServiceImplTest extends AbstractWebdavTestCase {
 		Resource newResource = new ResourceImpl();
 		newResource.setName("test.pdf");
 
-		try (InputStream is = this.getClass().getResourceAsStream("/pdf1.pdf")) {
+		try (InputStream is = ResourceUtil.getInputStream("pdf1.pdf")) {
 			ImportContextImpl importContext = new ImportContextImpl(newResource, null, is);
 			newResource = testSubject.createResource(parent, "test.pdf", false, importContext, davSession);
 		}
@@ -145,7 +146,7 @@ public class ResourceServiceImplTest extends AbstractWebdavTestCase {
 		assertFalse(resource.isFolder());
 		assertEquals(Long.valueOf(1356L), resource.getContentLength());
 
-		try (InputStream is = this.getClass().getResourceAsStream("/pdf2.pdf")) {
+		try (InputStream is = ResourceUtil.getInputStream("pdf2.pdf")) {
 			ImportContextImpl importContext = new ImportContextImpl(resource, null, is);
 			testSubject.updateResource(resource, importContext, davSession);
 		}

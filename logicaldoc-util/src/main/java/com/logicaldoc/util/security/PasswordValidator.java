@@ -16,6 +16,8 @@ import org.passay.PropertiesMessageResolver;
 import org.passay.RuleResult;
 import org.passay.WhitespaceRule;
 
+import com.logicaldoc.util.io.ResourceUtil;
+
 /**
  * An utility class to validate the passwords
  * 
@@ -37,8 +39,7 @@ public class PasswordValidator {
 		if (messages == null) {
 			Properties standardMessages = new Properties();
 			try {
-				standardMessages
-						.load(this.getClass().getClassLoader().getResourceAsStream("/passay.properties"));
+				standardMessages.load(ResourceUtil.getInputStream("passay.properties"));
 			} catch (Exception e) {
 				// Nothing to do
 			}

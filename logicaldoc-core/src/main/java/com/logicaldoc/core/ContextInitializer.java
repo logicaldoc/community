@@ -23,6 +23,7 @@ import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.io.ResourceUtil;
 
 /**
  * A super class for those initializers that prepare the environment for
@@ -103,7 +104,7 @@ public abstract class ContextInitializer implements ApplicationListener<ContextR
 				.findByFileNameAndParentFolderId(target.getId(), fileName, null, Tenant.DEFAULT_ID, null).stream()
 				.findFirst().orElse(null);
 		if (doc == null)
-			try (InputStream is = this.getClass().getResourceAsStream(resourcePath)) {
+			try (InputStream is = ResourceUtil.getInputStream(resourcePath)) {
 				Document trainingDoc = new Document();
 				trainingDoc.setFileName(fileName);
 				trainingDoc.setFolder(target);

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.io.ResourceUtil;
 
 /**
  * Utility class for MIME Type detection using the classpath
@@ -24,7 +25,7 @@ public class MimeType {
 		if (mimeTypes == null) {
 			mimeTypes = new Properties();
 			try {
-				mimeTypes.load(MimeType.class.getResourceAsStream("/mimetypes.properties"));
+				mimeTypes.load(ResourceUtil.getInputStream("mimetypes.properties"));
 			} catch (IOException e) {
 				// Nothing to do
 			}

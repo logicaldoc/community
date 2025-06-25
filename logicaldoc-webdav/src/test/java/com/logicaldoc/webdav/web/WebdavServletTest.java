@@ -20,6 +20,7 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.io.ResourceUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.servlet.MockServletRequest;
 import com.logicaldoc.util.servlet.MockServletResponse;
@@ -147,7 +148,7 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 			assertEquals(DocumentStatus.CHECKEDOUT, doc.getStatus());
 
 			request = prepareRequest("CHECKIN", "/five.pdf");
-			request.setPayload(this.getClass().getResourceAsStream("/pdf2.pdf"));
+			request.setPayload(ResourceUtil.getInputStream("pdf2.pdf"));
 
 			testSubject.service(request, response);
 
@@ -295,12 +296,12 @@ public class WebdavServletTest extends AbstractWebdavTestCase {
 
 			MockServletResponse response = new MockServletResponse(tempFile);
 			MockServletRequest request = prepareRequest(DavMethods.METHOD_PUT, "/folder6/newfile1.pdf");
-			request.setPayload(this.getClass().getResourceAsStream("/pdf1.pdf"));
+			request.setPayload(ResourceUtil.getInputStream("pdf1.pdf"));
 			testSubject.service(request, response);
 
 			response = new MockServletResponse(tempFile);
 			request = prepareRequest("POST", "/folder6/newfile2.pdf");
-			request.setPayload(this.getClass().getResourceAsStream("/pdf2.pdf"));
+			request.setPayload(ResourceUtil.getInputStream("pdf2.pdf"));
 			testSubject.service(request, response);
 
 			String responseBody = callPROPFIND();

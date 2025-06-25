@@ -15,6 +15,7 @@ import org.bouncycastle.cms.CMSException;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
+import com.logicaldoc.util.io.ResourceUtil;
 
 /**
  * Test case for the <code>MailUtil</code>
@@ -139,7 +140,7 @@ public class MailUtilTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testExtractMessageText() throws MessagingException, IOException {
-		MimeMessage mail = MailUtil.readMime(this.getClass().getResourceAsStream("/parche 2.eml"));
+		MimeMessage mail = MailUtil.readMime(ResourceUtil.getInputStream("parche 2.eml"));
 		assertNotNull(mail);
 
 		assertTrue(MailUtil.extractMessageText(mail).startsWith("Hola Marco, el parche 2"));

@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.logicaldoc.util.io.ResourceUtil;
+
 /**
  * This class is responsible for allowing the java program to launch a command
  * with administrator permissions. The way of achieving this greatly varies
@@ -19,6 +21,7 @@ import java.util.logging.Logger;
 public class PrivilegedRunner {
 
 	private static final String OS_NAME = "os.name";
+
 	private static final Logger logger = Logger.getLogger(PrivilegedRunner.class.getName());
 
 	public int executeWithElevatedRights(String command) throws IOException, InterruptedException {
@@ -71,12 +74,11 @@ public class PrivilegedRunner {
 		String path = System.getProperty("java.io.tmpdir") + File.separator + "Elevator";
 		File elevator = new File(path);
 
-		FileOutputStream out = new FileOutputStream(elevator);
-		InputStream in = getClass().getResourceAsStream(
-				"/com/logicaldoc/util/exec/mac/run-with-privileges-on-osx");
-		copyStream(out, in);
-		in.close();
-		out.close();
+		try (FileOutputStream out = new FileOutputStream(elevator);
+				InputStream in = ResourceUtil
+						.getInputStream("com/logicaldoc/util/exec/mac/run-with-privileges-on-osx");) {
+			copyStream(out, in);
+		}
 
 		if (!elevator.setExecutable(true)) {
 			throw new IOException("Failed to set execute permission on " + path);
@@ -104,7 +106,7 @@ public class PrivilegedRunner {
 
 	public static boolean isUnix() {
 		return (System.getProperty(OS_NAME).toLowerCase().indexOf("nix") >= 0
-				|| System.getProperty(OS_NAME).toLowerCase().indexOf("nux") >= 0 || System.getProperty(OS_NAME)
-				.toLowerCase().indexOf("aix") >= 0);
+				|| System.getProperty(OS_NAME).toLowerCase().indexOf("nux") >= 0
+				|| System.getProperty(OS_NAME).toLowerCase().indexOf("aix") >= 0);
 	}
 }

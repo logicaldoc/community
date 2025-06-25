@@ -17,7 +17,7 @@ public class P7MTest {
 	public void testExtractOriginalFile() throws IOException, CMSException {
 		File file = new File("target/text.xml");
 		try {
-			P7M p7m = new P7M(this.getClass().getResourceAsStream("/test.p7m"));
+			P7M p7m = new P7M(ResourceUtil.getInputStream("test.p7m"));
 			assertNotNull(p7m.getCms());
 			p7m.extractOriginalFile(file);
 			String content = FileUtil.readFile(file);
@@ -34,7 +34,7 @@ public class P7MTest {
 		}
 
 		try {
-			P7M p7m = new P7M(ResourceUtil.readAsBytes("/test.p7m"));
+			P7M p7m = new P7M(ResourceUtil.getInputStream("test.p7m"));
 			assertNotNull(p7m.getCms());
 			p7m.extractOriginalFile(file);
 			String content = FileUtil.readFile(file);
@@ -56,7 +56,7 @@ public class P7MTest {
 			FileUtil.delete(file);
 		}
 
-		P7M p7m = new P7M(this.getClass().getResourceAsStream("/test.p7m"));
+		P7M p7m = new P7M(ResourceUtil.getInputStream("test.p7m"));
 		try (InputStream is = p7m.extractOriginalFileStream();) {
 			String content = IOUtil.readStream(is);
 			assertTrue(content.contains("p:FatturaElettronica xmlns"));

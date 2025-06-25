@@ -33,6 +33,7 @@ import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.io.ResourceUtil;
 
 /**
  * Represents the automation scripting engine
@@ -82,7 +83,7 @@ public class Automation {
 			return;
 
 		Properties settings = null;
-		try (InputStream is = Automation.class.getResourceAsStream("/automation.properties")) {
+		try (InputStream is = ResourceUtil.getInputStream("automation.properties")) {
 			if (is != null) {
 				settings = new Properties();
 				settings.load(is);

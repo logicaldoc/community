@@ -44,6 +44,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.IOUtil;
+import com.logicaldoc.util.io.ResourceUtil;
 import com.logicaldoc.web.listener.ApplicationListener;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -122,7 +123,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 	}
 
 	private static String loadChangelog() {
-		try (InputStream is = IOUtil.getLimitedStream(InfoServiceImpl.class.getResourceAsStream("/CHANGELOG.txt"),
+		try (InputStream is = IOUtil.getLimitedStream(ResourceUtil.getInputStream("CHANGELOG.txt"),
 				5000)) {
 			String changelog = IOUtil.readStream(is);
 			return changelog.replace("logicaldoc", "").replace("LogicalDOC", "");

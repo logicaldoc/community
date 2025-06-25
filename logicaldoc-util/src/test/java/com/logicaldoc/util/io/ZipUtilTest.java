@@ -62,7 +62,7 @@ public class ZipUtilTest {
 			assertTrue(new File(folder, "index.xml").exists());
 			assertTrue(new File(folder.getPath() + "/abc/test.txt").exists());
 
-			testSubject.unzip(this.getClass().getResourceAsStream("/test.zip"), "abc/test.txt", test);
+			testSubject.unzip(ResourceUtil.getInputStream("test.zip"), "abc/test.txt", test);
 			assertTrue(test.exists());
 			FileUtil.delete(test);
 
@@ -118,7 +118,7 @@ public class ZipUtilTest {
 		} catch (NullPointerException npe) {
 			// All ok
 		}
-		ZipUtil.addEntry(file, "abc/pippo.txt", this.getClass().getResourceAsStream("/context.properties"));
+		ZipUtil.addEntry(file, "abc/pippo.txt", ResourceUtil.getInputStream("context.properties"));
 		assertNotNull(testSubject.getEntryContent(file, "abc/pippo.txt"));
 	}
 

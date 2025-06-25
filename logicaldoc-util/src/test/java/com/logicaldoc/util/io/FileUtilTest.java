@@ -51,7 +51,7 @@ public class FileUtilTest {
 
 		for (int i = 0; i < total; i++) {
 			File outFile =  new File(root+"/"+Integer.toString(i));
-			FileUtil.writeFile(this.getClass().getResourceAsStream("/kofax.rar") , outFile.getPath() );
+			FileUtil.writeFile(ResourceUtil.getInputStream("kofax.rar") , outFile.getPath() );
 			assertTrue(outFile.length() > 0);
 			assertEquals(new File("src/test/resources/kofax.rar").length(), outFile.length());
 		}
@@ -172,7 +172,7 @@ public class FileUtilTest {
 	public void testAppend() throws IOException {
 		File outFile = new File("target/testappend.txt");
 		try {
-			FileUtil.writeFile(this.getClass().getResourceAsStream("/context.properties"), outFile.getPath());
+			FileUtil.writeFile(ResourceUtil.getInputStream("context.properties"), outFile.getPath());
 			assertTrue(outFile.length() > 0);
 			assertFalse(FileUtil.readFile(outFile).endsWith("pippo"));
 
@@ -187,7 +187,7 @@ public class FileUtilTest {
 	public void testWriteUTF8() throws IOException {
 		File outFile = new File("target/testappend.txt");
 		try {
-			FileUtil.writeFile(this.getClass().getResourceAsStream("/context.properties"), outFile.getPath());
+			FileUtil.writeFile(ResourceUtil.getInputStream("context.properties"), outFile.getPath());
 			assertTrue(outFile.length() > 0);
 			assertFalse(FileUtil.readFile(outFile).endsWith("pippo"));
 

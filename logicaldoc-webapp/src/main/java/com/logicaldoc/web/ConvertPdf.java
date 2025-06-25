@@ -4,10 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +14,12 @@ import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.ResourceUtil;
 import com.logicaldoc.web.util.ServletUtil;
+
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet simply download the document if it is a PDF.
@@ -81,7 +82,7 @@ public class ConvertPdf extends HttpServlet {
 			log.error(r.getMessage(), r);
 
 			int letter = 0;
-			try (InputStream is = ConvertPdf.class.getResourceAsStream("/pdf/notavailable.pdf");
+			try (InputStream is = ResourceUtil.getInputStream("pdf/notavailable.pdf");
 					OutputStream os = response.getOutputStream();) {
 				ServletUtil.setContentDisposition(request, response, "notavailable.pdf");
 				while ((letter = is.read()) != -1)

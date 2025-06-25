@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import jakarta.mail.MessagingException;
-
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
@@ -30,8 +28,11 @@ import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.MailUtil;
 import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.io.ResourceUtil;
 import com.talanlabs.avatargenerator.Avatar;
 import com.talanlabs.avatargenerator.IdenticonAvatar;
+
+import jakarta.mail.MessagingException;
 
 public class CoreWorkbench {
 
@@ -154,7 +155,7 @@ public class CoreWorkbench {
 	}
 
 	static void emailStuff() throws MessagingException, IOException {
-		EMail email = MailUtil.messageToMail(CoreWorkbench.class.getResourceAsStream("/GENNAIO2020.eml"), true);
+		EMail email = MailUtil.messageToMail(ResourceUtil.getInputStream("GENNAIO2020.eml"), true);
 		Map<Integer, EMailAttachment> attachments = email.getAttachments();
 		for (Integer index : attachments.keySet()) {
 			EMailAttachment attachment = attachments.get(index);

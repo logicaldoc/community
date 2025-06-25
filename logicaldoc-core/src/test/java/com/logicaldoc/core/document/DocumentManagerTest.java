@@ -47,6 +47,7 @@ import com.logicaldoc.core.store.Store;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.io.ResourceUtil;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
@@ -867,7 +868,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		assertNotNull(doc2);
 
 		String resource = store.getResourceName(doc2.getId(), doc2.getFileVersion(), null);
-		store2.store(this.getClass().getResourceAsStream("/allowed-commands.txt"), 3L, resource);
+		store2.store(ResourceUtil.getInputStream("allowed-commands.txt"), 3L, resource);
 
 		try {
 			testSubject.replaceAlias(doc2.getId(), transaction);
@@ -898,7 +899,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		assertEquals("1.0", doc.getFileVersion());
 		assertNotNull(documentNoteDao.findById(2L));
 
-		try (InputStream is = getClass().getResourceAsStream("/abel.eml")) {
+		try (InputStream is = ResourceUtil.getInputStream("abel.eml")) {
 			testSubject.checkin(1L, is, "pippo", true, null, transaction);
 		}
 		doc = docDao.findById(1L);
@@ -920,7 +921,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		docDao.initialize(doc);
 
 		transaction.setComment("reason2");
-		try (InputStream is = getClass().getResourceAsStream("/abel.eml")) {
+		try (InputStream is = ResourceUtil.getInputStream("abel.eml")) {
 			testSubject.checkin(1L, is, "pippo", true, doc, transaction);
 		}
 		doc = docDao.findById(1);
@@ -931,7 +932,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		store.setErrorOnStore(true);
 
 		boolean exceptionHappened = false;
-		try (InputStream is = getClass().getResourceAsStream("/abel.eml")) {
+		try (InputStream is = ResourceUtil.getInputStream("abel.eml")) {
 			testSubject.checkin(1L, is, "pippo", true, doc, transaction);
 		} catch (PersistenceException e) {
 			exceptionHappened = true;
@@ -1094,7 +1095,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		history.setSession(SessionManager.get().newSession("admin", "admin", (Client) null));
 
-		try (InputStream is = getClass().getResourceAsStream("/abel.eml")) {
+		try (InputStream is = ResourceUtil.getInputStream("abel.eml")) {
 			testSubject.replaceFile(doc.getId(), "1.3", is, history);
 		}
 
@@ -1106,7 +1107,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		assertEquals("1.3", doc.getFileVersion());
 		assertTrue(str.getString(doc.getId(), str.getResourceName(doc, null, null)).contains("invoice calculation"));
 
-		try (InputStream is = getClass().getResourceAsStream("/abel.eml")) {
+		try (InputStream is = ResourceUtil.getInputStream("abel.eml")) {
 			testSubject.replaceFile(doc.getId(), "1.3", is, null);
 		} catch (IllegalArgumentException e) {
 			// catch exception

@@ -19,7 +19,7 @@ public class IOUtilTest {
 	@Test
 	public void testGetLimitedStream() throws IOException {
 		File file = new File("target/test.txt");
-		try (InputStream is = IOUtil.getLimitedStream(this.getClass().getResourceAsStream("/context.properties"), 64)) {
+		try (InputStream is = IOUtil.getLimitedStream(ResourceUtil.getInputStream("context.properties"), 64)) {
 			FileUtil.writeFile(is, file.getPath());
 			String content = FileUtil.readFile(file);
 			assertTrue(content.startsWith("default.tag.minsize=3"));
@@ -33,29 +33,26 @@ public class IOUtilTest {
 	@Test
 	public void testWrite() throws IOException {
 		File file = new File("target/test.txt");
-		InputStream is = this.getClass().getResourceAsStream("/context.properties");
-		try (OutputStream os = new FileOutputStream(file)) {
+		try (InputStream is = ResourceUtil.getInputStream("context.properties");
+				OutputStream os = new FileOutputStream(file)) {
 			IOUtil.write(is, os);
 			assertEquals(new File("src/test/resources/context.properties").length(), file.length());
 		} finally {
-			IOUtil.close(is);
 			FileUtil.delete(file);
 		}
 
 		assertFalse(file.exists());
-		is = this.getClass().getResourceAsStream("/context.properties");
-		try {
+		try (InputStream is = ResourceUtil.getInputStream("context.properties");) {
 			IOUtil.write(is, file);
 			assertEquals(new File("src/test/resources/context.properties").length(), file.length());
 		} finally {
-			IOUtil.close(is);
 			FileUtil.delete(file);
 		}
 	}
 
 	@Test
 	public void testGetReadStream() throws IOException {
-		try (InputStream is = this.getClass().getResourceAsStream("/context.properties")) {
+		try (InputStream is = ResourceUtil.getInputStream("context.properties")) {
 			String content = IOUtil.readStream(is);
 			assertEquals(FileUtil.readFile("src/test/resources/context.properties"), content);
 		}
@@ -63,7 +60,7 @@ public class IOUtilTest {
 
 	@Test
 	public void testGetBytesOfStream() throws IOException {
-		try (InputStream is = this.getClass().getResourceAsStream("/context.properties")) {
+		try (InputStream is = ResourceUtil.getInputStream("context.properties")) {
 			byte[] content = IOUtil.getBytesOfStream(is);
 			String str = new String(content);
 			assertTrue(str.startsWith("default.tag.minsize=3"));
