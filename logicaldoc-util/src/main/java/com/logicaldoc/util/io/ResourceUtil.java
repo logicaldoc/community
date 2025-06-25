@@ -28,8 +28,7 @@ public class ResourceUtil {
 
 	public static String readAsString(String resourceName) throws IOException {
 		StringBuilder resourceData = new StringBuilder(1000);
-		try (BufferedReader reader = new BufferedReader(
-				new InputStreamReader(getInputStream(resourceName)))) {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(getInputStream(resourceName)))) {
 			char[] buf = new char[1024];
 			int numRead = 0;
 			while ((numRead = reader.read(buf)) != -1) {
@@ -69,12 +68,15 @@ public class ResourceUtil {
 	}
 
 	public static InputStream getInputStream(String resourceName) throws IOException {
+		if (resourceName.startsWith("/"))
+			resourceName = resourceName.substring(1);
+
 		InputStream is;
 		try {
 			is = new BufferedInputStream(
-					Thread.currentThread().getContextClassLoader().getResource(resourceName).openStream());
+					Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName));
 		} catch (Exception e) {
-			is = new BufferedInputStream(FileUtil.class.getResource(resourceName).openStream());
+			is = new BufferedInputStream(FileUtil.class.getResourceAsStream(resourceName));
 		}
 		return is;
 	}

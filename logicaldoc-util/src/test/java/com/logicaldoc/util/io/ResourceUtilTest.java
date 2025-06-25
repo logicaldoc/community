@@ -23,7 +23,7 @@ public class ResourceUtilTest {
 		File out = new File("target/out.txt");
 		try {
 			assertFalse(out.exists());
-			ResourceUtil.copyResource("/context.xml", out);
+			ResourceUtil.copyResource("context.xml", out);
 			assertTrue(out.length() > 0);
 		} finally {
 			FileUtil.delete(out);
