@@ -1,5 +1,8 @@
 package com.logicaldoc.core.searchengine;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -18,12 +21,10 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
-import junit.framework.Assert;
-
 public class FulltextSearchTest extends AbstractCoreTestCase {
-	
+
 	private SearchEngine testSubject;
-	
+
 	private DocumentDAO documentDao;
 
 	@Before
@@ -56,14 +57,14 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 		opt.write(file);
 
 		FulltextSearchOptions opt2 = (FulltextSearchOptions) SearchOptions.read(file);
-		
-		Assert.assertEquals("prova test", opt2.getExpression());
-		Assert.assertEquals("it", opt2.getExpressionLanguage());
-		Assert.assertEquals(1, opt2.getTemplate().longValue());
-		Assert.assertEquals(3000, opt2.getSizeMax().longValue());
-		Assert.assertEquals(2, opt2.getSizeMin().longValue());
-		Assert.assertEquals(SearchOptions.TYPE_FULLTEXT, opt2.getType());
-		Assert.assertEquals(1, opt2.getUserId());
+
+		assertEquals("prova test", opt2.getExpression());
+		assertEquals("it", opt2.getExpressionLanguage());
+		assertEquals(1, opt2.getTemplate().longValue());
+		assertEquals(3000, opt2.getSizeMax().longValue());
+		assertEquals(2, opt2.getSizeMin().longValue());
+		assertEquals(SearchOptions.TYPE_FULLTEXT, opt2.getType());
+		assertEquals(1, opt2.getUserId());
 	}
 
 	private void addHits() throws Exception {
@@ -113,7 +114,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testSearch() throws Exception {
-		Assert.assertEquals(4, testSubject.getCount());
+		assertEquals(4, testSubject.getCount());
 
 		FulltextSearchOptions opt = new FulltextSearchOptions();
 		opt.setLanguage("en");
@@ -128,12 +129,12 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 
 		List<Hit> hits = null;
 		hits = search.search();
-		Assert.assertEquals(2, hits.size());
+		assertEquals(2, hits.size());
 
 		opt.setMaxHits(1);
 		hits = search.search();
-		Assert.assertEquals(1, hits.size());
-		Assert.assertTrue(search.isMoreHitsPresent());
+		assertEquals(1, hits.size());
+		assertTrue(search.isMoreHitsPresent());
 
 		opt = new FulltextSearchOptions();
 		opt.setLanguage("en");
@@ -147,9 +148,9 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 		search.setOptions(opt);
 
 		hits = search.search();
-		Assert.assertEquals(1, hits.size());
-		Assert.assertEquals(3L, hits.get(0).getId());
-		Assert.assertEquals("en", hits.get(0).getLanguage());
+		assertEquals(1, hits.size());
+		assertEquals(3L, hits.get(0).getId());
+		assertEquals("en", hits.get(0).getLanguage());
 	}
 
 	@Test
@@ -159,7 +160,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 			folderDao.computePath(folderId);
 		}
 
-		Assert.assertEquals(4, testSubject.getCount());
+		assertEquals(4, testSubject.getCount());
 
 		// Search in a tree
 		FulltextSearchOptions opt = new FulltextSearchOptions();
@@ -176,7 +177,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 		search.setOptions(opt);
 
 		List<Hit> hits = search.search();
-		Assert.assertEquals(2, hits.size());
+		assertEquals(2, hits.size());
 
 		// Search in another tree
 		opt.setFolderId(5L);
@@ -186,7 +187,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 		search.setOptions(opt);
 
 		hits = search.search();
-		Assert.assertEquals(0, hits.size());
+		assertEquals(0, hits.size());
 
 		// Search in single folder
 		opt.setFolderId(3000L);
@@ -196,7 +197,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 		search.setOptions(opt);
 
 		hits = search.search();
-		Assert.assertEquals(0, hits.size());
+		assertEquals(0, hits.size());
 
 		// Search in single folder
 		opt.setFolderId(6L);
@@ -206,6 +207,6 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 		search.setOptions(opt);
 
 		hits = search.search();
-		Assert.assertEquals(2, hits.size());
+		assertEquals(2, hits.size());
 	}
 }

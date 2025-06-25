@@ -1,5 +1,10 @@
 package com.logicaldoc.core.security.user;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -13,8 +18,6 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.i18n.DateBean;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
-
-import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateUserHistoryDAO</code>
@@ -39,32 +42,32 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testDelete() throws PersistenceException {
 		Collection<UserHistory> histories = (Collection<UserHistory>) testSubject.findByUserId(1);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(2, histories.size());
+		assertNotNull(histories);
+		assertEquals(2, histories.size());
 
 		for (UserHistory history : histories)
 			testSubject.delete(history.getId());
 
 		histories = (Collection<UserHistory>) testSubject.findByUserId(4);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(0, histories.size());
+		assertNotNull(histories);
+		assertEquals(0, histories.size());
 	}
 
 	@Test
 	public void testFindByUserIdAndType() {
 		List<UserHistory> histories = testSubject.findByUserId(1);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(2, histories.size());
+		assertNotNull(histories);
+		assertEquals(2, histories.size());
 
 		histories = testSubject.findByUserIdAndEvent(1L, "data test 02");
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(1, histories.size());
-		Assert.assertEquals("data test 02", histories.get(0).getEvent());
+		assertNotNull(histories);
+		assertEquals(1, histories.size());
+		assertEquals("data test 02", histories.get(0).getEvent());
 
 		// Try with unexisting user
 		histories = testSubject.findByUserId(99);
-		Assert.assertNotNull(histories);
-		Assert.assertEquals(0, histories.size());
+		assertNotNull(histories);
+		assertEquals(0, histories.size());
 	}
 
 	@Test
@@ -76,7 +79,7 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 		userHistory.setEvent(UserEvent.CREATED);
 
 		testSubject.store(userHistory);
-		Assert.assertNotNull(userHistory);
+		assertNotNull(userHistory);
 
 		UserHistory newUserHistory = new UserHistory();
 		newUserHistory.setDate(DateBean.dateFromCompactString("20061220"));
@@ -85,12 +88,12 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 		newUserHistory.setEvent(UserEvent.CREATED);
 
 		testSubject.store(newUserHistory);
-		Assert.assertNotNull(newUserHistory);
+		assertNotNull(newUserHistory);
 
 		// Test the stored history
 		Collection<UserHistory> histories = (Collection<UserHistory>) testSubject.findByUserId(3L);
-		Assert.assertNotNull(histories);
-		Assert.assertFalse(histories.isEmpty());
+		assertNotNull(histories);
+		assertFalse(histories.isEmpty());
 
 		UserHistory hStored = null;
 		for (UserHistory userHistory2 : histories) {
@@ -99,11 +102,11 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 				break;
 			}
 		}
-		
-		Assert.assertEquals(hStored, newUserHistory);
-		Assert.assertEquals(hStored.getDate().getTime(), DateBean.dateFromCompactString("20061220").getTime());
-		Assert.assertEquals(hStored.getUsername(), "sebastian");
-		Assert.assertEquals(UserEvent.CREATED, hStored.getEventEnum());
+
+		assertEquals(hStored, newUserHistory);
+		assertEquals(hStored.getDate().getTime(), DateBean.dateFromCompactString("20061220").getTime());
+		assertEquals(hStored.getUsername(), "sebastian");
+		assertEquals(UserEvent.CREATED, hStored.getEventEnum());
 	}
 
 	@Test
@@ -111,8 +114,8 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTestCase {
 		testSubject.cleanOldHistories(5);
 
 		UserHistory history = testSubject.findById(1);
-		Assert.assertNull(history);
+		assertNull(history);
 		List<UserHistory> histories = testSubject.findAll();
-		Assert.assertEquals(0, histories.size());
+		assertEquals(0, histories.size());
 	}
 }

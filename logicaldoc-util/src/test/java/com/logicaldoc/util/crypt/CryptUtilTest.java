@@ -2,6 +2,7 @@ package com.logicaldoc.util.crypt;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
@@ -11,8 +12,6 @@ import org.junit.Test;
 
 import com.logicaldoc.util.crypt.CryptUtil.EncryptionException;
 import com.logicaldoc.util.io.FileUtil;
-
-import junit.framework.Assert;
 
 public class CryptUtilTest {
 
@@ -31,13 +30,13 @@ public class CryptUtilTest {
 		try {
 
 			testSubject.encrypt(clearFile, cryptedFile);
-			Assert.assertTrue(cryptedFile.exists());
-			Assert.assertTrue(cryptedFile.length() > 0);
-			Assert.assertNotSame(cryptedFile.length(), clearFile.length());
+			assertTrue(cryptedFile.exists());
+			assertTrue(cryptedFile.length() > 0);
+			assertNotSame(cryptedFile.length(), clearFile.length());
 
 			testSubject.decrypt(cryptedFile, decryptedFile);
-			Assert.assertTrue(decryptedFile.exists());
-			Assert.assertEquals(clearFile.length(), decryptedFile.length());
+			assertTrue(decryptedFile.exists());
+			assertEquals(clearFile.length(), decryptedFile.length());
 
 		} finally {
 			FileUtil.delete(cryptedFile);

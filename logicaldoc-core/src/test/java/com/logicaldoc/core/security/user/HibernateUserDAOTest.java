@@ -1,5 +1,12 @@
 package com.logicaldoc.core.security.user;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
@@ -18,8 +25,6 @@ import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.plugin.PluginException;
-
-import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateUserDAO</code>
@@ -48,147 +53,147 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 	public void testDelete() throws PersistenceException {
 		// User with history, not deletable
 		User user = dao.findByUsername("author");
-		Assert.assertEquals(3, user.getGroups().size());
+		assertEquals(3, user.getGroups().size());
 		dao.delete(user.getId());
 		user = dao.findByUsername("author");
-		Assert.assertNull(user);
+		assertNull(user);
 
 		// Try with a deletable user
 		User testUser = dao.findByUsername("test");
-		Assert.assertEquals(2, testUser.getGroups().size());
+		assertEquals(2, testUser.getGroups().size());
 		testUser.removeGroupMemberships(null);
 		dao.store(testUser);
 		dao.initialize(testUser);
-		Assert.assertEquals(1, testUser.getGroups().size());
+		assertEquals(1, testUser.getGroups().size());
 
 		String name = testUser.getUserGroupName();
 		dao.delete(testUser.getId());
 		user = dao.findByUsername("test");
-		Assert.assertNull(user);
-		Assert.assertNull(groupDao.findByName(name, 1));
+		assertNull(user);
+		assertNull(groupDao.findByName(name, 1));
 
 		Group group = groupDao.findByName("guest", 1);
 		groupDao.initialize(group);
-		Assert.assertFalse(group.getUsers().contains(testUser));
+		assertFalse(group.getUsers().contains(testUser));
 	}
 
 	@Test
 	public void testFindAll() throws PersistenceException {
 		Collection<User> users = dao.findAll();
-		Assert.assertNotNull(users);
-		Assert.assertEquals(6, users.size());
+		assertNotNull(users);
+		assertEquals(6, users.size());
 	}
 
 	@Test
 	public void testFindByName() throws PersistenceException {
 		Collection<User> users = dao.findByName("Seba%");
-		Assert.assertNotNull(users);
-		Assert.assertEquals(1, users.size());
+		assertNotNull(users);
+		assertEquals(1, users.size());
 
 		users = dao.findByName("%i%");
-		Assert.assertNotNull(users);
-		Assert.assertEquals(3, users.size());
+		assertNotNull(users);
+		assertEquals(3, users.size());
 
 		users = dao.findByName("%xxx%");
-		Assert.assertNotNull(users);
-		Assert.assertEquals(0, users.size());
+		assertNotNull(users);
+		assertEquals(0, users.size());
 	}
 
 	@Test
 	public void testFindByGroup() throws PersistenceException {
 		Set<User> users = dao.findByGroup(1L);
-		Assert.assertNotNull(users);
-		Assert.assertEquals(2, users.size());
-		Assert.assertTrue(users.contains(dao.findById(1L)));
+		assertNotNull(users);
+		assertEquals(2, users.size());
+		assertTrue(users.contains(dao.findById(1L)));
 
 		users = dao.findByGroup(99L);
-		Assert.assertNotNull(users);
-		Assert.assertEquals(0, users.size());
+		assertNotNull(users);
+		assertEquals(0, users.size());
 	}
 
 	@Test
 	public void testFindByUserName() throws PersistenceException, NoSuchAlgorithmException {
 		User user = dao.findByUsername("admin");
-		Assert.assertNotNull(user);
-		Assert.assertEquals("admin", user.getUsername());
+		assertNotNull(user);
+		assertEquals("admin", user.getUsername());
 		user.setDecodedPassword("admin");
-		Assert.assertEquals(CryptUtil.encryptSHA256("admin"), user.getPassword());
-		Assert.assertEquals("admin@admin.net", user.getEmail());
-		Assert.assertEquals(2, user.getGroups().size());
+		assertEquals(CryptUtil.encryptSHA256("admin"), user.getPassword());
+		assertEquals("admin@admin.net", user.getEmail());
+		assertEquals(2, user.getGroups().size());
 
 		// Try with unexisting username
 		user = dao.findByUsername("xxxx");
-		Assert.assertNull(user);
+		assertNull(user);
 
 		user = dao.findByUsername("Admin");
-		Assert.assertNull(user);
+		assertNull(user);
 	}
 
 	@Test
 	public void testFindByUserNameIgnoreCase() throws PersistenceException {
 		User user = dao.findByUsernameIgnoreCase("admin");
-		Assert.assertNotNull(user);
-		Assert.assertEquals("admin", user.getUsername());
+		assertNotNull(user);
+		assertEquals("admin", user.getUsername());
 
 		// Try with unexisting username
 		user = dao.findByUsernameIgnoreCase("xxxx");
-		Assert.assertNull(user);
+		assertNull(user);
 
 		// Try with different case
 		user = dao.findByUsername("AdMiN");
-		Assert.assertNull(user);
+		assertNull(user);
 		user = dao.findByUsernameIgnoreCase("AdMiN");
-		Assert.assertNotNull(user);
-		Assert.assertEquals("admin", user.getUsername());
+		assertNotNull(user);
+		assertEquals("admin", user.getUsername());
 	}
 
 	@Test
 	public void testFindByLikeUserName() throws PersistenceException {
 		Collection<User> users = dao.findByLikeUsername("admin");
-		Assert.assertNotNull(users);
-		Assert.assertEquals(1, users.size());
-		Assert.assertEquals("admin", users.iterator().next().getUsername());
+		assertNotNull(users);
+		assertEquals(1, users.size());
+		assertEquals("admin", users.iterator().next().getUsername());
 
 		users = dao.findByLikeUsername("adm%");
-		Assert.assertNotNull(users);
-		Assert.assertEquals(1, users.size());
-		Assert.assertEquals("admin", users.iterator().next().getUsername());
+		assertNotNull(users);
+		assertEquals(1, users.size());
+		assertEquals("admin", users.iterator().next().getUsername());
 
 		users = dao.findByLikeUsername("xxx%");
-		Assert.assertNotNull(users);
-		Assert.assertTrue(users.isEmpty());
+		assertNotNull(users);
+		assertTrue(users.isEmpty());
 	}
 
 	@Test
 	public void testFindById() throws PersistenceException, NoSuchAlgorithmException {
 		User user = dao.findById(1, true);
-		Assert.assertNotNull(user);
-		Assert.assertEquals("admin", user.getUsername());
+		assertNotNull(user);
+		assertEquals("admin", user.getUsername());
 		user.setDecodedPassword("admin");
-		Assert.assertEquals(CryptUtil.encryptSHA256("admin"), user.getPassword());
-		Assert.assertEquals("admin@admin.net", user.getEmail());
-		Assert.assertEquals(2, user.getGroups().size());
+		assertEquals(CryptUtil.encryptSHA256("admin"), user.getPassword());
+		assertEquals("admin@admin.net", user.getEmail());
+		assertEquals(2, user.getGroups().size());
 
 		// Try with unexisting id
 		user = dao.findById(9999);
-		Assert.assertNull(user);
+		assertNull(user);
 	}
 
 	@Test
 	public void testFindByUserNameAndName() throws PersistenceException {
 		Collection<User> users = dao.findByUsernameAndName("boss", "Meschieri");
-		Assert.assertNotNull(users);
-		Assert.assertEquals(1, users.size());
-		Assert.assertEquals("boss", users.iterator().next().getUsername());
+		assertNotNull(users);
+		assertEquals(1, users.size());
+		assertEquals("boss", users.iterator().next().getUsername());
 
 		users = dao.findByUsernameAndName("b%", "Mes%");
-		Assert.assertNotNull(users);
-		Assert.assertEquals(1, users.size());
-		Assert.assertEquals("boss", users.iterator().next().getUsername());
+		assertNotNull(users);
+		assertEquals(1, users.size());
+		assertEquals("boss", users.iterator().next().getUsername());
 
 		users = dao.findByUsernameAndName("a%", "xxxx%");
-		Assert.assertNotNull(users);
-		Assert.assertTrue(users.isEmpty());
+		assertNotNull(users);
+		assertTrue(users.isEmpty());
 	}
 
 	@Test
@@ -208,22 +213,22 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 		transaction.setUserId(user.getId());
 		transaction.setNotified(0);
 		dao.store(user, transaction);
-		Assert.assertNotNull(groupDao.findByName(user.getUserGroupName(), 1));
+		assertNotNull(groupDao.findByName(user.getUserGroupName(), 1));
 
 		user.addGroup(groupDao.findById(1L));
 		dao.store(user);
 
 		User storedUser = dao.findByUsername("xxx");
 		dao.initialize(storedUser);
-		Assert.assertNotNull(user);
-		Assert.assertEquals(user, storedUser);
-		Assert.assertEquals(2, storedUser.getGroups().size());
-		Assert.assertNotNull(storedUser.getUserGroup());
-		Assert.assertEquals(CryptUtil.encryptSHA256("3$(a8BcX$7GAA%K)"), storedUser.getPassword());
-		Assert.assertEquals(1, storedUser.getWorkingTimes().size());
-		Assert.assertEquals(1, storedUser.getWorkingTimes().iterator().next().getDayOfWeek());
-		Assert.assertEquals(5, storedUser.getWorkingTimes().iterator().next().getHourStart());
-		Assert.assertEquals(30, storedUser.getWorkingTimes().iterator().next().getMinuteStart());
+		assertNotNull(user);
+		assertEquals(user, storedUser);
+		assertEquals(2, storedUser.getGroups().size());
+		assertNotNull(storedUser.getUserGroup());
+		assertEquals(CryptUtil.encryptSHA256("3$(a8BcX$7GAA%K)"), storedUser.getPassword());
+		assertEquals(1, storedUser.getWorkingTimes().size());
+		assertEquals(1, storedUser.getWorkingTimes().iterator().next().getDayOfWeek());
+		assertEquals(5, storedUser.getWorkingTimes().iterator().next().getHourStart());
+		assertEquals(30, storedUser.getWorkingTimes().iterator().next().getMinuteStart());
 
 		user = dao.findById(1);
 		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
@@ -238,7 +243,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 		dao.store(user);
 		user = dao.findById(1);
 		dao.initialize(user);
-		Assert.assertEquals(3, user.getGroups().size());
+		assertEquals(3, user.getGroups().size());
 	}
 
 	@Test
@@ -246,35 +251,35 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 
 		User user = dao.findById(1L);
 		dao.initialize(user);
-		Assert.assertEquals(0, user.getPasswordExpired());
-		Assert.assertEquals(0, user.getPasswordExpires());
+		assertEquals(0, user.getPasswordExpired());
+		assertEquals(0, user.getPasswordExpires());
 		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
 		dao.store(user);
 
 		user = dao.findById(1L);
 		dao.initialize(user);
-		Assert.assertEquals(0, user.getPasswordExpired());
-		Assert.assertEquals(0, user.getPasswordExpires());
+		assertEquals(0, user.getPasswordExpired());
+		assertEquals(0, user.getPasswordExpires());
 		user.setDecodedPassword("3$(a8BcX$7GAA%K-pippo");
 		dao.store(user);
 
 		// Give an already used password
 		user = dao.findById(1L);
 		dao.initialize(user);
-		Assert.assertEquals(0, user.getPasswordExpired());
-		Assert.assertEquals(0, user.getPasswordExpires());
+		assertEquals(0, user.getPasswordExpired());
+		assertEquals(0, user.getPasswordExpires());
 		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
 
 		try {
 			dao.store(user);
-			Assert.fail("an exception should have been raised at this point");
+			fail("an exception should have been raised at this point");
 		} catch (PasswordAlreadyUsedException e) {
 			// Nothing to do
 		}
 
 		user = dao.findById(1L);
 		dao.initialize(user);
-		Assert.assertEquals(0, user.getPasswordExpired());
+		assertEquals(0, user.getPasswordExpired());
 		user.setDecodedPassword("3$(a8BcX$7GAA%K)-neverused");
 		user.setPasswordExpired(1);
 		dao.store(user);
@@ -282,16 +287,16 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 		user = dao.findById(1L);
 
 		PasswordHistoryDAO pDao = (PasswordHistoryDAO) Context.get(PasswordHistoryDAO.class);
-		Assert.assertEquals(6, pDao.findByUserId(user.getId(), null).size());
+		assertEquals(6, pDao.findByUserId(user.getId(), null).size());
 	}
 
 	@Test
 	public void testCount() throws PersistenceException {
-		Assert.assertEquals(5, dao.count(null));
+		assertEquals(5, dao.count(null));
 	}
 
 	public void isPasswordExpired() throws PersistenceException {
-		Assert.assertFalse(dao.isPasswordExpired("admin"));
+		assertFalse(dao.isPasswordExpired("admin"));
 		User user = dao.findByUsername("boss");
 		Date lastChange = null;
 		Calendar calendar = new GregorianCalendar();
@@ -304,12 +309,12 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 		lastChange = calendar.getTime();
 		user.setPasswordChanged(lastChange);
 		dao.store(user);
-		Assert.assertTrue(dao.isPasswordExpired("boss"));
+		assertTrue(dao.isPasswordExpired("boss"));
 
 		calendar.add(Calendar.DAY_OF_MONTH, +2);
 		lastChange = calendar.getTime();
 		user.setPasswordChanged(lastChange);
 		dao.store(user);
-		Assert.assertFalse(dao.isPasswordExpired("boss"));
+		assertFalse(dao.isPasswordExpired("boss"));
 	}
 }

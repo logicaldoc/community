@@ -1,5 +1,10 @@
 package com.logicaldoc.core.lock;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -14,8 +19,6 @@ import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.plugin.PluginException;
-
-import junit.framework.Assert;
 
 /**
  * Test case for <code>LockManager</code>
@@ -42,9 +45,9 @@ public class LockManagerTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testGet() throws PersistenceException {
-		Assert.assertTrue(testSubject.get("test", "t1"));
-		Assert.assertTrue(testSubject.get("test", "t1"));
-		Assert.assertFalse(testSubject.get("test", "t2"));
+		assertTrue(testSubject.get("test", "t1"));
+		assertTrue(testSubject.get("test", "t1"));
+		assertFalse(testSubject.get("test", "t2"));
 
 		synchronized (this) {
 			try {
@@ -54,12 +57,12 @@ public class LockManagerTest extends AbstractCoreTestCase {
 			}
 		}
 
-		Assert.assertTrue(testSubject.get("test", "t2"));
+		assertTrue(testSubject.get("test", "t2"));
 		testSubject.release("test", "t2");
 
 		Generic lock = dao.findByAlternateKey("lock", "test-" + config.getProperty("id"), null, Tenant.DEFAULT_ID);
-		Assert.assertNotNull(lock);
-		Assert.assertNull(lock.getString1());
-		Assert.assertNull(lock.getDate1());
+		assertNotNull(lock);
+		assertNull(lock.getString1());
+		assertNull(lock.getDate1());
 	}
 }

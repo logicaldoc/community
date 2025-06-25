@@ -1,5 +1,6 @@
 package com.logicaldoc.core.searchengine.saved;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -19,8 +20,6 @@ import com.logicaldoc.core.searchengine.FulltextSearchOptions;
 import com.logicaldoc.core.searchengine.SearchOptions;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
-
-import junit.framework.Assert;
 
 /**
  * Test case for {@link HibernateSearchDAO}
@@ -68,11 +67,11 @@ public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 		testSubject.store(search);
 
 		List<SavedSearch> searches = testSubject.findByUserId(1L);
-		Assert.assertEquals(2, searches.size());
-		Assert.assertEquals("search1", searches.get(0).getName());
+		assertEquals(2, searches.size());
+		assertEquals("search1", searches.get(0).getName());
 
 		searches = testSubject.findByUserId(5L);
-		Assert.assertEquals(0, searches.size());
+		assertEquals(0, searches.size());
 	}
 
 	@Test

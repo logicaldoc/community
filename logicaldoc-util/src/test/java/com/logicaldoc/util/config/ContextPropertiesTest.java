@@ -13,8 +13,6 @@ import org.junit.Test;
 
 import com.logicaldoc.util.io.FileUtil;
 
-import junit.framework.Assert;
-
 /**
  * Test case for <code>WebConfigurator</code>
  * 
@@ -32,7 +30,7 @@ public class ContextPropertiesTest {
 
 		contextProperties.write();
 
-		Assert.assertEquals("value", contextProperties.getProperty("test"));
+		assertEquals("value", contextProperties.getProperty("test"));
 	}
 
 	@Test

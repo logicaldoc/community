@@ -1,5 +1,9 @@
 package com.logicaldoc.core.security;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -9,8 +13,6 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.util.plugin.PluginException;
-
-import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateSessionDAO</code>
@@ -34,39 +36,39 @@ public class HibernateSessionDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testDeleteCurrentNodeSessions() {
-		Assert.assertEquals(1, dao.countSessions(1L, null));
+		assertEquals(1, dao.countSessions(1L, null));
 		dao.deleteCurrentNodeSessions();
-		Assert.assertEquals(0, dao.countSessions(1L, null));
+		assertEquals(0, dao.countSessions(1L, null));
 	}
 
 	@Test
 	public void testFindByNode() {
 		List<Session> sessions = dao.findByNode("saert536yy");
-		Assert.assertEquals(1, sessions.size());
+		assertEquals(1, sessions.size());
 		sessions = dao.findByNode(null);
-		Assert.assertEquals(1, sessions.size());
+		assertEquals(1, sessions.size());
 		sessions = dao.findByNode("xxxx");
-		Assert.assertEquals(0, sessions.size());
+		assertEquals(0, sessions.size());
 	}
 
 	@Test
 	public void testFindBySid() {
 		Session session = dao.findBySid("sid1");
-		Assert.assertNotNull(session);
-		Assert.assertEquals("addr1", session.getClient().getAddress());
+		assertNotNull(session);
+		assertEquals("addr1", session.getClient().getAddress());
 
 		session = dao.findBySid("sid2");
-		Assert.assertNull(session);
+		assertNull(session);
 	}
 
 	@Test
 	public void testCountSessions() {
-		Assert.assertEquals(1, dao.countSessions(1L, Session.STATUS_OPEN));
-		Assert.assertEquals(1, dao.countSessions(null, Session.STATUS_OPEN));
-		Assert.assertEquals(1, dao.countSessions(1L, null));
-		Assert.assertEquals(1, dao.countSessions(null, null));
+		assertEquals(1, dao.countSessions(1L, Session.STATUS_OPEN));
+		assertEquals(1, dao.countSessions(null, Session.STATUS_OPEN));
+		assertEquals(1, dao.countSessions(1L, null));
+		assertEquals(1, dao.countSessions(null, null));
 
-		Assert.assertEquals(0, dao.countSessions(1L, Session.STATUS_CLOSED));
-		Assert.assertEquals(0, dao.countSessions(2L, Session.STATUS_OPEN));
+		assertEquals(0, dao.countSessions(1L, Session.STATUS_CLOSED));
+		assertEquals(0, dao.countSessions(2L, Session.STATUS_OPEN));
 	}
 }
