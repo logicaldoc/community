@@ -23,6 +23,7 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.ResourceUtil;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
@@ -103,7 +104,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		Store store = Context.get(Store.class);
 		for (Version ver : testSubject.findByDocId(doc.getId())) {
 			String res = store.getResourceName(doc.getId(), ver.getFileVersion(), null);
-			store.store(this.getClass().getResourceAsStream("/data.sql"), doc.getId(), res);
+			store.store(ResourceUtil.getInputStream("data.sql"), doc.getId(), res);
 		}
 		for (Version ver : testSubject.findByDocId(doc.getId())) {
 			String res = store.getResourceName(doc.getId(), ver.getFileVersion(), null);
@@ -115,7 +116,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		assertEquals("1.0", testSubject.findById(version.getId()).getVersion());
 
 		String resourceName = store.getResourceName(doc.getId(), version.getFileVersion(), null);
-		try (InputStream is = this.getClass().getResourceAsStream("/data.sql")) {
+		try (InputStream is = ResourceUtil.getInputStream("data.sql")) {
 			store.store(is, doc.getId(), resourceName);
 		}
 
@@ -130,7 +131,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		assertEquals("2.0", version.getVersion());
 
 		resourceName = store.getResourceName(doc.getId(), version.getFileVersion(), null);
-		try (InputStream is = this.getClass().getResourceAsStream("/data.sql")) {
+		try (InputStream is = ResourceUtil.getInputStream("data.sql")) {
 			store.store(is, doc.getId(), resourceName);
 		}
 
@@ -145,7 +146,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		assertEquals("2.1", version.getVersion());
 
 		resourceName = store.getResourceName(doc.getId(), version.getFileVersion(), null);
-		try (InputStream is = this.getClass().getResourceAsStream("/data.sql")) {
+		try (InputStream is = ResourceUtil.getInputStream("data.sql")) {
 			store.store(is, doc.getId(), resourceName);
 		}
 

@@ -174,6 +174,7 @@
     </reporting>
     
     <modules>
+        <module>logicaldoc-parent</module>
         <module>logicaldoc-i18n</module>
         <module>logicaldoc-util</module>
         <module>logicaldoc-core</module>

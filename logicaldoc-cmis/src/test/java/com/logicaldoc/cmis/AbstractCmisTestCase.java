@@ -45,7 +45,7 @@ public abstract class AbstractCmisTestCase extends AbstractTestCase {
 		Store store = (Store) context.getBean("Store");
 		store.init();
 
-		ResourceUtil.copyResource("/data.sql", new File(storeRoot, "5/doc/1.0"));
+		ResourceUtil.copyResource("data.sql", new File(storeRoot, "5/doc/1.0"));
 	}
 
 	@Override
@@ -55,6 +55,6 @@ public abstract class AbstractCmisTestCase extends AbstractTestCase {
 
 	@Override
 	protected List<String> getDatabaseScripts() {
-		return List.of("/sql/logicaldoc-core.sql", "/data.sql");
+		return List.of("sql/logicaldoc-core.sql", "data.sql");
 	}
 }

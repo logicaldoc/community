@@ -101,6 +101,6 @@ public abstract class AbstractWebdavTestCase extends AbstractTestCase {
 
 	@Override
 	protected List<String> getDatabaseScripts() {
-		return List.of("/sql/logicaldoc-core.sql", "/data.sql");
+		return List.of("sql/logicaldoc-core.sql", "data.sql");
 	}
 }

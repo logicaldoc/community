@@ -15,7 +15,7 @@ public class ResourceUtilTest {
 	@Test
 	public void testExistsResource() {
 		Assert.assertTrue(ResourceUtil.existsResource("/context.xml"));
-		Assert.assertFalse(ResourceUtil.existsResource("/test.txt"));
+		Assert.assertFalse(ResourceUtil.existsResource("/pippo.txt"));
 	}
 
 	@Test
@@ -32,7 +32,7 @@ public class ResourceUtilTest {
 
 	@Test
 	public void testReadAsString() throws IOException {
-		assertTrue(ResourceUtil.readAsString("/context.xml").contains("<beans default-lazy-init"));
+		assertTrue(ResourceUtil.readAsString("context.xml").contains("<beans default-lazy-init"));
 	}
 
 	@Test
@@ -40,7 +40,7 @@ public class ResourceUtilTest {
 		File out = new File("target/out.txt");
 		try {
 			assertFalse(out.exists());
-			IOUtil.write(new ByteArrayInputStream(ResourceUtil.readAsBytes("/context.xml")), out);
+			IOUtil.write(new ByteArrayInputStream(ResourceUtil.readAsBytes("context.xml")), out);
 			assertTrue(out.length() > 0);
 		} finally {
 			FileUtil.delete(out);

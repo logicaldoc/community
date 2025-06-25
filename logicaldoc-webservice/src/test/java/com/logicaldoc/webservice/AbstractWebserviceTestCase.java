@@ -66,7 +66,7 @@ public abstract class AbstractWebserviceTestCase extends AbstractTestCase {
 
 	@Override
 	protected List<String> getDatabaseScripts() {
-		return List.of("/sql/logicaldoc-core.sql", "/sql/logicaldoc-webservice.sql", "/data.sql");
+		return List.of("sql/logicaldoc-core.sql", "sql/logicaldoc-webservice.sql", "data.sql");
 	}
 
 }

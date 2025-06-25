@@ -17,7 +17,6 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.CopyOption;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -226,8 +225,7 @@ public class FileUtil {
 	public static void copyResource(String resourceName, File out) throws IOException {
 		out.getParentFile().mkdirs();
 
-		try (InputStream is = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream(resourceName.startsWith("/") ? resourceName.substring(1) : resourceName)) {
+		try (InputStream is = ResourceUtil.getInputStream(resourceName)) {
 			Files.copy(is, out.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);

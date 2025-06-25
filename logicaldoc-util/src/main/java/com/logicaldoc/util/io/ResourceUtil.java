@@ -22,14 +22,14 @@ public class ResourceUtil {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static byte[] readAsBytes(String resourcePath) throws IOException {
-		return ResourceUtil.class.getResourceAsStream(resourcePath).readAllBytes();
+	public static byte[] readAsBytes(String resourceName) throws IOException {
+		return getInputStream(resourceName).readAllBytes();
 	}
 
-	public static String readAsString(String resourcePath) throws IOException {
+	public static String readAsString(String resourceName) throws IOException {
 		StringBuilder resourceData = new StringBuilder(1000);
 		try (BufferedReader reader = new BufferedReader(
-				new InputStreamReader(ResourceUtil.class.getResourceAsStream(resourcePath)))) {
+				new InputStreamReader(getInputStream(resourceName)))) {
 			char[] buf = new char[1024];
 			int numRead = 0;
 			while ((numRead = reader.read(buf)) != -1) {
@@ -42,14 +42,14 @@ public class ResourceUtil {
 	/**
 	 * Copy a resource from the classpath into a file
 	 * 
-	 * @param classpath The classpath specification
+	 * @param resourceName The resource fully qualified name
 	 * @param out The target file
 	 * 
 	 * @throws IOException raised in case the resource does not exist or the
 	 *         output file cannot be written
 	 */
-	public static void copyResource(String classpath, File out) throws IOException {
-		try (InputStream is = new BufferedInputStream(ResourceUtil.class.getResource(classpath).openStream());
+	public static void copyResource(String resourceName, File out) throws IOException {
+		try (InputStream is = getInputStream(resourceName);
 				OutputStream os = new BufferedOutputStream(new FileOutputStream(out));) {
 			for (;;) {
 				int b = is.read();
@@ -61,29 +61,20 @@ public class ResourceUtil {
 	}
 
 	public static boolean existsResource(String resourceName) {
-		InputStream is = null;
-		try {
-			is = getInputStream(resourceName);
-			return is != null;
+		try (InputStream is = getInputStream(resourceName)) {
+			return is != null && is.available() > 0L;
 		} catch (Exception e) {
 			return false;
-		} finally {
-			if (is != null)
-				try {
-					is.close();
-				} catch (IOException e) {
-					// Nothing to do
-				}
 		}
 	}
 
-	private static InputStream getInputStream(String resourceName) throws IOException {
+	public static InputStream getInputStream(String resourceName) throws IOException {
 		InputStream is;
 		try {
-			is = new BufferedInputStream(FileUtil.class.getResource(resourceName).openStream());
-		} catch (Exception e) {
 			is = new BufferedInputStream(
 					Thread.currentThread().getContextClassLoader().getResource(resourceName).openStream());
+		} catch (Exception e) {
+			is = new BufferedInputStream(FileUtil.class.getResource(resourceName).openStream());
 		}
 		return is;
 	}

@@ -15,6 +15,6 @@ public abstract class AbstractDropBoxTestCase extends AbstractTestCase {
 
 	@Override
 	protected List<String> getDatabaseScripts() {
-		return List.of("/sql/logicaldoc-core.sql", "/sql/logicaldoc-dropbox.sql", "/data.sql");
+		return List.of("sql/logicaldoc-core.sql", "sql/logicaldoc-dropbox.sql", "data.sql");
 	}
 }

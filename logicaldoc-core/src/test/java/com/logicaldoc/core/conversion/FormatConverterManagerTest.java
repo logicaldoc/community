@@ -21,13 +21,13 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
-import com.logicaldoc.core.document.thumbnail.ThumbnailManagerTest;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.io.ResourceUtil;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
@@ -49,7 +49,7 @@ public class FormatConverterManagerTest extends AbstractCoreTestCase {
 
 	@Override
 	protected List<String> getPluginArchives() {
-		return List.of("/logicaldoc-core-plugin.jar");
+		return List.of("logicaldoc-core-plugin.jar");
 	}
 
 	@Before
@@ -77,7 +77,7 @@ public class FormatConverterManagerTest extends AbstractCoreTestCase {
 			transaction.setUserId(User.USERID_ADMIN);
 			transaction.setUsername("admin");
 			document = documentManager
-					.create(ThumbnailManagerTest.class.getResourceAsStream("/data.sql"), document, transaction).get();
+					.create(ResourceUtil.getInputStream("data.sql"), document, transaction).get();
 		} catch (PersistenceException | InterruptedException | ExecutionException e) {
 			throw new IOException(e);
 		}
