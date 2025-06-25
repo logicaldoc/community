@@ -222,7 +222,7 @@ public class Setup implements EntryPoint {
 				"jdbc:mysql://<server>[,<failoverhost>][<:3306>]/<database>?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC",
 				"org.hibernate.dialect.MySQL8Dialect", SELECT_1 });
 		engines.put(MARIADB, new String[] { MARIADB, "org.mariadb.jdbc.Driver",
-				"jdbc:mariadb://<server>[<:3306>]/<database>", "org.hibernate.dialect.MariaDB103Dialect", SELECT_1 });
+				"jdbc:mariadb://<server>[<:3306>]/<database>", "org.hibernate.dialect.MariaDB106Dialect", SELECT_1 });
 		engines.put(POSTGRESQL,
 				new String[] { POSTGRESQL, "org.postgresql.Driver", "jdbc:postgresql:[<//server>[<:5432>/]]<database>",
 						"org.hibernate.dialect.PostgreSQLDialect", SELECT_1 });

@@ -88,18 +88,7 @@
 
         <security:intercept-url pattern="/**" access="isAuthenticated()" />
         <security:http-basic entry-point-ref="basicAuthenticationEntryPoint" />
-    </security:http>   
-    <security:http pattern="/license/**" use-expressions="true"
-        create-session="never" disable-url-rewriting="true" auto-config="false"
-        authentication-manager-ref="adminAuthenticationManager"
-        security-context-repository-ref="LDSecurityContextRepository">
-        
-        <security:headers disabled="true" />
-        <security:csrf disabled="true" />
- 
-        <security:intercept-url pattern="/**" access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="basicAuthenticationEntryPoint" />
-    </security:http>     
+    </security:http>    
     <security:http pattern="/download-ticket/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
         authentication-manager-ref="authenticationManager"
@@ -135,18 +124,7 @@
         <security:intercept-url pattern="/**" access="isAuthenticated()" />
         <security:http-basic entry-point-ref="basicAuthenticationEntryPoint" />
     </security:http>
-    <security:http pattern="/webdavb/**" use-expressions="true"
-        create-session="never" disable-url-rewriting="true" auto-config="false"
-        authentication-manager-ref="authenticationManager"
-        security-context-repository-ref="LDSecurityContextRepository">
-        
-        <security:headers disabled="true" />
-        <security:csrf disabled="true" />
-        
-        <security:intercept-url pattern="/**"
-            access="isAuthenticated()" />       
-        <security:http-basic entry-point-ref="basicAuthenticationEntryPoint" />
-    </security:http>    
+  
     <security:http pattern="/service/cmis/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
         authentication-manager-ref="authenticationManager"
@@ -197,7 +175,6 @@
         <security:csrf disabled="true" />
         
         <security:intercept-url pattern="/fontawesome/**" access="permitAll()" />
-        
         <security:intercept-url pattern="/frontend.jsp" access="isAuthenticated()" />
         <security:intercept-url pattern="/frontend/**" access="isAuthenticated()" />
         <security:intercept-url pattern="/mobile.jsp" access="isAuthenticated()" />
