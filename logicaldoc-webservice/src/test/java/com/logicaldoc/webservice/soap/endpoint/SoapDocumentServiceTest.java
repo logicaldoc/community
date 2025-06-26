@@ -415,7 +415,6 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 			} catch (UnexistingResourceException e) {
 				// Continue
 			}
-			waiting();
 		}
 
 		dh = testSubject.getVersionContent("", wsDoc.getId(), wsDoc.getVersion());

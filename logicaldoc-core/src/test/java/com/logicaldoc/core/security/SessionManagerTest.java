@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 
 import org.junit.After;
 import org.junit.Before;
@@ -189,16 +190,18 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 	}
 
 	@Test
-	public void testTimeout() {
+	public void testTimeoutWithoutWaiting() {
 		ContextProperties conf = Context.get().getProperties();
 		int timeout = 1;
-		conf.setProperty("default.session.timeout", "" + timeout);
+		conf.setProperty("default.session.timeout", String.valueOf(timeout));
 
 		testSubject.clear();
+
 		Session session1 = testSubject.newSession("admin", "admin", (Client) null);
 		assertNotNull(session1);
 
-		waiting(timeout);
+		Date expiredDate = new Date(System.currentTimeMillis() - (timeout + 1) * 60 * 1000L);
+		session1.setLastRenew(expiredDate);
 
 		assertFalse(testSubject.isOpen(session1.getSid()));
 	}
@@ -261,16 +264,6 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		assertEquals(session.getSid(), SessionManager.getCurrentSid());
-	}
-
-	private void waiting(int timeout) {
-		synchronized (this) {
-			try {
-				wait(1000 * 60 * timeout);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-			}
-		}
 	}
 
 	@Override

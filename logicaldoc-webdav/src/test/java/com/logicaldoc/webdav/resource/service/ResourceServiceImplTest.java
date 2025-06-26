@@ -22,6 +22,7 @@ import com.logicaldoc.core.document.BookmarkDAO;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentStatus;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.IOUtil;
 import com.logicaldoc.util.io.ResourceUtil;
@@ -44,10 +45,9 @@ public class ResourceServiceImplTest extends AbstractWebdavTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		testSubject = (ResourceServiceImpl) context.getBean("resourceService");
-
-		docDao = (DocumentDAO) context.getBean("documentDAO");
-		bookmarkDao = (BookmarkDAO) context.getBean("BookmarkDAO");
+		testSubject = Context.get(ResourceServiceImpl.class);
+		docDao = Context.get(DocumentDAO.class);
+		bookmarkDao = Context.get(BookmarkDAO.class);
 	}
 
 	@Test

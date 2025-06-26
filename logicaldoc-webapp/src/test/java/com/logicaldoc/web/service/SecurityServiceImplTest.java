@@ -64,8 +64,8 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		userDAO = (UserDAO) context.getBean("UserDAO");
-		groupDAO = (GroupDAO) context.getBean("GroupDAO");
+		userDAO = Context.get(UserDAO.class);
+		groupDAO = Context.get(GroupDAO.class);
 	}
 
 	@Test

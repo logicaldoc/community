@@ -54,9 +54,10 @@ public class SystemServiceImplTest extends AbstractWebappTestCase {
 		File testWebappFolder = new File("target/webapp");
 		testWebappFolder.mkdir();
 		SystemServiceImpl.defaultWebappRootFolder = testWebappFolder;
-		
+
 		// This is to make JAXP happy even when running inside Eclipse
-		System.setProperty("javax.xml.parsers.SAXParserFactory", "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl");
+		System.setProperty("javax.xml.parsers.SAXParserFactory",
+				"com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl");
 	}
 
 	@Override
@@ -108,11 +109,19 @@ public class SystemServiceImplTest extends AbstractWebappTestCase {
 	}
 
 	@Test
-	public void testStartStop() throws ServerException, InterruptedException {
+	public void testStartStop() throws InterruptedException, ServerException {
 		testSubject.startTask("IndexerTask");
 		testSubject.stopTask("IndexerTask");
-		waiting();
-		GUITask task = testSubject.getTaskByName("IndexerTask", "en");
+
+		long start = System.currentTimeMillis();
+		GUITask task;
+		do {
+			Thread.sleep(100);
+			task = testSubject.getTaskByName("IndexerTask", "en");
+			if (task.getStatus() == Task.STATUS_IDLE)
+				break;
+		} while (System.currentTimeMillis() - start < 5000);
+
 		assertEquals(Task.STATUS_IDLE, task.getStatus());
 	}
 

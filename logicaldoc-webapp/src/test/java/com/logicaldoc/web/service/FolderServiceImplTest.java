@@ -30,6 +30,7 @@ import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.web.AbstractWebappTestCase;
@@ -49,8 +50,8 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		folderDao = (FolderDAO) context.getBean("folderDAO");
-		documentDao = (DocumentDAO) context.getBean("documentDAO");
+		folderDao = Context.get(FolderDAO.class);
+		documentDao = Context.get(DocumentDAO.class);
 	}
 
 	@Test
@@ -226,7 +227,8 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 		GUIFolder folder = testSubject.getFolder(6, true, true, true);
 		int aclBefore = folder.getAccessControlList().size();
 
-		folder.getAccessControlList().add(new GUIAccessControlEntry(4L, Permission.READ.name(), Permission.WRITE.name()));
+		folder.getAccessControlList()
+				.add(new GUIAccessControlEntry(4L, Permission.READ.name(), Permission.WRITE.name()));
 		testSubject.saveACL(folder, false);
 
 		folder = testSubject.getFolder(6, true, true, true);
@@ -533,7 +535,7 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 
 	@Test
 	public void testRestore() throws Exception {
-		assertEquals(8L, folderDao.queryForLong("select ld_id from ld_folder where ld_id="+8L+" and ld_deleted=1"));
+		assertEquals(8L, folderDao.queryForLong("select ld_id from ld_folder where ld_id=" + 8L + " and ld_deleted=1"));
 
 		testSubject.restore(List.of(8L), 1200L);
 		Folder folder = folderDao.findById(8L);
