@@ -85,7 +85,6 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 		doc2.setFileName("document2");
 		doc2.setFolder(folder2);
 		
-//		waiting();
 		testSubject.store(doc2);
 
 		Comparator<AbstractDocument> comparator = DocumentComparator.getComparator("id asc");
