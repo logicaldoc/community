@@ -18,7 +18,6 @@
 			<groupId>com.logicaldoc</groupId>
 			<artifactId>logicaldoc-i18n</artifactId>
 			<version>${project.version}</version>
-			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -73,11 +72,11 @@
 			<version>1.0</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
+		<!-- dependency>
 			<groupId>commons-el</groupId>
 			<artifactId>commons-el</artifactId>
 			<scope>provided</scope>
-		</dependency>
+		</dependency -->
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
@@ -303,6 +302,10 @@
 					<groupId>log4j</groupId>
 					<artifactId>log4j</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -346,8 +349,6 @@
 			<groupId>jakarta-regexp</groupId>
 			<artifactId>jakarta-regexp</artifactId>
 			<version>1.4</version>
-			<type>jar</type>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.annotation</groupId>
@@ -357,6 +358,10 @@
 			<groupId>jakarta.activation</groupId>
 			<artifactId>jakarta.activation-api</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>jakarta.transaction</groupId>
+			<artifactId>jakarta.transaction-api</artifactId>
+		</dependency>		
 		<dependency>
 			<groupId>jakarta.servlet</groupId>
 			<artifactId>jakarta.servlet-api</artifactId>

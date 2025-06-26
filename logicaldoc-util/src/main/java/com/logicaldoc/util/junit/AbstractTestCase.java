@@ -70,11 +70,11 @@ public abstract class AbstractTestCase {
 		String testName = description.getClassName() + "#" + description.getMethodName();
 		String message = String.format("Test %s %s, spent %s", testName, status,
 				TimeDiff.printDuration(TimeUnit.NANOSECONDS.toMillis(nanos)));
-		switch(status) {
+		switch (status) {
 		case "failed" -> log.error(message);
-		case "succeeded"-> log.debug(message);
-		case "skipped"-> log.debug(message);
-	    default -> log.info(message);
+		case "succeeded" -> log.debug(message);
+		case "skipped" -> log.debug(message);
+		default -> log.info(message);
 		}
 	}
 
@@ -106,19 +106,33 @@ public abstract class AbstractTestCase {
 		System.setProperty("LOGICALDOC_REPOSITORY", "target");
 		System.setProperty("java.io.tmpdir", tempDir.getAbsolutePath());
 
-		loadDevelSettingsInEnvironment();
+		try {
+			loadDevelSettingsInEnvironment();
 
-		updateUserHome();
+			updateUserHome();
 
-		createTestDirs();
+			createTestDirs();
 
-		initializePlugins(getPluginArchives());
+			initializePlugins(getPluginArchives());
 
-		context = buildApplicationContext();
+			context = buildApplicationContext();
 
-		loadDevelSettingsInContext();
+			loadDevelSettingsInContext();
 
-		createDatabase();
+			createDatabase();
+		} catch (Exception e) {
+			restoreUserHome();
+			log.error(e.getMessage(), e);
+
+			if (e instanceof IOException ioe)
+				throw ioe;
+			else if (e instanceof IOException sqe)
+				throw sqe;
+			else if (e instanceof IOException pe)
+				throw pe;
+			else
+				throw new RuntimeException(e);
+		}
 	}
 
 	@After
