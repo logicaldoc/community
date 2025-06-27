@@ -46,14 +46,12 @@
 			<groupId>com.logicaldoc</groupId>
 			<artifactId>logicaldoc-util</artifactId>
 			<version>${project.version}</version>
-			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
 			<artifactId>logicaldoc-core</artifactId>
 			<version>${project.version}</version>
-			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

@@ -7,7 +7,7 @@
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
 		<version>9.2.1</version>
-        <relativePath>../pom.xml</relativePath>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>logicaldoc-android</artifactId>
 	<name>logicaldoc-android</name>
@@ -38,7 +38,7 @@
 			<artifactId>logicaldoc-core</artifactId>
 			<version>${project.version}</version>
 			<scope>compile</scope>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
 			<artifactId>logicaldoc-util</artifactId>
@@ -90,25 +90,15 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-dbcp2</artifactId>
 			<scope>test</scope>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.sun.mail</groupId>
-			<artifactId>javax.mail</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.jdom</groupId>
 			<artifactId>jdom2</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.transaction</groupId>
-			<artifactId>jta</artifactId>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
@@ -130,36 +120,6 @@
 						<goals>
 							<goal>single</goal>
 						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>package</id>
-						<phase>package</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target>
-								<delete dir="target/plugin" quiet="true" />
-								<unzip src="target/${project.artifactId}-${project.version}-plugin.zip"
-									dest="target/plugin" />
-								<delete dir="target/${project.artifactId}-${project.version}-plugin.zip" />
-
-								<copy file="target/${project.artifactId}-${project.version}.${project.packaging}"
-									tofile="target/plugin/WEB-INF/lib/${project.artifactId}-${project.version}-plugin.${project.packaging}" />
-								<delete file="target/plugin/pom.xml" quiet="true" />
-
-								<zip destfile="target/${project.artifactId}-${project.version}-plugin2.zip"
-									basedir="target/plugin" />
-								<move file="target/${project.artifactId}-${project.version}-plugin2.zip"
-									tofile="target/${project.artifactId}-${project.version}-plugin.zip" />
-							</target>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>

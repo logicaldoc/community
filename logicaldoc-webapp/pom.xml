@@ -55,10 +55,6 @@
 			<artifactId>commons-fileupload</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>commons-digester</groupId>
-			<artifactId>commons-digester</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
 		</dependency>
@@ -86,10 +82,6 @@
 			<type>jar</type>
 		</dependency>
 
-		<dependency>
-			<groupId>commons-el</groupId>
-			<artifactId>commons-el</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
@@ -150,17 +142,17 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.4.3</version>
+			<version>42.7.7</version>
 		</dependency>
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.33</version>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<version>9.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
-			<version>3.0.5</version>
+			<version>3.5.3</version>
 		</dependency>
 		<dependency>
 			<groupId>com.oracle.jdbc</groupId>
@@ -172,6 +164,7 @@
 			<artifactId>mssql-jdbc</artifactId>
 			<version>12.6.0.jre11</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
@@ -312,19 +305,19 @@
 			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
-					<groupId>org.gwtproject </groupId>
+					<groupId>org.gwtproject</groupId>
 					<artifactId>gwt-user</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>org.gwtproject </groupId>
+					<groupId>org.gwtproject</groupId>
 					<artifactId>gwt-incubator</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>org.gwtproject </groupId>
+					<groupId>org.gwtproject</groupId>
 					<artifactId>gwt-dnd</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>org.gwtproject </groupId>
+					<groupId>org.gwtproject</groupId>
 					<artifactId>gwt-dev</artifactId>
 				</exclusion>
 			</exclusions>
@@ -499,7 +492,7 @@
 			<groupId>org.eclipse.angus</groupId>
 			<artifactId>angus-mail</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>

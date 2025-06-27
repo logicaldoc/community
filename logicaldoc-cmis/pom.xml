@@ -147,8 +147,6 @@
 			<scope>provided</scope>
 		</dependency>	
 
-
-		<!-- For testing purpose -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
@@ -168,7 +166,7 @@
 			<groupId>org.jdom</groupId>
 			<artifactId>jdom2</artifactId>
 			<scope>provided</scope>
-		</dependency>	
+		</dependency>
 		
 		<dependency>
 			<groupId>org.infinispan</groupId>
@@ -179,7 +177,13 @@
 			<groupId>org.infinispan</groupId>
 			<artifactId>${infinispan.hibernate.artifact}</artifactId>
 			<scope>test</scope>
-		</dependency>		
+		</dependency>
+
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<scope>test</scope>
+		</dependency>				
 	</dependencies>
 
 	<build>
@@ -191,9 +195,7 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<descriptors>
-						<descriptor>
-							src/main/assembly/assemblyplugin.xml
-						</descriptor>
+						<descriptor>src/main/assembly/assemblyplugin.xml</descriptor>
 					</descriptors>
 				</configuration>
 				<executions>
@@ -206,45 +208,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>package</id>
-						<phase>package</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target>
-								<delete dir="target/plugin" quiet="true" />
-								<unzip
-									src="target/${project.artifactId}-${project.version}-plugin.zip"
-									dest="target/plugin" />
-								<delete
-									dir="target/${project.artifactId}-${project.version}-plugin.zip" />
-								<delete>
-									<fileset dir="target/plugin/WEB-INF/lib"
-										includes="junit*,jax*,wood*,stax*,activation*,*logicaldoc*,*spring*,commons*,*velocity*,*geronimo*,*aopalliance*,*saaj*,ant*,hibernate*,ehcache*,slf4j*,cxf*,asm*,neethi*,xml*,wsdl*" />
-								</delete>
-
-								<copy
-									file="target/${project.artifactId}-${project.version}.${project.packaging}"
-									tofile="target/plugin/WEB-INF/lib/${project.artifactId}-${project.version}-plugin.${project.packaging}" />
-
-								<zip
-									destfile="target/${project.artifactId}-${project.version}-plugin2.zip"
-									basedir="target/plugin" />
-								<move
-									file="target/${project.artifactId}-${project.version}-plugin2.zip"
-									tofile="target/${project.artifactId}-${project.version}-plugin.zip" />
-							</target>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
 		</plugins>
 	</build>
 </project>

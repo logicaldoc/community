@@ -12,11 +12,22 @@
 		<format>zip</format>
 	</formats>
 	<includeBaseDirectory>false</includeBaseDirectory>
-	<dependencySets>
+    <dependencySets>
 		<dependencySet>
 			<outputDirectory>WEB-INF/lib</outputDirectory>
+			<includes>
+				<include>com.logicaldoc:logicaldoc-cmis</include>
+			</includes>
+			<outputFileNameMapping>
+				${artifact.artifactId}-${artifact.version}-plugin.${artifact.type}</outputFileNameMapping>
+		</dependencySet>     
+		<dependencySet>
+			<outputDirectory>WEB-INF/lib</outputDirectory>
+			<includes>
+              <include>org.apache.chemistry.opencmis:*</include>
+			</includes>
 		</dependencySet>
-	</dependencySets>	
+	</dependencySets>
 	<fileSets>
 		<fileSet>
 			<directory>src/main/resources/</directory>

@@ -35,7 +35,7 @@
 			<groupId>org.gwtproject</groupId>
 			<artifactId>gwt-servlet-jakarta</artifactId>
 			<scope>provided</scope>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-incubator</artifactId>
@@ -96,6 +96,59 @@
 					<groupId>com.google.gwt</groupId>
 					<artifactId>gwt-dev</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>com.google.gwt</groupId>
+					<artifactId>gwt-dev</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>ommons-digester</groupId>
+					<artifactId>commons-digester</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>ant</groupId>
+					<artifactId>ant</artifactId>
+				</exclusion>
+
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-webapp</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-servlets</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-servlet</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-xml</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-jndi</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-continuation</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-plus</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-security</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-annotations</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -109,10 +162,6 @@
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-digester</groupId>
-			<artifactId>commons-digester</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
@@ -146,15 +195,14 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>jakarta.annotation</groupId>
 			<artifactId>jakarta.annotation-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
-	
-		
-		
+
+
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
 			<artifactId>logicaldoc-util</artifactId>
@@ -167,6 +215,9 @@
 			<version>${jetty.version}</version>
 			<scope>test</scope>
 		</dependency>
+
+		<!--	
+		
 		<dependency>
 			<groupId>org.eclipse.jetty.websocket</groupId>
 			<artifactId>websocket-server</artifactId>
@@ -185,7 +236,8 @@
 			<version>${jetty.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
+		
+		 <dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-client</artifactId>
 			<version>${jetty.version}</version>
@@ -221,7 +273,7 @@
 			<version>${jetty.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
+		 dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-servlet</artifactId>
 			<version>${jetty.version}</version>
@@ -232,7 +284,7 @@
 			<artifactId>jetty-security</artifactId>
 			<version>${jetty.version}</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency -->
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.service.serviceloader</artifactId>
@@ -348,9 +400,10 @@
 						</goals>
 						<configuration>
 							<target>
-								<!-- maven does not support defining more than one target -->
-                                <!-- https://jira.codehaus.org/browse/MANTRUN-86 -->
-							    <ant antfile="${basedir}/antrun.xml" />
+								<!-- maven does not support defining more than
+								one target -->
+								<!-- https://jira.codehaus.org/browse/MANTRUN-86 -->
+								<ant antfile="${basedir}/antrun.xml" />
 							</target>
 						</configuration>
 					</execution>

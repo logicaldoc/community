@@ -103,11 +103,8 @@ public class FormatConverterManagerTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testConvertFile() throws IOException {
-		
-		long startTotal = System.currentTimeMillis();
-		
 		File file = FileUtil.createTempFile("test", ".pdf");
-
+		
 		try {
 			testSubject.convertFile(new File("src/test/resources/data.sql"), "src.txt", file, "out.pdf",
 					session.getSid());
@@ -115,9 +112,6 @@ public class FormatConverterManagerTest extends AbstractCoreTestCase {
 		} finally {
 			FileUtil.delete(file);
 		}
-		
-		long endTotal = System.currentTimeMillis();
-		System.out.println("total time: " + (endTotal - startTotal) + " ms");
 	}
 
 	@Test
