@@ -9,6 +9,14 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<dependencySets>
 		<dependencySet>
+			<outputDirectory>WEB-INF/lib</outputDirectory>
+			<includes>
+				<include>com.logicaldoc:logicaldoc-gui</include>
+			</includes>
+			<outputFileNameMapping>
+				${artifact.artifactId}-${artifact.version}-plugin.${artifact.type}</outputFileNameMapping>
+		</dependencySet>	
+		<dependencySet>
 			<includes>
 				<include>com.smartgwt:smartgwt</include>
 			</includes>

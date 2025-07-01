@@ -10,6 +10,14 @@
 		<dependencySet>
 			<outputDirectory>WEB-INF/lib</outputDirectory>
 			<includes>
+				<include>com.logicaldoc:logicaldoc-dropbox</include>
+			</includes>
+			<outputFileNameMapping>
+				${artifact.artifactId}-${artifact.version}-plugin.${artifact.type}</outputFileNameMapping>
+		</dependencySet>	
+		<dependencySet>
+			<outputDirectory>WEB-INF/lib</outputDirectory>
+			<includes>
 				<include>com.dropbox.*:*</include>
 				<include>com.fasterxml.jackson.core:*</include>
 			</includes>

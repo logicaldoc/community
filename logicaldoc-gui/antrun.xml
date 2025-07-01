@@ -88,7 +88,6 @@
 		<zip destfile="target/plugin/WEB-INF/lib/smartgwt-${smartgwt.version}.jar" basedir="target/plugin/WEB-INF/lib/smartgwt" />
 		<delete dir="target/plugin/WEB-INF/lib/smartgwt" failonerror="false" />
 
-		<copy file="target/${project.artifactId}-${project.version}.${project.packaging}" tofile="target/plugin/WEB-INF/lib/${project.artifactId}-${project.version}-plugin.${project.packaging}" />
 		<copy todir="target/plugin/frontend/sc/skins/standard/images/" file="./war/skin/images/blank.gif" />
 		<copy todir="target/plugin/setup/sc/skins/standard/images/" file="./war/skin/images/blank.gif" />
 		<delete file="target/${project.artifactId}-${project.version}-plugin2.zip" failonerror="false" />

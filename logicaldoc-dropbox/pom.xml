@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
 		<version>9.2.1</version>
-        <relativePath>../pom.xml</relativePath>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>logicaldoc-dropbox</artifactId>
 	<name>logicaldoc-dropbox</name>
@@ -89,7 +90,7 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-dbcp2</artifactId>
 			<scope>test</scope>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
@@ -111,8 +112,8 @@
 			<groupId>jakarta.annotation</groupId>
 			<artifactId>jakarta.annotation-api</artifactId>
 			<scope>provided</scope>
-		</dependency>	
-		
+		</dependency>
+
 		<dependency>
 			<groupId>org.gwtproject</groupId>
 			<artifactId>gwt-servlet-jakarta</artifactId>
@@ -121,8 +122,8 @@
 
 		<dependency>
 			<groupId>com.dropbox.core</groupId>
-    		<artifactId>dropbox-core-sdk</artifactId>
-    		<version>3.0.4</version>
+			<artifactId>dropbox-core-sdk</artifactId>
+			<version>3.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hsqldb</groupId>
@@ -141,8 +142,7 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<descriptors>
-						<descriptor> src/main/assembly/assemblyplugin.xml
-						</descriptor>
+						<descriptor>src/main/assembly/assemblyplugin.xml</descriptor>
 					</descriptors>
 				</configuration>
 				<executions>
@@ -152,39 +152,6 @@
 						<goals>
 							<goal>single</goal>
 						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>package</id>
-						<phase>package</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target>
-								<delete dir="target/plugin" quiet="true" />
-								<unzip
-									src="target/${project.artifactId}-${project.version}-plugin.zip"
-									dest="target/plugin" />
-								<delete
-									dir="target/${project.artifactId}-${project.version}-plugin.zip" />
-								<copy
-									file="target/${project.artifactId}-${project.version}.${project.packaging}"
-									tofile="target/plugin/WEB-INF/lib/${project.artifactId}-${project.version}-plugin.${project.packaging}" />
-								<delete file="target/plugin/pom.xml" quiet="true" />
-								<zip
-									destfile="target/${project.artifactId}-${project.version}-plugin2.zip"
-									basedir="target/plugin" />
-								<move
-									file="target/${project.artifactId}-${project.version}-plugin2.zip"
-									tofile="target/${project.artifactId}-${project.version}-plugin.zip" />
-							</target>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -201,17 +168,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jxr-plugin</artifactId>
 				<version>2.2</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-pmd-plugin</artifactId>
-				<version>2.5</version>
-				<configuration>
-					<linkXref>true</linkXref>
-					<sourceEncoding>utf-8</sourceEncoding>
-					<minimumTokens>100</minimumTokens>
-					<targetJdk>1.6</targetJdk>
-				</configuration>
 			</plugin>
 		</plugins>
 	</reporting>
