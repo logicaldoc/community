@@ -67,7 +67,7 @@ public abstract class Util {
 
 	private static final String DIV_CLASS_BOX = "<div class='box'>";
 
-	private static final String AND_SID_EQUAL = "&sid=";
+	private static final String AND_WSTARTSID_EQUAL = "&wstartsid=";
 
 	private static final String AND_FILEVERSION_EQUAL = "&fileVersion=";
 
@@ -200,12 +200,12 @@ public abstract class Util {
 
 	public static String webEditorUrl(long docId, String fileName, int height) {
 		return contextPath() + "ckeditor/index.jsp?docId=" + docId + "&lang=" + I18N.getLocale() + "&fileName="
-				+ fileName + HEIGHT + height + AND_SID_EQUAL + Session.get().getSid();
+				+ fileName + HEIGHT + height + AND_WSTARTSID_EQUAL + Session.get().getSid();
 	}
 
 	public static String webEditorUrl(int height) {
 		return contextPath() + "ckeditor/index.jsp?docId=nodoc&lang=" + I18N.getLocale() + HEIGHT + height
-				+ AND_SID_EQUAL + Session.get().getSid();
+				+ AND_WSTARTSID_EQUAL + Session.get().getSid();
 	}
 
 	public static String webstartURL(String appName, Map<String, String> params) {
@@ -218,7 +218,7 @@ public abstract class Util {
 		url.append(I18N.getLocale());
 		url.append("&docLanguage=");
 		url.append(I18N.getDefaultLocaleForDoc());
-		url.append(AND_SID_EQUAL);
+		url.append(AND_WSTARTSID_EQUAL);
 		url.append(Session.get().getSid());
 
 		if (params != null)
