@@ -85,23 +85,20 @@ abstract class ReportPanel extends AdminPanel {
 
 		fillToolBar(toolStrip);
 
-		ToolStripButton print = new ToolStripButton();
-		print.setIcon(ItemFactory.newImgIcon("printer.png").getSrc());
-		print.setTooltip(I18N.message("print"));
-		print.setAutoFit(true);
-		print.addClickHandler(event -> GridUtil.print(list));
+		ToolStripButton export = new ToolStripButton(I18N.message("export"));
+		export.addClickHandler(clkEvent -> GridUtil.exportCSV(list, true));
+
+		ToolStripButton print = new ToolStripButton(I18N.message("print"));
+		print.addClickHandler(printEvent -> GridUtil.print(list));
+
 		toolStrip.addSeparator();
 		toolStrip.addButton(print);
-
+		
 		if (Feature.visible(Feature.EXPORT_CSV)) {
 			toolStrip.addSeparator();
-			ToolStripButton export = new ToolStripButton();
-			export.setIcon(ItemFactory.newImgIcon("table_row_insert.png").getSrc());
-			export.setTooltip(I18N.message("export"));
-			export.setAutoFit(true);
 			toolStrip.addButton(export);
-			export.addClickHandler(event -> GridUtil.exportCSV(list, false));
 			if (!Feature.enabled(Feature.EXPORT_CSV)) {
+				export.addClickHandler(event -> GridUtil.exportCSV(list, false));
 				export.setDisabled(true);
 				export.setTooltip(I18N.message("featuredisabled"));
 			}

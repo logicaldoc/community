@@ -9,7 +9,6 @@ import com.logicaldoc.gui.common.client.grid.IdListGridField;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
-import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -29,8 +28,9 @@ public class UserSelector extends SelectItem {
 	public UserSelector(String name, String title, String groupIdOrName, boolean allowNull, boolean skipDisabled) {
 		this(name, title, groupIdOrName, allowNull, skipDisabled, true, null);
 	}
-	
-	public UserSelector(String name, String title, String groupIdOrName, boolean allowNull, boolean skipDisabled, boolean withClear) {
+
+	public UserSelector(String name, String title, String groupIdOrName, boolean allowNull, boolean skipDisabled,
+			boolean withClear) {
 		this(name, title, groupIdOrName, allowNull, skipDisabled, withClear, null);
 	}
 
@@ -55,17 +55,23 @@ public class UserSelector extends SelectItem {
 		setOptionDataSource(new UsersDS(groupIdOrName, allowNull, skipDisabled));
 		setHintStyle("hint");
 
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, event -> {
+		FormItemIcon clear = new FormItemIcon();
+		clear.setPrompt(I18N.message("clear"));
+		clear.setSrc("[SKIN]/icons/trash.png");
+		clear.setWidth(12);
+		clear.setHeight(12);
+		clear.addFormItemClickHandler(click -> {
 			clearValue();
 			setValue((String) null);
 			fireUserChanged();
 		});
-		clear.setWidth(12);
-		clear.setHeight(12);
 
-		PickerIcon search = new PickerIcon(PickerIcon.SEARCH, event -> new UserSearchDialog(UserSelector.this).show());
+		FormItemIcon search = new FormItemIcon();
+		search.setPrompt(I18N.message("search"));
+		search.setSrc("[SKIN]/icons/magnifying-glass.png");
 		search.setWidth(12);
 		search.setHeight(12);
+		search.addFormItemClickHandler(click -> new UserSearchDialog(UserSelector.this).show());
 
 		List<FormItemIcon> icons = new ArrayList<>();
 		if (withClear)

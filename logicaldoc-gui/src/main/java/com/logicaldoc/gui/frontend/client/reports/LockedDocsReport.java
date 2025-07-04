@@ -5,12 +5,12 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.LockedDocsDS;
 import com.logicaldoc.gui.common.client.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.grid.FileSizeListGridField;
 import com.logicaldoc.gui.common.client.grid.FileVersionListGridField;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.grid.VersionListGridField;
-import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.preview.PreviewPopup;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
@@ -23,7 +23,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -71,7 +70,7 @@ public class LockedDocsReport extends ReportPanel {
 		userSelector = ItemFactory.newUserSelector("user", "user", null, false, false);
 		userSelector.setWrapTitle(false);
 		userSelector.setWidth(150);
-		userSelector.addChangedHandler((ChangedEvent event) -> refresh());
+		userSelector.addChangedHandler(changed -> refresh());
 		toolStrip.addFormItem(userSelector);
 	}
 
@@ -174,7 +173,7 @@ public class LockedDocsReport extends ReportPanel {
 		preview.setTitle(I18N.message("preview"));
 		preview.setEnabled(
 				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
-		preview.addClickHandler((MenuItemClickEvent event) -> {
+		preview.addClickHandler(click -> {
 			long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
 			DocumentService.Instance.get().getById(id, new DefaultAsyncCallback<>() {
 				@Override
@@ -186,12 +185,11 @@ public class LockedDocsReport extends ReportPanel {
 
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
-		download.addClickHandler((MenuItemClickEvent event) -> DocUtil
-				.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
+		download.addClickHandler(click -> DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null));
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler((MenuItemClickEvent event) -> {
+		openInFolder.addClickHandler(click -> {
 			ListGridRecord rec = list.getSelectedRecord();
 			DocumentsPanel.get().openInFolder(Long.parseLong(rec.getAttributeAsString("folderId")),
 					Long.parseLong(rec.getAttributeAsString("id")));
@@ -214,7 +212,7 @@ public class LockedDocsReport extends ReportPanel {
 			userId = Long.parseLong(userSelector.getValueAsString());
 		list.refresh(new LockedDocsDS(userId, max.getValueAsInteger()));
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

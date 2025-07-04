@@ -463,6 +463,10 @@ public class ItemFactory {
 			date.setTitle(I18N.message(title));
 		else
 			date.setShowTitle(false);
+		
+		date.setPickerIconSrc("[SKIN]/icons/calendar-days.png");
+		date.setPickerIconHeight(12);
+		date.setPickerIconWidth(12);
 		return date;
 	}
 
@@ -488,7 +492,7 @@ public class ItemFactory {
 	public static DateItem newDateItemForAttribute(String name, String title) {
 		// We cannot use spaces in items name
 		String itemName = "_" + name.replace(" ", Constants.BLANK_PLACEHOLDER);
-		final DateItem date = new DateItem(itemName);
+		DateItem date = newDateItem(itemName);
 		date.setTitle(title);
 		return date;
 	}
@@ -2759,6 +2763,8 @@ public class ItemFactory {
 		FormItemIcon clear = new FormItemIcon();
 		clear.setPrompt(I18N.message(CLEAR));
 		clear.setSrc(SKIN_TRASH);
+		clear.setWidth(12);
+		clear.setHeight(12);
 		clear.addFormItemClickHandler(click -> {
 			selector.clearValue();
 			selector.setValue((String) null);

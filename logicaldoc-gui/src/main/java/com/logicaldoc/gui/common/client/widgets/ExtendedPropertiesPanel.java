@@ -449,7 +449,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	}
 
 	/**
-	 * Prepares the additional icons to be displayed in case of a multi value
+	 * Prepares the additional icons to be displayed in case of a multi-value
 	 * attribute.
 	 * 
 	 * @param att the attribute to process
@@ -462,12 +462,12 @@ public class ExtendedPropertiesPanel extends HLayout {
 			FormItemIcon add = new FormItemIcon();
 			add.setWidth(10);
 			add.setHeight(10);
-			add.setSrc("[SKIN]/add.png");
+			add.setSrc("[SKIN]/circle-plus.png");
 			add.setPrompt(I18N.message("addvalue"));
 			add.addFormItemClickHandler(event -> onValueAdd(att));
 
 			FormItemIcon down = new FormItemIcon();
-			down.setSrc("[SKIN]/down.png");
+			down.setSrc("[SKIN]/icons/down.png");
 			down.setWidth(10);
 			down.setHeight(10);
 			down.setPrompt(I18N.message("movedown"));
@@ -479,21 +479,21 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 		if (att.getParent() != null && !att.getParent().isEmpty()) {
 			FormItemIcon delete = new FormItemIcon();
-			delete.setSrc("[SKIN]/delete.png");
+			delete.setSrc("[SKIN]/icons/trash.png");
 			delete.setWidth(10);
 			delete.setHeight(10);
 			delete.setPrompt(I18N.message("remove"));
 			delete.addFormItemClickHandler(event -> onValueDelete(att));
 
 			FormItemIcon up = new FormItemIcon();
-			up.setSrc("[SKIN]/up.png");
+			up.setSrc("[SKIN]/icons/up.png");
 			up.setWidth(10);
 			up.setHeight(10);
 			up.setPrompt(I18N.message("moveup"));
 			up.addFormItemClickHandler(event -> onValueShift(att, true));
 
 			FormItemIcon down = new FormItemIcon();
-			down.setSrc("[SKIN]/down.png");
+			down.setSrc("[SKIN]/icons/down.png");
 			down.setWidth(10);
 			down.setHeight(10);
 			down.setPrompt(I18N.message("movedown"));
