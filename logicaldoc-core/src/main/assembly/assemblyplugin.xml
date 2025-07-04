@@ -10,6 +10,54 @@
 	<dependencySets>
 		<dependencySet>
 			<outputDirectory>WEB-INF/lib</outputDirectory>
+			<includes>
+				<include>com.logicaldoc:logicaldoc-core</include>
+			</includes>
+			<outputFileNameMapping>
+				${artifact.artifactId}-${artifact.version}-plugin.${artifact.type}</outputFileNameMapping>
+		</dependencySet>	
+	    <dependencySet>
+			<outputDirectory>WEB-INF/lib</outputDirectory>
+			<includes>
+              <include>org.apache.solr:*</include>
+              <include>org.apache.velocity*:*</include>
+              <include>org.apache.xmlbeans:*</include>
+              <include>org.apache.poi:*</include>
+              <include>org.apache.pdfbox:*</include>
+              <include>org.apache.zookeeper:*</include>
+              <include>io.opentracing:*</include>
+              <include>io.dropwizard.metrics:*</include>
+              <include>org.apache.lucene:*</include>
+              <include>org.jsoup:*</include>
+              <include>net.sf.jmimemagic:*</include>
+              <include>com.timgroup:jgravatar:*</include>
+              <include>org.eclipse.jetty*:*</include>
+              <include>org.bytedeco:*</include>
+              <include>javax.media:*</include>
+              <include>com.sun.media:*</include>
+              <include>com.ibm.icu:*</include>
+              <include>org.apache.calcite*:*</include>
+              <include>org.commonmark:*</include>
+              <include>com.github.ben-manes.caffeine:*</include>
+              <include>com.talanlabs:*</include>
+              <include>com.maxmind.*:*</include>
+              <include>com.mpatric:*</include>
+              <include>com.auxilii.msgparser:*</include>
+              <include>org.rrd4j:*</include>
+              <include>eu.bitwalker:*</include>
+              <include>org.simplejavamail:*</include>
+              <include>org.tukaani:*</include>
+              <include>net.lingala.zip4j:*</include>
+              <include>com.github.mertakdut:*</include>
+              <include>com.pff:*</include>
+              
+              
+              <include>org.bouncycastle:bcprov-jdk18on</include>
+              <include>org.apache.commons:commons-math3</include>
+			</includes>
+			<excludes>
+			  <exclude>org.bytedeco:openblas</exclude>
+			</excludes>
 		</dependencySet>
 	</dependencySets>
 	<fileSets>
