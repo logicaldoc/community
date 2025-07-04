@@ -58,7 +58,6 @@ import com.logicaldoc.gui.frontend.client.textcontent.TextContentCreate;
 import com.logicaldoc.gui.frontend.client.textcontent.TextContentEditor;
 import com.logicaldoc.gui.frontend.client.webcontent.WebcontentCreate;
 import com.logicaldoc.gui.frontend.client.webcontent.WebcontentEditor;
-import com.logicaldoc.gui.frontend.client.zoho.ZohoMenuItem;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -590,9 +589,6 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ONLYOFFICE)
 				&& Session.get().getConfigAsBoolean("converter.OnlyOfficeConverter.enabled"))
 			menu.addItem(getOnlyOfficeMenuItem(folder, document));
-		if (Feature.enabled(Feature.ZOHO)
-				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ZOHO))
-			menu.addItem(new ZohoMenuItem(folder, document));
 		if (Feature.enabled(Feature.DOCUSIGN)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUSIGN))
 			menu.addItem(getDocuSignMenuItem(document));

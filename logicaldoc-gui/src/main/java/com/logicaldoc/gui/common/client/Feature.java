@@ -193,8 +193,6 @@ public class Feature {
 
 	public static final int HOT_FOLDER = 91;
 
-	public static final int ZOHO = 92;
-
 	public static final int WEBDAV_BASIC = 93;
 
 	public static final int TWO_FACTORS_AUTHENTICATION = 94;

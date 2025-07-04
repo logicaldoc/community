@@ -159,8 +159,6 @@ public class Menu {
 
 	public static final long RETENTION_POLICIES = -2110;
 
-	public static final long ZOHO = -2120;
-
 	public static final long DOCUSIGN = -2125;
 
 	public static final long SYSTEM = 80;
