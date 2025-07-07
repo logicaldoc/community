@@ -709,6 +709,7 @@ insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) values (1609,-
 insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 10,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';
 insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 11,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';
 insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 12,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';
+insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 16,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';
 insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 40,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';
 insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 41,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';
 insert into ld_menu_acl(ld_menuid, ld_groupid, ld_read, ld_write) select 42,ld_id,1,0 from ld_group where ld_type=0 and not ld_name='admin';

@@ -43,6 +43,8 @@ public class Menu extends PersistentObject implements Secure<AccessControlEntry>
 	public static final long SETTINGS = 7;
 
 	public static final long SECURITY = 9;
+	
+	public static final long TOOLS = 16;
 
 	public static final long MAINMENU = 110;
 

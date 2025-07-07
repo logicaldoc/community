@@ -549,10 +549,12 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	}
 
 	private void addToolsButton(GUIFolder folder, GUIDocument document) {
-		tools = AwesomeFactory.newToolStripButton("toolbox", I18N.message("tools"), I18N.message("tools"));
-		tools.addClickHandler(click -> buildToolsMenu(folder, document).showContextMenu());
+		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.TOOLS)) {
+			tools = AwesomeFactory.newToolStripButton("toolbox", I18N.message("tools"), I18N.message("tools"));
+			tools.addClickHandler(click -> buildToolsMenu(folder, document).showContextMenu());
 
-		addButton(tools, 2);
+			addButton(tools, 2);
+		}
 	}
 
 	public Menu buildToolsMenu(GUIFolder folder, GUIDocument document) {
@@ -869,11 +871,13 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	}
 
 	private void updateToolsMenu(GUIFolder folder, GUIDocument document) {
-		if (tools != null)
-			removeMember(tools);
+		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.TOOLS)) {
+			if (tools != null)
+				removeMember(tools);
 
-		addToolsButton(folder, document);
-		addMember(tools, 2);
+			addToolsButton(folder, document);
+			addMember(tools, 2);
+		}
 	}
 
 	@Override

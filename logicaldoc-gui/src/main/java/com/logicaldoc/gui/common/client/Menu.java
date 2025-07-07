@@ -87,6 +87,8 @@ public class Menu {
 
 	public static final long DROP_SPOT = 12;
 
+	public static final long TOOLS = 16;
+
 	public static final long CUSTOM_ID = 17;
 
 	public static final long METADATA = 25;
@@ -110,7 +112,7 @@ public class Menu {
 	public static final long CUSTOMREPORTS = 1560;
 
 	public static final long PROXY = 99;
-	
+
 	public static final long PARAMETERS = 100;
 
 	public static final long SEARCH_AND_INDEXING = 101;
@@ -122,7 +124,7 @@ public class Menu {
 	public static final long OCR = 104;
 
 	public static final long REPOSITORIES = 105;
-	
+
 	public static final long AUDITING = 106;
 
 	public static final long OFFICE = -1090;
@@ -154,7 +156,7 @@ public class Menu {
 	public static final long WEBCONTENT = -2100;
 
 	public static final long TEXTCONTENT = 200;
-	
+
 	public static final long ONLYOFFICE = 201;
 
 	public static final long RETENTION_POLICIES = -2110;
@@ -218,11 +220,11 @@ public class Menu {
 	public static final long GOOGLE_CALENDAR = -2081;
 
 	public static final long ARTIFICIAL_INTELLIGENCE = 3000;
-	
+
 	public static final long AI_MODELS = 3001;
-	
+
 	public static final long ADMIN_ROBOTS = 3010;
-	
+
 	public static final long ROBOTS = 3020;
 
 	private static Set<Long> menus = new HashSet<>();
