@@ -462,7 +462,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 			FormItemIcon add = new FormItemIcon();
 			add.setWidth(10);
 			add.setHeight(10);
-			add.setSrc("[SKIN]/circle-plus.png");
+			add.setSrc("[SKIN]/icons/circle-plus.png");
 			add.setPrompt(I18N.message("addvalue"));
 			add.addFormItemClickHandler(event -> onValueAdd(att));
 
