@@ -3,8 +3,8 @@ package com.logicaldoc.gui.frontend.client.security;
 import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUISecuritySettings;
@@ -62,6 +62,8 @@ public class SecuritySettingsPanel extends AdminPanel {
 	private static final String PWD_UPPER_CASE = "pwdUpperCase";
 
 	private static final String PWD_SIZE = "pwdSize";
+	
+	private static final String PWD_CHECKLOGIN = "pwdCheckLogin";
 
 	private ValuesManager vm = new ValuesManager();
 
@@ -154,12 +156,19 @@ public class SecuritySettingsPanel extends AdminPanel {
 		pwdOccurrence.setMin(1);
 		pwdOccurrence.setStep(1);
 
+		final ToggleItem pwdCheckLogin = ItemFactory.newToggleItem(PWD_CHECKLOGIN, "checkpwdlogin",
+				settings.isPwdCheckLogin());
+		pwdCheckLogin.setHint(I18N.message("checkpwdloginhint"));
+		pwdCheckLogin.setWrapTitle(false);
+		pwdCheckLogin.setWrapHintText(false);
+		pwdCheckLogin.setRequired(true);
+
 		ButtonItem generatePassword = prepareGeneratePasswordButton(passwordForm);
 
 		ButtonItem tryPassword = prepareTryPasswordButton(passwordForm);
 
 		passwordForm.setItems(pwdSize, pwdDigit, pwUpperCase, pwdSpecial, pwLowerCase, pwdSequence, pwdOccurrence,
-				pwdExp, pwdEnforce, generatePassword, tryPassword);
+				pwdExp, pwdEnforce, pwdCheckLogin, generatePassword, tryPassword);
 
 		DynamicForm securityForm = new DynamicForm();
 		securityForm.setValuesManager(vm);
@@ -276,6 +285,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		SecuritySettingsPanel.this.settings.setPwdSequence((Integer) vm.getValue(PWD_SEQUENCE));
 		SecuritySettingsPanel.this.settings.setPwdOccurrence((Integer) vm.getValue(PWD_OCCURRENCE));
 		SecuritySettingsPanel.this.settings.setPwdEnforceHistory((Integer) vm.getValue("pwdEnforce"));
+		SecuritySettingsPanel.this.settings.setPwdCheckLogin((Boolean) vm.getValue(PWD_CHECKLOGIN));
 		SecuritySettingsPanel.this.settings.setMaxInactivity((Integer) vm.getValue("maxinactivity"));
 		SecuritySettingsPanel.this.settings.setSaveLogin(Boolean.valueOf(vm.getValueAsString("savelogin")));
 		SecuritySettingsPanel.this.settings
@@ -328,7 +338,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 	private ButtonItem prepareGeneratePasswordButton(DynamicForm passwordForm) {
 		ButtonItem generatePassword = new ButtonItem(I18N.message("generate"));
 		generatePassword.setStartRow(false);
-		generatePassword.setColSpan(2);
+		generatePassword.setColSpan(4);
 		generatePassword.setAlign(Alignment.RIGHT);
 		generatePassword.addClickHandler(event -> {
 			if (passwordForm.validate()) {
@@ -396,20 +406,21 @@ public class SecuritySettingsPanel extends AdminPanel {
 		ButtonItem syncGeoDB = new ButtonItem("geoSyncDb", I18N.message("syncgeolocationdb"));
 		syncGeoDB.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickEvent event) -> {
 			LD.contactingServer();
-			SecurityService.Instance.get().syncGeolocationDB(licenseKey.getValueAsString(), new DefaultAsyncCallback<>() {
+			SecurityService.Instance.get().syncGeolocationDB(licenseKey.getValueAsString(),
+					new DefaultAsyncCallback<>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					super.onFailure(caught);
-					LD.clearPrompt();
-				}
+						@Override
+						public void onFailure(Throwable caught) {
+							super.onFailure(caught);
+							LD.clearPrompt();
+						}
 
-				@Override
-				public void onSuccess(String dbVer) {
-					geoDBversion.setValue(dbVer);
-					LD.clearPrompt();
-				}
-			});
+						@Override
+						public void onSuccess(String dbVer) {
+							geoDBversion.setValue(dbVer);
+							LD.clearPrompt();
+						}
+					});
 		});
 
 		geolocationForm.setFields(enableGeolocation, useCache, licenseKey, geoDBversion, syncGeoDB);
@@ -462,7 +473,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		anonymous.setPane(anonymousForm);
 		return anonymous;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

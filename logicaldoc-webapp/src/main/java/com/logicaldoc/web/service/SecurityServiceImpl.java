@@ -15,10 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import jakarta.mail.MessagingException;
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.http.HttpSession;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -96,6 +92,10 @@ import com.logicaldoc.util.security.PasswordGenerator;
 import com.logicaldoc.util.security.PasswordValidator;
 import com.logicaldoc.util.sql.SqlUtil;
 import com.logicaldoc.web.UploadServlet;
+
+import jakarta.mail.MessagingException;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Implementation of the SecurityService
@@ -1023,6 +1023,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		securitySettings.setPwdSequence(pbean.getInt(session.getTenantName() + PASSWORD_SEQUENCE, 3));
 		securitySettings.setPwdOccurrence(pbean.getInt(session.getTenantName() + PASSWORD_OCCURRENCE, 3));
 		securitySettings.setPwdEnforceHistory(pbean.getInt(session.getTenantName() + ".password.enforcehistory", 3));
+		securitySettings.setPwdCheckLogin(pbean.getBoolean(session.getTenantName() + ".password.checklogin", false));
+
 		securitySettings.setMaxInactivity(pbean.getInt(session.getTenantName() + ".security.user.maxinactivity"));
 		if (StringUtils.isNotEmpty(pbean.getProperty(session.getTenantName() + GUI_SAVELOGIN)))
 			securitySettings.setSaveLogin("true".equals(pbean.getProperty(session.getTenantName() + GUI_SAVELOGIN)));
@@ -1114,6 +1116,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 						: Integer.toString(settings.getMaxInactivity()));
 		conf.setProperty(session.getTenantName() + ".password.enforcehistory",
 				Integer.toString(settings.getPwdEnforceHistory()));
+		conf.setProperty(session.getTenantName() + ".password.checklogin",
+				Boolean.toString(settings.isPwdCheckLogin()));
 		conf.setProperty(session.getTenantName() + PASSWORD_SIZE, Integer.toString(settings.getPwdSize()));
 		conf.setProperty(session.getTenantName() + PASSWORD_LOWERCASE, Integer.toString(settings.getPwdLowerCase()));
 		conf.setProperty(session.getTenantName() + PASSWORD_UPPERCASE, Integer.toString(settings.getPwdUpperCase()));

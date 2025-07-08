@@ -7,6 +7,7 @@ import java.util.Set;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.generic.Generic;
+import com.logicaldoc.core.security.authentication.PasswordWeakException;
 
 /**
  * This class is a DAO-service for User-objects.
@@ -70,7 +71,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * 
 	 * @return The found user
 	 * 
-	 * @throws PersistenceException Error in the data layer 
+	 * @throws PersistenceException Error in the data layer
 	 */
 	public User getUser(String username) throws PersistenceException;
 
@@ -127,7 +128,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * 
 	 * @return the last interaction time
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 */
 	public boolean isInactive(String username) throws PersistenceException;
 
@@ -190,4 +191,15 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * @throws PersistenceException Error in the database
 	 */
 	public Set<User> findByGroup(long groupId) throws PersistenceException;
+
+	/**
+	 * Checks if the user's password complies the current quality criteria
+	 * 
+	 * @param user The user to check
+	 * 
+	 * @throws PasswordWeakException Raised when the password does not comply
+	 *         with the quality criteria
+	 * @throws PersistenceException Error in the database
+	 */
+	void checkPasswordCompliance(User user) throws PasswordWeakException, PersistenceException;
 }

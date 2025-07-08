@@ -2,18 +2,21 @@ package com.logicaldoc.core.security.authentication;
 
 import java.security.NoSuchAlgorithmException;
 
-import jakarta.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Client;
+import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
+import com.logicaldoc.core.security.user.UserSource;
 import com.logicaldoc.core.security.user.UserType;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.crypt.CryptUtil;
+
+import jakarta.annotation.Resource;
 
 /**
  * This is the basic authentication mechanism, that searches for the user in the
@@ -45,8 +48,6 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 			throw new AuthenticationException(this, "dataerror", e);
 		}
 
-		validateUser(user);
-
 		// Check the password match with one of the current or legacy algorithm
 		String test = null;
 		try {
@@ -57,6 +58,14 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 
 		if (user.getPassword() == null || !user.getPassword().equals(test))
 			throw new WrongPasswordException(this);
+
+		try {
+			user.setDecodedPassword(password);
+		} catch (NoSuchAlgorithmException e) {
+			log.error(e.getMessage(), e);
+		}
+
+		validateUser(user);
 
 		return user;
 	}
@@ -106,5 +115,30 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 
 		if (user.getEnforceWorkingTime() == 1 && !user.isInWorkingTime())
 			throw new OutsideWorkingTimeException(this);
+
+		// Check if the password is too weak
+		if (user.getSource().equals(UserSource.DEFAULT))
+			try {
+				String tenantName = Context.get(TenantDAO.class).getTenantName(user.getTenantId());
+				if (Context.get().getProperties().getBoolean(tenantName + ".password.checklogin", false))
+					Context.get(UserDAO.class).checkPasswordCompliance(user);
+			} catch (PasswordWeakException pwe) {
+				// In case of password too week, log and mark it as expired in
+				// the DB
+				log.error("Password of user {} is too week: {}", user.getUsername(), pwe.getMessages());
+				markPasswordExpired(user);
+				throw pwe;
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+			}
+	}
+
+	private void markPasswordExpired(User user) {
+		user.setPasswordExpired(1);
+		try {
+			userDAO.store(user);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 	}
 }

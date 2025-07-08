@@ -30,8 +30,10 @@ public class GUISecuritySettings implements Serializable {
 
 	private int pwdOccurrence = 3;
 
+	private boolean pwdCheckLogin = false;
+	
 	private Integer maxInactivity;
-
+	
 	private boolean saveLogin = false;
 
 	private boolean ignoreLoginCase = false;
@@ -273,5 +275,13 @@ public class GUISecuritySettings implements Serializable {
 
 	public void setAllowClientId(boolean allowClientId) {
 		this.allowClientId = allowClientId;
+	}
+
+	public boolean isPwdCheckLogin() {
+		return pwdCheckLogin;
+	}
+
+	public void setPwdCheckLogin(boolean pwdCheckLogin) {
+		this.pwdCheckLogin = pwdCheckLogin;
 	}
 }

@@ -131,7 +131,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				null, null);
 	}
 
-	private static void checkPasswordStrength(User user) throws PasswordWeakException, PersistenceException {
+	@Override
+	public void checkPasswordCompliance(User user) throws PasswordWeakException, PersistenceException {
 
 		// Skip the tests in case of new tenant creation
 		if (user.getId() == 0L && user.getTenantId() != Tenant.DEFAULT_ID && "Administrator".equals(user.getFirstName())
@@ -524,7 +525,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 		if (passwordChanged) {
 			checkAlreadyUsedPassword(user);
-			checkPasswordStrength(user);
+			checkPasswordCompliance(user);
 		}
 		return passwordChanged;
 	}
