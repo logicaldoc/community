@@ -129,7 +129,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 		TextItem revision = ItemFactory.newTextItem("revision", document.getRevision());
 		if (changedHandler != null)
 			revision.addChangedHandler(changedHandler);
-		revision.setDisabled(!updateEnabled);
+		revision.setDisabled(!updateEnabled || !document.isRevision());
 		revision.setVisible(Feature.enabled(Feature.REVISION));
 
 		form1.setItems(id, customId, fileName, folder, size, pages, version, revision, creation, published, wfStatus,

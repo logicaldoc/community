@@ -125,6 +125,11 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		customid.setType(ListGridFieldType.BOOLEAN);
 		customid.setCanEdit(true);
 
+		ListGridField revision = new ListGridField(GUIAccessControlEntry.PERMISSION_REVISION.toLowerCase(),
+				prepareHeaderLabel(GUIAccessControlEntry.PERMISSION_REVISION));
+		revision.setType(ListGridFieldType.BOOLEAN);
+		revision.setCanEdit(true);
+
 		ListGridField add = new ListGridField("add", prepareHeaderLabel("addfolder"));
 		add.setType(ListGridFieldType.BOOLEAN);
 		add.setCanEdit(true);
@@ -196,7 +201,10 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		fields.add(write);
 		fields.add(add);
 		fields.add(rename);
-		fields.add(customid);
+		if (Feature.enabled(Feature.CUSTOMID))
+			fields.add(customid);
+		if (Feature.enabled(Feature.REVISION))
+			fields.add(revision);
 		fields.add(delete);
 		fields.add(move);
 		fields.add(security);

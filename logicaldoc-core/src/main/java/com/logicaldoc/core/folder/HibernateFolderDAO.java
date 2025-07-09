@@ -211,6 +211,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				ace.setWorkflow(0);
 				ace.setWrite(0);
 				ace.setCustomid(0);
+				ace.setRevision(0);
 				ace.setReadingreq(0);
 			}
 		}

@@ -2,13 +2,16 @@ package com.logicaldoc.core.security;
 
 import java.util.Set;
 
+import com.logicaldoc.core.document.DocumentAccessControlEntry;
+import com.logicaldoc.core.document.FolderAccessControlEntry;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;
 
 /**
- * Class for grouping common permissions for DocumentAccessControlEntry and
- * FolderAccessControlEntry
+ * Class for grouping common permissions for {@link DocumentAccessControlEntry}
+ * and {@link FolderAccessControlEntry}
  * 
  * @author Giuseppe Desiato - LogicalDOC
  * @since 9.2
@@ -75,6 +78,9 @@ public class ExtendedAccessControlEntry extends AccessControlEntry {
 	@Column(name = "ld_customid", nullable = false)
 	protected int customid = 0;
 
+	@Column(name = "ld_revision", nullable = false)
+	protected int revision = 0;
+
 	public ExtendedAccessControlEntry() {
 	}
 
@@ -99,6 +105,7 @@ public class ExtendedAccessControlEntry extends AccessControlEntry {
 		this.workflow = source.workflow;
 		this.readingreq = source.readingreq;
 		this.customid = source.customid;
+		this.revision = source.revision;
 	}
 
 	protected ExtendedAccessControlEntry(long groupId) {
@@ -157,6 +164,7 @@ public class ExtendedAccessControlEntry extends AccessControlEntry {
 		automation = booleanToInt(permissions.contains(Permission.AUTOMATION));
 		readingreq = booleanToInt(permissions.contains(Permission.READINGREQ));
 		customid = booleanToInt(permissions.contains(Permission.CUSTOMID));
+		revision = booleanToInt(permissions.contains(Permission.REVISION));
 	}
 
 	public int getPreview() {
@@ -327,44 +335,54 @@ public class ExtendedAccessControlEntry extends AccessControlEntry {
 		ace.setRead(read);
 	}
 
+	public int getRevision() {
+		return revision;
+	}
+
+	public void setRevision(int revision) {
+		this.revision = revision;
+	}
+
 	public Set<Permission> grantedPermissions() {
 		Set<Permission> granted = ace.grantedPermissions();
-		if(preview==1)
+		if (preview == 1)
 			granted.add(Permission.PREVIEW);
-		if(download==1)
+		if (download == 1)
 			granted.add(Permission.DOWNLOAD);
-		if(security==1)
+		if (security == 1)
 			granted.add(Permission.SECURITY);
-		if(delete==1)
+		if (delete == 1)
 			granted.add(Permission.DELETE);
-		if(rename==1)
+		if (rename == 1)
 			granted.add(Permission.RENAME);
-		if(immutable==1)
+		if (immutable == 1)
 			granted.add(Permission.IMMUTABLE);
-		if(sign==1)
+		if (sign == 1)
 			granted.add(Permission.SIGN);
-		if(archive==1)
+		if (archive == 1)
 			granted.add(Permission.ARCHIVE);
-		if(workflow==1)
+		if (workflow == 1)
 			granted.add(Permission.WORKFLOW);
-		if(calendar==1)
+		if (calendar == 1)
 			granted.add(Permission.CALENDAR);
-		if(subscription==1)
+		if (subscription == 1)
 			granted.add(Permission.SUBSCRIPTION);
-		if(password==1)
+		if (password == 1)
 			granted.add(Permission.PASSWORD);
-		if(print==1)
+		if (print == 1)
 			granted.add(Permission.PRINT);
-		if(move==1)
+		if (move == 1)
 			granted.add(Permission.MOVE);
-		if(email==1)
+		if (email == 1)
 			granted.add(Permission.EMAIL);
-		if(automation==1)
+		if (automation == 1)
 			granted.add(Permission.AUTOMATION);
-		if(readingreq==1)
+		if (readingreq == 1)
 			granted.add(Permission.READINGREQ);
-		if(customid==1)
+		if (customid == 1)
 			granted.add(Permission.CUSTOMID);
+		if (revision == 1)
+			granted.add(Permission.REVISION);
 		return granted;
 	}
 
@@ -400,8 +418,7 @@ public class ExtendedAccessControlEntry extends AccessControlEntry {
 				+ ", sign=" + sign + ", archive=" + archive + ", workflow=" + workflow + ", calendar=" + calendar
 				+ ", subscription=" + subscription + ", password=" + password + ", print=" + print + ", move=" + move
 				+ ", email=" + email + ", automation=" + automation + ", readingreq=" + readingreq + ", customid="
-				+ customid + "]";
+				+ customid + ", revision=" + revision + "]";
 	}
-	
-	
+
 }

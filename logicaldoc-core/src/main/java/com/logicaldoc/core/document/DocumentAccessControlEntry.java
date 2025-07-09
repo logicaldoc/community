@@ -20,208 +20,267 @@ public class DocumentAccessControlEntry extends ExtendedAccessControlEntry {
 	private static final long serialVersionUID = 1L;
 
 	@Embedded
-	private ExtendedAccessControlEntry extendedAccessControlEntry = new ExtendedAccessControlEntry();
-
-	public long getGroupId() {
-		return extendedAccessControlEntry.getGroupId();
-	}
-
-	public int getWrite() {
-		return extendedAccessControlEntry.getWrite();
-	}
-
-	public void setGroupId(long groupId) {
-		extendedAccessControlEntry.setGroupId(groupId);
-	}
-
-	public void setWrite(int write) {
-		extendedAccessControlEntry.setWrite(write);
-	}
-
-	public int getRead() {
-		return extendedAccessControlEntry.getRead();
-	}
-
-	public void setRead(int read) {
-		extendedAccessControlEntry.setRead(read);
-	}
-
-	public Set<Permission> grantedPermissions() {
-		return extendedAccessControlEntry.grantedPermissions();
-	}
-
-	public boolean equals(Object obj) {
-		return extendedAccessControlEntry.equals(obj);
-	}
-
-	public int hashCode() {
-		return extendedAccessControlEntry.hashCode();
-	}
-
-	public void grantPermissions(Set<Permission> permissions) {
-		extendedAccessControlEntry.grantPermissions(permissions);
-	}
-
-	public int getPreview() {
-		return extendedAccessControlEntry.getPreview();
-	}
-
-	public void setPreview(int preview) {
-		extendedAccessControlEntry.setPreview(preview);
-	}
-
-	public int getDownload() {
-		return extendedAccessControlEntry.getDownload();
-	}
-
-	public void setDownload(int download) {
-		extendedAccessControlEntry.setDownload(download);
-	}
-
-	public int getSecurity() {
-		return extendedAccessControlEntry.getSecurity();
-	}
-
-	public void setSecurity(int security) {
-		extendedAccessControlEntry.setSecurity(security);
-	}
-
-	public int getDelete() {
-		return extendedAccessControlEntry.getDelete();
-	}
-
-	public void setDelete(int delete) {
-		extendedAccessControlEntry.setDelete(delete);
-	}
-
-	public int getRename() {
-		return extendedAccessControlEntry.getRename();
-	}
-
-	public void setRename(int rename) {
-		extendedAccessControlEntry.setRename(rename);
-	}
-
-	public int getImmutable() {
-		return extendedAccessControlEntry.getImmutable();
-	}
-
-	public void setImmutable(int immutable) {
-		extendedAccessControlEntry.setImmutable(immutable);
-	}
-
-	public int getSign() {
-		return extendedAccessControlEntry.getSign();
-	}
-
-	public void setSign(int sign) {
-		extendedAccessControlEntry.setSign(sign);
-	}
-
-	public int getArchive() {
-		return extendedAccessControlEntry.getArchive();
-	}
-
-	public void setArchive(int archive) {
-		extendedAccessControlEntry.setArchive(archive);
-	}
-
-	public int getWorkflow() {
-		return extendedAccessControlEntry.getWorkflow();
-	}
-
-	public void setWorkflow(int workflow) {
-		extendedAccessControlEntry.setWorkflow(workflow);
-	}
-
-	public int getCalendar() {
-		return extendedAccessControlEntry.getCalendar();
-	}
-
-	public void setCalendar(int calendar) {
-		extendedAccessControlEntry.setCalendar(calendar);
-	}
-
-	public int getSubscription() {
-		return extendedAccessControlEntry.getSubscription();
-	}
-
-	public void setSubscription(int subscription) {
-		extendedAccessControlEntry.setSubscription(subscription);
-	}
-
-	public int getPassword() {
-		return extendedAccessControlEntry.getPassword();
-	}
-
-	public void setPassword(int password) {
-		extendedAccessControlEntry.setPassword(password);
-	}
-
-	public int getPrint() {
-		return extendedAccessControlEntry.getPrint();
-	}
-
-	public void setPrint(int print) {
-		extendedAccessControlEntry.setPrint(print);
-	}
-
-	public int getMove() {
-		return extendedAccessControlEntry.getMove();
-	}
-
-	public void setMove(int move) {
-		extendedAccessControlEntry.setMove(move);
-	}
-
-	public int getEmail() {
-		return extendedAccessControlEntry.getEmail();
-	}
-
-	public void setEmail(int email) {
-		extendedAccessControlEntry.setEmail(email);
-	}
-
-	public int getAutomation() {
-		return extendedAccessControlEntry.getAutomation();
-	}
-
-	public void setAutomation(int automation) {
-		extendedAccessControlEntry.setAutomation(automation);
-	}
-
-	public int getReadingreq() {
-		return extendedAccessControlEntry.getReadingreq();
-	}
-
-	public void setReadingreq(int readingreq) {
-		extendedAccessControlEntry.setReadingreq(readingreq);
-	}
-
-	public int getCustomid() {
-		return extendedAccessControlEntry.getCustomid();
-	}
-
-	public void setCustomid(int customid) {
-		extendedAccessControlEntry.setCustomid(customid);
-	}
-
-	public String toString() {
-		return extendedAccessControlEntry.toString();
-	}
+	private ExtendedAccessControlEntry ace = new ExtendedAccessControlEntry();
 
 	public DocumentAccessControlEntry() {
 	}
 
 	public DocumentAccessControlEntry(DocumentAccessControlEntry source) {
 		super(source);
-		extendedAccessControlEntry=new ExtendedAccessControlEntry(source);
+		ace = new ExtendedAccessControlEntry(source);
 	}
 
 	public DocumentAccessControlEntry(long groupId) {
 		super(groupId);
-	    setGroupId(groupId);
+		setGroupId(groupId);
 	}
 	
+	public ExtendedAccessControlEntry getAce() {
+		return ace;
+	}
+
+	@Override
+	public long getGroupId() {
+		return ace.getGroupId();
+	}
+
+	@Override
+	public int getWrite() {
+		return ace.getWrite();
+	}
+
+	@Override
+	public void setGroupId(long groupId) {
+		ace.setGroupId(groupId);
+	}
+
+	@Override
+	public void setWrite(int write) {
+		ace.setWrite(write);
+	}
+
+	@Override
+	public int getRead() {
+		return ace.getRead();
+	}
+
+	@Override
+	public void setRead(int read) {
+		ace.setRead(read);
+	}
+
+	@Override
+	public Set<Permission> grantedPermissions() {
+		return ace.grantedPermissions();
+	}
+
+	@Override
+	public void grantPermissions(Set<Permission> permissions) {
+		ace.grantPermissions(permissions);
+	}
+
+	@Override
+	public int getPreview() {
+		return ace.getPreview();
+	}
+
+	@Override
+	public void setPreview(int preview) {
+		ace.setPreview(preview);
+	}
+
+	@Override
+	public int getDownload() {
+		return ace.getDownload();
+	}
+
+	@Override
+	public void setDownload(int download) {
+		ace.setDownload(download);
+	}
+
+	@Override
+	public int getSecurity() {
+		return ace.getSecurity();
+	}
+
+	@Override
+	public void setSecurity(int security) {
+		ace.setSecurity(security);
+	}
+
+	@Override
+	public int getDelete() {
+		return ace.getDelete();
+	}
+
+	@Override
+	public void setDelete(int delete) {
+		ace.setDelete(delete);
+	}
+
+	@Override
+	public int getRename() {
+		return ace.getRename();
+	}
+
+	@Override
+	public void setRename(int rename) {
+		ace.setRename(rename);
+	}
+
+	@Override
+	public int getImmutable() {
+		return ace.getImmutable();
+	}
+
+	@Override
+	public void setImmutable(int immutable) {
+		ace.setImmutable(immutable);
+	}
+
+	@Override
+	public int getSign() {
+		return ace.getSign();
+	}
+
+	@Override
+	public void setSign(int sign) {
+		ace.setSign(sign);
+	}
+
+	@Override
+	public int getArchive() {
+		return ace.getArchive();
+	}
+
+	@Override
+	public void setArchive(int archive) {
+		ace.setArchive(archive);
+	}
+
+	@Override
+	public int getWorkflow() {
+		return ace.getWorkflow();
+	}
+
+	@Override
+	public void setWorkflow(int workflow) {
+		ace.setWorkflow(workflow);
+	}
+
+	@Override
+	public int getCalendar() {
+		return ace.getCalendar();
+	}
+
+	@Override
+	public void setCalendar(int calendar) {
+		ace.setCalendar(calendar);
+	}
+
+	@Override
+	public int getSubscription() {
+		return ace.getSubscription();
+	}
+
+	@Override
+	public void setSubscription(int subscription) {
+		ace.setSubscription(subscription);
+	}
+
+	@Override
+	public int getPassword() {
+		return ace.getPassword();
+	}
+
+	@Override
+	public void setPassword(int password) {
+		ace.setPassword(password);
+	}
+
+	@Override
+	public int getPrint() {
+		return ace.getPrint();
+	}
+
+	@Override
+	public void setPrint(int print) {
+		ace.setPrint(print);
+	}
+
+	@Override
+	public int getMove() {
+		return ace.getMove();
+	}
+
+	@Override
+	public void setMove(int move) {
+		ace.setMove(move);
+	}
+
+	@Override
+	public int getEmail() {
+		return ace.getEmail();
+	}
+
+	@Override
+	public void setEmail(int email) {
+		ace.setEmail(email);
+	}
+
+	@Override
+	public int getAutomation() {
+		return ace.getAutomation();
+	}
+
+	@Override
+	public void setAutomation(int automation) {
+		ace.setAutomation(automation);
+	}
+
+	@Override
+	public int getReadingreq() {
+		return ace.getReadingreq();
+	}
+
+	@Override
+	public void setReadingreq(int readingreq) {
+		ace.setReadingreq(readingreq);
+	}
+
+	@Override
+	public int getCustomid() {
+		return ace.getCustomid();
+	}
+
+	@Override
+	public void setCustomid(int customid) {
+		ace.setCustomid(customid);
+	}
+
+	@Override
+	public int getRevision() {
+		return ace.getRevision();
+	}
+
+	@Override
+	public void setRevision(int revision) {
+		ace.setRevision(revision);
+	}
+
+	@Override
+	public String toString() {
+		return ace.toString();
+	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		return ace.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		return ace.hashCode();
+	}
 }

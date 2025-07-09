@@ -32,13 +32,14 @@ import java.util.Set;
  * <li>READINGREQ: permission to send reading requests</li>
  * <li>PREVIEW: permission to preview a document</li>
  * <li>CUSTOMID: permission to edit the Custom ID</li>
+ * <li>REVISION: permission to edit the Revision</li>
  * </ul>
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
 public enum Permission {
-	READ, DOWNLOAD, WRITE, ADD, SECURITY, IMMUTABLE, DELETE, RENAME, IMPORT, EXPORT, SIGN, ARCHIVE, WORKFLOW, CALENDAR, SUBSCRIPTION, PRINT, PASSWORD, MOVE, EMAIL, AUTOMATION, STORE, READINGREQ, PREVIEW, CUSTOMID;
+	READ, DOWNLOAD, WRITE, ADD, SECURITY, IMMUTABLE, DELETE, RENAME, IMPORT, EXPORT, SIGN, ARCHIVE, WORKFLOW, CALENDAR, SUBSCRIPTION, PRINT, PASSWORD, MOVE, EMAIL, AUTOMATION, STORE, READINGREQ, PREVIEW, CUSTOMID, REVISION;
 
 	public static Set<Permission> all() {
 		return new HashSet<>(Arrays.asList(Permission.values()));

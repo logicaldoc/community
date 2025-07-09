@@ -355,6 +355,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 				guiAce.setAdd(ace.getAdd() == 1);
 				guiAce.setWrite(ace.getWrite() == 1);
 				guiAce.setCustomid(ace.getCustomid() == 1);
+				guiAce.setRevision(ace.getRevision() == 1);
 				guiAce.setSecurity(ace.getSecurity() == 1);
 				guiAce.setImmutable(ace.getImmutable() == 1);
 				guiAce.setDelete(ace.getDelete() == 1);
@@ -776,6 +777,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			fg.setStore(booleanToInt(ace.isStore()));
 			fg.setReadingreq(booleanToInt(ace.isReadingreq()));
 			fg.setCustomid(booleanToInt(ace.isCustomid()));
+			fg.setRevision(booleanToInt(ace.isRevision()));
 		}
 
 		folder.getAccessControlList().clear();

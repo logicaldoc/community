@@ -62,7 +62,9 @@ public class GUIAccessControlEntry implements Serializable {
 	public static final String PERMISSION_PRINT = "PRINT";
 
 	public static final String PERMISSION_CUSTOMID = "CUSTOMID";
-	
+
+	public static final String PERMISSION_REVISION = "REVISION";
+
 	private long entityId = 0;
 
 	private String name;
@@ -308,6 +310,14 @@ public class GUIAccessControlEntry implements Serializable {
 
 	public void setCustomid(boolean customid) {
 		setPermissionValue(PERMISSION_CUSTOMID, customid);
+	}
+
+	public boolean isRevision() {
+		return isPermissionAllowed(PERMISSION_REVISION);
+	}
+
+	public void setRevision(boolean revision) {
+		setPermissionValue(PERMISSION_REVISION, revision);
 	}
 
 	public boolean isPermissionAllowed(String permission) {

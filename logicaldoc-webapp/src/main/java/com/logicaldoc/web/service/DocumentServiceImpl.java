@@ -3194,6 +3194,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				ace.setAutomation(booleanToInt(guiAce.isAutomation()));
 				ace.setReadingreq(booleanToInt(guiAce.isReadingreq()));
 				ace.setCustomid(booleanToInt(guiAce.isCustomid()));
+				ace.setRevision(booleanToInt(guiAce.isRevision()));
 				acl.add(ace);
 			}
 

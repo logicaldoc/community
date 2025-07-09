@@ -111,6 +111,11 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		customid.setType(ListGridFieldType.BOOLEAN);
 		customid.setCanEdit(true);
 
+		ListGridField revision = new ListGridField(GUIAccessControlEntry.PERMISSION_REVISION.toLowerCase(),
+				prepareHeaderLabel(GUIAccessControlEntry.PERMISSION_REVISION));
+		revision.setType(ListGridFieldType.BOOLEAN);
+		revision.setCanEdit(true);
+
 		ListGridField security = new ListGridField(GUIAccessControlEntry.PERMISSION_SECURITY.toLowerCase(),
 				prepareHeaderLabel(GUIAccessControlEntry.PERMISSION_SECURITY));
 		security.setType(ListGridFieldType.BOOLEAN);
@@ -166,7 +171,10 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		fields.add(email);
 		fields.add(write);
 		fields.add(rename);
-		fields.add(customid);
+		if (Feature.enabled(Feature.CUSTOMID))
+			fields.add(customid);
+		if (Feature.enabled(Feature.REVISION))
+			fields.add(revision);
 		fields.add(delete);
 		fields.add(move);
 		fields.add(security);

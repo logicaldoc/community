@@ -1,8 +1,8 @@
 package com.logicaldoc.webservice.model;
 
-import jakarta.xml.bind.annotation.XmlType;
-
 import com.logicaldoc.webservice.doc.WSDoc;
+
+import jakarta.xml.bind.annotation.XmlType;
 
 /**
  * Useful class to associate a user or a group to a permission representation.
@@ -18,10 +18,10 @@ public class WSAccessControlEntry {
 
 	@WSDoc(description = "unique identifier of a user")
 	private long userId;
-	
+
 	@WSDoc(description = "permission to read")
 	private int read = 1;
-	
+
 	@WSDoc(description = "permission to preview")
 	private int preview = 1;
 
@@ -90,7 +90,10 @@ public class WSAccessControlEntry {
 
 	@WSDoc(description = "permission to edit the Custom ID")
 	private int customid = 0;
-	
+
+	@WSDoc(description = "permission to edit the Revision")
+	private int revision = 0;
+
 	public long getGroupId() {
 		return groupId;
 	}
@@ -297,5 +300,13 @@ public class WSAccessControlEntry {
 
 	public void setCustomid(int customid) {
 		this.customid = customid;
+	}
+
+	public int getRevision() {
+		return revision;
+	}
+
+	public void setRevision(int revision) {
+		this.revision = revision;
 	}
 }
