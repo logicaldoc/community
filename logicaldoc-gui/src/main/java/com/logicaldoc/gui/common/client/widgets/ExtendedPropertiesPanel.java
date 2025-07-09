@@ -28,7 +28,6 @@ import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.SectionItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
@@ -57,8 +56,6 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	protected boolean allowTemplateSelection = true;
 
-	protected boolean customidEnabled = true;
-
 	protected DynamicForm templateForm = new DynamicForm();
 
 	protected DynamicForm attributesForm = new DynamicForm();
@@ -75,13 +72,12 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	public ExtendedPropertiesPanel(GUIExtensibleObject object, ChangedHandler changedHandler,
 			ChangedHandler templateChangedHandler, boolean updateEnabled, boolean checkMandatory,
-			boolean allowTemplateSelection, boolean customidEnabled) {
+			boolean allowTemplateSelection) {
 		super();
 		this.extensibleObject = object;
 		this.changedHandler = changedHandler;
 		this.templateChangedHandler = templateChangedHandler;
 		this.updateEnabled = updateEnabled;
-		this.customidEnabled = customidEnabled;
 		this.checkMandatory = checkMandatory;
 		this.allowTemplateSelection = allowTemplateSelection;
 
@@ -94,8 +90,8 @@ public class ExtendedPropertiesPanel extends HLayout {
 	}
 
 	public ExtendedPropertiesPanel(GUIExtensibleObject object, ChangedHandler changedHandler, boolean updateEnabled,
-			boolean checkMandatory, boolean allowTemplateSelection, boolean customidEnabled) {
-		this(object, changedHandler, null, updateEnabled, checkMandatory, allowTemplateSelection, customidEnabled);
+			boolean checkMandatory, boolean allowTemplateSelection) {
+		this(object, changedHandler, null, updateEnabled, checkMandatory, allowTemplateSelection);
 	}
 
 	protected void adaptForms() {
@@ -133,8 +129,6 @@ public class ExtendedPropertiesPanel extends HLayout {
 		templateForm.setNumCols(1);
 		standardItems.clear();
 
-		putCustomIdField();
-
 		templateItem = ItemFactory.newTemplateSelector(true, extensibleObject.getTemplateId());
 		if (changedHandler != null)
 			templateItem.addChangedHandler(changedHandler);
@@ -165,16 +159,6 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 		if (Feature.enabled(Feature.TEMPLATE))
 			prepareExtendedAttributes(extensibleObject.getTemplateId());
-	}
-
-	private void putCustomIdField() {
-		if (isDocument()) {
-			TextItem customId = ItemFactory.newTextItem("customid", ((GUIDocument) extensibleObject).getCustomId());
-			if (changedHandler != null)
-				customId.addChangedHandler(changedHandler);
-			customId.setDisabled(!updateEnabled || !customidEnabled);
-			standardItems.add(customId);
-		}
 	}
 
 	private void handleTemplateChangedSelection(ChangedEvent event) {
@@ -508,15 +492,8 @@ public class ExtendedPropertiesPanel extends HLayout {
 	}
 
 	public boolean validate() {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> values = vm.getValues();
-		vm.validate();
-
 		if (Boolean.TRUE.equals(vm.hasErrors()))
 			return false;
-
-		if (isDocument() && allowTemplateSelection)
-			((GUIDocument) extensibleObject).setCustomId((String) values.get("customid"));
 
 		validateExtendedAttributes();
 
@@ -853,7 +830,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

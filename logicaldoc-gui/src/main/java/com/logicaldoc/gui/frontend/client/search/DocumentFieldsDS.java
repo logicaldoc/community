@@ -43,6 +43,10 @@ public class DocumentFieldsDS extends DataSource {
 		version.setValidOperators(OperatorId.ICONTAINS, OperatorId.INOT_CONTAINS, OperatorId.EQUALS,
 				OperatorId.NOT_EQUAL);
 
+		DataSourceTextField revision = new DataSourceTextField("revision", I18N.message("revision"));
+		revision.setValidOperators(OperatorId.ICONTAINS, OperatorId.INOT_CONTAINS, OperatorId.EQUALS,
+				OperatorId.NOT_EQUAL);
+		
 		DataSourceTextField publisher = new DataSourceTextField("publisher", I18N.message("publisher"));
 		publisher.setValidOperators(OperatorId.ICONTAINS, OperatorId.INOT_CONTAINS, OperatorId.EQUALS,
 				OperatorId.NOT_EQUAL);
@@ -107,7 +111,7 @@ public class DocumentFieldsDS extends DataSource {
 		DataSourceTextField tmplt = new DataSourceTextField("template", I18N.message("template"));
 		tmplt.setValidOperators(OperatorId.IS_NULL);
 
-		setFields(id, filename, fileSize, pages, publisher, version, lastModified, published, created, creator,
+		setFields(id, filename, fileSize, pages, publisher, version, revision, lastModified, published, created, creator,
 				customId, extension, rating, tags, comment, notes, wfStatus, publishedStatus, startPublishing,
 				stopPublishing, indexed, tmplt);
 

@@ -10,7 +10,7 @@ create table ld_bookmark (ld_id number(19,0) not null, ld_lastmodified timestamp
                           ld_position int not null, ld_filetype varchar(40), ld_type int not null, primary key (ld_id));
 create table ld_document (ld_id number(19,0) not null, ld_lastmodified timestamp not null, ld_recordversion number(19,0) not null, 
 						  ld_deleted int not null, ld_tenantid number(19,0) not null, ld_immutable int not null,
-                          ld_customid varchar(200), ld_version varchar(255), ld_fileversion varchar(10), ld_date timestamp, 
+                          ld_customid varchar(200), ld_version varchar(10), ld_fileversion varchar(10), ld_revision varchar(255), ld_date timestamp, 
                           ld_creation timestamp not null, ld_publisher varchar(255), ld_publisherid number(19,0) not null, ld_creator varchar(255),
                           ld_creatorid number(19,0) not null, ld_status int, ld_type varchar(255), ld_lockuserid number(19,0), ld_lockuser varchar(255),
                           ld_language varchar(10), ld_filename varchar(255), ld_password varchar(255),
@@ -134,7 +134,7 @@ create table ld_user_history (ld_id number(19,0) not null, ld_lastmodified times
 create table ld_usergroup (ld_groupid number(19,0) not null, ld_userid number(19,0) not null, primary key (ld_groupid, ld_userid));
 create table ld_version (ld_id number(19,0) not null, ld_lastmodified timestamp not null, ld_recordversion number(19,0) not null,
                          ld_deleted int not null, ld_tenantid number(19,0) not null, ld_immutable int not null, ld_customid varchar(200),
-                         ld_version varchar(255), ld_fileversion varchar(10), ld_date timestamp, ld_creation timestamp, ld_publisher varchar(255),
+                         ld_version varchar(10), ld_fileversion varchar(10), ld_revision varchar(255), ld_date timestamp, ld_creation timestamp, ld_publisher varchar(255),
                          ld_publisherid number(19,0) not null,  ld_creator varchar(255), ld_creatorid number(19,0) not null, ld_status int, ld_type varchar(255),
                          ld_lockuserid number(19,0), ld_lockuser varchar(255),
                          ld_language varchar(10), ld_filename varchar(255), ld_password varchar(255),

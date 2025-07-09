@@ -35,6 +35,8 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	private String fileVersion;
 
+	private String revision;
+
 	private String fileName;
 
 	private Date date;
@@ -661,6 +663,14 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	public void setLastNote(String lastNote) {
 		this.lastNote = lastNote;
+	}
+
+	public String getRevision() {
+		return revision;
+	}
+
+	public void setRevision(String revision) {
+		this.revision = revision;
 	}
 
 	public boolean hasPermission(String permission) {

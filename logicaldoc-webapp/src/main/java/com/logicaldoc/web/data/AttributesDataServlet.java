@@ -66,6 +66,7 @@ public class AttributesDataServlet extends AbstractDataServlet {
 			printAttibute("published", I18N.message("publishedon", locale), Attribute.TYPE_DATE, writer);
 			printAttibute("fileVersion", I18N.message("fileversion", locale), writer);
 			printAttibute("version", I18N.message("version", locale), writer);
+			printAttibute("revision", I18N.message("revision", locale), writer);
 			printAttibute("type", I18N.message("type", locale), writer);
 			printAttibute("size", I18N.message("size", locale), Attribute.TYPE_INT, writer);
 			printAttibute("pages", I18N.message("pages", locale), Attribute.TYPE_INT, writer);

@@ -823,6 +823,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		}
 
 		guiDocument.setCustomId(realDoc.getCustomId());
+		guiDocument.setRevision(realDoc.getRevision());
 		guiDocument.setTags(new ArrayList<>(realDoc.getTagsAsWords()));
 		guiDocument.setType(doc.getType());
 		guiDocument.setFileName(doc.getFileName());
@@ -931,6 +932,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			version1.setComment(docVersion.getComment());
 			version1.setId(id1);
 			version1.setCustomId(docVersion.getCustomId());
+			version1.setRevision(docVersion.getRevision());
 			version1.setTagsString(docVersion.getTgs());
 			version1.setType(docVersion.getType());
 			version1.setFileName(docVersion.getFileName());
@@ -977,6 +979,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			version2.setComment(docVersion.getComment());
 			version2.setId(id1);
 			version2.setCustomId(docVersion.getCustomId());
+			version2.setRevision(docVersion.getRevision());
 			version2.setTagsString(docVersion.getTgs());
 			version2.setType(docVersion.getType());
 			version2.setFileName(docVersion.getFileName());
@@ -1277,6 +1280,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		Document docVO = new Document();
 		docVO.setTagsFromWords(new HashSet<>(guiDocument.getTags()));
 		docVO.setCustomId(HTMLSanitizer.sanitizeSimpleText(guiDocument.getCustomId()));
+		docVO.setRevision(HTMLSanitizer.sanitizeSimpleText(guiDocument.getRevision()));
 		docVO.setFileName(HTMLSanitizer.sanitizeSimpleText(guiDocument.getFileName()));
 		docVO.setVersion(guiDocument.getVersion());
 		docVO.setCreation(guiDocument.getCreation());

@@ -86,7 +86,7 @@ public class AutomationDialog extends Window {
 								tabSet.enableTab(1);
 								tabSet.selectTab(1);
 								tabSet.disableTab(0);
-								propertiesPanel = new ExtendedPropertiesPanel(routine, null, true, true, false, true);
+								propertiesPanel = new ExtendedPropertiesPanel(routine, null, true, true, false);
 								tabSet.getTab(1).setPane(propertiesPanel);
 							}
 						});

@@ -19,7 +19,7 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 public class SearchHitsGrid extends DocumentsListGrid {
 
 	private static final String CUSTOM_ID = "customId";
-	
+
 	private List<ListGridField> fields = new ArrayList<>();
 
 	public SearchHitsGrid() {
@@ -87,6 +87,8 @@ public class SearchHitsGrid extends DocumentsListGrid {
 			fields.add(fieldsMap.get("fileVersion"));
 		if (!fields.contains(fieldsMap.get("version")))
 			fields.add(fieldsMap.get("version"));
+		if (!fields.contains(fieldsMap.get("revision")))
+			fields.add(fieldsMap.get("revision"));
 	}
 
 	private void addUsers() {
@@ -121,9 +123,9 @@ public class SearchHitsGrid extends DocumentsListGrid {
 
 	private void getSearchColumns() {
 		String srcColsSpec = Session.get().getInfo().getConfig("gui.search.columns");
-		if(srcColsSpec==null || srcColsSpec.isEmpty())
+		if (srcColsSpec == null || srcColsSpec.isEmpty())
 			return;
-		
+
 		String[] searchColumns = srcColsSpec.split(",");
 		for (String col : searchColumns) {
 			ListGridField field = fieldsMap.get(col);
@@ -151,7 +153,7 @@ public class SearchHitsGrid extends DocumentsListGrid {
 
 		return pageSize;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

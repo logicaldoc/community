@@ -83,6 +83,9 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	@Column(name = "ld_customid")
 	private String customId;
 
+	@Column(name = "ld_revision", length = 255)
+	private String revision;
+
 	@Column(name = "ld_comment")
 	private String comment;
 
@@ -116,7 +119,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	@Column(name = "ld_status")
 	@Enumerated(EnumType.ORDINAL)
 	private DocumentStatus status = DocumentStatus.UNLOCKED;
-	
+
 	@Column(name = "ld_indexed", nullable = false)
 	@Enumerated(EnumType.ORDINAL)
 	private IndexingStatus indexingStatus = IndexingStatus.TO_INDEX;
@@ -248,13 +251,13 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	 */
 	@Transient
 	private boolean modified = false;
-	
+
 	@Transient
 	private String documentTemplateName;
 
 	@Transient
 	private Long documentTemplateId;
-	
+
 	protected AbstractDocument() {
 		super();
 	}
@@ -278,7 +281,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	public void setVersion(String version) {
 		this.version = version;
 	}
-	
+
 	public DocumentStatus getStatus() {
 		return status;
 	}
@@ -286,11 +289,11 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	public void setStatus(DocumentStatus status) {
 		this.status = status;
 	}
-	
+
 	public void setStatus(int status) {
 		this.status = DocumentStatus.values()[status];
 	}
-	
+
 	public IndexingStatus getIndexed() {
 		return indexingStatus;
 	}
@@ -298,7 +301,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	public void setIndexingStatus(IndexingStatus indexingStatus) {
 		this.indexingStatus = indexingStatus;
 	}
-	
+
 	public void setIndexingStatus(int indexingStatus) {
 		this.indexingStatus = IndexingStatus.values()[indexingStatus];
 	}
@@ -865,8 +868,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	public void setTemplateName(String templateName) {
 		this.documentTemplateName = templateName;
 	}
-	
-	
+
 	@Override
 	public Long getTemplateId() {
 		return documentTemplateId;
@@ -876,7 +878,15 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	public void setTemplateId(Long templateId) {
 		this.documentTemplateId = templateId;
 	}
-	
+
+	public String getRevision() {
+		return revision;
+	}
+
+	public void setRevision(String revision) {
+		this.revision = revision;
+	}
+
 	/**
 	 * Copies in the current instance the attributes of the passed values
 	 * object, but NOT the ID
@@ -886,6 +896,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	public void copyAttributes(AbstractDocument docVO) {
 		setTenantId(docVO.getTenantId());
 		setCustomId(docVO.getCustomId());
+		setRevision(docVO.getRevision());
 		setImmutable(docVO.getImmutable());
 		setVersion(docVO.getVersion());
 		setFileVersion(docVO.getFileVersion());
@@ -958,7 +969,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	public void setLastNote(String lastNote) {
 		this.lastNote = lastNote;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

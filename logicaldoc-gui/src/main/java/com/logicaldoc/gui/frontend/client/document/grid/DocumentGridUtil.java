@@ -247,6 +247,7 @@ public class DocumentGridUtil {
 			rec.setAttribute(CREATOR_ID, doc.getCreatorId());
 			rec.setAttribute(CREATED, doc.getCreation());
 			rec.setAttribute("customId", doc.getCustomId());
+			rec.setAttribute("revision", doc.getRevision());
 			rec.setAttribute("type", doc.getType());
 			rec.setAttribute(IMMUTABLE, doc.getImmutable());
 			rec.setAttribute(PASSWORD, doc.isPasswordProtected());

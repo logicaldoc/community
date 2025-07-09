@@ -340,6 +340,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				doc.setCustomId(Long.toString(doc.getId()));
 				doc.setModified(true);
 			}
+			
+			if (StringUtils.isEmpty(doc.getRevision())) {
+				doc.setRevision(doc.getVersion());
+				doc.setModified(true);
+			}
 
 			// Perhaps some listeners may have modified the document
 			if (doc.isModified())

@@ -65,7 +65,7 @@ public class FolderExtendedPropertiesPanel extends FolderDetailTab {
 		form1.setItems(locked, applyMetadata);
 
 		propertiesPanel = new ExtendedPropertiesPanel(folder, changedHandler, templateChangedHandler, folder.isWrite(),
-				false, true, folder.isCustomid());
+				false, true);
 		setMembers(form1, propertiesPanel);
 	}
 
@@ -82,7 +82,7 @@ public class FolderExtendedPropertiesPanel extends FolderDetailTab {
 	public void handleErrors(ServerValidationError[] errors) {
 		propertiesPanel.onErrors(errors);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

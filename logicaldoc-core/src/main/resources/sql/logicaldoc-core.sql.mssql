@@ -10,7 +10,7 @@ create table ld_bookmark (ld_id bigint not null, ld_lastmodified datetime not nu
                           ld_position int not null, ld_filetype nvarchar(40), ld_type int not null, primary key (ld_id));
 create table ld_document (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null, 
 						  ld_deleted int not null, ld_tenantid bigint not null, ld_immutable int not null,
-                          ld_customid nvarchar(200), ld_version nvarchar(255), ld_fileversion nvarchar(10), ld_date datetime, 
+                          ld_customid nvarchar(200), ld_version nvarchar(10), ld_fileversion nvarchar(10), ld_revision nvarchar(255), ld_date datetime, 
                           ld_creation datetime not null, ld_publisher nvarchar(255), ld_publisherid bigint not null, ld_creator nvarchar(255),
                           ld_creatorid bigint not null, ld_status int, ld_type nvarchar(255), ld_lockuserid bigint, ld_lockuser nvarchar(255),
                           ld_language nvarchar(10), ld_filename nvarchar(255), ld_password nvarchar(255),
@@ -134,7 +134,7 @@ create table ld_user_history (ld_id bigint not null, ld_lastmodified datetime no
 create table ld_usergroup (ld_groupid bigint not null, ld_userid bigint not null, primary key (ld_groupid, ld_userid));
 create table ld_version (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                          ld_deleted int not null, ld_tenantid bigint not null, ld_immutable int not null, ld_customid nvarchar(200),
-                         ld_version nvarchar(255), ld_fileversion nvarchar(10), ld_date datetime, ld_creation datetime, ld_publisher nvarchar(255),
+                         ld_version nvarchar(10), ld_fileversion nvarchar(10), ld_revision nvarchar(255), ld_date datetime, ld_creation datetime, ld_publisher nvarchar(255),
                          ld_publisherid bigint not null,  ld_creator nvarchar(255), ld_creatorid bigint not null, ld_status int, ld_type nvarchar(255),
                          ld_lockuserid bigint, ld_lockuser nvarchar(255),
                          ld_language nvarchar(10), ld_filename nvarchar(255), ld_password nvarchar(255), ld_lastnote nvarchar(4000),

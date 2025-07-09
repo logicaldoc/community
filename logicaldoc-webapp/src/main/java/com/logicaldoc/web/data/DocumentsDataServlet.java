@@ -15,9 +15,6 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +25,8 @@ import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentComparator;
 import com.logicaldoc.core.document.DocumentDAO;
-import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.DocumentStatus;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
@@ -40,6 +37,9 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for documents data.
@@ -164,6 +164,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		writer.print("<id>" + document.getId() + "</id>");
 
 		printFolderAndDocRef(writer, document);
+		printCustomIdAndRevision(writer, document);
 
 		writer.print("<icon>" + FileUtil.getBaseName(document.getIcon()) + "</icon>");
 		writer.print("<version>" + document.getVersion() + "</version>");
@@ -289,13 +290,18 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 	private void printFolderAndDocRef(PrintWriter writer, Document document) {
 		if (document.getFolder() != null)
 			writer.print("<folderId>" + document.getFolder().getId() + "</folderId>");
-		writer.print("<customId><![CDATA[" + (document.getCustomId() != null ? document.getCustomId() : "")
-				+ "]]></customId>");
 		if (document.getDocRef() != null) {
 			writer.print("<docref>" + document.getDocRef() + "</docref>");
 			if (document.getDocRefType() != null)
 				writer.print("<docrefType>" + document.getDocRefType() + "</docrefType>");
 		}
+	}
+
+	private void printCustomIdAndRevision(PrintWriter writer, Document document) {
+		writer.print("<customId><![CDATA[" + (document.getCustomId() != null ? document.getCustomId() : "")
+				+ "]]></customId>");
+		writer.print("<revision><![CDATA[" + (document.getRevision() != null ? document.getRevision() : "")
+				+ "]]></revision>");
 	}
 
 	private void findDocumentsByIds(HttpServletRequest request, Session session, List<Document> documentsInCurrentPage)
@@ -382,7 +388,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		StringBuilder query = new StringBuilder("""
 select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.publisher, A.creation, A.creator, A.fileSize, A.immutable, A.indexingStatus, A.lockUserId, A.fileName, A.status,
        A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus, A.startPublishing, A.stopPublishing, A.published, A.extResId, B.name, A.docRefType, A.stamped, A.lockUser,
-       A.password, A.pages, A.workflowStatusDisplay, A.language, A.links+A.docAttrs, A.tgs, A.creatorId, A.publisherId, A.color, A.folder.id, A.tenantId, A.lastNote
+       A.password, A.pages, A.workflowStatusDisplay, A.language, A.links+A.docAttrs, A.tgs, A.creatorId, A.publisherId, A.color, A.folder.id, A.tenantId, A.lastNote, A.revision
   from Document as A
   left outer join A.template as B
  where A.deleted = 0
@@ -533,6 +539,7 @@ select ld_docid
 			doc.setFileVersion((String) cols[19]);
 			doc.setComment((String) cols[20]);
 			doc.setLastNote((String) cols[41]);
+			doc.setRevision((String) cols[42]);
 			doc.setWorkflowStatus((String) cols[21]);
 			doc.setExtResId((String) cols[25]);
 			doc.setTemplateName((String) cols[26]);

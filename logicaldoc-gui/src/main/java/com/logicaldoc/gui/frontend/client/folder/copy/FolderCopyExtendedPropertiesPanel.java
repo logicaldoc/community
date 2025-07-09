@@ -34,7 +34,7 @@ public class FolderCopyExtendedPropertiesPanel extends FolderDetailTab {
 		form1.setTitleOrientation(TitleOrientation.TOP);
 		form1.setItems(locked);
 
-		propertiesPanel = new ExtendedPropertiesPanel(folder, null, null, true, false, true, true);
+		propertiesPanel = new ExtendedPropertiesPanel(folder, null, null, true, false, true);
 		setMembers(form1, propertiesPanel);
 	}
 

@@ -68,6 +68,8 @@ import com.smartgwt.client.widgets.grid.events.SelectionEvent;
  */
 public class DocumentsListGrid extends RefreshableListGrid implements DocumentsGrid, DocumentObserver {
 
+	private static final String REVISION = "revision";
+
 	private static final String LAST_NOTE = "lastNote";
 
 	private static final String GROUP_FIELD_NAME = "group:[{fieldName:";
@@ -232,19 +234,16 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		fieldsMap.put(size.getName(), size);
 
 		ListGridField pages = new IntegerListGridField(PAGES, I18N.getAttributeLabel(PAGES));
-		pages.setHidden(true);
 		fieldsMap.put(pages.getName(), pages);
 
 		ListGridField icon = new TypeIconGridField();
 		fieldsMap.put(icon.getName(), icon);
 
 		ListGridField version = new VersionListGridField();
-		version.setHidden(true);
 		version.setCanFilter(true);
 		fieldsMap.put(version.getName(), version);
 
 		ListGridField lastModified = new DateListGridField(LAST_MODIFIED, "lastmodified");
-		lastModified.setHidden(true);
 		fieldsMap.put(lastModified.getName(), lastModified);
 
 		ListGridField publisher = new UserListGridField(PUBLISHER, "publisherId", PUBLISHER,
@@ -260,12 +259,10 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		ListGridField creator = new UserListGridField(CREATOR, "creatorId", CREATOR,
 				Session.get().getConfigAsBoolean(GUI_AVATAR_SHOWINGRIDS));
 		creator.setCanFilter(true);
-		creator.setHidden(true);
 		creator.setCanSort(true);
 		fieldsMap.put(creator.getName(), creator);
 
 		ListGridField created = new DateListGridField(CREATED, CREATED);
-		created.setHidden(true);
 		fieldsMap.put(created.getName(), created);
 
 		ListGridField customId = new ColoredListGridField(CUSTOM_ID, I18N.message("customid"), 110);
@@ -294,13 +291,11 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		fieldsMap.put(filename.getName(), filename);
 
 		ListGridField lockUserId = new ColoredListGridField("lockUserId", " ", 24);
-		lockUserId.setHidden(true);
 		lockUserId.setCanFilter(false);
 		lockUserId.setCanSort(false);
 		fieldsMap.put(lockUserId.getName(), lockUserId);
 
 		ListGridField rating = new RatingListGridField();
-		rating.setHidden(true);
 		fieldsMap.put(rating.getName(), rating);
 
 		final Map<String, String> languages = I18N.getSupportedLanguages(false);
@@ -309,57 +304,51 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		language.setType(ListGridFieldType.TEXT);
 		language.setCanFilter(false);
 		language.setAlign(Alignment.CENTER);
-		language.setHidden(true);
 		language.setCellFormatter((Object value, ListGridRecord rec, int rowNum, int colNum) -> languages
 				.get(rec.getAttribute(LANGUAGE)));
 		fieldsMap.put(language.getName(), language);
 
 		ListGridField fileVersion = new VersionListGridField(FILE_VERSION, "fileversion");
-		fileVersion.setHidden(false);
 		fileVersion.setCanFilter(true);
 		fieldsMap.put(fileVersion.getName(), fileVersion);
 
+		ListGridField revision = new VersionListGridField(REVISION, REVISION);
+		revision.setCanFilter(true);
+		fieldsMap.put(revision.getName(), revision);
+
 		ListGridField comment = new ColoredListGridField(COMMENT, 300);
-		comment.setHidden(true);
 		comment.setCanFilter(true);
 		comment.setCanSort(true);
 		fieldsMap.put(comment.getName(), comment);
 
 		ListGridField lastNote = new ColoredListGridField(LAST_NOTE, 300);
-		lastNote.setHidden(true);
 		lastNote.setCanFilter(true);
 		lastNote.setCanSort(true);
 		fieldsMap.put(lastNote.getName(), lastNote);
 
 		ListGridField tags = new ColoredListGridField("tags", 200);
-		tags.setHidden(true);
 		tags.setCanFilter(true);
 		tags.setCanSort(true);
 		fieldsMap.put(tags.getName(), tags);
 
 		ListGridField wfStatus = new WorkflowTaskNameListGridField();
-		wfStatus.setHidden(true);
 		fieldsMap.put(wfStatus.getName(), wfStatus);
 
 		ListGridField startPublishing = new DateListGridField(START_PUBLISHING, "startpublishing",
 				DateCellFormatter.FORMAT_SHORT);
-		startPublishing.setHidden(true);
 		fieldsMap.put(startPublishing.getName(), startPublishing);
 
 		ListGridField stopPublishing = new DateListGridField(STOP_PUBLISHING, "stoppublishing",
 				DateCellFormatter.FORMAT_SHORT);
-		stopPublishing.setHidden(true);
 		fieldsMap.put(stopPublishing.getName(), stopPublishing);
 
 		ListGridField publishedStatus = new ColoredListGridField(PUBLISHED_STATUS, I18N.message(PUBLISHED), 50);
-		publishedStatus.setHidden(true);
 		publishedStatus.setCanFilter(true);
 		publishedStatus.setCanSort(true);
 		fieldsMap.put(publishedStatus.getName(), publishedStatus);
 
 		ListGridField template = new ColoredListGridField(TEMPLATE, 150);
 		template.setAlign(Alignment.LEFT);
-		template.setHidden(true);
 		template.setCanFilter(true);
 		template.setCanSort(true);
 		fieldsMap.put(template.getName(), template);
@@ -370,25 +359,21 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		 * put the thumbnail image cell
 		 */
 		ListGridField folderId = new ColoredListGridField("folderId", 80);
-		folderId.setHidden(true);
 		folderId.setCanSort(false);
 		fieldsMap.put(folderId.getName(), folderId);
 
 		ListGridField tenantId = new ColoredListGridField("tenantId", 80);
-		tenantId.setHidden(true);
 		tenantId.setCanSort(false);
 		fieldsMap.put(tenantId.getName(), tenantId);
 
 		// For search only
 		ListGridField folderField = new ColoredListGridField("folder", 200);
-		folderField.setHidden(true);
 		folderField.setCanSort(false);
 		fieldsMap.put(folderField.getName(), folderField);
 
 		// For search only
 		ListGridField score = new ColoredListGridField("score", 120);
 		score.setCanFilter(false);
-		score.setHidden(true);
 		score.setCellFormatter((value, rec, rowNum, colNum) -> {
 			try {
 				int scoreValue = rec.getAttributeAsInt("score");
@@ -418,6 +403,11 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 				}
 			}
 		});
+
+		// Mark all fields as hidden, then just those specified in the layout
+		// will be displayed
+		for (ListGridField field : fieldsMap.values())
+			field.setHidden(true);
 	}
 
 	private void addSelectionToClipboard(List<GUIDocument> selection) {
@@ -457,7 +447,6 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 					}
 				}
 
-				ext.setHidden(true);
 				ext.setCanFilter(true);
 				ext.setCanSort(true);
 				fieldsMap.put(ext.getName(), ext);
@@ -561,6 +550,10 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		if (!fields.contains(fieldsMap.get(VERSION))) {
 			fieldsMap.get(VERSION).setHidden(true);
 			fields.add(fieldsMap.get(VERSION));
+		}
+		if (!fields.contains(fieldsMap.get(REVISION))) {
+			fieldsMap.get(REVISION).setHidden(true);
+			fields.add(fieldsMap.get(REVISION));
 		}
 	}
 

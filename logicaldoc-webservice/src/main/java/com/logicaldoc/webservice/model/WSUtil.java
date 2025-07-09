@@ -55,6 +55,7 @@ public class WSUtil {
 		try {
 			wsDoc.setId(document.getId());
 			wsDoc.setCustomId(document.getCustomId());
+			wsDoc.setRevision(document.getRevision());
 			wsDoc.setLanguage(document.getLanguage());
 			wsDoc.setComment(document.getComment());
 			wsDoc.setLastNote(document.getLastNote());
@@ -207,6 +208,7 @@ public class WSUtil {
 		setAttributesIntoDocument(wsDoc, doc);
 
 		doc.setCustomId(wsDoc.getCustomId());
+		doc.setRevision(wsDoc.getRevision());
 		doc.setLanguage(wsDoc.getLanguage());
 		doc.setImmutable(wsDoc.getImmutable());
 		if (wsDoc.getIndexed() != WSDocument.INDEX_INDEXED)

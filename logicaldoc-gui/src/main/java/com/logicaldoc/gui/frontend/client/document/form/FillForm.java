@@ -50,7 +50,7 @@ public class FillForm extends Window {
 		buttonsBar.setWidth100();
 		buttonsBar.addButton(save);
 
-		propertiesPanel = new ExtendedPropertiesPanel(document, null, true, true, false, true);
+		propertiesPanel = new ExtendedPropertiesPanel(document, null, true, true, false);
 
 		VLayout propertiesContainer = new VLayout();
 		propertiesContainer.setWidth100();

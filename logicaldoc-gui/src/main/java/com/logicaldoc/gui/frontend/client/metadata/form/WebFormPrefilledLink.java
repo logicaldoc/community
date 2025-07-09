@@ -57,7 +57,7 @@ public class WebFormPrefilledLink extends StickyWindow {
 		FormService.Instance.get().getById(formId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIForm frm) {
-				extPanel = new ExtendedPropertiesPanel(frm, null, true, false, false, true);
+				extPanel = new ExtendedPropertiesPanel(frm, null, true, false, false);
 				addItem(extPanel);
 
 				prefilledLink = ItemFactory.newStaticTextItem("prefilledlink", null);
@@ -94,7 +94,7 @@ public class WebFormPrefilledLink extends StickyWindow {
 					}
 				});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

@@ -12,6 +12,8 @@ import java.io.Serializable;
 public class GUIScheme implements Serializable, Comparable<GUIScheme> {
 
 	public static final String CUSTOMID_SCHEME = "customid-scheme";
+	
+	public static final String REVISION_SCHEME = "revision-scheme";
 
 	public static final String AUTONAMING_SCHEME = "autonaming-scheme";
 

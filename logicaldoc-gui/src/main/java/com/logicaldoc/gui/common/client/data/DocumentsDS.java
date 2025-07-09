@@ -87,6 +87,7 @@ public class DocumentsDS extends DataSource {
 		DataSourceTextField icon = new DataSourceTextField("icon");
 		icon.setHidden(true);
 		DataSourceTextField customId = new DataSourceTextField("customId");
+		DataSourceTextField revision = new DataSourceTextField("revision");
 		DataSourceTextField type = new DataSourceTextField("type");
 		DataSourceTextField version = new DataSourceTextField("version");
 		DataSourceTextField docref = new DataSourceTextField("docref");
@@ -153,6 +154,7 @@ public class DocumentsDS extends DataSource {
 		fields.add(creatorId);
 		fields.add(creator);
 		fields.add(customId);
+		fields.add(revision);
 		fields.add(immutable);
 		fields.add(iindexed);
 		fields.add(signed);

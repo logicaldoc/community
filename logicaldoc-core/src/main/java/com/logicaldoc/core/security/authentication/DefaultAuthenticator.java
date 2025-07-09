@@ -48,6 +48,9 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 			throw new AuthenticationException(this, "dataerror", e);
 		}
 
+		if(user==null)
+			throw new AccountNotFoundException();
+		
 		// Check the password match with one of the current or legacy algorithm
 		String test = null;
 		try {

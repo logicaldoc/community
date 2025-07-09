@@ -192,6 +192,8 @@ public class Feature {
 	public static final int DOCUSIGN = 90;
 
 	public static final int HOT_FOLDER = 91;
+	
+	public static final int REVISION = 92;
 
 	public static final int WEBDAV_BASIC = 93;
 

@@ -58,6 +58,8 @@ public class MetadataDiff extends Window {
 				version2.getComment(), 0));
 		records.add(new DiffRecord(I18N.message("customid"), I18N.message("customid"), version1.getCustomId(),
 				version2.getCustomId(), 0));
+		records.add(new DiffRecord(I18N.message("revision"), I18N.message("revision"), version1.getRevision(),
+				version2.getRevision(), 0));
 		records.add(new DiffRecord(I18N.message("language"), I18N.message("language"), version1.getLanguage(),
 				version2.getLanguage(), 0));
 		records.add(new DiffRecord(I18N.message("createdon"), I18N.message("createdon"),

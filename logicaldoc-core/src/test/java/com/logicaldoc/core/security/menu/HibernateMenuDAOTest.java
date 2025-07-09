@@ -165,7 +165,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 
 		menus = testSubject.findByUserId(4);
 		assertNotNull(menus);
-		assertEquals(28, menus.size());
+		assertEquals(29, menus.size());
 	}
 
 	@Test
@@ -202,7 +202,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 	public void testFindMenuIdByUserId() {
 		Collection<Long> ids = testSubject.findMenuIdByUserId(4, true);
 		assertNotNull(ids);
-		assertEquals(27, ids.size());
+		assertEquals(28, ids.size());
 		assertTrue(ids.contains(-104L));
 		assertTrue(ids.contains(1200L));
 

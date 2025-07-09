@@ -54,7 +54,7 @@ public class FillStamp extends StickyWindow {
 		buttonsBar.setWidth100();
 		buttonsBar.addButton(save);
 
-		propertiesPanel = new ExtendedPropertiesPanel(stamp, null, true, true, false, true);
+		propertiesPanel = new ExtendedPropertiesPanel(stamp, null, true, true, false);
 
 		VLayout propertiesContainer = new VLayout();
 		propertiesContainer.setWidth100();
@@ -75,7 +75,7 @@ public class FillStamp extends StickyWindow {
 
 		StampDialog.applyStamp(stamp, visualPositioning, this, documents);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

@@ -73,10 +73,13 @@ public class WSDocument implements Serializable {
 
 	@WSDoc(required = false)
 	private String version;
-
+	
 	@WSDoc(required = false)
 	private String fileVersion;
 
+	@WSDoc(required = false, description = "custom revision")
+	private String revision;
+	
 	@WSDoc(description = "last publication date; format must be 'yyyy-MM-dd HH:mm:ss' or 'yyyy-MM-dd'")
 	private String date;
 
@@ -671,5 +674,13 @@ public class WSDocument implements Serializable {
 
 	public void setLastNote(String lastNote) {
 		this.lastNote = lastNote;
+	}
+
+	public String getRevision() {
+		return revision;
+	}
+
+	public void setRevision(String revision) {
+		this.revision = revision;
 	}
 }

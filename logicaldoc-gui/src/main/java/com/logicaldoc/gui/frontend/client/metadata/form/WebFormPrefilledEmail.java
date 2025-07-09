@@ -55,7 +55,7 @@ public class WebFormPrefilledEmail extends StickyWindow {
 		FormService.Instance.get().getById(formId, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(GUIForm frm) {
-				extPanel = new ExtendedPropertiesPanel(frm, null, true, false, false, true);
+				extPanel = new ExtendedPropertiesPanel(frm, null, true, false, false);
 				addItem(extPanel);
 
 				SubmitItem send = new SubmitItem();
@@ -96,7 +96,7 @@ public class WebFormPrefilledEmail extends StickyWindow {
 					}
 				});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

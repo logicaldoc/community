@@ -62,6 +62,10 @@ public class CustomIdPanel extends AdminPanel {
 		if (Feature.enabled(Feature.CUSTOMID))
 			body.setMembers(setupSchemesPanel(schemesData, GUIScheme.CUSTOMID_SCHEME));
 
+		Tab revisionTab = new Tab();
+		revisionTab.setTitle(I18N.message("revision"));
+		revisionTab.setPane(setupSchemesPanel(schemesData, GUIScheme.REVISION_SCHEME));
+
 		Tab autonamingTab = new Tab();
 		autonamingTab.setTitle(I18N.message("autonaming"));
 		autonamingTab.setPane(setupSchemesPanel(schemesData, GUIScheme.AUTONAMING_SCHEME));
@@ -82,6 +86,8 @@ public class CustomIdPanel extends AdminPanel {
 			tabs.addTab(autonamingTab);
 		if (Feature.enabled(Feature.AUTO_FOLDING))
 			tabs.addTab(autofoldingTab);
+		if (Feature.enabled(Feature.REVISION))
+			tabs.addTab(revisionTab);
 		if (Feature.enabled(Feature.SPLIT))
 			tabs.addTab(splittingTab);
 		tabs.addTab(sequencesTab);
@@ -106,15 +112,15 @@ public class CustomIdPanel extends AdminPanel {
 		evaluateAtUpdate.setWidth(150);
 		evaluateAtUpdate.setType(ListGridFieldType.BOOLEAN);
 
-		final ListGrid customIds = new ListGrid();
-		customIds.setEmptyMessage(I18N.message("notitemstoshow"));
-		customIds.setShowAllRecords(true);
-		customIds.setCanEdit(true);
-		customIds.setWidth100();
-		customIds.setHeight100();
-		customIds.setFields(template);
-		customIds.setSelectionType(SelectionStyle.SINGLE);
-		customIds.setModalEditing(true);
+		final ListGrid grid = new ListGrid();
+		grid.setEmptyMessage(I18N.message("notitemstoshow"));
+		grid.setShowAllRecords(true);
+		grid.setCanEdit(true);
+		grid.setWidth100();
+		grid.setHeight100();
+		grid.setFields(template);
+		grid.setSelectionType(SelectionStyle.SINGLE);
+		grid.setModalEditing(true);
 
 		List<ListGridRecord> records = new ArrayList<>();
 		if (data != null)
@@ -131,21 +137,21 @@ public class CustomIdPanel extends AdminPanel {
 				rec.setAttribute("type", cid.getType());
 				records.add(rec);
 			}
-		customIds.setData(records.toArray(new ListGridRecord[0]));
+		grid.setData(records.toArray(new ListGridRecord[0]));
 
 		if (GUIScheme.SPLIT_SCHEME.equals(type))
-			customIds.setFields(template, scheme);
+			grid.setFields(template, scheme);
 		else
-			customIds.setFields(template, scheme, evaluateAtCheckin, evaluateAtUpdate);
+			grid.setFields(template, scheme, evaluateAtCheckin, evaluateAtUpdate);
 
-		customIds.addCellContextClickHandler(event -> {
-			showSchemeContextMenu(customIds);
-			event.cancel();
+		grid.addCellContextClickHandler(click -> {
+			showSchemeContextMenu(grid);
+			click.cancel();
 		});
 
-		customIds.addEditCompleteHandler(event -> {
+		grid.addEditCompleteHandler(event -> {
 			GUIScheme cid = new GUIScheme();
-			ListGridRecord rec = customIds.getRecord(event.getRowNum());
+			ListGridRecord rec = grid.getRecord(event.getRowNum());
 			cid.setTemplateId(Long.parseLong(rec.getAttribute(TEMPLATE_ID)));
 			cid.setEvaluateAtCheckin(Boolean.TRUE.equals(rec.getAttributeAsBoolean(EVALUATE_AT_CHECKIN)));
 			cid.setEvaluateAtUpdate(Boolean.TRUE.equals(rec.getAttributeAsBoolean(EVALUATE_AT_UPDATE)));
@@ -164,7 +170,7 @@ public class CustomIdPanel extends AdminPanel {
 		HTMLFlow hint = new HTMLFlow(I18N.message("customidhint"));
 		hint.setMargin(3);
 		sc.addMember(hint);
-		sc.addMember(customIds);
+		sc.addMember(grid);
 
 		return sc;
 	}

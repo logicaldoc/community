@@ -23,7 +23,7 @@ public class DocumentExtendedPropertiesPanel extends DocumentDetailTab {
 		setMembersMargin(1);
 
 		extPropertiesPanel = new ExtendedPropertiesPanel(document, changedHandler, templateChangedHandler,
-				updateEnabled, !document.isBulkUpdate(), true, document.isCustomid());
+				updateEnabled, !document.isBulkUpdate(), true);
 		setMembers(extPropertiesPanel);
 	}
 
@@ -36,12 +36,12 @@ public class DocumentExtendedPropertiesPanel extends DocumentDetailTab {
 	public void handleErrors(ServerValidationError[] errors) {
 		extPropertiesPanel.onErrors(errors);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

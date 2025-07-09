@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -120,10 +120,20 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 
 		StaticTextItem permaLink = preparePermaLink();
 
-		if (Feature.enabled(Feature.WORKFLOW))
-			form1.setItems(id, fileName, folder, size, pages, version, creation, published, wfStatus, color, permaLink);
-		else
-			form1.setItems(id, fileName, folder, size, pages, version, creation, published, color, permaLink);
+		TextItem customId = ItemFactory.newTextItem("customid", document.getCustomId());
+		if (changedHandler != null)
+			customId.addChangedHandler(changedHandler);
+		customId.setDisabled(!updateEnabled || !document.isCustomid());
+		customId.setVisible(Feature.enabled(Feature.CUSTOMID));
+
+		TextItem revision = ItemFactory.newTextItem("revision", document.getRevision());
+		if (changedHandler != null)
+			revision.addChangedHandler(changedHandler);
+		revision.setDisabled(!updateEnabled);
+		revision.setVisible(Feature.enabled(Feature.REVISION));
+
+		form1.setItems(id, customId, fileName, folder, size, pages, version, revision, creation, published, wfStatus,
+				color, permaLink);
 
 		columns.addMember(form1);
 
@@ -194,6 +204,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 		if (document.getWorkflowStatusDisplay() != null)
 			wfStatus.setValue("<span style='color:" + document.getWorkflowStatusDisplay() + "'>"
 					+ document.getWorkflowStatus() + "</span>");
+		wfStatus.setVisible(Feature.enabled(Feature.WORKFLOW));
 		return wfStatus;
 	}
 
