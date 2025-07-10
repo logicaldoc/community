@@ -37,7 +37,7 @@ public class RangeResourceImpl extends DavResourceImpl {
 	private final Pair<String, String> requestRange;
 
 	public RangeResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
-			ResourceConfig config, Resource resource, Pair<String, String> requestRange) {
+			ResourceConfiguration config, Resource resource, Pair<String, String> requestRange) {
 		super(locator, factory, session, config, resource);
 		this.requestRange = requestRange;
 	}

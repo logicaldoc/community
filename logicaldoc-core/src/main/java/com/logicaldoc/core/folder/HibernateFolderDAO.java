@@ -19,11 +19,13 @@ import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -63,6 +65,8 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
+@Repository("folderDAO")
+@Transactional
 public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> implements FolderDAO {
 
 	private static final String ROOT_ID = "rootId";
@@ -97,10 +101,10 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private static final String WHERE_GROUP_GROUPID_IN = " where _acl.ace.ace.groupId in (";
 
-	@Resource(name = "UserDAO")
+	@Resource(name = "userDAO")
 	protected UserDAO userDAO;
 
-	@Resource(name = "FolderHistoryDAO")
+	@Resource(name = "folderHistoryDAO")
 	protected FolderHistoryDAO historyDAO;
 
 	@Resource(name = "Store")

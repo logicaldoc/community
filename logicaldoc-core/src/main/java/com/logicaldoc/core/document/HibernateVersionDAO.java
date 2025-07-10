@@ -10,9 +10,11 @@ import java.util.Map;
 import java.util.Set;
 
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -29,6 +31,8 @@ import com.logicaldoc.util.io.FileUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
+@Repository("versionDAO")
+@Transactional
 public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> implements VersionDAO {
 
 	private static final String DOC_ID = ".docId=";

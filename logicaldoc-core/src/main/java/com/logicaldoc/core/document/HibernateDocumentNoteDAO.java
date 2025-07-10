@@ -8,13 +8,17 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
+import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.html.HTMLSanitizer;
+
+import jakarta.transaction.Transactional;
 
 /**
  * Hibernate implementation of <code>DocumentNoteDAO</code>
@@ -22,6 +26,8 @@ import com.logicaldoc.util.html.HTMLSanitizer;
  * @author Matteo Caruso - LogicalDOC
  * @since 6.2
  */
+@Repository("documentNoteDAO")
+@Transactional
 public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<DocumentNote> implements DocumentNoteDAO {
 
 	private static final String DELETED_0 = ".deleted=0";
@@ -42,16 +48,38 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 		if (doc == null)
 			throw new PersistenceException("Cannot save note for undexisting document " + note.getDocId());
 
-		documentDao.initialize(doc);
 		if (note.getFileVersion() == null)
 			note.setFileVersion(doc.getFileVersion());
 
-		if (note.getId() == 0L) {
-			doc.setLastNote(HTMLSanitizer.sanitizeSimpleText(note.getMessage()));
-			documentDao.store(doc);
-		}
-
 		super.store(note);
+
+		updateLastNote(doc, note);
+	}
+
+	private void updateLastNote(Document document, DocumentNote note) {
+		// In case of note on the whole document, update the document's lastNote
+		// field
+		if (note.getPage() == 0)
+			ThreadPools.get().execute(() -> {
+				try {
+					DocumentDAO dao = Context.get(DocumentDAO.class);
+					Document doc = dao.findById(note.getDocId());
+					dao.initialize(doc);
+
+					String lastNoteMessage = dao.queryForList(
+							"select ld_message from ld_note where ld_page=0 and ld_deleted=0 and ld_docid=:id order by ld_date desc",
+							Map.of("id", note.getDocId()), String.class, null).stream().findFirst()
+							.orElse(note.getMessage());
+
+					doc.setLastNote(HTMLSanitizer.sanitizeSimpleText(lastNoteMessage));
+					if (document.getIndexed() == IndexingStatus.INDEXED)
+						document.setIndexingStatus(IndexingStatus.TO_INDEX);
+					dao.store(doc);
+				} catch (PersistenceException e) {
+					log.error(e.getMessage(), e);
+				}
+				return null;
+			}, "Note");
 	}
 
 	@Override
@@ -119,6 +147,23 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	@Override
 	public List<DocumentNote> findByUserId(long userId) throws PersistenceException {
 		return findByWhere(ENTITY + ".userId =" + userId, ENTITY + ".date desc", null);
+	}
+
+	@Override
+	public void delete(long id, int code) throws PersistenceException {
+		DocumentNote note = findById(id);
+		if (note != null) {
+			super.delete(id, code);
+			DocumentDAO documentDao = Context.get(DocumentDAO.class);
+			Document document = documentDao.findById(note.getDocId());
+			if (document != null && document.getIndexed() == IndexingStatus.INDEXED) {
+				// Mark to index
+				documentDao.initialize(document);
+				document.setIndexingStatus(IndexingStatus.TO_INDEX);
+				documentDao.store(document);
+				updateLastNote(document, note);
+			}
+		}
 	}
 
 	@Override

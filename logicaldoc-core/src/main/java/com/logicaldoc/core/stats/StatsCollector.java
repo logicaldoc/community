@@ -61,16 +61,16 @@ public class StatsCollector extends Task {
 	@Resource(name = "folderDAO")
 	private FolderDAO folderDAO;
 
-	@Resource(name = "GroupDAO")
+	@Resource(name = "groupDAO")
 	private GroupDAO groupDAO;
 
-	@Resource(name = "GenericDAO")
+	@Resource(name = "genericDAO")
 	protected GenericDAO genericDAO;
 
-	@Resource(name = "TenantDAO")
+	@Resource(name = "tenantDAO")
 	protected TenantDAO tenantDAO;
 
-	@Resource(name = "SequenceDAO")
+	@Resource(name = "sequenceDAO")
 	private SequenceDAO sequenceDAO;
 
 	private static String userno = "community";

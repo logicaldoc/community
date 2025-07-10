@@ -8,10 +8,13 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.history.HibernateHistoryDAO;
 import com.logicaldoc.util.sql.SqlUtil;
+
+import jakarta.transaction.Transactional;
 
 /**
  * Hibernate implementation of <code>FolderHistoryDAO</code>
@@ -19,6 +22,8 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
+@Repository("folderHistoryDAO")
+@Transactional
 public class HibernateFolderHistoryDAO extends HibernateHistoryDAO<FolderHistory> implements FolderHistoryDAO {
 
 	private static final String AND = " and ";

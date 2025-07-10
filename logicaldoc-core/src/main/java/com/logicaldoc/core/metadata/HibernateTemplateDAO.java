@@ -8,9 +8,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -30,11 +32,13 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
+@Repository("templateDAO")
+@Transactional
 public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template> implements TemplateDAO {
 
 	private static final String TENANT_ID_EQUAL = ".tenantId=";
 
-	@Resource(name = "UserDAO")
+	@Resource(name = "userDAO")
 	protected UserDAO userDAO;
 
 	public HibernateTemplateDAO() {

@@ -24,5 +24,5 @@
 		</property>
 	</bean>
 
-	<bean id="ResourceConfig" class="com.logicaldoc.webdav.resource.ResourceConfig" />
+	<bean id="ResourceConfiguration" class="com.logicaldoc.webdav.resource.ResourceConfiguration" />
 </beans>

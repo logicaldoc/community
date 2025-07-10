@@ -23,13 +23,12 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.Resource;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -55,12 +54,17 @@ import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.sql.SqlUtil;
 
+import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
+
 /**
  * Hibernate implementation of <code>DocumentDAO</code>
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
+@Repository("documentDAO")
+@Transactional
 public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document> implements DocumentDAO {
 	private static final String TRANSACTION_CANNOT_BE_NULL = "transaction cannot be null";
 
@@ -70,28 +74,28 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	private static final String STATUS = ".status=";
 
-	@Resource(name = "DocumentHistoryDAO")
+	@Resource(name = "documentHistoryDAO")
 	private DocumentHistoryDAO documentHistoryDAO;
 
-	@Resource(name = "VersionDAO")
+	@Resource(name = "versionDAO")
 	private VersionDAO versionDAO;
 
-	@Resource(name = "TenantDAO")
+	@Resource(name = "tenantDAO")
 	private TenantDAO tenantDAO;
 
-	@Resource(name = "DocumentNoteDAO")
+	@Resource(name = "documentNoteDAO")
 	private DocumentNoteDAO noteDAO;
 
 	@Resource(name = "folderDAO")
 	private FolderDAO folderDAO;
 
-	@Resource(name = "UserDAO")
+	@Resource(name = "userDAO")
 	private UserDAO userDAO;
 
-	@Resource(name = "GroupDAO")
+	@Resource(name = "groupDAO")
 	private GroupDAO groupDAO;
 
-	@Resource(name = "DocumentLinkDAO")
+	@Resource(name = "documentLinkDAO")
 	private DocumentLinkDAO linkDAO;
 
 	@Resource(name = "documentListenerManager")

@@ -16,6 +16,7 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -35,6 +36,7 @@ import com.logicaldoc.util.security.PasswordCriteria;
 import com.logicaldoc.util.security.PasswordValidator;
 
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 
 /**
  * Hibernate implementation of <code>UserDAO</code>
@@ -42,6 +44,8 @@ import jakarta.annotation.Resource;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
+@Repository("userDAO")
+@Transactional
 public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> implements UserDAO {
 
 	private static final String ADMIN = "admin";
@@ -50,13 +54,13 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	private static final String USERNAME = "username";
 
-	@Resource(name = "GenericDAO")
+	@Resource(name = "genericDAO")
 	private GenericDAO genericDAO;
 
-	@Resource(name = "UserHistoryDAO")
+	@Resource(name = "userHistoryDAO")
 	private UserHistoryDAO userHistoryDAO;
 
-	@Resource(name = "PasswordHistoryDAO")
+	@Resource(name = "passwordHistoryDAO")
 	private PasswordHistoryDAO passwordHistoryDAO;
 
 	@Resource(name = "userListenerManager")

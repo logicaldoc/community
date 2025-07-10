@@ -26,7 +26,7 @@
     <context:annotation-config />
 
 	<import resource="classpath*:context-security.xml" />
-	<import resource="classpath*:context/context-*.xml" />
+	<!--<import resource="classpath*:context/context-*.xml" />-->
 
 	<!-- This post processor ensures placeholders substitutions -->
 	<bean id="PropertyPlaceholderConfigurer" class="com.logicaldoc.util.spring.PropertiesPlaceHolder">
@@ -43,7 +43,7 @@
 	<bean id="Context" class="com.logicaldoc.util.Context" factory-method="get" lazy-init="false" />
 
 	<!-- Connection Pool implementations -->
-	<bean id="DbcpConfig" class="com.logicaldoc.core.util.DbcpConfig">
+	<bean id="DbcpConfig" class="com.logicaldoc.core.util.DbcpConfiguration">
 		<property name="driverClassName" value="${jdbc.driver}" />
 		<property name="url" value="${jdbc.url}" />
 		<property name="username" value="${jdbc.username}" />

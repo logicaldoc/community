@@ -3,8 +3,6 @@ package com.logicaldoc.webdav.resource;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavMethods;
@@ -19,6 +17,8 @@ import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.resource.service.ResourceService;
 import com.logicaldoc.webdav.session.WebdavSession;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 /**
  * For more informations, please visit
  * {@link org.apache.jackrabbit.webdav.simple.ResourceFactoryImpl}
@@ -32,18 +32,17 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 
 	private static final Pattern versionRequestPattern = Pattern.compile("/vstore/(\\d.\\d)/(.*)");
 
-	private final ResourceConfig resourceConfig;
+	private final ResourceConfiguration resourceConfig;
 
 	private ResourceService resourceService;
 
 	public DavResourceFactoryImpl() {
-		this.resourceConfig = (ResourceConfig) Context.get("resourceConfig");
+		this.resourceConfig = Context.get(ResourceConfiguration.class);
 		this.resourceService = (ResourceService) Context.get("ResourceService");
 	}
 
-	public DavResourceFactoryImpl(ResourceConfig resourceConfig) {
-		this.resourceConfig = (resourceConfig != null) ? resourceConfig
-				: (ResourceConfig) Context.get("resourceConfig");
+	public DavResourceFactoryImpl(ResourceConfiguration resourceConfig) {
+		this.resourceConfig = (resourceConfig != null) ? resourceConfig : Context.get(ResourceConfiguration.class);
 		this.resourceService = (ResourceService) Context.get("ResourceService");
 	}
 

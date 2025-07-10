@@ -29,8 +29,8 @@ import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.CollectionUtils;
 
 import com.logicaldoc.util.Context;
@@ -162,7 +162,7 @@ public abstract class AbstractTestCase {
 	 * @return the ApplicationContext
 	 */
 	protected ApplicationContext buildApplicationContext() {
-		return new ClassPathXmlApplicationContext("/context.xml");
+		return new AnnotationConfigApplicationContext(TestContext.class);
 	}
 
 	/**

@@ -30,7 +30,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 
 	private static final Logger log = LoggerFactory.getLogger(DefaultAuthenticator.class);
 
-	@Resource(name = "UserDAO")
+	@Resource(name = "userDAO")
 	protected UserDAO userDAO;
 
 	@Override

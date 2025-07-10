@@ -6,11 +6,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.SystemInfo;
 
+import jakarta.transaction.Transactional;
+
+@Repository("sessionDAO")
+@Transactional
 public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> implements SessionDAO {
 
 	private static final String AND = " and ";

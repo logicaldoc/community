@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -15,12 +16,16 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.util.Context;
 
+import jakarta.transaction.Transactional;
+
 /**
  * Hibernate implementation of <code>RatingDAO</code>
  * 
  * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
+@Repository("ratingDAO")
+@Transactional
 @SuppressWarnings("unchecked")
 public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> implements RatingDAO {
 

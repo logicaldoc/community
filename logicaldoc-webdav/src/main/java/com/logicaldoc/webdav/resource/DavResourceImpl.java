@@ -91,7 +91,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 	private boolean isCollection = true;
 
-	protected transient ResourceConfig config;
+	protected transient ResourceConfiguration config;
 
 	private long modificationTime = System.currentTimeMillis();
 
@@ -100,7 +100,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 	private transient List<DavResource> list = null;
 
 	public DavResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
-			ResourceConfig config, Resource resource) {
+			ResourceConfiguration config, Resource resource) {
 
 		this.locator = locator;
 		this.resource = resource;
@@ -126,7 +126,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 * @throws DavException error in the DAV communication
 	 */
 	public DavResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
-			ResourceConfig config) throws DavException {
+			ResourceConfiguration config) throws DavException {
 
 		this.factory = factory;
 		this.locator = locator;
@@ -147,7 +147,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 * @throws DavException error in the DAV communication
 	 */
 	public DavResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
-			ResourceConfig config, boolean isCollection) throws DavException {
+			ResourceConfiguration config, boolean isCollection) throws DavException {
 		this(locator, factory, session, config);
 		this.isCollection = isCollection;
 		resourceService = (ResourceService) Context.get(RESOURCE_SERVICE);
@@ -243,7 +243,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 * <code>IOException</code> is thrown.
 	 * 
 	 * @see DavResource#spool(OutputContext)
-	 * @see ResourceConfig#getIOManager()
+	 * @see ResourceConfiguration#getIOManager()
 	 *
 	 * @throws IOException if the export fails
 	 */

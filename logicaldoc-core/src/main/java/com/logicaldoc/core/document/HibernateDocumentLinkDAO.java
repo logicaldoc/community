@@ -6,9 +6,12 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
+
+import jakarta.transaction.Transactional;
 
 /**
  * Hibernate implementation of <code>DocumentLinkDAO</code>
@@ -16,6 +19,8 @@ import com.logicaldoc.core.PersistenceException;
  * @author Matteo Caruso - LogicalDOC
  * @since 4.0
  */
+@Repository("documentLinkDAO")
+@Transactional
 public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<DocumentLink> implements DocumentLinkDAO {
 	public HibernateDocumentLinkDAO() {
 		super(DocumentLink.class);

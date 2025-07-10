@@ -40,19 +40,19 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 	protected transient SupportedReportSetProperty supportedReports = new SupportedReportSetProperty();
 
 	public DeltaVResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
-			ResourceConfig config, Resource resource) throws DavException {
+			ResourceConfiguration config, Resource resource) throws DavException {
 		super(locator, factory, session, config, resource);
 		initSupportedReports();
 	}
 
 	public DeltaVResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
-			ResourceConfig config) throws DavException {
+			ResourceConfiguration config) throws DavException {
 		super(locator, factory, session, config);
 		initSupportedReports();
 	}
 
 	public DeltaVResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
-			ResourceConfig config, boolean isCollection) throws DavException {
+			ResourceConfiguration config, boolean isCollection) throws DavException {
 		super(locator, factory, session, config, isCollection);
 		initSupportedReports();
 	}

@@ -25,17 +25,15 @@
             http://cxf.apache.org/schemas/jaxrs.xsd">
     <import resource="classpath:META-INF/cxf/cxf.xml" />
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+    
+    <tx:annotation-driven transaction-manager="TransactionManager"/>
+    
+    <context:component-scan base-package="com.logicaldoc.webservice"/>
      
     <!-- This allows to access the current Message in the MessageContext of CXF -->
     <bean id="currentMessage" class="org.apache.cxf.phase.PhaseInterceptorChain" factory-method="getCurrentMessage" scope="request">
 		<aop:scoped-proxy/>
     </bean>
-    
-    <bean id="WebserviceCallDAO" parent="ApplicationBaseTransactionProxy">
-      <property name="target">
-         <bean class="com.logicaldoc.webservice.HibernateWebserviceCallDAO" />
-      </property>
-    </bean>  
     
     <bean id="GZIPInInterceptor" class="org.apache.cxf.transport.common.gzip.GZIPInInterceptor" />
     <bean id="GZIPOutInterceptor" class="com.logicaldoc.webservice.ThresholdGZIPOutInterceptor">

@@ -180,7 +180,7 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 			MessagingException, PermissionException {
 		WSDocument wsDoc = createDocument();
 
-		DocumentHistoryDAO hDao = (DocumentHistoryDAO) context.getBean("DocumentHistoryDAO");
+		DocumentHistoryDAO hDao = Context.get(DocumentHistoryDAO.class);
 		long sentCount = hDao.findByDocId(wsDoc.getId()).stream()
 				.filter(h -> DocumentEvent.SENT.toString().equals(h.getEvent())).count();
 		assertEquals(0L, sentCount);

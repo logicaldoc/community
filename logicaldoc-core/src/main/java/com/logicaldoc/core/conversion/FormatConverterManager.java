@@ -61,7 +61,7 @@ public class FormatConverterManager {
 	@Resource(name = "Store")
 	protected Store store;
 
-	@Resource(name = "TenantDAO")
+	@Resource(name = "tenantDAO")
 	protected TenantDAO tenantDao;
 
 	@Resource(name = "documentManager")

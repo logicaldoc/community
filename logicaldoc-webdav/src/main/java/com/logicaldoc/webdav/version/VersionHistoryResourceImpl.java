@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.webdav.resource.DavResourceFactory;
 import com.logicaldoc.webdav.resource.DeltaVResourceImpl;
-import com.logicaldoc.webdav.resource.ResourceConfig;
+import com.logicaldoc.webdav.resource.ResourceConfiguration;
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.session.WebdavSession;
 
@@ -42,7 +42,7 @@ public class VersionHistoryResourceImpl extends DeltaVResourceImpl implements Ve
 	private static final long serialVersionUID = 1L;
 
 	public VersionHistoryResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
-			ResourceConfig config, Resource resource) throws DavException {
+			ResourceConfiguration config, Resource resource) throws DavException {
 		super(locator, factory, session, config, resource);
 	}
 

@@ -17,9 +17,10 @@
             http://www.springframework.org/schema/aop/spring-aop.xsd
             http://www.springframework.org/schema/security
             http://www.springframework.org/schema/security/spring-security.xsd">
-    <import resource="classpath*:context/context-core.xml" />
     
     <context:annotation-config />
+    
+    <tx:annotation-driven transaction-manager="TransactionManager" />
     
     <!-- This post processor ensures placeholders substitutions -->
 	<bean id="PropertyPlaceholderConfigurer"

@@ -70,6 +70,12 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 
+/**
+ * Test case for {@link LDRepository}
+ * 
+ * @author Giuseppe Desiato - LogicalDOC
+ * @since 9.0
+ */
 public class LDRepositoryTest extends AbstractCmisTestCase {
 
 	private static final Logger log = LoggerFactory.getLogger(LDRepositoryTest.class);
@@ -111,68 +117,6 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 	@Override
 	protected List<String> getPluginArchives() {
 		return List.of("/logicaldoc-core-plugin.jar");
-	}
-
-	private void addHits() throws Exception {
-
-		Document document = new Document();
-		document.setId(1L);
-		document.setFileName("test.doc");
-		document.setLanguage("en");
-		document.setDate(new Date());
-		Folder fold = new Folder();
-		fold.setId(5);
-		fold.setName("root");
-		document.setFolder(fold);
-		ddao.initialize(document);
-		engine.addHit(document, "Questo � un documento di prova. Per fortuna che esistono i test. document");
-
-		// Adding unexisting document 111
-		document = new Document();
-		document.setId(2L);
-		document.setFileName("test.doc");
-		document.setTemplateId(0L);
-		document.setLanguage("en");
-		document.setDate(new Date());
-		document.setFolder(fold);
-		ddao.initialize(document);
-		engine.addHit(document,
-				"This is another test documents just for test insertion.Solr is an enterprise-ready, Lucene-based search server that supports faceted ... This is useful for retrieving and highlighting the documents contents for display but is not .... hl, When hl=true , highlight snippets in the query response.");
-
-		document = new Document();
-		document.setId(3L);
-		document.setFileName("test.doc");
-		document.setLanguage("en");
-		document.setDate(new Date());
-		document.setFolder(fold);
-		ddao.initialize(document);
-		engine.addHit(document, "Another document");
-
-		document = new Document();
-		document.setId(4L);
-		document.setFileName("test.doc");
-		document.setLanguage("en");
-		document.setDate(new Date());
-		document.setFolder(fold);
-		ddao.initialize(document);
-		engine.addHit(document,
-				"Lorem ipsum dolor sit amet, consectetur 5568299afbX0 ZKBKCHZZ80A CH8900761016116097873 adipisicing elit");
-
-		document = new Document();
-		document.setId(5L);
-		document.setFileName("flexspaces.xlsx");
-		document.setLanguage("en");
-		document.setDate(new Date());
-		Folder fold04 = new Folder();
-		fold04.setId(4);
-		fold04.setName("Default");
-		document.setFolder(fold04);
-		document.addTag("Google");
-		document.addTag("document");
-		document.addTag("numbered");
-		ddao.initialize(document);
-		engine.addHit(document,
-				"12, 81390264001300, FLEXSPACE NO 1 LLP, T/A FLEXSPACE, UNIT 13 EVANS BUSINESS CENTRE, VINCENT CAREY ROAD, ROTHERWAS INDUSTRIAL ESTATE, HEREFORD, HR2");
 	}
 
 	@Test
@@ -374,7 +318,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 	@Test
 	public void testGetAllVersions() throws PersistenceException {
-		VersionDAO vd = (VersionDAO) context.getBean("VersionDAO");
+		VersionDAO vd = Context.get(VersionDAO.class);
 		List<Version> versions = vd.findByDocId(1L);
 		assertEquals(2, versions.size());
 
@@ -386,7 +330,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 	public void testGetContentChanges() throws PersistenceException, ParseException {
 		Document document = ddao.findById(1L);
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		DocumentHistoryDAO dao = (DocumentHistoryDAO) context.getBean("DocumentHistoryDAO");
+		DocumentHistoryDAO dao = Context.get(DocumentHistoryDAO.class);
 		DocumentHistory hist = new DocumentHistory();
 		hist.setEvent(DocumentEvent.STORED);
 		hist.setDate(df.parse("2019-15-12"));
@@ -410,7 +354,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		dao.store(hist);
 
 		Folder folder = fdao.findById(4L);
-		FolderHistoryDAO folderHistoryDao = (FolderHistoryDAO) context.getBean("FolderHistoryDAO");
+		FolderHistoryDAO folderHistoryDao = Context.get(FolderHistoryDAO.class);
 		FolderHistory folderHistory = new FolderHistory();
 		folderHistory.setEvent(FolderEvent.CREATED);
 		folderHistory.setDate(df.parse("2018-15-12"));
@@ -833,4 +777,65 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 	}
 
+	private void addHits() throws Exception {
+
+		Document document = new Document();
+		document.setId(1L);
+		document.setFileName("test.doc");
+		document.setLanguage("en");
+		document.setDate(new Date());
+		Folder fold = new Folder();
+		fold.setId(5);
+		fold.setName("root");
+		document.setFolder(fold);
+		ddao.initialize(document);
+		engine.addHit(document, "Questo � un documento di prova. Per fortuna che esistono i test. document");
+
+		// Adding unexisting document 111
+		document = new Document();
+		document.setId(2L);
+		document.setFileName("test.doc");
+		document.setTemplateId(0L);
+		document.setLanguage("en");
+		document.setDate(new Date());
+		document.setFolder(fold);
+		ddao.initialize(document);
+		engine.addHit(document,
+				"This is another test documents just for test insertion.Solr is an enterprise-ready, Lucene-based search server that supports faceted ... This is useful for retrieving and highlighting the documents contents for display but is not .... hl, When hl=true , highlight snippets in the query response.");
+
+		document = new Document();
+		document.setId(3L);
+		document.setFileName("test.doc");
+		document.setLanguage("en");
+		document.setDate(new Date());
+		document.setFolder(fold);
+		ddao.initialize(document);
+		engine.addHit(document, "Another document");
+
+		document = new Document();
+		document.setId(4L);
+		document.setFileName("test.doc");
+		document.setLanguage("en");
+		document.setDate(new Date());
+		document.setFolder(fold);
+		ddao.initialize(document);
+		engine.addHit(document,
+				"Lorem ipsum dolor sit amet, consectetur 5568299afbX0 ZKBKCHZZ80A CH8900761016116097873 adipisicing elit");
+
+		document = new Document();
+		document.setId(5L);
+		document.setFileName("flexspaces.xlsx");
+		document.setLanguage("en");
+		document.setDate(new Date());
+		Folder fold04 = new Folder();
+		fold04.setId(4);
+		fold04.setName("Default");
+		document.setFolder(fold04);
+		document.addTag("Google");
+		document.addTag("document");
+		document.addTag("numbered");
+		ddao.initialize(document);
+		engine.addHit(document,
+				"12, 81390264001300, FLEXSPACE NO 1 LLP, T/A FLEXSPACE, UNIT 13 EVANS BUSINESS CENTRE, VINCENT CAREY ROAD, ROTHERWAS INDUSTRIAL ESTATE, HEREFORD, HR2");
+	}
 }

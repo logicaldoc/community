@@ -5,9 +5,11 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.transaction.Transactional;
 import jakarta.xml.bind.DatatypeConverter;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -19,6 +21,8 @@ import com.logicaldoc.util.crypt.CryptUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.9.4
  */
+@Repository("apiKeyDAO")
+@Transactional
 public class HibernateApiKeyDAO extends HibernatePersistentObjectDAO<ApiKey> implements ApiKeyDAO {
 
 	private HibernateApiKeyDAO() {

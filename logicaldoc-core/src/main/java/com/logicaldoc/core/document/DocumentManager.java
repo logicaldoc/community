@@ -21,8 +21,6 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.Resource;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -70,6 +68,8 @@ import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.time.TimeDiff;
 import com.logicaldoc.util.time.TimeDiff.TimeField;
 
+import jakarta.annotation.Resource;
+
 /**
  * Basic Implementation of <code>DocumentManager</code>
  * 
@@ -94,28 +94,28 @@ public class DocumentManager {
 	@Resource(name = "documentDAO")
 	protected DocumentDAO documentDAO;
 
-	@Resource(name = "DocumentLinkDAO")
+	@Resource(name = "documentLinkDAO")
 	protected DocumentLinkDAO documentLinkDAO;
 
-	@Resource(name = "DocumentNoteDAO")
+	@Resource(name = "documentNoteDAO")
 	protected DocumentNoteDAO documentNoteDAO;
 
 	@Resource(name = "folderDAO")
 	protected FolderDAO folderDAO;
 
-	@Resource(name = "TemplateDAO")
+	@Resource(name = "templateDAO")
 	protected TemplateDAO templateDAO;
 
 	@Resource(name = "documentListenerManager")
 	protected DocumentListenerManager listenerManager;
 
-	@Resource(name = "VersionDAO")
+	@Resource(name = "versionDAO")
 	protected VersionDAO versionDAO;
 
-	@Resource(name = "UserDAO")
+	@Resource(name = "userDAO")
 	protected UserDAO userDAO;
 
-	@Resource(name = "TicketDAO")
+	@Resource(name = "ticketDAO")
 	protected TicketDAO ticketDAO;
 
 	@Resource(name = "SearchEngine")
@@ -642,7 +642,7 @@ public class DocumentManager {
 			transaction.setComment(HTMLSanitizer.sanitize(StringUtils.abbreviate(cont, 100)));
 			transaction.setReason(Integer.toString(currentIndexed));
 			transaction.setDocument(doc);
-			
+
 		}
 		DocumentHistoryDAO hDao = Context.get(DocumentHistoryDAO.class);
 		hDao.store(transaction);
@@ -1479,11 +1479,10 @@ public class DocumentManager {
 	 * <li>the document must be taken into consideration by the indexer (status
 	 * = {@link IndexingStatus#TO_INDEX} .</li>
 	 * <li>the document must be taken into consideration by the indexer for the
-	 * metadata only(status =
-	 * {@link IndexingStatus#TO_INDEX_METADATA}.</li>
+	 * metadata only(status = {@link IndexingStatus#TO_INDEX_METADATA}.</li>
 	 * <li>the document must not be taken into consideration by the indexer
-	 * (status = {@link IndexingStatus#SKIP}). If the document was
-	 * previously indexed it is removed from the index.</li>
+	 * (status = {@link IndexingStatus#SKIP}). If the document was previously
+	 * indexed it is removed from the index.</li>
 	 * </ol>
 	 * 
 	 * Status:

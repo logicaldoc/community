@@ -30,7 +30,7 @@ public class LockManager {
 
 	protected Logger log = LoggerFactory.getLogger(LockManager.class);
 
-	@Resource(name = "GenericDAO")
+	@Resource(name = "genericDAO")
 	protected GenericDAO genericDao;
 
 	@Resource(name = "ContextProperties")

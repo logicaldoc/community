@@ -6,9 +6,12 @@ import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
+
+import jakarta.transaction.Transactional;
 
 /**
  * Hibernate implementation of <code>DashletDAO</code>
@@ -16,6 +19,8 @@ import com.logicaldoc.core.PersistenceException;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.2.3
  */
+@Repository("dashletDAO")
+@Transactional
 public class HibernateDashletDAO extends HibernatePersistentObjectDAO<Dashlet> implements DashletDAO {
 
 	protected HibernateDashletDAO() {

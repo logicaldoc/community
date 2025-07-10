@@ -3,9 +3,12 @@ package com.logicaldoc.core.document;
 import java.util.List;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
+
+import jakarta.transaction.Transactional;
 
 /**
  * Hibernate implementation of <code>BookmarkDAO</code>
@@ -13,6 +16,8 @@ import com.logicaldoc.core.PersistenceException;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
+@Repository("bookmarkDAO")
+@Transactional
 public class HibernateBookmarkDAO extends HibernatePersistentObjectDAO<Bookmark> implements BookmarkDAO {
 
 	private static final String AND = " and ";

@@ -20,7 +20,7 @@
    
     <context:annotation-config />
 
-    <import resource="classpath*:context/context-core.xml" />    
+    <tx:annotation-driven transaction-manager="TransactionManager" />
     
     <!-- This post processor ensures placeholders substitutions -->
 	<bean id="PropertyPlaceholderConfigurer"

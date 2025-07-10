@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.logicaldoc.core.PersistenceException;
@@ -92,11 +90,6 @@ public abstract class AbstractWebdavTestCase extends AbstractTestCase {
 		file5.getParentFile().mkdirs();
 		FileUtil.copyResource("pdf2.pdf", file5);
 		FileUtil.copyResource("pdf2.pdf", new File(repositoryDir.getPath() + "/docs/5/doc/1.0-conversion.pdf"));
-	}
-
-	@Override
-	protected ApplicationContext buildApplicationContext() {
-		return new ClassPathXmlApplicationContext(new String[] { "/context.xml" });
 	}
 
 	@Override

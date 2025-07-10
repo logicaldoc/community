@@ -62,13 +62,13 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	@Resource(name = "authenticationChain")
 	protected transient AuthenticationChain authenticationChain;
 
-	@Resource(name = "SessionDAO")
+	@Resource(name = "sessionDAO")
 	protected transient SessionDAO sessionDao;
 
-	@Resource(name = "ApiKeyDAO")
+	@Resource(name = "apiKeyDAO")
 	protected transient ApiKeyDAO apiKeyDao;
 
-	@Resource(name = "UserDAO")
+	@Resource(name = "userDAO")
 	protected transient UserDAO userDao;
 
 	private transient SessionTimeoutWatchDog timeoutWatchDog = new SessionTimeoutWatchDog();

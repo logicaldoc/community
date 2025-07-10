@@ -59,7 +59,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 	private static final Logger log = LoggerFactory.getLogger(WebserviceInterceptor.class);
 
-	@Resource(name = "SequenceDAO")
+	@Resource(name = "sequenceDAO")
 	private SequenceDAO sequenceDAO;
 
 	@Resource(name = "ContextProperties")

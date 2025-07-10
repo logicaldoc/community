@@ -286,7 +286,7 @@ public class FolderServiceImplTest extends AbstractWebappTestCase {
 		Folder parentFolder = folderDao.findById(7L);
 		folderDao.initialize(parentFolder);
 
-		TemplateDAO templateDao = (TemplateDAO) context.getBean("TemplateDAO");
+		TemplateDAO templateDao = Context.get(TemplateDAO.class);
 		parentFolder.setTemplate(templateDao.findById(-1L));
 		parentFolder.setValue("source", "test");
 		folderDao.store(parentFolder);

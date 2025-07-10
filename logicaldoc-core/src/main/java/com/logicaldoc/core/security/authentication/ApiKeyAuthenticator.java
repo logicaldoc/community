@@ -24,7 +24,7 @@ import com.logicaldoc.core.security.user.User;
 @Component("apiKeyAuthenticator")
 public class ApiKeyAuthenticator extends DefaultAuthenticator {
 
-	@Resource(name = "ApiKeyDAO")
+	@Resource(name = "apiKeyDAO")
 	protected ApiKeyDAO apiKeyDAO;
 
 	@Override

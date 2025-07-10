@@ -8,9 +8,11 @@ import java.util.UUID;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -23,6 +25,8 @@ import com.logicaldoc.core.security.user.UserDAO;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.5.3
  */
+@Repository("deviceDAO")
+@Transactional
 public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> implements DeviceDAO {
 
 	private static final String USER_ID_EQUAL_USER_ID = ".userId = :userId";
@@ -31,7 +35,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 
 	private static final String USER_ID = "userId";
 
-	@Resource(name = "UserDAO")
+	@Resource(name = "userDAO")
 	private UserDAO userDAO;
 
 	private HibernateDeviceDAO() {

@@ -36,7 +36,6 @@ public class HibernateDocumentLinkDAOTest extends AbstractCoreTestCase {
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDocumentLinkDAO
 		testSubject = Context.get(DocumentLinkDAO.class);
-
 		docDao = Context.get(DocumentDAO.class);
 	}
 

@@ -14,7 +14,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.webdav.resource.DavResourceFactory;
 import com.logicaldoc.webdav.resource.DavResourceFactoryImpl;
-import com.logicaldoc.webdav.resource.ResourceConfig;
+import com.logicaldoc.webdav.resource.ResourceConfiguration;
 
 /**
  * For more informations, please visit
@@ -45,7 +45,7 @@ public class WebdavServlet extends AbstractWebdavServlet {
 
 	private static DavLocatorFactory locatorFactory;
 
-	private static ResourceConfig config;
+	private static ResourceConfiguration config;
 
 	@Override
 	public void init() {
@@ -75,7 +75,7 @@ public class WebdavServlet extends AbstractWebdavServlet {
 		WebdavServlet.resourcePathPrefix = resourcePathPrefix;
 	}
 
-	private static void setConfig(ResourceConfig config) {
+	private static void setConfig(ResourceConfiguration config) {
 		WebdavServlet.config = config;
 	}
 
@@ -103,10 +103,10 @@ public class WebdavServlet extends AbstractWebdavServlet {
 		return resourceFactory;
 	}
 
-	public ResourceConfig getResourceConfig() {
+	public ResourceConfiguration getResourceConfig() {
 		// fallback if no config present
 		if (config == null)
-			setConfig(Context.get(ResourceConfig.class));
+			setConfig(Context.get(ResourceConfiguration.class));
 		return config;
 	}
 

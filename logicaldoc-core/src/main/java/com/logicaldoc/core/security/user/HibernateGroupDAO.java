@@ -5,10 +5,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import jakarta.annotation.Resource;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -16,15 +16,19 @@ import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.sql.SqlUtil;
 
+import jakarta.annotation.Resource;
+
 /**
  * Hibernate implementation of {@link GroupDAO}
  * 
  * @author Alessandro Gasparini - LogicalDOC
  * @since 3.0
  */
+@Repository("groupDAO")
+@Transactional
 public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> implements GroupDAO {
 
-	@Resource(name = "MenuDAO")
+	@Resource(name = "menuDAO")
 	private MenuDAO menuDAO;
 
 	private HibernateGroupDAO() {

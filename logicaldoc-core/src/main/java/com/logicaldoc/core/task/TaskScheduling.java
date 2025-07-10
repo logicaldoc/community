@@ -119,7 +119,7 @@ public class TaskScheduling {
 	 * @throws ParseException raised if the scheduling expression is invalid
 	 */
 	public void save() throws IOException, ParseException {
-		Scheduler scheduler = (Scheduler) Context.get("Scheduler");
+		Scheduler scheduler = Context.get(Scheduler.class);
 		// Use the & prefix to get the factory and not the bean it produces
 		TaskTrigger trigger = (TaskTrigger) Context.get("&" + taskName + "Trigger");
 		String expression = getCronExpression();

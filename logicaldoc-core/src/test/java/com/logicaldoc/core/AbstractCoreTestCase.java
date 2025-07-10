@@ -27,7 +27,7 @@ import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.servlet.MockServletSession;
 
 /**
- * Abstract test case for the Core module. This class initialises a test
+ * Abstract test case for the Core module. This class initializes a test
  * database and prepares the spring test context.
  * <p>
  * All LogicalDOC's tests must extend this test case in order to find a ready
@@ -47,6 +47,7 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 	protected MockServletSession servletSession = new MockServletSession();
 
 	protected Session session;
+
 
 	@Before
 	@Override

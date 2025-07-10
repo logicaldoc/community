@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -16,12 +17,16 @@ import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.util.config.ContextProperties;
 
+import jakarta.transaction.Transactional;
+
 /**
  * Hibernate implementation of <code>TicketDAO</code>
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
+@Repository("ticketDAO")
+@Transactional
 public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> implements TicketDAO {
 
 	private DocumentDAO documentDAO;

@@ -75,7 +75,7 @@ public class StandardSearchEngine implements SearchEngine {
 	@Resource(name = "documentDAO")
 	protected DocumentDAO documentDao;
 
-	@Resource(name = "DocumentNoteDAO")
+	@Resource(name = "documentNoteDAO")
 	protected DocumentNoteDAO noteDao;
 
 	protected EmbeddedSolrServer server;

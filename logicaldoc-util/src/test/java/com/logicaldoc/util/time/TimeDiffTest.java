@@ -17,9 +17,9 @@ public class TimeDiffTest extends AbstractTestCase {
 
 	@Override
 	protected List<String> getDatabaseScripts() {
-		return List.of( "sql1.sql" );
+		return List.of("sql1.sql");
 	}
-	
+
 	@Test
 	public void testGetTimeDifference() throws ParseException {
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");

@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -22,12 +23,16 @@ import com.logicaldoc.core.security.user.UserHistoryDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.sql.SqlUtil;
 
+import jakarta.transaction.Transactional;
+
 /**
  * Hibernate implementation of <code>SystemMessageDAO</code>
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
+@Repository("systemMessageDAO")
+@Transactional
 public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<SystemMessage> implements SystemMessageDAO {
 	private static final String SELECT = "select ld_lastmodified, ld_author, ld_messagetext, ld_subject, ld_sentdate, ld_datescope, ld_prio, ld_confirmation, ld_lastnotified, ld_status, ld_trials, ld_type, ld_id, ld_html, ld_author, ld_tenantid ";
 

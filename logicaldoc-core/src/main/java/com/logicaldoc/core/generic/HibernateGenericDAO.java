@@ -7,10 +7,13 @@ import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.sql.SqlUtil;
+
+import jakarta.transaction.Transactional;
 
 /**
  * Hibernate implementation of <code>GenericDAO</code>
@@ -18,6 +21,8 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
+@Repository("genericDAO")
+@Transactional
 public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> implements GenericDAO {
 	
 	private static final String AND = " and ";

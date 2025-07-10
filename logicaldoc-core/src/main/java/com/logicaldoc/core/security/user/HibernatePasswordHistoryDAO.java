@@ -5,9 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
+
+import jakarta.transaction.Transactional;
 
 /**
  * Hibernate implementation of <code>PasswordHistoryDAO</code>
@@ -15,6 +18,8 @@ import com.logicaldoc.core.PersistenceException;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.6.1
  */
+@Repository("passwordHistoryDAO")
+@Transactional
 public class HibernatePasswordHistoryDAO extends HibernatePersistentObjectDAO<PasswordHistory>
 		implements PasswordHistoryDAO {
 

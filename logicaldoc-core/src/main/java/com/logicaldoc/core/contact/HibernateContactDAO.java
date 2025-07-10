@@ -5,10 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.generic.HibernateGenericDAO;
+
+import jakarta.transaction.Transactional;
 
 /**
  * Hibernate implementation of <code>ContactDAO</code>
@@ -16,6 +19,8 @@ import com.logicaldoc.core.generic.HibernateGenericDAO;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
+@Repository("contactDAO")
+@Transactional
 public class HibernateContactDAO extends HibernatePersistentObjectDAO<Contact> implements ContactDAO {
 
 	public HibernateContactDAO() {

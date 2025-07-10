@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
@@ -30,7 +31,7 @@ public class HibernatePasswordHistoryDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernatePasswordHistoryDAO
-		dao = (PasswordHistoryDAO) context.getBean("PasswordHistoryDAO");
+		dao = Context.get(PasswordHistoryDAO.class);
 	}
 
 	@Test

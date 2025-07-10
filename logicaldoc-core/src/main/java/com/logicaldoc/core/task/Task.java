@@ -79,7 +79,7 @@ public abstract class Task implements Runnable {
 	@Resource(name = "EMailSender")
 	protected EMailSender sender = null;
 
-	@Resource(name = "UserDAO")
+	@Resource(name = "userDAO")
 	protected UserDAO userDao = null;
 
 	@Resource(name = "lockManager")

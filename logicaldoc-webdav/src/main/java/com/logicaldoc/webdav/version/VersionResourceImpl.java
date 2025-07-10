@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.webdav.resource.DavResourceFactory;
 import com.logicaldoc.webdav.resource.DeltaVResourceImpl;
-import com.logicaldoc.webdav.resource.ResourceConfig;
+import com.logicaldoc.webdav.resource.ResourceConfiguration;
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.session.WebdavSession;
 
@@ -49,7 +49,7 @@ public class VersionResourceImpl extends DeltaVResourceImpl implements VersionRe
 	private static final Logger log = LoggerFactory.getLogger(VersionResourceImpl.class);
 
 	public VersionResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
-			ResourceConfig config, Resource item) throws DavException {
+			ResourceConfiguration config, Resource item) throws DavException {
 		super(locator, factory, session, config, item);
 
 	}

@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.Context;
@@ -28,6 +28,11 @@ import com.logicaldoc.util.plugin.PluginException;
 public abstract class AbstractCmisTestCase extends AbstractTestCase {
 
 	@Override
+	protected ApplicationContext buildApplicationContext() {
+		return new AnnotationConfigApplicationContext(CmisTestContext.class);
+	}
+
+	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
@@ -46,11 +51,6 @@ public abstract class AbstractCmisTestCase extends AbstractTestCase {
 		store.init();
 
 		ResourceUtil.copyResource("data.sql", new File(storeRoot, "5/doc/1.0"));
-	}
-
-	@Override
-	protected ApplicationContext buildApplicationContext() {
-		return new ClassPathXmlApplicationContext(new String[] { "/contexttest.xml" });
 	}
 
 	@Override

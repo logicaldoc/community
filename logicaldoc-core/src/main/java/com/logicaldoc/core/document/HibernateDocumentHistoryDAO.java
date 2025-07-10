@@ -8,10 +8,13 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.history.HibernateHistoryDAO;
 import com.logicaldoc.util.sql.SqlUtil;
+
+import jakarta.transaction.Transactional;
 
 /**
  * Hibernate implementation of <code>HistoryDAO</code>
@@ -19,6 +22,8 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Alessandro Gasparini - LogicalDOC
  * @since 3.0
  */
+@Repository("documentHistoryDAO")
+@Transactional
 public class HibernateDocumentHistoryDAO extends HibernateHistoryDAO<DocumentHistory> implements DocumentHistoryDAO {
 
 	private static final String DATE_ASC = ".date asc";

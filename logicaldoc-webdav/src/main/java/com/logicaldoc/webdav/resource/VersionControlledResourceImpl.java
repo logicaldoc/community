@@ -43,7 +43,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	private static final Logger log = LoggerFactory.getLogger(VersionControlledResourceImpl.class);
 
 	public VersionControlledResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
-			ResourceConfig config, Resource resource) throws DavException {
+			ResourceConfiguration config, Resource resource) throws DavException {
 		super(locator, factory, session, config, resource);
 		initSupportedReports();
 	}
@@ -60,7 +60,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 *         communication
 	 */
 	public VersionControlledResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
-			ResourceConfig config) throws DavException {
+			ResourceConfiguration config) throws DavException {
 		super(locator, factory, session, config);
 		initSupportedReports();
 	}
@@ -78,7 +78,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 *         communication
 	 */
 	public VersionControlledResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
-			ResourceConfig config, boolean isCollection) throws DavException {
+			ResourceConfiguration config, boolean isCollection) throws DavException {
 		super(locator, factory, session, config, isCollection);
 		initSupportedReports();
 	}

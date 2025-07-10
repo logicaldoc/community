@@ -15,6 +15,7 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.i18n.DateBean;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
@@ -34,7 +35,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDeviceDAO
-		dao = (DeviceDAO) context.getBean("DeviceDAO");
+		dao = Context.get(DeviceDAO.class);
 	}
 
 	@Test

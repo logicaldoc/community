@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
@@ -31,7 +32,7 @@ public class HibernateSessionDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateSessionDAO
-		dao = (SessionDAO) context.getBean("SessionDAO");
+		dao = Context.get(SessionDAO.class);
 	}
 
 	@Test

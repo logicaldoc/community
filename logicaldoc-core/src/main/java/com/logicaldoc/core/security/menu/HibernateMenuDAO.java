@@ -12,9 +12,11 @@ import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -33,6 +35,8 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
+@Repository("menuDAO")
+@Transactional
 public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> implements MenuDAO {
 
 	private static final String SELECT_DISTINCT_A_LD_MENUID_FROM_LD_MENUGROUP_A_LD_MENU_B = "select distinct(A.ld_menuid) from ld_menu_acl A, ld_menu B ";
@@ -59,7 +63,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 
 	private static final String AND = " and ";
 
-	@Resource(name = "UserDAO")
+	@Resource(name = "userDAO")
 	protected UserDAO userDAO;
 
 	public HibernateMenuDAO() {

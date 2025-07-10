@@ -35,7 +35,7 @@
 	</Appenders>
 
 	<Loggers>
-		<Logger name="com.logicaldoc.util.junit.AbstractTestCase" level="fatal" />
+		<Logger name="com.logicaldoc.util.junit.AbstractTestCase" level="error" />
 		<Logger name="com.logicaldoc" level="warn" />
 		<Logger name="com.logicaldoc.core.document.DocumentManagerImpl"
 			level="info" />
@@ -48,11 +48,13 @@
 		<Logger name="org.hsqldb" level="error" />
 		<Logger name="org.apache.cxf" level="fatal" />
 
+        <Logger name="org.springframework" level="debug" />
+
 		<Logger name="com.zaxxer.hikari" level="debug" additivity="false">
 			<AppenderRef ref="hikari" />
 		</Logger>
 
-		<Root level="fatal">
+		<Root level="error">
 			<AppenderRef ref="file" />
 		</Root>
 	</Loggers>

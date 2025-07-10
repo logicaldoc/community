@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
@@ -33,7 +34,7 @@ public class HibernateTicketDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDownaloadTicketoDAO
-		dao = (TicketDAO) context.getBean("TicketDAO");
+		dao = Context.get(TicketDAO.class);
 	}
 
 	@Test

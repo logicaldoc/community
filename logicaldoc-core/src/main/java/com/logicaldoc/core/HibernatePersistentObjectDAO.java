@@ -32,6 +32,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 
 /**
  * Hibernate implementation of <code>PersistentObjectDAO</code>
@@ -42,6 +43,7 @@ import jakarta.annotation.Resource;
  * @param <T> Class of the implementation of a {@link PersistentObject} this DAO
  *        handles
  */
+@Transactional
 public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> implements PersistentObjectDAO<T> {
 
 	private static final String UPDATE = "update ";

@@ -13,12 +13,13 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.searchengine.saved.SearchDAO;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 public abstract class AbstractFulltextTestCase extends AbstractWebappTestCase {
 
 	protected SearchEngine engine;
-	
+
 	protected SearchDAO searchDao;
 
 	public AbstractFulltextTestCase() {
@@ -28,8 +29,8 @@ public abstract class AbstractFulltextTestCase extends AbstractWebappTestCase {
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		engine = (SearchEngine) context.getBean("SearchEngine");
-		searchDao = (SearchDAO) context.getBean("SearchDAO");
+		engine = Context.get(SearchEngine.class);
+		searchDao = Context.get(SearchDAO.class);
 		try {
 			addHits();
 		} catch (Exception e) {
@@ -46,19 +47,19 @@ public abstract class AbstractFulltextTestCase extends AbstractWebappTestCase {
 		DocumentDAO documentDao = (DocumentDAO) context.getBean("documentDAO");
 		Document document = documentDao.findById(1L);
 		documentDao.initialize(document);
-	
-		TemplateDAO templateDao = (TemplateDAO) context.getBean("TemplateDAO");
+
+		TemplateDAO templateDao = Context.get(TemplateDAO.class);
 		document.setTemplate(templateDao.findById(-1L));
 		document.setTemplateId(-1L);
 		document.setValue("source", "boh");
 		documentDao.store(document);
-	
+
 		engine.addHit(document, "Questo e un documento di prova. Per fortuna che esistono i test. document");
-	
+
 		Folder fold = new Folder();
 		fold.setId(Folder.DEFAULTWORKSPACEID);
 		fold.setName("test");
-	
+
 		// Adding unexisting document 111
 		document = new Document();
 		document.setId(111L);
@@ -69,7 +70,7 @@ public abstract class AbstractFulltextTestCase extends AbstractWebappTestCase {
 		document.setFolder(fold);
 		engine.addHit(document,
 				"This is another test documents just for test insertion.Solr is an enterprise-ready, Lucene-based search server that supports faceted ... This is useful for retrieving and highlighting the documents contents for display but is not .... hl, When hl=true , highlight snippets in the query response. document");
-	
+
 		document = new Document();
 		document.setId(2L);
 		document.setFileName("test.doc");
@@ -77,7 +78,7 @@ public abstract class AbstractFulltextTestCase extends AbstractWebappTestCase {
 		document.setDate(new Date());
 		document.setFolder(fold);
 		engine.addHit(document, "Another document");
-	
+
 		document = new Document();
 		document.setId(3L);
 		document.setFileName("test.doc");

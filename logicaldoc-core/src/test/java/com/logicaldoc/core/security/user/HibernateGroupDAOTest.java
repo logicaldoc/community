@@ -18,6 +18,7 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.menu.MenuDAO;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
@@ -37,7 +38,7 @@ public class HibernateGroupDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateGroupDAO
-		dao = (GroupDAO) context.getBean("GroupDAO");
+		dao = Context.get(GroupDAO.class);
 	}
 
 	@Test
@@ -137,7 +138,7 @@ public class HibernateGroupDAOTest extends AbstractCoreTestCase {
 
 		dao.insert(group, 0);
 
-		MenuDAO menuDao = (MenuDAO) context.getBean("MenuDAO");
+		MenuDAO menuDao = Context.get(MenuDAO.class);
 
 		Menu menu=menuDao.findById(5L);
 		menuDao.initialize(menu);

@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.logicaldoc.core.PersistenceException;
@@ -48,6 +48,11 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 	protected Session session;
 
 	protected MockServletSession servletSession = new MockServletSession();
+
+	@Override
+	protected ApplicationContext buildApplicationContext() {
+		return new AnnotationConfigApplicationContext(WebappTestContext.class);
+	}
 
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
@@ -101,11 +106,6 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 
 			LDDeferredSecurityContext.bindServletSession(guiSession.getSid(), servletSession);
 		}
-	}
-
-	@Override
-	protected ApplicationContext buildApplicationContext() {
-		return new ClassPathXmlApplicationContext(new String[] { "/contexttest.xml" });
 	}
 
 	@Override

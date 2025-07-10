@@ -7,9 +7,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -21,14 +23,16 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5.0
  */
+@Repository("attributeSetDAO")
+@Transactional
 public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<AttributeSet> implements AttributeSetDAO {
 
 	private static final String TENANT_ID_EQUAL = ".tenantId=";
 
-	@Resource(name = "AttributeOptionDAO")
+	@Resource(name = "attributeOptionDAO")
 	protected AttributeOptionDAO optionsDao;
 
-	@Resource(name = "TemplateDAO")
+	@Resource(name = "templateDAO")
 	protected TemplateDAO templateDao;
 
 	public HibernateAttributeSetDAO() {

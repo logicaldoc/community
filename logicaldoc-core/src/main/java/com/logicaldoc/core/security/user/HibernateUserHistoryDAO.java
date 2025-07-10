@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.history.HibernateHistoryDAO;
@@ -14,6 +15,10 @@ import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 
+import jakarta.transaction.Transactional;
+
+@Repository("userHistoryDAO")
+@Transactional
 public class HibernateUserHistoryDAO extends HibernateHistoryDAO<UserHistory> implements UserHistoryDAO {
 
 	private HibernateUserHistoryDAO() {

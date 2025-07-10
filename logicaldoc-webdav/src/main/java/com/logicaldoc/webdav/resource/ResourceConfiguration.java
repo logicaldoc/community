@@ -18,11 +18,11 @@ import com.logicaldoc.webdav.io.manager.IOManager;
  * @author Sebastian Wenzky
  * 
  */
-public class ResourceConfig implements Serializable {
+public class ResourceConfiguration implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger log = LoggerFactory.getLogger(ResourceConfig.class);
+	private static final Logger log = LoggerFactory.getLogger(ResourceConfiguration.class);
 
 	private transient ItemFilter itemFilter;
 

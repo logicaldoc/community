@@ -8,8 +8,10 @@ import java.util.Map;
 import java.util.Set;
 
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
@@ -23,6 +25,8 @@ import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.config.ContextProperties;
 
+@Repository("tenantDAO")
+@Transactional
 public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> implements TenantDAO {
 
 	@Resource(name = "ContextProperties")
@@ -31,25 +35,25 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 	@Resource(name = "folderDAO")
 	private FolderDAO folderDao;
 
-	@Resource(name = "GroupDAO")
+	@Resource(name = "groupDAO")
 	private GroupDAO groupDao;
 
-	@Resource(name = "UserDAO")
+	@Resource(name = "userDAO")
 	private UserDAO userDao;
 
-	@Resource(name = "GenericDAO")
+	@Resource(name = "genericDAO")
 	private GenericDAO genericDao;
 
-	@Resource(name = "TemplateDAO")
+	@Resource(name = "templateDAO")
 	private TemplateDAO templateDao;
 
-	@Resource(name = "AttributeSetDAO")
+	@Resource(name = "attributeSetDAO")
 	private AttributeSetDAO attributeSetDao;
 
-	@Resource(name = "MessageTemplateDAO")
+	@Resource(name = "messageTemplateDAO")
 	private MessageTemplateDAO messageTemplateDao;
 
-	@Resource(name = "DashletDAO")
+	@Resource(name = "dashletDAO")
 	private DashletDAO dashletDao;
 
 	protected HibernateTenantDAO() {

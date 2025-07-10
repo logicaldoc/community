@@ -6,7 +6,7 @@ package com.logicaldoc.core.util;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.2
  */
-public class DbcpConfig {
+public class DbcpConfiguration {
 	
 	private String driverClassName;
 

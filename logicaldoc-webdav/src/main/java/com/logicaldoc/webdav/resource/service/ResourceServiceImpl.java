@@ -63,7 +63,7 @@ public class ResourceServiceImpl implements ResourceService {
 	@jakarta.annotation.Resource(name = "documentDAO")
 	private transient DocumentDAO documentDAO;
 
-	@jakarta.annotation.Resource(name = "VersionDAO")
+	@jakarta.annotation.Resource(name = "versionDAO")
 	private transient VersionDAO versionDAO;
 
 	@jakarta.annotation.Resource(name = "folderDAO")
@@ -75,7 +75,7 @@ public class ResourceServiceImpl implements ResourceService {
 	@jakarta.annotation.Resource(name = "Store")
 	private transient Store store;
 
-	@jakarta.annotation.Resource(name = "UserDAO")
+	@jakarta.annotation.Resource(name = "userDAO")
 	private transient UserDAO userDAO;
 
 	private static WebdavCache wdc = WebdavCache.getInstance();

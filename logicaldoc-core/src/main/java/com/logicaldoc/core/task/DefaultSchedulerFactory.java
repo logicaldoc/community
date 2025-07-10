@@ -71,6 +71,8 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 
 		List<Trigger> triggers = new ArrayList<>();
 
+		// Access the applicationContext directly because at this time the
+		// Context is not initialized yet
 		TaskManager manager = (TaskManager) applicationContext.getBean("taskManager");
 		Collection<Task> tasks = manager.getTasks(applicationContext);
 		for (Task task : tasks) {

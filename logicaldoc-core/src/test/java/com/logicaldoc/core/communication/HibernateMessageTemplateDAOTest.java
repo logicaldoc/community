@@ -16,6 +16,7 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.automation.AutomationException;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
 
 /**
@@ -34,7 +35,7 @@ public class HibernateMessageTemplateDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context.
 		// Make sure that it is an HibernateMessageTemplateDAO
-		dao = (MessageTemplateDAO) context.getBean("MessageTemplateDAO");
+		dao = Context.get(MessageTemplateDAO.class);
 	}
 
 	@Test

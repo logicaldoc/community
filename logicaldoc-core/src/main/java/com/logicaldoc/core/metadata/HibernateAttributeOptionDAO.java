@@ -8,11 +8,14 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.util.sql.SqlUtil;
+
+import jakarta.transaction.Transactional;
 
 /**
  * Hibernate implementation of <code>AttributeOptionDAO</code>
@@ -20,6 +23,8 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.1
  */
+@Repository("attributeOptionDAO")
+@Transactional
 public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<AttributeOption>
 		implements AttributeOptionDAO {
 

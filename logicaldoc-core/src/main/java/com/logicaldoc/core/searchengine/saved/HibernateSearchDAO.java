@@ -6,9 +6,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
+
+import jakarta.transaction.Transactional;
 
 /**
  * Hibernate implementation of {@link SearchDAO}
@@ -16,6 +19,8 @@ import com.logicaldoc.core.PersistenceException;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.6.1
  */
+@Repository("searchDAO")
+@Transactional
 public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch> implements SearchDAO {
 
 	private static final String USERID = "userId";
