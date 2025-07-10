@@ -245,7 +245,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		// exact ticket ID
 		assertEquals("http://server:port/download-ticket?ticketId=" + ticket.get(0), ticket.get(1));
 
-		TicketDAO tDao = (TicketDAO) context.getBean("TicketDAO");
+		TicketDAO tDao = (TicketDAO) context.getBean(TicketDAO.class);
 		Ticket t = tDao.findByTicketId(ticket.get(0));
 		assertNotNull(t);
 		assertEquals(5L, t.getDocId());
@@ -257,7 +257,7 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 
 		// We do not have a HTTP request so expect that the first string is the
 		// exact ticket ID
-		TicketDAO tDao = (TicketDAO) context.getBean("TicketDAO");
+		TicketDAO tDao = (TicketDAO) context.getBean(TicketDAO.class);
 		Ticket t = tDao.findByTicketId(ticket.get(0));
 		assertNotNull(t);
 		assertEquals(5L, t.getDocId());
@@ -349,17 +349,17 @@ public class DocumentServiceImplTest extends AbstractWebappTestCase {
 		testSubject.checkinContent(7, "checkedin contents");
 
 		// try to work on an alias
-		Document alias=new Document();
+		Document alias = new Document();
 		alias.setFileName("alias.txt");
 		alias.setDocRef(7L);
 		alias.setFolder(folderDao.findById(5L));
-		
+
 		assertEquals("checkedin contents", testSubject.getContentAsString(7L));
-		
+
 		docDao.store(alias);
 		testSubject.checkout(List.of(alias.getId()));
 		testSubject.checkinContent(alias.getId(), "checkedin contents2");
-		
+
 		assertEquals("checkedin contents2", testSubject.getContentAsString(alias.getId()));
 	}
 
