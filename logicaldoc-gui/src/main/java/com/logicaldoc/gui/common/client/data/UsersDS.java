@@ -39,6 +39,7 @@ public class UsersDS extends DataSource {
 		DataSourceTextField organizationalUnit = new DataSourceTextField("organizationalUnit");
 		DataSourceTextField usergroup = new DataSourceTextField("usergroup");
 		DataSourceTextField groups = new DataSourceTextField("groups");
+		DataSourceTextField secondFactor = new DataSourceTextField("sfa");
 		DataSourceImageField avatar = new DataSourceImageField("avatar", I18N.message("avatar"), 16);
 		DataSourceDateField expire = new DataSourceDateField("expire");
 		DataSourceDateField lastlogin = new DataSourceDateField("lastLogin");
@@ -47,7 +48,7 @@ public class UsersDS extends DataSource {
 
 		setFields(id, username, label, enabled, name, firstName, email, phone, cell, city, company, department,
 				organizationalUnit, building, groups, usergroup, guest, lastlogin, expire, creation, avatar, timeZone,
-				source);
+				source, secondFactor);
 		setDataURL("data/users.xml?1=1" + (groupIdOrName != null ? "&groupId=" + groupIdOrName : "") + "&required="
 				+ required + "&skipdisabled=" + skipDisabled);
 		setClientOnly(true);

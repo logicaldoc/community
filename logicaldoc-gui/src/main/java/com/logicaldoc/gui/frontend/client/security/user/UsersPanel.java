@@ -50,6 +50,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class UsersPanel extends AdminPanel {
 
+	private static final String SFA = "sfa";
+
 	private static final String DEPARTMENT = "department";
 
 	private static final String BUILDING = "building";
@@ -230,6 +232,10 @@ public class UsersPanel extends AdminPanel {
 		source.setHidden(true);
 		source.setAlign(Alignment.CENTER);
 
+		ListGridField secondFactor = new ListGridField(SFA, I18N.message(SFA), 80);
+		secondFactor.setCanFilter(true);
+		secondFactor.setHidden(true);
+
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
@@ -239,7 +245,8 @@ public class UsersPanel extends AdminPanel {
 		list.setShowFilterEditor(true);
 		list.setDataSource(new UsersDS(null, true, false));
 		list.setFields(id, enabled, avatar, username, firstName, name, email, creation, lastLogin, expire, company,
-				department, building, organizationalUnit, city, phone, cell, groups, guest, timeZone, source);
+				department, building, organizationalUnit, city, phone, cell, groups, guest, timeZone, source,
+				secondFactor);
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -305,6 +312,7 @@ public class UsersPanel extends AdminPanel {
 		rec.setAttribute("organizationalUnit", user.getOrganizationalUnit());
 		rec.setAttribute(DEPARTMENT, user.getDepartment());
 		rec.setAttribute(COMPANY, user.getCompany());
+		rec.setAttribute(SFA, user.getSecondFactor() != null ? user.getSecondFactor() : "");
 		rec.setAttribute(GROUPS, user.getGroups().stream().filter(g -> g.getType() == GUIGroup.TYPE_DEFAULT)
 				.map(g -> g.getName()).collect(Collectors.joining(",")));
 

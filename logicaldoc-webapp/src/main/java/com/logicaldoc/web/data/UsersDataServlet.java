@@ -105,6 +105,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 		writer.print("<groups><![CDATA[" + user.getGroups().stream().filter(g -> g.getType() == GroupType.DEFAULT)
 				.map(Group::getName).collect(Collectors.joining(", ")) + "]]></groups>");
 		writer.print("<avatar>" + user.getId() + "</avatar>");
+		writer.print("<sfa>" +  StringUtils.defaultString(user.getSecondFactor()) + "</sfa>");
 
 		if (user.getTimeZone() != null)
 			writer.print("<timeZone><![CDATA[" + user.getTimeZone() + "]]></timeZone>");
