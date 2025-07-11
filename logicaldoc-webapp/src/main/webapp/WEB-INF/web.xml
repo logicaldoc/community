@@ -12,17 +12,16 @@
     <param-name>org.apache.chemistry.opencmis.REPOSITORY_CONFIG_FILE</param-name>
     <param-value>/cmis-repository.properties</param-value>
   </context-param>
-  <!-- Location of the XML file that defines the root application context Applied by ContextListener -->
+  
   <context-param>
     <param-name>contextConfigLocation</param-name>
-    <param-value>com.logicaldoc.web.WebappConfig</param-value>
+    <param-value>com.logicaldoc.web.WebappContext</param-value>
   </context-param>
   <context-param>
     <param-name>contextClass</param-name>
     <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
   </context-param>
-  
-  
+    
   <session-config>
     <session-timeout>30</session-timeout>
     <tracking-mode>COOKIE</tracking-mode>
