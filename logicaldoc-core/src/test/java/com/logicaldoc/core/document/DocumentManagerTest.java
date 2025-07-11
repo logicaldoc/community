@@ -45,10 +45,10 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.MockStore;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.core.ticket.Ticket;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ResourceUtil;
 import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link DocumentManager}

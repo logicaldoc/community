@@ -16,8 +16,8 @@ import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.i18n.I18N;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This servlet is responsible for stores data.

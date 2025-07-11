@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.menu.MenuDAO;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.annotation.Resource;

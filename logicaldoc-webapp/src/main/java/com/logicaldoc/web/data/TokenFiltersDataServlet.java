@@ -14,8 +14,8 @@ import org.apache.commons.lang.StringUtils;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.searchengine.analyzer.FilteredAnalyzer;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This servlet is responsible for token filters data

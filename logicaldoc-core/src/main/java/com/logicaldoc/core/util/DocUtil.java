@@ -10,7 +10,7 @@ import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Some utility methods for documents.

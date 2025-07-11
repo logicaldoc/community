@@ -28,8 +28,8 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;

@@ -16,8 +16,8 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.store.Store;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link ThumbnailManager}

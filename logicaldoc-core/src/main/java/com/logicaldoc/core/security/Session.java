@@ -25,9 +25,9 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.core.security.user.UserHistoryDAO;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;

@@ -22,9 +22,9 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This class represents a user. A user can be member of any number of groups,

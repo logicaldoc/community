@@ -34,8 +34,8 @@ import com.logicaldoc.core.security.user.UserHistoryDAO;
 import com.logicaldoc.core.sequence.Sequence;
 import com.logicaldoc.core.sequence.SequenceDAO;
 import com.logicaldoc.core.threading.ThreadPools;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Utility methods to prevent brute force attacks

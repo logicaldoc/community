@@ -25,8 +25,8 @@ import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIAttributeSet;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.csv.CSVFileReader;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.UploadServlet;
 
 /**

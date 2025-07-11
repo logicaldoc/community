@@ -29,8 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.util.GhostUtil;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Utility methods for handling images

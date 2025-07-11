@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.IOException;
 
 import com.logicaldoc.core.document.Document;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.P7M;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Converter to convert image files in PDF

@@ -23,8 +23,8 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.store.Store;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
 
 /**

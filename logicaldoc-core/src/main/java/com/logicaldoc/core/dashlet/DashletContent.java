@@ -44,9 +44,9 @@ import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.i18n.I18N;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This servlet is responsible for rendering dashlet's contents.

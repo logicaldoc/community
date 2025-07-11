@@ -20,8 +20,8 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 
 @RunWith(MockitoJUnitRunner.class)

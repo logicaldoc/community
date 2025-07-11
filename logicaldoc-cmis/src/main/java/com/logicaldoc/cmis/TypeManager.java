@@ -42,8 +42,8 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.core.metadata.Attribute;
-import com.logicaldoc.util.Context;
 
 /**
  * Type Manager.

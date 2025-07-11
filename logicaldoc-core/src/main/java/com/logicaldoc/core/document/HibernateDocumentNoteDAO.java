@@ -15,8 +15,8 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.threading.ThreadPools;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.html.HTMLSanitizer;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.transaction.Transactional;
 

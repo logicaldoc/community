@@ -33,10 +33,10 @@ import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.core.security.user.UserHistoryDAO;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.core.util.DocUtil;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Manager class used to handle format converters. For each couple

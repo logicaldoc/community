@@ -12,7 +12,7 @@ import org.apache.jackrabbit.webdav.DavServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.resource.service.ResourceService;
 import com.logicaldoc.webdav.session.WebdavSession;

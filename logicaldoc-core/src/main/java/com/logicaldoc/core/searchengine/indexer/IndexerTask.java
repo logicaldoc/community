@@ -27,9 +27,9 @@ import com.logicaldoc.core.task.TaskException;
 import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.CollectionUtil;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.concurrent.SerialFuture;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.TimeDiff;
 
 /**

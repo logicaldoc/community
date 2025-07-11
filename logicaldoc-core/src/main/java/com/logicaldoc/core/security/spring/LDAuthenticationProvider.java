@@ -29,7 +29,7 @@ import com.logicaldoc.core.security.authentication.AccountNotFoundException;
 import com.logicaldoc.core.security.authentication.OutsideWorkingTimeException;
 import com.logicaldoc.core.security.authentication.PasswordExpiredException;
 import com.logicaldoc.core.security.user.Group;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
 

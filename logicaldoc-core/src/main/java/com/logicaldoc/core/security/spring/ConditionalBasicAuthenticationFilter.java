@@ -12,7 +12,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import com.logicaldoc.core.security.SessionManager;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * An filter for the basic authentication that is enabled or not depending on a

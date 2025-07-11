@@ -26,8 +26,8 @@ import com.logicaldoc.core.security.spring.LDAuthenticationToken;
 import com.logicaldoc.core.security.spring.LDDeferredSecurityContext;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.annotation.PreDestroy;

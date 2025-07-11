@@ -22,9 +22,9 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.store.Store;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.ResourceUtil;
 import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for <code>HibernateVersionDAO</code>

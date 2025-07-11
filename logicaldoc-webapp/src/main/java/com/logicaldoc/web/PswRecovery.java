@@ -30,9 +30,9 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.security.PasswordGenerator;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This class allows the user to recover a password.

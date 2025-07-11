@@ -29,11 +29,11 @@ import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
 import com.logicaldoc.core.security.authentication.PasswordWeakException;
 import com.logicaldoc.i18n.I18N;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.security.PasswordCriteria;
 import com.logicaldoc.util.security.PasswordValidator;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;

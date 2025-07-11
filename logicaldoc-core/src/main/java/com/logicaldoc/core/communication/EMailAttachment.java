@@ -13,7 +13,7 @@ import com.logicaldoc.core.parser.Parser;
 import com.logicaldoc.core.parser.ParserFactory;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * An attachment of an email message

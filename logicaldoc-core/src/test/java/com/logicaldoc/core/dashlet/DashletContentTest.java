@@ -15,11 +15,11 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.servlet.MockServletRequest;
 import com.logicaldoc.util.servlet.MockServletResponse;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link DashletContent}

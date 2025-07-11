@@ -14,7 +14,7 @@ import com.logicaldoc.core.communication.Message;
 import com.logicaldoc.core.communication.SystemMessage;
 import com.logicaldoc.core.communication.SystemMessageDAO;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This servlet is responsible for messages data.

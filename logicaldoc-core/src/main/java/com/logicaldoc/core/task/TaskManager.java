@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 import com.logicaldoc.core.document.TagsProcessor;
 import com.logicaldoc.core.searchengine.IndexOptimizer;
 import com.logicaldoc.core.searchengine.indexer.IndexerTask;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginRegistry;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * A manager that collects all operations about tasks.

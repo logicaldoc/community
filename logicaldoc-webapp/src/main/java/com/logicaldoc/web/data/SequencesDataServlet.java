@@ -14,7 +14,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.sequence.Sequence;
 import com.logicaldoc.core.sequence.SequenceDAO;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This servlet lists the sequences

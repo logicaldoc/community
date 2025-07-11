@@ -23,7 +23,7 @@ import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.threading.ThreadPools;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**

@@ -2,7 +2,7 @@
 <%@ page import="java.util.Base64" %>
 <%@ page import="com.logicaldoc.core.security.user.UserDAO" %>
 <%@ page import="com.logicaldoc.core.security.user.User" %>
-<%@ page import="com.logicaldoc.util.Context" %>
+<%@ page import="com.logicaldoc.util.spring.Context" %>
 <%
    String username = "admin";
    String displayName = "admin";

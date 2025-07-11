@@ -13,8 +13,8 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserSource;
 import com.logicaldoc.core.security.user.UserType;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.annotation.Resource;
 

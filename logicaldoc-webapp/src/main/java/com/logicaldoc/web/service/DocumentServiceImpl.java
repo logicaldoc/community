@@ -112,7 +112,6 @@ import com.logicaldoc.gui.common.client.beans.GUIRating;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.i18n.I18N;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.MimeType;
 import com.logicaldoc.util.StringUtil;
@@ -120,6 +119,7 @@ import com.logicaldoc.util.concurrent.FutureElaboration;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.html.HTMLSanitizer;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.UploadServlet;
 import com.logicaldoc.web.websockets.WebsocketTool;
 

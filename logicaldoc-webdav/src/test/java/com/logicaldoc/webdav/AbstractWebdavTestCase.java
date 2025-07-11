@@ -18,11 +18,11 @@ import com.logicaldoc.core.security.spring.LDAuthenticationToken;
 import com.logicaldoc.core.security.spring.LDDeferredSecurityContext;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.junit.AbstractTestCase;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.servlet.MockServletSession;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webdav.session.DavSessionImpl;
 import com.logicaldoc.webdav.session.WebdavSession;
 

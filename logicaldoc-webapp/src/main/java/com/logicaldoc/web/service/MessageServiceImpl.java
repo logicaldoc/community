@@ -25,8 +25,8 @@ import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
 import com.logicaldoc.gui.common.client.beans.GUIMessageTemplate;
 import com.logicaldoc.gui.frontend.client.services.MessageService;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.html.HTMLSanitizer;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Implementation of the MessageService

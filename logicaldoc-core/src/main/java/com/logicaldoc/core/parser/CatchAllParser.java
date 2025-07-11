@@ -7,8 +7,8 @@ import org.apache.commons.io.FileUtils;
 
 import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.store.Store;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Parser that tries to convert the document into PDF and then tries to parse it

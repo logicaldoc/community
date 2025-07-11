@@ -40,11 +40,11 @@ import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.services.InfoService;
 import com.logicaldoc.i18n.I18N;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.IOUtil;
 import com.logicaldoc.util.io.ResourceUtil;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.listener.ApplicationListener;
 
 import jakarta.servlet.http.HttpServletRequest;

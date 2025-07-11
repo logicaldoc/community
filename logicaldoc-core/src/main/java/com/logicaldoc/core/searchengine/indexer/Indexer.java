@@ -15,9 +15,9 @@ import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.TimeDiff;
 import com.logicaldoc.util.time.TimeDiff.TimeField;
 

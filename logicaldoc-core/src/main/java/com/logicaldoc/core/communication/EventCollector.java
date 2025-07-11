@@ -18,7 +18,7 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.history.History;
 import com.logicaldoc.core.threading.ThreadPools;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * A collector of events that can distribute them to a set of listeners
@@ -98,7 +98,7 @@ public class EventCollector {
 
 		if (history instanceof AbstractDocumentHistory adh) {
 			if (adh.getDocId() != null && adh.getDocument() == null) {
-				DocumentDAO docDao = com.logicaldoc.util.Context.get(DocumentDAO.class);
+				DocumentDAO docDao = com.logicaldoc.util.spring.Context.get(DocumentDAO.class);
 				try {
 					adh.setDocument(docDao.findById(adh.getDocId()));
 				} catch (PersistenceException e) {

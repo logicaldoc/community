@@ -19,8 +19,8 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Produces the XML used to display the links of a document in the GUI.

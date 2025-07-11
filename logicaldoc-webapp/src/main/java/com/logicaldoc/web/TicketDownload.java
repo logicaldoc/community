@@ -25,9 +25,9 @@ import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.MimeType;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
 
 public class TicketDownload extends HttpServlet {

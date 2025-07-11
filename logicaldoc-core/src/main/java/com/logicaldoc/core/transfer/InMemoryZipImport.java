@@ -16,9 +16,9 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ZipUtil;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This is an import utilities that imports documents stored in a zip archive.

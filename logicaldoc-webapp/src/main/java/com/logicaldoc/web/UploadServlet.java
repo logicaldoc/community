@@ -22,8 +22,8 @@ import com.logicaldoc.core.security.SessionListener;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.spring.LDDeferredSecurityContext;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;

@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
 import com.logicaldoc.core.document.Document;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.io.IOUtil;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Class for parsing text (*.txt) files.

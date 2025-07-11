@@ -12,9 +12,9 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.apikey.ApiKey;
 import com.logicaldoc.core.security.apikey.ApiKeyDAO;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.junit.AbstractTestCase;
 import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Abstract test case for the Web Service module. This class initialises a test
@@ -57,12 +57,12 @@ public abstract class AbstractWebserviceTestCase extends AbstractTestCase {
 		super.tearDown();
 	}
 
-	@Override
-	protected ApplicationContext buildApplicationContext() {
-		WebserviceApplicationContext appContext = new WebserviceApplicationContext();
-		appContext.refresh();
-		return appContext;
-	}
+//	@Override
+//	protected ApplicationContext buildApplicationContext() {
+//		WebserviceApplicationContext appContext = new WebserviceApplicationContext();
+//		appContext.refresh();
+//		return appContext;
+//	}
 
 	@Override
 	protected List<String> getDatabaseScripts() {

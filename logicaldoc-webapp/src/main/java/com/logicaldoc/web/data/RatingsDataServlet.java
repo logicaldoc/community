@@ -13,7 +13,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Rating;
 import com.logicaldoc.core.document.RatingDAO;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This servlet is responsible for ratings data.

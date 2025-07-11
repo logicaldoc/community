@@ -6,11 +6,11 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.time.Duration;
 import java.util.Arrays;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -43,11 +43,17 @@ public class ConnectionPool implements DataSource, Closeable {
 			log.info("Instantiating connection pool {}", implementation);
 			if ("dbcp".equals(implementation)) {
 				BasicDataSource ds = new BasicDataSource();
-				try {
-					BeanUtils.copyProperties(ds, dbcpConfig);
-				} catch (Exception e) {
-					log.error(e.getMessage(), e);
-				}
+				ds.setMaxTotal(dbcpConfig.getMaxTotal());
+				ds.setMaxIdle(dbcpConfig.getMaxIdle());
+				ds.setInitialSize(dbcpConfig.getInitialSize());
+				ds.setTestOnBorrow(dbcpConfig.isTestOnBorrow());
+				ds.setDurationBetweenEvictionRuns(Duration.ofMillis(dbcpConfig.getTimeBetweenEvictionRunsMillis()));
+				ds.setNumTestsPerEvictionRun(dbcpConfig.getNumTestsPerEvictionRun());
+				ds.setTestWhileIdle(dbcpConfig.isTestWhileIdle());
+				ds.setPassword(dbcpConfig.getPassword());
+				ds.setUrl(dbcpConfig.getUrl());
+				ds.setUsername(dbcpConfig.getUsername());
+				ds.setValidationQuery(dbcpConfig.getValidationQuery());
 
 				if (StringUtils.isNotEmpty(dbcpConfig.getConnectionInitSqls())) {
 					String[] sqls = dbcpConfig.getConnectionInitSqls().split(";");

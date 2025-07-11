@@ -14,7 +14,7 @@ import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.transaction.Transactional;
 

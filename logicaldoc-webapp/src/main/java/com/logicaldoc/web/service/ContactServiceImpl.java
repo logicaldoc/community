@@ -22,8 +22,8 @@ import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.beans.GUIParseContactsParameters;
 import com.logicaldoc.gui.frontend.client.services.ContactService;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.csv.CSVFileReader;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.UploadServlet;
 
 /**

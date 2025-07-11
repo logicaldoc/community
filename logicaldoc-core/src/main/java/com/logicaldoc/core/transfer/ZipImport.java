@@ -29,9 +29,9 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.util.UserUtil;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ZipUtil;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This is an import utilities that imports documents stored in a zip archive.

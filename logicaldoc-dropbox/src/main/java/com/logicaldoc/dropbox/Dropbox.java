@@ -29,9 +29,9 @@ import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.security.StringEncrypter;
 import com.logicaldoc.util.security.StringEncrypter.EncryptionException;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Our Dropbox facade

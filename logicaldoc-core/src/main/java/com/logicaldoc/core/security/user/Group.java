@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;

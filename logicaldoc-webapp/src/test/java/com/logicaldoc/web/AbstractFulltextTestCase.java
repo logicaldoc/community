@@ -13,8 +13,8 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.searchengine.saved.SearchDAO;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.spring.Context;
 
 public abstract class AbstractFulltextTestCase extends AbstractWebappTestCase {
 

@@ -36,13 +36,13 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.menu.Menu;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.SystemUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.LogConfigurator;
 import com.logicaldoc.util.config.OrderedProperties;
 import com.logicaldoc.util.csv.CSVFileWriter;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
 
 /**

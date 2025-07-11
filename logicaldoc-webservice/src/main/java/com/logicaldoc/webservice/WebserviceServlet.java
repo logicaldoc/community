@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.transport.servlet.CXFServlet;
 
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Extension of the standard CXF servlet that checks the enabled flag

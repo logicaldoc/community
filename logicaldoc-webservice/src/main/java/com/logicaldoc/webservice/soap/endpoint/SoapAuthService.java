@@ -3,7 +3,7 @@ package com.logicaldoc.webservice.soap.endpoint;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.soap.AuthService;
 

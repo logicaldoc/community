@@ -40,11 +40,11 @@ import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.threading.ThreadPools;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.http.UrlUtil;
 import com.logicaldoc.util.io.FileUtil;
 // import com.sun.mail.smtp.SMTPTransport;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;

@@ -8,8 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.chemistry.opencmis.server.impl.atompub.CmisAtomPubServlet;
 
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Extension of a Cmis servlet compliant with AtomPub

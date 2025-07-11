@@ -35,9 +35,9 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.sequence.SequenceDAO;
 import com.logicaldoc.core.threading.ThreadPools;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.Pair;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.TimeDiff;
 import com.logicaldoc.util.time.TimeDiff.TimeField;
 

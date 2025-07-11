@@ -16,7 +16,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.user.Group;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Search specialization for the Tag search.

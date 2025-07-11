@@ -16,7 +16,7 @@ import org.springframework.security.web.savedrequest.RequestCache;
 
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This handler gets the j_successurl request parameter and use it's value to

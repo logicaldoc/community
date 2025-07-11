@@ -12,7 +12,7 @@ import java.util.jar.JarFile;
 
 import org.apache.commons.io.FileUtils;
 
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This class is for handling with jar-files.

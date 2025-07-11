@@ -29,9 +29,9 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.sequence.SequenceDAO;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This servlet provides the chart of the calls to the API

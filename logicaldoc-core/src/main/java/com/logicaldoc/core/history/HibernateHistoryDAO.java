@@ -15,8 +15,8 @@ import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.communication.EventCollector;
 import com.logicaldoc.core.security.TenantDAO;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Parent of all DAOs that handle histories

@@ -8,8 +8,8 @@ import org.springframework.web.context.ContextLoaderListener;
 
 import com.logicaldoc.core.SystemInfo;
 import com.logicaldoc.core.security.SessionDAO;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Listener that initializes and destroys the Spring Context

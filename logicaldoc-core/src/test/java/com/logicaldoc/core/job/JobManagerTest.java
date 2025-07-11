@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.automation.AutomationDateTool;
 import com.logicaldoc.core.security.Tenant;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link JobManager}

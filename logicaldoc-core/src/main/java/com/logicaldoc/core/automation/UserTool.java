@@ -8,7 +8,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.util.UserUtil;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Utility methods to handle some user related operations from within the

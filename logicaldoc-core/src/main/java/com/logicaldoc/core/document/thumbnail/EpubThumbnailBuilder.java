@@ -13,8 +13,8 @@ import com.logicaldoc.core.conversion.FormatConverter;
 import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.conversion.NotAvailableConverter;
 import com.logicaldoc.core.document.Document;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This builder generates the thumbnail for a .epub(e-book) document.

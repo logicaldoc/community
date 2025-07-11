@@ -10,8 +10,8 @@ import org.apache.jackrabbit.webdav.simple.LocatorFactoryImplEx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webdav.resource.DavResourceFactory;
 import com.logicaldoc.webdav.resource.DavResourceFactoryImpl;
 import com.logicaldoc.webdav.resource.ResourceConfiguration;

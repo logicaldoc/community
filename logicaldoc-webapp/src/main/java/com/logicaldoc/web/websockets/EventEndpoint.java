@@ -37,8 +37,8 @@ import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.websockets.WebsocketMessage;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.service.DocumentServiceImpl;
 import com.logicaldoc.web.service.FolderServiceImpl;
 

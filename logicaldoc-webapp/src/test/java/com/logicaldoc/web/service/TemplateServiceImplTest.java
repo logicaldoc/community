@@ -31,8 +31,8 @@ import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.AbstractWebappTestCase;
 
 public class TemplateServiceImplTest extends AbstractWebappTestCase {

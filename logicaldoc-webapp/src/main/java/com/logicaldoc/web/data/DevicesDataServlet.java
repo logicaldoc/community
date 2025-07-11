@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import com.logicaldoc.core.security.Device;
 import com.logicaldoc.core.security.DeviceDAO;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This servlet retrieves the trusted devices

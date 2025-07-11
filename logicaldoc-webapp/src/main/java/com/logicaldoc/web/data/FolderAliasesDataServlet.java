@@ -18,7 +18,7 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 public class FolderAliasesDataServlet extends AbstractDataServlet {
 

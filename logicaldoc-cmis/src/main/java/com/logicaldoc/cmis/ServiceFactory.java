@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * CMIS Service factory

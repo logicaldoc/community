@@ -34,8 +34,6 @@
 
     <bean id="ContextProperties" class="com.logicaldoc.util.config.ContextProperties" />
 
-    <bean id="Context" class="com.logicaldoc.util.Context" factory-method="get" />
-
     <!-- DataSource -->
     <bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">
         <property name="driverClassName" value="org.hsqldb.jdbc.JDBCDriver" />

@@ -17,4 +17,5 @@ import org.springframework.context.ApplicationContext;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(TYPE)
 public @interface PluginContext {
+	// Tag annotation to mark a class as a context to load at runtime
 }

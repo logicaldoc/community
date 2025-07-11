@@ -54,9 +54,9 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserGroup;
 import com.logicaldoc.core.store.Store;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.html.HTMLSanitizer;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**
@@ -1579,7 +1579,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		newFolder = createPath(target, StringUtils.isNotEmpty(newName) ? newName : source.getName(),
 				"inherit".equals(securityOption), new FolderHistory(transaction));
 		newFolder.setFoldRef(source.getFoldRef());
-
+		
 		replicateSecurityPolicies(source, securityOption, newFolder);
 
 		DocumentDAO docDao = Context.get(DocumentDAO.class);
@@ -1640,7 +1640,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private Folder internalCopyValidation(Folder source, Folder target, String securityOption,
 			FolderHistory transaction) throws PersistenceException {
-		if (!(securityOption == null || "inherit".equals(securityOption) || REPLICATE.equals(securityOption)))
+		if (!(securityOption == null || "none".equals(securityOption) || "inherit".equals(securityOption) || REPLICATE.equals(securityOption)))
 			throw new IllegalArgumentException("Invalid security option " + securityOption);
 		if (source == null)
 			throw new IllegalArgumentException("Source folder cannot be null");

@@ -23,7 +23,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Tenant;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 public class DocToolTest extends AbstractCoreTestCase {
 

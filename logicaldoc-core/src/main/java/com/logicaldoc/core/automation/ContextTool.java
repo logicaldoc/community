@@ -2,7 +2,7 @@ package com.logicaldoc.core.automation;
 
 import java.util.List;
 
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Utility methods to access the Application context from inside the Automation

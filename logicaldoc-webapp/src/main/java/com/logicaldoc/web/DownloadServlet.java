@@ -24,8 +24,8 @@ import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.authentication.InvalidSessionException;
 import com.logicaldoc.core.store.Store;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.html.HTMLSanitizer;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
 
 /**

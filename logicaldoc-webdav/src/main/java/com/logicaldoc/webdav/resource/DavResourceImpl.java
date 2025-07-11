@@ -48,8 +48,8 @@ import org.apache.jackrabbit.webdav.xml.Namespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.MimeType;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webdav.context.ExportContext;
 import com.logicaldoc.webdav.context.ExportContextImpl;
 import com.logicaldoc.webdav.context.ImportContext;

@@ -7,8 +7,8 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.searchengine.SearchOptions;
 import com.logicaldoc.core.security.TenantDAO;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.IOUtil;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;

@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.util.List;
 
 import com.logicaldoc.core.document.Document;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * A base class for those converters that operate on compressed archives

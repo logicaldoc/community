@@ -14,7 +14,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.GroupType;
 import com.logicaldoc.i18n.I18N;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This servlet is responsible for groups data.

@@ -15,8 +15,8 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.parser.ParserFactory;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This servlet is responsible for parsers data.

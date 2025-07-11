@@ -18,7 +18,7 @@ import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Secure;
 import com.logicaldoc.core.util.IconSelector;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.CollectionTable;

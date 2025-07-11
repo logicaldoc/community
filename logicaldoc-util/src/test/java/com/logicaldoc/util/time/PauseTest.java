@@ -6,10 +6,9 @@ import java.util.Date;
 
 import org.junit.Test;
 
-import com.logicaldoc.util.junit.AbstractTestCase;
 import com.logicaldoc.util.time.TimeDiff.TimeField;
 
-public class PauseTest extends AbstractTestCase {
+public class PauseTest {
 
 	@Test
 	public void testDoPause() throws InterruptedException {

@@ -21,11 +21,11 @@ import com.logicaldoc.core.security.authentication.InvalidSessionException;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.gui.common.client.ServerException;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.servlet.MockServletRequest;
 import com.logicaldoc.util.servlet.MockServletResponse;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.AbstractFulltextTestCase;
 
 public class ServletUtilTest extends AbstractFulltextTestCase {

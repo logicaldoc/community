@@ -58,13 +58,13 @@ import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.core.util.MergeUtil;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.Pair;
 import com.logicaldoc.util.concurrent.FutureValue;
 import com.logicaldoc.util.concurrent.SerialFuture;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.html.HTMLSanitizer;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.TimeDiff;
 import com.logicaldoc.util.time.TimeDiff.TimeField;
 

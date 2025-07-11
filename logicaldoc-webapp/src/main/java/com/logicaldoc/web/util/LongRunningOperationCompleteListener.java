@@ -16,7 +16,7 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.threading.NotifyingThread;
 import com.logicaldoc.core.threading.NotifyingThread.ThreadCompleteListener;
 import com.logicaldoc.i18n.I18N;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.TimeDiff;
 
 /**

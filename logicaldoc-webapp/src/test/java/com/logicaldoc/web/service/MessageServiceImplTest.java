@@ -13,8 +13,8 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.communication.MessageTemplate;
 import com.logicaldoc.core.communication.MessageTemplateDAO;
 import com.logicaldoc.gui.common.client.ServerException;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.AbstractWebappTestCase;
 
 public class MessageServiceImplTest extends AbstractWebappTestCase {

@@ -1,4 +1,4 @@
-package com.logicaldoc.util;
+package com.logicaldoc.util.spring;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,11 +15,15 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.logicaldoc.util.config.ContextProperties;
@@ -34,6 +38,9 @@ import net.sf.ehcache.CacheManager;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
+@ComponentScan(basePackages = "com.logicaldoc", useDefaultFilters = false, includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, value = PluginContext.class))
+@ImportResource("classpath:context.xml")
+@Component("context")
 public class Context implements ApplicationContextAware, ApplicationListener<ApplicationEvent> {
 
 	private static final Logger log = LoggerFactory.getLogger(Context.class);
@@ -47,7 +54,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	private static Context instance;
 
 	private Context() {
-		// Do nothing
+		instance = this;
 	}
 
 	public static Context get() {

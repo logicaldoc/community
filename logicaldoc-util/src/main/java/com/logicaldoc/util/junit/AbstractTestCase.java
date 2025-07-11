@@ -33,11 +33,11 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.util.CollectionUtils;
 
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.Pause;
 import com.logicaldoc.util.time.TimeDiff;
 
@@ -156,13 +156,13 @@ public abstract class AbstractTestCase {
 
 	/**
 	 * Concrete implementations should prepare and return the Spring
-	 * ApplicationContext to use. By default it is used the
-	 * ClassPathXmlApplicationContext loading the /context.xml resource.
+	 * {@link ApplicationContext} to use. By default it is used the
+	 * {@link AnnotationConfigApplicationContext}.
 	 * 
 	 * @return the ApplicationContext
 	 */
 	protected ApplicationContext buildApplicationContext() {
-		return new AnnotationConfigApplicationContext(TestContext.class);
+		return new AnnotationConfigApplicationContext(Context.class);
 	}
 
 	/**

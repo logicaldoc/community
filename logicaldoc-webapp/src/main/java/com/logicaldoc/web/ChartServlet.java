@@ -32,9 +32,9 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.sequence.SequenceDAO;
 import com.logicaldoc.i18n.I18N;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
 
 /**

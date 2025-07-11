@@ -35,9 +35,9 @@ import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.login.client.services.LoginService;
-import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.security.PasswordGenerator;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Implementation of the <code>LoginService</code>
