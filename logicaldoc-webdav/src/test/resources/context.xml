@@ -18,11 +18,6 @@
             http://www.springframework.org/schema/security
             http://www.springframework.org/schema/security/spring-security-2.0.xsd">
 
-<!--
-    <import resource="classpath*:context/context-core.xml" />
-	<import resource="classpath*:context/context-webdav.xml" />
--->
-
 	<tx:annotation-driven transaction-manager="TransactionManager"/>
 
     <context:annotation-config />

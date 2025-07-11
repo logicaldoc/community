@@ -26,7 +26,6 @@
     <context:annotation-config />
 
 	<import resource="classpath*:context-security.xml" />
-	<!--<import resource="classpath*:context/context-*.xml" />-->
 
 	<!-- This post processor ensures placeholders substitutions -->
 	<bean id="PropertyPlaceholderConfigurer" class="com.logicaldoc.util.spring.PropertiesPlaceHolder">
