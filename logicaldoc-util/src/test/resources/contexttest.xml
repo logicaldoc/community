@@ -18,9 +18,7 @@
             http://www.springframework.org/schema/security
             http://www.springframework.org/schema/security/spring-security.xsd">
 
-    <context:annotation-config />
-
-    <import resource="classpath*:context/context-*.xml" />    
+    <context:annotation-config /> 
 
     <!-- This post processor ensures placeholders substitutions -->
 	<bean id="PropertyPlaceholderConfigurer"

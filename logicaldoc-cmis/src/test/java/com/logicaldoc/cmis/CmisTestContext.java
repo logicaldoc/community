@@ -12,7 +12,7 @@ import com.logicaldoc.util.spring.PluginContext;
  * @author Giuseppe Desiato - LogicalDOC
  * @since 9.2.1
  */
-@ComponentScan(basePackages = "com.logicaldoc", useDefaultFilters = false, includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, value = PluginContext.class))
+@ComponentScan(basePackages = {"com.logicaldoc.core", "com.logicaldoc.cmis"}, useDefaultFilters = false, includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, value = PluginContext.class))
 @ImportResource("classpath:contexttest.xml")
 public class CmisTestContext {
 
