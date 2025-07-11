@@ -16,5 +16,5 @@ import com.logicaldoc.util.spring.PluginContext;
 		"com.logicaldoc" }, useDefaultFilters = false, includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, value = PluginContext.class))
 @ImportResource("classpath:contexttest.xml")
 public class WebappTestContext {
-
+// Main ApplicationContext configuration for testing this module
 }

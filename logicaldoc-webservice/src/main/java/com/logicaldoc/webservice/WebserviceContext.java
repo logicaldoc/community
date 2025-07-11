@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ImportResource;
 import com.logicaldoc.util.spring.PluginContext;
 
 /**
- * Main ApplicationContext configuration
+ * Context of the webserivce plugin
  * 
  * @author Giuseppe Desiato - LogicalDOC
  * @since 9.2.1
@@ -15,5 +15,5 @@ import com.logicaldoc.util.spring.PluginContext;
 @ComponentScan("com.logicaldoc.webservice")
 @ImportResource("classpath:context/context-webservice.xml")
 public class WebserviceContext {
-
+	// Context of the webserivce plugin
 }

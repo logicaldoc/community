@@ -33,7 +33,7 @@ import com.logicaldoc.util.event.SystemEventStatus;
 import net.sf.ehcache.CacheManager;
 
 /**
- * Utility class collecting static methods related to spring's context.
+ * Main context
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0

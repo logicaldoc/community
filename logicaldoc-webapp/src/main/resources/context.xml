@@ -25,6 +25,8 @@
 
     <context:annotation-config />
 
+    <tx:annotation-driven transaction-manager="TransactionManager" />
+
 	<import resource="classpath*:context-security.xml" />
 
 	<!-- This post processor ensures placeholders substitutions -->

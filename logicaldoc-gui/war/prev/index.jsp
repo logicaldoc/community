@@ -5,6 +5,7 @@
 <%@ page import="com.logicaldoc.core.ticket.*" %>
 <%@ page import="com.logicaldoc.core.security.*" %>
 <%@ page import="com.logicaldoc.util.*" %>
+<%@ page import="com.logicaldoc.util.spring.*" %>
 <%@ page import="com.logicaldoc.web.util.*" %>
 <%@ page import="com.logicaldoc.i18n.*" %>
 <%
@@ -217,7 +218,7 @@
         <div class="findbar hidden doorHanger" id="findbar">
           <div id="findbarInputContainer">
             <span class="loadingInput end">
-              <input id="findInput" class="toolbarField" title="Find" placeholder="Find in document…" tabindex="91" data-l10n-id="pdfjs-find-input" aria-invalid="false">
+              <input id="findInput" class="toolbarField" title="Find" placeholder="Find in documentâ€¦" tabindex="91" data-l10n-id="pdfjs-find-input" aria-invalid="false">
             </span>
             <div class="splitToolbarButton">
               <button id="findPrevious" class="toolbarButton" title="Find the previous occurrence of the phrase" tabindex="92" data-l10n-id="pdfjs-find-previous-button">
@@ -394,8 +395,8 @@
 
             <div class="horizontalToolbarSeparator"></div>
 
-            <button id="documentProperties" class="secondaryToolbarButton" title="Document Properties…" tabindex="69" data-l10n-id="pdfjs-document-properties-button" aria-controls="documentPropertiesDialog">
-              <span data-l10n-id="pdfjs-document-properties-button-label">Document Properties…</span>
+            <button id="documentProperties" class="secondaryToolbarButton" title="Document Propertiesâ€¦" tabindex="69" data-l10n-id="pdfjs-document-properties-button" aria-controls="documentPropertiesDialog">
+              <span data-l10n-id="pdfjs-document-properties-button-label">Document Propertiesâ€¦</span>
             </button>
           </div>
         </div>  <!-- secondaryToolbar -->
@@ -582,7 +583,7 @@
             <div id="overallDescription">
               <span id="dialogLabel" data-l10n-id="pdfjs-editor-alt-text-dialog-label" class="title">Choose an option</span>
               <span id="dialogDescription" data-l10n-id="pdfjs-editor-alt-text-dialog-description">
-                Alt text (alternative text) helps when people can’t see the image or when it doesn’t load.
+                Alt text (alternative text) helps when people canâ€™t see the image or when it doesnâ€™t load.
               </span>
             </div>
             <div id="addDescription">
@@ -598,7 +599,7 @@
                 </div>
               </div>
               <div class="descriptionArea">
-                <textarea id="descriptionTextarea" placeholder="For example, “A young man sits down at a table to eat a meal”" aria-labelledby="descriptionAreaLabel" data-l10n-id="pdfjs-editor-alt-text-textarea" tabindex="0"></textarea>
+                <textarea id="descriptionTextarea" placeholder="For example, â€œA young man sits down at a table to eat a mealâ€�" aria-labelledby="descriptionAreaLabel" data-l10n-id="pdfjs-editor-alt-text-textarea" tabindex="0"></textarea>
               </div>
             </div>
             <div id="markAsDecorative">
@@ -622,7 +623,7 @@
         </dialog>
         <dialog id="printServiceDialog" style="min-width: 200px;">
           <div class="row">
-            <span data-l10n-id="pdfjs-print-progress-message">Preparing document for printing…</span>
+            <span data-l10n-id="pdfjs-print-progress-message">Preparing document for printingâ€¦</span>
           </div>
           <div class="row">
             <progress value="0" max="100"></progress>

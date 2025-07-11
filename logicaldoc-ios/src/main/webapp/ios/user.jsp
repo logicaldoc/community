@@ -5,6 +5,7 @@
 <%@ page import="java.io.*" %>
 <%@ page import="com.logicaldoc.core.security.user.*" %>
 <%@ page import="com.logicaldoc.util.*" %>
+<%@ page import="com.logicaldoc.util.spring.*" %>
 
 <%
    String username="admin";
@@ -20,7 +21,7 @@
    
         username = decodedString.substring(0, decodedString.indexOf(":"));
         
-        UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
+        UserDAO dao = Context.get(UserDAO.class);
         User user = dao.findByUsername(username);
         displayName = user.getFullName();
         email = user.getEmail();

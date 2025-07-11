@@ -6,15 +6,14 @@ import org.springframework.context.annotation.ImportResource;
 import com.logicaldoc.util.spring.PluginContext;
 
 /**
- * Main configuration for the core plugin
+ * Context of the core plugin
  * 
  * @author Giuseppe Desiato - LogicalDOC
  * @since 9.2.1
- *
  */
 @PluginContext
 @ComponentScan("com.logicaldoc.core")
 @ImportResource("classpath:context/context-core.xml")
 public class CoreContext {
-
+	// Context of the core plugin
 }

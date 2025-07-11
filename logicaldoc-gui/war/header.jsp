@@ -3,6 +3,7 @@
 <%@page import="jakarta.servlet.http.Cookie"%>
 <%@page import="java.io.*"%>
 <%@page import="java.util.*"%>
+<%@page import="com.logicaldoc.util.spring.*"%>
 <%@page import="com.logicaldoc.util.*"%>
 <%@page import="com.logicaldoc.util.config.*"%>
 <%@page import="com.logicaldoc.core.security.*"%>
