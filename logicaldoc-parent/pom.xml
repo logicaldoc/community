@@ -635,7 +635,7 @@
             </dependency>
             <dependency>
 			  <groupId>org.jboss.logging</groupId>
-			  <artifactId>jboss-logging:jar</artifactId>
+			  <artifactId>jboss-logging</artifactId>
               <version>3.6.1.Final</version>
 		    </dependency>            
             <dependency>
