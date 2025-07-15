@@ -634,6 +634,11 @@
                 <version>${infinispan.version}</version>
             </dependency>
             <dependency>
+			  <groupId>org.jboss.logging</groupId>
+			  <artifactId>jboss-logging:jar</artifactId>
+              <version>3.6.1.Final</version>
+		    </dependency>            
+            <dependency>
                 <groupId>org.infinispan</groupId>
                 <artifactId>${infinispan.hibernate.artifact}</artifactId>
                 <version>${infinispan.version}</version>
@@ -642,43 +647,36 @@
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-core</artifactId>
                 <version>${lucene.version}</version>
-                <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-highlighter</artifactId>
                 <version>${lucene.version}</version>
-                <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-spellchecker</artifactId>
                 <version>${lucene.version}</version>
-                <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-misc</artifactId>
                 <version>${lucene.version}</version>
-                <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-memory</artifactId>
                 <version>${lucene.version}</version>
-                <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-analyzers-common</artifactId>
                 <version>${lucene.version}</version>
-                <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>org.apache.solr</groupId>
                 <artifactId>solr-core</artifactId>
                 <version>${solr.version}</version>
-                <type>jar</type>
                 <exclusions>
                     <exclusion>
                         <groupId>org.slf4j</groupId>
