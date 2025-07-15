@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+  <diskStore path="C:\LogicalDOC-Devel\repository\cache" />
+  <defaultCache maxElementsInMemory="5000" eternal="true" timeToIdleSeconds="0" timeToLiveSeconds="0" overflowToDisk="true" />
+  <cache name="Syndication-101" maxElementsInMemory="1" eternal="true" overflowToDisk="true" diskPersistent="true">
+    <persistence strategy="localRestartable" synchronousWrites="true" />
+  </cache>
+</ehcache>
+

@@ -3,7 +3,7 @@
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="urn:infinispan:config:15.2 https://infinispan.org/schemas/infinispan-config-15.2.xsd">
 
-  <cache-container name="logicaldoc" default-cache="default" statistics="false">
+    <cache-container name="logicaldoc" default-cache="default" statistics="false">
 
     <!-- Default template configuration for all unspecified entity caches -->
     <local-cache-configuration name="default" simple-cache="true" statistics="false">
