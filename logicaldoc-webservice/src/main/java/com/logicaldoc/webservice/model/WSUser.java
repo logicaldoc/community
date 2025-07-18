@@ -134,6 +134,9 @@ public class WSUser {
 
 	@WSDoc(description = "if <b>1</b> the user is enabled, if <b>0</b> the user is disabled")
 	private int enabled = 1;
+	
+	@WSDoc(description = "if <b>1</b> the user must confirm any change in the legals")
+	private int legals = 1;
 
 	@WSDoc(description = "if <b>1</b> the user can connect during working time only")
 	private int enforceWorkingTime = 0;
@@ -491,6 +494,7 @@ public class WSUser {
 			user.setTimeZone(getTimeZone());
 			user.setKey(getKey());
 			user.setSecondFactor(getSecondFactor());
+			user.setLegals(getLegals());
 
 			if (CollectionUtils.isNotEmpty(groupIds)) {
 				GroupDAO groupDao = Context.get(GroupDAO.class);
@@ -565,6 +569,7 @@ public class WSUser {
 			wsUser.setTimeZone(user.getTimeZone());
 			wsUser.setKey(user.getKey());
 			wsUser.setSecondFactor(user.getSecondFactor());
+			wsUser.setLegals(user.getLegals());
 			wsUser.setGroupIds(user.getGroups().stream().map(g -> g.getId()).collect(Collectors.toList()));
 
 			List<WSWorkingTime> tmp = user.getWorkingTimes().stream().map(wt -> {
@@ -743,5 +748,13 @@ public class WSUser {
 
 	public void setEvalFormEnabled(int evalFormEnabled) {
 		this.evalFormEnabled = evalFormEnabled;
+	}
+
+	public int getLegals() {
+		return legals;
+	}
+
+	public void setLegals(int legals) {
+		this.legals = legals;
 	}
 }

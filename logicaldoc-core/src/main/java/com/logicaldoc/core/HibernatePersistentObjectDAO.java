@@ -468,6 +468,11 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	@Override
+	public String queryForString(String sql, Map<String, Object> parameters) throws PersistenceException {
+		return queryForObject(sql, parameters, String.class);
+	}
+
+	@Override
 	public <R> R queryForObject(String sql, Class<R> requiredType) throws PersistenceException {
 		return queryForObject(sql, null, requiredType);
 	}

@@ -1,5 +1,6 @@
 package com.logicaldoc.web.service;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -7,8 +8,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -32,12 +31,15 @@ import com.logicaldoc.core.security.user.UserHistoryDAO;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.login.client.services.LoginService;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.security.PasswordGenerator;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Implementation of the <code>LoginService</code>
@@ -240,5 +242,22 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 				config.getInt(tenant + ".password.uppercase", 2), config.getInt(tenant + ".password.lowercase", 2),
 				config.getInt(tenant + ".password.digit", 1), config.getInt(tenant + ".password.special", 1),
 				config.getInt(tenant + ".password.sequence", 4), config.getInt(tenant + ".password.occurrence", 3));
+	}
+
+	@Override
+	public List<GUIParameter> getLegalsToConfirm(String username) throws ServerException {
+		try {
+			List<GUIParameter> legals = new ArrayList<>();
+			UserDAO userDao = Context.get(UserDAO.class);
+			userDao.queryForResultSet(
+					"select ld_name, ld_title from ld_legal where not exists (select * from ld_legal_confirmation where ld_username = :username and ld_legal=ld_name)",
+					Map.of("username", username), null, rows -> {
+						while (rows.next())
+							legals.add(new GUIParameter(rows.getString(1), rows.getString(2)));
+					});
+			return legals;
+		} catch (PersistenceException e) {
+			throw new ServerException(e.getMessage());
+		}
 	}
 }

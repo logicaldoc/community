@@ -87,6 +87,8 @@ public class GUIUser implements Serializable {
 
 	private boolean enabled = true;
 
+	private boolean legals = true;
+
 	private int checkedOutDocs = 0;
 
 	private int lockedDocs = 0;
@@ -177,7 +179,7 @@ public class GUIUser implements Serializable {
 	private List<Long> menus = new ArrayList<>();
 
 	private boolean evalFormEnabled = true;
-	
+
 	public GUIUser() {
 		tenant = new GUITenant();
 		tenant.setId(Constants.TENANT_DEFAULTID);
@@ -772,5 +774,13 @@ public class GUIUser implements Serializable {
 
 	public void setEvalFormEnabled(boolean evalFormEnabled) {
 		this.evalFormEnabled = evalFormEnabled;
+	}
+
+	public boolean isLegals() {
+		return legals;
+	}
+
+	public void setLegals(boolean legals) {
+		this.legals = legals;
 	}
 }

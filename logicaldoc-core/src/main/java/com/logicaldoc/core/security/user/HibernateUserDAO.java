@@ -208,6 +208,9 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		boolean passwordChanged = false;
 		boolean enabledStatusChanged = false;
 
+		if("admin".equals(user.getUsername()))
+			user.setLegals(1);
+		
 		passwordChanged = processPasswordChanged(user);
 
 		validateUsernameUniquenes(user, newUser);

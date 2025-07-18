@@ -13,9 +13,11 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.CookiesManager;
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
+import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -32,6 +34,7 @@ import com.logicaldoc.gui.login.client.services.TfaService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
+import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.Img;
@@ -735,9 +738,32 @@ public class LoginPanel extends VLayout {
 					SC.warn(I18N.message("usernameblockedwarn", info.getConfig("throttle.username.wait")));
 				} else if ("ipblocked".equals(failure)) {
 					SC.warn(I18N.message("ipblockedwarn", info.getConfig("throttle.ip.wait")));
+				} else if ("unconfirmedlegals".equals(failure)) {
+					handleUnconfirmedLegals(user.getUsername());
 				} else
 					SC.warn(I18N.message("accesdenied"));
 
+			}
+		});
+	}
+
+	protected void handleUnconfirmedLegals(String username) {
+		unlockInput();
+		LD.ask(I18N.message("unconfirmedlegals"), I18N.message("needconfirmlegals"), new BooleanCallback() {
+
+			@Override
+			public void execute(Boolean value) {
+				if (Boolean.TRUE.equals(value)) {
+					LoginService.Instance.get().getLegalsToConfirm(DEBUG_ID_PREFIX, new DefaultAsyncCallback<>() {
+
+						@Override
+						public void onSuccess(List<GUIParameter> legals) {
+							new LegalsPopup(username, legals).show();
+						}
+					});
+				} else {
+					SC.warn(I18N.message("accesdenied"));
+				}
 			}
 		});
 	}

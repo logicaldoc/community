@@ -39,6 +39,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 6.0
  */
 public class UserPropertiesPanel extends HLayout {
+	private static final String LEGALS = "legals";
+
 	private static final String USERMUSTBELONGTOGROUP = "usermustbelongtogroup";
 
 	private static final String ADMIN = "admin";
@@ -101,6 +103,8 @@ public class UserPropertiesPanel extends HLayout {
 
 		final CheckboxItem guest = prepareGuestItem(readonly);
 
+		final CheckboxItem legals = prepareLegalsItem(readonly);
+
 		CheckboxItem notifyCredentials = new CheckboxItem("notifyCredentials", I18N.message("notifycredentials"));
 		notifyCredentials.setValue(true);
 		notifyCredentials.setVisible(user.getId() == 0);
@@ -148,11 +152,11 @@ public class UserPropertiesPanel extends HLayout {
 		ComboBoxItem timeZone = prepareTimeZoneSelector(readonly);
 
 		if (user.getId() == 0L)
-			form1.setItems(notifyCredentials, guest, username, email, firstname, name, email2, language, timeZone,
+			form1.setItems(notifyCredentials, guest, legals, username, email, firstname, name, email2, language, timeZone,
 					address, postalcode, city, country, state, phone, cell, company, department, building,
 					organizationalUnit);
 		else
-			form1.setItems(id, lastLogin, creation, username, notifyCredentials, guest, email, firstname, name, email2,
+			form1.setItems(id, lastLogin, creation, username, notifyCredentials, guest, legals, email, firstname, name, email2,
 					language, timeZone, address, postalcode, city, country, state, phone, cell, company, department,
 					building, organizationalUnit);
 		addMember(layout);
@@ -360,6 +364,18 @@ public class UserPropertiesPanel extends HLayout {
 		});
 	}
 
+	private CheckboxItem prepareLegalsItem(boolean readonly) {
+		final CheckboxItem lgs = new CheckboxItem(LEGALS, I18N.message(LEGALS));
+		lgs.setValue(user.isLegals());
+		lgs.setDisabled(ADMIN.equals(user.getUsername()));
+		if (readonly || ADMIN.equals(user.getUsername())) {
+			lgs.setDisabled(true);
+		} else {
+			lgs.addChangedHandler(changedHandler);
+		}
+		return lgs;
+	}
+
 	private void prepareGroupsForm(boolean readOnly) {
 		List<String> groupIds = user.getGroups().stream().filter(g -> g.getType() == 0)
 				.map(g -> Long.toString(g.getId())).collect(Collectors.toList());
@@ -401,7 +417,8 @@ public class UserPropertiesPanel extends HLayout {
 			user.setOrganizationalUnit((String) values.get("organizationalunit"));
 			user.setDepartment((String) values.get("department"));
 			user.setCompany((String) values.get("company"));
-
+			user.setLegals(Boolean.parseBoolean(values.get(LEGALS).toString())); 
+			
 			if (user.getId() == 0L)
 				user.setNotifyCredentials(Boolean.parseBoolean(values.get("notifyCredentials").toString()));
 		}

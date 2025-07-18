@@ -1,11 +1,14 @@
 package com.logicaldoc.gui.login.client.services;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 
@@ -63,14 +66,25 @@ public interface LoginService extends RemoteService {
 	 * @return the generated password
 	 */
 	public String generatePassword(String username);
-	
+
+	/**
+	 * Returns the legals the current user is required to confirm 
+	 * 
+	 * @param username The user to check
+	 * 
+	 * @return The legals (name-title)
+	 * 
+	 * @throws ServerException Error retrieving the legals information
+	 */
+	public List<GUIParameter> getLegalsToConfirm(String username) throws ServerException;
+
 	public static class Instance {
 		private static LoginServiceAsync inst;
 
 		private Instance() {
-			
+
 		}
-		
+
 		public static LoginServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(LoginService.class);

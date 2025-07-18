@@ -26,8 +26,7 @@ import com.logicaldoc.util.spring.Context;
  */
 public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 
-	// Instance under test
-	private DeviceDAO dao;
+	private DeviceDAO testSubject;
 
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
@@ -35,7 +34,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDeviceDAO
-		dao = Context.get(DeviceDAO.class);
+		testSubject = Context.get(DeviceDAO.class);
 	}
 
 	@Test
@@ -50,7 +49,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 		device.setOperativeSystem("Windows 10");
 		device.setType("COMPUTER");
 
-		dao.store(device);
+		testSubject.store(device);
 		assertNotNull(device.getDeviceId());
 	}
 
@@ -65,7 +64,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 		device.setBrowser("Firefox");
 		device.setOperativeSystem("Windows 10");
 		device.setType("COMPUTER");
-		dao.store(device);
+		testSubject.store(device);
 
 		device = new Device();
 		device.setCreation(DateBean.dateFromCompactString("20101201"));
@@ -77,7 +76,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 		device.setBrowser("Firefox");
 		device.setOperativeSystem("Windows 8");
 		device.setType("COMPUTER");
-		dao.store(device);
+		testSubject.store(device);
 
 		device = new Device();
 		device.setCreation(DateBean.dateFromCompactString("20101201"));
@@ -89,11 +88,11 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 		device.setBrowser("Firefox");
 		device.setOperativeSystem("Windows 7");
 		device.setType("COMPUTER");
-		dao.store(device);
+		testSubject.store(device);
 
-		assertEquals(3, dao.findAll(1L).size());
-		assertEquals(1, dao.findTrustedDevices(1L).size());
-		assertEquals(0, dao.findTrustedDevices(3L).size());
+		assertEquals(3, testSubject.findAll(1L).size());
+		assertEquals(1, testSubject.findTrustedDevices(1L).size());
+		assertEquals(0, testSubject.findTrustedDevices(3L).size());
 	}
 
 	@Test
@@ -106,7 +105,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 		device.setBrowser("Firefox");
 		device.setOperativeSystem("Windows 10");
 		device.setType("COMPUTER");
-		dao.store(device);
+		testSubject.store(device);
 
 		device = new Device();
 		device.setCreation(DateBean.dateFromCompactString("20061201"));
@@ -117,12 +116,12 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 		device.setBrowser("Firefox");
 		device.setOperativeSystem("Windows 10");
 		device.setType("COMPUTER");
-		dao.store(device);
+		testSubject.store(device);
 
-		assertEquals(2, dao.findAll(1L).size());
+		assertEquals(2, testSubject.findAll(1L).size());
 
-		dao.cleanOldDevices(1);
-		List<Device> devices = dao.findAll();
+		testSubject.cleanOldDevices(1);
+		List<Device> devices = testSubject.findAll();
 		assertEquals(1, devices.size());
 		assertEquals("sebastian", devices.get(0).getUsername());
 	}
@@ -138,13 +137,13 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 		device.setBrowser("Firefox");
 		device.setOperativeSystem("Windows 10");
 		device.setType("COMPUTER");
-		dao.store(device);
+		testSubject.store(device);
 
 		String id = device.getDeviceId();
 		Device requestDevice = new Device();
 		requestDevice.setDeviceId(id);
 
-		device = dao.findByDevice(requestDevice);
+		device = testSubject.findByDevice(requestDevice);
 		assertNotNull(device);
 		assertEquals(id, device.getDeviceId());
 
@@ -152,7 +151,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 		requestDevice.setBrowser("Firefox");
 		requestDevice.setOperativeSystem("Windows 10");
 		requestDevice.setUserId(3L);
-		device = dao.findByDevice(requestDevice);
+		device = testSubject.findByDevice(requestDevice);
 		assertNull(device);
 
 		requestDevice = new Device();
@@ -160,7 +159,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 		requestDevice.setOperativeSystem("Windows 10");
 		requestDevice.setType("COMPUTER");
 		requestDevice.setUserId(3L);
-		device = dao.findByDevice(requestDevice);
+		device = testSubject.findByDevice(requestDevice);
 		assertNotNull(device);
 		assertEquals(id, device.getDeviceId());
 	}

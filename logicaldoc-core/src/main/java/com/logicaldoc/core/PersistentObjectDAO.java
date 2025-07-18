@@ -151,7 +151,8 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public List<Object[]> findByQuery(String query, Map<String, Object> parameters, Integer max) throws PersistenceException;
+	public List<Object[]> findByQuery(String query, Map<String, Object> parameters, Integer max)
+			throws PersistenceException;
 
 	/**
 	 * Find everything you want from the DB using the ORM query language
@@ -435,6 +436,25 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
 	public String queryForString(String sql) throws PersistenceException;
+
+	/**
+	 * Execute a query that results in an string value, given static SQL. Uses a
+	 * JDBC Statement, not a PreparedStatement. If you want to execute a static
+	 * query with a PreparedStatement, use the overloaded queryForInt method
+	 * with null as argument array. This method is useful for running static SQL
+	 * with a known outcome. The query is expected to be a single row/single
+	 * column query that results in a string value.
+	 * 
+	 * @param sql SQL query to execute (for parameters please use JPA-style:
+	 *        :paramA, :paramB ...)
+	 * @param parameters Parameters used in the where expression (map
+	 *        name-value)
+	 * 
+	 * @return the string value
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
+	 */
+	public String queryForString(String sql, Map<String, Object> parameters) throws PersistenceException;
 
 	/**
 	 * Execute a query that results in a Object value, given static SQL. Uses a

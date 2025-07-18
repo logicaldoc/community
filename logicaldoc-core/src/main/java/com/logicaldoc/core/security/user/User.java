@@ -119,6 +119,12 @@ public class User extends PersistentObject implements Serializable {
 	private int enabled = 1;
 
 	/**
+	 * If the users must confirm changes in the legals or not
+	 */
+	@Column(name = "ld_legals", nullable = false)
+	private int legals = 0;
+	
+	/**
 	 * The last time the password was changed
 	 */
 	@Column(name = "ld_passwordchanged", columnDefinition = "DATETIME(3)")
@@ -943,6 +949,14 @@ public class User extends PersistentObject implements Serializable {
 
 	public void setBuilding(String building) {
 		this.building = building;
+	}
+
+	public int getLegals() {
+		return legals;
+	}
+
+	public void setLegals(int legals) {
+		this.legals = legals;
 	}
 
 	@Override

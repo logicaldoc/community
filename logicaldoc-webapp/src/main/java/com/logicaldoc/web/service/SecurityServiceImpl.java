@@ -495,6 +495,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				guiUser.setEvalFormEnabled(user.getEvalFormEnabled() == 1);
 				guiUser.setPasswordExpires(user.getPasswordExpires() == 1);
 				guiUser.setPasswordExpired(user.getPasswordExpired() == 1);
+				guiUser.setLegals(user.getLegals() == 1);
 				guiUser.setWelcomeScreen(user.getWelcomeScreen());
 				guiUser.setDefaultWorkspace(user.getDefaultWorkspace());
 				guiUser.setIpWhitelist(user.getIpWhiteList());
@@ -686,6 +687,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			user.setPasswordExpires(guiUser.isPasswordExpires() ? 1 : 0);
 			user.setPasswordExpired(guiUser.isPasswordExpired() ? 1 : 0);
 			user.setEvalFormEnabled(guiUser.isEvalFormEnabled() ? 1 : 0);
+			user.setLegals(guiUser.isLegals() ? 1 : 0);
 			user.setWelcomeScreen(guiUser.getWelcomeScreen());
 			user.setIpWhiteList(guiUser.getIpWhitelist());
 			user.setIpBlackList(guiUser.getIpBlacklist());
