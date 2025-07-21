@@ -20,4 +20,6 @@ public interface LoginServiceAsync {
 	void generatePassword(String username, AsyncCallback<String> callback);
 
 	void getLegalsToConfirm(String username, AsyncCallback<List<GUIParameter>> callback);
+
+	void confirmLegal(String username, String legal, AsyncCallback<Void> callback);
 }

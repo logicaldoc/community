@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * An output stram that writes into a string
+ * An output stream that writes into a string
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.6.1

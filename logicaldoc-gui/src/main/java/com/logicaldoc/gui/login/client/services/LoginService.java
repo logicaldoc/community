@@ -78,6 +78,17 @@ public interface LoginService extends RemoteService {
 	 */
 	public List<GUIParameter> getLegalsToConfirm(String username) throws ServerException;
 
+	/**
+	 * Confirms the reading and understanding of a specific legal
+	 * 
+	 * @param username The user that takes the action
+	 * @param legal The name of the legal to confirm
+	 * 
+	 * @throws ServerException Error marking the legal as read
+	 */
+	public void confirmLegal(String username, String legal) throws ServerException;
+
+	
 	public static class Instance {
 		private static LoginServiceAsync inst;
 

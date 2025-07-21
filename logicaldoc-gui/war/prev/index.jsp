@@ -2,22 +2,23 @@
 <%@ page import="jakarta.servlet.http.*" %>
 <%@ page import="java.util.regex.*" %>
 <%@ page import="java.util.*" %>
+<%@ page import="com.logicaldoc.core.document.*" %>
 <%@ page import="com.logicaldoc.core.ticket.*" %>
 <%@ page import="com.logicaldoc.core.security.*" %>
-<%@ page import="com.logicaldoc.util.*" %>
 <%@ page import="com.logicaldoc.util.spring.*" %>
+<%@ page import="com.logicaldoc.util.*" %>
 <%@ page import="com.logicaldoc.web.util.*" %>
 <%@ page import="com.logicaldoc.i18n.*" %>
 <%
   Long docId = null;
   String ticketId = request.getParameter("ticketId");
     
-  com.logicaldoc.core.document.DocumentDAO docDao = (com.logicaldoc.core.document.DocumentDAO)Context.get().getBean(com.logicaldoc.core.document.DocumentDAO.class);
+  DocumentDAO docDao = Context.get(DocumentDAO.class);
   
   Long userId = null;
   Ticket ticket = null;
   if(ticketId != null) {
-    com.logicaldoc.core.document.DocumentDAO docDao = Context.get(com.logicaldoc.core.document.DocumentDAO.class);
+    TicketDAO tDao = Context.get(TicketDAO.class);
     ticket = tDao.findByTicketId(ticketId);
   	if(ticket != null && ticket.isTicketViewExpired())
   	   ticket = null;
@@ -52,7 +53,7 @@
    * Also store a session attribute containing the docId as additional information used by the servlet
    * to prevent a user without download permission to download the file being previewed.
    */ 
-  com.logicaldoc.core.document.Document doc = docDao.findById(docId);
+  Document doc = docDao.findById(docId);
   Integer previewCheck=null;
   if(doc!=null) {
 	 if(doc.getDigest()!=null)

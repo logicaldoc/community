@@ -1,8 +1,10 @@
 package com.logicaldoc.gui.login.client;
 
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.login.client.services.LoginService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.Label;
@@ -24,7 +26,7 @@ public class LegalPreview extends VLayout {
 	protected GUIParameter legal;
 
 	protected String username;
-	
+
 	protected ClickHandler confirmation;
 
 	protected int width;
@@ -38,7 +40,7 @@ public class LegalPreview extends VLayout {
 	public LegalPreview(String username, GUIParameter legal, ClickHandler confirmation) {
 		this.legal = legal;
 		this.username = username;
-		this.confirmation=confirmation;
+		this.confirmation = confirmation;
 
 		declareOnReadingCompleted(this);
 	}
@@ -51,18 +53,12 @@ public class LegalPreview extends VLayout {
 
 	private void confirmReading() {
 		topConfirmReadingToolStrip.removeMember(topConfirmReadingButton);
-		confirmation.onClick(null);
-
-//		ReadingRequestService.Instance.get().confirmReadings(
-//				ReadingRequestController.get().getUnconfirmedReadingIds(document.getId()), document.getVersion(),
-//				new DefaultAsyncCallback<>() {
-//
-//					@Override
-//					public void onSuccess(Void v) {
-//						ReadingRequestController.get().confirmReading(document.getId());
-//						confirmReadingLabel.setContents(I18N.message("readingconfirmthanks"));
-//					}
-//				});
+		LoginService.Instance.get().confirmLegal(username, legal.getName(), new DefaultAsyncCallback<>() {
+			@Override
+			public void onSuccess(Void v) {
+				confirmation.onClick(null);
+			}
+		});
 	}
 
 	/**

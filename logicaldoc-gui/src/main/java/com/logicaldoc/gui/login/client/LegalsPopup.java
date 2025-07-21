@@ -84,7 +84,7 @@ public class LegalsPopup extends Window {
 	protected void onLegalConfirmed() {
 		legals.remove(currentLegal.getName());
 		if(legals.isEmpty()) {
-			SC.say("thanksconfirmlegal");
+			SC.say(I18N.message("thanksconfirmlegal"));
 			destroy();
 		} else {
 			currentLegal = legals.values().iterator().next();

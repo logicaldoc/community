@@ -6,7 +6,6 @@ import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,7 @@ public class LegalServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger log = LoggerFactory.getLogger(AvatarServlet.class);
-	
+
 	/**
 	 * Constructor of the object.
 	 */
@@ -56,9 +55,9 @@ public class LegalServlet extends HttpServlet {
 					.queryForString("select ld_content from ld_legal where ld_name = :legal", Map.of("legal", legal));
 			ServletUtil.setContentDisposition(request, response, legal + ".pdf");
 			Decoder decoder = Base64.getDecoder();
-			byte[] lefgalBytes = decoder.decode(content);
-			try (ByteArrayInputStream bis = new ByteArrayInputStream(lefgalBytes)) {
-				IOUtils.write(lefgalBytes, response.getOutputStream());
+			byte[] legalBytes = decoder.decode(content);
+			try (ByteArrayInputStream bis = new ByteArrayInputStream(legalBytes)) {
+				bis.transferTo(response.getOutputStream());
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);

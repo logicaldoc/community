@@ -225,7 +225,7 @@ create table ld_temp (ld_int bigint, ld_int1 bigint, ld_date timestamp, ld_strin
 create table ld_uniquetag(ld_tag varchar(255), ld_tenantid bigint, ld_count bigint, primary key (ld_tag, ld_tenantid));
 create table ld_update (ld_update varchar(255), ld_date timestamp, ld_version varchar(255));
 create table ld_patch (ld_patch varchar(255), ld_date timestamp, ld_version varchar(255), ld_name varchar(255), ld_rating int not null, ld_size bigint not null, ld_description varchar(4000));
-create table ld_legal (ld_name varchar(255), ld_title varchar(255), ld_date timestamp, ld_content varchar(100000), primary key (ld_name));
+create table ld_legal (ld_name varchar(255), ld_category varchar(255), ld_title varchar(255), ld_date timestamp, ld_content varchar(100000), primary key (ld_name));
 create table ld_legal_confirmation(ld_legal varchar(255), ld_date timestamp, ld_username varchar(255), ld_user varchar(255), primary key(ld_legal, ld_username));
 create table ld_session(ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null,
                           ld_deleted int not null, ld_tenantid bigint not null, ld_sid varchar(255) not null,
