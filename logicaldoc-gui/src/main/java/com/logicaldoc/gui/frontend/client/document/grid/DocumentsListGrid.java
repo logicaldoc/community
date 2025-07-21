@@ -48,7 +48,6 @@ import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -660,15 +659,15 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 	@Override
 	public void registerDoubleClickHandler(final DoubleClickHandler handler) {
-		addDoubleClickHandler((DoubleClickEvent event) -> {
+		addDoubleClickHandler(click -> {
 			GUIDocument selectedDocument = getSelectedDocument();
 			if (selectedDocument == null)
 				return;
 			if (!selectedDocument.isPasswordProtected())
-				handler.onDoubleClick(event);
+				handler.onDoubleClick(click);
 			else
 				DocumentProtectionManager.askForPassword(selectedDocument.getId(),
-						document -> handler.onDoubleClick(event));
+						document -> handler.onDoubleClick(click));
 		});
 	}
 
