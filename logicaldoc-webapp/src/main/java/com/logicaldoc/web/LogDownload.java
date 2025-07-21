@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -18,12 +19,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -44,6 +39,12 @@ import com.logicaldoc.util.csv.CSVFileWriter;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
+
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet grant access to log files
@@ -204,9 +205,14 @@ public class LogDownload extends HttpServlet {
 			writePatchLogs(out);
 
 			/*
-			 * Dume the statistics
+			 * Dump the statistics
 			 */
 			dumpStats(out);
+
+			/*
+			 * Dump the confirmed legals
+			 */
+			dumpLegals(out);
 
 			prop.store(new FileOutputStream(buf), "Support Request");
 		}
@@ -339,6 +345,31 @@ public class LogDownload extends HttpServlet {
 					});
 
 			writeEntry(out, "stats.csv", buf);
+		} finally {
+			FileUtil.delete(buf);
+		}
+	}
+
+	private void dumpLegals(ZipOutputStream out) throws IOException, PersistenceException {
+		File buf = FileUtil.createTempFile("legals", ".csv");
+		try {
+			GenericDAO dao = Context.get(GenericDAO.class);
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+			dao.queryForResultSet(
+					"select ld_name, ld_category, ld_title, ld_username, B.ld_date from ld_legal A, ld_legal_confirmation B where ld_legal=ld_name order by ld_name, B.ld_date desc",
+					null, null, rows -> {
+						try (CSVFileWriter csv = new CSVFileWriter(buf.getAbsolutePath(), ',')) {
+							csv.writeFields(List.of("Legal", "Category", "Title", "Confirmed by", "Confirmed on"));
+							while (rows.next()) {
+								csv.writeFields(List.of(rows.getString(1), rows.getString(2), rows.getString(3),
+										rows.getString(4), df.format(rows.getTimestamp(5))));
+							}
+						} catch (IOException ioe) {
+							throw new PersistenceException(ioe);
+						}
+					});
+
+			writeEntry(out, "legals.csv", buf);
 		} finally {
 			FileUtil.delete(buf);
 		}
