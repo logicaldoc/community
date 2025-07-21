@@ -754,7 +754,7 @@ public class LoginPanel extends VLayout {
 			@Override
 			public void execute(Boolean value) {
 				if (Boolean.TRUE.equals(value)) {
-					LoginService.Instance.get().getLegalsToConfirm(DEBUG_ID_PREFIX, new DefaultAsyncCallback<>() {
+					LoginService.Instance.get().getLegalsToConfirm(username, new DefaultAsyncCallback<>() {
 
 						@Override
 						public void onSuccess(List<GUIParameter> legals) {

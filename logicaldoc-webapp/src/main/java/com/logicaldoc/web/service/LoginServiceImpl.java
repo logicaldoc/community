@@ -265,9 +265,10 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 	public void confirmLegal(String username, String legal) throws ServerException {
 		try {
 			UserDAO userDao = Context.get(UserDAO.class);
+			User user = userDao.findByUsername(username);
 			userDao.jdbcUpdate(
-					"insert into ld_legal_confirmation(ld_username, ld_legal, ld_date) values (:username, :legal, CURRENT_TIMESTAMP)",
-					Map.of("username", username, "legal", legal));
+					"insert into ld_legal_confirmation(ld_username, ld_user, ld_legal, ld_date) values (:username, :user, :legal, CURRENT_TIMESTAMP)",
+					Map.of("username", user.getUsername(), "user", user.getFullName(), "legal", legal));
 			log.info("User {} confirmed legal {}", username, legal);
 		} catch (PersistenceException e) {
 			throw new ServerException(e.getMessage());
