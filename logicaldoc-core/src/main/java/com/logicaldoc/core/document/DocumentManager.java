@@ -440,6 +440,20 @@ public class DocumentManager {
 	}
 
 	/**
+	 * Checks out the given document
+	 * 
+	 * @param document the document to be checked out
+	 * @param transaction entry to log the event (set the user)
+	 * 
+	 * @throws PersistenceException error at data layer
+	 */
+	public void checkout(Document document, DocumentHistory transaction) throws PersistenceException {
+		if (transaction.getEvent() == null)
+			transaction.setEvent(DocumentEvent.CHECKEDOUT);
+		lock(document, DocumentStatus.CHECKEDOUT, transaction);
+	}
+	
+	/**
 	 * Locks the given document
 	 * 
 	 * @param docId the document to be locked
@@ -449,39 +463,47 @@ public class DocumentManager {
 	 * @throws PersistenceException if an error occurs, this exception is thrown
 	 */
 	public void lock(long docId, DocumentStatus status, DocumentHistory transaction) throws PersistenceException {
+		Document document=documentDAO.findDocument(docId);
+		documentDAO.initialize(document);
+		lock(document, status, transaction);
+	}
+
+	/**
+	 * Locks the given document, it is synchronized because under
+	 * high-ferquency, Hibernate may fail
+	 * 
+	 * @param doc the document to be locked
+	 * @param status the lock type (used to populate status attribute of the
+	 *        document)
+	 * @param transaction entry to log the event (set the user)
+	 * @throws PersistenceException if an error occurs, this exception is thrown
+	 */
+	public synchronized void lock(Document document, DocumentStatus status, DocumentHistory transaction)
+			throws PersistenceException {
 		validateTransaction(transaction);
 
-		/*
-		 * Better to synchronize this block because under high multi-threading
-		 * may lead to hibernate's sessions rollbacks
-		 */
-		synchronized (this) {
-			Document document = documentDAO.findDocument(docId);
-
-			if (document.getStatus() == status && document.getLockUserId().equals(transaction.getUserId())) {
-				log.debug("Document {} is already locked by user {}", document, transaction.getUser().getFullName());
-				return;
-			}
-
-			if (document.getStatus() != DocumentStatus.UNLOCKED)
-				throw new PersistenceException(
-						String.format("Document %s is already locked by user %s and cannot be locked by %s", document,
-								document.getLockUser(), transaction.getUser().getFullName()));
-
-			documentDAO.initialize(document);
-			document.setLockUserId(transaction.getUser().getId());
-			document.setLockUser(transaction.getUser().getFullName());
-			document.setStatus(status);
-			document.setFolder(document.getFolder());
-
-			if (transaction.getEvent() == null)
-				transaction.setEvent(DocumentEvent.LOCKED);
-
-			// Modify document history entry
-			documentDAO.store(document, transaction);
+		if (document.getStatus() == status && document.getLockUserId().equals(transaction.getUserId())) {
+			log.debug("Document {} is already locked by user {}", document, transaction.getUser().getFullName());
+			return;
 		}
 
-		log.debug("locked document {}", docId);
+		if (document.getStatus() != DocumentStatus.UNLOCKED)
+			throw new PersistenceException(
+					String.format("Document %s is already locked by user %s and cannot be locked by %s", document,
+							document.getLockUser(), transaction.getUser().getFullName()));
+
+		document.setLockUserId(transaction.getUser().getId());
+		document.setLockUser(transaction.getUser().getFullName());
+		document.setStatus(status);
+		document.setFolder(document.getFolder());
+
+		if (transaction.getEvent() == null)
+			transaction.setEvent(DocumentEvent.LOCKED);
+
+		// Modify document history entry
+		documentDAO.store(document, transaction);
+
+		log.debug("locked document {}", document);
 	}
 
 	private void storeFile(Document doc, File file) throws IOException {
