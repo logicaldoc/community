@@ -365,7 +365,7 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	private CheckboxItem prepareLegalsItem(boolean readonly) {
-		final CheckboxItem lgs = new CheckboxItem(LEGALS, I18N.message(LEGALS));
+		final CheckboxItem lgs = new CheckboxItem(LEGALS, I18N.message("legalrepresentative"));
 		lgs.setValue(user.isLegals());
 		lgs.setDisabled(ADMIN.equals(user.getUsername()));
 		if (readonly || ADMIN.equals(user.getUsername())) {

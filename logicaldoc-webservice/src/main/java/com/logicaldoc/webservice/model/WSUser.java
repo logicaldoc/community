@@ -132,11 +132,11 @@ public class WSUser {
 	@WSDoc(description = "ids of the groups this user belongs to")
 	private List<Long> groupIds = new ArrayList<>();
 
-	@WSDoc(description = "if <b>1</b> the user is enabled, if <b>0</b> the user is disabled")
-	private int enabled = 1;
-	
+	@WSDoc(required = false, description = "if <b>1</b> the user is enabled, if <b>0</b> the user is disabled")
+	private Integer enabled = 1;
+
 	@WSDoc(description = "if <b>1</b> the user must confirm any change in the legals")
-	private int legals = 1;
+	private Integer legals;
 
 	@WSDoc(description = "if <b>1</b> the user can connect during working time only")
 	private int enforceWorkingTime = 0;
@@ -494,7 +494,8 @@ public class WSUser {
 			user.setTimeZone(getTimeZone());
 			user.setKey(getKey());
 			user.setSecondFactor(getSecondFactor());
-			user.setLegals(getLegals());
+			if (getLegals() != null)
+				user.setLegals(getLegals());
 
 			if (CollectionUtils.isNotEmpty(groupIds)) {
 				GroupDAO groupDao = Context.get(GroupDAO.class);
@@ -750,11 +751,11 @@ public class WSUser {
 		this.evalFormEnabled = evalFormEnabled;
 	}
 
-	public int getLegals() {
+	public Integer getLegals() {
 		return legals;
 	}
 
-	public void setLegals(int legals) {
+	public void setLegals(Integer legals) {
 		this.legals = legals;
 	}
 }

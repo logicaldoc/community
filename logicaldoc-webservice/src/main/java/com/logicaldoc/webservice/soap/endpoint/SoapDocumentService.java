@@ -200,6 +200,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		User user = validateSession(sid);
 		DocumentDAO docDao = Context.get(DocumentDAO.class);
 		Document doc = docDao.findById(docId);
+		docDao.initialize(doc);
 		if (doc.getImmutable() == 1)
 			throw new PermissionException(THE_DOCUMENT + docId + IS_IMMUTABLE);
 
@@ -210,6 +211,8 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		checkDocumentPermission(Permission.DOWNLOAD, user, docId);
 
 		doc = docDao.findDocument(docId);
+		docDao.initialize(doc);
+		
 		checkPublished(user, doc);
 
 		// Create the document history event
@@ -220,7 +223,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		transaction.setUser(user);
 
 		DocumentManager documentManager = Context.get(DocumentManager.class);
-		documentManager.checkout(doc.getId(), transaction);
+		documentManager.checkout(doc, transaction);
 	}
 
 	@Override
