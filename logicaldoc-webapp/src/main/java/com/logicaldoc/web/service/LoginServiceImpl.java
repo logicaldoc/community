@@ -250,7 +250,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			List<GUIParameter> legals = new ArrayList<>();
 			UserDAO userDao = Context.get(UserDAO.class);
 			userDao.queryForResultSet(
-					"select ld_name, ld_title from ld_legal where not exists (select * from ld_legal_confirmation where ld_username = :username and ld_legal=ld_name)",
+					"select ld_name, ld_title from ld_legal where not exists (select * from ld_legal_confirmation where ld_username = :username and ld_legal=ld_name) order by ld_sort",
 					Map.of("username", username), null, rows -> {
 						while (rows.next())
 							legals.add(new GUIParameter(rows.getString(1), rows.getString(2)));

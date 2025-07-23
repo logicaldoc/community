@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
@@ -152,13 +153,13 @@ public class UserPropertiesPanel extends HLayout {
 		ComboBoxItem timeZone = prepareTimeZoneSelector(readonly);
 
 		if (user.getId() == 0L)
-			form1.setItems(notifyCredentials, guest, legals, username, email, firstname, name, email2, language, timeZone,
-					address, postalcode, city, country, state, phone, cell, company, department, building,
+			form1.setItems(notifyCredentials, guest, legals, username, email, firstname, name, email2, language,
+					timeZone, address, postalcode, city, country, state, phone, cell, company, department, building,
 					organizationalUnit);
 		else
-			form1.setItems(id, lastLogin, creation, username, notifyCredentials, guest, legals, email, firstname, name, email2,
-					language, timeZone, address, postalcode, city, country, state, phone, cell, company, department,
-					building, organizationalUnit);
+			form1.setItems(id, lastLogin, creation, username, notifyCredentials, guest, legals, email, firstname, name,
+					email2, language, timeZone, address, postalcode, city, country, state, phone, cell, company,
+					department, building, organizationalUnit);
 		addMember(layout);
 
 		prepareGroupsForm(readonly);
@@ -373,6 +374,7 @@ public class UserPropertiesPanel extends HLayout {
 		} else {
 			lgs.addChangedHandler(changedHandler);
 		}
+		lgs.setVisible(Feature.enabled(Feature.LEGALS));
 		return lgs;
 	}
 
@@ -417,8 +419,8 @@ public class UserPropertiesPanel extends HLayout {
 			user.setOrganizationalUnit((String) values.get("organizationalunit"));
 			user.setDepartment((String) values.get("department"));
 			user.setCompany((String) values.get("company"));
-			user.setLegals(Boolean.parseBoolean(values.get(LEGALS).toString())); 
-			
+			user.setLegals(Boolean.parseBoolean(values.get(LEGALS).toString()));
+
 			if (user.getId() == 0L)
 				user.setNotifyCredentials(Boolean.parseBoolean(values.get("notifyCredentials").toString()));
 		}

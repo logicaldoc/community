@@ -174,7 +174,7 @@ public class AboutDialog extends Window {
 		tabs.setWidth100();
 		tabs.setHeight100();
 
-		if (Session.get().getUser().isLegals())
+		if (Session.get().getUser().isLegals() && Feature.enabled(Feature.LEGALS))
 			tabs.setTabs(aboutTab, changelogTab, legalsTab);
 		else
 			tabs.setTabs(aboutTab, changelogTab);

@@ -88,7 +88,7 @@ public class LegalServlet extends HttpServlet {
 
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 		Context.get(UserDAO.class).queryForResultSet(
-				"select ld_name, ld_category, ld_title, B.ld_date from ld_legal A, ld_legal_confirmation B where ld_legal=ld_name and ld_username = :userName order by B.ld_date desc",
+				"select ld_name, ld_category, ld_title, B.ld_date from ld_legal A, ld_legal_confirmation B where ld_legal=ld_name and ld_username = :userName order by ld_sort asc, B.ld_date desc",
 				Map.of("userName", userName), null, new ResultSetWalker() {
 
 					@Override

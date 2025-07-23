@@ -146,6 +146,8 @@ public class Feature {
 	public static final int DUPLICATES_DISCOVERY = 66;
 
 	public static final int REPO_ENCRYPTION = 67;
+	
+	public static final int LEGALS = 68;
 
 	public static final int EXPORT_CSV = 69;
 
