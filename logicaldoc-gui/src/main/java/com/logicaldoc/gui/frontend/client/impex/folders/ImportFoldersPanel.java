@@ -140,7 +140,7 @@ public class ImportFoldersPanel extends AdminPanel {
 		list.addSelectionChangedHandler(selection -> {
 			Record rec = list.getSelectedRecord();
 			if (rec != null)
-				ImportFolderService.Instance.get().getImportFolder(Long.parseLong(rec.getAttributeAsString("id")),
+				ImportFolderService.Instance.get().get(Long.parseLong(rec.getAttributeAsString("id")),
 						new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(GUIImportFolder share) {
@@ -169,7 +169,7 @@ public class ImportFoldersPanel extends AdminPanel {
 		Menu contextMenu = new Menu();
 
 		final ListGridRecord rec = list.getSelectedRecord();
-		final long id = Long.parseLong(rec.getAttributeAsString("id"));
+		final long id = rec.getAttributeAsLong("id");
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
@@ -188,22 +188,21 @@ public class ImportFoldersPanel extends AdminPanel {
 
 		MenuItem test = new MenuItem();
 		test.setTitle(I18N.message("testconnection"));
-		test.addClickHandler(event -> ImportFolderService.Instance.get()
-				.test(Long.parseLong(rec.getAttributeAsString("id")), new DefaultAsyncCallback<>() {
-					@Override
-					public void onSuccess(Boolean result) {
-						if (Boolean.TRUE.equals(result))
-							SC.say(I18N.message("connectionestablished"));
-						else
-							SC.warn(I18N.message("connectionfailed"));
-					}
-				}));
+		test.addClickHandler(event -> ImportFolderService.Instance.get().test(id, new DefaultAsyncCallback<>() {
+			@Override
+			public void onSuccess(Boolean result) {
+				if (Boolean.TRUE.equals(result))
+					SC.say(I18N.message("connectionestablished"));
+				else
+					SC.warn(I18N.message("connectionfailed"));
+			}
+		}));
 
 		MenuItem enable = new MenuItem();
 		enable.setTitle(I18N.message("enable"));
 		enable.setEnabled(Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED)));
-		enable.addClickHandler(event -> ImportFolderService.Instance.get()
-				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new DefaultAsyncCallback<>() {
+		enable.addClickHandler(
+				event -> ImportFolderService.Instance.get().changeStatus(id, true, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						rec.setAttribute(ENABLED, true);
@@ -214,8 +213,8 @@ public class ImportFoldersPanel extends AdminPanel {
 		MenuItem disable = new MenuItem();
 		disable.setTitle(I18N.message("disable"));
 		disable.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED)));
-		disable.addClickHandler(event -> ImportFolderService.Instance.get()
-				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new DefaultAsyncCallback<>() {
+		disable.addClickHandler(
+				event -> ImportFolderService.Instance.get().changeStatus(id, false, new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void result) {
 						rec.setAttribute(ENABLED, false);
@@ -252,7 +251,16 @@ public class ImportFoldersPanel extends AdminPanel {
 					}
 				}));
 
-		contextMenu.setItems(test, enable, disable, new MenuItemSeparator(), resetCache, resetCounter,
+		MenuItem clone = new MenuItem();
+		clone.setTitle(I18N.message("clone"));
+		clone.addClickHandler(event -> ImportFolderService.Instance.get().clone(id, new DefaultAsyncCallback<>() {
+			@Override
+			public void onSuccess(GUIImportFolder result) {
+				refresh();
+			}
+		}));
+
+		contextMenu.setItems(test, enable, disable, clone, new MenuItemSeparator(), resetCache, resetCounter,
 				new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}

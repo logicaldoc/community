@@ -43,7 +43,7 @@ public interface ImportFolderService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIImportFolder getImportFolder(long id) throws ServerException;
+	public GUIImportFolder get(long id) throws ServerException;
 
 	/**
 	 * Tests the connection to the given import folder
@@ -84,12 +84,23 @@ public interface ImportFolderService extends RemoteService {
 	 */
 	public void resetCache(long id) throws ServerException;
 
+	/**
+	 * Clones a given import folder
+	 * 
+	 * @param id Identifier of the original import folder to clone
+	 * 
+	 * @return The created clone
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public GUIImportFolder clone(long id) throws ServerException;
+
 	public static class Instance {
 		private static ImportFolderServiceAsync inst;
 
 		private Instance() {
 		}
-		
+
 		public static ImportFolderServiceAsync get() {
 			if (inst == null) {
 				inst = GWT.create(ImportFolderService.class);

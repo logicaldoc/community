@@ -4,7 +4,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIImportFolder;
 
 public interface ImportFolderServiceAsync {
-
+	
+	void get(long id, AsyncCallback<GUIImportFolder> callback);
+	
 	void delete(long id, AsyncCallback<Void> callback);
 
 	void save(GUIImportFolder share, AsyncCallback<GUIImportFolder> callback);
@@ -15,7 +17,7 @@ public interface ImportFolderServiceAsync {
 
 	void resetCache(long id, AsyncCallback<Void> callback);
 
-	void getImportFolder(long id, AsyncCallback<GUIImportFolder> callback);
+	void clone(long id, AsyncCallback<GUIImportFolder> callback);
 
 	void resetCounter(long id, AsyncCallback<Void> callback);
 }

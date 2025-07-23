@@ -50,7 +50,7 @@ public class ImportFolderDetailsPanel extends VLayout {
 
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> {
 			if (importFolder.getId() != 0) {
-				ImportFolderService.Instance.get().getImportFolder(importFolder.getId(), new DefaultAsyncCallback<>() {
+				ImportFolderService.Instance.get().get(importFolder.getId(), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIImportFolder share) {
 						setShare(share);
