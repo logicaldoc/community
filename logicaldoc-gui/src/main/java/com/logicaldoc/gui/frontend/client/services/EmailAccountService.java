@@ -84,6 +84,17 @@ public interface EmailAccountService extends RemoteService {
 	 */
 	public void resetCounter(long id) throws ServerException;
 
+	/**
+	 * Clones a given email account
+	 * 
+	 * @param id Identifier of the original accout to clone
+	 * 
+	 * @return The created clone
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public GUIEmailAccount clone(long id) throws ServerException;
+	
 	public static class Instance {
 		private static EmailAccountServiceAsync inst;
 

@@ -18,4 +18,6 @@ public interface EmailAccountServiceAsync {
 	void test(long id, AsyncCallback<Boolean> callback);
 
 	void resetCounter(long id, AsyncCallback<Void> callback);
+
+	void clone(long id, AsyncCallback<GUIEmailAccount> callback);
 }

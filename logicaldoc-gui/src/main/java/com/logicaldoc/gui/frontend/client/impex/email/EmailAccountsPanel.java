@@ -30,7 +30,6 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.MenuItemSeparator;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -105,12 +104,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		ToolStripButton refresh = new ToolStripButton();
 		refresh.setTitle(I18N.message("refresh"));
 		toolStrip.addButton(refresh);
-		refresh.addClickHandler(click -> {
-			list.refresh(new EmailAccountsDS("default"));
-			detailsContainer.removeMembers(detailsContainer.getMembers());
-			details = SELECT_ACCOUNT;
-			detailsContainer.setMembers(details);
-		});
+		refresh.addClickHandler(click -> refresh());
 
 		ToolStripButton addAccount = new ToolStripButton();
 		addAccount.setTitle(I18N.message("addaccount"));
@@ -156,6 +150,13 @@ public class EmailAccountsPanel extends AdminPanel {
 		body.setMembers(toolStrip, listing, detailsContainer);
 	}
 
+	private void refresh() {
+		list.refresh(new EmailAccountsDS("default"));
+		detailsContainer.removeMembers(detailsContainer.getMembers());
+		details = SELECT_ACCOUNT;
+		detailsContainer.setMembers(details);
+	}
+
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
@@ -164,9 +165,9 @@ public class EmailAccountsPanel extends AdminPanel {
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler((MenuItemClickEvent event) -> LD.ask(I18N.message(QUESTION),
-				I18N.message("confirmdelete"), (Boolean value) -> {
-					if (Boolean.TRUE.equals(value)) {
+		delete.addClickHandler(click -> LD.ask(I18N.message(QUESTION),
+				I18N.message("confirmdelete"), choice -> {
+					if (Boolean.TRUE.equals(choice)) {
 						EmailAccountService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
 							@Override
 							public void onSuccess(Void result) {
@@ -180,7 +181,7 @@ public class EmailAccountsPanel extends AdminPanel {
 
 		MenuItem test = new MenuItem();
 		test.setTitle(I18N.message("testconnection"));
-		test.addClickHandler((MenuItemClickEvent event) -> EmailAccountService.Instance.get()
+		test.addClickHandler(click -> EmailAccountService.Instance.get()
 				.test(Long.parseLong(rec.getAttributeAsString("id")), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Boolean result) {
@@ -231,8 +232,8 @@ public class EmailAccountsPanel extends AdminPanel {
 
 		MenuItem resetCounter = new MenuItem();
 		resetCounter.setTitle(I18N.message("resetcounter"));
-		resetCounter.addClickHandler((MenuItemClickEvent event) -> LD.ask(I18N.message(QUESTION),
-				I18N.message("confirmresetcounter"), choice -> {
+		resetCounter.addClickHandler(
+				click -> LD.ask(I18N.message(QUESTION), I18N.message("confirmresetcounter"), choice -> {
 					if (Boolean.TRUE.equals(choice)) {
 						EmailAccountService.Instance.get().resetCounter(id, new DefaultAsyncCallback<>() {
 							@Override
@@ -245,7 +246,17 @@ public class EmailAccountsPanel extends AdminPanel {
 					}
 				}));
 
-		contextMenu.setItems(test, enable, disable, new MenuItemSeparator(), resetCache, resetCounter,
+		MenuItem clone = new MenuItem();
+		clone.setTitle(I18N.message("clone"));
+		clone.addClickHandler(click -> EmailAccountService.Instance.get()
+				.clone(Long.parseLong(rec.getAttributeAsString("id")), new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(GUIEmailAccount result) {
+						refresh();
+					}
+				}));
+
+		contextMenu.setItems(test, enable, disable, clone, new MenuItemSeparator(), resetCache, resetCounter,
 				new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
