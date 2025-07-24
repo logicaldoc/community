@@ -450,8 +450,7 @@ public class UsersPanel extends AdminPanel {
 	private MenuItem preparePasswordMenuItem(final ListGridRecord[] selectedUsers) {
 		MenuItem password = new MenuItem();
 		password.setTitle(I18N.message("changepassword"));
-		password.addClickHandler(
-				event -> new SetPassword(Long.parseLong(selectedUsers[0].getAttributeAsString("id"))).show());
+		password.addClickHandler(event -> new SetPassword(selectedUsers[0].getAttributeAsLong("id")).show());
 		return password;
 	}
 

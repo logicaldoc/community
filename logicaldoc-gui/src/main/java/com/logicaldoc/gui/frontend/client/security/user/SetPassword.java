@@ -116,8 +116,10 @@ public class SetPassword extends Window {
 									newPass.setErrors(val.getValue());
 								} else
 									GuiLog.warn(I18N.message("genericerror"), null);
-							} else
+							} else {
 								destroy();
+								SC.warn(I18N.message("passwordforcedhint"));
+							}
 						}
 					});
 		});
