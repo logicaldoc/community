@@ -216,32 +216,21 @@ public class Setup implements EntryPoint {
 	 * Prepares the database tab
 	 */
 	private Tab setupDatabase(final ValuesManager vm, GUIInfo info) {
-		// Prepare the fieldsMap with all database engines, with Hibernate 6 it
-		// is usggested to leave blank the dialect (the fourth element in the
-		// array)
+		// Prepare the fieldsMap with all database engines
 		engines.put(MYSQL, new String[] { MYSQL, "com.mysql.cj.jdbc.Driver",
 				"jdbc:mysql://<server>[,<failoverhost>][<:3306>]/<database>?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC",
-				"", SELECT_1 }); // in Hibernate 5.x:
-									// org.hibernate.dialect.MySQL8Dialect
+				"org.hibernate.dialect.MySQL8Dialect", SELECT_1 });
 		engines.put(MARIADB, new String[] { MARIADB, "org.mariadb.jdbc.Driver",
-				"jdbc:mariadb://<server>[<:3306>]/<database>", "", SELECT_1 }); // in
-																				// Hibernate
-																				// 5.x:
-																				// org.hibernate.dialect.MariaDB106Dialect
-		engines.put(POSTGRESQL, new String[] { POSTGRESQL, "org.postgresql.Driver",
-				"jdbc:postgresql:[<//server>[<:5432>/]]<database>", "", SELECT_1 }); // in
-																						// Hibernate
-																						// 5.x:
-																						// org.hibernate.dialect.PostgreSQLDialect
-		engines.put(ORACLE, new String[] { ORACLE, "oracle.jdbc.driver.OracleDriver",
-				"jdbc:oracle:thin:@<server>[<:1521>]:<sid>", "", "SELECT 1 FROM DUAL" });// in
-																							// Hibernate
-																							// 5.x:
-																							// org.hibernate.dialect.Oracle10gDialect
+				"jdbc:mariadb://<server>[<:3306>]/<database>", "org.hibernate.dialect.MariaDB106Dialect", SELECT_1 });
+		engines.put(POSTGRESQL,
+				new String[] { POSTGRESQL, "org.postgresql.Driver", "jdbc:postgresql:[<//server>[<:5432>/]]<database>",
+						"org.hibernate.dialect.PostgreSQLDialect", SELECT_1 });
+		engines.put(ORACLE,
+				new String[] { ORACLE, "oracle.jdbc.driver.OracleDriver", "jdbc:oracle:thin:@<server>[<:1521>]:<sid>",
+						"org.hibernate.dialect.Oracle10gDialect", "SELECT 1 FROM DUAL" });
 		engines.put(SQLSERVER, new String[] { "SQL Server", "com.microsoft.sqlserver.jdbc.SQLServerDriver",
 				"jdbc:sqlserver://<server>[:<1433>];encrypt=false;trustServerCertificate=true;databaseName=<database>;instanceName=<instance>",
-				"", SELECT_1 }); // in Hibernate 5.x:
-									// org.hibernate.dialect.SQLServer2008Dialect
+				"org.hibernate.dialect.SQLServer2008Dialect", SELECT_1 });
 
 		Tab databaseTab = new Tab();
 		databaseTab.setTitle(I18N.message("database"));
