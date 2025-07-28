@@ -206,7 +206,7 @@ public class VersionsPanel extends DocumentDetailTab {
 
 		MenuItem compareMetadata = prepareCompareMetadataItem(selection);
 
-		MenuItem compareContent = compareContentMenuItem(selection);
+		MenuItem compareContent = prepareCompareContentMenuItem(selection);
 
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message(DOWNLOAD));
@@ -219,7 +219,7 @@ public class VersionsPanel extends DocumentDetailTab {
 		preview.setEnabled(
 				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 
-		MenuItem promote = comparePromoteMenuItem(selection);
+		MenuItem promote = preparePromoteMenuItem(selection);
 
 		MenuItem delete = prepareDeleteMenuItem(selection);
 
@@ -283,7 +283,7 @@ public class VersionsPanel extends DocumentDetailTab {
 		return delete;
 	}
 
-	private MenuItem comparePromoteMenuItem(final ListGridRecord[] selection) {
+	private MenuItem preparePromoteMenuItem(final ListGridRecord[] selection) {
 		MenuItem promote = new MenuItem();
 		promote.setTitle(I18N.message("promote"));
 		promote.addClickHandler((MenuItemClickEvent promoteEvent) -> LD.ask(I18N.message("question"),
@@ -304,7 +304,7 @@ public class VersionsPanel extends DocumentDetailTab {
 		return promote;
 	}
 
-	private MenuItem compareContentMenuItem(final ListGridRecord[] selection) {
+	private MenuItem prepareCompareContentMenuItem(final ListGridRecord[] selection) {
 		MenuItem compareContent = new MenuItem();
 		compareContent.setTitle(I18N.message("comparecontent"));
 		compareContent.addClickHandler(compareContentEvent -> DocumentService.Instance.get().getVersionsById(

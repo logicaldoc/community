@@ -3,13 +3,13 @@ package com.logicaldoc.gui.frontend.client.document;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.IButton;
@@ -127,7 +127,6 @@ public class MetadataDiff extends Window {
 	}
 
 	private void printExtendedAttributes(ArrayList<DiffRecord> records, GUIVersion version1, GUIVersion version2) {
-		DateTimeFormat dateFormat = DateTimeFormat.getFormat(I18N.message("format_date"));
 		NumberFormat numberFormat = NumberFormat.getDecimalFormat();
 
 		List<DiffRecord> attributeRecords = new ArrayList<>();
@@ -135,14 +134,14 @@ public class MetadataDiff extends Window {
 		List<String> names = prepareAttributeNames(version1, version2);
 
 		for (String name : names)
-			addDiffRecord(version1, version2, dateFormat, numberFormat, attributeRecords, name);
+			addDiffRecord(version1, version2, numberFormat, attributeRecords, name);
 
 		attributeRecords.sort(null);
 		records.addAll(attributeRecords);
 	}
 
-	private void addDiffRecord(GUIVersion version1, GUIVersion version2, DateTimeFormat dateFormat,
-			NumberFormat numberFormat, List<DiffRecord> attributeRecords, String name) {
+	private void addDiffRecord(GUIVersion version1, GUIVersion version2, NumberFormat numberFormat,
+			List<DiffRecord> attributeRecords, String name) {
 
 		String val1 = "";
 		String label = null;
@@ -153,7 +152,7 @@ public class MetadataDiff extends Window {
 			label = att1.getDisplayName();
 			position = att1.getPosition();
 
-			val1 = extractValue(dateFormat, numberFormat, att1);
+			val1 = extractValue(numberFormat, att1);
 		}
 
 		GUIAttribute att2 = version2.getAttribute(name);
@@ -164,14 +163,14 @@ public class MetadataDiff extends Window {
 			if (position == -1)
 				position = att2.getPosition();
 
-			val2 = extractValue(dateFormat, numberFormat, att2);
+			val2 = extractValue(numberFormat, att2);
 		}
 
 		DiffRecord rec = new DiffRecord(name, label, val1, val2, position);
 		attributeRecords.add(rec);
 	}
 
-	private String extractValue(DateTimeFormat dateFormat, NumberFormat numberFormat, GUIAttribute attribute) {
+	private String extractValue(NumberFormat numberFormat, GUIAttribute attribute) {
 		String val = "";
 		if ((attribute.getType() == GUIAttribute.TYPE_STRING || attribute.getType() == GUIAttribute.TYPE_USER
 				|| attribute.getType() == GUIAttribute.TYPE_DOCUMENT || attribute.getType() == GUIAttribute.TYPE_FOLDER)
@@ -182,7 +181,7 @@ public class MetadataDiff extends Window {
 		} else if (attribute.getType() == GUIAttribute.TYPE_DOUBLE && attribute.getValue() != null) {
 			val = numberFormat.format(attribute.getDoubleValue());
 		} else if (attribute.getType() == GUIAttribute.TYPE_DATE && attribute.getValue() != null) {
-			val = dateFormat.format(attribute.getDateValue());
+			val = I18N.formatDate(attribute.getDateValue());
 		}
 		return val;
 	}
@@ -263,7 +262,7 @@ public class MetadataDiff extends Window {
 		public boolean equals(Object other) {
 			return super.equals(other);
 		}
-		
+
 		@Override
 		public int hashCode() {
 			return super.hashCode();

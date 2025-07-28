@@ -298,7 +298,7 @@ public abstract class AbstractTestCase {
 	}
 
 	protected Connection getConnection() throws SQLException {
-		return context.getBean(DataSource.class).getConnection();
+		return Context.get(DataSource.class).getConnection();
 	}
 
 	protected void waiting() throws InterruptedException {
