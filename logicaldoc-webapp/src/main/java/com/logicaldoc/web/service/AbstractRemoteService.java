@@ -447,7 +447,8 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	}
 
 	/**
-	 * Converts into Gregorian date in case it is before Oct 4th 1582
+	 * Converts into Gregorian date in case it is before Oct 4th 1582. Also put
+	 * default time of 12:00:00.
 	 * 
 	 * @param date the date to treat
 	 * 
@@ -456,17 +457,36 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	protected static final Date fixDateForDB(Date date) {
 		if (date != null && JulianCalendarUtil.isJulianDate(date))
 			date = JulianCalendarUtil.toGregorian(date);
+		if (date != null) {
+			Calendar c = Calendar.getInstance();
+			c.setTime(date);
+			c.set(Calendar.HOUR_OF_DAY, 12);
+			c.set(Calendar.MINUTE, 0);
+			c.set(Calendar.SECOND, 0);
+			c.set(Calendar.MILLISECOND, 0);
+			
+		}
 		return date;
 	}
 
 	/**
-	 * Converts into Julian date in case it is before Oct 4th 1582
+	 * Converts into Julian date in case it is before Oct 4th 1582. Also put
+	 * default time of 12:00:00.
 	 * 
 	 * @param date the date to treat
 	 * 
 	 * @return the converted date
 	 */
 	protected static final Date fixDateForGUI(Date date) {
+		if (date != null) {
+			Calendar c = Calendar.getInstance();
+			c.setTime(date);
+			c.set(Calendar.HOUR_OF_DAY, 12);
+			c.set(Calendar.MINUTE, 0);
+			c.set(Calendar.SECOND, 0);
+			c.set(Calendar.MILLISECOND, 0);
+			date = c.getTime();
+		}
 		if (date != null && JulianCalendarUtil.isJulianDate(date))
 			date = JulianCalendarUtil.toJulian(date);
 		return date;

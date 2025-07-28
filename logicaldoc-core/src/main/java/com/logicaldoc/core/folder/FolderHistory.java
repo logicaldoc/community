@@ -26,6 +26,11 @@ public class FolderHistory extends AbstractDocumentHistory {
 	public void setEvent(FolderEvent event) {
 		this.event = (event != null) ? event.toString() : null;
 	}
+	
+	@Override
+	public void setEvent(String event) {
+		setEvent(FolderEvent.fromKey(event));
+	}
 
 	public FolderEvent getEventEnum() {
 		if (event == null)

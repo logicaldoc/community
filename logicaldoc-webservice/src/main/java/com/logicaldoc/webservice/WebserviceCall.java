@@ -36,13 +36,19 @@ public class WebserviceCall extends History {
 	public WebserviceCall() {
 		setEvent(WebserviceCallEvent.CALL);
 	}
-	
+
 	public void setEvent(WebserviceCallEvent event) {
 		this.event = (event != null) ? event.toString() : null;
 	}
 
+	@Override
+	public void setEvent(String event) {
+		setEvent(WebserviceCallEvent.fromKey(event));
+	}
+
 	public WebserviceCallEvent getEventEnum() {
-		if (event == null) return null;
+		if (event == null)
+			return null;
 		return WebserviceCallEvent.fromKey(event);
 	}
 

@@ -43,6 +43,11 @@ public class DocumentHistory extends AbstractDocumentHistory {
 		this.event = (event != null) ? event.toString() : null;
 	}
 
+	@Override
+	public void setEvent(String event) {
+		setEvent(DocumentEvent.fromKey(event));
+	}
+
 	public DocumentEvent getEventEnum() {
 		if (event == null)
 			return null;

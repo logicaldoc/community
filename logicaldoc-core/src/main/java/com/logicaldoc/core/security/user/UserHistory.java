@@ -58,6 +58,11 @@ public class UserHistory extends History {
 		this.event = (event != null) ? event.toString() : null;
 	}
 
+	@Override
+	public void setEvent(String event) {
+		setEvent(UserEvent.fromKey(event));
+	}
+
 	public UserEvent getEventEnum() {
 		if (event == null)
 			return null;

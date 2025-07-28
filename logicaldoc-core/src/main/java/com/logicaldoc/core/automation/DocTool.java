@@ -144,6 +144,10 @@ public class DocTool {
 		return displayUrl(history.getTenantId(), history.getDocId());
 	}
 
+	public DocumentEvent documentEvent(String eventKey) {
+		return DocumentEvent.fromKey(eventKey);
+	}
+	
 	/**
 	 * Creates a new download ticket for a document
 	 * 

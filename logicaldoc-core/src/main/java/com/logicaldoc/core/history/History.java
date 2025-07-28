@@ -5,11 +5,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +19,11 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 /**
  * Superclass for history entries
@@ -120,6 +120,15 @@ public abstract class History extends PersistentObject implements Comparable<His
 	 */
 	public void setDate(Date date) {
 		this.date = date;
+	}
+
+	/**
+	 * Sets the event key
+	 * 
+	 * @param event key of the event
+	 */
+	public void setEvent(String event) {
+		this.event = event;
 	}
 
 	/**
