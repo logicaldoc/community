@@ -119,7 +119,7 @@ public class SearchToolbar extends ToolStrip {
 		if (Feature.visible(Feature.EXPORT_CSV)) {
 			ToolStripButton export = AwesomeFactory.newToolStripButton("angle-double-down", "export");
 			addButton(export);
-			export.addClickHandler(event -> GridUtil.exportCSV((ListGrid) hitsPanel.getGrid(), false));
+			export.addClickHandler(click -> GridUtil.exportCSV((ListGrid) hitsPanel.getGrid(), false));
 			if (!Feature.enabled(Feature.EXPORT_CSV))
 				setFeatureDisabled(export);
 		}
@@ -127,14 +127,14 @@ public class SearchToolbar extends ToolStrip {
 
 	private void addSaveLayout() {
 		ToolStripButton saveLayout = AwesomeFactory.newToolStripButton("save", "savelayoutinuserprofile");
-		saveLayout.addClickHandler(event -> saveGridState());
+		saveLayout.addClickHandler(click -> saveGridState());
 		addButton(saveLayout);
 	}
 
 	private void addDownload() {
 		ToolStripButton download = AwesomeFactory.newToolStripButton("download", "download");
 		addButton(download);
-		download.addClickHandler((ClickEvent event) -> {
+		download.addClickHandler(click -> {
 			if (Search.get().getOptions().getType() == GUISearchOptions.TYPE_FOLDERS
 					|| Search.get().getLastResult().isEmpty())
 				return;

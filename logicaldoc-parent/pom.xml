@@ -191,9 +191,9 @@
                 <version>2.3.1</version>
             </dependency>
             <dependency>
-                <groupId>javax.ws.rs</groupId>
-                <artifactId>javax.ws.rs-api</artifactId>
-                <version>2.1.1</version>
+                <groupId>jakarta.ws.rs</groupId>
+                <artifactId>jakarta.ws.rs-api</artifactId>
+                <version>4.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.main.javaee-api</groupId>
@@ -634,10 +634,10 @@
                 <version>${infinispan.version}</version>
             </dependency>
             <dependency>
-			  <groupId>org.jboss.logging</groupId>
-			  <artifactId>jboss-logging</artifactId>
-              <version>3.6.1.Final</version>
-		    </dependency>            
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>3.6.1.Final</version>
+            </dependency>
             <dependency>
                 <groupId>org.infinispan</groupId>
                 <artifactId>${infinispan.hibernate.artifact}</artifactId>
@@ -1013,7 +1013,7 @@
                     <exclusion>
                         <groupId>org.apache.zookeeper</groupId>
                         <artifactId>zookeeper-jute</artifactId>
-                    </exclusion>                    
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -1149,7 +1149,7 @@
                     <exclusion>
                         <groupId>org.apache.zookeeper</groupId>
                         <artifactId>zookeeper-jute</artifactId>
-                    </exclusion>                    
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -1358,6 +1358,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-rs-extension-providers</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-rs-client</artifactId>
                 <version>${cxf.version}</version>
             </dependency>
@@ -1468,8 +1473,8 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.jaxrs</groupId>
-                <artifactId>jackson-jaxrs-json-provider</artifactId>
+                <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+                <artifactId>jackson-jakarta-rs-json-provider</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>

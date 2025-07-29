@@ -96,7 +96,7 @@ public abstract class ContextInitializer implements ApplicationListener<ContextR
 	protected Document prepareDocument(String resourcePath, String documentPath, DocumentHistory transaction)
 			throws PersistenceException, InterruptedException, ExecutionException, IOException {
 		FolderHistory fHist = new FolderHistory();
-		BeanUtils.copyProperties(transaction, fHist);
+		BeanUtils.copyProperties(transaction, fHist, "event");
 		fHist.setId(0);
 		Folder target = prepareFolder(FileUtil.getPath(documentPath), fHist);
 		String fileName = FileUtil.getName(documentPath);

@@ -189,7 +189,7 @@
     
     <!-- to support Java-to-JSON and vice-versa conversion -->    
     <!-- JAXRS providers -->
-    <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
+    <bean id="jsonProvider" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider" />
 <!--     <bean id="multipartProvider" class="org.apache.cxf.jaxrs.provider.MultipartProvider" /> -->
     
     <jaxrs:server id="commentservice" address="/mobile/comments">
