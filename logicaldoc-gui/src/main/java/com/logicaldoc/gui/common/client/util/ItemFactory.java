@@ -92,6 +92,7 @@ import com.smartgwt.client.widgets.form.fields.ColorPickerItem;
 import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.DateRangeItem;
+import com.smartgwt.client.widgets.form.fields.DoubleItem;
 import com.smartgwt.client.widgets.form.fields.FloatItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
@@ -2484,6 +2485,28 @@ public class ItemFactory {
 		label.setAutoWidth();
 		return label;
 	}
+	
+	/**
+	 * Creates a new DoubleItem.
+	 * 
+	 * @param name The item name (mandatory)
+	 * @param title The item title (mandatory)
+	 * @param value The item value (optional)
+	 * 
+	 * @return the new item
+	 */
+	public static DoubleItem newDoubleItem(String name, String title, Double value) {
+		DoubleItem item = new DoubleItem();
+		item.setName(originalItemName(name));
+		item.setTitle(I18N.message(title));
+		if (value != null)
+			item.setValue(value);
+		IsFloatValidator iv = new IsFloatValidator();
+		iv.setErrorMessage(I18N.message(WHOLENUMBER));
+		item.setValidators(iv);
+		return item;
+	}
+
 
 	/**
 	 * Creates a new FloatItem.

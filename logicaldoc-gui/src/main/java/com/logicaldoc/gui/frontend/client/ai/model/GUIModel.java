@@ -54,6 +54,8 @@ public class GUIModel implements Serializable {
 
 	private GUIEvaluation evaluation = new GUIEvaluation();
 
+	private GUIUpdater updater = new GUIUpdater();
+
 	public GUIModel(long id, String name) {
 		super();
 		this.id = id;
@@ -139,11 +141,11 @@ public class GUIModel implements Serializable {
 	public String getFeatures() {
 		return features;
 	}
-	
+
 	public List<String> getFeaturesList() {
 		return Stream.of(features.split(",")).map(String::trim).collect(Collectors.toList());
 	}
-	
+
 	public String getCategories() {
 		return categories;
 	}
@@ -226,5 +228,13 @@ public class GUIModel implements Serializable {
 
 	public boolean isNeuralNetwork() {
 		return "neural".equals(type);
+	}
+
+	public GUIUpdater getUpdater() {
+		return updater;
+	}
+
+	public void setUpdater(GUIUpdater updater) {
+		this.updater = updater;
 	}
 }

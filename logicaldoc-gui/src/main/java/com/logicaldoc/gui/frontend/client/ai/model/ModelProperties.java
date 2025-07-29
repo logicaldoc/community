@@ -14,6 +14,7 @@ import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.DoubleItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -39,6 +40,8 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class ModelProperties extends ModelDetailsTab {
 
+	private static final String UPDATER = "updater";
+
 	private static final String FUNCTION = "function";
 
 	private static final String LANGUAGE = "language";
@@ -61,6 +64,8 @@ public class ModelProperties extends ModelDetailsTab {
 
 	private static final String TYPE = "type";
 
+	private static final AdvancedCriteria NEURAL_CRITERIA = new AdvancedCriteria(TYPE, OperatorId.EQUALS, NEURAL);
+
 	private DynamicForm form = new DynamicForm();
 
 	private HLayout container = new HLayout();
@@ -69,8 +74,8 @@ public class ModelProperties extends ModelDetailsTab {
 
 	private SectionStack layersStack = new SectionStack();
 
-	private SelectItem activation; 
-	
+	private SelectItem activation;
+
 	public ModelProperties(GUIModel model, final ChangedHandler changedHandler) {
 		super(model, changedHandler);
 		setWidth100();
@@ -149,7 +154,25 @@ public class ModelProperties extends ModelDetailsTab {
 		SelectItem weightInit = weightInitSeletor();
 
 		SelectItem loss = lossSeletor();
-		loss.setEndRow(true);
+
+		SelectItem updater = updaterSelector();
+
+		DoubleItem learningRate = ItemFactory.newDoubleItem("learningrate", "learningrate",
+				model.getUpdater().getLearningRate());
+		learningRate.addChangedHandler(changedHandler);
+		learningRate.setVisibleWhen(
+				new AdvancedCriteria(OperatorId.AND, new Criterion[] { NEURAL_CRITERIA, new AdvancedCriteria(UPDATER,
+						OperatorId.IN_SET, new String[] { GUIUpdater.ADAGRAD, GUIUpdater.NESTEROV }) }));
+
+		DoubleItem epsilon = ItemFactory.newDoubleItem("epsilon", "epsilon", model.getUpdater().getEpsilon());
+		epsilon.addChangedHandler(changedHandler);
+		epsilon.setVisibleWhen(new AdvancedCriteria(OperatorId.AND, new Criterion[] { NEURAL_CRITERIA,
+				new AdvancedCriteria(UPDATER, OperatorId.EQUALS, GUIUpdater.ADAGRAD) }));
+
+		DoubleItem momentum = ItemFactory.newDoubleItem("momentum", "momentum", model.getUpdater().getMomentum());
+		momentum.addChangedHandler(changedHandler);
+		momentum.setVisibleWhen(new AdvancedCriteria(OperatorId.AND, new Criterion[] { NEURAL_CRITERIA,
+				new AdvancedCriteria(UPDATER, OperatorId.EQUALS, GUIUpdater.NESTEROV) }));
 
 		SpinnerItem batch = ItemFactory.newSpinnerItem(BATCH, model.getBatch());
 		batch.setMin(1);
@@ -180,8 +203,8 @@ public class ModelProperties extends ModelDetailsTab {
 		ngramMax.addChangedHandler(changedHandler);
 		setNLPVisibility(ngramMax);
 
-		form.setItems(id, typeValue, type, name, label, features, categories, activation, weightInit, loss, batch, seed,
-				cutoff, ngramMin, ngramMax, language, description);
+		form.setItems(id, typeValue, type, name, label, features, categories, activation, weightInit, loss, updater,
+				learningRate, epsilon, momentum, batch, seed, cutoff, ngramMin, ngramMax, language, description);
 
 		container.setMembersMargin(3);
 		container.addMember(form);
@@ -190,8 +213,8 @@ public class ModelProperties extends ModelDetailsTab {
 	}
 
 	private void setNeuralNetworkVisibility(FormItem item) {
-		item.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, NEURAL));
-		item.setRequiredWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, NEURAL));
+		item.setVisibleWhen(NEURAL_CRITERIA);
+		item.setRequiredWhen(NEURAL_CRITERIA);
 	}
 
 	private void setNLPVisibility(FormItem item) {
@@ -201,6 +224,21 @@ public class ModelProperties extends ModelDetailsTab {
 
 		item.setVisibleWhen(criteria);
 		item.setRequiredWhen(criteria);
+	}
+
+	private SelectItem updaterSelector() {
+		SelectItem item = ItemFactory.newSelectItem(UPDATER, UPDATER);
+		item.addChangedHandler(changedHandler);
+
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
+		map.put(GUIUpdater.ADAGRAD, "Adaptive Gradient");
+		map.put(GUIUpdater.NESTEROV, "Nesterov Accelerated Gradient");
+		item.setValueMap(map);
+
+		item.setValue(model.getUpdater().getUpdateAlgorithm());
+
+		setNeuralNetworkVisibility(item);
+		return item;
 	}
 
 	private SelectItem lossSeletor() {
@@ -296,6 +334,17 @@ public class ModelProperties extends ModelDetailsTab {
 			model.setLoss(form.getValueAsString("loss"));
 			model.setBatch(Integer.parseInt(form.getValueAsString(BATCH)));
 			model.setSeed(Long.parseLong(form.getValueAsString(SEED)));
+
+			model.getUpdater().setUpdateAlgorithm(form.getValueAsString(UPDATER));
+
+			String val = form.getValueAsString("learningrate");
+			model.getUpdater().setLearningRate(val != null ? Double.parseDouble(val) : null);
+
+			val = form.getValueAsString("epsilon");
+			model.getUpdater().setEpsilon(val != null ? Double.parseDouble(val) : null);
+
+			val = form.getValueAsString("momentum");
+			model.getUpdater().setMomentum(val != null ? Double.parseDouble(val) : null);
 
 			if (NEURAL.equals(model.getType())) {
 				com.smartgwt.client.data.Record[] layerRecords = layers.getRecordList().toArray();
