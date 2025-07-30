@@ -28,11 +28,15 @@ import org.java.plugin.registry.PluginDescriptor;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.dbinit.PluginDbInit;
+import com.logicaldoc.core.document.AbstractDocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.Generic;
@@ -77,6 +81,8 @@ import com.logicaldoc.web.UploadServlet;
 import com.logicaldoc.web.data.LogDataServlet;
 import com.logicaldoc.web.listener.ApplicationListener;
 import com.logicaldoc.web.websockets.WebsocketTool;
+
+import jakarta.persistence.Table;
 
 /**
  * Implementation of the SystemService
@@ -584,6 +590,26 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		}
 	}
 
+	private static Class<?> getClassByTable(String table) {
+		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
+		scanner.addIncludeFilter(new AnnotationTypeFilter(Table.class));
+
+		for (BeanDefinition bd : scanner.findCandidateComponents("com.logicaldoc")) {
+			String beanClassName = bd.getBeanClassName();
+
+			try {
+				Class<?> beanClass = Class.forName(beanClassName);
+				Table annotation = beanClass.getAnnotation(Table.class);
+				if (annotation != null && table.equals(annotation.name()))
+					return beanClass;
+			} catch (Exception e) {
+				log.error(e.getMessage(), e);
+			}
+		}
+
+		return null;
+	}
+
 	@Override
 	public List<GUIHistory> search(Long userId, Date from, Date till, int maxResult, String historySid,
 			List<String> events, Long rootFolderId) throws ServerException {
@@ -592,6 +618,12 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		int i = 0;
 		StringBuilder query = new StringBuilder();
 		for (String table : History.eventTables()) {
+			// Skip histories that does not have a folder reference(not
+			// subclasses of AbstractDocumentHistory) in case one
+			// of the criteria is the folder
+			if (rootFolderId != null && !(AbstractDocumentHistory.class.isAssignableFrom(getClassByTable(table))))
+				continue;
+
 			String tableAlias = "A" + (i++);
 
 			appendUnion(query);

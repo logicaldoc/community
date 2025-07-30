@@ -48,7 +48,6 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 
 	protected Session session;
 
-
 	@Before
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
