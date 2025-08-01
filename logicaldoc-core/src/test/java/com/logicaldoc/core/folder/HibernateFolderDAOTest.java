@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -455,7 +456,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		folderVO.setName("folderE");
 		testSubject.create(folderC, folderVO, true, null);
 
-		Document doc = docDao.findById(1);
+		Document doc = docDao.findById(1L);
 		docDao.initialize(doc);
 		doc.setFolder(folderC);
 		doc.setIndexingStatus(IndexingStatus.INDEXED);
@@ -571,7 +572,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		Folder folder = new Folder();
 		folder.setName("text");
 		folder.setParentId(5);
-		folder.setAccessControlList(Set.of(new FolderAccessControlEntry(1L), new FolderAccessControlEntry(2L)));
+		folder.setAccessControlList(new HashSet<>(Arrays.asList(new FolderAccessControlEntry(1L), new FolderAccessControlEntry(2L))));
 
 		folder.addTag("A");
 
@@ -731,7 +732,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testStoreValidAndDefaultWorkspaceScenarios() {
+	public void testStoreValidAndDefaultWorkspaceScenarios() throws PersistenceException {
 		// Store a valid workspace
 		Folder workspaceFolder = new Folder();
 		testSubject.initialize(workspaceFolder);
@@ -748,7 +749,6 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		// Store workspace when root is null
 		Folder folder = new Folder();
-		folder.setId(560L);
 		folder.setType(Folder.TYPE_WORKSPACE);
 		folder.setTenantId(9999999L);
 		folder.setParentId(5);
@@ -762,8 +762,8 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		}
 
 		// Store a default workspace with the same name
-		Folder defaultWorkspace = new Folder();
-		defaultWorkspace.setId(4L);
+		Folder defaultWorkspace = testSubject.findById(Folder.DEFAULTWORKSPACEID);
+		testSubject.initialize(defaultWorkspace);
 		defaultWorkspace.setType(Folder.TYPE_WORKSPACE);
 		defaultWorkspace.setTenantId(1L);
 		defaultWorkspace.setParentId(5);
@@ -1767,25 +1767,25 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		doc.setId(0);
 		doc.setFolder(testSubject.findByPathExtended("/Default/Source/Pippo", 1L));
 		doc.setFileName("doc1.txt");
-		docManager.create(new FileInputStream("pom.xml"), doc, transaction);
+		docManager.create(new FileInputStream("pom.xml"), doc, new DocumentHistory(transaction));
 
 		doc = new Document(doc);
 		doc.setId(0);
 		doc.setFolder(testSubject.findByPathExtended("/Default/Source/Pippo", 1L));
 		doc.setFileName("doc2.txt");
-		docManager.create(new FileInputStream("pom.xml"), doc, transaction);
+		docManager.create(new FileInputStream("pom.xml"), doc, new DocumentHistory(transaction));
 
 		doc = new Document(doc);
 		doc.setId(0);
 		doc.setFolder(testSubject.findByPathExtended("/Default/Source/Pluto/Paperina", 1L));
 		doc.setFileName("doc3.txt");
-		docManager.create(new FileInputStream("pom.xml"), doc, transaction);
+		docManager.create(new FileInputStream("pom.xml"), doc, new DocumentHistory(transaction));
 
 		doc = new Document(doc);
 		doc.setId(0);
 		doc.setFolder(testSubject.findByPathExtended("/Default/Source/Pollo/DEF", 1L));
 		doc.setFileName("doc4.txt");
-		docManager.create(new FileInputStream("pom.xml"), doc, transaction);
+		docManager.create(new FileInputStream("pom.xml"), doc, new DocumentHistory(transaction));
 
 		Folder target = testSubject.findByPathExtended("/Default/Target", 1L);
 		Folder source = testSubject.findByPathExtended("/Default/Source", 1L);

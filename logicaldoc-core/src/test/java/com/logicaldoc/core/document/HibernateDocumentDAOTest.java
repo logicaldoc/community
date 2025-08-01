@@ -432,6 +432,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		Collection<Long> ids = testSubject.findPublishedIds(fids);
 		assertTrue(ids.contains(doc.getId()));
 
+		doc = testSubject.findById(doc.getId());
+		testSubject.initialize(doc);
 		doc.setPublished(0);
 		testSubject.store(doc);
 		ids = testSubject.findPublishedIds(fids);
@@ -439,6 +441,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 		cal.add(Calendar.DATE, 1);
 		Date pick = cal.getTime();
+		doc = testSubject.findById(doc.getId());
+		testSubject.initialize(doc);
 		doc.setPublished(1);
 		doc.setStartPublishing(pick);
 		testSubject.store(doc);
@@ -447,6 +451,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 		cal.add(Calendar.DATE, -3);
 		pick = cal.getTime();
+		doc = testSubject.findById(doc.getId());
+		testSubject.initialize(doc);
 		doc.setStartPublishing(pick);
 		testSubject.store(doc);
 		ids = testSubject.findPublishedIds(fids);
@@ -454,6 +460,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 		cal.add(Calendar.DATE, 1);
 		pick = cal.getTime();
+		doc = testSubject.findById(doc.getId());
+		testSubject.initialize(doc);
 		doc.setStopPublishing(pick);
 		testSubject.store(doc);
 		ids = testSubject.findPublishedIds(fids);
@@ -514,22 +522,24 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testStore() throws PersistenceException {
-		Document doc = testSubject.findById(1);
+		Document doc = testSubject.findById(1L);
 		assertNotNull(doc);
 		testSubject.initialize(doc);
 
 		// Try to store it inside a folder with extended attributes
-		Folder folder = folderDao.findById(1202);
+		Folder folder = folderDao.findById(1202L);
 		doc.setFolder(folder);
 
 		doc.setValue("object", "test");
 		testSubject.store(doc);
 
-		doc = testSubject.findById(doc.getId());
+		doc = testSubject.findById(1L);
 		testSubject.initialize(doc);
-
+		System.out.println("ddd "+doc.getTemplate());
+		
 		// Check if the defaults were applied
-		doc = testSubject.findById(1);
+		
+		System.out.println("xxx "+doc.getTemplate());
 		testSubject.initialize(doc);
 		assertEquals(1, doc.getTemplate().getId());
 		assertEquals("test_val_1", doc.getValue("val1"));
@@ -541,7 +551,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		testSubject.initialize(doc);
 		doc.setFolder(alias);
 		testSubject.store(doc);
-		
+
 		assertNotNull(testSubject.findById(doc.getId()).getLastModified());
 
 		// The document should be stored in the referenced folder

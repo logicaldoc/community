@@ -294,7 +294,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		doc = docDao.findById(2);
 		assertNotNull(doc);
-		testSubject.copyToFolder(doc, newFolder, transaction, true, true, false);
+		testSubject.copyToFolder(doc, newFolder, new DocumentHistory(transaction), true, true, false);
 	}
 
 	@Test
@@ -878,7 +878,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCheckin() throws PersistenceException, IOException {
+	public void testCheckin() throws PersistenceException, IOException, InterruptedException, ExecutionException {
 		User user = userDao.findByUsername("admin");
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setFolderId(103L);
@@ -900,7 +900,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		assertNotNull(documentNoteDao.findById(2L));
 
 		try (InputStream is = ResourceUtil.getInputStream("abel.eml")) {
-			testSubject.checkin(1L, is, "pippo", true, null, transaction);
+			testSubject.checkin(1L, is, "pippo", true, null, new DocumentHistory(transaction)).get();
 		}
 		doc = docDao.findById(1L);
 
@@ -922,9 +922,11 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		transaction.setComment("reason2");
 		try (InputStream is = ResourceUtil.getInputStream("abel.eml")) {
-			testSubject.checkin(1L, is, "pippo", true, doc, transaction);
+			testSubject.checkin(1L, is, "pippo", true, doc, new DocumentHistory(transaction)).get();
 		}
-		doc = docDao.findById(1);
+		
+		doc = docDao.findById(1L);
+		docDao.initialize(doc);
 		assertEquals("reason2", doc.getComment());
 
 		// Reproduce an error in the store
@@ -933,7 +935,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		boolean exceptionHappened = false;
 		try (InputStream is = ResourceUtil.getInputStream("abel.eml")) {
-			testSubject.checkin(1L, is, "pippo", true, doc, transaction);
+			testSubject.checkin(1L, is, "pippo", true, doc, new DocumentHistory(transaction)).get();
 		} catch (PersistenceException e) {
 			exceptionHappened = true;
 			assertEquals("Cannot save the new version pippo (1) into the store", e.getMessage());
@@ -946,14 +948,14 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		doc = docDao.findById(9);
 		assertNotNull(doc);
 		try {
-			testSubject.checkin(9, file, "testFile", true, doc, transaction);
+			testSubject.checkin(9, file, "testFile", true, doc, new DocumentHistory(transaction)).get();
 		} catch (PersistenceException e) {
 			// All ok
 		}
 
 		// null filename
 		try {
-			testSubject.checkin(9, file, null, true, doc, transaction);
+			testSubject.checkin(9, file, null, true, doc, new DocumentHistory(transaction)).get();
 		} catch (IllegalArgumentException e) {
 			// All ok
 		}
@@ -962,7 +964,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		assertEquals(null, doc.getComment());
 
 		transaction.setEvent((DocumentEvent) null);
-		testSubject.checkout(1L, transaction);
+		testSubject.checkout(1L, new DocumentHistory(transaction));
 	}
 
 	@Test

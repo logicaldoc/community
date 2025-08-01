@@ -179,9 +179,11 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 			UserHistory transaction = new UserHistory();
 			transaction.setSession(SessionManager.get().get(sid));
-			transaction.setEvent(wsUser.getId()==0 ? UserEvent.CREATED : UserEvent.UPDATED);
-			
+			transaction.setEvent(wsUser.getId() == 0 ? UserEvent.CREATED : UserEvent.UPDATED);
+
 			dao.store(usr, transaction);
+			usr = dao.findById(usr.getId());
+			dao.initialize(usr);
 
 			if (CollectionUtils.isNotEmpty(wsUser.getGroupIds())) {
 				usr.removeGroupMemberships(null);

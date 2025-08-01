@@ -329,10 +329,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 			// Save the document
 			saveOrUpdate(doc);
-			flush();
 
-			if (doc.getDeleted() == 0 && doc.getId() != 0L)
-				refresh(doc);
+			if (doc.getDeleted() == 0 && doc.getId() != 0L) {
+				doc=findById(doc.getId());
+				initialize(doc);
+			}
 
 			doc.setModified(false);
 

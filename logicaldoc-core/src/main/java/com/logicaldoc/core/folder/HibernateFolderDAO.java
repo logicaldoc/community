@@ -18,9 +18,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.Resource;
-import jakarta.transaction.Transactional;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -58,6 +55,9 @@ import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.html.HTMLSanitizer;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.sql.SqlUtil;
+
+import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 
 /**
  * Hibernate implementation of <code>FolderDAO</code>
@@ -173,15 +173,18 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				listener.beforeStore(folder, transaction, dictionary);
 
 			saveOrUpdate(folder);
-			if (StringUtils.isEmpty(folder.getPath())) {
+
+			if (folder.getDeleted() == 0 && StringUtils.isEmpty(folder.getPath())) {
+				folder = findById(folder.getId());
+				initialize(folder);
 				folder.setPath(computePath(folder.getId()));
 				saveOrUpdate(folder);
 			}
 
-			flush();
-
-			if (folder.getDeleted() == 0 && folder.getId() != 0L)
-				refresh(folder);
+			if (folder.getDeleted() == 0 && folder.getId() != 0L) {
+				folder = findById(folder.getId());
+				initialize(folder);
+			}
 
 			log.debug("Invoke listeners after store");
 			for (FolderListener listener : listenerManager.getListeners())
@@ -238,7 +241,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		}
 	}
 
-	private void updateAliases(Folder folder) {
+	private void updateAliases(Folder folder) throws PersistenceException {
 		if (folder.getId() != 0L) {
 			List<Folder> aliases = findAliases(folder.getId(), folder.getTenantId());
 			for (Folder alias : aliases) {
@@ -1311,9 +1314,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				Map.of(ROOT_ID, rootId));
 		log.warn("Removed {} specific rights in tree {}", records, rootId);
 
-		if (getSessionFactory().getCache() != null) {
-			getSessionFactory().getCache().evictEntityData(Folder.class);
-			getSessionFactory().getCache().evictCollectionData(Folder.class.getCanonicalName() + ".accessControlList");
+		if (sessionFactory.getCache() != null) {
+			sessionFactory.getCache().evictEntityData(Folder.class);
+			sessionFactory.getCache().evictCollectionData(Folder.class.getCanonicalName() + ".accessControlList");
 		}
 	}
 
@@ -1579,7 +1582,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		newFolder = createPath(target, StringUtils.isNotEmpty(newName) ? newName : source.getName(),
 				"inherit".equals(securityOption), new FolderHistory(transaction));
 		newFolder.setFoldRef(source.getFoldRef());
-		
+
 		replicateSecurityPolicies(source, securityOption, newFolder);
 
 		DocumentDAO docDao = Context.get(DocumentDAO.class);
@@ -1640,7 +1643,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private Folder internalCopyValidation(Folder source, Folder target, String securityOption,
 			FolderHistory transaction) throws PersistenceException {
-		if (!(securityOption == null || "none".equals(securityOption) || "inherit".equals(securityOption) || REPLICATE.equals(securityOption)))
+		if (!(securityOption == null || "none".equals(securityOption) || "inherit".equals(securityOption)
+				|| REPLICATE.equals(securityOption)))
 			throw new IllegalArgumentException("Invalid security option " + securityOption);
 		if (source == null)
 			throw new IllegalArgumentException("Source folder cannot be null");
@@ -1819,8 +1823,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		jdbcUpdate("update ld_document set ld_deleteuser=:user where  ld_folderid in " + treeIdsString,
 				Map.of("user", transaction.getUser().getFullName()));
 
-		if (getSessionFactory().getCache() != null)
-			getSessionFactory().getCache().evictEntityData(Folder.class);
+		if (sessionFactory.getCache() != null)
+			sessionFactory.getCache().evictEntityData(Folder.class);
 
 		log.warn("Deleted {} folders in tree {} - {}", records, folder.getName(), folder.getId());
 

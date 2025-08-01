@@ -347,8 +347,8 @@ public class DocTool {
 		transaction.setUser(user);
 
 		try {
-			manager.moveToFolder(doc, folder, transaction);
-		} catch (PersistenceException e) {
+			manager.moveToFolder(doc, folder, transaction).get();
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 	}

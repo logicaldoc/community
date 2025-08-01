@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import jakarta.annotation.Resource;
-import jakarta.transaction.Transactional;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -16,6 +13,9 @@ import org.springframework.stereotype.Repository;
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.sql.SqlUtil;
+
+import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 
 /**
  * Hibernate implementation of <code>TemplateDAO</code>
@@ -103,6 +103,8 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 			att.setSetId(set.getId());
 		}
 		super.store(set);
+		set = findById(set.getId());
+		initialize(set);
 		for (Attribute att : set.getAttributes().values())
 			att.setSetId(set.getId());
 		super.store(set);

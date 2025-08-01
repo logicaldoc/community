@@ -351,7 +351,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		hist.setEvent(DocumentEvent.DELETED);
 		hist.setDate(df.parse("2021-15-12"));
 		hist.setDocument(document);
-		dao.store(hist);
+		dao.store(new DocumentHistory(hist));
 
 		Folder folder = fdao.findById(4L);
 		FolderHistoryDAO folderHistoryDao = Context.get(FolderHistoryDAO.class);

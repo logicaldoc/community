@@ -145,6 +145,8 @@ public abstract class AbstractTestCase {
 
 			if (context != null)
 				((AbstractApplicationContext) context).close();
+		} catch (Exception e) {
+			// Ignore
 		} finally {
 			restoreUserHome();
 		}
@@ -285,15 +287,15 @@ public abstract class AbstractTestCase {
 
 	/**
 	 * Destroys the in-memory database
-	 * 
-	 * @throws SQLException error at database level
 	 */
-	private void destroyDatabase() throws SQLException {
+	private void destroyDatabase() {
 		if (CollectionUtils.isEmpty(getDatabaseScripts()))
 			return;
 
 		try (Connection con = getConnection(); Statement statement = con.createStatement()) {
 			statement.execute("shutdown");
+		} catch (SQLException e) {
+			// Ignore
 		}
 	}
 

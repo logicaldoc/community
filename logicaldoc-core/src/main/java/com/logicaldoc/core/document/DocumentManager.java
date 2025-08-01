@@ -376,6 +376,9 @@ public class DocumentManager {
 			try {
 				storeFile(document, file);
 			} catch (IOException ioe) {
+				document = documentDAO.findById(document.getId());
+				documentDAO.initialize(document);
+				
 				document.copyAttributes(oldDocument);
 				document.setOcrd(oldDocument.getOcrd());
 				document.setOcrTemplateId(oldDocument.getOcrTemplateId());
@@ -394,6 +397,10 @@ public class DocumentManager {
 
 			version.setFileSize(document.getFileSize());
 			version.setDigest(null);
+
+			document = documentDAO.findById(document.getId());
+			documentDAO.initialize(document);
+
 			DocumentFuture elaboration = new DocumentFuture(document, storeVersionAsync(version, document));
 
 			log.debug("Stored version {}", version.getVersion());
@@ -452,7 +459,7 @@ public class DocumentManager {
 			transaction.setEvent(DocumentEvent.CHECKEDOUT);
 		lock(document, DocumentStatus.CHECKEDOUT, transaction);
 	}
-	
+
 	/**
 	 * Locks the given document
 	 * 
@@ -463,7 +470,7 @@ public class DocumentManager {
 	 * @throws PersistenceException if an error occurs, this exception is thrown
 	 */
 	public void lock(long docId, DocumentStatus status, DocumentHistory transaction) throws PersistenceException {
-		Document document=documentDAO.findDocument(docId);
+		Document document = documentDAO.findDocument(docId);
 		documentDAO.initialize(document);
 		lock(document, status, transaction);
 	}
@@ -1528,8 +1535,11 @@ public class DocumentManager {
 		documentDAO.initialize(doc);
 		if (doc.getIndexed() == IndexingStatus.INDEXED)
 			deleteFromIndex(doc);
-		doc.setIndexingStatus(status);
+		
 		try {
+			doc = documentDAO.findById(doc.getId());
+			documentDAO.initialize(doc);
+			doc.setIndexingStatus(status);
 			documentDAO.store(doc);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -2157,5 +2167,7 @@ public class DocumentManager {
 		// Record this destroy event in the parent folder history
 		if (transaction.getFolder() != null)
 			folderDAO.saveFolderHistory(transaction.getFolder(), transaction);
+		
+		store.delete(docId);
 	}
 }

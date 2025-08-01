@@ -529,6 +529,21 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public void deleteAll(Collection<T> entities, int code) throws PersistenceException;
 
 	/**
+	 * Removes an entity from current session and cache
+	 * 
+	 * @param obj Class of the entity to evict
+	 * @param id Identifier of the entity
+	 */
+	public void evict(Class<? extends PersistentObject> obj, long id);
+
+	/**
+	 * Removes an entity from current session and cache
+	 * 
+	 * @param id Identifier of the entity
+	 */
+	public void evict(long id);
+
+	/**
 	 * Executes a bulk update as specified by the given HQL expression
 	 * 
 	 * @param expression The update expression.

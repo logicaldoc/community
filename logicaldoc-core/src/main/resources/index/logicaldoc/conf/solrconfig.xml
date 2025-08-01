@@ -343,7 +343,7 @@
         <str name="hl.snippets">4</str>
         <str name="terms">true</str>
         <str name="terms.limit">1000</str>
-        <str name="rows">500</str>
+        <str name="rows">1000</str>
         <str name="sort">score desc</str>
         <str name="fl">id,title,folderId,tags,templateId,folderName,creation,date,size,customId,docRef,comment,language,ext_*,score</str>
      </lst>

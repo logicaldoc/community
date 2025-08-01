@@ -146,7 +146,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 		}
 	}
 
-	private void deleteOldestVersions(List<Version> versions, int maxVersions) {
+	private void deleteOldestVersions(List<Version> versions, int maxVersions) throws PersistenceException {
 		if (versions.size() <= maxVersions)
 			return;
 
@@ -159,7 +159,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	}
 
 	@Override
-	public void updateDigest(Version version) {
+	public void updateDigest(Version version) throws PersistenceException {
 		initialize(version);
 		String resource = store.getResourceName(version.getDocId(), version.getFileVersion(), null);
 		if (store.exists(version.getDocId(), resource)) {
@@ -184,7 +184,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 			deleteVersion(ver, delCode);
 	}
 
-	protected void deleteVersion(Version versionToDelete, int delCode) {
+	protected void deleteVersion(Version versionToDelete, int delCode) throws PersistenceException {
 		if (delCode == 0)
 			throw new IllegalArgumentException("delCode cannot be 0");
 		versionToDelete.setDeleted(delCode);

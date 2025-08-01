@@ -40,7 +40,7 @@
 			level="fatal" />
 		<Logger name="com.logicaldoc.util.junit.AbstractTestCase" level="fatal" />
 
-		<Logger name="org.apache.commons" level="debug" />
+		<Logger name="org.apache.commons" level="error" />
 		<Logger name="org.apache.cxf" level="fatal" />
 		<Logger name="java.sql" level="error" />
 		<Logger name="org.hsqldb" level="error" />

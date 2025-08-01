@@ -741,6 +741,9 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 			guiUser.setId(user.getId());
 
+			
+			user=userDao.findById(user.getId());
+			userDao.initialize(user);
 			setGroups(user, guiUser);
 
 			// Notify the user by email

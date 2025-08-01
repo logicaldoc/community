@@ -677,7 +677,10 @@ public class ResourceServiceImpl implements ResourceService {
 
 		// Add a folder history entry
 		folderDAO.store(currentFolder, transaction);
-
+		
+		currentFolder = folderDAO.findById(currentFolder.getId());
+		folderDAO.initialize(currentFolder);
+		
 		currentFolder.setParentId(destinationParentFolder);
 		folderDAO.store(currentFolder);
 	}

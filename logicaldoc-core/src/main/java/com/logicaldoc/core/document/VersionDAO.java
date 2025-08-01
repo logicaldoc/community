@@ -51,6 +51,8 @@ public interface VersionDAO extends PersistentObjectDAO<Version> {
 	 * Updates the version's digest (SHA-1)
 	 * 
 	 * @param version The version to be processed
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public void updateDigest(Version version);
+	public void updateDigest(Version version) throws PersistenceException;
 }

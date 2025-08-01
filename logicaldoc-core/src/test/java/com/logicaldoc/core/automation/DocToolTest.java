@@ -126,15 +126,21 @@ public class DocToolTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testMove() {
+	public void testMove() throws InterruptedException {
 		FolderTool ft = new FolderTool();
 		Folder testFolder = ft.createPath(ft.findById(4L), "/Default/test", "admin");
 		Document doc = testSubject.findById(1L);
 		assertNotNull(doc);
 		testSubject.initialize(doc);
+		
 		testSubject.move(doc, "/Default/test", "admin");
 
+		assertEquals(testFolder, doc.getFolder());
+		
+		waiting();
+		
 		doc = testSubject.findByPath("/Default/test/pippo.pdf");
+		assertNotNull(doc);
 		assertEquals(1L, doc.getId());
 		assertEquals(testFolder, doc.getFolder());
 	}

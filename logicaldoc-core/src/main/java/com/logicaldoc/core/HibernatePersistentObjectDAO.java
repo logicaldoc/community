@@ -14,13 +14,16 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
+import org.hibernate.SessionEventListener;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,7 +123,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	public T findById(long id) throws PersistenceException {
 		T entity = null;
 		try {
-			entity = sessionFactory.getCurrentSession().get(entityClass, id);
+			entity = getCurrentSession().get(entityClass, id);
 			if (entity != null && entity.getDeleted() != 0)
 				return null;
 			return entity;
@@ -236,7 +239,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		}
 	}
 
-	protected void saveOrUpdate(Object entity) {
+	protected void saveOrUpdate(PersistentObject entity) throws PersistenceException {
 		// Update the attributes
 		if (entity instanceof ExtensibleObject extensibleEntity) {
 			try {
@@ -254,15 +257,21 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			}
 		}
 
-		sessionFactory.getCurrentSession().saveOrUpdate(entity);
+		Session session = getCurrentSession();
+		PersistentObject obj = session.find(entity.getClass(), entity.getId());
+		if (Objects.isNull(obj)) {
+			session.persist(entity);
+		} else {
+			entity = session.merge(entity);
+		}
+		flush();
 	}
 
 	protected void flush() {
 		try {
-			sessionFactory.getCurrentSession().flush();
+			getCurrentSession().flush();
 		} catch (Exception e) {
 			// Nothing to do
-
 		}
 	}
 
@@ -271,8 +280,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			return;
 
 		try {
-			if (!sessionFactory.getCurrentSession().contains(entity)) {
-				sessionFactory.getCurrentSession().refresh(entity);
+			if (!getCurrentSession().contains(entity)) {
+				getCurrentSession().refresh(entity);
 			}
 		} catch (Exception e) {
 			// Nothing to do
@@ -281,7 +290,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	protected Object merge(Object entity) {
 		try {
-			return sessionFactory.getCurrentSession().merge(entity);
+			return getCurrentSession().merge(entity);
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			return null;
@@ -289,11 +298,11 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	protected void evict(Object entity) {
-		sessionFactory.getCurrentSession().evict(entity);
+		getCurrentSession().evict(entity);
 	}
 
 	protected Query<Object[]> prepareQuery(String expression, Map<String, Object> values, Integer max) {
-		Query<Object[]> queryObject = sessionFactory.getCurrentSession().createQuery(expression, Object[].class);
+		Query<Object[]> queryObject = getCurrentSession().createQuery(expression, Object[].class);
 		applyParametersAndLimit(values, max, queryObject);
 		return queryObject;
 	}
@@ -311,7 +320,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	 */
 	protected <R> Query<R> prepareQuery(String expression, Map<String, Object> values, Class<R> requiredType,
 			Integer max) {
-		Query<R> queryObject = sessionFactory.getCurrentSession().createQuery(expression, requiredType);
+		Query<R> queryObject = getCurrentSession().createQuery(expression, requiredType);
 		applyParametersAndLimit(values, max, queryObject);
 		return queryObject;
 	}
@@ -323,6 +332,12 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 		if (max != null && max > 0)
 			queryObject.setMaxResults(max);
+	}
+
+	private void applyParametersAndLimit(Map<String, Object> parameters, Integer max, MutationQuery queryObject) {
+		if (parameters != null)
+			for (Map.Entry<String, Object> entry : parameters.entrySet())
+				queryObject.setParameter(entry.getKey(), entry.getValue());
 	}
 
 	/**
@@ -550,13 +565,24 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			return 0;
 
 		try {
-			Query<?> queryObject = sessionFactory.getCurrentSession()
-					.createQuery(UPDATE + entityClass.getCanonicalName() + " " + expression);
+			MutationQuery queryObject = getCurrentSession()
+					.createMutationQuery(UPDATE + entityClass.getCanonicalName() + " " + expression);
 			applyParametersAndLimit(parameters, null, queryObject);
 			return queryObject.executeUpdate();
 		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
+	}
+
+	@Override
+	public void evict(Class<? extends PersistentObject> obj, long id) {
+		getCurrentSession().evict(getCurrentSession().get(obj, id));
+		sessionFactory.getCache().evict(obj, id);
+	}
+
+	@Override
+	public void evict(long id) {
+		evict(entityClass, id);
 	}
 
 	protected Connection getConnection() throws PersistenceException {
@@ -598,10 +624,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	protected boolean isSqlServer() {
 		return "mssql".equals(getDbms());
-	}
-
-	public SessionFactory getSessionFactory() {
-		return sessionFactory;
 	}
 
 	/**
