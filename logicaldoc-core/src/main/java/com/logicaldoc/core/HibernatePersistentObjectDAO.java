@@ -21,7 +21,6 @@ import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
-import org.hibernate.SessionEventListener;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
@@ -295,10 +294,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			log.error(t.getMessage(), t);
 			return null;
 		}
-	}
-
-	protected void evict(Object entity) {
-		getCurrentSession().evict(entity);
 	}
 
 	protected Query<Object[]> prepareQuery(String expression, Map<String, Object> values, Integer max) {
@@ -576,13 +571,19 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	@Override
 	public void evict(Class<? extends PersistentObject> obj, long id) {
-		getCurrentSession().evict(getCurrentSession().get(obj, id));
+		evict(getCurrentSession().get(obj, id));
 		sessionFactory.getCache().evict(obj, id);
 	}
 
 	@Override
 	public void evict(long id) {
 		evict(entityClass, id);
+	}
+
+	protected void evict(Object entity) {
+		if (entity == null)
+			return;
+		getCurrentSession().evict(entity);
 	}
 
 	protected Connection getConnection() throws PersistenceException {

@@ -1525,19 +1525,13 @@ public class DocumentManager {
 	 * @param status The new document indexer status.
 	 */
 	public void changeIndexingStatus(Document doc, IndexingStatus status) {
-		if (status == IndexingStatus.SKIP && doc.getIndexed() == IndexingStatus.SKIP)
-			return;
-		if (status == IndexingStatus.TO_INDEX && doc.getIndexed() == IndexingStatus.TO_INDEX)
-			return;
-		if (status == IndexingStatus.TO_INDEX_METADATA && doc.getIndexed() == IndexingStatus.TO_INDEX_METADATA)
+		if (status.equals(doc.getIndexed()))
 			return;
 
-		documentDAO.initialize(doc);
-		if (doc.getIndexed() == IndexingStatus.INDEXED)
+		if (doc.getIndexed().equals(IndexingStatus.INDEXED))
 			deleteFromIndex(doc);
 		
 		try {
-			doc = documentDAO.findById(doc.getId());
 			documentDAO.initialize(doc);
 			doc.setIndexingStatus(status);
 			documentDAO.store(doc);

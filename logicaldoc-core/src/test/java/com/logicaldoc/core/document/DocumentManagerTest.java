@@ -975,7 +975,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		testSubject.changeIndexingStatus(doc, IndexingStatus.SKIP);
 		assertEquals(IndexingStatus.SKIP, doc.getIndexed());
 
-		doc = docDao.findById(2);
+		doc = docDao.findById(2L);
 		assertNotNull(doc);
 		assertEquals(IndexingStatus.TO_INDEX, doc.getIndexed());
 		testSubject.changeIndexingStatus(doc, IndexingStatus.SKIP);
@@ -986,16 +986,22 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		docTest.setFolder(folderDao.findById(Folder.DEFAULTWORKSPACEID));
 		docDao.store(docTest);
 
+	    docTest=docDao.findById(docTest.getId());
+	    docDao.initialize(docTest);
 		docTest.setIndexingStatus(IndexingStatus.SKIP);
 		docTest.setStatus(DocumentStatus.LOCKED);
 		testSubject.changeIndexingStatus(docTest, IndexingStatus.SKIP);
 		assertEquals(IndexingStatus.SKIP, docTest.getIndexed());
 
+		docTest=docDao.findById(docTest.getId());
+	    docDao.initialize(docTest);
 		docTest.setIndexingStatus(IndexingStatus.TO_INDEX);
 		docTest.setStatus(DocumentStatus.UNLOCKED);
 		testSubject.changeIndexingStatus(docTest, IndexingStatus.TO_INDEX);
 		assertEquals(IndexingStatus.TO_INDEX, docTest.getIndexed());
 
+		docTest=docDao.findById(docTest.getId());
+	    docDao.initialize(docTest);
 		docTest.setIndexingStatus(IndexingStatus.TO_INDEX_METADATA);
 		docTest.setStatus(DocumentStatus.ARCHIVED);
 		testSubject.changeIndexingStatus(docTest, IndexingStatus.TO_INDEX_METADATA);
@@ -1018,7 +1024,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testDestroyDocument() throws PersistenceException, PermissionException {
+	public void testDestroyDocument() throws PersistenceException, PermissionException, InterruptedException {
 		FolderHistory transaction = new FolderHistory();
 		transaction.setSessionId("1234");
 		transaction.setUser(userDao.findByUsername("admin"));
@@ -1029,6 +1035,10 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		testSubject.destroyDocument(1L, transaction);
 		assertNotNull(docDao.findById(1L));
+		
+		
+		// Sometimes the document does not get deleted
+		waiting();
 		assertEquals(false, store.exists(1L, store.getResourceName(doc, null, null)));
 	}
 
