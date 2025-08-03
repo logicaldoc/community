@@ -3,10 +3,9 @@ package com.logicaldoc.gui.common.client.log;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.RequestTimeoutException;
 import com.logicaldoc.gui.common.client.InvalidSessionServerException;
-import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.SessionTimeout;
 import com.smartgwt.client.util.SC;
 
 /**
@@ -45,11 +44,7 @@ public class GuiLog {
 		if (caught instanceof RequestTimeoutException) {
 			SC.warn(I18N.message("timeout"));
 		} else if (caught instanceof InvalidSessionServerException) {
-			// Redirect to the module's login page
-			Session.get().close();
-			String base = GWT.getHostPageBaseURL();
-			Util.redirect(
-					base + (base.endsWith("/") ? GWT.getModuleName() + ".jsp" : "/" + GWT.getModuleName() + ".jsp"));
+			SessionTimeout.get().show();
 		} else {
 			GuiLog.error(caught.getMessage(), null, caught);
 		}

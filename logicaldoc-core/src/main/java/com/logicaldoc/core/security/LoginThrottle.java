@@ -166,7 +166,7 @@ public class LoginThrottle {
 					Date oldestDate = cal.getTime();
 					if (oldestDate.before(seq.getLastModified())) {
 						log.warn("Possible brute force attack detected for IP {}", ip);
-						notifyBruteForceAttack(null, ip);
+						notifyBruteForceAttack(null, ip, null);
 						throw new IPBlockedException();
 					} else {
 						log.info("Login block for IP {} expired", ip);
@@ -195,7 +195,7 @@ public class LoginThrottle {
 					Date oldestDate = cal.getTime();
 					if (oldestDate.before(seq.getLastModified())) {
 						log.warn("Possible brute force attack detected for username {}", username);
-						notifyBruteForceAttack(username, null);
+						notifyBruteForceAttack(username, null, null);
 
 						disableUser(username);
 
@@ -230,7 +230,7 @@ public class LoginThrottle {
 					Date oldestDate = cal.getTime();
 					if (oldestDate.before(seq.getLastModified())) {
 						log.warn("Possible brute force attack detected for ApiKey {}", apikey);
-						notifyBruteForceAttack(null, apikey);
+						notifyBruteForceAttack(null, null, apikey);
 						throw new ApiKeyBlockedException();
 					} else {
 						log.info("Login block for ApiKey {} expired", apikey);
@@ -262,7 +262,7 @@ public class LoginThrottle {
 		}
 	}
 
-	private static void notifyBruteForceAttack(String suspectedUsername, String suspectedIp) {
+	private static void notifyBruteForceAttack(String suspectedUsername, String suspectedIp, String suspectedApiKey) {
 		ThreadPools.get().schedule(() -> {
 			try {
 				Date date = new Date();
@@ -273,6 +273,7 @@ public class LoginThrottle {
 					Map<String, Object> dictionary = new HashMap<>();
 					dictionary.put("suspectedUsername", suspectedUsername);
 					dictionary.put("suspectedIp", suspectedIp);
+					dictionary.put("suspectedApiKey", suspectedApiKey);
 					dictionary.put("date", date);
 					dictionary.put(Automation.LOCALE, user.getLocale());
 
