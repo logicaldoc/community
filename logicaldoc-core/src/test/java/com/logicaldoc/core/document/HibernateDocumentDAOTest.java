@@ -432,8 +432,6 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 		Collection<Long> ids = testSubject.findPublishedIds(fids);
 		assertTrue(ids.contains(doc.getId()));
 
-		doc = testSubject.findById(doc.getId());
-		testSubject.initialize(doc);
 		doc.setPublished(0);
 		testSubject.store(doc);
 		ids = testSubject.findPublishedIds(fids);
@@ -441,8 +439,6 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 		cal.add(Calendar.DATE, 1);
 		Date pick = cal.getTime();
-		doc = testSubject.findById(doc.getId());
-		testSubject.initialize(doc);
 		doc.setPublished(1);
 		doc.setStartPublishing(pick);
 		testSubject.store(doc);
@@ -451,8 +447,6 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 		cal.add(Calendar.DATE, -3);
 		pick = cal.getTime();
-		doc = testSubject.findById(doc.getId());
-		testSubject.initialize(doc);
 		doc.setStartPublishing(pick);
 		testSubject.store(doc);
 		ids = testSubject.findPublishedIds(fids);
@@ -460,8 +454,6 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 		cal.add(Calendar.DATE, 1);
 		pick = cal.getTime();
-		doc = testSubject.findById(doc.getId());
-		testSubject.initialize(doc);
 		doc.setStopPublishing(pick);
 		testSubject.store(doc);
 		ids = testSubject.findPublishedIds(fids);
@@ -532,15 +524,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 		doc.setValue("object", "test");
 		testSubject.store(doc);
-
-		doc = testSubject.findById(1L);
-		testSubject.initialize(doc);
-		System.out.println("ddd "+doc.getTemplate());
 		
 		// Check if the defaults were applied
-		
-		System.out.println("xxx "+doc.getTemplate());
-		testSubject.initialize(doc);
 		assertEquals(1, doc.getTemplate().getId());
 		assertEquals("test_val_1", doc.getValue("val1"));
 
@@ -556,21 +541,18 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 		// The document should be stored in the referenced folder
 		doc = testSubject.findById(1);
+		testSubject.initialize(doc);
 		assertNotNull(doc);
 		Folder realFolder = folderDao.findById(6L);
 		assertEquals(realFolder, doc.getFolder());
 
 		// Ocr template at folder level should be present
-		doc = testSubject.findById(1);
-		testSubject.initialize(doc);
 		doc.setFileName("test123");
 		doc.getFolder().setBarcodeTemplateId(1L);
 		doc.getFolder().setOcrTemplateId(1L);
 		testSubject.store(doc);
 
 		// The document template should be null
-		doc = testSubject.findById(1);
-		testSubject.initialize(doc);
 		doc.setFileName("test123");
 		doc.getFolder().setBarcodeTemplateId(null);
 		doc.getFolder().setOcrTemplateId(null);

@@ -260,10 +260,14 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		PersistentObject obj = session.find(entity.getClass(), entity.getId());
 		if (Objects.isNull(obj)) {
 			session.persist(entity);
+			flush();
 		} else {
-			entity = session.merge(entity);
+			PersistentObject persistedEntity = session.merge(entity);
+			flush();
+			
+			// Adjust the record version as it gets persisted 
+			entity.setRecordVersion(persistedEntity.getRecordVersion());
 		}
-		flush();
 	}
 
 	protected void flush() {
