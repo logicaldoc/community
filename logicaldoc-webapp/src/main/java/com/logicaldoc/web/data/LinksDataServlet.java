@@ -47,11 +47,11 @@ public class LinksDataServlet extends AbstractDataServlet {
 
 		DocumentDAO dao = Context.get(DocumentDAO.class);
 		StringBuilder query = new StringBuilder(
-				"select A.id, B.folder.id, A.type, A.document1.id, A.document1.fileName, A.document1.type, A.document2.id, A.document2.fileName, A.document2.type, ");
+				"select A.id, 0, A.type, A.document1.id, A.document1.fileName, A.document1.type, A.document2.id, A.document2.fileName, A.document2.type, ");
 		query.append(
-				" A.document1.folder.id, A.document2.folder.id, A.document1.color, A.document2.color from DocumentLink A, Document B where A.deleted = 0 and B.deleted = 0 ");
-		query.append(" and ((A.document1.id = B.id and A.document1.id = " + parentDocId + ")");
-		query.append(" or  (A.document2.id = B.id and A.document2.id = " + parentDocId + ")");
+				" A.document1.folder.id, A.document2.folder.id, A.document1.color, A.document2.color from DocumentLink A where A.deleted = 0");
+		query.append(" and ((A.document1.id = " + parentDocId + ")");
+		query.append(" or  (A.document2.id = " + parentDocId + ")");
 		query.append(") ");
 		if (!docId.equals(parentDocId)) {
 			query.append(" and not A.document1.id = " + docId);
