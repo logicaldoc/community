@@ -197,7 +197,7 @@ public class MessageDialog extends Window {
 			event.cancel();
 		});
 
-		final SelectItem userSelector = ItemFactory.newUserSelector("users", "users", null, false, true);
+		final SelectItem userSelector = ItemFactory.newUserSelector("users", "users", null, true, true);
 		userSelector.setWidth(150);
 		userSelector.setMultiple(true);
 		userSelector.addChangedHandler(event -> {
