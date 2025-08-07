@@ -72,9 +72,10 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 		Client client = SessionManager.get().buildClient(httpReq);
 
 		// Check the passwords match
-		Session session = null;
+		Session session = SessionManager.get().getSession(httpReq);
 		try {
-			session = SessionManager.get().newSession(username, password, key, client);
+			if (session == null)
+				session = SessionManager.get().newSession(username, password, key, client);
 
 			// Preferably clear the password in the user object before storing
 			// in authentication object

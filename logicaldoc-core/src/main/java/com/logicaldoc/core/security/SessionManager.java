@@ -354,13 +354,8 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	public Session getByClientId(String clientId) {
 		if (clientId == null)
 			return null;
-
-		for (Session session : getSessions()) {
-			if (session.getClient() != null && clientId.equals(session.getClient().getId()))
-				return session;
-		}
-
-		return null;
+		return getSessions().stream().filter(s -> s.getClient() != null && clientId.equals(s.getClient().getId()))
+				.findFirst().orElse(null);
 	}
 
 	/**
@@ -452,8 +447,8 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * <li>Session attribute <code>PARAM_SID</code></li>
 	 * <li>Cookie <code>COOKIE_SID</code></li>
 	 * <li>Header <code>X-API-KEY</code></li>
-	 * <li>Spring SecurityContextHolder</li>
 	 * <li>Client ID</li>
+	 * <li>Spring SecurityContextHolder</li>
 	 * </ol>
 	 * 
 	 * @param request The current request to inspect
@@ -465,11 +460,15 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		if (sid != null)
 			return sid;
 
+		sid = getSessionIdFromClient(request);
+		if (sid != null)
+			return sid;
+
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth instanceof LDAuthenticationToken ldAuthenticationToken)
 			return ldAuthenticationToken.getSid();
 
-		return getSessionIdFromClient(request);
+		return null;
 	}
 
 	private String getSessionIdFromClient(HttpServletRequest request) {
@@ -477,6 +476,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 			return null;
 
 		Client client = buildClient(request);
+
 		Session session = getByClientId(client.getId());
 
 		/*
@@ -493,8 +493,9 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 					 */
 					final String sessionUserPassword = session.getUser().getPassword();
 					if (StringUtils.isEmpty(sessionUserPassword)
-							|| CryptUtil.encryptSHA256(credentials[1]).equals(sessionUserPassword))
+							|| CryptUtil.encryptSHA256(credentials[1]).equals(sessionUserPassword)) {
 						return session.getSid();
+					}
 				} catch (NoSuchAlgorithmException e) {
 					log.error("Unable to check credentials", e);
 				}
@@ -540,8 +541,8 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 			if (StringUtils.isNotEmpty(request.getHeader(HEADER_APIKEY))) {
 				log.debug("Found API Key in header {}", HEADER_APIKEY);
 				String apiKey = CryptUtil.encryptSHA256(request.getHeader(HEADER_APIKEY));
-				sid = getSessions().stream().filter(s -> apiKey.equals(s.getKey()) && s.isOpen())
-						.map(Session::getSid).findFirst().orElse(null);
+				sid = getSessions().stream().filter(s -> apiKey.equals(s.getKey()) && s.isOpen()).map(Session::getSid)
+						.findFirst().orElse(null);
 				if (StringUtils.isNotEmpty(sid))
 					log.debug("Found SID bound to API Key in header {}", HEADER_APIKEY);
 			}
