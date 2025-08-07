@@ -30,27 +30,8 @@ public class Microsoft365TokenProvider implements TokenProvider {
 
 	private static final Logger log = LoggerFactory.getLogger(Microsoft365TokenProvider.class);
 
-	private String clientSecret;
-
-	private String clientId;
-
-	private String clientTenant;
-
-	/**
-	 * Constructor
-	 * 
-	 * @param clientSecret the client Secret
-	 * @param clientId the client ID
-	 * @param clientTenant the client Tenant
-	 */
-	public Microsoft365TokenProvider(String clientSecret, String clientId, String clientTenant) {
-		this.clientSecret = clientSecret;
-		this.clientId = clientId;
-		this.clientTenant = clientTenant;
-	}
-
 	@Override
-	public String getAccessToken() throws IOException {
+	public String getAccessToken(String clientSecret, String clientId, String clientTenant) throws IOException {
 		try (CloseableHttpClient httpClient = HttpUtil.getNotValidatingClient(60);) {
 
 			// Prepare the post parameters

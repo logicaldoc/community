@@ -75,7 +75,7 @@ public class UserCalendarPanel extends VLayout {
 			ToolStripButton authorize = new ToolStripButton();
 			authorize.setTitle(I18N.message("authorize"));
 			authorize.setTooltip(I18N.message("authorizegooglecal"));
-			authorize.addClickHandler(click -> GoogleApiAuthorization.get().show());
+			authorize.addClickHandler(click -> new GoogleApiAuthorization().show());
 			toolStrip.addButton(authorize);
 
 			ToolStripButton synchronize = new ToolStripButton();
@@ -88,21 +88,23 @@ public class UserCalendarPanel extends VLayout {
 			enableSynchronization.setTooltip(I18N.message("calendarenabledtip"));
 			toolStrip.addFormItem(enableSynchronization);
 
-			GoogleService.Instance.get().loadSettings(new DefaultAsyncCallback<List<String>>() {
+			GoogleService.Instance.get().loadSettings(Session.get().getUser().getUsername(),
+					new DefaultAsyncCallback<List<String>>() {
 
-				@Override
-				public void onSuccess(List<String> settings) {
-					enableSynchronization.setValue("1".equals(settings.get(2)));
-					enableSynchronization.addChangedHandler(changed -> GoogleService.Instance.get().enableCalendar(
-							enableSynchronization.getValueAsBoolean(), new DefaultAsyncCallback<Void>() {
+						@Override
+						public void onSuccess(List<String> settings) {
+							enableSynchronization.setValue("1".equals(settings.get(2)));
+							enableSynchronization.addChangedHandler(changed -> GoogleService.Instance.get()
+									.enableCalendar(enableSynchronization.getValueAsBoolean(),
+											new DefaultAsyncCallback<Void>() {
 
-								@Override
-								public void onSuccess(Void arg0) {
-									// Ignore
-								}
-							}));
-				}
-			});
+												@Override
+												public void onSuccess(Void arg0) {
+													// Ignore
+												}
+											}));
+						}
+					});
 		}
 
 		toolStrip.addFill();

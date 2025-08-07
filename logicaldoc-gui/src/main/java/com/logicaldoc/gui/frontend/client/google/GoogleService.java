@@ -78,6 +78,7 @@ public interface GoogleService extends RemoteService {
 	/**
 	 * Save the settings used by the Google API
 	 *
+	 * @param name the Google configuration name
 	 * @param clientId identifier of the client
 	 * @param clientSecret the secret key specified by he user
 	 * 
@@ -85,16 +86,18 @@ public interface GoogleService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public String saveSettings(String clientId, String clientSecret) throws ServerException;
+	public String saveSettings(String name, String clientId, String clientSecret) throws ServerException;
 
 	/**
 	 * Save the settings used by the Google Drive module
+	 * 
+	 * @param name the Google configuration name
 	 * 
 	 * @return clientId, clientSecret, calendar enabled
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public List<String> loadSettings() throws ServerException;
+	public List<String> loadSettings(String name) throws ServerException;
 
 	/**
 	 * Creates a new Google Document

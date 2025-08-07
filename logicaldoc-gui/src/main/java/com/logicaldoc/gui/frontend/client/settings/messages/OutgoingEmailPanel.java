@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
+import com.logicaldoc.gui.frontend.client.google.GoogleApiAuthorization;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.types.OperatorId;
@@ -23,7 +24,10 @@ import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.tab.Tab;
 
 /**
@@ -81,6 +85,23 @@ public class OutgoingEmailPanel extends AdminPanel {
 		SelectItem protocol = ItemFactory.newSmtpProtocolSelector();
 		protocol.setRequired(true);
 		protocol.setValue(this.emailSettings.getProtocol());
+		protocol.addChangedHandler(new ChangedHandler() {
+			
+			@Override
+			public void onChanged(ChangedEvent event) {
+				if(event.getValue().toString().contains("google")) {
+					vm.setValue("server", "smtp.google.com");
+					vm.setValue("port", 587);
+					vm.setValue("connSecurity", GUIEmailSettings.SECURITY_STARTTLS);
+					vm.setValue("secureAuth", false);
+				} else if(event.getValue().toString().contains("microsoft")) {
+					vm.setValue("server", "smtp.office365.com");
+					vm.setValue("port", 587);
+					vm.setValue("connSecurity", GUIEmailSettings.SECURITY_STARTTLS);
+					vm.setValue("secureAuth", true);
+				}
+			}
+		});
 
 		// Connection Security
 		SelectItem connSecurity = new SelectItem();
@@ -145,6 +166,10 @@ public class OutgoingEmailPanel extends AdminPanel {
 		clientTenant.setWidth(350);
 		clientTenant.setVisibleWhen(new AdvancedCriteria(PROTOCOL, OperatorId.CONTAINS, "365"));
 
+		StaticTextItem authorize = ItemFactory.newStaticTextItem("authorize", I18N.message("clickhereauthgoogle"));
+		authorize.setVisibleWhen(new AdvancedCriteria(PROTOCOL, OperatorId.CONTAINS, "google"));
+		authorize.addClickHandler(click -> new GoogleApiAuthorization(".smtp").show());
+
 		/*
 		 * Two invisible fields to 'mask' the real credentials to the browser
 		 * and prevent it to auto-fill the username, password and client secret
@@ -166,7 +191,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 		clientSecret.setVisibleWhen(new AdvancedCriteria(PROTOCOL, OperatorId.CONTAINS, "365"));
 
 		emailForm.setItems(protocol, server, port, connSecurity, secureAuth, username, password, clientId, clientTenant,
-				clientSecret, senderEmail, userAsSender, targetSelector, foldering, save, test, fakeUsername,
+				clientSecret, authorize, senderEmail, userAsSender, targetSelector, foldering, save, test, fakeUsername,
 				hiddenPassword, hiddenClientSecret);
 		body.setMembers(emailForm);
 
@@ -236,7 +261,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 		});
 		return save;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

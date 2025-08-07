@@ -19,7 +19,7 @@ public class GoogleAsyncCallback<T> extends DefaultAsyncCallback<T> {
 	public void onFailure(Throwable caught) {
 		LD.clearPrompt();
 		if (caught instanceof OAuthException)
-			GoogleApiAuthorization.get().show();
+			new GoogleApiAuthorization().show();
 		else
 			GuiLog.serverError(caught);
 	}

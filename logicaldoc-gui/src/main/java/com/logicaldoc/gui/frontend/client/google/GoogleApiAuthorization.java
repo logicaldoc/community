@@ -29,15 +29,29 @@ public class GoogleApiAuthorization extends Window {
 
 	private static final String CONSTSNT_B = "clientid";
 
-	private static GoogleApiAuthorization instance = new GoogleApiAuthorization();
-
 	private DynamicForm form = new DynamicForm();
 
 	private TextItem clientId = ItemFactory.newPasswordItem(CONSTSNT_B, CONSTSNT_B, null);
 
 	private TextItem clientSecret = ItemFactory.newPasswordItem(CONSTANT_A, CONSTANT_A, null);
 
-	private GoogleApiAuthorization() {
+	private String name;
+
+	/**
+	 * Constructor to handle the authorization of the currently logged-in user
+	 */
+	public GoogleApiAuthorization() {
+		this(Session.get().getUser().getUsername());
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param name Name of the Google configuration, it may be the username
+	 */
+	public GoogleApiAuthorization(String name) {
+		this.name = name;
+
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("googleapi"));
 		setCanDragResize(true);
@@ -59,7 +73,7 @@ public class GoogleApiAuthorization extends Window {
 
 		ButtonItem authorize = new ButtonItem("authorize", I18N.message("authorize"));
 		authorize.setAutoFit(true);
-		authorize.addClickHandler(event -> onAuthenticate());
+		authorize.addClickHandler(event -> onAuthorize());
 		authorize.setEnableWhen(new AdvancedCriteria("acceptPrivacyPolicy", OperatorId.EQUALS, true));
 
 		String policyUrl = Session.get().getConfig("policy.google");
@@ -76,7 +90,7 @@ public class GoogleApiAuthorization extends Window {
 
 	@Override
 	protected void onDraw() {
-		GoogleService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
+		GoogleService.Instance.get().loadSettings(name, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(List<String> settings) {
 				clientId.setValue(settings.get(0));
@@ -85,19 +99,15 @@ public class GoogleApiAuthorization extends Window {
 		});
 	}
 
-	public void onAuthenticate() {
-		GoogleService.Instance.get().saveSettings(form.getValueAsString(CONSTSNT_B), form.getValueAsString(CONSTANT_A),
-				new DefaultAsyncCallback<>() {
+	public void onAuthorize() {
+		GoogleService.Instance.get().saveSettings(name, form.getValueAsString(CONSTSNT_B),
+				form.getValueAsString(CONSTANT_A), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(String consentUrl) {
 						WindowUtils.openUrl(consentUrl, "_blank", null);
 						hide();
 					}
 				});
-	}
-
-	public static GoogleApiAuthorization get() {
-		return instance;
 	}
 
 	@Override

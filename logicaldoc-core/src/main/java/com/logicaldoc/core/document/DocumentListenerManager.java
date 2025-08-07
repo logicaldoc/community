@@ -30,8 +30,7 @@ public class DocumentListenerManager {
 	private static final Logger log = LoggerFactory.getLogger(DocumentListenerManager.class);
 
 	private List<DocumentListener> listeners = new ArrayList<>();
-
-	@SuppressWarnings("rawtypes")
+	
 	@PostConstruct
 	public synchronized void init() {
 		if (!listeners.isEmpty())
@@ -61,9 +60,8 @@ public class DocumentListenerManager {
 			String className = ext.getParameter("class").valueAsString();
 
 			try {
-				Class clazz = Class.forName(className);
+				Class<?> clazz = Class.forName(className);
 				// Try to instantiate the listener
-				@SuppressWarnings("unchecked")
 				Object listener = clazz.getDeclaredConstructor().newInstance();
 				if (!(listener instanceof DocumentListener))
 					throw new ClassNotFoundException(

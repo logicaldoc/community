@@ -32,7 +32,6 @@ public class FolderListenerManager {
 	private List<FolderListener> listeners = new ArrayList<>();
 
 	@PostConstruct
-	@SuppressWarnings("rawtypes")
 	public synchronized void init() {
 		if (!listeners.isEmpty())
 			return;
@@ -62,9 +61,8 @@ public class FolderListenerManager {
 			String className = ext.getParameter("class").valueAsString();
 
 			try {
-				Class clazz = Class.forName(className);
+				Class<?> clazz = Class.forName(className);
 				// Try to instantiate the listener
-				@SuppressWarnings("unchecked")
 				Object listener = clazz.getDeclaredConstructor().newInstance();
 				if (!(listener instanceof FolderListener))
 					throw new ClassNotFoundException(

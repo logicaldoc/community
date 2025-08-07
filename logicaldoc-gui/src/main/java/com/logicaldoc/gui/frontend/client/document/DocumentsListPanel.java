@@ -32,7 +32,7 @@ public class DocumentsListPanel extends VLayout {
 
 	protected DocumentsGrid documentsGrid;
 
-	private Cursor cursor;
+	protected Cursor cursor;
 
 	private boolean filters;
 
@@ -41,7 +41,8 @@ public class DocumentsListPanel extends VLayout {
 	public DocumentsListPanel(GUIFolder folder, int visualizationMode) {
 		this.visualizationMode = visualizationMode;
 
-		addCursor(folder);
+		this.cursor = prepareCursor(folder);
+		addMember(cursor);
 
 		documentsGrid = prepareDocumentsGrid(folder, visualizationMode);
 
@@ -124,13 +125,13 @@ public class DocumentsListPanel extends VLayout {
 		});
 	}
 
-	private void addCursor(GUIFolder folder) {
+	protected Cursor prepareCursor(GUIFolder folder) {
 		// Prepare a panel containing a title and the documents list
-		cursor = new Cursor(true, false);
+		Cursor cursor = new Cursor(true, false);
 		cursor.setTotalRecords((int) folder.getDocumentCount());
 		cursor.registerPageSizeChangedHandler(event -> DocumentsPanel.get().changePageSize());
 		cursor.registerPageChangedHandler(event -> DocumentsPanel.get().changePageSize());
-		addMember(cursor);
+		return cursor;
 	}
 
 	/**
@@ -165,12 +166,12 @@ public class DocumentsListPanel extends VLayout {
 		documentsGrid.showFilters(!filters);
 		filters = !filters;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

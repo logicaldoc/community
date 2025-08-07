@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.google.drive;
 
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.smartgwt.client.widgets.form.fields.PickerIcon;
+import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 
 /**
@@ -14,12 +14,16 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 public class SearchBox extends TextItem {
 
 	public SearchBox() {
-		PickerIcon searchPicker = new PickerIcon(PickerIcon.SEARCH, event -> onSearch());
-
 		setShowTitle(false);
 		setDefaultValue(I18N.message("search") + "...");
 		setWidth(160);
-		setIcons(searchPicker);
+
+		FormItemIcon search = new FormItemIcon();
+		search.setPrompt(I18N.message("search"));
+		search.setSrc("[SKIN]/icons/magnifying-glass.png");
+		search.addFormItemClickHandler(click -> onSearch());
+		setIcons(search);
+		
 		addKeyPressHandler(event -> {
 			if (event.getKeyName() == null)
 				return;
@@ -27,6 +31,7 @@ public class SearchBox extends TextItem {
 				onSearch();
 			}
 		});
+		
 		addClickHandler(event -> {
 			if ((I18N.message("search") + "...").equals(event.getItem().getValue())) {
 				event.getItem().setValue("");

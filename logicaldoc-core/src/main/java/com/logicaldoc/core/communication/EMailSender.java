@@ -9,7 +9,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -28,7 +27,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.automation.AutomationException;
-import com.logicaldoc.core.communication.oauth.Microsoft365TokenProvider;
+import com.logicaldoc.core.communication.oauth.TokenProviderManager;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
@@ -456,12 +455,6 @@ public class EMailSender {
 		return from;
 	}
 
-	private static String tokenForSMTP(String userName, String accessToken) {
-		final String ctrlA = Character.toString((char) 1);
-		final String coded = "user=" + userName + ctrlA + "auth=Bearer " + accessToken + ctrlA + ctrlA;
-		return Base64.getEncoder().encodeToString(coded.getBytes());
-	}
-
 	private void cleanAuthorAddress(EMail email) {
 		try {
 			TenantDAO tDao = Context.get(TenantDAO.class);
@@ -511,22 +504,26 @@ public class EMailSender {
 		props.put("mail.smtp.ssl.checkserveridentity", "false");
 		props.put("mail.smtp.ssl.trust", "*");
 
-		putOffice365settings(props);
+		if (log.isDebugEnabled()) {
+			props.put("mail.debug", "true");
+			props.put("mail.debug.auth", "true");
+		}
+
+		putOAuthSettings(props);
 
 		return props;
 	}
 
-	protected void putOffice365settings(Properties props) {
-		if (protocol.contains("365")) {
+	protected void putOAuthSettings(Properties props) {
+		if (!PROTOCOL_SMTP.equalsIgnoreCase(protocol)) {
 			props.clear();
 			props.put("mail.smtp.auth.xoauth2.disable", "false");
-			props.put("mail.smtp.sasl.enable", "true");
+//			props.put("mail.smtp.sasl.enable", "true");
 			props.put("mail.smtp.auth.mechanisms", "XOAUTH2");
 			props.put("mail.smtp.starttls.enable", "true");
 			props.put(MAIL_TRANSPORT_PROTOCOL, "smtp");
 			props.put("mail.smtp.host", host);
 			props.put("mail.smtp.port", port);
-			props.put("mail.debug", "true");
 		}
 	}
 
@@ -534,7 +531,7 @@ public class EMailSender {
 		Properties props = prepareMailSessionProperties();
 
 		Session sess = null;
-		if (StringUtils.isNotEmpty(username) && PROTOCOL_SMTP.equals(protocol))
+		if (StringUtils.isNotEmpty(username) && PROTOCOL_SMTP.equalsIgnoreCase(protocol))
 			sess = Session.getInstance(props, new Authenticator() {
 				@Override
 				protected PasswordAuthentication getPasswordAuthentication() {
@@ -554,11 +551,12 @@ public class EMailSender {
 		else
 			transport = session.getTransport("smtp");
 
-		if (protocol.equals(PROTOCOL_SMTP_MICROSOFT365)) {
+		if (!PROTOCOL_SMTP.equalsIgnoreCase(protocol)) {
 			transport = session.getTransport();
-
-			String token = new Microsoft365TokenProvider(clientSecret, clientId, clientTenant).getAccessToken();
-			transport.connect(username, token);
+			System.out.println("++++protocol: "+protocol);
+			log.debug("Retrieving token provider for protocol {}", protocol);
+			transport.connect(username, Context.get(TokenProviderManager.class).getProvider(protocol)
+					.getAccessToken(clientSecret, clientId, clientTenant));
 		} else {
 			if (StringUtils.isEmpty(username)) {
 				transport.connect(host, port, null, null);

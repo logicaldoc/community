@@ -155,7 +155,10 @@
   <extension-point id="Aspect">
     <parameter-def id="code" />
   </extension-point>
-
+  <extension-point id="TokenProvider">
+    <parameter-def id="class" />
+    <parameter-def id="protocols" />
+  </extension-point>
 
   <extension plugin-id="logicaldoc-core" point-id="Authentication" id="DefaultAuthentication">
     <parameter id="authenticatorId" value="DefaultAuthenticator" />
@@ -538,5 +541,10 @@
   <extension plugin-id="logicaldoc-core" point-id="FolderListener" id="folderInitializerListener">
 		<parameter id="position" value="2" />
 		<parameter id="class" value="com.logicaldoc.core.folder.FolderInitializer" />
-  </extension>   
+  </extension>
+  
+  <extension plugin-id="logicaldoc-core" point-id="TokenProvider" id="microsoftTokenProvider">
+    <parameter id="class" value="com.logicaldoc.core.communication.oauth.Microsoft365TokenProvider" />
+    <parameter id="protocols" value="smtpmicrosoft365,imapmicrosoft365" />
+  </extension>     
 </plugin>

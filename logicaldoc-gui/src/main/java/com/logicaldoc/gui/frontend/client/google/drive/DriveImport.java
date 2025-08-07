@@ -61,7 +61,7 @@ public class DriveImport extends Window {
 		layout.setWidth100();
 		layout.setHeight100();
 
-		addCloseClickHandler((CloseClickEvent event) -> destroy());
+		addCloseClickHandler(close -> destroy());
 
 		ListGridField resourceId = new ListGridField(RESOURCE_ID, "id", 200);
 		resourceId.setHidden(true);

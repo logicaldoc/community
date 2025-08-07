@@ -64,7 +64,7 @@ public class DriveMenuItem extends MenuItem {
 
 	private MenuItem prepareGDriveAuthorizeMenuItem() {
 		final MenuItem authorize = new MenuItem(I18N.message("authorize"));
-		authorize.addClickHandler(authorizeClick -> GoogleApiAuthorization.get().show());
+		authorize.addClickHandler(click -> new GoogleApiAuthorization().show());
 		authorize.setEnabled(Feature.enabled(Feature.GOOGLE_DRIVE));
 		return authorize;
 	}
@@ -90,10 +90,7 @@ public class DriveMenuItem extends MenuItem {
 
 	private MenuItem prepareGDriveImportDocsMenuItem(GUIFolder folder) {
 		final MenuItem importDocs = new MenuItem(I18N.message("importfromgdrive"));
-		importDocs.addClickHandler((MenuItemClickEvent importDocsClick) -> {
-			DriveImport popup = new DriveImport();
-			popup.show();
-		});
+		importDocs.addClickHandler(click -> new DriveImport().show());
 		importDocs.setEnabled(folder != null && folder.isDownload() && folder.isWrite()
 				&& Feature.enabled(Feature.GOOGLE_DRIVE) && MainPanel.get().isOnDocumentsTab());
 		return importDocs;
@@ -151,7 +148,7 @@ public class DriveMenuItem extends MenuItem {
 			}
 		});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

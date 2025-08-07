@@ -45,7 +45,7 @@ public class DocumentSelectorPanel extends HLayout {
 		folders.setWidth(250);
 		folders.setShowResizeBar(true);
 		folders.addCellClickHandler(event -> FolderService.Instance.get().getFolder(folders.getSelectedFolderId(),
-				false, false, Session.get().isFolderPagination(), new DefaultAsyncCallback<>() {
+				false, true, Session.get().isFolderPagination(), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIFolder folder) {
 						removeMember(documents);

@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.annotation.Resource;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.java.plugin.registry.Extension;
@@ -37,6 +35,8 @@ import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.annotation.Resource;
 
 /**
  * Manager class used to handle format converters. For each couple

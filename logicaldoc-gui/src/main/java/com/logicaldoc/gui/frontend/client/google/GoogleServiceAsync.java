@@ -21,9 +21,9 @@ public interface GoogleServiceAsync {
 
 	void create(String fileName, AsyncCallback<String> callback);
 
-	void saveSettings(String clientId, String clientSecret, AsyncCallback<String> callback);
-	
-	void loadSettings(AsyncCallback<List<String>> callback);
+	void saveSettings(String name, String clientId, String clientSecret, AsyncCallback<String> callback);
+
+	void loadSettings(String name, AsyncCallback<List<String>> callback);
 
 	void synchronizeCalendar(AsyncCallback<Void> callback);
 

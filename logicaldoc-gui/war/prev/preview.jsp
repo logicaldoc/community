@@ -15,7 +15,7 @@
     <script src="./viewer.mjs" type="module"></script>
   
     <script>
-        var pdfUrl= "/<%=request.getContextPath().trim()%><%=path%>?<%=query%>";
+       var pdfUrl= "<%=request.getContextPath().trim()%>/<%=path%>?<%=query%>";
                 
         var visitedPages = new Set();
         

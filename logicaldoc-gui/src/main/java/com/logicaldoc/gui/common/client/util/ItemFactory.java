@@ -464,7 +464,7 @@ public class ItemFactory {
 			date.setTitle(I18N.message(title));
 		else
 			date.setShowTitle(false);
-		
+
 		date.setPickerIconSrc("[SKIN]/icons/calendar-days.png");
 		date.setPickerIconHeight(12);
 		date.setPickerIconWidth(12);
@@ -1263,8 +1263,9 @@ public class ItemFactory {
 		final SelectItem select = newSelectItem(originalItemName(name), title);
 		select.setWidth(350);
 		select.setMultiple(false);
-		
-		EventsDSParameter param = new EventsDSParameter(options.isFolder(), options.isWorkflow(), options.isUser(), options.isImportfolder(), options.isOcr(), options.isWebservice(), options.isAi());
+
+		EventsDSParameter param = new EventsDSParameter(options.isFolder(), options.isWorkflow(), options.isUser(),
+				options.isImportfolder(), options.isOcr(), options.isWebservice(), options.isAi());
 		param.setAll(options.isAll());
 		select.setOptionDataSource(new EventsDS(param));
 		select.setValueField("code");
@@ -1724,7 +1725,7 @@ public class ItemFactory {
 		item.setValidators(new SimpleTextValidator());
 		return item;
 	}
-	
+
 	/**
 	 * Creates a new TextItem that validates a simple text
 	 * 
@@ -1742,11 +1743,11 @@ public class ItemFactory {
 		item.setValidators(new SimpleTextValidatorWithHyphen());
 		return item;
 	}
-	
+
 	public static TextItem newSimpleTextItemWithHyphen(String name, String value) {
 		return newSimpleTextItemWithHyphen(name, name, value);
 	}
-	
+
 	public static TextItem newSimpleTextItemPreventAutocomplete(String name, String title, String value) {
 		TextItem item = newSimpleTextItem(name, title, value);
 		item.setAutoCompleteKeywords("nope");
@@ -2266,6 +2267,8 @@ public class ItemFactory {
 		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("smtp", "SMTP");
 		map.put("smtpmicrosoft365", I18N.message("smtpmicrosoft365"));
+		if (Feature.enabled(Feature.GOOGLE_DRIVE))
+			map.put("smtpgoogle", I18N.message("smtpgoogle"));
 
 		SelectItem select = new SelectItem(originalItemName(PROTOCOL), I18N.message(PROTOCOL));
 		select.setWidth(180);
@@ -2485,7 +2488,7 @@ public class ItemFactory {
 		label.setAutoWidth();
 		return label;
 	}
-	
+
 	/**
 	 * Creates a new DoubleItem.
 	 * 
@@ -2506,7 +2509,6 @@ public class ItemFactory {
 		item.setValidators(iv);
 		return item;
 	}
-
 
 	/**
 	 * Creates a new FloatItem.
