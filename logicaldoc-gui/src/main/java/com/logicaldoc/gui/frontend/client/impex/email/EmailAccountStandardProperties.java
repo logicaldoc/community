@@ -4,6 +4,7 @@ import com.logicaldoc.gui.common.client.beans.GUIEmailAccount;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
+import com.logicaldoc.gui.frontend.client.google.GoogleApiAuthorization;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.TitleOrientation;
@@ -11,6 +12,7 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.ToggleItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
@@ -97,6 +99,14 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		protocol.setRequired(true);
 		protocol.setValue(account.getProvider());
 
+		StaticTextItem authorize = ItemFactory.newStaticTextItem("authorize",
+				account.getId() == 0L ? I18N.message("saveandclickhereauthgoogle")
+						: I18N.message("clickhereauthgoogle"));
+		authorize.setVisibleWhen(new AdvancedCriteria(PROTOCOL, OperatorId.CONTAINS, "google"));
+		authorize.setEndRow(true);
+		if (account.getId() != 0L)
+			authorize.addClickHandler(click -> new GoogleApiAuthorization("email-" + account.getId()).show());
+
 		SelectItem foldering = ItemFactory.newEmailFolderingSelector();
 		foldering.addChangedHandler(changedHandler);
 		foldering.setRequired(true);
@@ -141,7 +151,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		clientSecret.addChangedHandler(changedHandler);
 		clientSecret.setVisibleWhen(new AdvancedCriteria(PROTOCOL, OperatorId.CONTAINS, "365"));
 
-		form.setItems(mailaddress, protocol, ssl, server, port, username, password, clientId, clientTenant,
+		form.setItems(mailaddress, protocol, ssl, server, port, username, password, authorize, clientId, clientTenant,
 				clientSecret, foldering, targetSelector, language, fakeUsername, fakeUsernameAgain, hiddenPassword,
 				hiddenClientSecret);
 
@@ -166,7 +176,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		}
 		return !form.hasErrors();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

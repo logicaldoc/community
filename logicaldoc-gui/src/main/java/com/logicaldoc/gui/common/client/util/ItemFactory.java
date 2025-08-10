@@ -2256,6 +2256,8 @@ public class ItemFactory {
 		map.put("pop3", "POP3");
 		map.put("imap", "IMAP");
 		map.put("imapmicrosoft365", I18N.message("imapmicrosoft365"));
+		map.put("imapgoogle", I18N.message("imapgoogle"));
+		map.put("pop3google", I18N.message("pop3google"));
 
 		SelectItem select = new SelectItem(originalItemName(PROTOCOL), I18N.message(PROTOCOL));
 		select.setWidth(180);
