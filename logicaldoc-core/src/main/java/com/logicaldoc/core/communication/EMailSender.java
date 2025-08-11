@@ -73,13 +73,13 @@ import net.sf.jmimemagic.MagicMatch;
  */
 public class EMailSender {
 
+	private static final Logger log = LoggerFactory.getLogger(EMailSender.class);
+	
 	private static final String MAIL_TRANSPORT_PROTOCOL = "mail.transport.protocol";
 
 	private static final String UTF_8 = "UTF-8";
 
 	private static final String THREAD_POOL = "Email";
-
-	private static final Logger log = LoggerFactory.getLogger(EMailSender.class);
 
 	public static final int SECURITY_NONE = 0;
 
@@ -518,7 +518,6 @@ public class EMailSender {
 		if (!PROTOCOL_SMTP.equalsIgnoreCase(protocol)) {
 			props.clear();
 			props.put("mail.smtp.auth.xoauth2.disable", "false");
-//			props.put("mail.smtp.sasl.enable", "true");
 			props.put("mail.smtp.auth.mechanisms", "XOAUTH2");
 			props.put("mail.smtp.starttls.enable", "true");
 			props.put(MAIL_TRANSPORT_PROTOCOL, "smtp");
@@ -553,10 +552,9 @@ public class EMailSender {
 
 		if (!PROTOCOL_SMTP.equalsIgnoreCase(protocol)) {
 			transport = session.getTransport();
-			System.out.println("++++protocol: "+protocol);
 			log.debug("Retrieving token provider for protocol {}", protocol);
 			transport.connect(username, Context.get(TokenProviderManager.class).getProvider(protocol)
-					.getAccessToken(clientSecret, clientId, clientTenant));
+					.getAccessToken(clientSecret, clientId, protocol.contains("google") ? ".smtp" : clientTenant));
 		} else {
 			if (StringUtils.isEmpty(username)) {
 				transport.connect(host, port, null, null);

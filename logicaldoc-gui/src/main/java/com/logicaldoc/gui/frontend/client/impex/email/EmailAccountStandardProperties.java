@@ -96,6 +96,21 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 
 		SelectItem protocol = ItemFactory.newEmailProtocolSelector();
 		protocol.addChangedHandler(changedHandler);
+		protocol.addChangedHandler(changed -> {
+			if (changed.getValue().toString().contains("pop3google")) {
+				form.setValue("server", "pop.gmail.com");
+				form.setValue("port", 995);
+				form.setValue("ssl", false);
+			} else if (changed.getValue().toString().contains("imapgoogle")) {
+				form.setValue("server", "imap.gmail.com");
+				form.setValue("port", 993);
+				form.setValue("ssl", false);
+			} else if (changed.getValue().toString().contains("imapmicrosoft365")) {
+				form.setValue("server", "outlook.office365.com");
+				form.setValue("port", 993);
+				form.setValue("ssl", true);
+			} 
+		});
 		protocol.setRequired(true);
 		protocol.setValue(account.getProvider());
 

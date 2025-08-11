@@ -26,8 +26,6 @@ import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.tab.Tab;
 
 /**
@@ -85,21 +83,17 @@ public class OutgoingEmailPanel extends AdminPanel {
 		SelectItem protocol = ItemFactory.newSmtpProtocolSelector();
 		protocol.setRequired(true);
 		protocol.setValue(this.emailSettings.getProtocol());
-		protocol.addChangedHandler(new ChangedHandler() {
-			
-			@Override
-			public void onChanged(ChangedEvent event) {
-				if(event.getValue().toString().contains("google")) {
-					vm.setValue("server", "smtp.google.com");
-					vm.setValue("port", 587);
-					vm.setValue("connSecurity", GUIEmailSettings.SECURITY_STARTTLS);
-					vm.setValue("secureAuth", false);
-				} else if(event.getValue().toString().contains("microsoft")) {
-					vm.setValue("server", "smtp.office365.com");
-					vm.setValue("port", 587);
-					vm.setValue("connSecurity", GUIEmailSettings.SECURITY_STARTTLS);
-					vm.setValue("secureAuth", true);
-				}
+		protocol.addChangedHandler(changed -> {
+			if (changed.getValue().toString().contains("google")) {
+				vm.setValue("server", "smtp.gmail.com");
+				vm.setValue("port", 587);
+				vm.setValue("connSecurity", GUIEmailSettings.SECURITY_STARTTLS);
+				vm.setValue("secureAuth", false);
+			} else if (changed.getValue().toString().contains("microsoft")) {
+				vm.setValue("server", "smtp.office365.com");
+				vm.setValue("port", 587);
+				vm.setValue("connSecurity", GUIEmailSettings.SECURITY_STARTTLS);
+				vm.setValue("secureAuth", true);
 			}
 		});
 
