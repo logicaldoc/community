@@ -6,7 +6,7 @@
 		<property environment="env" />  
 		<property id="properties" file="build.properties" /> 
 
-		<echo message="Deploying ${pom.artifactId}" />
+		<echo message="Deploying ${pom.artifactId}" />  
 
 		<exec executable="mvn.cmd" resolveexecutable="true" searchpath="true">
 			<arg line="-o -Dmaven.test.skip=true install" />
