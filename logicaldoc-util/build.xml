@@ -4,7 +4,7 @@
 
 	<target name="deploy" depends="init-all" description="Updates a deployed webapp">
 		<property environment="env" />
-		<property id="properties" file="build.properties" />
+		<property id="properties" file="build.properties" /> 
 
 		<echo message="Deploying ${pom.artifactId}" />
 
