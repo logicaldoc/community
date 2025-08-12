@@ -478,8 +478,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		});
 	}
 
-	@Override
-	public boolean validate() {
+	public void onSave() {
 		// Apply all rights
 		try {
 			if (list != null)
@@ -487,12 +486,6 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		} catch (Exception e) {
 			// Nothing to do
 		}
-		return true;
-	}
-
-	public void onSave() {
-		validate();
-
 		DocumentService.Instance.get().saveACL(document, new DefaultAsyncCallback<>() {
 			@Override
 			public void onSuccess(Void result) {

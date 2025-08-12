@@ -439,15 +439,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 
 	@Override
 	public void onFolderChanged(GUIFolder folder) {
-		if (FolderController.get().getCurrentFolder().getId() == folder.getId()) {
-			enableAll();
-			if (listingPanel != null) {
-				listing.removeMember(listingPanel);
-				listingPanel.destroy();
-				listingPanel = null;
-			}
-			onFolderSelected(folder);
-		}
+       // Nothing to do	
 	}
 
 	@Override

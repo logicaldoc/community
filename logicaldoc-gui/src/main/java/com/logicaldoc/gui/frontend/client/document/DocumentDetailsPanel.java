@@ -646,8 +646,8 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			try {
 				// Check if the user has changed the extension and warn him
 				if (!originalExtension.equalsIgnoreCase(Util.getExtension(document.getFileName()))) {
-					LD.ask(I18N.message("filename"), I18N.message("extchangewarn"), (Boolean value) -> {
-						if (Boolean.TRUE.equals(value))
+					LD.ask(I18N.message("filename"), I18N.message("extchangewarn"), choice -> {
+						if (Boolean.TRUE.equals(choice))
 							saveDocument();
 					});
 				} else {
@@ -683,13 +683,12 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 			@Override
 			public void onSuccess(GUIDocument result) {
-				hideSave();
-
 				result.setStatus(GUIDocument.DOC_UNLOCKED);
 				result.setLockUser(null);
 				result.setLockUserId(null);
-				setDocument(result);
 
+				setDocument(result);
+				
 				DocumentController.get().modified(result);
 
 				// If the document is an alias we should alter the file name
@@ -699,6 +698,8 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 					result.setFileName(document.getFileName());
 					DocumentController.get().modified(result);
 				}
+				
+				hideSave();
 			}
 		});
 	}

@@ -19,6 +19,7 @@ import com.google.gwt.user.client.rpc.SerializationStreamWriter;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIReadingRequest;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -29,6 +30,7 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LimitedQueue;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.frontend.client.dashboard.chat.ChatController;
+import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.ReadingRequestService;
 import com.smartgwt.client.types.EdgeName;
 import com.smartgwt.client.widgets.notify.Notify;
@@ -58,6 +60,37 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 				"event.folder.created", "event.folder.moved", "event.workflowstatus", "event.user.message.received",
 				"event.chat.newmessage", "event.user.login", "event.user.logout", "event.user.timeout",
 				"event.reading.confirmed", "event.reading.requested", COMMAND));
+	}
+
+	/**
+	 * A callback handler that fills the ACL of the document and then takes an
+	 * action
+	 * 
+	 * @author Marco Meschieri - LogicalDOC
+	 * @since 9.2.1
+	 */
+	private abstract class FillDocumentACL extends DefaultAsyncCallback<GUIAccessControlEntry> {
+		private final WebsocketMessage event;
+
+		private FillDocumentACL(WebsocketMessage event) {
+			this.event = event;
+		}
+
+		@Override
+		public void onSuccess(GUIAccessControlEntry acl) {
+			event.getDocument().setAllowedPermissions(acl);
+
+			if (FolderController.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId()) {
+				event.getDocument().setFolder(FolderController.get().getCurrentFolder());
+			}
+
+			takeAction();
+		}
+
+		/**
+		 * Implementations should put here the logic after ACL filling
+		 */
+		protected abstract void takeAction();
 	}
 
 	/**
@@ -133,9 +166,9 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 		if (isDocumentModifiedEvent(event)) {
 			handleDocumentModifiedEvent(event);
 		} else if ("event.stored".equals(event.getEvent())) {
-			handleStoredEvent(event);
+			handleDocumentStoredEvent(event);
 		} else if ("event.moved".equals(event.getEvent())) {
-			handleMovedEvent(event);
+			handleDocumentMovedEvent(event);
 		} else if ("event.deleted".equals(event.getEvent())) {
 			DocumentController.get().deleted(Arrays.asList(event.getDocument()));
 		} else if (isFolderEvent(event)) {
@@ -190,23 +223,37 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 		}
 	}
 
+	private void fillDocumentACL(WebsocketMessage event, FillDocumentACL fillDoc) {
+		// We must take again the document in order to get the ACL for the
+		// current user.
+		DocumentService.Instance.get().getAllowedPermissions(Arrays.asList(event.getDocument().getId()), fillDoc);
+	}
+
 	private void handleDocumentModifiedEvent(WebsocketMessage event) {
-		if (FolderController.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId()) {
-			event.getDocument().setFolder(FolderController.get().getCurrentFolder());
-		}
-		DocumentController.get().modified(event.getDocument());
+		fillDocumentACL(event, new FillDocumentACL(event) {
+			@Override
+			protected void takeAction() {
+				DocumentController.get().modified(event.getDocument());
+			}
+		});
 	}
 
-	private void handleStoredEvent(WebsocketMessage event) {
-		if (FolderController.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId())
-			event.getDocument().setFolder(FolderController.get().getCurrentFolder());
-		DocumentController.get().stored(event.getDocument());
+	private void handleDocumentStoredEvent(WebsocketMessage event) {
+		fillDocumentACL(event, new FillDocumentACL(event) {
+			@Override
+			protected void takeAction() {
+				DocumentController.get().stored(event.getDocument());
+			}
+		});
 	}
 
-	private void handleMovedEvent(WebsocketMessage event) {
-		if (FolderController.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId())
-			event.getDocument().setFolder(FolderController.get().getCurrentFolder());
-		DocumentController.get().moved(event.getDocument());
+	private void handleDocumentMovedEvent(WebsocketMessage event) {
+		fillDocumentACL(event, new FillDocumentACL(event) {
+			@Override
+			protected void takeAction() {
+				DocumentController.get().moved(event.getDocument());
+			}
+		});
 	}
 
 	private void handleMessageReceived(WebsocketMessage event) {
