@@ -9,15 +9,11 @@ import org.junit.Before;
 
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.web.AbstractWebappTestCase;
+import com.logicaldoc.web.AbstractWPTestCase;
 
-public abstract class AbstractDataServletTestCase extends AbstractWebappTestCase {
+public abstract class AbstractDataServletTestCase extends AbstractWPTestCase {
 
 	protected final File responseFile = new File("target/response.xml");
-
-	public AbstractDataServletTestCase() {
-		super();
-	}
 
 	@Override
 	@Before

@@ -70,13 +70,13 @@ import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.spring.Context;
-import com.logicaldoc.web.AbstractWebappTestCase;
+import com.logicaldoc.web.AbstractWPTestCase;
 import com.logicaldoc.web.UploadServlet;
 
 import jakarta.mail.MessagingException;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DocumentServiceImplTest extends AbstractWebappTestCase {
+public class DocumentServiceImplTest extends AbstractWPTestCase {
 
 	private static final String UTF_8 = "UTF-8";
 

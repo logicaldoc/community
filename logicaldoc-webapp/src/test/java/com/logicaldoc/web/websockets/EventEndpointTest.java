@@ -5,8 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import jakarta.websocket.Session;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,9 +16,11 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.web.AbstractWebappTestCase;
+import com.logicaldoc.web.AbstractWPTestCase;
 
-public class EventEndpointTest extends AbstractWebappTestCase {
+import jakarta.websocket.Session;
+
+public class EventEndpointTest extends AbstractWPTestCase {
 
 	// Instance under test
 	private EventEndpoint endpoint = new EventEndpoint();

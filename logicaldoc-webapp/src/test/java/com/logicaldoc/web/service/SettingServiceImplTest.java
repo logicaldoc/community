@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIEmailSettings;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
-import com.logicaldoc.web.AbstractWebappTestCase;
+import com.logicaldoc.web.AbstractWPTestCase;
 
-public class SettingServiceImplTest extends AbstractWebappTestCase {
+public class SettingServiceImplTest extends AbstractWPTestCase {
 
 	private static final Logger log = LoggerFactory.getLogger(SettingServiceImplTest.class);
 

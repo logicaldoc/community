@@ -38,10 +38,10 @@ import com.logicaldoc.util.config.LogConfigurator;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.spring.Context;
-import com.logicaldoc.web.AbstractWebappTestCase;
+import com.logicaldoc.web.AbstractWPTestCase;
 import com.logicaldoc.web.UploadServlet;
 
-public class SystemServiceImplTest extends AbstractWebappTestCase {
+public class SystemServiceImplTest extends AbstractWPTestCase {
 
 	// Instance under test
 	private SystemServiceImpl testSubject = new SystemServiceImpl();

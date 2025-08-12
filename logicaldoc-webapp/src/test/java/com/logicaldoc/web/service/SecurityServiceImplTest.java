@@ -48,10 +48,10 @@ import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.spring.Context;
-import com.logicaldoc.web.AbstractWebappTestCase;
+import com.logicaldoc.web.AbstractWPTestCase;
 import com.logicaldoc.web.UploadServlet;
 
-public class SecurityServiceImplTest extends AbstractWebappTestCase {
+public class SecurityServiceImplTest extends AbstractWPTestCase {
 
 	// Instance under test
 	private SecurityServiceImpl testSubject = new SecurityServiceImpl();
@@ -316,7 +316,7 @@ public class SecurityServiceImplTest extends AbstractWebappTestCase {
 		securitySettings.setAnonymousKey("xxx");
 		securitySettings.setContentSecurityPolicy("xyz");
 		testSubject.saveSettings(securitySettings);
-		
+
 		GUISecuritySettings settings = testSubject.loadSettings();
 		assertEquals("xxx", settings.getAnonymousKey());
 	}

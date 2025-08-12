@@ -33,9 +33,9 @@ import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.spring.Context;
-import com.logicaldoc.web.AbstractWebappTestCase;
+import com.logicaldoc.web.AbstractWPTestCase;
 
-public class TemplateServiceImplTest extends AbstractWebappTestCase {
+public class TemplateServiceImplTest extends AbstractWPTestCase {
 
 	// Instance under test
 	private TemplateServiceImpl testSubject = new TemplateServiceImpl();

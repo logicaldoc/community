@@ -33,11 +33,11 @@ import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.spring.Context;
-import com.logicaldoc.web.AbstractWebappTestCase;
+import com.logicaldoc.web.AbstractWPTestCase;
 import com.logicaldoc.web.UploadServlet;
 import com.logicaldoc.web.data.FoldersDataServlet;
 
-public class FolderServiceImplTest extends AbstractWebappTestCase {
+public class FolderServiceImplTest extends AbstractWPTestCase {
 
 	// Instance under test
 	private FolderServiceImpl testSubject = new FolderServiceImpl();
