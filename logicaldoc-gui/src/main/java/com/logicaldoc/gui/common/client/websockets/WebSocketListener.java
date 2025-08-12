@@ -140,7 +140,7 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 			DocumentController.get().deleted(Arrays.asList(event.getDocument()));
 		} else if (isFolderEvent(event)) {
 			handleFolderEvent(event);
-		} else if ("event.user.messagereceived".equals(event.getEvent()) && Menu.enabled(Menu.MESSAGES)) {
+		} else if ("event.user.message.received".equals(event.getEvent()) && Menu.enabled(Menu.MESSAGES)) {
 			handleMessageReceived(event);
 		} else if ("event.user.login".equals(event.getEvent())) {
 			UserController.get().loggedIn(event.getUsername());
