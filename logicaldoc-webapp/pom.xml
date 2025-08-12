@@ -164,7 +164,7 @@
 			<artifactId>mssql-jdbc</artifactId>
 			<version>12.6.0.jre11</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
@@ -210,10 +210,10 @@
 			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<exclusions>
-			  <exclusion>
-			    <artifactId>org.jboss.logging</artifactId>
-			    <groupId>jboss-logging</groupId>
-			  </exclusion>
+				<exclusion>
+					<artifactId>org.jboss.logging</artifactId>
+					<groupId>jboss-logging</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -500,6 +500,20 @@
 		<dependency>
 			<groupId>org.eclipse.angus</groupId>
 			<artifactId>angus-mail</artifactId>
+		</dependency>
+
+		<!-- Required by Solr runtime, hopefully we will drop this javax dependency -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+
+		<!-- Required by Spring core, hopefully we will drop this javax dependency -->
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+			<version>1.3.2</version>
 		</dependency>
 	</dependencies>
 	<build>
