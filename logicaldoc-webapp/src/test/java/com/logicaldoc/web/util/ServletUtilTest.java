@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import jakarta.servlet.ServletException;
-
 import org.junit.Test;
 
 import com.logicaldoc.core.PersistenceException;
@@ -27,6 +25,8 @@ import com.logicaldoc.util.servlet.MockServletRequest;
 import com.logicaldoc.util.servlet.MockServletResponse;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.AbstractFulltextTestCase;
+
+import jakarta.servlet.ServletException;
 
 public class ServletUtilTest extends AbstractFulltextTestCase {
 
@@ -49,7 +49,7 @@ public class ServletUtilTest extends AbstractFulltextTestCase {
 	}
 
 	@Override
-	public void tearDown() throws SQLException, IOException {
+	public void tearDown() throws IOException {
 		super.tearDown();
 		FileUtil.delete(RESPONSE_OUTPUT);
 		FileUtil.delete(PLUGIN_RESOURCE);

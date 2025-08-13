@@ -37,7 +37,7 @@ public class EventEndpointTest extends AbstractWPTestCase {
 	}
 
 	@After
-	public void tearDown() throws SQLException, IOException {
+	public void tearDown() throws IOException {
 		endpoint.onClose(websocketSession);
 		super.tearDown();
 	}

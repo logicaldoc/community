@@ -35,7 +35,7 @@ public class StandardSearchEngineTest extends AbstractCoreTestCase {
 
 	@After
 	@Override
-	public void tearDown() throws SQLException, IOException {
+	public void tearDown() throws IOException {
 		testSubject.unlock();
 		testSubject.close();
 		super.tearDown();

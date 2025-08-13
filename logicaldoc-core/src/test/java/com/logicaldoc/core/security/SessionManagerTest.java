@@ -73,7 +73,7 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 
 	@After
 	@Override
-	public void tearDown() throws SQLException, IOException {
+	public void tearDown() throws IOException {
 		testSubject.removeListener(this);
 		testSubject.destroy();
 		super.tearDown();

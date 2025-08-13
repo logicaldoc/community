@@ -133,7 +133,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 	}
 
 	@Override
-	public void tearDown() throws SQLException, IOException {
+	public void tearDown() throws IOException {
 		searchEngine.unlock();
 		searchEngine.close();
 

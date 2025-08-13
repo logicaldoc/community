@@ -8,8 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import jakarta.servlet.ServletException;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,6 +18,8 @@ import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.servlet.MockServletRequest;
 import com.logicaldoc.util.servlet.MockServletResponse;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.ServletException;
 
 /**
  * Test case for {@link DashletContent}
@@ -46,7 +46,7 @@ public class DashletContentTest extends AbstractCoreTestCase {
 	}
 
 	@Override
-	public void tearDown() throws SQLException, IOException {
+	public void tearDown() throws IOException {
 		super.tearDown();
 		FileUtil.delete(responseFile);
 	}

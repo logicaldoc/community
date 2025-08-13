@@ -54,15 +54,10 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	private static Context instance;
 
 	private Context() {
-		// Nothing to do
+		// Empty constructor
 	}
 
 	public static Context get() {
-		if (instance == null) {
-			synchronized (Context.class) {
-				instance = new Context();
-			}
-		}
 		return instance;
 	}
 
@@ -90,6 +85,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
+		Context.instance = applicationContext.getBean(Context.class);
 	}
 
 	/**

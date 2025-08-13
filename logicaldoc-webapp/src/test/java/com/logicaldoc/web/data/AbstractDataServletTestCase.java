@@ -24,11 +24,11 @@ public abstract class AbstractDataServletTestCase extends AbstractWPTestCase {
 
 	@Override
 	@After
-	public void tearDown() throws SQLException, IOException {
+	public void tearDown() throws IOException {
 		super.tearDown();
 		clearResponseFile();
 	}
-	
+
 	protected void clearResponseFile() {
 		FileUtil.delete(responseFile);
 	}

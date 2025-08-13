@@ -93,7 +93,7 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 	}
 
 	@Override
-	public void tearDown() throws IOException, SQLException {
+	public void tearDown() throws IOException {
 		if (session != null)
 			Context.get(SessionManager.class).kill(session.getSid());
 		Context.get(SessionDAO.class).cleanOldSessions(-1);
