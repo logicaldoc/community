@@ -40,6 +40,14 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class ModelProperties extends ModelDetailsTab {
 
+	private static final String MOMENTUM = "momentum";
+
+	private static final String EPSILON = "epsilon";
+
+	private static final String LEARNINGRATE = "learningrate";
+
+	private static final String LABEL = "label";
+
 	private static final String UPDATER = "updater";
 
 	private static final String FUNCTION = "function";
@@ -74,8 +82,6 @@ public class ModelProperties extends ModelDetailsTab {
 
 	private SectionStack layersStack = new SectionStack();
 
-	private SelectItem activation;
-
 	public ModelProperties(GUIModel model, final ChangedHandler changedHandler) {
 		super(model, changedHandler);
 		setWidth100();
@@ -102,7 +108,7 @@ public class ModelProperties extends ModelDetailsTab {
 		name.addChangedHandler(changedHandler);
 		name.setRequired(true);
 
-		TextItem label = ItemFactory.newTextItem("label", model.getLabel());
+		TextItem label = ItemFactory.newTextItem(LABEL, model.getLabel());
 		label.addChangedHandler(changedHandler);
 
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", model.getDescription());
@@ -113,7 +119,7 @@ public class ModelProperties extends ModelDetailsTab {
 		SelectItem type = ItemFactory.newSelectItem(TYPE);
 		type.setOptionDataSource(new ModelTypesDS());
 		type.setValueField(VALUE);
-		type.setDisplayField("label");
+		type.setDisplayField(LABEL);
 		type.setValue(model.getType());
 		type.addChangedHandler(changedHandler);
 		type.addChangedHandler(changed -> layersStack.setVisible(NEURAL.equals(type.getValueAsString())));
@@ -147,9 +153,9 @@ public class ModelProperties extends ModelDetailsTab {
 		categories.setShowHintInField(true);
 		setNeuralNetworkVisibility(categories);
 
-		activation = activationSeletor();
-		setNeuralNetworkVisibility(activation);
-		activation.addChangedHandler(changedHandler);
+		SelectItem activationSelector = activationSeletor();
+		setNeuralNetworkVisibility(activationSelector);
+		activationSelector.addChangedHandler(changedHandler);
 
 		SelectItem weightInit = weightInitSeletor();
 
@@ -157,19 +163,19 @@ public class ModelProperties extends ModelDetailsTab {
 
 		SelectItem updater = updaterSelector();
 
-		DoubleItem learningRate = ItemFactory.newDoubleItem("learningrate", "learningrate",
+		DoubleItem learningRate = ItemFactory.newDoubleItem(LEARNINGRATE, LEARNINGRATE,
 				model.getUpdater().getLearningRate());
 		learningRate.addChangedHandler(changedHandler);
 		learningRate.setVisibleWhen(
 				new AdvancedCriteria(OperatorId.AND, new Criterion[] { NEURAL_CRITERIA, new AdvancedCriteria(UPDATER,
 						OperatorId.IN_SET, new String[] { GUIUpdater.ADAGRAD, GUIUpdater.NESTEROV }) }));
 
-		DoubleItem epsilon = ItemFactory.newDoubleItem("epsilon", "epsilon", model.getUpdater().getEpsilon());
+		DoubleItem epsilon = ItemFactory.newDoubleItem(EPSILON, EPSILON, model.getUpdater().getEpsilon());
 		epsilon.addChangedHandler(changedHandler);
 		epsilon.setVisibleWhen(new AdvancedCriteria(OperatorId.AND, new Criterion[] { NEURAL_CRITERIA,
 				new AdvancedCriteria(UPDATER, OperatorId.EQUALS, GUIUpdater.ADAGRAD) }));
 
-		DoubleItem momentum = ItemFactory.newDoubleItem("momentum", "momentum", model.getUpdater().getMomentum());
+		DoubleItem momentum = ItemFactory.newDoubleItem(MOMENTUM, MOMENTUM, model.getUpdater().getMomentum());
 		momentum.addChangedHandler(changedHandler);
 		momentum.setVisibleWhen(new AdvancedCriteria(OperatorId.AND, new Criterion[] { NEURAL_CRITERIA,
 				new AdvancedCriteria(UPDATER, OperatorId.EQUALS, GUIUpdater.NESTEROV) }));
@@ -203,8 +209,9 @@ public class ModelProperties extends ModelDetailsTab {
 		ngramMax.addChangedHandler(changedHandler);
 		setNLPVisibility(ngramMax);
 
-		form.setItems(id, typeValue, type, name, label, features, categories, activation, weightInit, loss, updater,
-				learningRate, epsilon, momentum, batch, seed, cutoff, ngramMin, ngramMax, language, description);
+		form.setItems(id, typeValue, type, name, label, features, categories, activationSelector, weightInit, loss,
+				updater, learningRate, epsilon, momentum, batch, seed, cutoff, ngramMin, ngramMax, language,
+				description);
 
 		container.setMembersMargin(3);
 		container.addMember(form);
@@ -321,49 +328,51 @@ public class ModelProperties extends ModelDetailsTab {
 	}
 
 	boolean validate() {
-		if (form.validate()) {
-			model.setName(form.getValueAsString(NAME));
-			model.setLabel(form.getValueAsString("label"));
-			model.setDescription(form.getValueAsString("description"));
-			model.setLanguage(form.getValueAsString(LANGUAGE));
-			model.setType(form.getValueAsString(TYPE));
-			model.setFeatures(form.getValueAsString("features"));
-			model.setCategories(form.getValueAsString("categories"));
-			model.setActivation(form.getValueAsString(ACTIVATION));
-			model.setWeightInit(form.getValueAsString("weightInit"));
-			model.setLoss(form.getValueAsString("loss"));
-			model.setBatch(Integer.parseInt(form.getValueAsString(BATCH)));
-			model.setSeed(Long.parseLong(form.getValueAsString(SEED)));
+		if (!form.validate())
+			return false;
 
-			model.getUpdater().setUpdateAlgorithm(form.getValueAsString(UPDATER));
+		model.setName(form.getValueAsString(NAME));
+		model.setLabel(form.getValueAsString(LABEL));
+		model.setDescription(form.getValueAsString("description"));
+		model.setLanguage(form.getValueAsString(LANGUAGE));
+		model.setType(form.getValueAsString(TYPE));
+		model.setFeatures(form.getValueAsString("features"));
+		model.setCategories(form.getValueAsString("categories"));
+		model.setActivation(form.getValueAsString(ACTIVATION));
+		model.setWeightInit(form.getValueAsString("weightInit"));
+		model.setLoss(form.getValueAsString("loss"));
+		model.setBatch(Integer.parseInt(form.getValueAsString(BATCH)));
+		model.setSeed(Long.parseLong(form.getValueAsString(SEED)));
 
-			String val = form.getValueAsString("learningrate");
-			model.getUpdater().setLearningRate(val != null ? Double.parseDouble(val) : null);
+		model.getUpdater().setUpdateAlgorithm(form.getValueAsString(UPDATER));
 
-			val = form.getValueAsString("epsilon");
-			model.getUpdater().setEpsilon(val != null ? Double.parseDouble(val) : null);
+		String val = form.getValueAsString(LEARNINGRATE);
+		model.getUpdater().setLearningRate(val != null ? Double.parseDouble(val) : null);
 
-			val = form.getValueAsString("momentum");
-			model.getUpdater().setMomentum(val != null ? Double.parseDouble(val) : null);
+		val = form.getValueAsString(EPSILON);
+		model.getUpdater().setEpsilon(val != null ? Double.parseDouble(val) : null);
 
-			if (NEURAL.equals(model.getType())) {
-				com.smartgwt.client.data.Record[] layerRecords = layers.getRecordList().toArray();
-				if (layerRecords.length < 2) {
-					GuiLog.error(I18N.message("modulelayersnotenough"));
-					return false;
-				}
+		val = form.getValueAsString(MOMENTUM);
+		model.getUpdater().setMomentum(val != null ? Double.parseDouble(val) : null);
 
-				model.getLayers().clear();
-				for (com.smartgwt.client.data.Record layerRecord : layerRecords)
-					model.getLayers().add(new GUINeuralNetworkLayer(layerRecord.getAttribute(NAME),
-							layerRecord.getAttributeAsInt(OUTPUTNODES), layerRecord.getAttribute(ACTIVATION)));
-			} else {
-				model.setLanguage(form.getValueAsString(LANGUAGE));
-				model.setCutoff(Integer.parseInt(form.getValueAsString("cutoff")));
-				model.setNgramMin(Integer.parseInt(form.getValueAsString("ngrammin")));
-				model.setNgramMax(Integer.parseInt(form.getValueAsString("ngrammax")));
+		if (NEURAL.equals(model.getType())) {
+			com.smartgwt.client.data.Record[] layerRecords = layers.getRecordList().toArray();
+			if (layerRecords.length < 2) {
+				GuiLog.error(I18N.message("modulelayersnotenough"));
+				return false;
 			}
+
+			model.getLayers().clear();
+			for (com.smartgwt.client.data.Record layerRecord : layerRecords)
+				model.getLayers().add(new GUINeuralNetworkLayer(layerRecord.getAttribute(NAME),
+						layerRecord.getAttributeAsInt(OUTPUTNODES), layerRecord.getAttribute(ACTIVATION)));
+		} else {
+			model.setLanguage(form.getValueAsString(LANGUAGE));
+			model.setCutoff(Integer.parseInt(form.getValueAsString("cutoff")));
+			model.setNgramMin(Integer.parseInt(form.getValueAsString("ngrammin")));
+			model.setNgramMax(Integer.parseInt(form.getValueAsString("ngrammax")));
 		}
+
 		return !form.hasErrors();
 	}
 
@@ -409,14 +418,14 @@ public class ModelProperties extends ModelDetailsTab {
 		editor.setMin(1);
 		outputNodes.setEditorProperties(editor);
 
-		ListGridField activation = new ListGridField(ACTIVATION, I18N.message("activationfunction"));
-		activation.setCanEdit(true);
-		activation.setCanSort(false);
-		activation.setAutoFitWidth(true);
-		activation.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
-		activation.setEditorProperties(activationSeletor());
+		ListGridField activationField = new ListGridField(ACTIVATION, I18N.message("activationfunction"));
+		activationField.setCanEdit(true);
+		activationField.setCanSort(false);
+		activationField.setAutoFitWidth(true);
+		activationField.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
+		activationField.setEditorProperties(activationSeletor());
 
-		layers.setFields(name, outputNodes, activation);
+		layers.setFields(name, outputNodes, activationField);
 
 		// Initialize the layers grid
 		for (GUINeuralNetworkLayer layer : model.getLayers()) {

@@ -52,6 +52,7 @@ public class FolderAccessControlEntry extends ExtendedAccessControlEntry {
 		setGroupId(groupId);
 	}
 
+	@Override
 	public ExtendedAccessControlEntry getAce() {
 		return ace;
 	}
@@ -373,9 +374,6 @@ public class FolderAccessControlEntry extends ExtendedAccessControlEntry {
 			return false;
 		if (iimport != other.iimport)
 			return false;
-		if (store != other.store)
-			return false;
-		return true;
+		return store == other.store;
 	}
-
 }

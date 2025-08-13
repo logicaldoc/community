@@ -65,7 +65,7 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCompareDifferentParameters() throws PersistenceException, InterruptedException {
+	public void testCompareDifferentParameters() throws PersistenceException {
 		Folder folder1 = new Folder();
 		folder1.setName("folder1");
 		folder1.setTemplateName("folder1Templ");

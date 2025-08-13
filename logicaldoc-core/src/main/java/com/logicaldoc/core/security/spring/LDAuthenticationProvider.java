@@ -46,12 +46,12 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		if (authentication instanceof AnonymousAuthenticationToken anonymousAuthentication)
-			return authenticateAnonymous(anonymousAuthentication);
-		else if (authentication instanceof UsernamePasswordAuthenticationToken credentialsAuthentication)
-			return authenticateCredentials(credentialsAuthentication);
-		else
-			return authentication;
+		return switch (authentication) {
+			case AnonymousAuthenticationToken anonymousAuthentication -> authenticateAnonymous(anonymousAuthentication);
+			case UsernamePasswordAuthenticationToken credentialsAuthentication -> authenticateCredentials(
+					credentialsAuthentication);
+			default -> authentication;
+		};
 	}
 
 	protected Authentication authenticateCredentials(UsernamePasswordAuthenticationToken authentication) {
@@ -62,12 +62,10 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 
 		String password = getPassword(authentication, httpReq);
 
-		String key = httpReq.getParameter("key");
+		String key = getKey(authentication, httpReq);
 
-		if (authentication.getDetails() instanceof LDAuthenticationDetails ldAuthenticationDetails)
-			key = ldAuthenticationDetails.getSecretKey();
-
-		log.debug("Authenticate user {} with key {}", username, key != null ? key : "-");
+		if (log.isDebugEnabled())
+			log.debug("Authenticate user {} with key {}", username, StringUtils.defaultString(key, "-"));
 
 		Client client = SessionManager.get().buildClient(httpReq);
 
@@ -137,6 +135,13 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 					? String.format("Security checks failed for user %s - %s", username, e.getMessage())
 					: "badcredentials");
 		}
+	}
+
+	private String getKey(UsernamePasswordAuthenticationToken authentication, HttpServletRequest httpReq) {
+		String key = httpReq.getParameter("key");
+		if (authentication.getDetails() instanceof LDAuthenticationDetails ldAuthenticationDetails)
+			key = ldAuthenticationDetails.getSecretKey();
+		return key;
 	}
 
 	private AnonymousAuthenticationToken authenticateAnonymous(AnonymousAuthenticationToken authentication)

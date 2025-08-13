@@ -492,12 +492,12 @@ public class ExtendedPropertiesPanel extends HLayout {
 	}
 
 	public boolean validate() {
-		if (Boolean.TRUE.equals(vm.hasErrors()))
-			return false;
-
-		validateExtendedAttributes();
+		if (vm.validate()) {
+			validateExtendedAttributes();
+		}
 
 		return !vm.hasErrors();
+
 	}
 
 	private void validateExtendedAttributes() {

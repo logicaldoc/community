@@ -311,26 +311,32 @@ public class ExtendedAccessControlEntry extends AccessControlEntry {
 		this.customid = customid;
 	}
 
+	@Override
 	public long getGroupId() {
 		return ace.getGroupId();
 	}
 
+	@Override
 	public int getWrite() {
 		return ace.getWrite();
 	}
 
+	@Override
 	public void setGroupId(long groupId) {
 		ace.setGroupId(groupId);
 	}
 
+	@Override
 	public void setWrite(int write) {
 		ace.setWrite(write);
 	}
 
+	@Override
 	public int getRead() {
 		return ace.getRead();
 	}
 
+	@Override
 	public void setRead(int read) {
 		ace.setRead(read);
 	}
@@ -343,6 +349,7 @@ public class ExtendedAccessControlEntry extends AccessControlEntry {
 		this.revision = revision;
 	}
 
+	@Override
 	public Set<Permission> grantedPermissions() {
 		Set<Permission> granted = ace.grantedPermissions();
 		if (preview == 1)
@@ -363,6 +370,11 @@ public class ExtendedAccessControlEntry extends AccessControlEntry {
 			granted.add(Permission.ARCHIVE);
 		if (workflow == 1)
 			granted.add(Permission.WORKFLOW);
+		grantedMorePermissions(granted);
+		return granted;
+	}
+
+	private void grantedMorePermissions(Set<Permission> granted) {
 		if (calendar == 1)
 			granted.add(Permission.CALENDAR);
 		if (subscription == 1)
@@ -383,7 +395,6 @@ public class ExtendedAccessControlEntry extends AccessControlEntry {
 			granted.add(Permission.CUSTOMID);
 		if (revision == 1)
 			granted.add(Permission.REVISION);
-		return granted;
 	}
 
 	@Override

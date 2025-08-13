@@ -4,7 +4,6 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.GridUtil;
-import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.smartgwt.client.types.SelectionStyle;

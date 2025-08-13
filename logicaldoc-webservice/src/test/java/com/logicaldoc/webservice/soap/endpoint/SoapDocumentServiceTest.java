@@ -15,10 +15,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.activation.DataHandler;
-import jakarta.activation.FileDataSource;
-import jakarta.mail.MessagingException;
-
 import org.junit.Test;
 
 import com.logicaldoc.core.PersistenceException;
@@ -49,6 +45,10 @@ import com.logicaldoc.webservice.model.WSLink;
 import com.logicaldoc.webservice.model.WSNote;
 import com.logicaldoc.webservice.model.WSRating;
 import com.logicaldoc.webservice.model.WSUtil;
+
+import jakarta.activation.DataHandler;
+import jakarta.activation.FileDataSource;
+import jakarta.mail.MessagingException;
 
 /**
  * Test case for <code>SoapDocumentService</code>
@@ -103,23 +103,23 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testAddNote() throws AuthenticationException, PersistenceException, PermissionException,
-	        UnexistingResourceException, WebserviceException {
+			UnexistingResourceException, WebserviceException {
 
-	    Document doc = docDao.findById(1);
-	    assertNotNull(doc);
+		Document doc = docDao.findById(1);
+		assertNotNull(doc);
 
-	    List<WSNote> initialNotes = testSubject.getNotes("", doc.getId());
-	    int originalNoteCount = initialNotes.size();
+		List<WSNote> initialNotes = testSubject.getNotes("", doc.getId());
+		int originalNoteCount = initialNotes.size();
 
-	    testSubject.addNote("", doc.getId(), "note1");
-	    WSNote note = testSubject.addNote("", doc.getId(), "note2");
-	    List<WSNote> notes = testSubject.getNotes("", doc.getId());
-	    assertEquals(originalNoteCount + 2, notes.size());
+		testSubject.addNote("", doc.getId(), "note1");
+		WSNote note = testSubject.addNote("", doc.getId(), "note2");
+		List<WSNote> notes = testSubject.getNotes("", doc.getId());
+		assertEquals(originalNoteCount + 2, notes.size());
 
-	    testSubject.deleteNote("", note.getId());
+		testSubject.deleteNote("", note.getId());
 
-	    notes = testSubject.getNotes("", doc.getId());
-	    assertEquals(originalNoteCount + 1, notes.size());
+		notes = testSubject.getNotes("", doc.getId());
+		assertEquals(originalNoteCount + 1, notes.size());
 	}
 
 	@Test
@@ -255,11 +255,11 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 		File originalFile = new File("build.xml");
 		File tmp = null;
 		try {
-		    tmp = FileUtil.createTempFile("test", ".xml");
-		    handler.writeTo(new FileOutputStream(tmp));
-		    assertEquals(originalFile.length(), tmp.length());
+			tmp = FileUtil.createTempFile("test", ".xml");
+			handler.writeTo(new FileOutputStream(tmp));
+			assertEquals(originalFile.length(), tmp.length());
 		} finally {
-		    FileUtil.delete(tmp);
+			FileUtil.delete(tmp);
 		}
 	}
 
@@ -401,7 +401,7 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testGetContent() throws AuthenticationException, PersistenceException, PermissionException,
-			WebserviceException, IOException, InterruptedException {
+			WebserviceException, IOException {
 		WSDocument wsDoc = createDocument();
 
 		DataHandler dh = testSubject.getContent("", wsDoc.getId());

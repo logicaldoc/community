@@ -34,7 +34,6 @@ import com.logicaldoc.gui.login.client.services.TfaService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.Img;
@@ -56,6 +55,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @since 7.5
  */
 public class LoginPanel extends VLayout {
+
+	private static final String ACCESSDENIED = "accessdenied";
 
 	private static final String PASSWORD_STR = "password";
 
@@ -720,7 +721,7 @@ public class LoginPanel extends VLayout {
 			@Override
 			public void onFailure(Throwable caught) {
 				unlockInput();
-				SC.warn(I18N.message("accesdenied"));
+				SC.warn(I18N.message(ACCESSDENIED));
 			}
 
 			@Override
@@ -741,7 +742,7 @@ public class LoginPanel extends VLayout {
 				} else if ("unconfirmedlegals".equals(failure)) {
 					handleUnconfirmedLegals(user.getUsername());
 				} else
-					SC.warn(I18N.message("accesdenied"));
+					SC.warn(I18N.message(ACCESSDENIED));
 
 			}
 		});
@@ -749,21 +750,17 @@ public class LoginPanel extends VLayout {
 
 	protected void handleUnconfirmedLegals(String username) {
 		unlockInput();
-		LD.ask(I18N.message("unconfirmedlegals"), I18N.message("needconfirmlegals"), new BooleanCallback() {
+		LD.ask(I18N.message("unconfirmedlegals"), I18N.message("needconfirmlegals"), choice -> {
+			if (Boolean.TRUE.equals(choice)) {
+				LoginService.Instance.get().getLegalsToConfirm(username, new DefaultAsyncCallback<>() {
 
-			@Override
-			public void execute(Boolean value) {
-				if (Boolean.TRUE.equals(value)) {
-					LoginService.Instance.get().getLegalsToConfirm(username, new DefaultAsyncCallback<>() {
-
-						@Override
-						public void onSuccess(List<GUIParameter> legals) {
-							new LegalsPopup(username, legals).show();
-						}
-					});
-				} else {
-					SC.warn(I18N.message("accesdenied"));
-				}
+					@Override
+					public void onSuccess(List<GUIParameter> legals) {
+						new LegalsPopup(username, legals).show();
+					}
+				});
+			} else {
+				SC.warn(I18N.message(ACCESSDENIED));
 			}
 		});
 	}

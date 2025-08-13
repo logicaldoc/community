@@ -61,7 +61,7 @@ public class SystemServiceImplTest extends AbstractWPTestCase {
 	}
 
 	@Override
-	public void tearDown() throws SQLException, IOException {
+	public void tearDown() throws IOException {
 		super.tearDown();
 		FileUtil.delete(SystemServiceImpl.defaultWebappRootFolder);
 	}
@@ -116,7 +116,7 @@ public class SystemServiceImplTest extends AbstractWPTestCase {
 		long start = System.currentTimeMillis();
 		GUITask task;
 		do {
-			Thread.sleep(100);
+			waiting();
 			task = testSubject.getTaskByName("IndexerTask", "en");
 			if (task.getStatus() == Task.STATUS_IDLE)
 				break;

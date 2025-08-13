@@ -54,7 +54,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	private static Context instance;
 
 	private Context() {
-		instance = this;
+		// Nothing to do
 	}
 
 	public static Context get() {

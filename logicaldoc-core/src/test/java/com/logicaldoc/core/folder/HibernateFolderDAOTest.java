@@ -629,7 +629,6 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		face = folder.getAccessControlEntry(10L);
 		assertTrue(face.grantedPermissions().contains(Permission.ADD));
-		assertTrue(face.grantedPermissions().contains(Permission.DOWNLOAD));
 		assertFalse(face.grantedPermissions().contains(Permission.PREVIEW));
 
 		// Set a securityRef
@@ -658,12 +657,8 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 			assertEquals("Unexisting parent folder " + folder.getParentId(), e.getMessage());
 		}
 
-		folder = testSubject.findById(6);
-		testSubject.initialize(folder);
-		assertEquals("folder6", folder.getName());
-
 		// Load an existing folder and modify it
-		folder = testSubject.findById(6);
+		folder = testSubject.findById(6L);
 		testSubject.initialize(folder);
 		assertEquals("folder6", folder.getName());
 

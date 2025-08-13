@@ -36,6 +36,12 @@ import com.smartgwt.client.widgets.tab.Tab;
  */
 public class OutgoingEmailPanel extends AdminPanel {
 
+	private static final String SECURE_AUTH = "secureAuth";
+
+	private static final String CONN_SECURITY = "connSecurity";
+
+	private static final String SERVER = "server";
+
 	private static final String PROTOCOL = "protocol";
 
 	private static final String USERASFROM = "userasfrom";
@@ -65,7 +71,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 		emailForm.setTitleOrientation(TitleOrientation.LEFT);
 
 		// Server
-		TextItem server = ItemFactory.newTextItem("server", this.emailSettings.getServer());
+		TextItem server = ItemFactory.newTextItem(SERVER, this.emailSettings.getServer());
 		server.setRequired(true);
 		server.setWidth(350);
 		server.setWrapTitle(false);
@@ -85,15 +91,15 @@ public class OutgoingEmailPanel extends AdminPanel {
 		protocol.setValue(this.emailSettings.getProtocol());
 		protocol.addChangedHandler(changed -> {
 			if (changed.getValue().toString().contains("google")) {
-				vm.setValue("server", "smtp.gmail.com");
+				vm.setValue(SERVER, "smtp.gmail.com");
 				vm.setValue("port", 587);
-				vm.setValue("connSecurity", GUIEmailSettings.SECURITY_STARTTLS);
-				vm.setValue("secureAuth", false);
+				vm.setValue(CONN_SECURITY, GUIEmailSettings.SECURITY_STARTTLS);
+				vm.setValue(SECURE_AUTH, false);
 			} else if (changed.getValue().toString().contains("microsoft")) {
-				vm.setValue("server", "smtp.office365.com");
+				vm.setValue(SERVER, "smtp.office365.com");
 				vm.setValue("port", 587);
-				vm.setValue("connSecurity", GUIEmailSettings.SECURITY_STARTTLS);
-				vm.setValue("secureAuth", true);
+				vm.setValue(CONN_SECURITY, GUIEmailSettings.SECURITY_STARTTLS);
+				vm.setValue(SECURE_AUTH, true);
 			}
 		});
 
@@ -105,14 +111,14 @@ public class OutgoingEmailPanel extends AdminPanel {
 		opts.put(GUIEmailSettings.SECURITY_TLS, I18N.message("tls"));
 		opts.put(GUIEmailSettings.SECURITY_SSL, I18N.message("ssl"));
 		connSecurity.setValueMap(opts);
-		connSecurity.setName("connSecurity");
+		connSecurity.setName(CONN_SECURITY);
 		connSecurity.setTitle(I18N.message("connsecurity"));
 		connSecurity.setValue(this.emailSettings.getConnSecurity());
 		connSecurity.setWrapTitle(false);
 
 		// Use Secure Authentication
 		CheckboxItem secureAuth = new CheckboxItem();
-		secureAuth.setName("secureAuth");
+		secureAuth.setName(SECURE_AUTH);
 		secureAuth.setTitle(I18N.message("secureauth"));
 		secureAuth.setRedrawOnChange(true);
 		secureAuth.setWidth(50);
@@ -225,7 +231,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 				return;
 
 			OutgoingEmailPanel.this.emailSettings.setProtocol(vm.getValueAsString(PROTOCOL));
-			OutgoingEmailPanel.this.emailSettings.setServer(vm.getValueAsString("server"));
+			OutgoingEmailPanel.this.emailSettings.setServer(vm.getValueAsString(SERVER));
 			if (vm.getValue("port") instanceof Integer intVal)
 				OutgoingEmailPanel.this.emailSettings.setPort(intVal);
 			else
@@ -233,8 +239,8 @@ public class OutgoingEmailPanel extends AdminPanel {
 
 			OutgoingEmailPanel.this.emailSettings.setUsername(vm.getValueAsString(USERNAME));
 			OutgoingEmailPanel.this.emailSettings.setPwd(vm.getValueAsString("password_hidden"));
-			OutgoingEmailPanel.this.emailSettings.setConnSecurity(vm.getValueAsString("connSecurity"));
-			OutgoingEmailPanel.this.emailSettings.setSecureAuth(Boolean.valueOf(vm.getValueAsString("secureAuth")));
+			OutgoingEmailPanel.this.emailSettings.setConnSecurity(vm.getValueAsString(CONN_SECURITY));
+			OutgoingEmailPanel.this.emailSettings.setSecureAuth(Boolean.valueOf(vm.getValueAsString(SECURE_AUTH)));
 			OutgoingEmailPanel.this.emailSettings.setSenderEmail(vm.getValueAsString(SENDEREMAIL));
 			OutgoingEmailPanel.this.emailSettings.setUserAsFrom(Boolean.valueOf(vm.getValueAsString(USERASFROM)));
 			OutgoingEmailPanel.this.emailSettings.setFoldering(Integer.parseInt(vm.getValueAsString("foldering")));

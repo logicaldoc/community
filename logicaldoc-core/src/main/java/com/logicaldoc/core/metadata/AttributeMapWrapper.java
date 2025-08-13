@@ -87,7 +87,7 @@ class AttributeMapWrapper extends HashMap<String, Attribute> {
 
 	@Override
 	public Collection<Attribute> values() {
-		return wrappedAttributesMap.values().stream().map(a -> (Attribute) a).toList();
+		return wrappedAttributesMap.values();
 	}
 
 	@Override

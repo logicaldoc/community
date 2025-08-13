@@ -334,8 +334,10 @@ public class DocTool {
 	 * @param doc the document
 	 * @param targetPath the full path of the target folder
 	 * @param username the user in whose name the method is run
+	 * 
+	 * @throws InterruptedException In case or thread interruption 
 	 */
-	public void move(Document doc, String targetPath, String username) {
+	public void move(Document doc, String targetPath, String username) throws InterruptedException {
 		User user = new SecurityTool().getUser(username);
 		DocumentManager manager = Context.get(DocumentManager.class);
 
@@ -348,6 +350,8 @@ public class DocTool {
 
 		try {
 			manager.moveToFolder(doc, folder, transaction).get();
+		} catch (InterruptedException ie) {
+			throw ie;
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}

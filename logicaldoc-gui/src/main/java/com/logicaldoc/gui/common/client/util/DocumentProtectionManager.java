@@ -52,7 +52,7 @@ public class DocumentProtectionManager {
 					LD.askForDocumentPassword(I18N.message("security"), I18N.message("enterprotpassword"), null,
 							(final String password) -> {
 								if (password == null) {
-									SC.warn(I18N.message("accesdenied"));
+									SC.warn(I18N.message("accessdenied"));
 									return;
 								}
 
@@ -86,7 +86,7 @@ public class DocumentProtectionManager {
 				if (Boolean.TRUE.equals(granted)) {
 					saveProtectionPasswordAndNotify(docId, handler, result, password);
 				} else if (handler != null) {
-					SC.warn(I18N.message("accesdenied"));
+					SC.warn(I18N.message("accessdenied"));
 				}
 			}
 		});

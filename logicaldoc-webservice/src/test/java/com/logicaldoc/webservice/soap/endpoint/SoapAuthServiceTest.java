@@ -9,8 +9,6 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.junit.Before;
@@ -23,6 +21,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SoapAuthServiceTest extends AbstractWebserviceTestCase {
@@ -53,7 +53,7 @@ public class SoapAuthServiceTest extends AbstractWebserviceTestCase {
 		String sid = soapAuthServiceImpl.login("author", "admin");
 		assertNotNull(sid);
 	}
-	
+
 	@Test
 	public void testLoginApiKey() {
 		String sid = soapAuthServiceImpl.loginApiKey(apiKey.getDecodedKey());
@@ -87,7 +87,7 @@ public class SoapAuthServiceTest extends AbstractWebserviceTestCase {
 	}
 
 	@Test
-	public void testRenew() throws InterruptedException {
+	public void testRenew() {
 		String sid = soapAuthServiceImpl.loginApiKey(apiKey.getDecodedKey());
 		assertNotNull(sid);
 		soapAuthServiceImpl.renew(sid);

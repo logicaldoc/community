@@ -9,7 +9,6 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.IButton;

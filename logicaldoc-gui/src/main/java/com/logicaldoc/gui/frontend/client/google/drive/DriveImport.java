@@ -19,7 +19,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;

@@ -238,7 +238,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		}
 	}
 
-	protected void saveOrUpdate(PersistentObject entity) throws PersistenceException {
+	protected void saveOrUpdate(PersistentObject entity) {
 		// Update the attributes
 		if (entity instanceof ExtensibleObject extensibleEntity) {
 			try {
@@ -264,8 +264,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		} else {
 			PersistentObject persistedEntity = session.merge(entity);
 			flush();
-			
-			// Adjust the record version as it gets persisted 
+
+			// Adjust the record version as it gets persisted
 			entity.setRecordVersion(persistedEntity.getRecordVersion());
 		}
 	}
@@ -333,7 +333,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			queryObject.setMaxResults(max);
 	}
 
-	private void applyParametersAndLimit(Map<String, Object> parameters, Integer max, MutationQuery queryObject) {
+	private void applyParameters(Map<String, Object> parameters, MutationQuery queryObject) {
 		if (parameters != null)
 			for (Map.Entry<String, Object> entry : parameters.entrySet())
 				queryObject.setParameter(entry.getKey(), entry.getValue());
@@ -564,10 +564,10 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			return 0;
 
 		try {
-			MutationQuery queryObject = getCurrentSession()
+			MutationQuery mutationQuery = getCurrentSession()
 					.createMutationQuery(UPDATE + entityClass.getCanonicalName() + " " + expression);
-			applyParametersAndLimit(parameters, null, queryObject);
-			return queryObject.executeUpdate();
+			applyParameters(parameters, mutationQuery);
+			return mutationQuery.executeUpdate();
 		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}

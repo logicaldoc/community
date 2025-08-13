@@ -121,7 +121,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 			throw new OutsideWorkingTimeException(this);
 
 		validatePasswordStrongness(user);
-		
+
 		validateLegals(user);
 	}
 
@@ -140,9 +140,7 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 				if (Context.get().getProperties().getBoolean(tenantName + ".password.checklogin", false))
 					Context.get(UserDAO.class).checkPasswordCompliance(user);
 			} catch (PasswordWeakException pwe) {
-				// In case of password too week, log and mark it as expired in
-				// the DB
-				log.error("Password of user {} is too week: {}", user.getUsername(), pwe.getMessages());
+				// In case of password too week, mark it as expired in the DB
 				markPasswordExpired(user);
 				throw pwe;
 			} catch (PersistenceException e) {

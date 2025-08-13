@@ -127,11 +127,11 @@ public class DocumentsListPanel extends VLayout {
 
 	protected Cursor prepareCursor(GUIFolder folder) {
 		// Prepare a panel containing a title and the documents list
-		Cursor cursor = new Cursor(true, false);
-		cursor.setTotalRecords((int) folder.getDocumentCount());
-		cursor.registerPageSizeChangedHandler(event -> DocumentsPanel.get().changePageSize());
-		cursor.registerPageChangedHandler(event -> DocumentsPanel.get().changePageSize());
-		return cursor;
+		Cursor crsr = new Cursor(true, false);
+		crsr.setTotalRecords((int) folder.getDocumentCount());
+		crsr.registerPageSizeChangedHandler(event -> DocumentsPanel.get().changePageSize());
+		crsr.registerPageChangedHandler(event -> DocumentsPanel.get().changePageSize());
+		return crsr;
 	}
 
 	/**

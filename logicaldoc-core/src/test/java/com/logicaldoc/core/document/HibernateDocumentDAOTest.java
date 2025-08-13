@@ -493,7 +493,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testStoreMassive() throws PersistenceException, InterruptedException {
+	public void testStoreMassive() throws PersistenceException {
 		assertEquals(0L, testSubject.queryForLong("select count(*) from ld_document where ld_filename like 'test-%'"));
 
 		int total = Context.get().getProperties().getInt("maxdocsperfolder") - 100;

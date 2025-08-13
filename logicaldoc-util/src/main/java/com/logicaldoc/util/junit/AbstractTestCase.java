@@ -41,6 +41,8 @@ import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.Pause;
 import com.logicaldoc.util.time.TimeDiff;
 
+import jakarta.persistence.PersistenceException;
+
 /**
  * Abstract test case that of database and context initialization.
  * 
@@ -71,10 +73,10 @@ public abstract class AbstractTestCase {
 		String message = String.format("Test %s %s, spent %s", testName, status,
 				TimeDiff.printDuration(TimeUnit.NANOSECONDS.toMillis(nanos)));
 		switch (status) {
-		case "failed" -> log.error(message);
-		case "succeeded" -> log.debug(message);
-		case "skipped" -> log.debug(message);
-		default -> log.info(message);
+			case "failed" -> log.error(message);
+			case "succeeded" -> log.debug(message);
+			case "skipped" -> log.debug(message);
+			default -> log.info(message);
 		}
 	}
 
@@ -124,19 +126,17 @@ public abstract class AbstractTestCase {
 			restoreUserHome();
 			log.error(e.getMessage(), e);
 
-			if (e instanceof IOException ioe)
-				throw ioe;
-			else if (e instanceof IOException sqe)
-				throw sqe;
-			else if (e instanceof IOException pe)
-				throw pe;
-			else
-				throw new RuntimeException(e);
+			switch (e) {
+				case IOException ioe -> throw ioe;
+				case SQLException sqe -> throw sqe;
+				case PersistenceException pe -> throw pe;
+				default -> throw new PluginException(e);
+			}
 		}
 	}
 
 	@After
-	public void tearDown() throws IOException, SQLException {
+	public void tearDown() throws IOException {
 		try {
 			destroyDatabase();
 			File pluginsDir = new File(

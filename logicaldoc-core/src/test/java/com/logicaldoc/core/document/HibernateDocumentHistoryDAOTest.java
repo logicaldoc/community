@@ -166,7 +166,7 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTestCase {
 		assertEquals(folderHistory, hStored);
 		assertEquals(hStored.getFolderId(), Long.valueOf(5L));
 		assertEquals(hStored.getDate().getTime(), DateBean.dateFromCompactString("20061220").getTime());
-		assertEquals(hStored.getUsername(), "sebastian");
+		assertEquals("sebastian", hStored.getUsername());
 		assertEquals(DocumentEvent.CHANGED, hStored.getEventEnum());
 	}
 

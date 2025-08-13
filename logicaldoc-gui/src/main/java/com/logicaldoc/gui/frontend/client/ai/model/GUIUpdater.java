@@ -13,9 +13,9 @@ public class GUIUpdater implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public final static String ADAGRAD = "ADAGRAD";
+	public static final String ADAGRAD = "ADAGRAD";
 
-	public final static String NESTEROV = "NESTEROV";
+	public static final String NESTEROV = "NESTEROV";
 
 	private String updateAlgorithm = ADAGRAD;
 

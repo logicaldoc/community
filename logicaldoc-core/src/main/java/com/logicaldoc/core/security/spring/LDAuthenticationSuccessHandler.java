@@ -2,11 +2,6 @@ package com.logicaldoc.core.security.spring;
 
 import java.io.IOException;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -17,6 +12,11 @@ import org.springframework.security.web.savedrequest.RequestCache;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This handler gets the j_successurl request parameter and use it's value to
@@ -44,8 +44,6 @@ public class LDAuthenticationSuccessHandler extends SavedRequestAwareAuthenticat
 		 * Deduct the destination URL
 		 */
 		String requestedUrl = request.getParameter(PARAM_SUCCESSURL);
-//		if (requestedUrl == null && request.getSession(false) != null)
-//			request.getSession(false).removeAttribute(LDAccessDecisionManager.REQUESTED_URL);
 
 		LDAuthenticationToken token = (LDAuthenticationToken) authentication;
 
@@ -55,8 +53,8 @@ public class LDAuthenticationSuccessHandler extends SavedRequestAwareAuthenticat
 		sidCookie.setPath("/");
 		response.addCookie(sidCookie);
 		response.setHeader("SID", token.getSid());
-		
-        log.debug("authentication success {} with sid {}", requestedUrl, token.getSid());		
+
+		log.debug("authentication success {} with sid {}", requestedUrl, token.getSid());
 		SessionManager.get().saveSid(request, response, token.getSid());
 
 		if (requestedUrl != null) {

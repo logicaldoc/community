@@ -241,7 +241,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		}
 	}
 
-	private void updateAliases(Folder folder) throws PersistenceException {
+	private void updateAliases(Folder folder) {
 		if (folder.getId() != 0L) {
 			List<Folder> aliases = findAliases(folder.getId(), folder.getTenantId());
 			for (Folder alias : aliases) {

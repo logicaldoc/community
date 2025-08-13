@@ -1247,7 +1247,7 @@ public abstract class Util {
 	public static String getParameterValue(List<GUIParameter> params, String name, String defaultValue) {
 		try {
 			GUIParameter param = getParameter(params, name);
-			return param.getValue() != null ? param.getValue() : defaultValue;
+			return param != null && param.getValue() != null ? param.getValue() : defaultValue;
 		} catch (Exception re) {
 			return defaultValue;
 		}
@@ -1260,7 +1260,7 @@ public abstract class Util {
 	public static Boolean getParameterValueAsBoolean(List<GUIParameter> params, String name) {
 		try {
 			GUIParameter param = getParameter(params, name);
-			return param.getValueAsBoolean() != null ? param.getValueAsBoolean() : false;
+			return param != null && param.getValueAsBoolean() != null && param.getValueAsBoolean();
 		} catch (Exception re) {
 			return Boolean.FALSE;
 		}
@@ -1269,7 +1269,7 @@ public abstract class Util {
 	public static int getParameterValueAsInt(List<GUIParameter> params, String name, int defaultValue) {
 		try {
 			GUIParameter param = getParameter(params, name);
-			return param.getValueAsInteger() != null ? param.getValueAsInteger() : defaultValue;
+			return param != null && param.getValueAsInteger() != null ? param.getValueAsInteger() : defaultValue;
 		} catch (Exception re) {
 			return defaultValue;
 		}

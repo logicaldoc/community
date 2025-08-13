@@ -42,7 +42,6 @@ import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.http.UrlUtil;
 import com.logicaldoc.util.io.FileUtil;
-// import com.sun.mail.smtp.SMTPTransport;
 import com.logicaldoc.util.spring.Context;
 
 import jakarta.activation.DataHandler;
@@ -74,7 +73,7 @@ import net.sf.jmimemagic.MagicMatch;
 public class EMailSender {
 
 	private static final Logger log = LoggerFactory.getLogger(EMailSender.class);
-	
+
 	private static final String MAIL_TRANSPORT_PROTOCOL = "mail.transport.protocol";
 
 	private static final String UTF_8 = "UTF-8";
@@ -469,52 +468,63 @@ public class EMailSender {
 
 	private Properties prepareMailSessionProperties() {
 		Properties props = new Properties();
-		if (!StringUtils.isEmpty(username))
-			props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.auth", Boolean.toString(!StringUtils.isEmpty(username)));
 
 		if (authEncrypted) {
-			// The 'smtps' protocol must be used
-			props.put(MAIL_TRANSPORT_PROTOCOL, "smtps");
-			props.put("mail.smtps.host", host);
-			props.put("mail.smtps.port", port);
-			props.put("mail.smtps.ssl.protocols", "TLSv1.1 TLSv1.2");
-			if (connectionSecurity == SECURITY_STARTTLS)
-				props.put("mail.smtps.starttls.enable", "true");
-			if (connectionSecurity == SECURITY_TLS)
-				props.put("mail.smtps.starttls.required", "true");
-			if (connectionSecurity == SECURITY_SSL) {
-				// Necessary property to send e-mails with SSL
-				props.put("mail.smtps.ssl.enable", "true");
-			}
+			prepareSmtpsProperties(props);
 		} else {
-			props.put(MAIL_TRANSPORT_PROTOCOL, "smtp");
-			props.put("mail.smtp.host", host);
-			props.put("mail.smtp.port", port);
-			if (connectionSecurity == SECURITY_STARTTLS)
-				props.put("mail.smtp.starttls.enable", "true");
-			if (connectionSecurity == SECURITY_TLS)
-				props.put("mail.smtp.starttls.required", "true");
-			if (connectionSecurity == SECURITY_SSL) {
-				// Necessary property to send e-mails with SSL
-				props.put("mail.smtp.ssl.enable", "true");
-			}
+			prepareSmtpProperties(props);
 		}
 
 		props.put("mail.smtp.ssl.protocols", "TLSv1.1 TLSv1.2");
 		props.put("mail.smtp.ssl.checkserveridentity", "false");
 		props.put("mail.smtp.ssl.trust", "*");
 
-		if (log.isDebugEnabled()) {
-			props.put("mail.debug", "true");
-			props.put("mail.debug.auth", "true");
-		}
+		prepareDebugProperties(props);
 
-		putOAuthSettings(props);
+		putOAuthProperties(props);
 
 		return props;
 	}
 
-	protected void putOAuthSettings(Properties props) {
+	private void prepareSmtpsProperties(Properties props) {
+		// The 'smtps' protocol must be used
+		props.put(MAIL_TRANSPORT_PROTOCOL, "smtps");
+		props.put("mail.smtps.host", host);
+		props.put("mail.smtps.port", port);
+		props.put("mail.smtps.ssl.protocols", "TLSv1.1 TLSv1.2");
+		if (connectionSecurity == SECURITY_STARTTLS)
+			props.put("mail.smtps.starttls.enable", "true");
+		if (connectionSecurity == SECURITY_TLS)
+			props.put("mail.smtps.starttls.required", "true");
+		if (connectionSecurity == SECURITY_SSL) {
+			// Necessary property to send e-mails with SSL
+			props.put("mail.smtps.ssl.enable", "true");
+		}
+	}
+
+	private void prepareSmtpProperties(Properties props) {
+		props.put(MAIL_TRANSPORT_PROTOCOL, "smtp");
+		props.put("mail.smtp.host", host);
+		props.put("mail.smtp.port", port);
+		if (connectionSecurity == SECURITY_STARTTLS)
+			props.put("mail.smtp.starttls.enable", "true");
+		if (connectionSecurity == SECURITY_TLS)
+			props.put("mail.smtp.starttls.required", "true");
+		if (connectionSecurity == SECURITY_SSL) {
+			// Necessary property to send e-mails with SSL
+			props.put("mail.smtp.ssl.enable", "true");
+		}
+	}
+
+	private void prepareDebugProperties(Properties props) {
+		if (log.isDebugEnabled()) {
+			props.put("mail.debug", "true");
+			props.put("mail.debug.auth", "true");
+		}
+	}
+
+	protected void putOAuthProperties(Properties props) {
 		if (!PROTOCOL_SMTP.equalsIgnoreCase(protocol)) {
 			props.clear();
 			props.put("mail.smtp.auth.xoauth2.disable", "false");

@@ -3,7 +3,6 @@ package com.logicaldoc.web;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -38,7 +37,7 @@ public class LegalServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger log = LoggerFactory.getLogger(AvatarServlet.class);
+	private static final Logger log = LoggerFactory.getLogger(LegalServlet.class);
 
 	/**
 	 * Constructor of the object.
@@ -109,7 +108,7 @@ public class LegalServlet extends HttpServlet {
 	}
 
 	private void downloadLegal(HttpServletRequest request, HttpServletResponse response, String legal)
-			throws PersistenceException, UnsupportedEncodingException, IOException {
+			throws PersistenceException, IOException {
 		String content = Context.get(DocumentDAO.class)
 				.queryForString("select ld_content from ld_legal where ld_name = :legal", Map.of("legal", legal));
 		ServletUtil.setContentDisposition(request, response, legal + ".pdf");

@@ -37,6 +37,8 @@ import com.smartgwt.client.widgets.menu.MenuItem;
  */
 public class SamplerProperties extends SamplerDetailsTab {
 
+	private static final String LABEL = "label";
+
 	private static final String TAKEATTRIBUTES = "takeattributes";
 
 	private static final String CHAIN = "chain";
@@ -98,7 +100,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		name.addChangedHandler(changedHandler);
 		name.setRequired(true);
 
-		TextItem label = ItemFactory.newTextItem("label", sampler.getLabel());
+		TextItem label = ItemFactory.newTextItem(LABEL, sampler.getLabel());
 		label.addChangedHandler(changedHandler);
 
 		TextItem delimiter = ItemFactory.newTextItem("delimiter", sampler.getDelimiter());
@@ -132,7 +134,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		SelectItem type = ItemFactory.newSelectItem(TYPE);
 		type.setOptionDataSource(new SamplerTypeDS());
 		type.setValueField(VALUE);
-		type.setDisplayField("label");
+		type.setDisplayField(LABEL);
 		type.setValue(sampler.getType());
 		type.addChangedHandler(changedHandler);
 		type.addChangedHandler(changed -> chainStack.setVisible(CHAIN.equals(type.getValueAsString())));
@@ -332,7 +334,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 	boolean validate() {
 		if (form.validate()) {
 			sampler.setName(form.getValueAsString(NAME));
-			sampler.setLabel(form.getValueAsString("label"));
+			sampler.setLabel(form.getValueAsString(LABEL));
 			sampler.setDescription(form.getValueAsString(DESCRIPTION));
 			sampler.setDelimiter(form.getValueAsString("delimiter"));
 			sampler.setQuote(form.getValueAsString("quote"));

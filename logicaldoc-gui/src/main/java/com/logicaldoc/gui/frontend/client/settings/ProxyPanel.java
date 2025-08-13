@@ -31,6 +31,18 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class ProxyPanel extends AdminPanel {
 
+	private static final String USERNAME = "username";
+
+	private static final String PROXY_USERNAME = "proxy.username";
+
+	private static final String PROXY_PASSWORD = "proxy.password";
+
+	private static final String PROXY_PORT = "proxy.port";
+
+	private static final String PROXY_HOST = "proxy.host";
+
+	private static final String PROXY_ENABLED = "proxy.enabled";
+
 	private static final String PORT = "port";
 
 	private static final String PASSWORD = "password";
@@ -42,7 +54,7 @@ public class ProxyPanel extends AdminPanel {
 	@Override
 	protected void onDraw() {
 		SettingService.Instance.get().loadSettingsByNames(
-				Arrays.asList("proxy.enabled", "proxy.host", "proxy.port", "proxy.password", "proxy.username"),
+				Arrays.asList(PROXY_ENABLED, PROXY_HOST, PROXY_PORT, PROXY_PASSWORD, PROXY_USERNAME),
 				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(List<GUIParameter> parameters) {
@@ -58,19 +70,19 @@ public class ProxyPanel extends AdminPanel {
 		form.setTitleOrientation(TitleOrientation.LEFT);
 
 		ToggleItem enabled = ItemFactory.newToggleItem("eenabled", "enabled",
-				Util.getParameterValueAsBoolean(parameters, "proxy.enabled"));
+				Util.getParameterValueAsBoolean(parameters, PROXY_ENABLED));
 
-		TextItem host = ItemFactory.newTextItem("host", Util.getParameterValue(parameters, "proxy.host", "localhost"));
+		TextItem host = ItemFactory.newTextItem("host", Util.getParameterValue(parameters, PROXY_HOST, "localhost"));
 		host.setRequired(true);
 
 		IntegerItem port = ItemFactory.newIntegerItem(PORT, I18N.message(PORT),
-				Util.getParameterValueAsInt(parameters, "proxy.port", 0));
+				Util.getParameterValueAsInt(parameters, PROXY_PORT, 0));
 		port.setRequired(true);
 
-		TextItem username = ItemFactory.newTextItem("username", Util.getParameterValue(parameters, "proxy.username"));
+		TextItem username = ItemFactory.newTextItem(USERNAME, Util.getParameterValue(parameters, PROXY_USERNAME));
 
 		PasswordItem password = ItemFactory.newPasswordItemPreventAutocomplete(PASSWORD, PASSWORD,
-				Util.getParameterValue(parameters, "proxy.password"));
+				Util.getParameterValue(parameters, PROXY_PASSWORD));
 
 		form.setItems(enabled, host, port, username, password);
 
@@ -78,11 +90,11 @@ public class ProxyPanel extends AdminPanel {
 		save.addClickHandler(click -> {
 			if (Boolean.TRUE.equals(form.validate())) {
 				List<GUIParameter> settings = new ArrayList<>();
-				settings.add(new GUIParameter("proxy.enabled", form.getValueAsString("eenabled")));
-				settings.add(new GUIParameter("proxy.host", form.getValueAsString("host")));
-				settings.add(new GUIParameter("proxy.port", form.getValueAsString(PORT)));
-				settings.add(new GUIParameter("proxy.username", form.getValueAsString("username")));
-				settings.add(new GUIParameter("proxy.password", form.getValueAsString(PASSWORD)));
+				settings.add(new GUIParameter(PROXY_ENABLED, form.getValueAsString("eenabled")));
+				settings.add(new GUIParameter(PROXY_HOST, form.getValueAsString("host")));
+				settings.add(new GUIParameter(PROXY_PORT, form.getValueAsString(PORT)));
+				settings.add(new GUIParameter(PROXY_USERNAME, form.getValueAsString(USERNAME)));
+				settings.add(new GUIParameter(PROXY_PASSWORD, form.getValueAsString(PASSWORD)));
 
 				SettingService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<>() {
 					@Override
@@ -97,7 +109,7 @@ public class ProxyPanel extends AdminPanel {
 		test.addClickHandler(click -> {
 			LD.contactingServer();
 			SettingService.Instance.get().testProxy(form.getValueAsString("host"),
-					Integer.parseInt(form.getValueAsString(PORT)), form.getValueAsString("username"),
+					Integer.parseInt(form.getValueAsString(PORT)), form.getValueAsString(USERNAME),
 					form.getValueAsString(PASSWORD), new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(Boolean connected) {

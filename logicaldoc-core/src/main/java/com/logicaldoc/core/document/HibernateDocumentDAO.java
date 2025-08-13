@@ -66,6 +66,8 @@ import jakarta.transaction.Transactional;
 @Repository("documentDAO")
 @Transactional
 public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document> implements DocumentDAO {
+	private static final String DOC_ID = "docId";
+
 	private static final String TRANSACTION_CANNOT_BE_NULL = "transaction cannot be null";
 
 	private static final String AND = " and ";
@@ -593,7 +595,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			Map<String, Object> params = new HashMap<>();
 			params.put("fileVersion", doc.getFileVersion());
 			params.put("digest", doc.getDigest());
-			params.put("docId", doc.getId());
+			params.put(DOC_ID, doc.getId());
 			jdbcUpdate(
 					"update ld_version set ld_digest = :digest  where ld_documentid = :docId and ld_fileversion = :fileVersion",
 					params);
@@ -809,7 +811,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			query.append("select distinct(ld_docid1) from ld_link where ld_deleted=0 and (ld_docid2 = :docId)");
 
 		Map<String, Object> params = new HashMap<>();
-		params.put("docId", docId);
+		params.put(DOC_ID, docId);
 
 		List<Long> ids = queryForList(query.toString(), params, Long.class, null);
 
@@ -913,15 +915,15 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	public void restore(long docId, long folderId, final DocumentHistory transaction) throws PersistenceException {
 
 		// Update the document using HQL
-		bulkUpdate("set deleted=0, lastModified=CURRENT_TIMESTAMP where id = :docId", Map.of("docId", docId));
+		bulkUpdate("set deleted=0, lastModified=CURRENT_TIMESTAMP where id = :docId", Map.of(DOC_ID, docId));
 		bulkUpdate("set folder = :folder where id = :docId",
-				Map.of("folder", getCurrentSession().get(Folder.class, folderId), "docId", docId));
+				Map.of("folder", getCurrentSession().get(Folder.class, folderId), DOC_ID, docId));
 
 		// Update the version using HQL
 		versionDAO.bulkUpdate("set deleted=0, lastModified=CURRENT_TIMESTAMP where id = :docId",
-				Map.of("docId", docId));
+				Map.of(DOC_ID, docId));
 		versionDAO.bulkUpdate("set folderId = :folderId where id = :docId",
-				Map.of("folderId", folderId, "docId", docId));
+				Map.of("folderId", folderId, DOC_ID, docId));
 
 		Document doc = findById(docId);
 		if (doc != null && transaction != null) {

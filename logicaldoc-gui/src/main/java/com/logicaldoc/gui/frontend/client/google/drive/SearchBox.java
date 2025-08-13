@@ -13,13 +13,15 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
  */
 public class SearchBox extends TextItem {
 
+	private static final String SEARCH = "search";
+
 	public SearchBox() {
 		setShowTitle(false);
-		setDefaultValue(I18N.message("search") + "...");
+		setDefaultValue(I18N.message(SEARCH) + "...");
 		setWidth(160);
 
 		FormItemIcon search = new FormItemIcon();
-		search.setPrompt(I18N.message("search"));
+		search.setPrompt(I18N.message(SEARCH));
 		search.setSrc("[SKIN]/icons/magnifying-glass.png");
 		search.addFormItemClickHandler(click -> onSearch());
 		setIcons(search);
@@ -33,7 +35,7 @@ public class SearchBox extends TextItem {
 		});
 		
 		addClickHandler(event -> {
-			if ((I18N.message("search") + "...").equals(event.getItem().getValue())) {
+			if ((I18N.message(SEARCH) + "...").equals(event.getItem().getValue())) {
 				event.getItem().setValue("");
 			}
 		});

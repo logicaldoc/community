@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jakarta.annotation.Resource;
-import jakarta.transaction.Transactional;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -24,6 +21,9 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
+
+import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 
 /**
  * Hibernate implementation of <code>VersionDAO</code>
@@ -146,7 +146,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 		}
 	}
 
-	private void deleteOldestVersions(List<Version> versions, int maxVersions) throws PersistenceException {
+	private void deleteOldestVersions(List<Version> versions, int maxVersions) {
 		if (versions.size() <= maxVersions)
 			return;
 
@@ -184,7 +184,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 			deleteVersion(ver, delCode);
 	}
 
-	protected void deleteVersion(Version versionToDelete, int delCode) throws PersistenceException {
+	protected void deleteVersion(Version versionToDelete, int delCode) {
 		if (delCode == 0)
 			throw new IllegalArgumentException("delCode cannot be 0");
 		versionToDelete.setDeleted(delCode);

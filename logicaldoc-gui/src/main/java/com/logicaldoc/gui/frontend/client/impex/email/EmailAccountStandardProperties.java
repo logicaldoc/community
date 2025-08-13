@@ -26,6 +26,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 
+	private static final String SERVER = "server";
+
 	private static final String PROTOCOL = "protocol";
 
 	private static final String USERNAME = "username";
@@ -81,7 +83,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		language.setRequired(true);
 		language.setValue(account.getLanguage());
 
-		TextItem server = ItemFactory.newTextItem("server", account.getHost());
+		TextItem server = ItemFactory.newTextItem(SERVER, account.getHost());
 		server.setRequired(true);
 		server.setWidth(200);
 		server.addChangedHandler(changedHandler);
@@ -98,15 +100,15 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		protocol.addChangedHandler(changedHandler);
 		protocol.addChangedHandler(changed -> {
 			if (changed.getValue().toString().contains("pop3google")) {
-				form.setValue("server", "pop.gmail.com");
+				form.setValue(SERVER, "pop.gmail.com");
 				form.setValue("port", 995);
 				form.setValue("ssl", false);
 			} else if (changed.getValue().toString().contains("imapgoogle")) {
-				form.setValue("server", "imap.gmail.com");
+				form.setValue(SERVER, "imap.gmail.com");
 				form.setValue("port", 993);
 				form.setValue("ssl", false);
 			} else if (changed.getValue().toString().contains("imapmicrosoft365")) {
-				form.setValue("server", "outlook.office365.com");
+				form.setValue(SERVER, "outlook.office365.com");
 				form.setValue("port", 993);
 				form.setValue("ssl", true);
 			} 
@@ -176,7 +178,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 	boolean validate() {
 		if (form.validate()) {
 			account.setMailAddress(form.getValueAsString("mailaddress"));
-			account.setHost(form.getValueAsString("server"));
+			account.setHost(form.getValueAsString(SERVER));
 			account.setUsername(form.getValueAsString(USERNAME));
 			account.setTarget(targetSelector.getFolder());
 			account.setLanguage(form.getValueAsString("language"));

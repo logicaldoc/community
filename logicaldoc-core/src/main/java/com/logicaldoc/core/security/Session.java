@@ -223,9 +223,10 @@ public class Session extends PersistentObject implements Comparable<Session> {
 			this.decodedKey = decodedKey;
 			this.key = CryptUtil.encryptSHA256(decodedKey);
 
+			String abbreviation = decodedKey.length() > 14 ? StringUtils.right(decodedKey, 4) : "";
 			this.keyLabel = decodedKey.length() < 10 ? "..."
 					: StringUtils.abbreviate(decodedKey, 10)
-							+ (decodedKey.length() > 14 ? StringUtils.right(decodedKey, 4) : "");
+							+ abbreviation;
 		}
 	}
 

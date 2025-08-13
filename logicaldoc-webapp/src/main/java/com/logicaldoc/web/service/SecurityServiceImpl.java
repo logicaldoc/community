@@ -747,8 +747,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			setGroups(user, guiUser);
 
 			// Notify the user by email
-			if (createNew && guiUser.isNotifyCredentials())
-				notifyAccount(user, user.getDecodedPassword());
+			notifyUser(guiUser, user, createNew);
 		} catch (MessagingException me) {
 			log.warn(me.getMessage(), me);
 		} catch (Exception e) {
@@ -756,6 +755,12 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		}
 
 		return getUser(guiUser.getId());
+	}
+
+	private void notifyUser(GUIUser guiUser, User user, boolean createNew)
+			throws MessagingException, AutomationException {
+		if (createNew && guiUser.isNotifyCredentials())
+			notifyAccount(user, user.getDecodedPassword());
 	}
 
 	private void disallowEditingOfOtherUsers(GUIUser guiUser, Session session)

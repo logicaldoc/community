@@ -30,7 +30,7 @@ public class WebContextConfiguratorTest {
 	}
 
 	@After
-	public void tearDown() throws Exception {
+	public void tearDown() {
 		FileUtil.delete(metainfXml);
 	}
 

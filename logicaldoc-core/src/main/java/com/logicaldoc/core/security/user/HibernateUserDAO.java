@@ -157,8 +157,6 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		for (String key : errorKeys)
 			props.put(key.substring(key.indexOf('.') + 1), messages.get(key));
 
-		ContextProperties config = Context.get().getProperties();
-
 		// length between X and 30 characters
 		// at least X upper-case character
 		// at least X lower-case characters

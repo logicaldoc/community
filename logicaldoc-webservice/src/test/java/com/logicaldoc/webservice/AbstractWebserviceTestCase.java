@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.springframework.context.ApplicationContext;
-
 import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Device;
 import com.logicaldoc.core.security.Session;
@@ -52,21 +50,13 @@ public abstract class AbstractWebserviceTestCase extends AbstractTestCase {
 	}
 
 	@Override
-	public void tearDown() throws SQLException, IOException {
+	public void tearDown() throws IOException {
 		SessionManager.get().kill(session.getSid());
 		super.tearDown();
 	}
-
-//	@Override
-//	protected ApplicationContext buildApplicationContext() {
-//		WebserviceApplicationContext appContext = new WebserviceApplicationContext();
-//		appContext.refresh();
-//		return appContext;
-//	}
 
 	@Override
 	protected List<String> getDatabaseScripts() {
 		return List.of("sql/logicaldoc-core.sql", "sql/logicaldoc-webservice.sql", "data.sql");
 	}
-
 }

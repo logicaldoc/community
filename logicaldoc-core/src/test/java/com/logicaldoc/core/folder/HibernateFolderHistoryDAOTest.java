@@ -163,7 +163,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
 		assertEquals(folderFolderHistory, hStored);
 		assertEquals(hStored.getFolderId(), Long.valueOf(5L));
 		assertEquals(hStored.getDate().getTime(), DateBean.dateFromCompactString("20061220").getTime());
-		assertEquals(hStored.getUsername(), "sebastian");
+		assertEquals("sebastian", hStored.getUsername());
 		assertEquals(FolderEvent.CREATED, hStored.getEventEnum());
 	}
 

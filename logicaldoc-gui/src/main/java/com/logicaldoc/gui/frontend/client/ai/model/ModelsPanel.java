@@ -104,7 +104,7 @@ public class ModelsPanel extends VLayout {
 
 		ListGridField modelType = new ListGridField("type", I18N.message("type"));
 		modelType.setAutoFit(AutoFitWidthApproach.BOTH);
-		modelType.setCellFormatter((value, record, rowNum, colNum) -> I18N.message("aimodeltype." + value));
+		modelType.setCellFormatter((value, rcrd, rowNum, colNum) -> I18N.message("aimodeltype." + value));
 
 		ListGridField training = new RunningListGridField(TRAINING);
 		training.setTitle(I18N.message(TRAINING));

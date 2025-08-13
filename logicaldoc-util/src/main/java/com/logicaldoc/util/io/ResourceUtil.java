@@ -61,13 +61,13 @@ public class ResourceUtil {
 
 	public static boolean existsResource(String resourceName) {
 		try (InputStream is = getInputStream(resourceName)) {
-			return is != null && is.available() > 0L;
+			return is.available() > 0L;
 		} catch (Exception e) {
 			return false;
 		}
 	}
 
-	public static InputStream getInputStream(String resourceName) throws IOException {
+	public static InputStream getInputStream(String resourceName) {
 		if (resourceName.startsWith("/"))
 			resourceName = resourceName.substring(1);
 

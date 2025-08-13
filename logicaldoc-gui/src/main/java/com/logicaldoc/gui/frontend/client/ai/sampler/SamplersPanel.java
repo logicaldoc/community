@@ -81,9 +81,9 @@ public class SamplersPanel extends VLayout {
 		description.setCanFilter(true);
 		description.setCanSort(false);
 
-		ListGridField samplerType = new ListGridField("type", I18N.message("type"));
-		samplerType.setCellFormatter((value, record, rowNum, colNum) -> I18N.message("aisamplertype." + value));
-		samplerType.setAutoFit(AutoFitWidthApproach.BOTH);
+		ListGridField samplerTypeField = new ListGridField("type", I18N.message("type"));
+		samplerTypeField.setCellFormatter((value, rcrd, rowNum, colNum) -> I18N.message("aisamplertype." + value));
+		samplerTypeField.setAutoFit(AutoFitWidthApproach.BOTH);
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -91,7 +91,7 @@ public class SamplersPanel extends VLayout {
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(id, name, label, samplerType, description);
+		list.setFields(id, name, label, samplerTypeField, description);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);

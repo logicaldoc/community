@@ -34,7 +34,8 @@ public class DocumentAccessControlEntry extends ExtendedAccessControlEntry {
 		super(groupId);
 		setGroupId(groupId);
 	}
-	
+
+	@Override
 	public ExtendedAccessControlEntry getAce() {
 		return ace;
 	}
@@ -273,7 +274,7 @@ public class DocumentAccessControlEntry extends ExtendedAccessControlEntry {
 	public String toString() {
 		return ace.toString();
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		return ace.equals(obj);

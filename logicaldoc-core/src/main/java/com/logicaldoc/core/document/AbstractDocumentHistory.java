@@ -23,7 +23,7 @@ import com.logicaldoc.util.spring.Context;
 @MappedSuperclass
 public abstract class AbstractDocumentHistory extends History {
 
-	private final static Logger log = LoggerFactory.getLogger(AbstractDocumentHistory.class);
+	private static final Logger log = LoggerFactory.getLogger(AbstractDocumentHistory.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -185,7 +185,7 @@ public abstract class AbstractDocumentHistory extends History {
 				try {
 					setPath(Context.get(FolderDAO.class).computePathExtended(getFolderId()));
 				} catch (PersistenceException e) {
-					log.warn("Cannot calculate path of folder {}");
+					log.warn("Cannot calculate path of folder {}", getFolderId());
 				}
 		}
 	}

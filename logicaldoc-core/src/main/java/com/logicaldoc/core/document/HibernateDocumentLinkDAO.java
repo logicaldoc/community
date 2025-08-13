@@ -79,8 +79,7 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
 			long docId1 = link.getDocument1() != null ? link.getDocument1().getId() : 0;
 			long docId2 = link.getDocument2() != null ? link.getDocument2().getId() : 0;
 
-			getCurrentSession().delete(link);
-
+			super.delete(id, code);
 			flush();
 
 			updateLinksCount(docId1);

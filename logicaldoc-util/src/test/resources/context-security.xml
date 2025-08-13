@@ -25,15 +25,6 @@
     <bean id="LDAuthenticationDetailsSource" class="com.logicaldoc.core.security.spring.LDAuthenticationDetailsSource" />
     <bean id="LDAuthenticationProvider" class="com.logicaldoc.core.security.spring.LDAuthenticationProvider" />
     <bean id="AdminAuthenticationProvider"  class="${security.adminauthprovider}" />
-    <bean id="LDAccessDecisionManager" class="com.logicaldoc.core.security.spring.LDAccessDecisionManager">
-        <constructor-arg>
-            <list>
-                <bean
-                    class="org.springframework.security.web.access.expression.WebExpressionVoter" />
-                <bean class="org.springframework.security.access.vote.RoleVoter" />
-            </list>
-        </constructor-arg>
-    </bean>
     <bean id="LDAuthenticationSuccessHandler"
         class="com.logicaldoc.core.security.spring.LDAuthenticationSuccessHandler" />
     <bean id="LDAuthenticationFailureHandler"
@@ -50,7 +41,6 @@
     </security:authentication-manager>
     <security:http pattern="/setup/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
         authentication-manager-ref="AdminAuthenticationManager"
         security-context-repository-ref="LDSecurityContextRepository">
         
@@ -64,7 +54,6 @@
     </security:http>
     <security:http pattern="/license/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
         authentication-manager-ref="AdminAuthenticationManager"
         security-context-repository-ref="LDSecurityContextRepository">
         
@@ -78,7 +67,6 @@
     </security:http>
     <security:http pattern="/sessions/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
         authentication-manager-ref="AdminAuthenticationManager"
         security-context-repository-ref="LDSecurityContextRepository">
         
@@ -95,7 +83,6 @@
     
     <security:http pattern="/services/rest/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
         authentication-manager-ref="AuthenticationManager"
         security-context-repository-ref="LDSecurityContextRepository">
         
@@ -111,7 +98,6 @@
     
     <security:http pattern="/webdav/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
         authentication-manager-ref="AuthenticationManager"
         security-context-repository-ref="LDSecurityContextRepository">
         
@@ -125,7 +111,6 @@
     </security:http>
     <security:http pattern="/webdavb/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
         authentication-manager-ref="AuthenticationManager"
         security-context-repository-ref="LDSecurityContextRepository">
         
@@ -139,7 +124,6 @@
     </security:http>    
     <security:http pattern="/service/cmis/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
         authentication-manager-ref="AuthenticationManager"
         security-context-repository-ref="LDSecurityContextRepository">
         
@@ -154,7 +138,6 @@
        
     <security:http pattern="/download-ticket/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
         authentication-manager-ref="AuthenticationManager"
         security-context-repository-ref="LDSecurityContextRepository">
         
@@ -169,8 +152,6 @@
     
     <security:http pattern="/webform/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
-        authentication-manager-ref="AuthenticationManager"
         security-context-repository-ref="LDSecurityContextRepository">
         
         <security:headers disabled="true" />
@@ -184,7 +165,6 @@
     
     <security:http use-expressions="true" create-session="never"
         disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
         authentication-manager-ref="AuthenticationManager"
         security-context-repository-ref="LDSecurityContextRepository">
         

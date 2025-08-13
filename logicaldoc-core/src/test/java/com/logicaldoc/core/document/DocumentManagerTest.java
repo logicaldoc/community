@@ -1024,7 +1024,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testDestroyDocument() throws PersistenceException, PermissionException, InterruptedException {
+	public void testDestroyDocument() throws PersistenceException, PermissionException {
 		FolderHistory transaction = new FolderHistory();
 		transaction.setSessionId("1234");
 		transaction.setUser(userDao.findByUsername("admin"));
