@@ -42,7 +42,7 @@
 		<constructor-arg value="contexttest.properties" />
 	</bean>
 
-    <bean id="context" class="com.logicaldoc.util.spring.Context" factory-method="get" lazy-init="false" />
+    <bean id="context" class="com.logicaldoc.util.spring.Context" />
 
 	<!-- DataSource -->
 	<bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">
