@@ -85,7 +85,11 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
-		Context.instance = applicationContext.getBean(Context.class);
+		setInstance(applicationContext.getBean(Context.class));
+	}
+
+	private static synchronized void setInstance(Context context) {
+		Context.instance = context;
 	}
 
 	/**

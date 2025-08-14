@@ -124,7 +124,6 @@ public abstract class AbstractTestCase {
 			createDatabase();
 		} catch (Exception e) {
 			restoreUserHome();
-			e.printStackTrace();
 			log.error(e.getMessage(), e);
 
 			switch (e) {

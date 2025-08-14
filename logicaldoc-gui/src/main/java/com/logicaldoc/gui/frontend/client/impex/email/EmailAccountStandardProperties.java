@@ -117,11 +117,11 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		protocol.setValue(account.getProvider());
 
 		StaticTextItem authorize = ItemFactory.newStaticTextItem("authorize",
-				account.getId() == 0L ? I18N.message("saveandclickhereauthgoogle")
+				account.getId() == null ? I18N.message("saveandclickhereauthgoogle")
 						: I18N.message("clickhereauthgoogle"));
 		authorize.setVisibleWhen(new AdvancedCriteria(PROTOCOL, OperatorId.CONTAINS, "google"));
 		authorize.setEndRow(true);
-		if (account.getId() != 0L)
+		if (account.getId() != null)
 			authorize.addClickHandler(click -> new GoogleApiAuthorization("email-" + account.getId()).show());
 
 		SelectItem foldering = ItemFactory.newEmailFolderingSelector();
