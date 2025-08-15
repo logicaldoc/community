@@ -5,26 +5,28 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.AutoFitWidthApproach;
 
 /**
- * A field to display a file version
+ * A field to display a revision
  * 
  * @author Marco Meschieri - LogicalDOC
- * @since 8.6.1
+ * @since 9.2.1
  */
-public class FileVersionListGridField extends ColoredListGridField {
+public class RevisionListGridField extends ColoredListGridField {
 
-	public FileVersionListGridField() {
-		this("fileVersion", "fileversion");
+	private static final String REVISION = "revision";
+
+	public RevisionListGridField() {
+		this(REVISION, REVISION);
 	}
 
-	public FileVersionListGridField(String name) {
-		this(name, "fileversion");
+	public RevisionListGridField(String name) {
+		this(name, REVISION);
 	}
 
-	public FileVersionListGridField(String name, String title) {
+	public RevisionListGridField(String name, String title) {
 		super(name, I18N.message(title));
 		setAutoFitWidth(true);
 		setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
-		setMinWidth(55);
+		setMinWidth(70);
 		setAlign(Alignment.CENTER);
 	}
 }

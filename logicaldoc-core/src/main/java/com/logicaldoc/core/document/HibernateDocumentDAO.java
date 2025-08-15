@@ -326,6 +326,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			if (StringUtils.isEmpty(doc.getCustomId()))
 				doc.setCustomId(UUID.randomUUID().toString());
 
+			if (StringUtils.isEmpty(doc.getRevision()))
+				doc.setRevision(doc.getVersion());
+
 			// Use unique filename in the same folder
 			setUniqueFilename(doc);
 
@@ -344,6 +347,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 			if (StringUtils.isEmpty(doc.getCustomId())) {
 				doc.setCustomId(Long.toString(doc.getId()));
+				doc.setModified(true);
+			}
+
+			if (StringUtils.isEmpty(doc.getRevision())) {
+				doc.setRevision(doc.getVersion());
 				doc.setModified(true);
 			}
 
@@ -920,8 +928,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				Map.of("folder", getCurrentSession().get(Folder.class, folderId), DOC_ID, docId));
 
 		// Update the version using HQL
-		versionDAO.bulkUpdate("set deleted=0, lastModified=CURRENT_TIMESTAMP where id = :docId",
-				Map.of(DOC_ID, docId));
+		versionDAO.bulkUpdate("set deleted=0, lastModified=CURRENT_TIMESTAMP where id = :docId", Map.of(DOC_ID, docId));
 		versionDAO.bulkUpdate("set folderId = :folderId where id = :docId",
 				Map.of("folderId", folderId, DOC_ID, docId));
 
@@ -992,6 +999,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			transaction.setFolderId(doc.getFolder().getId());
 			transaction.setVersion(doc.getVersion());
 			transaction.setFileVersion(doc.getFileVersion());
+			transaction.setRevision(doc.getRevision());
 			transaction.setFilename(doc.getFileName());
 			transaction.setFileSize(doc.getFileSize());
 			transaction.setNotified(0);

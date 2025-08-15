@@ -57,7 +57,7 @@ create table ld_history (ld_id bigint not null, ld_lastmodified datetime not nul
                          ld_folderid bigint, ld_userid bigint, ld_date datetime2(3), ld_username nvarchar(255), ld_event nvarchar(255), 
                          ld_comment nvarchar(4000), ld_reason nvarchar(4000), ld_version nvarchar(255), ld_fileversion varchar(10), ld_path nvarchar(4000), 
                          ld_pathold nvarchar(4000), ld_notified int not null, ld_sessionid nvarchar(255), ld_new int, ld_filename nvarchar(255),
-                         ld_filenameold nvarchar(255), ld_userlogin nvarchar(255), ld_ip nvarchar(255),
+                         ld_filenameold nvarchar(255), ld_userlogin nvarchar(255), ld_ip nvarchar(255), ld_revision varchar(255),
                          ld_geolocation varchar(255), ld_device varchar(255), ld_filesize bigint, ld_color varchar(255), primary key (ld_id));
 create table ld_tag (ld_docid bigint, ld_tenantid bigint not null, ld_tag nvarchar(255));
 create table ld_foldertag (ld_folderid bigint not null, ld_tenantid bigint not null, ld_tag nvarchar(255));
@@ -173,7 +173,7 @@ create table ld_folder_history (ld_id bigint not null, ld_lastmodified datetime 
                                 ld_folderid bigint, ld_userid bigint, ld_date datetime2(3), ld_username nvarchar(255), 
                                 ld_event nvarchar(255), ld_comment nvarchar(4000), ld_reason nvarchar(4000), ld_version nvarchar(255), ld_fileversion varchar(10), 
                                 ld_path nvarchar(4000), ld_pathold nvarchar(4000), ld_notified int not null, ld_sessionid nvarchar(255),
-                                ld_filename nvarchar(255), ld_userlogin nvarchar(255), ld_filenameold nvarchar(255),
+                                ld_filename nvarchar(255), ld_userlogin nvarchar(255), ld_filenameold nvarchar(255), ld_revision varchar(255),
                                 ld_ip nvarchar(255), ld_geolocation nvarchar(255), ld_device nvarchar(255), 
                                 ld_filesize bigint, ld_color nvarchar(255), primary key (ld_id));
 create table ld_folder_acl (ld_folderid bigint not null, ld_groupid bigint not null, ld_read int not null, ld_write int not null, 

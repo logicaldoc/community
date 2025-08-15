@@ -62,9 +62,9 @@ public class CustomIdPanel extends AdminPanel {
 		if (Feature.enabled(Feature.CUSTOMID))
 			body.setMembers(setupSchemesPanel(schemesData, GUIScheme.CUSTOMID_SCHEME));
 
-		Tab revisionTab = new Tab();
-		revisionTab.setTitle(I18N.message("revision"));
-		revisionTab.setPane(setupSchemesPanel(schemesData, GUIScheme.REVISION_SCHEME));
+		Tab autorevisioningTab = new Tab();
+		autorevisioningTab.setTitle(I18N.message("autorevisioning"));
+		autorevisioningTab.setPane(setupSchemesPanel(schemesData, GUIScheme.AUTOREVISIONING_SCHEME));
 
 		Tab autonamingTab = new Tab();
 		autonamingTab.setTitle(I18N.message("autonaming"));
@@ -87,7 +87,7 @@ public class CustomIdPanel extends AdminPanel {
 		if (Feature.enabled(Feature.AUTO_FOLDING))
 			tabs.addTab(autofoldingTab);
 		if (Feature.enabled(Feature.REVISION))
-			tabs.addTab(revisionTab);
+			tabs.addTab(autorevisioningTab);
 		if (Feature.enabled(Feature.SPLIT))
 			tabs.addTab(splittingTab);
 		tabs.addTab(sequencesTab);

@@ -13,8 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
@@ -27,6 +26,9 @@ import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for documents history data.
@@ -55,7 +57,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		StringBuilder query = new StringBuilder(
-				"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color, A.fileVersion, A.fileSize, A.keyLabel from DocumentHistory A where A.deleted = 0 ");
+				"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color, A.fileVersion, A.fileSize, A.keyLabel, A.revision from DocumentHistory A where A.deleted = 0 ");
 		Map<String, Object> params = prepareQueryParams(request, query);
 		List<?> records = Context.get(DocumentHistoryDAO.class).findByQuery(query.toString(), params,
 				max != null ? max : 100);
@@ -123,6 +125,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		writer.print("<fileSize>" + (historyRecord[18] == null ? "" : historyRecord[18]) + "</fileSize>");
 		if (historyRecord[19] != null)
 			writer.write("<key><![CDATA[" + historyRecord[19] + "]]></key>");
+		writer.write("<revision><![CDATA[" + StringUtils.defaultString((String) historyRecord[20]) + "]]></revision>");
 		writer.print("</history>");
 	}
 

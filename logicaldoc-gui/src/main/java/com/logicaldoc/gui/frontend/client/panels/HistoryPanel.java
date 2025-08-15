@@ -4,12 +4,13 @@ import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.grid.CopyCellClickHandler;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.grid.FileVersionListGridField;
 import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.grid.RevisionListGridField;
 import com.logicaldoc.gui.common.client.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.grid.VersionListGridField;
-import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -61,6 +62,7 @@ public abstract class HistoryPanel extends VLayout {
 
 		ListGridField version = new VersionListGridField();
 		ListGridField fileVersion = new FileVersionListGridField();
+		ListGridField revision = new RevisionListGridField();
 
 		final RefreshableListGrid list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -71,13 +73,13 @@ public abstract class HistoryPanel extends VLayout {
 
 		if (Menu.enabled(Menu.SESSIONS)) {
 			if (versionFields)
-				list.setFields(user, event, date, comment, version, fileVersion, fileName, path, sid, ip, device,
+				list.setFields(user, event, date, comment, version, fileVersion, revision, fileName, path, sid, ip, device,
 						geolocation);
 			else
 				list.setFields(user, event, date, comment, fileName, path, sid, ip, device, geolocation);
 		} else {
 			if (versionFields)
-				list.setFields(user, event, date, comment, version, fileVersion, fileName, path);
+				list.setFields(user, event, date, comment, version, fileVersion, revision, fileName, path);
 			else
 				list.setFields(user, event, date, comment, fileName, path);
 		}

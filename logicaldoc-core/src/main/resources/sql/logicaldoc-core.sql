@@ -55,7 +55,7 @@ create table ld_history (ld_id bigint not null, ld_lastmodified timestamp not nu
                          ld_folderid bigint, ld_userid bigint, ld_date timestamp, ld_username varchar(255), ld_event varchar(255), 
                          ld_comment varchar(4000), ld_reason varchar(4000), ld_version varchar(255), ld_fileversion varchar(10), ld_path varchar(4000), 
                          ld_pathold varchar(4000), ld_notified int not null, ld_sessionid varchar(255), ld_new int, ld_filename varchar(255),
-                         ld_filenameold varchar(255), ld_userlogin varchar(255), ld_ip varchar(255), 
+                         ld_filenameold varchar(255), ld_userlogin varchar(255), ld_ip varchar(255), ld_revision varchar(255),
                          ld_geolocation varchar(255), ld_device varchar(255), ld_filesize bigint, ld_color varchar(255), primary key (ld_id));
 create table ld_tag (ld_docid bigint, ld_tenantid bigint not null, ld_tag varchar(255));
 create table ld_foldertag (ld_folderid bigint, ld_tenantid bigint not null, ld_tag varchar(255));
@@ -173,7 +173,7 @@ create table ld_folder_history (ld_id bigint not null, ld_lastmodified timestamp
                                 ld_event varchar(255), ld_comment varchar(4000), ld_reason varchar(4000), ld_version varchar(255), ld_fileversion varchar(10),  
                                 ld_path varchar(4000), ld_pathold varchar(4000), ld_notified int not null, ld_sessionid varchar(255),
                                 ld_filename varchar(255), ld_filenameold varchar(255), ld_userlogin varchar(255),
-                                ld_ip varchar(255), ld_geolocation varchar(255), ld_device varchar(255),  
+                                ld_ip varchar(255), ld_geolocation varchar(255), ld_device varchar(255), ld_revision varchar(255),
                                 ld_filesize bigint, ld_color varchar(255), primary key (ld_id));
 create table ld_folder_acl (ld_folderid bigint not null, ld_groupid bigint not null, ld_read int not null, ld_write int not null, 
                              ld_add int not null, ld_security int not null, ld_immutable int not null, ld_delete int not null, 

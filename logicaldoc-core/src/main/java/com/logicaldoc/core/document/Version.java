@@ -257,6 +257,7 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 			// Nothing to do
 		}
 
+		version.setRevision(document.getRevision() != null ? document.getRevision() : document.getVersion());
 		version.setVersion(document.getVersion());
 		version.setType(document.getType());
 		version.setTenantId(document.getTenantId());

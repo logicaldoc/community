@@ -775,6 +775,7 @@ public class DocumentManager {
 
 			document.setWorkflowStatus(docVO.getWorkflowStatus());
 			document.setColor(docVO.getColor());
+			document.setRevision(docVO.getRevision());
 
 			// Save retention policies
 			document.setPublished(docVO.getPublished());

@@ -61,6 +61,7 @@ public class DocumentHistoryDS extends DataSource {
 		DataSourceTextField filename = new DataSourceTextField("filename");
 		DataSourceTextField version = new DataSourceTextField("version");
 		DataSourceTextField fileVersion = new DataSourceTextField("fileVersion");
+		DataSourceTextField revision = new DataSourceTextField("revision");
 		DataSourceTextField fileSize = new DataSourceTextField("fileSize");
 		DataSourceImageField icon = new DataSourceImageField("icon");
 		icon.setHidden(true);
@@ -75,8 +76,8 @@ public class DocumentHistoryDS extends DataSource {
 		DataSourceTextField device = new DataSourceTextField("device");
 		DataSourceTextField geolocation = new DataSourceTextField("geolocation");
 
-		setFields(user, filename, date, event, comment, reason, version, fileVersion, fileSize, icon, newField, documentId,
-				folderId, userId, path, sid, key, ip, device, geolocation);
+		setFields(user, filename, date, event, comment, reason, version, fileVersion, revision, fileSize, icon,
+				newField, documentId, folderId, userId, path, sid, key, ip, device, geolocation);
 		setClientOnly(true);
 
 		setDataURL(url);

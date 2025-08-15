@@ -57,6 +57,7 @@ public class VersionsDataServlet extends AbstractDataServlet {
 			writer.print("<event><![CDATA[" + I18N.message((String) cols[2], locale) + "]]></event>");
 			writer.print("<version>" + cols[3] + "</version>");
 			writer.print("<fileVersion>" + cols[4] + "</fileVersion>");
+			writer.print("<revision>" + cols[17] + "</revision>");
 			writer.print("<date>" + df.format((Date) cols[5]) + "</date>");
 			writer.print("<comment><![CDATA[" + (cols[6] == null ? "" : cols[6]) + "]]></comment>");
 			writer.print("<docid>" + cols[7] + "</docid>");
@@ -89,7 +90,7 @@ public class VersionsDataServlet extends AbstractDataServlet {
 
 		StringBuilder query = new StringBuilder(
 				"select A.id, A.username, A.event, A.version, A.fileVersion, A.versionDate, A.comment, A.docId, A.fileName,"
-						+ " A.customId, A.fileSize, A.type, A.templateName, A.workflowStatus, A.workflowStatusDisplay, A.userId, A.color ");
+						+ " A.customId, A.fileSize, A.type, A.templateName, A.workflowStatus, A.workflowStatusDisplay, A.userId, A.color, A.revision ");
 		if (request.getParameter(DOC_ID) != null) {
 			long docId = Long.parseLong(request.getParameter(DOC_ID));
 			DocumentDAO ddao = Context.get(DocumentDAO.class);

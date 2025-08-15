@@ -4,7 +4,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.types.Alignment;
 
 /**
- * A field to display a file name with icon
+ * A field to display a version
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.6.1

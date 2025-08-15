@@ -418,10 +418,8 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 					event -> DocumentService.Instance.get().getRating(document.getId(), new DefaultAsyncCallback<>() {
 						@Override
 						public void onSuccess(GUIRating rating) {
-							if (rating != null) {
-								RatingDialog dialog = new RatingDialog(document.getRating(), rating);
-								dialog.show();
-							}
+							if (rating != null)
+								new RatingDialog(document.getRating(), rating).show();
 						}
 					}));
 		rating.setDisabled(!updateEnabled);
@@ -438,6 +436,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 			document.setLanguage((String) values.get("language"));
 			document.setColor((String) values.get(COLOR));
 			document.setTags(Arrays.asList(tagItem.getValues()));
+			document.setRevision((String) values.get("revision"));
 		}
 		return !vm.hasErrors();
 	}

@@ -67,6 +67,7 @@ public class VersionsPanel extends DocumentDetailTab {
 		ListGridField event = new ColoredListGridField("event", 200);
 		ListGridField version = new ColoredListGridField(VERSION, 70);
 		ListGridField fileVersion = new ColoredListGridField(FILE_VERSION, I18N.message("fileversion"), 70);
+		ListGridField revision = new ColoredListGridField("revision", I18N.message("revision"), 70);
 		ListGridField date = new DateListGridField("date", "date");
 		ListGridField comment = new ColoredListGridField("comment", I18N.message("comment"));
 		FileNameListGridField fileName = new FileNameListGridField();
@@ -86,9 +87,9 @@ public class VersionsPanel extends DocumentDetailTab {
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
 		if (document.getFolder().isDownload())
-			list.setFields(id, user, event, fileName, type, fileVersion, version, date, permalink, wfStatus, comment);
+			list.setFields(id, user, event, fileName, type, fileVersion, version, revision, date, permalink, wfStatus, comment);
 		else
-			list.setFields(id, user, event, fileName, type, fileVersion, version, date, comment);
+			list.setFields(id, user, event, fileName, type, fileVersion, version, revision, date, comment);
 
 		addListHandlers();
 

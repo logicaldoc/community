@@ -1,9 +1,5 @@
 package com.logicaldoc.core.document;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Transient;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +9,10 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.history.History;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Transient;
 
 /**
  * A superclass for those histories tightly related to documents
@@ -50,6 +50,9 @@ public abstract class AbstractDocumentHistory extends History {
 
 	@Column(name = "ld_fileversion", length = 10)
 	private String fileVersion = null;
+
+	@Column(name = "ld_revision", length = 255)
+	private String revision = null;
 
 	@Column(name = "ld_pathold", length = 4000)
 	private String pathOld = null;
@@ -152,6 +155,14 @@ public abstract class AbstractDocumentHistory extends History {
 		this.filenameOld = filenameOld;
 	}
 
+	public String getRevision() {
+		return revision;
+	}
+
+	public void setRevision(String revision) {
+		this.revision = revision;
+	}
+
 	protected void copyAttributesFrom(AbstractDocumentHistory source) {
 		super.copyAttributesFrom(source);
 
@@ -162,6 +173,7 @@ public abstract class AbstractDocumentHistory extends History {
 		setReason(source.getReason());
 		setVersion(source.getVersion());
 		setFileVersion(source.getFileVersion());
+		setRevision(source.getRevision());
 		setPathOld(source.getPathOld());
 		setFilenameOld(source.getFilenameOld());
 	}
@@ -172,6 +184,7 @@ public abstract class AbstractDocumentHistory extends History {
 		if (document != null) {
 			this.setFileSize(document.getFileSize());
 			this.setFilename(document.getFileName());
+			this.setRevision(document.getRevision());
 
 			if (document instanceof Version ver) {
 				this.setDocId(ver.getDocId());
