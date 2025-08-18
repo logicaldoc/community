@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.impex.archives;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIArchive;
 import com.logicaldoc.gui.common.client.data.VersionsDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
@@ -14,8 +15,7 @@ import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.IntegerItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -25,7 +25,6 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  * This panel shows a list of versions of an archive in a tabular way.
@@ -39,43 +38,30 @@ public class VersionsPanel extends VLayout {
 
 	private ListGrid listGrid;
 
-	private int max = 100;
-
-	private ToolStrip toolbar = new ToolStrip();
-
 	private ExportArchivesList archivesList = null;
 
 	public VersionsPanel(ExportArchivesList list, final Long archiveId, final boolean readonly) {
 		this.archivesList = list;
 
-		final IntegerItem maxItem = ItemFactory.newValidateIntegerItem("max", "", null, 1, null);
+		ToolStrip buttons = new ToolStrip();
+		buttons.setWidth100();
+
+		SpinnerItem maxItem = ItemFactory.newSpinnerItem("max", "display",
+				Session.get().getConfigAsInt("gui.maxversions"), 1, (Integer) null);
+		maxItem.setWidth(70);
+		maxItem.setStep(20);
+		maxItem.setSaveOnEnter(true);
+		maxItem.setImplicitSave(true);
 		maxItem.setHint(I18N.message("elements"));
-		maxItem.setShowTitle(false);
-		maxItem.setDefaultValue(100);
-		maxItem.setWidth(40);
+		maxItem.addChangedHandler(changed -> initListGrid(archiveId, readonly, maxItem.getValueAsLong().intValue()));
+		buttons.addFormItem(maxItem);
+		buttons.addFill();
 
-		toolbar.setWidth100();
-
-		ToolStripButton display = new ToolStripButton();
-		display.setTitle(I18N.message("display"));
-		toolbar.addButton(display);
-		toolbar.addFormItem(maxItem);
-		display.addClickHandler((ClickEvent event) -> {
-			if (Boolean.TRUE.equals(maxItem.validate()) && maxItem.getValue() != null) {
-				if (maxItem.getValue() instanceof Integer intVal)
-					max = intVal;
-				else
-					max = Integer.parseInt(maxItem.getValue().toString());
-				initListGrid(archiveId, readonly);
-			}
-		});
-		toolbar.addFill();
-
-		addMember(toolbar);
-		initListGrid(archiveId, readonly);
+		addMember(buttons);
+		initListGrid(archiveId, readonly, Session.get().getConfigAsInt("gui.maxversions"));
 	}
 
-	private void initListGrid(final Long archiveId, final boolean readonly) {
+	private void initListGrid(final Long archiveId, final boolean readonly, int maxElements) {
 		if (listGrid != null)
 			removeMember(listGrid);
 
@@ -99,7 +85,7 @@ public class VersionsPanel extends VLayout {
 		listGrid.setEmptyMessage(I18N.message("notitemstoshow"));
 		listGrid.setCanFreezeFields(true);
 		listGrid.setAutoFetchData(true);
-		dataSource = new VersionsDS(null, archiveId, max);
+		dataSource = new VersionsDS(null, archiveId, maxElements);
 		listGrid.setDataSource(dataSource);
 		listGrid.setFields(id, docid, customid, fileName, version, date, size, template);
 		addMember(listGrid, 1);
