@@ -392,9 +392,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	private void notifyUsersInNewThread(List<Document> docs, final GUIDocument metadata, final String templateName,
 			final Session session) {
 		if (!metadata.getNotifyUsers().isEmpty()) {
-			Thread notifier = new Thread(() -> notifyDocuments(docs, templateName, metadata.getNotifyMessage(),
-					metadata.getNotifyUsers(), session));
-			notifier.start();
+			new Thread(() -> notifyDocuments(docs, templateName, metadata.getNotifyMessage(), metadata.getNotifyUsers(),
+					session)).start();
 		}
 	}
 
@@ -502,8 +501,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				if (mail != null && !mail.getRecipients().isEmpty())
 					log.info("Notify the new documents {} to {}", docs, mail.getRecipients());
 
-				EMailSender sender = getEmailSender(session);
-				sender.send(mail);
+				getEmailSender(session).send(mail);
 
 				/*
 				 * Save also as system message
@@ -2900,14 +2898,14 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				maintainedDoc.getDate());
 
 		duplications.remove(0);
-		
+
 		log.debug("Delete {} documents", duplications.size());
 		for (Document doc : duplications) {
 			if (doc.getId() == maintainedDoc.getId())
 				continue;
-			
+
 			doc.setDeleted(1);
-			
+
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSession(session);
 			transaction.setDocument(doc);
