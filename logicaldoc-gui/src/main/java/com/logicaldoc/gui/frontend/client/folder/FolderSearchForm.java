@@ -15,7 +15,6 @@ import com.logicaldoc.gui.common.client.beans.GUICriterion;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.UserSelector;
@@ -309,7 +308,7 @@ public abstract class FolderSearchForm extends VLayout {
 			fieldValue = selector.getUser().getId();
 		else if (condition.getValueFieldItem() instanceof FolderSelector selector)
 			fieldValue = selector.getFolder().getId();
-		
+
 		return fieldValue;
 	}
 

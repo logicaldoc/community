@@ -184,6 +184,8 @@ public abstract class AbstractDocumentHistory extends History {
 		if (document != null) {
 			this.setFileSize(document.getFileSize());
 			this.setFilename(document.getFileName());
+			this.setVersion(document.getVersion());
+			this.setFileVersion(document.getFileVersion());
 			this.setRevision(document.getRevision());
 
 			if (document instanceof Version ver) {
