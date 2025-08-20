@@ -8,13 +8,14 @@ import java.util.Map;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.logicaldoc.gui.common.client.Constants;
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUICriterion;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.UserSelector;
@@ -303,11 +304,12 @@ public abstract class FolderSearchForm extends VLayout {
 
 		// This lines are necessary to avoid error for GWT values type.
 		if (condition.getValueFieldItem() instanceof IntegerItem integerItem)
-			fieldValue = Long.parseLong(integerItem.toString());
-		if (condition.getValueFieldItem() instanceof UserSelector selector)
+			fieldValue = Long.parseLong(integerItem.getValueAsString());
+		else if (condition.getValueFieldItem() instanceof UserSelector selector)
 			fieldValue = selector.getUser().getId();
-		if (condition.getValueFieldItem() instanceof FolderSelector selector)
+		else if (condition.getValueFieldItem() instanceof FolderSelector selector)
 			fieldValue = selector.getFolder().getId();
+		
 		return fieldValue;
 	}
 

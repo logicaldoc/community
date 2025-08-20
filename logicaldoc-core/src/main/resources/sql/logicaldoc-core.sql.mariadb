@@ -1,7 +1,7 @@
 -- timestamp -> datetime
 
 create table ld_bookmark (ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null,
-                          ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint not null, 
+                          ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint not null,  
                           ld_docid bigint not null, ld_title varchar(255) not null, ld_description varchar(4000), 
                           ld_position int not null, ld_filetype varchar(40), ld_type int not null, primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_document (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null, 
@@ -250,37 +250,67 @@ create table ld_apikey (ld_id bigint not null, ld_lastmodified datetime not null
                         ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint not null, ld_lastused datetime, ld_key varchar(255) not null,
                         ld_name varchar(255) not null, ld_label varchar(255), primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
                                                   
--- Create the sequences for ID generation
-create sequence ld_bookmark_SEQ  increment by 50 start with 100;
-create sequence ld_document_SEQ  increment by 50 start with 100;
-create sequence ld_generic_SEQ  increment by 50 start with 100;
-create sequence ld_group_SEQ  increment by 50 start with 100;
-create sequence ld_history_SEQ  increment by 50 start with 100;
-create sequence ld_link_SEQ  increment by 50 start with 100;
-create sequence ld_menu_SEQ  increment by 50 start with 100;
-create sequence ld_systemmessage_SEQ  increment by 50 start with 100;
-create sequence ld_template_SEQ  increment by 50 start with 100;                             
-create sequence ld_attributeset_SEQ  increment by 50 start with 100;
-create sequence ld_ticket_SEQ  increment by 50 start with 100;
-create sequence ld_user_SEQ  increment by 50 start with 100;
-create sequence ld_user_history_SEQ  increment by 50 start with 100;
-create sequence ld_version_SEQ  increment by 50 start with 100;
-create sequence ld_folder_SEQ  increment by 50 start with 100;                         
-create sequence ld_folder_history_SEQ  increment by 50 start with 100;
-create sequence ld_rating_SEQ  increment by 50 start with 100;                      
-create sequence ld_note_SEQ  increment by 50 start with 100;
-create sequence ld_messagetemplate_SEQ  increment by 50 start with 100;
-create sequence ld_contact_SEQ  increment by 50 start with 100;                                 
-create sequence ld_tenant_SEQ  increment by 50 start with 100;  
-create sequence ld_sequence_SEQ  increment by 50 start with 100;
-create sequence ld_extoption_SEQ  increment by 50 start with 100;
-create sequence ld_session_SEQ  increment by 50 start with 100;
-create sequence ld_dashlet_SEQ  increment by 50 start with 100;                          
-create sequence ld_device_SEQ  increment by 50 start with 100;
-create sequence ld_password_history_SEQ  increment by 50 start with 100;                   
-create sequence ld_search_SEQ  increment by 50 start with 100;
-create sequence ld_apikey_SEQ  increment by 50 start with 100;
+-- Create the tables for ID generation
+create table ld_bookmark_SEQ (next_val bigint not null);
+create table ld_document_SEQ (next_val bigint not null);
+create table ld_generic_SEQ (next_val bigint not null);
+create table ld_group_SEQ (next_val bigint not null);
+create table ld_history_SEQ (next_val bigint not null);
+create table ld_link_SEQ (next_val bigint not null);
+create table ld_menu_SEQ (next_val bigint not null);
+create table ld_systemmessage_SEQ (next_val bigint not null);
+create table ld_template_SEQ (next_val bigint not null);                             
+create table ld_attributeset_SEQ (next_val bigint not null);
+create table ld_ticket_SEQ (next_val bigint not null);
+create table ld_user_SEQ (next_val bigint not null);
+create table ld_user_history_SEQ (next_val bigint not null);
+create table ld_version_SEQ (next_val bigint not null);
+create table ld_folder_SEQ (next_val bigint not null);                         
+create table ld_folder_history_SEQ (next_val bigint not null);
+create table ld_rating_SEQ (next_val bigint not null);                      
+create table ld_note_SEQ (next_val bigint not null);
+create table ld_messagetemplate_SEQ (next_val bigint not null);
+create table ld_contact_SEQ (next_val bigint not null);                                 
+create table ld_tenant_SEQ (next_val bigint not null);  
+create table ld_sequence_SEQ (next_val bigint not null);
+create table ld_extoption_SEQ (next_val bigint not null);
+create table ld_session_SEQ (next_val bigint not null);
+create table ld_dashlet_SEQ (next_val bigint not null);                          
+create table ld_device_SEQ (next_val bigint not null);
+create table ld_password_history_SEQ (next_val bigint not null);                   
+create table ld_search_SEQ (next_val bigint not null);
+create table ld_apikey_SEQ (next_val bigint not null);
 
+-- Initialize the tables for ID generation
+insert into ld_bookmark_SEQ(next_val) values (100);
+insert into ld_document_SEQ(next_val) values (100);
+insert into ld_generic_SEQ(next_val) values (100);
+insert into ld_group_SEQ(next_val) values (100);
+insert into ld_history_SEQ(next_val) values (100);
+insert into ld_link_SEQ(next_val) values (100);
+insert into ld_menu_SEQ(next_val) values (100);
+insert into ld_systemmessage_SEQ(next_val) values (100);
+insert into ld_template_SEQ(next_val) values (100);
+insert into ld_attributeset_SEQ(next_val) values (100);
+insert into ld_ticket_SEQ(next_val) values (100);
+insert into ld_user_SEQ(next_val) values (100);
+insert into ld_user_history_SEQ(next_val) values (100);
+insert into ld_version_SEQ(next_val) values (100);
+insert into ld_folder_SEQ(next_val) values (100);
+insert into ld_folder_history_SEQ(next_val) values (100);
+insert into ld_rating_SEQ(next_val) values (100);                     
+insert into ld_note_SEQ(next_val) values (100);   
+insert into ld_messagetemplate_SEQ(next_val) values (100);   
+insert into ld_contact_SEQ(next_val) values (100);                                
+insert into ld_tenant_SEQ(next_val) values (100); 
+insert into ld_sequence_SEQ(next_val) values (100);   
+insert into ld_extoption_SEQ(next_val) values (100);
+insert into ld_session_SEQ(next_val) values (100);   
+insert into ld_dashlet_SEQ(next_val) values (100);                         
+insert into ld_device_SEQ(next_val) values (100);   
+insert into ld_password_history_SEQ(next_val) values (100);                  
+insert into ld_search_SEQ(next_val) values (100);   
+insert into ld_apikey_SEQ(next_val) values (100);
 
 alter table ld_document add constraint FK75ED9C0276C86307 foreign key (ld_templateid) references ld_template(ld_id);
 alter table ld_document add constraint FK75ED9C027C565C60 foreign key (ld_folderid) references ld_folder(ld_id);
