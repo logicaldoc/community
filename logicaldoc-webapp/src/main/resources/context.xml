@@ -80,7 +80,7 @@
 		<property name="dbcpConfig" ref="DbcpConfig" />
 	</bean>
 
-<!-- Hibernate SessionFactory -->
+    <!-- Hibernate SessionFactory -->
     <bean id="SessionFactory" class="com.logicaldoc.util.spring.LocalSessionFactory"
 		abstract="false" lazy-init="default" autowire="default">
 		<property name="dataSource" ref="DataSource" />
