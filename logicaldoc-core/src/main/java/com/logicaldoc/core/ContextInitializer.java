@@ -20,7 +20,7 @@ import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
-import com.logicaldoc.core.security.Tenant;
+import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -47,14 +47,19 @@ public abstract class ContextInitializer implements ApplicationListener<ContextR
 	@Resource(name = "folderDAO")
 	protected FolderDAO folderDAO;
 
+	@Resource(name = "tenantDAO")
+	protected TenantDAO tenantDAO;
+
 	/**
 	 * Concrete implementations must override this method to put their
 	 * initialization logic.
 	 * 
-	 * @throws IOException Generic I/O error
+	 * @param tenantId Identifier of the tenant to initialize
+	 * 
+	 * @throws IOException  Generic I/O error
 	 * @throws SQLException Error in the data layer
 	 */
-	protected abstract void initialize() throws IOException, SQLException;
+	protected abstract void initialize(long tenantId) throws IOException, SQLException;
 
 	@Override
 	public final void onApplicationEvent(ContextRefreshedEvent event) {
@@ -62,7 +67,8 @@ public abstract class ContextInitializer implements ApplicationListener<ContextR
 			return;
 
 		try {
-			initialize();
+			for (Long tenantId : tenantDAO.findAllIds())
+				initialize(tenantId);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -79,8 +85,9 @@ public abstract class ContextInitializer implements ApplicationListener<ContextR
 	/**
 	 * Creates a folder
 	 * 
-	 * @param path The path
-	 * @param transaction The current transaction
+	 * @param path        The path
+	 * @param transaction The current transaction, it is mandatory and used to pick
+	 *                    the tenant's ID
 	 * 
 	 * @return The created folder
 	 * 
@@ -95,16 +102,18 @@ public abstract class ContextInitializer implements ApplicationListener<ContextR
 	protected Document prepareDocument(String resourcePath, String documentPath, DocumentHistory transaction)
 			throws PersistenceException, InterruptedException, ExecutionException, IOException {
 		FolderHistory fHist = new FolderHistory();
-		BeanUtils.copyProperties(transaction, fHist);
+		BeanUtils.copyProperties(transaction, fHist, "event");
 		fHist.setId(0);
+		fHist.setTenantId(transaction.getTenantId());
 		Folder target = prepareFolder(FileUtil.getPath(documentPath), fHist);
 		String fileName = FileUtil.getName(documentPath);
 		Document doc = documentDAO
-				.findByFileNameAndParentFolderId(target.getId(), fileName, null, Tenant.DEFAULT_ID, null).stream()
-				.findFirst().orElse(null);
+				.findByFileNameAndParentFolderId(target.getId(), fileName, null, transaction.getTenantId(), null)
+				.stream().findFirst().orElse(null);
 		if (doc == null)
 			try (InputStream is = this.getClass().getResourceAsStream(resourcePath)) {
 				Document trainingDoc = new Document();
+				trainingDoc.setTenantId(transaction.getTenantId());
 				trainingDoc.setFileName(fileName);
 				trainingDoc.setFolder(target);
 				trainingDoc.setLanguage("en");
