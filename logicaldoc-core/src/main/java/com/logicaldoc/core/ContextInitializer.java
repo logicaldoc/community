@@ -47,7 +47,7 @@ public abstract class ContextInitializer implements ApplicationListener<ContextR
 	@Resource(name = "folderDAO")
 	protected FolderDAO folderDAO;
 
-	@Resource(name = "tenantDAO")
+	@Resource(name = "TenantDAO")
 	protected TenantDAO tenantDAO;
 
 	/**
