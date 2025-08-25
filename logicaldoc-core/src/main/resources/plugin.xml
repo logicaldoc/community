@@ -284,6 +284,10 @@
   <extension plugin-id="logicaldoc-core" point-id="Language" id="idLanguage">
 	<parameter id="locale" value="id" />
 	<parameter id="analyzer" value="-" />
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="Language" id="amLanguage">
+	<parameter id="locale" value="am" />
+	<parameter id="analyzer" value="-" />
   </extension>  
 
   <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="jpgThumb">
