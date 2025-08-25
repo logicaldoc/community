@@ -183,13 +183,14 @@ public class ModelDetailsPanel extends VLayout {
 
 	private boolean validate() {
 		boolean valid = propertiesPanel.validate();
-		if (!valid)
+		if (!valid) {
 			tabSet.selectTab(0);
+			return valid;
+		}
 
 		valid = trainingPanel.validate();
 		if (!valid)
 			tabSet.selectTab(1);
-
 		return valid;
 	}
 
