@@ -126,27 +126,24 @@ public class WSUtil {
 				for (String name : document.getAttributeNames()) {
 					Attribute attr = document.getAttribute(name);
 
-					WSAttribute attribute = new WSAttribute();
-					attribute.setName(name);
-					attribute.setMandatory(attr.getMandatory());
-					attribute.setHidden(attr.getHidden());
-					attribute.setReadonly(attr.getReadonly());
-					attribute.setMultiple(attr.getMultiple());
-					attribute.setParent(attr.getParent());
-					attribute.setPosition(attr.getPosition());
-					WSAttribute.setValue(attribute, attr.getValue());
-					attribute.setSetId(attr.getSetId());
-					attribute.setStringValues(attr.getStringValues());
-
-					if (attr.getType() == Attribute.TYPE_USER || attr.getType() == Attribute.TYPE_FOLDER
-							|| attr.getType() == Attribute.TYPE_DOCUMENT) {
-						attribute.setIntValue(attr.getIntValue());
-						attribute.setStringValue(attr.getStringValue());
-					}
-
-					attribute.setType(attr.getType());
-					attribute.setDependsOn(attr.getDependsOn());
-					attributes.add(attribute);
+					WSAttribute wsAttribute = new WSAttribute();
+					wsAttribute.setName(name);
+					wsAttribute.setMandatory(attr.getMandatory());
+					wsAttribute.setHidden(attr.getHidden());
+					wsAttribute.setReadonly(attr.getReadonly());
+					wsAttribute.setMultiple(attr.getMultiple());
+					wsAttribute.setParent(attr.getParent());
+					wsAttribute.setPosition(attr.getPosition());
+					wsAttribute.setEditor(attr.getEditor());
+					wsAttribute.setSetId(attr.getSetId());
+					wsAttribute.setDateValue(WSUtil.convertDateToString(attr.getDateValue()));
+					wsAttribute.setDoubleValue(attr.getDoubleValue());
+					wsAttribute.setIntValue(attr.getIntValue());
+					wsAttribute.setStringValue(attr.getStringValue());
+					wsAttribute.setStringValues(attr.getStringValues());
+					wsAttribute.setType(attr.getType());
+					wsAttribute.setDependsOn(attr.getDependsOn());
+					attributes.add(wsAttribute);
 				}
 			}
 		} catch (Exception t) {
