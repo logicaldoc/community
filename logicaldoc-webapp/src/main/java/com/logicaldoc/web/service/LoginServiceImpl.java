@@ -263,15 +263,31 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 	@Override
 	public void confirmLegal(String username, String legal) throws ServerException {
+		UserDAO userDao = Context.get(UserDAO.class);
+		User user;
+		// Record the confirmation
 		try {
-			UserDAO userDao = Context.get(UserDAO.class);
-			User user = userDao.findByUsername(username);
+			user = userDao.findByUsername(username);
 			userDao.jdbcUpdate(
 					"insert into ld_legal_confirmation(ld_username, ld_user, ld_legal, ld_date) values (:username, :user, :legal, CURRENT_TIMESTAMP)",
 					Map.of("username", user.getUsername(), "user", user.getFullName(), "legal", legal));
 			log.info("User {} confirmed legal {}", username, legal);
 		} catch (PersistenceException e) {
 			throw new ServerException(e.getMessage());
+		}
+
+		// Save also the user's event
+		try {
+			UserHistoryDAO hDao = Context.get(UserHistoryDAO.class);
+			UserHistory event = new UserHistory();
+			event.setUser(user);
+			event.setEvent(UserEvent.LEGAL_CONFIRMED);
+			event.setComment(
+					hDao.queryForString("select ld_title from ld_legal where ld_name = :legal", Map.of("legal", legal))
+							+ " - " + legal);
+			hDao.store(event);
+		} catch (Exception e) {
+			log.warn(e.getMessage(), e);
 		}
 	}
 }
