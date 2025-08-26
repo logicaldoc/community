@@ -31,7 +31,7 @@ public class SoapMultithreadWorkbench extends SoapWorkbench {
 	private static ExecutorService executorService = Executors.newFixedThreadPool(threads);
 
 	public static void main(String[] args) throws Exception {
-		
+
 		SoapAuthClient auth = new SoapAuthClient(BASE + "/Auth");
 
 		SoapSystemClient systemClient = new SoapSystemClient(BASE + "/System");

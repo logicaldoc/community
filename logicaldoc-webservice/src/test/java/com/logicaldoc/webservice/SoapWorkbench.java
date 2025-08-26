@@ -70,7 +70,7 @@ public class SoapWorkbench {
 
 //		    securityStuff(sid);
 
-//			documentStuff(sid);
+			documentStuff(sid);
 
 			// This will search by filename using LIKE %filename%
 			// searchByFilename(sid, "simply");
@@ -165,19 +165,20 @@ public class SoapWorkbench {
 		}
 	}
 
-	private static void massiveInsert(String sid) throws AuthenticationException, PermissionException, PersistenceException, UnexistingResourceException, WebserviceException, IOException {
+	private static void massiveInsert(String sid) throws AuthenticationException, PermissionException,
+			PersistenceException, UnexistingResourceException, WebserviceException, IOException {
 		SoapFolderClient folderClient = new SoapFolderClient(BASE + "/Folder");
 
-		Date start=new Date();		
-		for(int i=0; i<1000; i++) {
+		Date start = new Date();
+		for (int i = 0; i < 1000; i++) {
 			WSFolder folder = new WSFolder();
-			folder.setName("dummy--"+i);
+			folder.setName("dummy--" + i);
 			folder.setParentId(717514744L);
 			folder = folderClient.create(sid, folder);
 		}
-		Date end=new Date();
-		
-		System.out.println("Completed in "+TimeDiff.printDuration(start, end));
+		Date end = new Date();
+
+		System.out.println("Completed in " + TimeDiff.printDuration(start, end));
 	}
 
 	private static void systemStuff(String sid) throws Exception {
@@ -570,12 +571,17 @@ public class SoapWorkbench {
 
 		SoapDocumentClient documentClient = new SoapDocumentClient(BASE + "/Document");
 
-		List<WSDocument> documents = documentClient.list(sid, 103L, null, "fileName desc", 1, 3);
-		for (WSDocument doc : documents) {
-			System.out.println(doc.getFileName() + "\t" + doc.getDate());
+//		List<WSDocument> documents = documentClient.list(sid, 103L, null, "fileName desc", 1, 3);
+//		for (WSDocument doc : documents) {
+//			System.out.println(doc.getFileName() + "\t" + doc.getDate());
+//		}
+
+		WSDocument doc = documentClient.getDocument(sid, 723651853L);
+		for (WSAttribute attr : doc.getAttributes()) {
+			System.out.println(attr.getName() + " s:" + attr.getStringValue() + " i:" + attr.getIntValue() + " d:"
+					+ attr.getDoubleValue());
 		}
 
-//		WSDocument doc = documentClient.getDocument(sid, 723741317L);
 //
 //		doc.setId(0);
 //		doc.setCustomId(null);

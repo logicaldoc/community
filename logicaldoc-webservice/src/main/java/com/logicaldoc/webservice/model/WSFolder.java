@@ -181,16 +181,16 @@ public class WSFolder implements Serializable {
 				wsAttribute.setMultiple(attr.getMultiple());
 				wsAttribute.setParent(attr.getParent());
 				wsAttribute.setPosition(attr.getPosition());
-				WSAttribute.setValue(wsAttribute, attr.getValue());
+				wsAttribute.setEditor(attr.getEditor());
+				wsAttribute.setValidation(attr.getValidation());
+				wsAttribute.setSetId(attr.getSetId());
+				wsAttribute.setDateValue(WSUtil.convertDateToString(attr.getDateValue()));
+				wsAttribute.setDoubleValue(attr.getDoubleValue());
+				wsAttribute.setIntValue(attr.getIntValue());
+				wsAttribute.setStringValue(attr.getStringValue());
 				wsAttribute.setStringValues(attr.getStringValues());
-
-				if (attr.getType() == Attribute.TYPE_USER || attr.getType() == Attribute.TYPE_FOLDER
-						|| attr.getType() == Attribute.TYPE_DOCUMENT) {
-					wsAttribute.setIntValue(attr.getIntValue());
-					wsAttribute.setStringValue(attr.getStringValue());
-				}
-
 				wsAttribute.setType(attr.getType());
+				wsAttribute.setDependsOn(attr.getDependsOn());				
 				wsAttributes.add(wsAttribute);
 			}
 		}
