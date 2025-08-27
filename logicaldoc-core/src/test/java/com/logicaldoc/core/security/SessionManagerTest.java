@@ -190,7 +190,7 @@ public class SessionManagerTest extends AbstractCoreTestCase implements SessionL
 	}
 
 	@Test
-	public void testTimeoutWithoutWaiting() {
+	public void testTimeout() {
 		ContextProperties conf = Context.get().getProperties();
 		int timeout = 1;
 		conf.setProperty("default.session.timeout", String.valueOf(timeout));

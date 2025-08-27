@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -25,7 +26,6 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.core.security.user.UserHistoryDAO;
-import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.spring.Context;
 
@@ -143,11 +143,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	 * Retrieves the timeout in minutes
 	 */
 	protected int getTimeout() {
-		int timeout = 30;
-		ContextProperties config = Context.get().getProperties();
-		if (config.getInt(getTenantName() + ".session.timeout") > 0)
-			timeout = config.getInt(getTenantName() + ".session.timeout");
-		return timeout;
+		return Context.get().getProperties().getInt(getTenantName() + ".session.timeout", -1);
 	}
 
 	public boolean isOpen() {
@@ -175,8 +171,8 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		calendar.set(Calendar.MILLISECOND, 0);
 		Date lastRen = calendar.getTime();
 
-		long diff = now.getTime() - lastRen.getTime();
-		long diffMinutes = Math.abs(diff / 1000 / 60);
+		long diff = Math.abs(now.getTime() - lastRen.getTime());
+		long diffMinutes = TimeUnit.MILLISECONDS.toMinutes(diff);
 		return diffMinutes >= timeout;
 	}
 
@@ -224,9 +220,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 			this.key = CryptUtil.encryptSHA256(decodedKey);
 
 			String abbreviation = decodedKey.length() > 14 ? StringUtils.right(decodedKey, 4) : "";
-			this.keyLabel = decodedKey.length() < 10 ? "..."
-					: StringUtils.abbreviate(decodedKey, 10)
-							+ abbreviation;
+			this.keyLabel = decodedKey.length() < 10 ? "..." : StringUtils.abbreviate(decodedKey, 10) + abbreviation;
 		}
 	}
 
