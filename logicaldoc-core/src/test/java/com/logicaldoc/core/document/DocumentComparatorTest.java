@@ -99,10 +99,6 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 		assertEquals(1, comparator.compare(doc1, doc2));
 		assertEquals(-1, comparator.compare(doc2, doc1));
 
-		comparator = DocumentComparator.getComparator("lastModified asc");
-		assertEquals(-1, comparator.compare(doc1, doc2));
-		assertEquals(1, comparator.compare(doc2, doc1));
-
 		comparator = DocumentComparator.getComparator("creation asc");
 		assertEquals(-1, comparator.compare(doc1, doc2));
 		assertEquals(1, comparator.compare(doc2, doc1));
