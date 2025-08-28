@@ -86,10 +86,10 @@ public class LegalPreview extends VLayout {
 	public void onReadingCompleted() {
 		topConfirmReadingButton.setDisabled(false);
 		topConfirmReadingButton.setTooltip("");
-		topConfirmReadingButton.setStyleName("btn");
+		topConfirmReadingButton.setStyleName("confirmbutton");
 		bottomConfirmReadingButton.setDisabled(false);
 		bottomConfirmReadingButton.setTooltip("");
-		bottomConfirmReadingButton.setStyleName("btn");
+		bottomConfirmReadingButton.setStyleName("confirmbutton");
 	}
 
 	private void addTopConfirmReadingPanel() {
