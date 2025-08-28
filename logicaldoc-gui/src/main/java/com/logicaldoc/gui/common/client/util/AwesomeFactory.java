@@ -225,7 +225,7 @@ public class AwesomeFactory {
 			return "";
 		String html = AwesomeFactory.getIconHtml("database");
 		if (indexed == Constants.INDEX_SKIP) {
-			html = "<span class='fa-stack'><i class='" + getCssClassPrefix() + " fa-database fa-stack-1x fa-" + STYLE
+			html = "<span class='fa-stack' style='width: 13px; height: 12px;'><i class='" + getCssClassPrefix() + " fa-database fa-stack-1x fa-" + STYLE
 					+ "' aria-hidden='true' ></i>";
 			html += I_CLASS + AwesomeFactory.getCssClassPrefix()
 					+ " fa-times fa-stack-1x' style='color: red' ></i></span>";
