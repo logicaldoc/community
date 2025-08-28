@@ -6,7 +6,8 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.login.client.services.LoginService;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.widgets.HTMLFlow;
+import com.smartgwt.client.types.ContentsType;
+import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -21,7 +22,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class LegalPreview extends VLayout {
 
-	protected HTMLFlow preview = null;
+	protected HTMLPane preview = null;
 
 	protected GUIParameter legal;
 
@@ -37,6 +38,10 @@ public class LegalPreview extends VLayout {
 
 	protected ToolStripButton topConfirmReadingButton = new ToolStripButton(I18N.message("confirmlegal"));
 
+	protected ToolStrip bottomConfirmReadingToolStrip = new ToolStrip();
+
+	protected ToolStripButton bottomConfirmReadingButton = new ToolStripButton(I18N.message("confirmlegal"));
+
 	public LegalPreview(String username, GUIParameter legal, ClickHandler confirmation) {
 		this.legal = legal;
 		this.username = username;
@@ -48,7 +53,10 @@ public class LegalPreview extends VLayout {
 	@Override
 	protected void onDraw() {
 		addTopConfirmReadingPanel();
-		reloadPreview();
+
+		addPreview();
+
+		addBottomConfirmReadingPanel();
 	}
 
 	private void confirmReading() {
@@ -61,20 +69,13 @@ public class LegalPreview extends VLayout {
 		});
 	}
 
-	/**
-	 * Reloads a preview.
-	 */
-	protected void reloadPreview() {
-		if (preview == null) {
-			preview = new HTMLFlow();
-			preview.setWidth100();
-			preview.setHeight100();
-			addMember(preview);
-		}
-
-		preview.setContents("<iframe src='" + legalPreviewUrl()
-				+ "' style='border:0px solid white; overflow:hidden; display: block; height: 100vh; width: 100vw;' scrolling='no' seamless='seamless'></iframe>");
-		preview.redraw();
+	private void addPreview() {
+		preview = new HTMLPane();
+		preview.setWidth100();
+		preview.setHeight100();
+		preview.setContentsType(ContentsType.PAGE);
+		preview.setContentsURL(legalPreviewUrl());
+		addMember(preview);
 	}
 
 	protected String legalPreviewUrl() {
@@ -85,6 +86,10 @@ public class LegalPreview extends VLayout {
 	public void onReadingCompleted() {
 		topConfirmReadingButton.setDisabled(false);
 		topConfirmReadingButton.setTooltip("");
+		topConfirmReadingButton.setStyleName("btn");
+		bottomConfirmReadingButton.setDisabled(false);
+		bottomConfirmReadingButton.setTooltip("");
+		bottomConfirmReadingButton.setStyleName("btn");
 	}
 
 	private void addTopConfirmReadingPanel() {
@@ -104,6 +109,25 @@ public class LegalPreview extends VLayout {
 		topConfirmReadingToolStrip.addButton(topConfirmReadingButton);
 
 		addMember(topConfirmReadingToolStrip);
+	}
+
+	private void addBottomConfirmReadingPanel() {
+		bottomConfirmReadingToolStrip.setWidth100();
+		bottomConfirmReadingToolStrip.setAlign(Alignment.RIGHT);
+
+		bottomConfirmReadingButton.addClickHandler(click -> confirmReading());
+		bottomConfirmReadingButton.setDisabled(true);
+		bottomConfirmReadingButton.setTooltip(I18N.message("readalldoctoenablebutton"));
+
+		Label bottomConfirmReadingLabel = new Label(I18N.message("yourequiredtoconfirmlegal", legal.getValue()));
+		bottomConfirmReadingLabel.setWrap(false);
+		bottomConfirmReadingLabel.setAlign(Alignment.LEFT);
+
+		bottomConfirmReadingToolStrip.addMember(bottomConfirmReadingLabel);
+		bottomConfirmReadingToolStrip.addFill();
+		bottomConfirmReadingToolStrip.addButton(bottomConfirmReadingButton);
+
+		addMember(bottomConfirmReadingToolStrip);
 	}
 
 	@Override

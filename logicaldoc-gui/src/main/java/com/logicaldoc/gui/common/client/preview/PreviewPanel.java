@@ -39,7 +39,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class PreviewPanel extends VLayout {
 
-	protected HTMLFlow preview = null;
+	protected HTMLPane preview = null;
 
 	protected HTMLFlow media = null;
 
@@ -65,11 +65,17 @@ public class PreviewPanel extends VLayout {
 
 	protected boolean redrawing = false;
 
-	protected ToolStrip confirmReadingToolStrip = new ToolStrip();
+	protected ToolStrip topConfirmReadingToolStrip = null;
 
-	protected ToolStripButton confirmReadingButton = new ToolStripButton(I18N.message("confirmreading"));
+	protected ToolStripButton topConfirmReadingButton = new ToolStripButton(I18N.message("confirmreading"));
 
-	protected Label confirmReadingLabel;
+	protected ToolStrip bottomConfirmReadingToolStrip = null;
+
+	protected ToolStripButton bottomConfirmReadingButton = new ToolStripButton(I18N.message("confirmreading"));
+
+	protected Label topConfirmReadingLabel;
+
+	protected Label bottomConfirmReadingLabel;
 
 	public PreviewPanel(final GUIDocument document) {
 		this.document = document;
@@ -87,16 +93,12 @@ public class PreviewPanel extends VLayout {
 
 		DocumentProtectionManager.askForPassword(docId, doc -> onAccessGranted(document));
 
-		if (Feature.enabled(Feature.READING_CONFIRMATION)
-				&& ReadingRequestController.get().isReadingConfirmRequired(document.getId())) {
-			showConfirmReadingPanel();
-		}
-
 		addResizedHandler(event -> doResize());
 	}
 
 	private void confirmReading() {
-		confirmReadingToolStrip.removeMember(confirmReadingButton);
+		topConfirmReadingToolStrip.removeMember(topConfirmReadingButton);
+		bottomConfirmReadingToolStrip.removeMember(bottomConfirmReadingButton);
 
 		ReadingRequestService.Instance.get().confirmReadings(
 				ReadingRequestController.get().getUnconfirmedReadingIds(document.getId()), document.getVersion(),
@@ -105,7 +107,8 @@ public class PreviewPanel extends VLayout {
 					@Override
 					public void onSuccess(Void v) {
 						ReadingRequestController.get().confirmReading(document.getId());
-						confirmReadingLabel.setContents(I18N.message("readingconfirmthanks"));
+						topConfirmReadingLabel.setContents(I18N.message("readingconfirmthanks"));
+						bottomConfirmReadingLabel.setContents(I18N.message("readingconfirmthanks"));
 					}
 				});
 	}
@@ -274,24 +277,35 @@ public class PreviewPanel extends VLayout {
 	protected void reloadPreview() {
 		if (preview != null)
 			removeMember(preview);
+		if (topConfirmReadingToolStrip != null)
+			removeMember(topConfirmReadingToolStrip);
+		if (bottomConfirmReadingToolStrip != null)
+			removeMember(bottomConfirmReadingToolStrip);
 
-		preview = new HTMLFlow();
-		String contents = "";
+		preview = new HTMLPane();
 
 		long maxFileSize = Session.get().getConfigAsLong("gui.preview.maxfilesize") * 1024 * 1024;
 		if (maxFileSize > 0 && maxFileSize < document.getFileSize()) {
-			contents = "<div><br><center><b>" + I18N.message("doctoobigtoberendered") + "</b></center></br></div>";
+			preview.setContentsType(ContentsType.FRAGMENT);
+			preview.setContents(
+					"<div><br><center><b>" + I18N.message("doctoobigtoberendered") + "</b></center></br></div>");
+			addMember(preview);
 		} else {
-			try {
-				contents = "<iframe src='" + generalPreviewUrl() + "' style='border:0px solid white; width:"
-						+ (getWidth() - 1) + "px; height:" + (getHeight() - 1)
-						+ "px; overflow:hidden;'  scrolling='no' seamless='seamless'></iframe>";
-			} catch (Exception t) {
-				// Nothing to do
+			preview.setContentsType(ContentsType.PAGE);
+			preview.setContentsURL(generalPreviewUrl());
+
+			if (Feature.enabled(Feature.READING_CONFIRMATION)
+					&& ReadingRequestController.get().isReadingConfirmRequired(document.getId())) {
+				showTopConfirmReadingToolbar();
+			}
+
+			addMember(preview);
+
+			if (Feature.enabled(Feature.READING_CONFIRMATION)
+					&& ReadingRequestController.get().isReadingConfirmRequired(document.getId())) {
+				showBottomConfirmReadingToolbar();
 			}
 		}
-		preview.setContents(contents);
-		addMember(preview);
 	}
 
 	protected String generalPreviewUrl() {
@@ -369,27 +383,42 @@ public class PreviewPanel extends VLayout {
 
 	public void onReadingCompleted() {
 		if (Feature.enabled(Feature.READING_CONFIRMATION)) {
-			confirmReadingButton.setDisabled(false);
-			confirmReadingButton.setTooltip("");
+			topConfirmReadingButton.setDisabled(false);
+			topConfirmReadingButton.setTooltip("");
+			topConfirmReadingButton.setStyleName("confirmbutton");
+			bottomConfirmReadingButton.setDisabled(false);
+			bottomConfirmReadingButton.setTooltip("");
+			bottomConfirmReadingButton.setStyleName("confirmbutton");
 		}
 	}
 
-	private void showConfirmReadingPanel() {
-		confirmReadingToolStrip.setWidth100();
-		confirmReadingToolStrip.setAlign(Alignment.RIGHT);
+	private void showTopConfirmReadingToolbar() {
+		topConfirmReadingButton.addClickHandler(event -> confirmReading());
+		topConfirmReadingButton.setDisabled(true);
+		topConfirmReadingButton.setTooltip(I18N.message("readalldoctoenablebutton"));
 
-		confirmReadingButton.addClickHandler(event -> confirmReading());
-		confirmReadingButton.setDisabled(true);
-		confirmReadingButton.setTooltip(I18N.message("readalldoctoenablebutton"));
+		topConfirmReadingLabel = prepareConfirmReadingLabel();
 
-		confirmReadingLabel = new Label(I18N.message("usersrequirereading"));
+		topConfirmReadingToolStrip = new ToolStrip();
+		topConfirmReadingToolStrip.setWidth100();
+		topConfirmReadingToolStrip.setAlign(Alignment.RIGHT);
+		topConfirmReadingToolStrip.addMember(topConfirmReadingLabel);
+		topConfirmReadingToolStrip.addFill();
+		topConfirmReadingToolStrip.addButton(topConfirmReadingButton);
+
+		redrawing = true;
+		addMember(topConfirmReadingToolStrip, 0);
+		redrawing = false;
+	}
+
+	private Label prepareConfirmReadingLabel() {
+		Label label = new Label(I18N.message("usersrequirereading"));
 		List<GUIReadingRequest> unconfirmedReadings = ReadingRequestController.get()
 				.getUnconfirmedReadings(document.getId());
 		if (unconfirmedReadings.size() == 1)
-			confirmReadingLabel = new Label(
-					I18N.message("userrequiresreading", unconfirmedReadings.get(0).getRequestorName()));
-		confirmReadingLabel.setWrap(false);
-		confirmReadingLabel.setAlign(Alignment.LEFT);
+			label = new Label(I18N.message("userrequiresreading", unconfirmedReadings.get(0).getRequestorName()));
+		label.setWrap(false);
+		label.setAlign(Alignment.LEFT);
 
 		StringBuilder sb = new StringBuilder();
 		for (GUIReadingRequest reading : unconfirmedReadings) {
@@ -402,14 +431,26 @@ public class PreviewPanel extends VLayout {
 			}
 		}
 		sb.append("<br />");
-		confirmReadingLabel.setTooltip(sb.toString());
+		label.setTooltip(sb.toString());
+		return label;
+	}
 
-		confirmReadingToolStrip.addMember(confirmReadingLabel);
-		confirmReadingToolStrip.addFill();
-		confirmReadingToolStrip.addButton(confirmReadingButton);
+	private void showBottomConfirmReadingToolbar() {
+		bottomConfirmReadingButton.addClickHandler(event -> confirmReading());
+		bottomConfirmReadingButton.setDisabled(true);
+		bottomConfirmReadingButton.setTooltip(I18N.message("readalldoctoenablebutton"));
+
+		bottomConfirmReadingLabel = prepareConfirmReadingLabel();
+
+		bottomConfirmReadingToolStrip = new ToolStrip();
+		bottomConfirmReadingToolStrip.setWidth100();
+		bottomConfirmReadingToolStrip.setAlign(Alignment.RIGHT);
+		bottomConfirmReadingToolStrip.addMember(bottomConfirmReadingLabel);
+		bottomConfirmReadingToolStrip.addFill();
+		bottomConfirmReadingToolStrip.addButton(bottomConfirmReadingButton);
 
 		redrawing = true;
-		addMember(confirmReadingToolStrip, 0);
+		addMember(bottomConfirmReadingToolStrip, 2);
 		redrawing = false;
 	}
 

@@ -482,3 +482,11 @@
   top:0;
   left:0;
 }
+
+.confirmbutton {
+  background-color: orange;
+}
+
+.confirmbutton .toolStripButton {
+  color: white;
+}

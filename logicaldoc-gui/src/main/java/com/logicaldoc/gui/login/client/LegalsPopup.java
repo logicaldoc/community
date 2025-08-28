@@ -43,7 +43,7 @@ public class LegalsPopup extends Window {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setWidth(Math.round((float) com.google.gwt.user.client.Window.getClientWidth() - 20));
 		setHeight(Math.round((float) com.google.gwt.user.client.Window.getClientHeight() - 20));
-		setCanDragResize(true);
+		setCanDragResize(false);
 		setIsModal(true);
 		setShowModalMask(true);
 		centerInPage();
