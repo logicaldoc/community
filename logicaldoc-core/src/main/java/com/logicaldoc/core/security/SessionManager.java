@@ -452,8 +452,8 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * <li>Session attribute <code>PARAM_SID</code></li>
 	 * <li>Cookie <code>COOKIE_SID</code></li>
 	 * <li>Header <code>X-API-KEY</code></li>
-	 * <li>Spring SecurityContextHolder</li>
 	 * <li>Client ID</li>
+	 * <li>Spring SecurityContextHolder</li>
 	 * </ol>
 	 * 
 	 * @param request The current request to inspect
@@ -465,11 +465,15 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		if (sid != null)
 			return sid;
 
+		sid = getSessionIdFromClient(request);
+		if (sid != null)
+			return sid;
+
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth instanceof LDAuthenticationToken ldAuthenticationToken)
 			return ldAuthenticationToken.getSid();
 
-		return getSessionIdFromClient(request);
+		return null;
 	}
 
 	private String getSessionIdFromClient(HttpServletRequest request) {
@@ -510,18 +514,23 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 		String sid = null;
 		if (StringUtils.isNotEmpty(request.getParameter(PARAM_SID))
-				&& Context.get().getProperties().getBoolean("security.acceptsid", false))
+				&& Context.get().getProperties().getBoolean("security.acceptsid", false)) {
+			log.debug("Got SID in request {}", PARAM_SID);
 			sid = request.getParameter(PARAM_SID);
-		else if (StringUtils.isNotEmpty(request.getHeader(PARAM_SID)))
+		} else if (StringUtils.isNotEmpty(request.getHeader(PARAM_SID))) {
+			log.debug("Got SID in request header {}", PARAM_SID);
 			sid = request.getHeader(PARAM_SID);
-		else if (request.getAttribute(PARAM_SID) != null
-				&& StringUtils.isNotEmpty((String) request.getAttribute(PARAM_SID)))
+		} else if (request.getAttribute(PARAM_SID) != null
+				&& StringUtils.isNotEmpty((String) request.getAttribute(PARAM_SID))) {
+			log.debug("Got SID in request attribute {}", PARAM_SID);
 			sid = (String) request.getAttribute(PARAM_SID);
-		else if (request.getSession(true).getAttribute(PARAM_SID) != null
-				&& StringUtils.isNotEmpty((String) request.getSession(true).getAttribute(PARAM_SID)))
+		} else if (request.getSession(true).getAttribute(PARAM_SID) != null
+				&& StringUtils.isNotEmpty((String) request.getSession(true).getAttribute(PARAM_SID))) {
+			log.debug("Got SID in session attribute {}", PARAM_SID);
 			sid = (String) request.getSession(true).getAttribute(PARAM_SID);
-		else
+		} else {
 			sid = getSessionIdFromCookie(request);
+		}
 
 		if (StringUtils.isEmpty(sid))
 			sid = getSessionFromApiKey(request);

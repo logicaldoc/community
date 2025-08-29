@@ -1,6 +1,7 @@
 package com.logicaldoc.core;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -443,8 +444,14 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	@Override
 	public long queryForLong(String sql, Map<String, Object> parameters) throws PersistenceException {
-		Long ret = queryForObject(sql, parameters, Long.class);
-		return ret != null ? ret.longValue() : 0L;
+		try {
+			Long ret = queryForObject(sql, parameters, Long.class);
+			return ret != null ? ret.longValue() : 0L;
+		} catch (Exception e) {
+			// It may be normal, with postgresql the returned value could be a BigDecimal
+			BigDecimal ret = queryForObject(sql, parameters, BigDecimal.class);
+			return ret != null ? ret.longValue() : 0L;
+		}
 	}
 
 	@Override
