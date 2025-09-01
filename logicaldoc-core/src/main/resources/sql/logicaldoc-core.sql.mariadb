@@ -405,7 +405,7 @@ values     (1601,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'sessions',1600,'menu.png
 insert into ld_menu
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
 values     (1602,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'trash',1500,'menu.png',1,1,1,10,1);
-
+	
 insert into ld_menu
            (ld_id,ld_lastmodified,ld_creation,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
 values     (1603,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,'versions',1500,'menu.png',1,1,1,10,1);
@@ -740,6 +740,7 @@ insert into ld_folder_acl(ld_folderid, ld_groupid, ld_read, ld_write, ld_add, ld
 values (4,-10000,1,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,0,1,1,1,0);
 insert into ld_folder_history (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_docid, ld_folderid, ld_userid, ld_date, ld_username, ld_event, ld_comment, ld_version, ld_notified, ld_path, ld_tenantid, ld_recordversion)
 values (2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,0,null,4,1,CURRENT_TIMESTAMP,'admin','event.folder.created',null,'1.0',1,'/Default',1,1);
+
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_creation, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
 values(1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,0,'task.report','system','en', '$product - $task',
