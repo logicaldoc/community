@@ -34,7 +34,11 @@ public class SearchHitsGrid extends DocumentsListGrid {
 
 		fields.add(fieldsMap.get("id"));
 		fields.add(fieldsMap.get("thumbnail"));
-		fields.add(fieldsMap.get("statusIcons"));
+
+		ListGridField statusIcons = fieldsMap.get("statusIcons");
+		statusIcons.setHidden(false);
+		fields.add(statusIcons);
+		
 		fields.add(fieldsMap.get("icon"));
 
 		getSearchColumns();
