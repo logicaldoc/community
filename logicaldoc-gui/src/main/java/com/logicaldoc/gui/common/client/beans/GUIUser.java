@@ -87,7 +87,7 @@ public class GUIUser implements Serializable {
 
 	private boolean enabled = true;
 
-	private boolean legals = true;
+	private boolean legals = false;
 
 	private int checkedOutDocs = 0;
 

@@ -118,7 +118,7 @@ public class SetPassword extends Window {
 									GuiLog.warn(I18N.message("genericerror"), null);
 							} else {
 								destroy();
-								SC.warn(I18N.message("passwordforcedhint"));
+								SC.say(I18N.message("passwordforcedhint"));
 							}
 						}
 					});

@@ -732,6 +732,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				user.setPasswordChanged(new Date());
 			}
 
+			String decodedPassword = user.getDecodedPassword();
 			saveWorkingTimes(user, guiUser.getWorkingTimes());
 
 			UserHistory transaction = new UserHistory();
@@ -741,12 +742,12 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 			guiUser.setId(user.getId());
 
-			
-			user=userDao.findById(user.getId());
+			user = userDao.findById(user.getId());
 			userDao.initialize(user);
 			setGroups(user, guiUser);
 
 			// Notify the user by email
+			user.setDecodedPassword(decodedPassword);
 			notifyUser(guiUser, user, createNew);
 		} catch (MessagingException me) {
 			log.warn(me.getMessage(), me);
