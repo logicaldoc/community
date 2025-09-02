@@ -81,25 +81,35 @@ public class LinksDataServlet extends AbstractDataServlet {
 		if (!Context.get().getProperties().getBoolean(tenant + ".gui.showdocattrsaslinks", false))
 			return;
 
-		DocumentDAO dao = Context.get(DocumentDAO.class);
-
-		StringBuilder query;
-		query = new StringBuilder(
-				"select DOC1.ld_id, DOC1.ld_folderid, DOC1.ld_filename, DOC1.ld_color, E.ld_name, DOC2.ld_id, DOC2.ld_folderid, DOC2.ld_filename, DOC2.ld_color, E.ld_label from ld_document_ext E, ld_document DOC1, ld_document DOC2 where E.ld_type="
-						+ Attribute.TYPE_DOCUMENT
-						+ " and DOC1.ld_deleted=0 and DOC2.ld_deleted=0 and E.ld_intvalue is not null ");
+		// Use the stringValue of the attribute to print the filename of the
+		// referenced document
+		StringBuilder query = new StringBuilder("select DOC1.ld_id, DOC1.ld_folderid, DOC1.ld_filename, DOC1.ld_color, E.ld_name, DOC2.ld_id, DOC2.ld_folderid, E.ld_stringvalue, DOC2.ld_color, E.ld_label ");
+		query.append(" from ld_document_ext E, ld_document DOC1, ld_document DOC2 where E.ld_type="+ Attribute.TYPE_DOCUMENT);
+		query.append(" and DOC1.ld_deleted=0 and DOC2.ld_deleted=0 and E.ld_intvalue is not null ");
 		query.append(" and DOC1.ld_id = E.ld_docid ");
 		query.append(" and DOC2.ld_id = E.ld_intvalue ");
-		query.append(" and (E.ld_intvalue = ");
+		query.append(" and E.ld_docid = ");
 		query.append(parentDocId);
-		query.append(" or E.ld_docid = ");
+		if (!docId.equals(parentDocId)) {
+			query.append(" and not DOC1.ld_id = " + docId);
+			query.append(" and not DOC2.ld_id = " + docId);
+		}
+		
+		// Get backward references to current document from referenced ones
+		query.append(" UNION ");
+		query.append("select DOC1.ld_id, DOC1.ld_folderid, DOC1.ld_filename, DOC1.ld_color, E.ld_name, DOC2.ld_id, DOC2.ld_folderid, DOC2.ld_filename, DOC2.ld_color, E.ld_label ");
+		query.append(" from ld_document_ext E, ld_document DOC1, ld_document DOC2 where E.ld_type="+ Attribute.TYPE_DOCUMENT);
+		query.append(" and DOC1.ld_deleted=0 and DOC2.ld_deleted=0 and E.ld_intvalue is not null ");
+		query.append(" and DOC1.ld_id = E.ld_docid ");
+		query.append(" and DOC2.ld_id = E.ld_intvalue ");
+		query.append(" and E.ld_intvalue = ");
 		query.append(parentDocId);
-		query.append(") ");
 		if (!docId.equals(parentDocId)) {
 			query.append(" and not DOC1.ld_id = " + docId);
 			query.append(" and not DOC2.ld_id = " + docId);
 		}
 
+		DocumentDAO dao = Context.get(DocumentDAO.class);
 		dao.queryForResultSet(query.toString(), null, null, rows -> {
 			while (rows.next()) {
 				List<Object> cols = new ArrayList<>(Collections.nCopies(13, null));
