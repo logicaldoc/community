@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.LazyInitializationException;
@@ -424,47 +423,11 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 			Collections.sort(attributes);
 
-			updateFileNameInDocumentAttributes(attributes);
-
 			return attributes;
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 			return new ArrayList<>();
 		}
-	}
-
-	/**
-	 * Traverses the attributes updating the file names of those ones of type Document
-	 * 
-	 * @param attributes The attributes to process
-	 * 
-	 * @throws PersistenceException Error in the data layer
-	 */
-	private void updateFileNameInDocumentAttributes(List<GUIAttribute> attributes) throws PersistenceException {
-		// Retrieve the unique document ids referenced by document attributes
-		List<Long> uniqueDocIds = attributes.stream()
-				.filter(d -> d.getType() == GUIAttribute.TYPE_DOCUMENT && d.getIntValue() != null)
-				.map(d -> d.getIntValue()).distinct().toList();
-		if (uniqueDocIds.isEmpty())
-			return;
-
-		// Select the ids with current filename and update the GUIAttributes
-		// accordingly
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
-		docDao.queryForResultSet(
-				"select ld_id, ld_filename from ld_document where ld_id in ("
-						+ uniqueDocIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")) + ");",
-				null, null, rows -> {
-					while (rows.next()) {
-						Long docId = rows.getLong(1);
-						for (GUIAttribute docAtt : attributes.stream().filter(
-								at -> at.getType() == GUIAttribute.TYPE_DOCUMENT && at.getIntValue() != null && at.getIntValue().equals(docId))
-								.toList()) {
-							docAtt.setStringValue(rows.getString(2));
-							System.out.println(docAtt.getName()+": "+ docAtt.getIntValue()+" > "+docAtt.getStringValue());
-						}
-					}
-				});
 	}
 
 	private Template initializeTemplateAttributes(Template template) {
