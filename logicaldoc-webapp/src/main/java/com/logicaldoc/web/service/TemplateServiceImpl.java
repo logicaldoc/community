@@ -423,6 +423,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			}
 
 			Collections.sort(attributes);
+
 			return attributes;
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
@@ -573,7 +574,14 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			AbstractDocumentHistory transaction = null;
 			if (extensibleObject instanceof Document document) {
 				transaction = new DocumentHistory();
-				transaction.setDocument(document);
+				if (document.getFolder() != null) {
+					transaction.setDocument(document);
+				} else {
+					transaction.setDocId(document.getId());
+					transaction.setFilename(document.getFileName());
+					transaction.setFileSize(document.getFileSize());
+				}
+
 				transaction.setUser(sessionUser);
 			} else if (extensibleObject instanceof Folder folder) {
 				transaction = new FolderHistory();

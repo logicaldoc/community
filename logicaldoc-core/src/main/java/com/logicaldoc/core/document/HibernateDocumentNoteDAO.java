@@ -43,6 +43,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 		if (doc == null)
 			throw new PersistenceException("Cannot save note for undexisting document " + note.getDocId());
 
+		documentDao.initialize(doc);
 		if (note.getFileVersion() == null)
 			note.setFileVersion(doc.getFileVersion());
 
@@ -53,6 +54,26 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 			if (doc.getIndexed() == IndexingStatus.INDEXED)
 				doc.setIndexingStatus(IndexingStatus.TO_INDEX);
 			documentDao.store(doc);
+		}
+	}
+
+	@Override
+	public void store(DocumentNote note, DocumentHistory transaction) throws PersistenceException {
+		this.store(note);
+
+		try {
+			if (transaction != null) {
+				DocumentDAO documentDao = Context.get(DocumentDAO.class);
+				Document doc = documentDao.findById(note.getDocId());
+				transaction.setEvent(DocumentEvent.NEW_NOTE);
+				documentDao.saveDocumentHistory(doc, transaction);
+			}
+		} catch (Exception e) {
+			if (StringUtils.isNotEmpty(transaction.getSessionId())) {
+				Session session = SessionManager.get().get(transaction.getSessionId());
+				session.logError(e.getMessage());
+			}
+			log.error(e.getMessage(), e);
 		}
 	}
 
@@ -81,27 +102,16 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 				return null;
 			}, "Note");
 	}
-
+	
 	@Override
-	public void store(DocumentNote note, DocumentHistory transaction) throws PersistenceException {
-		this.store(note);
-
-		try {
-			if (transaction != null) {
-				DocumentDAO documentDao = Context.get(DocumentDAO.class);
-				Document doc = documentDao.findById(note.getDocId());
-				transaction.setEvent(DocumentEvent.NEW_NOTE);
-				documentDao.saveDocumentHistory(doc, transaction);
-			}
-		} catch (Exception e) {
-			if (StringUtils.isNotEmpty(transaction.getSessionId())) {
-				Session session = SessionManager.get().get(transaction.getSessionId());
-				session.logError(e.getMessage());
-			}
-			log.error(e.getMessage(), e);
+	public void delete(long id, int code) throws PersistenceException {
+		DocumentNote note = findById(id);
+		if (note != null) {
+			super.delete(id, code);
+			updateLastNote(note);
 		}
 	}
-
+	
 	@Override
 	public List<DocumentNote> findByDocId(long docId, String fileVersion) throws PersistenceException {
 		return findByDocIdAndType(docId, fileVersion, null);
@@ -147,15 +157,6 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	@Override
 	public List<DocumentNote> findByUserId(long userId) throws PersistenceException {
 		return findByWhere(ENTITY + ".userId =" + userId, ENTITY + ".date desc", null);
-	}
-
-	@Override
-	public void delete(long id, int code) throws PersistenceException {
-		DocumentNote note = findById(id);
-		if (note != null) {
-			super.delete(id, code);
-			updateLastNote(note);
-		}
 	}
 
 	@Override

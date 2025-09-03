@@ -418,6 +418,11 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			createdHistory.setComment(user.getUsername());
 			saveUserHistory(user, createdHistory);
 		} else {
+			if (transaction == null) {
+				transaction = new UserHistory();
+				transaction.setEvent(UserEvent.UPDATED);
+				transaction.setComment(user.getUsername());
+			}
 			saveUserHistory(user, transaction);
 		}
 	}

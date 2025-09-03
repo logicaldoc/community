@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
@@ -178,8 +179,8 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		calendar.set(Calendar.MILLISECOND, 0);
 		Date lastRen = calendar.getTime();
 
-		long diff = now.getTime() - lastRen.getTime();
-		long diffMinutes = Math.abs(diff / 1000 / 60);
+		long diff = Math.abs(now.getTime() - lastRen.getTime());
+		long diffMinutes = TimeUnit.MILLISECONDS.toMinutes(diff);
 		return diffMinutes >= timeout;
 	}
 

@@ -1050,4 +1050,8 @@ public class DocTool {
 	public boolean isDownloadAllowed(long documentId, long userId) {
 		return isPermissionAllowed(Permission.DOWNLOAD.name(), documentId, userId);
 	}
+	
+	public DocumentEvent documentEvent(String eventKey) {
+		return DocumentEvent.fromKey(eventKey);
+	}
 }

@@ -1574,7 +1574,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		newFolder = createPath(target, StringUtils.isNotEmpty(newName) ? newName : source.getName(),
 				"inherit".equals(securityOption), new FolderHistory(transaction));
 		newFolder.setFoldRef(source.getFoldRef());
-
+		
 		replicateSecurityPolicies(source, securityOption, newFolder);
 
 		DocumentDAO docDao = Context.get(DocumentDAO.class);
@@ -1635,7 +1635,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private Folder internalCopyValidation(Folder source, Folder target, String securityOption,
 			FolderHistory transaction) throws PersistenceException {
-		if (!(securityOption == null || "inherit".equals(securityOption) || REPLICATE.equals(securityOption)))
+		if (!(securityOption == null || "none".equals(securityOption) || "inherit".equals(securityOption) || REPLICATE.equals(securityOption)))
 			throw new IllegalArgumentException("Invalid security option " + securityOption);
 		if (source == null)
 			throw new IllegalArgumentException("Source folder cannot be null");

@@ -1048,6 +1048,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			att.setIntValue(extAttr.getIntValue());
 			att.setBooleanValue(extAttr.getBooleanValue());
 			att.setDoubleValue(extAttr.getDoubleValue());
+			att.setDateValue(extAttr.getDateValue());
 			att.setType(extAttr.getType());
 			guiVersion.addAttribute(att);
 		}
