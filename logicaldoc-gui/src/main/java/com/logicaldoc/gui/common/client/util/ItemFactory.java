@@ -1,12 +1,12 @@
 package com.logicaldoc.gui.common.client.util;
 
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
@@ -251,8 +251,9 @@ public class ItemFactory {
 		dateItem.setDateFormatter(I18N.getDateDisplayFormat(false));
 		dateItem.setPickerIconPrompt(I18N.message(SHOWDATECHOOSER));
 		dateItem.setRequiredMessage(I18N.message(FIELDREQUIRED));
-		dateItem.setEndDate(new Date(new Date().getTime() + 2208992400000L));
-		dateItem.setStartDate(new Date(-2208992400000L));
+		DateTimeFormat format = DateTimeFormat.getFormat("dd/MM/yyyy");
+		dateItem.setEndDate(format.parse("01/01/3000"));
+		dateItem.setStartDate(format.parse("01/01/0000"));
 		dateItem.setBrowserSpellCheck(false);
 		dateItem.setIconHeight(ITEM_ICON_SIZE);
 		dateItem.setIconWidth(ITEM_ICON_SIZE);

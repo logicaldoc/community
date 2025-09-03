@@ -30,7 +30,6 @@ import com.smartgwt.client.widgets.form.fields.SectionItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 
@@ -377,8 +376,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	}
 
 	protected FormItem prepareFolderItem(GUIAttribute att, List<FormItemIcon> multiValIcons) {
-		FormItem item;
-		item = ItemFactory.newFolderSelectorForAttribute(att.getName(), att.getDisplayName(), multiValIcons);
+		FormItem item = ItemFactory.newFolderSelectorForAttribute(att.getName(), att.getDisplayName(), multiValIcons);
 		FolderSelector selector = (FolderSelector) item;
 		if (extensibleObject.getValue(att.getName()) != null) {
 			selector.setFolder(att.getIntValue(), att.getStringValue());
@@ -392,8 +390,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	}
 
 	protected FormItem prepareDocumentItem(GUIAttribute att, List<FormItemIcon> multiValIcons) {
-		FormItem item;
-		item = ItemFactory.newDocumentSelectorForAttribute(att.getName(), att.getDisplayName(), multiValIcons);
+		FormItem item = ItemFactory.newDocumentSelectorForAttribute(att.getName(), att.getDisplayName(), multiValIcons);
 		DocumentSelector selector = (DocumentSelector) item;
 		if (extensibleObject.getValue(att.getName()) != null) {
 			selector.setDocument(att.getIntValue(), att.getStringValue());
@@ -407,12 +404,12 @@ public class ExtendedPropertiesPanel extends HLayout {
 	}
 
 	protected FormItem prepareDateItem(GUIAttribute att) {
-		FormItem item;
-		item = ItemFactory.newDateItemForAttribute(att.getName(), att.getDisplayName());
+		FormItem item = ItemFactory.newDateItemForAttribute(att.getName(), att.getDisplayName());
 		if (extensibleObject.getValue(att.getName()) != null)
 			item.setValue((Date) extensibleObject.getValue(att.getName()));
-		item.addKeyPressHandler((KeyPressEvent event) -> {
-			if ("backspace".equalsIgnoreCase(event.getKeyName()) || "delete".equalsIgnoreCase(event.getKeyName())) {
+		item.addKeyPressHandler(keyPressed -> {
+			if ("backspace".equalsIgnoreCase(keyPressed.getKeyName())
+					|| "delete".equalsIgnoreCase(keyPressed.getKeyName())) {
 				item.clearValue();
 				item.setValue((Date) null);
 				changedHandler.onChanged(null);
@@ -424,8 +421,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	}
 
 	protected FormItem prepareBooleanItem(GUIAttribute att) {
-		FormItem item;
-		item = ItemFactory.newBooleanSelectorForAttribute(att.getName(), att.getDisplayName(),
+		FormItem item = ItemFactory.newBooleanSelectorForAttribute(att.getName(), att.getDisplayName(),
 				checkMandatory && !att.isMandatory());
 		if (extensibleObject.getValue(att.getName()) != null)
 			item.setValue(((Boolean) extensibleObject.getValue(att.getName())).booleanValue() ? "1" : "0");
