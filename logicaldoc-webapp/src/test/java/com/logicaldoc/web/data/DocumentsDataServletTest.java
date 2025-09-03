@@ -1,14 +1,18 @@
 package com.logicaldoc.web.data;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
 import org.junit.Test;
 
+import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.util.servlet.MockServletRequest;
 import com.logicaldoc.util.servlet.MockServletResponse;
+import com.logicaldoc.util.spring.Context;
 
 public class DocumentsDataServletTest extends AbstractDataServletTestCase {
 
@@ -69,5 +73,41 @@ public class DocumentsDataServletTest extends AbstractDataServletTestCase {
 
 		output = response.getOutputString();
 		assertEquals("<list></list>", output);
+	}
+
+	@Test
+	public void testServiceWithLastNote() throws Exception {
+		DocumentDAO dao = Context.get(DocumentDAO.class);
+		Document doc = dao.findById(1L);
+		assertNotNull(doc);
+
+		dao.initialize(doc);
+
+		String original = doc.getLastNote();
+
+		doc.setLastNote("note-one");
+		dao.store(doc);
+
+		doc.setLastNote("note-two");
+		dao.store(doc);
+		
+		doc.setLastNote("note-three");
+		dao.store(doc);
+
+		MockServletRequest mockRequest = new MockServletRequest(servletSession);
+		mockRequest.setParameter("page", "1");
+		mockRequest.setParameter("folderId", String.valueOf(doc.getFolder().getId()));
+		mockRequest.setParameter("sort", "date desc");
+
+		MockServletResponse response = new MockServletResponse(responseFile);
+		testSubject.service(mockRequest, response);
+		response.flushBuffer();
+
+		String output = response.getOutputString();
+
+		assertTrue(output.contains("note-three"));
+
+		doc.setLastNote(original);
+		dao.store(doc);
 	}
 }

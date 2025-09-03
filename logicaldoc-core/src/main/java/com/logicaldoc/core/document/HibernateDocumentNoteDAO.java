@@ -52,11 +52,16 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 			note.setFileVersion(doc.getFileVersion());
 
 		super.store(note);
-
-		updateLastNote(doc, note);
+		if (note.getPage() == 0) {
+			documentDao.initialize(doc);
+			doc.setLastNote(HTMLSanitizer.sanitizeSimpleText(note.getMessage()));
+			if (doc.getIndexed() == IndexingStatus.INDEXED)
+				doc.setIndexingStatus(IndexingStatus.TO_INDEX);
+			documentDao.store(doc);
+		}
 	}
 
-	private void updateLastNote(Document document, DocumentNote note) {
+	private void updateLastNote(DocumentNote note) {
 		// In case of note on the whole document, update the document's lastNote
 		// field
 		if (note.getPage() == 0)
@@ -65,17 +70,17 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 					DocumentDAO dao = Context.get(DocumentDAO.class);
 					Document doc = dao.findById(note.getDocId());
 					dao.initialize(doc);
-
 					String lastNoteMessage = dao.queryForList(
 							"select ld_message from ld_note where ld_page=0 and ld_deleted=0 and ld_docid=:id order by ld_date desc",
-							Map.of("id", note.getDocId()), String.class, null).stream().findFirst()
-							.orElse(note.getMessage());
-
-					doc.setLastNote(HTMLSanitizer.sanitizeSimpleText(lastNoteMessage));
-					if (document.getIndexed() == IndexingStatus.INDEXED)
-						document.setIndexingStatus(IndexingStatus.TO_INDEX);
-					dao.store(doc);
-				} catch (PersistenceException e) {
+							Map.of("id", note.getDocId()), String.class, null).stream().findFirst().orElse("");
+					lastNoteMessage = HTMLSanitizer.sanitizeSimpleText(lastNoteMessage);
+					if (!lastNoteMessage.equals(doc.getLastNote())) {
+						doc.setLastNote(HTMLSanitizer.sanitizeSimpleText(lastNoteMessage));
+						if (doc.getIndexed() == IndexingStatus.INDEXED)
+							doc.setIndexingStatus(IndexingStatus.TO_INDEX);
+						dao.store(doc);
+					}
+				} catch (Exception e) {
 					log.error(e.getMessage(), e);
 				}
 				return null;
@@ -154,15 +159,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 		DocumentNote note = findById(id);
 		if (note != null) {
 			super.delete(id, code);
-			DocumentDAO documentDao = Context.get(DocumentDAO.class);
-			Document document = documentDao.findById(note.getDocId());
-			if (document != null && document.getIndexed() == IndexingStatus.INDEXED) {
-				// Mark to index
-				documentDao.initialize(document);
-				document.setIndexingStatus(IndexingStatus.TO_INDEX);
-				documentDao.store(document);
-				updateLastNote(document, note);
-			}
+			updateLastNote(note);
 		}
 	}
 
