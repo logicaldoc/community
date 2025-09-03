@@ -7,7 +7,7 @@ import java.util.List;
 import org.junit.Test;
 
 /**
- * Test case for Encodings class
+ * Test cases for Encodings class
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.5

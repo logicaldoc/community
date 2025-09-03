@@ -21,6 +21,15 @@ public class SystemUtilTest {
 	public void testGetOS() {
 		String originalOsName = System.getProperty("os.name");
 		try {
+			System.setProperty("os.name", "windows");
+			assertEquals("win", SystemUtil.getOS());
+
+			System.setProperty("os.name", "macintosh");
+			assertEquals("osx", SystemUtil.getOS());
+
+			System.setProperty("os.name", "sunos");
+			assertEquals("sol", SystemUtil.getOS());
+
 			System.setProperty("os.name", "Unix");
 			assertEquals("uni", SystemUtil.getOS());
 

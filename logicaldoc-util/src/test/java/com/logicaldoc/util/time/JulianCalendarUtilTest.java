@@ -24,6 +24,10 @@ public class JulianCalendarUtilTest extends TestCase {
 
 	@Test
 	public void testToJulian() throws ParseException {
-		assertEquals(df.parse("1582-12-11"), JulianCalendarUtil.toGregorian(df.parse("1582-12-01")));
+		assertEquals(df.parse("1582-12-01"), JulianCalendarUtil.toJulian(df.parse("1582-12-11")));
+
+		assertEquals(df.parse("1582-01-01"), JulianCalendarUtil.toJulian(df.parse("1582-01-11")));
+
+		assertEquals(df.parse("2023-12-19"), JulianCalendarUtil.toJulian(df.parse("2024-01-01")));
 	}
 }

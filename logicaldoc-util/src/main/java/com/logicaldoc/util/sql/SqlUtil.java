@@ -51,7 +51,7 @@ public class SqlUtil {
 	/**
 	 * Retrieves the date stored in a given column
 	 * 
-	 * @param resultSet The resultset to use
+	 * @param resultSet The result set to use
 	 * @param column The column index
 	 * @return The date value
 	 * 

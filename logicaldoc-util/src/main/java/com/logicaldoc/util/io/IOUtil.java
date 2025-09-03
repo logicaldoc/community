@@ -18,12 +18,12 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 public class IOUtil {
 
@@ -138,9 +138,7 @@ public class IOUtil {
 	public static void download(final String url, File dest, int timeout, int bufferSize)
 			throws IOException, URISyntaxException {
 		if (url == null || url.isEmpty()) {
-			throw new IOException("Url argument is not specified"); // URL
-																	// isn't
-																	// specified
+			throw new IOException("Url argument is not specified");
 		}
 
 		URL uri = new URI(url).toURL();

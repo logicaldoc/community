@@ -22,5 +22,13 @@ public class PasswordGeneratorTest extends TestCase {
 			Assert.assertNotNull(password);
 			Assert.assertTrue(password.length() >= 5);
 		}
+
+		// Exception case: minLength < 5 should throw IllegalArgumentException
+		try {
+			PasswordGenerator.generate(4, 1, 1, 1, 1, 2, 1);
+			Assert.fail("Expected IllegalArgumentException for minLength < 5");
+		} catch (IllegalArgumentException e) {
+			// ✅ expected
+		}
 	}
 }

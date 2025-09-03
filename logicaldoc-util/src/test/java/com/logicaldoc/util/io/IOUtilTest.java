@@ -3,6 +3,7 @@ package com.logicaldoc.util.io;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -73,10 +74,21 @@ public class IOUtilTest {
 		map.put("1", "value1");
 
 		String serialized = IOUtil.serialize(map, null);
-		
+
 		@SuppressWarnings("unchecked")
 		HashMap<String, Object> deserialized = (HashMap<String, Object>) IOUtil.deserialize(serialized);
 		assertNotNull(deserialized);
 		assertEquals("value1", deserialized.get("1"));
+	}
+
+	@Test
+	public void testDownload() {
+		File dest = new File("target/dummy.txt");
+
+		// null URL
+		assertThrows(IOException.class, () -> IOUtil.download(null, dest, 5000, 1024));
+
+		// empty URL
+		assertThrows(IOException.class, () -> IOUtil.download("", dest, 5000, 1024));
 	}
 }

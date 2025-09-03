@@ -1,5 +1,6 @@
 package com.logicaldoc.util.io;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -8,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -19,6 +21,7 @@ public class FileUtilTest {
 
 	@Test
 	public void testDelete() throws IOException {
+		assertTrue(FileUtil.delete((File) null));
 		File root = new File("target/test-destroy");
 
 		int total = 1000;
@@ -50,8 +53,8 @@ public class FileUtilTest {
 		int total = 1000;
 
 		for (int i = 0; i < total; i++) {
-			File outFile =  new File(root+"/"+Integer.toString(i));
-			FileUtil.writeFile(ResourceUtil.getInputStream("kofax.rar") , outFile.getPath() );
+			File outFile = new File(root + "/" + Integer.toString(i));
+			FileUtil.writeFile(ResourceUtil.getInputStream("kofax.rar"), outFile.getPath());
 			assertTrue(outFile.length() > 0);
 			assertEquals(new File("src/test/resources/kofax.rar").length(), outFile.length());
 		}
@@ -68,6 +71,7 @@ public class FileUtilTest {
 	@Test
 	public void testMatch() {
 		assertTrue(FileUtil.matches("ReleaseNotes.txt", "*.doc,*.txt", ""));
+		assertFalse(FileUtil.matches("ReleaseNotes.txt", "*.doc,*.txt", "*.txt"));
 	}
 
 	@Test
@@ -286,5 +290,19 @@ public class FileUtilTest {
 		assertEquals("5,292,332.6 GB", FileUtil.getDisplaySize(5682598909897798L, null));
 		assertEquals("5,549.4 KB", FileUtil.getDisplaySizeKB(5682598L, null));
 		assertEquals(FileUtil.getDisplaySizeKB(5682598L, null), FileUtil.getDisplaySizeKB(5682598L, "en"));
+	}
+
+	@Test
+	public void testWriteFileByteArray() throws Exception {
+		byte[] data = "hello world".getBytes("UTF-8");
+		File outFile = new File("target/test-writefile-bytearray.txt");
+
+		FileUtil.writeFile(data, outFile.getPath());
+
+		assertTrue(outFile.exists());
+		assertEquals(data.length, outFile.length());
+		assertArrayEquals(data, Files.readAllBytes(outFile.toPath()));
+
+		FileUtil.delete(outFile);
 	}
 }

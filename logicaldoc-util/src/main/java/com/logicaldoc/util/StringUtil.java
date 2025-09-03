@@ -192,7 +192,7 @@ public class StringUtil {
 	}
 
 	/**
-	 * Converts the non latin chars in the nearest ASCII char
+	 * Converts the non Latin chars in the nearest ASCII char
 	 * 
 	 * @param src the source string to process
 	 * 

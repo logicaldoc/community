@@ -791,7 +791,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		ddao.initialize(document);
 		engine.addHit(document, "Questo � un documento di prova. Per fortuna che esistono i test. document");
 
-		// Adding unexisting document 111
+		// Adding non-existing document 111
 		document = new Document();
 		document.setId(2L);
 		document.setFileName("test.doc");
@@ -837,5 +837,20 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		ddao.initialize(document);
 		engine.addHit(document,
 				"12, 81390264001300, FLEXSPACE NO 1 LLP, T/A FLEXSPACE, UNIT 13 EVANS BUSINESS CENTRE, VINCENT CAREY ROAD, ROTHERWAS INDUSTRIAL ESTATE, HEREFORD, HR2");
+	}
+
+	@Test
+	public void testAddUser_min() throws Exception {
+		testSubject.addUser(null, true);
+		testSubject.addUser("", true);
+		testSubject.addUser("alice", true);
+		testSubject.addUser("alice", false);
+
+		java.lang.reflect.Field f = LDRepository.class.getDeclaredField("userMap");
+		f.setAccessible(true);
+		Map<?, ?> map = (Map<?, ?>) f.get(testSubject);
+
+		assertTrue(map.containsKey("alice"));
+		assertEquals(Boolean.FALSE, map.get("alice"));
 	}
 }
