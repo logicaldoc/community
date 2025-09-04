@@ -5,6 +5,7 @@ import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.data.NotesDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
@@ -174,6 +175,13 @@ public class NotesPanel extends DocumentDetailTab {
 					@Override
 					public void onSuccess(Void result) {
 						notesGrid.removeSelectedData();
+						DocumentService.Instance.get().getById(document.getId(), new DefaultAsyncCallback<GUIDocument>() {
+
+							@Override
+							public void onSuccess(GUIDocument result) {
+								DocumentController.get().modified(result);
+							}
+						});
 					}
 				});
 			}
