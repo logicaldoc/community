@@ -761,6 +761,20 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		}
 	}
 
+	@Override
+	public boolean isPasswordProtected(long docId) throws ServerException {
+		Session session = validateSession();
+
+		try {
+			DocumentDAO docDao = Context.get(DocumentDAO.class);
+			return docDao.queryForInt(
+					"select count(ld_id) from ld_document where ld_deleted=0 and not ld_password = null and ld_id="
+							+ docId) > 0;
+		} catch (PersistenceException e) {
+			return throwServerException(session, log, e);
+		}
+	}
+
 	public GUIDocument getDocument(Session session, long docId)
 			throws InvalidSessionServerException, PersistenceException, PermissionException {
 		if (session != null)

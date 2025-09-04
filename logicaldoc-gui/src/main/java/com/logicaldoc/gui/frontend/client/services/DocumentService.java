@@ -39,6 +39,17 @@ public interface DocumentService extends RemoteService {
 	public GUIDocument getById(long docId) throws ServerException;
 
 	/**
+	 * Checks if the document is protected by a password
+	 * 
+	 * @param docId identifier of the document
+	 * 
+	 * @return true only if the document has been protected by a password
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public boolean isPasswordProtected(long docId) throws ServerException;
+
+	/**
 	 * Saves the document in the DB
 	 * 
 	 * @param document The document to save

@@ -30,22 +30,52 @@ public class DocumentProtectionManager {
 	}
 
 	/**
-	 * Controls the document and asks the user for a password(if needed).
+	 * Checks the document and asks the user for a password(if needed).
+	 * 
+	 * @param document the document to check
+	 * @param handler Optional handler to react something when the document gets
+	 *        unlocked
+	 */
+	public static void askForPassword(long docId, final DocumentProtectionHandler handler) {
+		DocumentService.Instance.get().getById(docId, new DefaultAsyncCallback<>() {
+			@Override
+			public void onSuccess(GUIDocument document) {
+				askForPassword(document, handler);
+			}
+		});
+	}
+
+	/**
+	 * Checks the document and asks the user for a password(if needed).
+	 * 
+	 * @param document the document to check
+	 * @param handler Optional handler to react something when the document gets
+	 *        unlocked
+	 */
+	public static void askForPassword(GUIDocument document, final DocumentProtectionHandler handler) {
+		DocumentService.Instance.get().isPasswordProtected(document.getId(), new DefaultAsyncCallback<>() {
+			@Override
+			public void onSuccess(Boolean passwordProtected) {
+				if (Boolean.TRUE.equals(passwordProtected))
+					handlePasswordProtectedDocument(document.getId(), handler);
+				else
+					notifyUnprotected(handler, document);
+			}
+		});
+	}
+
+	/**
+	 * This method gets invoked when a document with password has been hit
 	 * 
 	 * @param docId identifier of the document
-	 * @param handler Optional handler to react something when the documents
-	 *        gets unlocked
+	 * @param handler Optional handler to react something when the document gets
+	 *        unlocked
 	 */
-	public static void askForPassword(final Long docId, final DocumentProtectionHandler handler) {
+	private static void handlePasswordProtectedDocument(final long docId, DocumentProtectionHandler handler) {
 		DocumentService.Instance.get().getById(docId, new DefaultAsyncCallback<>() {
 
 			@Override
 			public void onSuccess(final GUIDocument result) {
-				if (!result.isPasswordProtected()) {
-					notifyUnprotected(handler, result);
-					return;
-				}
-
 				if (unprotectedDocs.containsKey(docId)) {
 					notifyUnprotected(handler, result);
 				} else {

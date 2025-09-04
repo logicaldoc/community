@@ -25,15 +25,12 @@ import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
-import com.smartgwt.client.widgets.events.ShowContextMenuEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 import com.smartgwt.client.widgets.tile.TileGrid;
 import com.smartgwt.client.widgets.tile.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.tile.events.SelectionChangedEvent;
 import com.smartgwt.client.widgets.viewer.DetailViewerField;
 
 /**
@@ -95,7 +92,9 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 
 				// The status row
 				if (Boolean.TRUE.equals(rec.getAttributeAsBoolean("bookmarked")))
-					html += "<td>" + DocUtil.getBookmarkedIcon(Boolean.TRUE.equals(rec.getAttributeAsBoolean("bookmarked"))) + CLOSE_TD;
+					html += "<td>"
+							+ DocUtil.getBookmarkedIcon(Boolean.TRUE.equals(rec.getAttributeAsBoolean("bookmarked")))
+							+ CLOSE_TD;
 				html += "<td>" + AwesomeFactory.getIndexedIcon(rec.getAttributeAsInt("indexed")) + CLOSE_TD;
 
 				// The locked icon
@@ -109,7 +108,9 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 					}
 				}
 
-				html += "<td>" + DocUtil.getPasswordProtectedIcon(Boolean.TRUE.equals(rec.getAttributeAsBoolean("password"))) + CLOSE_TD;
+				html += "<td>"
+						+ DocUtil.getPasswordProtectedIcon(Boolean.TRUE.equals(rec.getAttributeAsBoolean("password")))
+						+ CLOSE_TD;
 				html += "<td>" + DocUtil.getImmutableIcon(rec.getAttributeAsInt("immutable")) + CLOSE_TD;
 				html += "<td>" + DocUtil.getSignedIcon(rec.getAttributeAsInt("signed")) + CLOSE_TD;
 				html += "<td>" + DocUtil.getStampedIcon(rec.getAttributeAsInt("stamped")) + CLOSE_TD;
@@ -270,35 +271,33 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 
 	@Override
 	public void registerDoubleClickHandler(final DoubleClickHandler handler) {
-		addDoubleClickHandler((DoubleClickEvent event) -> {
+		addDoubleClickHandler(click -> {
 			GUIDocument selectedDocument = getSelectedDocument();
 			if (selectedDocument == null)
 				return;
-			DocumentProtectionManager.askForPassword(selectedDocument.getId(), document -> handler.onDoubleClick(null));
+			DocumentProtectionManager.askForPassword(selectedDocument, document -> handler.onDoubleClick(null));
 		});
 	}
 
 	@Override
 	public void registerSelectionChangedHandler(final SelectionChangedHandler handler) {
-		addSelectionChangedHandler((SelectionChangedEvent event) -> {
+		addSelectionChangedHandler(changed -> {
 			GUIDocument selectedDocument = getSelectedDocument();
 			if (selectedDocument == null)
 				return;
-			DocumentProtectionManager.askForPassword(selectedDocument.getId(),
-					document -> handler.onSelectionChanged(null));
+			DocumentProtectionManager.askForPassword(selectedDocument, document -> handler.onSelectionChanged(null));
 		});
 	}
 
 	@Override
 	public void registerCellContextClickHandler(final CellContextClickHandler handler) {
-		addShowContextMenuHandler((final ShowContextMenuEvent event) -> {
+		addShowContextMenuHandler(click -> {
 			GUIDocument selectedDocument = getSelectedDocument();
 			if (selectedDocument == null)
 				return;
-			DocumentProtectionManager.askForPassword(selectedDocument.getId(),
-					document -> handler.onCellContextClick(null));
-			if (event != null)
-				event.cancel();
+			DocumentProtectionManager.askForPassword(selectedDocument, document -> handler.onCellContextClick(null));
+			if (click != null)
+				click.cancel();
 		});
 	}
 
@@ -452,13 +451,12 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 
 		return pageSize;
 	}
-	
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

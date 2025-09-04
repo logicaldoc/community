@@ -52,12 +52,10 @@ import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
 import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 
 /**
  * Grid used to show a documents list in different contexts.
@@ -666,39 +664,38 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			if (!selectedDocument.isPasswordProtected())
 				handler.onDoubleClick(click);
 			else
-				DocumentProtectionManager.askForPassword(selectedDocument.getId(),
-						document -> handler.onDoubleClick(click));
+				DocumentProtectionManager.askForPassword(selectedDocument, document -> handler.onDoubleClick(click));
 		});
 	}
 
 	@Override
 	public void registerSelectionChangedHandler(final SelectionChangedHandler handler) {
-		addSelectionChangedHandler((SelectionEvent event) -> {
+		addSelectionChangedHandler(selectionChanged -> {
 			GUIDocument selectedDocument = getSelectedDocument();
 			if (selectedDocument == null)
 				return;
 			if (!selectedDocument.isPasswordProtected())
-				handler.onSelectionChanged(event);
+				handler.onSelectionChanged(selectionChanged);
 			else
-				DocumentProtectionManager.askForPassword(selectedDocument.getId(),
-						document -> handler.onSelectionChanged(event));
+				DocumentProtectionManager.askForPassword(selectedDocument,
+						document -> handler.onSelectionChanged(selectionChanged));
 		});
 	}
 
 	@Override
 	public void registerCellContextClickHandler(final CellContextClickHandler handler) {
-		addCellContextClickHandler((CellContextClickEvent event) -> {
+		addCellContextClickHandler(click -> {
 			GUIDocument selectedDocument = getSelectedDocument();
 			if (selectedDocument == null)
 				return;
 			if (!selectedDocument.isPasswordProtected())
-				handler.onCellContextClick(event);
+				handler.onCellContextClick(click);
 			else
-				DocumentProtectionManager.askForPassword(selectedDocument.getId(),
-						document -> handler.onCellContextClick(event));
+				DocumentProtectionManager.askForPassword(selectedDocument,
+						document -> handler.onCellContextClick(click));
 
-			if (event != null)
-				event.cancel();
+			if (click != null)
+				click.cancel();
 		});
 	}
 

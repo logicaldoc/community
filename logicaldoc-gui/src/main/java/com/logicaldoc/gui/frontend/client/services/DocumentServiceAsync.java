@@ -18,6 +18,8 @@ public interface DocumentServiceAsync {
 	void getVersionsById(long id1, long id2, AsyncCallback<List<GUIVersion>> callback);
 
 	void getById(long docId, AsyncCallback<GUIDocument> callback);
+	
+	void isPasswordProtected(long docId, AsyncCallback<Boolean> callback);
 
 	void save(GUIDocument document, AsyncCallback<GUIDocument> callback);
 
