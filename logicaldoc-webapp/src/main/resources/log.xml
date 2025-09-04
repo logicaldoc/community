@@ -645,14 +645,10 @@
       <AppenderRef ref="TagsProcessor" />
       <AppenderRef ref="TagsProcessor_WEB" />
     </Logger>
-    <Logger name="org.hibernate.orm" level="error" additivity="true">
+    <Logger name="org.hibernate" level="error" additivity="true">
       <AppenderRef ref="DB" />
       <AppenderRef ref="DB_WEB" />
-    </Logger>
-    <Logger name="org.hibernate.orm.cache" level="warn" additivity="true">
-      <AppenderRef ref="DB" />
-      <AppenderRef ref="DB_WEB" />
-    </Logger>
+    </Logger>
     <Logger name="STORAGE_DELETIONS" level="info" additivity="false">
       <AppenderRef ref="STORAGE_DELETIONS" />
       <AppenderRef ref="STORAGE_DELETIONS_WEB" />
