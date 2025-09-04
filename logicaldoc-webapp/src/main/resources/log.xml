@@ -649,6 +649,10 @@
       <AppenderRef ref="DB" />
       <AppenderRef ref="DB_WEB" />
     </Logger>
+    <Logger name="org.hibernate.stat" level="error" additivity="true">
+      <AppenderRef ref="DB" />
+      <AppenderRef ref="DB_WEB" />
+    </Logger>
     <Logger name="STORAGE_DELETIONS" level="info" additivity="false">
       <AppenderRef ref="STORAGE_DELETIONS" />
       <AppenderRef ref="STORAGE_DELETIONS_WEB" />
