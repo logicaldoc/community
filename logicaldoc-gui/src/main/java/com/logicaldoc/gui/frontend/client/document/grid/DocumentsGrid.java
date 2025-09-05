@@ -5,8 +5,8 @@ import java.util.List;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
+import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 
@@ -151,7 +151,7 @@ public interface DocumentsGrid {
 	 * 
 	 * @param handler invoked when the user does the double-click
 	 */
-	public void registerDoubleClickHandler(DoubleClickHandler handler);
+	public void registerDoubleClickHandler(CellDoubleClickHandler handler);
 
 	/**
 	 * Defines the handler for double clicks. Implementations must check if the

@@ -91,7 +91,7 @@ public class PreviewPanel extends VLayout {
 			return;
 		}
 
-		DocumentProtectionManager.askForPassword(docId, doc -> onAccessGranted(document));
+		DocumentProtectionManager.askForPassword(this.document, doc -> onAccessGranted(document));
 
 		addResizedHandler(event -> doResize());
 	}

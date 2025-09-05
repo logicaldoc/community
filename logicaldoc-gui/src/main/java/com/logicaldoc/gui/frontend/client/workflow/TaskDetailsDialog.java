@@ -50,7 +50,6 @@ import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -667,7 +666,7 @@ public class TaskDetailsDialog extends Window {
 			event.cancel();
 			showAppendedDocsContextMenu();
 		});
-		appendedDocs.registerDoubleClickHandler((DoubleClickEvent eevent) -> {
+		appendedDocs.registerDoubleClickHandler(doubleClick -> {
 			final ListGridRecord selection = appendedDocs.getSelectedRecord();
 			FolderService.Instance.get().getFolder(selection.getAttributeAsLong("folderId"), false, false, false,
 					new DefaultAsyncCallback<>() {
@@ -871,8 +870,8 @@ public class TaskDetailsDialog extends Window {
 	private MenuItem prepareRemoveContextMenuItem(final GUIDocument selectedDocument) {
 		final MenuItem remove = new MenuItem();
 		remove.setTitle(I18N.message("remove"));
-		remove.addClickHandler(event -> WorkflowService.Instance.get()
-				.removeDocument(workflow.getSelectedTask().getId(), selectedDocument.getId(), new DefaultAsyncCallback<>() {
+		remove.addClickHandler(event -> WorkflowService.Instance.get().removeDocument(
+				workflow.getSelectedTask().getId(), selectedDocument.getId(), new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(Void arg) {
 						appendedDocs.removeSelectedData();

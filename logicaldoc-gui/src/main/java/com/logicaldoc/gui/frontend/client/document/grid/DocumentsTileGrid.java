@@ -25,8 +25,8 @@ import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
+import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 import com.smartgwt.client.widgets.tile.TileGrid;
@@ -270,12 +270,12 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	}
 
 	@Override
-	public void registerDoubleClickHandler(final DoubleClickHandler handler) {
+	public void registerDoubleClickHandler(CellDoubleClickHandler handler) {
 		addDoubleClickHandler(click -> {
 			GUIDocument selectedDocument = getSelectedDocument();
 			if (selectedDocument == null)
 				return;
-			DocumentProtectionManager.askForPassword(selectedDocument, document -> handler.onDoubleClick(null));
+			DocumentProtectionManager.askForPassword(selectedDocument, document -> handler.onCellDoubleClick(null));
 		});
 	}
 

@@ -48,11 +48,11 @@ import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
+import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
 import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
@@ -656,15 +656,16 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	}
 
 	@Override
-	public void registerDoubleClickHandler(final DoubleClickHandler handler) {
-		addDoubleClickHandler(click -> {
+	public void registerDoubleClickHandler(CellDoubleClickHandler handler) {
+		addCellDoubleClickHandler(doubleClick -> {
 			GUIDocument selectedDocument = getSelectedDocument();
 			if (selectedDocument == null)
 				return;
 			if (!selectedDocument.isPasswordProtected())
-				handler.onDoubleClick(click);
+				handler.onCellDoubleClick(doubleClick);
 			else
-				DocumentProtectionManager.askForPassword(selectedDocument, document -> handler.onDoubleClick(click));
+				DocumentProtectionManager.askForPassword(selectedDocument,
+						document -> handler.onCellDoubleClick(doubleClick));
 		});
 	}
 
