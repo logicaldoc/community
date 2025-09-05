@@ -99,7 +99,7 @@ public class UserTool {
 	public String getAvatarImg(String username, int size) {
 		try {
 			String content = UserUtil.getAvatarImage(username);
-			return "<img src='data:image/png;base64," + content + "' style='border: 0px height: " + size + "px; width: "
+			return "<img src='" + content + "' style='border: 0px height: " + size + "px; width: "
 					+ size + "px; vertical-align:middle;' />";
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -118,7 +118,7 @@ public class UserTool {
 	public String getAvatarImg(long userId, int size) {
 		try {
 			String content = UserUtil.getAvatarImage("" + userId);
-			return "<img src='data:image/png;base64," + content + "' style='border: 0px height: " + size + "px; width: "
+			return "<img src='" + content + "' style='border: 0px height: " + size + "px; width: "
 					+ size + "px; vertical-align:middle;' />";
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
