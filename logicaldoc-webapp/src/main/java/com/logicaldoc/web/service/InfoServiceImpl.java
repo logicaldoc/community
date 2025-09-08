@@ -95,7 +95,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 			ContextProperties config = Context.get().getProperties();
 			boolean needSetup = config.getProperty("jdbc.url").startsWith("jdbc:hsqldb:mem:");
 			if (!needSetup)
-				needSetup = "false".equals(config.getProperty("initialized", "true"));
+				needSetup = !config.getBoolean("initialized", true);
 
 			if (needSetup) {
 				GUIMessage setupReminder = new GUIMessage();
@@ -123,8 +123,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 	}
 
 	private static String loadChangelog() {
-		try (InputStream is = IOUtil.getLimitedStream(ResourceUtil.getInputStream("CHANGELOG.txt"),
-				5000)) {
+		try (InputStream is = IOUtil.getLimitedStream(ResourceUtil.getInputStream("CHANGELOG.txt"), 5000)) {
 			String changelog = IOUtil.readStream(is);
 			return changelog.replace("logicaldoc", "").replace("LogicalDOC", "");
 		} catch (Exception e) {
