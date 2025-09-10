@@ -2,15 +2,12 @@ package com.logicaldoc.core.searchengine.indexer;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-
-import jakarta.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -31,6 +28,8 @@ import com.logicaldoc.util.concurrent.SerialFuture;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.TimeDiff;
+
+import jakarta.annotation.Resource;
 
 /**
  * This task enlists all non-indexed documents and performs the indexing
@@ -112,16 +111,15 @@ public class IndexerTask extends Task {
 			ContextProperties config = Context.get().getProperties();
 
 			// Retrieve the actual transactions
-			String transactionIdsStr = lockManager.getAllTransactions().stream().map(t -> "'" + t + "'")
+			String currentTransactionIds = lockManager.getAllTransactions().stream().map(t -> "'" + t + "'")
 					.collect(Collectors.joining(","));
 
 			// First of all find documents to be indexed and not already
 			// involved into a transaction
 			String[] query = IndexerTask.prepareQuery();
-			List<Long> docIds = documentDao.findIdsByWhere(
-					query[0] + " and (" + PersistentObjectDAO.ENTITY + ".transactionId is null or "
-							+ PersistentObjectDAO.ENTITY + ".transactionId not in (" + transactionIdsStr + "))",
-					query[1], max);
+			List<Long> docIds = documentDao.findIdsByWhere(query[0] + " and (" + PersistentObjectDAO.ENTITY
+					+ ".transactionId is null or " + PersistentObjectDAO.ENTITY + ".transactionId not in ("
+					+ StringUtils.defaultString(currentTransactionIds, "'unexisting'") + "))", query[1], max);
 			size = docIds.size();
 			log.info("Found a total of {} documents to be processed", size);
 
@@ -178,12 +176,9 @@ public class IndexerTask extends Task {
 				lockManager.release(getName(), transactionId);
 
 				// Remove the transaction reference
-				Map<String, Object> params = new HashMap<>();
-				params.put("transactionId", transactionId);
-
 				documentDao.jdbcUpdate(
 						"update ld_document set ld_transactionid = null where ld_transactionId = :transactionId",
-						params);
+						Map.of("transactionId", transactionId));
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
@@ -223,14 +218,10 @@ public class IndexerTask extends Task {
 			// Mark all these documents as belonging to the current
 			// transaction. This may require time
 			String idsStr = docIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","));
-
-			Map<String, Object> params = new HashMap<>();
-			params.put("transactionId", transactionId);
-
 			documentDao.jdbcUpdate(
 					" update ld_document set ld_transactionid = :transactionId where ld_transactionid is null and ld_id in ("
 							+ idsStr + ")",
-					params);
+					Map.of("transactionId", transactionId));
 		}
 		log.info("Documents marked for indexing in transaction {}", transactionId);
 	}

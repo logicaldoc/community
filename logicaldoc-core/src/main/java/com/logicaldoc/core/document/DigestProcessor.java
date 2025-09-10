@@ -2,8 +2,8 @@ package com.logicaldoc.core.document;
 
 import java.util.List;
 import java.util.Locale;
-
-import jakarta.annotation.Resource;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -13,6 +13,9 @@ import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.task.Task;
 import com.logicaldoc.core.task.TaskException;
 import com.logicaldoc.i18n.I18N;
+import com.logicaldoc.util.spring.Context;
+
+import jakarta.annotation.Resource;
 
 /**
  * This task takes care of calculating the documents digest
@@ -52,19 +55,23 @@ public class DigestProcessor extends Task {
 		errors = 0;
 		processed = 0;
 		try {
-			// First of all find documents to be processed
-			size = documentDao.queryForLong(
-					"select count(*) from ld_document where ld_deleted = 0 and ld_docref is null and ld_digest is null");
+			// Retrieve the actual transactions
+			String transactionIdsStr = lockManager.getAllTransactions().stream().map(t -> "'" + t + "'")
+					.collect(Collectors.joining(","));
 
-			int max = config.getInt("digest.batch", (int) size);
-			if (max < size && max > 0)
-				size = max;
-
+			// First of all find documents to be processed and not already
+			// involved into a transaction
+			List<Long> docIds = documentDao.findIdsByWhere(
+					"(" + PersistentObjectDAO.ENTITY + ".transactionId is null or " + PersistentObjectDAO.ENTITY
+							+ ".transactionId not in (" + transactionIdsStr + ")) and " + PersistentObjectDAO.ENTITY
+							+ ".digest is null" + " and " + PersistentObjectDAO.ENTITY + ".docRef is null",
+					null, null, Context.get().getProperties().getInt("digest.batch", 500));
+			size = docIds.size();
 			log.info("Found a total of {} documents to process", size);
 
-			List<Long> ids = documentDao.findIdsByWhere(PersistentObjectDAO.ENTITY + ".docRef is null and "
-					+ PersistentObjectDAO.ENTITY + ".digest is null and deleted = 0", null, max);
-			for (Long id : ids) {
+			assignTransaction(docIds);
+
+			for (Long id : docIds) {
 				processDocument(id);
 				if (interruptRequested)
 					return;
@@ -75,7 +82,33 @@ public class DigestProcessor extends Task {
 			log.info("Digest processing finished");
 			log.info("Processed documents: {}", processed);
 			log.info("Errors: {}", errors);
+
+			try {
+				// To be safer always release the lock
+				lockManager.release(getName(), transactionId);
+
+				// Remove the transaction reference
+				documentDao.jdbcUpdate(
+						"update ld_document set ld_transactionid = null where ld_transactionId = :transactionId",
+						Map.of("transactionId", transactionId));
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+			}
+
 		}
+	}
+
+	private void assignTransaction(List<Long> docIds) throws PersistenceException {
+		if (!docIds.isEmpty()) {
+			// Mark all these documents as belonging to the current
+			// transaction. This may require time
+			String idsStr = docIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","));
+			documentDao.jdbcUpdate(
+					" update ld_document set ld_transactionid = :transactionId where ld_transactionid is null and ld_id in ("
+							+ idsStr + ")",
+					Map.of("transactionId", transactionId));
+		}
+		log.info("Documents marked for digest calculation in transaction {}", transactionId);
 	}
 
 	private void processDocument(Long id) {
