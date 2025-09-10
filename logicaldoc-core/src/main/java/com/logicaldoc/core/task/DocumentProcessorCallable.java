@@ -73,8 +73,11 @@ public abstract class DocumentProcessorCallable<T extends DocumentProcessorStats
 
 				processDocument(doc, user);
 
-				log.debug("Processed document {}", id);
+				stats.setProcessed(stats.getProcessed() + 1);
+				log.debug("Processed document {}", doc);
 			} catch (Exception e) {
+				stats.setErrors(stats.getErrors() + 1);
+				log.error("Error processing document {}", id);
 				log.error(e.getMessage(), e);
 			}
 

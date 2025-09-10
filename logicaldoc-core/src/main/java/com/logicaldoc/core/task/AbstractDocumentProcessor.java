@@ -97,7 +97,7 @@ public abstract class AbstractDocumentProcessor extends Task {
 			log.info("{} documents assigned to transaction {}", count, transactionId);
 
 		List<Object[]> records = documentDao
-				.findByQuery("select A.id, A.fileName from Document where A.id in " + idsStr, null, null);
+				.findByQuery("select A.id, A.fileName from Document A where A.id in " + idsStr, null, null);
 
 		if (!records.isEmpty()) {
 			int threadsTotal = config.getInt("threadpool." + getName() + ".max", 1);
