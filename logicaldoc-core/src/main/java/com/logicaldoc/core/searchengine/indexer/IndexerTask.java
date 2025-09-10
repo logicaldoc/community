@@ -1,5 +1,6 @@
 package com.logicaldoc.core.searchengine.indexer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,11 +16,13 @@ import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.searchengine.SearchEngine;
-import com.logicaldoc.core.task.Task;
+import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.task.AbstractDocumentProcessor;
 import com.logicaldoc.core.task.TaskException;
 import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.i18n.I18N;
@@ -38,7 +41,7 @@ import jakarta.annotation.Resource;
  * @since 4.0
  */
 @Component("indexerTask")
-public class IndexerTask extends Task {
+public class IndexerTask extends AbstractDocumentProcessor {
 
 	public static final String NAME = "IndexerTask";
 
@@ -104,10 +107,6 @@ public class IndexerTask extends Task {
 		totalIndexingTime = 0;
 		totalParsingTime = 0;
 		try {
-			Integer max = getMax();
-
-			setSize(max);
-
 			ContextProperties config = Context.get().getProperties();
 
 			// Retrieve the actual transactions
@@ -154,7 +153,7 @@ public class IndexerTask extends Task {
 				}
 
 				// Wait for the completion of all the indexers
-				waitForIndexersCompletion(futures);
+				waitForCompletion(futures);
 
 				log.info("All indexers have completed");
 			}
@@ -172,9 +171,6 @@ public class IndexerTask extends Task {
 			searchEngine.unlock();
 
 			try {
-				// To be safer always release the lock
-				lockManager.release(getName(), transactionId);
-
 				// Remove the transaction reference
 				documentDao.jdbcUpdate(
 						"update ld_document set ld_transactionid = null where ld_transactionId = :transactionId",
@@ -197,7 +193,7 @@ public class IndexerTask extends Task {
 	 * @param futures The futures containing the stats from each one of the
 	 *        running indexers
 	 */
-	protected void waitForIndexersCompletion(List<Future<IndexerStats>> futures) {
+	protected void waitForCompletion(List<Future<IndexerStats>> futures) {
 		try {
 			List<IndexerStats> stats = new SerialFuture<IndexerStats>(futures).getAll();
 			for (IndexerStats stat : stats) {
@@ -224,20 +220,6 @@ public class IndexerTask extends Task {
 					Map.of("transactionId", transactionId));
 		}
 		log.info("Documents marked for indexing in transaction {}", transactionId);
-	}
-
-	private Integer getMax() {
-		Integer max = Context.get().getProperties().getProperty("index.batch") != null
-				? Integer.parseInt(config.getProperty("index.batch"))
-				: null;
-		if (max != null && max.intValue() < 1)
-			max = null;
-		return max;
-	}
-
-	private void setSize(Integer max) {
-		if (max != null && max.intValue() < size && max.intValue() > 0)
-			size = max.intValue();
 	}
 
 	/**
@@ -276,7 +258,7 @@ public class IndexerTask extends Task {
 	}
 
 	@Override
-	protected String prepareReport(Locale locale) {
+	public String prepareReport(Locale locale) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(I18N.message("indexationtime", locale) + ": ");
 		sb.append(TimeDiff.printDuration(totalIndexingTime));
@@ -287,5 +269,28 @@ public class IndexerTask extends Task {
 		sb.append(I18N.message("errors", locale) + ": ");
 		sb.append(totalErrors);
 		return sb.toString();
+	}
+
+	@Override
+	protected String getDefaultUser() {
+		return "_system";
+	}
+
+	@Override
+	protected int getBatchSize() {
+		return config.getInt("index.batch", 500);
+	}
+
+	@Override
+	protected void processDocument(Document document, User user) throws PersistenceException, IOException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void prepareQueueQuery(StringBuilder where, StringBuilder sort) {
+		String[] queryParts = prepareQuery();
+		where.append(queryParts[0]);
+		sort.append(queryParts[1]);
 	}
 }

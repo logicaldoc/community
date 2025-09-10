@@ -1,22 +1,29 @@
 package com.logicaldoc.core.task;
 
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.Resource;
-
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.i18n.I18N;
+import com.logicaldoc.util.CollectionUtil;
+import com.logicaldoc.util.concurrent.SerialFuture;
+import com.logicaldoc.util.spring.Context;
+
+import jakarta.annotation.Resource;
 
 /**
  * A base implementation for those tasks that process documents
@@ -25,6 +32,8 @@ import com.logicaldoc.i18n.I18N;
  * @since 8.8.3
  */
 public abstract class AbstractDocumentProcessor extends Task {
+
+	private List<DocumentProcessorCallable<DocumentProcessorStats>> threads = new ArrayList<>();
 
 	protected int processed = 0;
 
@@ -38,21 +47,33 @@ public abstract class AbstractDocumentProcessor extends Task {
 	}
 
 	@Override
-	protected void runTask() throws TaskException {
-		if (!lockManager.get(getName(), transactionId)) {
-			log.warn("Unable to acquire lock {}, skipping processing", getName());
-			return;
-		}
-
+	public void runTask() throws TaskException {
 		log.info("Start processing of all documents");
 		errors = 0;
 		processed = 0;
-
+		threads.clear();
 		try {
 			int max = getBatchSize();
 
-			List<Long> ids = documentDao.queryForList("select ld_id from ld_document where " + prepareQueueQuery(null),
-					null, Long.class, max);
+			// Retrieve the actual transactions
+			String currentTransactionIds = lockManager.getAllTransactions().stream().map(t -> "'" + t + "'")
+					.collect(Collectors.joining(","));
+
+			// Select the IDs of those documents not involved in any transaction
+			StringBuilder where = new StringBuilder(PersistentObjectDAO.ENTITY);
+			where.append(".deleted = 0 and (");
+			where.append(PersistentObjectDAO.ENTITY);
+			where.append(".transactionId is null or ");
+			where.append(PersistentObjectDAO.ENTITY);
+			where.append(".transactionId not in (");
+			where.append(StringUtils.defaultString(currentTransactionIds, "'unexisting'"));
+			where.append(")) and ");
+
+			StringBuilder sort = new StringBuilder();
+
+			prepareQueueQuery(where, sort);
+
+			List<Long> ids = documentDao.findIdsByWhere(where.toString(), sort.toString(), max);
 			getSize(max, ids);
 
 			if (size > 0)
@@ -64,71 +85,88 @@ public abstract class AbstractDocumentProcessor extends Task {
 			log.info("Processed documents: {}", processed);
 			log.info("Errors: {}", errors);
 
-			// To be safer always release the lock
-			try {
-				lockManager.release(getName(), transactionId);
-			} catch (PersistenceException e) {
-				log.warn(e.getMessage(), e);
-			}
-
 			removeTransactionReference();
 		}
 	}
 
 	private void processDocuments(List<Long> docIds, int max) throws PersistenceException {
-		String idsStr = docIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","));
-		if (StringUtils.isNotEmpty(idsStr))
-			idsStr = "(" + idsStr + ")";
+		String idsStr = "(" + docIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")) + ")";
 
 		// Mark all these documents as belonging to the current
 		// transaction
-		documentDao
+		int count = documentDao
 				.jdbcUpdate("update ld_document set ld_transactionid='" + transactionId + "' where ld_id in " + idsStr);
+		if (log.isInfoEnabled())
+			log.info("{} documents assigned to transaction {}", count, transactionId);
 
-		// Now we can release the lock
-		lockManager.release(getName(), transactionId);
+		List<Object[]> records = documentDao
+				.findByQuery("select A.id, A.fileName from Document where A.id in " + idsStr, null, null);
 
-		List<Object[]> records = documentDao.query(
-				"select ld_id, ld_filename from ld_document where ld_id in " + idsStr, new RowMapper<Object[]>() {
-					@Override
-					public Object[] mapRow(ResultSet rs, int row) throws SQLException {
-						Object[] rec = new Object[2];
-						rec[0] = rs.getLong(1);
-						rec[1] = rs.getString(2);
-						return rec;
-					}
-				}, max);
+		if (!records.isEmpty()) {
+			int threadsTotal = config.getInt("threadpool." + getName() + ".max", 1);
+			log.info("Distribute the processing among {} threads", threadsTotal);
 
-		User user = loadUser();
-		for (Object[] cols : records) {
-			long id = (Long) cols[0];
-			log.debug("Process document {}", id);
+			// Divide the documents in segments of N
+			Collection<List<Long>> segments = CollectionUtil.partition(docIds,
+					(int) Math.ceil((double) docIds.size() / (double) threadsTotal));
 
-			try {
-				Document doc = documentDao.findById(id);
-				if (doc == null)
+			// Prepare the threads and launch them
+			List<Future<DocumentProcessorStats>> futures = new ArrayList<>();
+			for (List<Long> segment : segments) {
+				if (interruptRequested)
 					continue;
-				documentDao.initialize(doc);
 
-				processDocument(doc, user);
-
-				log.debug("Processed document {}", id);
-				processed++;
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-				errors++;
-			} finally {
-				next();
+				DocumentProcessorCallable<DocumentProcessorStats> callable = prepareCallable(segment);
+				threads.add(callable);
+				futures.add(Context.get(ThreadPools.class).schedule(callable, getName(), 1));
+				log.debug("Launched the processing for documents {}", segment);
 			}
-			if (interruptRequested)
-				return;
+
+			// Wait for the completion of all the indexers
+			waitForCompletion(futures);
+
+			log.info("All threads have completed");
+		}
+	}
+
+	abstract protected DocumentProcessorCallable<DocumentProcessorStats> prepareCallable(List<Long> segment);
+
+	@Override
+	public synchronized void interrupt() {
+		super.interrupt();
+		for (DocumentProcessorCallable<DocumentProcessorStats> thread : threads)
+			thread.interrupt();
+	}
+
+	/**
+	 * Stays waiting for the completion of all the callables, collecting the
+	 * total time spent in processing.
+	 * 
+	 * @param futures The futures containing the stats from each one of the
+	 *        running callables
+	 * @param futures The list of futures to wait for
+	 */
+	protected void waitForCompletion(Collection<Future<DocumentProcessorStats>> futures) {
+		try {
+			List<DocumentProcessorStats> stats = new SerialFuture<>(futures).getAll();
+			for (DocumentProcessorStats stat : stats) {
+				processed += stat.getProcessed();
+				errors += stat.getErrors();
+			}
+		} catch (ExecutionException e) {
+			log.error(e.getMessage(), e);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 		}
 	}
 
 	private void removeTransactionReference() {
 		try {
-			documentDao.jdbcUpdate(
-					"update ld_document set ld_transactionid=null where ld_transactionId='" + transactionId + "'");
+			int count = documentDao.jdbcUpdate(
+					"update ld_document set ld_transactionid = null where ld_transactionId = :transactionId",
+					Map.of("transactionId", transactionId));
+			if (log.isInfoEnabled())
+				log.info("{} documents released from transaction {}", count, transactionId);
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
 		}
@@ -182,15 +220,18 @@ public abstract class AbstractDocumentProcessor extends Task {
 	/**
 	 * Prepares the query conditions for selecting the documents that have to be
 	 * processed
+	 * 
+	 * @param where The query being prepared
+	 * @param sort The sorting clause
 	 */
-	protected abstract String prepareQueueQuery(Long tenantId);
+	protected abstract void prepareQueueQuery(StringBuilder where, StringBuilder sort);
 
 	public void setDocumentDao(DocumentDAO documentDao) {
 		this.documentDao = documentDao;
 	}
 
 	@Override
-	protected String prepareReport(Locale locale) {
+	public String prepareReport(Locale locale) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(I18N.message("processeddocs", locale) + ": ");
 		sb.append(processed);
