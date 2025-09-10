@@ -1,16 +1,14 @@
 package com.logicaldoc.core.searchengine.indexer;
 
+import com.logicaldoc.core.task.DocumentProcessorStats;
+
 /**
  * Statistics of an indexing
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2
  */
-public class IndexerStats {
-
-	private long indexed = 0;
-
-	private long errors = 0;
+public class IndexerStats extends DocumentProcessorStats {
 
 	private long indexingTime = 0;
 
@@ -18,22 +16,6 @@ public class IndexerStats {
 
 	public IndexerStats() {
 		super();
-	}
-
-	public long getIndexed() {
-		return indexed;
-	}
-
-	public void setIndexed(long indexed) {
-		this.indexed = indexed;
-	}
-
-	public long getErrors() {
-		return errors;
-	}
-
-	public void setErrors(long errors) {
-		this.errors = errors;
 	}
 
 	public long getIndexingTime() {

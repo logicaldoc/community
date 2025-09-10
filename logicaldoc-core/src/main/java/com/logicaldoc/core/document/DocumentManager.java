@@ -216,7 +216,7 @@ public class DocumentManager {
 
 			log.debug("Replaced fileVersion {} of document {}", fileVersion, docId);
 
-			return new DocumentFuture(document, new SerialFuture<>(futures));
+			return new DocumentFuture(document, new SerialFuture<Document>(futures));
 		} else {
 			return new DocumentFuture(null, null);
 		}

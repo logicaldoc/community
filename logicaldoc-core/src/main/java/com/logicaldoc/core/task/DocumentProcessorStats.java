@@ -12,8 +12,6 @@ public class DocumentProcessorStats {
 
 	private long errors = 0;
 
-	private long processingTime = 0;
-	
 	public long getProcessed() {
 		return processed;
 	}
@@ -29,12 +27,4 @@ public class DocumentProcessorStats {
 	public void setErrors(long errors) {
 		this.errors = errors;
 	}
-
-	public long getProcessingTime() {
-		return processingTime;
-	}
-
-	public void setProcessingTime(long processingTime) {
-		this.processingTime = processingTime;
-	}	
 }

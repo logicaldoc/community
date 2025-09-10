@@ -1,6 +1,5 @@
 package com.logicaldoc.core.task;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -14,13 +13,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
-import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
-import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.CollectionUtil;
-import com.logicaldoc.util.concurrent.SerialFuture;
+import com.logicaldoc.util.concurrent.LaxSerialFuture;
 import com.logicaldoc.util.spring.Context;
 
 import jakarta.annotation.Resource;
@@ -33,7 +30,7 @@ import jakarta.annotation.Resource;
  */
 public abstract class AbstractDocumentProcessor extends Task {
 
-	private List<DocumentProcessorCallable<DocumentProcessorStats>> threads = new ArrayList<>();
+	private List<DocumentProcessorCallable<? extends DocumentProcessorStats>> threads = new ArrayList<>();
 
 	protected int processed = 0;
 
@@ -89,7 +86,7 @@ public abstract class AbstractDocumentProcessor extends Task {
 		}
 	}
 
-	private void processDocuments(List<Long> docIds, int max) throws PersistenceException {
+	protected void processDocuments(List<Long> docIds, int max) throws PersistenceException {
 		String idsStr = "(" + docIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")) + ")";
 
 		// Mark all these documents as belonging to the current
@@ -111,12 +108,12 @@ public abstract class AbstractDocumentProcessor extends Task {
 					(int) Math.ceil((double) docIds.size() / (double) threadsTotal));
 
 			// Prepare the threads and launch them
-			List<Future<DocumentProcessorStats>> futures = new ArrayList<>();
+			List<Future<? extends DocumentProcessorStats>> futures = new ArrayList<>();
 			for (List<Long> segment : segments) {
 				if (interruptRequested)
 					continue;
 
-				DocumentProcessorCallable<DocumentProcessorStats> callable = prepareCallable(segment);
+				DocumentProcessorCallable<? extends DocumentProcessorStats> callable = prepareCallable(segment);
 				threads.add(callable);
 				futures.add(Context.get(ThreadPools.class).schedule(callable, getName(), 1));
 				log.debug("Launched the processing for documents {}", segment);
@@ -129,12 +126,12 @@ public abstract class AbstractDocumentProcessor extends Task {
 		}
 	}
 
-	abstract protected DocumentProcessorCallable<DocumentProcessorStats> prepareCallable(List<Long> segment);
+	abstract protected DocumentProcessorCallable<? extends DocumentProcessorStats> prepareCallable(List<Long> segment);
 
 	@Override
 	public synchronized void interrupt() {
 		super.interrupt();
-		for (DocumentProcessorCallable<DocumentProcessorStats> thread : threads)
+		for (DocumentProcessorCallable<? extends DocumentProcessorStats> thread : threads)
 			thread.interrupt();
 	}
 
@@ -146,18 +143,28 @@ public abstract class AbstractDocumentProcessor extends Task {
 	 *        running callables
 	 * @param futures The list of futures to wait for
 	 */
-	protected void waitForCompletion(Collection<Future<DocumentProcessorStats>> futures) {
+	protected void waitForCompletion(Collection<Future<? extends DocumentProcessorStats>> futures) {
 		try {
-			List<DocumentProcessorStats> stats = new SerialFuture<>(futures).getAll();
+			List<DocumentProcessorStats> stats = new LaxSerialFuture<>(futures).getAll();
 			for (DocumentProcessorStats stat : stats) {
 				processed += stat.getProcessed();
 				errors += stat.getErrors();
 			}
+			allCompleted(stats);
 		} catch (ExecutionException e) {
 			log.error(e.getMessage(), e);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
+	}
+
+	/**
+	 * Invoked when all the callables completed
+	 * 
+	 * @param stats The stats from the callables
+	 */
+	protected void allCompleted(List<DocumentProcessorStats> stats) {
+		// do nothing by default
 	}
 
 	private void removeTransactionReference() {
@@ -179,13 +186,6 @@ public abstract class AbstractDocumentProcessor extends Task {
 		log.info("Found a total of {} documents to be processed", size);
 	}
 
-	private User loadUser() throws PersistenceException {
-		User user = userDao.findByUsername(getDefaultUser());
-		if (user == null)
-			user = userDao.findByUsername("_system");
-		return user;
-	}
-
 	@Override
 	public boolean isIndeterminate() {
 		return false;
@@ -193,29 +193,20 @@ public abstract class AbstractDocumentProcessor extends Task {
 
 	@Override
 	public boolean isConcurrent() {
-		return true;
+		return false;
 	}
 
 	/**
 	 * Retrieves the user name in whose name to operate
 	 */
-	protected abstract String getDefaultUser();
+	protected String getDefaultUser() {
+		return "_system";
+	}
 
 	/**
 	 * Retrieves the batch size for each run
 	 */
 	protected abstract int getBatchSize();
-
-	/**
-	 * Concrete implementations put here the processing logic
-	 * 
-	 * @param document the document to be processed
-	 * @param user the user to process the document in the name of
-	 * 
-	 * @throws IOException I/O error
-	 * @throws PersistenceException Error in the persistence layer
-	 */
-	protected abstract void processDocument(Document document, User user) throws PersistenceException, IOException;
 
 	/**
 	 * Prepares the query conditions for selecting the documents that have to be
@@ -225,10 +216,6 @@ public abstract class AbstractDocumentProcessor extends Task {
 	 * @param sort The sorting clause
 	 */
 	protected abstract void prepareQueueQuery(StringBuilder where, StringBuilder sort);
-
-	public void setDocumentDao(DocumentDAO documentDao) {
-		this.documentDao = documentDao;
-	}
 
 	@Override
 	public String prepareReport(Locale locale) {

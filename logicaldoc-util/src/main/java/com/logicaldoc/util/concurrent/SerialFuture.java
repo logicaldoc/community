@@ -22,9 +22,8 @@ public class SerialFuture<V> implements Future<V> {
 	private List<Future<V>> futures = new ArrayList<>();
 
 	public SerialFuture(Collection<Future<V>> futures) {
-		for (Future<V> future : futures) {
+		for (Future<V> future : futures)
 			this.futures.add(future);
-		}
 	}
 
 	@Override

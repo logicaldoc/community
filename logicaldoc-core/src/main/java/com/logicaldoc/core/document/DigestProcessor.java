@@ -1,6 +1,7 @@
 package com.logicaldoc.core.document;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,9 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.task.AbstractDocumentProcessor;
+import com.logicaldoc.core.task.DocumentProcessorCallable;
+import com.logicaldoc.core.task.DocumentProcessorStats;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This task takes care of calculating the documents digest
@@ -37,18 +41,8 @@ public class DigestProcessor extends AbstractDocumentProcessor {
 	}
 
 	@Override
-	protected String getDefaultUser() {
-		return "_system";
-	}
-
-	@Override
 	protected int getBatchSize() {
 		return config.getInt("digest.batch", 500);
-	}
-
-	@Override
-	protected void processDocument(Document document, User user) throws PersistenceException, IOException {
-		documentDao.updateDigest(document);
 	}
 
 	@Override
@@ -57,5 +51,21 @@ public class DigestProcessor extends AbstractDocumentProcessor {
 		where.append(".digest is null and ");
 		where.append(PersistentObjectDAO.ENTITY);
 		where.append(".docRef is null");
+	}
+
+	@Override
+	protected DocumentProcessorCallable<? extends DocumentProcessorStats> prepareCallable(List<Long> docIds) {
+		return new DocumentProcessorCallable<DocumentProcessorStats>(docIds, this, log) {
+
+			@Override
+			protected void processDocument(Document document, User user) throws PersistenceException, IOException {
+				Context.get(DocumentDAO.class).updateDigest(document);
+			}
+
+			@Override
+			protected DocumentProcessorStats prepareStats() {
+				return new DocumentProcessorStats();
+			}
+		};
 	}
 }

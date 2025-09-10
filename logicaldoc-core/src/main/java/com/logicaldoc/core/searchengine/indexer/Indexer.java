@@ -1,9 +1,7 @@
 package com.logicaldoc.core.searchengine.indexer;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 
@@ -14,26 +12,24 @@ import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
+import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
+import com.logicaldoc.core.task.DocumentProcessorCallable;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.TimeDiff;
 import com.logicaldoc.util.time.TimeDiff.TimeField;
 
-class Indexer implements Callable<IndexerStats> {
+/**
+ * A {@link DocumentProcessorCallable} to index a segment of documents
+ * 
+ * @author Marco Meschieri - LogicalDOC
+ * @since 9.2.1
+ */
+class Indexer extends DocumentProcessorCallable<IndexerStats> {
 
 	private static final String DEFAULT_USERNAME = "_system";
-
-	private List<Long> docIds = new ArrayList<>();
-
-	private boolean completed = false;
-
-	private boolean interrupt = false;
-
-	private IndexerTask task;
-
-	private Logger log;
 
 	private UserDAO userDao;
 
@@ -45,21 +41,13 @@ class Indexer implements Callable<IndexerStats> {
 
 	private DocumentManager documentManager;
 
-	private IndexerStats stats = new IndexerStats();
-
 	Indexer(List<Long> docIds, IndexerTask task, Logger log) {
-		this.docIds = docIds;
-		this.task = task;
-		this.log = log;
+		super(docIds, task, log);
 		this.config = Context.get().getProperties();
 		this.userDao = Context.get(UserDAO.class);
 		this.documentDao = Context.get(DocumentDAO.class);
 		this.tenantDao = Context.get(TenantDAO.class);
 		this.documentManager = Context.get(DocumentManager.class);
-	}
-
-	void interrupt() {
-		interrupt = true;
 	}
 
 	@Override
@@ -70,7 +58,7 @@ class Indexer implements Callable<IndexerStats> {
 			 */
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setUser(userDao.findByUsername(DEFAULT_USERNAME));
-			
+
 			log.info("Indexing {} documents", docIds.size());
 			for (Long id : docIds) {
 				try {
@@ -103,7 +91,7 @@ class Indexer implements Callable<IndexerStats> {
 					log.error(e.getMessage(), e);
 					increaseErrors();
 				} finally {
-					task.onDocumentProcessed();
+					((IndexerTask) task).onDocumentProcessed();
 				}
 
 				if (interrupt) {
@@ -124,7 +112,7 @@ class Indexer implements Callable<IndexerStats> {
 	}
 
 	private void increaseIndexed() {
-		stats.setIndexed(stats.getIndexed() + 1);
+		stats.setProcessed(stats.getProcessed() + 1);
 	}
 
 	private void increaseParsingTime(long increase) {
@@ -141,5 +129,44 @@ class Indexer implements Callable<IndexerStats> {
 
 	public IndexerStats getStats() {
 		return stats;
+	}
+
+	@Override
+	protected void processDocument(Document document, User user) {
+		try {
+			Tenant tenant = tenantDao.findById(document.getTenantId());
+
+			// Check if this document must be marked for skipping
+			if (!FileUtil.matches(document.getFileName(),
+					config.getProperty(tenant.getName() + ".index.includes") == null ? ""
+							: config.getProperty(tenant.getName() + ".index.includes"),
+					config.getProperty(tenant.getName() + ".index.excludes") == null ? ""
+							: config.getProperty(tenant.getName() + ".index.excludes"))) {
+				documentDao.initialize(document);
+				document.setIndexingStatus(IndexingStatus.SKIP);
+				documentDao.store(document);
+				log.warn("Document {} with filename '{}' marked as unindexable", document.getId(),
+						document.getFileName());
+			} else {
+				Date beforeIndexing = new Date();
+				DocumentHistory transaction = new DocumentHistory();
+				transaction.setUser(user);
+
+				increaseParsingTime(documentManager.index(document.getId(), null, transaction));
+				long indexingDiff = TimeDiff.getTimeDifference(beforeIndexing, new Date(), TimeField.MILLISECOND);
+				increaseIndexingTime(indexingDiff);
+				log.debug("Indexed document {} in {}ms", document, indexingDiff);
+			}
+			increaseIndexed();
+		} catch (Exception e) {
+			increaseErrors();
+			log.error("There was a problem indexing document {}", document);
+			log.error(e.getMessage(), e);
+		}
+	}
+
+	@Override
+	protected IndexerStats prepareStats() {
+		return new IndexerStats();
 	}
 }

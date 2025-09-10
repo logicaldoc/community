@@ -36,15 +36,15 @@ public class DigestProcessorTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testRunTask() throws TaskException {
-		testSubject.runTask();
+		testSubject.run();
 		
 		Context.get().getProperties().setProperty("digest.batch", "10");
 		assertEquals("10", Context.get().getProperties().getProperty("digest.batch"));
-		testSubject.runTask();
+		testSubject.run();
 		
 		Context.get().getProperties().setProperty("digest.batch", "1");
 		assertEquals("1", Context.get().getProperties().getProperty("digest.batch"));
-		testSubject.runTask();
+		testSubject.run();
 		
 		assertFalse(testSubject.isIndeterminate());
 		assertTrue(testSubject.isConcurrent());
