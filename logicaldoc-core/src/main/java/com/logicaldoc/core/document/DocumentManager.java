@@ -1201,6 +1201,7 @@ public class DocumentManager {
 		try (InputStream is = store.getStream(doc.getId(), resource);) {
 			Document cloned = new Document(doc);
 			cloned.setId(0);
+			cloned.setCustomId(null);
 			if (doc.getFolder().getId() != folder.getId())
 				cloned.setFolder(folder);
 			cloned.setLastModified(null);
@@ -1212,7 +1213,7 @@ public class DocumentManager {
 			cloned.setLinks(0);
 			cloned.setOcrd(0);
 			cloned.setBarcoded(0);
-
+			
 			if (!security)
 				cloned.getAccessControlList().clear();
 
