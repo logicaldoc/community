@@ -12,7 +12,7 @@
 	<name>logicaldoc-webdav</name>
 	<packaging>jar</packaging>
 	<properties>
-		<jackrabbit.version>2.22.0-jakarta</jackrabbit.version>
+		<jackrabbit.version>2.22.2</jackrabbit.version>
 	</properties>
 	<dependencies>
 		<dependency>
