@@ -74,6 +74,7 @@ public abstract class DocumentProcessorCallable<T extends DocumentProcessorStats
 				processDocument(doc, user);
 
 				stats.setProcessed(stats.getProcessed() + 1);
+				task.next();
 				log.debug("Processed document {}", doc);
 			} catch (Exception e) {
 				stats.setErrors(stats.getErrors() + 1);

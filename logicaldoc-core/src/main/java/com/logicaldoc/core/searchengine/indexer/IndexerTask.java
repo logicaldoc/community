@@ -90,7 +90,7 @@ public class IndexerTask extends AbstractDocumentProcessor {
 		totalIndexedDocuments = 0;
 		totalIndexingTime = 0;
 		totalParsingTime = 0;
-		
+
 		try {
 			super.runTask();
 		} finally {
@@ -106,109 +106,12 @@ public class IndexerTask extends AbstractDocumentProcessor {
 		}
 	}
 
-//	@Override
-//	protected void runTask() throws TaskException {
-//
-//		if (searchEngine.isLocked()) {
-//			log.warn("Index locked, skipping indexing");
-//			return;
-//		}
-//
-//		if (!lockManager.get(getName(), transactionId)) {
-//			log.warn("Unable to acquire lock {}, skipping indexing", getName());
-//			return;
-//		}
-//
-//		log.info("Start indexing of all documents");
-//
-//		totalErrors = 0;
-//		totalIndexedDocuments = 0;
-//		totalIndexingTime = 0;
-//		totalParsingTime = 0;
-//		try {
-//			ContextProperties config = Context.get().getProperties();
-//
-//			// Retrieve the actual transactions
-//			String currentTransactionIds = lockManager.getAllTransactions().stream().map(t -> "'" + t + "'")
-//					.collect(Collectors.joining(","));
-//
-//			// First of all find documents to be indexed and not already
-//			// involved into a transaction
-//			String[] query = IndexerTask.prepareQuery();
-//			List<Long> docIds = documentDao.findIdsByWhere(query[0] + " and (" + PersistentObjectDAO.ENTITY
-//					+ ".transactionId is null or " + PersistentObjectDAO.ENTITY + ".transactionId not in ("
-//					+ StringUtils.defaultString(currentTransactionIds, "'unexisting'") + "))", query[1], max);
-//			size = docIds.size();
-//			log.info("Found a total of {} documents to be processed", size);
-//
-//			// Must take into account start and end of the transaction
-//			size += 2;
-//
-//			// Mark all the documents as belonging to the current
-//			// transaction. This may require time
-//			assignTransaction(docIds);
-//
-//			// First step done
-//			next();
-//
-//			// Now we can release the lock
-//			lockManager.release(getName(), transactionId);
-//
-//			if (!docIds.isEmpty()) {
-//				int threadsTotal = config.getInt("threadpool." + NAME + ".max", 1);
-//				log.info("Distribute the indexing among {} threads", threadsTotal);
-//
-//				// Divide the documents in segments of N
-//				Collection<List<Long>> segments = CollectionUtil.partition(docIds,
-//						(int) Math.ceil((double) docIds.size() / (double) threadsTotal));
-//
-//				// Prepare the threads and launch them
-//				List<Future<IndexerStats>> futures = new ArrayList<>();
-//				for (List<Long> segment : segments) {
-//					Indexer indexer = new Indexer(segment, this, log);
-//					threads.add(indexer);
-//					futures.add(Context.get(ThreadPools.class).schedule(indexer, NAME, 1));
-//					log.debug("Launched the indexer for documents {}", segment);
-//				}
-//
-//				// Wait for the completion of all the indexers
-//				waitForCompletion(futures);
-//
-//				log.info("All indexers have completed");
-//			}
-//		} catch (PersistenceException e) {
-//			throw new TaskException(e.getMessage(), e);
-//		} finally {
-//			if (log.isInfoEnabled()) {
-//				log.info("Indexing finished");
-//				log.info("Indexing time: {}", TimeDiff.printDuration(totalIndexingTime));
-//				log.info("Parsing time: {}", TimeDiff.printDuration(totalParsingTime));
-//				log.info("Indexed documents: {}", totalIndexedDocuments);
-//				log.info("Errors: {}", totalErrors);
-//			}
-//
-//			searchEngine.unlock();
-//
-//			try {
-//				// Remove the transaction reference
-//				documentDao.jdbcUpdate(
-//						"update ld_document set ld_transactionid = null where ld_transactionId = :transactionId",
-//						Map.of("transactionId", transactionId));
-//			} catch (PersistenceException e) {
-//				log.error(e.getMessage(), e);
-//			}
-//
-//			// Last step done
-//			next();
-//			if (log.isInfoEnabled())
-//				log.info("Documents released from transaction {}", transactionId);
-//		}
-//	}
-
 	@Override
 	protected void allCompleted(List<DocumentProcessorStats> stats) {
 		for (DocumentProcessorStats stat : stats) {
 			IndexerStats iStat = (IndexerStats) stat;
+			totalIndexedDocuments += iStat.getProcessed();
+			totalErrors += iStat.getErrors();
 			totalIndexingTime += iStat.getIndexingTime();
 			totalParsingTime += iStat.getParsingTime();
 		}
