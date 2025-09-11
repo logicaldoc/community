@@ -91,9 +91,9 @@ public class TenantKeystorePanel extends VLayout {
 		passwordAgain.setRequired(true);
 		passwordAgain.setWrapTitle(false);
 		MatchesFieldValidator validator = new MatchesFieldValidator();
-		validator.setOtherField("passwordagain");
+		validator.setOtherField("password");
 		validator.setErrorMessage(I18N.message("passwordnotmatch"));
-		password.setValidators(validator);
+		passwordAgain.setValidators(validator);
 
 		StaticTextItem details = prepareDetailsItem();
 
@@ -351,8 +351,7 @@ public class TenantKeystorePanel extends VLayout {
 	}
 
 	boolean validate() {
-		vm.validate();
-		if (Boolean.FALSE.equals(vm.hasErrors())) {
+		if (Boolean.TRUE.equals(vm.validate())) {
 			keystore.setTenantId(tenantId);
 			keystore.setOrganizationAlias(vm.getValueAsString("localCAalias"));
 			keystore.setValidity(Integer.parseInt(vm.getValueAsString("validity")));
@@ -372,8 +371,10 @@ public class TenantKeystorePanel extends VLayout {
 			} catch (Exception t) {
 				// Nothing to do
 			}
+			return true;
+		} else {
+			return false;
 		}
-		return !vm.hasErrors();
 	}
 
 	public GUIKeystore getKeystore() {
@@ -383,7 +384,7 @@ public class TenantKeystorePanel extends VLayout {
 	public long getTenantId() {
 		return tenantId;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
