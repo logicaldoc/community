@@ -3,6 +3,7 @@ package com.logicaldoc.core.document;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
@@ -60,6 +61,7 @@ public class DigestProcessor extends AbstractDocumentProcessor {
 			@Override
 			protected void processDocument(Document document, User user) throws PersistenceException, IOException {
 				Context.get(DocumentDAO.class).updateDigest(document);
+				log.debug("Digested document {}: {}", document, StringUtils.abbreviate(document.getDigest(), 100));
 			}
 
 			@Override
