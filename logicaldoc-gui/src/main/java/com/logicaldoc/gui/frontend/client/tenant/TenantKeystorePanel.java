@@ -35,6 +35,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class TenantKeystorePanel extends VLayout {
 
+	private static final String PASSWORD = "password";
+
 	private DynamicForm form = new DynamicForm();
 
 	private ValuesManager vm = new ValuesManager();
@@ -81,7 +83,7 @@ public class TenantKeystorePanel extends VLayout {
 
 		TextItem localCAalias = prepareLocalCAaliasItem();
 
-		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "keystorepasswd", null);
+		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete(PASSWORD, "keystorepasswd", null);
 		password.setRequired(true);
 		password.setWrapTitle(false);
 		password.setValidators(new MinLengthValidator(6));
@@ -91,7 +93,7 @@ public class TenantKeystorePanel extends VLayout {
 		passwordAgain.setRequired(true);
 		passwordAgain.setWrapTitle(false);
 		MatchesFieldValidator validator = new MatchesFieldValidator();
-		validator.setOtherField("password");
+		validator.setOtherField(PASSWORD);
 		validator.setErrorMessage(I18N.message("passwordnotmatch"));
 		passwordAgain.setValidators(validator);
 
@@ -361,7 +363,7 @@ public class TenantKeystorePanel extends VLayout {
 			keystore.setSignVisual(Boolean.valueOf(vm.getValueAsString("visual")));
 			keystore.setSignOpacity(Integer.parseInt(vm.getValueAsString("opacity")));
 			keystore.setSignText(vm.getValueAsString("text"));
-			keystore.setPassword(vm.getValueAsString("password"));
+			keystore.setPassword(vm.getValueAsString(PASSWORD));
 			keystore.setKeytoolPath(vm.getValueAsString("keytoolCommand"));
 			keystore.setOpenSSLPath(vm.getValueAsString("opensslCommand"));
 			try {

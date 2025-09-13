@@ -216,7 +216,7 @@ public class DocumentManager {
 
 			log.debug("Replaced fileVersion {} of document {}", fileVersion, docId);
 
-			return new DocumentFuture(document, new SerialFuture<Document>(futures));
+			return new DocumentFuture(document, new SerialFuture<>(futures));
 		} else {
 			return new DocumentFuture(null, null);
 		}
@@ -378,7 +378,7 @@ public class DocumentManager {
 			} catch (IOException ioe) {
 				document = documentDAO.findById(document.getId());
 				documentDAO.initialize(document);
-				
+
 				document.copyAttributes(oldDocument);
 				document.setOcrd(oldDocument.getOcrd());
 				document.setOcrTemplateId(oldDocument.getOcrTemplateId());
@@ -1213,7 +1213,7 @@ public class DocumentManager {
 			cloned.setLinks(0);
 			cloned.setOcrd(0);
 			cloned.setBarcoded(0);
-			
+
 			if (!security)
 				cloned.getAccessControlList().clear();
 
@@ -1532,7 +1532,7 @@ public class DocumentManager {
 
 		if (doc.getIndexed().equals(IndexingStatus.INDEXED))
 			deleteFromIndex(doc);
-		
+
 		try {
 			documentDAO.initialize(doc);
 			doc.setIndexingStatus(status);
@@ -2163,7 +2163,7 @@ public class DocumentManager {
 		// Record this destroy event in the parent folder history
 		if (transaction.getFolder() != null)
 			folderDAO.saveFolderHistory(transaction.getFolder(), transaction);
-		
+
 		store.delete(docId);
 	}
 }

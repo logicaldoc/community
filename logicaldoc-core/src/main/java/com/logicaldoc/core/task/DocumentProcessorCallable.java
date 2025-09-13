@@ -51,7 +51,7 @@ public abstract class DocumentProcessorCallable<T extends DocumentProcessorStats
 
 	protected T stats;
 
-	public DocumentProcessorCallable(List<Long> docIds, Task task, Logger log) {
+	protected DocumentProcessorCallable(List<Long> docIds, Task task, Logger log) {
 		this.docIds = docIds;
 		this.log = log;
 		this.task = task;
@@ -67,8 +67,6 @@ public abstract class DocumentProcessorCallable<T extends DocumentProcessorStats
 
 			try {
 				Document doc = documentDao.findById(id);
-				if (doc == null)
-					continue;
 				documentDao.initialize(doc);
 
 				processDocument(doc, user);

@@ -13,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
-import com.logicaldoc.core.task.TaskException;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.spring.Context;
 
@@ -35,17 +34,17 @@ public class DigestProcessorTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testRunTask() throws TaskException {
+	public void testRunTask() {
 		testSubject.run();
-		
+
 		Context.get().getProperties().setProperty("digest.batch", "10");
 		assertEquals("10", Context.get().getProperties().getProperty("digest.batch"));
 		testSubject.run();
-		
+
 		Context.get().getProperties().setProperty("digest.batch", "1");
 		assertEquals("1", Context.get().getProperties().getProperty("digest.batch"));
 		testSubject.run();
-		
+
 		assertFalse(testSubject.isIndeterminate());
 		assertTrue(testSubject.isConcurrent());
 	}

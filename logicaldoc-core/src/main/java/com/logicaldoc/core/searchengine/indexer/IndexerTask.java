@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistentObjectDAO;
-import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.searchengine.SearchEngine;
@@ -34,9 +33,6 @@ import jakarta.annotation.Resource;
 public class IndexerTask extends AbstractDocumentProcessor {
 
 	public static final String NAME = "IndexerTask";
-
-	@Resource(name = "documentDAO")
-	protected DocumentDAO documentDao;
 
 	@Resource(name = "SearchEngine")
 	protected SearchEngine searchEngine;

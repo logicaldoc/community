@@ -74,7 +74,7 @@ public abstract class AbstractDocumentProcessor extends Task {
 			getSize(max, ids);
 
 			if (size > 0)
-				processDocuments(ids, max);
+				processDocuments(ids);
 		} catch (PersistenceException e) {
 			throw new TaskException(e.getMessage(), e);
 		} finally {
@@ -86,7 +86,7 @@ public abstract class AbstractDocumentProcessor extends Task {
 		}
 	}
 
-	protected void processDocuments(List<Long> docIds, int max) throws PersistenceException {
+	protected void processDocuments(List<Long> docIds) throws PersistenceException {
 		String idsStr = "(" + docIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")) + ")";
 
 		// Mark all these documents as belonging to the current
@@ -126,13 +126,13 @@ public abstract class AbstractDocumentProcessor extends Task {
 		}
 	}
 
-	abstract protected DocumentProcessorCallable<? extends DocumentProcessorStats> prepareCallable(List<Long> segment);
+	protected abstract DocumentProcessorCallable<? extends DocumentProcessorStats> prepareCallable(List<Long> segment);
 
 	@Override
 	public synchronized void interrupt() {
-		super.interrupt();
 		for (DocumentProcessorCallable<? extends DocumentProcessorStats> thread : threads)
 			thread.interrupt();
+		super.interrupt();
 	}
 
 	/**

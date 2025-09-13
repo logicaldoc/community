@@ -94,7 +94,6 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 		setTemplate(source.getTemplate());
 		setTemplateId(source.getTemplateId());
 		setTemplateName(source.getTemplateName());
-		// setCustomId(null);
 
 		if (source.getIndexed() != IndexingStatus.INDEXED)
 			setIndexingStatus(source.getIndexed());

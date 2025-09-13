@@ -61,7 +61,8 @@ public class DigestProcessor extends AbstractDocumentProcessor {
 			@Override
 			protected void processDocument(Document document, User user) throws PersistenceException, IOException {
 				Context.get(DocumentDAO.class).updateDigest(document);
-				log.debug("Digested document {}: {}", document, StringUtils.abbreviate(document.getDigest(), 100));
+				if (log.isDebugEnabled())
+					log.debug("Digested document {}: {}", document, StringUtils.abbreviate(document.getDigest(), 100));
 			}
 
 			@Override

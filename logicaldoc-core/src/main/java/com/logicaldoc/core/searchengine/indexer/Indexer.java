@@ -54,6 +54,7 @@ class Indexer extends DocumentProcessorCallable<IndexerStats> {
 		stats.setIndexingTime(stats.getIndexingTime() + increase);
 	}
 
+	@Override
 	public boolean isCompleted() {
 		return completed;
 	}
