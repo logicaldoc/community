@@ -180,7 +180,7 @@ public class IndexerTask extends AbstractDocumentProcessor {
 	}
 
 	@Override
-	protected DocumentProcessorCallable<? extends DocumentProcessorStats> prepareCallable(List<Long> segment) {
+	protected DocumentProcessorCallable<IndexerStats> prepareCallable(List<Long> segment) {
 		return new Indexer(segment, this, log);
 	}
 }

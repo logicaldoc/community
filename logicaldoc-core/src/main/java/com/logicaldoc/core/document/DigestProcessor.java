@@ -55,7 +55,7 @@ public class DigestProcessor extends AbstractDocumentProcessor {
 	}
 
 	@Override
-	protected DocumentProcessorCallable<? extends DocumentProcessorStats> prepareCallable(List<Long> docIds) {
+	protected DocumentProcessorCallable<DocumentProcessorStats> prepareCallable(List<Long> docIds) {
 		return new DocumentProcessorCallable<DocumentProcessorStats>(docIds, this, log) {
 
 			@Override
