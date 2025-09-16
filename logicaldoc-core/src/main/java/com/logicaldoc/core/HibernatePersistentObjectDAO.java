@@ -1,6 +1,7 @@
 package com.logicaldoc.core;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -57,7 +58,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	protected SessionFactory sessionFactory;
 
 	protected static final String ORDER_BY = " order by ";
-	
+
 	protected static final String ASPECT_STORING = "storing";
 
 	protected static final String DEFAULT_WHERE_PREAMBLE = " " + ENTITY + " where " + ENTITY + ".deleted=0 ";
@@ -165,7 +166,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	@Override
-	public List<Object[]> findByQuery(String query, Map<String, Object> parameters, Integer max) throws PersistenceException {
+	public List<Object[]> findByQuery(String query, Map<String, Object> parameters, Integer max)
+			throws PersistenceException {
 		try {
 			logQuery(query);
 			return prepareQuery(query, parameters, max).list();
@@ -447,10 +449,17 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			Long ret = queryForObject(sql, parameters, Long.class);
 			return ret != null ? ret.longValue() : 0L;
 		} catch (Exception e) {
-			// It may be normal, with postgresql the returned value could be a
+			// It may be normal, with postgresql the returned value could be an
 			// Integer
-			Integer ret = queryForObject(sql, parameters, Integer.class);
-			return ret != null ? ret.longValue() : 0L;
+			try {
+				// Other times, with postgresql the returned value could be a
+				// BigDecimal
+				Integer ret = queryForObject(sql, parameters, Integer.class);
+				return ret != null ? ret.longValue() : 0L;
+			} catch (Exception ex) {
+				BigDecimal ret = queryForObject(sql, parameters, BigDecimal.class);
+				return ret != null ? ret.longValue() : 0L;
+			}
 		}
 	}
 
