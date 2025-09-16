@@ -16,7 +16,7 @@
         <gwt.source.level>17</gwt.source.level>
         <smartgwt.version>14.1p</smartgwt.version>
         <smartgwt.skins>Tahoe,Shiva,Simplicity</smartgwt.skins>
-        <spring.version>6.2.8</spring.version>
+        <spring.version>6.2.11</spring.version>
         <spring-security.version>6.3.10</spring-security.version>
         <hibernate.version>6.6.18.Final</hibernate.version>
         <infinispan.version>15.2.4.Final</infinispan.version>
