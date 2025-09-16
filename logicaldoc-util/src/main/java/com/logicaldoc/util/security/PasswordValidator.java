@@ -37,8 +37,7 @@ public class PasswordValidator {
 		if (messages == null) {
 			Properties standardMessages = new Properties();
 			try {
-				standardMessages
-						.load(this.getClass().getClassLoader().getResourceAsStream("/passay.properties"));
+				standardMessages.load(this.getClass().getClassLoader().getResourceAsStream("/passay.properties"));
 			} catch (Exception e) {
 				// Nothing to do
 			}
@@ -71,9 +70,9 @@ public class PasswordValidator {
 				// is 'asdf' the false parameter indicates that wrapped
 				// sequences are
 				// allowed; e.g. 'xyzab'
-				new IllegalSequenceRule(EnglishSequenceData.Alphabetical, criteria.getMaxSequenceSize(), false),
-				new IllegalSequenceRule(EnglishSequenceData.Numerical, criteria.getMaxSequenceSize(), false),
-				new IllegalSequenceRule(EnglishSequenceData.USQwerty, criteria.getMaxSequenceSize(), false),
+				new IllegalSequenceRule(EnglishSequenceData.Alphabetical, criteria.getMaxSequenceSize() + 1, false),
+				new IllegalSequenceRule(EnglishSequenceData.Numerical, criteria.getMaxSequenceSize() + 1, false),
+				new IllegalSequenceRule(EnglishSequenceData.USQwerty, criteria.getMaxSequenceSize() + 1, false),
 
 				// no whitespace
 				new WhitespaceRule());
