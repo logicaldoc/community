@@ -466,8 +466,31 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			Long ret = queryForObject(sql, parameters, Long.class);
 			return ret != null ? ret.longValue() : 0L;
 		} catch (Exception e) {
-			// It may be normal, with postgresql the returned value could be a Integer
+			return queryForLongFromIntegerOrBigDecimal(sql, parameters);
+		}
+	}
+
+	/**
+	 * A utility method for those databases that do not return Long
+	 * 
+	 * @param sql SQL query to execute
+	 * @param parameters the parameters
+	 * 
+	 * @return the long value, or 0 in case of SQL NULL
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
+	 */
+	private long queryForLongFromIntegerOrBigDecimal(String sql, Map<String, Object> parameters)
+			throws PersistenceException {
+		// It may be normal, with postgresql the returned value could be an
+		// Integer or a BigDecimal
+		try {
+			// Other times, with postgresql the returned value could be a
+			// BigDecimal
 			Integer ret = queryForObject(sql, parameters, Integer.class);
+			return ret != null ? ret.longValue() : 0L;
+		} catch (Exception ex) {
+			BigDecimal ret = queryForObject(sql, parameters, BigDecimal.class);
 			return ret != null ? ret.longValue() : 0L;
 		}
 	}
