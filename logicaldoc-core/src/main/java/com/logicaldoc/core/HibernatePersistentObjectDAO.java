@@ -448,8 +448,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			Long ret = queryForObject(sql, parameters, Long.class);
 			return ret != null ? ret.longValue() : 0L;
 		} catch (Exception e) {
-			// It may be normal, with postgresql the returned value could be a BigDecimal
-			BigDecimal ret = queryForObject(sql, parameters, BigDecimal.class);
+			// It may be normal, with postgresql the returned value could be a Integer
+			Integer ret = queryForObject(sql, parameters, Integer.class);
 			return ret != null ? ret.longValue() : 0L;
 		}
 	}
