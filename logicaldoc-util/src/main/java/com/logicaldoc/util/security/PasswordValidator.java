@@ -68,13 +68,11 @@ public class PasswordValidator {
 
 				// define some illegal sequences that will fail when >= 4 chars
 				// long alphabetical is of the form 'abcd', numerical is '3456',
-				// qwer
-				// is 'asdf' the false parameter indicates that wrapped
-				// sequences are
+				// qwer is 'asdf' the false parameter indicates that wrapped sequences are
 				// allowed; e.g. 'xyzab'
-				new IllegalSequenceRule(EnglishSequenceData.Alphabetical, criteria.getMaxSequenceSize(), false),
-				new IllegalSequenceRule(EnglishSequenceData.Numerical, criteria.getMaxSequenceSize(), false),
-				new IllegalSequenceRule(EnglishSequenceData.USQwerty, criteria.getMaxSequenceSize(), false),
+				new IllegalSequenceRule(EnglishSequenceData.Alphabetical, criteria.getMaxSequenceSize() + 1 , false),
+				new IllegalSequenceRule(EnglishSequenceData.Numerical, criteria.getMaxSequenceSize() + 1, false),
+				new IllegalSequenceRule(EnglishSequenceData.USQwerty, criteria.getMaxSequenceSize() + 1, false),
 
 				// no whitespace
 				new WhitespaceRule());
