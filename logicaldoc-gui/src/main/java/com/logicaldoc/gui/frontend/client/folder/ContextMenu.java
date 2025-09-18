@@ -285,8 +285,8 @@ public class ContextMenu extends Menu {
 		MenuItem createAlias = new MenuItem();
 		createAlias.setTitle(I18N.message("createalias"));
 		createAlias.addClickHandler(caClick -> new CreateAliasDialog().show());
-		createAlias.setEnabled(
-				acl.isAdd() && tree.getSelectedRecord().getAttributeAsString(FolderNavigator.FOLD_REF) == null);
+		createAlias.setEnabled(acl.isAdd() && tree.getSelectedRecord()
+				.getAttributeAsString(com.logicaldoc.gui.frontend.client.folder.browser.FolderTree.FOLD_REF) == null);
 		return createAlias;
 	}
 

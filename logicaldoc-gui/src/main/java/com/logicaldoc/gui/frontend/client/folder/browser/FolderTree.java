@@ -5,9 +5,12 @@ import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.core.client.Scheduler;
+import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
+import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.data.FoldersDS;
 import com.logicaldoc.gui.common.client.grid.FolderListGridField;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
@@ -34,6 +37,10 @@ public class FolderTree extends TreeGrid {
 	protected static final String OPENED = "opened";
 
 	public static final String PARENT_ID = "parentId";
+
+	public static final String FOLD_REF = "foldRef";
+
+	protected static final String COLOR = "color";
 
 	/**
 	 * String typed by the user inside the tree, to quickly select folders
@@ -97,12 +104,13 @@ public class FolderTree extends TreeGrid {
 
 			addCellClickHandler(event ->
 
-			FolderService.Instance.get().getFolder(getSelectedFolderId(), false, false, true, new DefaultAsyncCallback<>() {
-				@Override
-				public void onSuccess(GUIFolder folder) {
-					cursor.onFolderSelected(folder);
-				}
-			}));
+			FolderService.Instance.get().getFolder(getSelectedFolderId(), false, false, true,
+					new DefaultAsyncCallback<>() {
+						@Override
+						public void onSuccess(GUIFolder folder) {
+							cursor.onFolderSelected(folder);
+						}
+					}));
 		}
 
 		/*
@@ -311,7 +319,99 @@ public class FolderTree extends TreeGrid {
 		path.append(leafNode.getName().equals("/") ? "" : leafNode.getName());
 		return path.toString();
 	}
-	
+
+	/**
+	 * Opens the branch to show the specified folder, it cycles the path
+	 * creating minimal tree nodes
+	 * 
+	 * @param folderId identifier of the folder to open
+	 */
+	public void openFolder(final long folderId) {
+		getTree().closeAll();
+
+		FolderService.Instance.get().getFolder(folderId, true, true, isPaginationEnabled(),
+				new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(GUIFolder folder) {
+						long folderId = folder.getId();
+						Long folderRef = folder.getFoldRef();
+						if (folder.getFoldRef() != null) {
+							folderId = folder.getFoldRef();
+							folderRef = folder.getId();
+						}
+
+						TreeNode parent = getParentNode(folder);
+
+						TreeNode node = new TreeNode(folder.getName());
+						node.setAttribute("id", parent.getAttributeAsString("id") + "-" + Long.toString(folderId));
+						node.setAttribute(FOLDER_ID, Long.toString(folderId));
+						node.setAttribute(PARENT_ID, Long.toString(folder.getParentId()));
+						node.setAttribute("type", Integer.toString(folder.getType()));
+						node.setAttribute(FOLD_REF, folderRef != null ? Long.toString(folderRef) : null);
+						if (folder.getColor() != null)
+							node.setAttribute(COLOR, folder.getColor());
+						node.setAttribute(GUIAccessControlEntry.PERMISSION_ADD,
+								Boolean.toString(folder.hasPermission(GUIAccessControlEntry.PERMISSION_ADD)));
+						node.setAttribute(GUIAccessControlEntry.PERMISSION_DELETE,
+								Boolean.toString(folder.hasPermission(GUIAccessControlEntry.PERMISSION_DELETE)));
+						node.setAttribute(GUIAccessControlEntry.PERMISSION_RENAME,
+								Boolean.toString(folder.hasPermission(GUIAccessControlEntry.PERMISSION_RENAME)));
+						getTree().add(node, parent);
+						parent = node;
+
+						getTree().openFolders(getTree().getParents(parent));
+						getTree().openFolder(parent);
+						scrollToCell(getRowNum(parent), 0);
+						selectRecord(parent);
+
+						folder.setPathExtended(getPath(folderId));
+						FolderController.get().selected(folder);
+					}
+				});
+	}
+
+	private TreeNode getParentNode(GUIFolder folder) {
+		TreeNode parent = getTree().getRoot();
+		for (GUIFolder fld : folder.getPath()) {
+			if (fld.getId() == Constants.DOCUMENTS_FOLDERID)
+				continue;
+
+			long fldId = fld.getId();
+			Long fldRef = fld.getFoldRef();
+			if (fld.getFoldRef() != null) {
+				fldId = fld.getFoldRef();
+				fldRef = fld.getId();
+			}
+
+			String parentId = parent.getAttributeAsString("id");
+			if ("/".equals(parentId))
+				parentId = "" + Constants.DOCUMENTS_FOLDERID;
+
+			TreeNode node = new TreeNode(fld.getName());
+			node.setAttribute("id", parentId + "-" + Long.toString(fldId));
+			node.setAttribute(FOLDER_ID, Long.toString(fldId));
+			node.setAttribute(PARENT_ID, Long.toString(fld.getParentId()));
+			node.setAttribute("type", Integer.toString(fld.getType()));
+			node.setAttribute(FOLD_REF, fldRef != null ? Long.toString(fldRef) : null);
+			if (fld.getColor() != null)
+				node.setAttribute(COLOR, fld.getColor());
+			node.setAttribute(GUIAccessControlEntry.PERMISSION_ADD,
+					fld.hasPermission(GUIAccessControlEntry.PERMISSION_ADD));
+			node.setAttribute(GUIAccessControlEntry.PERMISSION_DELETE,
+					fld.hasPermission(GUIAccessControlEntry.PERMISSION_DELETE));
+			node.setAttribute(GUIAccessControlEntry.PERMISSION_RENAME,
+					fld.hasPermission(GUIAccessControlEntry.PERMISSION_RENAME));
+
+			getTree().add(node, parent);
+			parent = node;
+		}
+		return parent;
+	}
+
+	protected boolean isPaginationEnabled() {
+		return Session.get().getConfigAsBoolean("gui.folder.pagination");
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
