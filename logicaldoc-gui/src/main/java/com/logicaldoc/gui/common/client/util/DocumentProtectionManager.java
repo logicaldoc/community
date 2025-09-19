@@ -32,7 +32,7 @@ public class DocumentProtectionManager {
 	/**
 	 * Checks the document and asks the user for a password(if needed).
 	 * 
-	 * @param document the document to check
+	 * @param docId id of the document to check
 	 * @param handler Optional handler to react something when the document gets
 	 *        unlocked
 	 */

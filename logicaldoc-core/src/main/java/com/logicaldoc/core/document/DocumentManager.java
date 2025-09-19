@@ -479,7 +479,7 @@ public class DocumentManager {
 	 * Locks the given document, it is synchronized because under
 	 * high-ferquency, Hibernate may fail
 	 * 
-	 * @param doc the document to be locked
+	 * @param document the document to be locked
 	 * @param status the lock type (used to populate status attribute of the
 	 *        document)
 	 * @param transaction entry to log the event (set the user)
