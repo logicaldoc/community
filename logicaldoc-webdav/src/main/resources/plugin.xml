@@ -88,7 +88,7 @@
 <!ELEMENT value (#PCDATA)>
 ]>
 
-<plugin id="logicaldoc-webdav" version="9.2.1" class="com.logicaldoc.webdav.WebDAVPlugin">
+<plugin id="logicaldoc-webdav" version="9.2.2" class="com.logicaldoc.webdav.WebDAVPlugin">
 	<requires>
 		<import plugin-id="logicaldoc-core" />
 	</requires>
