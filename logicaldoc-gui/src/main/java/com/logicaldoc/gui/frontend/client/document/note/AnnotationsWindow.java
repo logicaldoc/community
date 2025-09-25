@@ -96,7 +96,9 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 		}
 		notes.add(newNote);
 
-		showCurrentPage();
+		DrawItem newItem = prepareAnnotationItem(newNote);
+		pageDrawingPane.addDrawItem(newItem, true);
+		currentPageItems.put(newItem, newNote);
 	}
 
 	@Override
