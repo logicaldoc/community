@@ -340,7 +340,7 @@ public class VersionsPanel extends DocumentDetailTab {
 
 	private MenuItem prepareShowMetadataItem(final ListGridRecord[] selection) {
 		MenuItem metadata = new MenuItem();
-		metadata.setTitle(I18N.message("metadata"));
+		metadata.setTitle(I18N.message("mmetadata"));
 		metadata.addClickHandler(compareMetadataEvent -> DocumentService.Instance.get().getVersionsById(
 				Long.parseLong(selection[0].getAttribute("id")), Long.parseLong(selection[0].getAttribute("id")),
 				new DefaultAsyncCallback<>() {

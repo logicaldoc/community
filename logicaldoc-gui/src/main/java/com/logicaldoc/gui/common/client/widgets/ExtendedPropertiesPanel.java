@@ -16,6 +16,8 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIExtensibleObject;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
+import com.logicaldoc.gui.common.client.beans.GUIVersion;
+import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
@@ -345,7 +347,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		} else if (att.getType() == GUIAttribute.TYPE_FOLDER) {
 			item = prepareFolderItem(att, multiValIcons);
 		} else if (att.getType() == GUIAttribute.TYPE_DOCUMENT) {
-			item = prepareDocumentItem(att, multiValIcons);
+			item = prepareDocumentItem(att, getDefaultFolderForDocumentSelector(), multiValIcons);
 		} else {
 			item = null;
 		}
@@ -353,6 +355,17 @@ public class ExtendedPropertiesPanel extends HLayout {
 		prepareItemIconsAndVisibility(att, multiValIcons, item);
 
 		return item;
+	}
+
+	private long getDefaultFolderForDocumentSelector() {
+		long defaultFolderId = FolderController.get().getCurrentFolder().getId();
+		if (extensibleObject instanceof GUIDocument doc)
+			defaultFolderId = doc.getFolder().getId();
+		else if (extensibleObject instanceof GUIVersion ver)
+			defaultFolderId = ver.getFolder().getId();
+		else if (extensibleObject instanceof GUIFolder fld)
+			defaultFolderId = fld.getId();
+		return defaultFolderId;
 	}
 
 	private void prepareItemIconsAndVisibility(GUIAttribute att, List<FormItemIcon> multiValIcons, FormItem item) {
@@ -389,8 +402,9 @@ public class ExtendedPropertiesPanel extends HLayout {
 		return item;
 	}
 
-	protected FormItem prepareDocumentItem(GUIAttribute att, List<FormItemIcon> multiValIcons) {
-		FormItem item = ItemFactory.newDocumentSelectorForAttribute(att.getName(), att.getDisplayName(), multiValIcons);
+	protected FormItem prepareDocumentItem(GUIAttribute att, Long defaultFolderId, List<FormItemIcon> multiValIcons) {
+		FormItem item = ItemFactory.newDocumentSelectorForAttribute(att.getName(), defaultFolderId,
+				att.getDisplayName(), multiValIcons);
 		DocumentSelector selector = (DocumentSelector) item;
 		if (extensibleObject.getValue(att.getName()) != null) {
 			selector.setDocument(att.getIntValue(), att.getStringValue());

@@ -6,6 +6,7 @@ import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
+import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.document.DocumentsListPanel;
 import com.logicaldoc.gui.frontend.client.folder.browser.FolderBrowser;
@@ -29,6 +30,10 @@ public class DocumentSelectorPanel extends HLayout {
 	private Canvas documents = new VLayout();
 
 	public DocumentSelectorPanel() {
+		this(null);
+	}
+
+	public DocumentSelectorPanel(Long defaultFolderId) {
 		setWidth100();
 
 		documents = new Label("&nbsp;" + I18N.message("selectfolder"));
@@ -36,23 +41,30 @@ public class DocumentSelectorPanel extends HLayout {
 		documents.setWidth100();
 		documents.setShowResizeBar(true);
 
-		prepareFolderBrowser();
+		prepareFolderBrowser(defaultFolderId);
 		setMembers(folders, documents);
 	}
 
-	private void prepareFolderBrowser() {
+	private void prepareFolderBrowser(Long defaultFolderId) {
 		folders = new FolderBrowser();
 		folders.setWidth(250);
 		folders.setShowResizeBar(true);
-		folders.addCellClickHandler(event -> FolderService.Instance.get().getFolder(folders.getSelectedFolderId(),
-				false, true, Session.get().isFolderPagination(), new DefaultAsyncCallback<>() {
+		folders.addCellClickHandler(event -> onFolderSelected(folders.getSelectedFolderId()));
+		folders.openFolder(
+				defaultFolderId != null ? defaultFolderId : FolderController.get().getCurrentFolder().getId());
+		onFolderSelected(defaultFolderId != null ? defaultFolderId : FolderController.get().getCurrentFolder().getId());
+	}
+
+	private void onFolderSelected(long folderId) {
+		FolderService.Instance.get().getFolder(folderId, false, true, Session.get().isFolderPagination(),
+				new DefaultAsyncCallback<>() {
 					@Override
 					public void onSuccess(GUIFolder folder) {
 						removeMember(documents);
 						documents = new DocumentSelectorDocumentsPanel(folder);
 						addMember(documents);
 					}
-				}));
+				});
 	}
 
 	public List<GUIDocument> getSelection() {

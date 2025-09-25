@@ -322,11 +322,22 @@ public class FolderTree extends TreeGrid {
 
 	/**
 	 * Opens the branch to show the specified folder, it cycles the path
-	 * creating minimal tree nodes
+	 * creating minimal tree nodes. At the end the folder is also selected as currently selected folder
 	 * 
 	 * @param folderId identifier of the folder to open
 	 */
-	public void openFolder(final long folderId) {
+	public void openFolder(long folderId) {
+		openFolder(folderId, true);
+	}
+	
+	/**
+	 * Opens the branch to show the specified folder, it cycles the path
+	 * creating minimal tree nodes
+	 * 
+	 * @param folderId identifier of the folder to open
+	 * @param select if the open node must also be selected as currently selected folder
+	 */
+	public void openFolder(long folderId, boolean select) {
 		getTree().closeAll();
 
 		FolderService.Instance.get().getFolder(folderId, true, true, isPaginationEnabled(),
@@ -365,7 +376,9 @@ public class FolderTree extends TreeGrid {
 						selectRecord(parent);
 
 						folder.setPathExtended(getPath(folderId));
-						FolderController.get().selected(folder);
+
+						if (select)
+							FolderController.get().selected(folder);
 					}
 				});
 	}

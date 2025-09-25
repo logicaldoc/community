@@ -24,6 +24,10 @@ public class DocumentSelector extends StaticTextItem {
 	private Collection<DocumentChangeListener> listeners = new ArrayList<>();
 
 	public DocumentSelector(String name, List<FormItemIcon> additionalIcons) {
+		this(name, null, additionalIcons);
+	}
+
+	public DocumentSelector(String name, Long defaultFolderId, List<FormItemIcon> additionalIcons) {
 		if (name != null)
 			setName(name);
 		else
@@ -41,7 +45,7 @@ public class DocumentSelector extends StaticTextItem {
 		search.setSrc("[SKIN]/icons/magnifying-glass.png");
 		search.setWidth(12);
 		search.setHeight(12);
-		search.addFormItemClickHandler(click -> new DocumentSelectorDialog() {
+		search.addFormItemClickHandler(click -> new DocumentSelectorDialog(defaultFolderId) {
 
 			@Override
 			protected void onSelection(List<GUIDocument> selection) {

@@ -15,7 +15,15 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 8.8.6
  */
 public abstract class DocumentSelectorDialog extends StickyWindow {
+private Long defaultFolderId;
+	
+	
+	protected DocumentSelectorDialog(Long defaultFolderId) {
+		super("documentselector");
+		this.defaultFolderId=defaultFolderId;
+	}
 
+	
 	protected DocumentSelectorDialog() {
 		super("documentselector");
 	}
@@ -29,10 +37,10 @@ public abstract class DocumentSelectorDialog extends StickyWindow {
 
 	@Override
 	protected void onDraw() {
-		DocumentSelectorPanel selectionPanel = new DocumentSelectorPanel();
+		DocumentSelectorPanel selectionPanel = new DocumentSelectorPanel(defaultFolderId);
 		addItem(selectionPanel);
 
-		ToolStripButton confirmSelection = new ToolStripButton(I18N.message("Confirm selection"));
+		ToolStripButton confirmSelection = new ToolStripButton(I18N.message("confirmselection"));
 		confirmSelection.addClickHandler(event -> onSelection(selectionPanel.getSelection()));
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setWidth100();
