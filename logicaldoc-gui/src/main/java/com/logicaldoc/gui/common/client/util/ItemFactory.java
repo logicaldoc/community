@@ -544,10 +544,10 @@ public class ItemFactory {
 				true, additionalIcons);
 	}
 
-	public static StaticTextItem newDocumentSelectorForAttribute(String name, String title,
+	public static StaticTextItem newDocumentSelectorForAttribute(String name, Long defaultFolderId, String title,
 			List<FormItemIcon> additionalIcons) {
 		final StaticTextItem item = new DocumentSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER),
-				additionalIcons);
+				defaultFolderId, additionalIcons);
 		if (title != null)
 			item.setTitle(I18N.message(title));
 		return item;

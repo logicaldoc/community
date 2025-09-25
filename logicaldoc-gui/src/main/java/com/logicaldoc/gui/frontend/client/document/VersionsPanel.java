@@ -87,7 +87,8 @@ public class VersionsPanel extends DocumentDetailTab {
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
 		if (document.getFolder().isDownload())
-			list.setFields(id, user, event, fileName, type, fileVersion, version, revision, date, permalink, wfStatus, comment);
+			list.setFields(id, user, event, fileName, type, fileVersion, version, revision, date, permalink, wfStatus,
+					comment);
 		else
 			list.setFields(id, user, event, fileName, type, fileVersion, version, revision, date, comment);
 
@@ -205,6 +206,8 @@ public class VersionsPanel extends DocumentDetailTab {
 
 		Menu contextMenu = new Menu();
 
+		MenuItem showMetadata = prepareShowMetadataItem(selection);
+
 		MenuItem compareMetadata = prepareCompareMetadataItem(selection);
 
 		MenuItem compareContent = prepareCompareContentMenuItem(selection);
@@ -246,16 +249,18 @@ public class VersionsPanel extends DocumentDetailTab {
 			delete.setEnabled(false);
 			replaceFile.setEnabled(false);
 			promote.setEnabled(false);
+			showMetadata.setEnabled(false);
 			compareMetadata.setEnabled(false);
 			compareContent.setEnabled(false);
 			notes.setEnabled(false);
 		}
 
 		if (Feature.visible(Feature.COMPARISON))
-			contextMenu.setItems(preview, download, notes, compareMetadata, compareContent, new MenuItemSeparator(), delete, promote,
-					replaceFile);
+			contextMenu.setItems(preview, download, notes, showMetadata, compareMetadata, compareContent,
+					new MenuItemSeparator(), delete, promote, replaceFile);
 		else
-			contextMenu.setItems(preview, download, notes, compareMetadata, new MenuItemSeparator(), delete, promote, replaceFile);
+			contextMenu.setItems(preview, download, notes, showMetadata, compareMetadata, new MenuItemSeparator(),
+					delete, promote, replaceFile);
 
 		return contextMenu;
 	}
@@ -331,6 +336,20 @@ public class VersionsPanel extends DocumentDetailTab {
 					}
 				}));
 		return compareMetadata;
+	}
+
+	private MenuItem prepareShowMetadataItem(final ListGridRecord[] selection) {
+		MenuItem metadata = new MenuItem();
+		metadata.setTitle(I18N.message("mmetadata"));
+		metadata.addClickHandler(compareMetadataEvent -> DocumentService.Instance.get().getVersionsById(
+				Long.parseLong(selection[0].getAttribute("id")), Long.parseLong(selection[0].getAttribute("id")),
+				new DefaultAsyncCallback<>() {
+					@Override
+					public void onSuccess(List<GUIVersion> result) {
+						new VersionMetadata(result.get(0)).show();
+					}
+				}));
+		return metadata;
 	}
 
 	@Override
