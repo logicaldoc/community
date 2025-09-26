@@ -80,30 +80,7 @@
 
         <security:intercept-url pattern="/**" access="isAuthenticated()" />
         <security:http-basic entry-point-ref="basicAuthenticationEntryPoint" />
-    </security:http>    
-    <security:http pattern="/download-ticket/**" use-expressions="true"
-        create-session="never" disable-url-rewriting="true" auto-config="false"
-        authentication-manager-ref="authenticationManager"
-        security-context-repository-ref="LDSecurityContextRepository">
-        
-        <security:headers disabled="true" />
-        <security:csrf disabled="true" />
-        
-        <security:intercept-url pattern="/nosecurity" access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="basicAuthenticationEntryPoint" />
-    </security:http>    
-    <security:http pattern="/webform/**" use-expressions="true"
-        create-session="never" disable-url-rewriting="true" auto-config="false"
-        authentication-manager-ref="authenticationManager"
-        security-context-repository-ref="LDSecurityContextRepository">
-        
-        <security:headers disabled="true" />
-        <security:csrf disabled="true" />
-        
-        <security:intercept-url pattern="/nosecurity" access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="basicAuthenticationEntryPoint" />
-    </security:http>  
-    
+    </security:http>
  
     <security:http pattern="/webdav/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
