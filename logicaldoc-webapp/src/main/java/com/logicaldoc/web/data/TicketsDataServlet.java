@@ -71,7 +71,7 @@ public class TicketsDataServlet extends AbstractDataServlet {
 			fileName = fileName + ".pdf";
 
 		writer.print("<ticket>");
-		writer.print("<id>" + rows.getInt(1) + "</id>");
+		writer.print("<id>" + rows.getLong(1) + "</id>");
 		writer.print("<ticketId><![CDATA[" + rows.getString(2) + "]]></ticketId>");
 
 		writer.print("<type><![CDATA[" + rows.getInt(14) + "]]></type>");
