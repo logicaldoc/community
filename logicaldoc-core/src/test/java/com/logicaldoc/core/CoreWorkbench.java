@@ -1,6 +1,5 @@
 package com.logicaldoc.core;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -29,8 +28,6 @@ import com.logicaldoc.core.communication.MailUtil;
 import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ResourceUtil;
-import com.talanlabs.avatargenerator.Avatar;
-import com.talanlabs.avatargenerator.IdenticonAvatar;
 
 import jakarta.mail.MessagingException;
 
@@ -80,12 +77,6 @@ public class CoreWorkbench {
 //		System.out.println("Cpu usage: " + percent + "%");
 
 //		statsStuff();
-	}
-
-	private static void avatarStuff() {
-		Avatar avatar = IdenticonAvatar.newAvatarBuilder().size(128, 128).build();
-		BufferedImage image = avatar.create(-1050);
-		System.out.println(image);
 	}
 
 	private static void statsStuff() throws ClientProtocolException, IOException {

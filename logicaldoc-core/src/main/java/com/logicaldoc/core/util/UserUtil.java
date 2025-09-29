@@ -23,8 +23,6 @@ import com.logicaldoc.core.security.user.UserType;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
-import com.talanlabs.avatargenerator.Avatar;
-import com.talanlabs.avatargenerator.IdenticonAvatar;
 import com.timgroup.jgravatar.Gravatar;
 import com.timgroup.jgravatar.GravatarDefaultImage;
 import com.timgroup.jgravatar.GravatarRating;
@@ -46,6 +44,9 @@ public class UserUtil {
 	 */
 	private static final String TRANSPARENT_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
+	
+	private static final String DEFAULT_AVATAR_IMAGE = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tISBGb250IEF3ZXNvbWUgUHJvIDYuNy4yIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlIChDb21tZXJjaWFsIExpY2Vuc2UpIENvcHlyaWdodCAyMDI0IEZvbnRpY29ucywgSW5jLiAtLT48cGF0aCBkPSJNMzIwIDEyOGE5NiA5NiAwIDEgMCAtMTkyIDAgOTYgOTYgMCAxIDAgMTkyIDB6TTk2IDEyOGExMjggMTI4IDAgMSAxIDI1NiAwQTEyOCAxMjggMCAxIDEgOTYgMTI4ek0zMiA0ODBsMzg0IDBjLTEuMi03OS43LTY2LjItMTQ0LTE0Ni4zLTE0NGwtOTEuNCAwYy04MCAwLTE0NSA2NC4zLTE0Ni4zIDE0NHpNMCA0ODIuM0MwIDM4My44IDc5LjggMzA0IDE3OC4zIDMwNGw5MS40IDBDMzY4LjIgMzA0IDQ0OCAzODMuOCA0NDggNDgyLjNjMCAxNi40LTEzLjMgMjkuNy0yOS43IDI5LjdMMjkuNyA1MTJDMTMuMyA1MTIgMCA0OTguNyAwIDQ4Mi4zeiIvPjwvc3ZnPg==";
+	
 	private static final Logger log = LoggerFactory.getLogger(UserUtil.class);
 
 	private UserUtil() {
@@ -169,8 +170,13 @@ public class UserUtil {
 			int size = Context.get().getProperties().getInt(tenantName + ".gui.avatar.size", 128);
 
 			BufferedImage avatar = UserUtil.generateDefaultAvatarImage(user, size);
-			ImageIO.write(avatar, "png", tmpAvatarImage);
-			user.setAvatar("data:image/png;base64," + ImageUtil.encode(tmpAvatarImage));
+			if (avatar != null) {
+				ImageIO.write(avatar, "png", tmpAvatarImage);
+				user.setAvatar("data:image/png;base64," + ImageUtil.encode(tmpAvatarImage));
+			} else {
+				log.debug("No avatar could be obtained for user {} so switch to default one", user);
+				user.setAvatar(DEFAULT_AVATAR_IMAGE);
+			}
 
 			if (user.getType() != UserType.SYSTEM) {
 				userDao.store(user);
@@ -193,20 +199,8 @@ public class UserUtil {
 		 * Check Gravatar with main email
 		 */
 		BufferedImage avatarImage = getImageFromGravatar(user, size);
-
-		/*
-		 * Now generate one from scratch
-		 */
-		if (avatarImage == null) {
-			try {
-				Avatar avatar = IdenticonAvatar.newAvatarBuilder().size(size, size).build();
-				avatarImage = avatar.create(user.getId() > 0 ? user.getId() : -user.getId());
-			} catch (Exception t) {
-				log.warn("Cannot generate avatar for user {}", user, t);
-			}
-		}
-
-		avatarImage = getImageCentralSquare(size, avatarImage);
+		if (avatarImage != null)
+			avatarImage = getImageCentralSquare(size, avatarImage);
 
 		return avatarImage;
 	}

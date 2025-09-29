@@ -6,18 +6,22 @@ import java.io.OutputStream;
 import java.util.Base64;
 import java.util.Base64.Decoder;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
+import com.logicaldoc.core.util.UserUtil;
+import com.logicaldoc.util.MimeType;
+import com.logicaldoc.util.spring.Context;
+import com.logicaldoc.web.util.ServletUtil;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.logicaldoc.core.util.UserUtil;
-import com.logicaldoc.util.MimeType;
-import com.logicaldoc.web.util.ServletUtil;
 
 /**
  * This servlet provides the user's avatar image, if it is not already available
@@ -57,14 +61,20 @@ public class AvatarServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			String id = request.getParameter(USER_ID);
-
 			String content = UserUtil.getAvatarImage(id);
+
+			if (StringUtils.isEmpty(content)) {
+				User user = Context.get(UserDAO.class).findById(Long.parseLong(id));
+				UserUtil.generateDefaultAvatar(user);
+				content = user.getAvatar();
+			}
+
 			String fileName = "avatar-" + id + "." + getExtension(content);
 
 			response.setContentType(MimeType.getByFilename(fileName));
 			ServletUtil.setContentDisposition(request, response, fileName);
 
-			saveImage(content, response.getOutputStream());
+			writeImage(content, response.getOutputStream());
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			ServletUtil.sendError(response, e.getMessage());
@@ -81,7 +91,7 @@ public class AvatarServlet extends HttpServlet {
 		return extension;
 	}
 
-	private void saveImage(String content, OutputStream out) throws IOException {
+	private void writeImage(String content, OutputStream out) throws IOException {
 		if (content.startsWith(DATA_PREFIX))
 			content = content.substring(content.indexOf(',') + 1);
 
