@@ -22,4 +22,6 @@
             http://www.springframework.org/schema/aop/spring-aop.xsd
             http://www.springframework.org/schema/security
             http://www.springframework.org/schema/security/spring-security.xsd">
+            
+    <bean id="context" class="com.logicaldoc.util.spring.Context" />
 </beans>

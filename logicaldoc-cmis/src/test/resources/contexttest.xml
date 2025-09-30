@@ -21,7 +21,7 @@
     <context:annotation-config />
     
     <tx:annotation-driven transaction-manager="TransactionManager" />
-    
+ 
     <!-- This post processor ensures placeholders substitutions -->
 	<bean id="PropertyPlaceholderConfigurer"
 		class="com.logicaldoc.util.spring.PropertiesPlaceHolder" lazy-init="false" abstract="false"

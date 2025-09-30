@@ -18,6 +18,8 @@
             http://www.springframework.org/schema/security
             http://www.springframework.org/schema/security/spring-security.xsd">
 
+    <bean id="context" class="com.logicaldoc.util.spring.Context" />
+
 	<!-- This post processor ensures placeholders substitutions -->
 	<bean id="PropertyPlaceholderConfigurer"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" lazy-init="false" abstract="false"
@@ -29,9 +31,7 @@
 		</property>
 	</bean>
 
-	<bean id="ContextProperties"
-		class="com.logicaldoc.util.config.ContextProperties">
-	</bean>
+	<bean id="ContextProperties" class="com.logicaldoc.util.config.ContextProperties" />
 
 	<!-- DataSource -->
     <bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">

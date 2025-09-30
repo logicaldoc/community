@@ -22,6 +22,8 @@
 
     <context:annotation-config />
 
+    <bean id="context" class="com.logicaldoc.util.spring.Context" />
+
 	<!-- This post processor ensures placeholders substitutions -->
 	<bean id="PropertyPlaceholderConfigurer"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
