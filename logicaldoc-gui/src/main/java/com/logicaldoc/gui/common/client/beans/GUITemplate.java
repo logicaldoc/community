@@ -28,6 +28,8 @@ public class GUITemplate implements Serializable {
 
 	private int type = TYPE_DEFAULT;
 
+	private String initialization;
+
 	private String validation;
 
 	private List<GUIAttribute> attributes = new ArrayList<>();
@@ -151,10 +153,10 @@ public class GUITemplate implements Serializable {
 		}
 		accessControlList = newAce;
 	}
-	
+
 	public void addAce(GUIAccessControlEntry ace) {
 		GUIAccessControlEntry existingAce = getAce(ace.getEntityId());
-		if(existingAce==null) {
+		if (existingAce == null) {
 			accessControlList.add(ace);
 		} else {
 			existingAce.setRead(ace.isRead());
@@ -184,6 +186,14 @@ public class GUITemplate implements Serializable {
 
 	public void setValidation(String validation) {
 		this.validation = validation;
+	}
+
+	public String getInitialization() {
+		return initialization;
+	}
+
+	public void setInitialization(String initialization) {
+		this.initialization = initialization;
 	}
 
 	public String getLabel() {

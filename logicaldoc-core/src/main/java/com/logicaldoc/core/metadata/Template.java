@@ -33,6 +33,9 @@ public class Template extends AbstractAttributeSet implements Secure<AccessContr
 
 	private static final long serialVersionUID = 1L;
 
+	@Column(name = "ld_initialization")
+	private String initialization;
+
 	@Column(name = "ld_validation")
 	private String validation;
 
@@ -61,6 +64,14 @@ public class Template extends AbstractAttributeSet implements Secure<AccessContr
 
 	public void setValidation(String validation) {
 		this.validation = validation;
+	}
+
+	public String getInitialization() {
+		return initialization;
+	}
+
+	public void setInitialization(String initialization) {
+		this.initialization = initialization;
 	}
 
 	@Override

@@ -305,6 +305,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		clonedTemplate.setDescription(originalTemplate.getDescription());
 		clonedTemplate.setReadonly(originalTemplate.getReadonly());
 		clonedTemplate.setValidation(originalTemplate.getValidation());
+		clonedTemplate.setInitialization(originalTemplate.getInitialization());
 		clonedTemplate.setTemplateAttributes(originalTemplate.getTemplateAttributes().entrySet().stream()
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 		store(clonedTemplate);

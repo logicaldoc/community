@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.logicaldoc.webservice.doc.WSDoc;
+
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
-
-import com.logicaldoc.webservice.doc.WSDoc;
 
 /**
  * A WS Template
@@ -34,6 +34,9 @@ public class WSTemplate implements Serializable {
 
 	@WSDoc(description = "the last modified date (format must be 'yyyy-MM-dd HH:mm:ss' or 'yyyy-MM-dd')", required = false)
 	private int docsCount;
+
+	@WSDoc(required = false)
+	private String initialization;
 
 	@WSDoc(required = false)
 	private String validation;
@@ -120,5 +123,13 @@ public class WSTemplate implements Serializable {
 
 	public void setValidation(String validation) {
 		this.validation = validation;
+	}
+
+	public String getInitialization() {
+		return initialization;
+	}
+
+	public void setInitialization(String initialization) {
+		this.initialization = initialization;
 	}
 }

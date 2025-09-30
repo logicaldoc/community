@@ -31,7 +31,7 @@ public class WorkflowsDS extends DataSource {
 		setDataURL("data/workflows.xml?locale=" + I18N.getLocale()
 				+ (retrieveDefinitions ? "&retrievedefinitions=true" : "") + (deployedOnly ? "&deployedOnly=true" : "")
 				+ (workflowName != null ? "&name=" + workflowName : "") + (userId != null ? "&userId=" + userId : "")
-				+ (checkDeployExists ? "&checkDeployExists=true" : "") + (checkDeployExists ? "&checkDeployExists=true" : ""));
+				+ (checkDeployExists ? "&checkDeployExists=true" : ""));
 		setClientOnly(true);
 	}
 

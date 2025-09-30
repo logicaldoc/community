@@ -38,6 +38,10 @@ public class TemplateDetailsPanel extends VLayout {
 
 	protected TemplateValidationPanel validationPanel;
 
+	protected Layout initializationTabPanel;
+
+	protected TemplateInitializationPanel initializationPanel;
+	
 	protected EditingTabSet tabSet;
 
 	private TemplatesPanel templatesPanel;
@@ -130,6 +134,17 @@ public class TemplateDetailsPanel extends VLayout {
 		validationTabPanel.addMember(validationPanel);
 
 		/*
+		 * Prepare the initialization tab
+		 */
+		if (initializationPanel != null) {
+			initializationPanel.destroy();
+			if (Boolean.TRUE.equals(initializationTabPanel.contains(initializationPanel)))
+				initializationTabPanel.removeMember(initializationPanel);
+		}
+		initializationPanel = new TemplateInitializationPanel(template, changeHandler);
+		initializationTabPanel.addMember(initializationPanel);
+		
+		/*
 		 * Prepare the security tab
 		 */
 		if (securityPanel != null) {
@@ -169,6 +184,9 @@ public class TemplateDetailsPanel extends VLayout {
 		stdValid = validationPanel.validate();
 		if (!stdValid)
 			tabSet.selectTab(1);
+		stdValid = initializationPanel.validate();
+		if (!stdValid)
+			tabSet.selectTab(2);
 		return stdValid;
 	}
 

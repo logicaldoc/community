@@ -55,7 +55,15 @@ public class Initializer {
 
 		setUser(transaction);
 
-		template = initializeAttributes(template);
+		template = initializeAttributesCollection(template);
+
+		// Initialize the object with general initalization defined at template
+		// level(if any)
+		try {
+			executeInitialization(object, transaction, template);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
 
 		// We access the collection as is without initializing the bean
 		// because that would lead to hibernate errors
@@ -72,7 +80,7 @@ public class Initializer {
 		}
 	}
 
-	private Template initializeAttributes(Template template) {
+	private Template initializeAttributesCollection(Template template) {
 		try {
 			int attributesCount = template.getAttributeNames().size();
 			if (log.isDebugEnabled())
@@ -90,6 +98,22 @@ public class Initializer {
 			}
 		}
 		return template;
+	}
+
+	private void executeInitialization(ExtensibleObject object, History transaction, Template template)
+			throws AutomationException {
+		if (StringUtils.isEmpty(template.getInitialization()))
+			return;
+
+		Map<String, Object> fieldValidationDictionary = new HashMap<>();
+		fieldValidationDictionary.put("object", object);
+		fieldValidationDictionary.put("event", transaction);
+
+		Automation script = new Automation("initializer-" + template.getName(),
+				transaction != null && transaction.getUser() != null ? transaction.getUser().getLocale()
+						: Locale.getDefault(),
+				object.getTenantId());
+		script.evaluate(template.getInitialization(), fieldValidationDictionary);
 	}
 
 	private void executeInitialization(ExtensibleObject object, History transaction, String attributeName,

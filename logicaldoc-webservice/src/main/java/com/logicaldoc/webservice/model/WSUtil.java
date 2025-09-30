@@ -414,6 +414,7 @@ public class WSUtil {
 		template.setName(wsTemplate.getName());
 		template.setDescription(wsTemplate.getDescription());
 		template.setValidation(wsTemplate.getValidation());
+		template.setInitialization(wsTemplate.getInitialization());
 
 		Map<String, Attribute> attributes = null;
 		if (CollectionUtils.isNotEmpty(wsTemplate.getAttributes())) {
@@ -454,6 +455,7 @@ public class WSUtil {
 			wsTemplate.setName(template.getName());
 			wsTemplate.setDescription(template.getDescription());
 			wsTemplate.setValidation(template.getValidation());
+			wsTemplate.setInitialization(template.getInitialization());
 			wsTemplate.setLastModified(DateUtil.format(template.getLastModified()));
 
 			TemplateDAO templateDao = Context.get(TemplateDAO.class);

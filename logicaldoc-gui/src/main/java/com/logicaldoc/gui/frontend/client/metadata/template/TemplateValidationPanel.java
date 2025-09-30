@@ -71,9 +71,8 @@ public class TemplateValidationPanel extends HLayout {
 	}
 
 	protected boolean validate() {
-		if (form.validate()) {
+		if (form.validate())
 			template.setValidation(form.getValueAsString("validation"));
-		}
 		return !form.hasErrors();
 	}
 
