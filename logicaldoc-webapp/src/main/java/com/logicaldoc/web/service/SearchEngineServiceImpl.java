@@ -70,6 +70,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 			searchEngine
 					.setIncludePatternsMetadata(conf.getProperty(session.getTenantName() + ".index.includes.metadata"));
 			searchEngine.setSkipOnError(conf.getBoolean(session.getTenantName() + ".index.skiponerror", false));
+			searchEngine.setIgnoreContentError(conf.getBoolean(session.getTenantName() + ".index.ignorecontenterror", false));
 			searchEngine.setParsingTimeout(conf.getInt(session.getTenantName() + ".parser.timeout", 0));
 			searchEngine
 					.setParsingTimeoutRetain(conf.getBoolean(session.getTenantName() + ".parser.timeout.retain", true));
@@ -160,6 +161,9 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 					searchEngine.getIncludePattersMetadata() != null ? searchEngine.getIncludePattersMetadata() : "");
 			conf.setProperty(session.getTenantName() + ".index.skiponerror",
 					Boolean.toString(searchEngine.isSkipOnError()));
+			conf.setProperty(session.getTenantName() + ".index.ignorecontenterror",
+					Boolean.toString(searchEngine.isIgnoreContentError()));
+			
 			conf.setProperty(session.getTenantName() + ".parser.timeout",
 					searchEngine.getParsingTimeout() != null ? Integer.toString(searchEngine.getParsingTimeout()) : "");
 			conf.setProperty(session.getTenantName() + ".parser.timeout.retain",

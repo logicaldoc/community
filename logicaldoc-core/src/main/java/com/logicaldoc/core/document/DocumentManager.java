@@ -46,6 +46,7 @@ import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
+import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.menu.Menu;
@@ -576,10 +577,9 @@ public class DocumentManager {
 		if (parser != null) {
 			log.debug("Using parser {} to parse document {}", parser.getClass().getName(), doc.getId());
 
-			TenantDAO tDao = Context.get(TenantDAO.class);
 			try {
 				content = parser.parse(store.getStream(doc.getId(), resource), new ParseParameters(doc,
-						doc.getFileName(), fileVersion, null, locale, tDao.findById(doc.getTenantId()).getName()));
+						doc.getFileName(), fileVersion, null, locale, tenantName(doc.getTenantId())));
 			} catch (Exception e) {
 				log.error("Cannot parse document {}", doc);
 				log.error(e.getMessage(), e);
@@ -647,7 +647,7 @@ public class DocumentManager {
 				// Extracts the content from the file. This may take very long
 				// time.
 				Date beforeParsing = new Date();
-				cont = parseDocument(doc, null);
+				cont = parseDocumentWithTrapping(doc);
 				parsingTime = TimeDiff.getTimeDifference(beforeParsing, new Date(), TimeField.MILLISECOND);
 			}
 
@@ -684,6 +684,21 @@ public class DocumentManager {
 		return parsingTime;
 	}
 
+	private String parseDocumentWithTrapping(Document document) throws ParsingException {
+		String cont = "";
+		try {
+			cont = parseDocument(document, null);
+		} catch (ParsingException e) {
+			if (config.getBoolean(tenantName(document.getTenantId()) + ".index.ignorecontenterror", false)) {
+				log.warn("Ignore parsing errors for document {}", document);
+				if (log.isDebugEnabled())
+					log.debug(e.getMessage(), e);
+			} else
+				throw e;
+		}
+		return cont;
+	}
+
 	private void recordIndexingError(DocumentHistory transaction, Document document, Exception exception)
 			throws PersistenceException {
 		if (transaction == null)
@@ -697,14 +712,22 @@ public class DocumentManager {
 		hDao.store(transaction);
 
 		if (exception instanceof ParsingException) {
-			TenantDAO tDao = Context.get(TenantDAO.class);
-			String tenant = tDao.getTenantName(document.getTenantId());
-			if (Context.get().getProperties().getBoolean(tenant + ".index.skiponerror", false)) {
+			if (Context.get().getProperties().getBoolean(tenantName(document.getTenantId()) + ".index.skiponerror",
+					false)) {
 				DocumentDAO dDao = Context.get(DocumentDAO.class);
 				dDao.initialize(document);
 				document.setIndexingStatus(IndexingStatus.SKIP);
 				dDao.store(document);
 			}
+		}
+	}
+
+	private String tenantName(long tenantId) {
+		try {
+			return Context.get(TenantDAO.class).getTenantName(tenantId);
+		} catch (PersistenceException e) {
+			log.warn(e.getMessage(), e);
+			return Tenant.DEFAULT_NAME;
 		}
 	}
 

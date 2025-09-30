@@ -488,11 +488,17 @@ public class SearchIndexPanel extends AdminPanel {
 		skipOnError.setHint(I18N.message("onerrormarkunindexablehint"));
 		skipOnError.setRequired(true);
 
+		// Ignore errors when extracting body content
+		ToggleItem ignoreContentError = ItemFactory.newToggleItem("ignoreContentError", "ignorecontenterror",
+				this.searchEngine.isIgnoreContentError());
+		ignoreContentError.setHint(I18N.message("ignorecontenterrorhint"));
+		ignoreContentError.setRequired(true);
+
 		HLayout buttons = prepareButtons();
 
 		searchEngineForm.setItems(entries, status, repository, includePatterns, excludePatterns,
-				includePatternsMetadata, excludePatternsMetadata, skipOnError, sorting, customSorting, threads, batch,
-				timeout, timeoutRetain, maxText, maxTextFileSize);
+				includePatternsMetadata, excludePatternsMetadata, skipOnError, ignoreContentError, sorting,
+				customSorting, threads, batch, timeout, timeoutRetain, maxText, maxTextFileSize);
 
 		buttons.setMembersMargin(5);
 		searchEngineTabPanel.setMembers(searchEngineForm, buttons);
@@ -658,6 +664,9 @@ public class SearchIndexPanel extends AdminPanel {
 		SearchIndexPanel.this.searchEngine.setSorting(vm.getValueAsString("sorting"));
 		SearchIndexPanel.this.searchEngine.setCustomSorting(vm.getValueAsString("customsorting"));
 		SearchIndexPanel.this.searchEngine.setSkipOnError(Boolean.valueOf(vm.getValueAsString("skipOnError")));
+		SearchIndexPanel.this.searchEngine
+				.setIgnoreContentError(Boolean.valueOf(vm.getValueAsString("ignoreContentError")));
+
 		SearchIndexPanel.this.searchEngine
 				.setParsingTimeoutRetain(Boolean.valueOf(vm.getValueAsString("timeoutRetain")));
 
