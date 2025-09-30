@@ -38,6 +38,7 @@ import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.util.spring.Context;
+import com.logicaldoc.util.spring.MainContext;
 import com.logicaldoc.util.time.Pause;
 import com.logicaldoc.util.time.TimeDiff;
 
@@ -164,7 +165,7 @@ public abstract class AbstractTestCase {
 	 * @return the ApplicationContext
 	 */
 	protected ApplicationContext buildApplicationContext() {
-		return new AnnotationConfigApplicationContext(Context.class);
+		return new AnnotationConfigApplicationContext(MainContext.class);
 	}
 
 	/**

@@ -15,9 +15,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
@@ -38,8 +35,6 @@ import net.sf.ehcache.CacheManager;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
-@ComponentScan(basePackages = "com.logicaldoc", useDefaultFilters = false, includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, value = PluginContext.class))
-@ImportResource("classpath:context.xml")
 @Component("context")
 public class Context implements ApplicationContextAware, ApplicationListener<ApplicationEvent> {
 
@@ -53,7 +48,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 
 	private static Context instance;
 
-	private Context() {
+	protected Context() {
 		// Empty constructor
 	}
 
