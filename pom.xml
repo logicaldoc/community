@@ -19,7 +19,7 @@
     </organization>
     <url>http://www.logicaldoc.com</url>
     <issueManagement>
-        <system>Mantis</system>
+        <system>Track</system>
         <url>http://bugs.logicaldoc.com</url>
     </issueManagement>
     <licenses>
