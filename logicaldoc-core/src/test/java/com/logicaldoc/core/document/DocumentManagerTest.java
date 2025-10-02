@@ -719,7 +719,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		}
 
 		// Overridden method - transaction is null
-		File file = new File("testFile");
+		File file = new File("target/testFile");
 		doc = docDao.findById(1);
 		assertNotNull(doc);
 		docDao.initialize(doc);
@@ -942,7 +942,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		}
 		assertTrue(exceptionHappened);
 
-		File file = new File("testFile");
+		File file = new File("target/testFile");
 
 		// immutable is not 0
 		doc = docDao.findById(9);
@@ -1067,6 +1067,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		// Non-admin user
 		user = new User();
+		user.setPassword("admin");
 		user.setName("testUser");
 		userDao.store(user);
 		transaction = new DocumentHistory();

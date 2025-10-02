@@ -1005,6 +1005,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		// Existing user without group
 		User user = new User();
 		user.setUsername("userWithNoGroup");
+		user.setPassword("admin");
 		user.setGroups(new HashSet<>());
 		userDao.store(user);
 
@@ -1157,7 +1158,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		// User with no group
 		User user = new User();
 		user.setUsername("userWithNoGroup");
-
+		user.setPassword("admin");
 		userDao.store(user);
 
 		User storedUser = userDao.findByUsername("userWithNoGroup");
@@ -1238,6 +1239,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		// Create a user with no groups
 		User user = new User();
 		user.setUsername("userWithoutGroups");
+		user.setPassword("admin");
 		user.setGroups(new HashSet<>());
 		userDao.store(user);
 

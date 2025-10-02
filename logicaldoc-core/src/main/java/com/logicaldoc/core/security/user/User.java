@@ -8,15 +8,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 
-import jakarta.persistence.Cacheable;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
-
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +17,14 @@ import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.persistence.Cacheable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 /**
  * This class represents a user. A user can be member of any number of groups,
@@ -47,7 +47,7 @@ public class User extends PersistentObject implements Serializable {
 	public static final long USERID_SYSTEM = -1010;
 
 	private static final long serialVersionUID = 8093874904302301982L;
-	
+
 	@Column(name = "ld_type", nullable = false)
 	@Enumerated(EnumType.ORDINAL)
 	private UserType type = UserType.DEFAULT;
@@ -110,7 +110,7 @@ public class User extends PersistentObject implements Serializable {
 
 	@Column(name = "ld_telephone2", length = 255)
 	private String telephone2 = "";
-	
+
 	// Not persisted
 	@Transient
 	private Set<Group> groups = new HashSet<>();
@@ -123,7 +123,7 @@ public class User extends PersistentObject implements Serializable {
 	 */
 	@Column(name = "ld_legals", nullable = false)
 	private int legals = 0;
-	
+
 	/**
 	 * The last time the password was changed
 	 */
@@ -313,7 +313,7 @@ public class User extends PersistentObject implements Serializable {
 	public void setType(UserType type) {
 		this.type = type;
 	}
-	
+
 	public void setType(int type) {
 		this.type = UserType.values()[type];
 	}
@@ -465,10 +465,12 @@ public class User extends PersistentObject implements Serializable {
 	 * @throws NoSuchAlgorithmException Cripting error
 	 */
 	public void setDecodedPassword(String pwd) throws NoSuchAlgorithmException {
-		if (StringUtils.isNotEmpty(pwd)) {
-			decodedPassword = pwd;
-			password = CryptUtil.encryptSHA256(pwd);
-		}
+		if (StringUtils.isEmpty(pwd))
+			throw new NoSuchAlgorithmException("Password cannot be empty");
+		decodedPassword = pwd;
+		password = CryptUtil.encryptSHA256(pwd);
+		if (StringUtils.isEmpty(password))
+			throw new NoSuchAlgorithmException("Password cannot be empty");
 	}
 
 	public void setName(String name) {
@@ -652,7 +654,7 @@ public class User extends PersistentObject implements Serializable {
 	public void setSource(UserSource source) {
 		this.source = source;
 	}
-	
+
 	public void setSource(int source) {
 		this.source = UserSource.values()[source];
 	}

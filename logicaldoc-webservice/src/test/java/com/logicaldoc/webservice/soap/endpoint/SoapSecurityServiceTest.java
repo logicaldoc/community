@@ -107,6 +107,7 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 		wsUserTest.setName("user test");
 		wsUserTest.setEmail("user@acme.com");
 		wsUserTest.setUsername("user");
+		wsUserTest.setPassword("us2K.E)r/#");
 		wsUserTest.setFirstName("test");
 
 		Long userId = securityServiceImpl.storeUser("", wsUserTest);
@@ -145,6 +146,7 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 		wsUserTest.setName("Lavender Haze");
 		wsUserTest.setEmail("l.haze@midnights.com");
 		wsUserTest.setUsername("lavhaze");
+		wsUserTest.setPassword("us2K.E)r/#");
 		wsUserTest.setFirstName("Lavender");
 		wsUserTest.setType(UserType.SYSTEM.ordinal());
 

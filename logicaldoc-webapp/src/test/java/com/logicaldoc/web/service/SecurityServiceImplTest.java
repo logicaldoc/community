@@ -193,7 +193,6 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
 	@Test
 	public void testSaveUser() throws ServerException {
 		GUIUser user = testSubject.getUser(1);
-
 		user = testSubject.saveUser(user, guiSession.getInfo());
 		assertNotNull(user);
 		assertEquals("admin", user.getUsername());

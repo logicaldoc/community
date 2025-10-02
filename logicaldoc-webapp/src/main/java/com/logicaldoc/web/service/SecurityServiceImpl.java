@@ -711,6 +711,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 			setExpire(user, guiUser);
 
+			String decodedPassword = StringUtils.defaultString(user.getDecodedPassword(), "-");
 			if (createNew) {
 				User existingUser = userDao.findByUsername(guiUser.getUsername());
 				if (existingUser != null) {
@@ -723,16 +724,15 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 				// Generate an initial password(that must be changed)
 				ContextProperties config = Context.get().getProperties();
-				String password = PasswordGenerator.generate(config.getInt(tenant + PASSWORD_SIZE, 8),
+				decodedPassword = PasswordGenerator.generate(config.getInt(tenant + PASSWORD_SIZE, 8),
 						config.getInt(tenant + PASSWORD_UPPERCASE, 2), config.getInt(tenant + PASSWORD_LOWERCASE, 2),
 						config.getInt(tenant + PASSWORD_DIGIT, 1), config.getInt(tenant + PASSWORD_SPECIAL, 1),
 						config.getInt(tenant + PASSWORD_SEQUENCE, 4), config.getInt(tenant + PASSWORD_OCCURRENCE, 3));
-				user.setDecodedPassword(password);
+				user.setDecodedPassword(decodedPassword);
 				user.setPasswordExpired(1);
 				user.setPasswordChanged(new Date());
 			}
 
-			String decodedPassword = user.getDecodedPassword();
 			saveWorkingTimes(user, guiUser.getWorkingTimes());
 
 			UserHistory transaction = new UserHistory();
