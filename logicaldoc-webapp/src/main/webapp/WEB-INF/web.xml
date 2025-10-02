@@ -15,7 +15,7 @@
   
   <context-param>
     <param-name>contextConfigLocation</param-name>
-    <param-value>com.logicaldoc.util.spring.Context</param-value>
+    <param-value>com.logicaldoc.util.spring.MainContext</param-value>
   </context-param>
   <context-param>
     <param-name>contextClass</param-name>
