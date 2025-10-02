@@ -117,7 +117,6 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 		User user = testSubject.findByUsername("admin");
 		assertNotNull(user);
 		assertEquals("admin", user.getUsername());
-		user.setDecodedPassword(PasswordGenerator.generate(12, 2, 2, 2, 2, 2, 2));
 		assertEquals(CryptUtil.encryptSHA256("admin"), user.getPassword());
 		assertEquals("admin@admin.net", user.getEmail());
 		assertEquals(2, user.getGroups().size());
@@ -254,7 +253,6 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testStorePasswordChanged() throws PersistenceException, NoSuchAlgorithmException {
-
 		String pswd = PasswordGenerator.generate(12, 2, 2, 2, 2, 2, 2);
 
 		User user = testSubject.findById(1L);
@@ -288,7 +286,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 		user = testSubject.findById(1L);
 		testSubject.initialize(user);
 		assertEquals(0, user.getPasswordExpired());
-		user.setDecodedPassword(pswd + "-neverused");
+		user.setDecodedPassword(pswd + "-nvrusd");
 		user.setPasswordExpired(1);
 		testSubject.store(user);
 
