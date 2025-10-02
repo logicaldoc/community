@@ -22,6 +22,7 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserType;
 import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.security.PasswordGenerator;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSGroup;
@@ -107,7 +108,7 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 		wsUserTest.setName("user test");
 		wsUserTest.setEmail("user@acme.com");
 		wsUserTest.setUsername("user");
-		wsUserTest.setPassword("us2K.E)r/#");
+		wsUserTest.setPassword(PasswordGenerator.generate(12, 2, 2, 2, 2, 2, 2));
 		wsUserTest.setFirstName("test");
 
 		Long userId = securityServiceImpl.storeUser("", wsUserTest);
@@ -146,7 +147,7 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 		wsUserTest.setName("Lavender Haze");
 		wsUserTest.setEmail("l.haze@midnights.com");
 		wsUserTest.setUsername("lavhaze");
-		wsUserTest.setPassword("us2K.E)r/#");
+		wsUserTest.setPassword(PasswordGenerator.generate(12, 2, 2, 2, 2, 2, 2));
 		wsUserTest.setFirstName("Lavender");
 		wsUserTest.setType(UserType.SYSTEM.ordinal());
 
@@ -267,26 +268,28 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testChangePassword() throws Exception {
+		String pswd=PasswordGenerator.generate(12, 2, 2, 2, 2, 2, 2);
+		
 		WSUser newUser = new WSUser();
 		newUser.setName("user test");
 		newUser.setUsername("user");
 		newUser.setFirstName("test");
 		newUser.setEmail("user@acme.com");
-		newUser.setPassword("(-xi%HT3y?r3'ux");
+		newUser.setPassword(pswd);
 
 		Long userId = securityServiceImpl.storeUser("", newUser);
 		assertNotNull(userId);
 
-		int changeResult = securityServiceImpl.changePassword("", userId, "(-xi%HT3y?r3'ux", "t<(`oN]I{*2d(0");
+		int changeResult = securityServiceImpl.changePassword("", userId, pswd, "t<(`oN]I{*2d(0");
 		assertEquals(0, changeResult);
 
 		// attempt to change the passwd using the previously used passwd (same
 		// passwd)
-		changeResult = securityServiceImpl.changePassword("", userId, "(-xi%HT3y?r3'ux", "t<(`oN]I{*2d(0");
+		changeResult = securityServiceImpl.changePassword("", userId, pswd, "t<(`oN]I{*2d(0");
 		assertEquals(1, changeResult);
 
 		// attempt to change password of a non existent user
-		changeResult = securityServiceImpl.changePassword("", 2110, "(-xi%HT3y?r3'ux", "t<(`oN]I{*2d(0");
+		changeResult = securityServiceImpl.changePassword("", 2110, pswd, "t<(`oN]I{*2d(0");
 		assertEquals(1, changeResult);
 	}
 
