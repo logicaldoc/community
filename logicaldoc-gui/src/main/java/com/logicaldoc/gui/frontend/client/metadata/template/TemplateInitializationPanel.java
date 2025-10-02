@@ -61,7 +61,7 @@ public class TemplateInitializationPanel extends HLayout {
 		form.setTitleOrientation(TitleOrientation.TOP);
 
 		TextAreaItem initialization = ItemFactory.newTextAreaItemForAutomation("initialization",
-				template.getValidation(), (!template.isReadonly() && template.isWrite()) ? changedHandler : null,
+				template.getInitialization(), (!template.isReadonly() && template.isWrite()) ? changedHandler : null,
 				false);
 		initialization.setDisabled(template.isReadonly() || !template.isWrite());
 		initialization.setWidth("*");

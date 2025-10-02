@@ -41,7 +41,7 @@ public class TemplateDetailsPanel extends VLayout {
 	protected Layout initializationTabPanel;
 
 	protected TemplateInitializationPanel initializationPanel;
-	
+
 	protected EditingTabSet tabSet;
 
 	private TemplatesPanel templatesPanel;
@@ -88,6 +88,13 @@ public class TemplateDetailsPanel extends VLayout {
 		propertiesTabPanel.setHeight100();
 		propertiesTab.setPane(propertiesTabPanel);
 		tabSet.addTab(propertiesTab);
+
+		Tab initializationTab = new Tab(I18N.message("initialization"));
+		initializationTabPanel = new HLayout();
+		initializationTabPanel.setWidth100();
+		initializationTabPanel.setHeight100();
+		initializationTab.setPane(initializationTabPanel);
+		tabSet.addTab(initializationTab);
 
 		Tab validationTab = new Tab(I18N.message("validation"));
 		validationTabPanel = new HLayout();
@@ -143,7 +150,7 @@ public class TemplateDetailsPanel extends VLayout {
 		}
 		initializationPanel = new TemplateInitializationPanel(template, changeHandler);
 		initializationTabPanel.addMember(initializationPanel);
-		
+
 		/*
 		 * Prepare the security tab
 		 */
@@ -201,7 +208,7 @@ public class TemplateDetailsPanel extends VLayout {
 			});
 		}
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
