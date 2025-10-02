@@ -8,15 +8,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 
-import jakarta.persistence.Cacheable;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
-
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +17,14 @@ import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.persistence.Cacheable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 /**
  * This class represents a user. A user can be member of any number of groups,
@@ -465,10 +465,12 @@ public class User extends PersistentObject implements Serializable {
 	 * @throws NoSuchAlgorithmException Cripting error
 	 */
 	public void setDecodedPassword(String pwd) throws NoSuchAlgorithmException {
-		if (StringUtils.isNotEmpty(pwd)) {
-			decodedPassword = pwd;
-			password = CryptUtil.encryptSHA256(pwd);
-		}
+		if (StringUtils.isEmpty(pwd))
+			throw new NoSuchAlgorithmException("Password cannot be empty");
+		decodedPassword = pwd;
+		password = CryptUtil.encryptSHA256(pwd);
+		if (StringUtils.isEmpty(password))
+			throw new NoSuchAlgorithmException("Password cannot be empty");
 	}
 
 	public void setName(String name) {
