@@ -24,6 +24,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.security.PasswordGenerator;
 import com.logicaldoc.util.spring.Context;
 
 /**
@@ -116,7 +117,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 		User user = testSubject.findByUsername("admin");
 		assertNotNull(user);
 		assertEquals("admin", user.getUsername());
-		user.setDecodedPassword("admin");
+		user.setDecodedPassword(PasswordGenerator.generate(12, 2, 2, 2, 2, 2, 2));
 		assertEquals(CryptUtil.encryptSHA256("admin"), user.getPassword());
 		assertEquals("admin@admin.net", user.getEmail());
 		assertEquals(2, user.getGroups().size());
@@ -198,9 +199,11 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testStore() throws PersistenceException, NoSuchAlgorithmException {
+
+		String pswd = PasswordGenerator.generate(12, 2, 2, 2, 2, 2, 2);
 		User user = new User();
 		user.setUsername("xxx");
-		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
+		user.setDecodedPassword(pswd);
 		user.setName("claus");
 		user.setFirstName("valca");
 		user.setEmail("valca@acme.com");
@@ -226,14 +229,14 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 		assertEquals(user, storedUser);
 		assertEquals(2, storedUser.getGroups().size());
 		assertNotNull(storedUser.getUserGroup());
-		assertEquals(CryptUtil.encryptSHA256("3$(a8BcX$7GAA%K)"), storedUser.getPassword());
+		assertEquals(CryptUtil.encryptSHA256(pswd), storedUser.getPassword());
 		assertEquals(1, storedUser.getWorkingTimes().size());
 		assertEquals(1, storedUser.getWorkingTimes().iterator().next().getDayOfWeek());
 		assertEquals(5, storedUser.getWorkingTimes().iterator().next().getHourStart());
 		assertEquals(30, storedUser.getWorkingTimes().iterator().next().getMinuteStart());
 
 		user = testSubject.findById(1);
-		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
+		user.setDecodedPassword(PasswordGenerator.generate(12, 2, 2, 2, 2, 2, 2));
 		transaction = new UserHistory();
 		transaction.setEvent(UserEvent.PASSWORDCHANGED);
 		transaction.setUserId(user.getId());
@@ -252,18 +255,20 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testStorePasswordChanged() throws PersistenceException, NoSuchAlgorithmException {
 
+		String pswd = PasswordGenerator.generate(12, 2, 2, 2, 2, 2, 2);
+
 		User user = testSubject.findById(1L);
 		testSubject.initialize(user);
 		assertEquals(0, user.getPasswordExpired());
 		assertEquals(0, user.getPasswordExpires());
-		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
+		user.setDecodedPassword(pswd);
 		testSubject.store(user);
 
 		user = testSubject.findById(1L);
 		testSubject.initialize(user);
 		assertEquals(0, user.getPasswordExpired());
 		assertEquals(0, user.getPasswordExpires());
-		user.setDecodedPassword("3$(a8BcX$7GAA%K-pippo");
+		user.setDecodedPassword(pswd + "-pippo");
 		testSubject.store(user);
 
 		// Give an already used password
@@ -271,7 +276,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 		testSubject.initialize(user);
 		assertEquals(0, user.getPasswordExpired());
 		assertEquals(0, user.getPasswordExpires());
-		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
+		user.setDecodedPassword(pswd);
 
 		try {
 			testSubject.store(user);
@@ -283,7 +288,7 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 		user = testSubject.findById(1L);
 		testSubject.initialize(user);
 		assertEquals(0, user.getPasswordExpired());
-		user.setDecodedPassword("3$(a8BcX$7GAA%K)-neverused");
+		user.setDecodedPassword(pswd + "-neverused");
 		user.setPasswordExpired(1);
 		testSubject.store(user);
 
