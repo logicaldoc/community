@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.frontend.client.security.twofactorsauth;
 
 /**
- * Panel for setting up the YubiKey second factor.
+ * Panel for setting up the Email second factor.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.7.3

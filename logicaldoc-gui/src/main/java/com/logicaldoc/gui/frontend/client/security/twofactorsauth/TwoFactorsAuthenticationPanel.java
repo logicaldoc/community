@@ -8,7 +8,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -44,27 +43,27 @@ public class TwoFactorsAuthenticationPanel extends VLayout {
 		notify.setDisabled(true);
 
 		SelectItem method = ItemFactory.new2AFMethodSelector(FACTOR, user.getSecondFactor(), true);
-		method.addChangedHandler((ChangedEvent event) -> {
+		method.addChangedHandler(changed -> {
 			removeMember(setupPanel);
-			if (event.getValue() == null || event.getValue().toString().isEmpty()) {
+			if (changed.getValue() == null || changed.getValue().toString().isEmpty()) {
 				setupPanel = new TwoFactorsAuthenticationSetup();
 				TwoFactorsAuthenticationPanel.this.user.setKey(null);
 				TwoFactorsAuthenticationPanel.this.user.setSecondFactor(null);
 				notify.setValue(false);
 				notify.setDisabled(true);
-			} else if (Constants.TWOFA_GOOGLE_AUTHENTICATOR.equals(event.getValue().toString())) {
+			} else if (Constants.TWOFA_GOOGLE_AUTHENTICATOR.equals(changed.getValue().toString())) {
 				setupPanel = new GoogleAuthenticatorSetup(TwoFactorsAuthenticationPanel.this.user);
 				notify.setValue(true);
 				notify.setDisabled(false);
-			} else if (Constants.TWOFA_YUBIKEY.equals(event.getValue().toString())) {
+			} else if (Constants.TWOFA_YUBIKEY.equals(changed.getValue().toString())) {
 				setupPanel = new YubiKeySetup(TwoFactorsAuthenticationPanel.this.user);
 				notify.setValue(false);
 				notify.setDisabled(true);
-			} else if (Constants.TWOFA_EMAIL_AUTHENTICATOR.equals(event.getValue().toString())) {
+			} else if (Constants.TWOFA_EMAIL_AUTHENTICATOR.equals(changed.getValue().toString())) {
 				setupPanel = new EmailAuthenticatorSetup();
 				notify.setValue(false);
 				notify.setDisabled(true);
-			} else if (Constants.TWOFA_DUO.equals(event.getValue().toString())) {
+			} else if (Constants.TWOFA_DUO.equals(changed.getValue().toString())) {
 				setupPanel = new DuoSetup(TwoFactorsAuthenticationPanel.this.user);
 				notify.setValue(false);
 				notify.setDisabled(true);
@@ -110,7 +109,7 @@ public class TwoFactorsAuthenticationPanel extends VLayout {
 
 		return vm.validate();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
