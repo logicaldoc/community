@@ -50,13 +50,17 @@ public class ContextPropertiesTest {
 
 		contextProperties.setProperty("emptyKey", "");
 
+		contextProperties.setPropertyEncoded("encoded", "pippoplutopaperino");
+		
 		contextProperties.write();
 
 		assertEquals("pippo", contextProperties.getString("propA"));
 		assertEquals("pippo\npluto\npaperino", contextProperties.getString("propB"));
 		assertEquals(" Lorem ipsum dolor sit amet, consectetur adipiscing elit.", contextProperties.getString("propC"));
 		assertEquals("", contextProperties.getString("emptyKey"));
-
+		assertEquals("pippoplutopaperino",  contextProperties.getString("encoded"));
+		assertEquals("_b64_cGlwcG9wbHV0b3BhcGVyaW5v",  contextProperties.getProperty("encoded"));
+		
 		Properties properties = new Properties();
 		try (FileReader reader = new FileReader(abcFile)) {
 			properties.load(reader);

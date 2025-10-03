@@ -341,6 +341,19 @@ public class ContextProperties extends OrderedProperties {
 	}
 
 	/**
+	 * Same as setProperty but the value gets encoded Base64 first
+	 * 
+	 * @param key name of the setting
+	 * @param value value of the setting
+	 * 
+	 * @return created value
+	 */
+	public synchronized Object setPropertyEncoded(String key, String value) {
+		return super.setProperty(key,
+				BASE64_PREFIX + Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8)));
+	}
+
+	/**
 	 * Gets the property value replacing all variable references
 	 * 
 	 * @param property name of the setting to process
