@@ -1,9 +1,13 @@
 package com.logicaldoc.core.ticket;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.UUID;
 
+import org.hsqldb.lib.StringUtil;
+
 import com.logicaldoc.core.PersistentObject;
+import com.logicaldoc.util.crypt.CryptUtil;
 
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
@@ -83,6 +87,12 @@ public class Ticket extends PersistentObject {
 	 */
 	@Transient
 	private Integer expireHours;
+
+	@Column(name = "ld_password", length = 255)
+	private String password = null;
+
+	@Transient
+	private String decodedPassword;
 
 	public long getDocId() {
 		return docId;
@@ -202,6 +212,33 @@ public class Ticket extends PersistentObject {
 
 	public void setExpireHours(Integer expireHours) {
 		this.expireHours = expireHours;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String pwd) {
+		password = pwd;
+	}
+
+	/**
+	 * Sets the password and encode it
+	 * 
+	 * @param pwd The password in readable format
+	 * @throws NoSuchAlgorithmException Crypting error
+	 */
+	public void setDecodedPassword(String pwd) throws NoSuchAlgorithmException {
+		decodedPassword = pwd;
+		if (StringUtil.isEmpty(pwd)) {
+			password = null;
+		} else {
+			password = CryptUtil.encryptSHA256(pwd);
+		}
+	}
+
+	public String getDecodedPassword() {
+		return decodedPassword;
 	}
 
 	@Override

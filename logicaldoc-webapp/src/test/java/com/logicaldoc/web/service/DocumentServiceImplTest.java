@@ -240,7 +240,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
 	@Test
 	public void testCreateDownloadTicket() throws ServerException {
-		List<String> ticket = testSubject.createDownloadTicket(5L, 0, null, null, null, null, null);
+		List<String> ticket = testSubject.createTicket(5L, 0, null, null, null, null, null, null);
 		// We do not have a HTTP request so expect that the first string is the
 		// exact ticket ID
 		assertEquals("http://server:port/download-ticket?ticketId=" + ticket.get(0), ticket.get(1));
@@ -253,7 +253,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
 	@Test
 	public void testDeleteEnableDisableTicket() throws ServerException {
-		List<String> ticket = testSubject.createDownloadTicket(5, 0, null, null, null, null, null);
+		List<String> ticket = testSubject.createTicket(5, 0, null, null, null, null, null, null);
 
 		// We do not have a HTTP request so expect that the first string is the
 		// exact ticket ID

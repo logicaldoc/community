@@ -18,7 +18,7 @@ public interface DocumentServiceAsync {
 	void getVersionsById(long id1, long id2, AsyncCallback<List<GUIVersion>> callback);
 
 	void getById(long docId, AsyncCallback<GUIDocument> callback);
-	
+
 	void isPasswordProtected(long docId, AsyncCallback<Boolean> callback);
 
 	void save(GUIDocument document, AsyncCallback<GUIDocument> callback);
@@ -98,8 +98,10 @@ public interface DocumentServiceAsync {
 
 	void unarchiveDocuments(List<Long> docIds, AsyncCallback<Void> callback);
 
-	void createDownloadTicket(long docId, int type, String suffix, Integer expireHours, Date expireDate,
-			Integer maxDownloads, Integer maxViews, AsyncCallback<List<String>> callback);
+	void createTicket(long docId, int type, String suffix, Integer expireHours, Date expireDate, Integer maxDownloads,
+			Integer maxViews, String password, AsyncCallback<List<String>> callback);
+
+	void setTicketPassword(long ticketId, String password, AsyncCallback<List<String>> callback);
 
 	void setPassword(long docId, String password, AsyncCallback<Void> callback);
 
@@ -135,7 +137,8 @@ public interface DocumentServiceAsync {
 	void getNotes(long docId, String fileVersion, Collection<String> types,
 			AsyncCallback<List<GUIDocumentNote>> callback);
 
-	void saveNotes(long docId, String fileVersion, List<GUIDocumentNote> notes, Collection<String> types, AsyncCallback<Void> callback);
+	void saveNotes(long docId, String fileVersion, List<GUIDocumentNote> notes, Collection<String> types,
+			AsyncCallback<Void> callback);
 
 	void deleteTicket(long ticketId, AsyncCallback<Void> callback);
 

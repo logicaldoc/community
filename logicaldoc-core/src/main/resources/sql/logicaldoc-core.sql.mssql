@@ -104,7 +104,7 @@ create table ld_ticket (ld_id bigint not null, ld_lastmodified datetime not null
                         ld_deleted int not null, ld_tenantid bigint not null, ld_ticketid nvarchar(255) not null, 
                         ld_docid bigint not null, ld_userid bigint not null, ld_type int not null, 
                         ld_creation datetime not null, ld_expired datetime, ld_count int not null, ld_suffix nvarchar(255),
-                        ld_enabled int not null, ld_maxcount int, ld_maxviews int, ld_views int not null,
+                        ld_enabled int not null, ld_maxcount int, ld_maxviews int, ld_views int not null, ld_password varchar(255), 
                         primary key (ld_id));
 create table ld_user (ld_id bigint not null, ld_lastmodified datetime not null, ld_creation datetime not null, ld_recordversion bigint not null,
                       ld_deleted int not null, ld_tenantid bigint not null, ld_enabled int not null, 

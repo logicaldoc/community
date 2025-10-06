@@ -2,6 +2,7 @@ package com.logicaldoc.webservice.soap.endpoint;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -973,7 +974,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 	@Override
 	public String createDownloadTicket(String sid, long docId, String suffix, Integer expireHours, String expireDate,
-			Integer maxDownloads)
+			Integer maxDownloads, String password)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		validateSession(sid);
 
@@ -989,6 +990,11 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		ticket.setExpireHours(expireHours);
 		ticket.setExpired(convertStringToDate(expireDate));
 		ticket.setMaxCount(maxDownloads);
+		try {
+			ticket.setDecodedPassword(password);
+		} catch (NoSuchAlgorithmException e) {
+			throw new PersistenceException(e);
+		}
 
 		ticket = manager.createTicket(ticket, transaction);
 
@@ -997,7 +1003,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 	@Override
 	public String createViewTicket(String sid, long docId, String suffix, Integer expireHours, String expireDate,
-			Integer maxDownloads, Integer maxViews)
+			Integer maxDownloads, Integer maxViews, String password)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		validateSession(sid);
 
@@ -1014,6 +1020,11 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		ticket.setExpired(convertStringToDate(expireDate));
 		ticket.setMaxCount(maxDownloads);
 		ticket.setMaxViews(maxViews);
+		try {
+			ticket.setDecodedPassword(password);
+		} catch (NoSuchAlgorithmException e) {
+			throw new PersistenceException(e);
+		}
 
 		ticket = manager.createTicket(ticket, transaction);
 

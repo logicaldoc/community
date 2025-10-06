@@ -8,23 +8,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import jakarta.activation.DataHandler;
-import jakarta.mail.MessagingException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.FormParam;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.PathSegment;
-import jakarta.ws.rs.core.Response;
-
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.slf4j.Logger;
@@ -58,6 +41,22 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.activation.DataHandler;
+import jakarta.mail.MessagingException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.PathSegment;
+import jakarta.ws.rs.core.Response;
 
 @Path("/")
 @Tag(name = "document")
@@ -630,11 +629,12 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	Integer expireHours, @FormParam("expireDate")
 	@Parameter(description = "exact expiration date expressed in the format yyyy-MM-dd")
 	String expireDate, @FormParam("maxDownloads")
-	@Parameter(description = "maximum number of downloads allowed")
-	Integer maxDownloads)
+	@Parameter(description = "maximum number of allowed downloads")
+	Integer maxDownloads, @Parameter(description = "Optional password")
+	String password)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		String sid = validateSessionREST();
-		return super.createDownloadTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads);
+		return super.createDownloadTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads, password);
 	}
 
 	@Override
@@ -654,9 +654,10 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Parameter(description = "maximum number of downloads allowed")
 	Integer maxDownloads, @FormParam("maxViews")
 	@Parameter(description = "maximum number of downloads views")
-	Integer maxViews) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
+	Integer maxViews, @Parameter(description = "Optional password")
+	String password) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		String sid = validateSessionREST();
-		return super.createViewTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads, maxViews);
+		return super.createViewTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads, maxViews, password);
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -85,6 +86,7 @@ import com.logicaldoc.core.metadata.validation.Validator;
 import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.authentication.PasswordWeakException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.core.security.user.Group;
@@ -2389,8 +2391,41 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public List<String> createDownloadTicket(long docId, int type, String suffix, Integer expireHours, Date expireDate,
-			Integer maxDownloads, Integer maxViews) throws ServerException {
+	public List<String> setTicketPassword(long ticketId, String password) throws ServerException {
+		Session session = validateSession();
+		try {
+			DocumentHistory transaction = new DocumentHistory();
+			transaction.setSession(session);
+
+			TicketDAO tDao = Context.get(TicketDAO.class);
+			Ticket ticket = tDao.findById(ticketId);
+			ticket.setDecodedPassword(password);
+			if (password != null) {
+				User dummy = new User();
+				dummy.setId(-1);
+				dummy.setUsername("dummy");
+				dummy.setTenantId(transaction.getTenantId());
+				dummy.setLocale(Locale.ENGLISH);
+				try {
+					dummy.setDecodedPassword(password);
+				} catch (NoSuchAlgorithmException e) {
+					throw new PasswordWeakException(List.of(e.getMessage()));
+				}
+				Context.get(UserDAO.class).checkPasswordCompliance(dummy);
+			}
+
+			tDao.store(ticket, transaction);
+			return new ArrayList<>();
+		} catch (PasswordWeakException pwe) {
+			return pwe.getMessages();
+		} catch (PersistenceException | NoSuchAlgorithmException e) {
+			return throwServerException(session, log, e);
+		}
+	}
+
+	@Override
+	public List<String> createTicket(long docId, int type, String suffix, Integer expireHours, Date expireDate,
+			Integer maxDownloads, Integer maxViews, String password) throws ServerException {
 		Session session = validateSession();
 
 		String urlPrefix = "";
@@ -2412,6 +2447,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			ticket.setExpired(expireDate);
 			ticket.setMaxCount(maxDownloads);
 			ticket.setMaxViews(maxViews);
+			ticket.setDecodedPassword(password);
 
 			ticket = manager.createTicket(ticket, transaction);
 
@@ -2422,7 +2458,11 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 					new URI(ticket.getUrl().replace(urlPrefix, Context.get().getProperties().getProperty("server.url")))
 							.normalize().toString());
 			return result;
-		} catch (PermissionException | PersistenceException | URISyntaxException e) {
+		} catch (PasswordWeakException pwe) {
+			List<String> messages = pwe.getMessages();
+			messages.add(0, "passwordweek");
+			return messages;
+		} catch (PermissionException | PersistenceException | URISyntaxException | NoSuchAlgorithmException e) {
 			return throwServerException(session, log, e);
 		}
 	}

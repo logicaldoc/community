@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -26,9 +24,15 @@ import com.logicaldoc.core.store.Store;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.util.MimeType;
+import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
+
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 public class TicketDownload extends HttpServlet {
 
@@ -55,15 +59,13 @@ public class TicketDownload extends HttpServlet {
 	 */
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
-		String ticketId = request.getParameter(TICKET_ID);
+		Ticket ticket = null;
 		try {
-			ticketId = getTicketId(request);
-
-			Ticket ticket = getTicket(ticketId);
+			ticket = TicketDownload.getTicket(request);
 
 			Document document = getDocument(ticket);
 
-			if (ticket.isTicketExpired() && !isPreviewDownload(ticketId, request, document))
+			if (ticket.isTicketExpired() && !isPreviewDownload(ticket.getTicketId(), request, document))
 				throw new IOException("Expired ticket");
 
 			String suffix = getSuffix(ticket, document, request);
@@ -77,17 +79,20 @@ public class TicketDownload extends HttpServlet {
 						"download");
 			request.setAttribute("open", Boolean.toString("display".equals(behavior)));
 
-			downloadDocument(request, response, document, null, suffix, ticketId);
+			if (!TicketDownload.checkPassword(request, response, ticket))
+				return;
 
-			if (isPreviewDownload(ticketId, request, document)) {
-				request.getSession().removeAttribute(getPreviewAttributeName(ticketId));
+			downloadDocument(request, response, document, null, suffix, ticket.getTicketId());
+
+			if (isPreviewDownload(ticket.getTicketId(), request, document)) {
+				request.getSession().removeAttribute(getPreviewAttributeName(ticket.getTicketId()));
 
 				/**
 				 * The user may resize the view panel that will trigger a reload
 				 * so we must mark the read in the session and count it just the
 				 * first time
 				 */
-				String viewMarker = "ticketviewed-" + ticketId;
+				String viewMarker = "ticketviewed-" + ticket.getTicketId();
 				if (request.getSession().getAttribute(viewMarker) == null) {
 					ticket.setViews(ticket.getViews() + 1);
 					request.getSession().setAttribute(viewMarker, true);
@@ -98,17 +103,54 @@ public class TicketDownload extends HttpServlet {
 				increaseDownloadCount(request, ticket, document);
 			}
 
-			TicketDAO ticketDao = Context.get(TicketDAO.class);
-			ticketDao.store(ticket);
+			Context.get(TicketDAO.class).store(ticket);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 
 			try (PrintWriter out = response.getWriter();) {
-				out.println("Ticket " + ticketId + " is no more active"
+				out.println("Ticket " + ticket.getTicketId() + " not authorized"
 						+ (e.getMessage() != null ? ": " + e.getMessage() : ""));
 			} catch (Exception t) {
 				// Nothing to do
 			}
+		}
+	}
+
+	public static boolean checkPassword(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		return checkPassword(request, response, getTicket(request));
+	}
+
+	public static boolean checkPassword(HttpServletRequest request, HttpServletResponse response, Ticket ticket)
+			throws IOException {
+		if (StringUtils.isNotEmpty(ticket.getPassword())) {
+			String password = getPasswordInRequest(request);
+			if (StringUtils.isNotEmpty(password)) {
+				try {
+					if (!CryptUtil.encryptSHA256(password).equals(ticket.getPassword()))
+						throw new IOException("Wrong password");
+				} catch (NoSuchAlgorithmException e) {
+					throw new IOException(e);
+				}
+			} else {
+				response.setHeader("WWW-Authenticate", "Basic realm=\"Ticket " + ticket.getTicketId() + "\"");
+				response.sendError(401, "Unauthorized");
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private static String getPasswordInRequest(HttpServletRequest request) {
+		String authorization = request.getHeader("Authorization");
+		if (authorization != null && authorization.toLowerCase().startsWith("basic")) {
+			String base64Credentials = authorization.substring("Basic".length()).trim();
+			byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
+			String credentials = new String(credDecoded, StandardCharsets.UTF_8);
+			// credentials = username:password
+			String[] values = credentials.split(":", 2);
+			return values[1];
+		} else {
+			return request.getParameter("password");
 		}
 	}
 
@@ -162,15 +204,15 @@ public class TicketDownload extends HttpServlet {
 		return doc;
 	}
 
-	private Ticket getTicket(String ticketId) throws IOException {
+	private static Ticket getTicket(HttpServletRequest request) throws IOException {
 		TicketDAO tktDao = Context.get(TicketDAO.class);
-		Ticket ticket = tktDao.findByTicketId(ticketId);
+		Ticket ticket = tktDao.findByTicketId(getTicketId(request));
 		if (ticket == null || ticket.getDocId() == 0)
 			throw new IOException("Unexisting ticket");
 		return ticket;
 	}
 
-	private String getTicketId(HttpServletRequest request) {
+	private static String getTicketId(HttpServletRequest request) {
 		String ticketId = request.getParameter(TICKET_ID);
 		if (StringUtils.isEmpty(ticketId)) {
 			ticketId = (String) request.getAttribute(TICKET_ID);
@@ -181,7 +223,7 @@ public class TicketDownload extends HttpServlet {
 			ticketId = (String) session.getAttribute(TICKET_ID);
 		}
 
-		log.debug("Download ticket ticketId={}", ticketId);
+		log.debug("Ticket ticketId={}", ticketId);
 		return ticketId;
 	}
 

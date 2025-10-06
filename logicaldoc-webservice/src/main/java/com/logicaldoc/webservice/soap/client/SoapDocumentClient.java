@@ -6,11 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.activation.DataHandler;
-import jakarta.activation.FileDataSource;
-import jakarta.jws.WebService;
-import jakarta.mail.MessagingException;
-
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
@@ -25,6 +20,11 @@ import com.logicaldoc.webservice.model.WSLink;
 import com.logicaldoc.webservice.model.WSNote;
 import com.logicaldoc.webservice.model.WSRating;
 import com.logicaldoc.webservice.soap.DocumentService;
+
+import jakarta.activation.DataHandler;
+import jakarta.activation.FileDataSource;
+import jakarta.jws.WebService;
+import jakarta.mail.MessagingException;
 
 /**
  * Document Web Service client.
@@ -307,16 +307,16 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 
 	@Override
 	public String createDownloadTicket(String sid, long docId, String suffix, Integer expireHours, String expireDate,
-			Integer maxDownloads)
+			Integer maxDownloads, String password)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		return client.createDownloadTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads);
+		return client.createDownloadTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads, password);
 	}
 
 	@Override
 	public String createViewTicket(String sid, long docId, String suffix, Integer expireHours, String expireDate,
-			Integer maxDownloads, Integer maxViews)
+			Integer maxDownloads, Integer maxViews, String password)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
-		return client.createViewTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads, maxViews);
+		return client.createViewTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads, maxViews, password);
 	}
 
 	@Override

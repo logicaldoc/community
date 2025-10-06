@@ -462,7 +462,7 @@ public class User extends PersistentObject implements Serializable {
 	 * Sets the password and encode it
 	 * 
 	 * @param pwd The password in readable format
-	 * @throws NoSuchAlgorithmException Cripting error
+	 * @throws NoSuchAlgorithmException Crypting error
 	 */
 	public void setDecodedPassword(String pwd) throws NoSuchAlgorithmException {
 		if (StringUtils.isEmpty(pwd))

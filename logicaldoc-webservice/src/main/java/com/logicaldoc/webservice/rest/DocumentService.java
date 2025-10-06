@@ -665,6 +665,7 @@ public interface DocumentService {
 	 * @param expireDate exact expiration date expressed in the format
 	 *        yyyy-MM-dd
 	 * @param maxDownloads maximum number of admitted downloads
+	 * @param password optional password
 	 * 
 	 * @return the download ticket
 	 * 
@@ -678,7 +679,7 @@ public interface DocumentService {
 	@Path("/createDownloadTicket")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
 	public String createDownloadTicket(long docId, String suffix, Integer expireHours, String expireDate,
-			Integer maxDownloads)
+			Integer maxDownloads, String password)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
@@ -691,6 +692,7 @@ public interface DocumentService {
 	 *        yyyy-MM-dd
 	 * @param maxDownloads maximum number of admitted downloads
 	 * @param maxViews maximum number of admitted views
+	 * @param password optional password
 	 * 
 	 * @return the download ticket
 	 * 
@@ -704,7 +706,7 @@ public interface DocumentService {
 	@Path("/createViewTicket")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
 	public String createViewTicket(long docId, String suffix, Integer expireHours, String expireDate,
-			Integer maxDownloads, Integer maxViews)
+			Integer maxDownloads, Integer maxViews, String password)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**

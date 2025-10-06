@@ -3,13 +3,6 @@ package com.logicaldoc.webservice.soap;
 import java.io.IOException;
 import java.util.List;
 
-import jakarta.activation.DataHandler;
-import jakarta.jws.WebMethod;
-import jakarta.jws.WebParam;
-import jakarta.jws.WebResult;
-import jakarta.jws.WebService;
-import jakarta.mail.MessagingException;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
@@ -22,6 +15,13 @@ import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSLink;
 import com.logicaldoc.webservice.model.WSNote;
 import com.logicaldoc.webservice.model.WSRating;
+
+import jakarta.activation.DataHandler;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
+import jakarta.mail.MessagingException;
 
 /**
  * Document Web Service definition interface
@@ -772,9 +772,12 @@ public interface DocumentService {
 	String sid, @WebParam(name = "folderId")
 	long folderId, @WSDoc(description = "file name filter", required = false)
 	@WebParam(name = "fileName")
-	String fileName, @WSDoc(description = "Optional sort criteria (eg date asc)")@WebParam(name = "sort")
-	String sort, @WSDoc(description = "Optional page number")@WebParam(name = "page")
-	Integer page, @WSDoc(description = "Optional maximum number of elements per page")@WebParam(name = "max")
+	String fileName, @WSDoc(description = "Optional sort criteria (eg date asc)")
+	@WebParam(name = "sort")
+	String sort, @WSDoc(description = "Optional page number")
+	@WebParam(name = "page")
+	Integer page, @WSDoc(description = "Optional maximum number of elements per page")
+	@WebParam(name = "max")
 	Integer max) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
@@ -1014,6 +1017,7 @@ public interface DocumentService {
 	 * @param expireDate exact expiration date expressed in the format
 	 *        yyyy-MM-dd
 	 * @param maxDownloads maximum number of downloads allowed
+	 * @param password optional password to provide to download
 	 * 
 	 * @return the download ticket
 	 * 
@@ -1039,7 +1043,8 @@ public interface DocumentService {
 			@WebParam(name = "expireDate")
 			String expireDate, @WSDoc(description = "maximum number of downloads allowed", required = false)
 			@WebParam(name = "maxDownloads")
-			Integer maxDownloads)
+			Integer maxDownloads, @WebParam(name = "password")
+			String password)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
@@ -1053,8 +1058,9 @@ public interface DocumentService {
 	 *        yyyy-MM-dd
 	 * @param maxDownloads maximum number of downloads allowed
 	 * @param maxViews maximum number of downloads allowed
+	 * @param password optional password to provide to download
 	 * 
-	 * @return the download ticket
+	 * @return the view ticket
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -1080,7 +1086,8 @@ public interface DocumentService {
 			@WebParam(name = "maxDownloads")
 			Integer maxDownloads, @WSDoc(description = "maximum number of views allowed", required = false)
 			@WebParam(name = "maxViews")
-			Integer maxViews)
+			Integer maxViews, @WebParam(name = "password")
+			String password)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**

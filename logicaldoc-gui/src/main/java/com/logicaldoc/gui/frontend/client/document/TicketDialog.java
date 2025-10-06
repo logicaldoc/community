@@ -1,13 +1,15 @@
 package com.logicaldoc.gui.frontend.client.document;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.AdvancedCriteria;
@@ -19,6 +21,7 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.DateItem;
+import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -127,7 +130,10 @@ public class TicketDialog extends Window {
 		maxViews.setMin(0);
 		maxViews.setVisibleWhen(new AdvancedCriteria(ACTION, OperatorId.EQUALS, "2"));
 
-		form.setItems(action, docOrPdfConversion, duedateTimeItem, duedateTime, date, maxDownloads, maxViews);
+		PasswordItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "password", null, true);
+		password.setColSpan(4);
+
+		form.setItems(action, docOrPdfConversion, duedateTimeItem, duedateTime, date, maxDownloads, maxViews, password);
 	}
 
 	public void onSave() {
@@ -156,29 +162,38 @@ public class TicketDialog extends Window {
 		if (val != null && !val.trim().isEmpty())
 			maxViews = Integer.parseInt(val.trim());
 
-		DocumentService.Instance.get().createDownloadTicket(document.getId(),
-				Integer.parseInt(form.getValueAsString(ACTION)), suffix, expireHours, date, maxDownloads, maxViews,
-				new DefaultAsyncCallback<>() {
+		Object psw = form.getValue("password");
+		String password = psw != null && !psw.toString().isEmpty() ? psw.toString() : null;
+
+		DocumentService.Instance.get().createTicket(document.getId(), Integer.parseInt(form.getValueAsString(ACTION)),
+				suffix, expireHours, date, maxDownloads, maxViews, password, new DefaultAsyncCallback<>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
+						GuiLog.info(caught.getMessage());
 						super.onFailure(caught);
-						destroy();
 					}
 
 					@Override
 					public void onSuccess(List<String> ret) {
-						destroy();
-						new TicketDisplay(ret.get(0), ret.get(1), ret.get(2)).show();
+						if (ret.get(0).contains("passwordweek")) {
+							List<String> errors = new ArrayList<>();
+							for (int i = 1; i<ret.size();i++ )
+							  errors.add(ret.get(i));
+							form.setFieldErrors("password", errors.toArray(new String[0]), true);
+						} else {
+							destroy();
+							new TicketDisplay(ret.get(0), ret.get(1), ret.get(2)).show();
+						}
 					}
 				});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

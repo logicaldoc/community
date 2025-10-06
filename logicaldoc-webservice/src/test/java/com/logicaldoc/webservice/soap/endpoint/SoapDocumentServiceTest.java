@@ -214,8 +214,10 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 	@Test
 	public void testCreateTicket()
 			throws AuthenticationException, PersistenceException, PermissionException, WebserviceException {
-		assertNotNull(testSubject.createDownloadTicket(session.getSid(), 1L, "https://localhost:8080", 12, null, 100));
-		assertNotNull(testSubject.createViewTicket(session.getSid(), 1L, "https://localhost:8080", 12, null, 100, 20));
+		assertNotNull(testSubject.createDownloadTicket(session.getSid(), 1L, "https://localhost:8080", 12, null, 100,
+				"pippo"));
+		assertNotNull(testSubject.createViewTicket(session.getSid(), 1L, "https://localhost:8080", 12, null, 100, 20,
+				"pippo"));
 	}
 
 	@Test

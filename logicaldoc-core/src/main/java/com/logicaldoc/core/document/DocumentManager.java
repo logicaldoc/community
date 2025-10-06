@@ -3,6 +3,7 @@ package com.logicaldoc.core.document;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -48,6 +49,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
+import com.logicaldoc.core.security.authentication.PasswordWeakException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.menu.MenuDAO;
@@ -1798,6 +1800,20 @@ public class DocumentManager {
 
 		transaction.setEvent(DocumentEvent.TICKET_CREATED);
 		transaction.setSessionId(transaction.getSessionId());
+
+		if (StringUtils.isNotEmpty(ticket.getPassword())) {
+			User dummy = new User();
+			dummy.setId(-1);
+			dummy.setUsername("dummy");
+			dummy.setTenantId(transaction.getTenantId());
+			dummy.setLocale(Locale.ENGLISH);
+			try {
+				dummy.setDecodedPassword(ticket.getDecodedPassword());
+			} catch (NoSuchAlgorithmException e) {
+				throw new PasswordWeakException(List.of(e.getMessage()));
+			}
+			Context.get(UserDAO.class).checkPasswordCompliance(dummy);
+		}
 
 		ticketDAO.store(ticket, transaction);
 

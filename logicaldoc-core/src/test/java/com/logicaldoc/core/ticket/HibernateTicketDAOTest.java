@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.spring.Context;
 
@@ -95,15 +97,17 @@ public class HibernateTicketDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testStore() throws PersistenceException {
+	public void testStore() throws PersistenceException, NoSuchAlgorithmException {
 		Ticket ticket = new Ticket();
 		ticket.setDocId(1);
 		ticket.setUserId(3);
 		ticket.setTicketId("5");
+		ticket.setDecodedPassword("1234ABC");
 		dao.store(ticket);
 
 		Ticket storedTicket = dao.findByTicketId("5");
 		assertNotNull(storedTicket);
 		assertEquals(ticket, storedTicket);
+		assertEquals(CryptUtil.encryptSHA256("1234ABC"), storedTicket.getPassword());
 	}
 }

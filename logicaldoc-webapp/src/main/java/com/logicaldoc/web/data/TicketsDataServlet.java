@@ -8,9 +8,6 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
@@ -20,6 +17,9 @@ import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for listing the tickets.
@@ -40,7 +40,7 @@ public class TicketsDataServlet extends AbstractDataServlet {
 
 		TicketDAO dao = Context.get(TicketDAO.class);
 		StringBuilder query = new StringBuilder(
-				"select A.ld_id, A.ld_ticketid, A.ld_docid, A.ld_creation, A.ld_expired, A.ld_count, A.ld_maxcount, A.ld_suffix, A.ld_enabled, B.ld_filename, B.ld_folderid, A.ld_views, A.ld_maxviews, A.ld_type from ld_ticket as A, ld_document as B where A.ld_deleted = 0 and (A.ld_type = "
+				"select A.ld_id, A.ld_ticketid, A.ld_docid, A.ld_creation, A.ld_expired, A.ld_count, A.ld_maxcount, A.ld_suffix, A.ld_enabled, B.ld_filename, B.ld_folderid, A.ld_views, A.ld_maxviews, A.ld_type, A.ld_password from ld_ticket as A, ld_document as B where A.ld_deleted = 0 and (A.ld_type = "
 						+ Ticket.DOWNLOAD + " or A.ld_type = " + Ticket.VIEW + ") and A.ld_tenantid="
 						+ session.getTenantId()
 						+ " and B.ld_deleted=0 and A.ld_docid=B.ld_id order by A.ld_creation desc");
@@ -94,6 +94,7 @@ public class TicketsDataServlet extends AbstractDataServlet {
 		writer.print(
 				"<icon>" + FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(fileName))) + "</icon>");
 		writer.print("<folderId>" + rows.getLong(11) + "</folderId>");
+		writer.print("<password>" + Boolean.toString(rows.getObject(15) != null) + "</password>");
 		writer.print("</ticket>");
 	}
 

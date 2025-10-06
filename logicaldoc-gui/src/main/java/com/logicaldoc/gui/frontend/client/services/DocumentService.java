@@ -316,7 +316,7 @@ public interface DocumentService extends RemoteService {
 			GUIDocument metadata) throws ServerException;
 
 	/**
-	 * Creates a download ticket
+	 * Creates a ticket
 	 * 
 	 * @param docId identifier of the document
 	 * @param type the ticket type (0='download' 2='view')
@@ -325,15 +325,29 @@ public interface DocumentService extends RemoteService {
 	 * @param expireDate the exact expiration date
 	 * @param maxDownloads maximum number of allowed downloads
 	 * @param maxViews maximum number of allowed views
+	 * @param password an optional password
 	 * 
 	 * @return the generated ticket ID, a sample URL using the browser's URL, a
 	 *         sample URL using the server.url setting
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public List<String> createDownloadTicket(long docId, int type, String suffix, Integer expireHours, Date expireDate,
-			Integer maxDownloads, Integer maxViews) throws ServerException;
+	public List<String> createTicket(long docId, int type, String suffix, Integer expireHours, Date expireDate,
+			Integer maxDownloads, Integer maxViews, String password) throws ServerException;
 
+	/**
+	 * Puts a password protection to the ticket
+	 * 
+	 * @param ticketId the identifier of the ticket to protect
+	 * @param password the password to assign(null to remove the password)
+	 * 
+	 * @return password errors, empty list in case all was ok
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public List<String> setTicketPassword(long ticketId, String password) throws ServerException;
+	
+	
 	public void deleteTicket(long ticketId) throws ServerException;
 
 	public void enableTicket(long ticketId) throws ServerException;
