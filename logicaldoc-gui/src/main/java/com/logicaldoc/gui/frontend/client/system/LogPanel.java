@@ -43,8 +43,7 @@ public class LogPanel extends VLayout {
 		htmlPane.setHeight100();
 		htmlPane.setShowEdges(true);
 		htmlPane.setContentsURL(GWT.getHostPageBaseURL() + "log?appender=" + appender);
-		htmlPane.setContentsType(ContentsType.FRAGMENT);
-		htmlPane.addContentLoadedHandler(loaded -> scrollBottom());
+		htmlPane.setContentsType(ContentsType.PAGE);
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
@@ -54,8 +53,9 @@ public class LogPanel extends VLayout {
 		SelectItem logFileSelector = ItemFactory.newLogAppenderSelector();
 		logFileSelector.setValue(appender);
 		logFileSelector.addChangedHandler(changed -> {
-			htmlPane.setContentsURL(GWT.getHostPageBaseURL() + "log?appender=" + changed.getValue().toString());
-			LogPanel.scrollLogPanelToBottom();
+			LogPanel.this.appender = changed.getValue().toString();
+			htmlPane.setContentsURL(GWT.getHostPageBaseURL() + "log?appender=" + LogPanel.this.appender);
+			scrollBottom();
 		});
 
 		SelectItem levelSelector = ItemFactory.newLogLevelSelector();
@@ -83,10 +83,10 @@ public class LogPanel extends VLayout {
 		});
 
 		ToolStripButton bottom = new ToolStripButton(I18N.message("bottom"));
-		bottom.addClickHandler(event -> LogPanel.scrollLogPanelToBottom());
+		bottom.addClickHandler(event -> LogPanel.scrollLogPanelToBottom(appender));
 
 		ToolStripButton top = new ToolStripButton(I18N.message("top"));
-		top.addClickHandler(event -> LogPanel.scrollLogPanelToTop());
+		top.addClickHandler(event -> LogPanel.scrollLogPanelToTop(appender));
 
 		ToolStripButton download = new ToolStripButton(I18N.message("downloadlogs"));
 		download.addClickHandler(event -> Util.download(Util.contextPath() + "log?appender=all"));
@@ -113,6 +113,8 @@ public class LogPanel extends VLayout {
 		toolStrip.addFill();
 		addMember(toolStrip);
 		addMember(htmlPane);
+		
+		scrollBottom();
 	}
 
 	private void onDeleteLogger(ComboBoxItem loggerSelector) {
@@ -162,20 +164,26 @@ public class LogPanel extends VLayout {
 
 	private void scrollBottom() {
 		Scheduler.get().scheduleFixedDelay(() -> {
-			LogPanel.scrollLogPanelToBottom();
+			LogPanel.scrollLogPanelToBottom(appender);
 			return false;
 		}, 1000);
 	}
 
-	public static native void scrollLogPanelToBottom() /*-{
-      var xpath = "//div[contains(@eventproxy,'isc_HTMLPane_')]";
-      var logDiv = $wnd.document.evaluate(xpath, $wnd.document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-      logDiv.scrollTop = logDiv.scrollHeight;
+	public static native void scrollLogPanelToBottom(String appender) /*-{
+//      var xpath = "//div[contains(@eventproxy,'isc_HTMLPane_')]";
+//      var logDiv = $wnd.document.evaluate(xpath, $wnd.document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+//      logDiv.scrollTop = logDiv.scrollHeight;
+     var xpath = "//iframe[contains(@src,'"+appender+"')]";
+     var logFrame = $wnd.document.evaluate(xpath, $wnd.document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+     logFrame.contentWindow.scrollTo(0, logFrame.contentDocument.body.scrollHeight);   
 }-*/;
 
-	public static native void scrollLogPanelToTop() /*-{
-	  var xpath = "//div[contains(@eventproxy,'isc_HTMLPane_')]";
-      var logDiv = $wnd.document.evaluate(xpath, $wnd.document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-      logDiv.scrollTop = 0;
+	public static native void scrollLogPanelToTop(String appender) /*-{
+//	  var xpath = "//div[contains(@eventproxy,'isc_HTMLPane_')]";
+//      var logDiv = $wnd.document.evaluate(xpath, $wnd.document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+//      logDiv.scrollTop = 0;
+     var xpath = "//iframe[contains(@src,'"+appender+"')]";
+     var logFrame = $wnd.document.evaluate(xpath, $wnd.document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+     logFrame.contentWindow.scrollTo(0, 0);   
 }-*/;
 }
