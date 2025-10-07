@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.system;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.data.LoggersDS;
@@ -27,6 +28,8 @@ public class LogPanel extends VLayout {
 
 	private String appender;
 
+	private HTMLPane htmlPane;
+
 	public LogPanel(String appender) {
 		this.appender = appender;
 		setHeight100();
@@ -34,12 +37,14 @@ public class LogPanel extends VLayout {
 
 	@Override
 	public void onDraw() {
-		final HTMLPane htmlPane = new HTMLPane();
+		htmlPane = new HTMLPane();
+		htmlPane.setPrefix("sdar");
 		htmlPane.setWidth100();
 		htmlPane.setHeight100();
 		htmlPane.setShowEdges(true);
 		htmlPane.setContentsURL(GWT.getHostPageBaseURL() + "log?appender=" + appender);
-		htmlPane.setContentsType(ContentsType.PAGE);
+		htmlPane.setContentsType(ContentsType.FRAGMENT);
+		htmlPane.addContentLoadedHandler(loaded -> scrollBottom());
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
@@ -48,8 +53,10 @@ public class LogPanel extends VLayout {
 
 		SelectItem logFileSelector = ItemFactory.newLogAppenderSelector();
 		logFileSelector.setValue(appender);
-		logFileSelector.addChangedHandler(changed -> htmlPane
-				.setContentsURL(GWT.getHostPageBaseURL() + "log?appender=" + changed.getValue().toString()));
+		logFileSelector.addChangedHandler(changed -> {
+			htmlPane.setContentsURL(GWT.getHostPageBaseURL() + "log?appender=" + changed.getValue().toString());
+			LogPanel.scrollLogPanelToBottom();
+		});
 
 		SelectItem levelSelector = ItemFactory.newLogLevelSelector();
 
@@ -60,7 +67,7 @@ public class LogPanel extends VLayout {
 
 		ToolStripButton delete = new ToolStripButton(I18N.message("ddelete"));
 		delete.setDisabled(true);
-		delete.addClickHandler(event -> onDeleteLogger(loggerSelector));
+		delete.addClickHandler(lick -> onDeleteLogger(loggerSelector));
 
 		loggerSelector.addChangedHandler(event -> {
 			levelSelector.setValue(loggerSelector.getSelectedRecord().getAttribute("level"));
@@ -68,11 +75,18 @@ public class LogPanel extends VLayout {
 		});
 
 		ToolStripButton refresh = new ToolStripButton(I18N.message("refresh"));
-		refresh.addClickHandler(event -> {
+		refresh.addClickHandler(click -> {
 			htmlPane.redraw();
 			htmlPane.setWidth100();
 			htmlPane.setHeight100();
+			scrollBottom();
 		});
+
+		ToolStripButton bottom = new ToolStripButton(I18N.message("bottom"));
+		bottom.addClickHandler(event -> LogPanel.scrollLogPanelToBottom());
+
+		ToolStripButton top = new ToolStripButton(I18N.message("top"));
+		top.addClickHandler(event -> LogPanel.scrollLogPanelToTop());
 
 		ToolStripButton download = new ToolStripButton(I18N.message("downloadlogs"));
 		download.addClickHandler(event -> Util.download(Util.contextPath() + "log?appender=all"));
@@ -80,8 +94,14 @@ public class LogPanel extends VLayout {
 		if ("DMS_WEB".equals(appender))
 			toolStrip.addFormItem(logFileSelector);
 		toolStrip.addButton(refresh);
-		if (!Session.get().isDemo())
+		toolStrip.addButton(bottom);
+		toolStrip.addButton(top);
+
+		if (!Session.get().isDemo()) {
+			toolStrip.addSeparator();
 			toolStrip.addButton(download);
+		}
+
 		if ("DMS_WEB".equals(appender) && Session.get().isDefaultTenant() && !Session.get().isDemo()) {
 			toolStrip.addSeparator();
 			toolStrip.addFormItem(loggerSelector);
@@ -90,7 +110,6 @@ public class LogPanel extends VLayout {
 			toolStrip.addButton(delete);
 		}
 
-		toolStrip.addButton(refresh);
 		toolStrip.addFill();
 		addMember(toolStrip);
 		addMember(htmlPane);
@@ -100,13 +119,14 @@ public class LogPanel extends VLayout {
 		SC.ask(I18N.message("confirmdeletelogger"), choice -> {
 			if (Boolean.TRUE.equals(choice) && loggerSelector.getValueAsString() != null
 					&& !loggerSelector.getValueAsString().isEmpty()) {
-				SystemService.Instance.get().removeLogger(loggerSelector.getValueAsString(), new DefaultAsyncCallback<>() {
-					@Override
-					public void onSuccess(Void arg0) {
-						loggerSelector.setValue("root");
-						loggerSelector.selectValue();
-					}
-				});
+				SystemService.Instance.get().removeLogger(loggerSelector.getValueAsString(),
+						new DefaultAsyncCallback<>() {
+							@Override
+							public void onSuccess(Void arg0) {
+								loggerSelector.setValue("root");
+								loggerSelector.selectValue();
+							}
+						});
 			}
 		});
 	}
@@ -129,7 +149,7 @@ public class LogPanel extends VLayout {
 					});
 		}
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
@@ -139,4 +159,23 @@ public class LogPanel extends VLayout {
 	public int hashCode() {
 		return super.hashCode();
 	}
+
+	private void scrollBottom() {
+		Scheduler.get().scheduleFixedDelay(() -> {
+			LogPanel.scrollLogPanelToBottom();
+			return false;
+		}, 1000);
+	}
+
+	public static native void scrollLogPanelToBottom() /*-{
+      var xpath = "//div[contains(@eventproxy,'isc_HTMLPane_')]";
+      var logDiv = $wnd.document.evaluate(xpath, $wnd.document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+      logDiv.scrollTop = logDiv.scrollHeight;
+}-*/;
+
+	public static native void scrollLogPanelToTop() /*-{
+	  var xpath = "//div[contains(@eventproxy,'isc_HTMLPane_')]";
+      var logDiv = $wnd.document.evaluate(xpath, $wnd.document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+      logDiv.scrollTop = 0;
+}-*/;
 }
