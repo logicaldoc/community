@@ -24,5 +24,10 @@ public class UpdateAndPatchPanel extends AdminPanel {
 		patches.setTitle(I18N.message("patches"));
 		patches.setPane(new PatchPanel());
 		tabs.addTab(patches);
+		
+		Tab history = new Tab();
+		history.setTitle(I18N.message("history"));
+		history.setPane(new UpdateHistoryPanel());
+		tabs.addTab(history);
 	}
 }

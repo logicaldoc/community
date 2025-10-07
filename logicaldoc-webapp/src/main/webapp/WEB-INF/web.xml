@@ -461,7 +461,15 @@
   	<servlet-name>Legal</servlet-name>
     <servlet-class>com.logicaldoc.web.LegalServlet</servlet-class>
   </servlet>  
-
+  <servlet>
+  	<servlet-name>UpdateHistory</servlet-name>
+    <servlet-class>com.logicaldoc.web.data.UpdateHistoryDataServlet</servlet-class>
+  </servlet>  
+  
+  <servlet-mapping>
+    <servlet-name>UpdateHistory</servlet-name>
+    <url-pattern>/data/updatehistory.xml</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>Legal</servlet-name>
     <url-pattern>/legal</url-pattern>
