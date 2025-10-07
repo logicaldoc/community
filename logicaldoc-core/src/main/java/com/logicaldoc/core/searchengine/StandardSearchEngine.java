@@ -356,7 +356,7 @@ public class StandardSearchEngine implements SearchEngine {
 			hit.setContent((String) doc.getFieldValue(HitField.CONTENT.getName()));
 			return hit;
 		} catch (Exception e) {
-			log.error(e.getMessage());
+			log.error(e.getMessage(), e);
 		}
 		return null;
 	}
