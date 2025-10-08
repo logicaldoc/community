@@ -232,8 +232,7 @@ public class CalendarReport extends AdminPanel {
 		toolStrip.setHeight(20);
 		toolStrip.setWidth100();
 
-		ToolStripButton print = new ToolStripButton();
-		print.setIcon(ItemFactory.newImgIcon("printer.png").getSrc());
+		ToolStripButton print = new ToolStripButton(I18N.message("print"));
 		print.setTooltip(I18N.message("print"));
 		print.setAutoFit(true);
 		print.addClickHandler(event -> GridUtil.print(list));
@@ -241,8 +240,7 @@ public class CalendarReport extends AdminPanel {
 
 		if (Feature.visible(Feature.EXPORT_CSV)) {
 			toolStrip.addSeparator();
-			ToolStripButton export = new ToolStripButton();
-			export.setIcon(ItemFactory.newImgIcon("table_row_insert.png").getSrc());
+			ToolStripButton export = new ToolStripButton(I18N.message("export"));
 			export.setTooltip(I18N.message("export"));
 			export.setAutoFit(true);
 			toolStrip.addButton(export);

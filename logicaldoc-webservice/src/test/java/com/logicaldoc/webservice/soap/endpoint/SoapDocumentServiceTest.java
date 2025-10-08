@@ -35,6 +35,7 @@ import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
+import com.logicaldoc.util.security.PasswordGenerator;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.WebserviceException;
@@ -71,7 +72,6 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 		docDao = Context.get(DocumentDAO.class);
 		folderDao = Context.get(FolderDAO.class);
 
-		// Make sure that this is a DocumentServiceImpl instance
 		testSubject = new SoapDocumentService();
 		testSubject.setValidateSession(false);
 	}
@@ -215,9 +215,9 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 	public void testCreateTicket()
 			throws AuthenticationException, PersistenceException, PermissionException, WebserviceException {
 		assertNotNull(testSubject.createDownloadTicket(session.getSid(), 1L, "https://localhost:8080", 12, null, 100,
-				"pippo"));
+				PasswordGenerator.generate(12, 3, 3, 2, 2, 2, 2)));
 		assertNotNull(testSubject.createViewTicket(session.getSid(), 1L, "https://localhost:8080", 12, null, 100, 20,
-				"pippo"));
+				PasswordGenerator.generate(12, 3, 3, 2, 2, 2, 2)));
 	}
 
 	@Test

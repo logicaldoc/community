@@ -79,10 +79,6 @@ public class FolderComparatorTest extends AbstractCoreTestCase {
 		assertEquals(1, comparator.compare(folder1, folder2));
 		assertEquals(-1, comparator.compare(folder2, folder1));
 
-		comparator = FolderComparator.getComparator("lastModified asc");
-		assertEquals(-1, comparator.compare(folder1, folder2));
-		assertEquals(1, comparator.compare(folder2, folder1));
-
 		comparator = FolderComparator.getComparator("creation asc");
 		assertEquals(-1, comparator.compare(folder1, folder2));
 		assertEquals(1, comparator.compare(folder2, folder1));

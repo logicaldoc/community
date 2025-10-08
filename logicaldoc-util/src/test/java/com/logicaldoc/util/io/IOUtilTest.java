@@ -24,7 +24,7 @@ public class IOUtilTest {
 			FileUtil.writeFile(is, file.getPath());
 			String content = FileUtil.readFile(file);
 			assertTrue(content.startsWith("default.tag.minsize=3"));
-			assertTrue(content.endsWith("store.1.dir=targe"));
+			assertTrue(content.endsWith("store.1.dir=target/"));
 			assertFalse(content.contains("default.password.occurrence"));
 		} finally {
 			FileUtil.delete(file);
