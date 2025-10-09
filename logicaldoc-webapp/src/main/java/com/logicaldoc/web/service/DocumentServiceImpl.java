@@ -1876,7 +1876,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			DocumentDAO docDao = Context.get(DocumentDAO.class);
 			Document document = docDao.findById(guiNote.getDocId());
 
-			return saveNote(session, document, guiNote);
+			return saveNote(session, document, guiNote, true);
 		} catch (PersistenceException | ServerException e) {
 			return throwServerException(session, log, e);
 		}
@@ -1974,7 +1974,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				guiNote.setRotation(note.getRotation());
 				guiNotes.add(guiNote);
 			}
-			
+
 			return guiNotes;
 		} catch (PersistenceException e) {
 			return throwServerException(session, log, e);
@@ -2015,13 +2015,13 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			 * Do the updates / inserts
 			 */
 			for (GUIDocumentNote guiNote : notes)
-				saveNote(session, document, guiNote);
+				saveNote(session, document, guiNote, false);
 		} catch (UnexistingResourceException | PersistenceException e) {
 			throwServerException(session, log, e);
 		}
 	}
 
-	private GUIDocumentNote saveNote(Session session, Document document, GUIDocumentNote guiNote)
+	private GUIDocumentNote saveNote(Session session, Document document, GUIDocumentNote guiNote, boolean updateAcl)
 			throws ServerException, PersistenceException {
 
 		DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
@@ -2057,13 +2057,15 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		note.setLineWidth(guiNote.getLineWidth());
 		note.setRotation(guiNote.getRotation());
 
-		note.getAccessControlList().clear();
-		for (GUIAccessControlEntry guiAce : guiNote.getAccessControlList()) {
-			AccessControlEntry ace = new AccessControlEntry();
-			ace.setGroupId(guiAce.getEntityId());
-			ace.setRead(guiAce.isRead() ? 1 : 0);
-			ace.setWrite(guiAce.isWrite() ? 1 : 0);
-			note.addAccessControlEntry(ace);
+		if (updateAcl) {
+			note.getAccessControlList().clear();
+			for (GUIAccessControlEntry guiAce : guiNote.getAccessControlList()) {
+				AccessControlEntry ace = new AccessControlEntry();
+				ace.setGroupId(guiAce.getEntityId());
+				ace.setRead(guiAce.isRead() ? 1 : 0);
+				ace.setWrite(guiAce.isWrite() ? 1 : 0);
+				note.addAccessControlEntry(ace);
+			}
 		}
 
 		saveNote(note, session);
