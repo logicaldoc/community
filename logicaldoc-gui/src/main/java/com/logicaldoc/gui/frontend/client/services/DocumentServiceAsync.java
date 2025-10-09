@@ -70,15 +70,13 @@ public interface DocumentServiceAsync {
 
 	void deleteNotes(List<Long> ids, AsyncCallback<Void> callback);
 
-	void addNote(long docId, String message, AsyncCallback<Long> callback);
-
 	void bulkUpdate(List<Long> ids, GUIDocument vo, boolean ignoreEmptyFields,
 			AsyncCallback<List<GUIDocument>> callback);
 
 	void addDocuments(boolean importZip, String charset, boolean immediateIndexing, GUIDocument metadata,
 			AsyncCallback<List<GUIDocument>> callback);
 
-	void updateNote(long docId, long noteId, String fileVersion, String message, AsyncCallback<Void> callback);
+	void saveNote(GUIDocumentNote note, AsyncCallback<GUIDocumentNote> callback);
 
 	void deleteVersions(List<Long> ids, AsyncCallback<GUIDocument> callback);
 
@@ -133,6 +131,8 @@ public interface DocumentServiceAsync {
 	void replaceFile(long docId, String fileVersion, String comment, AsyncCallback<Void> callback);
 
 	void promoteVersion(long docId, String version, AsyncCallback<GUIDocument> callback);
+
+	void getNote(long noteId, AsyncCallback<GUIDocumentNote> callback);
 
 	void getNotes(long docId, String fileVersion, Collection<String> types,
 			AsyncCallback<List<GUIDocumentNote>> callback);

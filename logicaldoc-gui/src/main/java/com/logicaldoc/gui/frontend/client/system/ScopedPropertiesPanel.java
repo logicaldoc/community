@@ -113,7 +113,7 @@ public class ScopedPropertiesPanel extends VLayout {
 			if (Boolean.TRUE.equals(yes)) {
 				ClusterService.Instance.get().makeLocal(selectedSettings, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						ListGridRecord[] selection = list.getSelectedRecords();
 						for (int i = 0; i < selection.length; i++) {
 							selection[i].setAttribute(SCOPE, "local");
@@ -134,7 +134,7 @@ public class ScopedPropertiesPanel extends VLayout {
 					if (Boolean.TRUE.equals(yes)) {
 						ClusterService.Instance.get().makeGlobal(selectedSettings, new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void result) {
+							public void handleSuccess(Void result) {
 								ListGridRecord[] selection = list.getSelectedRecords();
 								for (int i = 0; i < selection.length; i++) {
 									selection[i].setAttribute(SCOPE, "global");

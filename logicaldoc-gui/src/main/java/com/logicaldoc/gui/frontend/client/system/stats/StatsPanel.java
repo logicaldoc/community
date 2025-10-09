@@ -27,7 +27,7 @@ public class StatsPanel extends VLayout {
 	public void onDraw() {
 		SystemService.Instance.get().getStatistics(I18N.getLocale(), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<List<GUIParameter>> parameters) {
+			public void handleSuccess(List<List<GUIParameter>> parameters) {
 				Label lastUpdateLabel = new Label(
 						"<b>" + I18N.message("lastupdate") + ": " + parameters.get(4).get(0).getValue() + "</b>");
 				lastUpdateLabel.setHeight(30);

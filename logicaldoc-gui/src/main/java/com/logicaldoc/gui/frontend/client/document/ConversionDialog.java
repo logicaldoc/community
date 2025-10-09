@@ -65,7 +65,7 @@ public class ConversionDialog extends Window {
 		FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIFolder folder) {
+					public void handleSuccess(GUIFolder folder) {
 						convert.setDisabled(!folder.isDownload() && !folder.isWrite());
 
 						LinkedHashMap<String, String> map = new LinkedHashMap<>();
@@ -100,8 +100,7 @@ public class ConversionDialog extends Window {
 						}
 
 						@Override
-						public void onSuccess(GUIDocument doc) {
-							LD.clearPrompt();
+						public void handleSuccess(GUIDocument doc) {
 							if (MainPanel.get().isOnDocumentsTab() && FolderController.get().getCurrentFolder() != null)
 								FolderNavigator.get().selectFolder(FolderController.get().getCurrentFolder().getId());
 							destroy();

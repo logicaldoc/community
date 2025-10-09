@@ -64,7 +64,7 @@ public class FolderTemplatesPanel extends AdminPanel {
 
 		FolderService.Instance.get().loadTemplates(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIValue> p) {
+			public void handleSuccess(List<GUIValue> p) {
 				reloadTemplates(p);
 			}
 		});
@@ -101,7 +101,7 @@ public class FolderTemplatesPanel extends AdminPanel {
 
 		FolderService.Instance.get().saveTemplates(templates, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg) {
+			public void handleSuccess(Void arg) {
 				GuiLog.info(I18N.message("settingssaved"), null);
 			}
 		});

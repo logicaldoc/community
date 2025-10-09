@@ -51,7 +51,7 @@ public class AuditingPanel extends AdminPanel {
 
 		SettingService.Instance.get().loadAuditingSettings(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIParameter> result) {
+			public void handleSuccess(List<GUIParameter> result) {
 				initGUI(result);
 			}
 		});
@@ -178,7 +178,7 @@ public class AuditingPanel extends AdminPanel {
 
 			SettingService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void ret) {
+				public void handleSuccess(Void ret) {
 					GuiLog.info(I18N.message("settingssaved"), null);
 				}
 			});

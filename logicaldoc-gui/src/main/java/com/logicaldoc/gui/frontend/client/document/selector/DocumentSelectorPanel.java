@@ -59,7 +59,7 @@ public class DocumentSelectorPanel extends HLayout {
 		FolderService.Instance.get().getFolder(folderId, false, true, Session.get().isFolderPagination(),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIFolder folder) {
+					public void handleSuccess(GUIFolder folder) {
 						removeMember(documents);
 						documents = new DocumentSelectorDocumentsPanel(folder);
 						addMember(documents);

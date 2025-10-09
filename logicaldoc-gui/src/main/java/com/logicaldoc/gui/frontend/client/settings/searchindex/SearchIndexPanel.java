@@ -104,7 +104,7 @@ public class SearchIndexPanel extends AdminPanel {
 		if (searchEngine == null)
 			SearchEngineService.Instance.get().getInfo(new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUISearchEngine searchEngine) {
+				public void handleSuccess(GUISearchEngine searchEngine) {
 					SearchIndexPanel.this.searchEngine = searchEngine;
 					fillSearchEngineTab();
 
@@ -192,7 +192,7 @@ public class SearchIndexPanel extends AdminPanel {
 			SearchEngineService.Instance.get().setAliases(rec.getAttributeAsString(EXTENSION),
 					(String) event.getNewValues().get(ALIASES), new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void ret) {
+						public void handleSuccess(Void ret) {
 							parsersList.invalidateCache();
 							parsersList.getDataSource().invalidateCache();
 							parsersList.redraw();
@@ -283,7 +283,7 @@ public class SearchIndexPanel extends AdminPanel {
 
 			SearchEngineService.Instance.get().reorderTokenFilters(filters, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void arg) {
+				public void handleSuccess(Void arg) {
 					// Nothing to do
 				}
 			});
@@ -333,7 +333,7 @@ public class SearchIndexPanel extends AdminPanel {
 
 			SearchEngineService.Instance.get().saveTokenFilterSettings(filter, params, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void arg) {
+				public void handleSuccess(Void arg) {
 					// Nothing to do
 				}
 			});
@@ -368,7 +368,7 @@ public class SearchIndexPanel extends AdminPanel {
 			click.getItem().setValue(I18N.message("computing") + "...");
 			SearchEngineService.Instance.get().countEntries(new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Long count) {
+				public void handleSuccess(Long count) {
 					click.getItem().setValue(Util.formatLong(count));
 				}
 			});
@@ -539,7 +539,7 @@ public class SearchIndexPanel extends AdminPanel {
 				LD.contactingServer();
 				SearchEngineService.Instance.get().purge(new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void ret) {
+					public void handleSuccess(Void ret) {
 						LD.clearPrompt();
 					}
 				});
@@ -555,10 +555,8 @@ public class SearchIndexPanel extends AdminPanel {
 			LD.contactingServer();
 			SearchEngineService.Instance.get().check(new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(String ret) {
-					LD.clearPrompt();
-					SearchIndexCheckStatus sc = new SearchIndexCheckStatus(ret);
-					sc.show();
+				public void handleSuccess(String ret) {
+					new SearchIndexCheckStatus(ret).show();
 				}
 			});
 		});
@@ -582,7 +580,7 @@ public class SearchIndexPanel extends AdminPanel {
 							}
 
 							@Override
-							public void onSuccess(Void ret) {
+							public void handleSuccess(Void ret) {
 								GuiLog.info(I18N.message("docsreindex"), null);
 								dropIndex.setDisabled(false);
 								LD.clearPrompt();
@@ -611,7 +609,7 @@ public class SearchIndexPanel extends AdminPanel {
 							}
 
 							@Override
-							public void onSuccess(Void ret) {
+							public void handleSuccess(Void ret) {
 								GuiLog.info(I18N.message("docsreindex"), null);
 								rescheduleAll.setDisabled(false);
 								LD.clearPrompt();
@@ -628,7 +626,7 @@ public class SearchIndexPanel extends AdminPanel {
 		unlock.setAutoFit(true);
 		unlock.addClickHandler(unlockClick -> SearchEngineService.Instance.get().unlock(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void ret) {
+			public void handleSuccess(Void ret) {
 				GuiLog.info(I18N.message("indexunlocked"), null);
 				AdminScreen.get().setContent(new SearchIndexPanel());
 			}
@@ -647,7 +645,7 @@ public class SearchIndexPanel extends AdminPanel {
 
 			SearchEngineService.Instance.get().save(SearchIndexPanel.this.searchEngine, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void ret) {
+				public void handleSuccess(Void ret) {
 					AdminScreen.get().setContent(new SearchIndexPanel());
 				}
 			});
@@ -823,7 +821,7 @@ public class SearchIndexPanel extends AdminPanel {
 
 			DocumentService.Instance.get().markUnindexable(ids, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void result) {
+				public void handleSuccess(Void result) {
 					for (ListGridRecord rec : selection) {
 						docsList.removeData(rec);
 					}
@@ -845,7 +843,7 @@ public class SearchIndexPanel extends AdminPanel {
 		enable.addClickHandler(event -> SearchEngineService.Instance.get()
 				.setLanguageStatus(rec.getAttributeAsString("code"), true, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, true);
 						langsList.refreshRow(langsList.getRecordIndex(rec));
 						GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
@@ -858,7 +856,7 @@ public class SearchIndexPanel extends AdminPanel {
 		disable.addClickHandler(event -> SearchEngineService.Instance.get()
 				.setLanguageStatus(rec.getAttributeAsString("code"), false, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, false);
 						langsList.refreshRow(langsList.getRecordIndex(rec));
 						GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
@@ -879,7 +877,7 @@ public class SearchIndexPanel extends AdminPanel {
 		enable.addClickHandler(event -> SearchEngineService.Instance.get()
 				.setTokenFilterStatus(rec.getAttributeAsString("name"), true, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, true);
 						grid.refreshRow(grid.getRecordIndex(rec));
 					}
@@ -891,7 +889,7 @@ public class SearchIndexPanel extends AdminPanel {
 		disable.addClickHandler(event -> SearchEngineService.Instance.get()
 				.setTokenFilterStatus(rec.getAttributeAsString("name"), false, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, false);
 						grid.refreshRow(grid.getRecordIndex(rec));
 					}

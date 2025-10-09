@@ -71,7 +71,7 @@ public class BookmarkDialog extends Window {
 
 					DocumentService.Instance.get().updateBookmark(bookmark, new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void ret) {
+						public void handleSuccess(Void ret) {
 							destroy();
 							BookmarksPanel.get().refresh();
 						}

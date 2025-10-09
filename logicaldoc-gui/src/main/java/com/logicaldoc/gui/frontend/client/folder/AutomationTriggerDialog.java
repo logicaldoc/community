@@ -152,7 +152,7 @@ public class AutomationTriggerDialog extends Window {
 
 			AutomationService.Instance.get().saveTrigger(trigger, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIAutomationTrigger trg) {
+				public void handleSuccess(GUIAutomationTrigger trg) {
 					automationPanel.updateRecord(trg);
 					destroy();
 				}

@@ -104,7 +104,7 @@ public class ImportArchiveFoldersList extends VLayout {
 			if (Boolean.TRUE.equals(confirm)) {
 				ImpexService.Instance.get().deleteFolder(name, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 					}

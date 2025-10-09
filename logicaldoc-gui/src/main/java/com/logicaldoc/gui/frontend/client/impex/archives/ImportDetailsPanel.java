@@ -40,7 +40,7 @@ public class ImportDetailsPanel extends VLayout {
 		tabSet = new EditingTabSet(saveEvent -> onSave(),
 				cancelEvent -> ImpexService.Instance.get().load(getArchive().getId(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIArchive archive) {
+					public void handleSuccess(GUIArchive archive) {
 						setArchive(archive);
 						tabSet.hideSave();
 					}
@@ -79,7 +79,7 @@ public class ImportDetailsPanel extends VLayout {
 		if (settingsPanel.validate()) {
 			ImpexService.Instance.get().save(archive, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIArchive result) {
+				public void handleSuccess(GUIArchive result) {
 					tabSet.hideSave();
 					listPanel.updateRecord(result);
 				}

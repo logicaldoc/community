@@ -52,7 +52,7 @@ public class RepositoriesPanel extends AdminPanel {
 				"conf.importdir", "conf.logdir", "conf.plugindir", "conf.userdir"),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(List<GUIParameter> folderParameters) {
+					public void handleSuccess(List<GUIParameter> folderParameters) {
 						List<FormItem> items = new ArrayList<>();
 
 						for (GUIParameter f : folderParameters) {
@@ -87,7 +87,7 @@ public class RepositoriesPanel extends AdminPanel {
 
 		SettingService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg) {
+			public void handleSuccess(Void arg) {
 				GuiLog.info(I18N.message("settingssaved"), null);
 
 				// Replicate the settings in the current session

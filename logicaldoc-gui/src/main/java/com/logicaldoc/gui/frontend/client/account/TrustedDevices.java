@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.data.DevicesDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
@@ -56,13 +57,7 @@ public class TrustedDevices extends com.smartgwt.client.widgets.Window {
 		label.setCanEdit(true);
 		label.addCellSavedHandler(event -> SecurityService.Instance.get().updateDeviceLabel(
 				event.getRecord().getAttributeAsLong("id"),
-				event.getNewValue() != null ? event.getNewValue().toString() : null, new DefaultAsyncCallback<>() {
-
-					@Override
-					public void onSuccess(Void arg) {
-						// Nothing to do
-					}
-				}));
+				event.getNewValue() != null ? event.getNewValue().toString() : null, new EmptyAsyncCallback<>()));
 
 		ListGridField deviceId = new ListGridField("deviceId", I18N.message("deviceid"), 150);
 		deviceId.setHidden(true);
@@ -122,7 +117,7 @@ public class TrustedDevices extends com.smartgwt.client.widgets.Window {
 			if (Boolean.TRUE.equals(answer)) {
 				SecurityService.Instance.get().deleteTrustedDevices(ids, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 					}

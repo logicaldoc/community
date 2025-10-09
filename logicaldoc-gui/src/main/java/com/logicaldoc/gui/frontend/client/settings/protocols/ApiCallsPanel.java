@@ -316,9 +316,7 @@ public class ApiCallsPanel extends VLayout {
 		SystemService.Instance.get().searchApiCalls(userId, fromValue, tillValue, sid, protocol, uri, displayMaxValue,
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(List<GUIHistory> histories) {
-						LD.clearPrompt();
-
+					public void handleSuccess(List<GUIHistory> histories) {
 						if (!histories.isEmpty()) {
 							List<ListGridRecord> records = new ArrayList<>();
 							for (GUIHistory history : histories) {

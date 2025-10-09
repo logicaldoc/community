@@ -189,7 +189,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	private void removeNotes(long docId, int delCode) throws PersistenceException {
-		for (DocumentNote note : noteDAO.findByDocId(docId, null)) {
+		for (DocumentNote note : noteDAO.findByDocId(docId, User.USERID_ADMIN, null)) {
 			note.setDeleted(delCode);
 			saveOrUpdate(note);
 		}

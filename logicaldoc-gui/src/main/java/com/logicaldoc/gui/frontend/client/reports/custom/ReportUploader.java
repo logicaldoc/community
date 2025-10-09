@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.reports.custom;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIReport;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -71,7 +72,7 @@ public class ReportUploader extends Window {
 
 		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void result) {
+			public void handleSuccess(Void result) {
 				destroy();
 			}
 		}));
@@ -79,12 +80,7 @@ public class ReportUploader extends Window {
 		addItem(layout);
 
 		// Clean the upload folder
-		DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
-			@Override
-			public void onSuccess(Void result) {
-				// Nothing to do
-			}
-		});
+		DocumentService.Instance.get().cleanUploadedFileFolder(new EmptyAsyncCallback<>());
 	}
 
 	private void prepareForm() {
@@ -112,7 +108,7 @@ public class ReportUploader extends Window {
 		if (report != null) {
 			ReportService.Instance.get().storeUploadedDesign(report.getId(), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void arg) {
+				public void handleSuccess(Void arg) {
 					destroy();
 					I18N.message("reportsaved");
 				}
@@ -127,7 +123,7 @@ public class ReportUploader extends Window {
 
 			ReportService.Instance.get().create(report, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIReport rep) {
+				public void handleSuccess(GUIReport rep) {
 					I18N.message("reportsaved");
 					reportsPanel.refresh();
 					destroy();
@@ -135,7 +131,7 @@ public class ReportUploader extends Window {
 			});
 		}
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

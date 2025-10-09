@@ -346,8 +346,7 @@ public interface DocumentService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public List<String> setTicketPassword(long ticketId, String password) throws ServerException;
-	
-	
+
 	public void deleteTicket(long ticketId) throws ServerException;
 
 	public void enableTicket(long ticketId) throws ServerException;
@@ -544,28 +543,15 @@ public interface DocumentService extends RemoteService {
 	public int saveRating(GUIRating rating) throws ServerException;
 
 	/**
-	 * Adds a new document note on the given document
-	 * 
-	 * @param docId identifier of the document
-	 * @param note the note's text
-	 * 
-	 * @return identifier of the created note
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public long addNote(long docId, String note) throws ServerException;
-
-	/**
 	 * Updates a document note on the given document
 	 * 
-	 * @param docId identifier of the document
-	 * @param noteId identifier of the note
-	 * @param fileVersion file version to bind the note to
-	 * @param note text of the note
+	 * @param note the note to save
+	 * 
+	 * @return the updated / created quote
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void updateNote(long docId, long noteId, String fileVersion, String note) throws ServerException;
+	public GUIDocumentNote saveNote(GUIDocumentNote note) throws ServerException;
 
 	/**
 	 * Retrieves the notes of a document
@@ -580,6 +566,17 @@ public interface DocumentService extends RemoteService {
 	 */
 	public List<GUIDocumentNote> getNotes(long docId, String fileVersion, Collection<String> types)
 			throws ServerException;
+
+	/**
+	 * Retrieves the note of a document
+	 * 
+	 * @param noteId identifier of the note
+	 * 
+	 * @return the existing note
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public GUIDocumentNote getNote(long noteId) throws ServerException;
 
 	/**
 	 * Saves a set of notes

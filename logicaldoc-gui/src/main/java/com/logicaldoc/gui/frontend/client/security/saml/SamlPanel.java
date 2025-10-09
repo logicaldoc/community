@@ -79,7 +79,7 @@ public class SamlPanel extends VLayout {
 	protected void onDraw() {
 		SamlService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUISamlSettings settings) {
+			public void handleSuccess(GUISamlSettings settings) {
 				initGUI(settings);
 			}
 		});
@@ -299,7 +299,7 @@ public class SamlPanel extends VLayout {
 
 			SamlService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void ret) {
+				public void handleSuccess(Void ret) {
 					GuiLog.info(I18N.message("settingssaved"), null);
 				}
 			});

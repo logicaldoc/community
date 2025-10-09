@@ -69,8 +69,7 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 							}
 
 							@Override
-							public void onSuccess(List<GUIContact> contacts) {
-								LD.clearPrompt();
+							public void handleSuccess(List<GUIContact> contacts) {
 								settings.destroy();
 								destroy();
 

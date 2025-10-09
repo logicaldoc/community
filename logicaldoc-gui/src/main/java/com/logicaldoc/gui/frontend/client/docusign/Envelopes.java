@@ -125,7 +125,7 @@ public class Envelopes extends com.smartgwt.client.widgets.Window {
 			inviteToChat.addClickHandler(evnt -> DocuSignService.Instance.get()
 					.getSigners(list.getSelectedRecord().getAttributeAsString("id"), new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Collection<String> signers) {
+						public void handleSuccess(Collection<String> signers) {
 							StringBuilder message = new StringBuilder();
 							for (String signer : signers) {
 								message.append("\n");

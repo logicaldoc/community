@@ -30,9 +30,7 @@ public class ZonalOCRZoneCanvas extends ZoneCanvas {
 			LD.contactingServer();
 			ZonalOCRService.Instance.get().updateZone(zone, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIZone newZone) {
-					LD.clearPrompt();
-
+				public void handleSuccess(GUIZone newZone) {
 					ZonalOCRZoneCanvas.this.zone.setSample(newZone.getSample());
 					ZonalOCRZoneCanvas.this.zone.setSampleText(newZone.getSampleText());
 					new ZoneEditor(zone).show();

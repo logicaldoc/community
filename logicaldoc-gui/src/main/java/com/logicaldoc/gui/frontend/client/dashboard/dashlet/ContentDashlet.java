@@ -40,7 +40,7 @@ public class ContentDashlet extends Dashlet {
 		DashletService.Instance.get().get(guiDashlet.getId(), new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onSuccess(GUIDashlet dashlet) {
+			public void handleSuccess(GUIDashlet dashlet) {
 				guiDashlet = dashlet;
 				initGUI();
 			}

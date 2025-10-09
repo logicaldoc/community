@@ -135,7 +135,7 @@ public class OCRHistoryPanel extends VLayout {
 			downloadIndexed.addClickHandler(evnt -> FolderService.Instance.get().getFolder(
 					selectedRecord.getAttributeAsLong("folderId"), false, false, false, new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIFolder folder) {
+						public void handleSuccess(GUIFolder folder) {
 							if (folder.isDownload())
 								Util.download(Util.downloadURL(selectedRecord.getAttributeAsLong(DOC_ID))
 										+ "&downloadText=true");

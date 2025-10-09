@@ -42,7 +42,7 @@ public class AttributeSetDetailsPanel extends VLayout {
 			if (attributeSet.getId() != 0) {
 				AttributeSetService.Instance.get().getAttributeSet(attributeSet.getId(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIAttributeSet set) {
+					public void handleSuccess(GUIAttributeSet set) {
 						setAttributeSet(set);
 					}
 				});
@@ -115,7 +115,7 @@ public class AttributeSetDetailsPanel extends VLayout {
 		if (validate()) {
 			AttributeSetService.Instance.get().save(attributeSet, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIAttributeSet result) {
+				public void handleSuccess(GUIAttributeSet result) {
 					setsPanel.updateRecord(result);
 					setAttributeSet(result);
 				}

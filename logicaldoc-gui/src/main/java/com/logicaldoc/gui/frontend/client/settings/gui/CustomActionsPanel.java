@@ -82,7 +82,7 @@ public class CustomActionsPanel extends VLayout {
 
 				SecurityService.Instance.get().saveMenu(action, I18N.getLocale(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIMenu newMenu) {
+					public void handleSuccess(GUIMenu newMenu) {
 						actions.add(newMenu);
 						fillGrid();
 						new CustomActionEditor(newMenu, CustomActionsPanel.this).show();
@@ -177,7 +177,7 @@ public class CustomActionsPanel extends VLayout {
 		SecurityService.Instance.get().getMenus(com.logicaldoc.gui.common.client.Menu.CUSTOM_ACTIONS, I18N.getLocale(),
 				false, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(List<GUIMenu> menus) {
+					public void handleSuccess(List<GUIMenu> menus) {
 						actions.clear();
 						actions.addAll(menus);
 						fillGrid();
@@ -204,7 +204,7 @@ public class CustomActionsPanel extends VLayout {
 
 		SecurityService.Instance.get().saveMenus(actions, I18N.getLocale(), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg0) {
+			public void handleSuccess(Void arg0) {
 				GuiLog.info(I18N.message("settingssaved"), null);
 			}
 		});
@@ -262,7 +262,7 @@ public class CustomActionsPanel extends VLayout {
 					SecurityService.Instance.get().deleteMenu(selectedRecord.getAttributeAsLong("id"),
 							new DefaultAsyncCallback<>() {
 								@Override
-								public void onSuccess(Void arg) {
+								public void handleSuccess(Void arg) {
 									reload();
 								}
 							});

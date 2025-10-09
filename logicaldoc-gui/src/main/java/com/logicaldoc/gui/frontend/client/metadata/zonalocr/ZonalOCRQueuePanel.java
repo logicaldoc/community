@@ -86,7 +86,7 @@ public class ZonalOCRQueuePanel extends VLayout {
 					if (Boolean.TRUE.equals(confirm))
 						ZonalOCRService.Instance.get().rescheduleAll(new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void ret) {
+							public void handleSuccess(Void ret) {
 								GuiLog.info(I18N.message("docsrescheduledprocessing"), null);
 								maxRecords = (Integer) max.getValue();
 								DocumentsDSParameters params = new DocumentsDSParameters(null, null, maxRecords, 1,
@@ -214,7 +214,7 @@ public class ZonalOCRQueuePanel extends VLayout {
 				return;
 			ZonalOCRService.Instance.get().markUnprocessable(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void result) {
+				public void handleSuccess(Void result) {
 					for (ListGridRecord rec : selection) {
 						list.removeData(rec);
 					}

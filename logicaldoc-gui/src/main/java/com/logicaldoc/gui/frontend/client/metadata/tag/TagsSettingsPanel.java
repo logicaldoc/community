@@ -122,7 +122,7 @@ public class TagsSettingsPanel extends VLayout {
 
 					SettingService.Instance.get().saveSettings(params, new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void ret) {
+						public void handleSuccess(Void ret) {
 							Session.get().getInfo().setConfig(Session.get().getTenantName() + ".tag.mode",
 									values.get("mode").toString());
 							Session.get().getInfo().setConfig(Session.get().getTenantName() + ".tag.maxsize",

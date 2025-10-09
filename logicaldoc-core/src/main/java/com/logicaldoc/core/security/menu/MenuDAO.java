@@ -43,7 +43,7 @@ public interface MenuDAO extends PersistentObjectDAO<Menu> {
 	public List<Menu> findByUserId(long userId);
 
 	/**
-	 * Finds all menus ids with a specific permission enabled on the specifies
+	 * Finds all menus ids with a specific permission enabled on the specified
 	 * user
 	 * 
 	 * @param userId The user identifier

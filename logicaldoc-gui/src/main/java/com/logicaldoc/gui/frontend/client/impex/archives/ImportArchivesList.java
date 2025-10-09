@@ -149,7 +149,7 @@ public class ImportArchivesList extends VLayout {
 			if (Boolean.TRUE.equals(confirm)) {
 				ImpexService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						showDetails(null);
@@ -173,7 +173,7 @@ public class ImportArchivesList extends VLayout {
 
 		ImpexService.Instance.get().load(archiveId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIArchive result) {
+			public void handleSuccess(GUIArchive result) {
 				details = new ImportDetailsPanel(result, ImportArchivesList.this);
 				detailsContainer.addMember(details);
 			}

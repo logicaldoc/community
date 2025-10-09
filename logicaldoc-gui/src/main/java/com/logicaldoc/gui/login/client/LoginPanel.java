@@ -755,7 +755,7 @@ public class LoginPanel extends VLayout {
 				LoginService.Instance.get().getLegalsToConfirm(username, new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(List<GUIParameter> legals) {
+					public void handleSuccess(List<GUIParameter> legals) {
 						new LegalsPopup(username, legals).show();
 					}
 				});

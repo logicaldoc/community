@@ -56,7 +56,7 @@ public class WebFormPrefilledLink extends StickyWindow {
 
 		FormService.Instance.get().getById(formId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIForm frm) {
+			public void handleSuccess(GUIForm frm) {
 				extPanel = new ExtendedPropertiesPanel(frm, null, true, false, false);
 				addItem(extPanel);
 
@@ -89,7 +89,7 @@ public class WebFormPrefilledLink extends StickyWindow {
 		FormService.Instance.get().getPreFilledLink((GUIForm) extPanel.getObject(), vm.getValueAsString(RESPONDEREMAIL),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(String link) {
+					public void handleSuccess(String link) {
 						prefilledLink.setValue("<a href='" + link + "' target=='_blank'>" + link + "</a>");
 					}
 				});

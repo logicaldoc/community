@@ -57,7 +57,7 @@ public class RestoreDialog extends Dialog {
 						Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void arg0) {
+							public void handleSuccess(Void arg0) {
 								if (handler != null)
 									handler.onClick(event);
 								close();
@@ -69,7 +69,7 @@ public class RestoreDialog extends Dialog {
 						Long.parseLong(folders.getSelectedRecord().getAttributeAsString("folderId")),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void arg0) {
+							public void handleSuccess(Void arg0) {
 								if (handler != null)
 									handler.onClick(event);
 								close();

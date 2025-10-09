@@ -166,9 +166,8 @@ public class LDAPBrowser extends VLayout {
 				}
 
 				@Override
-				public void onSuccess(List<GUIUser> result) {
+				public void handleSuccess(List<GUIUser> result) {
 					searchButton.setDisabled(false);
-					LD.clearPrompt();
 					List<ListGridRecord> records = new ArrayList<>();
 					for (GUIUser user : result) {
 						ListGridRecord rec = new ListGridRecord();
@@ -202,8 +201,7 @@ public class LDAPBrowser extends VLayout {
 			users.deselectAllRecords();
 			LDAPService.Instance.get().importUsers(usernames, server.getId(), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(List<GUIValue> report) {
-					LD.clearPrompt();
+				public void handleSuccess(List<GUIValue> report) {
 					String message = I18N.message("importreport", report.get(0).getValue(), report.get(1).getValue(),
 							report.get(2).getValue());
 					if ("0".equals(report.get(2).getValue()))

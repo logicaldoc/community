@@ -6,10 +6,10 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.ArchivedDocsDS;
 import com.logicaldoc.gui.common.client.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.grid.FileSizeListGridField;
 import com.logicaldoc.gui.common.client.grid.VersionListGridField;
-import com.logicaldoc.gui.common.client.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.preview.PreviewPopup;
@@ -146,9 +146,8 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 
 			DocumentService.Instance.get().getById(id, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIDocument doc) {
-					PreviewPopup iv = new PreviewPopup(doc);
-					iv.show();
+				public void handleSuccess(GUIDocument doc) {
+					new PreviewPopup(doc).show();
 				}
 			});
 		});
@@ -172,7 +171,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 		restore.addClickHandler(event -> DocumentService.Instance.get().unarchiveDocuments(GridUtil.getIds(selection),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void arg0) {
+					public void handleSuccess(Void arg0) {
 						list.removeSelectedData();
 						GuiLog.info(I18N.message("docsrestored"), null);
 					}
@@ -184,7 +183,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 			if (Boolean.TRUE.equals(answer)) {
 				DocumentService.Instance.get().delete(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 					}
 				});
@@ -210,7 +209,7 @@ public class ArchivedDocsReport extends ReportPanel implements FolderChangeListe
 	public void onChanged(GUIFolder folder) {
 		refresh();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

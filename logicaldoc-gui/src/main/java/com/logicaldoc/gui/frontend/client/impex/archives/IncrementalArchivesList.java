@@ -124,7 +124,7 @@ public class IncrementalArchivesList extends VLayout {
 			ImpexService.Instance.get().loadIncremental(Long.parseLong(rec.getAttributeAsString("id")),
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIIncrementalArchive result) {
+						public void handleSuccess(GUIIncrementalArchive result) {
 							showDetails(result);
 						}
 					});
@@ -163,7 +163,7 @@ public class IncrementalArchivesList extends VLayout {
 			if (Boolean.TRUE.equals(confirm)) {
 				ImpexService.Instance.get().deleteIncremental(id, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						showDetails(null);
@@ -222,7 +222,7 @@ public class IncrementalArchivesList extends VLayout {
 		archive.setType(IncrementalArchivesList.this.archivesType);
 		showDetails(archive);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

@@ -51,8 +51,7 @@ public class DocumentHistoryDashlet extends DocumentDashlet {
 				}
 
 				@Override
-				public void onSuccess(Void ret) {
-					LD.clearPrompt();
+				public void handleSuccess(Void ret) {
 					RecordList l = list.getRecordList();
 					for (int i = 0; i < list.getTotalRows(); i++) {
 						l.get(i).setAttribute("new", false);

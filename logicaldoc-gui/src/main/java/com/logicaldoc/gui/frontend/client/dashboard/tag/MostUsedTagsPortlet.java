@@ -83,7 +83,7 @@ public class MostUsedTagsPortlet extends Portlet {
 		TagService.Instance.get().getTagCloud(new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onSuccess(List<GUITag> cloud) {
+			public void handleSuccess(List<GUITag> cloud) {
 				List<ListGridRecord> records = new ArrayList<>();
 				for (GUITag tag : cloud) {
 					ListGridRecord rec = new ListGridRecord();

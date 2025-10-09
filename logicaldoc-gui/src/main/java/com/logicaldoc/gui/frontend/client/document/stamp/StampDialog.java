@@ -87,9 +87,7 @@ public class StampDialog extends StickyWindow {
 			}
 
 			@Override
-			public void onSuccess(GUIStamp stamp) {
-				LD.clearPrompt();
-
+			public void handleSuccess(GUIStamp stamp) {
 				Boolean visualPositioningFlag = visualPositioning.getValueAsBoolean();
 				if (stamp.getTemplateId() != null) {
 					// Display the form for filling the form parameters
@@ -120,13 +118,12 @@ public class StampDialog extends StickyWindow {
 						}
 
 						@Override
-						public void onSuccess(Void result) {
-							LD.clearPrompt();
+						public void handleSuccess(Void result) {
 							GuiLog.info(I18N.message("event.stamped"), null);
 							for (GUIDocument doc : documents) {
 								DocumentService.Instance.get().getById(doc.getId(), new DefaultAsyncCallback<>() {
 									@Override
-									public void onSuccess(GUIDocument document) {
+									public void handleSuccess(GUIDocument document) {
 										DocumentController.get().modified(document);
 									}
 								});

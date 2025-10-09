@@ -100,7 +100,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 
 		BarcodeService.Instance.get().save((GUIBarcodeTemplate) selectedOcrTemplate, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIBarcodeTemplate template) {
+			public void handleSuccess(GUIBarcodeTemplate template) {
 				GuiLog.info(I18N.message("settingssaved"), null);
 			}
 		});
@@ -231,7 +231,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 					if (Boolean.TRUE.equals(yes))
 						BarcodeService.Instance.get().delete(selectedOcrTemplate.getId(), new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void arg0) {
+							public void handleSuccess(Void arg0) {
 								selectedOcrTemplate = null;
 								refresh(selectedDocumentTemplate.getId(), null);
 							}
@@ -302,7 +302,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 			ListGridRecord rec = barcodeTemplateSelector.getSelectedRecord();
 			BarcodeService.Instance.get().getTemplate(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIBarcodeTemplate tmpl) {
+				public void handleSuccess(GUIBarcodeTemplate tmpl) {
 					setSelectedOcrTemplate(tmpl);
 				}
 			});

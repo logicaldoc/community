@@ -188,7 +188,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 							}
 
 							@Override
-							public void onSuccess(Void result) {
+							public void handleSuccess(Void result) {
 								DocumentsPanel.get().onFolderSelected(FolderController.get().getCurrentFolder());
 								GuiLog.debug("Drag&Drop operation completed.");
 							}
@@ -223,7 +223,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 					}
 
 					@Override
-					public void onSuccess(Void ret) {
+					public void handleSuccess(Void ret) {
 						TreeNode targetNode = getTree().find(FOLDER_ID, (Object) Long.valueOf(target));
 						if (targetNode != null)
 							getTree().reloadChildren(targetNode);
@@ -243,7 +243,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 		FolderService.Instance.get().getFolder(folderId, false, true, Session.get().isFolderPagination(),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIFolder result) {
+					public void handleSuccess(GUIFolder result) {
 						if (result != null) {
 							result.setPathExtended(getPath(folderId));
 							FolderController.get().selected(result);
@@ -260,7 +260,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 	private void showContextMenu() {
 		FolderService.Instance.get().getAllowedPermissions(getSelectedIds(), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIAccessControlEntry acl) {
+			public void handleSuccess(GUIAccessControlEntry acl) {
 				new ContextMenu(FolderNavigator.this, acl).showContextMenu();
 			}
 		});
@@ -332,7 +332,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			FolderService.Instance.get().getFolder(folderId, true, true, Session.get().isFolderPagination(),
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIFolder folder) {
+						public void handleSuccess(GUIFolder folder) {
 							selectFolder(folder.getId());
 						}
 					});
@@ -402,7 +402,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			}
 
 			@Override
-			public void onSuccess(Void ret) {
+			public void handleSuccess(Void ret) {
 				LD.clearPrompt();
 				TreeNode target = getTree().find(FOLDER_ID, Long.toString(targetFolderId));
 				if (target != null)
@@ -521,7 +521,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			else
 				DocumentService.Instance.get().archiveFolder(folderId, value, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Long result) {
+					public void handleSuccess(Long result) {
 						GuiLog.info(I18N.message("documentswerearchived", "" + result), null);
 						reload();
 					}
@@ -603,7 +603,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 						cursor.getCurrentPagination().getStartRow(), cursor.getCurrentPagination().getPageSize(),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void arg) {
+							public void handleSuccess(Void arg) {
 								TreeNode parentNode = getTree().find(FOLDER_ID, "" + cursor.getFolderId());
 								getTree().reloadChildren(parentNode);
 							}
@@ -628,7 +628,7 @@ public class FolderNavigator extends FolderTree implements FolderObserver {
 			FolderService.Instance.get().getFolder(fld.getId(), true, true, Session.get().isFolderPagination(),
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIFolder folder) {
+						public void handleSuccess(GUIFolder folder) {
 							getTree().openFolder(node);
 							scrollToCell(getRowNum(node), 0);
 							selectRecord(node);

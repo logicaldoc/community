@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.google;
 
-import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.OAuthException;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -14,7 +14,7 @@ import com.logicaldoc.gui.common.client.util.LD;
  * @param <T> The type of the return value that was declared in the synchronous
  *        version of the service method.
  */
-public class GoogleAsyncCallback<T> extends DefaultAsyncCallback<T> {
+public class GoogleAsyncCallback<T> extends EmptyAsyncCallback<T> {
 	@Override
 	public void onFailure(Throwable caught) {
 		LD.clearPrompt();

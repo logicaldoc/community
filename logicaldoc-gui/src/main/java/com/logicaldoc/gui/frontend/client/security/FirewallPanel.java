@@ -143,7 +143,7 @@ public class FirewallPanel extends VLayout {
 								FIREWALL_ALLOW_URL_ENCODED_SLASH, FIREWALL_ALLOW_URL_ENCODED_PERIOD),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(List<GUIParameter> params) {
+							public void handleSuccess(List<GUIParameter> params) {
 								enabled.setValue(params.get(0).getValueAsBoolean());
 								whitelist.setValue(params.get(1).getValue().replace(',', '\n'));
 								blacklist.setValue(params.get(2).getValue().replace(',', '\n'));
@@ -278,7 +278,7 @@ public class FirewallPanel extends VLayout {
 
 		SettingService.Instance.get().saveFirewallSettings(params, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg) {
+			public void handleSuccess(Void arg) {
 				if (user == null)
 					GuiLog.info(I18N.message("settingssaved"), null);
 			}

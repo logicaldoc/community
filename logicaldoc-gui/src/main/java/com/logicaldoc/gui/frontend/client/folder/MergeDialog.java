@@ -80,7 +80,7 @@ public class MergeDialog extends Dialog {
 		LD.contactingServer();
 		FolderService.Instance.get().merge(ids, targetFolderId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void ret) {
+			public void handleSuccess(Void ret) {
 				LD.clearPrompt();
 				TreeNode target = FolderNavigator.get().getTree().find(
 						com.logicaldoc.gui.frontend.client.folder.browser.FolderTree.FOLDER_ID,

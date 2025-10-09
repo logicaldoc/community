@@ -62,7 +62,7 @@ public class LegalPreview extends VLayout {
 	private void confirmReading() {
 		LoginService.Instance.get().confirmLegal(username, legal.getName(), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void v) {
+			public void handleSuccess(Void v) {
 				topConfirmReadingToolStrip.removeMember(topConfirmReadingButton);
 				confirmation.onClick(null);
 			}

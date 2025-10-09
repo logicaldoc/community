@@ -17,6 +17,8 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.core.security.AccessControlEntry;
+import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.spring.Context;
 
@@ -49,7 +51,7 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testFindByDocId() throws PersistenceException {
-		List<DocumentNote> notes = testSubject.findByDocId(1L, null);
+		List<DocumentNote> notes = testSubject.findByDocId(1L, User.USERID_ADMIN, null);
 		assertNotNull(notes);
 		assertEquals(2, notes.size());
 		DocumentNote note = notes.get(0);
@@ -57,6 +59,32 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 		assertNotNull(notes.toString());
 
 		assertNotSame(0, note.hashCode());
+
+		// No ACL so whatever user can access all the notes
+		notes = testSubject.findByDocId(1L, 4L, null);
+		assertNotNull(notes);
+		assertEquals(2, notes.size());
+
+		// No give read access to just user 3
+		note = notes.getFirst();
+		testSubject.initialize(note);
+		note.addAccessControlEntry(new AccessControlEntry(-3L));
+		testSubject.store(note);
+
+		// User 4 cannot access the protected note anymore
+		notes = testSubject.findByDocId(1L, 4L, null);
+		assertNotNull(notes);
+		assertEquals(1, notes.size());
+
+		// User 3 can access the note
+		notes = testSubject.findByDocId(1L, 3L, null);
+		assertNotNull(notes);
+		assertEquals(2, notes.size());
+
+		// Administrator can access all the notes
+		notes = testSubject.findByDocId(1L, User.USERID_ADMIN, null);
+		assertNotNull(notes);
+		assertEquals(2, notes.size());
 	}
 
 	@SuppressWarnings("unlikely-arg-type")
@@ -106,21 +134,21 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testFindByDocIdAndType() throws PersistenceException {
-		List<DocumentNote> notes = testSubject.findByDocIdAndType(1L, null, "x");
+		List<DocumentNote> notes = testSubject.findByDocIdAndType(1L, User.USERID_ADMIN, null, "x");
 		assertNotNull(notes);
 		assertEquals(1, notes.size());
 		DocumentNote note = notes.get(0);
 		assertEquals("message for note 2", note.getMessage());
 
-		notes = testSubject.findByDocIdAndType(3L, "1.3", "x");
+		notes = testSubject.findByDocIdAndType(3L, User.USERID_ADMIN, "1.3", "x");
 		assertNotNull(notes);
 	}
 
 	@Test
 	public void testCopyAnnotations() throws PersistenceException {
-		assertTrue(testSubject.findByDocId(4L, "2.0").isEmpty());
+		assertTrue(testSubject.findByDocId(4L, User.USERID_ADMIN, "2.0").isEmpty());
 		testSubject.copyAnnotations(3L, "1.0", "2.0");
-		assertEquals(1, testSubject.findByDocId(3L, "2.0").size());
+		assertEquals(1, testSubject.findByDocId(3L, User.USERID_ADMIN, "2.0").size());
 	}
 
 	@Test

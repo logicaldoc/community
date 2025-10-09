@@ -268,7 +268,7 @@ public class StoresPanel extends VLayout {
 	private void doRemoveStore(int selectedStoreId) {
 		SettingService.Instance.get().removeStore(selectedStoreId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<String> paths) {
+			public void handleSuccess(List<String> paths) {
 				if (!paths.isEmpty()) {
 					SC.warn(I18N.message("foldersusingstorage", "" + selectedStoreId) + Util.padLeft("<ul>"
 							+ paths.stream().map(p -> "<li>" + p + "</li>").collect(Collectors.joining()) + "</ul>",
@@ -288,7 +288,7 @@ public class StoresPanel extends VLayout {
 		test.addClickHandler(event -> SettingService.Instance.get().testStore(selectedRecord.getAttributeAsInt("id"),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Boolean result) {
+					public void handleSuccess(Boolean result) {
 						if (result.booleanValue())
 							SC.say(I18N.message("connectionestablished"));
 						else
@@ -321,7 +321,7 @@ public class StoresPanel extends VLayout {
 
 		SettingService.Instance.get().saveStoreSettings(settings, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg) {
+			public void handleSuccess(Void arg) {
 				GuiLog.info(I18N.message("settingssaved"), null);
 
 				// Replicate the settings in the current session

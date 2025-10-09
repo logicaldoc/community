@@ -99,7 +99,7 @@ public class UserSearchDialog extends Window {
 			}
 
 			@Override
-			public void onSuccess(List<GUIUser> result) {
+			public void handleSuccess(List<GUIUser> result) {
 				List<ListGridRecord> recs = new ArrayList<>();
 				for (GUIUser hit : result) {
 					ListGridRecord rec = new ListGridRecord();

@@ -31,13 +31,10 @@ public class BarcodeZoneCanvas extends ZoneCanvas {
 			LD.contactingServer();
 			BarcodeService.Instance.get().updateZone((GUIBarcodeZone) zone, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIBarcodeZone newZone) {
-					LD.clearPrompt();
-
+				public void handleSuccess(GUIBarcodeZone newZone) {
 					BarcodeZoneCanvas.this.zone.setSample(newZone.getSample());
 					BarcodeZoneCanvas.this.zone.setSampleText(newZone.getSampleText());
-					ZoneEditor editor = new ZoneEditor((GUIBarcodeZone) zone);
-					editor.show();
+					new ZoneEditor((GUIBarcodeZone) zone).show();
 				}
 			});
 		} else {

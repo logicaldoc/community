@@ -163,7 +163,7 @@ public class LockedDocsReport extends ReportPanel {
 
 			DocumentService.Instance.get().unlock(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void result) {
+				public void handleSuccess(Void result) {
 					refresh();
 				}
 			});
@@ -177,7 +177,7 @@ public class LockedDocsReport extends ReportPanel {
 			long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
 			DocumentService.Instance.get().getById(id, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIDocument doc) {
+				public void handleSuccess(GUIDocument doc) {
 					new PreviewPopup(doc).show();
 				}
 			});

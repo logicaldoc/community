@@ -275,7 +275,7 @@ public class UsersPanel extends AdminPanel {
 	private void onSelectUser(long userId) {
 		SecurityService.Instance.get().getUser(userId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIUser user) {
+			public void handleSuccess(GUIUser user) {
 				showUserDetails(user);
 			}
 		});
@@ -396,7 +396,7 @@ public class UsersPanel extends AdminPanel {
 		disableUser.addClickHandler(event -> SecurityService.Instance.get()
 				.changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), false, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.getSelectedRecord().setAttribute(ENABLED, false);
 						list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
 						onSelectUser(list.getSelectedRecord().getAttributeAsLong("id"));
@@ -411,7 +411,7 @@ public class UsersPanel extends AdminPanel {
 		enableUser.addClickHandler(event -> SecurityService.Instance.get()
 				.changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), true, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.getSelectedRecord().setAttribute(ENABLED, true);
 						list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
 						onSelectUser(list.getSelectedRecord().getAttributeAsLong("id"));
@@ -426,9 +426,8 @@ public class UsersPanel extends AdminPanel {
 		twoTactorsAuth.addClickHandler(event -> SecurityService.Instance.get()
 				.getUser(selectedUsers[0].getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIUser user) {
-						TwoFactorsAuthenticationDialog dialog = new TwoFactorsAuthenticationDialog(user, true);
-						dialog.show();
+					public void handleSuccess(GUIUser user) {
+						new TwoFactorsAuthenticationDialog(user, true).show();
 					}
 				}));
 		return twoTactorsAuth;
@@ -437,12 +436,11 @@ public class UsersPanel extends AdminPanel {
 	private MenuItem prepareReplicateMenuItem(final ListGridRecord[] selectedUsers) {
 		MenuItem replicate = new MenuItem();
 		replicate.setTitle(I18N.message("replicatesettings"));
-		replicate.addClickHandler(event -> {
+		replicate.addClickHandler(click -> {
 			List<Long> selectedIds = new ArrayList<>();
 			for (ListGridRecord rec : selectedUsers)
 				selectedIds.add(rec.getAttributeAsLong("id"));
-			ReplicateUserSettings dialog = new ReplicateUserSettings(selectedIds, UsersPanel.this);
-			dialog.show();
+			new ReplicateUserSettings(selectedIds, UsersPanel.this).show();
 		});
 		return replicate;
 	}
@@ -461,7 +459,7 @@ public class UsersPanel extends AdminPanel {
 			if (Boolean.TRUE.equals(yes)) {
 				SecurityService.Instance.get().deleteUser(selectedUserId, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						details = SELECT_USER;

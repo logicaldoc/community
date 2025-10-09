@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.folder.browser;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.controllers.FolderController;
@@ -179,20 +179,10 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 		if (currentPagination.getTotalPages() < 2
 				&& currentPagination.getPageSize() == Session.get().getConfigAsInt(GUI_FOLDER_MAXCHILDREN))
 			FolderService.Instance.get().setFolderPagination(currentPagination.getFolderId(), null, null,
-					new DefaultAsyncCallback<>() {
-						@Override
-						public void onSuccess(Void arg) {
-							// Nothing to do
-						}
-					});
+					new EmptyAsyncCallback<>());
 		else
 			FolderService.Instance.get().setFolderPagination(currentPagination.getFolderId(),
-					currentPagination.getStartRow(), currentPagination.getPageSize(), new DefaultAsyncCallback<>() {
-						@Override
-						public void onSuccess(Void arg) {
-							// Nothing to do
-						}
-					});
+					currentPagination.getStartRow(), currentPagination.getPageSize(), new EmptyAsyncCallback<>());
 	}
 
 	@Override
@@ -229,7 +219,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 	public FolderPagination getCurrentPagination() {
 		return currentPagination;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

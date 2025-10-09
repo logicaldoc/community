@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.folder;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationTrigger;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.AutomationTriggersDS;
@@ -112,19 +113,7 @@ public class FolderAutomationPanel extends FolderDetailTab {
 
 		applyToSubfolders.addClickHandler(event -> {
 			LD.contactingServer();
-			AutomationService.Instance.get().applyTriggersToTree(folder.getId(), new DefaultAsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					super.onFailure(caught);
-				}
-
-				@Override
-				public void onSuccess(Void arg) {
-					LD.clearPrompt();
-				}
-			});
+			AutomationService.Instance.get().applyTriggersToTree(folder.getId(), new EmptyAsyncCallback<>());
 		});
 
 		buttons.setMembers(add, applyToSubfolders);
@@ -145,7 +134,7 @@ public class FolderAutomationPanel extends FolderDetailTab {
 						AutomationService.Instance.get().deleteTriggers(GridUtil.getIds(selection),
 								new DefaultAsyncCallback<>() {
 									@Override
-									public void onSuccess(Void result) {
+									public void handleSuccess(Void result) {
 										list.removeSelectedData();
 										list.deselectAllRecords();
 									}
@@ -194,7 +183,7 @@ public class FolderAutomationPanel extends FolderDetailTab {
 		ListGridRecord selection = list.getSelectedRecord();
 		AutomationService.Instance.get().getTrigger(selection.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIAutomationTrigger trigger) {
+			public void handleSuccess(GUIAutomationTrigger trigger) {
 				AutomationTriggerDialog dialog = new AutomationTriggerDialog(trigger, FolderAutomationPanel.this);
 				dialog.show();
 			}

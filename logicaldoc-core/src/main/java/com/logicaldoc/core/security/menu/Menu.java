@@ -2,6 +2,7 @@ package com.logicaldoc.core.security.menu;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.security.AccessControlEntry;
@@ -218,6 +219,11 @@ public class Menu extends PersistentObject implements Secure<AccessControlEntry>
 	@Override
 	public AccessControlEntry getAccessControlEntry(long groupId) {
 		return getAccessControlList().stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);
+	}
+	
+	@Override
+	public Set<AccessControlEntry> getAccessControlEntries(Set<Long> groupIds) {
+		return getAccessControlList().stream().filter(ace -> groupIds.contains(ace.getGroupId())).collect(Collectors.toSet());
 	}
 
 	@Override

@@ -100,7 +100,7 @@ public class DocumentsListPanel extends VLayout {
 			DocumentService.Instance.get().getAllowedPermissions(documentsGrid.getSelectedIds(),
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIAccessControlEntry enabledPermissions) {
+						public void handleSuccess(GUIAccessControlEntry enabledPermissions) {
 							new ContextMenu(FolderController.get().getCurrentFolder(), documentsGrid,
 									enabledPermissions).showContextMenu();
 						}
@@ -118,7 +118,7 @@ public class DocumentsListPanel extends VLayout {
 			GUIDocument selectedDocument = documentsGrid.getSelectedDocument();
 			DocumentService.Instance.get().getById(selectedDocument.getId(), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIDocument doc) {
+				public void handleSuccess(GUIDocument doc) {
 					DocumentController.get().setCurrentDocument(doc);
 				}
 			});

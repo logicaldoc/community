@@ -121,8 +121,7 @@ public class EnvelopeDetails extends Window {
 		LD.contactingServer();
 		DocuSignService.Instance.get().validateEnvelope(docIds, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Collection<GUIDocument> docs) {
-				LD.clearPrompt();
+			public void handleSuccess(Collection<GUIDocument> docs) {
 				if (!docs.isEmpty()) {
 					StringBuilder message = new StringBuilder(I18N.message("providesignheretabfordocs") + ": <ul>");
 					for (GUIDocument doc : docs) {
@@ -142,8 +141,7 @@ public class EnvelopeDetails extends Window {
 					LD.contactingServer();
 					DocuSignService.Instance.get().sendEnvelope(settings, new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(String envelopeId) {
-							LD.clearPrompt();
+						public void handleSuccess(String envelopeId) {
 							SC.say(I18N.message("sentenvelope", envelopeId));
 							destroy();
 						}

@@ -175,7 +175,7 @@ public class DashletsPanel extends VLayout {
 	private void saveDashlets() {
 		DashletService.Instance.get().saveDashlets(dashlets, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg0) {
+			public void handleSuccess(Void arg0) {
 				GuiLog.info(I18N.message("settingssaved"), null);
 			}
 		});
@@ -211,7 +211,7 @@ public class DashletsPanel extends VLayout {
 		delete.addClickHandler(event -> DashletService.Instance.get()
 				.delete(grid.getSelectedRecord().getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void arg) {
+					public void handleSuccess(Void arg) {
 						reload();
 					}
 				}));
@@ -225,7 +225,7 @@ public class DashletsPanel extends VLayout {
 	private void reload() {
 		DashletService.Instance.get().loadDashlets(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIDashlet> dashlts) {
+			public void handleSuccess(List<GUIDashlet> dashlts) {
 				dashlets.addAll(dashlts);
 				refreshGrid();
 			}

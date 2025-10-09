@@ -105,9 +105,7 @@ public class UpdatePanel extends VLayout {
 			}
 
 			@Override
-			public void onSuccess(List<GUIParameter> parameters) {
-				LD.clearPrompt();
-
+			public void handleSuccess(List<GUIParameter> parameters) {
 				if (parameters.isEmpty()) {
 					onUpdateUnavailable();
 				} else if (parameters.size() == 1 && parameters.get(0).getName().equals("error")) {
@@ -220,14 +218,14 @@ public class UpdatePanel extends VLayout {
 						}
 
 						@Override
-						public void onSuccess(Void arg) {
+						public void handleSuccess(Void arg) {
 							confirmUpdate.setVisible(false);
 
 							new Timer() {
 								public void run() {
 									UpdateService.Instance.get().checkDownloadStatus(new DefaultAsyncCallback<>() {
 										@Override
-										public void onSuccess(List<Integer> status) {
+										public void handleSuccess(List<Integer> status) {
 											bar.setPercentDone(status.get(1));
 
 											if (status.get(1) == 100)
@@ -274,7 +272,7 @@ public class UpdatePanel extends VLayout {
 	private void displayNotes(String fileName) {
 		UpdateService.Instance.get().getUpdateNotes(fileName, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<String> infos) {
+			public void handleSuccess(List<String> infos) {
 				VLayout panel = new VLayout();
 
 				Label notesLabel = new Label(I18N.message("updatenotes"));
@@ -406,7 +404,7 @@ public class UpdatePanel extends VLayout {
 				download.setVisible(false);
 				UpdateService.Instance.get().confirmUpdate(updateFileName, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(String path) {
+					public void handleSuccess(String path) {
 						Session.get().setUpdating(true);
 						switchLogView();
 						lastConfirmed = new Date();
@@ -421,7 +419,7 @@ public class UpdatePanel extends VLayout {
 			if (Boolean.TRUE.equals(choice)) {
 				UpdateService.Instance.get().deleteUpdate(updateFileName, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void v) {
+					public void handleSuccess(Void v) {
 						refresh();
 					}
 				});

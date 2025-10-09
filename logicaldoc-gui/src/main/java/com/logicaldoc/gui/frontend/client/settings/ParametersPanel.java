@@ -41,7 +41,7 @@ public class ParametersPanel extends AdminPanel {
 	protected void onDraw() {
 		SettingService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIParameter> settings) {
+			public void handleSuccess(List<GUIParameter> settings) {
 				initGUI(settings);
 			}
 
@@ -96,7 +96,7 @@ public class ParametersPanel extends AdminPanel {
 
 			SettingService.Instance.get().saveSettings(params, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void ret) {
+				public void handleSuccess(Void ret) {
 					GuiLog.info(I18N.message("settingssaved"), null);
 				}
 			});

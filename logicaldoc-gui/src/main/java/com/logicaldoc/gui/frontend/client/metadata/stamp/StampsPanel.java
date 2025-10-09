@@ -135,7 +135,7 @@ public class StampsPanel extends AdminPanel {
 				StampService.Instance.get().getStamp(Long.parseLong(rec.getAttributeAsString("id")),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(GUIStamp stamp) {
+							public void handleSuccess(GUIStamp stamp) {
 								showStampDetails(stamp);
 							}
 						});
@@ -169,7 +169,7 @@ public class StampsPanel extends AdminPanel {
 			if (Boolean.TRUE.equals(confirm)) {
 				StampService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						showStampDetails(null);
@@ -184,7 +184,7 @@ public class StampsPanel extends AdminPanel {
 		enable.addClickHandler(event -> StampService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, true);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
@@ -196,7 +196,7 @@ public class StampsPanel extends AdminPanel {
 		disable.addClickHandler(event -> StampService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, false);
 						list.refreshRow(list.getRecordIndex(rec));
 					}

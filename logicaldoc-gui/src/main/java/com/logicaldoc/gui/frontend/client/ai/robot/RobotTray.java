@@ -48,7 +48,7 @@ public class RobotTray extends MenuTray {
 			RobotService.Instance.get().get(Long.parseLong(getValueAsString("robot")), new DefaultAsyncCallback<>() {
 
 				@Override
-				public void onSuccess(GUIRobot rbt) {
+				public void handleSuccess(GUIRobot rbt) {
 					RobotThread.get(rbt).open(question);
 				}
 			});

@@ -47,8 +47,7 @@ public class TwoFactorsAuthenticationDialog extends Window {
 							}
 
 							@Override
-							public void onSuccess(Void arg) {
-								LD.clearPrompt();
+							public void handleSuccess(Void arg) {
 								if (panel != null) {
 									user.setSecondFactor(panel.getFactor());
 									user.setKey(panel.getKey());

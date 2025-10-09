@@ -124,7 +124,7 @@ public class Frontend implements EntryPoint {
 							tenant != null ? tenant : session.getUser().getTenant().getName(), false,
 							new DefaultAsyncCallback<>() {
 								@Override
-								public void onSuccess(GUIInfo info) {
+								public void handleSuccess(GUIInfo info) {
 									session.setInfo(info);
 									init(info);
 

@@ -93,9 +93,8 @@ public class DocumentDashlet extends Dashlet {
 					new DefaultAsyncCallback<>() {
 
 						@Override
-						public void onSuccess(GUIDocument document) {
-							Menu contextMenu = prepareContextMenu(document);
-							contextMenu.showContextMenu();
+						public void handleSuccess(GUIDocument document) {
+							prepareContextMenu(document).showContextMenu();
 						}
 					});
 		});
@@ -169,7 +168,7 @@ public class DocumentDashlet extends Dashlet {
 			unlock.addClickHandler(event -> DocumentService.Instance.get().unlock(Arrays.asList(document.getId()),
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void result) {
+						public void handleSuccess(Void result) {
 							Session.get().getUser().setLockedDocs(Session.get().getUser().getLockedDocs() - 1);
 							list.removeSelectedData();
 							list.refresh(getDataSource());

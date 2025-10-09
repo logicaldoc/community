@@ -89,7 +89,7 @@ public class WorkflowHistoryDialog extends Window {
 			WorkflowService.Instance.get().get(selectedRecord.getAttributeAsString("name"), null,
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIWorkflow result) {
+						public void handleSuccess(GUIWorkflow result) {
 							selectedWorkflow = result;
 							tagFilter = tagItem.getValueAsString();
 							refreshInstancesGrid();
@@ -224,7 +224,7 @@ public class WorkflowHistoryDialog extends Window {
 				WorkflowService.Instance.get().deleteInstance(selection.getAttributeAsString("id"),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void result) {
+							public void handleSuccess(Void result) {
 								instancesGrid.removeSelectedData();
 								instancesGrid.deselectAllRecords();
 								historiesPanel.getHistoriesGrid().removeSelectedData();
@@ -240,7 +240,7 @@ public class WorkflowHistoryDialog extends Window {
 				selectedWorkflow.getName(), selectedWorkflow.getVersion(), selection.getAttributeAsString("id"),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIWorkflow workflow) {
+					public void handleSuccess(GUIWorkflow workflow) {
 						new WorkflowPreview(workflow).show();
 					}
 				}));

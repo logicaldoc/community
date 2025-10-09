@@ -57,7 +57,7 @@ public class SecurityMenu extends VLayout {
 		security.addClickHandler(
 				event -> SecurityService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUISecuritySettings settings) {
+					public void handleSuccess(GUISecuritySettings settings) {
 						AdminScreen.get().setContent(new SecuritySettingsPanel(settings));
 					}
 

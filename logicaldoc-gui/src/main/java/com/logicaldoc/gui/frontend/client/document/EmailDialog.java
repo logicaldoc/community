@@ -69,7 +69,7 @@ public class EmailDialog extends AbstractEmailDialog {
 				MessageService.Instance.get().getTemplate(Long.parseLong(messageTemplate.getValueAsString()),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(GUIMessageTemplate t) {
+							public void handleSuccess(GUIMessageTemplate t) {
 								subject.setValue(t.getSubject());
 								message.setValue(t.getBody());
 								updateSignature();
@@ -133,7 +133,7 @@ public class EmailDialog extends AbstractEmailDialog {
 
 		MessageService.Instance.get().loadTemplates(I18N.getLocale(), "user", new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIMessageTemplate> templates) {
+			public void handleSuccess(List<GUIMessageTemplate> templates) {
 				LinkedHashMap<String, String> map = new LinkedHashMap<>();
 				map.put("", "");
 				for (GUIMessageTemplate t : templates)
@@ -156,8 +156,7 @@ public class EmailDialog extends AbstractEmailDialog {
 			}
 
 			@Override
-			public void onSuccess(String result) {
-				LD.clearPrompt();
+			public void handleSuccess(String result) {
 				sendButton.enable();
 				if ("ok".equals(result)) {
 					GuiLog.info(I18N.message("messagesent") + ". " + I18N.message("documentcopysent"));

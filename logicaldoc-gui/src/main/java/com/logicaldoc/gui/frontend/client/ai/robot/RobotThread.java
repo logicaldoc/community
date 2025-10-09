@@ -172,7 +172,7 @@ public class RobotThread extends Window {
 		RobotService.Instance.get().ask(robot.getId(), question, new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onSuccess(String answer) {
+			public void handleSuccess(String answer) {
 				updateLastMessage(answer);
 			}
 		});

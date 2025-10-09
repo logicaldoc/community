@@ -167,7 +167,7 @@ public class WorkflowDashlet extends Portlet {
 			WorkflowService.Instance.get().getWorkflowDetailsByTask(rec.getAttributeAsString("id"),
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIWorkflow result) {
+						public void handleSuccess(GUIWorkflow result) {
 							if (result != null) {
 								TaskDetailsDialog workflowDetailsDialog = new TaskDetailsDialog(workflowDashboard,
 										result, type == WorkflowDashboard.TASKS_INVOLVED);
@@ -212,7 +212,7 @@ public class WorkflowDashlet extends Portlet {
 				WorkflowService.Instance.get().countAssignedTasks(Session.get().getUser().getUsername(),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Integer total) {
+							public void handleSuccess(Integer total) {
 								Session.get().getUser().setTasks(total != null ? total.intValue() : 0);
 								UserController.get().changed(Session.get().getUser());
 							}

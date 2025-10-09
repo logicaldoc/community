@@ -77,7 +77,7 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 		}
 
 		@Override
-		public void onSuccess(GUIAccessControlEntry acl) {
+		public void handleSuccess(GUIAccessControlEntry acl) {
 			event.getDocument().setAllowedPermissions(acl);
 
 			if (FolderController.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId()) {
@@ -189,7 +189,7 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 				ReadingRequestService.Instance.get().getUnconfimedReadings(new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(List<GUIReadingRequest> readings) {
+					public void handleSuccess(List<GUIReadingRequest> readings) {
 						ReadingRequestController.get().addUnconfirmedReadings(readings);
 					}
 				});

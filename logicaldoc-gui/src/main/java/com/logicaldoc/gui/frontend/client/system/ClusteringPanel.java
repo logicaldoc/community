@@ -45,7 +45,7 @@ public class ClusteringPanel extends AdminPanel {
 						"cluster.multicastip", "cluster.cache.resources", "cluster.chunk.size", "id"),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(List<GUIParameter> parameters) {
+							public void handleSuccess(List<GUIParameter> parameters) {
 								init(parameters);
 							}
 						});
@@ -98,7 +98,7 @@ public class ClusteringPanel extends AdminPanel {
 
 				SettingService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						GuiLog.info(I18N.message("settingssaved") + " " + I18N.message("needrestart"), null);
 					}
 				});

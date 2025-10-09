@@ -36,7 +36,7 @@ public class SecurityUtil {
 		DocumentService.Instance.get().getAllowedPermissions(docIds, new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onSuccess(GUIAccessControlEntry grantedPermissions) {
+			public void handleSuccess(GUIAccessControlEntry grantedPermissions) {
 				for (String permission : requiredPermissions) {
 					if (!grantedPermissions.isPermissionAllowed(permission.toLowerCase())) {
 						GuiLog.warn(I18N.message("somedocsdonothaveperm", permission.toUpperCase()), null);

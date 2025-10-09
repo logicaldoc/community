@@ -40,7 +40,7 @@ public class AutomationTriggerDetailsPanel extends VLayout {
 			if (trigger.getId() != 0) {
 				AutomationService.Instance.get().getTrigger(trigger.getId(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIAutomationTrigger trigger) {
+					public void handleSuccess(GUIAutomationTrigger trigger) {
 						setTrigger(trigger);
 					}
 				});
@@ -109,7 +109,7 @@ public class AutomationTriggerDetailsPanel extends VLayout {
 				}
 
 				@Override
-				public void onSuccess(GUIAutomationTrigger trigger) {
+				public void handleSuccess(GUIAutomationTrigger trigger) {
 					tabSet.hideSave();
 					AutomationTriggerDetailsPanel.this.setTrigger(trigger);
 					if (trigger != null)

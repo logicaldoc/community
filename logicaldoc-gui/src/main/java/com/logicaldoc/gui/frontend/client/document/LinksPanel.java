@@ -89,7 +89,7 @@ public class LinksPanel extends DocumentDetailTab {
 			FolderService.Instance.get().getFolder(rec.getAttributeAsLong("folderId"), false, false, false,
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIFolder fld) {
+						public void handleSuccess(GUIFolder fld) {
 							if (fld.isDownload()
 									&& "download".equals(Session.get().getInfo().getConfig("gui.doubleclick")))
 								onDownload(rec);
@@ -142,7 +142,7 @@ public class LinksPanel extends DocumentDetailTab {
 
 			FolderService.Instance.get().getFolder(folderId, false, false, false, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIFolder fld) {
+				public void handleSuccess(GUIFolder fld) {
 					if (fld == null)
 						return;
 					download.setEnabled(fld.isDownload());
@@ -168,7 +168,7 @@ public class LinksPanel extends DocumentDetailTab {
 			if (Boolean.TRUE.equals(answer)) {
 				DocumentService.Instance.get().deleteLinks(selectedIds, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						TreeNode parent = treeGrid.getTree().getParent(treeGrid.getSelectedRecord());
 						treeGrid.selectRecord(parent);
 						treeGrid.getTree().reloadChildren(parent);
@@ -217,7 +217,7 @@ public class LinksPanel extends DocumentDetailTab {
 					final String typ = (String) event.getNewValues().get("type");
 					DocumentService.Instance.get().updateLink(id, typ, new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void result) {
+						public void handleSuccess(Void result) {
 							treeGrid.getSelectedRecord().setAttribute("type", typ);
 							treeGrid.updateData(treeGrid.getSelectedRecord());
 						}
@@ -232,7 +232,7 @@ public class LinksPanel extends DocumentDetailTab {
 		long docId = Long.parseLong(documentId.substring(documentId.lastIndexOf('-') + 1));
 		DocumentService.Instance.get().getById(docId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIDocument document) {
+			public void handleSuccess(GUIDocument document) {
 				DocumentsPanel.get().openInFolder(document.getFolder().getId(), document.getId());
 			}
 		});
@@ -275,9 +275,8 @@ public class LinksPanel extends DocumentDetailTab {
 		long docId = Long.parseLong(documentId.substring(documentId.lastIndexOf('-') + 1));
 		DocumentService.Instance.get().getById(docId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIDocument document) {
-				PreviewPopup iv = new PreviewPopup(document);
-				iv.show();
+			public void handleSuccess(GUIDocument document) {
+				new PreviewPopup(document).show();
 			}
 		});
 	}

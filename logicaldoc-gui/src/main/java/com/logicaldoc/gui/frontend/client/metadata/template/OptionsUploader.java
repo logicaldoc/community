@@ -69,7 +69,7 @@ public class OptionsUploader extends Window {
 					}
 
 					@Override
-					public void onSuccess(List<GUIValue> ret) {
+					public void handleSuccess(List<GUIValue> ret) {
 						options.refresh();
 						LD.clearPrompt();
 						destroy();

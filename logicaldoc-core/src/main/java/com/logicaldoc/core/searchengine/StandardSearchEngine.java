@@ -12,10 +12,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-import jakarta.annotation.Resource;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.index.CheckIndex;
@@ -42,16 +38,21 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
-import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.DocumentNoteDAO;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.parser.ParserFactory;
 import com.logicaldoc.core.parser.ParsingException;
 import com.logicaldoc.core.searchengine.analyzer.FilteredAnalyzer;
+import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.annotation.Resource;
 
 /**
  * Standard implementation that implements a local search engine
@@ -120,7 +121,7 @@ public class StandardSearchEngine implements SearchEngine {
 
 			// Retrieve the notes
 			StringBuilder sb = new StringBuilder();
-			List<DocumentNote> notes = noteDao.findByDocId(doc.getId(), doc.getFileVersion());
+			List<DocumentNote> notes = noteDao.findByDocId(doc.getId(), User.USERID_ADMIN, doc.getFileVersion());
 			for (DocumentNote note : notes) {
 				if (sb.length() > 0)
 					sb.append("\n\n");

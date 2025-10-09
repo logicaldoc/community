@@ -164,7 +164,7 @@ public class TaskEditor extends Window {
 
 		MessageService.Instance.get().loadTemplates(I18N.getLocale(), "user", new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIMessageTemplate> templates) {
+			public void handleSuccess(List<GUIMessageTemplate> templates) {
 				LinkedHashMap<String, String> map = new LinkedHashMap<>();
 				map.put("", "");
 				for (GUIMessageTemplate t : templates)

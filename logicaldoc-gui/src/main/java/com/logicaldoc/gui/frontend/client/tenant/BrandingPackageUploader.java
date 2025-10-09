@@ -76,7 +76,7 @@ public class BrandingPackageUploader extends Window {
 
 		TenantService.Instance.get().importBrandingPackage(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIBranding branding) {
+			public void handleSuccess(GUIBranding branding) {
 				panel.update(branding);
 				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 

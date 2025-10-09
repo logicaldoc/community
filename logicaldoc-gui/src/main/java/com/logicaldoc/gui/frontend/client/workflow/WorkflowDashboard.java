@@ -109,7 +109,7 @@ public class WorkflowDashboard extends VLayout {
 		LD.contactingServer();
 		WorkflowService.Instance.get().deleteInstances(instanceIds, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void result) {
+			public void handleSuccess(Void result) {
 				refreshGridsAfterWorkflowsKilled(instanceIds);
 				LD.clearPrompt();
 			}

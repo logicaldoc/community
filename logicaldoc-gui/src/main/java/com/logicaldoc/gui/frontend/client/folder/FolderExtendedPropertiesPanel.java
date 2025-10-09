@@ -1,6 +1,6 @@
 package com.logicaldoc.gui.frontend.client.folder;
 
-import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.ServerValidationError;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -43,19 +43,7 @@ public class FolderExtendedPropertiesPanel extends FolderDetailTab {
 		applyMetadata.setColSpan(1);
 		applyMetadata.addClickHandler(event -> {
 			LD.contactingServer();
-			FolderService.Instance.get().applyMetadata(folder.getId(), new DefaultAsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					super.onFailure(caught);
-				}
-
-				@Override
-				public void onSuccess(Void v) {
-					LD.clearPrompt();
-				}
-			});
+			FolderService.Instance.get().applyMetadata(folder.getId(), new EmptyAsyncCallback<>());
 		});
 
 		form1 = new DynamicForm();

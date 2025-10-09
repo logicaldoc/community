@@ -24,7 +24,7 @@ public class QuotaPanel extends AdminPanel {
 
 		TenantService.Instance.get().load(tenantId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUITenant ten) {
+			public void handleSuccess(GUITenant ten) {
 				tenant = ten;
 				initGUI();
 			}
@@ -42,7 +42,7 @@ public class QuotaPanel extends AdminPanel {
 			if (tenantQuota.validate())
 				TenantService.Instance.get().save(tenant, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUITenant ten) {
+					public void handleSuccess(GUITenant ten) {
 						QuotaPanel.this.tenant = ten;
 						GuiLog.info(I18N.message("settingssaved"), null);
 					}

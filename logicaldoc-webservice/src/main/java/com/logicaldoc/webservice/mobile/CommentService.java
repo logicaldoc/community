@@ -57,7 +57,7 @@ public class CommentService extends AbstractService {
 
 		DocumentNoteDAO dndao = Context.get(DocumentNoteDAO.class);
 
-		List<DocumentNote> notes = dndao.findByDocId(docId, document.getFileVersion());
+		List<DocumentNote> notes = dndao.findByDocId(docId, user.getId(), document.getFileVersion());
 
 		SimpleDateFormat sdf = new SimpleDateFormat("MMM dd yyyy HH:mm:ss Z", Locale.ENGLISH);
 

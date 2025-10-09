@@ -74,7 +74,7 @@ public class DocumentsUploader extends Window {
 		addCloseClickHandler(
 				event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						destroy();
 					}
 				}));

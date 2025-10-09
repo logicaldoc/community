@@ -209,8 +209,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 						LD.contactingServer();
 						SettingService.Instance.get().testEmail(value, new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Boolean yes) {
-								LD.clearPrompt();
+							public void handleSuccess(Boolean yes) {
 								if (yes.booleanValue())
 									SC.say(I18N.message("connectionestablished"));
 								else
@@ -252,7 +251,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 			SettingService.Instance.get().saveEmailSettings(OutgoingEmailPanel.this.emailSettings,
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void ret) {
+						public void handleSuccess(Void ret) {
 							Session.get().getInfo().setConfig(Session.get().getTenantName() + ".smtp.userasfrom",
 									"" + OutgoingEmailPanel.this.emailSettings.isUserAsFrom());
 							GuiLog.info(I18N.message("settingssaved"), null);

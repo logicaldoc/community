@@ -81,8 +81,7 @@ public class VisualPositioningDigitalSignatureDialog extends Window {
 						}
 
 						@Override
-						public void onSuccess(GUIDocument doc) {
-							LD.clearPrompt();
+						public void handleSuccess(GUIDocument doc) {
 							firstSelectedDoc = doc;
 							initGUI();
 						}
@@ -168,8 +167,7 @@ public class VisualPositioningDigitalSignatureDialog extends Window {
 
 		SignService.Instance.get().signDocuments(docIds, reason, page, exprX, exprY, exprW, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg0) {
-				LD.clearPrompt();
+			public void handleSuccess(Void arg0) {
 				GuiLog.info(I18N.message("event.signed"), null);
 				showPage(pageCursor.getValueAsInteger());
 			}

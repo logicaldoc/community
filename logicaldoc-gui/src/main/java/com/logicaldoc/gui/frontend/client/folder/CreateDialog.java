@@ -83,7 +83,7 @@ public class CreateDialog extends Dialog {
 					folder.getType() == 0 && Boolean.valueOf(form.getValueAsString("inheritSecurity")),
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIFolder newFolder) {
+						public void handleSuccess(GUIFolder newFolder) {
 							FolderController.get().created(newFolder);
 							destroy();
 						}

@@ -172,7 +172,7 @@ public class TagsForm extends VLayout {
 						TagService.Instance.get().rename(selection.getAttribute("word"), value,
 								new DefaultAsyncCallback<>() {
 									@Override
-									public void onSuccess(Void arg) {
+									public void handleSuccess(Void arg) {
 										GuiLog.info(I18N.message("procinexecution"), I18N.message("taginexecution"));
 										ListGridRecord selection = tags.getSelectedRecord();
 										selection.setAttribute("word", value);
@@ -189,7 +189,7 @@ public class TagsForm extends VLayout {
 					ListGridRecord selection = tags.getSelectedRecord();
 					TagService.Instance.get().delete(selection.getAttribute("word"), new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void arg) {
+						public void handleSuccess(Void arg) {
 							GuiLog.info(I18N.message("procinexecution"), I18N.message("taginexecution"));
 							tags.removeSelectedData();
 						}

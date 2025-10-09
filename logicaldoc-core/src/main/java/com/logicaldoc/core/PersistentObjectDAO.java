@@ -210,6 +210,16 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public void initialize(T entity) throws PersistenceException;
 
 	/**
+	 * Initialises lazy loaded data such as collections of all specified entities
+	 * 
+	 * @param entities The entities to be initialize
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
+	 */
+	public void initialize(Collection<T> entities) throws PersistenceException;
+
+	
+	/**
 	 * Query given SQL to create a prepared statement from SQL and a list of
 	 * arguments to bind to the query, mapping each row to a Java object via a
 	 * RowMapper.

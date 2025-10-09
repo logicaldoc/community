@@ -121,7 +121,7 @@ public class AutomationRoutinesPanel extends VLayout {
 			if (rec != null)
 				AutomationService.Instance.get().getRoutine(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIAutomationRoutine routine) {
+					public void handleSuccess(GUIAutomationRoutine routine) {
 						showRoutineDetails(routine);
 					}
 				});
@@ -155,7 +155,7 @@ public class AutomationRoutinesPanel extends VLayout {
 			if (Boolean.TRUE.equals(answer)) {
 				AutomationService.Instance.get().deleteRoutines(Arrays.asList(id), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						showRoutineDetails(null);

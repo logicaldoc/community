@@ -131,7 +131,7 @@ public class RatingDialog extends Window {
 					}
 
 					@Override
-					public void onSuccess(Integer rating) {
+					public void handleSuccess(Integer rating) {
 						GuiLog.info(I18N.message("votesaved"), null);
 						afterSaveOrDelete();
 					}
@@ -145,7 +145,7 @@ public class RatingDialog extends Window {
 
 		DocumentService.Instance.get().getUserRating(rat.getDocId(), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(final GUIRating vote) {
+			public void handleSuccess(final GUIRating vote) {
 				if (vote != null) {
 					yourVote.setValue("" + vote.getVote());
 
@@ -168,7 +168,7 @@ public class RatingDialog extends Window {
 					delete.addClickHandler(
 							event -> DocumentService.Instance.get().deleteRating(vote.getId(), new DefaultAsyncCallback<>() {
 								@Override
-								public void onSuccess(Integer rating) {
+								public void handleSuccess(Integer rating) {
 									afterSaveOrDelete();
 								}
 							}));
@@ -189,7 +189,7 @@ public class RatingDialog extends Window {
 		// panel or into the Search list panel.
 		DocumentService.Instance.get().getById(rating.getDocId(), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIDocument doc) {
+			public void handleSuccess(GUIDocument doc) {
 				DocumentController.get().modified(doc);
 				destroy();
 			}

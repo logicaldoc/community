@@ -122,7 +122,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 		if (id > 0) {
 			DocumentService.Instance.get().getById(id, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIDocument result) {
+				public void handleSuccess(GUIDocument result) {
 					DocumentController.get().setCurrentDocument(result);
 				}
 			});
@@ -134,7 +134,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 		if (id > 0) {
 			FolderService.Instance.get().getFolder(id, true, false, false, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIFolder fld) {
+				public void handleSuccess(GUIFolder fld) {
 					if (detailPanel instanceof FolderDetailsPanel folderDetails) {
 						folderDetails.setFolder(fld);
 					} else {

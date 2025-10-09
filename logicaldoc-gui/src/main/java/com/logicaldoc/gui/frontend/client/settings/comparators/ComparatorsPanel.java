@@ -190,9 +190,7 @@ public class ComparatorsPanel extends AdminPanel {
 
 		SettingService.Instance.get().saveSettings(parameters, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg) {
-				super.onSuccess(arg);
-
+			public void handleSuccess(Void arg) {
 				GuiLog.info(I18N.message("settingssaved"), null);
 
 				// Replicate the setting in the current session
@@ -272,9 +270,7 @@ public class ComparatorsPanel extends AdminPanel {
 			GUIParameter setting = new GUIParameter(settingsPrefix + comparatorShort + "." + paramName, newValue);
 			SettingService.Instance.get().saveSettings(Arrays.asList(setting), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void arg) {
-					super.onSuccess(arg);
-
+				public void handleSuccess(Void arg) {
 					GuiLog.info(I18N.message("settingssaved"), null);
 
 					// Replicate the setting in the current session
@@ -344,7 +340,7 @@ public class ComparatorsPanel extends AdminPanel {
 						settingsPrefix + settingsGrid.getSelectedRecord().getAttribute(LABEL) + ".enabled", "false")),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void arg0) {
+							public void handleSuccess(Void arg0) {
 								settingsGrid.getSelectedRecord().setAttribute(ENABLED, false);
 								settingsGrid.refreshRow(settingsGrid.getRecordIndex(settingsGrid.getSelectedRecord()));
 
@@ -375,7 +371,7 @@ public class ComparatorsPanel extends AdminPanel {
 						settingsPrefix + settingsGrid.getSelectedRecord().getAttribute(LABEL) + ".enabled", "true")),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void arg0) {
+							public void handleSuccess(Void arg0) {
 								settingsGrid.getSelectedRecord().setAttribute(ENABLED, true);
 								settingsGrid.refreshRow(settingsGrid.getRecordIndex(settingsGrid.getSelectedRecord()));
 

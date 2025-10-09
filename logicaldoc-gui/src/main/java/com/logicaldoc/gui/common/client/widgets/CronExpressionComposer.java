@@ -538,7 +538,7 @@ public class CronExpressionComposer extends Window {
 				new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(String description) {
+					public void handleSuccess(String description) {
 						vm.getItem(DESCRIPTION).setValue(description);
 					}
 				});

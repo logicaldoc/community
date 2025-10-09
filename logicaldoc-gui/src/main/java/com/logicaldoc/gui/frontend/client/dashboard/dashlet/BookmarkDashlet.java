@@ -67,7 +67,7 @@ public class BookmarkDashlet extends Dashlet {
 					new DefaultAsyncCallback<>() {
 
 						@Override
-						public void onSuccess(GUIDocument document) {
+						public void handleSuccess(GUIDocument document) {
 							prepareContextMenu(document).showContextMenu();
 						}
 					});

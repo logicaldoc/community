@@ -93,14 +93,14 @@ public class GoogleAuthenticatorSetup extends TwoFactorsAuthenticationSetup {
 		TwoFactorsAuthenticationService.Instance.get().generateGoogleAuthorizationCredentials(account,
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(List<String> arg) {
+					public void handleSuccess(List<String> arg) {
 						user.setKey(arg.get(0));
 						key = arg.get(0);
 						init(account, arg.get(0), arg.get(1));
 					}
 				});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

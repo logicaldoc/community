@@ -88,7 +88,7 @@ public class PluginsPanel extends VLayout {
 	void refresh() {
 		SystemService.Instance.get().getPlugins(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIValue> plugins) {
+			public void handleSuccess(List<GUIValue> plugins) {
 				List<ListGridRecord> records = new ArrayList<>();
 				for (GUIValue val : plugins) {
 					ListGridRecord rec = new ListGridRecord();
@@ -112,8 +112,7 @@ public class PluginsPanel extends VLayout {
 						SystemService.Instance.get().initializePlugin(
 								list.getSelectedRecord().getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 									@Override
-									public void onSuccess(Void result) {
-										LD.clearPrompt();
+									public void handleSuccess(Void result) {
 										GuiLog.info(I18N.message("plugininitialized"), null);
 									}
 								});
@@ -129,8 +128,7 @@ public class PluginsPanel extends VLayout {
 						SystemService.Instance.get().uninstallPlugin(
 								list.getSelectedRecord().getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 									@Override
-									public void onSuccess(Void result) {
-										LD.clearPrompt();
+									public void handleSuccess(Void result) {
 										GuiLog.info(I18N.message("pluginuninstalled"), null);
 									}
 								});

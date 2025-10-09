@@ -1,10 +1,13 @@
 package com.logicaldoc.core.document;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -14,6 +17,9 @@ import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
+import com.logicaldoc.core.security.user.Group;
+import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.util.html.HTMLSanitizer;
 import com.logicaldoc.util.spring.Context;
@@ -52,7 +58,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 			note.setFileVersion(doc.getFileVersion());
 
 		super.store(note);
-		if (note.getPage() == 0) {
+		if (note.getPage() == 0 && note.getAccessControlList().isEmpty()) {
 			documentDao.initialize(doc);
 			doc.setLastNote(HTMLSanitizer.sanitizeSimpleText(note.getMessage()));
 			if (doc.getIndexed() == IndexingStatus.INDEXED)
@@ -108,35 +114,37 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	}
 
 	@Override
-	public List<DocumentNote> findByDocId(long docId, String fileVersion) throws PersistenceException {
-		return findByDocIdAndType(docId, fileVersion, null);
+	public List<DocumentNote> findByDocId(long docId, long userId, String fileVersion) throws PersistenceException {
+		return findByDocIdAndType(docId, userId, fileVersion, null);
 	}
 
 	@Override
-	public List<DocumentNote> findByDocIdAndType(long docId, String fileVersion, String type)
+	public List<DocumentNote> findByDocIdAndType(long docId, long userId, String fileVersion, String type)
 			throws PersistenceException {
-		return findByDocIdAndTypes(docId, fileVersion, StringUtils.isEmpty(type) ? null : Arrays.asList(type));
+		return findByDocIdAndTypes(docId, userId, fileVersion, StringUtils.isEmpty(type) ? null : Arrays.asList(type));
 	}
 
 	@Override
-	public List<DocumentNote> findByDocIdAndTypes(long docId, String fileVersion, Collection<String> types)
+	public List<DocumentNote> findByDocIdAndTypes(long docId, long userId, String fileVersion, Collection<String> types)
 			throws PersistenceException {
+
+		List<DocumentNote> notes = new ArrayList<>();
 		if (StringUtils.isEmpty(fileVersion)) {
 			if (types == null || types.isEmpty()) {
-				return findByWhere(ENTITY + ".docId = " + docId, null, null);
+				notes = findByWhere(ENTITY + ".docId = " + docId, null, null);
 			} else {
 				Map<String, Object> params = new HashMap<>();
 				params.put(DOC_ID, docId);
 				params.put("types", types);
 
-				return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".type in (:types) and " + ENTITY + DELETED_0,
+				notes = findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".type in (:types) and " + ENTITY + DELETED_0,
 						params, null, null);
 			}
 		} else if (types == null || types.isEmpty()) {
 			Map<String, Object> params = new HashMap<>();
 			params.put(DOC_ID, docId);
 			params.put("fileVersion", fileVersion);
-			return findByWhere(
+			notes = findByWhere(
 					ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion and " + ENTITY + DELETED_0,
 					params, null, null);
 		} else {
@@ -144,8 +152,40 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 			params.put(DOC_ID, docId);
 			params.put("fileVersion", fileVersion);
 			params.put("types", types);
-			return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion and " + ENTITY
+			notes = findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion and " + ENTITY
 					+ ".type in (:types) and " + ENTITY + DELETED_0, params, null, null);
+		}
+
+		/*
+		 * @formatter:off
+		 * 
+		 * Filter the results using the user: 
+		 * 1. notes created by the specified user
+		 * 2. notes where the user is one of the participants 
+		 * 3. notes without any ACL
+		 * 4. for admin users no filter at all 
+		 * 
+		 * @formatter:on
+		 */
+		if (userId == User.USERID_ADMIN) {
+			return notes;
+		} else {
+			UserDAO userDao = Context.get(UserDAO.class);
+			User user = userDao.findById(userId);
+			if (user == null)
+				return new ArrayList<>();
+			userDao.initialize(user);
+			if (user.isAdmin()) {
+				return notes;
+			} else {
+				Set<Long> userGroups = user.getGroups().stream().map(Group::getId).collect(Collectors.toSet());
+				for (DocumentNote note : notes)
+					initialize(note);
+				return notes.stream()
+						.filter(note -> note.getUserId() == userId || note.getAccessControlList().isEmpty() || note
+								.getAccessControlEntries(userGroups).stream().anyMatch(ace -> ace.getRead() == 1))
+						.toList();
+			}
 		}
 	}
 
@@ -165,7 +205,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 
 	@Override
 	public int copyAnnotations(long docId, String oldFileVersion, String newFileVersion) throws PersistenceException {
-		List<DocumentNote> oldNotes = findByDocId(docId, oldFileVersion);
+		List<DocumentNote> oldNotes = findByDocId(docId, User.USERID_ADMIN, oldFileVersion);
 		int count = 0;
 		for (DocumentNote oldNote : oldNotes) {
 			if (oldNote.getPage() > 0)
@@ -178,5 +218,16 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 			count++;
 		}
 		return count;
+	}
+
+	@Override
+	public void initialize(DocumentNote note) throws PersistenceException {
+		if (note == null)
+			return;
+
+		refresh(note);
+
+		if (note.getAccessControlList() != null)
+			log.trace("Initialized {} aces", note.getAccessControlList().size());
 	}
 }

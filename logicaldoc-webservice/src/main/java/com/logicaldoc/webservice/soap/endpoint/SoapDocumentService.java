@@ -213,7 +213,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		doc = docDao.findDocument(docId);
 		docDao.initialize(doc);
-		
+
 		checkPublished(user, doc);
 
 		// Create the document history event
@@ -1132,6 +1132,8 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			note.setUserId(user.getId());
 			note.setUsername(user.getUsername());
 			note.setDate(new Date());
+		} else {
+			dao.initialize(note);
 		}
 
 		note.setPage(wsNote.getPage());
@@ -1190,13 +1192,13 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	@Override
 	public List<WSNote> getNotes(String sid, long docId) throws AuthenticationException, WebserviceException,
 			PersistenceException, PermissionException, UnexistingResourceException {
-		validateSession(sid);
+		User user = validateSession(sid);
 		WSDocument document = getDocument(sid, docId);
 		if (document == null)
 			throw new WebserviceException(DOCUMENT_WITH_ID + docId + NOT_FOUND_OR_NOT_ACCESSIBLE);
 
 		DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
-		List<DocumentNote> notes = dao.findByDocId(docId, document.getFileVersion());
+		List<DocumentNote> notes = dao.findByDocId(docId, user.getId(), document.getFileVersion());
 		List<WSNote> wsNotes = new ArrayList<>();
 		if (notes != null)
 			for (DocumentNote note : notes)

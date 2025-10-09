@@ -143,7 +143,7 @@ public class ImportFoldersPanel extends AdminPanel {
 				ImportFolderService.Instance.get().get(Long.parseLong(rec.getAttributeAsString("id")),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(GUIImportFolder share) {
+							public void handleSuccess(GUIImportFolder share) {
 								showShareDetails(share);
 							}
 						});
@@ -177,7 +177,7 @@ public class ImportFoldersPanel extends AdminPanel {
 			if (Boolean.TRUE.equals(choice)) {
 				ImportFolderService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						showShareDetails(null);
@@ -190,7 +190,7 @@ public class ImportFoldersPanel extends AdminPanel {
 		test.setTitle(I18N.message("testconnection"));
 		test.addClickHandler(event -> ImportFolderService.Instance.get().test(id, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Boolean result) {
+			public void handleSuccess(Boolean result) {
 				if (Boolean.TRUE.equals(result))
 					SC.say(I18N.message("connectionestablished"));
 				else
@@ -204,7 +204,7 @@ public class ImportFoldersPanel extends AdminPanel {
 		enable.addClickHandler(
 				event -> ImportFolderService.Instance.get().changeStatus(id, true, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, true);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
@@ -216,7 +216,7 @@ public class ImportFoldersPanel extends AdminPanel {
 		disable.addClickHandler(
 				event -> ImportFolderService.Instance.get().changeStatus(id, false, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, false);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
@@ -228,7 +228,7 @@ public class ImportFoldersPanel extends AdminPanel {
 			if (Boolean.TRUE.equals(value)) {
 				ImportFolderService.Instance.get().resetCache(id, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						GuiLog.info(I18N.message("cachedeleted"), null);
 					}
 				});
@@ -242,7 +242,7 @@ public class ImportFoldersPanel extends AdminPanel {
 					if (Boolean.TRUE.equals(value)) {
 						ImportFolderService.Instance.get().resetCounter(id, new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void result) {
+							public void handleSuccess(Void result) {
 								GuiLog.info(I18N.message("counterreseted"), null);
 								rec.setAttribute("docs", "0");
 								list.refreshRow(list.getRecordIndex(rec));
@@ -255,7 +255,7 @@ public class ImportFoldersPanel extends AdminPanel {
 		clone.setTitle(I18N.message("clone"));
 		clone.addClickHandler(event -> ImportFolderService.Instance.get().clone(id, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIImportFolder result) {
+			public void handleSuccess(GUIImportFolder result) {
 				refresh();
 			}
 		}));

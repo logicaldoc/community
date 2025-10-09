@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
@@ -92,17 +93,11 @@ public class UserCalendarPanel extends VLayout {
 					new DefaultAsyncCallback<List<String>>() {
 
 						@Override
-						public void onSuccess(List<String> settings) {
+						public void handleSuccess(List<String> settings) {
 							enableSynchronization.setValue("1".equals(settings.get(2)));
-							enableSynchronization.addChangedHandler(changed -> GoogleService.Instance.get()
-									.enableCalendar(enableSynchronization.getValueAsBoolean(),
-											new DefaultAsyncCallback<Void>() {
-
-												@Override
-												public void onSuccess(Void arg0) {
-													// Ignore
-												}
-											}));
+							enableSynchronization
+									.addChangedHandler(changed -> GoogleService.Instance.get().enableCalendar(
+											enableSynchronization.getValueAsBoolean(), new EmptyAsyncCallback<Void>()));
 						}
 					});
 		}

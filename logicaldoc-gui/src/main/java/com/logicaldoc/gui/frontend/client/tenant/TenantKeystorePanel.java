@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.tenant;
 
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIKeystore;
 import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -62,7 +63,7 @@ public class TenantKeystorePanel extends VLayout {
 
 			SignService.Instance.get().loadKeystore(tenantId, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIKeystore keystore) {
+				public void handleSuccess(GUIKeystore keystore) {
 					TenantKeystorePanel.this.keystore = keystore;
 					if (keystore == null) {
 						TenantKeystorePanel.this.keystore = new GUIKeystore();
@@ -301,7 +302,7 @@ public class TenantKeystorePanel extends VLayout {
 			if (Boolean.TRUE.equals(answer))
 				SignService.Instance.get().deleteKeystore(tenantId, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void arg) {
+					public void handleSuccess(Void arg) {
 						initGUI();
 					}
 				});
@@ -324,12 +325,7 @@ public class TenantKeystorePanel extends VLayout {
 				return;
 
 			LD.contactingServer();
-			SignService.Instance.get().saveKeystore(keystore, new DefaultAsyncCallback<>() {
-				@Override
-				public void onSuccess(Void arg) {
-					LD.clearPrompt();
-				}
-			});
+			SignService.Instance.get().saveKeystore(keystore, new EmptyAsyncCallback<>());
 		});
 		return save;
 	}
@@ -343,8 +339,7 @@ public class TenantKeystorePanel extends VLayout {
 			LD.contactingServer();
 			SignService.Instance.get().generateNewKeystore(keystore, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void arg) {
-					LD.clearPrompt();
+				public void handleSuccess(Void arg) {
 					initGUI();
 				}
 			});

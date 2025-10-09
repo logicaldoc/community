@@ -124,7 +124,7 @@ public class SyndicationsPanel extends AdminPanel {
 				SyndicationService.Instance.get().getSyndication(Long.parseLong(rec.getAttributeAsString("id")),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(GUISyndication syndication) {
+							public void handleSuccess(GUISyndication syndication) {
 								showSyndicationDetails(syndication);
 							}
 						});
@@ -158,7 +158,7 @@ public class SyndicationsPanel extends AdminPanel {
 			if (Boolean.TRUE.equals(confirm)) {
 				SyndicationService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						showSyndicationDetails(null);
@@ -174,8 +174,7 @@ public class SyndicationsPanel extends AdminPanel {
 			SyndicationService.Instance.get().test(Long.parseLong(rec.getAttributeAsString("id")),
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Boolean result) {
-							LD.clearPrompt();
+						public void handleSuccess(Boolean result) {
 							if (result.booleanValue())
 								SC.say(I18N.message("connectionestablished"));
 							else
@@ -190,7 +189,7 @@ public class SyndicationsPanel extends AdminPanel {
 		enable.addClickHandler(click -> SyndicationService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, true);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
@@ -202,7 +201,7 @@ public class SyndicationsPanel extends AdminPanel {
 		disable.addClickHandler(event -> SyndicationService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, false);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
@@ -215,7 +214,7 @@ public class SyndicationsPanel extends AdminPanel {
 					if (Boolean.TRUE.equals(value)) {
 						SyndicationService.Instance.get().resetCache(id, new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void result) {
+							public void handleSuccess(Void result) {
 								GuiLog.info(I18N.message("cachedeleted"), null);
 							}
 						});

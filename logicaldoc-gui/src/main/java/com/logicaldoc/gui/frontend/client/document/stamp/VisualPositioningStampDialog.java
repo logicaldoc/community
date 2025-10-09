@@ -96,8 +96,7 @@ public class VisualPositioningStampDialog extends Window {
 						}
 
 						@Override
-						public void onSuccess(GUIDocument doc) {
-							LD.clearPrompt();
+						public void handleSuccess(GUIDocument doc) {
 							firstSelectedDoc = doc;
 							initGUI();
 						}
@@ -153,13 +152,12 @@ public class VisualPositioningStampDialog extends Window {
 					}
 
 					@Override
-					public void onSuccess(Void result) {
-						LD.clearPrompt();
+					public void handleSuccess(Void result) {
 						GuiLog.info(I18N.message("event.stamped"), null);
 						for (GUIDocument doc : documents) {
 							DocumentService.Instance.get().getById(doc.getId(), new DefaultAsyncCallback<>() {
 								@Override
-								public void onSuccess(GUIDocument document) {
+								public void handleSuccess(GUIDocument document) {
 									DocumentController.get().modified(document);
 								}
 							});
@@ -183,7 +181,7 @@ public class VisualPositioningStampDialog extends Window {
 		stampSelector.addChangedHandler(changed -> StampService.Instance.get()
 				.getStamp(Long.parseLong(stampSelector.getValueAsString()), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIStamp stmp) {
+					public void handleSuccess(GUIStamp stmp) {
 						VisualPositioningStampDialog.this.stamp = stmp;
 					}
 				}));

@@ -740,7 +740,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		Session.get().getUser().setDocsGrid(DocumentsPanel.get().getDocsGridViewState());
 		SecurityService.Instance.get().saveInterfaceSettings(Session.get().getUser(), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIUser usr) {
+			public void handleSuccess(GUIUser usr) {
 				GuiLog.info(I18N.message("settingssaved"));
 			}
 		});

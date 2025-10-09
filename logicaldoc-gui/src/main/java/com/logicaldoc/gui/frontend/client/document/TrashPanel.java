@@ -100,7 +100,7 @@ public class TrashPanel extends VLayout {
 		DocumentService.Instance.get().restore(Arrays.asList(id), FolderController.get().getCurrentFolder().getId(),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void ret) {
+					public void handleSuccess(Void ret) {
 						list.removeSelectedData();
 						GuiLog.info(I18N.message("documentrestored"),
 								I18N.message("documentrestoreddetail", Long.toString(id)));
@@ -115,7 +115,7 @@ public class TrashPanel extends VLayout {
 		FolderService.Instance.get().restore(Arrays.asList(id), FolderController.get().getCurrentFolder().getId(),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void ret) {
+					public void handleSuccess(Void ret) {
 						list.removeSelectedData();
 						GuiLog.info(I18N.message("folderrestored"),
 								I18N.message("folderrestoreddetail", Long.toString(id)));
@@ -158,7 +158,7 @@ public class TrashPanel extends VLayout {
 					if (Boolean.TRUE.equals(response)) {
 						DocumentService.Instance.get().emptyTrash(new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void arg) {
+							public void handleSuccess(Void arg) {
 								refresh();
 							}
 						});
@@ -189,14 +189,14 @@ public class TrashPanel extends VLayout {
 				if (!docIds.isEmpty())
 					DocumentService.Instance.get().deleteFromTrash(docIds, new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void arg) {
+						public void handleSuccess(Void arg) {
 							refresh();
 						}
 					});
 				if (!folderIds.isEmpty())
 					FolderService.Instance.get().deleteFromTrash(folderIds, new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void arg) {
+						public void handleSuccess(Void arg) {
 							refresh();
 						}
 					});

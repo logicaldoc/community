@@ -28,20 +28,22 @@ public interface DocumentNoteDAO extends PersistentObjectDAO<DocumentNote> {
 	 * This method finds the list of document notes regarding a document with
 	 * the given ID
 	 * 
-	 * @param docId ID of the document.
+	 * @param docId ID of the document
+	 * @param userId identifier of the current user
 	 * @param fileVersion indicates a specific file version, optional
 	 * 
 	 * @return The list of document note
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	public List<DocumentNote> findByDocId(long docId, String fileVersion) throws PersistenceException;
+	public List<DocumentNote> findByDocId(long docId, long userId, String fileVersion) throws PersistenceException;
 
 	/**
 	 * This method finds the list of document notes regarding a document with
 	 * the given ID and optionally filter on the type
 	 * 
 	 * @param docId ID of the document
+	 * @param userId identifier of the current user
 	 * @param fileVersion indicates a specific file version, optional
 	 * @param type note type, optional
 	 * 
@@ -49,7 +51,7 @@ public interface DocumentNoteDAO extends PersistentObjectDAO<DocumentNote> {
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	public List<DocumentNote> findByDocIdAndType(long docId, String fileVersion, String type)
+	public List<DocumentNote> findByDocIdAndType(long docId, long userId, String fileVersion, String type)
 			throws PersistenceException;
 
 	/**
@@ -57,6 +59,7 @@ public interface DocumentNoteDAO extends PersistentObjectDAO<DocumentNote> {
 	 * the given ID and optionally filter on a collection of types
 	 * 
 	 * @param docId ID of the document
+	 * @param userId identifier of the current user
 	 * @param fileVersion indicates a specific file version, optional
 	 * @param types collection of admitted note types, optional
 	 * 
@@ -64,7 +67,7 @@ public interface DocumentNoteDAO extends PersistentObjectDAO<DocumentNote> {
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	public List<DocumentNote> findByDocIdAndTypes(long docId, String fileVersion, Collection<String> types)
+	public List<DocumentNote> findByDocIdAndTypes(long docId, long userId, String fileVersion, Collection<String> types)
 			throws PersistenceException;
 
 	/**

@@ -56,7 +56,7 @@ public class TenantDetailsPanel extends VLayout {
 			if (tenant.getId() != 0) {
 				TenantService.Instance.get().load(tenant.getId(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUITenant tenant) {
+					public void handleSuccess(GUITenant tenant) {
 						setTenant(tenant);
 					}
 				});
@@ -205,7 +205,7 @@ public class TenantDetailsPanel extends VLayout {
 
 			TenantService.Instance.get().save(tenant, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUITenant tenant) {
+				public void handleSuccess(GUITenant tenant) {
 					tabSet.hideSave();
 					if (tenant != null) {
 						if (newTenant) {

@@ -95,7 +95,7 @@ public class DropboxDialog extends Dialog {
 						DropboxService.Instance.get().exportDocuments(targetPath, folderIds, docIds,
 								new DefaultAsyncCallback<>() {
 									@Override
-									public void onSuccess(Boolean result) {
+									public void handleSuccess(Boolean result) {
 										LD.clearPrompt();
 										if (result.booleanValue()) {
 											SC.say(I18N.message("dboxexportok"));
@@ -124,8 +124,7 @@ public class DropboxDialog extends Dialog {
 				DropboxService.Instance.get().importDocuments(FolderController.get().getCurrentFolder().getId(), paths,
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Integer count) {
-								LD.clearPrompt();
+							public void handleSuccess(Integer count) {
 								FolderNavigator.get().reload();
 								SC.say(I18N.message("importeddocs2", count.toString()));
 							}

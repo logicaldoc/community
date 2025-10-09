@@ -155,7 +155,7 @@ public class SubscriptionDialog extends Window {
 			final String eventsStr, final String folderOption) {
 		AuditService.Instance.get().update(selectedIds, CURRENT.equals(folderOption), events, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void ret) {
+			public void handleSuccess(Void ret) {
 				GuiLog.info(I18N.message("settingssaved"), null);
 				for (ListGridRecord rec : grid.getSelectedRecords()) {
 					rec.setAttribute("events", eventsStr);
@@ -247,7 +247,7 @@ public class SubscriptionDialog extends Window {
 				AuditService.Instance.get().subscribeFolder(folderId, form.getValueAsString(OPTION).equals(CURRENT),
 						events, null, null, new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void ret) {
+							public void handleSuccess(Void ret) {
 								GuiLog.info(I18N.message("foldersubscribed"), null);
 								Session.get().getUser()
 										.setSubscriptions(Session.get().getUser().getSubscriptions() + 1);
@@ -256,7 +256,7 @@ public class SubscriptionDialog extends Window {
 			else
 				AuditService.Instance.get().subscribeDocuments(docIds, events, null, null, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void ret) {
+					public void handleSuccess(Void ret) {
 						GuiLog.info(I18N.message("documentsubscribed"), null);
 						Session.get().getUser().setSubscriptions(Session.get().getUser().getSubscriptions() + 1);
 					}

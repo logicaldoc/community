@@ -64,7 +64,7 @@ public class ArchiveDialog extends Window {
 
 				ImpexService.Instance.get().save(archive, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIArchive result) {
+					public void handleSuccess(GUIArchive result) {
 						destroy();
 						// We can reload the archives list with the saved
 						// archive, because all archives of the same list

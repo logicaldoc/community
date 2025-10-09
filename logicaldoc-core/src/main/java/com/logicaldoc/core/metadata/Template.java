@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Secure;
@@ -87,6 +88,12 @@ public class Template extends AbstractAttributeSet implements Secure<AccessContr
 	@Override
 	public AccessControlEntry getAccessControlEntry(long groupId) {
 		return getAccessControlList().stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);
+	}
+	
+	@Override
+	public Set<AccessControlEntry> getAccessControlEntries(Set<Long> groupIds) {
+		return getAccessControlList().stream().filter(ace -> groupIds.contains(ace.getGroupId()))
+				.collect(Collectors.toSet());
 	}
 
 	@Override

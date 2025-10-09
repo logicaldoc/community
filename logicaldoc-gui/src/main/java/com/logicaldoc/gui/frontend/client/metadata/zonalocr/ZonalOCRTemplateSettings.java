@@ -70,7 +70,7 @@ public class ZonalOCRTemplateSettings extends Window {
 		// Clean the upload folder if the window is closed
 		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void result) {
+			public void handleSuccess(Void result) {
 				destroy();
 			}
 		}));
@@ -138,7 +138,7 @@ public class ZonalOCRTemplateSettings extends Window {
 
 		ZonalOCRService.Instance.get().save(ocrPanel.getSelectedOcrTemplate(), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIOCRTemplate template) {
+			public void handleSuccess(GUIOCRTemplate template) {
 				ocrPanel.setSelectedOcrTemplate(template);
 				destroy();
 			}

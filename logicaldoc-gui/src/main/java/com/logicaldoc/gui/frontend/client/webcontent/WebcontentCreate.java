@@ -86,9 +86,7 @@ public class WebcontentCreate extends Window {
 					}
 
 					@Override
-					public void onSuccess(GUIDocument document) {
-						LD.clearPrompt();
-
+					public void handleSuccess(GUIDocument document) {
 						DocumentsPanel.get().refresh();
 						DocumentsPanel.get().selectDocument(document.getId(), true);
 

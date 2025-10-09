@@ -42,9 +42,8 @@ public class AccountMenu extends Menu {
 		profile.addClickHandler(event -> SecurityService.Instance.get().getUser(Session.get().getUser().getId(),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIUser user) {
-						Profile profile = new Profile(user);
-						profile.show();
+					public void handleSuccess(GUIUser user) {
+						new Profile(user).show();
 					}
 				}));
 
@@ -59,7 +58,7 @@ public class AccountMenu extends Menu {
 			Session.get().getUser().setDocsGrid(null);
 			SecurityService.Instance.get().saveInterfaceSettings(Session.get().getUser(), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIUser usr) {
+				public void handleSuccess(GUIUser usr) {
 					CookiesManager.removeAllCookies();
 					GuiLog.info(I18N.message("cookiesremoved"), null);
 					Session.get().logout();

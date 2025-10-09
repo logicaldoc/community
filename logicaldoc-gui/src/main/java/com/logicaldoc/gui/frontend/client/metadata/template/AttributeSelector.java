@@ -132,7 +132,7 @@ public class AttributeSelector extends Window {
 	protected void fillSetAttributesList(Long setId) {
 		AttributeSetService.Instance.get().getAttributeSet(setId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIAttributeSet set) {
+			public void handleSuccess(GUIAttributeSet set) {
 				ListGridRecord[] records = setAttributesList.getRecords();
 				if (records != null)
 					for (ListGridRecord rec : records)

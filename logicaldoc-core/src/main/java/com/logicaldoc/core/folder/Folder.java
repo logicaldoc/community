@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -16,7 +17,6 @@ import com.logicaldoc.core.document.Tag;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.metadata.Template;
-import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Secure;
 import com.logicaldoc.util.spring.Context;
 
@@ -682,8 +682,14 @@ public class Folder extends ExtensibleObject implements Secure<FolderAccessContr
 	}
 
 	@Override
-	public AccessControlEntry getAccessControlEntry(long groupId) {
+	public FolderAccessControlEntry getAccessControlEntry(long groupId) {
 		return getAccessControlList().stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);
+	}
+
+	@Override
+	public Set<FolderAccessControlEntry> getAccessControlEntries(Set<Long> groupIds) {
+		return getAccessControlList().stream().filter(ace -> groupIds.contains(ace.getGroupId()))
+				.collect(Collectors.toSet());
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.data.SavedSearchesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -65,7 +66,7 @@ public class SavedSearchesPanel extends VLayout {
 			ListGridRecord rec = event.getRecord();
 			SearchService.Instance.get().load(rec.getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUISearchOptions options) {
+				public void handleSuccess(GUISearchOptions options) {
 					Search.get().setOptions(options);
 					Search.get().search();
 				}
@@ -87,7 +88,7 @@ public class SavedSearchesPanel extends VLayout {
 			ListGridRecord selection = list.getSelectedRecord();
 			SearchService.Instance.get().load(selection.getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUISearchOptions options) {
+				public void handleSuccess(GUISearchOptions options) {
 					Search.get().setOptions(options);
 					Search.get().search();
 				}
@@ -114,12 +115,8 @@ public class SavedSearchesPanel extends VLayout {
 						public void execute(Map<String, Object> values) {
 							LD.contactingServer();
 							SearchService.Instance.get().shareSearch(selection.getAttributeAsString("name"),
-									usersSelector.getUserIds(), groupsSelector.getGroupIds(), new DefaultAsyncCallback<>() {
-										@Override
-										public void onSuccess(Void arg0) {
-											LD.clearPrompt();
-										}
-									});
+									usersSelector.getUserIds(), groupsSelector.getGroupIds(),
+									new EmptyAsyncCallback<>());
 						}
 					});
 		});
@@ -139,7 +136,7 @@ public class SavedSearchesPanel extends VLayout {
 				if (Boolean.TRUE.equals(value)) {
 					SearchService.Instance.get().delete(names, new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void result) {
+						public void handleSuccess(Void result) {
 							list.removeSelectedData();
 						}
 					});
@@ -161,7 +158,7 @@ public class SavedSearchesPanel extends VLayout {
 		rec.setAttribute("type", type);
 		list.addData(rec);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

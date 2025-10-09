@@ -157,7 +157,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 			}
 
 			@Override
-			public void onSuccess(GUIDocument result) {
+			public void handleSuccess(GUIDocument result) {
 				DocumentController.get().selected(result);
 				GUIFolder fld = result.getFolder();
 				if (fld != null) {
@@ -187,7 +187,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 			}
 
 			@Override
-			public void onSuccess(GUIDocument result) {
+			public void handleSuccess(GUIDocument result) {
 				if (!(detailPanel instanceof DocumentDetailsPanel)) {
 					details.removeMember(detailPanel);
 					detailPanel.destroy();

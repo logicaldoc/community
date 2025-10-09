@@ -69,7 +69,7 @@ public class TemplateDetailsPanel extends VLayout {
 			if (template.getId() != 0) {
 				TemplateService.Instance.get().getTemplate(template.getId(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUITemplate template) {
+					public void handleSuccess(GUITemplate template) {
 						setTemplate(template);
 					}
 				});
@@ -201,7 +201,7 @@ public class TemplateDetailsPanel extends VLayout {
 		if (validate()) {
 			TemplateService.Instance.get().save(template, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUITemplate result) {
+				public void handleSuccess(GUITemplate result) {
 					templatesPanel.updateRecord(result);
 					setTemplate(result);
 				}

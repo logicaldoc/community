@@ -59,7 +59,7 @@ public class ReportParametersForm extends Window {
 
 		ReportService.Instance.get().getReportParameters(form.getId(), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIAttribute> parameters) {
+			public void handleSuccess(List<GUIAttribute> parameters) {
 				ReportParametersForm.this.parameters = parameters;
 				initGUI();
 			}
@@ -199,7 +199,7 @@ public class ReportParametersForm extends Window {
 	private void doExecute(ArrayList<GUIAttribute> parameters) {
 		ReportService.Instance.get().execute(report.getId(), parameters, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg) {
+			public void handleSuccess(Void arg) {
 				destroy();
 				GuiLog.info(I18N.message("reportinexecution"), null);
 				panel.update();

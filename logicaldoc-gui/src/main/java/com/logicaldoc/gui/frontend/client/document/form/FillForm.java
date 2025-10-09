@@ -79,8 +79,7 @@ public class FillForm extends Window {
 					}
 
 					@Override
-					public void onSuccess(GUIDocument doc) {
-						LD.clearPrompt();
+					public void handleSuccess(GUIDocument doc) {
 						DocumentsPanel.get().refresh();
 						destroy();
 					}

@@ -34,7 +34,7 @@ public class SignatureDialog extends Window {
 		StampService.Instance.get().getSignature(new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onSuccess(GUIStamp stamp) {
+			public void handleSuccess(GUIStamp stamp) {
 				SignaturePanel signaturePanel = new SignaturePanel(stamp);
 
 				ToolStripButton save = new ToolStripButton(I18N.message("save"));
@@ -42,7 +42,7 @@ public class SignatureDialog extends Window {
 					if (signaturePanel.validate())
 						StampService.Instance.get().save(signaturePanel.getStamp(), new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(GUIStamp arg) {
+							public void handleSuccess(GUIStamp arg) {
 								destroy();
 							}
 						});

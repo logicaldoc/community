@@ -35,7 +35,7 @@ public class DocumentCalendarPanel extends DocumentDetailTab {
 
 		calendar = new EventsCalendar(docId, null, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg0) {
+			public void handleSuccess(Void arg0) {
 				refresh();
 			}
 		});

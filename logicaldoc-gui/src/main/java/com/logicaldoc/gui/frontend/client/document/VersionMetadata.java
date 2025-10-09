@@ -132,7 +132,7 @@ public class VersionMetadata extends Window {
 		DocumentService.Instance.get().getAllowedPermissions(Arrays.asList(selection.getAttribute().getIntValue()),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIAccessControlEntry acl) {
+					public void handleSuccess(GUIAccessControlEntry acl) {
 						if(acl==null)
 							return;
 						
@@ -144,7 +144,7 @@ public class VersionMetadata extends Window {
 						preview.addClickHandler(
 								click -> DocumentService.Instance.get().getById(docId, new DefaultAsyncCallback<>() {
 									@Override
-									public void onSuccess(GUIDocument doc) {
+									public void handleSuccess(GUIDocument doc) {
 										new PreviewPopup(doc).show();
 									}
 								}));

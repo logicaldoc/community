@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.account;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.data.ApiKeysDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
@@ -52,7 +53,7 @@ public class ApiKeys extends com.smartgwt.client.widgets.Window {
 		newKey.addClickHandler(click -> LD.askForString("createnewapikey", "createnewapikeymessage", "My Key",
 				keyName -> SecurityService.Instance.get().createApiKey(keyName, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(String apikey) {
+					public void handleSuccess(String apikey) {
 						list.refresh(new ApiKeysDS());
 						StaticTextItem item = ItemFactory.newStaticTextItem("apikey", "apikey", apikey);
 						item.setIcons(new CopyTextFormItemIcon(apikey, "copytext"));
@@ -76,13 +77,7 @@ public class ApiKeys extends com.smartgwt.client.widgets.Window {
 		name.setCanEdit(true);
 		name.addCellSavedHandler(
 				saved -> SecurityService.Instance.get().updateApiKey(saved.getRecord().getAttributeAsLong("id"),
-						saved.getNewValue() != null ? saved.getNewValue().toString() : null, new DefaultAsyncCallback<>() {
-
-							@Override
-							public void onSuccess(Void arg) {
-								// Nothing to do
-							}
-						}));
+						saved.getNewValue() != null ? saved.getNewValue().toString() : null, new EmptyAsyncCallback<>()));
 
 		ListGridField key = new ListGridField("key", I18N.message("secretkey"), 150);
 		key.setCanEdit(false);
@@ -126,7 +121,7 @@ public class ApiKeys extends com.smartgwt.client.widgets.Window {
 						new DefaultAsyncCallback<>() {
 
 							@Override
-							public void onSuccess(Void result) {
+							public void handleSuccess(Void result) {
 								list.removeSelectedData();
 								list.deselectAllRecords();
 								list.refresh(new ApiKeysDS());

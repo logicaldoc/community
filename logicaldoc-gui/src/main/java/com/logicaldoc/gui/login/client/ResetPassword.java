@@ -67,7 +67,7 @@ public class ResetPassword extends Window {
 							}
 
 							@Override
-							public void onSuccess(Void result) {
+							public void handleSuccess(Void result) {
 								buttonForm.setDisabled(false);
 								SC.say(I18N.message("amessagewassentto", emailAddress));
 								destroy();

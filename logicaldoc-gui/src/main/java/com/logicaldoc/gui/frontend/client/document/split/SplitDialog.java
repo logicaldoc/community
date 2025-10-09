@@ -89,8 +89,7 @@ public class SplitDialog extends Window {
 							}
 
 							@Override
-							public void onSuccess(Void ret) {
-								LD.clearPrompt();
+							public void handleSuccess(Void ret) {
 								destroy();
 							}
 						});

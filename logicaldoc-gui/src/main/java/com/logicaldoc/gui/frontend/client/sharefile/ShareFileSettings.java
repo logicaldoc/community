@@ -34,7 +34,7 @@ public class ShareFileSettings extends Window {
 
 		ShareFileService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<String> settings) {
+			public void handleSuccess(List<String> settings) {
 				initGUI(settings);
 			}
 		});
@@ -77,7 +77,7 @@ public class ShareFileSettings extends Window {
 		ShareFileService.Instance.get().authorize(form.getValueAsString("clientid"),
 				form.getValueAsString("clientsecret"), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(String authorizationUrl) {
+					public void handleSuccess(String authorizationUrl) {
 						WindowUtils.openUrl(authorizationUrl, "_blank", null);
 						destroy();
 					}

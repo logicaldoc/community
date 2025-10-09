@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.LazyInitializationException;
 import org.hibernate.exception.GenericJDBCException;
@@ -15,7 +16,6 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
-import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Secure;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.spring.Context;
@@ -325,8 +325,14 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 	}
 
 	@Override
-	public AccessControlEntry getAccessControlEntry(long groupId) {
+	public DocumentAccessControlEntry getAccessControlEntry(long groupId) {
 		return getAccessControlList().stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);
+	}
+
+	@Override
+	public Set<DocumentAccessControlEntry> getAccessControlEntries(Set<Long> groupIds) {
+		return getAccessControlList().stream().filter(ace -> groupIds.contains(ace.getGroupId()))
+				.collect(Collectors.toSet());
 	}
 
 	@Override

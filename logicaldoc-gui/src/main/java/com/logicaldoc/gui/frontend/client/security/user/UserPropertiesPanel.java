@@ -171,7 +171,7 @@ public class UserPropertiesPanel extends HLayout {
 		if (user.getId() != 0L) {
 			UserAvatar avatar = new UserAvatar(user.getId(), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void result) {
+				public void handleSuccess(Void result) {
 					if (usersPanel != null)
 						usersPanel.updateRecord(user);
 				}

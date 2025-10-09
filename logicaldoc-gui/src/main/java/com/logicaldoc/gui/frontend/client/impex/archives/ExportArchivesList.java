@@ -179,7 +179,7 @@ public class ExportArchivesList extends VLayout {
 			if (Boolean.TRUE.equals(confirm)) {
 				ImpexService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						showDetails(null, true);
@@ -230,7 +230,7 @@ public class ExportArchivesList extends VLayout {
 		ImpexService.Instance.get().setStatus(rec.getAttributeAsLong("id"), GUIArchive.STATUS_CLOSED,
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(STATUS, GUIArchive.STATUS_CLOSED);
 						list.refreshRow(list.getRecordIndex(rec));
 						showDetails(Long.parseLong(rec.getAttributeAsString("id")), true);
@@ -262,7 +262,7 @@ public class ExportArchivesList extends VLayout {
 		ImpexService.Instance.get().setStatus(rec.getAttributeAsLong("id"), GUIArchive.STATUS_OPEN,
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(STATUS, GUIArchive.STATUS_OPEN);
 						list.refreshRow(list.getRecordIndex(rec));
 						showDetails(rec.getAttributeAsLong("id"), true);

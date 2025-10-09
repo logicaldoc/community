@@ -203,7 +203,7 @@ public class MessageTemplatesPanel extends VLayout {
 
 		MessageService.Instance.get().saveTemplates(templates, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg0) {
+			public void handleSuccess(Void arg0) {
 				GuiLog.info(I18N.message("settingssaved"), null);
 			}
 		});
@@ -225,7 +225,7 @@ public class MessageTemplatesPanel extends VLayout {
 
 			MessageService.Instance.get().deleteTemplates(ids, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void arg0) {
+				public void handleSuccess(Void arg0) {
 					reload();
 				}
 			});
@@ -236,7 +236,7 @@ public class MessageTemplatesPanel extends VLayout {
 		delete.addClickHandler(event -> MessageService.Instance.get()
 				.deleteTemplates(list.getSelectedRecord().getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void arg) {
+					public void handleSuccess(Void arg) {
 						reload();
 					}
 				}));
@@ -253,7 +253,7 @@ public class MessageTemplatesPanel extends VLayout {
 
 		MessageService.Instance.get().loadTemplates(lang, null, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIMessageTemplate> templates) {
+			public void handleSuccess(List<GUIMessageTemplate> templates) {
 				List<ListGridRecord> records = new ArrayList<>();
 				for (GUIMessageTemplate pat : templates) {
 					ListGridRecord rec = new ListGridRecord();

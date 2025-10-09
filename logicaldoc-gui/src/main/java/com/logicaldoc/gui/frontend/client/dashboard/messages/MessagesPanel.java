@@ -112,7 +112,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 						new DefaultAsyncCallback<>() {
 
 							@Override
-							public void onSuccess(GUIMessage message) {
+							public void handleSuccess(GUIMessage message) {
 								rec.setAttribute("read", "true");
 								grid.refreshRow(grid.getRecordIndex(rec));
 								body.setContents(grid.getSelectedRecord().getAttributeAsString("text"));
@@ -167,7 +167,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 			if (Boolean.TRUE.equals(answer)) {
 				MessageService.Instance.get().delete(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						grid.removeSelectedData();
 					}
 				});

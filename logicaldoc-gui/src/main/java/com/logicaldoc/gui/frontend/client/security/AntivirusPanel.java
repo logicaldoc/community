@@ -57,7 +57,7 @@ public class AntivirusPanel extends VLayout {
 						tenant + ANTIVIRUS_INCLUDES, tenant + ANTIVIRUS_EXCLUDES, tenant + ANTIVIRUS_TIMEOUT),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(List<GUIParameter> parameters) {
+							public void handleSuccess(List<GUIParameter> parameters) {
 								initGUI(parameters);
 							}
 						});
@@ -86,7 +86,7 @@ public class AntivirusPanel extends VLayout {
 
 				SettingService.Instance.get().saveSettings(params, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void ret) {
+					public void handleSuccess(Void ret) {
 						GuiLog.info(I18N.message("settingssaved"), null);
 					}
 				});

@@ -8,12 +8,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.document.DocumentNote;
+import com.logicaldoc.core.document.DocumentNoteDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Template;
@@ -24,6 +23,9 @@ import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.security.user.GroupType;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible retrieving the Access Control List for documents,
@@ -43,6 +45,10 @@ public class AclDataServlet extends AbstractDataServlet {
 	private static final String READ_CLOSED = "</read>";
 
 	private static final String READ = "<read>";
+
+	private static final String WRITE = "<write>";
+
+	private static final String WRITE_CLOSED = "</write>";
 
 	private static final String AVATAR_CLOSED = "</avatar>";
 
@@ -75,17 +81,20 @@ public class AclDataServlet extends AbstractDataServlet {
 		long id = Long.parseLong(request.getParameter("id"));
 		String type = request.getParameter("type");
 		switch (type) {
-		case "menu":
-			menuAcl(response, id, session.getTenantId());
-			break;
-		case "folder":
-			folderACL(response, id);
-			break;
-		case "template":
-			templateACL(response, id);
-			break;
-		default:
-			documentACL(response, id);
+			case "menu":
+				menuACL(response, id, session.getTenantId());
+				break;
+			case "folder":
+				folderACL(response, id);
+				break;
+			case "template":
+				templateACL(response, id);
+				break;
+			case "note":
+				noteACL(response, id);
+				break;
+			default:
+				documentACL(response, id);
 		}
 
 	}
@@ -235,7 +244,7 @@ public class AclDataServlet extends AbstractDataServlet {
 		writer.write(LIST_CLOSED);
 	}
 
-	private void menuAcl(HttpServletResponse response, long menuId, long tenantId)
+	private void menuACL(HttpServletResponse response, long menuId, long tenantId)
 			throws IOException, PersistenceException {
 		MenuDAO menuDao = Context.get(MenuDAO.class);
 		Menu menu = menuDao.findById(menuId);
@@ -278,6 +287,57 @@ public class AclDataServlet extends AbstractDataServlet {
 				}
 
 				writer.print(READ + intToBoolean(rows.getInt(4)) + READ_CLOSED);
+				writer.print(TYPE + groupType + TYPE_CLOSED);
+				writer.print(ACE_CLOSED);
+			}
+		});
+
+		writer.write(LIST_CLOSED);
+	}
+
+	private void noteACL(HttpServletResponse response, long noteId) throws IOException, PersistenceException {
+		DocumentNoteDAO noteDao = Context.get(DocumentNoteDAO.class);
+		DocumentNote note = noteDao.findById(noteId);
+		noteDao.initialize(note);
+
+		// Prepare a map of users
+		Map<Long, String> users = getUsers(note.getTenantId());
+
+		PrintWriter writer = response.getWriter();
+		writer.write(LIST);
+
+		// Prepare the query on the menu ACL in join with groups
+		StringBuilder query = new StringBuilder(
+				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_read, A.ld_write from ld_note_acl A, ld_group B where A.ld_noteid = ");
+		query.append("" + note.getId());
+		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id and B.ld_tenantid = " + note.getTenantId());
+		query.append(" order by B.ld_type asc, B.ld_name asc");
+
+		noteDao.queryForResultSet(query.toString(), null, null, rows -> {
+			/*
+			 * Iterate over records composing the response XML document
+			 */
+			while (rows.next()) {
+				long groupId = rows.getLong(1);
+				String groupName = rows.getString(2);
+				int groupType = rows.getInt(3);
+				long userId = 0L;
+				if (groupType == GroupType.USER.ordinal() && groupName != null)
+					userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
+
+				writer.print(ACE);
+				writer.print(ENTITYID + groupId + ENTITYID_CLOSED);
+
+				if (groupType == GroupType.DEFAULT.ordinal()) {
+					writer.print(ENTITY + groupName + ENTITY_CLOSED);
+					writer.print(AVATAR_GROUP_AVATAR);
+				} else {
+					writer.print(ENTITY + users.get(userId) + ENTITY_CLOSED);
+					writer.print(AVATAR + userId + AVATAR_CLOSED);
+				}
+
+				writer.print(READ + intToBoolean(rows.getInt(4)) + READ_CLOSED);
+				writer.print(WRITE + intToBoolean(rows.getInt(5)) + WRITE_CLOSED);
 				writer.print(TYPE + groupType + TYPE_CLOSED);
 				writer.print(ACE_CLOSED);
 			}

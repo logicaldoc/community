@@ -81,7 +81,7 @@ public class MenusPanel extends VLayout {
 				SecurityService.Instance.get().getMenu(Long.parseLong(rec.getAttributeAsString("id")), I18N.getLocale(),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(GUIMenu menu) {
+							public void handleSuccess(GUIMenu menu) {
 								showRights(menu);
 							}
 						});

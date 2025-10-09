@@ -144,7 +144,7 @@ public class TemplatesPanel extends VLayout {
 				TemplateService.Instance.get().getTemplate(Long.parseLong(rec.getAttributeAsString("id")),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(GUITemplate template) {
+							public void handleSuccess(GUITemplate template) {
 								showTemplateDetails(template);
 							}
 						});
@@ -181,7 +181,7 @@ public class TemplatesPanel extends VLayout {
 			if (Boolean.TRUE.equals(answer)) {
 				TemplateService.Instance.get().delete(selectedTemplateId, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						showTemplateDetails(null);
@@ -195,7 +195,7 @@ public class TemplatesPanel extends VLayout {
 		clone.addClickHandler(event -> TemplateService.Instance.get().clone(selectedTemplateId,
 				selectedRecord.getAttribute("name") + "-Clone", new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUITemplate templateClone) {
+					public void handleSuccess(GUITemplate templateClone) {
 						list.deselectAllRecords();
 						list.refresh(new TemplatesDS(false, null, GUITemplate.TYPE_DEFAULT));
 						templateIdToSelect = templateClone.getId();

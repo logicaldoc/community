@@ -127,7 +127,7 @@ public class QueryDialog extends Window {
 					}
 
 					@Override
-					public void onSuccess(List<GUIQueryResult> answers) {
+					public void handleSuccess(List<GUIQueryResult> answers) {
 						query.setDisabled(false);
 						resultGrid.setData(new RecordList(answers.stream().map(answer -> {
 							ListGridRecord rec = new ListGridRecord();

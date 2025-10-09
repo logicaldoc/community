@@ -182,7 +182,7 @@ public class WorkflowToolStrip extends ToolStrip {
 			if (Boolean.TRUE.equals(answer)) {
 				WorkflowService.Instance.get().delete(currentWorkflow.getName(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						currentWorkflow = new GUIWorkflow();
 						AdminScreen.get().setContent(new WorkflowDesigner(currentWorkflow));
 						update();
@@ -205,7 +205,7 @@ public class WorkflowToolStrip extends ToolStrip {
 				if (Boolean.TRUE.equals(yes))
 					WorkflowService.Instance.get().undeploy(currentWorkflow.getName(), new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void result) {
+						public void handleSuccess(Void result) {
 							GuiLog.info(I18N.message("workflowundeployed", currentWorkflow.getName()));
 							update();
 							reload(currentWorkflow.getName());
@@ -245,8 +245,7 @@ public class WorkflowToolStrip extends ToolStrip {
 			LD.contactingServer();
 			WorkflowService.Instance.get().deploy(currentWorkflow, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIWorkflow result) {
-					LD.clearPrompt();
+				public void handleSuccess(GUIWorkflow result) {
 					GuiLog.info(I18N.message("workflowdeployed", currentWorkflow.getName()));
 					currentWorkflow = result;
 					reload(currentWorkflow.getName());
@@ -353,7 +352,7 @@ public class WorkflowToolStrip extends ToolStrip {
 		WorkflowService.Instance.get().get(currentWorkflow.getName(), (Integer) event.getValue(),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIWorkflow result) {
+					public void handleSuccess(GUIWorkflow result) {
 						if (result != null) {
 							currentWorkflow = result;
 							WorkflowToolStrip.this.designer.redraw(currentWorkflow);
@@ -371,7 +370,7 @@ public class WorkflowToolStrip extends ToolStrip {
 				WorkflowService.Instance.get().get(workflowSelector.getSelectedRecord().getAttributeAsString("name"),
 						null, new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(GUIWorkflow result) {
+							public void handleSuccess(GUIWorkflow result) {
 								if (result != null) {
 									currentWorkflow = result;
 									WorkflowToolStrip.this.designer.redraw(currentWorkflow);
@@ -433,7 +432,7 @@ public class WorkflowToolStrip extends ToolStrip {
 		LD.contactingServer();
 		WorkflowService.Instance.get().save(currentWorkflow, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIWorkflow result) {
+			public void handleSuccess(GUIWorkflow result) {
 				LD.clearPrompt();
 				if (result == null) {
 					SC.warn(I18N.message("workflowalreadyexist"));
@@ -462,7 +461,7 @@ public class WorkflowToolStrip extends ToolStrip {
 	protected void reload(String workflowName) {
 		WorkflowService.Instance.get().get(workflowName, null, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIWorkflow result) {
+			public void handleSuccess(GUIWorkflow result) {
 				if (result != null) {
 					currentWorkflow = result;
 					WorkflowToolStrip.this.designer.redraw(result);

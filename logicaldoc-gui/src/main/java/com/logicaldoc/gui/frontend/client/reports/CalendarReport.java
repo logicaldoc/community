@@ -326,7 +326,7 @@ public class CalendarReport extends AdminPanel {
 	private void doSearch(GUICalendarEventSearchCriteria criteria) {
 		CalendarService.Instance.get().find(criteria, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUICalendarEvent> result) {
+			public void handleSuccess(List<GUICalendarEvent> result) {
 				List<ListGridRecord> records = new ArrayList<>();
 				for (GUICalendarEvent event : result) {
 					ListGridRecord rec = new ListGridRecord();

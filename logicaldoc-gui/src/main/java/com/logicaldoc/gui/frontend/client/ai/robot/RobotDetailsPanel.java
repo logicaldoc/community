@@ -43,7 +43,7 @@ public class RobotDetailsPanel extends VLayout {
 				RobotService.Instance.get().get(robot.getId(), new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(GUIRobot robot) {
+					public void handleSuccess(GUIRobot robot) {
 						setRobot(robot);
 					}
 
@@ -121,7 +121,7 @@ public class RobotDetailsPanel extends VLayout {
 		if (validate()) {
 			RobotService.Instance.get().save(robot, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIRobot robot) {
+				public void handleSuccess(GUIRobot robot) {
 					tabSet.hideSave();
 					if (robot != null) {
 						robotsPanel.updateRecord(robot);

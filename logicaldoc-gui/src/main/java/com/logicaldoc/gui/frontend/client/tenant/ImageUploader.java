@@ -78,7 +78,7 @@ public class ImageUploader extends Window {
 
 		TenantService.Instance.get().encodeBrandingImage(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(String imageContent) {
+			public void handleSuccess(String imageContent) {
 				panel.updateImage(imageName, imageContent);
 				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<>() {
 

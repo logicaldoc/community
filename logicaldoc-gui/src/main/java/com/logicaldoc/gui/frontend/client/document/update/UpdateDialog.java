@@ -93,14 +93,14 @@ public class UpdateDialog extends StickyWindow {
 			FolderService.Instance.get().getFolder(metadata.getFolder().getId(), false, false, false,
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIFolder folder) {
+						public void handleSuccess(GUIFolder folder) {
 							onDraw(folder.getAllowedPermissions());
 						}
 					});
 		} else {
 			DocumentService.Instance.get().getAllowedPermissions(ids, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIAccessControlEntry permissions) {
+				public void handleSuccess(GUIAccessControlEntry permissions) {
 					onDraw(permissions);
 				}
 			});
@@ -125,7 +125,7 @@ public class UpdateDialog extends StickyWindow {
 				}
 
 				@Override
-				public void onSuccess(Void arg) {
+				public void handleSuccess(Void arg) {
 					if (CHECKIN.equals(context)) {
 						doCheckin();
 					} else if (!ids.isEmpty()) {

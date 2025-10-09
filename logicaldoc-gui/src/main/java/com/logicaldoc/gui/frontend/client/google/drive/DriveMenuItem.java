@@ -121,7 +121,7 @@ public class DriveMenuItem extends MenuItem {
 		// Need to checkout first
 		DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void result) {
+			public void handleSuccess(Void result) {
 				document.setStatus(Constants.DOC_CHECKED_OUT);
 				document.setLockUserId(Session.get().getUser().getId());
 				document.setLockUser(Session.get().getUser().getFullName());

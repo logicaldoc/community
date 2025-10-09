@@ -70,7 +70,7 @@ public class PasswordTrial extends PasswordGenerator {
 					}
 
 					@Override
-					public void onSuccess(List<String> failures) {
+					public void handleSuccess(List<String> failures) {
 						if (failures.isEmpty()) {
 							result.setValue("<p style='color:green'>" + I18N.message("thispasswdisvalid") + "</p>");
 						} else {

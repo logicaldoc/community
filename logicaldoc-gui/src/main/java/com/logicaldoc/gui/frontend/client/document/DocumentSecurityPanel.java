@@ -488,7 +488,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		}
 		DocumentService.Instance.get().saveACL(document, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void result) {
+			public void handleSuccess(Void result) {
 				GuiLog.info(I18N.message("appliedrightsondoc"), null);
 				refresh(document);
 			}
@@ -499,7 +499,7 @@ public class DocumentSecurityPanel extends DocumentDetailTab {
 		FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIFolder folder) {
+					public void handleSuccess(GUIFolder folder) {
 						document.setAccessControlList(folder.getAccessControlList());
 						list.refresh(new AccessControlListDS(document.getFolder().getId(), "folder"));
 					}

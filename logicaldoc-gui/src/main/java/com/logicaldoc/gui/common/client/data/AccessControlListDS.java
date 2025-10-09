@@ -18,7 +18,7 @@ public class AccessControlListDS extends DataSource {
 	 * Constructor
 	 * 
 	 * @param id identifier of the object
-	 * @param objectType type of object(folder, menu, document, template)
+	 * @param objectType type of object(folder, menu, document, template, note)
 	 */
 	public AccessControlListDS(long id, String objectType) {
 		setTitleField("entity");

@@ -57,7 +57,7 @@ public class ProxyPanel extends AdminPanel {
 				Arrays.asList(PROXY_ENABLED, PROXY_HOST, PROXY_PORT, PROXY_PASSWORD, PROXY_USERNAME),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(List<GUIParameter> parameters) {
+					public void handleSuccess(List<GUIParameter> parameters) {
 						init(parameters);
 					}
 				});
@@ -98,7 +98,7 @@ public class ProxyPanel extends AdminPanel {
 
 				SettingService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						GuiLog.info(I18N.message("settingssaved"), null);
 					}
 				});
@@ -112,8 +112,7 @@ public class ProxyPanel extends AdminPanel {
 					Integer.parseInt(form.getValueAsString(PORT)), form.getValueAsString(USERNAME),
 					form.getValueAsString(PASSWORD), new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Boolean connected) {
-							LD.clearPrompt();
+						public void handleSuccess(Boolean connected) {
 							if (connected.booleanValue())
 								SC.say(I18N.message("connectionestablished"));
 							else

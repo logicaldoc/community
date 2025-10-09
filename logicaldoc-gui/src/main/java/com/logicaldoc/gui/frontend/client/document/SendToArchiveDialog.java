@@ -66,7 +66,7 @@ public class SendToArchiveDialog extends Window {
 			ImpexService.Instance.get().addDocuments(Long.parseLong(form.getValueAsString("archive")), ids,
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void result) {
+						public void handleSuccess(Void result) {
 							GuiLog.info(I18N.message("documentsaddedtoarchive"), null);
 							destroy();
 						}
@@ -76,8 +76,7 @@ public class SendToArchiveDialog extends Window {
 			ImpexService.Instance.get().addFolder(Long.parseLong(form.getValueAsString("archive")), ids.get(0),
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void result) {
-							LD.clearPrompt();
+						public void handleSuccess(Void result) {
 							GuiLog.info(I18N.message("documentsaddedtoarchive"), null);
 							destroy();
 						}

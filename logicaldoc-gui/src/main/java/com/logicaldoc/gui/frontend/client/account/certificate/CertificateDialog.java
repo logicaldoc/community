@@ -80,11 +80,10 @@ public class CertificateDialog extends Window implements UserObserver {
 			LD.contactingServer();
 			SignService.Instance.get().generateNewCertificate(new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void arg) {
-					LD.clearPrompt();
+				public void handleSuccess(Void arg) {
 					SecurityService.Instance.get().getUser(Session.get().getUser().getId(), new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIUser user) {
+						public void handleSuccess(GUIUser user) {
 							Session.get().setUser(user);
 							refresh();
 						}
@@ -103,8 +102,7 @@ public class CertificateDialog extends Window implements UserObserver {
 			LD.contactingServer();
 			SignService.Instance.get().deleteCertificate(new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void arg) {
-					LD.clearPrompt();
+				public void handleSuccess(Void arg) {
 					Session.get().getUser().setCertDN(null);
 					Session.get().getUser().setCertExpire(null);
 					refresh();

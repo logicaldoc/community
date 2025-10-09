@@ -75,7 +75,7 @@ public class OCRSettingsPanel extends AdminPanel {
 
 		OCRService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIParameter> params) {
+			public void handleSuccess(List<GUIParameter> params) {
 				initGUI(params);
 			}
 		});
@@ -375,7 +375,7 @@ public class OCRSettingsPanel extends AdminPanel {
 	private void doSaveSettings(List<GUIParameter> params) {
 		SettingService.Instance.get().saveSettings(params, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void ret) {
+			public void handleSuccess(Void ret) {
 				GuiLog.info(I18N.message("settingssaved"), null);
 			}
 		});

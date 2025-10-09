@@ -84,6 +84,7 @@ import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.metadata.validation.Validator;
 import com.logicaldoc.core.parser.ParsingException;
+import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.authentication.PasswordWeakException;
@@ -1868,33 +1869,64 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public long addNote(long docId, String message) throws ServerException {
+	public GUIDocumentNote saveNote(GUIDocumentNote guiNote) throws ServerException {
 		Session session = validateSession();
 
 		try {
 			DocumentDAO docDao = Context.get(DocumentDAO.class);
-			Document document = docDao.findDocument(docId);
-			if (document == null)
-				throw new ServerException(UNEXISTING_DOCUMENT + " " + docId);
+			Document document = docDao.findById(guiNote.getDocId());
 
-			DocumentNote note = new DocumentNote();
-			note.setTenantId(session.getTenantId());
-			note.setDocId(document.getId());
-			note.setUserId(session.getUserId());
-			note.setUsername(session.getUser().getFullName());
-			note.setDate(new Date());
-			note.setMessage(message);
-			note.setFileName(document.getFileName());
-			note.setFileVersion(document.getFileVersion());
-
-			DocumentHistory transaction = new DocumentHistory();
-			transaction.setSession(session);
-
-			DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
-			dao.store(note, transaction);
-
-			return note.getId();
+			return saveNote(session, document, guiNote);
 		} catch (PersistenceException | ServerException e) {
+			return throwServerException(session, log, e);
+		}
+	}
+
+	@Override
+	public GUIDocumentNote getNote(long noteId) throws ServerException {
+		Session session = validateSession();
+
+		try {
+			DocumentNoteDAO noteDao = Context.get(DocumentNoteDAO.class);
+			DocumentNote note = noteDao.findById(noteId);
+			if (note != null)
+				noteDao.initialize(note);
+			else
+				return null;
+
+			GUIDocumentNote guiNote = new GUIDocumentNote(note.getId(), note.getFileVersion());
+			guiNote.setDocId(note.getDocId());
+			guiNote.setColor(note.getColor());
+			guiNote.setDate(note.getDate());
+			guiNote.setFileName(note.getFileName());
+			guiNote.setHeight(note.getHeight());
+			guiNote.setLeft(note.getLeft());
+			guiNote.setLineColor(note.getLineColor());
+			guiNote.setLineOpacity(note.getLineOpacity());
+			guiNote.setLineWidth(note.getLineWidth());
+			guiNote.setMessage(note.getMessage());
+			guiNote.setOpacity(note.getOpacity());
+			guiNote.setPage(note.getPage());
+			guiNote.setRecipient(note.getRecipient());
+			guiNote.setRecipientEmail(note.getRecipientEmail());
+			guiNote.setRotation(note.getRotation());
+			guiNote.setShape(note.getShape());
+			guiNote.setTop(note.getTop());
+			guiNote.setType(note.getType());
+			guiNote.setUserId(note.getUserId());
+			guiNote.setUsername(note.getUsername());
+
+			note.getAccessControlList().clear();
+			for (AccessControlEntry ace : note.getAccessControlList()) {
+				GUIAccessControlEntry guiAce = new GUIAccessControlEntry();
+				guiAce.setEntityId(ace.getGroupId());
+				guiAce.setRead(ace.getRead() == 1);
+				guiAce.setWrite(ace.getWrite() == 1);
+				guiNote.getAccessControlList().add(guiAce);
+			}
+
+			return guiNote;
+		} catch (PersistenceException e) {
 			return throwServerException(session, log, e);
 		}
 	}
@@ -1913,7 +1945,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			List<GUIDocumentNote> guiNotes = new ArrayList<>();
 			DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
 
-			List<DocumentNote> notes = dao.findByDocIdAndTypes(document.getId(),
+			List<DocumentNote> notes = dao.findByDocIdAndTypes(document.getId(), session.getUserId(),
 					fileVersion != null ? fileVersion : document.getFileVersion(), types);
 			for (DocumentNote note : notes) {
 				GUIDocumentNote guiNote = new GUIDocumentNote();
@@ -1942,11 +1974,11 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				guiNote.setRotation(note.getRotation());
 				guiNotes.add(guiNote);
 			}
+			
 			return guiNotes;
 		} catch (PersistenceException e) {
 			return throwServerException(session, log, e);
 		}
-
 	}
 
 	@Override
@@ -1964,9 +1996,16 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			/*
 			 * Check for deletions
 			 */
-			List<DocumentNote> documentNotes = dao.findByDocIdAndTypes(document.getId(),
+
+			// Get all the notes
+			List<DocumentNote> documentNotes = dao.findByDocIdAndTypes(document.getId(), User.USERID_ADMIN,
 					fileVersion != null ? fileVersion : document.getFileVersion(), types);
-			List<Long> actualNoteIds = documentNotes.stream().map(PersistentObject::getId).toList();
+
+			// Maintain just those notes created by current user or all notes in
+			// case of admistrator
+			List<Long> actualNoteIds = documentNotes.stream()
+					.filter(note -> session.getUser().isAdmin() || note.getUserId() == session.getUserId())
+					.map(PersistentObject::getId).toList();
 			List<Long> noteIds = notes.stream().map(GUIDocumentNote::getId).toList();
 			for (Long actualNoteId : actualNoteIds)
 				if (!noteIds.contains(actualNoteId))
@@ -1980,21 +2019,14 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		} catch (UnexistingResourceException | PersistenceException e) {
 			throwServerException(session, log, e);
 		}
-
 	}
 
-	private void saveNote(Session session, Document document, GUIDocumentNote guiNote)
+	private GUIDocumentNote saveNote(Session session, Document document, GUIDocumentNote guiNote)
 			throws ServerException, PersistenceException {
 
 		DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
 
-		DocumentNote note = null;
-		try {
-			note = dao.findById(guiNote.getId());
-		} catch (PersistenceException e) {
-			// Unexisting note
-		}
-
+		DocumentNote note = dao.findById(guiNote.getId());
 		if (note == null) {
 			note = new DocumentNote();
 			note.setTenantId(session.getTenantId());
@@ -2005,6 +2037,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			note.setUsername(session.getUser().getFullName());
 			note.setDate(new Date());
 			note.setPage(guiNote.getPage());
+		} else {
+			dao.initialize(note);
 		}
 
 		note.setFileName(document.getFileName());
@@ -2022,6 +2056,15 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		note.setLineOpacity(guiNote.getLineOpacity());
 		note.setLineWidth(guiNote.getLineWidth());
 		note.setRotation(guiNote.getRotation());
+
+		note.getAccessControlList().clear();
+		for (GUIAccessControlEntry guiAce : guiNote.getAccessControlList()) {
+			AccessControlEntry ace = new AccessControlEntry();
+			ace.setGroupId(guiAce.getEntityId());
+			ace.setRead(guiAce.isRead() ? 1 : 0);
+			ace.setWrite(guiAce.isWrite() ? 1 : 0);
+			note.getAccessControlList().add(ace);
+		}
 
 		saveNote(note, session);
 
@@ -2047,6 +2090,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				saveContact(contact);
 			}
 		}
+
+		return getNote(note.getId());
 	}
 
 	private void saveNote(DocumentNote note, Session session) throws ServerException {
@@ -2185,40 +2230,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	protected static void checkPublished(User user, Document doc) throws PermissionException {
 		if (!user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher") && !doc.isPublishing())
 			throw new PermissionException("Document not published");
-	}
-
-	@Override
-	public void updateNote(long docId, long noteId, String fileVersion, String message) throws ServerException {
-		Session session = validateSession();
-
-		try {
-			DocumentDAO docDao = Context.get(DocumentDAO.class);
-			Document document = docDao.findDocument(docId);
-			if (document == null)
-				throw new ServerException(UNEXISTING_DOCUMENT + " " + docId);
-
-			DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
-			DocumentNote note = dao.findById(noteId);
-			if (note == null) {
-				note = new DocumentNote();
-				note.setTenantId(session.getTenantId());
-				note.setDocId(document.getId());
-				note.setUserId(session.getUserId());
-				note.setUsername(session.getUser().getFullName());
-				note.setColor(null);
-			}
-
-			note.setFileName(document.getFileName());
-			note.setFileVersion(StringUtils.defaultIfEmpty(fileVersion, document.getFileVersion()));
-			note.setMessage(message);
-			note.setUserId(session.getUser().getId());
-			note.setUsername(session.getUser().getFullName());
-			note.setMessage(message);
-
-			saveNote(note, session);
-		} catch (PersistenceException | ServerException e) {
-			throwServerException(session, log, e);
-		}
 	}
 
 	@Override

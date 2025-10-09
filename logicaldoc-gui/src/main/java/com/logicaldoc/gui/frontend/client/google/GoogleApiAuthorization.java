@@ -92,7 +92,7 @@ public class GoogleApiAuthorization extends Window {
 	protected void onDraw() {
 		GoogleService.Instance.get().loadSettings(name, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<String> settings) {
+			public void handleSuccess(List<String> settings) {
 				clientId.setValue(settings.get(0));
 				clientSecret.setValue(settings.get(1));
 			}
@@ -103,7 +103,7 @@ public class GoogleApiAuthorization extends Window {
 		GoogleService.Instance.get().saveSettings(name, form.getValueAsString(CONSTSNT_B),
 				form.getValueAsString(CONSTANT_A), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(String consentUrl) {
+					public void handleSuccess(String consentUrl) {
 						WindowUtils.openUrl(consentUrl, "_blank", null);
 						hide();
 					}

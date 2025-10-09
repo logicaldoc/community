@@ -335,7 +335,7 @@ public class CalendarEventDialog extends Window {
 		required.setType(ListGridFieldType.BOOLEAN);
 		required.setAutoFitWidth(true);
 		required.setAutoFitWidthApproach(AutoFitWidthApproach.BOTH);
-		
+
 		UserListGridField avatar = new UserListGridField();
 
 		attendeesGrid = new ListGrid();
@@ -503,7 +503,7 @@ public class CalendarEventDialog extends Window {
 
 			DocumentService.Instance.get().getById(id, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIDocument doc) {
+				public void handleSuccess(GUIDocument doc) {
 					new PreviewPopup(doc).show();
 				}
 			});
@@ -801,8 +801,7 @@ public class CalendarEventDialog extends Window {
 			LD.contactingServer();
 			CalendarService.Instance.get().saveEvent(calendarEvent, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void arg) {
-					LD.clearPrompt();
+				public void handleSuccess(Void arg) {
 					destroy();
 					if (onChangedCallback != null)
 						onChangedCallback.onSuccess(arg);
@@ -903,8 +902,7 @@ public class CalendarEventDialog extends Window {
 			LD.contactingServer();
 			CalendarService.Instance.get().deleteEvent(id, Boolean.TRUE.equals(answer), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void arg) {
-					LD.clearPrompt();
+				public void handleSuccess(Void arg) {
 					destroy();
 					if (onChangedCallback != null)
 						onChangedCallback.onSuccess(arg);

@@ -889,42 +889,48 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 
 	@Test
 	public void testDeleteNotes() throws ServerException, PersistenceException {
-		List<DocumentNote> notes = noteDao.findByDocId(1L, "1.0");
+		List<DocumentNote> notes = noteDao.findByDocId(1L, User.USERID_ADMIN, "1.0");
 		assertNotNull(notes);
 		assertEquals(2, notes.size());
 		assertEquals("message for note 1", notes.get(0).getMessage());
 
 		testSubject.deleteNotes(List.of(notes.get(0).getId()));
 
-		notes = noteDao.findByDocId(1L, "1.0");
+		notes = noteDao.findByDocId(1L, User.USERID_ADMIN, "1.0");
 		assertNotNull(notes);
 		assertEquals(1, notes.size());
 	}
 
 	@Test
-	public void testAddNote() throws ServerException, PersistenceException {
-		List<DocumentNote> notes = noteDao.findByDocId(1L, "1.0");
+	public void testSaveNote() throws ServerException, PersistenceException {
+		List<DocumentNote> notes = noteDao.findByDocId(1L, User.USERID_ADMIN, "1.0");
 		assertNotNull(notes);
 		assertEquals(2, notes.size());
 
-		long noteId = testSubject.addNote(1L, "pippo");
+		GUIDocumentNote guiNote = new GUIDocumentNote();
+		guiNote.setDocId(1L);
+		guiNote.setMessage("pippo");
 
-		DocumentNote note = noteDao.findById(noteId);
+		guiNote = testSubject.saveNote(guiNote);
+
+		DocumentNote note = noteDao.findById(guiNote.getId());
 		assertNotNull(note);
 		assertEquals("pippo", note.getMessage());
 
-		notes = noteDao.findByDocId(1L, "1.0");
+		notes = noteDao.findByDocId(1L, User.USERID_ADMIN, "1.0");
 		assertNotNull(notes);
 		assertEquals(2, notes.size());
 
-		boolean exceptionHappened = false;
 		try {
 			// add note to a non existent doc
-			testSubject.addNote(21L, "Midnight Rain");
-		} catch (ServerException e) {
-			exceptionHappened = true;
+			guiNote = new GUIDocumentNote();
+			guiNote.setDocId(21L);
+			guiNote.setMessage("Midnight Rain");
+			testSubject.saveNote(guiNote);
+			fail("No exception in case of unexisting document?");
+		} catch (Exception e) {
+			// All ok
 		}
-		assertTrue(exceptionHappened);
 	}
 
 	@Test
@@ -1229,7 +1235,10 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 		assertEquals(1, notes.size());
 		assertEquals("message for note 3", notes.get(0).getMessage());
 
-		testSubject.updateNote(4, notes.get(0).getId(), null, "updated message");
+		GUIDocumentNote guiNote = notes.getFirst();
+		guiNote.setMessage("updated message");
+		testSubject.saveNote(guiNote);
+		
 		List<GUIDocumentNote> notes2 = testSubject.getNotes(4, null, null);
 		assertEquals(1, notes2.size());
 		assertEquals(notes.get(0).getId(), notes2.get(0).getId());

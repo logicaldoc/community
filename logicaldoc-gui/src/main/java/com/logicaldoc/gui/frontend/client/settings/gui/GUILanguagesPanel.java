@@ -70,7 +70,7 @@ public class GUILanguagesPanel extends VLayout {
 		enable.addClickHandler(click -> SystemService.Instance.get()
 				.setGUILanguageStatus(rec.getAttributeAsString("code"), true, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(EENABLED, true);
 						list.refreshRow(list.getRecordIndex(rec));
 						GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
@@ -82,7 +82,7 @@ public class GUILanguagesPanel extends VLayout {
 		disable.addClickHandler(click -> SystemService.Instance.get()
 				.setGUILanguageStatus(rec.getAttributeAsString("code"), false, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(EENABLED, false);
 						list.refreshRow(list.getRecordIndex(rec));
 						GuiLog.info(I18N.message("settingsaffectnewsessions"), null);

@@ -154,7 +154,7 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 			if (Boolean.TRUE.equals(answer)) {
 				AuditService.Instance.get().deleteSubscriptions(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 					}
@@ -177,7 +177,7 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 			else {
 				DocumentService.Instance.get().getById(Long.parseLong(id), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIDocument result) {
+					public void handleSuccess(GUIDocument result) {
 						DocumentsPanel.get().openInFolder(result.getFolder().getId(), result.getId());
 					}
 				});

@@ -75,7 +75,7 @@ public class ProtocolsPanel extends AdminPanel {
 	protected void onDraw() {
 		SettingService.Instance.get().loadProtocolSettings(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIParameter> settings) {
+			public void handleSuccess(List<GUIParameter> settings) {
 				init(settings);
 			}
 		});
@@ -309,7 +309,7 @@ public class ProtocolsPanel extends AdminPanel {
 
 		SettingService.Instance.get().saveSettings(params, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void ret) {
+			public void handleSuccess(Void ret) {
 				GuiLog.info(I18N.message("settingssaved"), null);
 				GuiLog.info(I18N.message("needrestart"), null);
 			}

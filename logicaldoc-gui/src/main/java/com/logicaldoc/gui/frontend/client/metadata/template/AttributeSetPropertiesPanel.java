@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIAttributeSet;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -647,7 +647,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 		MenuItem applyAllToTemplates = prepareApplyAllToTemplatesContextMenuItem();
 
-		contextMenu.setItems(applyInitializationToTemplates, applyValidationToTemplates, applyAllToTemplates, new MenuItemSeparator(), delete);
+		contextMenu.setItems(applyInitializationToTemplates, applyValidationToTemplates, applyAllToTemplates,
+				new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 
@@ -661,12 +662,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 				if (Boolean.TRUE.equals(yes)) {
 					LD.contactingServer();
 					AttributeSetService.Instance.get().applyAllToTemplates(attributeSet.getId(),
-							selection.getAttributeAsString("name"), new DefaultAsyncCallback<>() {
-								@Override
-								public void onSuccess(Void arg0) {
-									LD.clearPrompt();
-								}
-							});
+							selection.getAttributeAsString("name"), new EmptyAsyncCallback<>());
 				}
 			});
 		});
@@ -685,12 +681,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 						if (Boolean.TRUE.equals(yes)) {
 							LD.contactingServer();
 							AttributeSetService.Instance.get().applyInitializationToTemplates(attributeSet.getId(),
-									selection.getAttributeAsString("name"), new DefaultAsyncCallback<>() {
-										@Override
-										public void onSuccess(Void arg0) {
-											LD.clearPrompt();
-										}
-									});
+									selection.getAttributeAsString("name"), new EmptyAsyncCallback<>());
 						}
 					});
 		});
@@ -709,12 +700,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 						if (Boolean.TRUE.equals(confirm)) {
 							LD.contactingServer();
 							AttributeSetService.Instance.get().applyValidationToTemplates(attributeSet.getId(),
-									selection.getAttributeAsString("name"), new DefaultAsyncCallback<>() {
-										@Override
-										public void onSuccess(Void arg0) {
-											LD.clearPrompt();
-										}
-									});
+									selection.getAttributeAsString("name"), new EmptyAsyncCallback<>());
 						}
 					});
 		});
@@ -805,7 +791,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		attributeSettingsForm1.markForRedraw();
 		attributeSettingsForm2.markForRedraw();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

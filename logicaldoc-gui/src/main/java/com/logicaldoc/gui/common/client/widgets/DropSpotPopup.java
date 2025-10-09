@@ -59,9 +59,8 @@ public class DropSpotPopup extends Window {
 		DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onSuccess(Void result) {
-				DropSpotPopup dropSpot = new DropSpotPopup();
-				dropSpot.show();
+			public void handleSuccess(Void result) {
+				new DropSpotPopup().show();
 			}
 		});
 	}

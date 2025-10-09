@@ -60,7 +60,7 @@ public class StampUploader extends Window {
 
 		addCloseClickHandler(event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void result) {
+			public void handleSuccess(Void result) {
 				destroy();
 			}
 		}));
@@ -76,7 +76,7 @@ public class StampUploader extends Window {
 
 		StampService.Instance.get().saveImage(stampId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg) {
+			public void handleSuccess(Void arg) {
 				panel.refreshStampImage();
 				close();
 			}

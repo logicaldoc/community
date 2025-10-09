@@ -127,7 +127,7 @@ public class DriveEditor extends Window {
 		cancel.addClickHandler(event -> DocumentService.Instance.get()
 				.unlock(Arrays.asList(DriveEditor.this.document.getId()), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						DocUtil.markUnlocked(document);
 						DocumentController.get().setCurrentDocument(document);
 						LD.contactingServer();
@@ -140,8 +140,7 @@ public class DriveEditor extends Window {
 									}
 
 									@Override
-									public void onSuccess(Void result) {
-										LD.clearPrompt();
+									public void handleSuccess(Void result) {
 										destroy();
 									}
 								});
@@ -174,8 +173,7 @@ public class DriveEditor extends Window {
 											}
 
 											@Override
-											public void onSuccess(Void ret) {
-												LD.clearPrompt();
+											public void handleSuccess(Void ret) {
 												destroy();
 											}
 										});

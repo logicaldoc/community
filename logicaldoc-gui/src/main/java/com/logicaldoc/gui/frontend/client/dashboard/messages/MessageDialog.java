@@ -136,7 +136,7 @@ public class MessageDialog extends Window {
 					}
 
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						EventPanel.get().info(I18N.message("messagesent"), null);
 						destroy();
 					}
@@ -213,7 +213,7 @@ public class MessageDialog extends Window {
 			SecurityService.Instance.get().searchUsers(null, groupId, new DefaultAsyncCallback<>() {
 
 				@Override
-				public void onSuccess(List<GUIUser> users) {
+				public void handleSuccess(List<GUIUser> users) {
 					if (users.isEmpty())
 						return;
 

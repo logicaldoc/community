@@ -135,7 +135,7 @@ public class ContextMenu extends Menu {
 			FolderService.Instance.get().getFolder(firstSelectedFolder.getId(), false, false, false,
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIFolder selectedFolder) {
+						public void handleSuccess(GUIFolder selectedFolder) {
 							delete.setEnabled(!selectedFolder.isDefaultWorkspace());
 							move.setEnabled(!selectedFolder.isDefaultWorkspace());
 							rename.setEnabled(!selectedFolder.isDefaultWorkspace());
@@ -174,7 +174,7 @@ public class ContextMenu extends Menu {
 		 */
 		SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIMenu action) {
+			public void handleSuccess(GUIMenu action) {
 				Session.get().getUser().updateCustomAction(action);
 
 				if ((action.getRoutineId() == null || action.getRoutineId().longValue() == 0L)
@@ -189,7 +189,7 @@ public class ContextMenu extends Menu {
 				} else if (action.getRoutineId() != null && action.getRoutineId().longValue() != 0L) {
 					AutomationService.Instance.get().getRoutine(action.getRoutineId(), new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIAutomationRoutine routine) {
+						public void handleSuccess(GUIAutomationRoutine routine) {
 							if (routine.getTemplateId() != null && routine.getTemplateId().longValue() != 0L) {
 								/*
 								 * A routine with parameters is referenced, so
@@ -213,7 +213,7 @@ public class ContextMenu extends Menu {
 	private void executeRoutine(List<Long> folderIds, List<Long> docIds, GUIAutomationRoutine routine) {
 		AutomationService.Instance.get().execute(routine, docIds, folderIds, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg0) {
+			public void handleSuccess(Void arg0) {
 				// Nothing to do
 			}
 		});
@@ -361,7 +361,7 @@ public class ContextMenu extends Menu {
 		DocumentService.Instance.get().countDocuments(selectedIds, Constants.DOC_ARCHIVED,
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Long count) {
+					public void handleSuccess(Long count) {
 						LD.clearPrompt();
 						final String folderMessage = selectedIds.size() == 1 ? "confirmdeletefolder"
 								: "confirmdeletefolders";
@@ -394,7 +394,7 @@ public class ContextMenu extends Menu {
 			}
 
 			@Override
-			public void onSuccess(Void result) {
+			public void handleSuccess(Void result) {
 				LD.clearPrompt();
 
 				for (long id : selectedIds) {
@@ -432,7 +432,7 @@ public class ContextMenu extends Menu {
 							com.logicaldoc.gui.frontend.client.folder.browser.FolderTree.FOLDER_ID));
 					FolderService.Instance.get().rename(folderId, val, new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void v) {
+						public void handleSuccess(Void v) {
 							selectedNode.setAttribute("name", val);
 							tree.refreshRow(getRecordIndex(selectedNode));
 						}
@@ -477,7 +477,7 @@ public class ContextMenu extends Menu {
 						Boolean.TRUE.equals(values.get("copynotes")), Boolean.TRUE.equals(values.get("copysecurity")),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void result) {
+							public void handleSuccess(Void result) {
 								DocumentsPanel.get().onFolderSelected(FolderController.get().getCurrentFolder());
 								Clipboard.getInstance().clear();
 							}
@@ -505,7 +505,7 @@ public class ContextMenu extends Menu {
 	private void pasteAsAlias(final long folderId, final List<Long> docIds, String type) {
 		FolderService.Instance.get().pasteAsAlias(docIds, folderId, type, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void result) {
+			public void handleSuccess(Void result) {
 				DocumentsPanel.get().onFolderSelected(FolderController.get().getCurrentFolder());
 				Clipboard.getInstance().clear();
 				GuiLog.debug("Paste as Alias operation completed.");
@@ -519,7 +519,7 @@ public class ContextMenu extends Menu {
 	private void onAddBookmark(List<Long> selection) {
 		DocumentService.Instance.get().addBookmarks(selection, 1, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void v) {
+			public void handleSuccess(Void v) {
 				// Nothing to do
 			}
 		});
@@ -535,7 +535,7 @@ public class ContextMenu extends Menu {
 			else
 				DocumentService.Instance.get().archiveFolder(folderId, value, new DefaultAsyncCallback<Long>() {
 					@Override
-					public void onSuccess(Long result) {
+					public void handleSuccess(Long result) {
 						GuiLog.info(I18N.message("documentswerearchived", "" + result), null);
 						tree.reload();
 					}

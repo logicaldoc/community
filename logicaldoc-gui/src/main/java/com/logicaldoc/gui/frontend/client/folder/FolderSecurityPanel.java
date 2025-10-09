@@ -234,7 +234,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		FolderService.Instance.get().getFolder(folder.getSecurityRef().getId(), true, false, false,
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(final GUIFolder refFolder) {
+					public void handleSuccess(final GUIFolder refFolder) {
 						inheritInfoPanel = new HLayout();
 						inheritInfoPanel.setMembersMargin(5);
 						inheritInfoPanel.setStyleName("warn");
@@ -377,7 +377,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		inheritFromParent.addClickHandler((ClickEvent event) -> FolderService.Instance.get()
 				.getFolder(folder.getParentId(), false, false, false, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIFolder parent) {
+					public void handleSuccess(GUIFolder parent) {
 						LD.ask(I18N.message("inheritrights"),
 								I18N.message("inheritrightsask", folder.getName(), parent.getName()),
 								(Boolean interitConfirmed) -> {
@@ -385,7 +385,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 										FolderService.Instance.get().inheritACL(folder.getId(), folder.getParentId(),
 												new DefaultAsyncCallback<>() {
 													@Override
-													public void onSuccess(GUIFolder arg) {
+													public void handleSuccess(GUIFolder arg) {
 														FolderSecurityPanel.this.refresh(arg);
 													}
 												});
@@ -608,7 +608,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 		FolderService.Instance.get().saveACL(folder, recursive, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void result) {
+			public void handleSuccess(Void result) {
 				if (!recursive)
 					GuiLog.info(I18N.message("appliedrights"), null);
 				else

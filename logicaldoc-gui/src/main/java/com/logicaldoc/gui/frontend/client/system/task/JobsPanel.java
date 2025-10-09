@@ -124,8 +124,7 @@ public class JobsPanel extends VLayout {
 
 						SystemService.Instance.get().unscheduleJobs(selectedJobs, new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void result) {
-								LD.clearPrompt();
+							public void handleSuccess(Void result) {
 								refresh();
 							}
 						});

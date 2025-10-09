@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -43,7 +44,7 @@ public class ImportFolderSettings extends Window {
 		SettingService.Instance.get().loadSettingsByNames(Arrays.asList(THREADS_SETTING), new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onSuccess(List<GUIParameter> params) {
+			public void handleSuccess(List<GUIParameter> params) {
 				init(params);
 			}
 		});
@@ -76,7 +77,7 @@ public class ImportFolderSettings extends Window {
 
 		List<GUIParameter> params = new ArrayList<>();
 		params.add(new GUIParameter(THREADS_SETTING, form.getValueAsString("threads")));
-		SettingService.Instance.get().saveSettings(params, new DefaultAsyncCallback<>());
+		SettingService.Instance.get().saveSettings(params, new EmptyAsyncCallback<>());
 
 		destroy();
 	}

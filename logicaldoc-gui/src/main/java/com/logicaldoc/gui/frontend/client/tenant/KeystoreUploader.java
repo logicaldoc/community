@@ -110,7 +110,7 @@ public class KeystoreUploader extends Window {
 
 		SignService.Instance.get().imporKeystore(keystore, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg) {
+			public void handleSuccess(Void arg) {
 				keystorePanel.initGUI();
 
 				// Cleanup the upload folder

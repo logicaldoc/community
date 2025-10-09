@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
-import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.beans.GUIWorkingTime;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -85,7 +85,7 @@ public class WorkingTimePanel extends VLayout {
 						public void execute(Map<String, Object> values) {
 							LD.contactingServer();
 							SecurityService.Instance.get().cloneWorkTimes(user.getId(), usersSelector.getUserIds(),
-									groupsSelector.getGroupIds(), new DefaultAsyncCallback<>() {
+									groupsSelector.getGroupIds(), new EmptyAsyncCallback<>() {
 										@Override
 										public void onSuccess(Void arg0) {
 											LD.clearPrompt();
@@ -168,7 +168,7 @@ public class WorkingTimePanel extends VLayout {
 
 		return true;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

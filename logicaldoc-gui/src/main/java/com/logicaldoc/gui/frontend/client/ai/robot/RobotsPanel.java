@@ -132,7 +132,7 @@ public class RobotsPanel extends AdminPanel {
 			if (rec != null)
 				RobotService.Instance.get().get(rec.getAttributeAsLong(ID), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIRobot robot) {
+					public void handleSuccess(GUIRobot robot) {
 						showRobotDetails(robot);
 					}
 				});
@@ -170,7 +170,7 @@ public class RobotsPanel extends AdminPanel {
 			if (Boolean.TRUE.equals(confirm)) {
 				RobotService.Instance.get().delete(ids, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						showRobotDetails(null);
@@ -184,7 +184,7 @@ public class RobotsPanel extends AdminPanel {
 		enable.addClickHandler(
 				event -> RobotService.Instance.get().enable(selectedRobotId, true, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.getSelectedRecord().setAttribute(ENABLED, true);
 						list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
 					}
@@ -196,7 +196,7 @@ public class RobotsPanel extends AdminPanel {
 		disable.addClickHandler(
 				event -> RobotService.Instance.get().enable(selectedRobotId, false, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.getSelectedRecord().setAttribute(ENABLED, false);
 						list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
 					}
@@ -207,7 +207,7 @@ public class RobotsPanel extends AdminPanel {
 		ask.setTitle(I18N.message("ask"));
 		ask.addClickHandler(event -> RobotService.Instance.get().get(selectedRobotId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIRobot robot) {
+			public void handleSuccess(GUIRobot robot) {
 				LD.askForStringMandatory("question", null, null, question -> RobotThread.get(robot).open(question));
 			}
 		}));
@@ -219,7 +219,7 @@ public class RobotsPanel extends AdminPanel {
 				selection[0].getAttributeAsString("name") + "Cloned",
 				value -> RobotService.Instance.get().clone(selectedRobotId, value, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIRobot rbt) {
+					public void handleSuccess(GUIRobot rbt) {
 						refresh();
 					}
 				})));

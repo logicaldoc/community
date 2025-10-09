@@ -1,7 +1,9 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Representation of a single document handled by the GUI
@@ -69,8 +71,33 @@ public class GUIDocumentNote implements Serializable {
 	private double rotation = 0.0;
 
 	private boolean showKnobs = false;
-	
+
 	private boolean movedOrResized = false;
+
+	private List<GUIAccessControlEntry> accessControlList = new ArrayList<>();
+
+	public GUIDocumentNote(long id, GUIDocument doc) {
+		super();
+		this.id = id;
+		this.docId = doc.getId();
+		this.fileVersion = doc.getFileVersion();
+		this.fileName = doc.getFileName();
+	}
+
+	public GUIDocumentNote(long id, String fileVersion) {
+		super();
+		this.id = id;
+		this.fileVersion = fileVersion;
+	}
+
+	public GUIDocumentNote(long id) {
+		super();
+		this.id = id;
+	}
+
+	public GUIDocumentNote() {
+		super();
+	}
 
 	public long getId() {
 		return id;
@@ -251,7 +278,15 @@ public class GUIDocumentNote implements Serializable {
 	public boolean isSquareShape() {
 		return getShape() == null || getShape().isEmpty() || "square".equals(getShape());
 	}
-	
+
+	public List<GUIAccessControlEntry> getAccessControlList() {
+		return accessControlList;
+	}
+
+	public void setAccessControlList(List<GUIAccessControlEntry> accessControlList) {
+		this.accessControlList = accessControlList;
+	}
+
 	@Override
 	public int hashCode() {
 		return Long.valueOf(id).hashCode();
@@ -260,11 +295,11 @@ public class GUIDocumentNote implements Serializable {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null)
-		    return false;
+			return false;
 
-		  if (this.getClass() != obj.getClass())
-		    return false;
-		  
+		if (this.getClass() != obj.getClass())
+			return false;
+
 		GUIDocumentNote other = (GUIDocumentNote) obj;
 		return id == other.id;
 	}

@@ -124,7 +124,7 @@ public class LogPanel extends VLayout {
 				SystemService.Instance.get().removeLogger(loggerSelector.getValueAsString(),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void arg0) {
+							public void handleSuccess(Void arg0) {
 								loggerSelector.setValue("root");
 								loggerSelector.selectValue();
 							}
@@ -143,7 +143,7 @@ public class LogPanel extends VLayout {
 			SystemService.Instance.get().saveLogger(name, levelSelector.getValueAsString(), additivity,
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void arg0) {
+						public void handleSuccess(Void arg0) {
 							loggerSelector.setOptionDataSource(new LoggersDS());
 							loggerSelector.setValue(name);
 							loggerSelector.selectValue();

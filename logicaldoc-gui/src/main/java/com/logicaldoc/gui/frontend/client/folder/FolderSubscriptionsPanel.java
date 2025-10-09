@@ -112,7 +112,7 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 			AuditService.Instance.get().subscribeFolder(folder.getId(), false, Constants.getAuditDefaultEvents(), null,
 					groupId, new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void arg0) {
+						public void handleSuccess(Void arg0) {
 							refreshList();
 						}
 					});
@@ -130,7 +130,7 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 			AuditService.Instance.get().subscribeFolder(folder.getId(), false, Constants.getAuditDefaultEvents(),
 					userId, null, new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void arg0) {
+						public void handleSuccess(Void arg0) {
 							refreshList();
 						}
 					});
@@ -152,7 +152,7 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 			if (Boolean.TRUE.equals(answer)) {
 				AuditService.Instance.get().deleteSubscriptions(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 					}

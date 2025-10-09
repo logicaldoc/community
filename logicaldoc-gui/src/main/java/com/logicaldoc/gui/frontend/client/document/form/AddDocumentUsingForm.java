@@ -72,7 +72,7 @@ public class AddDocumentUsingForm extends Window {
 
 		TemplateService.Instance.get().getTemplate(frm.getTemplateId(), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUITemplate guiTemplate) {
+			public void handleSuccess(GUITemplate guiTemplate) {
 				frm.setTemplate(guiTemplate.getName());
 				frm.setAttributes(guiTemplate.getAttributes());
 				FillForm fillForm = new FillForm(frm);

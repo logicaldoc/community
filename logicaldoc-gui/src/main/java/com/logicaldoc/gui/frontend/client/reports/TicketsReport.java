@@ -165,7 +165,7 @@ public class TicketsReport extends ReportPanel {
 			long id = Long.parseLong(rec.getAttribute(DOC_ID));
 			DocumentService.Instance.get().getById(id, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIDocument doc) {
+				public void handleSuccess(GUIDocument doc) {
 					new PreviewPopup(doc).show();
 				}
 			});
@@ -200,7 +200,7 @@ public class TicketsReport extends ReportPanel {
 		enable.addClickHandler(event -> DocumentService.Instance.get().enableTicket(rec.getAttributeAsLong("id"),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, true);
 						rec.setAttribute(VALID, true);
 						list.refreshRow(list.getRecordIndex(rec));
@@ -213,7 +213,7 @@ public class TicketsReport extends ReportPanel {
 		disable.addClickHandler(event -> DocumentService.Instance.get().disableTicket(rec.getAttributeAsLong("id"),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, false);
 						rec.setAttribute(VALID, false);
 						list.refreshRow(list.getRecordIndex(rec));
@@ -226,7 +226,7 @@ public class TicketsReport extends ReportPanel {
 			if (Boolean.TRUE.equals(choice))
 				DocumentService.Instance.get().deleteTicket(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 					}
@@ -240,7 +240,7 @@ public class TicketsReport extends ReportPanel {
 					DocumentService.Instance.get().setTicketPassword(rec.getAttributeAsLong("id"), psw,
 							new DefaultAsyncCallback<>() {
 								@Override
-								public void onSuccess(List<String> result) {
+								public void handleSuccess(List<String> result) {
 									if (result.isEmpty())  {
 										list.getSelectedRecord().setAttribute("password", true);
 										list.invalidateRecordComponents();
@@ -259,7 +259,7 @@ public class TicketsReport extends ReportPanel {
 		unsetPassword.addClickHandler(click -> DocumentService.Instance.get()
 				.setTicketPassword(rec.getAttributeAsLong("id"), null, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(List<String> result) {
+					public void handleSuccess(List<String> result) {
 						list.getSelectedRecord().setAttribute("password", false);
 						list.invalidateRecordComponents();
 						list.refreshRecordComponent(list.getRecordIndex(list.getSelectedRecord()));

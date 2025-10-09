@@ -181,7 +181,7 @@ public class ModelsPanel extends VLayout {
 			if (rec != null)
 				AIService.Instance.get().getModel(rec.getAttributeAsLong(ID), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIModel model) {
+					public void handleSuccess(GUIModel model) {
 						showModelDetails(model);
 					}
 				});
@@ -229,7 +229,7 @@ public class ModelsPanel extends VLayout {
 			if (Boolean.TRUE.equals(confirm)) {
 				AIService.Instance.get().deleteModels(ids, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						showModelDetails(null);
@@ -244,7 +244,7 @@ public class ModelsPanel extends VLayout {
 			if (Boolean.TRUE.equals(confirm)) {
 				AIService.Instance.get().trainModel(ids.get(0), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						// Nothing to do
 					}
 				});
@@ -258,7 +258,7 @@ public class ModelsPanel extends VLayout {
 			if (Boolean.TRUE.equals(confirm)) {
 				AIService.Instance.get().evaluateModel(ids.get(0), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						// Nothing to do
 					}
 				});
@@ -273,7 +273,7 @@ public class ModelsPanel extends VLayout {
 		query.setTitle(I18N.message("querymodel"));
 		query.addClickHandler(event -> AIService.Instance.get().getModel(selectedModelId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIModel mdl) {
+			public void handleSuccess(GUIModel mdl) {
 				new QueryDialog(mdl).show();
 			}
 		}));
@@ -286,7 +286,7 @@ public class ModelsPanel extends VLayout {
 				selection[0].getAttributeAsString("name") + "Cloned",
 				value -> AIService.Instance.get().cloneModel(selectedModelId, value, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIModel mdl) {
+					public void handleSuccess(GUIModel mdl) {
 						refresh();
 					}
 				})));
@@ -381,7 +381,7 @@ public class ModelsPanel extends VLayout {
 	private void loadModels() {
 		AIService.Instance.get().getModels(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIModel> models) {
+			public void handleSuccess(List<GUIModel> models) {
 				for (GUIModel guiModel : models) {
 					updateRecord(guiModel);
 				}

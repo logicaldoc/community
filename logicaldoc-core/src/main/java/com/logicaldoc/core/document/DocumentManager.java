@@ -1267,7 +1267,7 @@ public class DocumentManager {
 	}
 
 	private void copyNotes(Document sourceDocument, Document createdDocument) throws PersistenceException {
-		List<DocumentNote> docNotes = documentNoteDAO.findByDocId(sourceDocument.getId(),
+		List<DocumentNote> docNotes = documentNoteDAO.findByDocId(sourceDocument.getId(), User.USERID_ADMIN,
 				sourceDocument.getFileVersion());
 		docNotes.sort((o1, o2) -> o1.getDate().compareTo(o2.getDate()));
 		for (DocumentNote docNote : docNotes) {

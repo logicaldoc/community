@@ -57,7 +57,7 @@ public class ModelDetailsPanel extends VLayout {
 				AIService.Instance.get().getModel(model.getId(), new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(GUIModel sampler) {
+					public void handleSuccess(GUIModel sampler) {
 						setModel(model);
 					}
 
@@ -198,7 +198,7 @@ public class ModelDetailsPanel extends VLayout {
 		if (validate()) {
 			AIService.Instance.get().saveModel(model, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIModel model) {
+				public void handleSuccess(GUIModel model) {
 					tabSet.hideSave();
 					if (model != null) {
 						modelsPanel.updateRecord(model);

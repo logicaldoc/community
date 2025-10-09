@@ -117,8 +117,7 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 							}
 
 							@Override
-							public void onSuccess(Void ret) {
-								LD.clearPrompt();
+							public void handleSuccess(Void ret) {
 								refresh(document);
 							}
 						});
@@ -136,7 +135,7 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 
 		SignService.Instance.get().isVisualSignatureEnabled(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Boolean enabled) {
+			public void handleSuccess(Boolean enabled) {
 				visualPositioning.setDisabled(!enabled);
 			}
 		});

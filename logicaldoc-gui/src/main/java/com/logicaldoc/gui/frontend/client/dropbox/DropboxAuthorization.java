@@ -65,7 +65,7 @@ public class DropboxAuthorization extends Window {
 	protected void onDraw() {
 		DropboxService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<String> settings) {
+			public void handleSuccess(List<String> settings) {
 				apiKey.setValue(settings.get(0));
 				apiSecret.setValue(settings.get(1));
 			}
@@ -76,11 +76,11 @@ public class DropboxAuthorization extends Window {
 		DropboxService.Instance.get().saveSettings(form.getValueAsString(CONSTANT_B), form.getValueAsString(CONSTANT_A),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void consentUrl) {
+					public void handleSuccess(Void consentUrl) {
 						hide();
 						DropboxService.Instance.get().startAuthorization(new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(String authorizationUrl) {
+							public void handleSuccess(String authorizationUrl) {
 								new DropboxAccessTokenWizard(authorizationUrl).show();
 							}
 						});

@@ -274,7 +274,7 @@ public class VersionsPanel extends DocumentDetailTab {
 						DocumentService.Instance.get().deleteVersions(GridUtil.getIds(selection),
 								new DefaultAsyncCallback<>() {
 									@Override
-									public void onSuccess(GUIDocument result) {
+									public void handleSuccess(GUIDocument result) {
 										if (result != null) {
 											document.setVersion(result.getVersion());
 											document.setFileVersion(result.getFileVersion());
@@ -299,8 +299,7 @@ public class VersionsPanel extends DocumentDetailTab {
 						DocumentService.Instance.get().promoteVersion(document.getId(),
 								selection[0].getAttributeAsString(VERSION), new DefaultAsyncCallback<>() {
 									@Override
-									public void onSuccess(GUIDocument document) {
-										LD.clearPrompt();
+									public void handleSuccess(GUIDocument document) {
 										DocumentController.get().checkedIn(document);
 										destroy();
 									}
@@ -317,7 +316,7 @@ public class VersionsPanel extends DocumentDetailTab {
 				Long.parseLong(selection[0].getAttribute("id")), Long.parseLong(selection[1].getAttribute("id")),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(List<GUIVersion> versions) {
+					public void handleSuccess(List<GUIVersion> versions) {
 						new ComparisonWindow(versions.get(0), versions.get(1)).show();
 					}
 				}));
@@ -331,7 +330,7 @@ public class VersionsPanel extends DocumentDetailTab {
 				Long.parseLong(selection[0].getAttribute("id")), Long.parseLong(selection[1].getAttribute("id")),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(List<GUIVersion> result) {
+					public void handleSuccess(List<GUIVersion> result) {
 						new MetadataDiff(result.get(0), result.get(1)).show();
 					}
 				}));
@@ -345,7 +344,7 @@ public class VersionsPanel extends DocumentDetailTab {
 				Long.parseLong(selection[0].getAttribute("id")), Long.parseLong(selection[0].getAttribute("id")),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(List<GUIVersion> result) {
+					public void handleSuccess(List<GUIVersion> result) {
 						new VersionMetadata(result.get(0)).show();
 					}
 				}));

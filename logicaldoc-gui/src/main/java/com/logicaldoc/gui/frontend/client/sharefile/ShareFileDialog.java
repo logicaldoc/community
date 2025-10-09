@@ -95,8 +95,7 @@ public class ShareFileDialog extends Dialog {
 						ShareFileService.Instance.get().exportDocuments(targetId, folderIds, docIds,
 								new DefaultAsyncCallback<>() {
 									@Override
-									public void onSuccess(Boolean result) {
-										LD.clearPrompt();
+									public void handleSuccess(Boolean result) {
 										if (result.booleanValue()) {
 											SC.say(I18N.message("sfileexportok"));
 											ShareFileDialog.this.destroy();
@@ -124,8 +123,7 @@ public class ShareFileDialog extends Dialog {
 				ShareFileService.Instance.get().importDocuments(FolderController.get().getCurrentFolder().getId(), ids,
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Integer count) {
-								LD.clearPrompt();
+							public void handleSuccess(Integer count) {
 								FolderNavigator.get().reload();
 								SC.say(I18N.message("importeddocs2", count.toString()));
 							}

@@ -3,8 +3,8 @@ package com.logicaldoc.gui.frontend.client.metadata.template;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.data.AttributeOptionsDS;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
@@ -92,9 +92,8 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		importCsv.addClickHandler(
 				event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void arg0) {
-						OptionsUploader uploader = new OptionsUploader(Options.this);
-						uploader.show();
+					public void handleSuccess(Void arg0) {
+						new OptionsUploader(Options.this).show();
 					}
 				}));
 
@@ -182,8 +181,7 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		LD.contactingServer();
 		AttributeSetService.Instance.get().saveOptions(setId, attribute, values, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg0) {
-				LD.clearPrompt();
+			public void handleSuccess(Void arg0) {
 				SC.say(I18N.message("optionssaved"));
 			}
 		});
@@ -202,7 +200,7 @@ public class Options extends com.smartgwt.client.widgets.Window {
 
 		AttributeSetService.Instance.get().deleteOptions(setId, attribute, values, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg0) {
+			public void handleSuccess(Void arg0) {
 				list.removeSelectedData();
 				list.deselectAllRecords();
 			}
@@ -236,7 +234,7 @@ public class Options extends com.smartgwt.client.widgets.Window {
 	public long getSetId() {
 		return setId;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

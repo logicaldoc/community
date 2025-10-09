@@ -67,7 +67,7 @@ public class OwnCertificateDialog extends Window {
 				event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						destroy();
 					}
 				}));
@@ -115,14 +115,13 @@ public class OwnCertificateDialog extends Window {
 		SignService.Instance.get().importCertificate(form.getValueAsString(CERTIFICATE + ".crt"),
 				form.getValueAsString(PRIVATEKEY), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void arg0) {
-						LD.clearPrompt();
+					public void handleSuccess(Void arg0) {
 						cleanUploadFolder();
 						SecurityService.Instance.get().getUser(Session.get().getUser().getId(),
 								new DefaultAsyncCallback<>() {
 
 									@Override
-									public void onSuccess(GUIUser user) {
+									public void handleSuccess(GUIUser user) {
 										Session.get().setUser(user);
 										UserController.get().changed(user);
 										destroy();

@@ -296,7 +296,7 @@ public class Session implements DocumentObserver {
 		} else {
 			SecurityService.Instance.get().logout(new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void result) {
+				public void handleSuccess(Void result) {
 					CookiesManager.removeSid();
 
 					try {

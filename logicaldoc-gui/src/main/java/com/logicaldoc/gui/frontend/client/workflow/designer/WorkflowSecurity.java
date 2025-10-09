@@ -288,7 +288,7 @@ public class WorkflowSecurity extends Window {
 		workflow.setAccessControlList(getACL());
 		WorkflowService.Instance.get().saveACL(workflow, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg0) {
+			public void handleSuccess(Void arg0) {
 				destroy();
 			}
 		});

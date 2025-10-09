@@ -18,7 +18,6 @@ import com.logicaldoc.gui.frontend.client.services.LDAPService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.FormItem;
@@ -232,10 +231,10 @@ public class LDAPServerDetailsPanel extends VLayout {
 		defaultGroupsItem.setValueField("id");
 		defaultGroupsItem.setDisplayField("name");
 
-		ldapForm.setItems(url, anon, fakeUsername, hiddenPassword, username, password, pageSize, timeout,
-				language, userType, defaultGroupsItem, syncTtl, keepMembership, userIdentifierAttr, grpIdentifierAttr,
-				userClass, groupClass, usersBaseNode, groupsBaseNode, userInclude, groupInclude, userExclude,
-				groupExclude, logonAttr, realm, validation);
+		ldapForm.setItems(url, anon, fakeUsername, hiddenPassword, username, password, pageSize, timeout, language,
+				userType, defaultGroupsItem, syncTtl, keepMembership, userIdentifierAttr, grpIdentifierAttr, userClass,
+				groupClass, usersBaseNode, groupsBaseNode, userInclude, groupInclude, userExclude, groupExclude,
+				logonAttr, realm, validation);
 
 		ldapTab.setPane(ldapForm);
 
@@ -271,7 +270,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 
 			if (Boolean.FALSE.equals(vm.validate()))
 				return;
-			
+
 			LDAPServerDetailsPanel.this.server.setAnonymous(Boolean.valueOf(vm.getValueAsString("anon")));
 			LDAPServerDetailsPanel.this.server
 					.setKeepLocalMemberships(Boolean.valueOf(vm.getValueAsString(KEEPMEMBERSHIP)));
@@ -309,7 +308,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 
 			LDAPService.Instance.get().save(LDAPServerDetailsPanel.this.server, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUILDAPServer server) {
+				public void handleSuccess(GUILDAPServer server) {
 					LDAPServerDetailsPanel.this.server = server;
 					if (browser instanceof LDAPBrowser)
 						browser.setServer(LDAPServerDetailsPanel.this.server);
@@ -326,8 +325,8 @@ public class LDAPServerDetailsPanel extends VLayout {
 		IButton activedir = new IButton();
 		activedir.setAutoFit(true);
 		activedir.setTitle(I18N.message("activedirectory"));
-		activedir.addClickHandler((ClickEvent event) -> LD.askForValue(I18N.message("activedirectory"),
-				I18N.message("addomain"), "", (String value) -> {
+		activedir.addClickHandler(click -> LD.askForValue(I18N.message("activedirectory"), I18N.message("addomain"), "",
+				(String value) -> {
 					if (value == null)
 						return;
 					String node = value.replace("\\.", ",DC=");
@@ -352,7 +351,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 		test.setAutoFit(true);
 		test.setTitle(I18N.message("testconnection"));
 		test.setDisabled(server.getId() == 0L);
-		test.addClickHandler(event -> {
+		test.addClickHandler(click -> {
 			if (Boolean.FALSE.equals(vm.validate()))
 				return;
 
@@ -385,7 +384,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 
 			LDAPService.Instance.get().testConnection(LDAPServerDetailsPanel.this.server, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Boolean ret) {
+				public void handleSuccess(Boolean ret) {
 					if (Boolean.TRUE.equals(ret))
 						SC.say(I18N.message("connectionestablished"));
 					else

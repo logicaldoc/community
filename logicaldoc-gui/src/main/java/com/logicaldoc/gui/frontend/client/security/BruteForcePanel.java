@@ -86,7 +86,7 @@ public class BruteForcePanel extends AdminPanel {
 						THROTTLE_APIKEY_MAX, THROTTLE_APIKEY_WAIT, THROTTLE_ALERT_RECIPIENTS),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(List<GUIParameter> params) {
+					public void handleSuccess(List<GUIParameter> params) {
 						Map<String, String> p = new HashMap<>();
 						for (GUIParameter par : params)
 							p.put(par.getName(), par.getValue());
@@ -166,7 +166,7 @@ public class BruteForcePanel extends AdminPanel {
 
 		SecurityService.Instance.get().loadBlockedEntities(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUISequence> seqs) {
+			public void handleSuccess(List<GUISequence> seqs) {
 				prepareBlockedEntriesGrid(seqs);
 			}
 		});
@@ -228,7 +228,7 @@ public class BruteForcePanel extends AdminPanel {
 			if (Boolean.TRUE.equals(confirm)) {
 				SecurityService.Instance.get().removeBlockedEntities(ids, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						blockedEntities.removeSelectedData();
 					}
 				});
@@ -264,7 +264,7 @@ public class BruteForcePanel extends AdminPanel {
 
 		SettingService.Instance.get().saveSettings(params, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg) {
+			public void handleSuccess(Void arg) {
 				GuiLog.info(I18N.message("settingssaved"), null);
 			}
 		});

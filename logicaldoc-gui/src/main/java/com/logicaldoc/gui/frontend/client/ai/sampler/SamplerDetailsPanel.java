@@ -39,7 +39,7 @@ public class SamplerDetailsPanel extends VLayout {
 				AIService.Instance.get().getSampler(sampler.getId(), new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(GUISampler sampler) {
+					public void handleSuccess(GUISampler sampler) {
 						setSampler(sampler);
 					}
 
@@ -101,7 +101,7 @@ public class SamplerDetailsPanel extends VLayout {
 		if (validate()) {
 			AIService.Instance.get().saveSampler(sampler, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUISampler sampler) {
+				public void handleSuccess(GUISampler sampler) {
 					tabSet.hideSave();
 					if (sampler != null) {
 						samplersPanel.updateRecord(sampler);

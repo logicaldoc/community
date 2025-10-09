@@ -175,7 +175,7 @@ public class TicketDialog extends Window {
 					}
 
 					@Override
-					public void onSuccess(List<String> ret) {
+					public void handleSuccess(List<String> ret) {
 						if (ret.get(0).contains("passwordweek")) {
 							List<String> errors = new ArrayList<>();
 							for (int i = 1; i<ret.size();i++ )

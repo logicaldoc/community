@@ -57,7 +57,7 @@ public class WorkflowNoteEditor extends Window {
 		WorkflowService.Instance.get().addNote(parentDialog.getWorkflow().getSelectedTask().getId(), null,
 				message.getValue().toString(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Long noteId) {
+					public void handleSuccess(Long noteId) {
 						parentDialog.onNewNote();
 						destroy();
 					}

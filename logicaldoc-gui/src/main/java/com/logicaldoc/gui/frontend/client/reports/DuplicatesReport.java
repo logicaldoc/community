@@ -124,8 +124,7 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 							DocumentService.Instance.get().deDuplicate(folderSelector.getFolderId(),
 									NEWEST.equals(value), new DefaultAsyncCallback<>() {
 										@Override
-										public void onSuccess(Void arg) {
-											LD.clearPrompt();
+										public void handleSuccess(Void arg) {
 											refresh();
 										}
 									});
@@ -261,9 +260,8 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 			long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));
 			DocumentService.Instance.get().getById(id, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIDocument doc) {
-					PreviewPopup iv = new PreviewPopup(doc);
-					iv.show();
+				public void handleSuccess(GUIDocument doc) {
+					new PreviewPopup(doc).show();
 				}
 			});
 		});
@@ -281,7 +279,7 @@ public class DuplicatesReport extends ReportPanel implements FolderChangeListene
 				if (Boolean.TRUE.equals(yes)) {
 					DocumentService.Instance.get().delete(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void result) {
+						public void handleSuccess(Void result) {
 							list.removeSelectedData();
 							DocumentsPanel.get().getDocumentsMenu().refresh("trash");
 						}

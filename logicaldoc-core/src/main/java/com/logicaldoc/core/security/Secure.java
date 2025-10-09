@@ -21,6 +21,15 @@ public interface Secure<T extends AccessControlEntry> extends Serializable {
 	public AccessControlEntry getAccessControlEntry(long groupId);
 
 	/**
+	 * Retrieves the set of entries related to one of the specified groups
+	 * 
+	 * @param groupIds identifiers of groups
+	 * 
+	 * @return The set of matching entries
+	 */
+	public Set<T> getAccessControlEntries(Set<Long> groupIds);
+
+	/**
 	 * Adds a new entry, replacing a previous one with the same groupId.
 	 * 
 	 * @param ace the access control entry to add

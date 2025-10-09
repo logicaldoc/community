@@ -326,7 +326,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 	private void doSaveSettings() {
 		SecurityService.Instance.get().saveSettings(SecuritySettingsPanel.this.settings, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Boolean restartRequired) {
+			public void handleSuccess(Boolean restartRequired) {
 				GuiLog.info(I18N.message("settingssaved"), null);
 
 				if (restartRequired.booleanValue())
@@ -408,17 +408,9 @@ public class SecuritySettingsPanel extends AdminPanel {
 			LD.contactingServer();
 			SecurityService.Instance.get().syncGeolocationDB(licenseKey.getValueAsString(),
 					new DefaultAsyncCallback<>() {
-
 						@Override
-						public void onFailure(Throwable caught) {
-							super.onFailure(caught);
-							LD.clearPrompt();
-						}
-
-						@Override
-						public void onSuccess(String dbVer) {
+						public void handleSuccess(String dbVer) {
 							geoDBversion.setValue(dbVer);
-							LD.clearPrompt();
 						}
 					});
 		});

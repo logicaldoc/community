@@ -257,7 +257,7 @@ public class MailPreviewPanel extends VLayout {
 				doc.getFileVersion(), attachment.getFileName(), new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(GUIDocument doc) {
+					public void handleSuccess(GUIDocument doc) {
 						if (MainPanel.get().isOnDocumentsTab() && FolderController.get().getCurrentFolder() != null)
 							FolderNavigator.get().selectFolder(FolderController.get().getCurrentFolder().getId());
 					}

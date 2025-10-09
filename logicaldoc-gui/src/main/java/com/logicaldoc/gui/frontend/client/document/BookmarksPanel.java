@@ -81,7 +81,7 @@ public class BookmarksPanel extends VLayout {
 			FolderService.Instance.get().getFolder(Long.parseLong(rec.getAttributeAsString("folderId")), false, false,
 					false, new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIFolder folder) {
+						public void handleSuccess(GUIFolder folder) {
 							showContextMenu(folder, rec.getAttributeAsString("type").equals("0"));
 						}
 					});
@@ -126,7 +126,7 @@ public class BookmarksPanel extends VLayout {
 					DocumentService.Instance.get().deleteBookmarks(GridUtil.getIds(selection),
 							new DefaultAsyncCallback<>() {
 								@Override
-								public void onSuccess(Void result) {
+								public void handleSuccess(Void result) {
 									list.removeSelectedData();
 								}
 							});

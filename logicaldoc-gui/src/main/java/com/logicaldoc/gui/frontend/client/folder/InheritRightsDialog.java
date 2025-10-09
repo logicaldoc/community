@@ -67,7 +67,7 @@ public class InheritRightsDialog extends Dialog {
 									}
 
 									@Override
-									public void onSuccess(GUIFolder arg) {
+									public void handleSuccess(GUIFolder arg) {
 										panel.refresh(arg);
 										destroy();
 									}

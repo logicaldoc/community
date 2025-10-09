@@ -5,6 +5,7 @@ import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.data.NotesDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
@@ -90,7 +91,8 @@ public class NotesPanel extends DocumentDetailTab {
 		toolStrip.setWidth100();
 
 		ToolStripButton addNote = new ToolStripButton(I18N.message("addnote"));
-		addNote.addClickHandler(click -> new NoteUpdateDialog(document.getId(), 0L, null, null, this::refresh).show());
+		addNote.addClickHandler(
+				click -> new NoteUpdateDialog(new GUIDocumentNote(document.getId()), this::refresh).show());
 
 		ToolStripButton annotations = new ToolStripButton(I18N.message("annotations"));
 		annotations.addClickHandler(
@@ -132,9 +134,14 @@ public class NotesPanel extends DocumentDetailTab {
 			MenuItem edit = new MenuItem();
 			edit.setTitle(I18N.message("edit"));
 			edit.setEnabled(false);
-			edit.addClickHandler(clickEvent -> new NoteUpdateDialog(document.getId(),
-					notesGrid.getSelectedRecord().getAttributeAsLong("id"), null,
-					notesGrid.getSelectedRecord().getAttribute(MESSAGE), this::refresh).show());
+			edit.addClickHandler(clickEvent -> DocumentService.Instance.get().getNote(
+					notesGrid.getSelectedRecord().getAttributeAsLong("id"),
+					new DefaultAsyncCallback<GUIDocumentNote>() {
+						@Override
+						public void handleSuccess(GUIDocumentNote note) {
+							new NoteUpdateDialog(note, NotesPanel.this::refresh).show();
+						}
+					}));
 
 			MenuItem prnt = new MenuItem();
 			prnt.setTitle(I18N.message("print"));
@@ -173,15 +180,16 @@ public class NotesPanel extends DocumentDetailTab {
 				DocumentService.Instance.get().deleteNotes(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						notesGrid.removeSelectedData();
-						DocumentService.Instance.get().getById(document.getId(), new DefaultAsyncCallback<GUIDocument>() {
+						DocumentService.Instance.get().getById(document.getId(),
+								new DefaultAsyncCallback<GUIDocument>() {
 
-							@Override
-							public void onSuccess(GUIDocument result) {
-								DocumentController.get().modified(result);
-							}
-						});
+									@Override
+									public void handleSuccess(GUIDocument result) {
+										DocumentController.get().modified(result);
+									}
+								});
 					}
 				});
 			}

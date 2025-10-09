@@ -24,7 +24,7 @@ public interface DocumentUtil {
 		DocumentService.Instance.get().getAllowedPermissions(Arrays.asList(Long.parseLong(docId)),
 				new DefaultAsyncCallback<GUIAccessControlEntry>() {
 					@Override
-					public void onSuccess(GUIAccessControlEntry acl) {
+					public void handleSuccess(GUIAccessControlEntry acl) {
 						if (acl.isDownload()) {
 							if (url == null || url.trim().isEmpty())
 								Util.download(Util.downloadURL(Long.parseLong(docId)));

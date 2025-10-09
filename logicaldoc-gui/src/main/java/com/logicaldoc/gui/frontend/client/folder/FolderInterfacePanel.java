@@ -106,8 +106,7 @@ public class FolderInterfacePanel extends FolderDetailTab {
 				}
 
 				@Override
-				public void onSuccess(Void arg0) {
-					LD.clearPrompt();
+				public void handleSuccess(Void arg0) {
 					GuiLog.info(I18N.message("appliedgridonsubfolders"));
 				}
 			});

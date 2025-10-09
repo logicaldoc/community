@@ -54,7 +54,7 @@ public class WebFormPrefilledEmail extends StickyWindow {
 
 		FormService.Instance.get().getById(formId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIForm frm) {
+			public void handleSuccess(GUIForm frm) {
 				extPanel = new ExtendedPropertiesPanel(frm, null, true, false, false);
 				addItem(extPanel);
 
@@ -89,8 +89,7 @@ public class WebFormPrefilledEmail extends StickyWindow {
 					}
 
 					@Override
-					public void onSuccess(Void arg) {
-						LD.clearPrompt();
+					public void handleSuccess(Void arg) {
 						GuiLog.info(I18N.message("messagesent"));
 						destroy();
 					}

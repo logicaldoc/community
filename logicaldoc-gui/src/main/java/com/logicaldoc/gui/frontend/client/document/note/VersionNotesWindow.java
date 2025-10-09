@@ -4,6 +4,7 @@ import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.data.NotesDS;
 import com.logicaldoc.gui.common.client.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.grid.IdListGridField;
@@ -78,7 +79,7 @@ public class VersionNotesWindow extends Window {
 
 		ToolStripButton addNote = new ToolStripButton(I18N.message("addnote"));
 		addNote.addClickHandler(
-				event -> new NoteUpdateDialog(document.getId(), 0L, fileVersion, null, this::refresh).show());
+				event -> new NoteUpdateDialog(new GUIDocumentNote(0L, fileVersion), this::refresh).show());
 
 		if (document.getFolder().isWrite())
 			toolStrip.addButton(addNote);
@@ -117,10 +118,14 @@ public class VersionNotesWindow extends Window {
 			MenuItem edit = new MenuItem();
 			edit.setTitle(I18N.message("edit"));
 			edit.setEnabled(false);
-			edit.addClickHandler(click -> new NoteUpdateDialog(document.getId(),
-					notesGrid.getSelectedRecord().getAttributeAsLong("id"), null,
-					notesGrid.getSelectedRecord().getAttribute(MESSAGE), this::refresh).show());
+			edit.addClickHandler(click -> DocumentService.Instance.get().getNote(notesGrid.getSelectedRecord().getAttributeAsLong("id"), new DefaultAsyncCallback<GUIDocumentNote>() {
 
+				@Override
+				protected void handleSuccess(GUIDocumentNote result) {
+					new NoteUpdateDialog(result, VersionNotesWindow.this::refresh).show();
+				}
+			}));
+			
 			MenuItem prnt = new MenuItem();
 			prnt.setTitle(I18N.message("print"));
 			prnt.addClickHandler(clickEvent -> {
@@ -164,7 +169,7 @@ public class VersionNotesWindow extends Window {
 			if (Boolean.TRUE.equals(confirm)) {
 				DocumentService.Instance.get().deleteNotes(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						notesGrid.removeSelectedData();
 					}
 				});

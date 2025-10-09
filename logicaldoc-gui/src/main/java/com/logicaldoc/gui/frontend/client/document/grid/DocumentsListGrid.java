@@ -197,7 +197,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			final int docRating = Integer.parseInt(ratingImageName.replace(RATING, ""));
 			DocumentService.Instance.get().getRating(id, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIRating rating) {
+				public void handleSuccess(GUIRating rating) {
 					if (rating != null) {
 						RatingDialog dialog = new RatingDialog(docRating, rating);
 						dialog.show();

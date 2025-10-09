@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.metadata;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIRetentionPolicy;
 import com.logicaldoc.gui.common.client.data.RetentionPoliciesDS;
 import com.logicaldoc.gui.common.client.grid.EnabledListGridField;
@@ -151,7 +152,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 				RetentionPoliciesService.Instance.get().getPolicy(Long.parseLong(rec.getAttributeAsString("id")),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(GUIRetentionPolicy policy) {
+							public void handleSuccess(GUIRetentionPolicy policy) {
 								showPolicyDetails(policy);
 							}
 						});
@@ -161,12 +162,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 				.setMessage(I18N.message("showretpolicies", Integer.toString(list.getTotalRows()))));
 
 		list.addDropCompleteHandler(listDropCompleted -> RetentionPoliciesService.Instance.get()
-				.reorder(GridUtil.getIds(list.getRecords()), new DefaultAsyncCallback<>() {
-					@Override
-					public void onSuccess(Void arg) {
-						// Nothing to do
-					}
-				}));
+				.reorder(GridUtil.getIds(list.getRecords()), new EmptyAsyncCallback<>()));
 	}
 
 	private ListGridField prepareActionField() {
@@ -213,7 +209,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 			if (Boolean.TRUE.equals(confirm))
 				RetentionPoliciesService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						showPolicyDetails(null);
@@ -227,7 +223,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		enable.addClickHandler(event -> RetentionPoliciesService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, true);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
@@ -239,7 +235,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		disable.addClickHandler(event -> RetentionPoliciesService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, false);
 						list.refreshRow(list.getRecordIndex(rec));
 					}

@@ -71,7 +71,7 @@ public class FormCreate extends Window {
 
 		FormService.Instance.get().save(vo, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIForm form) {
+			public void handleSuccess(GUIForm form) {
 				grid.refresh();
 				destroy();
 			}

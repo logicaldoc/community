@@ -93,7 +93,7 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 			if (user.getId() != 0) {
 				SecurityService.Instance.get().getUser(user.getId(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIUser user) {
+					public void handleSuccess(GUIUser user) {
 						setUser(user);
 					}
 				});
@@ -363,8 +363,7 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 			LD.contactingServer();
 			SecurityService.Instance.get().saveUser(user, Session.get().getInfo(), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIUser user) {
-					LD.clearPrompt();
+				public void handleSuccess(GUIUser user) {
 					tabSet.hideSave();
 					if (createNew && user.getWelcomeScreen() == -99) {
 						GuiLog.warn(I18N.message(USERNAMEALREADYINUSE), I18N.message(USERNAMEALREADYINUSE));

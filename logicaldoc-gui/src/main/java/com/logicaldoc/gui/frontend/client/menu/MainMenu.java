@@ -149,7 +149,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 					TenantService.Instance.get().changeSessionTenant(tenantId, new DefaultAsyncCallback<>() {
 
 						@Override
-						public void onSuccess(GUITenant tenant) {
+						public void handleSuccess(GUITenant tenant) {
 							Session.get().getInfo().setTenant(tenant);
 							Util.redirectToRoot();
 						}
@@ -228,7 +228,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				// Need to checkout first
 				DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						DocUtil.markCheckedOut(document);
 						WebcontentEditor popup = new WebcontentEditor(document);
 						popup.show();
@@ -269,7 +269,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				// Need to checkout first
 				DocumentService.Instance.get().checkout(Arrays.asList(document.getId()), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						DocUtil.markCheckedOut(document);
 						TextContentEditor popup = new TextContentEditor(document, null);
 						popup.show();
@@ -299,7 +299,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		final MenuItem exportTo = new MenuItem(I18N.message("exporttodropbox"));
 		exportTo.addClickHandler(event -> DropboxService.Instance.get().isConnected(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Boolean connected) {
+			public void handleSuccess(Boolean connected) {
 				if (Boolean.FALSE.equals(connected))
 					DropboxAuthorization.get().show();
 				else
@@ -311,7 +311,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		importFrom.addClickHandler(
 				event -> DropboxService.Instance.get().isConnected(new DefaultAsyncCallback<Boolean>() {
 					@Override
-					public void onSuccess(Boolean connected) {
+					public void handleSuccess(Boolean connected) {
 						if (Boolean.FALSE.equals(connected))
 							DropboxAuthorization.get().show();
 						else
@@ -341,7 +341,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		final MenuItem settings = new MenuItem(I18N.message("settings"));
 		settings.addClickHandler(click -> ChatGPTService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIValue> settings) {
+			public void handleSuccess(List<GUIValue> settings) {
 				TextItem apiKey = ItemFactory.newPasswordItem(APIKEY, APIKEY, GUIValue.getValue(APIKEY, settings));
 				apiKey.setWidth(360);
 
@@ -356,7 +356,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 						ChatGPTService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void arg0) {
+							public void handleSuccess(Void arg0) {
 								// Nothing to do
 							}
 						});
@@ -390,7 +390,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		final MenuItem importFrom = new MenuItem(I18N.message("importfromsharefile"));
 		importFrom.addClickHandler(event -> ShareFileService.Instance.get().isAuthorized(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Boolean authorized) {
+			public void handleSuccess(Boolean authorized) {
 				LD.clearPrompt();
 				if (Boolean.TRUE.equals(authorized)) {
 					ShareFileDialog dialog = new ShareFileDialog(false);
@@ -430,7 +430,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			LD.contactingServer();
 			DocuSignService.Instance.get().isAuthorized(new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Boolean authorized) {
+				public void handleSuccess(Boolean authorized) {
 					LD.clearPrompt();
 					if (Boolean.TRUE.equals(authorized)) {
 						new EnvelopeDetails().show();
@@ -449,7 +449,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			LD.contactingServer();
 			DocuSignService.Instance.get().isAuthorized(new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Boolean authorized) {
+				public void handleSuccess(Boolean authorized) {
 					LD.clearPrompt();
 					if (Boolean.TRUE.equals(authorized)) {
 						new Envelopes().show();
@@ -622,7 +622,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 					Arrays.asList("reg.name", "reg.email", "reg.organization", "reg.website"),
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(List<GUIParameter> reg) {
+						public void handleSuccess(List<GUIParameter> reg) {
 							new Registration(reg.stream().map(r -> r.getValue()).collect(Collectors.toList())).show();
 						}
 					}));

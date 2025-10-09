@@ -39,7 +39,7 @@ public class DocuSignSettings extends Window {
 		DocuSignService.Instance.get().loadSettings(new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onSuccess(GUIDocuSignSettings settings) {
+			public void handleSuccess(GUIDocuSignSettings settings) {
 				DocuSignSettings.this.settings = settings;
 				initGui();
 			}
@@ -98,7 +98,7 @@ public class DocuSignSettings extends Window {
 
 		DocuSignService.Instance.get().authorize(settings, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(String authorizationUrl) {
+			public void handleSuccess(String authorizationUrl) {
 				WindowUtils.openUrl(authorizationUrl, "_blank", null);
 				destroy();
 			}

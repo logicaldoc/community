@@ -85,7 +85,7 @@ public class BarcodeTemplateSettings extends Window {
 		addCloseClickHandler(
 				event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						destroy();
 					}
 				}));
@@ -187,7 +187,7 @@ public class BarcodeTemplateSettings extends Window {
 
 		BarcodeService.Instance.get().save(template, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIBarcodeTemplate tmpl) {
+			public void handleSuccess(GUIBarcodeTemplate tmpl) {
 				panel.setSelectedOcrTemplate(tmpl);
 				destroy();
 			}

@@ -169,7 +169,7 @@ public class WebservicesPanel extends VLayout {
 	private void refreshStats(Long tenantId) {
 		SettingService.Instance.get().loadWebserviceStats(tenantId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIParameter> parameters) {
+			public void handleSuccess(List<GUIParameter> parameters) {
 				if (!parameters.isEmpty()) {
 					for (GUIParameter parameter : parameters) {
 						if (parameter.getName().equals("webservice.apicalls"))

@@ -93,7 +93,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 				FolderService.Instance.get().getFolder(doc.getFolder().getId(), false, false, false,
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(GUIFolder folder) {
+							public void handleSuccess(GUIFolder folder) {
 								if (folder.isDownload()
 										&& "download".equals(Session.get().getInfo().getConfig("gui.doubleclick")))
 									DocUtil.download(doc.getId(), null);
@@ -127,7 +127,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 					 */
 					FolderService.Instance.get().getFolder(id, false, false, false, new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIFolder folder) {
+						public void handleSuccess(GUIFolder folder) {
 							showContextMenu(folder, !type.contains(FOLDER));
 						}
 					});
@@ -204,7 +204,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		if (document) {
 			DocumentService.Instance.get().getAllowedPermissions(grid.getSelectedIds(), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIAccessControlEntry enabledPermissions) {
+				public void handleSuccess(GUIAccessControlEntry enabledPermissions) {
 					new ContextMenu(folder, grid, enabledPermissions).showContextMenu();
 				}
 			});

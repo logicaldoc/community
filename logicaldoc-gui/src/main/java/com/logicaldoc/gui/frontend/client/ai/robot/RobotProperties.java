@@ -252,7 +252,7 @@ public class RobotProperties extends RobotDetailsTab {
 		if (robot.getId() != 0L) {
 			RobotAvatar avatar = new RobotAvatar(robot.getId(), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(String avatar) {
+				public void handleSuccess(String avatar) {
 					robot.setAvatar(avatar);
 				}
 			});

@@ -135,7 +135,7 @@ public class EmailAccountsPanel extends AdminPanel {
 				EmailAccountService.Instance.get().get(Long.parseLong(rec.getAttributeAsString("id")),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(GUIEmailAccount account) {
+							public void handleSuccess(GUIEmailAccount account) {
 								showDetails(account);
 							}
 						});
@@ -170,7 +170,7 @@ public class EmailAccountsPanel extends AdminPanel {
 					if (Boolean.TRUE.equals(choice)) {
 						EmailAccountService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void result) {
+							public void handleSuccess(Void result) {
 								list.removeSelectedData();
 								list.deselectAllRecords();
 								showDetails(null);
@@ -184,7 +184,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		test.addClickHandler(click -> EmailAccountService.Instance.get()
 				.test(Long.parseLong(rec.getAttributeAsString("id")), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Boolean result) {
+					public void handleSuccess(Boolean result) {
 						if (result.booleanValue())
 							SC.say(I18N.message("connectionestablished"));
 						else
@@ -198,7 +198,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		enable.addClickHandler(click -> EmailAccountService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, true);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
@@ -210,7 +210,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		disable.addClickHandler(click -> EmailAccountService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, false);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
@@ -223,7 +223,7 @@ public class EmailAccountsPanel extends AdminPanel {
 					if (Boolean.TRUE.equals(choice)) {
 						EmailAccountService.Instance.get().resetCache(id, new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void result) {
+							public void handleSuccess(Void result) {
 								GuiLog.info(I18N.message("cachedeleted"), null);
 							}
 						});
@@ -237,7 +237,7 @@ public class EmailAccountsPanel extends AdminPanel {
 					if (Boolean.TRUE.equals(choice)) {
 						EmailAccountService.Instance.get().resetCounter(id, new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void result) {
+							public void handleSuccess(Void result) {
 								GuiLog.info(I18N.message("counterreseted"), null);
 								rec.setAttribute("emails", "0");
 								list.refreshRow(list.getRecordIndex(rec));
@@ -251,7 +251,7 @@ public class EmailAccountsPanel extends AdminPanel {
 		clone.addClickHandler(click -> EmailAccountService.Instance.get()
 				.clone(Long.parseLong(rec.getAttributeAsString("id")), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIEmailAccount result) {
+					public void handleSuccess(GUIEmailAccount result) {
 						refresh();
 					}
 				}));

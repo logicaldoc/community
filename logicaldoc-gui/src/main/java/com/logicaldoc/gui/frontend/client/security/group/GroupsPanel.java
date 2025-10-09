@@ -141,7 +141,7 @@ public class GroupsPanel extends AdminPanel {
 				SecurityService.Instance.get().getGroup(Long.parseLong(rec.getAttributeAsString("id")),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(GUIGroup group) {
+							public void handleSuccess(GUIGroup group) {
 								showGroupDetails(group);
 							}
 						});
@@ -198,7 +198,7 @@ public class GroupsPanel extends AdminPanel {
 					if (Boolean.TRUE.equals(value)) {
 						SecurityService.Instance.get().deleteGroup(id, new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void result) {
+							public void handleSuccess(Void result) {
 								list.removeSelectedData();
 								list.deselectAllRecords();
 								details = SELECT_GROUP;

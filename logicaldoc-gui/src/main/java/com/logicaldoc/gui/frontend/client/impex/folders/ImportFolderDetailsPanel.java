@@ -52,7 +52,7 @@ public class ImportFolderDetailsPanel extends VLayout {
 			if (importFolder.getId() != 0) {
 				ImportFolderService.Instance.get().get(importFolder.getId(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIImportFolder share) {
+					public void handleSuccess(GUIImportFolder share) {
 						setShare(share);
 					}
 				});
@@ -204,7 +204,7 @@ public class ImportFolderDetailsPanel extends VLayout {
 		if (validate()) {
 			ImportFolderService.Instance.get().save(importFolder, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIImportFolder importFolder) {
+				public void handleSuccess(GUIImportFolder importFolder) {
 					tabSet.hideSave();
 					if (importFolder != null) {
 						foldersPanel.updateRecord(importFolder);

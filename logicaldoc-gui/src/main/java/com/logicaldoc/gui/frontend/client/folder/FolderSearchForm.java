@@ -148,7 +148,7 @@ public abstract class FolderSearchForm extends VLayout {
 					TemplateService.Instance.get().getTemplate(Long.parseLong((String) event.getValue()),
 							new DefaultAsyncCallback<>() {
 								@Override
-								public void onSuccess(GUITemplate result) {
+								public void handleSuccess(GUITemplate result) {
 									selectedTemplate = result;
 								}
 							});

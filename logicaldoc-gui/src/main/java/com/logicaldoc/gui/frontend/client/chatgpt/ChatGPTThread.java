@@ -157,7 +157,7 @@ public class ChatGPTThread extends Window {
 		ChatGPTService.Instance.get().ask(question, new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onSuccess(Void result) {
+			public void handleSuccess(Void result) {
 				collectAnswer();
 			}
 		});
@@ -172,7 +172,7 @@ public class ChatGPTThread extends Window {
 				new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(Void arg0) {
+					public void handleSuccess(Void arg0) {
 						collectAnswer();
 					}
 				});
@@ -183,7 +183,7 @@ public class ChatGPTThread extends Window {
 			public void run() {
 				ChatGPTService.Instance.get().getAnswer(new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIValue answer) {
+					public void handleSuccess(GUIValue answer) {
 						if (answer.getValue() != null) {
 							updateLastMessage(answer.getValue());
 							if (!"complete".equals(answer.getCode()))

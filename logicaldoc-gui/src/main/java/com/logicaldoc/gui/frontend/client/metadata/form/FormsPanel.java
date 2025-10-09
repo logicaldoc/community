@@ -140,7 +140,7 @@ public class FormsPanel extends AdminPanel {
 				FormService.Instance.get().getById(Long.parseLong(rec.getAttributeAsString("id")),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(GUIForm form) {
+							public void handleSuccess(GUIForm form) {
 								showFormDetails(form);
 							}
 						});
@@ -168,7 +168,7 @@ public class FormsPanel extends AdminPanel {
 			if (Boolean.TRUE.equals(value)) {
 				FormService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						showFormDetails(null);

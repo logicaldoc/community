@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.folder;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -81,7 +82,7 @@ public class AutomationDialog extends Window {
 						new DefaultAsyncCallback<>() {
 
 							@Override
-							public void onSuccess(GUIAutomationRoutine rt) {
+							public void handleSuccess(GUIAutomationRoutine rt) {
 								routine = rt;
 								tabSet.enableTab(1);
 								tabSet.selectTab(1);
@@ -144,14 +145,9 @@ public class AutomationDialog extends Window {
 		LD.contactingServer();
 		AutomationDialog.this.destroy();
 		GuiLog.info(I18N.message("automationlaunched"));
-		AutomationService.Instance.get().execute(routine, docIds, folderIds, new DefaultAsyncCallback<>() {
-			@Override
-			public void onSuccess(Void arg0) {
-				LD.clearPrompt();
-			}
-		});
+		AutomationService.Instance.get().execute(routine, docIds, folderIds, new EmptyAsyncCallback<>());
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

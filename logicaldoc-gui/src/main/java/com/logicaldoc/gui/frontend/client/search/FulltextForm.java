@@ -314,7 +314,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 
 		TemplateService.Instance.get().getAttributes(templateId, null, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIAttribute> result) {
+			public void handleSuccess(List<GUIAttribute> result) {
 				for (GUIAttribute att : result.stream()
 						.filter(att -> att.getType() == GUIAttribute.TYPE_STRING && !att.isHidden())
 						.collect(Collectors.toList()))

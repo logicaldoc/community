@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIScheme;
 import com.logicaldoc.gui.common.client.data.SequencesDS;
@@ -158,12 +159,7 @@ public class CustomIdPanel extends AdminPanel {
 			cid.setScheme(rec.getAttributeAsString(SCHEME));
 			cid.setType(rec.getAttributeAsString("type"));
 
-			SchemeService.Instance.get().save(cid, new DefaultAsyncCallback<>() {
-				@Override
-				public void onSuccess(Void ret) {
-					// Nothing to do
-				}
-			});
+			SchemeService.Instance.get().save(cid, new EmptyAsyncCallback<>());
 		});
 
 		VLayout sc = new VLayout();
@@ -219,12 +215,7 @@ public class CustomIdPanel extends AdminPanel {
 		sequences.addEditCompleteHandler(event -> {
 			ListGridRecord rec = sequences.getRecord(event.getRowNum());
 			SchemeService.Instance.get().resetSequence(rec.getAttributeAsLong("id"), rec.getAttributeAsInt(VALUE),
-					new DefaultAsyncCallback<>() {
-						@Override
-						public void onSuccess(Void ret) {
-							// Nothing to do
-						}
-					});
+					new EmptyAsyncCallback<>());
 		});
 
 		sequences.addCellContextClickHandler(ckick -> {
@@ -251,7 +242,7 @@ public class CustomIdPanel extends AdminPanel {
 						SchemeService.Instance.get().delete(Long.parseLong(rec.getAttributeAsString(TEMPLATE_ID)),
 								rec.getAttributeAsString("type"), new DefaultAsyncCallback<>() {
 									@Override
-									public void onSuccess(Void ret) {
+									public void handleSuccess(Void ret) {
 										schemes.getSelectedRecord().setAttribute(SCHEME, (String) null);
 										schemes.getSelectedRecord().setAttribute(EVALUATE_AT_CHECKIN, false);
 										schemes.getSelectedRecord().setAttribute(EVALUATE_AT_UPDATE, false);
@@ -278,7 +269,7 @@ public class CustomIdPanel extends AdminPanel {
 					if (Boolean.TRUE.equals(confirm)) {
 						SchemeService.Instance.get().deleteSequence(id, new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void result) {
+							public void handleSuccess(Void result) {
 								sequences.removeSelectedData();
 								sequences.deselectAllRecords();
 							}

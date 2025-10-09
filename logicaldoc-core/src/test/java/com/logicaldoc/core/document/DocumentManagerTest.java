@@ -253,7 +253,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		List<DocumentLink> originalLinks = documentLinkDao.findByDocId(doc.getId());
 		assertFalse(originalLinks.isEmpty());
 
-		List<DocumentNote> originalNotes = documentNoteDao.findByDocId(doc.getId(), null);
+		List<DocumentNote> originalNotes = documentNoteDao.findByDocId(doc.getId(), User.USERID_ADMIN, null);
 		assertFalse(originalNotes.isEmpty());
 
 		try {
@@ -262,7 +262,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 			assertNotSame(doc.getId(), newDoc.getId());
 			assertEquals(newFolder, newDoc.getFolder());
 			assertTrue(documentLinkDao.findByDocId(newDoc.getId()).isEmpty());
-			assertTrue(documentNoteDao.findByDocId(newDoc.getId(), null).isEmpty());
+			assertTrue(documentNoteDao.findByDocId(newDoc.getId(), User.USERID_ADMIN, null).isEmpty());
 		} finally {
 			store.setUseDummyFile(false);
 		}
@@ -282,7 +282,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 						newDoc.getId() == link.getDocument1().getId() || newDoc.getId() == link.getDocument2().getId());
 			}
 
-			List<DocumentNote> notes = documentNoteDao.findByDocId(newDoc.getId(), null);
+			List<DocumentNote> notes = documentNoteDao.findByDocId(newDoc.getId(), User.USERID_ADMIN, null);
 			assertEquals(originalNotes.size(), notes.size());
 			for (DocumentNote note : notes) {
 				assertEquals(newDoc.getId(), note.getDocId());
@@ -924,7 +924,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		try (InputStream is = ResourceUtil.getInputStream("abel.eml")) {
 			testSubject.checkin(1L, is, "pippo", true, doc, new DocumentHistory(transaction)).get();
 		}
-		
+
 		doc = docDao.findById(1L);
 		docDao.initialize(doc);
 		assertEquals("reason2", doc.getComment());
@@ -986,22 +986,22 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 		docTest.setFolder(folderDao.findById(Folder.DEFAULTWORKSPACEID));
 		docDao.store(docTest);
 
-	    docTest=docDao.findById(docTest.getId());
-	    docDao.initialize(docTest);
+		docTest = docDao.findById(docTest.getId());
+		docDao.initialize(docTest);
 		docTest.setIndexingStatus(IndexingStatus.SKIP);
 		docTest.setStatus(DocumentStatus.LOCKED);
 		testSubject.changeIndexingStatus(docTest, IndexingStatus.SKIP);
 		assertEquals(IndexingStatus.SKIP, docTest.getIndexed());
 
-		docTest=docDao.findById(docTest.getId());
-	    docDao.initialize(docTest);
+		docTest = docDao.findById(docTest.getId());
+		docDao.initialize(docTest);
 		docTest.setIndexingStatus(IndexingStatus.TO_INDEX);
 		docTest.setStatus(DocumentStatus.UNLOCKED);
 		testSubject.changeIndexingStatus(docTest, IndexingStatus.TO_INDEX);
 		assertEquals(IndexingStatus.TO_INDEX, docTest.getIndexed());
 
-		docTest=docDao.findById(docTest.getId());
-	    docDao.initialize(docTest);
+		docTest = docDao.findById(docTest.getId());
+		docDao.initialize(docTest);
 		docTest.setIndexingStatus(IndexingStatus.TO_INDEX_METADATA);
 		docTest.setStatus(DocumentStatus.ARCHIVED);
 		testSubject.changeIndexingStatus(docTest, IndexingStatus.TO_INDEX_METADATA);
@@ -1035,7 +1035,7 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 
 		testSubject.destroyDocument(1L, transaction);
 		assertNotNull(docDao.findById(1L));
-		
+
 		// We should check that the file does not exist anymore in the store
 		// but quite ofter it does not get immediately deleted by the JVM
 		// so we do not test in order to complete all the tests without errors

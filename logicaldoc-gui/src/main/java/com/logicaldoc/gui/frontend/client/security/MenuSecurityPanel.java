@@ -228,7 +228,7 @@ public class MenuSecurityPanel extends VLayout {
 
 		SecurityService.Instance.get().saveACL(menu, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void result) {
+			public void handleSuccess(Void result) {
 				GuiLog.info(I18N.message("appliedrightsmenu"), null);
 			}
 		});

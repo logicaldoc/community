@@ -49,7 +49,7 @@ public class StampDetailsPanel extends VLayout {
 			if (stamp.getId() != 0) {
 				StampService.Instance.get().getStamp(stamp.getId(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIStamp stamp) {
+					public void handleSuccess(GUIStamp stamp) {
 						setStamp(stamp);
 					}
 				});
@@ -144,7 +144,7 @@ public class StampDetailsPanel extends VLayout {
 		if (validate()) {
 			StampService.Instance.get().save(stamp, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIStamp stamp) {
+				public void handleSuccess(GUIStamp stamp) {
 					tabSet.hideSave();
 					StampDetailsPanel.this.setStamp(stamp);
 					if (stamp != null)

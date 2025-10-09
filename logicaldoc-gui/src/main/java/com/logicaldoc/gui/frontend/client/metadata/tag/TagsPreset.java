@@ -68,7 +68,7 @@ public class TagsPreset extends VLayout {
 			if (value != null && !"".equals(value))
 				TagService.Instance.get().addTag(value, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void arg0) {
+					public void handleSuccess(Void arg0) {
 						GuiLog.info(I18N.message("settingssaved"), null);
 						reloadTags();
 					}

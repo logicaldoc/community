@@ -106,7 +106,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 			AuditService.Instance.get().subscribeDocuments(Arrays.asList(document.getId()),
 					Constants.getAuditDefaultEvents(), null, groupId, new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void arg0) {
+						public void handleSuccess(Void arg0) {
 							refreshList();
 						}
 					});
@@ -124,7 +124,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 			AuditService.Instance.get().subscribeDocuments(Arrays.asList(document.getId()),
 					Constants.getAuditDefaultEvents(), userId, null, new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void arg0) {
+						public void handleSuccess(Void arg0) {
 							refreshList();
 						}
 					});
@@ -146,7 +146,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 			if (Boolean.TRUE.equals(answer)) {
 				AuditService.Instance.get().deleteSubscriptions(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 					}

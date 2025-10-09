@@ -154,7 +154,7 @@ public class SessionsPanel extends VLayout {
 				ListGridRecord rec = sessionsGrid.getSelectedRecord();
 				SecurityService.Instance.get().kill(rec.getAttributeAsString("sid"), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						sessionsGrid.getSelectedRecord().setAttribute(STATUS_LABEL, "Closed");
 						sessionsGrid.getSelectedRecord().setAttribute(STATUS, "1");
 						sessionsGrid.refreshRow(sessionsGrid.getRecordIndex(sessionsGrid.getSelectedRecord()));

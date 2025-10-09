@@ -144,7 +144,7 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 			if (rec != null)
 				AutomationService.Instance.get().getTrigger(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIAutomationTrigger trigger) {
+					public void handleSuccess(GUIAutomationTrigger trigger) {
 						showTriggerDetails(trigger);
 					}
 				});
@@ -180,7 +180,7 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 			if (Boolean.TRUE.equals(value)) {
 				AutomationService.Instance.get().deleteTriggers(Arrays.asList(id), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						showTriggerDetails(null);

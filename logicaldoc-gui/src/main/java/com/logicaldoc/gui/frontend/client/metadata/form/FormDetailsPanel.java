@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.automation.HtmlItemEditor;
-import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.UsersDS;
@@ -98,13 +98,12 @@ public class FormDetailsPanel extends VLayout {
 			if (form.getId() != 0) {
 				FormService.Instance.get().getById(form.getId(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIForm form) {
+					public void handleSuccess(GUIForm form) {
 						setForm(form);
 					}
 				});
 			} else {
-				GUIForm newForm = new GUIForm();
-				setForm(newForm);
+				setForm(new GUIForm());
 			}
 			tabSet.hideSave();
 		});
@@ -404,7 +403,7 @@ public class FormDetailsPanel extends VLayout {
 	private void saveForm() {
 		FormService.Instance.get().save(form, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIForm newForm) {
+			public void handleSuccess(GUIForm newForm) {
 				tabSet.hideSave();
 				if (form.getId() == 0L)
 					formsPanel.refresh();
@@ -415,7 +414,7 @@ public class FormDetailsPanel extends VLayout {
 			}
 		});
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof QuickSearchTray)

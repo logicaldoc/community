@@ -138,7 +138,7 @@ public class AttributeSetsPanel extends VLayout {
 				AttributeSetService.Instance.get().getAttributeSet(rec.getAttributeAsLong("id"),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(GUIAttributeSet attSet) {
+							public void handleSuccess(GUIAttributeSet attSet) {
 								showSetDetails(attSet);
 							}
 						});
@@ -165,7 +165,7 @@ public class AttributeSetsPanel extends VLayout {
 			if (Boolean.TRUE.equals(confirm)) {
 				AttributeSetService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						showSetDetails(null);

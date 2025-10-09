@@ -81,7 +81,7 @@ public class AIStatsPanel extends VLayout {
 	private void refreshStats(Long tenantId) {
 		AIService.Instance.get().getStats(modelId, tenantId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIParameter> parameters) {
+			public void handleSuccess(List<GUIParameter> parameters) {
 				if (!parameters.isEmpty()) {
 					for (GUIParameter parameter : parameters) {
 						if (parameter.getName().equals("ai.queries"))

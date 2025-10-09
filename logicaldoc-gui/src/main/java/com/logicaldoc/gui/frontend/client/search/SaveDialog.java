@@ -71,7 +71,7 @@ public class SaveDialog extends Window {
 		options.setDescription(vm.getValueAsString(DESCRIPTION));
 		SearchService.Instance.get().save(Search.get().getOptions(), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Boolean b) {
+			public void handleSuccess(Boolean b) {
 				if (Boolean.FALSE.equals(b))
 					SC.warn(I18N.message("duplicateelement"));
 				else {

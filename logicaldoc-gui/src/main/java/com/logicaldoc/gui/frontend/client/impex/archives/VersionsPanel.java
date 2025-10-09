@@ -124,7 +124,7 @@ public class VersionsPanel extends VLayout {
 					ImpexService.Instance.get().deleteVersions(archiveId, GridUtil.getIds(selection),
 							new DefaultAsyncCallback<>() {
 								@Override
-								public void onSuccess(GUIArchive archive) {
+								public void handleSuccess(GUIArchive archive) {
 									ListGridRecord selectedRecord = archivesList.getList().getSelectedRecord();
 									if (selectedRecord != null) {
 										selectedRecord.setAttribute("size", archive.getSize());

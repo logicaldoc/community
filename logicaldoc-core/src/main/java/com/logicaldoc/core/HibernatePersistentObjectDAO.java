@@ -350,6 +350,12 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		// By default do nothing
 	}
 
+	@Override
+	public void initialize(Collection<T> entities) throws PersistenceException {
+		for (T entity : entities)
+			initialize(entity);
+	}
+
 	protected Session getCurrentSession() {
 		return sessionFactory.getCurrentSession();
 	}

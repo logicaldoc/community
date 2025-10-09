@@ -359,7 +359,7 @@ public class Profile extends Window {
 		SecurityService.Instance.get().saveProfile(u, new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onSuccess(GUIUser ret) {
+			public void handleSuccess(GUIUser ret) {
 				// Update the currently logged user bean
 				user.setFirstName(ret.getFirstName());
 				user.setName(ret.getName());

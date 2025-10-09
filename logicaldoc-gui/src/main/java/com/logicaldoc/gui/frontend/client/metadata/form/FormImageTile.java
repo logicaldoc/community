@@ -116,7 +116,7 @@ public class FormImageTile extends HLayout {
 			addCloseClickHandler(
 					event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void result) {
+						public void handleSuccess(Void result) {
 							destroy();
 						}
 					}));
@@ -132,12 +132,12 @@ public class FormImageTile extends HLayout {
 
 			FormService.Instance.get().processImage(new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(String imageSrc) {
+				public void handleSuccess(String imageSrc) {
 					form.setHeaderImage(imageSrc);
 					FormImageTile.this.initGUI();
 					DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void result) {
+						public void handleSuccess(Void result) {
 							destroy();
 							close();
 							if (changedHandler != null)

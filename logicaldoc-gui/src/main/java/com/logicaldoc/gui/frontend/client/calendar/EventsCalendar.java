@@ -63,7 +63,7 @@ public class EventsCalendar extends Calendar {
 			CalendarService.Instance.get().getEvent(event.getEvent().getAttributeAsLong("eventId"),
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(final GUICalendarEvent ev) {
+						public void handleSuccess(final GUICalendarEvent ev) {
 							long organizerId = Long.parseLong(event.getEvent().getAttribute("organizerId"));
 							GUIUser currentUser = Session.get().getUser();
 
@@ -80,7 +80,7 @@ public class EventsCalendar extends Calendar {
 														Long.parseLong(event.getEvent().getAttribute("parentId")),
 														new DefaultAsyncCallback<>() {
 															@Override
-															public void onSuccess(GUICalendarEvent calEv) {
+															public void handleSuccess(GUICalendarEvent calEv) {
 																new CalendarEventDialog(calEv, onChangeCallback).show();
 															}
 														});

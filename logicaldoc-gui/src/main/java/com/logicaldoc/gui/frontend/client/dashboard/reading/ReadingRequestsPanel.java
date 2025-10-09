@@ -126,7 +126,7 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 		readingsGrid.addSelectionChangedHandler(event -> DocumentService.Instance.get()
 				.getById(event.getSelectedRecord().getAttributeAsLong(DOC_ID), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIDocument document) {
+					public void handleSuccess(GUIDocument document) {
 						previewPanel.setDocument(document);
 					}
 				}));
@@ -180,7 +180,7 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 				event -> DocumentService.Instance.get().getById(selectedDocId, new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(GUIDocument document) {
+					public void handleSuccess(GUIDocument document) {
 						new PreviewPopup(document).show();
 					}
 				}));
@@ -192,7 +192,7 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 				ReadingRequestService.Instance.get().delete(selectedReadingId, new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						readingsGrid.removeSelectedData();
 					}
 				});
@@ -205,7 +205,7 @@ public class ReadingRequestsPanel extends VLayout implements ReadingRequestObser
 				new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(Void arg) {
+					public void handleSuccess(Void arg) {
 						GuiLog.info("invitationsent");
 					}
 				}));

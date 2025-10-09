@@ -19,13 +19,13 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
-import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.DocumentLink;
 import com.logicaldoc.core.document.DocumentLinkDAO;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.DocumentNoteDAO;
 import com.logicaldoc.core.document.DocumentStatus;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
@@ -147,7 +147,7 @@ public class DocTool {
 	public DocumentEvent documentEvent(String eventKey) {
 		return DocumentEvent.fromKey(eventKey);
 	}
-	
+
 	/**
 	 * Creates a new download ticket for a document
 	 * 
@@ -335,7 +335,7 @@ public class DocTool {
 	 * @param targetPath the full path of the target folder
 	 * @param username the user in whose name the method is run
 	 * 
-	 * @throws InterruptedException In case or thread interruption 
+	 * @throws InterruptedException In case or thread interruption
 	 */
 	public void move(Document doc, String targetPath, String username) throws InterruptedException {
 		User user = new SecurityTool().getUser(username);
@@ -900,6 +900,19 @@ public class DocTool {
 	 * @return the list of notes
 	 */
 	public List<DocumentNote> getNotes(long docId, String fileVersion) {
+		return getNotes(docId, User.USERID_ADMIN, fileVersion);
+	}
+
+	/**
+	 * Lists the notes of a given document and visible to a given user
+	 * 
+	 * @param docId identifier of the document
+	 * @param userId identifier of the user
+	 * @param fileVersion version of the file, optional
+	 * 
+	 * @return the list of notes
+	 */
+	public List<DocumentNote> getNotes(long docId, long userId, String fileVersion) {
 		DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
 
 		String fVer = fileVersion;
@@ -913,7 +926,7 @@ public class DocTool {
 			}
 		}
 		try {
-			return dao.findByDocId(docId, fVer);
+			return dao.findByDocId(docId, userId, fVer);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -1001,8 +1014,8 @@ public class DocTool {
 	}
 
 	/**
-	 * Same as parse() but first it tries to get the text from
-	 * the already built fulltext index
+	 * Same as parse() but first it tries to get the text from the already built
+	 * fulltext index
 	 * 
 	 * @param document The document to elaborate
 	 * 

@@ -78,7 +78,7 @@ public class StartWorkflowDialog extends Window {
 				selection.getAttributeAsString("description"), tag.getValueAsString(), color.getValueAsString(), ids,
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(String result) {
+					public void handleSuccess(String result) {
 						GuiLog.info(I18N.message("event.workflow.start"), null);
 						destroy();
 					}

@@ -57,7 +57,7 @@ public class TaskDetailPanel extends VLayout {
 		tabSet = new EditingTabSet(saveEvent -> onSave(), cancelEvent -> SystemService.Instance.get()
 				.getTaskByName(task.getName(), I18N.getLocale(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUITask task) {
+					public void handleSuccess(GUITask task) {
 						setTask(task);
 						tabSet.hideSave();
 					}
@@ -152,7 +152,7 @@ public class TaskDetailPanel extends VLayout {
 		if (schedulingPanel.validate() && notificationPanel.validate()) {
 			SystemService.Instance.get().saveTask(task, I18N.getLocale(), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUITask task) {
+				public void handleSuccess(GUITask task) {
 					if (task != null) {
 						tasksPanel.updateSelectedRecord(task);
 						tabSet.hideSave();

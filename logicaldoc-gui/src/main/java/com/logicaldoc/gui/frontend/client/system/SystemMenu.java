@@ -69,7 +69,7 @@ public class SystemMenu extends VLayout {
 			if (Boolean.TRUE.equals(answer)) {
 				SystemService.Instance.get().restart(new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void arg) {
+					public void handleSuccess(Void arg) {
 						ApplicationRestarting.get().show();
 
 						restart.setDisabled(true);
@@ -114,7 +114,7 @@ public class SystemMenu extends VLayout {
 		confirmUpdate.setHeight(25);
 		confirmUpdate.addClickHandler(event -> SystemService.Instance.get().confirmUpdate(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg) {
+			public void handleSuccess(Void arg) {
 				Session.get().getInfo().setConfig("runlevel", "default");
 				confirmUpdate.setVisible(false);
 				updatesButton.setVisible(true);

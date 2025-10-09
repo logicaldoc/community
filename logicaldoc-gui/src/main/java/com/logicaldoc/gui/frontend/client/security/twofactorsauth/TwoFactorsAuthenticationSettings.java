@@ -47,7 +47,7 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 		SettingService.Instance.get().loadSettingsByNames(Arrays.asList(Session.get().getTenantName() + TWOFA_STAR),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(List<GUIParameter> params) {
+					public void handleSuccess(List<GUIParameter> params) {
 						init(params);
 					}
 				});
@@ -196,7 +196,7 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 	private void doSaveSettings(final List<GUIParameter> params) {
 		SettingService.Instance.get().saveSettings(params, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg) {
+			public void handleSuccess(Void arg) {
 				Session.get().updateConfig(params);
 				GuiLog.info(I18N.message("settingssaved"), null);
 			}

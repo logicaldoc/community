@@ -396,8 +396,7 @@ public class TemplatePropertiesPanel extends HLayout implements AttributeSelecto
 		LD.contactingServer();
 		AttributeSetService.Instance.get().getAttributeSets(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIAttributeSet> sets) {
-				LD.clearPrompt();
+			public void handleSuccess(List<GUIAttributeSet> sets) {
 				Map<Long, GUIAttributeSet> setsMap = new HashMap<>();
 				for (GUIAttributeSet set : sets)
 					setsMap.put(set.getId(), set);
@@ -439,8 +438,7 @@ public class TemplatePropertiesPanel extends HLayout implements AttributeSelecto
 		LD.contactingServer();
 		AttributeSetService.Instance.get().getAttributeSets(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIAttributeSet> sets) {
-				LD.clearPrompt();
+			public void handleSuccess(List<GUIAttributeSet> sets) {
 				Map<Long, GUIAttributeSet> setsMap = new HashMap<>();
 				for (GUIAttributeSet set : sets)
 					setsMap.put(set.getId(), set);
@@ -773,7 +771,7 @@ public class TemplatePropertiesPanel extends HLayout implements AttributeSelecto
 			event.getItem().setValue(I18N.message("computing") + "...");
 			TemplateService.Instance.get().countDocuments(template.getId(), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Long count) {
+				public void handleSuccess(Long count) {
 					event.getItem().setValue(Util.formatLong(count));
 				}
 			});
@@ -845,8 +843,7 @@ public class TemplatePropertiesPanel extends HLayout implements AttributeSelecto
 		LD.contactingServer();
 		AttributeSetService.Instance.get().getAttributeSets(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIAttributeSet> sets) {
-				LD.clearPrompt();
+			public void handleSuccess(List<GUIAttributeSet> sets) {
 				Map<Long, GUIAttributeSet> setsMap = new HashMap<>();
 				for (GUIAttributeSet set : sets)
 					setsMap.put(set.getId(), set);

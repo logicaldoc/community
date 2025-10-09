@@ -2,8 +2,8 @@ package com.logicaldoc.gui.frontend.client.document;
 
 import java.util.Map;
 
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.controllers.DocumentController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -70,14 +70,7 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 			ZonalOCRService.Instance.get().process(document.getId(), new DefaultAsyncCallback<>() {
 
 				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					super.onFailure(caught);
-				}
-
-				@Override
-				public void onSuccess(GUIDocument result) {
-					LD.clearPrompt();
+				public void handleSuccess(GUIDocument result) {
 					DocumentController.get().modified(result);
 				}
 			});
@@ -98,15 +91,9 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		processBarcode.addClickHandler(event -> {
 			LD.contactingServer();
 			BarcodeService.Instance.get().process(document.getId(), new DefaultAsyncCallback<>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					super.onFailure(caught);
-				}
 
 				@Override
-				public void onSuccess(GUIDocument result) {
-					LD.clearPrompt();
+				public void handleSuccess(GUIDocument result) {
 					DocumentController.get().modified(result);
 				}
 			});
@@ -155,7 +142,7 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		}
 		return !vm.hasErrors();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

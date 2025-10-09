@@ -62,7 +62,7 @@ public class TextContentEditor extends Window {
 			DocumentService.Instance.get().getContentAsString(TextContentEditor.this.document.getId(),
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(String content) {
+						public void handleSuccess(String content) {
 							prepareBody(content);
 						}
 					});
@@ -112,7 +112,7 @@ public class TextContentEditor extends Window {
 						}
 
 						@Override
-						public void onSuccess(Void result) {
+						public void handleSuccess(Void result) {
 							DocumentsPanel.get().refresh();
 							destroy();
 						}
@@ -128,8 +128,7 @@ public class TextContentEditor extends Window {
 			DocumentService.Instance.get().checkinContent(document.getId(), form.getValueAsString(CONTENT),
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIDocument doc) {
-							LD.clearPrompt();
+						public void handleSuccess(GUIDocument doc) {
 							TextContentEditor.this.document = doc;
 							DocumentsPanel.get().refresh();
 							destroy();
@@ -140,8 +139,7 @@ public class TextContentEditor extends Window {
 			DocumentService.Instance.get().createDocument(document, form.getValueAsString(CONTENT),
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIDocument doc) {
-							LD.clearPrompt();
+						public void handleSuccess(GUIDocument doc) {
 							TextContentEditor.this.document = doc;
 							DocumentsPanel.get().refresh();
 							destroy();

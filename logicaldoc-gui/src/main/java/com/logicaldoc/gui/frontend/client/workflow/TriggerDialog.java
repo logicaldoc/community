@@ -83,7 +83,8 @@ public class TriggerDialog extends Window {
 		if (panel.getSelectedRecord() != null)
 			template.setValue(panel.getSelectedRecord().getAttributeAsLong("templateId"));
 
-		SelectItem eventsSelector = ItemFactory.newEventsSelector("events", "triggeron", null, new EventSelectorOptions(new EventSelectorOptionsParameter(false, false, false, false, false, false, false)));
+		SelectItem eventsSelector = ItemFactory.newEventsSelector("events", "triggeron", null, new EventSelectorOptions(
+				new EventSelectorOptionsParameter(false, false, false, false, false, false, false)));
 		eventsSelector.setValue(events);
 
 		DynamicForm form = new DynamicForm();
@@ -103,7 +104,7 @@ public class TriggerDialog extends Window {
 				WorkflowService.Instance.get().saveTrigger(Long.toString(panel.getFolder().getId()), workflowSelectedId,
 						templateSelectedId, eventsSelector.getValueAsString(), new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void result) {
+							public void handleSuccess(Void result) {
 								panel.refresh();
 								destroy();
 							}

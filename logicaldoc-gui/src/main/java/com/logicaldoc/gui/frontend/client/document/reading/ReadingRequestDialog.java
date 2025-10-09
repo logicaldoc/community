@@ -82,8 +82,7 @@ public class ReadingRequestDialog extends StickyWindow {
 							}
 
 							@Override
-							public void onSuccess(Void arg0) {
-								LD.clearPrompt();
+							public void handleSuccess(Void arg0) {
 								sendButton.enable();
 								GuiLog.info(I18N.message("requestreadingsent"));
 								destroy();

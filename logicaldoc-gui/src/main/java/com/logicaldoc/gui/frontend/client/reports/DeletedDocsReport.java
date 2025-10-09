@@ -159,8 +159,7 @@ public class DeletedDocsReport extends ReportPanel implements FolderChangeListen
 									}
 
 									@Override
-									public void onSuccess(Void arg0) {
-										LD.clearPrompt();
+									public void handleSuccess(Void arg0) {
 										refresh();
 									}
 								});

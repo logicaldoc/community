@@ -74,7 +74,7 @@ public class IncrementalDetailsPanel extends VLayout implements FolderChangeList
 			if (getIncremental().getId() != 0) {
 				ImpexService.Instance.get().loadIncremental(getIncremental().getId(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIIncrementalArchive incremental) {
+					public void handleSuccess(GUIIncrementalArchive incremental) {
 						setIncremental(incremental);
 					}
 				});
@@ -148,7 +148,7 @@ public class IncrementalDetailsPanel extends VLayout implements FolderChangeList
 		if (settingsPanel.validate()) {
 			ImpexService.Instance.get().saveIncremental(incremental, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIIncrementalArchive incremental) {
+				public void handleSuccess(GUIIncrementalArchive incremental) {
 					savePanel.setVisible(false);
 					if (incremental != null) {
 						listPanel.updateRecord(incremental);

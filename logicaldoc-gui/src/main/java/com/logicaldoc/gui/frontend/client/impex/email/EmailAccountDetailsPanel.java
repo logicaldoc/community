@@ -53,7 +53,7 @@ public class EmailAccountDetailsPanel extends VLayout {
 			if (account.getId() != 0) {
 				EmailAccountService.Instance.get().get(account.getId(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIEmailAccount account) {
+					public void handleSuccess(GUIEmailAccount account) {
 						setAccount(account);
 					}
 				});
@@ -196,7 +196,7 @@ public class EmailAccountDetailsPanel extends VLayout {
 		if (validate()) {
 			EmailAccountService.Instance.get().save(account, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIEmailAccount account) {
+				public void handleSuccess(GUIEmailAccount account) {
 					tabSet.hideSave();
 					if (account != null) {
 						accountsPanel.updateRecord(account);

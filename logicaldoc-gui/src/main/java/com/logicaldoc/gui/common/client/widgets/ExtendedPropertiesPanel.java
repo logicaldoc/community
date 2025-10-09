@@ -220,7 +220,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		TemplateService.Instance.get().getAttributes(templateId, extensibleObject, new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onSuccess(List<GUIAttribute> templateAttributes) {
+			public void handleSuccess(List<GUIAttribute> templateAttributes) {
 
 				// Update the object's attributes
 				if (templateAttributes != null)

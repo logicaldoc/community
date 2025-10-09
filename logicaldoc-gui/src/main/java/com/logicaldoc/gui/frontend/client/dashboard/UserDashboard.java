@@ -126,7 +126,7 @@ public class UserDashboard extends VLayout {
 		Session.get().getUser().setDashlets(dashlets);
 		DashletService.Instance.get().saveUserDashlets(dashlets, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void ret) {
+			public void handleSuccess(Void ret) {
 				GuiLog.info(I18N.message("settingssaved"), null);
 			}
 		});

@@ -73,7 +73,7 @@ public class Search {
 
 		SearchService.Instance.get().search(options, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIResult result) {
+			public void handleSuccess(GUIResult result) {
 				try {
 					time = result.getTime();
 					estimatedHits = result.getEstimatedHits();
@@ -82,7 +82,6 @@ public class Search {
 					for (SearchObserver observer : observers)
 						observer.onSearchArrived();
 				} finally {
-					LD.clearPrompt();
 					SearchPanel.get().onDraw();
 					MainPanel.get().selectSearchTab();
 				}

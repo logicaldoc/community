@@ -105,7 +105,7 @@ public class PreviewPanel extends VLayout {
 				new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(Void v) {
+					public void handleSuccess(Void v) {
 						ReadingRequestController.get().confirmReading(document.getId());
 						topConfirmReadingLabel.setContents(I18N.message("readingconfirmthanks"));
 						bottomConfirmReadingLabel.setContents(I18N.message("readingconfirmthanks"));
@@ -126,7 +126,7 @@ public class PreviewPanel extends VLayout {
 			DocumentService.Instance.get().getById(document.getId(), new DefaultAsyncCallback<>() {
 
 				@Override
-				public void onSuccess(GUIDocument doc) {
+				public void handleSuccess(GUIDocument doc) {
 					if (doc.isDownload())
 						reloadDICOM();
 					else
@@ -206,7 +206,7 @@ public class PreviewPanel extends VLayout {
 		DocumentService.Instance.get().extractEmail(docId, document.getFileVersion(), new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onSuccess(final GUIEmail email) {
+			public void handleSuccess(final GUIEmail email) {
 				if (mail != null)
 					removeMember(mail);
 				mail = new MailPreviewPanel(email, document, getWidth());

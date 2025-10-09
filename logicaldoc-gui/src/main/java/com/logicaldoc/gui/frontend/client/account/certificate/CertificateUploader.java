@@ -62,7 +62,7 @@ public class CertificateUploader extends Window {
 				event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						destroy();
 					}
 				}));
@@ -77,7 +77,7 @@ public class CertificateUploader extends Window {
 		SignService.Instance.get().getUploadedContent(new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onSuccess(String content) {
+			public void handleSuccess(String content) {
 				srcItem.setValue(content);
 				destroy();
 			}

@@ -62,7 +62,7 @@ public class DashletSelector extends Window {
 			DashletService.Instance.get().get(form.getValueAsString("dashlet"), new DefaultAsyncCallback<>() {
 
 				@Override
-				public void onSuccess(GUIDashlet guiDashlet) {
+				public void handleSuccess(GUIDashlet guiDashlet) {
 					// Find the column with less dashlets
 					int smallerColumn = 0;
 					int smallerSize = 9999;

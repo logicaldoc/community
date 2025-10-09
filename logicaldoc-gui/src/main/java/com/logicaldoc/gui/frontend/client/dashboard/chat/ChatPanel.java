@@ -74,7 +74,7 @@ public class ChatPanel extends VLayout {
 		ChatService.Instance.get().post(message, new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onSuccess(Void arg) {
+			public void handleSuccess(Void arg) {
 				postForm.clearValue("post");
 			}
 		});

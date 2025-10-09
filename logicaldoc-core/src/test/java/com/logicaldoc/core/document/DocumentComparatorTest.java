@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.automation.AutomationDateTool;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Template;
@@ -65,7 +66,7 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCompareDifferentParameters() throws PersistenceException {
+	public void testCompareDifferentParameters() throws PersistenceException, InterruptedException {
 		Folder folder1 = new Folder();
 		folder1.setName("folder1");
 		folder1.setTemplateName("folder1Templ");
@@ -80,11 +81,11 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 		doc1.setFileName("document1");
 		doc1.setFolder(folder1);
 		testSubject.store(doc1);
+		doc1.setCreation(new AutomationDateTool().addDays(new Date(), -1));
 
 		Document doc2 = new Document();
 		doc2.setFileName("document2");
 		doc2.setFolder(folder2);
-		
 		testSubject.store(doc2);
 
 		Comparator<AbstractDocument> comparator = DocumentComparator.getComparator("id asc");

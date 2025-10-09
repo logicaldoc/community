@@ -66,7 +66,7 @@ public class ExtensionAliasesDialog extends Window {
 
 			SettingService.Instance.get().saveExtensionAliases(extn, als, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void arg0) {
+				public void handleSuccess(Void arg0) {
 					GuiLog.info(I18N.message("settingssaved"), null);
 				}
 			});

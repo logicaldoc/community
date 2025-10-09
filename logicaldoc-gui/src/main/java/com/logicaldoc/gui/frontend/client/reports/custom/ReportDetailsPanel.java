@@ -45,7 +45,7 @@ public class ReportDetailsPanel extends VLayout {
 			if (report.getId() != 0) {
 				ReportService.Instance.get().getReport(report.getId(), true, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIReport report) {
+					public void handleSuccess(GUIReport report) {
 						setReport(report);
 					}
 				});
@@ -125,7 +125,7 @@ public class ReportDetailsPanel extends VLayout {
 		if (validate()) {
 			ReportService.Instance.get().save(report, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIReport report) {
+				public void handleSuccess(GUIReport report) {
 					tabSet.hideSave();
 					if (report != null) {
 						reportsPanel.updateReportRecord(report);

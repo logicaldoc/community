@@ -104,7 +104,7 @@ public class RunLevelPanel extends VLayout {
 
 		SettingService.Instance.get().saveSettings(settings, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg) {
+			public void handleSuccess(Void arg) {
 				GuiLog.info(I18N.message("settingssaved"));
 				for (GUIParameter param : settings)
 					Session.get().setConfig(param.getName(), param.getValue());

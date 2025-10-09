@@ -64,7 +64,7 @@ public class RetentionPolicyDetailsPanel extends VLayout implements FolderChange
 			if (policy.getId() != 0) {
 				RetentionPoliciesService.Instance.get().getPolicy(policy.getId(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIRetentionPolicy policy) {
+					public void handleSuccess(GUIRetentionPolicy policy) {
 						setPolicy(policy);
 					}
 				});
@@ -149,7 +149,7 @@ public class RetentionPolicyDetailsPanel extends VLayout implements FolderChange
 
 			RetentionPoliciesService.Instance.get().save(policy, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIRetentionPolicy newPolicy) {
+				public void handleSuccess(GUIRetentionPolicy newPolicy) {
 					tabSet.hideSave();
 					if (newPolicy != null) {
 						policiesPanel.updateRecord(newPolicy);

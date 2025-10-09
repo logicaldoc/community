@@ -14,7 +14,7 @@ import com.logicaldoc.gui.common.client.util.LD;
  * @param <T> The type of the return value that was declared in the synchronous
  *        version of the service method.
  */
-public class DefaultAsyncCallback<T> implements AsyncCallback<T> {
+public abstract class DefaultAsyncCallback<T> implements AsyncCallback<T> {
 
 	@Override
 	public void onFailure(Throwable caught) {
@@ -25,5 +25,8 @@ public class DefaultAsyncCallback<T> implements AsyncCallback<T> {
 	@Override
 	public void onSuccess(T v) {
 		LD.clearPrompt();
+		handleSuccess(v);
 	}
+	
+	protected abstract void handleSuccess(T result);
 }

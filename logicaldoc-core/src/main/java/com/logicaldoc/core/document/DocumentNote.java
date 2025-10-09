@@ -1,14 +1,23 @@
 package com.logicaldoc.core.document;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.LazyInitializationException;
 
 import com.logicaldoc.core.PersistentObject;
+import com.logicaldoc.core.security.AccessControlEntry;
+import com.logicaldoc.core.security.Secure;
 
 import jakarta.persistence.Cacheable;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 
 /**
@@ -20,7 +29,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "ld_note")
 @Cacheable
-public class DocumentNote extends PersistentObject {
+public class DocumentNote extends PersistentObject implements Secure<AccessControlEntry> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -120,6 +129,10 @@ public class DocumentNote extends PersistentObject {
 	@Column(name = "ld_rotation", nullable = false)
 	private double rotation = 0.0;
 
+	@ElementCollection
+	@CollectionTable(name = "ld_note_acl", joinColumns = @JoinColumn(name = "ld_noteid"))
+	private Set<AccessControlEntry> accessControlList = new HashSet<>();
+
 	public DocumentNote() {
 	}
 
@@ -147,6 +160,13 @@ public class DocumentNote extends PersistentObject {
 		this.recipient = source.recipient;
 		this.recipientEmail = source.recipientEmail;
 		this.setTenantId(source.getTenantId());
+
+		try {
+			for (AccessControlEntry ace : source.getAccessControlList())
+				getAccessControlList().add(new AccessControlEntry(ace));
+		} catch (LazyInitializationException x) {
+			// may happen do nothing
+		}
 	}
 
 	public long getDocId() {
@@ -323,6 +343,35 @@ public class DocumentNote extends PersistentObject {
 
 	public void setRotation(double rotation) {
 		this.rotation = rotation;
+	}
+
+	@Override
+	public void setAccessControlList(Set<AccessControlEntry> acl) {
+		accessControlList = acl;
+	}
+
+	@Override
+	public Set<AccessControlEntry> getAccessControlList() {
+		return accessControlList;
+	}
+
+	@Override
+	public AccessControlEntry getAccessControlEntry(long groupId) {
+		return getAccessControlList().stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);
+	}
+
+	@Override
+	public Set<AccessControlEntry> getAccessControlEntries(Set<Long> groupIds) {
+		return getAccessControlList().stream().filter(ace -> groupIds.contains(ace.getGroupId()))
+				.collect(Collectors.toSet());
+	}
+
+	@Override
+	public void addAccessControlEntry(AccessControlEntry ace) {
+		if (!getAccessControlList().add(ace)) {
+			getAccessControlList().remove(ace);
+			getAccessControlList().add(ace);
+		}
 	}
 
 	@Override

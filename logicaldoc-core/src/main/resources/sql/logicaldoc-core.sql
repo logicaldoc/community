@@ -194,6 +194,7 @@ create table ld_note (ld_id bigint not null, ld_lastmodified timestamp not null,
  					  ld_type varchar(255), ld_recipient varchar(255), ld_recipientemail varchar(255),
  					  ld_shape varchar(255), ld_linecolor varchar(255), ld_lineopacity int not null, ld_linewidth int not null, ld_rotation float not null,
  					  primary key (ld_id));
+create table ld_note_acl (ld_noteid bigint not null, ld_groupid bigint not null, ld_read int not null, ld_write int not null, primary key (ld_noteid, ld_groupid)); 					  
 create table ld_messagetemplate (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null,
                                  ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null, ld_language varchar(10) not null,
                                  ld_description varchar(1000), ld_body varchar(4000), ld_type varchar(255),
@@ -307,6 +308,8 @@ alter table ld_ticket add constraint FK_TICKET_USER foreign key (ld_userid) refe
 alter table ld_menu add constraint FK_MENU_PARENT foreign key (ld_parentid) references ld_menu(ld_id);
 alter table ld_menu_acl add constraint FK_MENUACL_GROUP foreign key (ld_groupid) references ld_group(ld_id) on delete cascade;
 alter table ld_menu_acl add constraint FK_MENUACL_MENU foreign key (ld_menuid) references ld_menu(ld_id) on delete cascade;
+alter table ld_note_acl add constraint FK_NOTEACL_GROUP foreign key (ld_groupid) references ld_group(ld_id) on delete cascade;
+alter table ld_note_acl add constraint FK_NOTEACL_MENU foreign key (ld_noteid) references ld_menu(ld_id) on delete cascade;
 alter table ld_folder add constraint FK_FOLDER_PARENT foreign key (ld_parentid) references ld_folder(ld_id);
 alter table ld_folder add constraint FK_FOLDER_TEMPLATE foreign key (ld_templateid) references ld_template(ld_id);
 alter table ld_folder_ext add constraint FK_FOLDEREXT_FOLDER foreign key (ld_folderid) references ld_folder(ld_id);

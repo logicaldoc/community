@@ -77,7 +77,7 @@ public class PluginUploader extends Window {
 			}
 
 			@Override
-			public void onSuccess(Void result) {
+			public void handleSuccess(Void result) {
 				cleanUploads();
 				GuiLog.info(I18N.message("plugininstalled"));
 				pluginsPanel.refresh();

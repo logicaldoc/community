@@ -47,7 +47,7 @@ public class PasswordGenerator extends Window {
 			}
 
 			@Override
-			public void onSuccess(String pswd) {
+			public void handleSuccess(String pswd) {
 				password.setValue(pswd);
 				generate.setDisabled(false);
 			}

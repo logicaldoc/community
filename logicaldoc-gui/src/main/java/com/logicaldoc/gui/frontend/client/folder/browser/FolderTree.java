@@ -107,7 +107,7 @@ public class FolderTree extends TreeGrid {
 			FolderService.Instance.get().getFolder(getSelectedFolderId(), false, false, true,
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIFolder folder) {
+						public void handleSuccess(GUIFolder folder) {
 							cursor.onFolderSelected(folder);
 						}
 					}));
@@ -274,7 +274,7 @@ public class FolderTree extends TreeGrid {
 		FolderService.Instance.get().getFolder(folderId, false, false, Session.get().isFolderPagination(),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIFolder result) {
+					public void handleSuccess(GUIFolder result) {
 						if (result != null) {
 							result.setPathExtended(getPath(folderId));
 							if (Session.get().isFolderPagination()) {
@@ -322,20 +322,22 @@ public class FolderTree extends TreeGrid {
 
 	/**
 	 * Opens the branch to show the specified folder, it cycles the path
-	 * creating minimal tree nodes. At the end the folder is also selected as currently selected folder
+	 * creating minimal tree nodes. At the end the folder is also selected as
+	 * currently selected folder
 	 * 
 	 * @param folderId identifier of the folder to open
 	 */
 	public void openFolder(long folderId) {
 		openFolder(folderId, true);
 	}
-	
+
 	/**
 	 * Opens the branch to show the specified folder, it cycles the path
 	 * creating minimal tree nodes
 	 * 
 	 * @param folderId identifier of the folder to open
-	 * @param select if the open node must also be selected as currently selected folder
+	 * @param select if the open node must also be selected as currently
+	 *        selected folder
 	 */
 	public void openFolder(long folderId, boolean select) {
 		getTree().closeAll();
@@ -343,7 +345,7 @@ public class FolderTree extends TreeGrid {
 		FolderService.Instance.get().getFolder(folderId, true, true, isPaginationEnabled(),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIFolder folder) {
+					public void handleSuccess(GUIFolder folder) {
 						long folderId = folder.getId();
 						Long folderRef = folder.getFoldRef();
 						if (folder.getFoldRef() != null) {

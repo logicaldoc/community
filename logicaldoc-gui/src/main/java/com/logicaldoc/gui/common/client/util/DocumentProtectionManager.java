@@ -39,7 +39,7 @@ public class DocumentProtectionManager {
 	public static void askForPassword(long docId, final DocumentProtectionHandler handler) {
 		DocumentService.Instance.get().getById(docId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIDocument document) {
+			public void handleSuccess(GUIDocument document) {
 				askForPassword(document, handler);
 			}
 		});
@@ -55,7 +55,7 @@ public class DocumentProtectionManager {
 	public static void askForPassword(GUIDocument document, final DocumentProtectionHandler handler) {
 		DocumentService.Instance.get().isPasswordProtected(document.getId(), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Boolean passwordProtected) {
+			public void handleSuccess(Boolean passwordProtected) {
 				if (Boolean.TRUE.equals(passwordProtected))
 					handlePasswordProtectedDocument(document.getId(), handler);
 				else
@@ -75,7 +75,7 @@ public class DocumentProtectionManager {
 		DocumentService.Instance.get().getById(docId, new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onSuccess(final GUIDocument result) {
+			public void handleSuccess(final GUIDocument result) {
 				if (unprotectedDocs.containsKey(docId)) {
 					notifyUnprotected(handler, result);
 				} else {
@@ -102,7 +102,7 @@ public class DocumentProtectionManager {
 			final GUIDocument result, final String password) {
 		DocumentService.Instance.get().unsetPassword(result.getId(), password, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void res) {
+			public void handleSuccess(Void res) {
 				saveProtectionPasswordAndNotify(docId, handler, result, password);
 			}
 		});
@@ -112,7 +112,7 @@ public class DocumentProtectionManager {
 			final String password) {
 		DocumentService.Instance.get().unprotect(result.getId(), password, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Boolean granted) {
+			public void handleSuccess(Boolean granted) {
 				if (Boolean.TRUE.equals(granted)) {
 					saveProtectionPasswordAndNotify(docId, handler, result, password);
 				} else if (handler != null) {

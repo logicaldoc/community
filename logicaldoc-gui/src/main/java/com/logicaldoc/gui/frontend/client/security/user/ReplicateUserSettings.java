@@ -59,8 +59,7 @@ public class ReplicateUserSettings extends Window {
 				SecurityService.Instance.get().replicateUsersSettings(masterUserId, userIds,
 						userInterface.getValueAsBoolean(), groups.getValueAsBoolean(), new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void arg0) {
-								LD.clearPrompt();
+							public void handleSuccess(Void arg0) {
 								GuiLog.info(I18N.message("userssaved"));
 								destroy();
 								panel.refresh();

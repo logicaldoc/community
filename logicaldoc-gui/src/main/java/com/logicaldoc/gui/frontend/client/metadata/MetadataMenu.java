@@ -150,7 +150,7 @@ public class MetadataMenu extends VLayout {
 		customidAndAutonaming.addClickHandler(
 				customidAndAutonamingClick -> SchemeService.Instance.get().load(new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(List<GUIScheme> schemas) {
+					public void handleSuccess(List<GUIScheme> schemas) {
 						AdminScreen.get().setContent(new CustomIdPanel(schemas));
 					}
 				}));
@@ -186,7 +186,7 @@ public class MetadataMenu extends VLayout {
 		}
 		tags.addClickHandler(tagsClick -> TagService.Instance.get().getSettings(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIParameter> parameters) {
+			public void handleSuccess(List<GUIParameter> parameters) {
 				AdminScreen.get().setContent(new TagsPanel(parameters));
 			}
 		}));

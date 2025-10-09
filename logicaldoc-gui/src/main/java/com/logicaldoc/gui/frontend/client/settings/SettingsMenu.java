@@ -141,7 +141,7 @@ public class SettingsMenu extends VLayout {
 		smtp.setHeight(25);
 		smtp.addClickHandler(event -> SettingService.Instance.get().loadEmailSettings(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIEmailSettings settings) {
+			public void handleSuccess(GUIEmailSettings settings) {
 				AdminScreen.get().setContent(new OutgoingEmailPanel(settings));
 			}
 

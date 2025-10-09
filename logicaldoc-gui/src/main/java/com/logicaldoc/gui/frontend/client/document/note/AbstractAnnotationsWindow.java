@@ -101,7 +101,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 
 		DocumentService.Instance.get().getNotes(document.getId(), fileVersion, types, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIDocumentNote> nts) {
+			public void handleSuccess(List<GUIDocumentNote> nts) {
 				notes.addAll(nts);
 				initGUI();
 			}
@@ -178,7 +178,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 		captureNotesPosition();
 		DocumentService.Instance.get().saveNotes(document.getId(), fileVersion, notes, types, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg) {
+			public void handleSuccess(Void arg) {
 				onNotesSaved();
 			}
 		});
@@ -265,7 +265,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 			if (document.getPreviewPages() <= 1)
 				DocumentService.Instance.get().getById(document.getId(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIDocument dc) {
+					public void handleSuccess(GUIDocument dc) {
 						document.setPages(dc.getPreviewPages());
 						pageCursor.setMaxValue((double) document.getPreviewPages());
 						pageCursor.setNumValues(document.getPreviewPages());

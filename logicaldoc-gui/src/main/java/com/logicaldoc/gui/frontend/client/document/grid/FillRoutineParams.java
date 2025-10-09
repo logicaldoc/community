@@ -59,7 +59,7 @@ public class FillRoutineParams extends Window {
 
 		AutomationService.Instance.get().execute(routine, docIds, folderIds, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg0) {
+			public void handleSuccess(Void arg0) {
 				destroy();
 			}
 		});

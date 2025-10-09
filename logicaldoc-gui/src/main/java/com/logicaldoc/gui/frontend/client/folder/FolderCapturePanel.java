@@ -2,8 +2,8 @@ package com.logicaldoc.gui.frontend.client.folder;
 
 import java.util.Map;
 
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -62,19 +62,7 @@ public class FolderCapturePanel extends FolderDetailTab {
 		applySubFolders.setColSpan(1);
 		applySubFolders.addClickHandler((ClickEvent event) -> {
 			LD.contactingServer();
-			FolderService.Instance.get().applyOCR(folder.getId(), new DefaultAsyncCallback<>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					LD.clearPrompt();
-					super.onFailure(caught);
-				}
-
-				@Override
-				public void onSuccess(Void v) {
-					LD.clearPrompt();
-				}
-			});
+			FolderService.Instance.get().applyOCR(folder.getId(), new EmptyAsyncCallback<>());
 		});
 
 		SelectItem ocrTemplate = ItemFactory.newOCRTemplateSelector(true, documentTemplateId,
@@ -116,7 +104,7 @@ public class FolderCapturePanel extends FolderDetailTab {
 		}
 		return !vm.hasErrors();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

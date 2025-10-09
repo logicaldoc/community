@@ -43,7 +43,7 @@ public class GroupDetailsPanel extends VLayout {
 			if (group.getId() != 0) {
 				SecurityService.Instance.get().getGroup(group.getId(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIGroup group) {
+					public void handleSuccess(GUIGroup group) {
 						setGroup(group);
 					}
 				});
@@ -123,7 +123,7 @@ public class GroupDetailsPanel extends VLayout {
 		if (validate()) {
 			SecurityService.Instance.get().saveGroup(group, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIGroup group) {
+				public void handleSuccess(GUIGroup group) {
 					tabSet.hideSave();
 					if (group != null) {
 						groupsPanel.updateRecord(group);

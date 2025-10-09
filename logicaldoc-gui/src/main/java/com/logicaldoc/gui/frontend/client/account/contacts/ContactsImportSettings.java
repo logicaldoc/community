@@ -173,14 +173,7 @@ public class ContactsImportSettings extends Window {
 				ContactService.Instance.get().parseContacts(true, getParseContactsParameters(), new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onFailure(Throwable caught) {
-						super.onFailure(caught);
-						LD.clearPrompt();
-					}
-
-					@Override
-					public void onSuccess(List<GUIContact> contacts) {
-						LD.clearPrompt();
+					public void handleSuccess(List<GUIContact> contacts) {
 						ContactsImportPreview preview = new ContactsImportPreview(ContactsImportSettings.this);
 						preview.show();
 						preview.setContacts(contacts);

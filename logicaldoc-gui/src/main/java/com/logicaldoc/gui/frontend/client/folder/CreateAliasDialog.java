@@ -70,7 +70,7 @@ public class CreateAliasDialog extends Dialog {
 				parent.getAttributeAsLong(com.logicaldoc.gui.frontend.client.folder.browser.FolderTree.FOLDER_ID),
 				referencedFolderId, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIFolder ret) {
+					public void handleSuccess(GUIFolder ret) {
 						if (parent != null)
 							FolderNavigator.get().getTree().reloadChildren(parent);
 					}

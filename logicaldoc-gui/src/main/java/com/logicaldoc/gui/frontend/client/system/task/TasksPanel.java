@@ -73,11 +73,11 @@ public class TasksPanel extends AdminPanel {
 				tasksGrid.getSelectedRecord().getAttributeAsString("name"), I18N.getLocale(),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUITask task) {
+					public void handleSuccess(GUITask task) {
 						final GUITask currentTask = task;
 						SystemService.Instance.get().startTask(currentTask.getName(), new DefaultAsyncCallback<Void>() {
 							@Override
-							public void onSuccess(Void result) {
+							public void handleSuccess(Void result) {
 								final ListGridRecord rec = tasksGrid.getSelectedRecord();
 								rec.setAttribute(STATUS, GUITask.STATUS_RUNNING);
 								rec.setAttribute(RUNNING, true);
@@ -100,7 +100,7 @@ public class TasksPanel extends AdminPanel {
 		taskStop.addClickHandler(event -> SystemService.Instance.get()
 				.stopTask(tasksGrid.getSelectedRecord().getAttributeAsString("name"), new DefaultAsyncCallback<Void>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						tasksGrid.getSelectedRecord().setAttribute(STATUS, GUITask.STATUS_STOPPING);
 						tasksGrid.refreshRow(tasksGrid.getRecordIndex(tasksGrid.getSelectedRecord()));
 					}
@@ -115,7 +115,7 @@ public class TasksPanel extends AdminPanel {
 		enableTask.addClickHandler(event -> SystemService.Instance.get()
 				.enableTask(tasksGrid.getSelectedRecord().getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Boolean result) {
+					public void handleSuccess(Boolean result) {
 						tasksGrid.getSelectedRecord().setAttribute(ENABLED, true);
 						tasksGrid.getSelectedRecord().setAttribute(RUNNING, false);
 						tasksGrid.refreshRow(tasksGrid.getRecordIndex(tasksGrid.getSelectedRecord()));
@@ -130,7 +130,7 @@ public class TasksPanel extends AdminPanel {
 		disableTask.addClickHandler(event -> SystemService.Instance.get()
 				.disableTask(tasksGrid.getSelectedRecord().getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Boolean result) {
+					public void handleSuccess(Boolean result) {
 						tasksGrid.getSelectedRecord().setAttribute(ENABLED, false);
 						tasksGrid.getSelectedRecord().setAttribute(RUNNING, false);
 						tasksGrid.refreshRow(tasksGrid.getRecordIndex(tasksGrid.getSelectedRecord()));
@@ -222,7 +222,7 @@ public class TasksPanel extends AdminPanel {
 				SystemService.Instance.get().getTaskByName(rec.getAttribute("name"), I18N.getLocale(),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(GUITask task) {
+							public void handleSuccess(GUITask task) {
 								onSelectedTask(task);
 							}
 						});
@@ -240,7 +240,7 @@ public class TasksPanel extends AdminPanel {
 				SystemService.Instance.get().getTaskByName(rec.getAttribute("name"), I18N.getLocale(),
 						new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(GUITask task) {
+							public void handleSuccess(GUITask task) {
 								rec.setAttribute(STATUS, task.getStatus());
 								rec.setAttribute(ENABLED, task.getScheduling().isEnabled());
 								rec.setAttribute(RUNNING,task.getStatus() != GUITask.STATUS_IDLE);
@@ -319,7 +319,7 @@ public class TasksPanel extends AdminPanel {
 	private void loadTasks() {
 		SystemService.Instance.get().loadTasks(I18N.getLocale(), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUITask> tasks) {
+			public void handleSuccess(List<GUITask> tasks) {
 				for (GUITask guiTask : tasks) {
 					Progressbar p = progresses.get(guiTask.getName());
 					if (p == null)

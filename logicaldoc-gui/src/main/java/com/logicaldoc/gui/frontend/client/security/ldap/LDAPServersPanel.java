@@ -140,7 +140,7 @@ public class LDAPServersPanel extends AdminPanel {
 			if (list.getRecords() != null && list.getRecords().length > 0) {
 				LDAPService.Instance.get().reorder(GridUtil.getIds(list.getRecords()), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void arg) {
+					public void handleSuccess(Void arg) {
 						// Nothing to do
 					}
 				});
@@ -153,7 +153,7 @@ public class LDAPServersPanel extends AdminPanel {
 		if (rec != null)
 			LDAPService.Instance.get().get(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUILDAPServer server) {
+				public void handleSuccess(GUILDAPServer server) {
 					showServerDetails(server);
 				}
 			});
@@ -179,7 +179,7 @@ public class LDAPServersPanel extends AdminPanel {
 					if (Boolean.TRUE.equals(value)) {
 						LDAPService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
 							@Override
-							public void onSuccess(Void result) {
+							public void handleSuccess(Void result) {
 								refresh();
 							}
 						});
@@ -191,13 +191,12 @@ public class LDAPServersPanel extends AdminPanel {
 		enable.setEnabled(Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED)));
 		enable.addClickHandler(event -> LDAPService.Instance.get().get(id, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUILDAPServer server) {
+			public void handleSuccess(GUILDAPServer server) {
 				server.setEnabled(true);
 				LDAPService.Instance.get().save(server, new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(GUILDAPServer v) {
-						super.onSuccess(v);
+					public void handleSuccess(GUILDAPServer v) {
 						updateRecord(v);
 						onSelectionChanged();
 					}
@@ -210,13 +209,12 @@ public class LDAPServersPanel extends AdminPanel {
 		disable.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED)));
 		disable.addClickHandler(event -> LDAPService.Instance.get().get(id, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUILDAPServer server) {
+			public void handleSuccess(GUILDAPServer server) {
 				server.setEnabled(false);
 				LDAPService.Instance.get().save(server, new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(GUILDAPServer v) {
-						super.onSuccess(v);
+					public void handleSuccess(GUILDAPServer v) {
 						updateRecord(v);
 						onSelectionChanged();
 					}

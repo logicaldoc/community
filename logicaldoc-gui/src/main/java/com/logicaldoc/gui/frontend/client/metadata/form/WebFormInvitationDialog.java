@@ -52,8 +52,7 @@ public class WebFormInvitationDialog extends AbstractEmailDialog {
 				}
 
 				@Override
-				public void onSuccess(Void arg) {
-					LD.clearPrompt();
+				public void handleSuccess(Void arg) {
 					GuiLog.info(I18N.message("messagesent"));
 					destroy();
 				}

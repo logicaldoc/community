@@ -123,7 +123,7 @@ public class FolderCopyDialog extends Dialog {
 	private void copySingleFolder(long selectedSourceId, final DynamicForm form, long tagetFolderId) {
 		FolderService.Instance.get().getFolder(selectedSourceId, false, false, false, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIFolder sourceFolder) {
+			public void handleSuccess(GUIFolder sourceFolder) {
 				sourceFolder.setName(form.getValueAsString("name"));
 				sourceFolder.setAllowedPermissions(new GUIAccessControlEntry(GUIAccessControlEntry.PERMISSION_READ,
 						GUIAccessControlEntry.PERMISSION_WRITE));
@@ -151,8 +151,7 @@ public class FolderCopyDialog extends Dialog {
 		FolderService.Instance.get().copyFolders(FolderNavigator.get().getSelectedIds(), targetFolderId, foldersOnly,
 				securityOption, null, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void ret) {
-						LD.clearPrompt();
+					public void handleSuccess(Void ret) {
 						if (target != null)
 							FolderNavigator.get().reload();
 					}

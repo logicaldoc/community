@@ -89,7 +89,7 @@ public class DigitalSignatureDialog extends Window {
 
 		SignService.Instance.get().isVisualSignatureEnabled(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Boolean enabled) {
+			public void handleSuccess(Boolean enabled) {
 				visualPositioning.setDisabled(!enabled);
 			}
 		});
@@ -108,9 +108,8 @@ public class DigitalSignatureDialog extends Window {
 			SignService.Instance.get().signDocuments(docIds, vm.getValueAsString(REASON), 1, null, null, null,
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void arg) {
+						public void handleSuccess(Void arg) {
 							GuiLog.info(I18N.message("event.signed"), null);
-							LD.clearPrompt();
 						}
 					});
 		}

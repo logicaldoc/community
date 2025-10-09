@@ -100,8 +100,7 @@ public class ModelImporter extends Window {
 			}
 
 			@Override
-			public void onSuccess(GUIModel model) {
-				super.onSuccess(model);
+			public void handleSuccess(GUIModel model) {
 				save.setDisabled(false);
 				if (changedHandler != null)
 					changedHandler.onChanged(null);

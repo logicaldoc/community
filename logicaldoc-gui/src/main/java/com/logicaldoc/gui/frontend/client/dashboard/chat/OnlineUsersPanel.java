@@ -183,7 +183,7 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 					ChatService.Instance.get().invite(users, answer, new DefaultAsyncCallback<>() {
 
 						@Override
-						public void onSuccess(Void arg) {
+						public void handleSuccess(Void arg) {
 							GuiLog.info(I18N.message("invitationsent"));
 						}
 					});

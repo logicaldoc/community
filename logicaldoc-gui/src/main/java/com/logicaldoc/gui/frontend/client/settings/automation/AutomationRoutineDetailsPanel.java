@@ -49,7 +49,7 @@ public class AutomationRoutineDetailsPanel extends VLayout {
 			if (routine.getId() != 0) {
 				AutomationService.Instance.get().getRoutine(routine.getId(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIAutomationRoutine routine) {
+					public void handleSuccess(GUIAutomationRoutine routine) {
 						setRoutine(routine);
 					}
 				});
@@ -144,7 +144,7 @@ public class AutomationRoutineDetailsPanel extends VLayout {
 		if (validate()) {
 			AutomationService.Instance.get().saveRoutine(routine, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIAutomationRoutine routine) {
+				public void handleSuccess(GUIAutomationRoutine routine) {
 					tabSet.hideSave();
 					AutomationRoutineDetailsPanel.this.setRoutine(routine);
 					if (routine != null)

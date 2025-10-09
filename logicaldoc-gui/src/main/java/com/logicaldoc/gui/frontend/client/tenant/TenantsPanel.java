@@ -158,7 +158,7 @@ public class TenantsPanel extends AdminPanel {
 	public void loadTenant(long tenantId) {
 		TenantService.Instance.get().load(tenantId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUITenant tenant) {
+			public void handleSuccess(GUITenant tenant) {
 				showTenantDetails(tenant);
 			}
 		});
@@ -215,8 +215,7 @@ public class TenantsPanel extends AdminPanel {
 			if (Boolean.TRUE.equals(answer)) {
 				TenantService.Instance.get().delete(id, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
-						super.onSuccess(result);
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						details = SELECT_TENANT;
@@ -231,13 +230,12 @@ public class TenantsPanel extends AdminPanel {
 		enable.setEnabled(Boolean.FALSE.equals(rec.getAttributeAsBoolean(ENABLED)));
 		enable.addClickHandler(event -> TenantService.Instance.get().load(id, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUITenant tenant) {
+			public void handleSuccess(GUITenant tenant) {
 				tenant.setEnabled(true);
 				TenantService.Instance.get().save(tenant, new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(GUITenant v) {
-						super.onSuccess(v);
+					public void handleSuccess(GUITenant v) {
 						updateRecord(v);
 						showTenantDetails(v);
 					}
@@ -250,13 +248,12 @@ public class TenantsPanel extends AdminPanel {
 		disable.setEnabled(Boolean.TRUE.equals(rec.getAttributeAsBoolean(ENABLED)));
 		disable.addClickHandler(event -> TenantService.Instance.get().load(id, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUITenant tenant) {
+			public void handleSuccess(GUITenant tenant) {
 				tenant.setEnabled(false);
 				TenantService.Instance.get().save(tenant, new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(GUITenant v) {
-						super.onSuccess(v);
+					public void handleSuccess(GUITenant v) {
 						updateRecord(v);
 						showTenantDetails(v);
 					}

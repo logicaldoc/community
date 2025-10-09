@@ -91,7 +91,7 @@ public class WebcontentEditor extends Window {
 						}
 
 						@Override
-						public void onSuccess(Void result) {
+						public void handleSuccess(Void result) {
 							DocumentsPanel.get().refresh();
 							destroy();
 						}

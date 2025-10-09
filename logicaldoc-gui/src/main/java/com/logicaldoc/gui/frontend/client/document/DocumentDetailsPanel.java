@@ -245,7 +245,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		// Search list panel.
 		DocumentService.Instance.get().getById(document.getId(), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIDocument doc) {
+			public void handleSuccess(GUIDocument doc) {
 				DocumentController.get().selected(doc);
 			}
 		}));
@@ -682,7 +682,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			}
 
 			@Override
-			public void onSuccess(GUIDocument result) {
+			public void handleSuccess(GUIDocument result) {
 				result.setStatus(GUIDocument.DOC_UNLOCKED);
 				result.setLockUser(null);
 				result.setLockUserId(null);

@@ -107,7 +107,7 @@ public class SearchIndexEntriesPanel extends VLayout {
 
 		SearchEngineService.Instance.get().query(q, pageNumber, size, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIResult result) {
+			public void handleSuccess(GUIResult result) {
 				long totalPages = (long) Math
 						.ceil((double) result.getEstimatedHits() / (double) pageSize.getValueAsInteger().intValue());
 				page.setHint("/" + totalPages);
@@ -152,13 +152,12 @@ public class SearchIndexEntriesPanel extends VLayout {
 
 		MenuItem deleteEntry = new MenuItem();
 		deleteEntry.setTitle(I18N.message("ddelete"));
-		deleteEntry.addClickHandler(event -> SC.ask(I18N.message("deleteindexentriesconfirm"), confirm -> {
+		deleteEntry.addClickHandler(click -> SC.ask(I18N.message("deleteindexentriesconfirm"), confirm -> {
 			if (confirm.booleanValue()) {
 				LD.contactingServer();
 				SearchEngineService.Instance.get().remove(entriesGrid.getSelectedIds(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void arg) {
-						LD.clearPrompt();
+					public void handleSuccess(Void arg) {
 						onSearch();
 					}
 				});

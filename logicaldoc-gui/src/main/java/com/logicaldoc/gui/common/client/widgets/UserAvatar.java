@@ -70,7 +70,7 @@ public class UserAvatar extends HLayout {
 		reset.setTitle(I18N.message("reset"));
 		reset.addClickHandler(event -> SecurityService.Instance.get().resetAvatar(userId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg) {
+			public void handleSuccess(Void arg) {
 				UserAvatar.this.initGUI();
 				if (callback != null)
 					callback.onSuccess(null);
@@ -129,7 +129,7 @@ public class UserAvatar extends HLayout {
 					event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 
 						@Override
-						public void onSuccess(Void result) {
+						public void handleSuccess(Void result) {
 							destroy();
 						}
 					}));
@@ -152,12 +152,12 @@ public class UserAvatar extends HLayout {
 				}
 
 				@Override
-				public void onSuccess(Void arg) {
+				public void handleSuccess(Void arg) {
 					UserAvatar.this.initGUI();
 					DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 
 						@Override
-						public void onSuccess(Void result) {
+						public void handleSuccess(Void result) {
 							destroy();
 							close();
 						}

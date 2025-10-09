@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.data.ContactsDS;
@@ -88,9 +89,8 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 				click -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(Void arg0) {
-						ContactsUploader uploader = new ContactsUploader();
-						uploader.show();
+					public void handleSuccess(Void arg0) {
+						new ContactsUploader().show();
 					}
 				}));
 
@@ -193,7 +193,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 			if (Boolean.TRUE.equals(confirm))
 				ContactService.Instance.get().delete(GridUtil.getIds(selection), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 					}
@@ -227,45 +227,34 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 			public void execute(Map<String, Object> values) {
 				LD.contactingServer();
 				ContactService.Instance.get().shareContacts(GridUtil.getIds(list.getSelectedRecords()),
-						usersSelector.getUserIds(), groupsSelector.getGroupIds(), new DefaultAsyncCallback<>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								LD.clearPrompt();
-								super.onFailure(caught);
-							}
-
-							@Override
-							public void onSuccess(Void arg0) {
-								LD.clearPrompt();
-							}
-						});
+						usersSelector.getUserIds(), groupsSelector.getGroupIds(), new EmptyAsyncCallback<>());
 			}
 		});
 	}
 
 	private void onEdit() {
 		final ListGridRecord[] selection = list.getSelectedRecords();
-		ContactService.Instance.get().load(Long.parseLong(selection[0].getAttribute("id")), new DefaultAsyncCallback<>() {
-			@Override
-			public void onSuccess(GUIContact result) {
-				if (result != null) {
-					new ContactDetails(result, Contacts.this).show();
-				}
-			}
-		});
+		ContactService.Instance.get().load(Long.parseLong(selection[0].getAttribute("id")),
+				new DefaultAsyncCallback<>() {
+					@Override
+					public void handleSuccess(GUIContact result) {
+						if (result != null) {
+							new ContactDetails(result, Contacts.this).show();
+						}
+					}
+				});
 	}
 
 	@Override
 	protected void onDraw() {
 		GridUtil.scrollGrid(list, null);
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

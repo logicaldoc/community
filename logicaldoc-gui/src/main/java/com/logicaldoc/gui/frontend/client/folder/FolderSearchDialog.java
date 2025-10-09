@@ -95,7 +95,7 @@ public class FolderSearchDialog extends Window {
 	protected void search(GUISearchOptions options) {
 		SearchService.Instance.get().search(options, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(GUIResult result) {
+			public void handleSuccess(GUIResult result) {
 				lastResult = new ArrayList<>();
 				for (GUIDocument hit : result.getHits()) {
 					ListGridRecord rec = new ListGridRecord();

@@ -194,7 +194,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 			click.getItem().setValue(I18N.message("computing") + "...");
 			FolderService.Instance.get().computeStats(folder.getId(), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(List<Long> stats) {
+				public void handleSuccess(List<Long> stats) {
 					folder.setDocumentCount(stats.get(0));
 					documents.setValue(Util.formatLong(stats.get(0)));
 					folder.setSubfolderCount(stats.get(1));
@@ -233,7 +233,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 							DocumentService.Instance.get().enforceFilesIntoFolderStore(folder.getId(),
 									new DefaultAsyncCallback<>() {
 										@Override
-										public void onSuccess(Void v) {
+										public void handleSuccess(Void v) {
 											LD.clearPrompt();
 										}
 									});
@@ -253,7 +253,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 			LD.contactingServer();
 			FolderService.Instance.get().applyStore(folder.getId(), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void v) {
+				public void handleSuccess(Void v) {
 					LD.clearPrompt();
 				}
 			});
@@ -411,7 +411,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 			LD.contactingServer();
 			FolderService.Instance.get().applyTags(folder.getId(), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void v) {
+				public void handleSuccess(Void v) {
 					LD.clearPrompt();
 				}
 			});

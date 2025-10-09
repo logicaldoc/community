@@ -49,7 +49,7 @@ public class ResponsesStatsPanel extends VLayout {
 				form.setStatChartWidth((Integer) tileWidth.getValue());
 				FormService.Instance.get().save(form, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIForm frm) {
+					public void handleSuccess(GUIForm frm) {
 						form.setId(frm.getId());
 						refresh(form.getStatChartWidth());
 					}

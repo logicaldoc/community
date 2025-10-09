@@ -138,7 +138,7 @@ public class GroupUsersPanel extends VLayout {
 			SecurityService.Instance.get().addUserToGroup(groupId, Long.parseLong(selectedRecord.getAttribute("id")),
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void ret) {
+						public void handleSuccess(Void ret) {
 							// Update the users table
 							ListGridRecord rec = new ListGridRecord();
 							rec.setAttribute("id", selectedRecord.getAttribute("id"));
@@ -188,7 +188,7 @@ public class GroupUsersPanel extends VLayout {
 				if (Boolean.TRUE.equals(confirm)) {
 					SecurityService.Instance.get().removeFromGroup(groupId, ids, new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void result) {
+						public void handleSuccess(Void result) {
 							list.removeSelectedData();
 							list.deselectAllRecords();
 						}

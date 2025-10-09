@@ -263,7 +263,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 			click.getItem().setValue(I18N.message("computing") + "...");
 			DocumentService.Instance.get().updatePages(document.getId(), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Integer docPages) {
+				public void handleSuccess(Integer docPages) {
 					if (docPages != null) {
 						document.setPages(docPages.intValue());
 						pages.setValue(Util.formatInt(document.getPages()));
@@ -417,7 +417,7 @@ public class DocumentStandardPropertiesPanel extends DocumentDetailTab {
 			rating.addClickHandler(
 					event -> DocumentService.Instance.get().getRating(document.getId(), new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIRating rating) {
+						public void handleSuccess(GUIRating rating) {
 							if (rating != null)
 								new RatingDialog(document.getRating(), rating).show();
 						}

@@ -73,8 +73,7 @@ public class ApplyTemplateDialog extends Dialog {
 			FolderService.Instance.get().applyTemplate(folderId, templateId,
 					Boolean.valueOf(form.getValueAsString("inheritSecurity")), new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(Void arg0) {
-							LD.clearPrompt();
+						public void handleSuccess(Void arg0) {
 							FolderNavigator.get().getTree().reloadChildren(selectedNode);
 							GuiLog.info(I18N.message("templateapplied"), null);
 							destroy();

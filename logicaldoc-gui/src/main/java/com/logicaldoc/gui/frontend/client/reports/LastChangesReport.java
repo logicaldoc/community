@@ -373,9 +373,7 @@ public class LastChangesReport extends AdminPanel {
 		SystemService.Instance.get().search(userId, fromValue, tillValue, displayMaxValue, sid, eventValues,
 				folder.getFolderId(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(List<GUIHistory> result) {
-						LD.clearPrompt();
-
+					public void handleSuccess(List<GUIHistory> result) {
 						List<ListGridRecord> records = new ArrayList<>();
 						for (GUIHistory hist : result) {
 							ListGridRecord rec = new ListGridRecord();
@@ -450,7 +448,7 @@ public class LastChangesReport extends AdminPanel {
 		if (docId != null)
 			preview.addClickHandler(event -> DocumentService.Instance.get().getById(docId, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUIDocument doc) {
+				public void handleSuccess(GUIDocument doc) {
 					new PreviewPopup(doc).show();
 				}
 			}));

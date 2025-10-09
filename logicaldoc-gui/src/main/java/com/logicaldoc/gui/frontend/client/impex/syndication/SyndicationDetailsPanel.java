@@ -39,7 +39,7 @@ public class SyndicationDetailsPanel extends VLayout {
 			if (syndication.getId() != 0) {
 				SyndicationService.Instance.get().getSyndication(syndication.getId(), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUISyndication share) {
+					public void handleSuccess(GUISyndication share) {
 						setSyndication(share);
 					}
 				});
@@ -101,7 +101,7 @@ public class SyndicationDetailsPanel extends VLayout {
 		if (validate()) {
 			SyndicationService.Instance.get().save(syndication, new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(GUISyndication syndication) {
+				public void handleSuccess(GUISyndication syndication) {
 					tabSet.hideSave();
 					if (syndication != null) {
 						syndicationsPanel.updateRecord(syndication);

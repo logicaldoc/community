@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.workflow;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.WorkflowTriggersDS;
 import com.logicaldoc.gui.common.client.grid.EventsListGridField;
@@ -45,7 +46,7 @@ public class WorkflowTriggersPanel extends VLayout {
 		applyTriggersToSubfolders.setAutoFit(true);
 		applyTriggersToSubfolders.addClickHandler(event -> {
 			LD.contactingServer();
-			WorkflowService.Instance.get().applyTriggersToTree(folder.getId(), new DefaultAsyncCallback<>());
+			WorkflowService.Instance.get().applyTriggersToTree(folder.getId(), new EmptyAsyncCallback<>());
 		});
 
 		HLayout buttons = new HLayout();
@@ -107,7 +108,7 @@ public class WorkflowTriggersPanel extends VLayout {
 						WorkflowService.Instance.get().deleteTrigger(Long.parseLong(rec.getAttributeAsString("id")),
 								new DefaultAsyncCallback<>() {
 									@Override
-									public void onSuccess(Void result) {
+									public void handleSuccess(Void result) {
 										removeMember(list);
 										refresh();
 									}
@@ -119,7 +120,7 @@ public class WorkflowTriggersPanel extends VLayout {
 		edit.setTitle(I18N.message("edit"));
 		edit.addClickHandler(click -> new TriggerDialog(WorkflowTriggersPanel.this).show());
 
-		contextMenu.setItems(edit, new MenuItemSeparator(),  deleteTrigger);
+		contextMenu.setItems(edit, new MenuItemSeparator(), deleteTrigger);
 		contextMenu.showContextMenu();
 	}
 
@@ -130,7 +131,7 @@ public class WorkflowTriggersPanel extends VLayout {
 	public ListGridRecord getSelectedRecord() {
 		return list.getSelectedRecord();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

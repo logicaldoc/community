@@ -58,7 +58,7 @@ public class RobotAvatar extends HLayout {
 		RobotService.Instance.get().get(robotId, new DefaultAsyncCallback<>() {
 
 			@Override
-			public void onSuccess(GUIRobot rbt) {
+			public void handleSuccess(GUIRobot rbt) {
 				int avatarSize = Session.get().getConfigAsInt(GUI_AVATAR_SIZE);
 				Img avatarImage = new Img(rbt.getAvatar(), avatarSize, avatarSize);
 				avatarImage.setLeft(0);
@@ -78,7 +78,7 @@ public class RobotAvatar extends HLayout {
 		reset.setTitle(I18N.message("reset"));
 		reset.addClickHandler(event -> RobotService.Instance.get().resetAvatar(robotId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg) {
+			public void handleSuccess(Void arg) {
 				initGUI();
 			}
 		}));
@@ -135,7 +135,7 @@ public class RobotAvatar extends HLayout {
 					event -> DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 
 						@Override
-						public void onSuccess(Void result) {
+						public void handleSuccess(Void result) {
 							destroy();
 						}
 					}));
@@ -158,12 +158,12 @@ public class RobotAvatar extends HLayout {
 				}
 
 				@Override
-				public void onSuccess(Void arg) {
+				public void handleSuccess(Void arg) {
 					initGUI();
 					DocumentService.Instance.get().cleanUploadedFileFolder(new DefaultAsyncCallback<>() {
 
 						@Override
-						public void onSuccess(Void result) {
+						public void handleSuccess(Void result) {
 							destroy();
 							close();
 						}

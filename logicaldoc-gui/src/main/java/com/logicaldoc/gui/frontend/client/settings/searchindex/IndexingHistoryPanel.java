@@ -198,7 +198,7 @@ public class IndexingHistoryPanel extends VLayout {
 			FolderService.Instance.get().getFolder(rec.getAttributeAsLong("folderId"), false, false, false,
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIFolder folder) {
+						public void handleSuccess(GUIFolder folder) {
 							if (folder.isDownload())
 								Util.download(Util.downloadURL(rec.getAttributeAsLong(DOC_ID)) + "&downloadText=true");
 						}
@@ -212,8 +212,7 @@ public class IndexingHistoryPanel extends VLayout {
 			LD.contactingServer();
 			DocumentService.Instance.get().indexDocuments(getSelectedDocIds(list), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void result) {
-					LD.clearPrompt();
+				public void handleSuccess(Void result) {
 					refresh(list);
 				}
 			});
@@ -224,7 +223,7 @@ public class IndexingHistoryPanel extends VLayout {
 		markIndexMetadataOnly.addClickHandler(event -> DocumentService.Instance.get()
 				.markIndexable(getSelectedDocIds(list), Constants.INDEX_TO_INDEX_METADATA, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						refresh(list);
 					}
 				}));
@@ -234,7 +233,7 @@ public class IndexingHistoryPanel extends VLayout {
 		markUnindexable.addClickHandler(event -> DocumentService.Instance.get().markUnindexable(getSelectedDocIds(list),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						refresh(list);
 					}
 				}));
@@ -244,7 +243,7 @@ public class IndexingHistoryPanel extends VLayout {
 		markIndexable.addClickHandler(event -> DocumentService.Instance.get().markIndexable(getSelectedDocIds(list),
 				Constants.INDEX_TO_INDEX, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						refresh(list);
 					}
 				}));

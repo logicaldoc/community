@@ -275,7 +275,7 @@ public class GUIGridsPanel extends VLayout {
 		// Save all
 		SettingService.Instance.get().saveSettings(parameters, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void arg0) {
+			public void handleSuccess(Void arg0) {
 				GuiLog.info(I18N.message("settingssaved"), null);
 			}
 		});
@@ -325,7 +325,7 @@ public class GUIGridsPanel extends VLayout {
 		Session.get().setConfig(param.getName(), param.getValue());
 		return parameters;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

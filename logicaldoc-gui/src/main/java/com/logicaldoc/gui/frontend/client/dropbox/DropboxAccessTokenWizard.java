@@ -84,7 +84,7 @@ public class DropboxAccessTokenWizard extends Window {
 
 		DropboxService.Instance.get().finishAuthorization(vm.getValueAsString("code").trim(), new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(String account) {
+			public void handleSuccess(String account) {
 				if (account != null) {
 					destroy();
 					SC.say(I18N.message("correctlyauthorized", Session.get().getInfo().getBranding().getProductName(),

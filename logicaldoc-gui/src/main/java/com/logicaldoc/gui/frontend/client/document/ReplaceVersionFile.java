@@ -81,7 +81,7 @@ public class ReplaceVersionFile extends Window {
 		DocumentService.Instance.get().replaceFile(document.getId(), fileVersion, vm.getValueAsString("comment"),
 				new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void arg0) {
+					public void handleSuccess(Void arg0) {
 						destroy();
 					}
 				});

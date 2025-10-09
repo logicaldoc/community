@@ -55,7 +55,7 @@ public class OnlyOfficeEditor extends Window {
 			// the document is being edited, so declare the editing
 			OnlyOfficeService.Instance.get().startFilling(document.getId(), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void result) {
+				public void handleSuccess(Void result) {
 					reloadBody(document, layout);
 				}
 			});
@@ -63,7 +63,7 @@ public class OnlyOfficeEditor extends Window {
 			// the document is being edited, so declare the editing
 			OnlyOfficeService.Instance.get().startEditing(document.getId(), new DefaultAsyncCallback<>() {
 				@Override
-				public void onSuccess(Void result) {
+				public void handleSuccess(Void result) {
 					reloadBody(document, layout);
 				}
 			});
@@ -74,7 +74,7 @@ public class OnlyOfficeEditor extends Window {
 		// the document is being edited, so declare the end of editing
 		OnlyOfficeService.Instance.get().endEditing(docId, new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(Void result) {
+			public void handleSuccess(Void result) {
 				destroy();
 			}
 		});

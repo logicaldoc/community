@@ -167,7 +167,7 @@ public class CustomReportsPanel extends AdminPanel {
 	public void update() {
 		ReportService.Instance.get().getReports(new DefaultAsyncCallback<>() {
 			@Override
-			public void onSuccess(List<GUIReport> reports) {
+			public void handleSuccess(List<GUIReport> reports) {
 				for (GUIReport report : reports)
 					updateReportRecord(report);
 			}
@@ -228,7 +228,7 @@ public class CustomReportsPanel extends AdminPanel {
 		execute.addClickHandler(
 				event -> ReportService.Instance.get().getReport(selectedId, false, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIReport report) {
+					public void handleSuccess(GUIReport report) {
 						new ReportParametersForm(report, CustomReportsPanel.this).show();
 					}
 				}));
@@ -253,7 +253,7 @@ public class CustomReportsPanel extends AdminPanel {
 			if (Boolean.TRUE.equals(chioice))
 				ReportService.Instance.get().delete(selectedId, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						showReportDetails(null);
@@ -266,7 +266,7 @@ public class CustomReportsPanel extends AdminPanel {
 		enable.addClickHandler(event -> ReportService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, true);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
@@ -278,7 +278,7 @@ public class CustomReportsPanel extends AdminPanel {
 		disable.addClickHandler(event -> ReportService.Instance.get()
 				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						rec.setAttribute(ENABLED, false);
 						list.refreshRow(list.getRecordIndex(rec));
 					}
@@ -299,7 +299,7 @@ public class CustomReportsPanel extends AdminPanel {
 		preview.addClickHandler(
 				event -> DocumentService.Instance.get().getById(outputDocId, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUIDocument doc) {
+					public void handleSuccess(GUIDocument doc) {
 						new PreviewPopup(doc).show();
 					}
 				}));
@@ -359,7 +359,7 @@ public class CustomReportsPanel extends AdminPanel {
 			ReportService.Instance.get().getReport(Long.parseLong(rec.getAttributeAsString("id")), true,
 					new DefaultAsyncCallback<>() {
 						@Override
-						public void onSuccess(GUIReport report) {
+						public void handleSuccess(GUIReport report) {
 							showReportDetails(report);
 						}
 					});

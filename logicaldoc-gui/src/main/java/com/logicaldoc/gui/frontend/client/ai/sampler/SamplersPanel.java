@@ -134,7 +134,7 @@ public class SamplersPanel extends VLayout {
 			if (rec != null)
 				AIService.Instance.get().getSampler(rec.getAttributeAsLong("id"), new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(GUISampler sampler) {
+					public void handleSuccess(GUISampler sampler) {
 						showSamplerDetails(sampler);
 					}
 				});
@@ -163,7 +163,7 @@ public class SamplersPanel extends VLayout {
 			if (Boolean.TRUE.equals(confirm)) {
 				AIService.Instance.get().deleteSamplers(ids, new DefaultAsyncCallback<>() {
 					@Override
-					public void onSuccess(Void result) {
+					public void handleSuccess(Void result) {
 						list.removeSelectedData();
 						list.deselectAllRecords();
 						showSamplerDetails(null);

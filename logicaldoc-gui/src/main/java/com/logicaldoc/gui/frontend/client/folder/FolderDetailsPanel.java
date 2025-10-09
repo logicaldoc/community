@@ -228,7 +228,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 				.getFolder(getFolder().getId(), false, false, false, new DefaultAsyncCallback<>() {
 
 					@Override
-					public void onSuccess(GUIFolder folder) {
+					public void handleSuccess(GUIFolder folder) {
 						folder.setPathExtended(folder.getPathExtended() != null ? folder.getPathExtended()
 								: FolderNavigator.get().getPath(folder.getId()));
 						setFolder(folder);
@@ -494,7 +494,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 				}
 
 				@Override
-				public void onSuccess(GUIFolder folder) {
+				public void handleSuccess(GUIFolder folder) {
 					disableSave();
 					FolderDetailsPanel.this.folder = folder;
 
