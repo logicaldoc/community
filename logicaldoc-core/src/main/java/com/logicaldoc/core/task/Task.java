@@ -16,9 +16,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +34,9 @@ import com.logicaldoc.core.system.SystemLoadMonitor;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 
 /**
  * A task is a long running process that is fired regularly
@@ -392,7 +392,8 @@ public abstract class Task implements Runnable {
 			dictionary.put("started", scheduling.getPreviousFireTime());
 			dictionary.put("ended", new Date());
 			dictionary.put("error", (lastRunError != null ? lastRunError.getMessage() : null));
-			dictionary.put("report", prepareReport(recipient.getLocale()).replace("\\n", "<br />"));
+			dictionary.put("report",
+					StringUtils.defaultString(prepareReport(recipient.getLocale())).replace("\\n", "<br />"));
 
 			// Send the email..eeee
 			try {

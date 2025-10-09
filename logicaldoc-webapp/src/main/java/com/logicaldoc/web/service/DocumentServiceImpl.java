@@ -2063,7 +2063,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			ace.setGroupId(guiAce.getEntityId());
 			ace.setRead(guiAce.isRead() ? 1 : 0);
 			ace.setWrite(guiAce.isWrite() ? 1 : 0);
-			note.getAccessControlList().add(ace);
+			note.addAccessControlEntry(ace);
 		}
 
 		saveNote(note, session);

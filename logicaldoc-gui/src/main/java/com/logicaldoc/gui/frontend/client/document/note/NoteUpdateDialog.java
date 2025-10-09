@@ -74,7 +74,8 @@ public class NoteUpdateDialog extends Window {
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
-		setAutoSize(true);
+		setHeight(420);
+		setWidth(550);
 		centerInPage();
 
 		addResizedHandler(resized -> {
@@ -121,6 +122,8 @@ public class NoteUpdateDialog extends Window {
 		securityTab.setPane(prepareSecurityPanel());
 
 		TabSet tabs = new TabSet();
+		tabs.setWidth100();
+		tabs.setHeight100();
 		tabs.setTabs(messageTab, securityTab);
 
 		addItem(toolStrip);
@@ -154,8 +157,6 @@ public class NoteUpdateDialog extends Window {
 		aclGrid.setCanFreezeFields(true);
 		aclGrid.setSelectionType(SelectionStyle.MULTIPLE);
 		aclGrid.setAutoFetchData(true);
-		aclGrid.setRotateHeaderTitles(true);
-		aclGrid.setHeaderHeight(100);
 		aclGrid.setFields(entityId, entity, read, write);
 		aclGrid.setDataSource(new AccessControlListDS(note.getId(), "note"));
 

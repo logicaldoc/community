@@ -128,7 +128,7 @@ public class DocumentNote extends PersistentObject implements Secure<AccessContr
 
 	@Column(name = "ld_rotation", nullable = false)
 	private double rotation = 0.0;
-
+	
 	@ElementCollection
 	@CollectionTable(name = "ld_note_acl", joinColumns = @JoinColumn(name = "ld_noteid"))
 	private Set<AccessControlEntry> accessControlList = new HashSet<>();
@@ -159,7 +159,7 @@ public class DocumentNote extends PersistentObject implements Secure<AccessContr
 		this.type = source.type;
 		this.recipient = source.recipient;
 		this.recipientEmail = source.recipientEmail;
-		this.setTenantId(source.getTenantId());
+		setTenantId(source.getTenantId());
 
 		try {
 			for (AccessControlEntry ace : source.getAccessControlList())

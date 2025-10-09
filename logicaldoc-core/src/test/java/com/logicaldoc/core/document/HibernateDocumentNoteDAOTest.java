@@ -162,7 +162,21 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 		} catch (PersistenceException e) {
 			// catch exception
 		}
+		
+		note.setDocId(1L);
+		testSubject.store(note);
+		note = testSubject.findById(note.getId());
+		testSubject.initialize(note);
+		
+		AccessControlEntry ace=new AccessControlEntry();
+		ace.setGroupId(2L);
+		note.addAccessControlEntry(ace);
+		testSubject.store(note);
 
+		note = testSubject.findById(note.getId());
+		testSubject.initialize(note);
+		assertEquals(1, note.getAccessControlList().size());
+		
 		// fileVersion() == null
 		Folder folder = folderDao.findById(6);
 		Document doc = new Document();
