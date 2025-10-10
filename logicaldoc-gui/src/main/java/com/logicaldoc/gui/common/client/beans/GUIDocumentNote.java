@@ -76,6 +76,11 @@ public class GUIDocumentNote implements Serializable {
 
 	private List<GUIAccessControlEntry> accessControlList = new ArrayList<>();
 
+	/**
+	 * Permissions granted to the current user on this note
+	 */
+	private GUIAccessControlEntry allowedPermissions = new GUIAccessControlEntry();
+
 	public GUIDocumentNote(long id, GUIDocument doc) {
 		super();
 		this.id = id;
@@ -326,5 +331,29 @@ public class GUIDocumentNote implements Serializable {
 
 	public void setMovedOrResized(boolean movedOrResized) {
 		this.movedOrResized = movedOrResized;
+	}
+
+	public GUIAccessControlEntry getAllowedPermissions() {
+		return allowedPermissions;
+	}
+
+	public void setAllowedPermissions(GUIAccessControlEntry allowedPermissions) {
+		this.allowedPermissions = allowedPermissions;
+	}
+
+	public boolean isRead() {
+		return allowedPermissions.isRead();
+	}
+
+	public boolean isWrite() {
+		return allowedPermissions.isWrite();
+	}
+
+	public boolean isDelete() {
+		return allowedPermissions.isDelete();
+	}
+
+	public boolean isSecurity() {
+		return allowedPermissions.isSecurity();
 	}
 }

@@ -152,7 +152,7 @@ public class AbstractService {
 			throws WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 		MenuDAO dao = Context.get(MenuDAO.class);
-		if (!dao.isReadEnable(menuId, user.getId())) {
+		if (!dao.isReadAllowed(menuId, user.getId())) {
 			String message = String.format("User %s cannot access menu %s", user.getUsername(), menuId);
 			log.error(message);
 			throw new PermissionException(user.getUsername(), "menu " + menuId, Permission.READ);
@@ -183,7 +183,7 @@ public class AbstractService {
 
 	protected void checkMenu(User user, long menuId) throws PermissionException {
 		MenuDAO dao = Context.get(MenuDAO.class);
-		if (!dao.isReadEnable(menuId, user.getId())) {
+		if (!dao.isReadAllowed(menuId, user.getId())) {
 			String message = String.format("User %s doesn't have read permission on menu %s", user.getUsername(),
 					menuId);
 			log.error(message);

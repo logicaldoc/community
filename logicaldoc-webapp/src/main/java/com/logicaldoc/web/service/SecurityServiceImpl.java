@@ -323,7 +323,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			 */
 			MenuDAO mDao = Context.get(MenuDAO.class);
 			if (currentUser != null && currentUser.getId() != userId
-					&& !mDao.isReadEnable(Menu.SECURITY, currentUser.getId()))
+					&& !mDao.isReadAllowed(Menu.SECURITY, currentUser.getId()))
 				throw new PermissionException(String.format("User %s not allowed to change the password of user %s",
 						currentUser.getUsername(), user.getUsername()));
 
@@ -1157,7 +1157,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	private void saveACL(Session session, Menu menu, List<GUIAccessControlEntry> aces)
 			throws PermissionException, PersistenceException {
 		MenuDAO mdao = Context.get(MenuDAO.class);
-		if (!mdao.isReadEnable(Menu.SECURITY, session.getUserId()))
+		if (!mdao.isReadAllowed(Menu.SECURITY, session.getUserId()))
 			throw new PermissionException(session.getUsername(), "Menu " + menu.getName(), Permission.READ);
 
 		GroupDAO gdao = Context.get(GroupDAO.class);

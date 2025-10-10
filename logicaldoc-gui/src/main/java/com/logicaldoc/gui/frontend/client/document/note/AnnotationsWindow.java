@@ -5,7 +5,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.NoteChangeListener;
+import com.logicaldoc.gui.common.client.widgets.NoteChangedListener;
 import com.smartgwt.client.widgets.drawing.DrawItem;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -36,7 +36,7 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 
 	private boolean editEnabled = true;
 
-	private NoteChangeListener saveHandler;
+	private NoteChangedListener changedListener;
 
 	/**
 	 * Constructor
@@ -44,13 +44,14 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 	 * @param doc the document to be displayed
 	 * @param fileVer file version specification, null to use the current
 	 *        version
-	 * @param saveHandler the handler to invoke on save
+	 * @param changedListener the handler to invoke on save
 	 * @param editEnabled if the user can edit the annotations
 	 */
-	public AnnotationsWindow(GUIDocument doc, String fileVer, NoteChangeListener saveHandler, boolean editEnabled) {
+	public AnnotationsWindow(GUIDocument doc, String fileVer, NoteChangedListener changedListener,
+			boolean editEnabled) {
 		super(doc, fileVer != null ? fileVer : doc.getFileVersion(), null);
 
-		this.saveHandler = saveHandler;
+		this.changedListener = changedListener;
 		this.editEnabled = editEnabled;
 	}
 
@@ -60,12 +61,15 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 		if (editEnabled && drawItem != null) {
 			AnnotationContextMenu contextMenu = new AnnotationContextMenu(drawItem, note);
 			contextMenu.addDeleteClickHandler(
-					event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
+					click -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), confirm -> {
 						if (Boolean.TRUE.equals(confirm)) {
 							notes.remove(note);
 							drawItem.erase();
 						}
 					}));
+
+			contextMenu.addSecurityClickHandler(click -> new NoteSecurityDialog(note, null).show());
+
 			drawItem.setContextMenu(contextMenu);
 		}
 		return drawItem;
@@ -174,17 +178,16 @@ public class AnnotationsWindow extends AbstractAnnotationsWindow {
 
 	@Override
 	protected void onNotesSaved() {
-		if (saveHandler != null)
-			saveHandler.onChanged();
+		if (changedListener != null)
+			changedListener.onChanged(null);
 		destroy();
 	}
 
-	
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return super.hashCode();

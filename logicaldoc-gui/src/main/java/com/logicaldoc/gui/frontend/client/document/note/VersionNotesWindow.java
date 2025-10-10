@@ -74,12 +74,12 @@ public class VersionNotesWindow extends Window {
 		ToolStripButton annotations = new ToolStripButton();
 		annotations.setTitle(I18N.message("annotations"));
 		annotations.addClickHandler(
-				event -> new AnnotationsWindow(document, fileVersion, this::refresh, document.getFolder().isWrite())
+				event -> new AnnotationsWindow(document, fileVersion, nt -> refresh(), document.getFolder().isWrite())
 						.show());
 
 		ToolStripButton addNote = new ToolStripButton(I18N.message("addnote"));
 		addNote.addClickHandler(
-				event -> new NoteUpdateDialog(new GUIDocumentNote(0L, fileVersion), this::refresh).show());
+				event -> new NoteUpdateDialog(new GUIDocumentNote(0L, fileVersion), nt -> refresh()).show());
 
 		if (document.getFolder().isWrite())
 			toolStrip.addButton(addNote);
@@ -118,14 +118,16 @@ public class VersionNotesWindow extends Window {
 			MenuItem edit = new MenuItem();
 			edit.setTitle(I18N.message("edit"));
 			edit.setEnabled(false);
-			edit.addClickHandler(click -> DocumentService.Instance.get().getNote(notesGrid.getSelectedRecord().getAttributeAsLong("id"), new DefaultAsyncCallback<GUIDocumentNote>() {
+			edit.addClickHandler(click -> DocumentService.Instance.get().getNote(
+					notesGrid.getSelectedRecord().getAttributeAsLong("id"),
+					new DefaultAsyncCallback<GUIDocumentNote>() {
 
-				@Override
-				protected void handleSuccess(GUIDocumentNote result) {
-					new NoteUpdateDialog(result, VersionNotesWindow.this::refresh).show();
-				}
-			}));
-			
+						@Override
+						protected void handleSuccess(GUIDocumentNote result) {
+							new NoteUpdateDialog(result, nt -> refresh()).show();
+						}
+					}));
+
 			MenuItem prnt = new MenuItem();
 			prnt.setTitle(I18N.message("print"));
 			prnt.addClickHandler(clickEvent -> {

@@ -108,7 +108,7 @@ public class ExtendedAccessControlEntry extends AccessControlEntry {
 		this.revision = source.revision;
 	}
 
-	protected ExtendedAccessControlEntry(long groupId) {
+	public ExtendedAccessControlEntry(long groupId) {
 		super(groupId);
 		ace.setGroupId(groupId);
 	}

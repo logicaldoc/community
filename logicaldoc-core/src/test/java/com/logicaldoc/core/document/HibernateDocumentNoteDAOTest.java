@@ -1,6 +1,7 @@
 package com.logicaldoc.core.document;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
@@ -17,7 +18,7 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
-import com.logicaldoc.core.security.AccessControlEntry;
+import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.spring.Context;
@@ -68,7 +69,7 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 		// No give read access to just user 3
 		note = notes.getFirst();
 		testSubject.initialize(note);
-		note.addAccessControlEntry(new AccessControlEntry(-3L));
+		note.addAccessControlEntry(new NoteAccessControlEntry(-3L));
 		testSubject.store(note);
 
 		// User 4 cannot access the protected note anymore
@@ -152,6 +153,35 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
+	public void testSecurity() throws PersistenceException {
+		DocumentNote note = new DocumentNote();
+		note.setFileName("documentNoteTest");
+		note.setDocId(1L);
+		note.setUserId(5L);
+		note.setMessage("test note");
+
+		NoteAccessControlEntry ace = new NoteAccessControlEntry();
+		ace.setGroupId(-2L);
+		note.addAccessControlEntry(ace);
+		testSubject.store(note);
+
+		assertTrue(testSubject.isWriteAllowed(note.getId(), User.USERID_ADMIN));
+		assertTrue(testSubject.isWriteAllowed(note.getId(), 5L));
+		assertTrue(testSubject.isReadAllowed(note.getId(), 2L));
+		assertFalse(testSubject.isWriteAllowed(note.getId(), 2L));
+		assertTrue(testSubject.isReadAllowed(note.getId(), 3L));
+		assertFalse(testSubject.isWriteAllowed(note.getId(), 4L));
+
+		assertEquals(Permission.all(), testSubject.getAllowedPermissions(note.getId(), User.USERID_ADMIN));
+		assertEquals(Permission.all(), testSubject.getAllowedPermissions(note.getId(), 5L));
+		assertFalse(
+				testSubject.getAllowedPermissions(note.getId(), 2L).stream().anyMatch(p -> p.equals(Permission.WRITE)));
+		assertTrue(
+				testSubject.getAllowedPermissions(note.getId(), 2L).stream().anyMatch(p -> p.equals(Permission.READ)));
+		assertTrue(testSubject.getAllowedPermissions(note.getId(), 4L).isEmpty());
+	}
+
+	@Test
 	public void testStore() throws PersistenceException {
 		DocumentNote note = new DocumentNote();
 		note.setFileName("documentNoteTest");
@@ -162,13 +192,13 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 		} catch (PersistenceException e) {
 			// catch exception
 		}
-		
+
 		note.setDocId(1L);
 		testSubject.store(note);
 		note = testSubject.findById(note.getId());
 		testSubject.initialize(note);
-		
-		AccessControlEntry ace=new AccessControlEntry();
+
+		NoteAccessControlEntry ace = new NoteAccessControlEntry();
 		ace.setGroupId(2L);
 		note.addAccessControlEntry(ace);
 		testSubject.store(note);
@@ -176,7 +206,7 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 		note = testSubject.findById(note.getId());
 		testSubject.initialize(note);
 		assertEquals(1, note.getAccessControlList().size());
-		
+
 		// fileVersion() == null
 		Folder folder = folderDao.findById(6);
 		Document doc = new Document();

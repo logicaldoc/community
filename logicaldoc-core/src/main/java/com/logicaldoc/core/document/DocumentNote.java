@@ -29,7 +29,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "ld_note")
 @Cacheable
-public class DocumentNote extends PersistentObject implements Secure<AccessControlEntry> {
+public class DocumentNote extends PersistentObject implements Secure<NoteAccessControlEntry> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -128,10 +128,10 @@ public class DocumentNote extends PersistentObject implements Secure<AccessContr
 
 	@Column(name = "ld_rotation", nullable = false)
 	private double rotation = 0.0;
-	
+
 	@ElementCollection
 	@CollectionTable(name = "ld_note_acl", joinColumns = @JoinColumn(name = "ld_noteid"))
-	private Set<AccessControlEntry> accessControlList = new HashSet<>();
+	private Set<NoteAccessControlEntry> accessControlList = new HashSet<>();
 
 	public DocumentNote() {
 	}
@@ -162,8 +162,8 @@ public class DocumentNote extends PersistentObject implements Secure<AccessContr
 		setTenantId(source.getTenantId());
 
 		try {
-			for (AccessControlEntry ace : source.getAccessControlList())
-				getAccessControlList().add(new AccessControlEntry(ace));
+			for (NoteAccessControlEntry ace : source.getAccessControlList())
+				getAccessControlList().add(new NoteAccessControlEntry(ace));
 		} catch (LazyInitializationException x) {
 			// may happen do nothing
 		}
@@ -346,12 +346,12 @@ public class DocumentNote extends PersistentObject implements Secure<AccessContr
 	}
 
 	@Override
-	public void setAccessControlList(Set<AccessControlEntry> acl) {
+	public void setAccessControlList(Set<NoteAccessControlEntry> acl) {
 		accessControlList = acl;
 	}
 
 	@Override
-	public Set<AccessControlEntry> getAccessControlList() {
+	public Set<NoteAccessControlEntry> getAccessControlList() {
 		return accessControlList;
 	}
 
@@ -361,13 +361,13 @@ public class DocumentNote extends PersistentObject implements Secure<AccessContr
 	}
 
 	@Override
-	public Set<AccessControlEntry> getAccessControlEntries(Set<Long> groupIds) {
+	public Set<NoteAccessControlEntry> getAccessControlEntries(Set<Long> groupIds) {
 		return getAccessControlList().stream().filter(ace -> groupIds.contains(ace.getGroupId()))
 				.collect(Collectors.toSet());
 	}
 
 	@Override
-	public void addAccessControlEntry(AccessControlEntry ace) {
+	public void addAccessControlEntry(NoteAccessControlEntry ace) {
 		if (!getAccessControlList().add(ace)) {
 			getAccessControlList().remove(ace);
 			getAccessControlList().add(ace);

@@ -92,12 +92,12 @@ public class NotesPanel extends DocumentDetailTab {
 
 		ToolStripButton addNote = new ToolStripButton(I18N.message("addnote"));
 		addNote.addClickHandler(
-				click -> new NoteUpdateDialog(new GUIDocumentNote(document.getId()), this::refresh).show());
+				click -> new NoteUpdateDialog(new GUIDocumentNote(document.getId()), (nt) -> refresh()).show());
 
 		ToolStripButton annotations = new ToolStripButton(I18N.message("annotations"));
 		annotations.addClickHandler(
 				click -> new com.logicaldoc.gui.frontend.client.document.note.AnnotationsWindow(document, null,
-						this::refresh, true).show());
+						(nt) -> refresh(), true).show());
 
 		ToolStripButton export = new ToolStripButton(I18N.message("export"));
 		export.addClickHandler(click -> GridUtil.exportCSV(notesGrid, true));
@@ -124,49 +124,50 @@ public class NotesPanel extends DocumentDetailTab {
 		container.addMember(notesGrid);
 		container.addMember(toolStrip);
 
-		notesGrid.addCellContextClickHandler(event -> {
-			Menu contextMenu = new Menu();
-			MenuItem delete = new MenuItem();
-			delete.setTitle(I18N.message("ddelete"));
-			delete.setEnabled(false);
-			delete.addClickHandler(clickEvent -> onDelete());
-
-			MenuItem edit = new MenuItem();
-			edit.setTitle(I18N.message("edit"));
-			edit.setEnabled(false);
-			edit.addClickHandler(clickEvent -> DocumentService.Instance.get().getNote(
-					notesGrid.getSelectedRecord().getAttributeAsLong("id"),
+		notesGrid.addCellContextClickHandler(click -> {
+			click.cancel();
+			DocumentService.Instance.get().getNote(notesGrid.getSelectedRecord().getAttributeAsLong("id"),
 					new DefaultAsyncCallback<GUIDocumentNote>() {
 						@Override
-						public void handleSuccess(GUIDocumentNote note) {
-							new NoteUpdateDialog(note, NotesPanel.this::refresh).show();
+						protected void handleSuccess(GUIDocumentNote note) {
+							Menu contextMenu = new Menu();
+							MenuItem delete = new MenuItem();
+							delete.setTitle(I18N.message("ddelete"));
+							delete.setEnabled(false);
+							delete.addClickHandler(clickEvent -> onDelete());
+
+							MenuItem edit = new MenuItem();
+							edit.setTitle(I18N.message("edit"));
+							edit.setEnabled(false);
+							edit.addClickHandler(click -> new NoteUpdateDialog(note, (nt) -> refresh()).show());
+
+							MenuItem security = new MenuItem();
+							security.setTitle(I18N.message("security"));
+							security.setEnabled(false);
+							security.addClickHandler(
+									click -> new NoteSecurityDialog(note, NotesPanel.this::onSecurityChanged).show());
+
+							MenuItem prnt = new MenuItem();
+							prnt.setTitle(I18N.message("print"));
+							prnt.addClickHandler(click -> {
+								HTMLPane printContainer = new HTMLPane();
+								printContainer.setContents(notesGrid.getSelectedRecord().getAttribute(MESSAGE));
+								Canvas.showPrintPreview(printContainer);
+							});
+
+							ListGridRecord[] selection = notesGrid.getSelectedRecords();
+
+							boolean editingFlag = Session.get().getConfigAsBoolean("gui.notes.allowedit");
+							edit.setEnabled(selection.length == 1 && editingFlag && note.isWrite());
+							security.setEnabled(selection.length == 1 && note.isSecurity());
+							delete.setEnabled((selection.length == 1 && editingFlag && note.isDelete())
+									|| Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN));
+							prnt.setEnabled(selection.length == 1);
+
+							contextMenu.setItems(edit, security, prnt, new MenuItemSeparator(), delete);
+							contextMenu.showContextMenu();
 						}
-					}));
-
-			MenuItem prnt = new MenuItem();
-			prnt.setTitle(I18N.message("print"));
-			prnt.addClickHandler(clickEvent -> {
-				HTMLPane printContainer = new HTMLPane();
-				printContainer.setContents(notesGrid.getSelectedRecord().getAttribute(MESSAGE));
-				Canvas.showPrintPreview(printContainer);
-			});
-
-			ListGridRecord[] selection = notesGrid.getSelectedRecords();
-
-			if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
-				delete.setEnabled(selection.length > 0);
-				edit.setEnabled(selection.length == 1);
-			} else if (Session.get().getConfigAsBoolean("gui.notes.allowedit")) {
-				long usrId = Long.parseLong(selection[0].getAttribute(USER_ID));
-				delete.setEnabled(selection.length == 1 && usrId == Session.get().getUser().getId());
-				edit.setEnabled(selection.length == 1 && usrId == Session.get().getUser().getId());
-			}
-
-			prnt.setEnabled(selection.length == 1);
-
-			contextMenu.setItems(edit, prnt, new MenuItemSeparator(), delete);
-			contextMenu.showContextMenu();
-			event.cancel();
+					});
 		});
 	}
 
@@ -190,6 +191,28 @@ public class NotesPanel extends DocumentDetailTab {
 										DocumentController.get().modified(result);
 									}
 								});
+					}
+				});
+			}
+		});
+	}
+
+	private void onSecurityChanged(GUIDocumentNote note) {
+		DocumentService.Instance.get().saveNote(note, new DefaultAsyncCallback<>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				super.onFailure(caught);
+				destroy();
+			}
+
+			@Override
+			public void handleSuccess(GUIDocumentNote result) {
+				refresh();
+				DocumentService.Instance.get().getById(result.getDocId(), new DefaultAsyncCallback<GUIDocument>() {
+					@Override
+					protected void handleSuccess(GUIDocument result) {
+						DocumentController.get().modified(result);
 					}
 				});
 			}

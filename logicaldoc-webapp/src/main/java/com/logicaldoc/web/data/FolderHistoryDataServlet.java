@@ -30,7 +30,7 @@ public class FolderHistoryDataServlet extends AbstractDataServlet {
 			Locale locale) throws PersistenceException, IOException {
 
 		MenuDAO mDao = Context.get(MenuDAO.class);
-		boolean showSid = mDao.isReadEnable(Menu.SESSIONS, session.getUserId());
+		boolean showSid = mDao.isReadAllowed(Menu.SESSIONS, session.getUserId());
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");

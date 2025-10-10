@@ -71,7 +71,7 @@ public class DashletContent extends HttpServlet {
 			Session session = validateSession(request);
 
 			MenuDAO mDao = Context.get(MenuDAO.class);
-			boolean showSid = mDao.isReadEnable(Menu.SESSIONS, session.getUserId());
+			boolean showSid = mDao.isReadAllowed(Menu.SESSIONS, session.getUserId());
 
 			Locale locale = LocaleUtil.toLocale(request.getParameter("locale"));
 			long dashletId = Long.parseLong(request.getParameter("dashletId"));

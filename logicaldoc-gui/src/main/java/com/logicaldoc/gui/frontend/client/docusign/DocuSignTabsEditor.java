@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.document.note.AbstractAnnotationsWindow;
+import com.logicaldoc.gui.frontend.client.document.note.NoteSecurityDialog;
 import com.smartgwt.client.widgets.drawing.DrawItem;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
@@ -47,6 +48,9 @@ public class DocuSignTabsEditor extends AbstractAnnotationsWindow {
 							drawItem.erase();
 						}
 					}));
+			
+			contextMenu.addSecurityClickHandler(click -> new NoteSecurityDialog(note, null));
+			
 			drawItem.setContextMenu(contextMenu);
 		}
 		return drawItem;

@@ -40,6 +40,8 @@ public class AnnotationContextMenu extends Menu {
 	protected GUIDocumentNote note;
 
 	private MenuItem delete = new MenuItem(I18N.message("ddelete"));
+	
+	private MenuItem security = new MenuItem(I18N.message("security"));
 
 	private boolean editEnabled = true;
 
@@ -89,6 +91,8 @@ public class AnnotationContextMenu extends Menu {
 		appendAdditionalItems(items);
 
 		if (editEnabled) {
+			items.add(new MenuItemSeparator());
+			items.add(security);
 			items.add(new MenuItemSeparator());
 			items.add(delete);
 		}
@@ -236,7 +240,12 @@ public class AnnotationContextMenu extends Menu {
 	public void addDeleteClickHandler(ClickHandler handler) {
 		delete.addClickHandler(handler);
 	}
-
+	
+	public void addSecurityClickHandler(ClickHandler handler) {
+		security.addClickHandler(handler);
+	}
+	
+	
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

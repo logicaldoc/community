@@ -308,7 +308,7 @@ public class AclDataServlet extends AbstractDataServlet {
 
 		// Prepare the query on the menu ACL in join with groups
 		StringBuilder query = new StringBuilder(
-				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_read, A.ld_write from ld_note_acl A, ld_group B where A.ld_noteid = ");
+				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_read, A.ld_write, A.ld_delete, A.ld_security from ld_note_acl A, ld_group B where A.ld_noteid = ");
 		query.append("" + note.getId());
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id and B.ld_tenantid = " + note.getTenantId());
 		query.append(" order by B.ld_type asc, B.ld_name asc");
@@ -338,7 +338,10 @@ public class AclDataServlet extends AbstractDataServlet {
 
 				writer.print(READ + intToBoolean(rows.getInt(4)) + READ_CLOSED);
 				writer.print(WRITE + intToBoolean(rows.getInt(5)) + WRITE_CLOSED);
+				writer.print("<delete>" + intToBoolean(rows.getInt(6)) + "</delete>");
+				writer.print("<security>" + intToBoolean(rows.getInt(6)) + "</security>");
 				writer.print(TYPE + groupType + TYPE_CLOSED);
+				
 				writer.print(ACE_CLOSED);
 			}
 		});

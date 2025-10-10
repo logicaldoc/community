@@ -2,9 +2,11 @@ package com.logicaldoc.core.document;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.core.security.Permission;
 
 /**
  * DAO for <code>DocumentNote</code> handling.
@@ -92,7 +94,43 @@ public interface DocumentNoteDAO extends PersistentObjectDAO<DocumentNote> {
 	 * 
 	 * @return The list of document notes ordered by descending date
 	 * 
-	 * @throws PersistenceException Errorin the database
+	 * @throws PersistenceException Error in the database
 	 */
 	public List<DocumentNote> findByUserId(long userId) throws PersistenceException;
+
+	/**
+	 * This method is looking up for writing rights for a note and an user
+	 * 
+	 * @param noteId ID of the note
+	 * @param userId ID of the user
+	 * 
+	 * @return id the user has write permission
+	 * 
+	 * @throws PersistenceException Error in the database 
+	 */
+	public boolean isWriteAllowed(long noteId, long userId) throws PersistenceException;
+
+	/**
+	 * This method is looking up for read rights for a note and an user
+	 * 
+	 * @param noteId ID of the note
+	 * @param userId ID of the user
+	 * 
+	 * @return if the user can access the note
+	 * 
+	 * @throws PersistenceException Error in the database  
+	 */
+	public boolean isReadAllowed(long noteId, long userId) throws PersistenceException;
+	
+	/**
+	 * Finds all permissions of a user enabled on the specified note
+	 * 
+	 * @param noteId ID of the note
+	 * @param userId ID of the user
+	 * 
+	 * @return Collection of enabled permissions
+	 * 
+	 * @throws PersistenceException error at data layer
+	 */
+	public Set<Permission> getAllowedPermissions(long noteId, long userId) throws PersistenceException;
 }

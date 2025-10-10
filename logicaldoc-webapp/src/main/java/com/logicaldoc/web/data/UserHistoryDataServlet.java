@@ -39,7 +39,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 			Locale locale) throws PersistenceException, IOException {
 
 		MenuDAO mDao = Context.get(MenuDAO.class);
-		boolean showSid = mDao.isReadEnable(Menu.SESSIONS, session.getUserId());
+		boolean showSid = mDao.isReadAllowed(Menu.SESSIONS, session.getUserId());
 
 		Long userId = StringUtils.isNotEmpty(request.getParameter("id")) ? Long.parseLong(request.getParameter("id"))
 				: null;

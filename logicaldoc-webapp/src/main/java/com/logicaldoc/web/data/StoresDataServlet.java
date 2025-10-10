@@ -117,7 +117,7 @@ public class StoresDataServlet extends AbstractDataServlet {
 		boolean parameters = "true".equals(request.getParameter("parameters"));
 		if (parameters) {
 			MenuDAO mDao = Context.get(MenuDAO.class);
-			parameters = session.getTenantId() == Tenant.DEFAULT_ID && mDao.isReadEnable(105, session.getUserId());
+			parameters = session.getTenantId() == Tenant.DEFAULT_ID && mDao.isReadAllowed(105, session.getUserId());
 		}
 		return parameters;
 	}

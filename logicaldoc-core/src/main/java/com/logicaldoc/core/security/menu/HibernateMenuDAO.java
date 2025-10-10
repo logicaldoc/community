@@ -11,9 +11,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.Resource;
-import jakarta.transaction.Transactional;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -28,6 +25,9 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.sql.SqlUtil;
+
+import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 
 /**
  * Hibernate implementation of {@link MenuDAO}
@@ -273,12 +273,12 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 	}
 
 	@Override
-	public boolean isWriteEnable(long menuId, long userId) {
+	public boolean isWriteAllowed(long menuId, long userId) {
 		return isWriteOrReadEnable(menuId, userId, true);
 	}
 
 	@Override
-	public boolean isReadEnable(long menuId, long userId) {
+	public boolean isReadAllowed(long menuId, long userId) {
 		return isWriteOrReadEnable(menuId, userId, false);
 	}
 
@@ -296,38 +296,6 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 	@Override
 	public List<Long> findMenuIdByUserId(long userId, boolean enabledOnly) {
 		return findMenuIdByUserIdAndPermission(userId, Permission.READ, enabledOnly);
-	}
-
-	/**
-	 * @see com.logicaldoc.core.security.menu.MenuDAO#isMenuWriteable(long,
-	 *      long)
-	 */
-	public int isMenuWriteable(long menuId, long userId) {
-		boolean writePrivilegeBool = isWriteEnable(menuId, userId);
-		int writePrivilegeInt = 0;
-
-		if (writePrivilegeBool) {
-			writePrivilegeInt = 1;
-		}
-
-		return writePrivilegeInt;
-	}
-
-	@Override
-	public boolean hasWriteAccess(Menu menu, long userId) {
-		if (!isWriteEnable(menu.getId(), userId)) {
-			return false;
-		}
-
-		List<Menu> children = findByParentId(menu.getId(), false);
-
-		for (Menu subMenu : children) {
-			if (!hasWriteAccess(subMenu, userId)) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 	@Override

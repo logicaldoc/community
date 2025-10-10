@@ -51,7 +51,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 			Locale locale) throws IOException, PersistenceException {
 
 		MenuDAO mDao = Context.get(MenuDAO.class);
-		boolean showSid = mDao.isReadEnable(Menu.SESSIONS, session.getUserId());
+		boolean showSid = mDao.isReadAllowed(Menu.SESSIONS, session.getUserId());
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");

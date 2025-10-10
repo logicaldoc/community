@@ -194,7 +194,7 @@ create table ld_note (ld_id bigint not null, ld_lastmodified timestamp not null,
  					  ld_type varchar(255), ld_recipient varchar(255), ld_recipientemail varchar(255),
  					  ld_shape varchar(255), ld_linecolor varchar(255), ld_lineopacity int not null, ld_linewidth int not null, ld_rotation float not null,
  					  primary key (ld_id));
-create table ld_note_acl (ld_noteid bigint not null, ld_groupid bigint not null, ld_read int not null, ld_write int not null, primary key (ld_noteid, ld_groupid)); 					  
+create table ld_note_acl (ld_noteid bigint not null, ld_groupid bigint not null, ld_read int not null, ld_write int not null, ld_security int not null, ld_delete int not null, primary key (ld_noteid, ld_groupid)); 					  
 create table ld_messagetemplate (ld_id bigint not null, ld_lastmodified timestamp not null, ld_creation timestamp not null, ld_recordversion bigint not null,
                                  ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null, ld_language varchar(10) not null,
                                  ld_description varchar(1000), ld_body varchar(4000), ld_type varchar(255),

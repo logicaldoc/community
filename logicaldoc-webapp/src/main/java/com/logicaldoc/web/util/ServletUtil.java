@@ -126,7 +126,7 @@ public class ServletUtil {
 			throws ServletException, InvalidSessionException {
 		Session session = validateSession(request);
 		MenuDAO dao = Context.get(MenuDAO.class);
-		if (!dao.isReadEnable(menuId, session.getUserId())) {
+		if (!dao.isReadAllowed(menuId, session.getUserId())) {
 			String message = "User " + session.getUsername() + " cannot access the menu " + menuId;
 			throw new ServletException(message);
 		}
@@ -150,7 +150,7 @@ public class ServletUtil {
 		Session session = validateSession(request);
 		MenuDAO dao = Context.get(MenuDAO.class);
 		for (long menuId : menuIds) {
-			if (dao.isReadEnable(menuId, session.getUserId()))
+			if (dao.isReadAllowed(menuId, session.getUserId()))
 				return session;
 		}
 

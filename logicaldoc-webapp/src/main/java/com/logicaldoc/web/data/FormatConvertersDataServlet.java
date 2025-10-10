@@ -44,7 +44,7 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 		String converterSpecification = request.getParameter("converter");
 
 		MenuDAO mDao = Context.get(MenuDAO.class);
-		boolean parameters = session.getTenantId() == Tenant.DEFAULT_ID && mDao.isReadEnable(1750, session.getUserId());
+		boolean parameters = session.getTenantId() == Tenant.DEFAULT_ID && mDao.isReadAllowed(1750, session.getUserId());
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");

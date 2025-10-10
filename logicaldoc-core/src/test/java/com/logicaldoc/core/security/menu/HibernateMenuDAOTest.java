@@ -182,20 +182,20 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testIsWriteEnable() {
-		assertTrue(testSubject.isWriteEnable(2, 1));
-		assertTrue(testSubject.isWriteEnable(26, 1));
-		assertTrue(testSubject.isWriteEnable(1200, 4));
-		assertTrue(testSubject.isWriteEnable(2, 3));
-		assertFalse(testSubject.isWriteEnable(2, 999));
+		assertTrue(testSubject.isWriteAllowed(2, 1));
+		assertTrue(testSubject.isWriteAllowed(26, 1));
+		assertTrue(testSubject.isWriteAllowed(1200, 4));
+		assertTrue(testSubject.isWriteAllowed(2, 3));
+		assertFalse(testSubject.isWriteAllowed(2, 999));
 	}
 
 	@Test
 	public void testIsReadEnable() {
-		assertTrue(testSubject.isReadEnable(2, 1));
-		assertTrue(testSubject.isReadEnable(26, 1));
-		assertFalse(testSubject.isReadEnable(2, 22));
-		assertFalse(testSubject.isReadEnable(2, 999));
-		assertTrue(testSubject.isReadEnable(1200, 4));
+		assertTrue(testSubject.isReadAllowed(2, 1));
+		assertTrue(testSubject.isReadAllowed(26, 1));
+		assertFalse(testSubject.isReadAllowed(2, 22));
+		assertFalse(testSubject.isReadAllowed(2, 999));
+		assertTrue(testSubject.isReadAllowed(1200, 4));
 	}
 
 	@Test
@@ -235,18 +235,6 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 		ids = testSubject.findIdByUserId(99, 101);
 		assertNotNull(ids);
 		assertEquals(0, ids.size());
-	}
-
-	@Test
-	public void testHasWriteAccess() throws PersistenceException {
-		Menu menu = testSubject.findById(103);
-		assertTrue(testSubject.hasWriteAccess(menu, 1));
-		assertTrue(testSubject.hasWriteAccess(menu, 3));
-		assertFalse(testSubject.hasWriteAccess(menu, 5));
-		menu = testSubject.findById(-103);
-		assertTrue(testSubject.hasWriteAccess(menu, 4));
-		menu = testSubject.findById(-104);
-		assertFalse(testSubject.hasWriteAccess(menu, 4));
 	}
 
 	@Test

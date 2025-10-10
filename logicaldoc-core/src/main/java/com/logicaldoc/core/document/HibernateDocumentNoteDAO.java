@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.user.Group;
@@ -229,5 +232,62 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 
 		if (note.getAccessControlList() != null)
 			log.trace("Initialized {} aces", note.getAccessControlList().size());
+	}
+
+	@Override
+	public boolean isWriteAllowed(long noteId, long userId) throws PersistenceException {
+		return getAllowedPermissions(noteId, userId).contains(Permission.WRITE);
+	}
+
+	@Override
+	public boolean isReadAllowed(long noteId, long userId) throws PersistenceException {
+		return getAllowedPermissions(noteId, userId).contains(Permission.READ);
+	}
+
+	private User getExistingtUser(long userId) throws PersistenceException {
+		User user = Context.get(UserDAO.class).findById(userId);
+		if (user == null)
+			throw new PersistenceException("Unexisting user " + userId);
+		Context.get(UserDAO.class).initialize(user);
+		return user;
+	}
+
+	@Override
+	public Set<Permission> getAllowedPermissions(long noteId, long userId) throws PersistenceException {
+		User user = getExistingtUser(userId);
+
+		DocumentNote note = findById(noteId);
+		if (note == null)
+			return new HashSet<>();
+
+		// If the user is an administrator or is the creator, bypass all
+		// controls
+		if (user.isAdmin() || note.getUserId() == userId)
+			return Permission.all();
+
+		StringBuilder query = new StringBuilder("""
+						select ld_read as LDREAD, ld_write as LDWRITE, ld_delete as LDDELETE, ld_security as LDSECURITY from ld_note_acl where ld_noteid=
+						""");
+		query.append(Long.toString(noteId));
+		query.append(" and ld_groupid in (select ld_groupid from ld_usergroup where ld_userid=");
+		query.append(Long.toString(userId));
+		query.append(")");
+
+		Map<String, Permission> permissionColumn = Map.of("LDWRITE", Permission.WRITE, "LDREAD", Permission.READ,
+				"LDDELETE", Permission.DELETE, "LDSECURITY", Permission.SECURITY);
+
+		Set<Permission> permissions = new HashSet<>();
+		queryForResultSet(query.toString(), null, null, rows -> {
+			while (rows.next()) {
+				for (Entry<String, Permission> entry : permissionColumn.entrySet()) {
+					String column = entry.getKey();
+					Permission permission = entry.getValue();
+					if (rows.getInt(column) == 1)
+						permissions.add(permission);
+				}
+			}
+		});
+
+		return permissions;
 	}
 }

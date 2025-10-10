@@ -70,6 +70,7 @@ import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.DocumentNoteDAO;
 import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.document.IndexingStatus;
+import com.logicaldoc.core.document.NoteAccessControlEntry;
 import com.logicaldoc.core.document.Rating;
 import com.logicaldoc.core.document.RatingDAO;
 import com.logicaldoc.core.document.Version;
@@ -84,7 +85,6 @@ import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.metadata.validation.Validator;
 import com.logicaldoc.core.parser.ParsingException;
-import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.authentication.PasswordWeakException;
@@ -1876,7 +1876,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			DocumentDAO docDao = Context.get(DocumentDAO.class);
 			Document document = docDao.findById(guiNote.getDocId());
 
-			return saveNote(session, document, guiNote, true);
+			return saveNote(session, document, guiNote);
 		} catch (PersistenceException | ServerException e) {
 			return throwServerException(session, log, e);
 		}
@@ -1893,42 +1893,56 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				noteDao.initialize(note);
 			else
 				return null;
-
-			GUIDocumentNote guiNote = new GUIDocumentNote(note.getId(), note.getFileVersion());
-			guiNote.setDocId(note.getDocId());
-			guiNote.setColor(note.getColor());
-			guiNote.setDate(note.getDate());
-			guiNote.setFileName(note.getFileName());
-			guiNote.setHeight(note.getHeight());
-			guiNote.setLeft(note.getLeft());
-			guiNote.setLineColor(note.getLineColor());
-			guiNote.setLineOpacity(note.getLineOpacity());
-			guiNote.setLineWidth(note.getLineWidth());
-			guiNote.setMessage(note.getMessage());
-			guiNote.setOpacity(note.getOpacity());
-			guiNote.setPage(note.getPage());
-			guiNote.setRecipient(note.getRecipient());
-			guiNote.setRecipientEmail(note.getRecipientEmail());
-			guiNote.setRotation(note.getRotation());
-			guiNote.setShape(note.getShape());
-			guiNote.setTop(note.getTop());
-			guiNote.setType(note.getType());
-			guiNote.setUserId(note.getUserId());
-			guiNote.setUsername(note.getUsername());
-
-			note.getAccessControlList().clear();
-			for (AccessControlEntry ace : note.getAccessControlList()) {
-				GUIAccessControlEntry guiAce = new GUIAccessControlEntry();
-				guiAce.setEntityId(ace.getGroupId());
-				guiAce.setRead(ace.getRead() == 1);
-				guiAce.setWrite(ace.getWrite() == 1);
-				guiNote.getAccessControlList().add(guiAce);
-			}
-
-			return guiNote;
+			return toGUINote(note, session);
 		} catch (PersistenceException e) {
 			return throwServerException(session, log, e);
 		}
+	}
+
+	private GUIDocumentNote toGUINote(DocumentNote note, Session session) throws PersistenceException {
+		GUIDocumentNote guiNote = new GUIDocumentNote(note.getId(), note.getFileVersion());
+		guiNote.setId(note.getId());
+		guiNote.setDocId(note.getDocId());
+		guiNote.setColor(note.getColor());
+		guiNote.setDate(note.getDate());
+		guiNote.setFileName(note.getFileName());
+		guiNote.setHeight(note.getHeight());
+		guiNote.setLeft(note.getLeft());
+		guiNote.setLineColor(note.getLineColor());
+		guiNote.setLineOpacity(note.getLineOpacity());
+		guiNote.setLineWidth(note.getLineWidth());
+		guiNote.setMessage(note.getMessage());
+		guiNote.setOpacity(note.getOpacity());
+		guiNote.setPage(note.getPage());
+		guiNote.setRecipient(note.getRecipient());
+		guiNote.setRecipientEmail(note.getRecipientEmail());
+		guiNote.setRotation(note.getRotation());
+		guiNote.setShape(note.getShape());
+		guiNote.setTop(note.getTop());
+		guiNote.setType(note.getType());
+		guiNote.setUserId(note.getUserId());
+		guiNote.setUsername(note.getUsername());
+
+		for (NoteAccessControlEntry ace : note.getAccessControlList()) {
+			GUIAccessControlEntry guiAce = new GUIAccessControlEntry();
+			guiAce.setEntityId(ace.getGroupId());
+			guiAce.setRead(ace.getRead() == 1);
+			guiAce.setWrite(ace.getWrite() == 1);
+			guiAce.setDelete(ace.getDelete() == 1);
+			guiAce.setSecurity(ace.getSecurity() == 1);
+			guiNote.getAccessControlList().add(guiAce);
+		}
+
+		DocumentNoteDAO noteDao = Context.get(DocumentNoteDAO.class);
+		Set<Permission> permissions = noteDao.getAllowedPermissions(note.getId(), session.getUserId());
+		GUIAccessControlEntry allowedPermissions = new GUIAccessControlEntry();
+		allowedPermissions.setRead(permissions.contains(Permission.READ));
+		allowedPermissions.setWrite(permissions.contains(Permission.WRITE));
+		allowedPermissions.setDelete(permissions.contains(Permission.DELETE));
+		allowedPermissions.setSecurity(permissions.contains(Permission.SECURITY));
+		guiNote.setAllowedPermissions(allowedPermissions);
+
+		return guiNote;
 	}
 
 	@Override
@@ -1948,31 +1962,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			List<DocumentNote> notes = dao.findByDocIdAndTypes(document.getId(), session.getUserId(),
 					fileVersion != null ? fileVersion : document.getFileVersion(), types);
 			for (DocumentNote note : notes) {
-				GUIDocumentNote guiNote = new GUIDocumentNote();
-				guiNote.setColor(note.getColor());
-				guiNote.setDate(note.getDate());
-				guiNote.setDocId(document.getId());
-				guiNote.setFileName(note.getFileName());
-				guiNote.setHeight(note.getHeight());
-				guiNote.setId(note.getId());
-				guiNote.setLeft(note.getLeft());
-				guiNote.setMessage(note.getMessage());
-				guiNote.setOpacity(note.getOpacity());
-				guiNote.setPage(note.getPage());
-				guiNote.setTop(note.getTop());
-				guiNote.setUserId(note.getUserId());
-				guiNote.setUsername(note.getUsername());
-				guiNote.setWidth(note.getWidth());
-				guiNote.setFileVersion(note.getFileVersion());
-				guiNote.setType(note.getType());
-				guiNote.setRecipient(note.getRecipient());
-				guiNote.setRecipientEmail(note.getRecipientEmail());
-				guiNote.setLineColor(note.getLineColor());
-				guiNote.setLineWidth(note.getLineWidth());
-				guiNote.setLineOpacity(note.getLineOpacity());
-				guiNote.setShape(note.getShape());
-				guiNote.setRotation(note.getRotation());
-				guiNotes.add(guiNote);
+				dao.initialize(note);
+				guiNotes.add(toGUINote(note, session));
 			}
 
 			return guiNotes;
@@ -2015,13 +2006,13 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			 * Do the updates / inserts
 			 */
 			for (GUIDocumentNote guiNote : notes)
-				saveNote(session, document, guiNote, false);
+				saveNote(session, document, guiNote);
 		} catch (UnexistingResourceException | PersistenceException e) {
 			throwServerException(session, log, e);
 		}
 	}
 
-	private GUIDocumentNote saveNote(Session session, Document document, GUIDocumentNote guiNote, boolean updateAcl)
+	private GUIDocumentNote saveNote(Session session, Document document, GUIDocumentNote guiNote)
 			throws ServerException, PersistenceException {
 
 		DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
@@ -2057,15 +2048,15 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		note.setLineWidth(guiNote.getLineWidth());
 		note.setRotation(guiNote.getRotation());
 
-		if (updateAcl) {
-			note.getAccessControlList().clear();
-			for (GUIAccessControlEntry guiAce : guiNote.getAccessControlList()) {
-				AccessControlEntry ace = new AccessControlEntry();
-				ace.setGroupId(guiAce.getEntityId());
-				ace.setRead(guiAce.isRead() ? 1 : 0);
-				ace.setWrite(guiAce.isWrite() ? 1 : 0);
-				note.addAccessControlEntry(ace);
-			}
+		note.getAccessControlList().clear();
+		for (GUIAccessControlEntry guiAce : guiNote.getAccessControlList()) {
+			NoteAccessControlEntry ace = new NoteAccessControlEntry();
+			ace.setGroupId(guiAce.getEntityId());
+			ace.setRead(guiAce.isRead() ? 1 : 0);
+			ace.setWrite(guiAce.isWrite() ? 1 : 0);
+			ace.setDelete(guiAce.isDelete() ? 1 : 0);
+			ace.setSecurity(guiAce.isSecurity() ? 1 : 0);
+			note.addAccessControlEntry(ace);
 		}
 
 		saveNote(note, session);

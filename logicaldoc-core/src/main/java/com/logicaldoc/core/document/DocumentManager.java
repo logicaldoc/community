@@ -2116,7 +2116,7 @@ public class DocumentManager {
 		validateTransaction(transaction);
 
 		MenuDAO menuDAO = Context.get(MenuDAO.class);
-		if (!menuDAO.isReadEnable(Menu.DESTROY_DOCUMENTS, transaction.getUserId())) {
+		if (!menuDAO.isReadAllowed(Menu.DESTROY_DOCUMENTS, transaction.getUserId())) {
 			String message = "User " + transaction.getUsername() + " cannot access the menu " + Menu.DESTROY_DOCUMENTS;
 			throw new PermissionException(message);
 		}

@@ -103,7 +103,7 @@ public interface MenuDAO extends PersistentObjectDAO<Menu> {
 	 * 
 	 * @return id the user has write permission
 	 */
-	public boolean isWriteEnable(long id, long userId);
+	public boolean isWriteAllowed(long id, long userId);
 
 	/**
 	 * This method is looking up for read rights for a menu and an user
@@ -113,7 +113,7 @@ public interface MenuDAO extends PersistentObjectDAO<Menu> {
 	 * 
 	 * @return if the user can access the menu
 	 */
-	public boolean isReadEnable(long id, long userId);
+	public boolean isReadAllowed(long id, long userId);
 
 	/**
 	 * This method selects only the menu text from a menu
@@ -144,26 +144,6 @@ public interface MenuDAO extends PersistentObjectDAO<Menu> {
 	 * @return List of selected menuId's.
 	 */
 	public List<Long> findIdByUserId(long userId, long parentId);
-
-	/**
-	 * Returns if a menu is writeable for a user
-	 * 
-	 * @param id check this menu
-	 * @param userId privileges for this should be checked
-	 * 
-	 * @return a <b>0</b> if false, a <b>1</b> if true
-	 */
-	public int isMenuWriteable(long id, long userId);
-
-	/**
-	 * Checks that the user has access to the menu and all its sub-items
-	 * 
-	 * @param menu the menu
-	 * @param userId identifier of the menu
-	 * 
-	 * @return if the user has write permission
-	 */
-	public boolean hasWriteAccess(Menu menu, long userId);
 
 	/**
 	 * Finds all menus accessible by the passed group

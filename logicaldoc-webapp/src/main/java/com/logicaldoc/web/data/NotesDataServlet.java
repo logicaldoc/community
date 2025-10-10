@@ -9,9 +9,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +21,9 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for document posts data.
@@ -79,23 +79,27 @@ public class NotesDataServlet extends AbstractDataServlet {
 		DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
 		dao.queryForResultSet(query.toString(), params, 200, rows -> {
 			while (rows.next())
-				printPost(writer, rows);
+				printPost(writer, rows, userId != null ? userId : session.getUserId());
 		});
 
 		writer.write("</list>");
 	}
 
-	private void printPost(PrintWriter writer, ResultSet set) throws SQLException {
+	private void printPost(PrintWriter writer, ResultSet set, long userId) throws SQLException {
 		DateFormat df = getDateFormat();
 
+		long noteId = set.getLong(1);
+		if (!Context.get(DocumentNoteDAO.class).isReadAllowed(noteId, userId))
+			return;
+
 		writer.print("<post>");
-		writer.print("<id>" + set.getLong(1) + "</id>");
+		writer.print("<id>" + noteId + "</id>");
 		writer.print("<title><![CDATA[" + StringUtils.abbreviate(set.getString(2), 100) + "]]></title>");
 		if (set.getString(9) != null)
 			writer.print("<noteColor><![CDATA[" + set.getString(9) + "]]></noteColor>");
 		writer.print("<page>" + set.getInt(8) + "</page>");
 		writer.print("<user><![CDATA[" + set.getString(3) + "]]></user>");
-		
+
 		Date date = null;
 		Object obj = set.getObject(4);
 		if (obj instanceof oracle.sql.TIMESTAMP timestamp) {
@@ -107,7 +111,7 @@ public class NotesDataServlet extends AbstractDataServlet {
 		} else {
 			date = set.getTimestamp(4);
 		}
-		
+
 		writer.print("<date>" + (date != null ? df.format(date) : "") + "</date>");
 		writer.print("<message><![CDATA[" + set.getString(2) + "]]></message>");
 		writer.print("<docId>" + set.getLong(5) + "</docId>");

@@ -84,7 +84,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
 			 * The current user must be enabled to see the sessions.
 			 */
 			MenuDAO mDao = Context.get(MenuDAO.class);
-			boolean showSid = currentUser == null || mDao.isReadEnable(Menu.ADMIN_SESSIONS, currentUser.getId());
+			boolean showSid = currentUser == null || mDao.isReadAllowed(Menu.ADMIN_SESSIONS, currentUser.getId());
 
 			PrintWriter writer = response.getWriter();
 			if (!csvFormat)
