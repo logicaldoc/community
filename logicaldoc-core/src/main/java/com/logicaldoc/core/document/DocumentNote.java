@@ -9,7 +9,6 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.LazyInitializationException;
 
 import com.logicaldoc.core.PersistentObject;
-import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Secure;
 
 import jakarta.persistence.Cacheable;
@@ -356,7 +355,7 @@ public class DocumentNote extends PersistentObject implements Secure<NoteAccessC
 	}
 
 	@Override
-	public AccessControlEntry getAccessControlEntry(long groupId) {
+	public NoteAccessControlEntry getAccessControlEntry(long groupId) {
 		return getAccessControlList().stream().filter(ace -> ace.getGroupId() == groupId).findFirst().orElse(null);
 	}
 

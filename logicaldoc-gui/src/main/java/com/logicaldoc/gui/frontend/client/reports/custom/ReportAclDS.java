@@ -1,0 +1,31 @@
+package com.logicaldoc.gui.frontend.client.reports.custom;
+
+import com.logicaldoc.gui.common.client.beans.GUIAccessControlEntry;
+import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.smartgwt.client.data.DataSource;
+import com.smartgwt.client.data.fields.DataSourceBooleanField;
+import com.smartgwt.client.data.fields.DataSourceTextField;
+
+/**
+ * Datasource to get the ACL of a report. It is based on Xml parsing
+ * 
+ * @author Marco Meschieri - LogicalDOC
+ * @since 9.2.2
+ */
+public class ReportAclDS extends DataSource {
+	public ReportAclDS(long id) {
+		setTitleField("entity");
+		setRecordXPath("/list/ace");
+		DataSourceTextField entity = new DataSourceTextField("entity");
+		DataSourceTextField entityId = new DataSourceTextField("entityId");
+		entityId.setPrimaryKey(true);
+		DataSourceBooleanField read = new DataSourceBooleanField(GUIAccessControlEntry.PERMISSION_READ.toLowerCase());
+		DataSourceBooleanField write = new DataSourceBooleanField(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase());
+		DataSourceTextField type = new DataSourceTextField("type");
+
+		setFields(entityId, entity, read, write, type);
+		setClientOnly(true);
+
+		setDataURL("data/reportacl.xml?reportId=" + id + "&locale=" + I18N.getLocale());
+	}
+}
