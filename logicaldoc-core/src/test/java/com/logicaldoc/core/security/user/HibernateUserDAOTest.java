@@ -198,13 +198,12 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testStore() throws PersistenceException, NoSuchAlgorithmException {
-
 		String pswd = PasswordGenerator.generate(12, 2, 2, 2, 2, 2, 2);
 		User user = new User();
 		user.setUsername("xxx");
 		user.setDecodedPassword(pswd);
 		user.setName("claus");
-		user.setFirstName("valca");
+		user.setFirstName("<h1>valca</h1>");
 		user.setEmail("valca@acme.com");
 
 		WorkingTime wt = new WorkingTime(1, 5, 30);
@@ -217,6 +216,8 @@ public class HibernateUserDAOTest extends AbstractCoreTestCase {
 		testSubject.store(user, transaction);
 		assertNotNull(groupDao.findByName(user.getUserGroupName(), 1));
 
+		assertEquals("valca", user.getFirstName());
+		
 		user = testSubject.findById(user.getId());
 		testSubject.initialize(user);
 		user.addGroup(groupDao.findById(1L));

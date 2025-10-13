@@ -31,6 +31,7 @@ import com.logicaldoc.core.security.authentication.PasswordWeakException;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.html.HTMLSanitizer;
 import com.logicaldoc.util.security.PasswordCriteria;
 import com.logicaldoc.util.security.PasswordValidator;
 import com.logicaldoc.util.spring.Context;
@@ -210,6 +211,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 		validateUsernameUniquenes(user, newUser);
 
+		sanitize(user);
+
 		if (user.getType() == UserType.SYSTEM)
 			user.setType(UserType.DEFAULT);
 
@@ -270,6 +273,26 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		enforceReadOnlyUserPermissions(user);
 
 		saveEnabledOrDisabledHistory(user, transaction, enabledStatusChanged);
+	}
+
+	/**
+	 * Sanitizes the text properties of a user
+	 * 
+	 * @param user the user to sanitize
+	 */
+	private void sanitize(User user) {
+		user.setName(HTMLSanitizer.sanitizeSimpleText(user.getName()));
+		user.setFirstName(HTMLSanitizer.sanitizeSimpleText(user.getFirstName()));
+		user.setCity(HTMLSanitizer.sanitizeSimpleText(user.getCity()));
+		user.setBuilding(HTMLSanitizer.sanitizeSimpleText(user.getBuilding()));
+		user.setCompany(HTMLSanitizer.sanitizeSimpleText(user.getCompany()));
+		user.setCountry(HTMLSanitizer.sanitizeSimpleText(user.getCountry()));
+		user.setDepartment(HTMLSanitizer.sanitizeSimpleText(user.getDepartment()));
+		user.setPostalcode(HTMLSanitizer.sanitizeSimpleText(user.getPostalcode()));
+		user.setState(HTMLSanitizer.sanitizeSimpleText(user.getState()));
+		user.setStreet(HTMLSanitizer.sanitizeSimpleText(user.getStreet()));
+		user.setTelephone(HTMLSanitizer.sanitizeSimpleText(user.getTelephone()));
+		user.setTelephone2(HTMLSanitizer.sanitizeSimpleText(user.getTelephone2()));
 	}
 
 	private void validateUsernameUniquenes(User user, boolean newUser) throws PersistenceException {
