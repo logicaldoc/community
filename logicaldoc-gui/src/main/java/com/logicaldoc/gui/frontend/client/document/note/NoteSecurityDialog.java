@@ -23,6 +23,8 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.menu.Menu;
+import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -143,7 +145,11 @@ public class NoteSecurityDialog extends Window {
 		aclGrid.setAutoFetchData(true);
 		aclGrid.setFields(entityId, entity, read, write, delete, security);
 		aclGrid.setDataSource(new AccessControlListDS(note.getId(), "note"));
-
+		aclGrid.addCellContextClickHandler(click -> {
+			showContextMenu();
+			click.cancel();
+		});
+		
 		HLayout buttons = new HLayout();
 		buttons.setMembersMargin(4);
 		buttons.setWidth100();
@@ -155,6 +161,17 @@ public class NoteSecurityDialog extends Window {
 		return panel;
 	}
 
+	private void showContextMenu() {
+		Menu menu = new Menu();
+
+		MenuItem delete = new MenuItem();
+		delete.setTitle(I18N.message("ddelete"));
+		delete.addClickHandler(event -> aclGrid.removeSelectedData());
+
+		menu.addItem(delete);
+		menu.showContextMenu();
+	}
+	
 	private void addUserSelector(HLayout buttons) {
 		final DynamicForm userForm = new DynamicForm();
 		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, true, false);

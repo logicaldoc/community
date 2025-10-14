@@ -47,8 +47,9 @@ public class ReportPropertiesPanel extends ReportDetailsTab {
 		outputFolderSelector.setTitle(I18N.message("outputfolder"));
 		if (report.getOutputFolder() != null)
 			outputFolderSelector.setFolder(report.getOutputFolder());
+		outputFolderSelector.setDisabled(!report.isWrite());
 		outputFolderSelector.addFolderChangeListener(folder -> changedHandler.onChanged(null));
-
+		
 		refresh();
 	}
 
@@ -73,11 +74,13 @@ public class ReportPropertiesPanel extends ReportDetailsTab {
 
 		TextItem name = ItemFactory.newSimpleTextItemWithHyphen("name", report.getName());
 		name.addChangedHandler(changedHandler);
+		name.setDisabled(!report.isWrite());
 
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", report.getDescription());
 		description.setWidth(250);
 		description.addChangedHandler(changedHandler);
-
+		description.setDisabled(!report.isWrite());
+		
 		SelectItem format = ItemFactory.newSelectItem("outputFormat", "format");
 		format.addChangedHandler(changedHandler);
 		format.setRequired(true);
@@ -87,7 +90,8 @@ public class ReportPropertiesPanel extends ReportDetailsTab {
 		map.put("html", "html");
 		format.setValueMap(map);
 		format.setValue(report.getOutputFormat());
-
+		format.setDisabled(!report.isWrite());
+		
 		SelectItem updatePolicy = ItemFactory.newSelectItem("updatePolicy", "onupdate");
 		updatePolicy.addChangedHandler(changedHandler);
 		LinkedHashMap<String, String> map2 = new LinkedHashMap<>();
@@ -95,7 +99,8 @@ public class ReportPropertiesPanel extends ReportDetailsTab {
 		map2.put("1", I18N.message("createnewdoc"));
 		updatePolicy.setValueMap(map2);
 		updatePolicy.setValue(Integer.toString(report.getUpdatePolicy()));
-
+		updatePolicy.setDisabled(!report.isWrite());
+		
 		String downloadUrl = "";
 		if (report.getOutputDocId() != null)
 			downloadUrl = Util.downloadURL(report.getOutputDocId());

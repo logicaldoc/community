@@ -3,9 +3,7 @@ package com.logicaldoc.gui.frontend.client.reports.custom;
 import java.util.List;
 
 import com.google.gwt.user.client.Timer;
-import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
-import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIReport;
 import com.logicaldoc.gui.common.client.data.ReportsDS;
@@ -123,11 +121,7 @@ public class CustomReportsPanel extends AdminPanel {
 			new ReportUploader(CustomReportsPanel.this, null).show();
 		});
 
-		/**
-		 * Only admin users of the default tenant can upload new reports
-		 */
-		if (canUploadDesign())
-			toolStrip.addButton(newReport);
+		toolStrip.addButton(newReport);
 
 		detailsContainer.setAlign(Alignment.CENTER);
 		detailsContainer.addMember(details);
@@ -208,109 +202,105 @@ public class CustomReportsPanel extends AdminPanel {
 		}
 	}
 
-	private boolean canUploadDesign() {
-		return Session.get().getUser().getTenant().isDefault()
-				&& Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN);
-	}
-
 	private void showContextMenu() {
-		Menu contextMenu = new Menu();
+		final ListGridRecord selectedRecord = list.getSelectedRecord();
+		final long selectedReportId = Long.parseLong(selectedRecord.getAttributeAsString("id"));
 
-		final ListGridRecord rec = list.getSelectedRecord();
-		final long selectedId = Long.parseLong(rec.getAttributeAsString("id"));
-		final Long outputDocId = rec.getAttribute(OUTPUT_DOC_ID) != null
-				? Long.parseLong(rec.getAttributeAsString(OUTPUT_DOC_ID))
-				: null;
-		final long outputFolderId = Long.parseLong(rec.getAttributeAsString("outputFolderId"));
+		ReportService.Instance.get().getReport(selectedReportId, false, new DefaultAsyncCallback<GUIReport>() {
 
-		MenuItem execute = new MenuItem();
-		execute.setTitle(I18N.message("execute"));
-		execute.addClickHandler(
-				event -> ReportService.Instance.get().getReport(selectedId, false, new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(GUIReport report) {
-						new ReportParametersForm(report, CustomReportsPanel.this).show();
-					}
-				}));
+			@Override
+			protected void handleSuccess(GUIReport report) {
+				Menu contextMenu = new Menu();
 
-		if (GUIReport.STATUS_IDLE != list.getSelectedRecord().getAttributeAsInt("status")
-				|| Boolean.FALSE.equals(list.getSelectedRecord().getAttributeAsBoolean(ENABLED)))
-			execute.setEnabled(false);
+				final Long outputDocId = selectedRecord.getAttribute(OUTPUT_DOC_ID) != null
+						? Long.parseLong(selectedRecord.getAttributeAsString(OUTPUT_DOC_ID))
+						: null;
+				final long outputFolderId = Long.parseLong(selectedRecord.getAttributeAsString("outputFolderId"));
 
-		MenuItem upload = new MenuItem();
-		upload.setTitle(I18N.message("uploadnewdesign"));
-		upload.addClickHandler(event -> {
-			GUIReport report = new GUIReport();
-			report.setId(selectedId);
-			report.setName(rec.getAttributeAsString("name"));
-			new ReportUploader(CustomReportsPanel.this, report).show();
+				MenuItem execute = new MenuItem();
+				execute.setTitle(I18N.message("execute"));
+				execute.addClickHandler(event -> new ReportParametersForm(report, CustomReportsPanel.this).show());
+
+				if (GUIReport.STATUS_IDLE != list.getSelectedRecord().getAttributeAsInt("status")
+						|| Boolean.FALSE.equals(list.getSelectedRecord().getAttributeAsBoolean(ENABLED)))
+					execute.setEnabled(false);
+
+				MenuItem upload = new MenuItem();
+				upload.setTitle(I18N.message("uploadnewdesign"));
+				upload.addClickHandler(event -> new ReportUploader(CustomReportsPanel.this, report).show());
+				upload.setEnabled(report.isWrite());
+
+				MenuItem delete = new MenuItem();
+				delete.setTitle(I18N.message("ddelete"));
+				delete.setEnabled(report.isWrite());
+				delete.addClickHandler(
+						event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), chioice -> {
+							if (Boolean.TRUE.equals(chioice))
+								ReportService.Instance.get().delete(selectedReportId, new DefaultAsyncCallback<>() {
+									@Override
+									public void handleSuccess(Void result) {
+										list.removeSelectedData();
+										list.deselectAllRecords();
+										showReportDetails(null);
+									}
+								});
+						}));
+
+				MenuItem enable = new MenuItem();
+				enable.setTitle(I18N.message("enable"));
+				enable.addClickHandler(event -> ReportService.Instance.get().changeStatus(
+						Long.parseLong(selectedRecord.getAttributeAsString("id")), true, new DefaultAsyncCallback<>() {
+							@Override
+							public void handleSuccess(Void result) {
+								selectedRecord.setAttribute(ENABLED, true);
+								list.refreshRow(list.getRecordIndex(selectedRecord));
+							}
+						}));
+				enable.setEnabled(Boolean.FALSE.equals(list.getSelectedRecord().getAttributeAsBoolean(ENABLED))
+						&& report.isWrite());
+
+				MenuItem disable = new MenuItem();
+				disable.setTitle(I18N.message("disable"));
+				disable.addClickHandler(event -> ReportService.Instance.get().changeStatus(
+						Long.parseLong(selectedRecord.getAttributeAsString("id")), false, new DefaultAsyncCallback<>() {
+							@Override
+							public void handleSuccess(Void result) {
+								selectedRecord.setAttribute(ENABLED, false);
+								list.refreshRow(list.getRecordIndex(selectedRecord));
+							}
+						}));
+				disable.setEnabled(Boolean.TRUE.equals(list.getSelectedRecord().getAttributeAsBoolean(ENABLED))
+						&& report.isWrite());
+
+				MenuItem openInFolder = new MenuItem();
+				openInFolder.setTitle(I18N.message("openinfolder"));
+				openInFolder.addClickHandler(event -> DocumentsPanel.get().openInFolder(outputFolderId, outputDocId));
+
+				MenuItem download = new MenuItem();
+				download.setTitle(I18N.message("download"));
+				download.addClickHandler(event -> DocumentUtil.downloadDocument(outputDocId));
+
+				MenuItem preview = new MenuItem();
+				preview.setTitle(I18N.message("preview"));
+				preview.setEnabled(outputDocId != null);
+				preview.addClickHandler(
+						event -> DocumentService.Instance.get().getById(outputDocId, new DefaultAsyncCallback<>() {
+							@Override
+							public void handleSuccess(GUIDocument doc) {
+								new PreviewPopup(doc).show();
+							}
+						}));
+
+				MenuItem export = new MenuItem();
+				export.setTitle(I18N.message("export"));
+				export.addClickHandler(event -> Util.download(Util.contextPath()
+						+ "report/controller?command=export&reportId=" + selectedRecord.getAttributeAsString("id")));
+
+				contextMenu.setItems(enable, disable, execute, preview, upload, export, openInFolder, download,
+						new MenuItemSeparator(), delete);
+				contextMenu.showContextMenu();
+			}
 		});
-		upload.setEnabled(canUploadDesign());
-
-		MenuItem delete = new MenuItem();
-		delete.setTitle(I18N.message("ddelete"));
-		delete.addClickHandler(event -> LD.ask(I18N.message("question"), I18N.message("confirmdelete"), chioice -> {
-			if (Boolean.TRUE.equals(chioice))
-				ReportService.Instance.get().delete(selectedId, new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(Void result) {
-						list.removeSelectedData();
-						list.deselectAllRecords();
-						showReportDetails(null);
-					}
-				});
-		}));
-
-		MenuItem enable = new MenuItem();
-		enable.setTitle(I18N.message("enable"));
-		enable.addClickHandler(event -> ReportService.Instance.get()
-				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), true, new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(Void result) {
-						rec.setAttribute(ENABLED, true);
-						list.refreshRow(list.getRecordIndex(rec));
-					}
-				}));
-		enable.setEnabled(Boolean.FALSE.equals(list.getSelectedRecord().getAttributeAsBoolean(ENABLED)));
-
-		MenuItem disable = new MenuItem();
-		disable.setTitle(I18N.message("disable"));
-		disable.addClickHandler(event -> ReportService.Instance.get()
-				.changeStatus(Long.parseLong(rec.getAttributeAsString("id")), false, new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(Void result) {
-						rec.setAttribute(ENABLED, false);
-						list.refreshRow(list.getRecordIndex(rec));
-					}
-				}));
-		disable.setEnabled(Boolean.TRUE.equals(list.getSelectedRecord().getAttributeAsBoolean(ENABLED)));
-
-		MenuItem openInFolder = new MenuItem();
-		openInFolder.setTitle(I18N.message("openinfolder"));
-		openInFolder.addClickHandler(event -> DocumentsPanel.get().openInFolder(outputFolderId, outputDocId));
-
-		MenuItem download = new MenuItem();
-		download.setTitle(I18N.message("download"));
-		download.addClickHandler(event -> DocumentUtil.downloadDocument(outputDocId));
-
-		MenuItem preview = new MenuItem();
-		preview.setTitle(I18N.message("preview"));
-		preview.setEnabled(outputDocId != null);
-		preview.addClickHandler(
-				event -> DocumentService.Instance.get().getById(outputDocId, new DefaultAsyncCallback<>() {
-					@Override
-					public void handleSuccess(GUIDocument doc) {
-						new PreviewPopup(doc).show();
-					}
-				}));
-
-		MenuItem export = new MenuItem();
-		export.setTitle(I18N.message("export"));
-		export.addClickHandler(event -> Util.download(
-				Util.contextPath() + "report/controller?command=export&reportId=" + rec.getAttributeAsString("id")));
-
-		contextMenu.setItems(enable, disable, execute, preview, upload, export, openInFolder, download, new MenuItemSeparator(), delete);
-		contextMenu.showContextMenu();
 	}
 
 	public void showReportDetails(GUIReport report) {

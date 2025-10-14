@@ -18,6 +18,8 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.menu.Menu;
+import com.smartgwt.client.widgets.menu.MenuItem;
 
 /**
  * Shows report's security policies
@@ -71,17 +73,39 @@ public class ReportSecurityPanel extends ReportDetailsTab {
 		aclGrid.setAutoFetchData(true);
 		aclGrid.setFields(entityId, entity, read, write);
 		aclGrid.setDataSource(new ReportAclDS(report.getId()));
+		aclGrid.setCanEdit(report.isWrite());
 
 		HLayout buttons = new HLayout();
 		buttons.setMembersMargin(4);
 		buttons.setWidth100();
 		buttons.setHeight(20);
-		addGroupSelector(buttons);
-		addUserSelector(buttons);
+		
+		
+		if (report.isWrite()) {
+			aclGrid.addCellSavedHandler(changed -> changedHandler.onChanged(null));
+			aclGrid.addCellContextClickHandler(click -> {
+				showContextMenu();
+				click.cancel();
+			});
+			
+			addGroupSelector(buttons);
+			addUserSelector(buttons);
+		}
 
-		VLayout body=new VLayout();
+		VLayout body = new VLayout();
 		body.setMembers(aclGrid, buttons);
 		addMember(body);
+	}
+
+	private void showContextMenu() {
+		Menu menu = new Menu();
+
+		MenuItem delete = new MenuItem();
+		delete.setTitle(I18N.message("ddelete"));
+		delete.addClickHandler(event -> aclGrid.removeSelectedData());
+
+		menu.addItem(delete);
+		menu.showContextMenu();
 	}
 
 	private void addUserSelector(HLayout buttons) {
@@ -115,6 +139,9 @@ public class ReportSecurityPanel extends ReportDetailsTab {
 			rec.setAttribute(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase(), false);
 
 			aclGrid.addData(rec);
+			if (changedHandler != null)
+				changedHandler.onChanged(null);
+
 			user.clearValue();
 		});
 		buttons.addMember(userForm);
@@ -149,6 +176,8 @@ public class ReportSecurityPanel extends ReportDetailsTab {
 			rec.setAttribute(GUIAccessControlEntry.PERMISSION_WRITE.toLowerCase(), false);
 
 			aclGrid.addData(rec);
+			if (changedHandler != null)
+				changedHandler.onChanged(null);
 			group.clearValue();
 		});
 		buttons.addMember(groupForm);
