@@ -410,7 +410,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	private boolean handleStoreError(final DocumentHistory transaction, Throwable e) throws PersistenceException {
 		if (transaction != null && StringUtils.isNotEmpty(transaction.getSessionId())) {
 			Session session = SessionManager.get().get(transaction.getSessionId());
-			session.logError(e.getMessage());
+			if (session != null)
+				session.logError(e.getMessage());
 		}
 		log.error(e.getMessage(), e);
 
