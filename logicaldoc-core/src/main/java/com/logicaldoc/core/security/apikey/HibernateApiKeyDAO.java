@@ -5,15 +5,16 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.transaction.Transactional;
-import jakarta.xml.bind.DatatypeConverter;
-
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.html.HTMLSanitizer;
+
+import jakarta.transaction.Transactional;
+import jakarta.xml.bind.DatatypeConverter;
 
 /**
  * Hibernate implementation of {@link ApiKeyDAO}
@@ -38,6 +39,7 @@ public class HibernateApiKeyDAO extends HibernatePersistentObjectDAO<ApiKey> imp
 			} catch (NoSuchAlgorithmException e) {
 				throw new PersistenceException(e.getMessage(), e);
 			}
+		apiKey.setName(HTMLSanitizer.sanitizeSimpleText(apiKey.getName()));
 		super.store(apiKey);
 	}
 
