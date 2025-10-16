@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.html.HTMLSanitizer;
 
 /**
  * Hibernate implementation of {@link ApiKeyDAO}
@@ -38,6 +39,7 @@ public class HibernateApiKeyDAO extends HibernatePersistentObjectDAO<ApiKey> imp
 			} catch (NoSuchAlgorithmException e) {
 				throw new PersistenceException(e.getMessage(), e);
 			}
+		apiKey.setName(HTMLSanitizer.sanitizeSimpleText(apiKey.getName()));
 		super.store(apiKey);
 	}
 
