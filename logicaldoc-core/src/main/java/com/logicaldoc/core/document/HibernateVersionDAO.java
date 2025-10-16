@@ -2,9 +2,11 @@ package com.logicaldoc.core.document;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -161,8 +163,23 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 		versionToDelete.setLastModified(new Date());
 		versionToDelete.setVersion(StringUtils.right(versionToDelete.getId() + "." + versionToDelete.getVersion(), 10));
 		saveOrUpdate(versionToDelete);
-		
-		store.delete(versionToDelete.getDocId(), versionToDelete.getFileVersion());
+
+		try {
+			long referencesToFileversion = queryForLong(
+					"select count(*) from ld_version where ld_deleted=0 and ld_documentid = :documentid and ld_fileversion = :fileversion and not ld_id = :currentid",
+					Map.of("documentid", versionToDelete.getDocId(), "fileversion", versionToDelete.getFileVersion(),
+							"currentid", versionToDelete.getId()));
+			if (referencesToFileversion == 0L)
+				store.delete(versionToDelete.getDocId(), versionToDelete.getFileVersion());
+		} catch (PersistenceException e) {
+			log.warn(e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public void deleteAll(Collection<Version> entities, int code) throws PersistenceException {
+		for (Version version : entities)
+			deleteVersion(version, code);
 	}
 
 	public void setFolderDAO(FolderDAO folderDAO) {
