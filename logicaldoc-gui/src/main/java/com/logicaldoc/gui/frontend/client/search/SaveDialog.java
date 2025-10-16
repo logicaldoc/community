@@ -44,7 +44,7 @@ public class SaveDialog extends Window {
 		form.setWidth(350);
 		form.setMargin(5);
 
-		TextItem name = ItemFactory.newSimpleTextItem("name", null);
+		TextItem name = ItemFactory.newSimpleTextItemWithHyphen("name", null);
 		name.setRequired(true);
 		name.setWidth(200);
 

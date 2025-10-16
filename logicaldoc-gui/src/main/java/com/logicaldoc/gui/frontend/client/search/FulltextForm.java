@@ -144,7 +144,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 			folder.setFolder(Search.get().getOptions().getFolder(), Search.get().getOptions().getFolderName());
 
 		SelectItem sizeOperator = ItemFactory.newSizeOperator("sizeOperator", "size");
-		IntegerItem size = ItemFactory.newIntegerItem("size", " ", (Integer)null);
+		IntegerItem size = ItemFactory.newIntegerItem("size", " ", (Integer) null);
 		size.setWidth(50);
 		size.setShowTitle(false);
 		size.setHint("KB");
@@ -333,7 +333,26 @@ public class FulltextForm extends VLayout implements SearchObserver {
 	public void onOptionsChanged(GUISearchOptions newOptions) {
 		if (newOptions.getType() == GUISearchOptions.TYPE_FULLTEXT) {
 			vm.setValue(EXPRESSION_STR, newOptions.getExpression());
-			folder.setFolder(newOptions.getFolder(), newOptions.getFolderName());
+
+			if (newOptions.getFolder() != null) {
+				folder.setFolder(newOptions.getFolder(), newOptions.getFolderName());
+				vm.setValue("subfolders", newOptions.isSearchInSubPath());
+			}
+
+			vm.setValue("aliases", newOptions.getRetrieveAliases() == 1);
+			vm.setValue(LANGUAGE, newOptions.getLanguage());
+			if (newOptions.getSizeMax() != null) {
+				vm.setValue("size", newOptions.getSizeMax());
+				vm.setValue("sizeOperator", LESSTHAN);
+			}
+			if (newOptions.getSizeMin() != null) {
+				vm.setValue("size", newOptions.getSizeMax());
+				vm.setValue("sizeOperator", "greaterthan");
+			}
+
+			if (newOptions.getTemplate() != null)
+				vm.setValue("template", Long.toString(newOptions.getTemplate()));
+
 		}
 	}
 
@@ -341,7 +360,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 	protected void onDraw() {
 		initGUI();
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

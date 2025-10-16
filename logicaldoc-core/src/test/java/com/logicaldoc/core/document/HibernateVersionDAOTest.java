@@ -54,7 +54,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testFindByDocumentId() throws PersistenceException {
 		List<Version> versions = testSubject.findByDocId(1);
-		assertEquals(2, versions.size());
+		assertEquals(3, versions.size());
 		assertTrue(versions.contains(testSubject.findByVersion(1, "0.1")));
 		assertTrue(versions.contains(testSubject.findByVersion(1, "0.2")));
 

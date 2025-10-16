@@ -2,10 +2,16 @@ package com.logicaldoc.core;
 
 import java.sql.ResultSet;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.jdbc.core.RowMapper;
+
+import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.spring.Context;
+
+import jakarta.transaction.Transactional;
 
 /**
  * Interface for DAOs that operate on persistent objects
@@ -16,6 +22,7 @@ import org.springframework.jdbc.core.RowMapper;
  * @param <T> Class of the implementation of a {@link PersistentObject} this DAO
  *        handles
  */
+@Transactional
 public interface PersistentObjectDAO<T extends PersistentObject> {
 
 	/**
@@ -54,7 +61,12 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public T findById(long id, boolean initialize) throws PersistenceException;
+	public default T findById(long id, boolean initialize) throws PersistenceException {
+		T entity = findById(id);
+		if (initialize)
+			initialize(entity);
+		return entity;
+	}
 
 	/**
 	 * Finds all entities in the database
@@ -63,7 +75,9 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	public List<T> findAll() throws PersistenceException;
+	public default List<T> findAll() throws PersistenceException {
+		return findByWhere("", "", null);
+	}
 
 	/**
 	 * Finds all entities in a specific tenant.
@@ -74,7 +88,9 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	public List<T> findAll(long tenantId) throws PersistenceException;
+	public default List<T> findAll(long tenantId) throws PersistenceException {
+		return findByWhere(" " + ENTITY + ".tenantId=" + tenantId, "", null);
+	}
 
 	/**
 	 * Finds all entities ids
@@ -83,7 +99,9 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	public List<Long> findAllIds() throws PersistenceException;
+	public default List<Long> findAllIds() throws PersistenceException {
+		return findIdsByWhere("", "", null);
+	}
 
 	/**
 	 * Finds all entities ids in a specific tenant.
@@ -94,7 +112,9 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException Error in the database
 	 */
-	public List<Long> findAllIds(long tenantId) throws PersistenceException;
+	public default List<Long> findAllIds(long tenantId) throws PersistenceException {
+		return findIdsByWhere(" " + ENTITY + ".tenantId=" + tenantId, "", null);
+	}
 
 	/**
 	 * Finds all entities by the given expression. Use {@value #ENTITY} alias to
@@ -108,7 +128,9 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public List<T> findByWhere(String where, String order, Integer max) throws PersistenceException;
+	public default List<T> findByWhere(String where, String order, Integer max) throws PersistenceException {
+		return findByWhere(where, (Map<String, Object>) null, order, max);
+	}
 
 	/**
 	 * Finds all entities by the given expression. Use {@value #ENTITY} alias to
@@ -181,7 +203,9 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public List<Long> findIdsByWhere(String where, String order, Integer max) throws PersistenceException;
+	public default List<Long> findIdsByWhere(String where, String order, Integer max) throws PersistenceException {
+		return findIdsByWhere(where, new HashMap<>(), order, max);
+	}
 
 	/**
 	 * Finds all entities ids by the given expression. Use {@value #ENTITY}
@@ -210,15 +234,18 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public void initialize(T entity) throws PersistenceException;
 
 	/**
-	 * Initialises lazy loaded data such as collections of all specified entities
+	 * Initialises lazy loaded data such as collections of all specified
+	 * entities
 	 * 
 	 * @param entities The entities to be initialize
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public void initialize(Collection<T> entities) throws PersistenceException;
+	public default void initialize(Collection<T> entities) throws PersistenceException {
+		for (T entity : entities)
+			initialize(entity);
+	}
 
-	
 	/**
 	 * Query given SQL to create a prepared statement from SQL and a list of
 	 * arguments to bind to the query, mapping each row to a Java object via a
@@ -232,7 +259,9 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public <P> List<P> query(String sql, RowMapper<P> rowMapper, Integer maxRows) throws PersistenceException;
+	public default <P> List<P> query(String sql, RowMapper<P> rowMapper, Integer maxRows) throws PersistenceException {
+		return query(sql, null, rowMapper, maxRows);
+	}
 
 	/**
 	 * Query given SQL to create a prepared statement from SQL and a list of
@@ -501,13 +530,16 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 			throws PersistenceException;
 
 	/**
-	 * This method deletes an entity. Same as delete(id, 1)
+	 * This method deletes an entity. Same as delete(id,
+	 * {@link PersistentObject#DELETED_CODE_DEFAULT})
 	 * 
 	 * @param id ID of the entity which should be deleted.
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public void delete(long id) throws PersistenceException;
+	public default void delete(long id) throws PersistenceException {
+		delete(id, PersistentObject.DELETED_CODE_DEFAULT);
+	}
 
 	/**
 	 * This method deletes an entity and you can give a deletion code
@@ -520,13 +552,16 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public void delete(long id, int code) throws PersistenceException;
 
 	/**
-	 * Deletes all entries form the database
+	 * Deletes all entries form the database. Same as deleteAll(entities,
+	 * {@link PersistentObject#DELETED_CODE_DEFAULT})
 	 * 
 	 * @param entities The entities to be deleted
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public void deleteAll(Collection<T> entities) throws PersistenceException;
+	public default void deleteAll(Collection<T> entities) throws PersistenceException {
+		deleteAll(entities, PersistentObject.DELETED_CODE_DEFAULT);
+	}
 
 	/**
 	 * Deletes all entries form the database giving a specific deletion code
@@ -598,11 +633,22 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @return the database identifier
 	 */
-	public String getDbms();
+	public default String getDbms() {
+		ContextProperties config = Context.get().getProperties();
+		return config.getProperty("jdbc.dbms", "mysql").toLowerCase();
+	}
 
-	public boolean isOracle();
+	public default boolean isOracle() {
+		return "oracle".equals(getDbms());
+	}
 
-	public boolean isMySQL();
+	public default boolean isMySQL() {
+		return "mysql".equals(getDbms()) || isMariaDB();
+	}
+	
+	public default boolean isMariaDB() {
+		return "maria".equals(getDbms());
+	}
 
 	/**
 	 * Retrieves the metadata from the database

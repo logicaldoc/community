@@ -31,7 +31,6 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
-import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.spring.Context;
 
 import jakarta.annotation.Resource;
@@ -91,34 +90,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		store(entity);
 	}
 
-	public void delete(long id) throws PersistenceException {
-		delete(id, PersistentObject.DELETED_CODE_DEFAULT);
-	}
-
-	public List<T> findAll() throws PersistenceException {
-		return findByWhere("", "", null);
-	}
-
-	public List<T> findAll(long tenantId) throws PersistenceException {
-		return findByWhere(" " + ENTITY + ".tenantId=" + tenantId, "", null);
-	}
-
-	public List<Long> findAllIds() throws PersistenceException {
-		return findIdsByWhere("", "", null);
-	}
-
-	public List<Long> findAllIds(long tenantId) throws PersistenceException {
-		return findIdsByWhere(" " + ENTITY + ".tenantId=" + tenantId, "", null);
-	}
-
-	@Override
-	public T findById(long id, boolean initialize) throws PersistenceException {
-		T entity = findById(id);
-		if (initialize)
-			initialize(entity);
-		return entity;
-	}
-
 	@Override
 	public T findById(long id) throws PersistenceException {
 		T entity = null;
@@ -130,11 +101,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
-	}
-
-	@Override
-	public List<T> findByWhere(String where, String order, Integer max) throws PersistenceException {
-		return findByWhere(where, (Map<String, Object>) null, order, max);
 	}
 
 	@Override
@@ -190,11 +156,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		} catch (Exception e) {
 			throw new PersistenceException(e);
 		}
-	}
-
-	@Override
-	public List<Long> findIdsByWhere(String where, String order, Integer max) throws PersistenceException {
-		return findIdsByWhere(where, new HashMap<>(), order, max);
 	}
 
 	@Override
@@ -350,19 +311,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		// By default do nothing
 	}
 
-	@Override
-	public void initialize(Collection<T> entities) throws PersistenceException {
-		for (T entity : entities)
-			initialize(entity);
-	}
-
 	protected Session getCurrentSession() {
 		return sessionFactory.getCurrentSession();
-	}
-
-	@Override
-	public <P> List<P> query(String sql, RowMapper<P> rowMapper, Integer maxRows) throws PersistenceException {
-		return query(sql, null, rowMapper, maxRows);
 	}
 
 	@Override
@@ -590,11 +540,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	@Override
-	public void deleteAll(Collection<T> entities) throws PersistenceException {
-		deleteAll(entities, PersistentObject.DELETED_CODE_DEFAULT);
-	}
-
-	@Override
 	public int bulkUpdate(String expression, Map<String, Object> parameters) throws PersistenceException {
 		if (!checkStoringAspect())
 			return 0;
@@ -635,28 +580,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		}
 	}
 
-	@Override
-	public String getDbms() {
-		ContextProperties config = Context.get().getProperties();
-		return config.getProperty("jdbc.dbms", "mysql").toLowerCase();
-	}
-
-	@Override
-	public boolean isOracle() {
-		return "oracle".equals(getDbms());
-	}
-
 	protected boolean isHsql() {
 		return "hsqldb".equals(getDbms());
-	}
-
-	@Override
-	public boolean isMySQL() {
-		return "mysql".equals(getDbms()) || isMariaDB();
-	}
-
-	protected boolean isMariaDB() {
-		return "maria".equals(getDbms());
 	}
 
 	protected boolean isPostgreSQL() {
