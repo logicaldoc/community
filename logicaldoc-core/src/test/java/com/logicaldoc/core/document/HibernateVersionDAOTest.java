@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -99,18 +101,41 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 		user.setName("xx");
 		user.setFirstName("xx");
 
-		int versionsCap = Context.get().getProperties().getInt("document.maxversions");
-		assertEquals(versionsCap, testSubject.findByDocId(doc.getId()).size());
 		Store store = Context.get(Store.class);
-		for (Version ver : testSubject.findByDocId(doc.getId())) {
-			String res = store.getResourceName(doc.getId(), ver.getFileVersion(), null);
-			store.store(ResourceUtil.getInputStream("data.sql"), doc.getId(), res);
-		}
-		for (Version ver : testSubject.findByDocId(doc.getId())) {
-			String res = store.getResourceName(doc.getId(), ver.getFileVersion(), null);
-			store.exists(doc.getId(), res);
+
+		int versionsCap = Context.get().getProperties().getInt("document.maxversions");
+		for (int i = 0; i < versionsCap * 2; i++) {
+			Version version = null;
+			if (i % 2 == 0) {
+				version = Version.create(doc, user, "checkin " + i, DocumentEvent.CHECKEDIN, true);
+				store.store(ResourceUtil.getInputStream("data.sql"), doc.getId(),
+						store.getResourceName(doc.getId(), version.getFileVersion(), null));
+			} else {
+				version = Version.create(doc, user, "edit " + i, DocumentEvent.CHANGED, true);
+			}
+			testSubject.store(version);
 		}
 
+		// Check if the versions cap has been respected
+		List<Version> versions = testSubject.findByDocId(doc.getId());
+		assertEquals(versionsCap, versions.size());
+
+		// Check if all the versions point to an existing file
+		for (Version version : versions)
+			assertTrue(store.exists(version.getDocId(), version.getFileVersion()));
+
+		// Check if no files of deleted versions are still in the store
+		Set<String> actualFileVersions = versions.stream().map(Version::getFileVersion).collect(Collectors.toSet());
+		List<String> currentResourceFiles = store.listResources(doc.getId(), null).stream().filter(r -> !r.contains("-")).toList();
+		for (String file : currentResourceFiles)
+			assertTrue(actualFileVersions.contains(file));
+
+		// Now reset all versions
+		testSubject.deleteAll(versions);
+		doc.setVersion("1.0");
+		doc.setFileVersion("1.0");
+		docDao.store(doc);
+		
 		Version version = Version.create(doc, user, "", DocumentEvent.STORED, true);
 		testSubject.store(version);
 		assertEquals("1.0", testSubject.findById(version.getId()).getVersion());
@@ -120,12 +145,8 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 			store.store(is, doc.getId(), resourceName);
 		}
 
-		assertEquals(versionsCap, testSubject.findByDocId(doc.getId()).size());
-		for (Version ver : testSubject.findByDocId(doc.getId())) {
-			String res = store.getResourceName(doc.getId(), ver.getFileVersion(), null);
-			store.exists(doc.getId(), res);
-		}
-
+		doc = docDao.findById(1);
+		docDao.initialize(doc);
 		version = Version.create(doc, user, "", DocumentEvent.CHANGED, true);
 		testSubject.store(version);
 		assertEquals("2.0", version.getVersion());
@@ -135,8 +156,8 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 			store.store(is, doc.getId(), resourceName);
 		}
 
-		assertEquals(versionsCap, testSubject.findByDocId(doc.getId()).size());
-		for (Version ver : testSubject.findByDocId(doc.getId())) {
+		assertEquals(versionsCap, versions.size());
+		for (Version ver : versions) {
 			String res = store.getResourceName(doc.getId(), ver.getFileVersion(), null);
 			store.exists(doc.getId(), res);
 		}
@@ -150,8 +171,8 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 			store.store(is, doc.getId(), resourceName);
 		}
 
-		assertEquals(versionsCap, testSubject.findByDocId(doc.getId()).size());
-		for (Version ver : testSubject.findByDocId(doc.getId())) {
+		assertEquals(versionsCap, versions.size());
+		for (Version ver : versions) {
 			String res = store.getResourceName(doc.getId(), ver.getFileVersion(), null);
 			store.exists(doc.getId(), res);
 		}
