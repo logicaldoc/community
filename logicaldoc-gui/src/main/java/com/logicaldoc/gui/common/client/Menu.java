@@ -21,6 +21,8 @@ public class Menu {
 
 	public static final long DESTROY_DOCUMENTS = -9;
 
+	public static final long DUPLICATES = -10;
+	
 	public static final long ARCHIVED_DOCS = -4;
 
 	public static final long LOCKED_DOCS = -3;
