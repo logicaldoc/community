@@ -208,7 +208,7 @@ public class RobotsPanel extends AdminPanel {
 		ask.addClickHandler(event -> RobotService.Instance.get().get(selectedRobotId, new DefaultAsyncCallback<>() {
 			@Override
 			public void handleSuccess(GUIRobot robot) {
-				LD.askForStringMandatory("question", null, null, question -> RobotThread.get(robot).open(question));
+				LD.askForStringMandatory("question", null, null, question -> RobotThread.get(robot).ask(question));
 			}
 		}));
 		ask.setEnabled(selection[0].getAttributeAsBoolean(ENABLED));

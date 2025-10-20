@@ -74,38 +74,6 @@ public class RobotThread extends Window {
 		});
 	}
 
-	public void open(String initialQuestion) {
-		if (contents != null) {
-			removeItem(contents);
-			contents.removeMembers(contents.getMembers());
-			messagesBoard.removeMembers(messagesBoard.getMembers());
-		}
-
-		messagesBoard = new VLayout();
-		messagesBoard.setWidth100();
-		messagesBoard.setHeight100();
-		messagesBoard.setOverflow(Overflow.SCROLL);
-		messagesBoard.setMembersMargin(2);
-
-		contents = new VLayout();
-		contents.setWidth100();
-		contents.setHeight100();
-		contents.setAlign(VerticalAlignment.TOP);
-		contents.setOverflow(Overflow.SCROLL);
-		contents.addMember(messagesBoard);
-
-		lastMessage = null;
-
-		addQuestionBar();
-
-		addItem(contents);
-
-		if(initialQuestion!=null && !initialQuestion.isEmpty())
-			ask(initialQuestion);
-
-		show();
-	}
-
 	private void addQuestionBar() {
 		TextItem question = ItemFactory.newTextItem("question", null);
 		question.setShowTitle(false);
@@ -165,7 +133,34 @@ public class RobotThread extends Window {
 			return robot.getLabel();
 	}
 
-	private void ask(String question) {
+	private void init() {
+		if (contents != null)
+			return;
+
+		messagesBoard = new VLayout();
+		messagesBoard.setWidth100();
+		messagesBoard.setHeight100();
+		messagesBoard.setOverflow(Overflow.SCROLL);
+		messagesBoard.setMembersMargin(2);
+
+		contents = new VLayout();
+		contents.setWidth100();
+		contents.setHeight100();
+		contents.setAlign(VerticalAlignment.TOP);
+		contents.setOverflow(Overflow.SCROLL);
+		contents.addMember(messagesBoard);
+
+		lastMessage = null;
+
+		addQuestionBar();
+
+		addItem(contents);
+	}
+
+	public void ask(String question) {
+		restore();
+		init();
+		
 		appendMessage(question, "user");
 		appendMessage("", "robot");
 
@@ -176,6 +171,8 @@ public class RobotThread extends Window {
 				updateLastMessage(answer);
 			}
 		});
+		
+		show();
 	}
 
 	@Override

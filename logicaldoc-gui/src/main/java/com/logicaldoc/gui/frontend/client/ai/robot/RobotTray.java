@@ -49,7 +49,7 @@ public class RobotTray extends MenuTray {
 
 				@Override
 				public void handleSuccess(GUIRobot rbt) {
-					RobotThread.get(rbt).open(question);
+					RobotThread.get(rbt).ask(question);
 				}
 			});
 		}
