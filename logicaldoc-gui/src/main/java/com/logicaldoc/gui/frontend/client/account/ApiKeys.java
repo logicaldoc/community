@@ -60,7 +60,6 @@ public class ApiKeys extends com.smartgwt.client.widgets.Window {
 						LD.askForValue("saveyourkey", "saveyourkeymessage", apikey, item, value -> {
 							list.refresh(new ApiKeysDS());
 							Util.copyText(apikey);
-							destroy();
 						});
 						
 					}

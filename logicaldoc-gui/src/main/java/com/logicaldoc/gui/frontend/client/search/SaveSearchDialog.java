@@ -6,7 +6,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.SearchService;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
@@ -19,13 +18,13 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class SaveDialog extends Window {
+public class SaveSearchDialog extends Window {
 
 	private static final String DESCRIPTION = "description";
 
 	private ValuesManager vm = new ValuesManager();
 
-	public SaveDialog() {
+	public SaveSearchDialog() {
 		super();
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
@@ -66,30 +65,20 @@ public class SaveDialog extends Window {
 		if (Boolean.TRUE.equals(vm.hasErrors()))
 			return;
 
-		final GUISearchOptions options = Search.get().getOptions();
+		GUISearchOptions options = Search.get().getOptions();
 		options.setName(vm.getValueAsString("name"));
 		options.setDescription(vm.getValueAsString(DESCRIPTION));
-		SearchService.Instance.get().save(Search.get().getOptions(), new DefaultAsyncCallback<>() {
+		SearchService.Instance.get().save(options, new DefaultAsyncCallback<>() {
 			@Override
 			public void handleSuccess(Boolean b) {
-				if (Boolean.FALSE.equals(b))
-					SC.warn(I18N.message("duplicateelement"));
-				else {
-					try {
-						if (SavedSearchesPanel.get() != null)
-							SavedSearchesPanel.get().addEntry(vm.getValueAsString("name"),
-									vm.getValueAsString(DESCRIPTION),
-									options.getType() == GUISearchOptions.TYPE_FULLTEXT ? I18N.message("fulltext")
-											: I18N.message("parametric"));
-					} catch (Exception t) {
-						// Nothing to do
-					}
+				if (Boolean.TRUE.equals(b)) {
+					SavedSearchesPanel.get().refresh();
 					destroy();
 				}
 			}
 		});
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

@@ -8,6 +8,7 @@ import java.util.List;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
+import com.logicaldoc.gui.frontend.client.search.SearchObserver;
 
 /**
  * Search options
@@ -79,6 +80,9 @@ public class GUISearchOptions implements Serializable {
 	private List<GUICriterion> criteria = new ArrayList<>();
 
 	private List<String> fields = Constants.getFulltextDefaultFields();
+
+	// The eventual observer that originated such search options
+	private transient SearchObserver source;
 
 	/** Creates a new instance of SearchOptions */
 	public GUISearchOptions() {
@@ -266,6 +270,10 @@ public class GUISearchOptions implements Serializable {
 		return criteria;
 	}
 
+	public GUICriterion getCriterion(String field) {
+		return criteria.stream().filter(c -> c.getField().equals(field)).findFirst().orElse(null);
+	}
+
 	public void setCriteria(List<GUICriterion> criteria) {
 		this.criteria = criteria;
 	}
@@ -308,5 +316,13 @@ public class GUISearchOptions implements Serializable {
 
 	public void setRetrieveAliases(int retrieveAliases) {
 		this.retrieveAliases = retrieveAliases;
+	}
+
+	public SearchObserver getSource() {
+		return source;
+	}
+
+	public void setSource(SearchObserver source) {
+		this.source = source;
 	}
 }

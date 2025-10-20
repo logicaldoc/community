@@ -40,7 +40,7 @@ public class LanguageManager {
 	public void init() {
 		languages.clear();
 
-		// Acquire the 'Language' extensions of the core plugin and add defined
+		// Acquire the 'Language' extensions of the core plug-in and add defined
 		// languages
 		PluginRegistry registry = PluginRegistry.getInstance();
 		if (registry == null)

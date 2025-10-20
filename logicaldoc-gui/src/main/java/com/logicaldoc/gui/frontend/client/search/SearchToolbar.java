@@ -90,7 +90,7 @@ public class SearchToolbar extends ToolStrip {
 
 	private void addSaveButton() {
 		ToolStripButton save = AwesomeFactory.newToolStripButton("save", "savesearch");
-		save.addClickHandler(event -> new SaveDialog().show());
+		save.addClickHandler(event -> new SaveSearchDialog().show());
 		if (Feature.visible(Feature.SAVED_SEARCHES)) {
 			addSeparator();
 			addButton(save);

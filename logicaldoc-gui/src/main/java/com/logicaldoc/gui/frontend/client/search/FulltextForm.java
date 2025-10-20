@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.search;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.TitleOrientation;
+import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
@@ -65,6 +67,8 @@ public class FulltextForm extends VLayout implements SearchObserver {
 
 	private TextItem expression;
 
+	private GUISearchOptions defaultOptions;
+
 	public FulltextForm() {
 		setHeight100();
 		setOverflow(Overflow.AUTO);
@@ -93,7 +97,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		clear.setSrc("[SKIN]/icons/trash.png");
 		clear.addFormItemClickHandler(click -> {
 			vm.clearValues();
-			prepareFields(null);
+			prepareFieldsSelector(null);
 		});
 
 		expression = ItemFactory.newTextItem(EXPRESSION_STR, I18N.message(SEARCH) + "...");
@@ -125,9 +129,9 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		template.setColSpan(3);
 		template.addChangedHandler(changed -> {
 			if (changed.getValue() != null && !"".equals(changed.getValue()))
-				prepareFields(Long.parseLong((String) changed.getValue()));
+				prepareFieldsSelector(Long.parseLong((String) changed.getValue()));
 			else
-				prepareFields(null);
+				prepareFieldsSelector(null);
 		});
 
 		CheckboxItem subfolders = new CheckboxItem("subfolders", I18N.message("searchinsubfolders"));
@@ -144,6 +148,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 			folder.setFolder(Search.get().getOptions().getFolder(), Search.get().getOptions().getFolderName());
 
 		SelectItem sizeOperator = ItemFactory.newSizeOperator("sizeOperator", "size");
+		sizeOperator.setTitleVAlign(VerticalAlignment.CENTER);
 		IntegerItem size = ItemFactory.newIntegerItem("size", " ", (Integer) null);
 		size.setWidth(50);
 		size.setShowTitle(false);
@@ -165,18 +170,22 @@ public class FulltextForm extends VLayout implements SearchObserver {
 
 		addMember(form1);
 
-		prepareFields(null);
+		prepareFieldsSelector(null);
+
+		applyOptions(defaultOptions);
 	}
 
 	private void search() {
-		if (Boolean.FALSE.equals(vm.validate())) {
+		if (Boolean.FALSE.equals(vm.validate()))
 			return;
-		}
+
+		defaultOptions = null;
 
 		@SuppressWarnings("unchecked")
 		Map<String, Object> values = vm.getValues();
 
 		GUISearchOptions options = new GUISearchOptions();
+		options.setSource(this);
 
 		options.setMaxHits(Search.get().getMaxHits());
 		options.setType(GUISearchOptions.TYPE_FULLTEXT);
@@ -281,10 +290,22 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		}
 	}
 
-	/*
+	/**
 	 * Prepare the form for the selectable fields
 	 */
-	private void prepareFields(Long templateId) {
+	private void prepareFieldsSelector(Long templateId) {
+		if (templateId == null)
+			prepareFieldsSelector(null, null);
+		else
+			TemplateService.Instance.get().getAttributes(templateId, null, new DefaultAsyncCallback<>() {
+				@Override
+				public void handleSuccess(List<GUIAttribute> templateAttributes) {
+					prepareFieldsSelector(templateId, templateAttributes);
+				}
+			});
+	}
+
+	private void prepareFieldsSelector(Long templateId, List<GUIAttribute> templateAttributes) {
 		if (fieldsForm != null && contains(fieldsForm))
 			removeMember(fieldsForm);
 
@@ -304,24 +325,19 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		fieldsMap.put(Constants.FULLTEXT_FIELD_COMMENT, I18N.message("comment"));
 		fieldsMap.put(Constants.FULLTEXT_FIELD_NOTES, I18N.message("notes"));
 
+		if (templateId != null) {
+			for (GUIAttribute att : templateAttributes.stream()
+					.filter(att -> att.getType() == GUIAttribute.TYPE_STRING && !att.isHidden())
+					.collect(Collectors.toList()))
+				fieldsMap.put("ext_" + att.getName(), att.getDisplayName());
+		}
 		searchinItem.setValueMap(fieldsMap);
-		searchinItem.setValue(Constants.getFulltextDefaultFields());
 
+		if (defaultOptions != null)
+			searchinItem.setValue(defaultOptions.getFields().toArray(new String[0]));
+		else
+			searchinItem.setValue(Constants.getFulltextDefaultFields());
 		fieldsForm.setItems(searchinItem);
-
-		if (templateId == null)
-			return;
-
-		TemplateService.Instance.get().getAttributes(templateId, null, new DefaultAsyncCallback<>() {
-			@Override
-			public void handleSuccess(List<GUIAttribute> result) {
-				for (GUIAttribute att : result.stream()
-						.filter(att -> att.getType() == GUIAttribute.TYPE_STRING && !att.isHidden())
-						.collect(Collectors.toList()))
-					fieldsMap.put("ext_" + att.getName(), att.getDisplayName());
-				searchinItem.setValueMap(fieldsMap);
-			}
-		});
 	}
 
 	@Override
@@ -330,29 +346,51 @@ public class FulltextForm extends VLayout implements SearchObserver {
 	}
 
 	@Override
-	public void onOptionsChanged(GUISearchOptions newOptions) {
-		if (newOptions.getType() == GUISearchOptions.TYPE_FULLTEXT) {
-			vm.setValue(EXPRESSION_STR, newOptions.getExpression());
+	public void onOptionsChanged(GUISearchOptions options) {
+		if (options.getType() == GUISearchOptions.TYPE_FULLTEXT) {
+			defaultOptions = options;
+			SearchMenu.get().openFulltextSection();
+			if (isDrawn())
+				applyOptions(options);
+		}
+	}
 
-			if (newOptions.getFolder() != null) {
-				folder.setFolder(newOptions.getFolder(), newOptions.getFolderName());
-				vm.setValue("subfolders", newOptions.isSearchInSubPath());
-			}
+	private void applyOptions(GUISearchOptions options) {
+		if (options == null)
+			return;
 
-			vm.setValue("aliases", newOptions.getRetrieveAliases() == 1);
-			vm.setValue(LANGUAGE, newOptions.getLanguage());
-			if (newOptions.getSizeMax() != null) {
-				vm.setValue("size", newOptions.getSizeMax());
-				vm.setValue("sizeOperator", LESSTHAN);
-			}
-			if (newOptions.getSizeMin() != null) {
-				vm.setValue("size", newOptions.getSizeMax());
-				vm.setValue("sizeOperator", "greaterthan");
-			}
+		folder.setFolder(options.getFolder(), options.getFolderName());
 
-			if (newOptions.getTemplate() != null)
-				vm.setValue("template", Long.toString(newOptions.getTemplate()));
+		vm.setValue(EXPRESSION_STR, options.getExpression());
+		vm.setValue("subfolders", options.isSearchInSubPath());
+		vm.setValue("aliases", options.getRetrieveAliases() == 1);
+		vm.setValue(LANGUAGE, options.getLanguage());
+		if (options.getSizeMax() != null) {
+			vm.setValue("size", options.getSizeMax() / 1024);
+			vm.setValue("sizeOperator", LESSTHAN);
+		}
+		if (options.getSizeMin() != null) {
+			vm.setValue("size", options.getSizeMin() / 1024);
+			vm.setValue("sizeOperator", "greaterthan");
+		}
 
+		Map<String, Date> range = new HashMap<>();
+		if (options.getCreationFrom() != null)
+			range.put("start", options.getCreationFrom());
+		if (options.getCreationTo() != null)
+			range.put("end", options.getCreationTo());
+		vm.setValue(CREATION_DATE_RANGE, range);
+
+		range = new HashMap<>();
+		if (options.getDateFrom() != null)
+			range.put("start", options.getDateFrom());
+		if (options.getDateTo() != null)
+			range.put("end", options.getDateTo());
+		vm.setValue(PUBLICATION_DATE_RANGE, range);
+
+		if (options.getTemplate() != null) {
+			vm.setValue("template", Long.toString(options.getTemplate()));
+			prepareFieldsSelector(options.getTemplate());
 		}
 	}
 

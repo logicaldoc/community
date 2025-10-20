@@ -21,7 +21,6 @@ public class ChatGPTTray extends MenuTray {
 	public ChatGPTTray() {
 		TextItem question = ItemFactory.newTextItem("chatgpt", "");
 		question.setWidth(250);
-		question.setRequired(true);
 		question.addKeyPressHandler(event -> {
 			if (event.getKeyName() != null && "enter".equalsIgnoreCase(event.getKeyName()))
 				onAsk(question.getValueAsString());

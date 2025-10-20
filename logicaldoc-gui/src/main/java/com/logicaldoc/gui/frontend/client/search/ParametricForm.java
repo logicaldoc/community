@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.logicaldoc.gui.common.client.Constants;
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUICriterion;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
@@ -43,7 +43,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class ParametricForm extends VLayout {
+public class ParametricForm extends VLayout implements SearchObserver {
 	private static final String TEMPLATE = "template";
 
 	private static final String TYPE = "type:";
@@ -66,6 +66,8 @@ public class ParametricForm extends VLayout {
 
 	private static ParametricForm instance;
 
+	private GUISearchOptions defaultOptions;
+
 	public static ParametricForm get() {
 		if (instance == null)
 			instance = new ParametricForm();
@@ -77,6 +79,7 @@ public class ParametricForm extends VLayout {
 		setOverflow(Overflow.AUTO);
 		setMembersMargin(3);
 		setAlign(Alignment.LEFT);
+		Search.get().addObserver(this);
 
 		addResizedHandler(event -> {
 			if (conditionsLayout.getMembers() != null)
@@ -95,6 +98,7 @@ public class ParametricForm extends VLayout {
 		languageForm.setValuesManager(vm);
 		languageForm.setTitleOrientation(TitleOrientation.TOP);
 		languageForm.setNumCols(1);
+
 		SelectItem language = ItemFactory.newLanguageSelector(LANGUAGE, true, false);
 		language.setDefaultValue("");
 
@@ -182,18 +186,20 @@ public class ParametricForm extends VLayout {
 
 		IButton add = new IButton(I18N.message("addcondition"));
 		add.setAutoFit(true);
-		add.addClickHandler(event -> addCondition());
+		add.addClickHandler(event -> appendCondition());
 		addMember(add);
 
 		conditionsLayout = new VLayout(3);
 		addMember(conditionsLayout);
+
+		applyOptions(defaultOptions);
 	}
 
 	public void removeCondition(ParameterConditionRow condition) {
 		conditionsLayout.removeMember(condition);
 	}
 
-	public void addCondition() {
+	public ParameterConditionRow appendCondition() {
 		ParameterConditionRow row = new ParameterConditionRow(selectedTemplate, true, event -> {
 			if (event.getKeyName() == null)
 				return;
@@ -203,6 +209,7 @@ public class ParametricForm extends VLayout {
 		row.setWidth(getWidth() - 10);
 		row.reload();
 		conditionsLayout.addMember(row);
+		return row;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -210,9 +217,12 @@ public class ParametricForm extends VLayout {
 		if (Boolean.FALSE.equals(vm.validate()))
 			return;
 
+		defaultOptions = null;
+
 		Map<String, Object> values = vm.getValues();
 
 		GUISearchOptions options = new GUISearchOptions();
+		options.setSource(this);
 
 		options.setMaxHits(Search.get().getMaxHits());
 		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString("aliases")) ? 1 : 0);
@@ -404,7 +414,60 @@ public class ParametricForm extends VLayout {
 	protected void onDraw() {
 		initGUI();
 	}
-	
+
+	@Override
+	public void onSearchArrived() {
+		// Nothing to do
+	}
+
+	@Override
+	public void onOptionsChanged(GUISearchOptions options) {
+		if (options.getType() == GUISearchOptions.TYPE_PARAMETRIC) {
+			defaultOptions = options;
+			SearchMenu.get().openParametricSection();
+			if (isDrawn())
+				applyOptions(options);
+		}
+	}
+
+	private void applyOptions(GUISearchOptions options) {
+		if (options == null)
+			return;
+
+		folder.setFolder(options.getFolder(), options.getFolderName());
+
+		vm.setValue("subfolders", options.isSearchInSubPath());
+		vm.setValue("aliases", options.getRetrieveAliases() == 1);
+		vm.setValue(LANGUAGE, options.getLanguage());
+
+		vm.setValue(CASESENSITIVE, options.getCaseSensitive() == 1);
+		vm.setValue("match", options.getTopOperator());
+
+		conditionsLayout.removeMembers(conditionsLayout.getMembers());
+
+		if (options.getTemplate() != null) {
+			vm.setValue("template", Long.toString(options.getTemplate()));
+			TemplateService.Instance.get().getTemplate(options.getTemplate(), new DefaultAsyncCallback<>() {
+				@Override
+				public void handleSuccess(GUITemplate result) {
+					selectedTemplate = result;
+					applyCriteria(options);
+				}
+			});
+		} else {
+			selectedTemplate = null;
+			vm.setValue("template", (String) null);
+			applyCriteria(options);
+		}
+	}
+
+	private void applyCriteria(GUISearchOptions options) {
+		for (GUICriterion criterion : options.getCriteria()) {
+			ParameterConditionRow row = appendCondition();
+			row.setCriterion(criterion);
+		}
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);

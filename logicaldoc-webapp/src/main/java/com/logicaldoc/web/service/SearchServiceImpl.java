@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,8 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.BookmarkDAO;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
+import com.logicaldoc.core.folder.Folder;
+import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.i18n.Language;
 import com.logicaldoc.core.i18n.LanguageManager;
 import com.logicaldoc.core.metadata.Attribute;
@@ -200,8 +203,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			search.setDescription(options.getDescription());
 			search.saveOptions(opt);
 
-			SearchDAO dao = Context.get(SearchDAO.class);
-			dao.store(search);
+			Context.get(SearchDAO.class).store(search);
 
 			log.debug("Saved search {}", opt.getName());
 			return true;
@@ -230,12 +232,19 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	@Override
 	public GUISearchOptions load(String name) throws ServerException {
 		Session session = validateSession();
-		SearchDAO dao = Context.get(SearchDAO.class);
 
 		try {
-			com.logicaldoc.core.searchengine.saved.SavedSearch search = dao.findByUserIdAndName(session.getUserId(),
-					name);
-			return toGUIOptions(search.readOptions());
+			com.logicaldoc.core.searchengine.saved.SavedSearch search = Context.get(SearchDAO.class)
+					.findByUserIdAndName(session.getUserId(), name);
+
+			GUISearchOptions guiOptions = toGUIOptions(search.readOptions());
+			if (guiOptions.getFolder() != null) {
+				Folder fld = Context.get(FolderDAO.class).findById(guiOptions.getFolder());
+				if (fld != null)
+					guiOptions.setFolderName(fld.getName());
+			}
+
+			return guiOptions;
 		} catch (Exception t) {
 			return throwServerException(session, log, t);
 		}
@@ -260,8 +269,8 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 			try {
 				map.put(search.getName(), search.readOptions());
 			} catch (Exception e) {
-				log.error("Cannot process saved search {} of user {}", search.getName(), session.getUsername());
-				log.error(e.getMessage(), e);
+				log.warn("Cannot read saved search {} of user {}", search.getName(), session.getUsername());
+				log.warn(e.getMessage(), e);
 			}
 		}
 
@@ -270,55 +279,59 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 	}
 
 	protected GUISearchOptions toGUIOptions(SearchOptions searchOptions) {
-		GUISearchOptions op = new GUISearchOptions();
-		op.setType(searchOptions.getType());
-		op.setDescription(searchOptions.getDescription());
-		op.setExpression(searchOptions.getExpression());
-		op.setMaxHits(searchOptions.getMaxHits());
-		op.setName(searchOptions.getName());
-		op.setUserId(searchOptions.getUserId());
-		op.setTopOperator(searchOptions.getTopOperator());
-		op.setFolder(searchOptions.getFolderId());
-		op.setSearchInSubPath(searchOptions.isSearchInSubPath());
-		op.setTemplate(searchOptions.getTemplate());
-		op.setCaseSensitive(searchOptions.isCaseSensitive() ? 1 : 0);
-		op.setRetrieveAliases(searchOptions.isRetrieveAliases() ? 1 : 0);
+		GUISearchOptions guiOptions = new GUISearchOptions();
+		guiOptions.setType(searchOptions.getType());
+		guiOptions.setDescription(searchOptions.getDescription());
+		guiOptions.setExpression(searchOptions.getExpression());
+		guiOptions.setMaxHits(searchOptions.getMaxHits());
+		guiOptions.setName(searchOptions.getName());
+		guiOptions.setUserId(searchOptions.getUserId());
+		guiOptions.setTopOperator(searchOptions.getTopOperator());
+		guiOptions.setFolder(searchOptions.getFolderId());
+		guiOptions.setSearchInSubPath(searchOptions.isSearchInSubPath());
+		guiOptions.setTemplate(searchOptions.getTemplate());
+		guiOptions.setCaseSensitive(searchOptions.isCaseSensitive() ? 1 : 0);
+		guiOptions.setRetrieveAliases(searchOptions.isRetrieveAliases() ? 1 : 0);
 
 		if (searchOptions.getType() == SearchOptions.TYPE_FULLTEXT) {
-			op.setDateFrom(((FulltextSearchOptions) searchOptions).getDateFrom());
-			op.setDateTo(((FulltextSearchOptions) searchOptions).getDateTo());
-			op.setCreationFrom(((FulltextSearchOptions) searchOptions).getCreationFrom());
-			op.setCreationTo(((FulltextSearchOptions) searchOptions).getCreationTo());
-			op.setExpressionLanguage(((FulltextSearchOptions) searchOptions).getExpressionLanguage());
-			op.setFields(new ArrayList<>(((FulltextSearchOptions) searchOptions).getFields()));
-			op.setFormat(((FulltextSearchOptions) searchOptions).getFormat());
-			op.setLanguage(((FulltextSearchOptions) searchOptions).getLanguage());
-			op.setSizeMax(((FulltextSearchOptions) searchOptions).getSizeMax());
-			op.setSizeMin(((FulltextSearchOptions) searchOptions).getSizeMin());
+			guiOptions.setDateFrom(((FulltextSearchOptions) searchOptions).getDateFrom());
+			guiOptions.setDateTo(((FulltextSearchOptions) searchOptions).getDateTo());
+			guiOptions.setCreationFrom(((FulltextSearchOptions) searchOptions).getCreationFrom());
+			guiOptions.setCreationTo(((FulltextSearchOptions) searchOptions).getCreationTo());
+			guiOptions.setExpressionLanguage(((FulltextSearchOptions) searchOptions).getExpressionLanguage());
+			guiOptions.setFields(((FulltextSearchOptions) searchOptions).getFields().stream()
+					.filter(f -> !"title".equals(f)).collect(Collectors.toList()));
+			guiOptions.setFormat(((FulltextSearchOptions) searchOptions).getFormat());
+			guiOptions.setLanguage(((FulltextSearchOptions) searchOptions).getLanguage());
+			guiOptions.setSizeMax(((FulltextSearchOptions) searchOptions).getSizeMax());
+			guiOptions.setSizeMin(((FulltextSearchOptions) searchOptions).getSizeMin());
 		} else if (searchOptions.getType() == SearchOptions.TYPE_FOLDERS) {
 			List<GUICriterion> criteria = new ArrayList<>();
-			for (FolderCriterion crit : ((FolderSearchOptions) searchOptions).getCriteria()) {
-				GUICriterion criterion = new GUICriterion();
-				criterion.setField(crit.getField());
-				if (crit.getType() == Attribute.TYPE_DATE)
-					criterion.setDateValue(crit.getDateValue());
-				else if (crit.getType() == Attribute.TYPE_INT || crit.getType() == FolderCriterion.TYPE_FOLDER
-						|| crit.getType() == Attribute.TYPE_USER || crit.getType() == Attribute.TYPE_BOOLEAN)
-					criterion.setLongValue(crit.getLongValue());
-				else if (crit.getType() == Attribute.TYPE_DOUBLE)
-					criterion.setDoubleValue(crit.getDoubleValue());
-				else if (crit.getType() == Attribute.TYPE_STRING || crit.getType() == FolderCriterion.TYPE_LANGUAGE)
-					criterion.setStringValue(crit.getStringValue());
+			for (FolderCriterion criterion : ((FolderSearchOptions) searchOptions).getCriteria()) {
+				GUICriterion guiCriterion = new GUICriterion();
+				guiCriterion.setField(criterion.getField());
+				if (criterion.getType() == Attribute.TYPE_DATE)
+					guiCriterion.setDateValue(criterion.getDateValue());
+				else if (criterion.getType() == Attribute.TYPE_INT || criterion.getType() == FolderCriterion.TYPE_FOLDER
+						|| criterion.getType() == Attribute.TYPE_USER || criterion.getType() == Attribute.TYPE_BOOLEAN)
+					guiCriterion.setLongValue(criterion.getLongValue());
+				else if (criterion.getType() == Attribute.TYPE_DOUBLE)
+					guiCriterion.setDoubleValue(criterion.getDoubleValue());
+				else if (criterion.getType() == Attribute.TYPE_STRING
+						|| criterion.getType() == FolderCriterion.TYPE_LANGUAGE)
+					guiCriterion.setStringValue(criterion.getStringValue());
 
-				criterion.setOperator(crit.getOperator().toLowerCase());
-				criteria.add(criterion);
+				guiCriterion.setOperator(criterion.getOperator().toLowerCase());
+
+				if (!"folder".equals(guiCriterion.getField()))
+					criteria.add(guiCriterion);
 			}
-			op.setCriteria(criteria);
+			guiOptions.setCriteria(criteria);
 		}
 
-		op.setFilterIds(new ArrayList<>(searchOptions.getFilterIds()));
+		guiOptions.setFilterIds(new ArrayList<>(searchOptions.getFilterIds()));
 
-		return op;
+		return guiOptions;
 	}
 
 	@Override
@@ -379,62 +392,62 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		return cal.getTime();
 	}
 
-	protected SearchOptions toSearchOptions(GUISearchOptions options) {
-		SearchOptions searchOptions = Search.newOptions(options.getType());
-		searchOptions.setTopOperator(options.getTopOperator());
-		searchOptions.setDescription(options.getDescription());
-		searchOptions.setExpression(options.getExpression());
-		searchOptions.setMaxHits(options.getMaxHits());
-		searchOptions.setName(options.getName());
-		searchOptions.setUserId(options.getUserId());
-		searchOptions.setCaseSensitive(options.getCaseSensitive() == 1);
-		searchOptions.setRetrieveAliases(options.getRetrieveAliases() == 1);
-		searchOptions.setFolderId(options.getFolder());
-		searchOptions.setSearchInSubPath(options.isSearchInSubPath());
-		searchOptions.setTemplate(options.getTemplate());
+	protected SearchOptions toSearchOptions(GUISearchOptions guiOptions) {
+		SearchOptions searchOptions = Search.newOptions(guiOptions.getType());
+		searchOptions.setTopOperator(guiOptions.getTopOperator());
+		searchOptions.setDescription(guiOptions.getDescription());
+		searchOptions.setExpression(guiOptions.getExpression());
+		searchOptions.setMaxHits(guiOptions.getMaxHits());
+		searchOptions.setName(guiOptions.getName());
+		searchOptions.setUserId(guiOptions.getUserId());
+		searchOptions.setCaseSensitive(guiOptions.getCaseSensitive() == 1);
+		searchOptions.setRetrieveAliases(guiOptions.getRetrieveAliases() == 1);
+		searchOptions.setFolderId(guiOptions.getFolder());
+		searchOptions.setSearchInSubPath(guiOptions.isSearchInSubPath());
+		searchOptions.setTemplate(guiOptions.getTemplate());
 
-		if (options.getType() == SearchOptions.TYPE_FULLTEXT) {
-			((FulltextSearchOptions) searchOptions).setDateFrom(convertToJavaDate(options.getDateFrom()));
-			((FulltextSearchOptions) searchOptions).setDateTo(convertToJavaDate(options.getDateTo()));
-			((FulltextSearchOptions) searchOptions).setCreationFrom(convertToJavaDate(options.getCreationFrom()));
-			((FulltextSearchOptions) searchOptions).setCreationTo(convertToJavaDate(options.getCreationTo()));
-			((FulltextSearchOptions) searchOptions).setExpressionLanguage(options.getExpressionLanguage());
-			((FulltextSearchOptions) searchOptions).setFields(new HashSet<>(options.getFields()));
-			((FulltextSearchOptions) searchOptions).setFormat(options.getFormat());
-			((FulltextSearchOptions) searchOptions).setLanguage(options.getLanguage());
-			((FulltextSearchOptions) searchOptions).setSizeMax(options.getSizeMax());
-			((FulltextSearchOptions) searchOptions).setSizeMin(options.getSizeMin());
-		} else if (options.getType() == SearchOptions.TYPE_FOLDERS) {
+		if (guiOptions.getType() == SearchOptions.TYPE_FULLTEXT) {
+			((FulltextSearchOptions) searchOptions).setDateFrom(convertToJavaDate(guiOptions.getDateFrom()));
+			((FulltextSearchOptions) searchOptions).setDateTo(convertToJavaDate(guiOptions.getDateTo()));
+			((FulltextSearchOptions) searchOptions).setCreationFrom(convertToJavaDate(guiOptions.getCreationFrom()));
+			((FulltextSearchOptions) searchOptions).setCreationTo(convertToJavaDate(guiOptions.getCreationTo()));
+			((FulltextSearchOptions) searchOptions).setExpressionLanguage(guiOptions.getExpressionLanguage());
+			((FulltextSearchOptions) searchOptions).setFields(new HashSet<>(guiOptions.getFields()));
+			((FulltextSearchOptions) searchOptions).setFormat(guiOptions.getFormat());
+			((FulltextSearchOptions) searchOptions).setLanguage(guiOptions.getLanguage());
+			((FulltextSearchOptions) searchOptions).setSizeMax(guiOptions.getSizeMax());
+			((FulltextSearchOptions) searchOptions).setSizeMin(guiOptions.getSizeMin());
+		} else if (guiOptions.getType() == SearchOptions.TYPE_FOLDERS) {
 			List<FolderCriterion> criteria = new ArrayList<>();
-			for (GUICriterion crit : options.getCriteria()) {
-				FolderCriterion c = new FolderCriterion();
-				c.setField(crit.getField());
-				c.setComposition(options.getTopOperator());
+			for (GUICriterion guiCriterion : guiOptions.getCriteria()) {
+				FolderCriterion criterion = new FolderCriterion();
+				criterion.setField(guiCriterion.getField());
+				criterion.setComposition(guiOptions.getTopOperator());
 
 				String operator = null;
-				if ("icontains".equals(crit.getOperator()) || "inotcontains".equals(crit.getOperator()))
-					operator = crit.getOperator().substring(1);
+				if ("icontains".equals(guiCriterion.getOperator()) || "inotcontains".equals(guiCriterion.getOperator()))
+					operator = guiCriterion.getOperator().substring(1);
 				else
-					operator = crit.getOperator();
+					operator = guiCriterion.getOperator();
 
-				c.setOperator(operator);
+				criterion.setOperator(operator);
 
-				if (crit.getLongValue() != null) {
-					c.setLongValue(crit.getLongValue());
-				} else if (crit.getDateValue() != null) {
-					c.setDateValue(convertToJavaDate(crit.getDateValue()));
-				} else if (crit.getDoubleValue() != null) {
-					c.setDoubleValue(crit.getDoubleValue());
+				if (guiCriterion.getLongValue() != null) {
+					criterion.setLongValue(guiCriterion.getLongValue());
+				} else if (guiCriterion.getDateValue() != null) {
+					criterion.setDateValue(convertToJavaDate(guiCriterion.getDateValue()));
+				} else if (guiCriterion.getDoubleValue() != null) {
+					criterion.setDoubleValue(guiCriterion.getDoubleValue());
 				} else {
-					c.setValue(crit.getStringValue());
+					criterion.setValue(guiCriterion.getStringValue());
 				}
 
-				criteria.add(c);
+				criteria.add(criterion);
 			}
 			((FolderSearchOptions) searchOptions).setCriteria(criteria);
 		}
 
-		searchOptions.setFilterIds(new HashSet<>(options.getFilterIds()));
+		searchOptions.setFilterIds(new HashSet<>(guiOptions.getFilterIds()));
 
 		return searchOptions;
 	}

@@ -530,9 +530,9 @@ public class ItemFactory {
 		return item;
 	}
 
-	public static TextItem newFolderSelectorForAttribute(String name, String title,
+	public static FolderSelector newFolderSelectorForAttribute(String name, String title,
 			List<FormItemIcon> additionalIcons) {
-		final TextItem item = new FolderSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER), additionalIcons);
+		final FolderSelector item = new FolderSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER), additionalIcons);
 		if (title != null)
 			item.setTitle(I18N.message(title));
 		return item;
@@ -544,9 +544,9 @@ public class ItemFactory {
 				true, additionalIcons);
 	}
 
-	public static StaticTextItem newDocumentSelectorForAttribute(String name, Long defaultFolderId, String title,
+	public static DocumentSelector newDocumentSelectorForAttribute(String name, Long defaultFolderId, String title,
 			List<FormItemIcon> additionalIcons) {
-		final StaticTextItem item = new DocumentSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER),
+		final DocumentSelector item = new DocumentSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER),
 				defaultFolderId, additionalIcons);
 		if (title != null)
 			item.setTitle(I18N.message(title));

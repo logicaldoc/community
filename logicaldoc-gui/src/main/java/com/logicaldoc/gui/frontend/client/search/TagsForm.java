@@ -37,7 +37,7 @@ import com.smartgwt.client.widgets.menu.MenuItemSeparator;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class TagsForm extends VLayout {
+public class TagsForm extends VLayout implements SearchObserver {
 
 	private static final String SEARCHINHITS = "searchinhits";
 
@@ -67,6 +67,9 @@ public class TagsForm extends VLayout {
 		setMembersMargin(3);
 		setAlign(Alignment.LEFT);
 
+		if (!admin)
+			Search.get().addObserver(this);
+
 		this.admin = admin;
 
 		HLayout vocabulary = new HLayout();
@@ -93,7 +96,7 @@ public class TagsForm extends VLayout {
 		otherCharForm.setWidth(1);
 
 		FormItemIcon search = new FormItemIcon();
-		search.setPrompt(I18N.message("clear"));
+		search.setPrompt(I18N.message("search"));
 		search.setSrc("[SKIN]/icons/magnifying-glass.png");
 		search.addFormItemClickHandler(click -> {
 			if (!otherCharForm.validate())
@@ -108,8 +111,7 @@ public class TagsForm extends VLayout {
 		otherChar.setLength(1);
 		otherChar.setWidth(50);
 
-		FormItem searchinhits = ItemFactory.newYesNoSelectItem(SEARCHINHITS, SEARCHINHITS);
-		searchinhits.setValue("false");
+		FormItem searchinhits = ItemFactory.newToggleItem(SEARCHINHITS, I18N.message(SEARCHINHITS), false);
 
 		if (searchInHits && !admin)
 			otherCharForm.setItems(otherChar, searchinhits);
@@ -232,6 +234,19 @@ public class TagsForm extends VLayout {
 
 		Search.get().setOptions(options);
 		Search.get().search();
+	}
+
+	@Override
+	public void onOptionsChanged(GUISearchOptions options) {
+		if (options.getType() == GUISearchOptions.TYPE_TAGS) {
+			SearchMenu.get().openTagsSection();
+			onLetterSelect(options.getExpression().substring(0, 1));
+		}
+	}
+
+	@Override
+	public void onSearchArrived() {
+		// Do nothing
 	}
 
 	@Override

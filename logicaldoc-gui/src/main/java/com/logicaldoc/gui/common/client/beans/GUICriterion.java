@@ -55,6 +55,10 @@ public class GUICriterion implements Serializable {
 		return longValue;
 	}
 
+	public Float getFloatValue() {
+		return longValue != null ? longValue.floatValue() : null;
+	}
+
 	public void setLongValue(Long longValue) {
 		this.longValue = longValue;
 	}

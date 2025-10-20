@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.util.html.HTMLSanitizer;
 
 import jakarta.transaction.Transactional;
 
@@ -60,6 +61,8 @@ public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch
 
 	@Override
 	public void store(SavedSearch search) throws PersistenceException {
+		search.setName(HTMLSanitizer.sanitizeSimpleText(search.getName()));
+		search.setDescription(HTMLSanitizer.sanitizeSimpleText(search.getDescription()));
 		setUniqueName(search);
 		super.store(search);
 	}

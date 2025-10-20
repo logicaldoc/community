@@ -97,11 +97,11 @@ public class FolderSelector extends TextItem {
 		});
 	}
 
-	public void setFolder(Long folderId, String name) {
+	public void setFolder(Long folderId, String folderName) {
 		this.folderId = folderId;
 
-		if (name != null && !(name.endsWith(" ") || name.endsWith("&nbsp;"))) {
-			setValue(name);
+		if (folderName != null && !(folderName.endsWith(" ") || folderName.endsWith("&nbsp;"))) {
+			setValue(folderName);
 		} else {
 			setValue("");
 		}

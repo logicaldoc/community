@@ -63,9 +63,9 @@ public class Search {
 
 	public void setOptions(GUISearchOptions options) {
 		this.options = options;
-		for (SearchObserver observer : observers) {
-			observer.onOptionsChanged(options);
-		}
+		for (SearchObserver observer : observers)
+			if (!observer.equals(options.getSource()))
+				observer.onOptionsChanged(options);
 	}
 
 	public void search() {

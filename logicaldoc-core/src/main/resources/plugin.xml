@@ -288,6 +288,10 @@
   <extension plugin-id="logicaldoc-core" point-id="Language" id="amLanguage">
 	<parameter id="locale" value="am" />
 	<parameter id="analyzer" value="-" />
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="Language" id="hiLanguage">
+	<parameter id="locale" value="hi" />
+	<parameter id="analyzer" value="org.apache.lucene.analysis.hi.HindiAnalyzer" />
   </extension>  
 
   <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="jpgThumb">

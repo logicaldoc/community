@@ -9,13 +9,13 @@ import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.EmptyAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.data.SavedSearchesDS;
+import com.logicaldoc.gui.common.client.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.ValuesCallback;
 import com.logicaldoc.gui.common.client.widgets.GroupSelectorCombo;
 import com.logicaldoc.gui.common.client.widgets.UserSelectorCombo;
 import com.logicaldoc.gui.frontend.client.services.SearchService;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -33,7 +33,7 @@ public class SavedSearchesPanel extends VLayout {
 
 	private static final String DESCRIPTION = "description";
 
-	private ListGrid list;
+	private RefreshableListGrid list;
 
 	private static SavedSearchesPanel instance;
 
@@ -52,7 +52,7 @@ public class SavedSearchesPanel extends VLayout {
 		ListGridField type = new ListGridField("type", I18N.message("type"), 70);
 		ListGridField description = new ListGridField(DESCRIPTION, I18N.message(DESCRIPTION));
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setWidth100();
 		list.setHeight100();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -62,25 +62,36 @@ public class SavedSearchesPanel extends VLayout {
 		list.setFields(name, type, description);
 		addMember(list);
 
-		list.addCellDoubleClickHandler(event -> {
-			ListGridRecord rec = event.getRecord();
+		list.addCellDoubleClickHandler(doubleClick -> {
+			ListGridRecord rec = doubleClick.getRecord();
 			SearchService.Instance.get().load(rec.getAttributeAsString("name"), new DefaultAsyncCallback<>() {
 				@Override
 				public void handleSuccess(GUISearchOptions options) {
 					Search.get().setOptions(options);
-					Search.get().search();
 				}
 			});
 		});
 
-		list.addCellContextClickHandler(event -> {
+		list.addCellContextClickHandler(click -> {
 			showContextMenu();
-			event.cancel();
+			click.cancel();
 		});
 	}
 
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
+
+		MenuItem load = new MenuItem();
+		load.setTitle(I18N.message("load"));
+		load.addClickHandler(event -> {
+			ListGridRecord selection = list.getSelectedRecord();
+			SearchService.Instance.get().load(selection.getAttributeAsString("name"), new DefaultAsyncCallback<>() {
+				@Override
+				public void handleSuccess(GUISearchOptions options) {
+					Search.get().setOptions(options);
+				}
+			});
+		});
 
 		MenuItem execute = new MenuItem();
 		execute.setTitle(I18N.message("execute"));
@@ -145,9 +156,9 @@ public class SavedSearchesPanel extends VLayout {
 		});
 
 		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.SHARE_SEARCH))
-			contextMenu.setItems(execute, share, new MenuItemSeparator(), delete);
+			contextMenu.setItems(load, execute, share, new MenuItemSeparator(), delete);
 		else
-			contextMenu.setItems(execute, new MenuItemSeparator(), delete);
+			contextMenu.setItems(load, execute, new MenuItemSeparator(), delete);
 		contextMenu.showContextMenu();
 	}
 
@@ -157,6 +168,10 @@ public class SavedSearchesPanel extends VLayout {
 		rec.setAttribute(DESCRIPTION, description);
 		rec.setAttribute("type", type);
 		list.addData(rec);
+	}
+
+	public void refresh() {
+		list.refresh(new SavedSearchesDS());
 	}
 
 	@Override

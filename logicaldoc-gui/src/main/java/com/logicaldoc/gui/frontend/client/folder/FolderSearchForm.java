@@ -47,19 +47,21 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public abstract class FolderSearchForm extends VLayout {
 
-	private static final String TEMPLATE = "template";
+	protected static final String TEMPLATE = "template";
 
-	private static final String TYPE = "type:";
+	protected static final String TYPE = "type:";
 
-	private static final String CASESENSITIVE = "casesensitive";
+	protected static final String CASESENSITIVE = "casesensitive";
 
-	private ValuesManager vm = new ValuesManager();
+	protected ValuesManager vm = new ValuesManager();
 
-	private FolderSelector folderSelector;
+	protected FolderSelector folderSelector;
 
-	private GUITemplate selectedTemplate = null;
+	protected GUITemplate selectedTemplate = null;
 
-	private VLayout conditionsLayout = null;
+	protected VLayout conditionsLayout = null;
+
+	protected GUISearchOptions defaultOptions = null;
 
 	protected FolderSearchForm() {
 		setHeight100();
@@ -165,12 +167,21 @@ public abstract class FolderSearchForm extends VLayout {
 
 		IButton add = new IButton(I18N.message("addcondition"));
 		add.setAutoFit(true);
-		add.addClickHandler(event -> addCondition());
+		add.addClickHandler(event -> appendCondition());
 		addMember(add);
 
 		conditionsLayout = new VLayout(3);
 		addMember(conditionsLayout);
-		addNameCondition();
+
+		if (defaultOptions != null)
+			applyOptions(defaultOptions);
+		else
+			appendNameCondition();
+
+	}
+
+	protected void applyOptions(GUISearchOptions options) {
+		// Do nothing by default
 	}
 
 	public void removeCondition(ParameterConditionRow criteria) {
@@ -191,19 +202,21 @@ public abstract class FolderSearchForm extends VLayout {
 	/**
 	 * Add the old-style condition on the folder's name
 	 */
-	public void addNameCondition() {
+	public ParameterConditionRow appendNameCondition() {
 		ParameterConditionRow row = new ParameterConditionRow(null, false, new SearchOnEnter());
 		row.setAttribute("name");
 		row.setWidth(getWidth() - 10);
 		row.reload();
 		conditionsLayout.addMember(row);
+		return row;
 	}
 
-	public void addCondition() {
+	public ParameterConditionRow appendCondition() {
 		ParameterConditionRow row = new ParameterConditionRow(selectedTemplate, false, new SearchOnEnter());
 		row.setWidth(getWidth() - 10);
 		row.reload();
 		conditionsLayout.addMember(row);
+		return row;
 	}
 
 	private void search() {

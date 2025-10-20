@@ -3,10 +3,13 @@ package com.logicaldoc.gui.frontend.client.search;
 import java.util.LinkedHashMap;
 
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
+import com.logicaldoc.gui.common.client.beans.GUICriterion;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.data.TagsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.DocumentSelector;
+import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.DataSourceField;
 import com.smartgwt.client.types.Alignment;
@@ -68,6 +71,8 @@ public class ParameterConditionRow extends HLayout {
 
 	private KeyPressHandler valueKeyPressHandler;
 
+	private GUICriterion criterion;
+
 	public ParameterConditionRow(GUITemplate templ, boolean forDocument, KeyPressHandler valueKeyPressHandler) {
 		setMembersMargin(5);
 		setAlign(Alignment.LEFT);
@@ -108,6 +113,13 @@ public class ParameterConditionRow extends HLayout {
 		attribute.setValueMap(fieldsMap);
 		attribute.setValue(fieldSelected);
 		attribute.setColSpan(1);
+		attribute.addChangedHandler(event -> {
+			if (event.getValue() != null) {
+				fieldSelected = (String) event.getValue();
+				criterion = null;
+				reload();
+			}
+		});
 
 		operator = new SelectItem("operators", "operators");
 		operator.setPickListWidth(90);
@@ -122,21 +134,17 @@ public class ParameterConditionRow extends HLayout {
 		else
 			operatorsMap = operatorsFor(null);
 		operator.setValueMap(operatorsMap);
-		if (!operatorsMap.isEmpty())
+		if (criterion != null)
+			operator.setValue(criterion.getOperator());
+		else if (!operatorsMap.isEmpty())
 			operator.setValue(operatorsMap.keySet().iterator().next());
-
-		attribute.addChangedHandler(event -> {
-			if (event.getValue() != null) {
-				fieldSelected = (String) event.getValue();
-				reload();
-			}
-		});
 
 		if (fieldSelected != null && !fieldSelected.trim().isEmpty()) {
 			value = valueItemFor(fieldSelected);
 		} else {
 			value = ItemFactory.newTextItem(VALUE_STR, null);
 		}
+
 		value.setRequired(true);
 		value.setEndRow(true);
 		value.setShowTitle(false);
@@ -268,45 +276,66 @@ public class ParameterConditionRow extends HLayout {
 				|| criteriaField.equals("rating") || criteriaField.equals("template")
 				|| criteriaField.equals("published") || criteriaField.equals("indexed")
 				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_INT)) {
-			return ItemFactory.newIntegerItem(VALUE_STR, "integer", (Integer)null);
+			return ItemFactory.newIntegerItem(VALUE_STR, "integer",
+					criterion != null ? criterion.getLongValue() : null);
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DOUBLE)) {
-			return ItemFactory.newFloatItem(VALUE_STR, "double", null);
+			return ItemFactory.newFloatItem(VALUE_STR, "double", criterion != null ? criterion.getFloatValue() : null);
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_BOOLEAN)) {
-			return ItemFactory.newToggleItem(VALUE_STR, "boolean", true);
+			return ItemFactory.newToggleItem(VALUE_STR, "boolean",
+					criterion != null ? criterion.getLongValue() == 1L : true);
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_STRING_PRESET)) {
-			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
+			String attributeName = attributeName(criteriaField);
 			FormItem item = ItemFactory.newStringItemForAttribute(template.getAttribute(attributeName));
 			item.setName(VALUE_STR);
+			if (criterion != null)
+				item.setValue(criterion.getStringValue());
 			return item;
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_USER)) {
-			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
+			String attributeName = attributeName(criteriaField);
 			GUIAttribute att = template.getAttribute(attributeName);
 			FormItem item = ItemFactory.newUserSelectorForAttribute(VALUE_STR, att.getLabel(),
 					!att.getOptions().isEmpty() ? att.getOptions().get(0) : null, null);
 			item.setName(VALUE_STR);
+			if (criterion != null)
+				item.setValue(criterion.getLongValue());
 			return item;
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_FOLDER)) {
-			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
+			String attributeName = attributeName(criteriaField);
 			GUIAttribute att = template.getAttribute(attributeName);
-			FormItem item = ItemFactory.newFolderSelectorForAttribute(VALUE_STR, att.getLabel(), null);
+			FolderSelector item = ItemFactory.newFolderSelectorForAttribute(VALUE_STR, att.getLabel(), null);
 			item.setName(VALUE_STR);
+			if (criterion != null)
+				item.setFolder(criterion.getLongValue(), criterion.getStringValue());
 			return item;
 		} else if (criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DOCUMENT)) {
-			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
+			String attributeName = attributeName(criteriaField);
 			GUIAttribute att = template.getAttribute(attributeName);
-			FormItem item = ItemFactory.newDocumentSelectorForAttribute(VALUE_STR, null, att.getLabel(), null);
+			DocumentSelector item = ItemFactory.newDocumentSelectorForAttribute(VALUE_STR, null, att.getLabel(), null);
 			item.setName(VALUE_STR);
+			if (criterion != null)
+				item.setDocument(criterion.getLongValue(), criterion.getStringValue());
 			return item;
 		} else if (criteriaField.equals("sourceDate") || criteriaField.equals("lastModified")
 				|| criteriaField.equals("date") || criteriaField.equals("creation")
 				|| criteriaField.equals("startPublishing") || criteriaField.equals("stopPublishing")
 				|| criteriaField.endsWith(TYPE + GUIAttribute.TYPE_DATE)) {
-			return ItemFactory.newDateItem(VALUE_STR, "date");
+			DateItem item = ItemFactory.newDateItem(VALUE_STR, "date");
+			if (criterion != null)
+				item.setValue(criterion.getDateValue());
+			return item;
 		} else if (criteriaField.equals("tags")) {
-			return ItemFactory.newTagsMultiplePickList(VALUE_STR, "tags", new TagsDS(null, false, null, null), null);
+			return ItemFactory.newTagsMultiplePickList(VALUE_STR, "tags", new TagsDS(null, false, null, null),
+					criterion != null ? criterion.getStringValue().split(",") : null);
 		} else {
-			return ItemFactory.newTextItem(VALUE_STR, null);
+			return ItemFactory.newTextItem(VALUE_STR, criterion != null ? criterion.getStringValue() : null);
 		}
+	}
+
+	private String attributeName(String criteriaField) {
+		if (criteriaField.indexOf(':') > 0)
+			return criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
+		else
+			return criteriaField;
 	}
 
 	public SelectItem getAttributeFieldItem() {
@@ -322,11 +351,20 @@ public class ParameterConditionRow extends HLayout {
 	}
 
 	public void setAttribute(String attributeName) {
-		attribute.setValue(attributeName);
 		fieldSelected = attributeName;
+		attribute.setValue(attributeName);
 		reload();
 	}
-	
+
+	public void setCriterion(GUICriterion criterion) {
+		this.criterion = criterion;
+		String field = criterion.getField();
+		if (field.indexOf(':') > 0)
+			field = "_" + field.substring(0, field.indexOf("type")).trim() + "___"
+					+ field.substring(field.indexOf("type")).trim();
+		setAttribute(field);
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		return super.equals(other);
