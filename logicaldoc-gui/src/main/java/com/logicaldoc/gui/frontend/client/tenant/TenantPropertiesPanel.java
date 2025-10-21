@@ -159,7 +159,6 @@ public class TenantPropertiesPanel extends HLayout {
 			tenant.setPostalCode(form.getValueAsString("postalcode"));
 			tenant.setTelephone(form.getValueAsString("phone"));
 			tenant.setEmail(form.getValueAsString(EMAIL));
-			tenant.setEnabled(Boolean.valueOf(form.getValueAsString("eenabled")));
 			tenant.setExpire((Date) form.getValue("expire"));
 		}
 
