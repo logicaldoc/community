@@ -534,9 +534,10 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				guiUser.setGroups(grps);
 
 				guiUser.setQuota(user.getQuota());
-
 				guiUser.setQuotaCount(seqDao.getCurrentValue("userquota", user.getId(), user.getTenantId()));
-
+				guiUser.setSessionsQuota(user.getSessionsQuota());
+				guiUser.setSessionsQuotaCount(SessionManager.get().countOpened(user.getUsername()));
+				
 				guiUser.setTenant(getTenant(user.getTenantId()));
 
 				ContextProperties config = Context.get().getProperties();
@@ -694,6 +695,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			user.setEmailSignature(guiUser.getEmailSignature());
 			user.setDefaultWorkspace(guiUser.getDefaultWorkspace());
 			user.setQuota(guiUser.getQuota());
+			user.setSessionsQuota(guiUser.getSessionsQuota());
 			user.setSecondFactor(StringUtils.isEmpty(guiUser.getSecondFactor()) ? null : guiUser.getSecondFactor());
 			user.setKey(guiUser.getKey());
 			user.setType(guiUser.getType());

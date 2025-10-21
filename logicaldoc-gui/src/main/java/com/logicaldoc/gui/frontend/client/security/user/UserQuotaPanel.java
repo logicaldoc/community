@@ -68,7 +68,7 @@ public class UserQuotaPanel extends HLayout {
 		maxConcurrentSessions.setRequired(true);
 		maxConcurrentSessions.setWidth(120);
 		maxConcurrentSessions.setMin(-1);
-		maxConcurrentSessions.setStep(10);
+		maxConcurrentSessions.setStep(1);
 		maxConcurrentSessions.setValue(user.getSessionsQuota());
 		if (!readonly)
 			maxConcurrentSessions.addChangedHandler(changedHandler);
