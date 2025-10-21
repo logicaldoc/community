@@ -151,6 +151,9 @@ public class User extends PersistentObject implements Serializable {
 	@Column(name = "ld_quota", nullable = false)
 	private long quota = -1;
 
+	@Column(name = "ld_sessionsquota", nullable = false)
+	private long sessionsQuota = -1;
+
 	@Column(name = "ld_welcomescreen", nullable = true)
 	private Integer welcomeScreen = 1520;
 
@@ -509,6 +512,14 @@ public class User extends PersistentObject implements Serializable {
 		telephone = phone;
 	}
 
+	public long getSessionsQuota() {
+		return sessionsQuota;
+	}
+
+	public void setSessionsQuota(long sessionsQuota) {
+		this.sessionsQuota = sessionsQuota;
+	}
+
 	public void reset() {
 		username = "";
 		password = "";
@@ -534,6 +545,8 @@ public class User extends PersistentObject implements Serializable {
 		building = null;
 		organizationalUnit = null;
 		department = null;
+		quota = -1;
+		sessionsQuota = -1;
 	}
 
 	@Override

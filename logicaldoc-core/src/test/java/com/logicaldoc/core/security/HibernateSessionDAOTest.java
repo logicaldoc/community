@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTestCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.spring.Context;
 
@@ -63,13 +64,21 @@ public class HibernateSessionDAOTest extends AbstractCoreTestCase {
 	}
 
 	@Test
-	public void testCountSessions() {
+	public void testCountSessions() throws PersistenceException {
+	 
 		assertEquals(1, dao.countSessions(1L, Session.STATUS_OPEN));
-		assertEquals(1, dao.countSessions(null, Session.STATUS_OPEN));
+		assertEquals(1, dao.countSessions((Long)null, Session.STATUS_OPEN));
 		assertEquals(1, dao.countSessions(1L, null));
-		assertEquals(1, dao.countSessions(null, null));
+		assertEquals(1, dao.countSessions((Long)null, null));
 
 		assertEquals(0, dao.countSessions(1L, Session.STATUS_CLOSED));
 		assertEquals(0, dao.countSessions(2L, Session.STATUS_OPEN));
+	
+		System.out.println(""+dao.findAll().stream().map(s -> s.getUsername()+" "+s.getStatus()).toList());
+		
+		assertEquals(1, dao.countSessions((String)null, Session.STATUS_OPEN));
+		assertEquals(1, dao.countSessions("admin", Session.STATUS_OPEN));
+		assertEquals(0, dao.countSessions("joe", Session.STATUS_OPEN));
+		
 	}
 }

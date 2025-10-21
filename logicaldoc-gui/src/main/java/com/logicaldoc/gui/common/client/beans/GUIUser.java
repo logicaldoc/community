@@ -109,6 +109,10 @@ public class GUIUser implements Serializable {
 
 	private long quotaCount = 0;
 
+	private long sessionsQuota = -1;
+
+	private long sessionsQuotaCount = 0;
+
 	private Integer welcomeScreen = 1500;
 
 	private String ipWhitelist;
@@ -782,5 +786,21 @@ public class GUIUser implements Serializable {
 
 	public void setLegals(boolean legals) {
 		this.legals = legals;
+	}
+
+	public long getSessionsQuota() {
+		return sessionsQuota;
+	}
+
+	public void setSessionsQuota(long sessionsQuota) {
+		this.sessionsQuota = sessionsQuota;
+	}
+
+	public long getSessionsQuotaCount() {
+		return sessionsQuotaCount;
+	}
+
+	public void setSessionsQuotaCount(long count) {
+		this.sessionsQuotaCount = count;
 	}
 }

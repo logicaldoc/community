@@ -13,12 +13,14 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserSource;
 import com.logicaldoc.core.security.user.WorkingTime;
+import com.logicaldoc.core.sequence.SequenceDAO;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.DateUtil;
@@ -153,12 +155,18 @@ public class WSUser {
 	@WSDoc(description = "must be <b>0</b>")
 	private int source = 0;
 
-	@WSDoc(description = "maximum allowed user's quota expressed in bytes, <b>-1</b> for no limits")
+	@WSDoc(description = "maximum allowed user's storage expressed in bytes, <b>-1</b> for no limits")
 	private long quota = -1;
-
-	@WSDoc(description = " actual quota used by the user ")
+	
+	@WSDoc(description = " actual storage quota used by the user ")
 	private long quotaCount = 0;
 
+	@WSDoc(description = "maximum allowed user's concurrent sessions, <b>-1</b> for no limits")
+	private long sessionsQuota = -1;
+	
+	@WSDoc(description = " actual sessions for this userr")
+	private long sessionsQuotaCount = 0;
+	
 	@WSDoc(required = false)
 	private String lastModified;
 
@@ -478,6 +486,7 @@ public class WSUser {
 			user.setPasswordExpires(getPasswordExpires());
 			user.setEvalFormEnabled(getEvalFormEnabled());
 			user.setQuota(getQuota());
+			user.setSessionsQuota(getSessionsQuota());
 			user.setType(getType());
 			user.setSource(getSource());
 			user.setPassword(getPassword());
@@ -584,6 +593,10 @@ public class WSUser {
 			}).collect(Collectors.toList());
 			wsUser.setWorkingTimes(tmp);
 
+			
+			wsUser.setQuotaCount(Context.get(SequenceDAO.class).getCurrentValue("userquota", user.getId(), user.getTenantId()));
+			wsUser.setSessionsQuotaCount(SessionManager.get().countOpened(user.getUsername()));
+			
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -757,5 +770,21 @@ public class WSUser {
 
 	public void setLegals(Integer legals) {
 		this.legals = legals;
+	}
+
+	public long getSessionsQuota() {
+		return sessionsQuota;
+	}
+
+	public void setSessionsQuota(long sessionsQuota) {
+		this.sessionsQuota = sessionsQuota;
+	}
+
+	public long getSessionsQuotaCount() {
+		return sessionsQuotaCount;
+	}
+
+	public void setSessionsQuotaCount(long sessionsQuotaCount) {
+		this.sessionsQuotaCount = sessionsQuotaCount;
 	}
 }

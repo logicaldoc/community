@@ -239,7 +239,7 @@
   </extension>
   <extension plugin-id="logicaldoc-core" point-id="Language" id="zhLanguage">
 	<parameter id="locale" value="zh" />
-	<parameter id="analyzer" value="org.apache.lucene.analysis.cn.ChineseAnalyzer" />
+	<parameter id="analyzer" value="org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer" />
   </extension>
   <extension plugin-id="logicaldoc-core" point-id="Language" id="noLanguage">
 	<parameter id="locale" value="no" />

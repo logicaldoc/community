@@ -34,7 +34,9 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 		}
 
 		try {
-			jdbcUpdate("update ld_session set ld_status=" + Session.STATUS_EXPIRED + " where ld_node = :node and ld_status = :status",
+			jdbcUpdate(
+					"update ld_session set ld_status=" + Session.STATUS_EXPIRED
+							+ " where ld_node = :node and ld_status = :status",
 					Map.of("node", SystemInfo.get().getInstallationId(), "status", Session.STATUS_OPEN));
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -54,6 +56,27 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 
 		try {
 			List<Session> sessions = findByWhere(query.toString(), null, null);
+			return sessions.size();
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return 0;
+		}
+	}
+
+	@Override
+	public int countSessions(String username, Integer status) {
+		StringBuilder query = new StringBuilder(" 1=1 ");
+		if (username != null)
+			query.append(AND + ENTITY + ".username = :username ");
+		if (status != null) {
+			query.append(AND + ENTITY + ".status = " + status);
+			if (status.intValue() == Session.STATUS_OPEN)
+				query.append(AND + ENTITY + ".finished is null ");
+		}
+
+		try {	
+			List<Session> sessions = findByWhere(query.toString(),
+					username != null ? Map.of("username", StringUtils.defaultString(username)) : null, null, null);
 			return sessions.size();
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);

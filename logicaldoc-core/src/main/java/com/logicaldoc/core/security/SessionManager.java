@@ -376,7 +376,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * @return number of opened sessions
 	 */
 	public int countOpened() {
-		return sessionDao.countSessions(null, Session.STATUS_OPEN);
+		return sessionDao.countSessions((Long)null, Session.STATUS_OPEN);
 	}
 
 	/**
@@ -388,6 +388,17 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 */
 	public int countOpened(long tenantId) {
 		return sessionDao.countSessions(tenantId, Session.STATUS_OPEN);
+	}
+	
+	/**
+	 * Counts the total number of opened sessions for a given user
+	 * 
+	 * @param username name of the suer
+	 * 
+	 * @return number of opened sessions
+	 */
+	public int countOpened(String username) {
+		return sessionDao.countSessions(username, Session.STATUS_OPEN);
 	}
 
 	/**
