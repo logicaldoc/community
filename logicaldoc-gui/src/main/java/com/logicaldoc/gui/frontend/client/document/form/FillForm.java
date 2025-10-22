@@ -2,11 +2,13 @@ package com.logicaldoc.gui.frontend.client.document.form;
 
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.controllers.FolderController;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ExtendedPropertiesPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
+import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.Overflow;
@@ -80,7 +82,7 @@ public class FillForm extends Window {
 
 					@Override
 					public void handleSuccess(GUIDocument doc) {
-						DocumentsPanel.get().refresh();
+						FolderNavigator.get().selectFolder(FolderController.get().getCurrentFolder().getId());
 						destroy();
 					}
 				});

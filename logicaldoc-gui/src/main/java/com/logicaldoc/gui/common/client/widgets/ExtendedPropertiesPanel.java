@@ -357,7 +357,10 @@ public class ExtendedPropertiesPanel extends HLayout {
 		return item;
 	}
 
-	private long getDefaultFolderForDocumentSelector() {
+	private Long getDefaultFolderForDocumentSelector() {
+		if (FolderController.get().getCurrentFolder() == null)
+			return null;
+		
 		long defaultFolderId = FolderController.get().getCurrentFolder().getId();
 		if (extensibleObject instanceof GUIDocument doc)
 			defaultFolderId = doc.getFolder().getId();
