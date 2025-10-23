@@ -12,9 +12,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +27,9 @@ import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 /**
  * This servlet is responsible for folders data.
  * 
@@ -39,7 +39,7 @@ import com.logicaldoc.util.spring.Context;
 public class FoldersDataServlet extends AbstractDataServlet {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private static final String PARENT = "parent";
 
 	public static final String FOLDER_PAGE_SIZE = "ld-folder-page-size";
@@ -60,6 +60,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 			return;
 		}
 
+		boolean withroot = "true".equals(request.getParameter("withroot"));
 		boolean nopagination = "true".equals(request.getParameter("nopagination"));
 		long tenantId = session.getTenantId();
 		String tenantName = session.getTenantName();
@@ -86,7 +87,20 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		if (parentFolder != null) {
-			printFolders(writer, session, tenantId, tenantName, parent, parentFolder, user, startRecord, endRecord);
+			if ("/".equals(request.getParameter(PARENT)) && withroot) {
+				writer.print("<folder>");
+				writer.print("<id>" + parentFolder.getId() + "</id>");
+				writer.print("<folderId>" + parentFolder.getId() + "</folderId>");
+				writer.print("<parentId>" + parentFolder.getId() + "</parentId>");
+				writer.print("<parent>" + parent + "</parent>");
+				writer.print("<name><![CDATA[" + parentFolder.getName() + "]]></name>");
+				writer.print("<type>" + parentFolder.getType() + "</type>");
+				writer.print("<status>0</status>");
+				writer.print("<publishedStatus>yes</publishedStatus>");
+				writer.print("</folder>");
+			} else {
+				printFolders(writer, session, tenantId, tenantName, parent, parentFolder, user, startRecord, endRecord);
+			}
 		}
 
 		if (request.getParameter("withdocs") != null) {

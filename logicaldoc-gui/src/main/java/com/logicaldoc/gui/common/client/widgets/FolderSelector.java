@@ -30,6 +30,10 @@ public class FolderSelector extends TextItem {
 	private Collection<FolderChangeListener> listeners = new ArrayList<>();
 
 	public FolderSelector(String name, List<FormItemIcon> additionalIcons) {
+		this(name, false, additionalIcons);
+	}
+
+	public FolderSelector(String name, boolean allowRootSelection, List<FormItemIcon> additionalIcons) {
 		if (name != null)
 			setName(name);
 		else
@@ -44,7 +48,7 @@ public class FolderSelector extends TextItem {
 
 		Date date = new Date();
 		Menu menu = new Menu();
-		menu.setDataSource(new FoldersDS("folderselector" + date.getTime(), true, 100L));
+		menu.setDataSource(new FoldersDS("folderselector" + date.getTime(), true, allowRootSelection, 100L));
 		menu.setWidth(130);
 		menu.setCanSelectParentItems(true);
 		menu.setAutoFetchData(true);

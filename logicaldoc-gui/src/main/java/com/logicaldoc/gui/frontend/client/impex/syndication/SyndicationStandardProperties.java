@@ -53,7 +53,7 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		setHeight100();
 
 		setMembers(formsContainer);
-		sourceSelector = new FolderSelector("source", null);
+		sourceSelector = new FolderSelector("source", true, null);
 		sourceSelector.setRequired(true);
 		sourceSelector.setWidth(250);
 		sourceSelector.setTitle(I18N.message("sourcefolder"));

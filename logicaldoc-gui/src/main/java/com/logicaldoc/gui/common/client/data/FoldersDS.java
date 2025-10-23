@@ -20,15 +20,15 @@ public class FoldersDS extends DataSource {
 
 	public static FoldersDS get() {
 		if (instance == null)
-			instance = new FoldersDS(null, !Session.get().getConfigAsBoolean("gui.folder.pagination"), null);
+			instance = new FoldersDS(null, !Session.get().getConfigAsBoolean("gui.folder.pagination"), false, null);
 		return instance;
 	}
 
 	public FoldersDS(String id, boolean nopagination) {
-		this(id, nopagination, null);
+		this(id, nopagination, false, null);
 	}
 
-	public FoldersDS(String id, boolean nopagination, Long max) {
+	public FoldersDS(String id, boolean nopagination, boolean withroot, Long max) {
 		String dsId = id;
 		if (dsId == null)
 			dsId = "FoldersDS";
@@ -45,7 +45,7 @@ public class FoldersDS extends DataSource {
 
 		DataSourceTextField folderId = new DataSourceTextField("folderId", I18N.message("id"));
 		folderId.setHidden(true);
-		
+
 		DataSourceTextField parentId = new DataSourceTextField("parentId", I18N.message("parentid"));
 		parentId.setHidden(true);
 
@@ -64,8 +64,8 @@ public class FoldersDS extends DataSource {
 
 		setFields(recordId, name, folderId, parentId, foldRef, parent, type, size, color);
 
-		setDataURL(
-				"data/folders.xml" + (nopagination ? "?nopagination=true" : "") + (max != null ? "&max=" + max : ""));
+		setDataURL("data/folders.xml?1=1" + (nopagination ? "&nopagination=true" : "") + (withroot ? "&withroot=true" : "")
+				+ (max != null ? "&max=" + max : ""));
 		setClientOnly(false);
 	}
 }
