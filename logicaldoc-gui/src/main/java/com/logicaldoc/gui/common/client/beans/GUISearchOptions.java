@@ -71,9 +71,9 @@ public class GUISearchOptions implements Serializable {
 
 	private String topOperator;
 
-	private int caseSensitive = 1;
+	private boolean caseSensitive = true;
 
-	private int retrieveAliases = 0;
+	private boolean retrieveAliases = false;
 
 	private List<Long> filterIds = new ArrayList<>();
 
@@ -302,22 +302,6 @@ public class GUISearchOptions implements Serializable {
 		this.depth = depth;
 	}
 
-	public int getCaseSensitive() {
-		return caseSensitive;
-	}
-
-	public void setCaseSensitive(int caseSensitive) {
-		this.caseSensitive = caseSensitive;
-	}
-
-	public int getRetrieveAliases() {
-		return retrieveAliases;
-	}
-
-	public void setRetrieveAliases(int retrieveAliases) {
-		this.retrieveAliases = retrieveAliases;
-	}
-
 	public SearchObserver getSource() {
 		return source;
 	}
@@ -325,4 +309,20 @@ public class GUISearchOptions implements Serializable {
 	public void setSource(SearchObserver source) {
 		this.source = source;
 	}
+
+	public boolean isCaseSensitive() {
+		return caseSensitive;
+	}
+
+	public void setCaseSensitive(boolean caseSensitive) {
+		this.caseSensitive = caseSensitive;
+	}
+
+	public boolean isRetrieveAliases() {
+		return retrieveAliases;
+	}
+
+	public void setRetrieveAliases(boolean retrieveAliases) {
+		this.retrieveAliases = retrieveAliases;
+	}	
 }

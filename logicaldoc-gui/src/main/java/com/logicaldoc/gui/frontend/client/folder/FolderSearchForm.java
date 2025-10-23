@@ -235,8 +235,8 @@ public abstract class FolderSearchForm extends VLayout {
 
 		GUISearchOptions options = new GUISearchOptions();
 		options.setMaxHits(Search.get().getMaxHits());
-		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString("aliases")) ? 1 : 0);
-		options.setCaseSensitive(Boolean.parseBoolean(vm.getValueAsString(CASESENSITIVE)) ? 1 : 0);
+		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString("aliases")));
+		options.setCaseSensitive(Boolean.parseBoolean(vm.getValueAsString(CASESENSITIVE)));
 
 		options.setType(GUISearchOptions.TYPE_FOLDERS);
 

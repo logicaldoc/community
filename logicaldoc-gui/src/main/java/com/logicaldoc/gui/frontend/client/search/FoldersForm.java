@@ -67,9 +67,9 @@ public class FoldersForm extends FolderSearchForm implements SearchObserver {
 		folderSelector.setFolder(options.getFolder(), options.getFolderName());
 
 		vm.setValue("subfolders", options.isSearchInSubPath());
-		vm.setValue("aliases", options.getRetrieveAliases() == 1);
+		vm.setValue("aliases", options.isRetrieveAliases());
 
-		vm.setValue(CASESENSITIVE, options.getCaseSensitive() == 1);
+		vm.setValue(CASESENSITIVE, options.isCaseSensitive());
 		vm.setValue("match", options.getTopOperator());
 
 		conditionsLayout.removeMembers(conditionsLayout.getMembers());

@@ -106,7 +106,7 @@ public class QuickSearchTray extends MenuTray {
 				}
 			} else
 				criterion.setStringValue(value);
-			options.setCaseSensitive(0);
+			options.setCaseSensitive(false);
 			options.setCriteria(Arrays.asList(criterion));
 		}
 

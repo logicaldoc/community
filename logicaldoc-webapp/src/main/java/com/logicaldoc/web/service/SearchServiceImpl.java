@@ -290,8 +290,8 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		guiOptions.setFolder(searchOptions.getFolderId());
 		guiOptions.setSearchInSubPath(searchOptions.isSearchInSubPath());
 		guiOptions.setTemplate(searchOptions.getTemplate());
-		guiOptions.setCaseSensitive(searchOptions.isCaseSensitive() ? 1 : 0);
-		guiOptions.setRetrieveAliases(searchOptions.isRetrieveAliases() ? 1 : 0);
+		guiOptions.setCaseSensitive(searchOptions.isCaseSensitive());
+		guiOptions.setRetrieveAliases(searchOptions.isRetrieveAliases());
 
 		if (searchOptions.getType() == SearchOptions.TYPE_FULLTEXT) {
 			guiOptions.setDateFrom(((FulltextSearchOptions) searchOptions).getDateFrom());
@@ -400,8 +400,8 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		searchOptions.setMaxHits(guiOptions.getMaxHits());
 		searchOptions.setName(guiOptions.getName());
 		searchOptions.setUserId(guiOptions.getUserId());
-		searchOptions.setCaseSensitive(guiOptions.getCaseSensitive() == 1);
-		searchOptions.setRetrieveAliases(guiOptions.getRetrieveAliases() == 1);
+		searchOptions.setCaseSensitive(guiOptions.isCaseSensitive());
+		searchOptions.setRetrieveAliases(guiOptions.isRetrieveAliases());
 		searchOptions.setFolderId(guiOptions.getFolder());
 		searchOptions.setSearchInSubPath(guiOptions.isSearchInSubPath());
 		searchOptions.setTemplate(guiOptions.getTemplate());

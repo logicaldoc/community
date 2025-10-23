@@ -219,7 +219,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		options.setFolder(folder.getFolderId());
 		options.setFolderName(folder.getFolderName());
 
-		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString("aliases")) ? 1 : 0);
+		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString("aliases")));
 
 		setSubfolderCondition(options);
 
@@ -363,7 +363,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 
 		vm.setValue(EXPRESSION_STR, options.getExpression());
 		vm.setValue("subfolders", options.isSearchInSubPath());
-		vm.setValue("aliases", options.getRetrieveAliases() == 1);
+		vm.setValue("aliases", options.isRetrieveAliases());
 		vm.setValue(LANGUAGE, options.getLanguage());
 		if (options.getSizeMax() != null) {
 			vm.setValue("size", options.getSizeMax() / 1024);

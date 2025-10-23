@@ -225,8 +225,8 @@ public class ParametricForm extends VLayout implements SearchObserver {
 		options.setSource(this);
 
 		options.setMaxHits(Search.get().getMaxHits());
-		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString("aliases")) ? 1 : 0);
-		options.setCaseSensitive(Boolean.parseBoolean(vm.getValueAsString(CASESENSITIVE)) ? 1 : 0);
+		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString("aliases")));
+		options.setCaseSensitive(Boolean.parseBoolean(vm.getValueAsString(CASESENSITIVE)));
 
 		options.setType(GUISearchOptions.TYPE_PARAMETRIC);
 
@@ -437,10 +437,10 @@ public class ParametricForm extends VLayout implements SearchObserver {
 		folder.setFolder(options.getFolder(), options.getFolderName());
 
 		vm.setValue("subfolders", options.isSearchInSubPath());
-		vm.setValue("aliases", options.getRetrieveAliases() == 1);
+		vm.setValue("aliases", options.isRetrieveAliases());
 		vm.setValue(LANGUAGE, options.getLanguage());
 
-		vm.setValue(CASESENSITIVE, options.getCaseSensitive() == 1);
+		vm.setValue(CASESENSITIVE, options.isCaseSensitive());
 		vm.setValue("match", options.getTopOperator());
 
 		conditionsLayout.removeMembers(conditionsLayout.getMembers());
