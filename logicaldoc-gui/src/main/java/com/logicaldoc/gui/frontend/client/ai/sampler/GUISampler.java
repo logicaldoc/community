@@ -33,6 +33,8 @@ public class GUISampler implements Serializable {
 	private GUIDocument document;
 
 	private GUIFolder folder;
+	
+	private boolean recursive = false;
 
 	private List<GUISampler> chain = new ArrayList<>();
 
@@ -191,5 +193,13 @@ public class GUISampler implements Serializable {
 
 	public void setFeatures(String features) {
 		this.features = features;
+	}
+
+	public boolean isRecursive() {
+		return recursive;
+	}
+
+	public void setRecursive(boolean recursive) {
+		this.recursive = recursive;
 	}
 }
