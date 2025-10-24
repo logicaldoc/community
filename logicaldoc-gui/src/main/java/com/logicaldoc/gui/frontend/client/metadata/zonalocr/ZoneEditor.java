@@ -102,7 +102,11 @@ public class ZoneEditor extends Window {
 		parsing.setHeight(100);
 		parsing.setWidth(300);
 
-		form.setItems(type, sample, language, format, decimalSeparator, groupingSeparator, parsing);
+		TextAreaItem filtering = ItemFactory.newTextAreaItemForAutomation("filtering", zone.getFiltering(), null, false);
+		filtering.setHeight(100);
+		filtering.setWidth(300);
+		
+		form.setItems(type, sample, language, format, decimalSeparator, groupingSeparator, filtering, parsing);
 	}
 
 	public void onSave() {
@@ -113,6 +117,7 @@ public class ZoneEditor extends Window {
 		zone.setDecimalSeparator(vm.getValueAsString("decimalseparator"));
 		zone.setGroupingSeparator(vm.getValueAsString("groupingseparator"));
 		zone.setParsing(vm.getValueAsString("parsing"));
+		zone.setFiltering(vm.getValueAsString("filtering"));
 		zone.setLanguage(vm.getValueAsString("language"));
 
 		destroy();

@@ -68,6 +68,12 @@ public class GUIZone implements Serializable {
 	private String parsing;
 
 	/**
+	 * Automation script that will be invoked to filter and adjust the text
+	 * extracted by the OCR
+	 */
+	private String filtering;
+
+	/**
 	 * The image cropped from the sample
 	 */
 	private String sample;
@@ -156,6 +162,14 @@ public class GUIZone implements Serializable {
 		this.parsing = parsing;
 	}
 
+	public String getFiltering() {
+		return filtering;
+	}
+
+	public void setFiltering(String filtering) {
+		this.filtering = filtering;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -180,7 +194,6 @@ public class GUIZone implements Serializable {
 		this.templateId = templateId;
 	}
 
-
 	public String getSampleText() {
 		return sampleText;
 	}
@@ -204,13 +217,13 @@ public class GUIZone implements Serializable {
 	public void setLanguage(String language) {
 		this.language = language;
 	}
-	
+
 	public String getSampleUrl() {
 		return Util.contextPath() + "ocrtemplateimage/" + getTemplateId() + "?zone=" + name + "&random="
 				+ new Date().getTime();
 	}
-	
+
 	public String getDisplayContent() {
-		return getName();		
+		return getName();
 	}
 }
