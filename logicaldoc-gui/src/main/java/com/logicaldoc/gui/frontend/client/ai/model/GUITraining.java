@@ -29,6 +29,11 @@ public class GUITraining implements Serializable {
 	 * Indicates if there is a currently running training process
 	 */
 	private boolean training = false;
+	
+	/**
+	 * Indicates if input training data must be persisted
+	 */
+	private boolean saveSamples = true;
 
 	private GUISampler sampler;
 	
@@ -86,5 +91,13 @@ public class GUITraining implements Serializable {
 
 	public void setTraining(boolean training) {
 		this.training = training;
+	}
+
+	public boolean isSaveSamples() {
+		return saveSamples;
+	}
+
+	public void setSaveSamples(boolean saveSamples) {
+		this.saveSamples = saveSamples;
 	}
 }

@@ -22,6 +22,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class ModelTraining extends ModelDetailsTab implements ModelObserver {
 
+	private static final String SAVESAMPLES = "savesamples";
+
 	private static final String ENABLED = "enabled";
 
 	private DynamicForm form = new DynamicForm();
@@ -53,6 +55,11 @@ public class ModelTraining extends ModelDetailsTab implements ModelObserver {
 		enableScheduling.setWrapTitle(false);
 		enableScheduling.addChangedHandler(changedHandler);
 
+		ToggleItem saveSamples = ItemFactory.newToggleItem(SAVESAMPLES, SAVESAMPLES,
+				model.getTraining().isSaveSamples());
+		saveSamples.setWrapTitle(false);
+		saveSamples.addChangedHandler(changedHandler);
+		
 		TextItem cron = ItemFactory.newCronExpressionItem("cron", "schedule", model.getTraining().getCron(),
 				changedHandler);
 		AdvancedCriteria visibleCriteria = new AdvancedCriteria(ENABLED, OperatorId.EQUALS, true);
@@ -74,7 +81,7 @@ public class ModelTraining extends ModelDetailsTab implements ModelObserver {
 		form.setNumCols(1);
 		form.setWidth(1);
 		form.setTitleOrientation(TitleOrientation.TOP);
-		form.setItems(sampler, epochs, enableScheduling, cron);
+		form.setItems(sampler, epochs, saveSamples, enableScheduling, cron);
 
 		container.setWidth100();
 		container.setMembersMargin(3);
@@ -96,6 +103,7 @@ public class ModelTraining extends ModelDetailsTab implements ModelObserver {
 		if (form.validate()) {
 			model.getTraining().setCron(form.getValueAsString("cron"));
 			model.getTraining().setEnabled(Boolean.parseBoolean(form.getValueAsString(ENABLED)));
+			model.getTraining().setSaveSamples(Boolean.parseBoolean(form.getValueAsString(SAVESAMPLES)));
 			model.getTraining().setEpochs(Integer.parseInt(form.getValueAsString("epochs")));
 			model.getTraining().setSampler(sampler.getSelectedSampler());
 		}
