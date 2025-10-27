@@ -14,6 +14,7 @@ import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
@@ -45,6 +46,8 @@ public class SamplerProperties extends SamplerDetailsTab {
 
 	private static final String CSV = "csv";
 
+	private static final String CONTENT = "content";
+
 	private static final String ID = "id";
 
 	private static final String DESCRIPTION = "description";
@@ -75,7 +78,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		setHeight100();
 
 		setMembers(container);
-		folderSelector = new FolderSelector("folder", null);
+		folderSelector = new FolderSelector("folder", true, null);
 		folderSelector.setWidth(250);
 
 		documentSelector = new DocumentSelector("document", null);
@@ -128,8 +131,15 @@ public class SamplerProperties extends SamplerDetailsTab {
 		automation.addChangedHandler(changedHandler);
 		automation.setColSpan(4);
 		automation.setWidth(400);
-		AdvancedCriteria folderCriteria = new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA);
-		automation.setVisibleWhen(folderCriteria);
+		AdvancedCriteria metadataCriteria = new AdvancedCriteria(TYPE, OperatorId.EQUALS, METADATA);
+		automation.setVisibleWhen(metadataCriteria);
+
+		AdvancedCriteria folderCriteria = new AdvancedCriteria(TYPE, OperatorId.IN_SET,
+				new String[] { METADATA, CONTENT });
+		CheckboxItem recursive = ItemFactory.newCheckbox("recursive");
+		recursive.setVisibleWhen(folderCriteria);
+		recursive.setValue(sampler.isRecursive());
+		recursive.addChangedHandler(changedHandler);
 
 		SelectItem type = ItemFactory.newSelectItem(TYPE);
 		type.setOptionDataSource(new SamplerTypeDS());
@@ -157,7 +167,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		documentSelector.setDocument(sampler.getDocument());
 		documentSelector.addDocumentChangeListener(document -> changedHandler.onChanged(null));
 		AdvancedCriteria documentCriteria = new AdvancedCriteria(TYPE, OperatorId.NOT_IN_SET,
-				new String[] { METADATA, CHAIN });
+				new String[] { METADATA, CHAIN, CONTENT });
 		documentSelector.setVisibleWhen(documentCriteria);
 		documentSelector.setRequiredWhen(documentCriteria);
 
@@ -166,7 +176,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 		category.setHint(I18N.message("extattrname"));
 		category.setShowHintInField(true);
 		category.setIconVAlign(VerticalAlignment.CENTER);
-		category.setVisibleWhen(folderCriteria);
+		category.setVisibleWhen(metadataCriteria);
 		FormItemIcon takeAttributeForCategory = prepareTakeAttributeForCategory();
 		category.setIcons(takeAttributeForCategory);
 
@@ -177,11 +187,11 @@ public class SamplerProperties extends SamplerDetailsTab {
 		features.setHint(I18N.message("extattrnamesseparated"));
 		features.setShowHintInField(true);
 		features.setIconVAlign(VerticalAlignment.CENTER);
-		features.setVisibleWhen(folderCriteria);
+		features.setVisibleWhen(metadataCriteria);
 		features.setIcons(prepareTakeAttributeForFeatures(category));
 
-		form.setItems(id, typeValue, type, name, label, delimiter, quote, folderSelector, documentSelector, category,
-				features, automation, description);
+		form.setItems(id, typeValue, type, name, label, delimiter, quote, folderSelector, recursive, documentSelector,
+				category, features, automation, description);
 
 		container.setMembersMargin(3);
 		container.addMember(form);
@@ -340,6 +350,7 @@ public class SamplerProperties extends SamplerDetailsTab {
 			sampler.setQuote(form.getValueAsString("quote"));
 			sampler.setType(form.getValueAsString(TYPE));
 			sampler.setFolder(folderSelector.getFolder());
+			sampler.setRecursive(Boolean.parseBoolean(form.getValueAsString("recursive")));
 			sampler.setDocument(documentSelector.getDocument());
 			sampler.setCategory(form.getValueAsString("category"));
 			sampler.setFeatures(form.getValueAsString("features"));
