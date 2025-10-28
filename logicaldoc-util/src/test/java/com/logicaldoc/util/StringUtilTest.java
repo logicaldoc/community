@@ -96,4 +96,12 @@ public class StringUtilTest {
 	public void testDefaultString() {
 		assertEquals("default", StringUtil.defaultString(null, "default"));
 	}
+	
+	@Test
+	public void testFirstWords() {
+		assertEquals("pippo pluto", StringUtil.firstWords("pippo pluto paperino", 2));
+		assertEquals("pippo pluto paperino", StringUtil.firstWords("pippo pluto paperino", 3));
+		assertEquals("pippo pluto paperino", StringUtil.firstWords("pippo pluto paperino", 10));
+		assertEquals("pippo", StringUtil.firstWords("pippo pluto paperino", 1));
+	}
 }

@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Some utility methods specialized in string manipulation
@@ -246,5 +247,18 @@ public class StringUtil {
 	 */
 	public static String defaultString(String input, String def) {
 		return StringUtils.defaultString(input, def);
+	}
+
+	/**
+	 * Returns the first N words of the given string
+	 * 
+	 * @param input the input string 
+	 * @param maxWords max number of words to maintain
+	 * @return The input sting cut at the first N words
+	 */
+	public static String firstWords(String input, int maxWords) {
+		String[] tokens = input.split(" ");
+		tokens = ArrayUtils.subarray(tokens, 0, maxWords);
+		return StringUtils.join(tokens, ' ');
 	}
 }
