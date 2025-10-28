@@ -57,6 +57,8 @@ public class GUISampler implements Serializable {
 	 */
 	private int categoryIndex = -1;
 	
+	private Integer maxWords;
+	
 	public GUISampler(long id, String name) {
 		super();
 		this.id = id;
@@ -201,5 +203,13 @@ public class GUISampler implements Serializable {
 
 	public void setRecursive(boolean recursive) {
 		this.recursive = recursive;
+	}
+
+	public Integer getMaxWords() {
+		return maxWords;
+	}
+
+	public void setMaxWords(Integer maxWords) {
+		this.maxWords = maxWords;
 	}
 }

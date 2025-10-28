@@ -17,6 +17,7 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -141,6 +142,11 @@ public class SamplerProperties extends SamplerDetailsTab {
 		recursive.setValue(sampler.isRecursive());
 		recursive.addChangedHandler(changedHandler);
 
+		SpinnerItem maxWords = ItemFactory.newSpinnerItem("maxwords", sampler.getMaxWords());
+		maxWords.setVisibleWhen(new AdvancedCriteria(TYPE, OperatorId.EQUALS, CONTENT));
+		maxWords.setStep(10);
+		maxWords.addChangedHandler(changedHandler);
+
 		SelectItem type = ItemFactory.newSelectItem(TYPE);
 		type.setOptionDataSource(new SamplerTypeDS());
 		type.setValueField(VALUE);
@@ -190,8 +196,8 @@ public class SamplerProperties extends SamplerDetailsTab {
 		features.setVisibleWhen(metadataCriteria);
 		features.setIcons(prepareTakeAttributeForFeatures(category));
 
-		form.setItems(id, typeValue, type, name, label, delimiter, quote, folderSelector, recursive, documentSelector,
-				category, features, automation, description);
+		form.setItems(id, typeValue, type, name, label, delimiter, quote, folderSelector, recursive, maxWords,
+				documentSelector, category, features, automation, description);
 
 		container.setMembersMargin(3);
 		container.addMember(form);
@@ -355,6 +361,8 @@ public class SamplerProperties extends SamplerDetailsTab {
 			sampler.setCategory(form.getValueAsString("category"));
 			sampler.setFeatures(form.getValueAsString("features"));
 			sampler.setAutomation(form.getValueAsString("automation"));
+			sampler.setMaxWords(
+					form.getValue("maxwords") != null ? Integer.parseInt(form.getValueAsString("maxwords")) : null);
 
 			if (CHAIN.equals(sampler.getType()) && Boolean.TRUE.equals(chainGrid.getRecordList().isEmpty())) {
 				GuiLog.error("samplerchainempty");
