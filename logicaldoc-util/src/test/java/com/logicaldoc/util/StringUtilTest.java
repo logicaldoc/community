@@ -103,5 +103,6 @@ public class StringUtilTest {
 		assertEquals("pippo pluto paperino", StringUtil.firstWords("pippo pluto paperino", 3));
 		assertEquals("pippo pluto paperino", StringUtil.firstWords("pippo pluto paperino", 10));
 		assertEquals("pippo", StringUtil.firstWords("pippo pluto paperino", 1));
+		assertEquals("", StringUtil.firstWords("", 1));
 	}
 }
