@@ -242,7 +242,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			user.setPasswordExpired(isPasswordExpired(user) ? 1 : 0);
 		}
 
-		if (StringUtils.isEmpty(user.getPassword()))
+		if (StringUtils.isEmpty(user.getPassword()) && user.getSource() == UserSource.DEFAULT)
 			throw new PersistenceException(String.format("Cannot set empty password to user %s", user.getUsername()));
 
 		saveOrUpdate(user);
