@@ -223,8 +223,7 @@ public class ModelProperties extends ModelDetailsTab {
 		vectorSize.addChangedHandler(changedHandler);
 		setEmbedderVisibility(vectorSize);
 
-		SpinnerItem minWordFrequency = ItemFactory.newSpinnerItem("minwordfrequency",
-				model.getMinWordFrequency());
+		SpinnerItem minWordFrequency = ItemFactory.newSpinnerItem("minwordfrequency", model.getMinWordFrequency());
 		minWordFrequency.setMin(1);
 		minWordFrequency.setStep(1);
 		minWordFrequency.addChangedHandler(changedHandler);
@@ -238,7 +237,7 @@ public class ModelProperties extends ModelDetailsTab {
 		setEmbedderVisibility(chunkSize);
 
 		SpinnerItem minChunkSize = ItemFactory.newSpinnerItem("minchunksize", model.getChunking().getMinChunkSize());
-		chunkSize.setHint(I18N.message("tokens").toLowerCase());
+		minChunkSize.setHint(I18N.message("tokens").toLowerCase());
 		minChunkSize.setMin(5);
 		minChunkSize.setStep(5);
 		minChunkSize.addChangedHandler(changedHandler);
@@ -260,7 +259,7 @@ public class ModelProperties extends ModelDetailsTab {
 
 		form.setItems(id, typeValue, type, name, label, features, categories, activationSelector, weightInit, loss,
 				updater, learningRate, epsilon, momentum, batch, seed, cutoff, ngramMin, ngramMax, language, vectorSize,
-				chunkSize, maxChunks, minChunkSize, minChunkSizeChars, minWordFrequency, minChunkSizeChars,
+				minWordFrequency, chunkSize, minChunkSize, minChunkSizeChars, maxChunks,
 				description);
 
 		container.setMembersMargin(3);
@@ -292,7 +291,7 @@ public class ModelProperties extends ModelDetailsTab {
 		model.getChunking().setMinChunkSize(Integer.parseInt(form.getValueAsString("minchunksize")));
 		model.getChunking().setMinChunkSizeChars(Integer.parseInt(form.getValueAsString("minchunksizechars")));
 		model.getChunking().setMaxChunks(Integer.parseInt(form.getValueAsString("maxchunks")));
-		
+
 		model.getUpdater().setUpdateAlgorithm(form.getValueAsString(UPDATER));
 
 		String val = form.getValueAsString(LEARNINGRATE);

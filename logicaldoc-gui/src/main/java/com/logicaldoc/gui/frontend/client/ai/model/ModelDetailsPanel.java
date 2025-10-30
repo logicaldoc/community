@@ -178,6 +178,7 @@ public class ModelDetailsPanel extends VLayout {
 	}
 
 	public void onModified() {
+		toggleEvaluationTab();
 		tabSet.displaySave();
 	}
 
