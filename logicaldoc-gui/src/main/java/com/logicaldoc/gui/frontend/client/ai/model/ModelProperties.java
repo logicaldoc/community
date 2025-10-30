@@ -16,7 +16,6 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.DoubleItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
-import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
@@ -60,6 +59,8 @@ public class ModelProperties extends ModelDetailsTab {
 
 	private static final String NEURAL = "neural";
 
+	private static final String EMBEDDER = "embedder";
+
 	private static final String ACTIVATION = "activation";
 
 	private static final String OUTPUTNODES = "outputnodes";
@@ -73,6 +74,8 @@ public class ModelProperties extends ModelDetailsTab {
 	private static final String TYPE = "type";
 
 	private static final AdvancedCriteria NEURAL_CRITERIA = new AdvancedCriteria(TYPE, OperatorId.EQUALS, NEURAL);
+
+	private static final AdvancedCriteria EMBEDDER_CRITERIA = new AdvancedCriteria(TYPE, OperatorId.EQUALS, EMBEDDER);
 
 	private DynamicForm form = new DynamicForm();
 
@@ -185,9 +188,14 @@ public class ModelProperties extends ModelDetailsTab {
 		batch.addChangedHandler(changedHandler);
 		setNeuralNetworkVisibility(batch);
 
-		IntegerItem seed = ItemFactory.newIntegerItem(SEED, SEED, model.getSeed());
+		SpinnerItem seed = ItemFactory.newSpinnerItem(SEED, SEED, model.getSeed());
+		seed.setMin(1);
+		seed.setStep(1);
 		seed.addChangedHandler(changedHandler);
-		setNeuralNetworkVisibility(seed);
+		AdvancedCriteria neuralOrEmbedder = new AdvancedCriteria(TYPE, OperatorId.IN_SET,
+				new String[] { NEURAL, EMBEDDER });
+		seed.setVisibleWhen(neuralOrEmbedder);
+		seed.setRequiredWhen(neuralOrEmbedder);
 
 		SelectItem language = ItemFactory.newLanguageSelector(LANGUAGE, true, false);
 		language.setValue(model.getLanguage());
@@ -209,8 +217,50 @@ public class ModelProperties extends ModelDetailsTab {
 		ngramMax.addChangedHandler(changedHandler);
 		setNLPVisibility(ngramMax);
 
+		SpinnerItem vectorSize = ItemFactory.newSpinnerItem("vectorsize", model.getVectorSize());
+		vectorSize.setMin(100);
+		vectorSize.setStep(50);
+		vectorSize.addChangedHandler(changedHandler);
+		setEmbedderVisibility(vectorSize);
+
+		SpinnerItem minWordFrequency = ItemFactory.newSpinnerItem("minwordfrequency",
+				model.getMinWordFrequency());
+		minWordFrequency.setMin(1);
+		minWordFrequency.setStep(1);
+		minWordFrequency.addChangedHandler(changedHandler);
+		setEmbedderVisibility(minWordFrequency);
+
+		SpinnerItem chunkSize = ItemFactory.newSpinnerItem("chunksize", model.getChunking().getChunkSize());
+		chunkSize.setHint(I18N.message("tokens").toLowerCase());
+		chunkSize.setMin(100);
+		chunkSize.setStep(10);
+		chunkSize.addChangedHandler(changedHandler);
+		setEmbedderVisibility(chunkSize);
+
+		SpinnerItem minChunkSize = ItemFactory.newSpinnerItem("minchunksize", model.getChunking().getMinChunkSize());
+		chunkSize.setHint(I18N.message("tokens").toLowerCase());
+		minChunkSize.setMin(5);
+		minChunkSize.setStep(5);
+		minChunkSize.addChangedHandler(changedHandler);
+		setEmbedderVisibility(minChunkSize);
+
+		SpinnerItem minChunkSizeChars = ItemFactory.newSpinnerItem("minchunksizechars", "minchunksize",
+				model.getChunking().getMinChunkSizeChars());
+		minChunkSizeChars.setHint(I18N.message("chars").toLowerCase());
+		minChunkSizeChars.setMin(100);
+		minChunkSizeChars.setStep(10);
+		minChunkSizeChars.addChangedHandler(changedHandler);
+		setEmbedderVisibility(minChunkSizeChars);
+
+		SpinnerItem maxChunks = ItemFactory.newSpinnerItem("maxchunks", model.getChunking().getMaxChunks());
+		maxChunks.setMin(1);
+		maxChunks.setStep(1000);
+		maxChunks.addChangedHandler(changedHandler);
+		setEmbedderVisibility(maxChunks);
+
 		form.setItems(id, typeValue, type, name, label, features, categories, activationSelector, weightInit, loss,
-				updater, learningRate, epsilon, momentum, batch, seed, cutoff, ngramMin, ngramMax, language,
+				updater, learningRate, epsilon, momentum, batch, seed, cutoff, ngramMin, ngramMax, language, vectorSize,
+				chunkSize, maxChunks, minChunkSize, minChunkSizeChars, minWordFrequency, minChunkSizeChars,
 				description);
 
 		container.setMembersMargin(3);
@@ -219,9 +269,70 @@ public class ModelProperties extends ModelDetailsTab {
 		prepareLayers();
 	}
 
+	boolean validate() {
+		if (!form.validate())
+			return false;
+
+		model.setName(form.getValueAsString(NAME));
+		model.setLabel(form.getValueAsString(LABEL));
+		model.setDescription(form.getValueAsString("description"));
+		model.setLanguage(form.getValueAsString(LANGUAGE));
+		model.setType(form.getValueAsString(TYPE));
+		model.setFeatures(form.getValueAsString("features"));
+		model.setCategories(form.getValueAsString("categories"));
+		model.setActivation(form.getValueAsString(ACTIVATION));
+		model.setWeightInit(form.getValueAsString("weightInit"));
+		model.setLoss(form.getValueAsString("loss"));
+		model.setBatch(Integer.parseInt(form.getValueAsString(BATCH)));
+		model.setSeed(Long.parseLong(form.getValueAsString(SEED)));
+		model.setVectorSize(Integer.parseInt(form.getValueAsString("vectorsize")));
+		model.setMinWordFrequency(Integer.parseInt(form.getValueAsString("minwordfrequency")));
+
+		model.getChunking().setChunkSize(Integer.parseInt(form.getValueAsString("chunksize")));
+		model.getChunking().setMinChunkSize(Integer.parseInt(form.getValueAsString("minchunksize")));
+		model.getChunking().setMinChunkSizeChars(Integer.parseInt(form.getValueAsString("minchunksizechars")));
+		model.getChunking().setMaxChunks(Integer.parseInt(form.getValueAsString("maxchunks")));
+		
+		model.getUpdater().setUpdateAlgorithm(form.getValueAsString(UPDATER));
+
+		String val = form.getValueAsString(LEARNINGRATE);
+		model.getUpdater().setLearningRate(val != null ? Double.parseDouble(val) : null);
+
+		val = form.getValueAsString(EPSILON);
+		model.getUpdater().setEpsilon(val != null ? Double.parseDouble(val) : null);
+
+		val = form.getValueAsString(MOMENTUM);
+		model.getUpdater().setMomentum(val != null ? Double.parseDouble(val) : null);
+
+		if (NEURAL.equals(model.getType())) {
+			com.smartgwt.client.data.Record[] layerRecords = layers.getRecordList().toArray();
+			if (layerRecords.length < 2) {
+				GuiLog.error(I18N.message("modulelayersnotenough"));
+				return false;
+			}
+
+			model.getLayers().clear();
+			for (com.smartgwt.client.data.Record layerRecord : layerRecords)
+				model.getLayers().add(new GUINeuralNetworkLayer(layerRecord.getAttribute(NAME),
+						layerRecord.getAttributeAsInt(OUTPUTNODES), layerRecord.getAttribute(ACTIVATION)));
+		} else {
+			model.setLanguage(form.getValueAsString(LANGUAGE));
+			model.setCutoff(Integer.parseInt(form.getValueAsString("cutoff")));
+			model.setNgramMin(Integer.parseInt(form.getValueAsString("ngrammin")));
+			model.setNgramMax(Integer.parseInt(form.getValueAsString("ngrammax")));
+		}
+
+		return !form.hasErrors();
+	}
+
 	private void setNeuralNetworkVisibility(FormItem item) {
 		item.setVisibleWhen(NEURAL_CRITERIA);
 		item.setRequiredWhen(NEURAL_CRITERIA);
+	}
+
+	private void setEmbedderVisibility(FormItem item) {
+		item.setVisibleWhen(EMBEDDER_CRITERIA);
+		item.setRequiredWhen(EMBEDDER_CRITERIA);
 	}
 
 	private void setNLPVisibility(FormItem item) {
@@ -325,55 +436,6 @@ public class ModelProperties extends ModelDetailsTab {
 		item.setPickListFields(functionField, graphField);
 
 		return item;
-	}
-
-	boolean validate() {
-		if (!form.validate())
-			return false;
-
-		model.setName(form.getValueAsString(NAME));
-		model.setLabel(form.getValueAsString(LABEL));
-		model.setDescription(form.getValueAsString("description"));
-		model.setLanguage(form.getValueAsString(LANGUAGE));
-		model.setType(form.getValueAsString(TYPE));
-		model.setFeatures(form.getValueAsString("features"));
-		model.setCategories(form.getValueAsString("categories"));
-		model.setActivation(form.getValueAsString(ACTIVATION));
-		model.setWeightInit(form.getValueAsString("weightInit"));
-		model.setLoss(form.getValueAsString("loss"));
-		model.setBatch(Integer.parseInt(form.getValueAsString(BATCH)));
-		model.setSeed(Long.parseLong(form.getValueAsString(SEED)));
-
-		model.getUpdater().setUpdateAlgorithm(form.getValueAsString(UPDATER));
-
-		String val = form.getValueAsString(LEARNINGRATE);
-		model.getUpdater().setLearningRate(val != null ? Double.parseDouble(val) : null);
-
-		val = form.getValueAsString(EPSILON);
-		model.getUpdater().setEpsilon(val != null ? Double.parseDouble(val) : null);
-
-		val = form.getValueAsString(MOMENTUM);
-		model.getUpdater().setMomentum(val != null ? Double.parseDouble(val) : null);
-
-		if (NEURAL.equals(model.getType())) {
-			com.smartgwt.client.data.Record[] layerRecords = layers.getRecordList().toArray();
-			if (layerRecords.length < 2) {
-				GuiLog.error(I18N.message("modulelayersnotenough"));
-				return false;
-			}
-
-			model.getLayers().clear();
-			for (com.smartgwt.client.data.Record layerRecord : layerRecords)
-				model.getLayers().add(new GUINeuralNetworkLayer(layerRecord.getAttribute(NAME),
-						layerRecord.getAttributeAsInt(OUTPUTNODES), layerRecord.getAttribute(ACTIVATION)));
-		} else {
-			model.setLanguage(form.getValueAsString(LANGUAGE));
-			model.setCutoff(Integer.parseInt(form.getValueAsString("cutoff")));
-			model.setNgramMin(Integer.parseInt(form.getValueAsString("ngrammin")));
-			model.setNgramMax(Integer.parseInt(form.getValueAsString("ngrammax")));
-		}
-
-		return !form.hasErrors();
 	}
 
 	private void prepareLayers() {

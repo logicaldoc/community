@@ -50,11 +50,22 @@ public class GUIModel implements Serializable {
 
 	private String language = "en";
 
+	private int vectorSize = 300;
+
+	private int windowSize = 5;
+
+	/**
+	 * Words that do not appear this minimum number of times must be discarded
+	 */
+	private int minWordFrequency = 1;
+
 	private GUITraining training = new GUITraining();
 
 	private GUIEvaluation evaluation = new GUIEvaluation();
 
 	private GUIUpdater updater = new GUIUpdater();
+
+	private GUIChunking chunking = new GUIChunking();
 
 	public GUIModel(long id, String name) {
 		super();
@@ -210,6 +221,22 @@ public class GUIModel implements Serializable {
 		this.seed = seed;
 	}
 
+	public int getVectorSize() {
+		return vectorSize;
+	}
+
+	public void setVectorSize(int vectorSize) {
+		this.vectorSize = vectorSize;
+	}
+
+	public int getWindowSize() {
+		return windowSize;
+	}
+
+	public void setWindowSize(int windowSize) {
+		this.windowSize = windowSize;
+	}
+
 	public GUITraining getTraining() {
 		return training;
 	}
@@ -236,5 +263,21 @@ public class GUIModel implements Serializable {
 
 	public void setUpdater(GUIUpdater updater) {
 		this.updater = updater;
+	}
+
+	public GUIChunking getChunking() {
+		return chunking;
+	}
+
+	public void setChunking(GUIChunking chunking) {
+		this.chunking = chunking;
+	}
+
+	public int getMinWordFrequency() {
+		return minWordFrequency;
+	}
+
+	public void setMinWordFrequency(int minWordFrequency) {
+		this.minWordFrequency = minWordFrequency;
 	}
 }
