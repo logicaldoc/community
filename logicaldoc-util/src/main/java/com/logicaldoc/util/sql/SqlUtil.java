@@ -1,5 +1,6 @@
 package com.logicaldoc.util.sql;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -66,5 +67,25 @@ public class SqlUtil {
 		else
 			date = resultSet.getDate(column);
 		return date;
+	}
+
+	/**
+	 * Retrieves the long stored in a given column
+	 * 
+	 * @param resultSet The result set to use
+	 * @param column The column index
+	 * @return The long value
+	 * 
+	 * @throws SQLException Error in the database
+	 */
+	public static long getColumnLongValue(ResultSet resultSet, int column) throws SQLException {
+		Long lgn;
+		if (resultSet.getObject(column) instanceof Integer intg)
+			lgn = intg.longValue();
+		else if (resultSet.getObject(column) instanceof BigDecimal bigDec)
+			lgn = bigDec != null ? bigDec.longValue() : 0L;
+		else
+			lgn = resultSet.getLong(column);
+		return lgn;
 	}
 }
