@@ -306,7 +306,18 @@ public class UsersPanel extends AdminPanel {
 		rec.setAttribute("expire", user.getExpire());
 		rec.setAttribute(ENABLED, user.isEnabled());
 		rec.setAttribute(GUEST, user.isReadOnly());
-		rec.setAttribute(SOURCE, user.getSource() == GUIUser.TYPE_DEFAULT ? "DEFAULT" : user.getSource());
+		
+		switch (user.getSource()) {
+			case 1:
+				rec.setAttribute(SOURCE, "LDAP");
+				break;
+			case 2:
+				rec.setAttribute(SOURCE, "SAML");
+				break;
+			default:
+				rec.setAttribute(SOURCE, "DEFAULT");
+		}
+		
 		rec.setAttribute("city", user.getCity());
 		rec.setAttribute(BUILDING, user.getBuilding());
 		rec.setAttribute("organizationalUnit", user.getOrganizationalUnit());
