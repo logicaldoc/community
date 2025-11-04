@@ -70,6 +70,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		long parentFolderId = getParentFolderId(parent);
 
 		Folder parentFolder = getParentFolder(response, parent, parentFolderId);
+		boolean root = parentFolder.getParentId() == parentFolder.getId();
 
 		UserDAO udao = Context.get(UserDAO.class);
 		User user = udao.findById(session.getUserId());
@@ -99,7 +100,8 @@ public class FoldersDataServlet extends AbstractDataServlet {
 				writer.print("<publishedStatus>yes</publishedStatus>");
 				writer.print("</folder>");
 			} else {
-				printFolders(writer, session, tenantId, tenantName, parent, parentFolder, user, startRecord, endRecord);
+				printFolders(writer, session, tenantId, tenantName, parent, parentFolder, user,
+						root ? null : startRecord, root ? null : endRecord);
 			}
 		}
 
