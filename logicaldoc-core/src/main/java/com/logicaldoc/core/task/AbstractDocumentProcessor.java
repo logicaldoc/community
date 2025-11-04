@@ -215,7 +215,9 @@ public abstract class AbstractDocumentProcessor extends Task {
 	 * @param where The query being prepared
 	 * @param sort The sorting clause
 	 */
-	protected abstract void prepareQueueQuery(StringBuilder where, StringBuilder sort);
+	protected void prepareQueueQuery(StringBuilder where, StringBuilder sort) {
+		// Do nothing by default
+	}
 
 	@Override
 	public String prepareReport(Locale locale) {
