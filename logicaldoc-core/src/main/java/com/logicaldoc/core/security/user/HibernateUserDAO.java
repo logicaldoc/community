@@ -596,15 +596,17 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (user == null || user.getSource() != UserSource.DEFAULT)
 			return false;
 
-		if (user.getPasswordExpired() == 1)
+		if (user.getPasswordExpired() == 1) {
+			log.warn("User {}'s password already marked as expired", user);
 			return true;
+		}
 
 		String tenantName = (Context.get(TenantDAO.class)).getTenantName(user.getTenantId());
 		int passwordTtl = config.getInt(tenantName + ".password.ttl", 90);
 		if (passwordTtl <= 0)
 			return false;
 
-		// Check if the password is expired
+		// Check if the password is already expired
 		if (user.getPasswordExpires() == 1) {
 			Date lastChange = user.getPasswordChanged();
 			if (lastChange == null)
@@ -626,7 +628,10 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			calendar.add(Calendar.DAY_OF_MONTH, -passwordTtl);
 			Date date = calendar.getTime();
 
-			return (lastChange.before(date));
+			boolean expired = lastChange.before(date);
+			if (expired)
+				log.warn("User {}'s password expired because last changed on {}", lastChange);
+			return expired;
 		} else
 			return false;
 	}
