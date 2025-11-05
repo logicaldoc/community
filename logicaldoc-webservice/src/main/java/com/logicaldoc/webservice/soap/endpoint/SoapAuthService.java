@@ -1,6 +1,5 @@
 package com.logicaldoc.webservice.soap.endpoint;
 
-import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.util.spring.Context;
@@ -17,6 +16,8 @@ public class SoapAuthService extends AbstractService implements AuthService {
 
 	@Override
 	public String login(String username, String password) throws AuthenticationException {
+		if (!isWebserviceEnabled())
+			throw new AuthenticationException("Webservices are disabled");
 		if (Context.get().getProperties().getBoolean("webservice.basicauth.enabled", false))
 			return SessionManager.get().newSession(username, password, getCurrentRequest()).getSid();
 		else
@@ -25,20 +26,21 @@ public class SoapAuthService extends AbstractService implements AuthService {
 
 	@Override
 	public String loginApiKey(String apiKey) throws AuthenticationException {
-		Session session = SessionManager.get().newSession(apiKey, getCurrentRequest());
-		return session.getSid();
+		if (!isWebserviceEnabled())
+			throw new AuthenticationException("Webservices are disabled");
+		return SessionManager.get().newSession(apiKey, getCurrentRequest()).getSid();
 	}
 
 	@Override
 	public void logout(String sidOrApiKey) {
-		SessionManager.get().kill(sessionId(sidOrApiKey));
+		if (isWebserviceEnabled())
+			SessionManager.get().kill(sessionId(sidOrApiKey));
 	}
 
 	@Override
 	public boolean valid(String sidOrApiKey) {
 		if (!isWebserviceEnabled())
 			return false;
-
 		return SessionManager.get().isOpen(sessionId(sidOrApiKey));
 	}
 
