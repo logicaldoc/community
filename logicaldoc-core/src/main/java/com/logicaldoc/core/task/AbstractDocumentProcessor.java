@@ -167,7 +167,7 @@ public abstract class AbstractDocumentProcessor extends Task {
 		// do nothing by default
 	}
 
-	private void removeTransactionReference() {
+	protected void removeTransactionReference() {
 		try {
 			int count = documentDao.jdbcUpdate(
 					"update ld_document set ld_transactionid = null where ld_transactionId = :transactionId",
@@ -179,7 +179,7 @@ public abstract class AbstractDocumentProcessor extends Task {
 		}
 	}
 
-	private void getSize(int max, List<Long> ids) {
+	protected void getSize(int max, List<Long> ids) {
 		size = ids.size();
 		if (max < size && max > 0)
 			size = max;

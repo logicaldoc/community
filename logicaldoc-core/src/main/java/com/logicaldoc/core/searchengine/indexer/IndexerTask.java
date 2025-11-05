@@ -69,10 +69,6 @@ public class IndexerTask extends AbstractDocumentProcessor {
 			thread.interrupt();
 	}
 
-	void onDocumentProcessed() {
-		next();
-	}
-
 	@Override
 	public void runTask() throws TaskException {
 		if (searchEngine.isLocked()) {
