@@ -16,7 +16,6 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for @link {@link HibernateApiKeyDAO}
@@ -34,7 +33,7 @@ public class HibernateApiKeyDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateAPIKeyDAO
-		testSubject = Context.get(ApiKeyDAO.class);
+		testSubject = ApiKeyDAO.get();
 	}
 
 	@Test

@@ -90,8 +90,7 @@ public class DocTool {
 			url += "/";
 
 		try {
-			TenantDAO tenantDao = Context.get(TenantDAO.class);
-			Tenant tenant = tenantDao.findById(tenantId);
+			Tenant tenant = TenantDAO.get().findById(tenantId);
 			url += "display?tenant=" + tenant.getName() + "&docId=" + docId;
 			return url;
 		} catch (PersistenceException e) {
@@ -263,7 +262,7 @@ public class DocTool {
 	 * 
 	 */
 	public void store(Document doc, DocumentHistory transaction) {
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		try {
 			docDao.store(doc, transaction);
 		} catch (Exception t) {
@@ -324,7 +323,7 @@ public class DocTool {
 	 * @param doc the document to initialize
 	 */
 	public void initialize(Document doc) {
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		docDao.initialize(doc);
 	}
 
@@ -425,7 +424,7 @@ public class DocTool {
 	 * @return the created link
 	 */
 	public DocumentLink link(Document doc1, Document doc2, String type) {
-		DocumentLinkDAO linkDao = Context.get(DocumentLinkDAO.class);
+		DocumentLinkDAO linkDao = DocumentLinkDAO.get();
 		DocumentLink link = null;
 		try {
 			link = linkDao.findByDocIdsAndType(doc1.getId(), doc2.getId(), "default");
@@ -550,7 +549,7 @@ public class DocTool {
 		transaction.setDocId(docId);
 		transaction.setUser(user);
 
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 		try {
 			dao.delete(docId, transaction);
 		} catch (PersistenceException e) {
@@ -709,7 +708,7 @@ public class DocTool {
 	 * @return the document object
 	 */
 	public Document findById(long docId) {
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		try {
 			Document doc = docDao.findDocument(docId);
 			docDao.initialize(doc);
@@ -740,7 +739,7 @@ public class DocTool {
 	 * @return the document object
 	 */
 	public Document findByPath(String path, Long tenantId) {
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		try {
 			return docDao.findByPath(path, tenantId != null ? tenantId : Tenant.DEFAULT_ID);
 		} catch (PersistenceException e) {
@@ -760,7 +759,7 @@ public class DocTool {
 		if (doc == null)
 			return "";
 		try {
-			FolderDAO folderDao = Context.get(FolderDAO.class);
+			FolderDAO folderDao = FolderDAO.get();
 			String path = folderDao.computePathExtended(doc.getFolder().getId());
 			if (!path.endsWith("/"))
 				path += "/";
@@ -805,7 +804,7 @@ public class DocTool {
 
 		Folder folder = null;
 		try {
-			FolderDAO fdao = Context.get(FolderDAO.class);
+			FolderDAO fdao = FolderDAO.get();
 			Folder parent = doc.getFolder();
 
 			if (targetPath.startsWith("/")) {
@@ -849,10 +848,8 @@ public class DocTool {
 	 * @return list of histories
 	 */
 	public List<DocumentHistory> getHistories(long docId, DocumentEvent event) {
-		DocumentHistoryDAO hDao = Context.get(DocumentHistoryDAO.class);
-
 		try {
-			return hDao.findByDocIdAndEvent(docId, event);
+			return DocumentHistoryDAO.get().findByDocIdAndEvent(docId, event);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -884,8 +881,7 @@ public class DocTool {
 		transaction.setUser(user);
 
 		try {
-			DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
-			dao.store(note, transaction);
+			DocumentNoteDAO.get().store(note, transaction);
 		} catch (Exception t) {
 			log.error(t.getMessage(), t);
 		}
@@ -913,20 +909,17 @@ public class DocTool {
 	 * @return the list of notes
 	 */
 	public List<DocumentNote> getNotes(long docId, long userId, String fileVersion) {
-		DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
-
 		String fVer = fileVersion;
 		if (StringUtils.isEmpty(fileVersion)) {
-			DocumentDAO docDao = Context.get(DocumentDAO.class);
 			try {
-				Document doc = docDao.findDocument(docId);
+				Document doc = DocumentDAO.get().findDocument(docId);
 				fVer = doc.getFileVersion();
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
 		}
 		try {
-			return dao.findByDocId(docId, userId, fVer);
+			return DocumentNoteDAO.get().findByDocId(docId, userId, fVer);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -955,7 +948,7 @@ public class DocTool {
 	 * @return Template with given name
 	 */
 	public Template findTemplateByName(String name, long tenantId) {
-		TemplateDAO dao = Context.get(TemplateDAO.class);
+		TemplateDAO dao = TemplateDAO.get();
 
 		try {
 			return dao.findByName(name, tenantId);
@@ -973,7 +966,7 @@ public class DocTool {
 	 * @return Template with given name
 	 */
 	public Template findTemplateById(long templateId) {
-		TemplateDAO dao = Context.get(TemplateDAO.class);
+		TemplateDAO dao = TemplateDAO.get();
 		try {
 			return dao.findById(templateId);
 		} catch (PersistenceException e) {
@@ -1048,8 +1041,7 @@ public class DocTool {
 	 */
 	public boolean isPermissionAllowed(String permission, long documentId, long userId) {
 		try {
-			return Context.get(DocumentDAO.class).isPermissionAllowed(Permission.valueOf(permission), documentId,
-					userId);
+			return DocumentDAO.get().isPermissionAllowed(Permission.valueOf(permission), documentId, userId);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return false;

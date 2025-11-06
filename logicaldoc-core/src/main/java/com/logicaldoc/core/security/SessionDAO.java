@@ -3,6 +3,7 @@ package com.logicaldoc.core.security;
 import java.util.List;
 
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * DAO for <code>UserSession</code> handling.
@@ -12,6 +13,15 @@ import com.logicaldoc.core.PersistentObjectDAO;
  */
 public interface SessionDAO extends PersistentObjectDAO<Session> {
 
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static SessionDAO get() {
+		return Context.get(SessionDAO.class);
+	}
+	
 	/**
 	 * Removes all the sessions that refers to the current node
 	 */

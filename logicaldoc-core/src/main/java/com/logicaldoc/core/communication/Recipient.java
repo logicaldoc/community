@@ -2,10 +2,10 @@ package com.logicaldoc.core.communication;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * A generic recipient of a message or email

@@ -12,9 +12,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -40,6 +37,9 @@ import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.TimeDiff;
 import com.logicaldoc.util.time.TimeDiff.TimeField;
+
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * An {@link Interceptor} invoked when a webservice message has been received
@@ -359,7 +359,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 		@Override
 		public Void call() {
 			try {
-				WebserviceCallDAO dao = Context.get(WebserviceCallDAO.class);
+				WebserviceCallDAO dao = WebserviceCallDAO.get();
 				Date now = new Date();
 
 				if (lastClean == null)

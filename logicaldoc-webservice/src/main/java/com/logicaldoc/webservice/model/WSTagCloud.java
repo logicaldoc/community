@@ -1,8 +1,8 @@
 package com.logicaldoc.webservice.model;
 
-import jakarta.xml.bind.annotation.XmlType;
-
 import com.logicaldoc.core.document.TagCloud;
+
+import jakarta.xml.bind.annotation.XmlType;
 
 /**
  * This class is a TagCloud for WebServices API

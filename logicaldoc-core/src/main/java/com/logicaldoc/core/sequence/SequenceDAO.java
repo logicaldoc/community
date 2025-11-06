@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Utility DAO that can manage sequences persisted in the DB
@@ -16,6 +17,15 @@ import com.logicaldoc.core.PersistentObjectDAO;
  * @since 4.0
  */
 public interface SequenceDAO extends PersistentObjectDAO<Sequence> {
+
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static SequenceDAO get() {
+		return Context.get(SequenceDAO.class);
+	}
 
 	/**
 	 * Returns the next value of the sequence

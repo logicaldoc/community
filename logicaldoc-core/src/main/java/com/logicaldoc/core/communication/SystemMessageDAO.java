@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This is a DAO service for SystemMessages.
@@ -15,6 +16,15 @@ import com.logicaldoc.core.PersistentObjectDAO;
 public interface SystemMessageDAO extends PersistentObjectDAO<SystemMessage> {
 
 	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static SystemMessageDAO get() {
+		return Context.get(SystemMessageDAO.class);
+	}
+
+	/**
 	 * This method selects all the messages for the specified recipient and type
 	 * 
 	 * @param recipient The recipient name
@@ -23,7 +33,8 @@ public interface SystemMessageDAO extends PersistentObjectDAO<SystemMessage> {
 	 * 
 	 * @return The messages list
 	 * 
-	 * @throws PersistenceException @throws PersistenceException Error in the database
+	 * @throws PersistenceException @throws PersistenceException Error in the
+	 *         database
 	 */
 	public List<SystemMessage> findByRecipient(String recipient, int type, Integer read) throws PersistenceException;
 
@@ -36,7 +47,7 @@ public interface SystemMessageDAO extends PersistentObjectDAO<SystemMessage> {
 	 * 
 	 * @return The number of messages
 	 * 
-     * @throws PersistenceException Error in the database
+	 * @throws PersistenceException Error in the database
 	 */
 	public int getUnreadCount(String recipient, int type) throws PersistenceException;
 

@@ -185,7 +185,7 @@ public class WSUtil {
 	}
 
 	public static Document toDocument(WSDocument wsDoc) throws PersistenceException {
-		FolderDAO fdao = Context.get(FolderDAO.class);
+		FolderDAO fdao = FolderDAO.get();
 		Folder folder = fdao.findById(wsDoc.getFolderId());
 		if (folder == null) {
 			throw new PersistenceException("error - folder not found");
@@ -247,7 +247,7 @@ public class WSUtil {
 		Template template = null;
 		Map<String, Attribute> attrs = new HashMap<>();
 		if (wsDoc.getTemplateId() != null) {
-			TemplateDAO templDao = Context.get(TemplateDAO.class);
+			TemplateDAO templDao = TemplateDAO.get();
 			template = templDao.findById(wsDoc.getTemplateId());
 			doc.setTemplate(template);
 			if (template != null) {
@@ -331,7 +331,7 @@ public class WSUtil {
 		wsAttributeSet.setDescription(attributeSet.getDescription());
 		wsAttributeSet.setLastModified(DateUtil.format(attributeSet.getLastModified()));
 
-		AttributeSetDAO setDao = Context.get(AttributeSetDAO.class);
+		AttributeSetDAO setDao = AttributeSetDAO.get();
 		setDao.initialize(attributeSet);
 
 		// Populate extended attributes
@@ -458,7 +458,7 @@ public class WSUtil {
 			wsTemplate.setInitialization(template.getInitialization());
 			wsTemplate.setLastModified(DateUtil.format(template.getLastModified()));
 
-			TemplateDAO templateDao = Context.get(TemplateDAO.class);
+			TemplateDAO templateDao = TemplateDAO.get();
 			templateDao.initialize(template);
 			wsTemplate.setDocsCount(templateDao.countDocs(template.getId()));
 
@@ -538,7 +538,7 @@ public class WSUtil {
 		}
 
 		if (wsAce.getUserId() != 0L) {
-			UserDAO userDao = Context.get(UserDAO.class);
+			UserDAO userDao = UserDAO.get();
 			User user = userDao.findById(wsAce.getUserId());
 			userDao.initialize(user);
 			ace.setGroupId(user.getUserGroup().getId());

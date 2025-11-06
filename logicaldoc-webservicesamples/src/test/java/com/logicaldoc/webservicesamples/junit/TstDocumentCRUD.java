@@ -3,15 +3,15 @@ package com.logicaldoc.webservicesamples.junit;
 import java.io.File;
 import java.util.List;
 
-import jakarta.activation.DataHandler;
-import jakarta.activation.DataSource;
-import jakarta.activation.FileDataSource;
-
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.soap.client.SoapDocumentClient;
+
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.activation.FileDataSource;
 
 public class TstDocumentCRUD extends BaseTestCase {
 

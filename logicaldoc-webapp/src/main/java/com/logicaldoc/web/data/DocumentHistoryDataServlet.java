@@ -50,7 +50,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws IOException, PersistenceException {
 
-		MenuDAO mDao = Context.get(MenuDAO.class);
+		MenuDAO mDao = MenuDAO.get();
 		boolean showSid = mDao.isReadAllowed(Menu.SESSIONS, session.getUserId());
 
 		PrintWriter writer = response.getWriter();
@@ -135,7 +135,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 
 		if (request.getParameter(DOC_ID) != null) {
 			Long docId = Long.parseLong(request.getParameter(DOC_ID));
-			DocumentDAO ddao = Context.get(DocumentDAO.class);
+			DocumentDAO ddao = DocumentDAO.get();
 			Document doc = ddao.findDocument(docId);
 			if (doc != null)
 				docId = doc.getId();

@@ -17,10 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-import jakarta.annotation.Resource;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.java.plugin.registry.Extension;
@@ -39,6 +35,10 @@ import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.annotation.Resource;
 
 /**
  * Common methods for all the Store implementations.
@@ -247,7 +247,7 @@ public abstract class AbstractStore implements Store {
 
 	@Override
 	public String getResourceName(Document doc, String fileVersion, String suffix) {
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		Document document = doc;
 
 		/*
@@ -285,7 +285,7 @@ public abstract class AbstractStore implements Store {
 
 	@Override
 	public String getResourceName(long docId, String fileVersion, String suffix) {
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		try {
 			Document doc = docDao.findById(docId);
 			return getResourceName(doc, fileVersion, suffix);
@@ -385,7 +385,7 @@ public abstract class AbstractStore implements Store {
 			deletionsLog.info("str: {}, doc: {}, res: {}\n{}", getId(), docId, path,
 					Arrays.toString(Thread.currentThread().getStackTrace()).replace(',', '\n'));
 
-		DocumentHistoryDAO documentHistoryDAO = Context.get(DocumentHistoryDAO.class);
+		DocumentHistoryDAO documentHistoryDAO = DocumentHistoryDAO.get();
 		DocumentHistory history = new DocumentHistory();
 		history.setEvent(DocumentEvent.RESOURCE_DELETED);
 		history.setDocId(docId);

@@ -10,7 +10,6 @@ import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Some utility methods for documents.
@@ -27,7 +26,7 @@ public class DocUtil {
 	public static String getFileName(Document document, String fileVersion) {
 		String fileName = document.getFileName();
 		if (StringUtils.isNotEmpty(fileVersion) && !fileVersion.equals(document.getFileVersion())) {
-			VersionDAO vDao = Context.get(VersionDAO.class);
+			VersionDAO vDao = VersionDAO.get();
 			try {
 				Version ver = vDao.findByFileVersion(document.getId(), fileVersion);
 				if (ver != null)
@@ -43,8 +42,7 @@ public class DocUtil {
 		String tenantName = "default";
 		if (document != null)
 			try {
-				TenantDAO tenantDao = Context.get(TenantDAO.class);
-				Tenant tenant = tenantDao.findById(document.getTenantId());
+				Tenant tenant = TenantDAO.get().findById(document.getTenantId());
 				tenantName = tenant.getName();
 			} catch (Exception t) {
 				log.error(t.getMessage());

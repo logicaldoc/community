@@ -7,10 +7,10 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
+import com.logicaldoc.core.document.Document;
+
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-
-import com.logicaldoc.core.document.Document;
 
 /**
  * The Store manages the repository where document files are maintained and all

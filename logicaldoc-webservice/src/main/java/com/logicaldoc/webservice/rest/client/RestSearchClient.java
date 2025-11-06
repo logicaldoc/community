@@ -1,7 +1,5 @@
 package com.logicaldoc.webservice.rest.client;
 
-import jakarta.ws.rs.core.MediaType;
-
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.logicaldoc.core.PersistenceException;
@@ -11,6 +9,8 @@ import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSSearchOptions;
 import com.logicaldoc.webservice.model.WSSearchResult;
 import com.logicaldoc.webservice.rest.SearchService;
+
+import jakarta.ws.rs.core.MediaType;
 
 public class RestSearchClient extends AbstractRestClient<SearchService> {
 

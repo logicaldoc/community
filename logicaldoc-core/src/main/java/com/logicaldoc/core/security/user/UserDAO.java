@@ -8,6 +8,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.security.authentication.PasswordWeakException;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This class is a DAO-service for User-objects.
@@ -17,6 +18,15 @@ import com.logicaldoc.core.security.authentication.PasswordWeakException;
  * @version 1.0
  */
 public interface UserDAO extends PersistentObjectDAO<User> {
+
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static UserDAO get() {
+		return Context.get(UserDAO.class);
+	}
 
 	/**
 	 * Counts the total number of standard users
@@ -153,7 +163,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	public void store(User user, UserHistory transaction) throws PersistenceException;
 
 	public void store(User user) throws PersistenceException;
-	
+
 	/**
 	 * Retrieves the settings for a user. The settings are stored as Generics of
 	 * type <b>usersetting</b>.

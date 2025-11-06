@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import jakarta.annotation.Resource;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -23,8 +21,8 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
-import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.document.DocumentStatus;
+import com.logicaldoc.core.document.IndexingStatus;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
@@ -39,6 +37,8 @@ import com.logicaldoc.core.util.UserUtil;
 import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.http.StringHttpClientResponseHandler;
 import com.logicaldoc.util.plugin.PluginRegistry;
+
+import jakarta.annotation.Resource;
 
 /**
  * Collects statistical informations to the stats site

@@ -2,8 +2,6 @@ package com.logicaldoc.webdav.resource;
 
 import java.io.Serializable;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavMethods;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -34,6 +32,8 @@ import com.logicaldoc.util.MimeType;
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.session.WebdavSession;
 import com.logicaldoc.webdav.version.VersionHistoryResourceImpl;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 public class VersionControlledResourceImpl extends DeltaVResourceImpl
 		implements VersionControlledResource, Serializable {

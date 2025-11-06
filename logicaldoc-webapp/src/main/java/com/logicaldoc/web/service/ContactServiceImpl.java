@@ -202,7 +202,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 	}
 
 	private void appendUserIdsFromGroups(Collection<Long> groupIds, Collection<Long> users) throws PersistenceException {
-		UserDAO gDao = Context.get(UserDAO.class);
+		UserDAO gDao = UserDAO.get();
 		for (Long gId : groupIds) {
 			Set<User> usrs = gDao.findByGroup(gId);
 			for (User user : usrs) {

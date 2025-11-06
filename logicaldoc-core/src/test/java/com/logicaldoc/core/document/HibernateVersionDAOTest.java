@@ -47,8 +47,8 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateVersionDAO
-		testSubject = Context.get(VersionDAO.class);
-		docDao = Context.get(DocumentDAO.class);
+		testSubject = VersionDAO.get();
+		docDao = DocumentDAO.get();
 	}
 
 	@Test
@@ -177,7 +177,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 			store.exists(doc.getId(), res);
 		}
 
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		Folder folder1 = new Folder();
 		folder1.setName("folderBVO");
 		folder1.setType(Folder.TYPE_WORKSPACE);
@@ -210,7 +210,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testCreate() throws PersistenceException {
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 
 		Document doc = docDao.findById(1);
 		docDao.initialize(doc);

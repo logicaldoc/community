@@ -31,7 +31,6 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.security.StringEncrypter;
 import com.logicaldoc.util.security.StringEncrypter.EncryptionException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Our Dropbox facade
@@ -227,10 +226,10 @@ public class Dropbox {
 	}
 
 	private Generic getGeneric() throws PersistenceException {
-		UserDAO uDao = Context.get(UserDAO.class);
+		UserDAO uDao = UserDAO.get();
 		User user = uDao.findById(userId);
 
-		GenericDAO genericDao = Context.get(GenericDAO.class);
+		GenericDAO genericDao = GenericDAO.get();
 		Generic settings = genericDao.findByAlternateKey("usersetting", "dropbox", userId, user.getTenantId());
 		if (settings == null) {
 			settings = new Generic("usersetting", "dropbox", userId, user.getTenantId());
@@ -249,7 +248,7 @@ public class Dropbox {
 		settings.setString2(encrypter.encrypt(apiSecret));
 		if (StringUtils.isNotEmpty(accessToken))
 			settings.setString3(encrypter.encrypt(accessToken));
-		GenericDAO genericDao = Context.get(GenericDAO.class);
+		GenericDAO genericDao = GenericDAO.get();
 		genericDao.store(settings);
 	}
 

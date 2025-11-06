@@ -19,7 +19,6 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.ResultSetWalker;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
 
 import jakarta.servlet.ServletException;
@@ -86,7 +85,7 @@ public class LegalServlet extends HttpServlet {
 		writer.write("<list>");
 
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-		Context.get(UserDAO.class).queryForResultSet(
+		UserDAO.get().queryForResultSet(
 				"select ld_name, ld_category, ld_title, B.ld_date from ld_legal A, ld_legal_confirmation B where ld_legal=ld_name and ld_username = :userName order by ld_sort asc, B.ld_date desc",
 				Map.of("userName", userName), null, new ResultSetWalker() {
 
@@ -109,7 +108,7 @@ public class LegalServlet extends HttpServlet {
 
 	private void downloadLegal(HttpServletRequest request, HttpServletResponse response, String legal)
 			throws PersistenceException, IOException {
-		String content = Context.get(DocumentDAO.class)
+		String content = DocumentDAO.get()
 				.queryForString("select ld_content from ld_legal where ld_name = :legal", Map.of("legal", legal));
 		ServletUtil.setContentDisposition(request, response, legal + ".pdf");
 		Decoder decoder = Base64.getDecoder();

@@ -9,10 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import jakarta.activation.DataHandler;
-import jakarta.activation.DataSource;
-import jakarta.activation.FileDataSource;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -32,6 +28,10 @@ import com.logicaldoc.webservice.rest.client.RestDocumentMetadataClient;
 import com.logicaldoc.webservice.rest.client.RestFolderClient;
 import com.logicaldoc.webservice.rest.client.RestSearchClient;
 import com.logicaldoc.webservice.rest.client.RestTagClient;
+
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.activation.FileDataSource;
 
 public class RestWorkbench {
 

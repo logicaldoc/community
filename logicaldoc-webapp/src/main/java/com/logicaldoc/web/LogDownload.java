@@ -306,7 +306,7 @@ public class LogDownload extends HttpServlet {
 	private void dumpUpdateTable(ZipOutputStream out) throws IOException, PersistenceException {
 		File buf = FileUtil.createTempFile("updates", ".csv");
 		try {
-			DocumentDAO dao = Context.get(DocumentDAO.class);
+			DocumentDAO dao = DocumentDAO.get();
 			dao.queryForResultSet("select ld_update, ld_date, ld_version from ld_update order by ld_date desc", null,
 					null, rows -> {
 						try (CSVFileWriter csv = new CSVFileWriter(buf.getAbsolutePath(), ',')) {
@@ -329,7 +329,7 @@ public class LogDownload extends HttpServlet {
 	private void dumpStats(ZipOutputStream out) throws IOException, PersistenceException {
 		File buf = FileUtil.createTempFile("stats", ".csv");
 		try {
-			GenericDAO dao = Context.get(GenericDAO.class);
+			GenericDAO dao = GenericDAO.get();
 			dao.queryForResultSet(
 					"select ld_subtype, ld_tenantid, ld_integer1 from ld_generic where ld_type = 'stat' order by ld_subtype, ld_tenantid",
 					null, null, rows -> {
@@ -353,7 +353,7 @@ public class LogDownload extends HttpServlet {
 	private void dumpLegals(ZipOutputStream out) throws IOException, PersistenceException {
 		File buf = FileUtil.createTempFile("legals", ".csv");
 		try {
-			GenericDAO dao = Context.get(GenericDAO.class);
+			GenericDAO dao = GenericDAO.get();
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 			dao.queryForResultSet(
 					"select ld_name, ld_category, ld_title, ld_username, B.ld_date from ld_legal A, ld_legal_confirmation B where ld_legal=ld_name order by ld_name, B.ld_date desc",
@@ -398,7 +398,7 @@ public class LogDownload extends HttpServlet {
 	private void dumpPatchTable(ZipOutputStream out) throws IOException, PersistenceException {
 		File buf = FileUtil.createTempFile("patches", ".csv");
 		try {
-			DocumentDAO dao = Context.get(DocumentDAO.class);
+			DocumentDAO dao = DocumentDAO.get();
 			dao.queryForResultSet("select ld_patch, ld_date, ld_version from ld_patch order by ld_date desc", null,
 					null, rows -> {
 						try (CSVFileWriter csv = new CSVFileWriter(buf.getAbsolutePath(), ',')) {

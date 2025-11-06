@@ -7,6 +7,7 @@ import java.util.Set;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.security.Permission;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Instances of this class is a DAO-service for folder objects.
@@ -16,6 +17,15 @@ import com.logicaldoc.core.security.Permission;
  */
 public interface FolderDAO extends PersistentObjectDAO<Folder> {
 
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static FolderDAO get() {
+		return Context.get(FolderDAO.class);
+	}
+	
 	/**
 	 * Gets a folder by a given ID if it is an alias, the referenced folder is
 	 * returned.

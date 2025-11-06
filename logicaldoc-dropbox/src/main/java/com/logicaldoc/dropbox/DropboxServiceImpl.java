@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.Metadata;
+import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
@@ -38,8 +39,6 @@ import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
-
-import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 
 /**
  * Implementation of the DropboxService
@@ -142,8 +141,8 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			if (!targetPath.endsWith("/"))
 				targetPath += "/";
 
-			FolderDAO folderDao = Context.get(FolderDAO.class);
-			DocumentDAO docDao = Context.get(DocumentDAO.class);
+			FolderDAO folderDao = FolderDAO.get();
+			DocumentDAO docDao = DocumentDAO.get();
 
 			// Prepare a fieldsMap docId-path
 			Map<Long, String> documents = new HashMap<>();
@@ -185,7 +184,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 	private void uploadDocument(Long docId, String path, Dropbox dropbox, Session session)
 			throws IOException, PersistenceException {
 		Store store = Context.get(Store.class);
-		DocumentDAO ddao = Context.get(DocumentDAO.class);
+		DocumentDAO ddao = DocumentDAO.get();
 
 		File temp = null;
 		try {
@@ -206,7 +205,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			history.setSession(session);
 			history.setDocument(doc);
 
-			FolderDAO fdao = Context.get(FolderDAO.class);
+			FolderDAO fdao = FolderDAO.get();
 			history.setPath(fdao.computePathExtended(doc.getFolder().getId()));
 			history.setEvent(DocumentEvent.DOWNLOADED);
 
@@ -222,7 +221,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 	private void loadFoldersTree(long parentId, String parentPath, long userId, Map<Long, String> folders)
 			throws PersistenceException {
-		FolderDAO fDao = Context.get(FolderDAO.class);
+		FolderDAO fDao = FolderDAO.get();
 		folders.put(parentId, parentPath);
 		for (Folder folder : fDao.findChildren(parentId, userId)) {
 			if (parentId != folder.getId())
@@ -233,7 +232,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 	@Override
 	public int importDocuments(long targetFolder, List<String> paths) throws ServerException {
 		Session session = DropboxServiceImpl.validateSession(getThreadLocalRequest());
-		FolderDAO fdao = Context.get(FolderDAO.class);
+		FolderDAO fdao = FolderDAO.get();
 
 		int count = 0;
 		try {
@@ -271,7 +270,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			importDocument(root, metadata, dbox, session);
 			imported.add(entry.getPathDisplay());
 		} else {
-			FolderDAO fdao = Context.get(FolderDAO.class);
+			FolderDAO fdao = FolderDAO.get();
 			String rootPath = entry.getPathDisplay();
 			if (!rootPath.endsWith("/"))
 				rootPath += "/";
@@ -297,7 +296,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 	private void importDocument(Folder root, FileMetadata src, Dropbox dbox, Session session)
 			throws IOException, PersistenceException {
-		DocumentDAO ddao = Context.get(DocumentDAO.class);
+		DocumentDAO ddao = DocumentDAO.get();
 		DocumentManager manager = Context.get(DocumentManager.class);
 
 		File temp = null;
@@ -317,7 +316,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 				history.setFolderId(root.getId());
 				history.setSession(session);
 
-				FolderDAO fdao = Context.get(FolderDAO.class);
+				FolderDAO fdao = FolderDAO.get();
 				String pathExtended = fdao.computePathExtended(root.getId());
 				history.setPath(pathExtended);
 
@@ -345,7 +344,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 				history.setComment("Imported from Dropbox");
 				history.setSession(session);
 
-				FolderDAO fdao = Context.get(FolderDAO.class);
+				FolderDAO fdao = FolderDAO.get();
 				history.setPath(fdao.computePathExtended(root.getId()));
 				history.setEvent(DocumentEvent.STORED);
 

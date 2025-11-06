@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
-
-import org.apache.commons.collections.CollectionUtils;
 
 /**
  * A base class for attribute sets and templates

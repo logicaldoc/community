@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionDAO;
@@ -17,6 +14,9 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet retrieves the users currently logged in
@@ -32,7 +32,7 @@ public class OnlineUsersDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 		SessionDAO sessionDao = Context.get(SessionDAO.class);
 		Session currentSession = ServletUtil.validateSession(request);
 		String tenant = currentSession.getTenantName();

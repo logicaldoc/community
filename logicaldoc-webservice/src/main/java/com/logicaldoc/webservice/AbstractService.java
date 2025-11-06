@@ -4,10 +4,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.WebApplicationException;
-
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.slf4j.Logger;
@@ -35,6 +31,10 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.DateUtil;
 import com.logicaldoc.webservice.model.WSUtil;
+
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.WebApplicationException;
 
 /**
  * Basepoint for creating webservices implementations
@@ -90,7 +90,7 @@ public class AbstractService {
 	 */
 	protected User validateSession(String sid)
 			throws WebserviceException, PersistenceException, AuthenticationException {
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 		if (!validateSession) {
 			User user = new User();
 			user.setId(User.USERID_ADMIN);
@@ -151,7 +151,7 @@ public class AbstractService {
 	protected void checkMenu(String sid, long menuId)
 			throws WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
-		MenuDAO dao = Context.get(MenuDAO.class);
+		MenuDAO dao = MenuDAO.get();
 		if (!dao.isReadAllowed(menuId, user.getId())) {
 			String message = String.format("User %s cannot access menu %s", user.getUsername(), menuId);
 			log.error(message);
@@ -161,7 +161,7 @@ public class AbstractService {
 
 	protected void checkFolderPermission(Permission permission, User user, long folderId)
 			throws PersistenceException, PermissionException {
-		FolderDAO dao = Context.get(FolderDAO.class);
+		FolderDAO dao = FolderDAO.get();
 		if (!dao.isPermissionAllowed(permission, folderId, user.getId())) {
 			String message = String.format("User %s doesn't have permission %s on folder %s", user.getUsername(),
 					permission.name(), folderId);
@@ -172,7 +172,7 @@ public class AbstractService {
 
 	protected void checkDocumentPermission(Permission permission, User user, long docId)
 			throws PersistenceException, PermissionException {
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 		if (!dao.isPermissionAllowed(permission, docId, user.getId())) {
 			String message = String.format("User %s doesn't have permission %s on document %s", user.getUsername(),
 					permission.name(), docId);
@@ -182,7 +182,7 @@ public class AbstractService {
 	}
 
 	protected void checkMenu(User user, long menuId) throws PermissionException {
-		MenuDAO dao = Context.get(MenuDAO.class);
+		MenuDAO dao = MenuDAO.get();
 		if (!dao.isReadAllowed(menuId, user.getId())) {
 			String message = String.format("User %s doesn't have read permission on menu %s", user.getUsername(),
 					menuId);

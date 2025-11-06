@@ -13,7 +13,6 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for <code>HibernateAttributeOptionDAO</code>
@@ -31,7 +30,7 @@ public class HibernateAttributeOptionDAOTest extends AbstractCoreTestCase {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateAttributeOptionDAO
-		testSubject = Context.get(AttributeOptionDAO.class);
+		testSubject = AttributeOptionDAO.get();
 	}
 
 	@Test

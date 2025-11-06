@@ -12,7 +12,6 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webdav.session.WebdavSession;
 
 /**
@@ -284,7 +283,7 @@ public class ResourceImpl implements Resource {
 			personRequest = (Long) session.getObject("id");
 		}
 
-		FolderDAO fdao = Context.get(FolderDAO.class);
+		FolderDAO fdao = FolderDAO.get();
 		Set<Permission> permissions = new HashSet<>();
 		long fid = 0;
 		if (folder)

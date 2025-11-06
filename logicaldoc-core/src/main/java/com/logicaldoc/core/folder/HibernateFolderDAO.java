@@ -1585,7 +1585,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		replicateSecurityPolicies(source, securityOption, newFolder);
 
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		DocumentManager docMan = Context.get(DocumentManager.class);
 
 		// List source docs and create them in the new folder
@@ -1595,7 +1595,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			 * query(findByFolder) to run properly without exception due to
 			 * template.templateGroups
 			 */
-			TemplateDAO tDao = Context.get(TemplateDAO.class);
+			TemplateDAO tDao = TemplateDAO.get();
 			List<Template> templates = tDao.findAll(source.getTenantId());
 			for (Template template : templates)
 				tDao.initialize(template);
@@ -2411,7 +2411,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private void deleteEmptySourceFolders(Folder source, FolderHistory transaction) throws PersistenceException {
 		log.debug("delete the empty source folder {}", source);
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		if (docDao.findByFolder(source.getId(), null).isEmpty() && findByParentId(source.getId()).isEmpty())
 			delete(source.getId(), new FolderHistory(transaction));
 	}
@@ -2433,7 +2433,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			throws PersistenceException {
 		log.debug("move documents fom folder {} to folder {}", source, target);
 		DocumentManager manager = Context.get(DocumentManager.class);
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		List<Document> docs = docDao.findByFolder(source.getId(), null);
 		for (Document document : docs) {
 			DocumentHistory hist = new DocumentHistory();

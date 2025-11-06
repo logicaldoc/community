@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
@@ -21,6 +18,9 @@ import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.security.user.UserHistoryDAO;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for user history data.
@@ -38,7 +38,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		MenuDAO mDao = Context.get(MenuDAO.class);
+		MenuDAO mDao = MenuDAO.get();
 		boolean showSid = mDao.isReadAllowed(Menu.SESSIONS, session.getUserId());
 
 		Long userId = StringUtils.isNotEmpty(request.getParameter("id")) ? Long.parseLong(request.getParameter("id"))

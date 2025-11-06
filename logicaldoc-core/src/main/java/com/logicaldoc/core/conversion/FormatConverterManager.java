@@ -34,7 +34,6 @@ import com.logicaldoc.core.util.DocUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.annotation.Resource;
 
@@ -269,7 +268,7 @@ public class FormatConverterManager {
 			if (transaction != null) {
 				transaction.setEvent(DocumentEvent.CONVERTED);
 				transaction.setComment("format: " + FileUtil.getExtension(out.getName()));
-				DocumentDAO dao = Context.get(DocumentDAO.class);
+				DocumentDAO dao = DocumentDAO.get();
 				try {
 					dao.initialize(document);
 					dao.store(document, transaction);
@@ -324,10 +323,8 @@ public class FormatConverterManager {
 				history.setFileSize(in.length());
 				history.setComment(String.format("%s -> %s", inFilename, history.getFilename()));
 				history.setIp(session.getClient().getAddress());
-
-				UserHistoryDAO dao = Context.get(UserHistoryDAO.class);
 				try {
-					dao.store(history);
+					UserHistoryDAO.get().store(history);
 				} catch (PersistenceException e) {
 					log.warn(e.getMessage(), e);
 				}

@@ -4,11 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.FileUtils;
 import org.bouncycastle.cms.CMSException;
 import org.slf4j.Logger;
@@ -26,6 +21,11 @@ import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
+
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for the download of email attachments
@@ -52,8 +52,8 @@ public class DownloadAttachmentServlet extends HttpServlet {
 		try {
 			Session session = ServletUtil.validateSession(request);
 
-			DocumentDAO docDao = Context.get(DocumentDAO.class);
-			FolderDAO folderDao = Context.get(FolderDAO.class);
+			DocumentDAO docDao = DocumentDAO.get();
+			FolderDAO folderDao = FolderDAO.get();
 
 			long docId = Long.parseLong(request.getParameter("docId"));
 			String fileVersion = request.getParameter("fileVersion");

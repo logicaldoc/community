@@ -1,13 +1,13 @@
 package com.logicaldoc.core.document;
 
-import jakarta.annotation.Resource;
-
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.task.Task;
 import com.logicaldoc.core.task.TaskException;
+
+import jakarta.annotation.Resource;
 
 /**
  * This task generate all data needed by the tag cloud panel and the tags

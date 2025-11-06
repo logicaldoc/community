@@ -31,7 +31,7 @@ public abstract class AbstractFulltextTestCase extends AbstractWPTestCase {
 		super.setUp();
 
 		engine = Context.get(SearchEngine.class);
-		searchDao = Context.get(SearchDAO.class);
+		searchDao = SearchDAO.get();
 		try {
 			addHits();
 		} catch (Exception e) {
@@ -49,7 +49,7 @@ public abstract class AbstractFulltextTestCase extends AbstractWPTestCase {
 		Document document = documentDao.findById(1L);
 		documentDao.initialize(document);
 
-		TemplateDAO templateDao = Context.get(TemplateDAO.class);
+		TemplateDAO templateDao = TemplateDAO.get();
 		document.setTemplate(templateDao.findById(-1L));
 		document.setTemplateId(-1L);
 		document.setValue("source", "boh");

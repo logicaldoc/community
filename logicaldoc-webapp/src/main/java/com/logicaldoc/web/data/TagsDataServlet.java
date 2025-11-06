@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.folder.FolderDAO;
@@ -20,6 +17,9 @@ import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for document tags data.
@@ -76,7 +76,7 @@ public class TagsDataServlet extends AbstractDataServlet {
 	}
 
 	private void enrichMapWithFolderTags(Long folderId, HashMap<String, Long> tagsMap, List<String> words) throws PersistenceException {
-		FolderDAO fDao = Context.get(FolderDAO.class);
+		FolderDAO fDao = FolderDAO.get();
 		if (folderId != null) {
 			List<String> tags = fDao.findTags(folderId);
 
@@ -95,7 +95,7 @@ public class TagsDataServlet extends AbstractDataServlet {
 	private void enrichMapWithDocumentTags(Long docId, HashMap<String, Long> tagsMap, List<String> words)
 			throws PersistenceException {
 		if (docId != null) {
-			DocumentDAO docDao = Context.get(DocumentDAO.class);
+			DocumentDAO docDao = DocumentDAO.get();
 			List<String> tags = docDao.findTags(docId);
 
 			/*
@@ -113,13 +113,13 @@ public class TagsDataServlet extends AbstractDataServlet {
 	private HashMap<String, Long> buildTagsMap(Session session, String mode, String firstLetter, String editing)
 			throws PersistenceException {
 
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		HashMap<String, Long> tagsMap = new HashMap<>();
 
 		if (("preset".equals(firstLetter) || "preset".equals(mode)) && "true".equals(editing)) {
 			// We have to return the preset only, because the user is
 			// editing a document
-			GenericDAO gDao = Context.get(GenericDAO.class);
+			GenericDAO gDao = GenericDAO.get();
 			List<Generic> buf = gDao.findByTypeAndSubtype("tag", null, null, session.getTenantId());
 			for (Generic generic : buf)
 				tagsMap.put(generic.getSubtype(), 0L);

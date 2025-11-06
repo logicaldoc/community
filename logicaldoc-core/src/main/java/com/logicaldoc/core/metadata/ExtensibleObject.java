@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import jakarta.persistence.MappedSuperclass;
-
 import org.apache.commons.collections.CollectionUtils;
 
 import com.logicaldoc.core.PersistentObject;
+
+import jakarta.persistence.MappedSuperclass;
 
 /**
  * An extensible object is able to store an indeterminate number of attributes.

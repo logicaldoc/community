@@ -171,7 +171,7 @@ public class FulltextSearch extends Search {
 		StringBuilder hitsIdsCondition = new StringBuilder();
 		if (!hitsIds.isEmpty()) {
 			hitsIdsCondition.append(" and (");
-			FolderDAO fdao = Context.get(FolderDAO.class);
+			FolderDAO fdao = FolderDAO.get();
 			if (fdao.isOracle()) {
 				/*
 				 * In Oracle The limit of 1000 elements applies to sets of
@@ -252,7 +252,7 @@ public class FulltextSearch extends Search {
 
 		log.debug("Execute query {}", richQuery);
 
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 		try {
 			dao.query(richQuery.toString(), new HitMapper(hitsMap), null);
 		} catch (PersistenceException e) {
@@ -303,8 +303,7 @@ public class FulltextSearch extends Search {
 
 	private void setQueryFilters(FulltextSearchOptions opt, Set<String> filters, long tenantId,
 			Collection<Long> accessibleFolderIds) throws SearchException, PersistenceException {
-		TenantDAO tdao = Context.get(TenantDAO.class);
-		if (searchUser != null && tdao.count() > 1)
+		if (searchUser != null && TenantDAO.get().count() > 1)
 			filters.add(HitField.TENANT_ID + ":" + (tenantId < 0 ? "\\" : "") + tenantId);
 
 		if (opt.getTemplate() != null)
@@ -337,7 +336,7 @@ public class FulltextSearch extends Search {
 
 	private void appendFolderQueryFilter(FulltextSearchOptions opt, Set<String> filters,
 			Collection<Long> accessibleFolderIds) throws SearchException {
-		FolderDAO fdao = Context.get(FolderDAO.class);
+		FolderDAO fdao = FolderDAO.get();
 		try {
 			if (opt.getFolderId() != null && !accessibleFolderIds.contains(opt.getFolderId())
 					&& fdao.isReadAllowed(opt.getFolderId().longValue(), opt.getUserId()))

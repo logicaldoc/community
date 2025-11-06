@@ -6,9 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
-
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +19,9 @@ import com.logicaldoc.util.MimeType;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 
 /**
  * Manager class used to handle document thumbnails
@@ -151,7 +151,6 @@ public class ThumbnailManager {
 
 	protected void createImage(Document document, String fileVersion, int size, Integer quality, String suffix,
 			String sid) throws IOException {
-		TenantDAO tDao = Context.get(TenantDAO.class);
 
 		ThumbnailBuilder builder = getBuilder(document);
 		if (builder == null) {
@@ -169,7 +168,7 @@ public class ThumbnailManager {
 			builder.buildThumbnail(sid, document, fileVersion, src, dest, size,
 					quality != null ? quality
 							: Context.get().getProperties()
-									.getInt(tDao.getTenantName(document.getTenantId()) + ".gui.thumbnail.quality", 93));
+									.getInt(TenantDAO.get().getTenantName(document.getTenantId()) + ".gui.thumbnail.quality", 93));
 
 			// Put the resource
 			String resource = store.getResourceName(document, getSuitableFileVersion(document, fileVersion), suffix);

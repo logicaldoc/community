@@ -7,6 +7,7 @@ import java.util.Set;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.security.Permission;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * DAO for <code>DocumentNote</code> handling.
@@ -16,6 +17,15 @@ import com.logicaldoc.core.security.Permission;
  */
 public interface DocumentNoteDAO extends PersistentObjectDAO<DocumentNote> {
 
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static DocumentNoteDAO get() {
+		return Context.get(DocumentNoteDAO.class);
+	}
+	
 	/**
 	 * Stores a note and saves the document's history
 	 * 

@@ -244,7 +244,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		Session session = checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
 
 		try {
-			GenericDAO genericDao = Context.get(GenericDAO.class);
+			GenericDAO genericDao = GenericDAO.get();
 			int counter = 0;
 			ContextProperties conf = Context.get().getProperties();
 			for (GUIParameter setting : settings) {
@@ -319,7 +319,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 				throw new ServerException(
 						"You cannot delete the store " + storeId + " because it is the current default");
 
-			FolderDAO dao = Context.get(FolderDAO.class);
+			FolderDAO dao = FolderDAO.get();
 
 			/*
 			 * Search for those folders that refer this store
@@ -404,7 +404,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 		 */
 
 		try {
-			GenericDAO gDao = Context.get(GenericDAO.class);
+			GenericDAO gDao = GenericDAO.get();
 			List<Generic> generics = gDao.findByTypeAndSubtype(GUISETTING, null, null, session.getTenantId());
 			for (Generic gen : generics)
 				params.add(new GUIParameter(tenantName + "." + gen.getSubtype(), gen.getString1()));

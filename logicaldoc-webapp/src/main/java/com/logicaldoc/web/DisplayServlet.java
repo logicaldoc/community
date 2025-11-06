@@ -2,10 +2,6 @@ package com.logicaldoc.web;
 
 import java.io.IOException;
 
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +11,10 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is used to serve those requests for displaying details of a
@@ -59,10 +58,10 @@ public class DisplayServlet extends HttpServlet {
 			else if (StringUtils.isNotEmpty(folderId))
 				redirectUrl += FOLDER_ID + "=" + folderId;
 			else if (StringUtils.isNotEmpty(folderPath)) {
-				UserDAO uDao = Context.get(UserDAO.class);
+				UserDAO uDao = UserDAO.get();
 				User user = uDao.findByUsername(username);
 
-				FolderDAO fDao = Context.get(FolderDAO.class);
+				FolderDAO fDao = FolderDAO.get();
 				Folder folder = fDao.findByPathExtended(folderPath, user.getTenantId());
 				redirectUrl += FOLDER_ID + "=" + folder.getId();
 			}

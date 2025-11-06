@@ -20,7 +20,6 @@ import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * An Initializer performs the checks on a generic {@link ExtensibleObject}
@@ -89,7 +88,7 @@ public class Initializer {
 			// If an error happens here it means that the collection could not
 			// be loaded, so load the bean again and initialize it.
 			log.debug("Got error {} trying to reload the template {}", e.getMessage(), template.getId());
-			TemplateDAO tDao = Context.get(TemplateDAO.class);
+			TemplateDAO tDao = TemplateDAO.get();
 			try {
 				template = tDao.findById(template.getId());
 				tDao.initialize(template);
@@ -134,7 +133,7 @@ public class Initializer {
 	private void setUser(History transaction) {
 		User user = transaction != null && transaction.getUser() != null ? transaction.getUser() : null;
 		if (user == null && transaction != null && transaction.getUserId() != null) {
-			UserDAO uDao = Context.get(UserDAO.class);
+			UserDAO uDao = UserDAO.get();
 			try {
 				user = uDao.findById(transaction.getUserId());
 				transaction.setUser(user);

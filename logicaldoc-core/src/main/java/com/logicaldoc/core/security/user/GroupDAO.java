@@ -4,8 +4,19 @@ import java.util.Collection;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 public interface GroupDAO extends PersistentObjectDAO<Group> {
+	
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static GroupDAO get() {
+		return Context.get(GroupDAO.class);
+	}
+	
 	/**
 	 * This method persists a new group object. All permissions and extended
 	 * attributes of the parent group will be replicated.

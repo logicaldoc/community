@@ -13,7 +13,6 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.task.AbstractDocumentProcessor;
 import com.logicaldoc.core.task.DocumentProcessorCallable;
 import com.logicaldoc.core.task.DocumentProcessorStats;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * This task takes care of calculating the documents digest
@@ -60,7 +59,7 @@ public class DigestProcessor extends AbstractDocumentProcessor {
 
 			@Override
 			protected void processDocument(Document document, User user) throws PersistenceException, IOException {
-				Context.get(DocumentDAO.class).updateDigest(document);
+				DocumentDAO.get().updateDigest(document);
 				if (log.isDebugEnabled())
 					log.debug("Digested document {}: {}", document, StringUtils.abbreviate(document.getDigest(), 100));
 			}

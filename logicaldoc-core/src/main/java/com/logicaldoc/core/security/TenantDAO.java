@@ -4,8 +4,18 @@ import java.util.Set;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 public interface TenantDAO extends PersistentObjectDAO<Tenant> {
+
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static TenantDAO get() {
+		return Context.get(TenantDAO.class);
+	}
 
 	/**
 	 * Finds a tenant by name
@@ -14,7 +24,7 @@ public interface TenantDAO extends PersistentObjectDAO<Tenant> {
 	 * 
 	 * @return Wanted tenant or null
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 */
 	public Tenant findByName(String name) throws PersistenceException;
 

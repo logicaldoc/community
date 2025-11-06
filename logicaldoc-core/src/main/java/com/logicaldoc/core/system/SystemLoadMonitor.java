@@ -5,9 +5,6 @@ import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-import jakarta.annotation.Resource;
 import javax.management.MBeanServerConnection;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
@@ -17,6 +14,10 @@ import org.springframework.stereotype.Component;
 
 import com.logicaldoc.util.config.ContextProperties;
 import com.sun.management.OperatingSystemMXBean;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.annotation.Resource;
 
 /**
  * This class monitors the system load and notifies the listeners accordingly

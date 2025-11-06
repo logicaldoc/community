@@ -14,7 +14,6 @@ import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.VersionDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.util.io.ResourceUtil;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
 
 import jakarta.servlet.http.HttpServlet;
@@ -57,8 +56,8 @@ public class ConvertPdf extends HttpServlet {
 		try {
 			Session session = ServletUtil.validateSession(request);
 
-			DocumentDAO docDao = Context.get(DocumentDAO.class);
-			VersionDAO versionDao = Context.get(VersionDAO.class);
+			DocumentDAO docDao = DocumentDAO.get();
+			VersionDAO versionDao = VersionDAO.get();
 
 			long docId = Long.parseLong(request.getParameter(DOCUMENT_ID));
 			Document document = docDao.findById(docId);

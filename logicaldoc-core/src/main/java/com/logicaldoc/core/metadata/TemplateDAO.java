@@ -6,6 +6,7 @@ import java.util.Set;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.security.Permission;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This class is a DAO-service for document templates.
@@ -14,6 +15,16 @@ import com.logicaldoc.core.security.Permission;
  * @version 1.0
  */
 public interface TemplateDAO extends PersistentObjectDAO<Template> {
+	
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static TemplateDAO get() {
+		return Context.get(TemplateDAO.class);
+	}
+	
 	/**
 	 * This method finds a template by name
 	 * 

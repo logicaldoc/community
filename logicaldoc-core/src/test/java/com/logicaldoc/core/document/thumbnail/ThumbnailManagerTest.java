@@ -46,7 +46,7 @@ public class ThumbnailManagerTest extends AbstractCoreTestCase {
 
 		prepareSession("admin", "admin");
 
-		docDao = Context.get(DocumentDAO.class);
+		docDao = DocumentDAO.get();
 
 		store = Context.get(Store.class);
 

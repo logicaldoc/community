@@ -3,8 +3,6 @@ package com.logicaldoc.webservice.soap.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.jws.WebService;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -14,6 +12,8 @@ import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.model.WSTagCloud;
 import com.logicaldoc.webservice.soap.TagService;
+
+import jakarta.jws.WebService;
 
 /**
  * Tag Web Service client.

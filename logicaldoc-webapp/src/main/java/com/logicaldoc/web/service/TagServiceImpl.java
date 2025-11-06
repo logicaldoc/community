@@ -34,7 +34,7 @@ public class TagServiceImpl extends AbstractRemoteService implements TagService 
 		Session session = validateSession();
 		try {
 			ArrayList<GUITag> ret = new ArrayList<>();
-			DocumentDAO dao = Context.get(DocumentDAO.class);
+			DocumentDAO dao = DocumentDAO.get();
 			List<TagCloud> list = dao.getTagCloud(session.getSid());
 
 			for (TagCloud tagCloud : list) {

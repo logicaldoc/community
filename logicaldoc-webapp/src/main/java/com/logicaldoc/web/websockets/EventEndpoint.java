@@ -8,13 +8,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import jakarta.websocket.OnClose;
-import jakarta.websocket.OnError;
-import jakarta.websocket.OnMessage;
-import jakarta.websocket.OnOpen;
-import jakarta.websocket.Session;
-import jakarta.websocket.server.ServerEndpoint;
-
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +34,13 @@ import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.service.DocumentServiceImpl;
 import com.logicaldoc.web.service.FolderServiceImpl;
+
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnError;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.ServerEndpoint;
 
 /**
  * Websockets end-point to distribute events.
@@ -197,7 +197,7 @@ public class EventEndpoint implements EventListener {
 				document = new DocumentServiceImpl().fromDocument(clone, null, null);
 				document.setId(adh.getDocId());
 			} else if (adh.getDocId() != null) {
-				DocumentDAO docDao = Context.get(DocumentDAO.class);
+				DocumentDAO docDao = DocumentDAO.get();
 				Document d = docDao.findById(adh.getDocId());
 				if (d != null) {
 					document = new DocumentServiceImpl().fromDocument(d, null, null);

@@ -123,9 +123,7 @@ public class UserUtil {
 	 * @param avatarImageFile The image type(eg png, svg)
 	 */
 	public static void saveAvatar(User user, File avatarImageFile, String imageType) {
-		UserDAO userDao = Context.get(UserDAO.class);
-		TenantDAO tenantDao = Context.get(TenantDAO.class);
-
+		UserDAO userDao = UserDAO.get();
 		File tmpAvatarImage = null;
 		try {
 			userDao.initialize(user);
@@ -134,7 +132,7 @@ public class UserUtil {
 				user.setAvatar("data:image/svg+xml;base64," + ImageUtil.encode(avatarImageFile));
 			} else {
 				// In case of raster image we crop and resize
-				String tenantName = tenantDao.getTenantName(user.getTenantId());
+				String tenantName = TenantDAO.get().getTenantName(user.getTenantId());
 				int size = Context.get().getProperties().getInt(tenantName + ".gui.avatar.size", 128);
 				tmpAvatarImage = FileUtil.createTempFile(AVATAR, ".png");
 				BufferedImage avatar = ImageIO.read(avatarImageFile);
@@ -158,7 +156,7 @@ public class UserUtil {
 	 * @param user The user to elaborate
 	 */
 	public static void generateDefaultAvatar(User user) {
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 
 		File tmpAvatarImage = null;
 		try {
@@ -257,7 +255,7 @@ public class UserUtil {
 	public static String getAvatarImage(String userIdOrName) throws PersistenceException {
 		String content = TRANSPARENT_IMAGE;
 
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 		User user = null;
 		if (userIdOrName != null)
 			try {

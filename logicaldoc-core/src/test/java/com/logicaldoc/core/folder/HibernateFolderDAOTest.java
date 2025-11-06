@@ -74,11 +74,11 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateFolderDAO
-		testSubject = Context.get(FolderDAO.class);
-		userDao = Context.get(UserDAO.class);
-		docDao = Context.get(DocumentDAO.class);
-		historyDao = Context.get(FolderHistoryDAO.class);
-		templateDao = Context.get(TemplateDAO.class);
+		testSubject = FolderDAO.get();
+		userDao = UserDAO.get();
+		docDao = DocumentDAO.get();
+		historyDao = FolderHistoryDAO.get();
+		templateDao = TemplateDAO.get();
 		docManager = Context.get(DocumentManager.class);
 	}
 
@@ -1875,7 +1875,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTestCase {
 		// Without a template the OCR template also must be forced to null
 		assertNull(folder.getOcrTemplateId());
 
-		TemplateDAO tDao = Context.get(TemplateDAO.class);
+		TemplateDAO tDao = TemplateDAO.get();
 		folder = testSubject.findById(1200);
 		testSubject.initialize(folder);
 		folder.setTemplate(tDao.findById(1));

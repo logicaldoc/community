@@ -2,8 +2,8 @@ package com.logicaldoc.gui.frontend.client.system;
 
 import com.google.gwt.user.client.Timer;
 import com.logicaldoc.gui.common.client.CookiesManager;
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.DefaultAsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;

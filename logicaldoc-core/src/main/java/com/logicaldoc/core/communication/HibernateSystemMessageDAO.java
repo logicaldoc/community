@@ -20,7 +20,6 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserEvent;
 import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.core.security.user.UserHistoryDAO;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.transaction.Transactional;
@@ -181,8 +180,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 		 * message
 		 */
 		if (originalId == 0L && message.getType() == Message.TYPE_SYSTEM) {
-			UserHistoryDAO hDao = Context.get(UserHistoryDAO.class);
-			UserDAO uDao = Context.get(UserDAO.class);
+			UserDAO uDao = UserDAO.get();
 			for (Recipient rec : message.getRecipients()) {
 				if (rec.getType() == Recipient.TYPE_EMAIL)
 					continue;
@@ -202,7 +200,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 				if (author != null)
 					history.setAuthor(author.getFullName());
 
-				hDao.store(history);
+				UserHistoryDAO.get().store(history);
 			}
 		}
 	}

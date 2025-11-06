@@ -96,8 +96,8 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		super.setUp();
 
 		engine = Context.get(SearchEngine.class);
-		fdao = Context.get(FolderDAO.class);
-		ddao = Context.get(DocumentDAO.class);
+		fdao = FolderDAO.get();
+		ddao = DocumentDAO.get();
 
 		try {
 			addHits();
@@ -318,7 +318,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 
 	@Test
 	public void testGetAllVersions() throws PersistenceException {
-		VersionDAO vd = Context.get(VersionDAO.class);
+		VersionDAO vd = VersionDAO.get();
 		List<Version> versions = vd.findByDocId(1L);
 		assertEquals(2, versions.size());
 
@@ -330,7 +330,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 	public void testGetContentChanges() throws PersistenceException, ParseException {
 		Document document = ddao.findById(1L);
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		DocumentHistoryDAO dao = Context.get(DocumentHistoryDAO.class);
+		DocumentHistoryDAO dao = DocumentHistoryDAO.get();
 		DocumentHistory hist = new DocumentHistory();
 		hist.setEvent(DocumentEvent.STORED);
 		hist.setDate(df.parse("2019-15-12"));
@@ -354,7 +354,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 		dao.store(new DocumentHistory(hist));
 
 		Folder folder = fdao.findById(4L);
-		FolderHistoryDAO folderHistoryDao = Context.get(FolderHistoryDAO.class);
+		FolderHistoryDAO folderHistoryDao = FolderHistoryDAO.get();
 		FolderHistory folderHistory = new FolderHistory();
 		folderHistory.setEvent(FolderEvent.CREATED);
 		folderHistory.setDate(df.parse("2018-15-12"));

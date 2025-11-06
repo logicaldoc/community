@@ -105,7 +105,7 @@ public class LoginThrottle {
 		}
 
 		// Record the failed login attempt
-		UserDAO uDao = Context.get(UserDAO.class);
+		UserDAO uDao = UserDAO.get();
 		try {
 			User user = uDao.findByUsername(username);
 			if (user == null) {
@@ -149,7 +149,6 @@ public class LoginThrottle {
 	}
 
 	private static void checkIp(String ip) throws IPBlockedException {
-		SequenceDAO sDao = Context.get(SequenceDAO.class);
 		Calendar cal = Calendar.getInstance();
 
 		ContextProperties config = Context.get().getProperties();
@@ -158,7 +157,7 @@ public class LoginThrottle {
 
 		if (maxTrials > 0 && wait > 0) {
 			String counterName = LOGINFAIL_IP + ip;
-			Sequence seq = sDao.findByAlternateKey(counterName, 0L, Tenant.SYSTEM_ID);
+			Sequence seq = SequenceDAO.get().findByAlternateKey(counterName, 0L, Tenant.SYSTEM_ID);
 			if (seq != null) {
 				long count = seq.getValue();
 				if (count >= maxTrials) {
@@ -178,7 +177,6 @@ public class LoginThrottle {
 	}
 
 	private static void checkUsername(String username) throws UsernameBlockedException {
-		SequenceDAO sDao = Context.get(SequenceDAO.class);
 		Calendar cal = Calendar.getInstance();
 
 		ContextProperties config = Context.get().getProperties();
@@ -187,7 +185,7 @@ public class LoginThrottle {
 
 		if (maxTrials > 0 && wait > 0) {
 			String counterName = LOGINFAIL_USERNAME + username;
-			Sequence seq = sDao.findByAlternateKey(counterName, 0L, Tenant.SYSTEM_ID);
+			Sequence seq = SequenceDAO.get().findByAlternateKey(counterName, 0L, Tenant.SYSTEM_ID);
 			if (seq != null) {
 				long count = seq.getValue();
 				if (count >= maxTrials) {
@@ -213,7 +211,6 @@ public class LoginThrottle {
 		if (StringUtils.isEmpty(apikey))
 			return;
 
-		SequenceDAO sDao = Context.get(SequenceDAO.class);
 		Calendar cal = Calendar.getInstance();
 
 		ContextProperties config = Context.get().getProperties();
@@ -222,7 +219,7 @@ public class LoginThrottle {
 
 		if (maxTrials > 0 && wait > 0) {
 			String counterName = LOGINFAIL_APIKEY + apikey;
-			Sequence seq = sDao.findByAlternateKey(counterName, 0L, Tenant.SYSTEM_ID);
+			Sequence seq = SequenceDAO.get().findByAlternateKey(counterName, 0L, Tenant.SYSTEM_ID);
 			if (seq != null) {
 				long count = seq.getValue();
 				if (count >= maxTrials) {
@@ -244,7 +241,7 @@ public class LoginThrottle {
 	protected static void disableUser(String username) {
 		if (Context.get().getProperties().getBoolean("throttle.username.disableuser", false)) {
 			try {
-				UserDAO userDao = Context.get(UserDAO.class);
+				UserDAO userDao = UserDAO.get();
 				User user = userDao.findByUsername(username);
 				if (user != null && user.getEnabled() == 1) {
 					user.setEnabled(0);
@@ -277,7 +274,7 @@ public class LoginThrottle {
 					dictionary.put("date", date);
 					dictionary.put(Automation.LOCALE, user.getLocale());
 
-					MessageTemplateDAO templateDAO = Context.get(MessageTemplateDAO.class);
+					MessageTemplateDAO templateDAO = MessageTemplateDAO.get();
 					MessageTemplate template = templateDAO.findByNameAndLanguage("bfa.alert", user.getLanguage(),
 							Tenant.DEFAULT_ID);
 					if (template == null)
@@ -304,7 +301,7 @@ public class LoginThrottle {
 					recipient.setType(Recipient.TYPE_SYSTEM);
 					message.getRecipients().add(recipient);
 
-					SystemMessageDAO messageDAO = Context.get(SystemMessageDAO.class);
+					SystemMessageDAO messageDAO = SystemMessageDAO.get();
 					messageDAO.store(message);
 
 					/*
@@ -337,7 +334,7 @@ public class LoginThrottle {
 		List<User> recipients = new ArrayList<>();
 		String setting = Context.get().getProperties().getProperty("throttle.alert.recipients", "");
 		if (StringUtils.isNotEmpty(setting)) {
-			UserDAO uDao = Context.get(UserDAO.class);
+			UserDAO uDao = UserDAO.get();
 			String[] usernames = setting.split(",");
 			for (String username : usernames) {
 				User user = uDao.findByUsername(username);
@@ -352,8 +349,7 @@ public class LoginThrottle {
 
 	private static void deleteSequence(Sequence seq) {
 		try {
-			SequenceDAO sDao = Context.get(SequenceDAO.class);
-			sDao.delete(seq.getId());
+			SequenceDAO.get().delete(seq.getId());
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
 		}

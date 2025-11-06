@@ -98,9 +98,8 @@ public class EventCollector {
 
 		if (history instanceof AbstractDocumentHistory adh) {
 			if (adh.getDocId() != null && adh.getDocument() == null) {
-				DocumentDAO docDao = com.logicaldoc.util.spring.Context.get(DocumentDAO.class);
 				try {
-					adh.setDocument(docDao.findById(adh.getDocId()));
+					adh.setDocument(DocumentDAO.get().findById(adh.getDocId()));
 				} catch (PersistenceException e) {
 					log.error(e.getMessage(), e);
 				}

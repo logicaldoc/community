@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import jakarta.annotation.Resource;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +14,8 @@ import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.communication.EventCollector;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.util.config.ContextProperties;
-import com.logicaldoc.util.spring.Context;
+
+import jakarta.annotation.Resource;
 
 /**
  * Parent of all DAOs that handle histories
@@ -69,8 +68,7 @@ public abstract class HibernateHistoryDAO<T extends History> extends HibernatePe
 		if (HibernateHistoryDAO.tenantNames.containsKey(history.getTenantId()))
 			return HibernateHistoryDAO.tenantNames.get(history.getTenantId());
 
-		TenantDAO tenantDao = Context.get(TenantDAO.class);
-		String name = tenantDao.getTenantName(history.getTenantId());
+		String name = TenantDAO.get().getTenantName(history.getTenantId());
 		HibernateHistoryDAO.tenantNames.put(history.getTenantId(), name);
 		return name;
 	}

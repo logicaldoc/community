@@ -15,7 +15,6 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link HibernateDocumentLinkDAO}
@@ -33,10 +32,9 @@ public class HibernateDocumentLinkDAOTest extends AbstractCoreTestCase {
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		// Retrieve the instance under test from spring context. Make sure that
-		// it is an HibernateDocumentLinkDAO
-		testSubject = Context.get(DocumentLinkDAO.class);
-		docDao = Context.get(DocumentDAO.class);
+
+		testSubject = DocumentLinkDAO.get();
+		docDao = DocumentDAO.get();
 	}
 
 	@Test

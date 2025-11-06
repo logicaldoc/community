@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Instances of this class is a DAO-service for Contact business entities.
@@ -12,6 +13,15 @@ import com.logicaldoc.core.PersistentObjectDAO;
  * @since 6.8
  */
 public interface ContactDAO extends PersistentObjectDAO<Contact> {
+
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static ContactDAO get() {
+		return Context.get(ContactDAO.class);
+	}
 
 	/**
 	 * Finds the contacts of the specified user.

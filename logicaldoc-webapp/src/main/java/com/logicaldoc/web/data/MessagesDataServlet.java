@@ -6,15 +6,14 @@ import java.text.DateFormat;
 import java.util.List;
 import java.util.Locale;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.communication.Message;
 import com.logicaldoc.core.communication.SystemMessage;
 import com.logicaldoc.core.communication.SystemMessageDAO;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for messages data.
@@ -33,7 +32,7 @@ public class MessagesDataServlet extends AbstractDataServlet {
 		/*
 		 * Execute the Query
 		 */
-		SystemMessageDAO dao = Context.get(SystemMessageDAO.class);
+		SystemMessageDAO dao = SystemMessageDAO.get();
 		dao.deleteExpiredMessages(session.getUsername());
 
 		DateFormat df = getDateFormat();

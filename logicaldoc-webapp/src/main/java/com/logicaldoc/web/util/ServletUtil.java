@@ -114,7 +114,7 @@ public class ServletUtil {
 	}
 
 	private static void initializeUser(User user) {
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 		try {
 			userDao.initialize(user);
 		} catch (PersistenceException e) {
@@ -125,7 +125,7 @@ public class ServletUtil {
 	public static Session checkMenu(HttpServletRequest request, long menuId)
 			throws ServletException, InvalidSessionException {
 		Session session = validateSession(request);
-		MenuDAO dao = Context.get(MenuDAO.class);
+		MenuDAO dao = MenuDAO.get();
 		if (!dao.isReadAllowed(menuId, session.getUserId())) {
 			String message = "User " + session.getUsername() + " cannot access the menu " + menuId;
 			throw new ServletException(message);
@@ -148,7 +148,7 @@ public class ServletUtil {
 	public static Session checkEvenOneMenu(HttpServletRequest request, long... menuIds)
 			throws ServletException, InvalidSessionException {
 		Session session = validateSession(request);
-		MenuDAO dao = Context.get(MenuDAO.class);
+		MenuDAO dao = MenuDAO.get();
 		for (long menuId : menuIds) {
 			if (dao.isReadAllowed(menuId, session.getUserId()))
 				return session;
@@ -442,7 +442,7 @@ public class ServletUtil {
 			history.setSessionId(sid);
 		}
 
-		FolderDAO fdao = Context.get(FolderDAO.class);
+		FolderDAO fdao = FolderDAO.get();
 		history.setPath(fdao.computePathExtended(document.getFolder().getId()));
 		if ("preview".equals(request.getParameter("control")))
 			history.setEvent(DocumentEvent.VIEWED);
@@ -509,7 +509,7 @@ public class ServletUtil {
 	}
 
 	private static Document getDocument(long docId, User user) throws PersistenceException, FileNotFoundException {
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 		Document doc = dao.findById(docId);
 		if (doc == null || (user != null && !user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher")
 				&& !doc.isPublishing()))
@@ -645,7 +645,7 @@ public class ServletUtil {
 		response.setCharacterEncoding(StandardCharsets.UTF_8.displayName());
 
 		// get document
-		DocumentDAO ddao = Context.get(DocumentDAO.class);
+		DocumentDAO ddao = DocumentDAO.get();
 		Document doc = ddao.findById(docId);
 
 		if (doc == null) {
@@ -726,7 +726,7 @@ public class ServletUtil {
 	 */
 	public static void uploadDocumentResource(HttpServletRequest request, long docId, String suffix, String fileVersion,
 			String docVersion) throws PersistenceException, IOException {
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		Document doc = docDao.findById(docId);
 
 		String ver = docVersion;

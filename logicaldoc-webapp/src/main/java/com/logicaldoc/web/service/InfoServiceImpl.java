@@ -133,7 +133,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
 	private void setAttributes(GUIInfo info, String tenantName) {
 		TenantDAO tDAO = Context.get(TenantDAO.class);
-		AttributeSetDAO aDAO = Context.get(AttributeSetDAO.class);
+		AttributeSetDAO aDAO = AttributeSetDAO.get();
 		try {
 			Tenant tenant = tDAO.findByName(tenantName);
 			if (tenant == null) {
@@ -175,7 +175,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 			alerts.add(restartReminder);
 		} else {
 			// Check if the database is connected
-			UserDAO dao = Context.get(UserDAO.class);
+			UserDAO dao = UserDAO.get();
 			int test = -1;
 			try {
 				test = dao.queryForInt("select count(*) from ld_user");
@@ -301,7 +301,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 
 	private static void loadGUISettingsFromDB(GUITenant tenant, List<GUIValue> values) {
 		try {
-			GenericDAO dao = Context.get(GenericDAO.class);
+			GenericDAO dao = GenericDAO.get();
 			List<Generic> dbSettings = dao.findByTypeAndSubtype("guisetting", null, 0L, tenant.getId());
 			for (Generic generic : dbSettings)
 				values.add(new GUIValue(generic.getSubtype(), generic.getString1()));
@@ -374,7 +374,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 		log.debug("Requested info for session {}", session.getSid());
 
 		try {
-			SystemMessageDAO messageDao = Context.get(SystemMessageDAO.class);
+			SystemMessageDAO messageDao = SystemMessageDAO.get();
 			List<GUIParameter> parameters = new ArrayList<>();
 
 			GUIParameter messages = new GUIParameter("messages",

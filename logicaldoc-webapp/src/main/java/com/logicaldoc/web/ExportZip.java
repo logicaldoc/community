@@ -6,11 +6,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +20,12 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.transfer.ZipExport;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible of zip export
@@ -53,7 +52,7 @@ public class ExportZip extends HttpServlet {
 		try {
 			Session session = ServletUtil.validateSession(request);
 
-			FolderDAO folderDao = Context.get(FolderDAO.class);
+			FolderDAO folderDao = FolderDAO.get();
 
 			String folderId = request.getParameter("folderId");
 			if (folderId != null) {
@@ -117,7 +116,7 @@ public class ExportZip extends HttpServlet {
 	}
 
 	private String getExportName(String folderId) throws PersistenceException {
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		String exportName = "export";
 		if (folderId != null) {
 			Folder folder = folderDao.findById(Long.parseLong(folderId));
@@ -130,8 +129,8 @@ public class ExportZip extends HttpServlet {
 	}
 
 	private ArrayList<Long> getDocIds(HttpServletRequest request, Long userId) throws PersistenceException {
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
+		FolderDAO folderDao = FolderDAO.get();
 
 		ArrayList<Long> docIds = new ArrayList<>();
 		if (request.getParameterValues(DOC_ID) != null && request.getParameterValues(DOC_ID).length > 0) {

@@ -5,14 +5,13 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Locale;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.apikey.ApiKey;
 import com.logicaldoc.core.security.apikey.ApiKeyDAO;
-import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for templates data.
@@ -28,7 +27,7 @@ public class ApiKeysDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		ApiKeyDAO dao = Context.get(ApiKeyDAO.class);
+		ApiKeyDAO dao = ApiKeyDAO.get();
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");

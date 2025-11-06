@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * DAO service for bookmarks
@@ -12,7 +13,15 @@ import com.logicaldoc.core.PersistentObjectDAO;
  * @since 5.2
  */
 public interface BookmarkDAO extends PersistentObjectDAO<Bookmark> {
-
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static BookmarkDAO get() {
+		return Context.get(BookmarkDAO.class);
+	}
+	
 	/**
 	 * Finds all bookmarks for the given user id
 	 * 

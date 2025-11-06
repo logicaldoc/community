@@ -6,14 +6,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import jakarta.annotation.PostConstruct;
-
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.util.plugin.PluginRegistry;
+
+import jakarta.annotation.PostConstruct;
 
 /**
  * A manager for document listeners. It's internals are initialized from the

@@ -103,7 +103,7 @@ public class TicketDownload extends HttpServlet {
 				increaseDownloadCount(request, ticket, document);
 			}
 
-			Context.get(TicketDAO.class).store(ticket);
+			TicketDAO.get().store(ticket);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 
@@ -195,7 +195,7 @@ public class TicketDownload extends HttpServlet {
 	}
 
 	private Document getDocument(Ticket ticket) throws PersistenceException, IOException {
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		Document doc = docDao.findById(ticket.getDocId());
 		if (doc.getDocRef() != null)
 			doc = docDao.findById(doc.getDocRef());
@@ -205,7 +205,7 @@ public class TicketDownload extends HttpServlet {
 	}
 
 	private static Ticket getTicket(HttpServletRequest request) throws IOException {
-		TicketDAO tktDao = Context.get(TicketDAO.class);
+		TicketDAO tktDao = TicketDAO.get();
 		Ticket ticket = tktDao.findByTicketId(getTicketId(request));
 		if (ticket == null || ticket.getDocId() == 0)
 			throw new IOException("Unexisting ticket");
@@ -312,7 +312,7 @@ public class TicketDownload extends HttpServlet {
 		DocumentHistory history = new DocumentHistory();
 		history.setDocument(document);
 
-		FolderDAO fdao = Context.get(FolderDAO.class);
+		FolderDAO fdao = FolderDAO.get();
 		history.setPath(fdao.computePathExtended(document.getFolder().getId()));
 		history.setEvent(
 				isPreviewDownload(ticket, request, document) ? DocumentEvent.VIEWED : DocumentEvent.DOWNLOADED);
@@ -320,7 +320,7 @@ public class TicketDownload extends HttpServlet {
 		history.setFolderId(document.getFolder().getId());
 		history.setComment("Ticket " + ticket);
 
-		DocumentDAO ddao = Context.get(DocumentDAO.class);
+		DocumentDAO ddao = DocumentDAO.get();
 		try {
 			ddao.saveDocumentHistory(document, history);
 		} catch (PersistenceException e) {

@@ -16,7 +16,6 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.user.Group;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Search specialization for the Tag search.
@@ -31,7 +30,7 @@ public class TagSearch extends Search {
 
 	@Override
 	public void internalSearch() throws SearchException {
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 		try {
 			String query = prepareQuery();
 			hits.addAll(dao.query(query, new HitMapper(), options.getMaxHits()));
@@ -135,7 +134,7 @@ public class TagSearch extends Search {
 					" and A.ld_docref is not null and REF.ld_deleted=0 and A.ld_docref = REF.ld_id and A.ld_docref in ");
 		else
 			query.append(" and A.ld_docref is null and A.ld_id in ");
-		DocumentDAO docDAO = Context.get(DocumentDAO.class);
+		DocumentDAO docDAO = DocumentDAO.get();
 		List<Long> precoll = docDAO.findDocIdByUserIdAndTag(options.getUserId(), options.getExpression());
 		String buf = precoll.toString().replace("[", "(").replace("]", ")");
 		query.append(!"()".equals(buf) ? buf : "(0)");

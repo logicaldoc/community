@@ -64,7 +64,7 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		userDAO = Context.get(UserDAO.class);
+		userDAO = UserDAO.get();
 		groupDAO = Context.get(GroupDAO.class);
 	}
 
@@ -511,7 +511,7 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
 		String key = testSubject.createApiKey("Test");
 		assertNotNull(key);
 
-		ApiKeyDAO dao = Context.get(ApiKeyDAO.class);
+		ApiKeyDAO dao = ApiKeyDAO.get();
 		ApiKey apiKey = dao.findByKey(key);
 
 		// try to recreate with same name

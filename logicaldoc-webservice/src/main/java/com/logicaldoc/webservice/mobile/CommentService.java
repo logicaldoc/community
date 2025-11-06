@@ -5,15 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.FormParam;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Response;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +20,15 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.WebserviceException;
+
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Adds new comments on a document.
@@ -48,7 +48,7 @@ public class CommentService extends AbstractService {
 	String docid) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 
-		DocumentDAO ddao = Context.get(DocumentDAO.class);
+		DocumentDAO ddao = DocumentDAO.get();
 		Long docId = Long.parseLong(docid);
 		Document document = ddao.findById(docId);
 
@@ -85,7 +85,7 @@ public class CommentService extends AbstractService {
 
 	private boolean isWriteEnabled(User user, long docId) {
 		try {
-			DocumentDAO dao = Context.get(DocumentDAO.class);
+			DocumentDAO dao = DocumentDAO.get();
 			if (dao.isPermissionAllowed(Permission.WRITE, docId, user.getId())) {
 				return true;
 			}

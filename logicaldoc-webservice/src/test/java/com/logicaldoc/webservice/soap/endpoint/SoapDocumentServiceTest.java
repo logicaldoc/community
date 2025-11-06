@@ -69,8 +69,8 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		docDao = Context.get(DocumentDAO.class);
-		folderDao = Context.get(FolderDAO.class);
+		docDao = DocumentDAO.get();
+		folderDao = FolderDAO.get();
 
 		testSubject = new SoapDocumentService();
 		testSubject.setValidateSession(false);

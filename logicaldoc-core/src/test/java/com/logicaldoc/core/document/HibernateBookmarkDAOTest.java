@@ -18,7 +18,6 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link HibernateBookmarkDAOTest}
@@ -34,9 +33,8 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		// Retrieve the instance under test from spring context. Make sure that
-		// it is an HibernateDiscussionDAO
-		testSubject = Context.get(BookmarkDAO.class);
+		
+		testSubject = BookmarkDAO.get();
 	}
 
 	@Test
@@ -158,11 +156,11 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testFindByUserIdAndFolderId() throws PersistenceException {
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		Folder folder = folderDao.findById(6);
 		assertNotNull(folder);
 
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		Document doc = docDao.findById(1);
 		assertNotNull(doc);
 

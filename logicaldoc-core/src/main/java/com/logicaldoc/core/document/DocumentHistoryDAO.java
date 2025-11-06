@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * DAO for <code>DocumentHistory</code> handling.
@@ -14,6 +15,16 @@ import com.logicaldoc.core.PersistentObjectDAO;
  * @author Alessandro Gasparini - LogicalDOC
  */
 public interface DocumentHistoryDAO extends PersistentObjectDAO<DocumentHistory> {
+	
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static DocumentHistoryDAO get() {
+		return Context.get(DocumentHistoryDAO.class);
+	}
+	
 	/**
 	 * This method selects all histories of a given document.
 	 * 

@@ -62,7 +62,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 	@Override
 	public GUIUser getUser(String username) {
 		try {
-			UserDAO userDao = Context.get(UserDAO.class);
+			UserDAO userDao = UserDAO.get();
 			UserHistoryDAO userHistoryDao = Context.get(UserHistoryDAO.class);
 			TenantDAO tenantDao = Context.get(TenantDAO.class);
 
@@ -120,7 +120,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			ticket.setExpired(cal.getTime());
 
 			// Store the ticket
-			TicketDAO ticketDao = Context.get(TicketDAO.class);
+			TicketDAO ticketDao = TicketDAO.get();
 			ticketDao.store(ticket);
 
 			// Try to clean the DB from old tickets
@@ -163,7 +163,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 	}
 
 	private User pickUser(String username) throws ServerException {
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 		User user;
 		try {
 			user = userDao.getUser(username);
@@ -177,7 +177,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 	@Override
 	public boolean isSecretKeyRequired(String username, String deviceId) throws ServerException {
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 		User user;
 		try {
 			user = pickUser(username);
@@ -248,7 +248,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 	public List<GUIParameter> getLegalsToConfirm(String username) throws ServerException {
 		try {
 			List<GUIParameter> legals = new ArrayList<>();
-			UserDAO userDao = Context.get(UserDAO.class);
+			UserDAO userDao = UserDAO.get();
 			userDao.queryForResultSet(
 					"select ld_name, ld_title from ld_legal where not exists (select * from ld_legal_confirmation where ld_username = :username and ld_legal=ld_name) order by ld_sort",
 					Map.of("username", username), null, rows -> {
@@ -263,7 +263,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 	@Override
 	public void confirmLegal(String username, String legal) throws ServerException {
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 		User user;
 		// Record the confirmation
 		try {

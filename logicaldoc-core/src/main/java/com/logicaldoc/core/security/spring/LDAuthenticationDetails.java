@@ -1,10 +1,10 @@
 package com.logicaldoc.core.security.spring;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang.StringUtils;
 import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Our customization of an <code>AuthenticationDetails</code> used to extract a

@@ -2,8 +2,6 @@ package com.logicaldoc.webservice.soap.client;
 
 import java.util.List;
 
-import jakarta.jws.WebService;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -11,6 +9,8 @@ import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSBookmark;
 import com.logicaldoc.webservice.soap.BookmarkService;
+
+import jakarta.jws.WebService;
 
 /**
  * Bookmark Web Service client.

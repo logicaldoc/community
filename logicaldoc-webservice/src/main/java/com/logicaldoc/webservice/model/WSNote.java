@@ -2,10 +2,10 @@ package com.logicaldoc.webservice.model;
 
 import java.util.Date;
 
-import jakarta.xml.bind.annotation.XmlType;
-
 import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.webservice.doc.WSDoc;
+
+import jakarta.xml.bind.annotation.XmlType;
 
 /**
  * Web Service Note.

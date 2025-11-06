@@ -42,7 +42,6 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Implementation of the TemplateService
@@ -61,7 +60,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		Session session = validateSession();
 
 		try {
-			TemplateDAO dao = Context.get(TemplateDAO.class);
+			TemplateDAO dao = TemplateDAO.get();
 			Template template = dao.findById(templateId);
 			if (template == null)
 				return;
@@ -77,7 +76,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 	private void deleteTemplate(long templateId) throws ServerException {
 		try {
-			TemplateDAO dao = Context.get(TemplateDAO.class);
+			TemplateDAO dao = TemplateDAO.get();
 			dao.delete(templateId);
 		} catch (Exception e) {
 			throw new ServerException("Template has not been deleted", e);
@@ -88,7 +87,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 	public long countDocuments(long templateId) throws ServerException {
 		Session session = validateSession();
 
-		TemplateDAO dao = Context.get(TemplateDAO.class);
+		TemplateDAO dao = TemplateDAO.get();
 		try {
 			return dao.countDocs(templateId);
 		} catch (Exception e) {
@@ -124,7 +123,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 	private void store(Template template) throws ServerException {
 		try {
-			TemplateDAO dao = Context.get(TemplateDAO.class);
+			TemplateDAO dao = TemplateDAO.get();
 			dao.store(template);
 		} catch (Exception e) {
 			throw new ServerException(
@@ -135,7 +134,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 	@Override
 	public GUITemplate clone(long templateId, String cloneName) throws ServerException {
 		try {
-			TemplateDAO dao = Context.get(TemplateDAO.class);
+			TemplateDAO dao = TemplateDAO.get();
 			Template clone = dao.clone(templateId, cloneName);
 			return getTemplate(clone.getId());
 		} catch (Exception e) {
@@ -192,7 +191,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 	private Template getTemplate(GUITemplate guiTemplate, Session session, User sessionUser)
 			throws PersistenceException, ServerException {
-		TemplateDAO dao = Context.get(TemplateDAO.class);
+		TemplateDAO dao = TemplateDAO.get();
 		Template template;
 		if (guiTemplate.getId() != 0) {
 			template = dao.findById(guiTemplate.getId());
@@ -227,7 +226,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 	}
 
 	private void saveACL(Template template, GUITemplate guiTemplate, Session session, User sessionUser) {
-		TemplateDAO dao = Context.get(TemplateDAO.class);
+		TemplateDAO dao = TemplateDAO.get();
 		if ((template.getReadonly() == 1 || !dao.isWriteEnable(template.getId(), session.getUserId()))
 				&& !sessionUser.isAdmin())
 			return;
@@ -247,7 +246,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		Session session = validateSession();
 
 		try {
-			TemplateDAO dao = Context.get(TemplateDAO.class);
+			TemplateDAO dao = TemplateDAO.get();
 			Template template = dao.findById(templateId);
 			if (template == null)
 				return null;
@@ -272,14 +271,14 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		guiTemplate.setReadonly(template.getReadonly() == 1);
 		guiTemplate.setType(template.getType());
 
-		TemplateDAO dao = Context.get(TemplateDAO.class);
+		TemplateDAO dao = TemplateDAO.get();
 		Set<Permission> permissions = dao.getAllowedPermissions(templateId, session.getUserId());
 		List<String> permissionsList = new ArrayList<>();
 		for (Permission permission : permissions)
 			permissionsList.add(permission.toString());
 		guiTemplate.setPermissions(permissionsList);
 
-		AttributeSetDAO setDao = Context.get(AttributeSetDAO.class);
+		AttributeSetDAO setDao = AttributeSetDAO.get();
 		Map<Long, AttributeSet> sets = setDao.load(template.getTenantId());
 
 		toGuiAttributes(template, guiTemplate, sets);
@@ -358,7 +357,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 		}
 
 		try {
-			TemplateDAO templateDao = Context.get(TemplateDAO.class);
+			TemplateDAO templateDao = TemplateDAO.get();
 			Template template = templateDao.findById(templateId);
 			templateDao.initialize(template);
 
@@ -403,7 +402,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 
 		template = initializeTemplateAttributes(template);
 
-		AttributeSetDAO setDao = Context.get(AttributeSetDAO.class);
+		AttributeSetDAO setDao = AttributeSetDAO.get();
 		Map<String, Attribute> attrs = template.getAttributes();
 		if (attrs == null || attrs.isEmpty())
 			return attributes;
@@ -443,7 +442,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 				// If an error happens here it means that the collection could
 				// not be loaded, so load the bean again and initialize it.
 				log.debug("Got error {} trying to reload the template {}", e.getMessage(), template.getId());
-				TemplateDAO tDao = Context.get(TemplateDAO.class);
+				TemplateDAO tDao = TemplateDAO.get();
 				try {
 					template = tDao.findById(template.getId());
 					tDao.initialize(template);
@@ -598,12 +597,12 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 			throws PersistenceException {
 		Template currentTemplate = null;
 		if (extensibleObject instanceof Document) {
-			DocumentDAO docDao = Context.get(DocumentDAO.class);
+			DocumentDAO docDao = DocumentDAO.get();
 			Document doc = docDao.findDocument(extensibleObject.getId());
 			if (doc != null)
 				currentTemplate = doc.getTemplate();
 		} else if (extensibleObject instanceof Folder) {
-			FolderDAO foldDao = Context.get(FolderDAO.class);
+			FolderDAO foldDao = FolderDAO.get();
 			Folder folder = foldDao.findFolder(extensibleObject.getId());
 			if (folder != null)
 				currentTemplate = folder.getTemplate();

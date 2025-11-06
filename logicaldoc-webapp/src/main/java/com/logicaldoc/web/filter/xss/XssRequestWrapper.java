@@ -2,10 +2,10 @@ package com.logicaldoc.web.filter.xss;
 
 import java.util.regex.Pattern;
 
+import org.owasp.esapi.ESAPI;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
-
-import org.owasp.esapi.ESAPI;
 
 /**
  * This wrapper implements the checks for avoiding the Cross Site Scripting

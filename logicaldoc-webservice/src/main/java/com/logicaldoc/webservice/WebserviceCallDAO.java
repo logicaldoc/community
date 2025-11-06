@@ -2,6 +2,7 @@ package com.logicaldoc.webservice;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * DAO for {@link WebserviceCall} handling.
@@ -11,6 +12,15 @@ import com.logicaldoc.core.PersistentObjectDAO;
  */
 public interface WebserviceCallDAO extends PersistentObjectDAO<WebserviceCall> {
 
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static WebserviceCallDAO get() {
+		return Context.get(WebserviceCallDAO.class);
+	}
+	
 	/**
 	 * This method deletes all the chat entries oldest than the given days from
 	 * now. If <code>ttl</code> is 0 or -1, the cancellation is not made

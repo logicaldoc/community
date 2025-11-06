@@ -12,7 +12,6 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * A callable to provide for processing a segment of documents
@@ -61,7 +60,7 @@ public abstract class DocumentProcessorCallable<T extends DocumentProcessorStats
 	@Override
 	public T call() throws Exception {
 		User user = loadUser();
-		DocumentDAO documentDao = Context.get(DocumentDAO.class);
+		DocumentDAO documentDao = DocumentDAO.get();
 		for (Long id : docIds) {
 			log.debug("Process document {}", id);
 
@@ -88,9 +87,9 @@ public abstract class DocumentProcessorCallable<T extends DocumentProcessorStats
 	}
 
 	private User loadUser() throws PersistenceException {
-		User user = Context.get(UserDAO.class).findByUsername(getDefaultUser());
+		User user = UserDAO.get().findByUsername(getDefaultUser());
 		if (user == null)
-			user = Context.get(UserDAO.class).findByUsername("_system");
+			user = UserDAO.get().findByUsername("_system");
 		return user;
 	}
 

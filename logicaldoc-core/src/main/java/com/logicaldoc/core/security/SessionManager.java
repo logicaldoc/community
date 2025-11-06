@@ -80,6 +80,11 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		log.info("Starting the session timeout watchdog");
 	}
 
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
 	public static final SessionManager get() {
 		return Context.get(SessionManager.class);
 	}

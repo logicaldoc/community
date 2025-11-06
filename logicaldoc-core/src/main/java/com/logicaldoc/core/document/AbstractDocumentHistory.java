@@ -8,7 +8,6 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.history.History;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
@@ -198,7 +197,7 @@ public abstract class AbstractDocumentHistory extends History {
 
 			if (StringUtils.isEmpty(getPath()))
 				try {
-					setPath(Context.get(FolderDAO.class).computePathExtended(getFolderId()));
+					setPath(FolderDAO.get().computePathExtended(getFolderId()));
 				} catch (PersistenceException e) {
 					log.warn("Cannot calculate path of folder {}", getFolderId());
 				}

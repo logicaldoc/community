@@ -7,9 +7,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import jakarta.activation.DataHandler;
-import jakarta.ws.rs.core.Response;
-
 import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;
 import org.junit.Test;
 
@@ -19,6 +16,9 @@ import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.WebserviceException;
+
+import jakarta.activation.DataHandler;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Test case for <code>SoapDocumentService</code>

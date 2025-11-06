@@ -2,18 +2,18 @@ package com.logicaldoc.webservice.rest;
 
 import java.util.List;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.webservice.WebserviceException;
+import com.logicaldoc.webservice.model.WSParameter;
+import com.logicaldoc.webservice.model.WSSystemInfo;
+
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-
-import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.security.authentication.AuthenticationException;
-import com.logicaldoc.webservice.WebserviceException;
-import com.logicaldoc.webservice.model.WSParameter;
-import com.logicaldoc.webservice.model.WSSystemInfo;
 
 /**
  * System Web Service definition interface for REST.

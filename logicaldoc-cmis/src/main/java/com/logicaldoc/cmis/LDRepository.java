@@ -231,14 +231,14 @@ public class LDRepository {
 		if (root == null)
 			throw new IllegalArgumentException("Invalid root folder!");
 
-		userDao = Context.get(UserDAO.class);
-		folderDao = Context.get(FolderDAO.class);
-		documentDao = Context.get(DocumentDAO.class);
-		documentManager = Context.get(DocumentManager.class);
-		templateDao = Context.get(TemplateDAO.class);
-		versionDao = Context.get(VersionDAO.class);
-		historyDao = Context.get(DocumentHistoryDAO.class);
-		folderHistoryDao = Context.get(FolderHistoryDAO.class);
+		userDao = UserDAO.get();
+		folderDao = FolderDAO.get();
+		documentDao = DocumentDAO.get();
+		documentManager = DocumentManager.get();
+		templateDao = TemplateDAO.get();
+		versionDao = VersionDAO.get();
+		historyDao = DocumentHistoryDAO.get();
+		folderHistoryDao = FolderHistoryDAO.get();
 
 		ContextProperties config = Context.get().getProperties();
 
@@ -1242,8 +1242,7 @@ public class LDRepository {
 
 	private void saveHistory(DocumentHistory transaction) {
 		try {
-			DocumentHistoryDAO historyDAO = Context.get(DocumentHistoryDAO.class);
-			historyDAO.store(transaction);
+			DocumentHistoryDAO.get().store(transaction);
 		} catch (PersistenceException t) {
 			log.warn(t.getMessage(), t);
 		}
@@ -1517,7 +1516,7 @@ public class LDRepository {
 		String filename = expr;
 		log.debug("filename: {}", filename);
 
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		List<Document> docs = docDao.findByFileNameAndParentFolderId(null, filename, null, getSessionUser().getId(),
 				maxItems);
 
@@ -1647,7 +1646,7 @@ public class LDRepository {
 	}
 
 	private void checkReadEnable(User user, long folderId) throws PermissionException, PersistenceException {
-		FolderDAO dao = Context.get(FolderDAO.class);
+		FolderDAO dao = FolderDAO.get();
 		if (!dao.isReadAllowed(folderId, user.getId())) {
 			String message = "User " + user.getUsername() + " doesn't have read permission on folder " + folderId;
 			log.error(message);
@@ -1899,7 +1898,7 @@ public class LDRepository {
 					checkoutUser != null ? checkoutUser.getFullName() : null);
 			addPropertyString(result, typeId, filter, PropertyIds.VERSION_SERIES_CHECKED_OUT_ID, getId(doc));
 		}
-		
+
 		addPropertyString(result, typeId, filter, PropertyIds.CHECKIN_COMMENT, doc.getComment());
 		addPropertyInteger(result, typeId, filter, PropertyIds.CONTENT_STREAM_LENGTH, doc.getFileSize());
 		objectInfo.setHasContent(true);
@@ -1969,23 +1968,23 @@ public class LDRepository {
 			String stringValue = null;
 			if (attribute.getValue() != null)
 				switch (attribute.getType()) {
-				case Attribute.TYPE_BOOLEAN:
-					stringValue = Long.toString(attribute.getIntValue());
-					break;
-				case Attribute.TYPE_DATE:
-					stringValue = df.format(attribute.getDateValue());
-					break;
-				case Attribute.TYPE_DOUBLE:
-					stringValue = attribute.getDoubleValue() != null ? attribute.getDoubleValue().toString() : null;
-					break;
-				case Attribute.TYPE_INT:
-					stringValue = Long.toString(attribute.getIntValue());
-					break;
-				case Attribute.TYPE_USER:
-					stringValue = Long.toString(attribute.getIntValue());
-					break;
-				default:
-					stringValue = attribute.getValue().toString();
+					case Attribute.TYPE_BOOLEAN:
+						stringValue = Long.toString(attribute.getIntValue());
+						break;
+					case Attribute.TYPE_DATE:
+						stringValue = df.format(attribute.getDateValue());
+						break;
+					case Attribute.TYPE_DOUBLE:
+						stringValue = attribute.getDoubleValue() != null ? attribute.getDoubleValue().toString() : null;
+						break;
+					case Attribute.TYPE_INT:
+						stringValue = Long.toString(attribute.getIntValue());
+						break;
+					case Attribute.TYPE_USER:
+						stringValue = Long.toString(attribute.getIntValue());
+						break;
+					default:
+						stringValue = attribute.getValue().toString();
 				}
 			addPropertyString(result, typeId, filter, TypeManager.PROP_EXT + attrName, stringValue);
 		}
@@ -2182,27 +2181,27 @@ public class LDRepository {
 		Attribute attribute = template.getAttribute(attributeName);
 
 		switch (attribute.getType()) {
-		case Attribute.TYPE_BOOLEAN:
-			updateDocumentBooleanValue(doc, attributeName, stringValue);
-			break;
-		case Attribute.TYPE_DATE:
-			updateDocumentDateValue(doc, attributeName, stringValue);
-			break;
-		case Attribute.TYPE_DOUBLE:
-			updateDocumentDoubleValue(doc, attributeName, stringValue);
-			break;
-		case Attribute.TYPE_INT:
-			updateDocumentIntValue(doc, attributeName, stringValue);
-			break;
-		case Attribute.TYPE_USER:
-			updateDocumentUserValue(doc, attributeName, stringValue);
-			break;
-		case Attribute.TYPE_STRING:
-			doc.setValue(attributeName, stringValue);
-			break;
-		default:
-			// nothing to do here
-			break;
+			case Attribute.TYPE_BOOLEAN:
+				updateDocumentBooleanValue(doc, attributeName, stringValue);
+				break;
+			case Attribute.TYPE_DATE:
+				updateDocumentDateValue(doc, attributeName, stringValue);
+				break;
+			case Attribute.TYPE_DOUBLE:
+				updateDocumentDoubleValue(doc, attributeName, stringValue);
+				break;
+			case Attribute.TYPE_INT:
+				updateDocumentIntValue(doc, attributeName, stringValue);
+				break;
+			case Attribute.TYPE_USER:
+				updateDocumentUserValue(doc, attributeName, stringValue);
+				break;
+			case Attribute.TYPE_STRING:
+				doc.setValue(attributeName, stringValue);
+				break;
+			default:
+				// nothing to do here
+				break;
 		}
 	}
 
@@ -2490,49 +2489,49 @@ public class LDRepository {
 		List<?> defaultValue = propDef.getDefaultValue();
 		if ((defaultValue != null) && (!defaultValue.isEmpty())) {
 			switch (propDef.getPropertyType()) {
-			case BOOLEAN:
-				PropertyBooleanImpl p = new PropertyBooleanImpl(propDef.getId(), (List<Boolean>) defaultValue);
-				p.setQueryName(propDef.getId());
-				props.addProperty(p);
-				break;
-			case DATETIME:
-				PropertyDateTimeImpl p1 = new PropertyDateTimeImpl(propDef.getId(),
-						(List<GregorianCalendar>) defaultValue);
-				p1.setQueryName(propDef.getId());
-				props.addProperty(p1);
-				break;
-			case DECIMAL:
-				PropertyDecimalImpl p3 = new PropertyDecimalImpl(propDef.getId(), (List<BigDecimal>) defaultValue);
-				p3.setQueryName(propDef.getId());
-				props.addProperty(p3);
-				break;
-			case HTML:
-				PropertyHtmlImpl p4 = new PropertyHtmlImpl(propDef.getId(), (List<String>) defaultValue);
-				p4.setQueryName(propDef.getId());
-				props.addProperty(p4);
-				break;
-			case ID:
-				PropertyIdImpl p5 = new PropertyIdImpl(propDef.getId(), (List<String>) defaultValue);
-				p5.setQueryName(propDef.getId());
-				props.addProperty(p5);
-				break;
-			case INTEGER:
-				PropertyIntegerImpl p6 = new PropertyIntegerImpl(propDef.getId(), (List<BigInteger>) defaultValue);
-				p6.setQueryName(propDef.getId());
-				props.addProperty(p6);
-				break;
-			case STRING:
-				PropertyStringImpl p7 = new PropertyStringImpl(propDef.getId(), (List<String>) defaultValue);
-				p7.setQueryName(propDef.getId());
-				props.addProperty(p7);
-				break;
-			case URI:
-				PropertyUriImpl p8 = new PropertyUriImpl(propDef.getId(), (List<String>) defaultValue);
-				p8.setQueryName(propDef.getId());
-				props.addProperty(p8);
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown datatype! Spec change?");
+				case BOOLEAN:
+					PropertyBooleanImpl p = new PropertyBooleanImpl(propDef.getId(), (List<Boolean>) defaultValue);
+					p.setQueryName(propDef.getId());
+					props.addProperty(p);
+					break;
+				case DATETIME:
+					PropertyDateTimeImpl p1 = new PropertyDateTimeImpl(propDef.getId(),
+							(List<GregorianCalendar>) defaultValue);
+					p1.setQueryName(propDef.getId());
+					props.addProperty(p1);
+					break;
+				case DECIMAL:
+					PropertyDecimalImpl p3 = new PropertyDecimalImpl(propDef.getId(), (List<BigDecimal>) defaultValue);
+					p3.setQueryName(propDef.getId());
+					props.addProperty(p3);
+					break;
+				case HTML:
+					PropertyHtmlImpl p4 = new PropertyHtmlImpl(propDef.getId(), (List<String>) defaultValue);
+					p4.setQueryName(propDef.getId());
+					props.addProperty(p4);
+					break;
+				case ID:
+					PropertyIdImpl p5 = new PropertyIdImpl(propDef.getId(), (List<String>) defaultValue);
+					p5.setQueryName(propDef.getId());
+					props.addProperty(p5);
+					break;
+				case INTEGER:
+					PropertyIntegerImpl p6 = new PropertyIntegerImpl(propDef.getId(), (List<BigInteger>) defaultValue);
+					p6.setQueryName(propDef.getId());
+					props.addProperty(p6);
+					break;
+				case STRING:
+					PropertyStringImpl p7 = new PropertyStringImpl(propDef.getId(), (List<String>) defaultValue);
+					p7.setQueryName(propDef.getId());
+					props.addProperty(p7);
+					break;
+				case URI:
+					PropertyUriImpl p8 = new PropertyUriImpl(propDef.getId(), (List<String>) defaultValue);
+					p8.setQueryName(propDef.getId());
+					props.addProperty(p8);
+					break;
+				default:
+					throw new IllegalArgumentException("Unknown datatype! Spec change?");
 			}
 
 			return true;

@@ -22,7 +22,6 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test Case for {@link DocumentComparator}
@@ -43,8 +42,8 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDocumentDAO
-		testSubject = Context.get(DocumentDAO.class);
-		folderDao = Context.get(FolderDAO.class);
+		testSubject = DocumentDAO.get();
+		folderDao = FolderDAO.get();
 	}
 
 	@Test
@@ -313,7 +312,7 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testTemplateNameSort() throws PersistenceException {
-		TemplateDAO templateDao = Context.get(TemplateDAO.class);
+		TemplateDAO templateDao = TemplateDAO.get();
 
 		Template template1 = new Template();
 		template1.setName("template1");
@@ -372,7 +371,7 @@ public class DocumentComparatorTest extends AbstractCoreTestCase {
 
 		Comparator<AbstractDocument> comparator = DocumentComparator.getComparator("ext_customAttr asc");
 
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 
 		Document doc1 = new Document();
 		doc1.setFileName("document1");

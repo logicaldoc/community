@@ -21,7 +21,6 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link DocumentNoteDAO}
@@ -42,12 +41,11 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTestCase {
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		// Retrieve the instance under test from spring context. Make sure that
-		// it is an HibernateDocumentNoteDAO
-		testSubject = Context.get(DocumentNoteDAO.class);
-		folderDao = Context.get(FolderDAO.class);
-		docDao = Context.get(DocumentDAO.class);
-		historyDao = Context.get(DocumentHistoryDAO.class);
+
+		testSubject = DocumentNoteDAO.get();
+		folderDao = FolderDAO.get();
+		docDao = DocumentDAO.get();
+		historyDao = DocumentHistoryDAO.get();
 	}
 
 	@Test

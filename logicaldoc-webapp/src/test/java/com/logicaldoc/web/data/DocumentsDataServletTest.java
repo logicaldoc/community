@@ -12,7 +12,6 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.util.servlet.MockServletRequest;
 import com.logicaldoc.util.servlet.MockServletResponse;
-import com.logicaldoc.util.spring.Context;
 
 public class DocumentsDataServletTest extends AbstractDataServletTestCase {
 
@@ -77,7 +76,7 @@ public class DocumentsDataServletTest extends AbstractDataServletTestCase {
 
 	@Test
 	public void testServiceWithLastNote() throws Exception {
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 		Document doc = dao.findById(1L);
 		assertNotNull(doc);
 

@@ -6,9 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
-import jakarta.activation.DataHandler;
-import jakarta.ws.rs.core.MediaType;
-
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.AttachmentBuilder;
@@ -23,6 +20,9 @@ import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSNote;
 import com.logicaldoc.webservice.model.WSRating;
 import com.logicaldoc.webservice.rest.DocumentService;
+
+import jakarta.activation.DataHandler;
+import jakarta.ws.rs.core.MediaType;
 
 public class RestDocumentClient extends AbstractRestClient<DocumentService> {
 

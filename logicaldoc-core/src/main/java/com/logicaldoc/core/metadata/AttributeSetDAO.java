@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This class is a DAO-service for attribute sets.
@@ -14,6 +15,15 @@ import com.logicaldoc.core.PersistentObjectDAO;
  */
 public interface AttributeSetDAO extends PersistentObjectDAO<AttributeSet> {
 
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static AttributeSetDAO get() {
+		return Context.get(AttributeSetDAO.class);
+	}
+	
 	/**
 	 * This method finds a attribute set by name
 	 * 

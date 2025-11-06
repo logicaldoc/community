@@ -15,7 +15,6 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.util.UserUtil;
 import com.logicaldoc.util.MimeType;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
 
 import jakarta.servlet.ServletException;
@@ -64,7 +63,7 @@ public class AvatarServlet extends HttpServlet {
 			String content = UserUtil.getAvatarImage(id);
 
 			if (StringUtils.isEmpty(content)) {
-				User user = Context.get(UserDAO.class).findById(Long.parseLong(id));
+				User user = UserDAO.get().findById(Long.parseLong(id));
 				UserUtil.generateDefaultAvatar(user);
 				content = user.getAvatar();
 			}

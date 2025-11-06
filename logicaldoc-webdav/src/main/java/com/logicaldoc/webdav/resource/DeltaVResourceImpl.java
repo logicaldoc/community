@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.jackrabbit.webdav.DavCompliance;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -26,6 +24,8 @@ import org.apache.jackrabbit.webdav.version.report.SupportedReportSetProperty;
 
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.session.WebdavSession;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * For more informations, please visit

@@ -1,8 +1,8 @@
 package com.logicaldoc.core.security.spring;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Our customization of an <code>AuthenticationDetailsSource</code> used to

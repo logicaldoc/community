@@ -8,12 +8,12 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import jakarta.xml.bind.annotation.XmlSeeAlso;
-import jakarta.xml.bind.annotation.XmlType;
-
 import com.logicaldoc.webservice.doc.model.JavaLanguageVariable;
 import com.logicaldoc.webservice.doc.model.Stub;
 import com.logicaldoc.webservice.doc.model.StubTypeTree;
+
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
 
 /**
  * Convert java language variables to stubs

@@ -31,7 +31,7 @@ public class PathCalculatorTest extends AbstractCoreTestCase {
 		super.setUp();
 
 		testSubject = Context.get(PathCalculator.class);
-		folderDao = Context.get(FolderDAO.class);
+		folderDao = FolderDAO.get();
 	}
 
 	@Test

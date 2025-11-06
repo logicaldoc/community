@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * DAO for {@link ApiKey} handling.
@@ -14,6 +15,15 @@ import com.logicaldoc.core.PersistentObjectDAO;
  */
 public interface ApiKeyDAO extends PersistentObjectDAO<ApiKey> {
 
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static ApiKeyDAO get() {
+		return Context.get(ApiKeyDAO.class);
+	}
+	
 	/**
 	 * Finds the user's ApiKey with a given name
 	 * 

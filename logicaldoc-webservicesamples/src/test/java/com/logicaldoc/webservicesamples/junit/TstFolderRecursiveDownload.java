@@ -5,8 +5,6 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import jakarta.activation.DataHandler;
-
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -16,6 +14,8 @@ import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.soap.client.SoapDocumentClient;
 import com.logicaldoc.webservice.soap.client.SoapFolderClient;
+
+import jakarta.activation.DataHandler;
 
 public class TstFolderRecursiveDownload extends BaseTestCase {
 

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.security.Client;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * DAO for <code>UserHistory</code> handling.
@@ -13,6 +14,15 @@ import com.logicaldoc.core.security.Client;
  */
 public interface UserHistoryDAO extends PersistentObjectDAO<UserHistory> {
 
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static UserHistoryDAO get() {
+		return Context.get(UserHistoryDAO.class);
+	}
+	
 	/**
 	 * This method selects all histories of a given user.
 	 * 

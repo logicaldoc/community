@@ -136,9 +136,9 @@ public class DefaultAuthenticator extends AbstractAuthenticator {
 		// Check if the password is too weak
 		if (user.getSource().equals(UserSource.DEFAULT))
 			try {
-				String tenantName = Context.get(TenantDAO.class).getTenantName(user.getTenantId());
+				String tenantName = TenantDAO.get().getTenantName(user.getTenantId());
 				if (Context.get().getProperties().getBoolean(tenantName + ".password.checklogin", false))
-					Context.get(UserDAO.class).checkPasswordCompliance(user);
+					UserDAO.get().checkPasswordCompliance(user);
 			} catch (PasswordWeakException pwe) {
 				// In case of password too week, mark it as expired in the DB
 				markPasswordExpired(user);

@@ -534,7 +534,7 @@ public class WSUser {
 	public static WSUser fromUser(User user) {
 		WSUser wsUser = new WSUser();
 		try {
-			UserDAO dao = Context.get(UserDAO.class);
+			UserDAO dao = UserDAO.get();
 			dao.initialize(user);
 
 			wsUser.setId(user.getId());

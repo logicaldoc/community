@@ -15,7 +15,6 @@ import org.junit.Test;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSAccessControlEntry;
 import com.logicaldoc.webservice.model.WSAttributeOption;
@@ -39,7 +38,7 @@ public class SoapDocumentMetadataServiceTest extends AbstractWebserviceTestCase 
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		templateDao = Context.get(TemplateDAO.class);
+		templateDao = TemplateDAO.get();
 
 		// Make sure that this is a SoapSecurityService instance
 		securityServiceImpl = new SoapSecurityService();

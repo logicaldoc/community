@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentHistoryDAO;
 import com.logicaldoc.core.security.Session;
@@ -21,6 +18,9 @@ import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 public class FolderHistoryDataServlet extends AbstractDataServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -29,7 +29,7 @@ public class FolderHistoryDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		MenuDAO mDao = Context.get(MenuDAO.class);
+		MenuDAO mDao = MenuDAO.get();
 		boolean showSid = mDao.isReadAllowed(Menu.SESSIONS, session.getUserId());
 
 		PrintWriter writer = response.getWriter();

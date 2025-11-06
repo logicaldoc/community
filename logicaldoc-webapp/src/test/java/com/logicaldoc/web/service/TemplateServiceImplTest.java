@@ -32,7 +32,6 @@ import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.AbstractWPTestCase;
 
 public class TemplateServiceImplTest extends AbstractWPTestCase {
@@ -45,7 +44,7 @@ public class TemplateServiceImplTest extends AbstractWPTestCase {
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		templateDao = Context.get(TemplateDAO.class);
+		templateDao = TemplateDAO.get();
 	}
 
 	@Test
@@ -126,8 +125,8 @@ public class TemplateServiceImplTest extends AbstractWPTestCase {
 	@Test
 	public void testGetAttributes() throws ServerException, PersistenceException, PermissionException,
 			IllegalAccessException, InvocationTargetException {
-		DocumentDAO documentDao = Context.get(DocumentDAO.class);
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		DocumentDAO documentDao = DocumentDAO.get();
+		FolderDAO folderDao = FolderDAO.get();
 
 		Template template = templateDao.findById(-1L);
 

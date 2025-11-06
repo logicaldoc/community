@@ -5,16 +5,15 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Locale;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.metadata.AttributeOption;
 import com.logicaldoc.core.metadata.AttributeOptionDAO;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet retrieves the options for extended attributes
@@ -43,7 +42,7 @@ public class AttributeOptionsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		AttributeOptionDAO dao = Context.get(AttributeOptionDAO.class);
+		AttributeOptionDAO dao = AttributeOptionDAO.get();
 		List<AttributeOption> options = dao.findByAttributeAndCategory(setId, attribute, category);
 
 		if (withempty) {

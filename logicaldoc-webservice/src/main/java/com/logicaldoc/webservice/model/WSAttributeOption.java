@@ -2,10 +2,10 @@ package com.logicaldoc.webservice.model;
 
 import java.io.Serializable;
 
+import com.logicaldoc.webservice.doc.WSDoc;
+
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
-
-import com.logicaldoc.webservice.doc.WSDoc;
 
 /**
  * An option for a preset attribute

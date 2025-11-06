@@ -43,7 +43,7 @@ public class InMemoryZipImport extends ZipImport {
 		this.zipFile = zipsource;
 		this.sessionId = sessionId;
 
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 
 		try {
 			this.user = userDao.findById(userId);
@@ -57,7 +57,7 @@ public class InMemoryZipImport extends ZipImport {
 	}
 
 	private void extractEntries(File sourceZipFile, Folder parent, String sessionId) throws PersistenceException {
-		FolderDAO fDao = Context.get(FolderDAO.class);
+		FolderDAO fDao = FolderDAO.get();
 		DocumentManager docManager = Context.get(DocumentManager.class);
 
 		// Open the Zip and list all the contents

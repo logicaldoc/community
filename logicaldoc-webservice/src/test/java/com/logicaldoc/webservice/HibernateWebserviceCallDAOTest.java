@@ -11,7 +11,6 @@ import org.junit.Test;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link HibernateWebserviceCallDAO}
@@ -28,7 +27,7 @@ public class HibernateWebserviceCallDAOTest extends AbstractWebserviceTestCase {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an WebserviceCallDAO
-		testSubject = Context.get(WebserviceCallDAO.class);
+		testSubject = WebserviceCallDAO.get();
 	}
 
 	@Test

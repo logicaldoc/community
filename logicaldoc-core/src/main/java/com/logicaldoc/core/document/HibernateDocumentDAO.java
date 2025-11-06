@@ -1241,7 +1241,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public List<TagCloud> getTagCloud(long tenantId, int maxTags) throws PersistenceException {
-		GenericDAO gendao = Context.get(GenericDAO.class);
+		GenericDAO gendao = GenericDAO.get();
 
 		List<TagCloud> list = gendao.query(
 				"select ld_tag, ld_count from ld_uniquetag where ld_tenantid=" + tenantId + " order by ld_count desc",

@@ -11,8 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import jakarta.mail.MessagingException;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -38,6 +36,8 @@ import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.MimeType;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.mail.MessagingException;
 
 /**
  * Utility functions to handle emails and send messages from within the
@@ -251,7 +251,7 @@ public class MailTool {
 	 */
 	public void sendSystemMessage(String recipient, String message, String subject, int scope, int priority)
 			throws PersistenceException {
-		UserDAO uDao = Context.get(UserDAO.class);
+		UserDAO uDao = UserDAO.get();
 		User user = uDao.findByUsername(recipient);
 
 		SystemMessage m = new SystemMessage();
@@ -274,8 +274,7 @@ public class MailTool {
 		m.setDateScope(scope);
 		m.setPrio(priority);
 
-		SystemMessageDAO dao = Context.get(SystemMessageDAO.class);
-		dao.store(m);
+		SystemMessageDAO.get().store(m);
 	}
 
 	/**

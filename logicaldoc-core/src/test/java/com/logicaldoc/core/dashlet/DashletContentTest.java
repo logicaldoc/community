@@ -17,7 +17,6 @@ import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.servlet.MockServletRequest;
 import com.logicaldoc.util.servlet.MockServletResponse;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.ServletException;
 
@@ -42,7 +41,7 @@ public class DashletContentTest extends AbstractCoreTestCase {
 		FileUtil.delete(responseFile);
 		prepareSession("admin", "admin");
 
-		dao = Context.get(DashletDAO.class);
+		dao = DashletDAO.get();
 	}
 
 	@Override

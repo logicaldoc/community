@@ -16,7 +16,6 @@ import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.i18n.I18N;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -92,10 +91,10 @@ public class AttributesDataServlet extends AbstractDataServlet {
 		 */
 		Map<String, Attribute> attributes = new HashMap<>();
 		if (templateId == null) {
-			AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
+			AttributeSetDAO dao = AttributeSetDAO.get();
 			attributes = dao.findAttributes(session.getTenantId(), null);
 		} else {
-			TemplateDAO dao = Context.get(TemplateDAO.class);
+			TemplateDAO dao = TemplateDAO.get();
 			Template template = dao.findById(templateId);
 			dao.initialize(template);
 			List<String> names = template.getAttributeNames();

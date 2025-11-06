@@ -26,7 +26,6 @@ import com.logicaldoc.gui.common.client.beans.GUIAttributeSet;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
 import com.logicaldoc.util.csv.CSVFileReader;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.UploadServlet;
 
 /**
@@ -46,7 +45,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		Session session = validateSession();
 
 		try {
-			AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
+			AttributeSetDAO dao = AttributeSetDAO.get();
 			dao.delete(setId);
 		} catch (Exception t) {
 			throwServerException(session, log, t);
@@ -58,7 +57,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		Session session = validateSession();
 
 		try {
-			AttributeOptionDAO dao = Context.get(AttributeOptionDAO.class);
+			AttributeOptionDAO dao = AttributeOptionDAO.get();
 			dao.deleteBySetIdAndAttribute(setId, attribute);
 			int i = 0;
 			for (GUIValue value : values) {
@@ -73,7 +72,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 
 	private void store(long setId, AttributeOption option) throws ServerException {
 		try {
-			AttributeOptionDAO dao = Context.get(AttributeOptionDAO.class);
+			AttributeOptionDAO dao = AttributeOptionDAO.get();
 			dao.store(option);
 		} catch (Exception e) {
 			throw new ServerException(String.format("Options have not been %s", setId != 0L ? "updated" : "stored"), e);
@@ -84,7 +83,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	public void deleteOptions(long setId, String attribute, List<String> values) throws ServerException {
 		Session session = validateSession();
 		try {
-			AttributeOptionDAO dao = Context.get(AttributeOptionDAO.class);
+			AttributeOptionDAO dao = AttributeOptionDAO.get();
 			List<AttributeOption> options = dao.findByAttribute(setId, attribute);
 			for (AttributeOption option : options)
 				for (String value : values)
@@ -99,7 +98,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 
 	private void delete(AttributeOption option) throws ServerException {
 		try {
-			AttributeOptionDAO dao = Context.get(AttributeOptionDAO.class);
+			AttributeOptionDAO dao = AttributeOptionDAO.get();
 			dao.delete(option.getId());
 		} catch (Exception e) {
 			throw new ServerException("Option has not been deleted", e);
@@ -113,7 +112,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		try {
 			AttributeSet attributeSet;
 			if (guiAttributeSet.getId() != 0) {
-				AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
+				AttributeSetDAO dao = AttributeSetDAO.get();
 				attributeSet = dao.findById(guiAttributeSet.getId());
 				dao.initialize(attributeSet);
 			} else {
@@ -141,7 +140,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 
 	private void store(GUIAttributeSet guiAttributeSet, AttributeSet attributeSet) throws ServerException {
 		try {
-			AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
+			AttributeSetDAO dao = AttributeSetDAO.get();
 			dao.store(attributeSet);
 		} catch (Exception e) {
 			throw new ServerException(
@@ -197,7 +196,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 
 	public GUIAttributeSet getAttributeSet(String name) throws ServerException {
 		Session session = validateSession();
-		AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
+		AttributeSetDAO dao = AttributeSetDAO.get();
 		try {
 			AttributeSet set = dao.findByName(name, session.getTenantId());
 			if (set != null)
@@ -213,7 +212,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	public GUIAttributeSet getAttributeSet(long setId) throws ServerException {
 		validateSession();
 
-		AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
+		AttributeSetDAO dao = AttributeSetDAO.get();
 		try {
 			AttributeSet attributeSet = dao.findById(setId);
 			if (attributeSet == null)
@@ -311,7 +310,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	public List<GUIAttributeSet> getAttributeSets() throws ServerException {
 		Session session = validateSession();
 		try {
-			AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
+			AttributeSetDAO dao = AttributeSetDAO.get();
 			List<GUIAttributeSet> guiSets = new ArrayList<>();
 			List<Long> setIds = dao.findAllIds(session.getTenantId());
 			for (Long setId : setIds)
@@ -356,7 +355,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	public void applyValidationToTemplates(long setId, String attribute) throws ServerException {
 		Session session = validateSession();
 		try {
-			AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
+			AttributeSetDAO dao = AttributeSetDAO.get();
 			AttributeSet set = dao.findById(setId);
 			dao.initialize(set);
 
@@ -381,7 +380,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	public void applyInitializationToTemplates(long setId, String attribute) throws ServerException {
 		Session session = validateSession();
 		try {
-			AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
+			AttributeSetDAO dao = AttributeSetDAO.get();
 			AttributeSet set = dao.findById(setId);
 			dao.initialize(set);
 			Attribute setAttribute = set.getTemplateAttributes().get(attribute);
@@ -405,11 +404,11 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 	public void applyAllToTemplates(long setId, String attributeName) throws ServerException {
 		Session session = validateSession();
 		try {
-			AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
+			AttributeSetDAO dao = AttributeSetDAO.get();
 			AttributeSet set = dao.findById(setId);
 			Attribute setAttribute = set.getTemplateAttributes().get(attributeName);
 
-			TemplateDAO templateDao = Context.get(TemplateDAO.class);
+			TemplateDAO templateDao = TemplateDAO.get();
 
 			/*
 			 * Update the attributes referenced in the templates

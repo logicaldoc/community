@@ -46,7 +46,7 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		userDao = Context.get(UserDAO.class);
+		userDao = UserDAO.get();
 		groupDao = Context.get(GroupDAO.class);
 
 		// Make sure that this is a SoapSecurityService instance

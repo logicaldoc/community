@@ -151,7 +151,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		Session session = validateSession();
 
 		try {
-			GenericDAO genDao = Context.get(GenericDAO.class);
+			GenericDAO genDao = GenericDAO.get();
 
 			List<List<GUIParameter>> parameters = new ArrayList<>();
 
@@ -383,7 +383,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	}
 
 	private void addReportRecipients(GUITask guiTask, Task task) {
-		UserDAO dao = Context.get(UserDAO.class);
+		UserDAO dao = UserDAO.get();
 		if (StringUtils.isNotEmpty(task.getReportRecipients())) {
 			StringTokenizer st = new StringTokenizer(task.getReportRecipients(), ",", false);
 			while (st.hasMoreTokens()) {
@@ -766,7 +766,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 			return;
 
 		StringBuilder folderPredicate = new StringBuilder();
-		FolderDAO fDao = Context.get(FolderDAO.class);
+		FolderDAO fDao = FolderDAO.get();
 		Collection<Long> tree = fDao.findFolderIdInTree(rootFolderId, false);
 		if (fDao.isOracle()) {
 			/*

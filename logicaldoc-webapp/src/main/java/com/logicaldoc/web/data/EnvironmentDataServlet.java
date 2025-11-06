@@ -6,13 +6,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for retrieving all the environmen variable
@@ -55,7 +54,7 @@ public class EnvironmentDataServlet extends AbstractDataServlet {
 			writer.print(ENTRY_CLOSE);
 		}
 
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 		Map<String, String> meta = dao.getDatabaseMetadata();
 		for (Map.Entry<String, String> entry : meta.entrySet()) {
 			writer.print(ENTRY_SCOPE_DATABASE_SCOPE);

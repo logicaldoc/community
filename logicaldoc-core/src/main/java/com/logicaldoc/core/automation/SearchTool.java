@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.searchengine.FulltextSearch.HitMapper;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.core.searchengine.Hit;
 import com.logicaldoc.core.searchengine.HitField;
 import com.logicaldoc.core.searchengine.Hits;
@@ -23,6 +22,7 @@ import com.logicaldoc.core.searchengine.Search;
 import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.searchengine.SearchException;
 import com.logicaldoc.core.searchengine.SearchOptions;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Utility methods to do searches from within Automation
@@ -110,7 +110,7 @@ public class SearchTool {
 			if (!hitsIds.isEmpty()) {
 				hitsIdsCondition.append(" and (");
 
-				FolderDAO fdao = Context.get(FolderDAO.class);
+				FolderDAO fdao = FolderDAO.get();
 				if (fdao.isOracle()) {
 					/*
 					 * In Oracle The limit of 1000 elements applies to sets of
@@ -148,7 +148,7 @@ public class SearchTool {
 			richQuery.append(" where A.ld_deleted=0 and A.ld_tenantid = " + tenantId);
 			richQuery.append(hitsIdsCondition.toString());
 
-			DocumentDAO dao = Context.get(DocumentDAO.class);
+			DocumentDAO dao = DocumentDAO.get();
 			try {
 				dao.query(richQuery.toString(), new HitMapper(hitsMap), null);
 			} catch (Exception e) {

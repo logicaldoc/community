@@ -15,7 +15,6 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link DocumentLink}
@@ -33,8 +32,8 @@ public class DocumentLinkTest extends AbstractCoreTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		folderDao = Context.get(FolderDAO.class);
-		docDao = Context.get(DocumentDAO.class);
+		folderDao = FolderDAO.get();
+		docDao = DocumentDAO.get();
 	}
 
 	@Test

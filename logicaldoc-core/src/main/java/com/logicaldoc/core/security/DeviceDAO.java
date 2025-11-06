@@ -2,11 +2,12 @@ package com.logicaldoc.core.security;
 
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.security.user.User;
+import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * A DAO to handle the devices
@@ -15,6 +16,15 @@ import com.logicaldoc.core.security.user.User;
  * @since 8.5.3
  */
 public interface DeviceDAO extends PersistentObjectDAO<Device> {
+
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static DeviceDAO get() {
+		return Context.get(DeviceDAO.class);
+	}
 
 	/**
 	 * Gets the device by it's alternate key: {@link Device#getDeviceId()}

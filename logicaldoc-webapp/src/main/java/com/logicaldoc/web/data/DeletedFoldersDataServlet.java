@@ -9,9 +9,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -19,7 +16,9 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for deleted folders data retrieval
@@ -42,7 +41,7 @@ public class DeletedFoldersDataServlet extends AbstractDataServlet {
 				? Long.parseLong(request.getParameter("userId"))
 				: null;
 
-		FolderDAO fldDao = Context.get(FolderDAO.class);
+		FolderDAO fldDao = FolderDAO.get();
 		DateFormat df = getDateFormat();
 
 		PrintWriter writer = response.getWriter();

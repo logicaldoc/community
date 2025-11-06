@@ -188,10 +188,9 @@ public class ParserFactory {
 	public static String parse(InputStream input, String filename, String encoding, Locale locale, long tenantId,
 			Document document, String fileVersion) throws ParsingException {
 		Parser parser = getParser(filename);
-		TenantDAO dao = Context.get(TenantDAO.class);
 		String tenantName;
 		try {
-			tenantName = dao.getTenantName(tenantId);
+			tenantName = TenantDAO.get().getTenantName(tenantId);
 		} catch (PersistenceException e) {
 			throw new ParsingException(e);
 		}

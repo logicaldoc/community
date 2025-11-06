@@ -22,7 +22,6 @@ import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSAccessControlEntry;
@@ -48,7 +47,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		List<WSTemplate> templates = new ArrayList<>();
-		TemplateDAO dao = Context.get(TemplateDAO.class);
+		TemplateDAO dao = TemplateDAO.get();
 		for (Template template : dao.findAll(user.getTenantId()))
 			if (dao.isReadEnable(template.getId(), user.getId()))
 				templates.add(WSUtil.toWSTemplate(template));
@@ -59,7 +58,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 	public WSTemplate getTemplate(String sid, String name)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
-		TemplateDAO dao = Context.get(TemplateDAO.class);
+		TemplateDAO dao = TemplateDAO.get();
 		Template template = dao.findByName(name, user.getTenantId());
 		if (template != null && dao.isReadEnable(template.getId(), user.getId()))
 			return WSUtil.toWSTemplate(template);
@@ -71,7 +70,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 	public WSTemplate getTemplateById(String sid, long templateId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
-		TemplateDAO dao = Context.get(TemplateDAO.class);
+		TemplateDAO dao = TemplateDAO.get();
 		Template template = dao.findById(templateId);
 		if (template != null && dao.isReadEnable(template.getId(), user.getId()))
 			return WSUtil.toWSTemplate(template);
@@ -86,7 +85,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 
 		Template template = loadTemplate(sid, wsTemplate, user);
 
-		TemplateDAO dao = Context.get(TemplateDAO.class);
+		TemplateDAO dao = TemplateDAO.get();
 		Map<String, Attribute> attrs = new HashMap<>();
 		if (CollectionUtils.isNotEmpty(wsTemplate.getAttributes())) {
 			template.getAttributes().clear();
@@ -126,7 +125,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 
 	private Template loadTemplate(String sid, WSTemplate wsTemplate, User user)
 			throws PersistenceException, WebserviceException, PermissionException {
-		TemplateDAO dao = Context.get(TemplateDAO.class);
+		TemplateDAO dao = TemplateDAO.get();
 		Template template = WSUtil.toTemplate(wsTemplate);
 		template.setTenantId(user.getTenantId());
 		if (wsTemplate.getId() != 0) {
@@ -148,7 +147,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 	public void deleteTemplate(String sid, long templateId)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
-		TemplateDAO dao = Context.get(TemplateDAO.class);
+		TemplateDAO dao = TemplateDAO.get();
 		if (dao.countDocs(templateId) > 0)
 			throw new WebserviceException("You cannot delete template with id " + templateId
 					+ " because some documents belongs to that template.");
@@ -164,7 +163,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 
-		AttributeOptionDAO dao = Context.get(AttributeOptionDAO.class);
+		AttributeOptionDAO dao = AttributeOptionDAO.get();
 		dao.deleteBySetIdAndAttribute(setId, attribute);
 
 		if (CollectionUtils.isEmpty(wsOptions))
@@ -181,7 +180,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 	public List<String> getAttributeOptions(String sid, long setId, String attribute)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		validateSession(sid);
-		AttributeOptionDAO dao = Context.get(AttributeOptionDAO.class);
+		AttributeOptionDAO dao = AttributeOptionDAO.get();
 
 		List<AttributeOption> options = dao.findByAttribute(setId, attribute);
 		return options.stream().map(o -> o.getValue()).collect(Collectors.toList());
@@ -191,7 +190,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 	public List<WSAttributeOption> getAttributeOptionsByCategory(String sid, long setId, String attribute,
 			String category) throws AuthenticationException, WebserviceException, PersistenceException {
 		validateSession(sid);
-		AttributeOptionDAO dao = Context.get(AttributeOptionDAO.class);
+		AttributeOptionDAO dao = AttributeOptionDAO.get();
 
 		List<AttributeOption> options = dao.findByAttributeAndCategory(setId, attribute, category);
 
@@ -204,7 +203,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		List<WSAttributeSet> templates = new ArrayList<>();
-		AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
+		AttributeSetDAO dao = AttributeSetDAO.get();
 		for (AttributeSet set : dao.findAll(user.getTenantId()))
 			templates.add(WSUtil.toWSAttributeSet(set));
 		return templates;
@@ -214,7 +213,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 	public WSAttributeSet getAttributeSet(String sid, String name)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
-		AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
+		AttributeSetDAO dao = AttributeSetDAO.get();
 		AttributeSet set = dao.findByName(name, user.getTenantId());
 		if (set != null)
 			return WSUtil.toWSAttributeSet(set);
@@ -226,7 +225,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 	public WSAttributeSet getAttributeSetById(String sid, long setId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		validateSession(sid);
-		AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
+		AttributeSetDAO dao = AttributeSetDAO.get();
 		AttributeSet set = dao.findById(setId);
 		if (set != null)
 			return WSUtil.toWSAttributeSet(set);
@@ -240,7 +239,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 		checkAdministrator(sid);
 		User user = validateSession(sid);
 
-		AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
+		AttributeSetDAO dao = AttributeSetDAO.get();
 		AttributeSet set = WSUtil.toAttributeSet(wsAttributeSet);
 		set.setTenantId(user.getTenantId());
 
@@ -293,7 +292,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 	@Override
 	public void deleteAttributeSet(String sid, long setId) throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
-		AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
+		AttributeSetDAO dao = AttributeSetDAO.get();
 		dao.delete(setId);
 	}
 
@@ -301,7 +300,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 	public boolean isReadable(String sid, long templateId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
-		TemplateDAO dao = Context.get(TemplateDAO.class);
+		TemplateDAO dao = TemplateDAO.get();
 		return dao.isReadEnable(templateId, user.getId());
 	}
 
@@ -309,7 +308,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 	public boolean isWritable(String sid, long templateId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
-		TemplateDAO dao = Context.get(TemplateDAO.class);
+		TemplateDAO dao = TemplateDAO.get();
 		return dao.isWriteEnable(templateId, user.getId());
 	}
 
@@ -318,7 +317,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
 		User sessionUser = validateSession(sid);
 
-		TemplateDAO templateDAO = Context.get(TemplateDAO.class);
+		TemplateDAO templateDAO = TemplateDAO.get();
 		// Check if the session user has the Write Permission of this template
 		if (!templateDAO.isWriteEnable(templateId, sessionUser.getId()))
 			throw new PermissionException(sessionUser.getUsername(), "Template " + templateId, Permission.WRITE);
@@ -338,7 +337,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 		validateSession(sid);
 
 		List<WSAccessControlEntry> acl = new ArrayList<>();
-		TemplateDAO templateDao = Context.get(TemplateDAO.class);
+		TemplateDAO templateDao = TemplateDAO.get();
 
 		Template template = templateDao.findById(templateId);
 		templateDao.initialize(template);
@@ -358,7 +357,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 		if (wsoption == null)
 			return;
 
-		AttributeOptionDAO dao = Context.get(AttributeOptionDAO.class);
+		AttributeOptionDAO dao = AttributeOptionDAO.get();
 
 		AttributeOption option = new AttributeOption(setId, attribute, wsoption.getValue(), wsoption.getCategory());
 		dao.store(option);

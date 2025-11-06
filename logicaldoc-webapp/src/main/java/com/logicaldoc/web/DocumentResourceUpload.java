@@ -3,11 +3,6 @@ package com.logicaldoc.web;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +17,12 @@ import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for document resource upload. It receives the
@@ -82,7 +81,7 @@ public class DocumentResourceUpload extends HttpServlet {
 		try {
 			Session session = ServletUtil.validateSession(request);
 
-			UserDAO udao = Context.get(UserDAO.class);
+			UserDAO udao = UserDAO.get();
 
 			// Load the user associated to the session
 			User user = udao.findByUsername(session.getUsername());
@@ -99,9 +98,9 @@ public class DocumentResourceUpload extends HttpServlet {
 
 			log.debug("Start Upload resource for document {}", docId);
 
-			FolderDAO fdao = Context.get(FolderDAO.class);
+			FolderDAO fdao = FolderDAO.get();
 
-			DocumentDAO docDao = Context.get(DocumentDAO.class);
+			DocumentDAO docDao = DocumentDAO.get();
 
 			Document doc = docDao.findById(docId);
 			Folder folder = doc.getFolder();
@@ -111,7 +110,7 @@ public class DocumentResourceUpload extends HttpServlet {
 					docDao.initialize(doc);
 					doc.setSigned(1);
 					docDao.store(doc);
-					VersionDAO vdao = Context.get(VersionDAO.class);
+					VersionDAO vdao = VersionDAO.get();
 					Version version = null;
 					if (StringUtils.isNotEmpty(docVersion))
 						version = vdao.findByVersion(doc.getId(), docVersion);

@@ -120,8 +120,8 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 	@Override
 	public void saveUserDashlets(List<GUIDashlet> dashlets) throws ServerException {
 		Session session = validateSession();
-		GenericDAO gDao = Context.get(GenericDAO.class);
-		UserDAO uDao = Context.get(UserDAO.class);
+		GenericDAO gDao = GenericDAO.get();
+		UserDAO uDao = UserDAO.get();
 
 		try {
 			/*

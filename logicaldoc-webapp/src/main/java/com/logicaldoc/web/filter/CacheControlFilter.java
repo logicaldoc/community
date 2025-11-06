@@ -5,6 +5,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.io.FileUtil;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
@@ -12,12 +18,6 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.logicaldoc.util.config.ContextProperties;
-import com.logicaldoc.util.io.FileUtil;
 
 /**
  * A filter that depending on the request compiles the Cache-Control header. The

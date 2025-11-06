@@ -2,6 +2,7 @@ package com.logicaldoc.core.dashlet;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Instances of this class is a DAO-service for dashlet objects.
@@ -10,6 +11,15 @@ import com.logicaldoc.core.PersistentObjectDAO;
  * @version 8.2.3
  */
 public interface DashletDAO extends PersistentObjectDAO<Dashlet> {
+
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static DashletDAO get() {
+		return Context.get(DashletDAO.class);
+	}
 
 	/**
 	 * Finds the dashlet by it's name

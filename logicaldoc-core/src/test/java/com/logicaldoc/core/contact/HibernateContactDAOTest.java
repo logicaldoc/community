@@ -15,7 +15,6 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link HibernateContactDAO}
@@ -33,7 +32,7 @@ public class HibernateContactDAOTest extends AbstractCoreTestCase {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateContactDAO
-		testSubject = Context.get(ContactDAO.class);
+		testSubject = ContactDAO.get();
 	}
 
 	@Test

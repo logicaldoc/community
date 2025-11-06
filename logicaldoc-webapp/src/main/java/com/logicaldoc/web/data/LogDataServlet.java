@@ -5,9 +5,6 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Locale;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.jdom2.Element;
 
@@ -17,6 +14,9 @@ import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.task.Task;
 import com.logicaldoc.util.config.LogConfigurator;
 import com.logicaldoc.web.util.ServletUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for retrieving informations about the logs as the

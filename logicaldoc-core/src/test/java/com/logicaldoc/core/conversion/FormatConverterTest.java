@@ -15,7 +15,6 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link FormatConverter}s
@@ -41,7 +40,7 @@ public class FormatConverterTest extends AbstractCoreTestCase {
 
 		prepareSession("admin", "admin");
 
-		docDao = Context.get(DocumentDAO.class);
+		docDao = DocumentDAO.get();
 		document = docDao.findById(1L);
 	}
 

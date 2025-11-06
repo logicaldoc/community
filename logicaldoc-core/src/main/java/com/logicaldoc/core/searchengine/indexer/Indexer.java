@@ -41,9 +41,9 @@ class Indexer extends DocumentProcessorCallable<IndexerStats> {
 	Indexer(List<Long> docIds, IndexerTask task, Logger log) {
 		super(docIds, task, log);
 		this.config = Context.get().getProperties();
-		this.documentDao = Context.get(DocumentDAO.class);
-		this.tenantDao = Context.get(TenantDAO.class);
-		this.documentManager = Context.get(DocumentManager.class);
+		this.documentDao = DocumentDAO.get();
+		this.tenantDao = TenantDAO.get();
+		this.documentManager = DocumentManager.get();
 	}
 
 	private void increaseParsingTime(long increase) {

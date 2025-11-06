@@ -9,6 +9,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.security.Permission;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This class is a DAO-service for documents.
@@ -19,6 +20,15 @@ import com.logicaldoc.core.security.Permission;
  */
 public interface DocumentDAO extends PersistentObjectDAO<Document> {
 
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static DocumentDAO get() {
+		return Context.get(DocumentDAO.class);
+	}
+	
 	/**
 	 * This method finds a document by the ID and if it is an alias the
 	 * referenced document is returned instead.

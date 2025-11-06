@@ -14,7 +14,6 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.DateUtil;
 import com.logicaldoc.webservice.doc.WSDoc;
 
@@ -201,7 +200,7 @@ public class WSFolder implements Serializable {
 		Template template = null;
 		if (templateId != null) {
 			folder.getAttributes().clear();
-			TemplateDAO templDao = Context.get(TemplateDAO.class);
+			TemplateDAO templDao = TemplateDAO.get();
 			template = templDao.findById(templateId);
 			if (template != null && CollectionUtils.isNotEmpty(attributes)) {
 				for (WSAttribute wsAttribute : attributes) {

@@ -18,11 +18,6 @@ import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +41,11 @@ import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for rendering dashlet's contents.
@@ -70,7 +69,7 @@ public class DashletContent extends HttpServlet {
 		try {
 			Session session = validateSession(request);
 
-			MenuDAO mDao = Context.get(MenuDAO.class);
+			MenuDAO mDao = MenuDAO.get();
 			boolean showSid = mDao.isReadAllowed(Menu.SESSIONS, session.getUserId());
 
 			Locale locale = LocaleUtil.toLocale(request.getParameter("locale"));
@@ -82,8 +81,7 @@ public class DashletContent extends HttpServlet {
 			response.setHeader("Pragma", "no-cache");
 			response.setCharacterEncoding("UTF-8");
 
-			DashletDAO dao = Context.get(DashletDAO.class);
-			Dashlet dashlet = dao.findById(dashletId);
+			Dashlet dashlet = DashletDAO.get().findById(dashletId);
 			if (Dashlet.TYPE_CONTENT.equals(dashlet.getType()))
 				response.setContentType("text/html");
 			else
@@ -135,9 +133,8 @@ public class DashletContent extends HttpServlet {
 		} else {
 			writer.write(LIST_TAG);
 
-			DocumentHistoryDAO hdao = Context.get(DocumentHistoryDAO.class);
 			String query = automation.evaluate(dashlet.getQuery(), dashletDictionary);
-			List<DocumentHistory> records = hdao.findByObjectQuery(query.trim(), (Map<String, Object>) null,
+			List<DocumentHistory> records = DocumentHistoryDAO.get().findByObjectQuery(query.trim(), (Map<String, Object>) null,
 					dashlet.getUnique() == 0 ? dashlet.getMax() : null);
 
 			List<DocumentHistory> uniqueRecords = filterUniqueDocumentEvents(dashlet, records);
@@ -149,7 +146,7 @@ public class DashletContent extends HttpServlet {
 			if (!uniqueRecords.isEmpty()) {
 				String docIds = uniqueRecords.stream().map(h -> Long.toString(h.getDocId()))
 						.collect(Collectors.joining(","));
-				DocumentDAO ddao = Context.get(DocumentDAO.class);
+				DocumentDAO ddao = DocumentDAO.get();
 				List<Document> docs = ddao.findByObjectQuery("from Document where id in (" + docIds + ")",
 						(Map<String, Object>) null, null);
 				for (Document document : docs)
@@ -286,7 +283,7 @@ public class DashletContent extends HttpServlet {
 		qry.append(attrs.stream().map(a -> "'" + a + "'").collect(Collectors.joining(",")));
 		qry.append(")");
 
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 		dao.query(qry.toString(), new EntendedAttributesRowMapper(locale, extValues), null);
 	}
 
@@ -362,7 +359,7 @@ public class DashletContent extends HttpServlet {
 			if (StringUtils.isNotEmpty(content))
 				writer.write(content.trim());
 		} else {
-			DocumentDAO dao = Context.get(DocumentDAO.class);
+			DocumentDAO dao = DocumentDAO.get();
 			String query = automation.evaluate(dashlet.getQuery(), dashletDictionary);
 
 			List<Document> records = dao.findByObjectQuery(query.trim(), (Map<String, Object>) null, dashlet.getMax());
@@ -518,11 +515,10 @@ public class DashletContent extends HttpServlet {
 		} else {
 			writer.write(LIST_TAG);
 
-			DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
 			String query = automation.evaluate(dashlet.getQuery(), dashletDictionary);
 			List<DocumentNote> records = new ArrayList<>();
 			try {
-				records = dao.findByObjectQuery(query.trim(), (Map<String, Object>) null, dashlet.getMax());
+				records = DocumentNoteDAO.get().findByObjectQuery(query.trim(), (Map<String, Object>) null, dashlet.getMax());
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}

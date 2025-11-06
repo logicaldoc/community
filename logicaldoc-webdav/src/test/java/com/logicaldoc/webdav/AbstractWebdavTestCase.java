@@ -22,7 +22,6 @@ import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.junit.AbstractTestCase;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.servlet.MockServletSession;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webdav.session.DavSessionImpl;
 import com.logicaldoc.webdav.session.WebdavSession;
 
@@ -56,7 +55,7 @@ public abstract class AbstractWebdavTestCase extends AbstractTestCase {
 	}
 
 	protected void prepareSession(String username, String password) throws PersistenceException {
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 
 		Client client = new Client("xyz", "192.168.2.13", "ghost");
 		Device device = new Device();

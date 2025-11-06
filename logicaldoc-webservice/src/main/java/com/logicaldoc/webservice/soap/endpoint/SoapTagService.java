@@ -130,7 +130,7 @@ public class SoapTagService extends AbstractService implements TagService {
 	@Override
 	public List<String> getTags(String sid) throws PersistenceException, AuthenticationException, WebserviceException {
 		User user = validateSession(sid);
-		return Context.get(DocumentDAO.class).findAllTags(null, user.getTenantId());
+		return DocumentDAO.get().findAllTags(null, user.getTenantId());
 	}
 
 	@Override
@@ -143,7 +143,7 @@ public class SoapTagService extends AbstractService implements TagService {
 		ContextProperties config = Context.get().getProperties();
 		String mode = config.getProperty(session.getTenantName() + ".tag.mode");
 		if ("preset".equals(mode)) {
-			GenericDAO gDao = Context.get(GenericDAO.class);
+			GenericDAO gDao = GenericDAO.get();
 			List<Generic> buf = gDao.findByTypeAndSubtype("tag", null, null, session.getTenantId());
 			for (Generic generic : buf)
 				tags.add(generic.getSubtype());
@@ -157,7 +157,7 @@ public class SoapTagService extends AbstractService implements TagService {
 			throws PersistenceException, AuthenticationException, WebserviceException {
 		validateSession(sid);
 
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 		List<TagCloud> list = dao.getTagCloud(sid);
 
 		List<WSTagCloud> tagClouds = new ArrayList<>();
@@ -172,7 +172,7 @@ public class SoapTagService extends AbstractService implements TagService {
 			throws PersistenceException, AuthenticationException, WebserviceException {
 		User user = validateSession(sid);
 
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		List<Document> docs = docDao.findByUserIdAndTag(user.getId(), tag, null);
 		List<WSDocument> wsDocs = new ArrayList<>();
 
@@ -195,7 +195,7 @@ public class SoapTagService extends AbstractService implements TagService {
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		List<Folder> folders = folderDao.findByUserIdAndTag(user.getId(), tag, null);
 		List<WSFolder> wsFolders = new ArrayList<>();
 		for (Folder folder : folders) {

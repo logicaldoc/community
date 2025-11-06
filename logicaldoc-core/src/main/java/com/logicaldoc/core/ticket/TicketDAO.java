@@ -3,6 +3,7 @@ package com.logicaldoc.core.ticket;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.document.DocumentHistory;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * DAO for <code>Ticket</code> handling.
@@ -11,7 +12,16 @@ import com.logicaldoc.core.document.DocumentHistory;
  * @author Marco Meschieri
  */
 public interface TicketDAO extends PersistentObjectDAO<Ticket> {
-
+	
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static TicketDAO get() {
+		return Context.get(TicketDAO.class);
+	}
+	
 	/**
 	 * This method deletes a download ticket.
 	 * 

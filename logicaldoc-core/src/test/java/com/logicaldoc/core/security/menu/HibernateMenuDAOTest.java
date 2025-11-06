@@ -21,7 +21,6 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.security.AccessControlEntry;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link HibernateMenuDAOTest}
@@ -40,7 +39,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateMenuDAO
-		testSubject = Context.get(MenuDAO.class);
+		testSubject = MenuDAO.get();
 	}
 
 	@Test
@@ -88,7 +87,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTestCase {
 		Menu menu = testSubject.findById(99);
 		assertNull(menu);
 
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		docDao.delete(1);
 
 		// Delete a folder with documents

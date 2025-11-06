@@ -25,7 +25,6 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.util.html.HTMLSanitizer;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.transaction.Transactional;
 
@@ -52,7 +51,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 
 	@Override
 	public void store(DocumentNote note) throws PersistenceException {
-		DocumentDAO documentDao = Context.get(DocumentDAO.class);
+		DocumentDAO documentDao = DocumentDAO.get();
 		Document doc = documentDao.findById(note.getDocId());
 		if (doc == null)
 			throw new PersistenceException("Cannot save note for undexisting document " + note.getDocId());
@@ -76,7 +75,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 		if (note.getPage() == 0)
 			ThreadPools.get().execute(() -> {
 				try {
-					DocumentDAO dao = Context.get(DocumentDAO.class);
+					DocumentDAO dao = DocumentDAO.get();
 					Document doc = dao.findById(note.getDocId());
 					dao.initialize(doc);
 					String lastNoteMessage = dao.queryForList(
@@ -102,7 +101,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 
 		try {
 			if (transaction != null) {
-				DocumentDAO documentDao = Context.get(DocumentDAO.class);
+				DocumentDAO documentDao = DocumentDAO.get();
 				Document doc = documentDao.findById(note.getDocId());
 				transaction.setEvent(DocumentEvent.NEW_NOTE);
 				documentDao.saveDocumentHistory(doc, transaction);
@@ -173,7 +172,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 		if (userId == User.USERID_ADMIN) {
 			return notes;
 		} else {
-			UserDAO userDao = Context.get(UserDAO.class);
+			UserDAO userDao = UserDAO.get();
 			User user = userDao.findById(userId);
 			if (user == null)
 				return new ArrayList<>();
@@ -245,10 +244,10 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	}
 
 	private User getExistingtUser(long userId) throws PersistenceException {
-		User user = Context.get(UserDAO.class).findById(userId);
+		User user = UserDAO.get().findById(userId);
 		if (user == null)
 			throw new PersistenceException("Unexisting user " + userId);
-		Context.get(UserDAO.class).initialize(user);
+		UserDAO.get().initialize(user);
 		return user;
 	}
 

@@ -1,9 +1,9 @@
 package com.logicaldoc.webservice.model;
 
-import jakarta.xml.bind.annotation.XmlType;
-
 import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.webservice.doc.WSDoc;
+
+import jakarta.xml.bind.annotation.XmlType;
 
 /**
  * Web Service Bookmark.

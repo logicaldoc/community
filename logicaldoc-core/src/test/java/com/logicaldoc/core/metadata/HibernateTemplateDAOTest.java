@@ -20,7 +20,6 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link HibernateTemplateDAO}
@@ -39,7 +38,7 @@ public class HibernateTemplateDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDocumentDAO
-		testSubject = Context.get(TemplateDAO.class);
+		testSubject = TemplateDAO.get();
 	}
 
 	@Test

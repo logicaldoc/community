@@ -6,14 +6,24 @@ import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
- * DAO for <code>FolderHistory</code> handling.
+ * DAO for {@link FolderHistory}s handling.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 5.0
  */
 public interface FolderHistoryDAO extends PersistentObjectDAO<FolderHistory> {
+
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static FolderHistoryDAO get() {
+		return Context.get(FolderHistoryDAO.class);
+	}
 
 	/**
 	 * This method selects all histories of a given user.

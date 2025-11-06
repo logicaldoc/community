@@ -1,7 +1,5 @@
 package com.logicaldoc.core.task;
 
-import jakarta.annotation.Resource;
-
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
 import org.quartz.SimpleTrigger;
@@ -15,6 +13,8 @@ import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 
 import com.logicaldoc.util.config.ContextProperties;
+
+import jakarta.annotation.Resource;
 
 /**
  * This trigger wraps both a SimpleTrigger and a CronTrigger

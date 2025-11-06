@@ -73,7 +73,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 	private List<WSUser> collectUsers(String group, User user) throws PersistenceException {
 		List<WSUser> users = new ArrayList<>();
-		UserDAO dao = Context.get(UserDAO.class);
+		UserDAO dao = UserDAO.get();
 		if (StringUtils.isEmpty(group)) {
 			for (User usr : dao.findAll(user.getTenantId())) {
 				dao.initialize(user);
@@ -120,7 +120,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 		try {
 			GroupDAO gDao = Context.get(GroupDAO.class);
-			UserDAO dao = Context.get(UserDAO.class);
+			UserDAO dao = UserDAO.get();
 			User usr = wsUser.toUser();
 			usr.setTenantId(sessionUser.getTenantId());
 
@@ -233,7 +233,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 			if (CollectionUtils.isNotEmpty(group.getUserIds())) {
 
-				UserDAO userDao = Context.get(UserDAO.class);
+				UserDAO userDao = UserDAO.get();
 				for (User usr : grp.getUsers()) {
 					usr.removeGroup(grp.getId());
 					userDao.store(usr);
@@ -266,7 +266,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			throw new PermissionException("You cannot delete the admin user");
 
 		try {
-			UserDAO dao = Context.get(UserDAO.class);
+			UserDAO dao = UserDAO.get();
 			User usr = dao.findById(userId);
 			if (usr.getType() == UserType.SYSTEM) {
 				throw new PermissionException(
@@ -305,7 +305,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		checkAdministrator(sid);
 
 		try {
-			UserDAO userDao = Context.get(UserDAO.class);
+			UserDAO userDao = UserDAO.get();
 			User user = userDao.findById(userId);
 			if (user == null)
 				throw new WebserviceException("User " + userId + " not found");
@@ -325,7 +325,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			history.setComment("");
 			user.setRepass("");
 
-			UserDAO dao = Context.get(UserDAO.class);
+			UserDAO dao = UserDAO.get();
 
 			dao.store(user, history);
 
@@ -340,7 +340,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	public WSUser getUser(String sid, long userId) throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 		try {
-			UserDAO userDao = Context.get(UserDAO.class);
+			UserDAO userDao = UserDAO.get();
 			User user = userDao.findById(userId);
 			if (user == null)
 				return null;
@@ -357,7 +357,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	public WSUser getUserByUsername(String sid, String username) throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 		try {
-			UserDAO userDao = Context.get(UserDAO.class);
+			UserDAO userDao = UserDAO.get();
 			User user = userDao.findByUsername(username);
 
 			if (user == null)

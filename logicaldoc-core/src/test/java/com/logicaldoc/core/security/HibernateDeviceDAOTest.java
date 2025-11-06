@@ -16,7 +16,6 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.i18n.DateBean;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for <code>HibernateUserHistoryDAO</code>
@@ -32,9 +31,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		// Retrieve the instance under test from spring context. Make sure that
-		// it is an HibernateDeviceDAO
-		testSubject = Context.get(DeviceDAO.class);
+		testSubject = DeviceDAO.get();
 	}
 
 	@Test

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This class is a DAO-service for persistent {@link SavedSearch} objects.
@@ -12,6 +13,15 @@ import com.logicaldoc.core.PersistentObjectDAO;
  * @since 8.6.1
  */
 public interface SearchDAO extends PersistentObjectDAO<SavedSearch> {
+
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static SearchDAO get() {
+		return Context.get(SearchDAO.class);
+	}
 
 	/**
 	 * Gets the search using the alternate key

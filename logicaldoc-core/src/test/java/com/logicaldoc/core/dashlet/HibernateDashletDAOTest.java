@@ -17,7 +17,6 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link HibernateDashletDAO}
@@ -35,7 +34,7 @@ public class HibernateDashletDAOTest extends AbstractCoreTestCase {
 		super.setUp();
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDashletDAO
-		testSubject = Context.get(DashletDAO.class);
+		testSubject = DashletDAO.get();
 	}
 
 	@Test
@@ -51,7 +50,7 @@ public class HibernateDashletDAOTest extends AbstractCoreTestCase {
 	@Test
 	public void testDelete() throws PersistenceException {
 		Dashlet dashlet = retrieveDashlet().get(9);
-		assertNotNull(dashlet);		
+		assertNotNull(dashlet);
 		testSubject.delete(dashlet.getId(), 1);
 	}
 
@@ -73,10 +72,9 @@ public class HibernateDashletDAOTest extends AbstractCoreTestCase {
 		dashlet1.setName(null);
 		assertEquals(false, dashlet1.equals(dashlet2));
 	}
-	
+
 	private List<Dashlet> retrieveDashlet() throws PersistenceException {
-		TenantDAO tenantDao = Context.get(TenantDAO.class);
-		Tenant tenant = tenantDao.findById(1L);
+		Tenant tenant = TenantDAO.get().findById(1L);
 		assertNotNull(tenant);
 
 		List<Dashlet> dashlets = testSubject.findAll(Tenant.DEFAULT_ID);

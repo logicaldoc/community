@@ -10,9 +10,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
@@ -24,6 +21,9 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserType;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for users data.
@@ -58,7 +58,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 		/*
 		 * Iterate over records composing the response XML document
 		 */
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 		for (User user : users) {
 			if (user.getType() == UserType.SYSTEM || (skipdisabled && user.getEnabled() != 1))
 				continue;
@@ -115,7 +115,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 	private List<User> findUsers(Session session, String groupIdOrName) throws PersistenceException {
 		List<User> users = new ArrayList<>();
 
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 		GroupDAO groupDao = Context.get(GroupDAO.class);
 
 		if (groupIdOrName != null && !groupIdOrName.trim().isEmpty()) {

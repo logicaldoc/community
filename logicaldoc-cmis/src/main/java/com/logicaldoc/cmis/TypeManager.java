@@ -40,10 +40,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
-import com.logicaldoc.util.spring.Context;
-import com.logicaldoc.core.metadata.Attribute;
 
 /**
  * Type Manager.
@@ -335,7 +334,7 @@ public class TypeManager {
 		/*
 		 * Extended properties
 		 */
-		AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
+		AttributeSetDAO dao = AttributeSetDAO.get();
 		List<AttributeSet> sets = dao.findAll();
 		for (AttributeSet set : sets) {
 			dao.initialize(set);

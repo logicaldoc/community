@@ -5,6 +5,7 @@ import java.util.List;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.security.Permission;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Instances of this class is a DAO-service for menu objects.
@@ -13,7 +14,16 @@ import com.logicaldoc.core.security.Permission;
  * @version 1.0
  */
 public interface MenuDAO extends PersistentObjectDAO<Menu> {
-
+	
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static MenuDAO get() {
+		return Context.get(MenuDAO.class);
+	}
+	
 	/**
 	 * Finds all menus by menu text.
 	 * 

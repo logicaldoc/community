@@ -39,7 +39,7 @@ public class SoapSearchServiceTest extends AbstractWebserviceTestCase {
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		documentDao = Context.get(DocumentDAO.class);
+		documentDao = DocumentDAO.get();
 		searchEngine = Context.get(SearchEngine.class);
 
 		testSubject = new SoapSearchService();

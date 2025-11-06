@@ -8,7 +8,6 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.util.UserUtil;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Utility methods to handle some user related operations from within the
@@ -31,7 +30,7 @@ public class UserTool {
 	 * @return the user object
 	 */
 	public User getUser(String username) {
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 		try {
 			return StringUtils.isNotEmpty(username) ? userDao.findByUsername(username)
 					: userDao.findByUsername("_system");
@@ -49,7 +48,7 @@ public class UserTool {
 	 * @return the user object
 	 */
 	public User getUser(long userId) {
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 		try {
 			return userDao.findById(userId);
 		} catch (PersistenceException e) {
@@ -64,7 +63,7 @@ public class UserTool {
 	 * @param user the user to initialize
 	 */
 	public void initialize(User user) {
-		UserDAO uDao = Context.get(UserDAO.class);
+		UserDAO uDao = UserDAO.get();
 		try {
 			uDao.initialize(user);
 		} catch (PersistenceException e) {

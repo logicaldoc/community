@@ -21,7 +21,6 @@ import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.util.junit.AbstractTestCase;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.servlet.MockServletSession;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.service.SecurityServiceImpl;
 
 /**
@@ -57,7 +56,7 @@ public abstract class AbstractWebappTestCase extends AbstractTestCase {
 	}
 
 	protected void prepareSession(String username, String password) throws ServerException, PersistenceException {
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 
 		guiSession = new GUISession();
 		Client client = new Client("xyz", "192.168.2.231", "ghost");

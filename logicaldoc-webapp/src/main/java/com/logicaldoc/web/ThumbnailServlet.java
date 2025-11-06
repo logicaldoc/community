@@ -4,11 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Set;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +23,11 @@ import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for document thumbnail. It searches for the
@@ -79,7 +79,7 @@ public class ThumbnailServlet extends HttpServlet {
 			long docId = Long.parseLong(id);
 			if (StringUtils.isEmpty(suffix))
 				suffix = ThumbnailManager.SUFFIX_THUMB;
-			DocumentDAO docDao = Context.get(DocumentDAO.class);
+			DocumentDAO docDao = DocumentDAO.get();
 			Document doc = docDao.findById(docId);
 			if (doc.getDocRef() != null) {
 				doc = docDao.findById(doc.getDocRef());
@@ -94,7 +94,7 @@ public class ThumbnailServlet extends HttpServlet {
 			checkPublication(doc, user);
 			
 			// Check read and preview
-			DocumentDAO dDao = Context.get(DocumentDAO.class);
+			DocumentDAO dDao = DocumentDAO.get();
 			Set<Permission> allowedPermissions = dDao.getAllowedPermissions(docId, user.getId());
 			if(!allowedPermissions.contains(Permission.READ) || !allowedPermissions.contains(Permission.PREVIEW))
 				throw new PermissionException(user.getUsername(), doc.toString(), Permission.PREVIEW);
@@ -126,7 +126,7 @@ public class ThumbnailServlet extends HttpServlet {
 			fileVersion = doc.getFileVersion();
 
 		if (version != null) {
-			VersionDAO vDao = Context.get(VersionDAO.class);
+			VersionDAO vDao = VersionDAO.get();
 			Version ver = vDao.findByVersion(docId, version);
 			if (ver != null)
 				fileVersion = ver.getFileVersion();

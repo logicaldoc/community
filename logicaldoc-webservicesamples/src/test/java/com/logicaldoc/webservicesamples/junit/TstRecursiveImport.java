@@ -5,10 +5,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import jakarta.activation.DataHandler;
-import jakarta.activation.DataSource;
-import jakarta.activation.FileDataSource;
-
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -22,6 +18,10 @@ import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.soap.client.SoapDocumentClient;
 import com.logicaldoc.webservice.soap.client.SoapFolderClient;
+
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.activation.FileDataSource;
 
 public class TstRecursiveImport extends BaseTestCase {
 

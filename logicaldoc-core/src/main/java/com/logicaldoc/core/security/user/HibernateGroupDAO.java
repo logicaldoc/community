@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.menu.MenuDAO;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.sql.SqlUtil;
 
 import jakarta.annotation.Resource;
@@ -167,7 +166,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 		if (group.getDeleted() == 0)
 			refresh(group);
 
-		UserDAO uDao = Context.get(UserDAO.class);
+		UserDAO uDao = UserDAO.get();
 		try {
 			group.setUsers(uDao.findByGroup(group.getId()));
 		} catch (PersistenceException e) {
@@ -193,7 +192,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 			return;
 		boolean guest = group.isGuest();
 		if (!guest && group.isUserGroup()) {
-			UserDAO userDao = Context.get(UserDAO.class);
+			UserDAO userDao = UserDAO.get();
 			User user = userDao
 					.findById(Long.parseLong(group.getName().substring(group.getName().lastIndexOf('_') + 1)));
 			guest = user.isReadonly();

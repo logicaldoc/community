@@ -82,12 +82,12 @@ public class DocumentManagerTest extends AbstractCoreTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		docDao = Context.get(DocumentDAO.class);
-		verDao = Context.get(VersionDAO.class);
-		userDao = Context.get(UserDAO.class);
-		folderDao = Context.get(FolderDAO.class);
-		documentNoteDao = Context.get(DocumentNoteDAO.class);
-		documentLinkDao = Context.get(DocumentLinkDAO.class);
+		docDao = DocumentDAO.get();
+		verDao = VersionDAO.get();
+		userDao = UserDAO.get();
+		folderDao = FolderDAO.get();
+		documentNoteDao = DocumentNoteDAO.get();
+		documentLinkDao = DocumentLinkDAO.get();
 		store = Context.get(MockStore.class);
 		store2 = Context.get(Store.class);
 

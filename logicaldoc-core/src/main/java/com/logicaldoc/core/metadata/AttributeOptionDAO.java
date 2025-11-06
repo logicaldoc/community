@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * DAO for <code>AttributeOption</code> handling.
@@ -15,6 +16,15 @@ import com.logicaldoc.core.PersistentObjectDAO;
  */
 public interface AttributeOptionDAO extends PersistentObjectDAO<AttributeOption> {
 
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static AttributeOptionDAO get() {
+		return Context.get(AttributeOptionDAO.class);
+	}
+	
 	/**
 	 * This method deletes options.
 	 * 

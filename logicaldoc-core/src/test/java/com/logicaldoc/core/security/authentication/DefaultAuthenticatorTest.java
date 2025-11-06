@@ -39,7 +39,7 @@ public class DefaultAuthenticatorTest extends AbstractCoreTestCase {
 		assertNotNull(user);
 
 		// Now add a legal not yet confirmed
-		Context.get(UserDAO.class).jdbcUpdate(
+		UserDAO.get().jdbcUpdate(
 				"insert into ld_legal(ld_name, ld_title, ld_date, ld_content) values ('EULA 1', 'EULA', CURRENT_TIMESTAMP, 'test')");
 
 		try {
@@ -50,7 +50,7 @@ public class DefaultAuthenticatorTest extends AbstractCoreTestCase {
 		}
 
 		// Now confirm the legal
-		Context.get(UserDAO.class).jdbcUpdate(
+		UserDAO.get().jdbcUpdate(
 				"insert into ld_legal_confirmation(ld_legal, ld_date, ld_username, ld_user) values ('EULA 1', CURRENT_TIMESTAMP, 'admin', 'Administrator')");
 		user = testSubject.authenticate("admin", "admin");
 		assertNotNull(user);

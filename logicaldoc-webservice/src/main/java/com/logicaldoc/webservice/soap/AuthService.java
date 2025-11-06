@@ -1,11 +1,11 @@
 package com.logicaldoc.webservice.soap;
 
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.webservice.doc.WSDoc;
+
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebParam;
 import jakarta.jws.WebService;
-
-import com.logicaldoc.core.security.authentication.AuthenticationException;
-import com.logicaldoc.webservice.doc.WSDoc;
 
 /**
  * Auth Web Service definition interface

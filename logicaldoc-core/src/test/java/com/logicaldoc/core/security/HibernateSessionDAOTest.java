@@ -14,7 +14,6 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for <code>HibernateSessionDAO</code>
@@ -31,9 +30,7 @@ public class HibernateSessionDAOTest extends AbstractCoreTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		// Retrieve the instance under test from spring context. Make sure that
-		// it is an HibernateSessionDAO
-		dao = Context.get(SessionDAO.class);
+		dao = SessionDAO.get();
 	}
 
 	@Test

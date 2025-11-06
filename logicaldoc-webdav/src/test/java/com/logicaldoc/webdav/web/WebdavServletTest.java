@@ -8,8 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavMethods;
@@ -25,6 +23,8 @@ import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.servlet.MockServletRequest;
 import com.logicaldoc.util.servlet.MockServletResponse;
 import com.logicaldoc.webdav.AbstractWebdavTestCase;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 public class WebdavServletTest extends AbstractWebdavTestCase {
 

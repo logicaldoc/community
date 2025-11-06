@@ -7,9 +7,6 @@ import java.text.DateFormat;
 import java.util.List;
 import java.util.Locale;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +23,9 @@ import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.TimeDiff;
 import com.logicaldoc.web.util.ServletUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for sessions data.
@@ -83,7 +83,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
 			/*
 			 * The current user must be enabled to see the sessions.
 			 */
-			MenuDAO mDao = Context.get(MenuDAO.class);
+			MenuDAO mDao = MenuDAO.get();
 			boolean showSid = currentUser == null || mDao.isReadAllowed(Menu.ADMIN_SESSIONS, currentUser.getId());
 
 			PrintWriter writer = response.getWriter();

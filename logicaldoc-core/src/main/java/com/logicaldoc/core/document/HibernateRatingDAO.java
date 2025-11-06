@@ -14,7 +14,6 @@ import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.transaction.Transactional;
 
@@ -58,7 +57,7 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 	@Override
 	public int updateDocumentRating(long docId, DocumentHistory transaction) throws PersistenceException {
 		Rating votesDoc = findVotesByDocId(docId);
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		Document doc = docDao.findById(docId);
 		if (doc == null)
 			return 0;

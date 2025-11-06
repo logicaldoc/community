@@ -20,7 +20,6 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserHistory;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSDocument;
@@ -55,7 +54,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 		lastSearch.search();
 		List<Hit> hitsList = lastSearch.getHits();
 
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		List<WSDocument> docs = new ArrayList<>();
 		for (Hit hit : hitsList) {
 			Document d = docDao.findById(hit.getId());
@@ -83,7 +82,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		List<Document> docs = docDao.findByFileNameAndParentFolderId(null, filename, null, user.getTenantId(), null);
 
 		List<WSDocument> wsDocs = new ArrayList<>();
@@ -107,7 +106,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		List<Folder> folders = folderDao.find(name, user.getTenantId());
 		List<WSFolder> wsFolders = new ArrayList<>();
 		for (Folder folder : folders) {

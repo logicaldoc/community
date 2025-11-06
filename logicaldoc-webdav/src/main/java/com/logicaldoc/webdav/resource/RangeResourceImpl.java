@@ -2,8 +2,6 @@ package com.logicaldoc.webdav.resource;
 
 import java.io.IOException;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
@@ -17,6 +15,8 @@ import com.logicaldoc.webdav.exception.UncheckedDavException;
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.session.WebdavSession;
 import com.logicaldoc.webdav.web.AbstractWebdavServlet;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 public class RangeResourceImpl extends DavResourceImpl {
 

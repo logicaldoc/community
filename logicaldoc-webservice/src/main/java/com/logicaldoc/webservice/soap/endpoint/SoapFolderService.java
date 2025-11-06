@@ -24,7 +24,6 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSAccessControlEntry;
@@ -55,7 +54,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		Folder parentFolder = folderDao.findById(wsFolder.getParentId());
 		if (parentFolder == null)
 			throw new WebserviceException(
@@ -106,7 +105,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		Folder parentFolder = folderDao.findFolder(parentId);
 		if (parentFolder == null)
 			throw new WebserviceException(String.format("A parent folder with id %s was not found.", parentId));
@@ -138,7 +137,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	public void delete(String sid, long folderId)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		long rootId = folderDao.findRoot(user.getTenantId()).getTenantId();
 		if (folderId == rootId)
 			throw new WebserviceException("Cannot delete root folder or Default workspace");
@@ -158,7 +157,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 		checkFolderPermission(Permission.READ, user, folderId);
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		Folder folder = folderDao.findById(folderId);
 		if (folder == null)
 			return null;
@@ -173,7 +172,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		Folder folder = folderDao.findByPathExtended(path, user.getTenantId());
 		if (folder == null)
 			return null;
@@ -202,7 +201,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		User user = validateSession(sid);
 		checkFolderPermission(Permission.READ, user, folderId);
 
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 
 		// Get the folders
 		List<Folder> folders = folderDao.findChildren(folderId, user.getId());
@@ -236,7 +235,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	public void move(String sid, long folderId, long parentId)
 			throws PersistenceException, AuthenticationException, WebserviceException, PermissionException {
 		User user = validateSession(sid);
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 
 		if (parentId == folderDao.findRoot(user.getTenantId()).getId()) {
 			String message = CANNOT_MOVE_FOLDERS_IN_THE_ROOT;
@@ -279,7 +278,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	public void copy(String sid, long folderId, long targetId, int foldersOnly, String securityOption)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 
 		if (targetId == folderDao.findRoot(user.getTenantId()).getId()) {
 			String message = CANNOT_MOVE_FOLDERS_IN_THE_ROOT;
@@ -315,7 +314,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	public void rename(String sid, long folderId, String name)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		if (!folderDao.isPermissionAllowed(Permission.RENAME, folderId, user.getId()))
 			throw new PermissionException(user.getUsername(), FOLDER + folderId, Permission.RENAME);
 
@@ -350,7 +349,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	public WSFolder getRootFolder(String sid)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 
 		Folder folder = folderDao.findRoot(user.getTenantId());
 		folderDao.initialize(folder);
@@ -362,7 +361,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	public WSFolder getDefaultWorkspace(String sid)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		return getFolder(sid, folderDao.findDefaultWorkspace(user.getTenantId()).getId());
 	}
 
@@ -370,7 +369,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	public boolean isWritable(String sid, long folderId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		return folderDao.isWriteAllowed(folderId, user.getId());
 	}
 
@@ -395,7 +394,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 		List<WSFolder> path = new ArrayList<>();
 
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		long rootId = folderDao.findRoot(user.getTenantId()).getId();
 		if (folderId == rootId)
 			path.add(getRootFolder(sid));
@@ -422,7 +421,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException {
 		User sessionUser = validateSession(sid);
 
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		// Check if the session user has the Security Permission of this
 		// folder
 		if (!folderDao.isPermissionAllowed(Permission.SECURITY, folderId, sessionUser.getId()))
@@ -449,7 +448,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 		List<WSAccessControlEntry> acl = new ArrayList<>();
 
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		Folder folder = folderDao.findById(folderId);
 		if (folder.getSecurityRef() != null)
 			folder = folderDao.findById(folder.getSecurityRef());
@@ -468,7 +467,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		long folderId = wsFolder.getId();
 		String name = wsFolder.getName();
 
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		if (!folderDao.isPermissionAllowed(Permission.RENAME, folderId, user.getId()))
 			throw new PermissionException(user.getUsername(), FOLDER + folderId, Permission.RENAME);
 
@@ -526,7 +525,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		User user = validateSession(sid);
 		checkFolderPermission(Permission.ADD, user, parentId);
 
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		Folder parent = folderDao.findById(parentId);
 		folderDao.initialize(parent);
 
@@ -576,7 +575,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		List<Folder> folders = folderDao.findByUserId(user.getId(), folderDao.findRoot(user.getTenantId()).getId());
 		List<WSFolder> wsFolders = new ArrayList<>();
 		for (Folder folder : folders) {
@@ -592,7 +591,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	public void merge(String sid, long sourceId, long targetId)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 
 		if (targetId == folderDao.findRoot(user.getTenantId()).getId()) {
 			throw new PermissionException(CANNOT_MOVE_FOLDERS_IN_THE_ROOT);

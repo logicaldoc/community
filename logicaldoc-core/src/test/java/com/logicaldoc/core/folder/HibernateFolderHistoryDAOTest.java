@@ -20,7 +20,6 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.i18n.DateBean;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link HibernateFolderFolderHistoryDAO}
@@ -39,7 +38,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateFolderFolderHistoryDAO
-		dao = Context.get(FolderHistoryDAO.class);
+		dao = FolderHistoryDAO.get();
 	}
 
 	@Test

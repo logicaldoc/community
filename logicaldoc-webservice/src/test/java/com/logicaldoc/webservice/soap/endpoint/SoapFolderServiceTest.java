@@ -22,7 +22,6 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSAccessControlEntry;
 import com.logicaldoc.webservice.model.WSAttribute;
@@ -47,8 +46,8 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 	@Override
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		folderDao = Context.get(FolderDAO.class);
-		userDao = Context.get(UserDAO.class);
+		folderDao = FolderDAO.get();
+		userDao = UserDAO.get();
 
 		// Make sure that this is a SoapFolderService instance
 		testSubject = new SoapFolderService();

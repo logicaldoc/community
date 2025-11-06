@@ -9,9 +9,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.PersistenceException;
@@ -20,7 +17,9 @@ import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentStatus;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for locked documents data retrieval
@@ -38,7 +37,7 @@ public class LockedDocsDataServlet extends AbstractDataServlet {
 
 		Long userId = request.getParameter("userId") != null ? Long.parseLong(request.getParameter("userId")) : null;
 
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		DateFormat df = getDateFormat();
 
 		PrintWriter writer = response.getWriter();

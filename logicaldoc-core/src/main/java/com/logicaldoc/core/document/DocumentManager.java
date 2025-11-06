@@ -82,6 +82,15 @@ import jakarta.annotation.Resource;
 @Component("documentManager")
 public class DocumentManager {
 
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static DocumentManager get() {
+		return Context.get(DocumentManager.class);
+	}
+	
 	private static final String UPDATE_LD_DOCUMENT_SET_LD_INDEXED = "update ld_document set ld_indexed=";
 
 	private static final String NO_VALUE_OBJECT_HAS_BEEN_PROVIDED = "No value object has been provided";
@@ -716,7 +725,7 @@ public class DocumentManager {
 		if (exception instanceof ParsingException) {
 			if (Context.get().getProperties().getBoolean(tenantName(document.getTenantId()) + ".index.skiponerror",
 					false)) {
-				DocumentDAO dDao = Context.get(DocumentDAO.class);
+				DocumentDAO dDao = DocumentDAO.get();
 				dDao.initialize(document);
 				document.setIndexingStatus(IndexingStatus.SKIP);
 				dDao.store(document);
@@ -1729,7 +1738,7 @@ public class DocumentManager {
 			throw new IllegalArgumentException("transaction user cannot be null");
 
 		List<Long> idsList = new ArrayList<>();
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 		Collection<Long> folderIds = folderDAO.findFolderIdByUserIdAndPermission(transaction.getUserId(),
 				Permission.ARCHIVE, null, true);
 
@@ -1812,7 +1821,7 @@ public class DocumentManager {
 			} catch (NoSuchAlgorithmException e) {
 				throw new PasswordWeakException(List.of(e.getMessage()));
 			}
-			Context.get(UserDAO.class).checkPasswordCompliance(dummy);
+			UserDAO.get().checkPasswordCompliance(dummy);
 		}
 
 		ticketDAO.store(ticket, transaction);
@@ -2041,7 +2050,7 @@ public class DocumentManager {
 			bigPdf = MergeUtil.mergePdf(List.of(pdfs));
 
 			// Add an history entry to track the export of the document
-			DocumentDAO docDao = Context.get(DocumentDAO.class);
+			DocumentDAO docDao = DocumentDAO.get();
 			if (transaction != null)
 				for (Long id : docIds) {
 					DocumentHistory trans = new DocumentHistory(transaction);
@@ -2051,7 +2060,7 @@ public class DocumentManager {
 
 			Document docVO = new Document();
 			docVO.setFileName(fileName.toLowerCase().endsWith(".pdf") ? fileName : fileName + ".pdf");
-			FolderDAO folderDao = Context.get(FolderDAO.class);
+			FolderDAO folderDao = FolderDAO.get();
 			docVO.setFolder(folderDao.findById(targetFolderId));
 
 			DocumentManager manager = Context.get(DocumentManager.class);
@@ -2081,7 +2090,7 @@ public class DocumentManager {
 		for (long docId : docIds) {
 			try {
 				i++;
-				DocumentDAO docDao = Context.get(DocumentDAO.class);
+				DocumentDAO docDao = DocumentDAO.get();
 				Document document = docDao.findDocument(docId);
 
 				if (document != null && user != null && !user.isMemberOf(Group.GROUP_ADMIN)
@@ -2115,7 +2124,7 @@ public class DocumentManager {
 			throws PersistenceException, PermissionException {
 		validateTransaction(transaction);
 
-		MenuDAO menuDAO = Context.get(MenuDAO.class);
+		MenuDAO menuDAO = MenuDAO.get();
 		if (!menuDAO.isReadAllowed(Menu.DESTROY_DOCUMENTS, transaction.getUserId())) {
 			String message = "User " + transaction.getUsername() + " cannot access the menu " + Menu.DESTROY_DOCUMENTS;
 			throw new PermissionException(message);

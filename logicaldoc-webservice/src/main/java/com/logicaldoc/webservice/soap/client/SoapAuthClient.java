@@ -1,9 +1,9 @@
 package com.logicaldoc.webservice.soap.client;
 
-import jakarta.jws.WebService;
-
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.webservice.soap.AuthService;
+
+import jakarta.jws.WebService;
 
 /**
  * Auth Web Service client (SOAP).

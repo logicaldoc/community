@@ -1,7 +1,5 @@
 package com.logicaldoc.web.listener;
 
-import jakarta.servlet.ServletContextEvent;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.ContextLoaderListener;
@@ -10,6 +8,8 @@ import com.logicaldoc.core.SystemInfo;
 import com.logicaldoc.core.security.SessionDAO;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.ServletContextEvent;
 
 /**
  * Listener that initializes and destroys the Spring Context

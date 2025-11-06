@@ -4,10 +4,10 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Set;
 
+import com.logicaldoc.core.document.Document;
+
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-
-import com.logicaldoc.core.document.Document;
 
 /**
  * Model of a search engine with search and I/O capabilities. Various

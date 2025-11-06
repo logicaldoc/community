@@ -35,7 +35,7 @@ public class HibernateSearchDAOTest extends AbstractCoreTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		testSubject = Context.get(SearchDAO.class);
+		testSubject = SearchDAO.get();
 	}
 
 	@Test

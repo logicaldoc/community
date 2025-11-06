@@ -59,14 +59,14 @@ public class FormatConverterManagerTest extends AbstractCoreTestCase {
 
 		prepareSession("admin", "admin");
 
-		docDao = Context.get(DocumentDAO.class);
+		docDao = DocumentDAO.get();
 
 		store = Context.get(Store.class);
 
 		testSubject = Context.get(FormatConverterManager.class);
 
 		DocumentManager documentManager = Context.get(DocumentManager.class);
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 
 		document = new Document();
 		document.setFileName("test.txt");

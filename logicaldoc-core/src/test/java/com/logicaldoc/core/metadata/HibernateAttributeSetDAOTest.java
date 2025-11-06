@@ -17,7 +17,6 @@ import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for {@link HibernateAttributeDAO}
@@ -38,7 +37,7 @@ public class HibernateAttributeSetDAOTest extends AbstractCoreTestCase {
 		 * Retrieve the instance under test from spring context. Make sure that
 		 * it is an HibernateAttributeSetDAO
 		 */
-		testSubject = Context.get(AttributeSetDAO.class);
+		testSubject = AttributeSetDAO.get();
 	}
 
 	@Test

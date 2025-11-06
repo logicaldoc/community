@@ -3,12 +3,12 @@ package com.logicaldoc.core.security.user;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.logicaldoc.core.PersistentObject;
+
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-
-import com.logicaldoc.core.PersistentObject;
 
 /**
  * This class represent an old password of a user

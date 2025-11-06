@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.rest;
 
+import com.logicaldoc.webservice.model.WSCredentials;
+
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.FormParam;
@@ -10,8 +12,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-
-import com.logicaldoc.webservice.model.WSCredentials;
 
 /**
  * Auth Web Service definition interface for Rest Services

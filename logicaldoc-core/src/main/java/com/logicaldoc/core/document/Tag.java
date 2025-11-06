@@ -2,10 +2,10 @@ package com.logicaldoc.core.document;
 
 import java.io.Serializable;
 
+import com.logicaldoc.core.security.Tenant;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-
-import com.logicaldoc.core.security.Tenant;
 
 /**
  * Represents a tag of a specific document

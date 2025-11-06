@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * Instances of this class is a DAO-service for Generic business entities.
@@ -12,6 +13,16 @@ import com.logicaldoc.core.PersistentObjectDAO;
  * @since 4.0
  */
 public interface GenericDAO extends PersistentObjectDAO<Generic> {
+
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static GenericDAO get() {
+		return Context.get(GenericDAO.class);
+	}
+
 	/**
 	 * Finds a Generic by it's alternate key
 	 * 
@@ -38,7 +49,8 @@ public interface GenericDAO extends PersistentObjectDAO<Generic> {
 	 * 
 	 * @return The collection of found Generics
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<Generic> findByTypeAndSubtype(String type, String subtype, Long qualifier, Long tenantId) throws PersistenceException;
+	public List<Generic> findByTypeAndSubtype(String type, String subtype, Long qualifier, Long tenantId)
+			throws PersistenceException;
 }

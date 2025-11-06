@@ -33,8 +33,8 @@ public class SoapTagServiceTest extends AbstractWebserviceTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		
-		folderDao = Context.get(FolderDAO.class);
-		documentDao = Context.get(DocumentDAO.class);
+		folderDao = FolderDAO.get();
+		documentDao = DocumentDAO.get();
 		documentDao.insertNewUniqueTags();
 
 		testSubject = new SoapTagService();

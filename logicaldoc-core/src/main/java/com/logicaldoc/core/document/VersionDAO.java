@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * This class is a DAO-service for versions.
@@ -12,6 +13,16 @@ import com.logicaldoc.core.PersistentObjectDAO;
  * @version 4.5
  */
 public interface VersionDAO extends PersistentObjectDAO<Version> {
+
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static VersionDAO get() {
+		return Context.get(VersionDAO.class);
+	}
+
 	/**
 	 * This method finds a version by the document's ID an the version code.
 	 * 
@@ -32,10 +43,10 @@ public interface VersionDAO extends PersistentObjectDAO<Version> {
 	 * 
 	 * @return the found version
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 */
 	public Version findByFileVersion(long docId, String fileVersion) throws PersistenceException;
-	
+
 	/**
 	 * Finds all versions of the given document
 	 * 
@@ -45,7 +56,6 @@ public interface VersionDAO extends PersistentObjectDAO<Version> {
 	 * @throws PersistenceException Error in the database
 	 */
 	public List<Version> findByDocId(long docId) throws PersistenceException;
-
 
 	/**
 	 * Updates the version's digest (SHA-1)

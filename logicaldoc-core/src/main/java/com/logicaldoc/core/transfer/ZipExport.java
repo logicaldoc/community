@@ -68,7 +68,7 @@ public class ZipExport {
 	 * @throws PersistenceException error at database level
 	 */
 	public ByteArrayOutputStream process(FolderHistory transaction, boolean pdfConversion) throws PersistenceException {
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		Folder folder = folderDao.findFolder(transaction.getFolderId());
 		this.userId = transaction.getUserId();
 		this.startFolderId = folder.getId();
@@ -130,8 +130,8 @@ public class ZipExport {
 	 */
 	public void process(Long[] docIds, OutputStream out, boolean pdfConversion, DocumentHistory transaction)
 			throws PersistenceException {
-		DocumentDAO ddao = Context.get(DocumentDAO.class);
-		FolderDAO fdao = Context.get(FolderDAO.class);
+		DocumentDAO ddao = DocumentDAO.get();
+		FolderDAO fdao = FolderDAO.get();
 
 		zos = new ZipArchiveOutputStream(out);
 		zos.setEncoding("UTF-8");
@@ -176,7 +176,7 @@ public class ZipExport {
 	}
 
 	private void saveHistory(DocumentHistory transaction, Document doc) {
-		DocumentDAO ddao = Context.get(DocumentDAO.class);
+		DocumentDAO ddao = DocumentDAO.get();
 		if (transaction != null) {
 			DocumentHistory t = new DocumentHistory(transaction);
 			transaction.setEvent(DocumentEvent.DOWNLOADED);
@@ -212,7 +212,7 @@ public class ZipExport {
 			throws PersistenceException {
 		if (allLevel || depth < 1) {
 			addFolderDocuments(folder, pdfConversion, sid);
-			FolderDAO folderDao = Context.get(FolderDAO.class);
+			FolderDAO folderDao = FolderDAO.get();
 			Collection<Folder> children = folderDao.findByUserId(userId, folder.getId());
 			Iterator<Folder> iter = children.iterator();
 
@@ -231,7 +231,7 @@ public class ZipExport {
 	 * @throws PersistenceException error in the databaes
 	 */
 	protected void addFolderDocuments(Folder folder, boolean pdfConversion, String sid) throws PersistenceException {
-		DocumentDAO ddao = Context.get(DocumentDAO.class);
+		DocumentDAO ddao = DocumentDAO.get();
 		Collection<Document> docs = ddao.findByFolder(folder.getId(), null);
 
 		for (Document document : docs) {
@@ -322,7 +322,7 @@ public class ZipExport {
 	 * @throws PersistenceException Error in the database
 	 */
 	private String getZipEntryPath(Folder folder) throws PersistenceException {
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 
 		long rootId = folderDao.findRoot(folder.getTenantId()).getId();
 		if (folder.getId() == rootId)

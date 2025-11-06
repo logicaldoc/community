@@ -5,11 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.hsqldb.lib.StringUtil;
 import org.slf4j.Logger;
@@ -27,6 +22,11 @@ import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.html.HTMLSanitizer;
 import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for document downloads. It searches for the
@@ -72,8 +72,8 @@ public class DownloadServlet extends HttpServlet {
 
 	private void downloadDocument(HttpServletRequest request, HttpServletResponse response, Session session)
 			throws IOException, ServletException, PersistenceException {
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
-		VersionDAO versDao = Context.get(VersionDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
+		VersionDAO versDao = VersionDAO.get();
 
 		// Flag indicating to download only indexed text
 		String downloadText = request.getParameter("downloadText");
@@ -203,7 +203,7 @@ public class DownloadServlet extends HttpServlet {
 	}
 
 	private void checkDownloadPermission(Session session, Document doc) throws PersistenceException, IOException {
-		DocumentDAO documentDao = Context.get(DocumentDAO.class);
+		DocumentDAO documentDao = DocumentDAO.get();
 		if (!documentDao.isDownloadAllowed(doc.getId(), session.getUserId()))
 			throw new IOException("You don't have the DOWNLOAD permission");
 	}

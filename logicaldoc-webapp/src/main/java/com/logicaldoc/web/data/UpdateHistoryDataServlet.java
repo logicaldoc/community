@@ -13,7 +13,6 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.ResultSetWalker;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,7 +34,7 @@ public class UpdateHistoryDataServlet extends AbstractDataServlet {
 
 		DateFormat df = getDateFormat();
 
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 		userDao.queryForResultSet("""
 select lower(ld_update), ld_date, ld_version, 0, 'update' from ld_update
  UNION

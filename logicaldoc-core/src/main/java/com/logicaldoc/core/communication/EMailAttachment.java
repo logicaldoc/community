@@ -13,7 +13,6 @@ import com.logicaldoc.core.parser.Parser;
 import com.logicaldoc.core.parser.ParserFactory;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.TenantDAO;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * An attachment of an email message
@@ -130,10 +129,9 @@ public class EMailAttachment implements Serializable {
 		// and gets some fields
 		try (InputStream contentStream = new ByteArrayInputStream(getData())) {
 			if (tenantId != null) {
-				TenantDAO tDao = Context.get(TenantDAO.class);
 				content = parser.parse(contentStream, getFileName(),
 						StringUtils.isNotEmpty(encoding) ? encoding : "UTF-8", locale != null ? locale : Locale.ENGLISH,
-						tDao.findById(tenantId).getName());
+								TenantDAO.get().findById(tenantId).getName());
 			} else
 				content = parser.parse(contentStream, getFileName(),
 						StringUtils.isNotEmpty(encoding) ? encoding : "UTF-8", locale != null ? locale : Locale.ENGLISH,

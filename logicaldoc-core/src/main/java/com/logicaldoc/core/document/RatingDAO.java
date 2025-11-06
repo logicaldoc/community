@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * DAO service for ratings
@@ -13,6 +14,15 @@ import com.logicaldoc.core.PersistentObjectDAO;
  */
 public interface RatingDAO extends PersistentObjectDAO<Rating> {
 
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static RatingDAO get() {
+		return Context.get(RatingDAO.class);
+	}
+	
 	/**
 	 * Stores a rating and saves the document's history
 	 * 

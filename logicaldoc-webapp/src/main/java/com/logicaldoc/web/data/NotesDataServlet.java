@@ -61,7 +61,7 @@ public class NotesDataServlet extends AbstractDataServlet {
 			query.append(" and A.ld_page =" + page);
 
 		if (docId != null && fileVersion == null) {
-			DocumentDAO ddao = Context.get(DocumentDAO.class);
+			DocumentDAO ddao = DocumentDAO.get();
 			Document doc = ddao.findDocument(docId);
 			fileVersion = doc.getFileVersion();
 		}
@@ -141,7 +141,7 @@ public class NotesDataServlet extends AbstractDataServlet {
 		Long docId = null;
 		if (request.getParameter("docId") != null) {
 			docId = Long.parseLong(request.getParameter("docId"));
-			DocumentDAO ddao = Context.get(DocumentDAO.class);
+			DocumentDAO ddao = DocumentDAO.get();
 			Document doc = ddao.findDocument(docId);
 			if (doc != null)
 				docId = doc.getId();

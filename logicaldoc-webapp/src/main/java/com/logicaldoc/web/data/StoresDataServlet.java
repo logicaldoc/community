@@ -5,9 +5,6 @@ import java.io.PrintWriter;
 import java.util.Locale;
 import java.util.Set;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
@@ -18,6 +15,9 @@ import com.logicaldoc.core.store.Store;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for stores data.
@@ -116,7 +116,7 @@ public class StoresDataServlet extends AbstractDataServlet {
 	private boolean isParameters(HttpServletRequest request, Session session) {
 		boolean parameters = "true".equals(request.getParameter("parameters"));
 		if (parameters) {
-			MenuDAO mDao = Context.get(MenuDAO.class);
+			MenuDAO mDao = MenuDAO.get();
 			parameters = session.getTenantId() == Tenant.DEFAULT_ID && mDao.isReadAllowed(105, session.getUserId());
 		}
 		return parameters;

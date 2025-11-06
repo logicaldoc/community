@@ -111,7 +111,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 		Runnable task = () -> {
 			try {
-				Context.get(DocumentDAO.class).jdbcUpdate("update ld_document set ld_indexed=0 where ld_indexed=1 "
+				DocumentDAO.get().jdbcUpdate("update ld_document set ld_indexed=0 where ld_indexed=1 "
 						+ (!dropIndex ? " and ld_tenantid=" + session.getTenantId() : ""));
 			} catch (Exception t) {
 				log.error(t.getMessage(), t);
@@ -293,7 +293,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 				indexer.deleteHits(entryIds);
 				log.info("Removed {} entries from the index", entryIds.size());
 
-				DocumentDAO dao = Context.get(DocumentDAO.class);
+				DocumentDAO dao = DocumentDAO.get();
 				StringBuilder updateQuery = new StringBuilder();
 				updateQuery = new StringBuilder("update ld_document set ld_indexed=0 where ld_indexed = 1 ");
 
@@ -459,7 +459,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		richQuery.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
 		richQuery.append(" where A.ld_deleted=0 and A.ld_folderid=FOLD.ld_id  ");
 
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 
 		Set<Long> hitsIds = hitsMap.keySet();
 		StringBuilder hitsIdsCondition = new StringBuilder();

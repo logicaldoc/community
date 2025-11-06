@@ -32,7 +32,6 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.AbstractWPTestCase;
 import com.logicaldoc.web.UploadServlet;
 import com.logicaldoc.web.data.FoldersDataServlet;
@@ -50,8 +49,8 @@ public class FolderServiceImplTest extends AbstractWPTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		folderDao = Context.get(FolderDAO.class);
-		documentDao = Context.get(DocumentDAO.class);
+		folderDao = FolderDAO.get();
+		documentDao = DocumentDAO.get();
 	}
 
 	@Test
@@ -286,7 +285,7 @@ public class FolderServiceImplTest extends AbstractWPTestCase {
 		Folder parentFolder = folderDao.findById(7L);
 		folderDao.initialize(parentFolder);
 
-		TemplateDAO templateDao = Context.get(TemplateDAO.class);
+		TemplateDAO templateDao = TemplateDAO.get();
 		parentFolder.setTemplate(templateDao.findById(-1L));
 		parentFolder.setValue("source", "test");
 		folderDao.store(parentFolder);

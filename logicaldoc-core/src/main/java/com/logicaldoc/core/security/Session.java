@@ -188,8 +188,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.finished = new Date();
 
 		// Add a user history entry
-		UserHistoryDAO userHistoryDAO = Context.get(UserHistoryDAO.class);
-		userHistoryDAO.createUserHistory(user, UserEvent.TIMEOUT, null, sid, client);
+		UserHistoryDAO.get().createUserHistory(user, UserEvent.TIMEOUT, null, sid, client);
 	}
 
 	public void setClosed() {
@@ -200,8 +199,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.finished = new Date();
 
 		// Add a user history entry
-		UserHistoryDAO userHistoryDAO = Context.get(UserHistoryDAO.class);
-		userHistoryDAO.createUserHistory(user, UserEvent.LOGOUT, null, sid, client);
+		UserHistoryDAO.get().createUserHistory(user, UserEvent.LOGOUT, null, sid, client);
 	}
 
 	public String getDecodedKey() {
@@ -248,9 +246,8 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.node = SystemInfo.get().getInstallationId();
 		this.setLastRenew(getCreation());
 
-		TenantDAO tenantDAO = Context.get(TenantDAO.class);
 		try {
-			this.tenantName = tenantDAO.getTenantName(tenantId);
+			this.tenantName = TenantDAO.get().getTenantName(tenantId);
 		} catch (PersistenceException e) {
 			log.warn("Cannot retrieve the name of tenant {}", tenantId);
 		}
@@ -264,8 +261,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 			client.getDevice().setUserId(user.getId());
 			client.getDevice().setUsername(user.getFullName());
 
-			DeviceDAO deviceDAO = Context.get(DeviceDAO.class);
-			Device device = deviceDAO.findByDevice(client.getDevice());
+			Device device = DeviceDAO.get().findByDevice(client.getDevice());
 			if (device == null)
 				device = client.getDevice();
 
@@ -276,12 +272,12 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 			try {
 				boolean newDevice = device.getId() == 0L;
-				deviceDAO.store(device);
+				DeviceDAO.get().store(device);
 				client.setDevice(device);
 				history.setDevice(client.getDevice().toString());
 				if (client.getGeolocation() != null)
 					history.setGeolocation(client.getGeolocation().toString());
-				Context.get(UserHistoryDAO.class).store(history);
+				UserHistoryDAO.get().store(history);
 
 				// Send an email alert to the user in case of new device
 				if (newDevice && Context.get().getProperties().getBoolean(tenantName + ".alertnewdevice", true)) {

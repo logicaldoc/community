@@ -5,16 +5,15 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Locale;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for attribute sets data.
@@ -48,7 +47,7 @@ public class AttributeSetsDataServlet extends AbstractDataServlet {
 			writer.print("</attributeset>");
 		}
 
-		AttributeSetDAO dao = Context.get(AttributeSetDAO.class);
+		AttributeSetDAO dao = AttributeSetDAO.get();
 		List<AttributeSet> sets = null;
 		if (type != null)
 			sets = dao.findByType(type, session.getTenantId());

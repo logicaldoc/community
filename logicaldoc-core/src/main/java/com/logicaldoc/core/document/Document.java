@@ -18,7 +18,6 @@ import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.security.Secure;
 import com.logicaldoc.core.util.IconSelector;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.CollectionTable;
@@ -285,7 +284,7 @@ public class Document extends AbstractDocument implements Secure<DocumentAccessC
 				log.debug("Got error when trying to copy collections from document {}", docVO, ex);
 
 				// load again the provided doc
-				DocumentDAO docDao = Context.get(DocumentDAO.class);
+				DocumentDAO docDao = DocumentDAO.get();
 				try {
 					Document testDocVO = docDao.findById(docVO.getId());
 					if (testDocVO != null) {

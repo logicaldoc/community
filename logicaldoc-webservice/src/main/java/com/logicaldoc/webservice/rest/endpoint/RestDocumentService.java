@@ -22,7 +22,6 @@ import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSAccessControlEntry;
 import com.logicaldoc.webservice.model.WSDocument;
@@ -957,7 +956,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 		String myPath = "/" + docPath;
 
 		User user = validateSession(sid);
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		Document doc = docDao.findByPath(myPath, user.getTenantId());
 
 		if (!type.toLowerCase().endsWith(".png"))

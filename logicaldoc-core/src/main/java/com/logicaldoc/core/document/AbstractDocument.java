@@ -23,7 +23,6 @@ import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
@@ -932,7 +931,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 			log.debug("Got error when trying to copy collections from document {}", docVO, ex);
 
 			// load again the provided doc
-			DocumentDAO docDao = Context.get(DocumentDAO.class);
+			DocumentDAO docDao = DocumentDAO.get();
 			try {
 				Document testDocVO = docDao.findById(docVO.getId());
 				if (testDocVO != null) {

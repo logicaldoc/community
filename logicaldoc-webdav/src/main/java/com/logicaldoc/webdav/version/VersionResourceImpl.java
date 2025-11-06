@@ -3,8 +3,6 @@ package com.logicaldoc.webdav.version;
 import java.util.Collections;
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -34,6 +32,8 @@ import com.logicaldoc.webdav.resource.DeltaVResourceImpl;
 import com.logicaldoc.webdav.resource.ResourceConfiguration;
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.session.WebdavSession;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * For more informations, please visit

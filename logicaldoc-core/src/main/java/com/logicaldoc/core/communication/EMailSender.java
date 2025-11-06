@@ -136,9 +136,8 @@ public class EMailSender {
 	private Long folderId;
 
 	public EMailSender(long tenant) {
-		TenantDAO tenantDao = Context.get(TenantDAO.class);
 		try {
-			loadSettings(tenantDao.findById(tenant).getName());
+			loadSettings(TenantDAO.get().findById(tenant).getName());
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -149,9 +148,8 @@ public class EMailSender {
 	}
 
 	public void setTenant(long tenant) {
-		TenantDAO tenantDao = Context.get(TenantDAO.class);
 		try {
-			loadSettings(tenantDao.findById(tenant).getName());
+			loadSettings(TenantDAO.get().findById(tenant).getName());
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -260,7 +258,7 @@ public class EMailSender {
 			return;
 		}
 
-		MessageTemplateDAO templateDao = Context.get(MessageTemplateDAO.class);
+		MessageTemplateDAO templateDao = MessageTemplateDAO.get();
 		MessageTemplate template = null;
 		try {
 			template = templateDao.findByNameAndLanguage(templateName, email.getLocale().toString(),
@@ -456,8 +454,7 @@ public class EMailSender {
 
 	private void cleanAuthorAddress(EMail email) {
 		try {
-			TenantDAO tDao = Context.get(TenantDAO.class);
-			String tenantName = tDao.getTenantName(email.getTenantId());
+			String tenantName = TenantDAO.get().getTenantName(email.getTenantId());
 			if (!Context.get().getProperties().getBoolean(tenantName + ".smtp.userasfrom", false))
 				email.setAuthorAddress(null);
 		} catch (Exception e) {
@@ -609,10 +606,10 @@ public class EMailSender {
 			return;
 
 		DocumentManager manager = Context.get(DocumentManager.class);
-		TemplateDAO templateDao = Context.get(TemplateDAO.class);
-		UserDAO userDao = Context.get(UserDAO.class);
+		TemplateDAO templateDao = TemplateDAO.get();
+		UserDAO userDao = UserDAO.get();
 
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		Folder saveFolder = null;
 		try {
 			saveFolder = folderId != null && folderId != 0 ? folderDao.findFolder(folderId) : null;

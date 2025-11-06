@@ -5,16 +5,15 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Locale;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for templates data.
@@ -35,7 +34,7 @@ public class TemplatesDataServlet extends AbstractDataServlet {
 				: null;
 		Integer type = request.getParameter("type") != null ? Integer.parseInt(request.getParameter("type")) : null;
 
-		TemplateDAO templateDao = Context.get(TemplateDAO.class);
+		TemplateDAO templateDao = TemplateDAO.get();
 		Template template = templateId != null ? templateDao.findById(templateId) : null;
 
 		PrintWriter writer = response.getWriter();

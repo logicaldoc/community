@@ -16,7 +16,6 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.threading.NotifyingThread;
 import com.logicaldoc.core.threading.NotifyingThread.ThreadCompleteListener;
 import com.logicaldoc.i18n.I18N;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.TimeDiff;
 
 /**
@@ -57,8 +56,8 @@ public class LongRunningOperationCompleteListener<T> implements ThreadCompleteLi
 
 	@Override
 	public void completed(NotifyingThread<T> thread) {
-		SystemMessageDAO smdao = Context.get(SystemMessageDAO.class);
-		UserDAO uDao = Context.get(UserDAO.class);
+		SystemMessageDAO smdao = SystemMessageDAO.get();
+		UserDAO uDao = UserDAO.get();
 		Date now = new Date();
 
 		for (String username : usernames) {

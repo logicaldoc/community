@@ -19,7 +19,6 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Test case for <code>HibernateGroupDAOTest</code>
@@ -36,9 +35,7 @@ public class HibernateGroupDAOTest extends AbstractCoreTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		// Retrieve the instance under test from spring context. Make sure that
-		// it is an HibernateGroupDAO
-		dao = Context.get(GroupDAO.class);
+		dao = GroupDAO.get();
 	}
 
 	@Test
@@ -138,18 +135,18 @@ public class HibernateGroupDAOTest extends AbstractCoreTestCase {
 
 		dao.insert(group, 0);
 
-		MenuDAO menuDao = Context.get(MenuDAO.class);
+		MenuDAO menuDao = MenuDAO.get();
 
-		Menu menu=menuDao.findById(5L);
+		Menu menu = menuDao.findById(5L);
 		menuDao.initialize(menu);
 		assertNull(menu.getAccessControlEntry(group.getId()));
 
 		dao.inheritACLs(group, 2);
-		menu=menuDao.findById(5L);
+		menu = menuDao.findById(5L);
 		menuDao.initialize(menu);
 		assertEquals(1, menu.getAccessControlEntry(group.getId()).getRead());
-		
-		menu=menuDao.findById(2L);
+
+		menu = menuDao.findById(2L);
 		menuDao.initialize(menu);
 		assertNull(menu.getAccessControlEntry(group.getId()));
 	}

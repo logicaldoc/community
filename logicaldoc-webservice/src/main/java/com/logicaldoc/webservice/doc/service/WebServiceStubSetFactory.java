@@ -6,9 +6,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.jws.WebMethod;
-
 import com.logicaldoc.webservice.doc.model.WebServiceStubSet;
+
+import jakarta.jws.WebMethod;
 
 public class WebServiceStubSetFactory {
 

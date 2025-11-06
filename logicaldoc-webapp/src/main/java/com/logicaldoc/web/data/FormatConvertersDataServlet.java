@@ -6,9 +6,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
@@ -20,6 +17,9 @@ import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for conversion formats data.
@@ -43,7 +43,7 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 		String out = request.getParameter("out");
 		String converterSpecification = request.getParameter("converter");
 
-		MenuDAO mDao = Context.get(MenuDAO.class);
+		MenuDAO mDao = MenuDAO.get();
 		boolean parameters = session.getTenantId() == Tenant.DEFAULT_ID && mDao.isReadAllowed(1750, session.getUserId());
 
 		PrintWriter writer = response.getWriter();

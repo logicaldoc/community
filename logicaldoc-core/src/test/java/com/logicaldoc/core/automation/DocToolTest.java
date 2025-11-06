@@ -23,7 +23,6 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Tenant;
-import com.logicaldoc.util.spring.Context;
 
 public class DocToolTest extends AbstractCoreTestCase {
 
@@ -105,7 +104,7 @@ public class DocToolTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testInitialize() throws PersistenceException {
-		TemplateDAO templateDao = Context.get(TemplateDAO.class);
+		TemplateDAO templateDao = TemplateDAO.get();
 		Template template = templateDao.findById(-1L);
 
 		final Folder folder = new FolderTool().findById(4L);

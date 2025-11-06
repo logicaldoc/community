@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.util.spring.Context;
 
 /**
  * DAO for <code>DocumentLink</code> handling.
@@ -13,6 +14,15 @@ import com.logicaldoc.core.PersistentObjectDAO;
  */
 public interface DocumentLinkDAO extends PersistentObjectDAO<DocumentLink> {
 
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static DocumentLinkDAO get() {
+		return Context.get(DocumentLinkDAO.class);
+	}
+	
 	/**
 	 * This method finds the list of document link in which there is a document
 	 * with the given ID

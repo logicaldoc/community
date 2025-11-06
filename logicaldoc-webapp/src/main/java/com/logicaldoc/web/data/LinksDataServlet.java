@@ -45,7 +45,7 @@ public class LinksDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 		StringBuilder query = new StringBuilder(
 				"select A.id, 0, A.type, A.document1.id, A.document1.fileName, A.document1.type, A.document2.id, A.document2.fileName, A.document2.type, ");
 		query.append(
@@ -109,7 +109,7 @@ public class LinksDataServlet extends AbstractDataServlet {
 			query.append(" and not DOC2.ld_id = " + docId);
 		}
 
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 		dao.queryForResultSet(query.toString(), null, null, rows -> {
 			while (rows.next()) {
 				List<Object> cols = new ArrayList<>(Collections.nCopies(13, null));
@@ -190,7 +190,7 @@ public class LinksDataServlet extends AbstractDataServlet {
 		Long docId = null;
 		if (StringUtils.isNotEmpty(request.getParameter("docId"))) {
 			docId = Long.parseLong(request.getParameter("docId"));
-			DocumentDAO ddao = Context.get(DocumentDAO.class);
+			DocumentDAO ddao = DocumentDAO.get();
 			Document doc = ddao.findDocument(docId);
 			if (doc != null)
 				docId = doc.getId();

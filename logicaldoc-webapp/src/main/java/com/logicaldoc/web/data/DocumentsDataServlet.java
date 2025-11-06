@@ -105,7 +105,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
 
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 
 		int page = getPage(request);
 
@@ -306,7 +306,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
 	private void findDocumentsByIds(HttpServletRequest request, Session session, List<Document> documentsInCurrentPage)
 			throws PersistenceException {
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 
 		String[] idsArray = request.getParameter("docIds").split(",");
 		for (String id : idsArray) {
@@ -324,7 +324,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
 	private void findDocumentsByStatus(Session session, int maxRecords, int page, Integer status,
 			List<Document> documentsInCurrentPage) throws PersistenceException {
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 
 		List<Document> docs = dao.findByLockUserAndStatus(session.getUserId(),
 				status != null ? DocumentStatus.values()[status] : null);
@@ -343,7 +343,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			String extendedAttributesSpec, final Map<String, Object> extendedAttributesValues)
 			throws PersistenceException, IOException {
 
-		UserDAO udao = Context.get(UserDAO.class);
+		UserDAO udao = UserDAO.get();
 		User sessionUser = udao.findById(session.getUserId());
 		udao.initialize(sessionUser);
 
@@ -384,7 +384,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			final Map<String, Object> extendedAttributesValues, User user, Long folderId, Long formId, String filename)
 			throws PersistenceException {
 
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 		StringBuilder query = new StringBuilder("""
 select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.publisher, A.creation, A.creator, A.fileSize, A.immutable, A.indexingStatus, A.lockUserId, A.fileName, A.status,
        A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus, A.startPublishing, A.stopPublishing, A.published, A.extResId, B.name, A.docRefType, A.stamped, A.lockUser,
@@ -439,7 +439,7 @@ select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.
 		if (user.isAdmin())
 			return new ArrayList<>();
 
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		String groupIdsString = user.getGroups().stream().map(g -> Long.toString(g.getId()))
 				.collect(Collectors.joining(","));
 
@@ -460,7 +460,7 @@ select ld_docid
 	private List<Document> enrichRecords(List<?> records, List<String> extendedAttributes,
 			final Map<String, Object> extendedAttributesValues, User user) throws PersistenceException {
 
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 
 		/*
 		 * Iterate over records enriching the data
@@ -590,7 +590,7 @@ select ld_docid
 	private Document retrieveHiliteDoc(List<Document> documentRecords, Long folderId, Long hiliteDocId)
 			throws PersistenceException {
 
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 		Document hiliteDoc = null;
 
 		// Always add the hilight doc as first element of the collection
@@ -641,7 +641,7 @@ select ld_docid
 	private void retrieveExtendedAttributesValues(Locale locale, List<String> extendedAttributes,
 			String extendedAttributesSpec, final Map<String, Object> extAttributesValues, Long folderId, Long formId)
 			throws PersistenceException {
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 		if (extendedAttributes.isEmpty())
 			return;
 
@@ -677,7 +677,7 @@ select ld_docid
 	}
 
 	private Long getFolder(Long folderId) throws PersistenceException {
-		FolderDAO fDao = Context.get(FolderDAO.class);
+		FolderDAO fDao = FolderDAO.get();
 		Folder folder = fDao.findById(folderId);
 		if (folder.getFoldRef() != null)
 			folderId = folder.getFoldRef();
@@ -685,7 +685,7 @@ select ld_docid
 	}
 
 	private Long getFolderId(HttpServletRequest request, Session session) throws PersistenceException, IOException {
-		FolderDAO fDao = Context.get(FolderDAO.class);
+		FolderDAO fDao = FolderDAO.get();
 		Long folderId = null;
 		if (StringUtils.isNotEmpty(request.getParameter("folderId")))
 			folderId = Long.parseLong(request.getParameter("folderId"));

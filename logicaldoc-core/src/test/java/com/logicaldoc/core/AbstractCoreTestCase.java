@@ -55,7 +55,7 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 		prepareStore();
 
 		// Prepare an API Key
-		ApiKeyDAO dao = Context.get(ApiKeyDAO.class);
+		ApiKeyDAO dao = ApiKeyDAO.get();
 		apiKey = new ApiKey(1L, "MyKey");
 		dao.store(apiKey);
 	}
@@ -96,7 +96,7 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 	public void tearDown() throws IOException {
 		if (session != null)
 			Context.get(SessionManager.class).kill(session.getSid());
-		Context.get(SessionDAO.class).cleanOldSessions(-1);
+		SessionDAO.get().cleanOldSessions(-1);
 
 		super.tearDown();
 
@@ -105,7 +105,7 @@ public abstract class AbstractCoreTestCase extends AbstractTestCase {
 	}
 
 	protected void prepareSession(String username, String password) throws PersistenceException {
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 
 		Client client = new Client("xyz", "192.168.2.231", "ghost");
 		Device device = new Device();

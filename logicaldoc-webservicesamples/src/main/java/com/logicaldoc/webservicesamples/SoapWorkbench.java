@@ -5,8 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import jakarta.activation.DataHandler;
-
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.searchengine.SearchOptions;
 import com.logicaldoc.util.config.ContextProperties;
@@ -27,6 +25,8 @@ import com.logicaldoc.webservice.soap.client.SoapSearchClient;
 import com.logicaldoc.webservice.soap.client.SoapSecurityClient;
 import com.logicaldoc.webservice.soap.client.SoapSystemClient;
 import com.logicaldoc.webservice.soap.client.SoapTagClient;
+
+import jakarta.activation.DataHandler;
 
 public class SoapWorkbench {
 

@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
@@ -20,7 +17,9 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.spring.Context;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet is responsible for document versions data.
@@ -84,7 +83,7 @@ public class VersionsDataServlet extends AbstractDataServlet {
 	}
 
 	private List<?> executeQuery(HttpServletRequest request, Integer max) throws PersistenceException {
-		VersionDAO dao = Context.get(VersionDAO.class);
+		VersionDAO dao = VersionDAO.get();
 
 		Map<String, Object> params = new HashMap<>();
 
@@ -93,7 +92,7 @@ public class VersionsDataServlet extends AbstractDataServlet {
 						+ " A.customId, A.fileSize, A.type, A.templateName, A.workflowStatus, A.workflowStatusDisplay, A.userId, A.color, A.revision ");
 		if (request.getParameter(DOC_ID) != null) {
 			long docId = Long.parseLong(request.getParameter(DOC_ID));
-			DocumentDAO ddao = Context.get(DocumentDAO.class);
+			DocumentDAO ddao = DocumentDAO.get();
 			Document doc = ddao.findDocument(docId);
 			if (doc != null)
 				docId = doc.getId();

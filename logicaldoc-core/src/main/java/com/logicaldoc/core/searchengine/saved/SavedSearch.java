@@ -62,8 +62,7 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 	public void saveOptions(SearchOptions opt) throws PersistenceException {
 		this.setType(opt.getType());
 
-		TenantDAO tenantDao = Context.get(TenantDAO.class);
-		String tenantName = tenantDao.getTenantName(getTenantId());
+		String tenantName = TenantDAO.get().getTenantName(getTenantId());
 		String charset = Context.get().getProperties().getProperty(tenantName + ".charset", "UTF-8");
 
 		setOptions(IOUtil.serialize(opt, charset));

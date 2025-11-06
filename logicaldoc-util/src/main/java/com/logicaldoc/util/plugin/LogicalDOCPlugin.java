@@ -9,8 +9,6 @@ import java.net.URLDecoder;
 import java.util.List;
 import java.util.Properties;
 
-import jakarta.servlet.Servlet;
-
 import org.java.plugin.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.LogConfigurator;
 import com.logicaldoc.util.config.WebConfigurator;
+
+import jakarta.servlet.Servlet;
 
 /**
  * This is the base class for LogicalDOC plugins.

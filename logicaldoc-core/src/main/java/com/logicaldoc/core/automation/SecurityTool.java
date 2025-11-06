@@ -9,7 +9,6 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Utility methods to handle some security related operations from within the
@@ -32,7 +31,7 @@ public class SecurityTool {
 	 * @return the user object
 	 */
 	public User getUser(String username) {
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 		try {
 			return StringUtils.isNotEmpty(username) ? userDao.findByUsername(username)
 					: userDao.findByUsername("_system");
@@ -50,7 +49,7 @@ public class SecurityTool {
 	 * @return the user object
 	 */
 	public User getUser(long userId) {
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 		try {
 			return userDao.findById(userId);
 		} catch (PersistenceException e) {

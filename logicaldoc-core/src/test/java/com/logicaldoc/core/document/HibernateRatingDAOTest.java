@@ -33,9 +33,8 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		// Retrieve the instance under test from spring context. Make sure that
-		// it is an HibernateRatingDAO
-		testSubject = Context.get(RatingDAO.class);
+
+		testSubject = RatingDAO.get();
 	}
 
 	@Test
@@ -62,10 +61,8 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 		assertEquals(4, rat2.getDocId());
 
 		// testing overridden method with Rating and DocumentHistory parameters
-		DocumentHistoryDAO historyDao = Context.get(DocumentHistoryDAO.class);
-
-		DocumentHistory history = historyDao.findById(1L);
-		historyDao.initialize(history);
+		DocumentHistory history = DocumentHistoryDAO.get().findById(1L);
+		DocumentHistoryDAO.get().initialize(history);
 		assertNotNull(history);
 
 		testSubject.store(rat2, history);
@@ -106,7 +103,7 @@ public class HibernateRatingDAOTest extends AbstractCoreTestCase {
 
 	@Test
 	public void testUpdateDocumentRating() throws PersistenceException {
-		DocumentDAO docDao = Context.get(DocumentDAO.class);
+		DocumentDAO docDao = DocumentDAO.get();
 		Document doc = docDao.findById(1L);
 		docDao.initialize(doc);
 		assertNotNull(doc);

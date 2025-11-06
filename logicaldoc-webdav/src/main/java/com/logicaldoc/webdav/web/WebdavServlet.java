@@ -1,8 +1,5 @@
 package com.logicaldoc.webdav.web;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.WebdavRequest;
@@ -15,6 +12,9 @@ import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webdav.resource.DavResourceFactory;
 import com.logicaldoc.webdav.resource.DavResourceFactoryImpl;
 import com.logicaldoc.webdav.resource.ResourceConfiguration;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * For more informations, please visit

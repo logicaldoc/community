@@ -70,10 +70,10 @@ public class HibernateDocumentDAOTest extends AbstractCoreTestCase {
 
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDocumentDAO
-		testSubject = Context.get(DocumentDAO.class);
-		folderDao = Context.get(FolderDAO.class);
+		testSubject = DocumentDAO.get();
+		folderDao = FolderDAO.get();
 		lockManager = Context.get(LockManager.class);
-		templateDao = Context.get(TemplateDAO.class);
+		templateDao = TemplateDAO.get();
 	}
 
 	@Test

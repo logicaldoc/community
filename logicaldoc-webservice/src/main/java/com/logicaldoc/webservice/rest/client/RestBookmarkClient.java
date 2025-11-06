@@ -2,12 +2,6 @@ package com.logicaldoc.webservice.rest.client;
 
 import java.util.List;
 
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.MediaType;
-
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.logicaldoc.core.PersistenceException;
@@ -17,6 +11,12 @@ import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSBookmark;
 import com.logicaldoc.webservice.rest.BookmarkService;
+
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
 
 public class RestBookmarkClient extends AbstractRestClient<BookmarkService> {
 

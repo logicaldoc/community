@@ -5,11 +5,11 @@ import java.io.PrintWriter;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet prints all the available time zones

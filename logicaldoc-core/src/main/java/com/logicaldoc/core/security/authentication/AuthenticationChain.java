@@ -88,7 +88,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
 
 	private void initializeUser(User user) {
 		try {
-			UserDAO userDao = Context.get(UserDAO.class);
+			UserDAO userDao = UserDAO.get();
 			userDao.initialize(user);
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
@@ -129,7 +129,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
 
 	protected void defaultValidations(String username, Client client)
 			throws AuthenticationException, PersistenceException {
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 		User user = userDao.findByUsername(username);
 		if (user == null)
 			return;
@@ -186,13 +186,12 @@ public class AuthenticationChain extends AbstractAuthenticator {
 			throws AuthenticationException, PersistenceException {
 		String tenant = Tenant.DEFAULT_NAME;
 
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 		User user = userDao.getUser(username);
 
 		defaultValidations(username, client);
 
-		TenantDAO tdao = Context.get(TenantDAO.class);
-		Tenant t = user != null ? tdao.findById(user.getTenantId()) : null;
+		Tenant t = user != null ? TenantDAO.get().findById(user.getTenantId()) : null;
 		if (t != null)
 			tenant = t.getName();
 

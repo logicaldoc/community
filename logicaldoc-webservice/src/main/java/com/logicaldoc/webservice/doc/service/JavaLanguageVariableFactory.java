@@ -10,12 +10,12 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.jws.WebParam;
-import jakarta.jws.WebResult;
-
 import com.logicaldoc.webservice.doc.WSDoc;
 import com.logicaldoc.webservice.doc.model.JavaLanguageVariable;
 import com.logicaldoc.webservice.doc.util.GenericsUtils;
+
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
 
 public class JavaLanguageVariableFactory {
 

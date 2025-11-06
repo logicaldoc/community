@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice;
 
+import org.apache.cxf.jaxrs.ext.MessageContext;
+
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,8 +11,6 @@ import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.SecurityContext;
 import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.ext.Providers;
-
-import org.apache.cxf.jaxrs.ext.MessageContext;
 
 public class WebserviceMessageContext implements MessageContext {
 

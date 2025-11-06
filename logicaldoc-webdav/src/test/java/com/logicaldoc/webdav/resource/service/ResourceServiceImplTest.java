@@ -46,7 +46,7 @@ public class ResourceServiceImplTest extends AbstractWebdavTestCase {
 		super.setUp();
 
 		testSubject = Context.get(ResourceServiceImpl.class);
-		docDao = Context.get(DocumentDAO.class);
+		docDao = DocumentDAO.get();
 		bookmarkDao = Context.get(BookmarkDAO.class);
 	}
 

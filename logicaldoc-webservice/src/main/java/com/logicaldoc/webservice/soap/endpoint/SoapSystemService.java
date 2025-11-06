@@ -21,7 +21,6 @@ import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.stats.StatsCollector;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSParameter;
@@ -83,7 +82,7 @@ public class SoapSystemService extends AbstractService implements SystemService 
 			/*
 			 * Users statistics
 			 */
-			UserDAO userDao = Context.get(UserDAO.class);
+			UserDAO userDao = UserDAO.get();
 			WSParameter users = new WSParameter();
 			users.setName("users_regular");
 			users.setValue(Long.toString(userDao.count(tenantId != Tenant.SYSTEM_ID ? tenantId : null)));
@@ -97,7 +96,7 @@ public class SoapSystemService extends AbstractService implements SystemService 
 			/*
 			 * Last run
 			 */
-			GenericDAO genDao = Context.get(GenericDAO.class);
+			GenericDAO genDao = GenericDAO.get();
 			Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, "lastrun", null, Tenant.SYSTEM_ID);
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			WSParameter lastrun = new WSParameter();
@@ -116,7 +115,7 @@ public class SoapSystemService extends AbstractService implements SystemService 
 	}
 
 	private WSParameter getStat(String statSubtype, String paramName, long tenantId) throws PersistenceException {
-		GenericDAO genDao = Context.get(GenericDAO.class);
+		GenericDAO genDao = GenericDAO.get();
 		Generic gen = genDao.findByAlternateKey(StatsCollector.STAT, statSubtype, null, tenantId);
 		WSParameter parameter = new WSParameter();
 		parameter.setName(paramName);

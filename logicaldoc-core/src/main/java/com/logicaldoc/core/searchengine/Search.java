@@ -143,10 +143,9 @@ public abstract class Search {
 		internalSearch();
 
 		ContextProperties config = Context.get().getProperties();
-		TenantDAO tdao = Context.get(TenantDAO.class);
 		String extattrs;
 		try {
-			extattrs = config.getProperty(tdao.getTenantName(searchUser.getTenantId()) + ".search.extattr");
+			extattrs = config.getProperty(TenantDAO.get().getTenantName(searchUser.getTenantId()) + ".search.extattr");
 		} catch (PersistenceException e) {
 			throw new SearchException(e);
 		}
@@ -164,7 +163,7 @@ public abstract class Search {
 			// Search for extended attributes, key is docId-name
 			final Map<String, Attribute> extAtt = new HashMap<>();
 
-			DocumentDAO ddao = Context.get(DocumentDAO.class);
+			DocumentDAO ddao = DocumentDAO.get();
 			StringBuilder query = new StringBuilder();
 
 			if (hits.get(0).getType().startsWith("folder")) {
@@ -213,8 +212,6 @@ public abstract class Search {
 		execTime = finish.getTime() - start.getTime();
 		log.info("Search completed in {} ms and found {} hits (estimated {})", execTime, hits.size(),
 				estimatedHitsNumber);
-
-		UserHistoryDAO historyDao = Context.get(UserHistoryDAO.class);
 		UserHistory transaction = options.getTransaction();
 		if (transaction == null)
 			transaction = new UserHistory();
@@ -222,7 +219,7 @@ public abstract class Search {
 		transaction.setComment(StringUtils.left(options.toString(), 500));
 		transaction.setEvent(UserEvent.SEARCH);
 		try {
-			historyDao.store(transaction);
+			UserHistoryDAO.get().store(transaction);
 		} catch (PersistenceException e) {
 			log.info("Error trying to save search history", e);
 		}
@@ -230,7 +227,7 @@ public abstract class Search {
 	}
 
 	protected Collection<Long> getAccessibleFolderIds() throws SearchException {
-		FolderDAO fdao = Context.get(FolderDAO.class);
+		FolderDAO fdao = FolderDAO.get();
 
 		/*
 		 * We have to see what folders the user can access. But we need to
@@ -270,7 +267,7 @@ public abstract class Search {
 		if (searchUser.isAdmin() || hits.isEmpty())
 			return denied;
 
-		DocumentDAO dao = Context.get(DocumentDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
 
 		// Detect those hits outside the accessible folders
 		for (Hit hit : hits)
@@ -314,7 +311,7 @@ public abstract class Search {
 	}
 
 	private void initSearchUser() throws SearchException {
-		UserDAO uDao = Context.get(UserDAO.class);
+		UserDAO uDao = UserDAO.get();
 		try {
 			searchUser = uDao.findById(options.getUserId());
 			uDao.initialize(searchUser);

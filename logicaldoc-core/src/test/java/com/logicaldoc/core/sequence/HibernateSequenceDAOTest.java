@@ -11,7 +11,6 @@ import org.junit.Test;
 import com.logicaldoc.core.AbstractCoreTestCase;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 public class HibernateSequenceDAOTest extends AbstractCoreTestCase {
 
@@ -21,9 +20,8 @@ public class HibernateSequenceDAOTest extends AbstractCoreTestCase {
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		// Retrieve the instance under test from spring context. Make sure that
-		// it is an HibernateSequqnceDAO
-		testSubject = Context.get(SequenceDAO.class);
+
+		testSubject = SequenceDAO.get();
 	}
 
 	@Test

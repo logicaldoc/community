@@ -110,13 +110,13 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		docDao = Context.get(DocumentDAO.class);
+		docDao = DocumentDAO.get();
 		linkDao = Context.get(DocumentLinkDAO.class);
 		noteDao = Context.get(DocumentNoteDAO.class);
 		documentHistoryDao = Context.get(DocumentHistoryDAO.class);
 		bookDao = Context.get(BookmarkDAO.class);
-		templateDao = Context.get(TemplateDAO.class);
-		folderDao = Context.get(FolderDAO.class);
+		templateDao = TemplateDAO.get();
+		folderDao = FolderDAO.get();
 		store = Context.get(Store.class);
 
 		searchEngine = Context.get(SearchEngine.class);

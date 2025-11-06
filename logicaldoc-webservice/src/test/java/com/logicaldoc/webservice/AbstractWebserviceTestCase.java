@@ -12,7 +12,6 @@ import com.logicaldoc.core.security.apikey.ApiKey;
 import com.logicaldoc.core.security.apikey.ApiKeyDAO;
 import com.logicaldoc.util.junit.AbstractTestCase;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Abstract test case for the Web Service module. This class initialises a test
@@ -32,7 +31,7 @@ public abstract class AbstractWebserviceTestCase extends AbstractTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		ApiKeyDAO dao = Context.get(ApiKeyDAO.class);
+		ApiKeyDAO dao = ApiKeyDAO.get();
 		apiKey = new ApiKey(1L, "MyKey");
 		dao.store(apiKey);
 

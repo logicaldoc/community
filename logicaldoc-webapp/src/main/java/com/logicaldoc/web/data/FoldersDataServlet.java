@@ -72,7 +72,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		Folder parentFolder = getParentFolder(response, parent, parentFolderId);
 		boolean root = parentFolder.getParentId() == parentFolder.getId();
 
-		UserDAO udao = Context.get(UserDAO.class);
+		UserDAO udao = UserDAO.get();
 		User user = udao.findById(session.getUserId());
 		udao.initialize(user);
 
@@ -115,7 +115,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 	private void printFolders(PrintWriter writer, Session session, long tenantId, String tenantName, String parent,
 			Folder parentFolder, User user, Long startRecord, Long endRecord) throws PersistenceException {
 		StringBuilder query = prepareQuery(session, tenantName, parentFolder, user);
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		folderDao.queryForResultSet(query.toString(), Map.of("parentId", parentFolder.getId(), "tenantId", tenantId),
 				null, rows -> {
 					long i = 0;
@@ -172,7 +172,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		query.append(" order by ld_filename");
 
 		if (parentFolder != null) {
-			FolderDAO folderDao = Context.get(FolderDAO.class);
+			FolderDAO folderDao = FolderDAO.get();
 			Map<String, Object> params = new HashMap<>();
 			params.put("parentId", parentFolder.getId());
 
@@ -224,7 +224,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 
 	private void addReadConditions(StringBuilder query, Session session, Folder parentFolder)
 			throws PersistenceException {
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		Collection<Long> accessibleIds = folderDao.findFolderIdByUserId(session.getUserId(), parentFolder.getId(),
 				false);
 		if (!accessibleIds.isEmpty()) {
@@ -292,7 +292,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 
 	private Folder getParentFolder(HttpServletResponse response, String parent, long parentFolderId)
 			throws PersistenceException {
-		FolderDAO fDao = Context.get(FolderDAO.class);
+		FolderDAO fDao = FolderDAO.get();
 		Folder parentFolder = fDao.findFolder(parentFolderId);
 		if (parentFolder == null) {
 			String message = String.format("No folder found with ID=%d parent %s", parentFolderId, parent);
@@ -316,7 +316,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 	}
 
 	private String getParent(HttpServletRequest request, long tenantId) throws PersistenceException, IOException {
-		FolderDAO folderDao = Context.get(FolderDAO.class);
+		FolderDAO folderDao = FolderDAO.get();
 		String parent = "" + Folder.ROOTID;
 
 		if (request.getParameter(PARENT) != null) {

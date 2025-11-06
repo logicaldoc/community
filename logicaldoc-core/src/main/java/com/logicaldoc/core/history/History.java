@@ -18,7 +18,6 @@ import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
@@ -178,7 +177,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	public User getUser() {
 		if (user == null && (userId != null && userId.longValue() != 0L)) {
-			UserDAO uDao = Context.get(UserDAO.class);
+			UserDAO uDao = UserDAO.get();
 			try {
 				user = uDao.findById(userId);
 				uDao.initialize(user);

@@ -55,7 +55,7 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 			log.error(e.getMessage(), e);
 		}
 
-		UserDAO uDao = Context.get(UserDAO.class);
+		UserDAO uDao = UserDAO.get();
 
 		/**
 		 * The standard authentication has failed, now check the database

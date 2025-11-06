@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jakarta.annotation.Resource;
-import jakarta.transaction.Transactional;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Repository;
 
@@ -24,6 +21,9 @@ import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.config.ContextProperties;
+
+import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 
 @Repository("tenantDAO")
 @Transactional

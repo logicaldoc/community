@@ -14,7 +14,6 @@ import com.logicaldoc.core.communication.MessageTemplate;
 import com.logicaldoc.core.communication.MessageTemplateDAO;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.AbstractWPTestCase;
 
 public class MessageServiceImplTest extends AbstractWPTestCase {
@@ -28,7 +27,7 @@ public class MessageServiceImplTest extends AbstractWPTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		templateDao = Context.get(MessageTemplateDAO.class);
+		templateDao = MessageTemplateDAO.get();
 	}
 
 	@Test

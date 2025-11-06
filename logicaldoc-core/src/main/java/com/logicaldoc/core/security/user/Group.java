@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
@@ -134,7 +133,7 @@ public class Group extends PersistentObject implements Serializable {
 	public User getUser() {
 		if (!isUserGroup())
 			return null;
-		UserDAO userDao = Context.get(UserDAO.class);
+		UserDAO userDao = UserDAO.get();
 		long userId = Long.parseLong(name.substring(name.lastIndexOf('_') + 1));
 		try {
 			return userDao.findById(userId);
