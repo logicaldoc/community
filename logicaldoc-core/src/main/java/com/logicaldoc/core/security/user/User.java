@@ -732,9 +732,20 @@ public class User extends PersistentObject implements Serializable {
 		this.emailSignature = emailSignature;
 	}
 
+	/**
+	 * Used to remove credentials informations from as security measure in case
+	 * some malicious code could get it from this bean
+	 */
 	public void clearPassword() {
-		this.password = null;
-		this.passwordmd4 = null;
+		/*
+		 * We just remove the password in human-readeable form because it may be a
+		 * security hole, it is save to remove it because the field is
+		 * transient. It is NOT safe to remove the password because it is
+		 * persisted and this instance may then be stored in the database during
+		 * the login process. Moreover the password is encrypted so it does not
+		 * constitute a real security problem to leave it as is here.
+		 */
+		this.decodedPassword = null;
 	}
 
 	public Long getDefaultWorkspace() {

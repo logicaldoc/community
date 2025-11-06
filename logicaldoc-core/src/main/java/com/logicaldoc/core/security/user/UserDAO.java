@@ -150,8 +150,10 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * 
 	 * @throws PersistenceException error at database level
 	 */
-	public void store(final User user, final UserHistory transaction) throws PersistenceException;
+	public void store(User user, UserHistory transaction) throws PersistenceException;
 
+	public void store(User user) throws PersistenceException;
+	
 	/**
 	 * Retrieves the settings for a user. The settings are stored as Generics of
 	 * type <b>usersetting</b>.
