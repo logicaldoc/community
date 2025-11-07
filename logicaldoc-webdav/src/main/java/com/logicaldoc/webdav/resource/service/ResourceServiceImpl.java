@@ -677,10 +677,10 @@ public class ResourceServiceImpl implements ResourceService {
 
 		// Add a folder history entry
 		folderDAO.store(currentFolder, transaction);
-		
+
 		currentFolder = folderDAO.findById(currentFolder.getId());
 		folderDAO.initialize(currentFolder);
-		
+
 		currentFolder.setParentId(destinationParentFolder);
 		folderDAO.store(currentFolder);
 	}
@@ -986,8 +986,6 @@ public class ResourceServiceImpl implements ResourceService {
 		try {
 			User user = userDAO.findById(resource.getRequestedPerson());
 
-			BookmarkDAO bdao = Context.get(BookmarkDAO.class);
-
 			Bookmark bmark = new Bookmark();
 			if (resource.isFolder()) {
 				bmark.setType(Bookmark.TYPE_FOLDER);
@@ -1005,7 +1003,7 @@ public class ResourceServiceImpl implements ResourceService {
 				bmark.setTargetId(Long.parseLong(resource.getID()));
 			}
 
-			bdao.store(bmark);
+			BookmarkDAO.get().store(bmark);
 		} catch (Exception e) {
 			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
@@ -1017,7 +1015,7 @@ public class ResourceServiceImpl implements ResourceService {
 		try {
 			User user = userDAO.findById(resource.getRequestedPerson());
 
-			BookmarkDAO bdao = Context.get(BookmarkDAO.class);
+			BookmarkDAO bdao = BookmarkDAO.get();
 
 			Bookmark bkm = null;
 			if (resource.isFolder()) {

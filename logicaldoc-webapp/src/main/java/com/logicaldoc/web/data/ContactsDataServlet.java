@@ -10,7 +10,6 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.contact.Contact;
 import com.logicaldoc.core.contact.ContactDAO;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -37,12 +36,10 @@ public class ContactsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		ContactDAO dao = Context.get(ContactDAO.class);
-
 		/*
 		 * Iterate over records composing the response XML document
 		 */
-		for (Contact contact : dao.findByUser(userId, null)) {
+		for (Contact contact : ContactDAO.get().findByUser(userId, null)) {
 			if (contact.getDeleted() == 1)
 				continue;
 

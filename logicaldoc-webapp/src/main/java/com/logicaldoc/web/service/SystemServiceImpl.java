@@ -726,8 +726,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 	}
 
 	private List<GUIHistory> executeQuery(String query, int maxResult, Session session) throws PersistenceException {
-		DocumentHistoryDAO dao = Context.get(DocumentHistoryDAO.class);
-		return dao.query(query, new RowMapper<GUIHistory>() {
+		return DocumentHistoryDAO.get().query(query, new RowMapper<GUIHistory>() {
 
 			@Override
 			public GUIHistory mapRow(ResultSet rs, int row) throws SQLException {
@@ -792,7 +791,7 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 		Session session = validateSession();
 
 		try {
-			TenantDAO dao = Context.get(TenantDAO.class);
+			TenantDAO dao = TenantDAO.get();
 			Map<Long, String> tenants = dao.findAll().stream()
 					.collect(Collectors.toMap(Tenant::getId, Tenant::getName));
 			tenants.put(Tenant.SYSTEM_ID, "system");

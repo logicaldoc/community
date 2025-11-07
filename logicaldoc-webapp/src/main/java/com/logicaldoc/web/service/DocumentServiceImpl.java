@@ -165,7 +165,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	public void addBookmarks(List<Long> ids, int type) throws ServerException {
 		Session session = validateSession();
 
-		BookmarkDAO bookmarkDao = Context.get(BookmarkDAO.class);
+		BookmarkDAO bookmarkDao = BookmarkDAO.get();
 		FolderDAO fdao = FolderDAO.get();
 		DocumentDAO dao = DocumentDAO.get();
 		for (Long id : ids) {
@@ -729,7 +729,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	@Override
 	public void deleteBookmarks(List<Long> bookmarkIds) throws ServerException {
 		validateSession();
-		BookmarkDAO dao = Context.get(BookmarkDAO.class);
+		BookmarkDAO dao = BookmarkDAO.get();
 		for (long id : bookmarkIds) {
 			try {
 				dao.delete(id);
@@ -743,7 +743,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	public void deleteLinks(List<Long> ids) throws ServerException {
 		validateSession();
 
-		DocumentLinkDAO dao = Context.get(DocumentLinkDAO.class);
+		DocumentLinkDAO dao = DocumentLinkDAO.get();
 		for (long id : ids) {
 			try {
 				dao.delete(id);
@@ -769,8 +769,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		Session session = validateSession();
 
 		try {
-			DocumentDAO docDao = DocumentDAO.get();
-			return docDao.queryForInt(
+			return DocumentDAO.get().queryForInt(
 					"select count(ld_id) from ld_document where ld_deleted=0 and not ld_password = null and ld_id="
 							+ docId) > 0;
 		} catch (PersistenceException e) {
@@ -804,8 +803,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			setAllowedPermissions(session, docId, guiDocument);
 
 			if (session != null && folder != null) {
-				FolderDAO fdao = FolderDAO.get();
-				Set<Permission> permissions = fdao.getAllowedPermissions(document.getFolder().getId(),
+				Set<Permission> permissions = FolderDAO.get().getAllowedPermissions(document.getFolder().getId(),
 						session.getUserId());
 				List<String> permissionsList = new ArrayList<>();
 				for (Permission permission : permissions)
@@ -918,7 +916,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	private void setBookmarked(GUIDocument document, boolean isFolder, User sessionUser) throws PersistenceException {
 		if (sessionUser != null && !isFolder) {
-			BookmarkDAO bDao = Context.get(BookmarkDAO.class);
+			BookmarkDAO bDao = BookmarkDAO.get();
 			document.setBookmarked(bDao.isDocBookmarkedByUser(document.getId(), sessionUser.getId()));
 			if (document.getDocRef() != null)
 				document.setBookmarked(bDao.isDocBookmarkedByUser(document.getDocRef(), sessionUser.getId()));
@@ -1787,7 +1785,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	public void updateLink(long id, String type) throws ServerException {
 		Session session = validateSession();
 
-		DocumentLinkDAO dao = Context.get(DocumentLinkDAO.class);
+		DocumentLinkDAO dao = DocumentLinkDAO.get();
 		try {
 			DocumentLink link = dao.findById(id);
 			dao.initialize(link);
@@ -1812,7 +1810,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	public GUIRating getRating(long docId) throws ServerException {
 		Session session = validateSession();
 
-		RatingDAO ratingDao = Context.get(RatingDAO.class);
+		RatingDAO ratingDao = RatingDAO.get();
 		try {
 			GUIRating rating = new GUIRating();
 			Rating rat = ratingDao.findVotesByDocId(docId);
@@ -1843,7 +1841,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	public int saveRating(GUIRating rating) throws ServerException {
 		Session session = validateSession();
 
-		RatingDAO ratingDao = Context.get(RatingDAO.class);
+		RatingDAO ratingDao = RatingDAO.get();
 		try {
 			Rating rat = ratingDao.findByDocIdAndUserId(rating.getDocId(), rating.getUserId());
 			if (rat == null) {
@@ -1887,7 +1885,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		Session session = validateSession();
 
 		try {
-			DocumentNoteDAO noteDao = Context.get(DocumentNoteDAO.class);
+			DocumentNoteDAO noteDao = DocumentNoteDAO.get();
 			DocumentNote note = noteDao.findById(noteId);
 			if (note != null)
 				noteDao.initialize(note);
@@ -1933,8 +1931,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			guiNote.getAccessControlList().add(guiAce);
 		}
 
-		DocumentNoteDAO noteDao = Context.get(DocumentNoteDAO.class);
-		Set<Permission> permissions = noteDao.getAllowedPermissions(note.getId(), session.getUserId());
+		Set<Permission> permissions = DocumentNoteDAO.get().getAllowedPermissions(note.getId(), session.getUserId());
 		GUIAccessControlEntry allowedPermissions = new GUIAccessControlEntry();
 		allowedPermissions.setRead(permissions.contains(Permission.READ));
 		allowedPermissions.setWrite(permissions.contains(Permission.WRITE));
@@ -1977,7 +1974,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			throws ServerException {
 		Session session = validateSession();
 
-		DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
+		DocumentNoteDAO dao = DocumentNoteDAO.get();
 		Document document = null;
 		try {
 			document = retrieveDocument(docId);
@@ -2089,7 +2086,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	private void saveNote(DocumentNote note, Session session) throws ServerException {
 		try {
-			DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
+			DocumentNoteDAO dao = DocumentNoteDAO.get();
 			if (note.getId() == 0L) {
 				DocumentHistory transaction = new DocumentHistory();
 				transaction.setSession(session);
@@ -2104,8 +2101,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 	private void saveContact(Contact contact) {
 		try {
-			ContactDAO cDao = Context.get(ContactDAO.class);
-			cDao.store(contact);
+			ContactDAO.get().store(contact);
 		} catch (PersistenceException e) {
 			log.warn("Error storing new contact {}", contact.getEmail(), e);
 		}
@@ -2115,7 +2111,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	public void deleteNotes(List<Long> ids) throws ServerException {
 		validateSession();
 
-		DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
+		DocumentNoteDAO dao = DocumentNoteDAO.get();
 		for (long id : ids)
 			try {
 				dao.delete(id);
@@ -2305,9 +2301,8 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		Session session = validateSession();
 
 		try {
-			DocumentDAO.get()
-					.jdbcUpdate("update ld_document set ld_deleted=2 where ld_deleted=1 and  ld_deleteuserid="
-							+ session.getUserId());
+			DocumentDAO.get().jdbcUpdate("update ld_document set ld_deleted=2 where ld_deleted=1 and  ld_deleteuserid="
+					+ session.getUserId());
 
 			FolderDAO.get().jdbcUpdate(
 					"update ld_folder set ld_deleted=2 where ld_deleted=1 and  ld_deleteuserid=" + session.getUserId());
@@ -2644,7 +2639,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	public GUIRating getUserRating(long docId) throws ServerException {
 		Session session = validateSession();
 
-		RatingDAO rDao = Context.get(RatingDAO.class);
+		RatingDAO rDao = RatingDAO.get();
 		try {
 			GUIRating rating = null;
 			Rating rat = rDao.findByDocIdAndUserId(docId, session.getUserId());
@@ -2671,7 +2666,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		Session session = validateSession();
 
 		try {
-			RatingDAO rDao = Context.get(RatingDAO.class);
+			RatingDAO rDao = RatingDAO.get();
 			Rating rat = rDao.findById(id);
 			if (rat == null)
 				return 0;
@@ -2681,9 +2676,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 			rDao.delete(id);
 
-			DocumentDAO docDao = DocumentDAO.get();
-			Document doc = docDao.findById(rat.getDocId());
-			return doc.getRating();
+			return DocumentDAO.get().findById(rat.getDocId()).getRating();
 		} catch (PersistenceException | ServerException e) {
 			return throwServerException(session, log, e);
 		}

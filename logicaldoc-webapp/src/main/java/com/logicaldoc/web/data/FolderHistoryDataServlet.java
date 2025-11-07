@@ -16,7 +16,6 @@ import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,14 +34,13 @@ public class FolderHistoryDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		DocumentHistoryDAO dao = Context.get(DocumentHistoryDAO.class);
 		StringBuilder query = new StringBuilder(
 				"select A.username, A.event, A.date, A.comment, A.filename, A.path, A.sessionId, A.id, A.reason, A.ip, A.device, A.geolocation, A.userId, A.color, A.keyLabel from FolderHistory A where A.deleted = 0 ");
 		if (request.getParameter("id") != null)
 			query.append(" and A.folderId=" + request.getParameter("id"));
 		query.append(" order by A.date desc ");
 
-		List<?> records = dao.findByQuery(query.toString(), (Map<String, Object>) null, max != null ? max : 100);
+		List<?> records = DocumentHistoryDAO.get().findByQuery(query.toString(), (Map<String, Object>) null, max != null ? max : 100);
 
 		/*
 		 * Iterate over records composing the response XML document

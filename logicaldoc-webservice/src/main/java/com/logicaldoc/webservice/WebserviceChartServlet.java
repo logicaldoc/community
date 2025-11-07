@@ -26,7 +26,6 @@ import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.sequence.SequenceDAO;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -92,7 +91,6 @@ public class WebserviceChartServlet extends HttpServlet {
 			 * Retrieve the sequences and order them by date
 			 */
 			DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-			SequenceDAO dao = Context.get(SequenceDAO.class);
 
 			DateFormat dfName = new SimpleDateFormat("MMM yyyy", locale);
 			DateFormat dfNumber = new SimpleDateFormat("yyyyMM");
@@ -101,7 +99,7 @@ public class WebserviceChartServlet extends HttpServlet {
 				cal.add(Calendar.MONTH, -i);
 				String month = dfNumber.format(cal.getTime());
 				String monthName = dfName.format(cal.getTime());
-				dataset.addValue(dao.getCurrentValue(WebserviceInterceptor.WSCALL_HYPHEN + month, 0L, tenantId),
+				dataset.addValue(SequenceDAO.get().getCurrentValue(WebserviceInterceptor.WSCALL_HYPHEN + month, 0L, tenantId),
 						"calls", monthName);
 			}
 

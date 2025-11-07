@@ -11,7 +11,6 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.BookmarkDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.i18n.I18N;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -37,7 +36,6 @@ public class DashletsDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		List<Object> records = new ArrayList<>();
-		BookmarkDAO dao = Context.get(BookmarkDAO.class);
 
 		/*
 		 * Search for folders first.
@@ -45,7 +43,7 @@ public class DashletsDataServlet extends AbstractDataServlet {
 		StringBuilder query = new StringBuilder("select A.id, A.name, A.title, A.type, A.query, A.content"
 				+ " from Dashlet A where A.deleted = 0 and A.tenantId = " + session.getTenantId()
 				+ " order by A.id asc");
-		records.addAll(dao.findByQuery(query.toString(), (Map<String, Object>) null, null));
+		records.addAll(BookmarkDAO.get().findByQuery(query.toString(), (Map<String, Object>) null, null));
 
 		/*
 		 * Iterate over records composing the response XML document

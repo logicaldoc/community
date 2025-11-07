@@ -20,7 +20,6 @@ import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.i18n.I18N;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.TimeDiff;
 import com.logicaldoc.web.util.ServletUtil;
 
@@ -60,8 +59,7 @@ public class SessionsDataServlet extends AbstractDataServlet {
 					: null;
 
 			// Just listing the sessions
-			SessionDAO sessionDao = Context.get(SessionDAO.class);
-			List<Session> sessions = sessionDao.findByNode(node);
+			List<Session> sessions = SessionDAO.get().findByNode(node);
 
 			boolean csvFormat = "true".equals(request.getParameter("csv"));
 

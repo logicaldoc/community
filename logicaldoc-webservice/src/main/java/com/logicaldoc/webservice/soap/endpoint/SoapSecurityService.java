@@ -24,7 +24,6 @@ import com.logicaldoc.core.security.user.UserHistory;
 import com.logicaldoc.core.security.user.UserType;
 import com.logicaldoc.core.security.user.WorkingTime;
 import com.logicaldoc.util.crypt.CryptUtil;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSGroup;
@@ -81,7 +80,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 					users.add(WSUser.fromUser(usr));
 			}
 		} else {
-			GroupDAO gDao = Context.get(GroupDAO.class);
+			GroupDAO gDao = GroupDAO.get();
 			Group grp = gDao.findByName(group, user.getTenantId());
 			gDao.initialize(grp);
 			for (User usr : grp.getUsers()) {
@@ -100,7 +99,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 		try {
 			List<WSGroup> groups = new ArrayList<>();
-			GroupDAO dao = Context.get(GroupDAO.class);
+			GroupDAO dao = GroupDAO.get();
 			for (Group grp : dao.findAll(user.getTenantId())) {
 				if (grp.getType() == GroupType.DEFAULT) {
 					dao.initialize(grp);
@@ -119,7 +118,6 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		User sessionUser = validateSession(sid);
 
 		try {
-			GroupDAO gDao = Context.get(GroupDAO.class);
 			UserDAO dao = UserDAO.get();
 			User usr = wsUser.toUser();
 			usr.setTenantId(sessionUser.getTenantId());
@@ -185,6 +183,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			usr = dao.findById(usr.getId());
 			dao.initialize(usr);
 
+			GroupDAO gDao = GroupDAO.get();
 			if (CollectionUtils.isNotEmpty(wsUser.getGroupIds())) {
 				usr.removeGroupMemberships(null);
 				for (long groupId : wsUser.getGroupIds())
@@ -214,7 +213,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		checkAdministrator(sid);
 
 		try {
-			GroupDAO dao = Context.get(GroupDAO.class);
+			GroupDAO dao = GroupDAO.get();
 			Group grp = group.toGroup();
 			if (group.getId() != 0) {
 				grp = dao.findById(group.getId());
@@ -287,13 +286,12 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			throw new PermissionException("You cannot delete the admin group");
 
 		try {
-			GroupDAO dao = Context.get(GroupDAO.class);
-			Group grp = dao.findById(groupId);
+			Group grp = GroupDAO.get().findById(groupId);
 			if (grp.getType() != GroupType.DEFAULT) {
 				throw new PermissionException(
 						"You cannot delete group with id " + grp.getId() + " because it is a system group");
 			}
-			dao.delete(groupId);
+			GroupDAO.get().delete(groupId);
 		} catch (Exception t) {
 			throw new PersistenceException("Unable to delete the group with id " + groupId);
 		}
@@ -375,7 +373,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 	public WSGroup getGroup(String sid, long groupId) throws WebserviceException, PersistenceException {
 		checkAdministrator(sid);
 
-		GroupDAO groupDao = Context.get(GroupDAO.class);
+		GroupDAO groupDao = GroupDAO.get();
 		Group group = groupDao.findById(groupId);
 		if (group == null)
 			return null;

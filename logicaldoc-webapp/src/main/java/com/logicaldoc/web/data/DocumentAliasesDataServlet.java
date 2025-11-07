@@ -37,8 +37,8 @@ public class DocumentAliasesDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		Context context = Context.get();
-		DocumentDAO dao = context.getBean(DocumentDAO.class);
-		FolderDAO folderDAO = context.getBean(FolderDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
+		FolderDAO folderDAO = FolderDAO.get();
 		Collection<Long> accessibleFolderIds = folderDAO.findFolderIdByUserId(session.getUserId(), null, true);
 
 		StringBuilder query = new StringBuilder(

@@ -132,7 +132,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 	}
 
 	private void setAttributes(GUIInfo info, String tenantName) {
-		TenantDAO tDAO = Context.get(TenantDAO.class);
+		TenantDAO tDAO = TenantDAO.get();
 		AttributeSetDAO aDAO = AttributeSetDAO.get();
 		try {
 			Tenant tenant = tDAO.findByName(tenantName);

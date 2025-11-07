@@ -44,7 +44,6 @@ import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.frontend.client.services.SearchService;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * Implementation of the SearchService
@@ -67,8 +66,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 		try {
 			List<Hit> hits = doSearch(options, session, result);
 
-			BookmarkDAO bDao = Context.get(BookmarkDAO.class);
-			List<Long> bookmarks = bDao.findBookmarkedDocs(session.getUserId());
+			List<Long> bookmarks = BookmarkDAO.get().findBookmarkedDocs(session.getUserId());
 
 			DocumentDAO docDao = DocumentDAO.get();
 			List<GUIDocument> guiResults = new ArrayList<>();

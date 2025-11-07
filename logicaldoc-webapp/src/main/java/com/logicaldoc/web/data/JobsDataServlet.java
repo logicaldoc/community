@@ -78,8 +78,7 @@ public class JobsDataServlet extends AbstractDataServlet {
 			throws SchedulerException, PersistenceException {
 		DateFormat df = getDateFormat();
 
-		TenantDAO tDao = Context.get(TenantDAO.class);
-		Map<Long, String> tenants = tDao.findAll().stream().collect(Collectors.toMap(t -> t.getId(), Tenant::getName));
+		Map<Long, String> tenants = TenantDAO.get().findAll().stream().collect(Collectors.toMap(t -> t.getId(), Tenant::getName));
 
 		int count = 0;
 

@@ -23,7 +23,6 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserType;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.security.PasswordGenerator;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSGroup;
 import com.logicaldoc.webservice.model.WSUser;
@@ -47,7 +46,7 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 		userDao = UserDAO.get();
-		groupDao = Context.get(GroupDAO.class);
+		groupDao = GroupDAO.get();
 
 		// Make sure that this is a SoapSecurityService instance
 		securityServiceImpl = new SoapSecurityService();

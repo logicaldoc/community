@@ -40,7 +40,6 @@ import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.util.LocaleUtil;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.DateUtil;
 
 public class WSUtil {
@@ -507,8 +506,7 @@ public class WSUtil {
 			throw new PersistenceException(e.getMessage(), e);
 		}
 
-		GroupDAO groupDao = Context.get(GroupDAO.class);
-		Group group = groupDao.findById(ace.getGroupId());
+		Group group = GroupDAO.get().findById(ace.getGroupId());
 		if (group.getName().startsWith("_user_"))
 			wsAce.setUserId(Long.parseLong(group.getName().substring(group.getName().lastIndexOf('_') + 1)));
 

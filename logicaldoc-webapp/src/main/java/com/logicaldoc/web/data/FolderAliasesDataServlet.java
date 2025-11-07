@@ -15,7 +15,6 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.user.Group;
 import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,9 +34,8 @@ public class FolderAliasesDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		Context context = Context.get();
-		DocumentDAO dao = context.getBean(DocumentDAO.class);
-		FolderDAO folderDAO = context.getBean(FolderDAO.class);
+		DocumentDAO dao = DocumentDAO.get();
+		FolderDAO folderDAO = FolderDAO.get();
 		Collection<Long> accessibleFolderIds = folderDAO.findFolderIdByUserId(session.getUserId(), null, true);
 
 		StringBuilder query = new StringBuilder(

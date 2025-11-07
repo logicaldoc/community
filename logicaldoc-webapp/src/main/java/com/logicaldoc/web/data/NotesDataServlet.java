@@ -76,8 +76,7 @@ public class NotesDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
-		dao.queryForResultSet(query.toString(), params, 200, rows -> {
+		DocumentNoteDAO.get().queryForResultSet(query.toString(), params, 200, rows -> {
 			while (rows.next())
 				printPost(writer, rows, userId != null ? userId : session.getUserId());
 		});

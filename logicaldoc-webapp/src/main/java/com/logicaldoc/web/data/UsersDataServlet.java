@@ -20,7 +20,6 @@ import com.logicaldoc.core.security.user.GroupType;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.core.security.user.UserType;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -116,7 +115,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 		List<User> users = new ArrayList<>();
 
 		UserDAO userDao = UserDAO.get();
-		GroupDAO groupDao = Context.get(GroupDAO.class);
+		GroupDAO groupDao = GroupDAO.get();
 
 		if (groupIdOrName != null && !groupIdOrName.trim().isEmpty()) {
 			Group group = null;

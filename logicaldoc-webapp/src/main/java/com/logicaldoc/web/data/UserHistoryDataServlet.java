@@ -17,7 +17,6 @@ import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.security.user.UserHistoryDAO;
 import com.logicaldoc.i18n.I18N;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -112,7 +111,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 
 		query.append(" order by A.date desc ");
 
-		return Context.get(UserHistoryDAO.class).findByQuery(query.toString(), params,
+		return UserHistoryDAO.get().findByQuery(query.toString(), params,
 				max != null ? max : 100);
 	}
 }

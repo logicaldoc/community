@@ -85,7 +85,7 @@ public class PswRecovery extends HttpServlet {
 
 			log.debug("Recover password for ticket with ticketId={}", ticketId);
 
-			TicketDAO ticketDao = Context.get().getBean(TicketDAO.class);
+			TicketDAO ticketDao = TicketDAO.get();
 			Ticket ticket = ticketDao.findByTicketId(ticketId);
 
 			if ((ticket != null) && ticket.getType() == Ticket.PSW_RECOVERY) {
@@ -98,8 +98,7 @@ public class PswRecovery extends HttpServlet {
 					ticketDao.store(ticket);
 				}
 
-				UserDAO userDao = Context.get().getBean(UserDAO.class);
-				User user = userDao.findById(Long.parseLong(userId));
+				User user = UserDAO.get().findById(Long.parseLong(userId));
 
 				sendEmail(request, response, tenant, user);
 			}
@@ -140,8 +139,7 @@ public class PswRecovery extends HttpServlet {
 		user.setPasswordChanged(new Date());
 		user.setPasswordExpired(1);
 
-		UserDAO userDao = Context.get().getBean(UserDAO.class);
-		userDao.store(user);
+		UserDAO.get().store(user);
 
 		Locale locale = user.getLocale();
 

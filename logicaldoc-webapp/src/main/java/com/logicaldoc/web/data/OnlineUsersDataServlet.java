@@ -12,7 +12,6 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionDAO;
 import com.logicaldoc.core.security.user.User;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.util.ServletUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,13 +31,12 @@ public class OnlineUsersDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
-		UserDAO userDao = UserDAO.get();
-		SessionDAO sessionDao = Context.get(SessionDAO.class);
 		Session currentSession = ServletUtil.validateSession(request);
 		String tenant = currentSession.getTenantName();
 
-		List<Session> sessions = sessionDao.findByNode(null);
+		List<Session> sessions = SessionDAO.get().findByNode(null);
 		Set<User> users = new HashSet<>();
+		UserDAO userDao = UserDAO.get();
 		for (Session sess : sessions) {
 			if (sess.getStatus() != Session.STATUS_OPEN || !tenant.equals(sess.getTenantName()))
 				continue;

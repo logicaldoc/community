@@ -672,11 +672,11 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 
-		DocumentHistoryDAO dao = Context.get(DocumentHistoryDAO.class);
 		StringBuilder query = new StringBuilder(
 				"select docId from DocumentHistory where deleted=0 and (docId is not NULL) and userId=" + user.getId());
 		query.append(" order by date desc");
-		List<Long> records = dao.findByQuery(query.toString(), (Map<String, Object>) null, Long.class, max);
+		List<Long> records = DocumentHistoryDAO.get().findByQuery(query.toString(), (Map<String, Object>) null,
+				Long.class, max);
 
 		List<Long> docIds = new ArrayList<>();
 
@@ -905,8 +905,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			WebserviceException, PersistenceException, PermissionException, UnexistingResourceException {
 		User user = validateSession(sid);
 
-		DocumentLinkDAO linkDao = Context.get(DocumentLinkDAO.class);
-		DocumentLink link = linkDao.findByDocIdsAndType(doc1, doc2, type);
+		DocumentLink link = DocumentLinkDAO.get().findByDocIdsAndType(doc1, doc2, type);
 
 		Document document1 = retrieveReadableDocument(doc1, user);
 		Document document2 = retrieveReadableDocument(doc2, user);
@@ -920,7 +919,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			link.setDocument1(document1);
 			link.setDocument2(document2);
 			link.setType(type);
-			linkDao.store(link);
+			DocumentLinkDAO.get().store(link);
 
 			WSLink lnk = new WSLink();
 			lnk.setId(link.getId());
@@ -938,11 +937,9 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 
-		DocumentLinkDAO linkDao = Context.get(DocumentLinkDAO.class);
-
 		checkDocumentPermission(Permission.READ, user, docId);
 
-		List<DocumentLink> links = linkDao.findByDocId(docId);
+		List<DocumentLink> links = DocumentLinkDAO.get().findByDocId(docId);
 		List<WSLink> lnks = new ArrayList<>();
 		for (DocumentLink link : links) {
 			WSLink lnk = new WSLink();
@@ -960,8 +957,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	public void deleteLink(String sid, long id)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		validateSession(sid);
-		DocumentLinkDAO linkDao = Context.get(DocumentLinkDAO.class);
-		linkDao.delete(id);
+		DocumentLinkDAO.get().delete(id);
 	}
 
 	@Override
@@ -978,7 +974,6 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		validateSession(sid);
 
-		DocumentManager manager = Context.get(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSession(SessionManager.get().get(sid));
 
@@ -996,7 +991,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			throw new PersistenceException(e);
 		}
 
-		ticket = manager.createTicket(ticket, transaction);
+		ticket = DocumentManager.get().createTicket(ticket, transaction);
 
 		return ticket.getUrl();
 	}
@@ -1007,7 +1002,6 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		validateSession(sid);
 
-		DocumentManager manager = Context.get(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSession(SessionManager.get().get(sid));
 
@@ -1026,7 +1020,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			throw new PersistenceException(e);
 		}
 
-		ticket = manager.createTicket(ticket, transaction);
+		ticket = DocumentManager.get().createTicket(ticket, transaction);
 
 		return ticket.getUrl();
 	}
@@ -1081,10 +1075,8 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	public boolean unprotect(String sid, long docId, String password)
 			throws PersistenceException, AuthenticationException, WebserviceException {
 		validateSession(sid);
-		DocumentManager manager = Context.get(DocumentManager.class);
-		DocumentDAO dao = DocumentDAO.get();
-		Document doc = dao.findDocument(docId);
-		return manager.unprotect(sid, doc.getId(), password);
+		Document doc = DocumentDAO.get().findDocument(docId);
+		return DocumentManager.get().unprotect(sid, doc.getId(), password);
 	}
 
 	@Override
@@ -1109,8 +1101,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		transaction.setSessionId(sid);
 		transaction.setUser(user);
 
-		DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
-		dao.store(newNote, transaction);
+		DocumentNoteDAO.get().store(newNote, transaction);
 
 		return WSNote.fromDocumentNote(newNote);
 	}
@@ -1123,7 +1114,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (document == null)
 			throw new PermissionException(DOCUMENT_WITH_ID + docId + NOT_FOUND_OR_NOT_ACCESSIBLE);
 
-		DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
+		DocumentNoteDAO dao = DocumentNoteDAO.get();
 		DocumentNote note = dao.findById(wsNote.getId());
 		if (note == null) {
 			note = new DocumentNote();
@@ -1144,8 +1135,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		note.setWidth(wsNote.getWidth());
 		note.setHeight(wsNote.getHeight());
 
-		DocumentDAO ddao = DocumentDAO.get();
-		Document doc = ddao.findDocument(docId);
+		Document doc = DocumentDAO.get().findDocument(docId);
 		note.setFileName(doc.getFileName());
 
 		if (note.getId() == 0L) {
@@ -1163,7 +1153,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	public void deleteNote(String sid, long noteId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
-		DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
+		DocumentNoteDAO dao = DocumentNoteDAO.get();
 		DocumentNote note = dao.findById(noteId);
 		if (note == null)
 			return;
@@ -1176,17 +1166,14 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	public String deleteVersion(String sid, long docId, String version)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		validateSession(sid);
-		VersionDAO dao = VersionDAO.get();
-		Version ver = dao.findByVersion(docId, version);
-
-		DocumentManager manager = Context.get(DocumentManager.class);
+		
+		Version ver = VersionDAO.get().findByVersion(docId, version);
 
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
 
-		Version latestVersion = manager.deleteVersion(ver.getId(), transaction);
-		return latestVersion.getVersion();
+		return DocumentManager.get().deleteVersion(ver.getId(), transaction).getVersion();
 	}
 
 	@Override
@@ -1197,8 +1184,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (document == null)
 			throw new WebserviceException(DOCUMENT_WITH_ID + docId + NOT_FOUND_OR_NOT_ACCESSIBLE);
 
-		DocumentNoteDAO dao = Context.get(DocumentNoteDAO.class);
-		List<DocumentNote> notes = dao.findByDocId(docId, user.getId(), document.getFileVersion());
+		List<DocumentNote> notes = DocumentNoteDAO.get().findByDocId(docId, user.getId(), document.getFileVersion());
 		List<WSNote> wsNotes = new ArrayList<>();
 		if (notes != null)
 			for (DocumentNote note : notes)
@@ -1218,8 +1204,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		transaction.setSessionId(sid);
 		transaction.setUser(user);
 
-		RatingDAO ratingDao = Context.get(RatingDAO.class);
-
+		RatingDAO ratingDao = RatingDAO.get();
 		Rating rating = ratingDao.findByDocIdAndUserId(docId, user.getId());
 		if (rating == null) {
 			rating = new Rating();
@@ -1241,8 +1226,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (document == null)
 			throw new WebserviceException(DOCUMENT_WITH_ID + docId + NOT_FOUND_OR_NOT_ACCESSIBLE);
 
-		RatingDAO ratingDao = Context.get(RatingDAO.class);
-		List<Rating> ratings = ratingDao.findByDocId(docId);
+		List<Rating> ratings = RatingDAO.get().findByDocId(docId);
 		List<WSRating> wsRatings = new ArrayList<>();
 		if (ratings != null)
 			for (Rating rating : ratings)
@@ -1273,8 +1257,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		transaction.setUser(user);
 		transaction.setSession(SessionManager.get().get(sid));
 
-		DocumentManager manager = Context.get(DocumentManager.class);
-		manager.replaceFile(doc.getId(), fileVersion, content.getInputStream(), transaction);
+		DocumentManager.get().replaceFile(doc.getId(), fileVersion, content.getInputStream(), transaction);
 		log.info("Replaced fileVersion {} of document {}", fileVersion, doc);
 	}
 

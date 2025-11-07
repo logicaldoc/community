@@ -537,7 +537,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 			List<GUIParameter> params = new ArrayList<>();
 
 			// Retrieve API calls stats
-			SequenceDAO dao = Context.get(SequenceDAO.class);
+			SequenceDAO dao = SequenceDAO.get();
 			GUIParameter p = new GUIParameter("webservice.apicalls",
 					"" + dao.getCurrentValue("wscall", 0, tenantId != null ? tenantId : Tenant.SYSTEM_ID));
 			params.add(p);

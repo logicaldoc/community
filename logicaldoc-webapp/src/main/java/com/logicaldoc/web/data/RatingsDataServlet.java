@@ -3,14 +3,12 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.util.List;
 import java.util.Locale;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Rating;
 import com.logicaldoc.core.document.RatingDAO;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,16 +31,13 @@ public class RatingsDataServlet extends AbstractDataServlet {
 
 		DateFormat df = getDateFormat();
 
-		RatingDAO ratingDao = Context.get(RatingDAO.class);
-		List<Rating> ratings = ratingDao.findByDocId(Long.parseLong(docId));
-
 		PrintWriter writer = response.getWriter();
-		writer.print("<list>");
-
+		
 		/*
 		 * Iterate over records composing the response XML document
 		 */
-		for (Rating rating : ratings) {
+		writer.print("<list>");
+		for (Rating rating : RatingDAO.get().findByDocId(Long.parseLong(docId))) {
 			writer.print("<rating>");
 			writer.print("<id>" + rating.getId() + "</id>");
 			writer.print("<user><![CDATA[" + rating.getUsername() + "]]></user>");

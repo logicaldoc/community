@@ -17,7 +17,6 @@ import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.user.User;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.WebserviceException;
 
@@ -48,16 +47,13 @@ public class CommentService extends AbstractService {
 	String docid) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 
-		DocumentDAO ddao = DocumentDAO.get();
 		Long docId = Long.parseLong(docid);
-		Document document = ddao.findById(docId);
+		Document document = DocumentDAO.get().findById(docId);
 
 		checkDocumentPermission(Permission.READ, user, docId);
 		boolean writeEnabled = isWriteEnabled(user, docId);
 
-		DocumentNoteDAO dndao = Context.get(DocumentNoteDAO.class);
-
-		List<DocumentNote> notes = dndao.findByDocId(docId, user.getId(), document.getFileVersion());
+		List<DocumentNote> notes = DocumentNoteDAO.get().findByDocId(docId, user.getId(), document.getFileVersion());
 
 		SimpleDateFormat sdf = new SimpleDateFormat("MMM dd yyyy HH:mm:ss Z", Locale.ENGLISH);
 
@@ -85,8 +81,7 @@ public class CommentService extends AbstractService {
 
 	private boolean isWriteEnabled(User user, long docId) {
 		try {
-			DocumentDAO dao = DocumentDAO.get();
-			if (dao.isPermissionAllowed(Permission.WRITE, docId, user.getId())) {
+			if (DocumentDAO.get().isPermissionAllowed(Permission.WRITE, docId, user.getId())) {
 				return true;
 			}
 		} catch (Exception e) {
@@ -115,8 +110,7 @@ public class CommentService extends AbstractService {
 		note.setDate(new Date());
 		note.setMessage(content);
 
-		DocumentNoteDAO dndao = Context.get(DocumentNoteDAO.class);
-		dndao.store(note);
+		DocumentNoteDAO.get().store(note);
 
 		return Response.ok(comment).build();
 	}
@@ -137,8 +131,7 @@ public class CommentService extends AbstractService {
 		note.setDate(new Date());
 		note.setMessage(comment.getContent());
 
-		DocumentNoteDAO dndao = Context.get(DocumentNoteDAO.class);
-		dndao.store(note);
+		DocumentNoteDAO.get().store(note);
 
 		return Response.ok(comment).build();
 	}

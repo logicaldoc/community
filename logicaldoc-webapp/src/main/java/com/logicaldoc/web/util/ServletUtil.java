@@ -454,7 +454,7 @@ public class ServletUtil {
 		 * we will not save if there is another view in the same session asked
 		 * since 30 seconds.
 		 */
-		DocumentHistoryDAO hdao = Context.get(DocumentHistoryDAO.class);
+		DocumentHistoryDAO hdao = DocumentHistoryDAO.get();
 		List<DocumentHistory> oldHistories = hdao.findByUserIdAndEvent(user.getId(), history.getEvent(),
 				session != null ? session.getSid() : sid);
 		Calendar cal = Calendar.getInstance();

@@ -189,7 +189,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 			guiFolder.setPathExtended(dao.computePathExtended(folder.getId()));
 
 		if (guiFolder.isWorkspace()) {
-			SequenceDAO seqDao = Context.get(SequenceDAO.class);
+			SequenceDAO seqDao = SequenceDAO.get();
 			guiFolder.setDocumentsTotal(seqDao.getCurrentValue("wsdocs", folder.getId(), folder.getTenantId()));
 			guiFolder.setSizeTotal(seqDao.getCurrentValue("wssize", folder.getId(), folder.getTenantId()));
 		}

@@ -123,9 +123,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 	}
 
 	private void saveMessage(GUIMessage message, Session session, long recipientId) throws ServerException {
-		Context context = Context.get();
-		SystemMessageDAO dao = context.getBean(SystemMessageDAO.class);
-		UserDAO uDao = context.getBean(UserDAO.class);
+		UserDAO uDao = UserDAO.get();
 
 		try {
 			User user = uDao.findById(recipientId);
@@ -151,7 +149,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 			m.setPrio(message.getPriority());
 			m.setConfirmation(message.isConfirmation() ? 1 : 0);
 
-			dao.store(m);
+			SystemMessageDAO.get().store(m);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			throw new ServerException("Message has not been saved");
@@ -164,7 +162,7 @@ public class MessageServiceImpl extends AbstractRemoteService implements Message
 		Context context = Context.get();
 
 		try {
-			MessageTemplateDAO dao = context.getBean(MessageTemplateDAO.class);
+			MessageTemplateDAO dao = MessageTemplateDAO.get();
 
 			List<GUIMessageTemplate> buf = new ArrayList<>();
 

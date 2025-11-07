@@ -113,8 +113,8 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 		docDao = DocumentDAO.get();
 		linkDao = Context.get(DocumentLinkDAO.class);
 		noteDao = Context.get(DocumentNoteDAO.class);
-		documentHistoryDao = Context.get(DocumentHistoryDAO.class);
-		bookDao = Context.get(BookmarkDAO.class);
+		documentHistoryDao = DocumentHistoryDAO.get();
+		bookDao = BookmarkDAO.get();
 		templateDao = TemplateDAO.get();
 		folderDao = FolderDAO.get();
 		store = Context.get(Store.class);

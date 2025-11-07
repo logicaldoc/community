@@ -144,10 +144,9 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	private static final Logger log = LoggerFactory.getLogger(SecurityServiceImpl.class);
 
 	public static GUITenant getTenant(long tenantId) {
-		TenantDAO dao = Context.get(TenantDAO.class);
 		Tenant tenant = null;
 		try {
-			tenant = dao.findById(tenantId);
+			tenant = TenantDAO.get().findById(tenantId);
 			return fromTenant(tenant);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -184,8 +183,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	}
 
 	public static GUITenant getTenant(String tenantName) throws PersistenceException {
-		TenantDAO dao = Context.get(TenantDAO.class);
-		Tenant tenant = dao.findByName(tenantName);
+		Tenant tenant = TenantDAO.get().findByName(tenantName);
 		return fromTenant(tenant);
 	}
 
@@ -208,7 +206,6 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 		DocumentDAO documentDao = DocumentDAO.get();
 		SystemMessageDAO messageDao = SystemMessageDAO.get();
-		SequenceDAO seqDao = Context.get(SequenceDAO.class);
 
 		User user = session.getUser();
 
@@ -231,7 +228,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 					documentDao.findByLockUserAndStatus(user.getId(), DocumentStatus.CHECKEDOUT).size());
 			guiUser.setUnreadMessages(messageDao.getUnreadCount(user.getUsername(), Message.TYPE_SYSTEM));
 			guiUser.setQuota(user.getQuota());
-			guiUser.setQuotaCount(seqDao.getCurrentValue("userquota", user.getId(), user.getTenantId()));
+			guiUser.setQuotaCount(SequenceDAO.get().getCurrentValue("userquota", user.getId(), user.getTenantId()));
 			guiUser.setCertDN(user.getCertDN());
 			guiUser.setCertExpire(user.getCertExpire());
 			guiUser.setSecondFactor(user.getSecondFactor());
@@ -385,11 +382,9 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
 
 		UserDAO userDao = UserDAO.get();
-		GroupDAO groupDao = Context.get(GroupDAO.class);
-
 		try {
 			User user = userDao.findById(userId, true);
-			user.addGroup(groupDao.findById(groupId));
+			user.addGroup(GroupDAO.get().findById(groupId));
 			userDao.store(user);
 			userDao.initialize(user);
 		} catch (PersistenceException e) {
@@ -402,7 +397,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
 
 		UserDAO userDao = UserDAO.get();
-		GroupDAO groupDao = Context.get(GroupDAO.class);
+		GroupDAO groupDao = GroupDAO.get();
 		try {
 			Group grp = groupDao.findById(groupId);
 			groupDao.initialize(grp);
@@ -440,9 +435,9 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		Session session = checkMenu(getThreadLocalRequest(), Menu.SECURITY);
 
 		validateSession();
-		GroupDAO groupDao = Context.get(GroupDAO.class);
+		
 		try {
-			Group group = groupDao.findById(groupId);
+			Group group = GroupDAO.get().findById(groupId);
 
 			if (group != null) {
 				GUIGroup grp = new GUIGroup();
@@ -464,7 +459,6 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		Session session = validateSession();
 
 		UserDAO userDao = UserDAO.get();
-		SequenceDAO seqDao = Context.get(SequenceDAO.class);
 
 		try {
 			User user = userDao.findById(userId);
@@ -534,10 +528,10 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 				guiUser.setGroups(grps);
 
 				guiUser.setQuota(user.getQuota());
-				guiUser.setQuotaCount(seqDao.getCurrentValue("userquota", user.getId(), user.getTenantId()));
+				guiUser.setQuotaCount(SequenceDAO.get().getCurrentValue("userquota", user.getId(), user.getTenantId()));
 				guiUser.setSessionsQuota(user.getSessionsQuota());
 				guiUser.setSessionsQuotaCount(SessionManager.get().countOpened(user.getUsername()));
-				
+
 				guiUser.setTenant(getTenant(user.getTenantId()));
 
 				ContextProperties config = Context.get().getProperties();
@@ -600,8 +594,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 		try {
 			UserDAO userDao = UserDAO.get();
-			GroupDAO groupDao = Context.get(GroupDAO.class);
-			Group group = groupDao.findById(groupId);
+			Group group = GroupDAO.get().findById(groupId);
 			for (long id : userIds) {
 				User user = userDao.findById(id, true);
 				user.removeGroup(group.getId());
@@ -617,7 +610,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		Session session = checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
 
 		try {
-			GroupDAO groupDao = Context.get(GroupDAO.class);
+			GroupDAO groupDao = GroupDAO.get();
 			Group grp;
 			if (group.getId() != 0) {
 				grp = groupDao.findById(group.getId());
@@ -774,11 +767,12 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 	private void setGroups(User user, GUIUser guiUser) throws PersistenceException {
 		UserDAO userDao = UserDAO.get();
-		GroupDAO groupDao = Context.get(GroupDAO.class);
+		GroupDAO groupDao = GroupDAO.get();
+
 		user.removeGroupMemberships(null);
 		for (Long groupId : guiUser.getGroups().stream().map(g -> g.getId()).toList())
 			user.addGroup(groupDao.findById(groupId));
-
+		
 		Group adminGroup = groupDao.findByName(ADMIN, user.getTenantId());
 		groupDao.initialize(adminGroup);
 
@@ -1162,7 +1156,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		if (!mdao.isReadAllowed(Menu.SECURITY, session.getUserId()))
 			throw new PermissionException(session.getUsername(), "Menu " + menu.getName(), Permission.READ);
 
-		GroupDAO gdao = Context.get(GroupDAO.class);
+		GroupDAO gdao = GroupDAO.get();
 		mdao.initialize(menu);
 
 		// Remove all current tenant rights
@@ -1333,7 +1327,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 
 		List<GUIAccessControlEntry> acl = new ArrayList<>();
 
-		GroupDAO gdao = Context.get(GroupDAO.class);
+		GroupDAO gdao = GroupDAO.get();
 		UserDAO udao = UserDAO.get();
 		for (AccessControlEntry mg : menu.getAccessControlList()) {
 			GUIAccessControlEntry ace = new GUIAccessControlEntry();
@@ -1403,7 +1397,6 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			return new ArrayList<>();
 
 		ContextProperties config = Context.get().getProperties();
-		SequenceDAO dao = Context.get(SequenceDAO.class);
 		List<Sequence> seqs = new ArrayList<>();
 		long max = config.getInt("throttle.username.max", 0);
 		Calendar cal = Calendar.getInstance();
@@ -1417,6 +1410,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		final String NAME_CONDITION = "_entity.name like '";
 		final String MORE_CONDITIONS = "%' and _entity.value >= :max and _entity.lastModified >= :oldestDate";
 
+		SequenceDAO dao = SequenceDAO.get();
 		try {
 			if (max > 0)
 				seqs.addAll(dao.findByWhere(NAME_CONDITION + LoginThrottle.LOGINFAIL_USERNAME + MORE_CONDITIONS, params,
@@ -1458,7 +1452,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		if (session.getTenantId() != Tenant.DEFAULT_ID)
 			return;
 
-		SequenceDAO dao = Context.get(SequenceDAO.class);
+		SequenceDAO dao = SequenceDAO.get();
 		try {
 			for (long id : ids) {
 				dao.delete(id);
@@ -1513,7 +1507,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	@Override
 	public void updateDeviceLabel(long deviceId, String label) throws ServerException {
 		Session session = validateSession();
-		DeviceDAO dDao = Context.get(DeviceDAO.class);
+		DeviceDAO dDao = DeviceDAO.get();
 		try {
 			Device device = dDao.findById(deviceId);
 			if (device != null) {
@@ -1533,9 +1527,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			Device device = session.getClient().getDevice();
 			if (label != null)
 				device.setLabel(label);
-			DeviceDAO dDao = Context.get(DeviceDAO.class);
 			try {
-				device = dDao.trustDevice(session.getUser(), device);
+				device = DeviceDAO.get().trustDevice(session.getUser(), device);
 			} catch (PersistenceException e) {
 				return throwServerException(session, log, e);
 			}
@@ -1553,8 +1546,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		if (StringUtils.isEmpty(session.getUser().getSecondFactor()))
 			return true;
 
-		DeviceDAO dDao = Context.get(DeviceDAO.class);
-		Device device = dDao.findByDeviceId(deviceId);
+		Device device = DeviceDAO.get().findByDeviceId(deviceId);
 		return device != null && device.getUserId() == session.getUserId() && device.getTrusted() == 1;
 
 	}
@@ -1562,7 +1554,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	@Override
 	public void deleteTrustedDevices(List<Long> ids) throws ServerException {
 		Session session = validateSession();
-		DeviceDAO dDao = Context.get(DeviceDAO.class);
+		DeviceDAO dDao = DeviceDAO.get();
 		for (Long id : ids)
 			try {
 				dDao.delete(id);
@@ -1735,8 +1727,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 			transaction.setComment(name + " (" + apiKey.getLabel() + ")");
 			transaction.setEvent(UserEvent.NEWAPIKEY);
 
-			UserHistoryDAO historyDao = Context.get(UserHistoryDAO.class);
-			historyDao.store(transaction);
+			UserHistoryDAO.get().store(transaction);
 
 			return apiKey.getDecodedKey();
 		} catch (PersistenceException e) {

@@ -65,7 +65,7 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
 		super.setUp();
 
 		userDAO = UserDAO.get();
-		groupDAO = Context.get(GroupDAO.class);
+		groupDAO = GroupDAO.get();
 	}
 
 	@Test
@@ -400,7 +400,7 @@ public class SecurityServiceImplTest extends AbstractWPTestCase {
 	public void testDeviceLabel() throws ServerException {
 		String deviceId = testSubject.trustDevice("myLabel");
 		assertTrue(testSubject.isTrustedDevice(deviceId));
-		DeviceDAO dDao = Context.get(DeviceDAO.class);
+		DeviceDAO dDao = DeviceDAO.get();
 		Device device = dDao.findByDeviceId(deviceId);
 		assertNotNull(device);
 		assertEquals("myLabel", device.getLabel());

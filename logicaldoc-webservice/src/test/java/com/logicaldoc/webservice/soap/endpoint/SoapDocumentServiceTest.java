@@ -36,7 +36,6 @@ import com.logicaldoc.core.security.authorization.UnexistingResourceException;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.security.PasswordGenerator;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSAccessControlEntry;
@@ -180,7 +179,7 @@ public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
 			MessagingException, PermissionException {
 		WSDocument wsDoc = createDocument();
 
-		DocumentHistoryDAO hDao = Context.get(DocumentHistoryDAO.class);
+		DocumentHistoryDAO hDao = DocumentHistoryDAO.get();
 		long sentCount = hDao.findByDocId(wsDoc.getId()).stream()
 				.filter(h -> DocumentEvent.SENT.toString().equals(h.getEvent())).count();
 		assertEquals(0L, sentCount);

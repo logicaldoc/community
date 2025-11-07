@@ -22,7 +22,6 @@ import com.logicaldoc.core.security.user.UserSource;
 import com.logicaldoc.core.security.user.WorkingTime;
 import com.logicaldoc.core.sequence.SequenceDAO;
 import com.logicaldoc.util.crypt.CryptUtil;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.util.time.DateUtil;
 import com.logicaldoc.webservice.doc.WSDoc;
 
@@ -507,7 +506,7 @@ public class WSUser {
 				user.setLegals(getLegals());
 
 			if (CollectionUtils.isNotEmpty(groupIds)) {
-				GroupDAO groupDao = Context.get(GroupDAO.class);
+				GroupDAO groupDao = GroupDAO.get();
 				Set<Group> groups = new HashSet<>();
 				for (long groupId : getGroupIds()) {
 					Group group = groupDao.findById(groupId);
@@ -594,7 +593,7 @@ public class WSUser {
 			wsUser.setWorkingTimes(tmp);
 
 			
-			wsUser.setQuotaCount(Context.get(SequenceDAO.class).getCurrentValue("userquota", user.getId(), user.getTenantId()));
+			wsUser.setQuotaCount(SequenceDAO.get().getCurrentValue("userquota", user.getId(), user.getTenantId()));
 			wsUser.setSessionsQuotaCount(SessionManager.get().countOpened(user.getUsername()));
 			
 		} catch (Exception e) {

@@ -11,7 +11,6 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.user.GroupDAO;
 import com.logicaldoc.core.security.user.GroupType;
 import com.logicaldoc.i18n.I18N;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -37,8 +36,7 @@ public class GroupsDataServlet extends AbstractDataServlet {
 				+ "from com.logicaldoc.core.security.user.Group A where A.deleted = 0 and A.type = "
 				+ GroupType.DEFAULT.ordinal() + " and A.tenantId=" + session.getTenantId());
 
-		GroupDAO dao = Context.get(GroupDAO.class);
-		List<?> records = dao.findByQuery(query.toString(), (Map<String, Object>) null, null);
+		List<?> records = GroupDAO.get().findByQuery(query.toString(), (Map<String, Object>) null, null);
 
 		/*
 		 * Iterate over records composing the response XML document

@@ -97,8 +97,7 @@ public class AbstractService {
 			user.setTenantId(Tenant.DEFAULT_ID);
 			user.setName("admin");
 			Set<Group> groups = new HashSet<>();
-			GroupDAO grpDao = Context.get(GroupDAO.class);
-			groups.add(grpDao.findById(1));
+			groups.add(GroupDAO.get().findById(1));
 			user.setGroups(groups);
 			return user;
 		}

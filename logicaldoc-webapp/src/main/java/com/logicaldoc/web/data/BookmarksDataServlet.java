@@ -13,7 +13,6 @@ import com.logicaldoc.core.document.BookmarkDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,7 +35,7 @@ public class BookmarksDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		List<Object> records = new ArrayList<>();
-		BookmarkDAO dao = Context.get(BookmarkDAO.class);
+		BookmarkDAO dao = BookmarkDAO.get();
 
 		/*
 		 * Search for documents first.

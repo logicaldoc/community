@@ -9,7 +9,6 @@ import java.util.Locale;
 import com.logicaldoc.core.security.Device;
 import com.logicaldoc.core.security.DeviceDAO;
 import com.logicaldoc.core.security.Session;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -86,12 +85,11 @@ public class DevicesDataServlet extends AbstractDataServlet {
 	}
 
 	private List<Device> getDevices(Session session, boolean trustedOnly) {
-		DeviceDAO dDao = Context.get(DeviceDAO.class);
 		List<Device> devices;
 		if (trustedOnly)
-			devices = dDao.findTrustedDevices(session.getUserId());
+			devices = DeviceDAO.get().findTrustedDevices(session.getUserId());
 		else
-			devices = dDao.findByUserId(session.getUserId());
+			devices = DeviceDAO.get().findByUserId(session.getUserId());
 		return devices;
 	}
 

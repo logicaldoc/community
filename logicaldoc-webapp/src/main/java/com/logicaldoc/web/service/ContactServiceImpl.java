@@ -23,7 +23,6 @@ import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.beans.GUIParseContactsParameters;
 import com.logicaldoc.gui.frontend.client.services.ContactService;
 import com.logicaldoc.util.csv.CSVFileReader;
-import com.logicaldoc.util.spring.Context;
 import com.logicaldoc.web.UploadServlet;
 
 /**
@@ -43,7 +42,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 		validateSession();
 
 		try {
-			ContactDAO dao = Context.get(ContactDAO.class);
+			ContactDAO dao = ContactDAO.get();
 			for (Long id : ids) {
 				dao.delete(id);
 			}
@@ -55,7 +54,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 	@Override
 	public void save(GUIContact contact) throws ServerException {
 		validateSession();
-		ContactDAO dao = Context.get(ContactDAO.class);
+		ContactDAO dao = ContactDAO.get();
 		try {
 			Contact cnt = dao.findById(contact.getId());
 			if (cnt == null)
@@ -80,8 +79,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 		Session session = validateSession();
 
 		try {
-			ContactDAO dao = Context.get(ContactDAO.class);
-			Contact contact = dao.findById(id);
+			Contact contact = ContactDAO.get().findById(id);
 			return fromContact(contact);
 		} catch (PersistenceException e) {
 			return throwServerException(session, log, e);
@@ -112,7 +110,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 		Map<String, File> uploadedFilesMap = UploadServlet.getUploads(session.getSid());
 		File file = uploadedFilesMap.values().iterator().next();
 
-		ContactDAO dao = Context.get(ContactDAO.class);
+		ContactDAO dao = ContactDAO.get();
 
 		List<GUIContact> contacts = new ArrayList<>();
 
@@ -174,7 +172,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 		validateSession();
 		try {
 			appendUserIdsFromGroups(groupIds, userIds);
-			ContactDAO dao = Context.get(ContactDAO.class);
+			ContactDAO dao = ContactDAO.get();
 			for (Long cId : contactIds) {
 				Contact originalContact = dao.findById(cId);
 				for (Long userId : userIds) {
@@ -193,9 +191,8 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 	}
 
 	private void storeContact(Contact contact) {
-		ContactDAO dao = Context.get(ContactDAO.class);
 		try {
-			dao.store(contact);
+			ContactDAO.get().store(contact);
 		} catch (PersistenceException e) {
 			log.warn("Cannot share contact {} with user {}", contact.getEmail(), contact.getUserId());
 		}

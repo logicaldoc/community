@@ -22,7 +22,6 @@ import com.logicaldoc.core.security.menu.Menu;
 import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.security.user.GroupType;
 import com.logicaldoc.core.security.user.UserDAO;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -296,7 +295,7 @@ public class AclDataServlet extends AbstractDataServlet {
 	}
 
 	private void noteACL(HttpServletResponse response, long noteId) throws IOException, PersistenceException {
-		DocumentNoteDAO noteDao = Context.get(DocumentNoteDAO.class);
+		DocumentNoteDAO noteDao = DocumentNoteDAO.get();
 		DocumentNote note = noteDao.findById(noteId);
 		noteDao.initialize(note);
 

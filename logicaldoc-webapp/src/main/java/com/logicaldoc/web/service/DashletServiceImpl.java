@@ -17,7 +17,6 @@ import com.logicaldoc.core.security.user.UserDAO;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.frontend.client.services.DashletService;
-import com.logicaldoc.util.spring.Context;
 
 /**
  * The dashlet service for the operations on the dashlets done through the GUI.
@@ -36,7 +35,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 		Session session = validateSession();
 		checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
 		try {
-			DashletDAO dao = Context.get(DashletDAO.class);
+			DashletDAO dao = DashletDAO.get();
 			Dashlet dashlet = dao.findByName(guiDashlet.getName(), session.getTenantId());
 			if (dashlet == null) {
 				dashlet = toDashlet(guiDashlet);
@@ -66,8 +65,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 	public List<GUIDashlet> loadDashlets() throws ServerException {
 		Session session = validateSession();
 		try {
-			DashletDAO dao = Context.get(DashletDAO.class);
-			List<Dashlet> dashlets = dao.findAll(session.getTenantId());
+			List<Dashlet> dashlets = DashletDAO.get().findAll(session.getTenantId());
 			ArrayList<GUIDashlet> guiDashlets = new ArrayList<>();
 			for (Dashlet dashlet : dashlets)
 				guiDashlets.add(fromDashlet(dashlet));
@@ -81,8 +79,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 	public GUIDashlet get(long dashletId) throws ServerException {
 		Session session = validateSession();
 		try {
-			DashletDAO dao = Context.get(DashletDAO.class);
-			Dashlet dashlet = dao.findById(dashletId);
+			Dashlet dashlet = DashletDAO.get().findById(dashletId);
 			if (dashlet == null)
 				throw new ServerException("Unexisting dashlet " + dashletId);
 			return fromDashlet(dashlet);
@@ -95,8 +92,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 	public GUIDashlet get(String name) throws ServerException {
 		Session session = validateSession();
 		try {
-			DashletDAO dao = Context.get(DashletDAO.class);
-			Dashlet dashlet = dao.findByName(name, session.getTenantId());
+			Dashlet dashlet = DashletDAO.get().findByName(name, session.getTenantId());
 			if (dashlet == null)
 				throw new ServerException("Unexisting dashlet " + name);
 			return fromDashlet(dashlet);
@@ -110,8 +106,7 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 		Session session = validateSession();
 		checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
 		try {
-			DashletDAO dao = Context.get(DashletDAO.class);
-			dao.delete(dashletId);
+			DashletDAO.get().delete(dashletId);
 		} catch (Exception e) {
 			throwServerException(session, log, e);
 		}
@@ -121,13 +116,11 @@ public class DashletServiceImpl extends AbstractRemoteService implements Dashlet
 	public void saveUserDashlets(List<GUIDashlet> dashlets) throws ServerException {
 		Session session = validateSession();
 		GenericDAO gDao = GenericDAO.get();
-		UserDAO uDao = UserDAO.get();
-
 		try {
 			/*
 			 * Delete the actual dashlets for this user
 			 */
-			Map<String, Generic> settings = uDao.findUserSettings(session.getUserId(), "dashlet");
+			Map<String, Generic> settings = UserDAO.get().findUserSettings(session.getUserId(), "dashlet");
 			for (Generic setting : settings.values())
 				gDao.delete(setting.getId());
 

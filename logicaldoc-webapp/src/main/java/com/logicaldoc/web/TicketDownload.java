@@ -70,8 +70,7 @@ public class TicketDownload extends HttpServlet {
 
 			String suffix = getSuffix(ticket, document, request);
 
-			TenantDAO tenantDao = Context.get(TenantDAO.class);
-			String tenantName = tenantDao.getTenantName(ticket.getTenantId());
+			String tenantName = TenantDAO.get().getTenantName(ticket.getTenantId());
 
 			String behavior = request.getParameter("behavior");
 			if (behavior == null)

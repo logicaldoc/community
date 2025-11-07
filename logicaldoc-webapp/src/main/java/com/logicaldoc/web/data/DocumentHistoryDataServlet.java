@@ -25,7 +25,6 @@ import com.logicaldoc.core.security.menu.MenuDAO;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.spring.Context;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,8 +49,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws IOException, PersistenceException {
 
-		MenuDAO mDao = MenuDAO.get();
-		boolean showSid = mDao.isReadAllowed(Menu.SESSIONS, session.getUserId());
+		boolean showSid = MenuDAO.get().isReadAllowed(Menu.SESSIONS, session.getUserId());
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
@@ -59,7 +57,7 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 		StringBuilder query = new StringBuilder(
 				"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color, A.fileVersion, A.fileSize, A.keyLabel, A.revision from DocumentHistory A where A.deleted = 0 ");
 		Map<String, Object> params = prepareQueryParams(request, query);
-		List<?> records = Context.get(DocumentHistoryDAO.class).findByQuery(query.toString(), params,
+		List<?> records = DocumentHistoryDAO.get().findByQuery(query.toString(), params,
 				max != null ? max : 100);
 
 		// Used only to cache the already encountered documents when the
