@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.conversion.FormatConverterManager;
+import com.logicaldoc.core.conversion.FormatConversionManager;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
@@ -623,14 +623,14 @@ public class DocTool {
 	/**
 	 * Converts a document in PDF format and saves it as ancillary resource of
 	 * the document with suffix
-	 * {@link FormatConverterManager#PDF_CONVERSION_SUFFIX}. If the conversion
+	 * {@link FormatConversionManager#PDF_CONVERSION_SUFFIX}. If the conversion
 	 * already exists, nothing will be done.
 	 * 
 	 * @param doc the document to convert
 	 */
 	public void convertPDF(Document doc) {
 		try {
-			FormatConverterManager.get().convertToPdf(doc, null);
+			FormatConversionManager.get().convertToPdf(doc, null);
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -653,7 +653,7 @@ public class DocTool {
 		transaction.setUser(user);
 
 		try {
-			return FormatConverterManager.get().convert(doc, null, format, transaction);
+			return FormatConversionManager.get().convert(doc, null, format, transaction);
 		} catch (IOException | PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return null;

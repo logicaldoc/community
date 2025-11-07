@@ -27,7 +27,7 @@ public class PstConverter extends AbstractFormatConverter {
 		if ("txt".equals(targetExtension)) {
 			FileUtil.writeFile(listing, dest.getAbsolutePath());
 		} else if ("pdf".equals(targetExtension)) {
-			FormatConverter converter = FormatConverterManager.get().getConverter("txt", targetExtension);
+			FormatConverter converter = FormatConversionManager.get().getConverter("txt", targetExtension);
 
 			if (converter == null)
 				throw new IOException(

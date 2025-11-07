@@ -22,7 +22,7 @@ import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.communication.Recipient;
-import com.logicaldoc.core.conversion.FormatConverterManager;
+import com.logicaldoc.core.conversion.FormatConversionManager;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentComparator;
 import com.logicaldoc.core.document.DocumentDAO;
@@ -319,7 +319,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		DocumentDAO docDao = DocumentDAO.get();
 		Document doc = docDao.findDocument(docId);
 
-		FormatConverterManager.get().convertToPdf(doc, fileVersion, sid);
+		FormatConversionManager.get().convertToPdf(doc, fileVersion, sid);
 	}
 
 	@Override

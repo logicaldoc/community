@@ -32,7 +32,7 @@ public class MarkdownConverter extends AbstractFormatConverter {
 
 			if (dest.getName().toLowerCase().endsWith(".pdf")) {
 				pdfTemp = FileUtil.createTempFile("mkconvert", ".pdf");
-				FormatConverterManager.get().convertFile(htmlTemp, "markdown.html", pdfTemp, "pdf", sid);
+				FormatConversionManager.get().convertFile(htmlTemp, "markdown.html", pdfTemp, "pdf", sid);
 				FileUtil.copyFile(pdfTemp, dest);
 			} else {
 				FileUtil.copyFile(htmlTemp, dest);

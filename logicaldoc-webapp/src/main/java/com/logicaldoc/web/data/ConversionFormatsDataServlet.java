@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 import java.util.Locale;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.conversion.FormatConverterManager;
+import com.logicaldoc.core.conversion.FormatConversionManager;
 import com.logicaldoc.core.security.Session;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,7 +33,7 @@ public class ConversionFormatsDataServlet extends AbstractDataServlet {
 		/*
 		 * Iterate over records composing the response XML document
 		 */
-		for (String format : FormatConverterManager.get().getEnabledOutputFormats(fileName)) {
+		for (String format : FormatConversionManager.get().getEnabledOutputFormats(fileName)) {
 			writer.print("<format>");
 			writer.print("<extension><![CDATA[" + format + "]]></extension>");
 			writer.print("</format>");

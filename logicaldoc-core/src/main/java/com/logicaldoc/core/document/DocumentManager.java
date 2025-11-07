@@ -30,7 +30,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.conversion.FormatConverterManager;
+import com.logicaldoc.core.conversion.FormatConversionManager;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderEvent;
@@ -2095,11 +2095,11 @@ public class DocumentManager {
 						&& !user.isMemberOf("publisher") && !document.isPublishing())
 					continue;
 
-				FormatConverterManager.get().convertToPdf(document, null);
+				FormatConversionManager.get().convertToPdf(document, null);
 
 				File pdf = new File(tempDir, nf.format(i) + ".pdf");
 
-				FormatConverterManager.get().writePdfToFile(document, null, pdf, null);
+				FormatConversionManager.get().writePdfToFile(document, null, pdf, null);
 			} catch (Exception t) {
 				log.error(t.getMessage(), t);
 			}

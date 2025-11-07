@@ -10,7 +10,7 @@ import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.conversion.FormatConverter;
-import com.logicaldoc.core.conversion.FormatConverterManager;
+import com.logicaldoc.core.conversion.FormatConversionManager;
 import com.logicaldoc.core.conversion.NotAvailableConverter;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Tenant;
@@ -61,7 +61,7 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 	}
 
 	private void printConverters(PrintWriter writer, String converterSpecification) {
-		FormatConverterManager manager = FormatConverterManager.get();
+		FormatConversionManager manager = FormatConversionManager.get();
 
 		// Get all the possible associations of a specific converter
 		for (String inExt : manager.getAvailableInputFormats()) {
@@ -93,10 +93,10 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 		Collection<FormatConverter> converters;
 		if (in.equals("-") && out.equals("-")) {
 			// Get all configured converters
-			converters = FormatConverterManager.get().getAllConverters();
+			converters = FormatConversionManager.get().getAllConverters();
 		} else {
 			// Get possible converters for a specific couple of formats
-			converters = FormatConverterManager.get().getAvailableConverters(in, out);
+			converters = FormatConversionManager.get().getAvailableConverters(in, out);
 		}
 
 		for (FormatConverter converter : converters) {
@@ -105,7 +105,7 @@ public class FormatConvertersDataServlet extends AbstractDataServlet {
 	}
 
 	private void writeConverters(PrintWriter writer, boolean parameters) {
-		FormatConverterManager manager = FormatConverterManager.get();
+		FormatConversionManager manager = FormatConversionManager.get();
 		// Get the full list of associations
 		for (String inExt : manager.getAvailableInputFormats()) {
 			for (String outExt : manager.getAllOutputFormats(inExt)) {

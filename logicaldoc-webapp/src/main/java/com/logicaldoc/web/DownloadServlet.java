@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.conversion.FormatConverterManager;
+import com.logicaldoc.core.conversion.FormatConversionManager;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.Version;
@@ -191,12 +191,12 @@ public class DownloadServlet extends HttpServlet {
 
 			// Generate the PDF conversion
 			try {
-				FormatConverterManager.get().convertToPdf(doc, fileVersion, session.getSid());
+				FormatConversionManager.get().convertToPdf(doc, fileVersion, session.getSid());
 			} catch (Exception e) {
 				log.error("Cannot convert to PDF the document {}", doc);
 			}
 
-			suffix = FormatConverterManager.PDF_CONVERSION_SUFFIX;
+			suffix = FormatConversionManager.PDF_CONVERSION_SUFFIX;
 		}
 		return suffix;
 	}

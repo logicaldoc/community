@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.conversion.FormatConverterManager;
+import com.logicaldoc.core.conversion.FormatConversionManager;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
@@ -279,12 +279,12 @@ public class ZipExport {
 
 		if (pdfConversion && !"pdf".equals(FileUtil.getExtension(document.getFileName().toLowerCase()))) {
 			try {
-				FormatConverterManager.get().convertToPdf(document, null);
+				FormatConversionManager.get().convertToPdf(document, null);
 			} catch (IOException e) {
 				log.warn(e.getMessage(), e);
 				return;
 			}
-			resource = store.getResourceName(document, null, FormatConverterManager.PDF_CONVERSION_SUFFIX);
+			resource = store.getResourceName(document, null, FormatConversionManager.PDF_CONVERSION_SUFFIX);
 		}
 
 		try (BufferedInputStream bis = new BufferedInputStream(store.getStream(document.getId(), resource))) {

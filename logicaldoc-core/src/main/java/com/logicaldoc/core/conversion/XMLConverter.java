@@ -143,7 +143,7 @@ public class XMLConverter extends AbstractFormatConverter {
 						removeMetaTags(transformedFile);
 					}
 
-					FormatConverter converter = FormatConverterManager.get().getConverter(xsltOutFormat, destExt);
+					FormatConverter converter = FormatConversionManager.get().getConverter(xsltOutFormat, destExt);
 					if (converter == null)
 						throw new IOException(
 								String.format("Unable to find a converter from %s to %s", xsltOutFormat, destExt));
@@ -171,7 +171,7 @@ public class XMLConverter extends AbstractFormatConverter {
 	}
 
 	private void convertFromTxt(String sid, Document document, File dest, String destExt, File xml) throws IOException {
-		FormatConverter converter = FormatConverterManager.get().getConverter("txt", destExt);
+		FormatConverter converter = FormatConversionManager.get().getConverter("txt", destExt);
 		if (converter == null)
 			throw new IOException(String.format("Unable to find a converter from txt to %s", destExt));
 		converter.convert(sid, document, xml, dest);

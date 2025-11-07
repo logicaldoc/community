@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.conversion.FormatConverterManager;
+import com.logicaldoc.core.conversion.FormatConversionManager;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentDAO;
 import com.logicaldoc.core.document.DocumentEvent;
@@ -185,7 +185,7 @@ public class TicketDownload extends HttpServlet {
 		if ("pdf".equals(suffix))
 			suffix = "conversion.pdf";
 		if ("conversion.pdf".equals(suffix)) {
-			FormatConverterManager.get().convertToPdf(document, null);
+			FormatConversionManager.get().convertToPdf(document, null);
 			if ("pdf".equalsIgnoreCase(FileUtil.getExtension(document.getFileName())))
 				suffix = null;
 		}

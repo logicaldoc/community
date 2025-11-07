@@ -30,7 +30,7 @@ public class P7MConverter extends AbstractFormatConverter {
 			p7m.read();
 			p7m.extractOriginalFile(tmp);
 
-			FormatConverter converter = FormatConverterManager.get().getConverter(enclosedExtension, targetExtension);
+			FormatConverter converter = FormatConversionManager.get().getConverter(enclosedExtension, targetExtension);
 			if (converter == null)
 				throw new IOException(
 						String.format("Unable to find a converter from %s to %s", enclosedExtension, targetExtension));

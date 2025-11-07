@@ -41,23 +41,22 @@ import jakarta.annotation.Resource;
 /**
  * Manager class used to handle format converters. For each couple
  * inFormat-outFormat you may have different possible converters, they are taken
- * by the <b>FormatConverter</b> extension point. The actual converter uses is
+ * by the {@link FormatConverter} extension point. The actual converter uses is
  * the one pointed by the context property names converter.inExt-outExt.
- * 
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.1.3
  */
-@Component("formatConverterManager")
-public class FormatConverterManager {
+@Component("formatConversionManager")
+public class FormatConversionManager {
 
 	/**
 	 * Gets the object available in the application context
 	 * 
 	 * @return the instance of this object in the application context
 	 */
-	public static FormatConverterManager get() {
-		return Context.get(FormatConverterManager.class);
+	public static FormatConversionManager get() {
+		return Context.get(FormatConversionManager.class);
 	}
 
 	/*
@@ -65,7 +64,7 @@ public class FormatConverterManager {
 	 */
 	public static final String PDF_CONVERSION_SUFFIX = "conversion.pdf";
 
-	private static final Logger log = LoggerFactory.getLogger(FormatConverterManager.class);
+	private static final Logger log = LoggerFactory.getLogger(FormatConversionManager.class);
 
 	@Resource(name = "Store")
 	protected Store store;

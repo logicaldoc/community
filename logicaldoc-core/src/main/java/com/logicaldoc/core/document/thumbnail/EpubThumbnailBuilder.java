@@ -10,7 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import com.github.mertakdut.NavPoint;
 import com.github.mertakdut.Reader;
 import com.logicaldoc.core.conversion.FormatConverter;
-import com.logicaldoc.core.conversion.FormatConverterManager;
+import com.logicaldoc.core.conversion.FormatConversionManager;
 import com.logicaldoc.core.conversion.NotAvailableConverter;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.io.FileUtil;
@@ -54,7 +54,7 @@ public class EpubThumbnailBuilder extends ImageThumbnailBuilder {
 				 */
 				ThumbnailBuilder pdfBuilder = Context.get(ThumbnailManager.class).getBuilder("pdf");
 
-				FormatConverter pdfConverter = FormatConverterManager.get().getConverter("epub",
+				FormatConverter pdfConverter = FormatConversionManager.get().getConverter("epub",
 						"pdf");
 
 				if (pdfBuilder != null && pdfConverter != null && !(pdfConverter instanceof NotAvailableConverter)) {
@@ -78,7 +78,7 @@ public class EpubThumbnailBuilder extends ImageThumbnailBuilder {
 
 					File pdf = FileUtil.createTempFile(EBOOKCOVER, ".pdf");
 					try {
-						pdfConverter = FormatConverterManager.get().getConverter("txt", "pdf");
+						pdfConverter = FormatConversionManager.get().getConverter("txt", "pdf");
 						pdfConverter.convert(tmp, pdf);
 
 						if (pdfBuilder != null)

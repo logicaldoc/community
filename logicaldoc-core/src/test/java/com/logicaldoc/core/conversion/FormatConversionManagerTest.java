@@ -31,19 +31,19 @@ import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.util.spring.Context;
 
 /**
- * Test case for {@link FormatConverterManager}
+ * Test case for {@link FormatConversionManager}
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 9.2
  */
-public class FormatConverterManagerTest extends AbstractCoreTestCase {
+public class FormatConversionManagerTest extends AbstractCoreTestCase {
 
 	private DocumentDAO docDao;
 
 	private Store store;
 
 	// Instance under test
-	private FormatConverterManager testSubject;
+	private FormatConversionManager testSubject;
 
 	private Document document;
 
@@ -63,7 +63,7 @@ public class FormatConverterManagerTest extends AbstractCoreTestCase {
 
 		store = Context.get(Store.class);
 
-		testSubject = FormatConverterManager.get();
+		testSubject = FormatConversionManager.get();
 
 		FolderDAO folderDao = FolderDAO.get();
 
@@ -118,7 +118,7 @@ public class FormatConverterManagerTest extends AbstractCoreTestCase {
 		long docId = document.getId();
 
 		String pdfResource = store.getResourceName(docId, document.getFileVersion(),
-				FormatConverterManager.PDF_CONVERSION_SUFFIX);
+				FormatConversionManager.PDF_CONVERSION_SUFFIX);
 		store.delete(docId, pdfResource);
 		assertFalse(store.exists(docId, pdfResource));
 
@@ -136,7 +136,7 @@ public class FormatConverterManagerTest extends AbstractCoreTestCase {
 
 		// Remove the conversion and invoke getPdfContent
 		String pdfResource = store.getResourceName(document.getId(), document.getFileVersion(),
-				FormatConverterManager.PDF_CONVERSION_SUFFIX);
+				FormatConversionManager.PDF_CONVERSION_SUFFIX);
 		store.delete(document.getId(), pdfResource);
 		assertTrue(testSubject.getPdfContent(document, document.getFileVersion(), session.getSid()).length > 0);
 
@@ -160,7 +160,7 @@ public class FormatConverterManagerTest extends AbstractCoreTestCase {
 
 			// Remove the conversion and invoke getPdfContent
 			String pdfResource = store.getResourceName(document.getId(), document.getFileVersion(),
-					FormatConverterManager.PDF_CONVERSION_SUFFIX);
+					FormatConversionManager.PDF_CONVERSION_SUFFIX);
 			store.delete(document.getId(), pdfResource);
 			testSubject.writePdfToFile(document, document.getFileVersion(), file, session.getSid());
 			assertTrue(file.length() > 0);

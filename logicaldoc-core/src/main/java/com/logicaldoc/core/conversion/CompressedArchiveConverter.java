@@ -32,7 +32,7 @@ public abstract class CompressedArchiveConverter extends AbstractFormatConverter
 			if ("txt".equals(targetExtension)) {
 				FileUtil.copyFile(tempFile, dest);
 			} else if ("pdf".equals(targetExtension)) {
-				FormatConverter converter = FormatConverterManager.get().getConverter("txt", targetExtension);
+				FormatConverter converter = FormatConversionManager.get().getConverter("txt", targetExtension);
 
 				if (converter == null)
 					throw new IOException(
@@ -61,7 +61,7 @@ public abstract class CompressedArchiveConverter extends AbstractFormatConverter
 		try {
 			extractEntry(src, entry, uncompressedEntryFile);
 
-			FormatConverter converter = FormatConverterManager.get().getConverter(entryExtension, targetExtension);
+			FormatConverter converter = FormatConversionManager.get().getConverter(entryExtension, targetExtension);
 
 			if (converter == null)
 				throw new IOException(

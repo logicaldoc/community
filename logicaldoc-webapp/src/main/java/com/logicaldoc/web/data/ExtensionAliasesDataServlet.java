@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.conversion.FormatConverterManager;
+import com.logicaldoc.core.conversion.FormatConversionManager;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.spring.Context;
@@ -28,10 +28,10 @@ public class ExtensionAliasesDataServlet extends AbstractDataServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max, Locale locale)
-			throws PersistenceException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
+			Locale locale) throws PersistenceException, IOException {
 
-		FormatConverterManager.get().getConverters();
+		FormatConversionManager.get().getConverters();
 
 		ContextProperties config = Context.get().getProperties();
 
@@ -41,7 +41,7 @@ public class ExtensionAliasesDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		// Get all the possible associations of a specific converter
-		for (String targetExt : manager.getAvailableInputFormats()) {
+		for (String targetExt : FormatConversionManager.get().getAvailableInputFormats()) {
 			writer.print("<alias>");
 			writer.print("<extension><![CDATA[" + targetExt + "]]></extension>");
 

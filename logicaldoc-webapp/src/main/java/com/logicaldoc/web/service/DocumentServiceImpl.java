@@ -54,7 +54,7 @@ import com.logicaldoc.core.communication.SystemMessage;
 import com.logicaldoc.core.communication.SystemMessageDAO;
 import com.logicaldoc.core.contact.Contact;
 import com.logicaldoc.core.contact.ContactDAO;
-import com.logicaldoc.core.conversion.FormatConverterManager;
+import com.logicaldoc.core.conversion.FormatConversionManager;
 import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.BookmarkDAO;
 import com.logicaldoc.core.document.Document;
@@ -1706,7 +1706,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 		if (convertToPdf) {
 			if (!"pdf".equals(FileUtil.getExtension(doc.getFileName().toLowerCase()))) {
-				FormatConverterManager.get().convertToPdf(doc, sid);
+				FormatConversionManager.get().convertToPdf(doc, sid);
 				resource = store.getResourceName(doc, null, "conversion.pdf");
 			}
 			att.setMimeType(MimeType.get("pdf"));
@@ -2679,7 +2679,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSession(session);
 
-			Document conversion = FormatConverterManager.get().convert(doc, fileVersion, format, transaction);
+			Document conversion = FormatConversionManager.get().convert(doc, fileVersion, format, transaction);
 			if (conversion == null)
 				throw new ServerException("Unable to convert");
 			return getById(conversion.getId());

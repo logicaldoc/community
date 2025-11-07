@@ -5,7 +5,7 @@ import java.io.InputStream;
 
 import org.apache.commons.io.FileUtils;
 
-import com.logicaldoc.core.conversion.FormatConverterManager;
+import com.logicaldoc.core.conversion.FormatConversionManager;
 import com.logicaldoc.core.store.Store;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.spring.Context;
@@ -31,14 +31,14 @@ public class CatchAllParser extends AbstractParser {
 	 */
 	private void parse2(ParseParameters parameters, StringBuilder content) {
 		try {
-			FormatConverterManager.get().convertToPdf(parameters.getDocument(), parameters.getFileVersion(), null);
+			FormatConversionManager.get().convertToPdf(parameters.getDocument(), parameters.getFileVersion(), null);
 
 			Store store = Context.get(Store.class);
 			String pdfResource = store
 					.getResourceName(parameters.getDocument(),
 							parameters.getFileVersion() != null ? parameters.getFileVersion()
 									: parameters.getDocument().getFileVersion(),
-							FormatConverterManager.PDF_CONVERSION_SUFFIX);
+							FormatConversionManager.PDF_CONVERSION_SUFFIX);
 			if (store.exists(parameters.getDocument().getId(), pdfResource)) {
 				Parser parser = ParserFactory.getParser("pdf");
 				content.append(parser.parse(store.getStream(parameters.getDocument().getId(), pdfResource),
@@ -65,7 +65,7 @@ public class CatchAllParser extends AbstractParser {
 			// Copy the input stream into a temporary file and convert into PDF
 			FileUtils.copyInputStreamToFile(input, inputFile);
 			if (inputFile.exists() && inputFile.length() > 0) {
-				FormatConverterManager.get().convertFile(inputFile, parameters.getFileName(), outputPdf, "pdf", null);
+				FormatConversionManager.get().convertFile(inputFile, parameters.getFileName(), outputPdf, "pdf", null);
 				if (outputPdf.exists() && outputPdf.length() > 0) {
 					Parser parser = ParserFactory.getParser("pdf");
 					content.append(parser.parse(outputPdf, "output.pdf", parameters.getEncoding(),
