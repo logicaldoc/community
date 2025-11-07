@@ -1758,8 +1758,7 @@ public class DocumentManager {
 		}
 
 		// Remove all corresponding hits from the index
-		SearchEngine engine = Context.get(SearchEngine.class);
-		engine.deleteHits(idsList);
+		SearchEngine.get().deleteHits(idsList);
 
 		log.info("Archived documents {}", idsList);
 	}

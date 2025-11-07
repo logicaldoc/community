@@ -1003,8 +1003,7 @@ public class DocTool {
 		String text = null;
 
 		if (document.getIndexed() == IndexingStatus.INDEXED) {
-			SearchEngine indexer = Context.get(SearchEngine.class);
-			Hit hit = indexer.getHit(document.getId());
+			Hit hit = SearchEngine.get().getHit(document.getId());
 			if (hit != null)
 				text = hit.getContent();
 		}

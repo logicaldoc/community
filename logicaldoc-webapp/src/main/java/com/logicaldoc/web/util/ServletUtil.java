@@ -668,9 +668,7 @@ public class ServletUtil {
 		if (!user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher") && !doc.isPublishing())
 			throw new FileNotFoundException("Document not published");
 
-		SearchEngine indexer = Context.get(SearchEngine.class);
-
-		String content = indexer.getHit(docId).getContent();
+		String content = SearchEngine.get().getHit(docId).getContent();
 		if (content == null)
 			content = "";
 

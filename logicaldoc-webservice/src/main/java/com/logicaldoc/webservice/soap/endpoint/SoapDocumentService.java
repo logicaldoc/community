@@ -950,8 +950,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	public String getExtractedText(String sid, long docId)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		validateSession(sid);
-		SearchEngine indexer = Context.get(SearchEngine.class);
-		return indexer.getHit(docId).getContent();
+		return SearchEngine.get().getHit(docId).getContent();
 	}
 
 	@Override

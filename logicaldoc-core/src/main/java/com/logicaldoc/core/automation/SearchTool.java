@@ -93,8 +93,7 @@ public class SearchTool {
 	public List<Hit> search(long tenantId, String expression, Set<String> filters, String expressionLanguage) {
 		filters.add(HitField.TENANT_ID.getName() + ":" + tenantId);
 
-		SearchEngine engine = Context.get(SearchEngine.class);
-		Hits result = engine.search(expression, filters, expressionLanguage, null);
+		Hits result = SearchEngine.get().search(expression, filters, expressionLanguage, null);
 
 		Map<Long, Hit> hitsMap = new HashMap<>();
 		while (result.hasNext()) {

@@ -124,7 +124,6 @@ public class FulltextSearch extends Search {
 	@Override
 	public void internalSearch() throws SearchException {
 		FulltextSearchOptions opt = (FulltextSearchOptions) options;
-		SearchEngine engine = Context.get(SearchEngine.class);
 
 		setDefaultFields(opt);
 
@@ -152,7 +151,7 @@ public class FulltextSearch extends Search {
 		 * Launch the search
 		 */
 		log.debug("Full-text seach: {}   filters: {}", query, filters);
-		Hits results = engine.search(query.toString(), filters, opt.getExpressionLanguage(), null);
+		Hits results = SearchEngine.get().search(query.toString(), filters, opt.getExpressionLanguage(), null);
 		log.debug("End of Full-text search");
 		log.debug("Fulltext hits count: {}", (results != null ? results.getCount() : 0));
 		

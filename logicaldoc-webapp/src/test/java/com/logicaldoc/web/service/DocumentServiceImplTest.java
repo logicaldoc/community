@@ -119,7 +119,7 @@ public class DocumentServiceImplTest extends AbstractWPTestCase {
 		folderDao = FolderDAO.get();
 		store = Context.get(Store.class);
 
-		searchEngine = Context.get(SearchEngine.class);
+		searchEngine = SearchEngine.get();
 
 		prepareRepository();
 

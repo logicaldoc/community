@@ -141,7 +141,7 @@ public class SetupServiceImpl extends AbstractRemoteService implements SetupServ
 
 		ContextProperties conf = Context.get().getProperties();
 
-		SearchEngine indexer = Context.get(SearchEngine.class);
+		SearchEngine indexer = SearchEngine.get();
 		indexer.close();
 		indexer.init();
 

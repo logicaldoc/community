@@ -30,7 +30,7 @@ public class FulltextSearchTest extends AbstractCoreTestCase {
 	@Before
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
-		testSubject = Context.get(SearchEngine.class);
+		testSubject = SearchEngine.get();
 		documentDao = DocumentDAO.get();
 		try {
 			addHits();

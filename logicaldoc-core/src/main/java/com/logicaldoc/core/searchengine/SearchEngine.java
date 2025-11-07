@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.util.spring.Context;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -18,6 +19,15 @@ import jakarta.annotation.PreDestroy;
  * @since 6.5
  */
 public interface SearchEngine {
+
+	/**
+	 * Gets the object loaded in the execution context
+	 * 
+	 * @return the instance of this object in the execution context
+	 */
+	public static SearchEngine get() {
+		return Context.get(SearchEngine.class);
+	}
 
 	/**
 	 * Adds a new Hit into the index

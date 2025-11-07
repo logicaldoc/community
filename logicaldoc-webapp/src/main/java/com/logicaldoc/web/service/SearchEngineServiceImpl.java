@@ -59,7 +59,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		try {
 			GUISearchEngine searchEngine = new GUISearchEngine();
 
-			SearchEngine indexer = Context.get(SearchEngine.class);
+			SearchEngine indexer = SearchEngine.get();
 			searchEngine.setLocked(indexer.isLocked());
 
 			ContextProperties conf = Context.get().getProperties();
@@ -104,7 +104,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 		if (dropIndex)
 			try {
-				Context.get(SearchEngine.class).dropIndex();
+				SearchEngine.get().dropIndex();
 			} catch (Exception e) {
 				throw new ServerException(e.getMessage(), e);
 			}
@@ -126,8 +126,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		Session session = validateSession();
 
 		try {
-			SearchEngine indexer = Context.get(SearchEngine.class);
-			indexer.unlock();
+			SearchEngine.get().unlock();
 		} catch (Exception t) {
 			throwServerException(session, log, t);
 		}
@@ -138,8 +137,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 		Session session = validateSession();
 
 		try {
-			SearchEngine indexer = Context.get(SearchEngine.class);
-			return indexer.check();
+			return SearchEngine.get().check();
 		} catch (Exception t) {
 			return throwServerException(session, log, t);
 		}
@@ -220,8 +218,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 	public long countEntries() throws ServerException {
 		Session session = validateSession();
 		try {
-			SearchEngine indexer = Context.get(SearchEngine.class);
-			return indexer.getCount();
+			return SearchEngine.get().getCount();
 		} catch (Exception t) {
 			return throwServerException(session, log, t);
 		}
@@ -273,8 +270,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 		try {
 			executeLongRunningOperation("Purge Index", () -> {
-				SearchEngine indexer = Context.get(SearchEngine.class);
-				indexer.purge();
+				SearchEngine.get().purge();
 				return null;
 			}, session);
 		} catch (Exception t) {
@@ -288,9 +284,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 
 		try {
 			Callable<Void> callable = () -> {
-				SearchEngine indexer = Context.get(SearchEngine.class);
-
-				indexer.deleteHits(entryIds);
+				SearchEngine.get().deleteHits(entryIds);
 				log.info("Removed {} entries from the index", entryIds.size());
 
 				DocumentDAO dao = DocumentDAO.get();
@@ -339,8 +333,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 	public GUIResult query(String query, int page, int size) throws ServerException {
 		Session session = validateSession();
 		try {
-			SearchEngine indexer = Context.get(SearchEngine.class);
-			Hits hits = indexer.query(query, page, size);
+			Hits hits = SearchEngine.get().query(query, page, size);
 
 			GUIResult result = new GUIResult();
 			result.setEstimatedHits(hits.getEstimatedCount());

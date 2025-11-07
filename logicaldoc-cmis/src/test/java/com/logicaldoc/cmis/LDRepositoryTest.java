@@ -95,7 +95,7 @@ public class LDRepositoryTest extends AbstractCmisTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		engine = Context.get(SearchEngine.class);
+		engine = SearchEngine.get();
 		fdao = FolderDAO.get();
 		ddao = DocumentDAO.get();
 

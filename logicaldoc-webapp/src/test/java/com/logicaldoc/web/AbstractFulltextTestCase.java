@@ -14,7 +14,6 @@ import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.searchengine.saved.SearchDAO;
 import com.logicaldoc.util.plugin.PluginException;
-import com.logicaldoc.util.spring.Context;
 
 public abstract class AbstractFulltextTestCase extends AbstractWPTestCase {
 
@@ -30,7 +29,7 @@ public abstract class AbstractFulltextTestCase extends AbstractWPTestCase {
 	public void setUp() throws IOException, SQLException, PluginException {
 		super.setUp();
 
-		engine = Context.get(SearchEngine.class);
+		engine = SearchEngine.get();
 		searchDao = SearchDAO.get();
 		try {
 			addHits();
