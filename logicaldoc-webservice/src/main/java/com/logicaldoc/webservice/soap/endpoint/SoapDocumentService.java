@@ -125,8 +125,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		transaction.setComment(document.getComment());
 		transaction.setUser(user);
 
-		DocumentManager documentManager = Context.get(DocumentManager.class);
-		doc = documentManager.create(content, doc, transaction).getDocument();
+		doc = DocumentManager.get().create(content, doc, transaction).getDocument();
 		return WSUtil.toWSDocument(doc);
 	}
 
@@ -184,8 +183,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			/*
 			 * checkin the document; throws an exception if something goes wrong
 			 */
-			DocumentManager documentManager = Context.get(DocumentManager.class);
-			documentManager.checkin(document.getId(), content, filename, release, doc, transaction);
+			DocumentManager.get().checkin(document.getId(), content, filename, release, doc, transaction);
 
 			/* create positive log message */
 			log.info("Document {} checked in", document.getId());
@@ -223,8 +221,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		transaction.setComment("");
 		transaction.setUser(user);
 
-		DocumentManager documentManager = Context.get(DocumentManager.class);
-		documentManager.checkout(doc, transaction);
+		DocumentManager.get().checkout(doc, transaction);
 	}
 
 	@Override
@@ -432,8 +429,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		transaction.setComment("");
 		transaction.setUser(user);
 
-		DocumentManager documentManager = Context.get(DocumentManager.class);
-		documentManager.lock(doc.getId(), DocumentStatus.LOCKED, transaction);
+		DocumentManager.get().lock(doc.getId(), DocumentStatus.LOCKED, transaction);
 	}
 
 	@Override
@@ -465,8 +461,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		transaction.setComment("");
 		transaction.setUser(user);
 
-		DocumentManager documentManager = Context.get(DocumentManager.class);
-		documentManager.moveToFolder(doc, folder, transaction);
+		DocumentManager.get().moveToFolder(doc, folder, transaction);
 	}
 
 	@Override
@@ -495,8 +490,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		Folder folder = fdao.findFolder(folderId);
 
-		DocumentManager documentManager = Context.get(DocumentManager.class);
-		Document createdDoc = documentManager.copyToFolder(doc, folder, transaction, links, notes, security)
+		Document createdDoc = DocumentManager.get().copyToFolder(doc, folder, transaction, links, notes, security)
 				.getDocument();
 		return getDoc(createdDoc.getId());
 	}
@@ -510,12 +504,10 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		checkFolderPermission(Permission.RENAME, user, doc.getFolder().getId());
 		checkPublished(user, doc);
 
-		DocumentManager manager = Context.get(DocumentManager.class);
-
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
 		transaction.setUser(user);
-		manager.rename(docId, name, transaction);
+		DocumentManager.get().rename(docId, name, transaction);
 	}
 
 	@Override
@@ -549,8 +541,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		transaction.setComment("");
 		transaction.setUser(user);
 
-		DocumentManager documentManager = Context.get(DocumentManager.class);
-		documentManager.unlock(docId, transaction);
+		DocumentManager.get().unlock(docId, transaction);
 	}
 
 	@Override
@@ -576,8 +567,6 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		doc.setCustomId(document.getCustomId());
 
-		DocumentManager manager = Context.get(DocumentManager.class);
-
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
@@ -585,7 +574,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		transaction.setComment(document.getComment());
 		transaction.setUser(user);
 
-		manager.update(doc, WSUtil.toDocument(document), transaction);
+		DocumentManager.get().update(doc, WSUtil.toDocument(document), transaction);
 
 		// If the folder is different, handle the move
 		if (!document.getFolderId().equals(originalFolderId))
@@ -825,9 +814,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		transaction.setComment("");
 		transaction.setUser(user);
 
-		DocumentManager documentManager = Context.get(DocumentManager.class);
-
-		Document doc = documentManager.createAlias(originalDoc, folder, type, transaction);
+		Document doc = DocumentManager.get().createAlias(originalDoc, folder, type, transaction);
 
 		checkPublished(user, doc);
 
@@ -838,12 +825,11 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	public void reindex(String sid, long docId, String content)
 			throws ParsingException, AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
-		DocumentManager documentManager = Context.get(DocumentManager.class);
 
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
 		transaction.setUser(user);
-		documentManager.index(docId, content, transaction);
+		DocumentManager.get().index(docId, content, transaction);
 	}
 
 	@Override
@@ -1166,7 +1152,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	public String deleteVersion(String sid, long docId, String version)
 			throws AuthenticationException, WebserviceException, PersistenceException {
 		validateSession(sid);
-		
+
 		Version ver = VersionDAO.get().findByVersion(docId, version);
 
 		// Create the document history event
@@ -1278,8 +1264,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		transaction.setUser(user);
 		transaction.setSession(SessionManager.get().get(sid));
 
-		DocumentManager manager = Context.get(DocumentManager.class);
-		manager.promoteVersion(doc.getId(), version, transaction);
+		DocumentManager.get().promoteVersion(doc.getId(), version, transaction);
 
 		log.info("Promoted version {} of document {}", version, doc);
 	}

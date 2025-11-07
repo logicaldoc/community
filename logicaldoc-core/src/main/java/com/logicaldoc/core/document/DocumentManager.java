@@ -2063,8 +2063,7 @@ public class DocumentManager {
 			FolderDAO folderDao = FolderDAO.get();
 			docVO.setFolder(folderDao.findById(targetFolderId));
 
-			DocumentManager manager = Context.get(DocumentManager.class);
-			return manager.create(bigPdf, docVO, transaction);
+			return create(bigPdf, docVO, transaction);
 		} finally {
 			FileUtil.delete(bigPdf);
 			FileUtil.delete(tempDir);

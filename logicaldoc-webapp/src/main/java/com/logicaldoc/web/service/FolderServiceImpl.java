@@ -815,7 +815,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	}
 
 	private void cut(Session session, List<Long> docIds, long folderId) throws ServerException {
-		DocumentManager docManager = Context.get(DocumentManager.class);
+		DocumentManager docManager = DocumentManager.get();
 		FolderDAO folderDao = FolderDAO.get();
 		DocumentDAO docDao = DocumentDAO.get();
 
@@ -871,7 +871,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 	private void copy(Session session, List<Long> docIds, long folderId, boolean links, boolean notes, boolean security)
 			throws ServerException {
 		FolderDAO folderDao = FolderDAO.get();
-		DocumentManager docManager = Context.get(DocumentManager.class);
+		DocumentManager docManager = DocumentManager.get();
 		DocumentDAO docDao = DocumentDAO.get();
 
 		try {
@@ -904,7 +904,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		Session session = validateSession();
 
 		FolderDAO folderDao = FolderDAO.get();
-		DocumentManager docManager = Context.get(DocumentManager.class);
+		DocumentManager docManager = DocumentManager.get();
 		DocumentDAO docDao = DocumentDAO.get();
 		try {
 			Folder selectedFolderFolder = folderDao.findFolder(folderId);
